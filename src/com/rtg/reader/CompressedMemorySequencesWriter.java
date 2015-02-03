@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.zip.CRC32;
 
 import com.rtg.mode.SequenceType;
+import com.rtg.util.bytecompression.CompressedByteArray;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.array.ExtensibleIndex;
 import com.rtg.util.array.longindex.LongCreate;
@@ -90,7 +91,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
     setSdfId(new SdfId(0)); //we don't know the provenance of the reads
     final int range = type.numberKnownCodes() + type.firstValid();
     mOriginPath = originPath;
-    mSeqData = new BitwiseByteArray(range);
+    mSeqData = new BitwiseByteArray(CompressedByteArray.minBits(range));
     mSeqChecksums = new MultiByteArray(0, 20);
     mChecksumSeq = new CRC32();
     mWriteFullNames = suffixes != null;

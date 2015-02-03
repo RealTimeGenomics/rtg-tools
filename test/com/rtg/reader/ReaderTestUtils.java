@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -284,6 +285,17 @@ public final class ReaderTestUtils {
     sequenceWriter.processSequences();
 
     return SequencesReaderFactory.createDefaultSequencesReader(dir);
+  }
+
+  /**
+   * @param sequence fasta sequence
+   * @return sequences reader for given sequence
+   * @throws IOException if data is invalid
+   */
+  public static SequencesReader getReaderProteinMemory(String sequence) throws IOException {
+    final SequencesWriter sw = new SequencesWriter(new FastaSequenceDataSource(Collections.singletonList((InputStream) new ByteArrayInputStream(sequence.getBytes())), new ProteinFastaSymbolTable()), null, PrereadType.UNKNOWN, true);
+    sw.setSdfId(DUMMY_TEST_ID);
+    return sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
   }
 
   /**
