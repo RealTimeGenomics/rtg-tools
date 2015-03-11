@@ -66,7 +66,7 @@ public class SamClosedFileReaderTest extends TestCase {
     final SamReader normalReader = SamUtils.makeSamReader(bam);
     final Iterator<SAMRecord> norm = normalReader.iterator();
     try {
-      try (final RecordIterator<SAMRecord> closed = new SamClosedFileReader(bam, null, normalReader.getFileHeader())) {
+      try (final RecordIterator<SAMRecord> closed = new SamClosedFileReader(bam, null, null, normalReader.getFileHeader())) {
         while (norm.hasNext() && closed.hasNext()) {
           final SAMRecord a = norm.next();
           final SAMRecord b = closed.next();
@@ -96,7 +96,7 @@ public class SamClosedFileReaderTest extends TestCase {
       final SamRegionRestriction rr = new SamRegionRestriction("simulatedSequence2", 10000, 20000);
       final Iterator<SAMRecord> norm = normalReader.query(rr.getSequenceName(), rr.getStart() + 1, rr.getEnd(), false);
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(normalReader.getFileHeader(), rr);
-      try (final RecordIterator<SAMRecord> closed = new SamClosedFileReader(sam, ranges, normalReader.getFileHeader())) {
+      try (final RecordIterator<SAMRecord> closed = new SamClosedFileReader(sam, ranges, null, normalReader.getFileHeader())) {
         while (norm.hasNext() && closed.hasNext()) {
           final SAMRecord a = norm.next();
           final SAMRecord b = closed.next();

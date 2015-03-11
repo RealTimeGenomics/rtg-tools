@@ -90,7 +90,10 @@ public abstract class DummySequencesReader implements SequencesReader {
   public long[] histogram() {
     return null;
   }
-
+  @Override
+  public SequencesReaderReferenceSource referenceSource() {
+    return null;
+  }
 
   @Override
   public int length(long sequenceIndex) {

@@ -106,7 +106,7 @@ public class SamFileAndRecordTest extends SkipInvalidRecordsIteratorTest {
       FileHelper.resourceToFile("com/rtg/sam/resources/test2.sam.gz.tbi", new File(tempDir, "test2.sam.gz.tbi"));
       final SAMFileHeader header = SamUtils.getSingleHeader(sam);
       final ReferenceRanges<String> r = SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("simulatedSequence1"));
-      try (RecordIterator<SAMRecord> it = new SkipInvalidRecordsIterator(sam.getPath(), new SamClosedFileReader(sam, r, header))) {
+      try (RecordIterator<SAMRecord> it = new SkipInvalidRecordsIterator(sam.getPath(), new SamClosedFileReader(sam, r, null, header))) {
         int c = 0;
         while (it.hasNext()) {
           final SAMRecord rec = it.next();
@@ -126,7 +126,7 @@ public class SamFileAndRecordTest extends SkipInvalidRecordsIteratorTest {
       FileHelper.resourceToFile("com/rtg/sam/resources/test2.bam.bai", new File(tempDir, "test2.bam.bai"));
       final SAMFileHeader header = SamUtils.getSingleHeader(sam);
       final ReferenceRanges<String> r = SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("simulatedSequence1"));
-      try (RecordIterator<SAMRecord>  it = new SkipInvalidRecordsIterator(sam.getPath(), new SamClosedFileReader(sam, r, SamUtils.getSingleHeader(sam)))) {
+      try (RecordIterator<SAMRecord>  it = new SkipInvalidRecordsIterator(sam.getPath(), new SamClosedFileReader(sam, r, null, SamUtils.getSingleHeader(sam)))) {
         int c = 0;
         while (it.hasNext()) {
           it.next();

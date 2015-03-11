@@ -47,7 +47,7 @@ public class SamReadingContextTest extends TestCase {
     final Set<File> files = Collections.emptySet();
     final SamFilterParams params = SamFilterParams.builder().create();
     final SAMFileHeader header = new SAMFileHeader();
-    final SamReadingContext sc = new SamReadingContext(files, 42, params, header);
+    final SamReadingContext sc = new SamReadingContext(files, 42, params, header, null);
     assertEquals(files, sc.files());
     assertEquals(42, sc.numThreads());
     assertEquals(params, sc.filterParams());

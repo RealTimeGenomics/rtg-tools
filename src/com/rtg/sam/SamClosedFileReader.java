@@ -33,6 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.LocusIndex;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
@@ -58,6 +59,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   private final File mFile;
   private final boolean mIsBam;
   private final ReferenceRanges<String> mRegions;
+  private final SequencesReader mReference;
   private final CloseableIterator<SAMRecord> mIterator;
   private final ClosedFileInputStream mStream;
   private boolean mIsClosed;
@@ -65,15 +67,17 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   /**
    * @param file SAM or BAM file, if region is specified an index must also be present with the appropriate relative file path
    * @param regions regions the file should select, null for whole file
-   * @param header header that should be used for SAM records may not be null
+   * @param reference the SequencesReader to be used as the reference (only required for CRAM files).
+   * @param header header that should be used for SAM records may not be null  @throws IOException if an IO error occurs
    * @throws IOException if an IO error occurs
    */
-  public SamClosedFileReader(File file, ReferenceRanges<String> regions, SAMFileHeader header) throws IOException {
+  public SamClosedFileReader(File file, ReferenceRanges<String> regions, SequencesReader reference, SAMFileHeader header) throws IOException {
     super(header);
     SamUtils.logRunId(header);
     mIsBam = SamUtils.isBAMFile(file);
     mFile = file;
     mStream = new ClosedFileInputStream(mFile);
+    mReference = reference;
     mRegions = regions;
     mIterator = obtainIteratorInternal();
   }
@@ -98,7 +102,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
 
 
   private CloseableIterator<SAMRecord> primaryIterator(BlockCompressedInputStream bcis) throws IOException {
-    return SamUtils.makeSamReader(bcis, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
+    return SamUtils.makeSamReader(bcis, mReference, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
   }
 
   /**
@@ -111,7 +115,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
     // Handle easy case of no restriction
     if (mRegions == null || mRegions.allAvailable()) {
       if (!mIsBam) {
-        return SamUtils.makeSamReader(mStream, mHeader).iterator(); // htsjdk will decide whether decompression is required
+        return SamUtils.makeSamReader(mStream, mReference, mHeader).iterator(); // htsjdk will decide whether decompression is required
       } else {
         return primaryIterator(new BlockCompressedInputStream(mStream));
       }
@@ -138,7 +142,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
     final VirtualOffsets filePointers = index.getFilePointers(mRegions);
 
     if (filePointers == null) {
-      return SamUtils.makeSamReader(new ByteArrayInputStream(new byte[0]), mHeader, SamReader.Type.SAM_TYPE).iterator();
+      return SamUtils.makeSamReader(new ByteArrayInputStream(new byte[0]), mReference, mHeader, SamReader.Type.SAM_TYPE).iterator();
     }
 
     //Diagnostic.developerLog("Using virtual offsets for file: " + mFile.toString() + "\t" + filePointers);
@@ -149,7 +153,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
      */
     final BlockCompressedInputStream cfis = new BlockCompressedInputStream(mStream);
     if (MULTI_CHUNKS) {
-      return new SamMultiRestrictingIterator(cfis, filePointers, mHeader, mIsBam, mFile.toString());
+      return new SamMultiRestrictingIterator(cfis, filePointers, mReference, mHeader, mIsBam, mFile.toString());
     } else {
       // This should be correct but will read all data from start of first region through to end of last region
       cfis.seek(filePointers.start(0));

@@ -195,7 +195,7 @@ public class ExtractCli extends AbstractCli {
     final SAMFileHeader header = SamUtils.getSingleHeader(f);
     try (final SAMFileWriter writer = new SAMFileWriterFactory().makeSAMWriter(header, true, out, printHeader)) {
       if (!headerOnly) {
-        try (RecordIterator<SAMRecord> samfr = new SkipInvalidRecordsIterator(f.getPath(), new SamClosedFileReader(f, regions, header))) {
+        try (RecordIterator<SAMRecord> samfr = new SkipInvalidRecordsIterator(f.getPath(), new SamClosedFileReader(f, regions, null, header))) {
           while (samfr.hasNext()) {
             writer.addAlignment(samfr.next());
           }

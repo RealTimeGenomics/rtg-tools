@@ -69,7 +69,7 @@ import junit.framework.TestCase;
 public class SamUtilsTest extends TestCase {
 
   public static void convertSamToBam(File outFile, File indexFile, File samFile) throws IOException {
-    try (RecordIterator<SAMRecord> sam = new SkipInvalidRecordsIterator(samFile.getPath(), new SamClosedFileReader(samFile, null, SamUtils.getSingleHeader(samFile)))) {
+    try (RecordIterator<SAMRecord> sam = new SkipInvalidRecordsIterator(samFile.getPath(), new SamClosedFileReader(samFile, null, null, SamUtils.getSingleHeader(samFile)))) {
       final SAMFileHeader header = sam.header().clone();
       header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
       SamUtils.addProgramRecord(header);

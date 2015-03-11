@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
+import com.rtg.reader.SequencesReader;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 
@@ -45,10 +46,10 @@ public class SamReadingContext {
 
   private final Collection<File> mFiles;
   private final SamFilterParams mParams;
-
   private final SAMFileHeader mHeader;
   private final int mNumThreads;
 
+  private final SequencesReader mReference;
   private final ReferenceRanges<String> mReferenceRanges;
 
   /**
@@ -57,10 +58,11 @@ public class SamReadingContext {
    * @param numThreads the number of threads to use for reading
    * @param filterParams supplies settings involving individual record filtering and region restrictions
    * @param header the already obtained merged SAM header.
+   * @param reference the SequencesReader to be used as the reference (only required for CRAM files).
    * @throws IOException if the restriction involved reading a BED file that could not be read
    */
-  public SamReadingContext(Collection<File> files, int numThreads, SamFilterParams filterParams, SAMFileHeader header) throws IOException {
-    this(files, numThreads, filterParams, header,  SamRangeUtils.createReferenceRanges(header, filterParams));
+  public SamReadingContext(Collection<File> files, int numThreads, SamFilterParams filterParams, SAMFileHeader header, SequencesReader reference) throws IOException {
+    this(files, numThreads, filterParams, header, reference, SamRangeUtils.createReferenceRanges(header, filterParams));
   }
 
   /**
@@ -69,9 +71,10 @@ public class SamReadingContext {
    * @param numThreads the number of threads to use for reading
    * @param filterParams supplies settings involving individual record filtering and region restrictions
    * @param header the already obtained merged SAM header.
+   * @param reference the SequencesReader to be used as the reference (only required for CRAM files).
    * @param referenceRanges the already resolved reference ranges to read over.
    */
-  public SamReadingContext(Collection<File> files, int numThreads, SamFilterParams filterParams, SAMFileHeader header, ReferenceRanges<String> referenceRanges) {
+  public SamReadingContext(Collection<File> files, int numThreads, SamFilterParams filterParams, SAMFileHeader header, SequencesReader reference, ReferenceRanges<String> referenceRanges) {
     if (header == null) {
       throw new NullPointerException();
     }
@@ -79,6 +82,7 @@ public class SamReadingContext {
     mParams = filterParams;
     mHeader = header;
     mNumThreads = numThreads;
+    mReference = reference;
     mReferenceRanges = referenceRanges;
   }
 
@@ -116,6 +120,14 @@ public class SamReadingContext {
    */
   public boolean hasRegions() {
     return mReferenceRanges != null;
+  }
+
+
+  /**
+   * @return the SequencesReader supplying the template that the SAM files were mapped against. Only required for CRAM reading.
+   */
+  public SequencesReader reference() {
+    return mReference;
   }
 
   /**

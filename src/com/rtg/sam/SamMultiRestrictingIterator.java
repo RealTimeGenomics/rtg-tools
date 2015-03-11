@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.VirtualOffsets;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -54,6 +55,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
   private final BlockCompressedInputStream mStream;
   private final VirtualOffsets mOffsets;
   private final SAMFileHeader mHeader;
+  private final SequencesReader mReference;
   private final boolean mIsBam;
   private final String mLabel;
 
@@ -67,10 +69,11 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
   private int mDoubleFetched = 0;
   private SAMRecord mNextRecord;
 
-  SamMultiRestrictingIterator(BlockCompressedInputStream stream, VirtualOffsets offsets, SAMFileHeader header, boolean isBam, String label) throws IOException {
+  SamMultiRestrictingIterator(BlockCompressedInputStream stream, VirtualOffsets offsets, SequencesReader reference, SAMFileHeader header, boolean isBam, String label) throws IOException {
     mStream = stream;
     mOffsets = offsets;
     mHeader = header;
+    mReference = reference;
     mIsBam = isBam;
     mLabel = label;
 
@@ -169,7 +172,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
         clearBuffered();
         mStream.seek(mOffsets.start(mCurrentOffset));
         // Warning: Confusing constructors being used here - the true is only used to force a different constructor
-        mCurrentIt = SamUtils.makeSamReader(mStream, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
+        mCurrentIt = SamUtils.makeSamReader(mStream, mReference, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
 
         //} else {
         //  Diagnostic.developerLog("After region " + mCurrentRegion + ", re-using existing reader for region " + mOffsets.region(mCurrentOffset));

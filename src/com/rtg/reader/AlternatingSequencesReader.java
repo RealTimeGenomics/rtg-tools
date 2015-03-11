@@ -125,6 +125,11 @@ public class AlternatingSequencesReader implements SequencesReader {
   }
 
   @Override
+  public SequencesReaderReferenceSource referenceSource() {
+    throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
   public long[] histogram() {
     throw new UnsupportedOperationException("Not supported yet.");
   }

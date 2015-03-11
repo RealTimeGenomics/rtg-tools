@@ -84,6 +84,7 @@ import htsjdk.samtools.SamInputResource;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
 import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.cram.ref.CRAMReferenceSource;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.BlockCompressedStreamConstants;
 import htsjdk.samtools.util.RuntimeIOException;
@@ -218,6 +219,10 @@ public final class SamUtils {
 
   /** The filename extension used for BAM index files */
   public static final String BAI_SUFFIX = BamIndexer.BAM_INDEX_EXTENSION;
+
+  private static final CRAMReferenceSource NO_CRAM_REFERENCE_SOURCE = (sequenceRecord, tryNameVariants) -> {
+    throw new NoTalkbackSlimException("Either no reference SDF was specified, or this command does not currently support CRAM input");
+  };
 
 //  private static final boolean IGNORE_HEADER_INCOMPATIBILITY = GlobalFlags.isSet(GlobalFlags.SAM_IGNORE_INCOMPATIBLE_HEADERS_FLAG);
 
@@ -736,7 +741,7 @@ public final class SamUtils {
    */
   public static SAMFileHeader getSingleHeader(InputStream is) throws IOException {
     final SAMFileHeader result;
-    try (SamReader sr = SamUtils.makeSamReader(is, null)) {
+    try (SamReader sr = SamUtils.makeSamReader(is)) {
       result = sr.getFileHeader();
     }
     return result;
@@ -750,19 +755,32 @@ public final class SamUtils {
    * @throws IOException if an I/O error occurs
    */
   public static SAMFileHeader getUberHeader(Collection<File> files) throws IOException {
-    return getUberHeader(files, false, null);
+    return getUberHeader(null, files, false, null);
   }
 
   /**
    * creates a header with the contents from the first file except the read group information is merged from all headers. Does some checking that headers are compatible
    *
+   * @param reference The reference (required if any input files are CRAM)
    * @param files SAM files
-   * @param ignoreHeaderIncompatibility true if should not care about incompatible header
-   * @param expectedSamples if non-null, check that headers contain sample information that overlaps the supplied names
    * @return the combined header
    * @throws IOException if an I/O error occurs
    */
-  public static SAMFileHeader getUberHeader(Collection <File> files, boolean ignoreHeaderIncompatibility, String[] expectedSamples) throws IOException {
+  public static SAMFileHeader getUberHeader(SequencesReader reference, Collection<File> files) throws IOException {
+    return getUberHeader(reference, files, false, null);
+  }
+
+  /**
+   * creates a header with the contents from the first file except the read group information is merged from all headers. Does some checking that headers are compatible
+   *
+   * @param reference The reference (required if any input files are CRAM)
+   * @param files SAM files
+   * @param ignoreHeaderIncompatibility true if should not care about incompatible header
+   * @param expectedSamples if non-null, check that headers contain sample information that overlaps the supplied names   @return the combined header
+   * @return the combined header
+   * @throws IOException if an I/O error occurs
+   */
+  public static SAMFileHeader getUberHeader(SequencesReader reference, Collection<File> files, boolean ignoreHeaderIncompatibility, String[] expectedSamples) throws IOException {
     if (files.size() == 0) {
       throw new IllegalArgumentException("File list is empty!");
     }
@@ -779,7 +797,7 @@ public final class SamUtils {
         errorMessage.append("Input file \"").append(file.getPath()).append("\" is not an ordinary file").append(StringUtils.LS);
         continue;
       }
-      try (SamReader sfr = SamUtils.makeSamReader(file)) {
+      try (SamReader sfr = SamUtils.makeSamReader(file, reference)) {
         if (first == null) {
           first = sfr.getFileHeader();
           firstFile = file;
@@ -890,25 +908,27 @@ public final class SamUtils {
     }
   }
 
-  private static SamReaderFactory getSamReaderFactory() {
+  private static SamReaderFactory getSamReaderFactory(SequencesReader reference) throws IOException {
     return SamReaderFactory.make()
+      .referenceSource(reference == null ? NO_CRAM_REFERENCE_SOURCE : reference.referenceSource())
       .validationStringency(ValidationStringency.SILENT);
   }
 
   /**
    * Entry point for specifically creating a SamReader given a pre-positioned stream, header, and known type
    * @param stream the stream to read from. Must already be performing decompression if required.
+   * @param reference the SequencesReader to be used as the reference (required for CRAM files).
    * @param headerOverride the pre-determined SAM header
-   * @param assumeType the type of input to assume.
+   * @param assumeType the type of input to assume.   @return the SamReader
    * @return the SamReader
    * @throws IOException if an I/O problem occurs opening the file
    */
-  public static SamReader makeSamReader(InputStream stream, SAMFileHeader headerOverride, SamReader.Type assumeType) throws IOException {
+  public static SamReader makeSamReader(InputStream stream, SequencesReader reference, SAMFileHeader headerOverride, SamReader.Type assumeType) throws IOException {
     if (assumeType == null) {
       throw new NullPointerException();
     }
     try {
-      return getSamReaderFactory()
+      return getSamReaderFactory(reference)
         .open(SamInputResource.of(stream).header(headerOverride).assumeType(assumeType));
     } catch (final RuntimeIOException e) {
       throw (IOException) e.getCause();
@@ -919,13 +939,40 @@ public final class SamUtils {
    * Entry point for specifically creating a SamReader given a provided stream and header, but let
    * htsjdk decide the underlying format (including working out whether the input is compressed).
    * @param stream the stream to read from
+   * @param reference the SequencesReader to be used as the reference (required for CRAM files).
    * @param headerOverride the pre-determined SAM header (or null to use the header from the stream)
    * @return the SamReader
    * @throws IOException if an I/O problem occurs opening the file
    */
-  public static SamReader makeSamReader(InputStream stream, SAMFileHeader headerOverride) throws IOException {
+  public static SamReader makeSamReader(InputStream stream, SequencesReader reference, SAMFileHeader headerOverride) throws IOException {
     try {
-      return getSamReaderFactory().open(SamInputResource.of(stream).header(headerOverride));
+      return getSamReaderFactory(reference).open(SamInputResource.of(stream).header(headerOverride));
+    } catch (final RuntimeIOException e) {
+      throw (IOException) e.getCause();
+    }
+  }
+
+  /**
+   * Entry point for creating SamReaders using our preferences
+   * @param stream the stream to read from
+   * @param reference the SequencesReader to be used as the reference (required for CRAM files).
+   * @return the SamReader
+   * @throws IOException if an I/O problem occurs opening the file
+   */
+  public static SamReader makeSamReader(InputStream stream, SequencesReader reference) throws IOException {
+    return makeSamReader(stream, reference, null);
+  }
+
+  /**
+   * Entry point for creating SamReaders using our preferences
+   * @param file the file to open
+   * @param reference the SequencesReader to be used as the reference (required for CRAM files).
+   * @return the SamReader
+   * @throws IOException if an I/O problem occurs opening the file
+   */
+  public static SamReader makeSamReader(File file, SequencesReader reference) throws IOException {
+    try {
+      return getSamReaderFactory(reference).open(file);
     } catch (final RuntimeIOException e) {
       throw (IOException) e.getCause();
     }
@@ -938,7 +985,7 @@ public final class SamUtils {
    * @throws IOException if an I/O problem occurs opening the file
    */
   public static SamReader makeSamReader(InputStream stream) throws IOException {
-    return makeSamReader(stream, null);
+    return makeSamReader(stream, null, null);
   }
 
   /**
@@ -949,8 +996,7 @@ public final class SamUtils {
    */
   public static SamReader makeSamReader(File file) throws IOException {
     try {
-      return getSamReaderFactory()
-        .open(file);
+      return getSamReaderFactory(null).open(file);
     } catch (final RuntimeIOException e) {
       throw (IOException) e.getCause();
     }

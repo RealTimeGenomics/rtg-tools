@@ -191,6 +191,11 @@ public interface SequencesReader extends AutoCloseable {
    */
   boolean hasNames();
 
+  /**
+   * @return the object that supplies reference data for htsjdk CRAM decoding
+   */
+  SequencesReaderReferenceSource referenceSource();
+
   // Direct accessor methods
 
   /**

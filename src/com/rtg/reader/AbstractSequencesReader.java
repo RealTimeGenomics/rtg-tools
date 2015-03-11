@@ -44,6 +44,15 @@ public abstract class AbstractSequencesReader implements AnnotatedSequencesReade
 
   private static final String README_FILENAME = "readme.txt";
 
+  private final SequencesReaderReferenceSource mReferenceSource;
+
+  /**
+   * Constructor
+   */
+  public AbstractSequencesReader() {
+    mReferenceSource = new SequencesReaderReferenceSource(this);
+  }
+
   @Override
   public abstract IndexFile index();
 
@@ -52,6 +61,10 @@ public abstract class AbstractSequencesReader implements AnnotatedSequencesReade
     return new DefaultSequencesIterator(this);
   }
 
+  @Override
+  public SequencesReaderReferenceSource referenceSource() {
+    return mReferenceSource;
+  }
 
   // For Direct sequence access
 
