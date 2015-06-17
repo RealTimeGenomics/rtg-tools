@@ -1,0 +1,88 @@
+Header correct: true
+numRefs: 16
+Format: SAM 0-based: false
+Columns: (refName:Start-End) 3:4-0
+Meta: @
+Skip: 0
+Sequence names: simulatedSequence1, simulatedSequence2, simulatedSequence3, simulatedSequence4, simulatedSequence5, simulatedSequence6, simulatedSequence7, simulatedSequence8, simulatedSequence9, simulatedSequence10, simulatedSequence11, simulatedSequence12, simulatedSequence13, simulatedSequence14, simulatedSequence15, simulatedSequence16
+refId: 0
+  numBins: 1
+    binSet: 4681=[{(0, 969), (0, 16833)}], 
+  numIntervals: 1
+    intervals 0-9: (0, 969), 
+refId: 1
+  numBins: 1
+    binSet: 4681=[{(0, 16833), (0, 32731)}], 
+  numIntervals: 1
+    intervals 0-9: (0, 16833), 
+refId: 2
+  numBins: 1
+    binSet: 4681=[{(0, 32731), (0, 47741)}], 
+  numIntervals: 1
+    intervals 0-9: (0, 32731), 
+refId: 3
+  numBins: 1
+    binSet: 4681=[{(0, 47741), (11968, 5540)}], 
+  numIntervals: 1
+    intervals 0-9: (0, 47741), 
+refId: 4
+  numBins: 2
+    binSet: 4681=[{(11968, 5540), (11968, 25024)}], 4682=[{(11968, 25024), (11968, 29475)}], 
+  numIntervals: 2
+    intervals 0-9: (11968, 5540), (11968, 25024), 
+refId: 5
+  numBins: 2
+    binSet: 4681=[{(11968, 29475), (11968, 47853)}], 4682=[{(11968, 47853), (11968, 48962)}], 
+  numIntervals: 2
+    intervals 0-9: (11968, 29475), (11968, 47853), 
+refId: 6
+  numBins: 1
+    binSet: 4681=[{(11968, 48962), (11968, 62618)}], 
+  numIntervals: 1
+    intervals 0-9: (11968, 48962), 
+refId: 7
+  numBins: 1
+    binSet: 4681=[{(11968, 62618), (24622, 18168)}], 
+  numIntervals: 1
+    intervals 0-9: (11968, 62618), 
+refId: 8
+  numBins: 1
+    binSet: 4681=[{(24622, 18168), (24622, 34545)}], 
+  numIntervals: 1
+    intervals 0-9: (24622, 18168), 
+refId: 9
+  numBins: 2
+    binSet: 4681=[{(24622, 34545), (24622, 54396)}], 4682=[{(24622, 54396), (24622, 56646)}], 
+  numIntervals: 2
+    intervals 0-9: (24622, 34545), (24622, 54396), 
+refId: 10
+  numBins: 1
+    binSet: 4681=[{(24622, 56646), (37288, 7285)}], 
+  numIntervals: 1
+    intervals 0-9: (24622, 56646), 
+refId: 11
+  numBins: 1
+    binSet: 4681=[{(37288, 7285), (37288, 22903)}], 
+  numIntervals: 1
+    intervals 0-9: (37288, 7285), 
+refId: 12
+  numBins: 1
+    binSet: 4681=[{(37288, 22903), (37288, 35707)}], 
+  numIntervals: 1
+    intervals 0-9: (37288, 22903), 
+refId: 13
+  numBins: 1
+    binSet: 4681=[{(37288, 35707), (37288, 54912)}], 
+  numIntervals: 1
+    intervals 0-9: (37288, 35707), 
+refId: 14
+  numBins: 1
+    binSet: 4681=[{(37288, 54912), (49768, 3119)}], 
+  numIntervals: 1
+    intervals 0-9: (37288, 54912), 
+refId: 15
+  numBins: 1
+    binSet: 4681=[{(49768, 3119), (53318, 0)}], 
+  numIntervals: 1
+    intervals 0-9: (49768, 3119), 
+

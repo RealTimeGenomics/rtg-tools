@@ -1,0 +1,4 @@
+
+Total records : 42
+Filtered due to RX : 1
+Remaining records : 41

@@ -1,0 +1,7 @@
+##fileformat=VCFv4.1
+##diseased=child,father
+##SAMPLE=<ID=child,Sex=MALE>
+##SAMPLE=<ID=father,Sex=MALE>
+##SAMPLE=<ID=mother,Sex=FEMALE>
+##PEDIGREE=<Child=child,Mother=mother,Father=father>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	child	father	mother

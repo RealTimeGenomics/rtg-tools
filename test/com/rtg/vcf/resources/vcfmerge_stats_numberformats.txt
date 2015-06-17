@@ -1,0 +1,39 @@
+Failed Filters               : 0
+Passed Filters               : 9
+Complex Called               : 4
+
+Sample Name: SAMPLEA
+SNPs                         : 3
+MNPs                         : 2
+Insertions                   : 0
+Deletions                    : 0
+Indels                       : 0
+Same as reference            : 0
+Missing Genotype             : 4
+SNP Transitions/Transversions: 1.00 (3/3)
+Total Het/Hom ratio          : 1.50 (3/2)
+SNP Het/Hom ratio            : - (3/0)
+MNP Het/Hom ratio            : 0.00 (0/2)
+Insertion Het/Hom ratio      : - (0/0)
+Deletion Het/Hom ratio       : - (0/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : - (0/0)
+Indel/SNP+MNP ratio          : 0.00 (0/5)
+
+Sample Name: SAMPLEB
+SNPs                         : 3
+MNPs                         : 2
+Insertions                   : 0
+Deletions                    : 0
+Indels                       : 0
+Same as reference            : 0
+Missing Genotype             : 4
+SNP Transitions/Transversions: 0.50 (2/4)
+Total Het/Hom ratio          : 0.67 (2/3)
+SNP Het/Hom ratio            : 2.00 (2/1)
+MNP Het/Hom ratio            : 0.00 (0/2)
+Insertion Het/Hom ratio      : - (0/0)
+Deletion Het/Hom ratio       : - (0/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : - (0/0)
+Indel/SNP+MNP ratio          : 0.00 (0/5)

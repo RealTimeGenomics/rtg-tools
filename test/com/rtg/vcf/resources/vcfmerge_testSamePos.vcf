@@ -1,0 +1,8 @@
+##fileformat=VCFv4.1
+##contig=<ID=chr2,length=10000>
+##contig=<ID=chr3,length=10000>
+##contig=<ID=1,length=10000000>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878	NA12891	NA12892
+1	20200602	.	C	T,G	575.1	PASS	XRX	GT:DP:RE:GQ	0/1:42:4.891:56	.	0/2:42:4.891:56
+1	20200602	.	CA	C	575.1	PASS	XRX	GT:DP:RE:GQ	.	0/1:42:4.891:56	.

@@ -1,0 +1,9 @@
+##fileformat=VCFv4.1
+##reference=GRCh37
+##ALT=<ID=DEL,Description="Deletion">
+##FILTER=<ID=YEA,Description="Yeah">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Alternate Allele Count">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total Allele Count">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+X	60034	.	ACC	A	256	.	AC=117;AN=2184
+X	60052	rs186434315	T	A	100	YEA	AC=752;AN=2184

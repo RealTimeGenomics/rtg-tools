@@ -1,0 +1,45 @@
+##fileformat=VCFv4.0
+##fileDate=20110728
+##source=RTGvPOST-2.2-DEV build <not found> (<not found>)
+##RUN-ID=14ba7445-9965-4667-977f-4b08062b3990
+##reference=/rtgshare/data/human/ref/sdf/hg18
+##source_20110701.1=/rtgshare/tools/vcftools/bin/vcf-merge na19238.vcf.gz na19239.vcf.gz na19240.vcf.gz
+##sourceFiles_20110701.1=0:na19238.vcf.gz,1:na19239.vcf.gz,2:na19240.vcf.gz
+##contig=<ID=chr21,length=46944323>
+##FILTER=<ID=c100,Description="Coverage exceeded 100">
+##FILTER=<ID=a10.0,Description="Ambiguity exceeded 10.0">
+##FILTER=<ID=RC,Description="RTG variant is a complex region">
+##FILTER=<ID=RX,Description="RTG variant contained within hypercomplex region">
+##INFO=<ID=SF,Number=.,Type=String,Description="Source File (index to sourceFiles, f when filtered)">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Allele count in genotypes">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=MCV,Number=.,Type=String,Description="Variant violates mendelian inheritance constraints">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="Ambiguity Ratio">
+##FORMAT=<ID=AB,Number=1,Type=Float,Description="Allele Balance">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+##FORMAT=<ID=MCP,Number=.,Type=String,Description="Describes the expected genotype ploidy in cases where the given genotype does not match the expected ploidy">
+##SAMPLE=<ID=NA19240,Sex=FEMALE>
+##SAMPLE=<ID=NA19238,Sex=FEMALE>
+##SAMPLE=<ID=NA19239,Sex=MALE>
+##PEDIGREE=<Child=NA19240,Mother=NA19238,Father=NA19239>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA19238	NA19239	NA19240
+chr21	9719768	.	A	C,T	44.53	a10.0	AC=3,1;AN=6;SF=0,1,2f;MCV=NA19240:0/0+1/1->1/2	GT	1/1	0/0	1/2
+chr21	9719797	.	G	C	1068.70	c100	AC=3;AN=6;SF=0,1,2f	GT:MCP	1/0	1/0	1:diploid
+chr21	9719804	.	T	C	334695.27	c100	AC=4;AN=6;SF=0,1,2f	GT:MCP	1/0	1:diploid	1/0
+chr21	9719812	.	T	G	720.90	c100	AC=2;AN=4;SF=0f,2f;MCV=NA19240:.+1/0->1/0	GT	1/0	.	1/0
+chr21	9719834	.	G	T	140.50	c100	AC=1;AN=2;SF=2f;MCV=NA19240:.+.->0/1	GT	.	.	0/1
+chr21	9719848	.	C	A	17.30	c100	AC=1;AN=2;SF=2f;MCV=NA19240:.+.->1/0	GT	.	.	1/0
+chr21	9719864	.	T	C	1419.53	a10.0;c100	AC=3;AN=6;SF=0f,1f,2f	GT:MCP	1:diploid	1/0	1/0
+chr21	9719951	.	G	C	334117.73	c100	AC=3;AN=6;SF=0f,1f,2f	GT:MCP	1/0	1/0/1:diploid	1/0
+chr21	9720018	.	G	T	120.20	c100	AC=2;AN=4;SF=1f,2f;MCV=NA19240:0/1+.->0/1	GT	.	0/1	0/1
+chr21	9720043	.	A	G	334064.07	c100	AC=3;AN=6;SF=0f,1f,2f;MCV=NA19240:0/0+0/0->1	GT:MCP	0/0	0/0	1:diploid
+chr21	9720046	.	C	T	166.60	c100	AC=2;AN=4;SF=1f,2f;MCV=NA19240:0/1+.->0/1	GT	.	0/1	0/1
+chr21	9720161	.	G	A	61.90	c100	AC=1;AN=2;SF=2f;MCV=NA19240:.+.->1/0	GT	.	.	1/0
+chr21	9720230	.	T	C	291.45	c100	AC=2;AN=4;SF=1f,2f;MCV=NA19240:1/0+.->1/0	GT	.	1/0	1/0
+chr21	9720244	.	A	G	331.13	c100	AC=3;AN=6;SF=0f,1f,2f;MCV=NA19240:0/1+0/1->0/1/1	GT:MCP	0/1	0/1	0/1/1:diploid
+chr21	9720281	.	C	T	587.85	c100	AC=2;AN=4;SF=1f,2f;MCV=NA19240:0/1+.->0/1	GT	.	0/1	0/1
+chr21	9720288	.	A	G	961.95	c100	AC=2;AN=4;SF=1f,2f;MCV=NA19240:0/1+.->0/1	GT	.	0/1	0/1

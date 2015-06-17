@@ -1,0 +1,7 @@
+Checking: 
+Family: [NA19239 + NA19238] -> [NA19240]
+Concordance NA19240: F:22/23 (95.65%)  M:20/20 (100.00%)  F+M:20/31 (64.52%)
+6/41 (14.63%) records did not conform to expected call ploidy
+32/41 (78.05%) records were variant in at least 1 family member and checked for Mendelian constraints
+11/32 (34.38%) records contained a violation of Mendelian constraints
+1/32 (3.12%) records were not adequately checked due to a child call that was neither haploid nor diploid

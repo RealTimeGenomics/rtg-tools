@@ -1,0 +1,5 @@
+
+Total records : 21
+Filtered due to simple SNP : 2
+Filtered due to not in keep set : 12
+Remaining records : 7

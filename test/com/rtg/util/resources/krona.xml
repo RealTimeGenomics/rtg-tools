@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta charset="utf-8"/>
+<link rel="shortcut icon" href="http://realtimegenomics.com/asset/icon.ico"/>
+<link rel="stylesheet" type="text/css" href="index_files/rtg.css"/>
+<script id="notfound">window.onload=function(){document.body.innerHTML="Could not get resource krona-2.0.js"}</script>
+<script src="index_files/krona-2.0.js"></script>
+</head>
+<body>
+<div id="dheader"><a id="lheader" href="http://www.realtimegenomics.com"><h1>Species Report</h1></a></div><img id="hiddenImage" src="index_files/hidden.png" style="display:none"/>
+<img id="loadingImage" src="index_files/loading.gif" style="display:none"/>
+<noscript>Javascript must be enabled to view this page.</noscript>
+<div style="display:none">
+<krona>
+<attributes magnitude="magnitude"><list>members</list>
+<attribute>magnitude</attribute>
+<attribute display="Taxonomy Id" hrefBase="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Info&amp;id=" mono="true">taxonomyid</attribute>
+<attribute display="Rank" mono="true">rank</attribute>
+<attribute display="Abundance" mono="true">abundance</attribute>
+<attribute display="Confidence" mono="true">confidence</attribute>
+<attribute display="DNA Fraction" mono="true">dnafraction</attribute>
+<attribute display="Coverage Depth" mono="true">coveragedepth</attribute>
+<attribute display="Coverage Breadth" mono="true">coveragebreadth</attribute>
+<attribute display="Genome Length" mono="true">genomelength</attribute>
+<attribute display="Mapped Reads" mono="true">mappedreads</attribute>
+</attributes>
+<datasets><dataset>by abundance</dataset><dataset>by DNA fraction</dataset></datasets>
+<node name="all"><magnitude><val>1.0</val><val>1.0</val></magnitude>
+  <node name="Acholeplasma_laidlawii"><magnitude><val>1.0</val><val>0.06156</val></magnitude><taxonomyid><val href="2">2</val></taxonomyid><rank><val>species</val></rank><abundance><val>1.00 (1.00~1.00)</val></abundance><confidence><val>417.10</val></confidence><dnafraction><val>0.06 (0.06~0.06)</val></dnafraction><coveragedepth><val>0.49</val></coveragedepth><coveragebreadth><val>0.39</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>20456.00</val></mappedreads>
+    <node name="Acidiphilium_cryptum"><magnitude><val>0.8</val><val>0.1384</val></magnitude><taxonomyid><val href="4">4</val></taxonomyid><rank><val>species</val></rank><abundance><val>0.80 (0.75~0.85)</val></abundance><confidence><val>655.50</val></confidence><dnafraction><val>0.14 (0.14~0.14)</val></dnafraction><coveragedepth><val>0.49</val></coveragedepth><coveragebreadth><val>0.39</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>46059.50</val></mappedreads>
+      <node name="Acidobacteria_bacterium"><magnitude><val>0.8</val><val>0.2301</val></magnitude><taxonomyid><val href="5">5</val></taxonomyid><rank><val>species</val></rank><abundance><val>0.80 (0.77~0.83)</val></abundance><confidence><val>868.40</val></confidence><dnafraction><val>0.23 (0.23~0.23)</val></dnafraction><coveragedepth><val>0.49</val></coveragedepth><coveragebreadth><val>0.39</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>76543.00</val></mappedreads>
+        <node name="Acaryochloris_marina"><magnitude><val>0.8</val><val>0.2562</val></magnitude><taxonomyid><val href="8">8</val></taxonomyid><rank><val>species</val></rank><abundance><val>0.80 (0.76~0.83)</val></abundance><confidence><val>921.40</val></confidence><dnafraction><val>0.26 (0.26~0.26)</val></dnafraction><coveragedepth><val>0.47</val></coveragedepth><coveragebreadth><val>0.38</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>85288.00</val></mappedreads></node></node></node>
+    <node name="Acidothermus_cellulolyticus"><magnitude><val>0.2</val><val>0.09967</val></magnitude><taxonomyid><val href="6">6</val></taxonomyid><rank><val>species</val></rank><abundance><val>0.20 (0.17~0.22)</val></abundance><confidence><val>546.00</val></confidence><dnafraction><val>0.10 (0.10~0.10)</val></dnafraction><coveragedepth><val>0.49</val></coveragedepth><coveragebreadth><val>0.39</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>33189.00</val></mappedreads>
+      <node name="Acidovorax_avenae"><magnitude><val>0.2</val><val>0.214</val></magnitude><taxonomyid><val href="7">7</val></taxonomyid><rank><val>species</val></rank><abundance><val>0.20 (0.16~0.23)</val></abundance><confidence><val>834.30</val></confidence><dnafraction><val>0.21 (0.21~0.22)</val></dnafraction><coveragedepth><val>0.48</val></coveragedepth><coveragebreadth><val>0.39</val></coveragebreadth><genomelength><val>0</val></genomelength><mappedreads><val>71295.50</val></mappedreads></node></node></node></node>
+</krona></div></body></html>

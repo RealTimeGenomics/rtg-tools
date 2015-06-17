@@ -1,0 +1,4 @@
+
+Total records : 20
+Filtered due to a1000.0 : 16
+Remaining records : 4

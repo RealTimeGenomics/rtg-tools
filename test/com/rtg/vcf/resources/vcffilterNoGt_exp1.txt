@@ -1,0 +1,2 @@
+Error: Specified filters require GT but no such field contained in record:
+g1	146	.	A	T	.	a1000.0	.	DP:RE:GQ:RS	1:0.501:33.0:A,1,0.501

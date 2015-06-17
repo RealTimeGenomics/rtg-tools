@@ -1,0 +1,3 @@
+#posterior	slope	log-slope
+23.00	2.00	0.301
+6.00	2.00	0.301

@@ -1,0 +1,9 @@
+browser position chr1:762097-762217
+track db="hg19" name="Human All Exon V4 plus UTRs" description="" visibility=2 color=0,128,0 useScore=1
+chr1	433	434	notHere1
+chr1	491	492	notHere2
+chr2	0	899	label1	EXTRAINFOSHOULDNOTSHOWUP
+chr2	200	900	label2
+chr3	299	300	label3
+chr3	99	399	label4
+

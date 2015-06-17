@@ -1,0 +1,41 @@
+##fileformat=VCFv4.1
+##fileDate=20111212
+##source=RTGvPOST-2.4 build  (2011-12-12)
+##CL=null
+##RUN-ID=2ba07311-139d-40cf-b602-49631cdc75c8
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="Coverage threshold that was applied">
+##FILTER=<ID=OC,Description="Coverage threshold exceeded">
+##FILTER=<ID=a1000.0,Description="Ambiguity exceeded 1000.0">
+##FILTER=<ID=RC,Description="RTG variant is a complex region">
+##FILTER=<ID=RX,Description="RTG variant contained within hypercomplex region">
+##FILTER=<ID=RCEQUIV,Description="RTG variant is equivalent to the previous variant">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="Ambiguity Ratio">
+##FORMAT=<ID=AB,Number=1,Type=Float,Description="Allele Balance">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+g1	1	.	A	.	.	PASS	.	GT:DP:RE:GQ	0/0:5:0.000:31.0
+g1	8	.	A	.	.	PASS	.	GT:DP:RE:GQ	0/0:7:0.000:31.0
+g1	11	.	A	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:2:1.002:36.0:A,2,1.002
+g1	54	.	T	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:2:1.002:36.0:T,2,1.002
+g1	65	.	C	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:3:1.504:37.0:C,3,1.504
+g1	76	.	G	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:5:2.506:41.0:G,5,2.506
+g1	87	.	A	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:5:2.506:43.0:A,5,2.506
+g1	98	.	C	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:5:2.506:41.0:C,5,2.506
+g1	109	.	T	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:5:2.506:43.0:T,5,2.506
+g1	110	.	G	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:5:2.506:41.0:G,5,2.506
+g1	115	.	G	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:4:2.005:20.0:C,2,1.002,T,2,1.002
+g1	125	.	T	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:4:2.005:41.0:T,4,2.005
+g1	135	.	C	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:3:1.504:37.0:C,3,1.504
+g1	145	.	A	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:1:0.501:33.0:A,1,0.501
+g1	155	.	G	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:1:0.501:31.0:G,1,0.501
+g1	165	.	C	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:1:0.501:31.0:C,1,0.501
+g1	175	.	T	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:1:0.501:34.0:T,1,0.501
+g1	185	.	A	.	.	a1000.0	.	GT:DP:RE:GQ:RS	0/0:1:0.501:33.0:A,1,0.501
+g1	195	.	G	.	.	PASS	.	GT:DP:RE:GQ	0/0:7:0.000:48.0
+g1	205	.	G	.	.	PASS	.	GT:DP:RE:GQ	0/0:7:0.000:48.0

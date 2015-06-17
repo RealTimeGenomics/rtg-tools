@@ -1,0 +1,4 @@
+
+Total records : 20
+Filtered due to AVR score : 19
+Remaining records : 1

@@ -1,0 +1,3 @@
+simulatedSequence19	583	.	A	T	.	PASS	.	GT:DP:RE:GQ:RS	0/1:23:0.458:185.0:A,11,0.219,T,12,0.239
+simulatedSequence19	637	.	G	C	.	PASS	.	GT:DP:RE:GQ:RS	1/0:27:0.537:53.0:C,7,0.139,G,20,0.398
+simulatedSequence19	737	.	G	C	.	PASS	.	GT:DP:RE:GQ:RS	1/1:27:0.537:74.0:C,26,0.517,T,1,0.020

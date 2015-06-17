@@ -1,0 +1,6 @@
+#Comment
+
+chr1	0	3701	annotation1
+chr1	3700	4792	annotation2
+chr1	4769	4792	annotation3	annotation4
+chr2	0	3333	annotationNonExistant

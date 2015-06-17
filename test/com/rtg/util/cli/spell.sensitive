@@ -1,0 +1,29 @@
+AVR
+BLASTX
+CNV
+TSV
+BED
+BEDGRAPH
+gzip
+sdf
+slimn
+slimp
+slimx
+tslimn
+tslimx
+CGMaska15b1
+CGMaska1b1
+IH
+# I would like to get rid of these next two
+topn
+topequal
+mapx
+ls454
+PCR
+Tabix
+VCF
+HTML
+# this is horrible
+@RG\tID
+READGROUP1\tSM
+SAMPLE\tPL

@@ -1,0 +1,140 @@
+##fileformat=VCFv4.1
+##fileDate=20141103
+##source=RTG Core Core vPOST-3.3 build 4e2843a (2014-10-30)
+##TEMPLATE-SDF-ID=f1765b39-de93-481a-925d-282fe62ec8a6
+##reference=/rtgshare/data/human/ref/1000g_v37_phase2/sdf
+##extraline=foo
+##extraline2=bar
+##contig=<ID=1,length=249250621>
+##contig=<ID=2,length=243199373>
+##contig=<ID=3,length=198022430>
+##contig=<ID=4,length=191154276>
+##contig=<ID=5,length=180915260>
+##contig=<ID=6,length=171115067>
+##contig=<ID=7,length=159138663>
+##contig=<ID=8,length=146364022>
+##contig=<ID=9,length=141213431>
+##contig=<ID=10,length=135534747>
+##contig=<ID=11,length=135006516>
+##contig=<ID=12,length=133851895>
+##contig=<ID=13,length=115169878>
+##contig=<ID=14,length=107349540>
+##contig=<ID=15,length=102531392>
+##contig=<ID=16,length=90354753>
+##contig=<ID=17,length=81195210>
+##contig=<ID=18,length=78077248>
+##contig=<ID=19,length=59128983>
+##contig=<ID=20,length=63025520>
+##contig=<ID=21,length=48129895>
+##contig=<ID=22,length=51304566>
+##contig=<ID=X,length=155270560>
+##contig=<ID=Y,length=59373566>
+##contig=<ID=MT,length=16569>
+##contig=<ID=GL000207.1,length=4262>
+##contig=<ID=GL000226.1,length=15008>
+##contig=<ID=GL000229.1,length=19913>
+##contig=<ID=GL000231.1,length=27386>
+##contig=<ID=GL000210.1,length=27682>
+##contig=<ID=GL000239.1,length=33824>
+##contig=<ID=GL000235.1,length=34474>
+##contig=<ID=GL000201.1,length=36148>
+##contig=<ID=GL000247.1,length=36422>
+##contig=<ID=GL000245.1,length=36651>
+##contig=<ID=GL000197.1,length=37175>
+##contig=<ID=GL000203.1,length=37498>
+##contig=<ID=GL000246.1,length=38154>
+##contig=<ID=GL000249.1,length=38502>
+##contig=<ID=GL000196.1,length=38914>
+##contig=<ID=GL000248.1,length=39786>
+##contig=<ID=GL000244.1,length=39929>
+##contig=<ID=GL000238.1,length=39939>
+##contig=<ID=GL000202.1,length=40103>
+##contig=<ID=GL000234.1,length=40531>
+##contig=<ID=GL000232.1,length=40652>
+##contig=<ID=GL000206.1,length=41001>
+##contig=<ID=GL000240.1,length=41933>
+##contig=<ID=GL000236.1,length=41934>
+##contig=<ID=GL000241.1,length=42152>
+##contig=<ID=GL000243.1,length=43341>
+##contig=<ID=GL000242.1,length=43523>
+##contig=<ID=GL000230.1,length=43691>
+##contig=<ID=GL000237.1,length=45867>
+##contig=<ID=GL000233.1,length=45941>
+##contig=<ID=GL000204.1,length=81310>
+##contig=<ID=GL000198.1,length=90085>
+##contig=<ID=GL000208.1,length=92689>
+##contig=<ID=GL000191.1,length=106433>
+##contig=<ID=GL000227.1,length=128374>
+##contig=<ID=GL000228.1,length=129120>
+##contig=<ID=GL000214.1,length=137718>
+##contig=<ID=GL000221.1,length=155397>
+##contig=<ID=GL000209.1,length=159169>
+##contig=<ID=GL000218.1,length=161147>
+##contig=<ID=GL000220.1,length=161802>
+##contig=<ID=GL000213.1,length=164239>
+##contig=<ID=GL000211.1,length=166566>
+##contig=<ID=GL000199.1,length=169874>
+##contig=<ID=GL000217.1,length=172149>
+##contig=<ID=GL000216.1,length=172294>
+##contig=<ID=GL000215.1,length=172545>
+##contig=<ID=GL000205.1,length=174588>
+##contig=<ID=GL000219.1,length=179198>
+##contig=<ID=GL000224.1,length=179693>
+##contig=<ID=GL000223.1,length=180455>
+##contig=<ID=GL000195.1,length=182896>
+##contig=<ID=GL000212.1,length=186858>
+##contig=<ID=GL000222.1,length=186861>
+##contig=<ID=GL000200.1,length=187035>
+##contig=<ID=GL000193.1,length=189789>
+##contig=<ID=GL000194.1,length=191469>
+##contig=<ID=GL000225.1,length=211173>
+##contig=<ID=GL000192.1,length=547496>
+##contig=<ID=NC_007605,length=171823>
+##contig=<ID=hs37d5,length=35477943>
+##FILTER=<ID=OC,Description="Coverage threshold exceeded">
+##FILTER=<ID=RC,Description="RTG variant is a complex region">
+##FILTER=<ID=RX,Description="RTG variant contained within hypercomplex region">
+##FILTER=<ID=RCEQUIV,Description="RTG variant is equivalent to the previous variant">
+##FILTER=<ID=OTHER,Description="Variant is invalid for unknown reasons">
+##INFO=<ID=DPR,Number=1,Type=Float,Description="Ratio of combined read depth for variant to expected combined read depth">
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="Coverage threshold that was applied">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=DPR,Number=1,Type=Float,Description="Ratio of read depth to expected read depth">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="Ambiguity Ratio">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=ABP,Number=1,Type=Float,Description="Phred scaled probability that allele imbalance is present">
+##FORMAT=<ID=SBP,Number=1,Type=Float,Description="Phred scaled probability that strand bias is present">
+##FORMAT=<ID=RPB,Number=1,Type=Float,Description="Phred scaled probability that read position bias is present">
+##FORMAT=<ID=PPB,Number=1,Type=Float,Description="Phred scaled probability that there is a bias in the proportion of alignments that are properly paired">
+##FORMAT=<ID=PUR,Number=1,Type=Float,Description="Ratio of placed unmapped reads to mapped reads">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=GL,Number=G,Type=Float,Description="Log_10 scaled genotype likelihoods. As defined in VCF specifications">
+##SAMPLE=<ID=NA12889,Sex=MALE>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12889	NA12880-1
+1	11119899	.	T	C	350.1	PASS	DPR=0.205	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:11:0.205:0.011:0.000:32:0.00:9.67:9.67:0.00:0.00:C,11,0.011:0,11:-35.01,-3.17,0.00	1/1:14:0.309:0.015:0.000:35:0.62:1.50:9.93:0.00:0.00:A,1,0.001,C,13,0.014:0,13:-41.76,-3.77,0.00
+1	11128654	.	G	A	1135.6	PASS	DPR=0.616	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:33:0.616:0.035:0.000:97:0.00:23.75:7.96:0.00:0.00:A,33,0.035:0,33:-113.56,-9.67,0.00	1/1:37:0.815:0.029:0.000:109:0.00:31.05:13.20:0.00:0.00:A,37,0.029:0,37:-129.86,-10.87,0.00
+1	11132217	.	G	A	333.3	PASS	DPR=0.187	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:10:0.187:0.007:0.000:28:0.00:0.00:0.87:0.00:0.00:A,10,0.007:0,10:-33.33,-2.75,0.00	1/1:19:0.419:0.013:0.000:55:0.00:0.11:5.60:0.00:0.00:A,19,0.013:0,19:-66.20,-5.46,0.00
+1	11133956	.	A	G	203.0	PASS	DPR=0.187	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	0/1:10:0.187:0.068:0.000:31:7.82:9.77:13.90:2.78:0.00:A,2,0.011,G,8,0.056:2,8:-20.30,0.00,-3.08	.
+1	11133956	.	A	AAAG	478.8	PASS	DPR=0.309;XRX	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL	.	1/1:14:0.309:0.130:0.000:32:62.04:2.17:2.48:0.19:0.00:3,4:-47.88,-3.82,0.00
+1	11141187	.	C	G	1977.7	PASS	DPR=1.065	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:57:1.065:0.148:0.000:169:0.00:8.57:6.44:0.00:0.00:G,57,0.148:0,57:-197.77,-16.94,0.00	1/1:39:0.860:0.096:0.000:115:0.00:16.09:0.50:0.00:0.00:G,39,0.096:0,39:-133.03,-11.53,0.00
+1	11205058	.	C	T	3737.8	PASS	DPR=1.980	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:106:1.980:0.265:0.000:316:0.00:20.98:9.92:0.00:0.02:T,106,0.265:0,106:-373.78,-31.61,0.00	1/1:68:1.499:0.054:0.000:202:0.00:3.19:25.04:0.00:0.01:T,68,0.054:0,68:-242.10,-20.20,0.00
+1	16388556	.	C	T	553.6	PASS	DPR=0.374	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:20:0.374:2.079:0.100:51:0.00:6.95:0.43:0.00:0.00:T,20,2.079:0,20:-55.36,-5.15,0.00	0/1:19:0.419:3.119:0.158:191:1.03:4.34:2.86:0.00:0.00:C,11,3.108,T,8,0.011:11,8:-19.21,0.00,-19.65
+1	16388565	.	C	G	348.9	PASS	DPR=0.392	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	0/1:21:0.392:2.074:0.095:134:8.38:5.79:0.10:0.00:0.00:C,6,0.057,G,15,2.017:6,15:-34.89,0.00,-13.37	0/1:24:0.529:3.124:0.125:258:0.36:1.78:5.79:0.00:0.00:C,13,3.061,G,11,0.063:13,11:-25.91,0.00,-26.64
+1	16388580	.	C	T	107.6	PASS	DPR=0.392	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	0/1:21:0.392:1.123:0.048:108:5.07:2.79:0.93:0.00:0.00:C,14,1.015,T,7,0.109:14,7:-10.76,0.00,-39.16	.
+1	16388580	.	C	A	216.2	PASS	DPR=0.639	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	.	1/0:29:0.639:2.041:0.069:216:1.87:6.51:3.67:0.00:0.00:A,12,2.015,C,17,0.026:17,12:-21.62,0.00,-48.98
+1	16388646	.	T	C	650.1	PASS	DPR=0.392	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:21:0.392:0.126:0.000:62:0.00:8.38:0.93:0.00:0.00:C,21,0.126:0,21:-65.01,-6.17,0.00	1/0:25:0.551:0.134:0.000:134:14.68:13.03:19.54:0.00:0.00:C,19,0.127,T,6,0.007:6,19:-51.31,0.00,-13.42
+1	16388709	.	G	T	74.8	PASS	DPR=0.262	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	0/1:14:0.262:0.130:0.000:75:2.48:6.03:22.34:0.00:0.00:G,9,0.074,T,5,0.055:9,5:-7.48,0.00,-24.51	1/1:4:0.088:0.005:0.000:10:0.00:8.69:2.17:0.00:0.00:T,4,0.005:0,4:-9.61,-1.02,-0.04
+1	16388890	.	G	.	4.5	PASS	DPR=0.022	GT:DP:DPR:RE:AR:GQ:ABP:RPB:PUR:RS:AD:GL	.	0/0:1:0.022:0.001:0.000:4:8.69:2.17:0.00:C,1,0.001:0:0.00
+5	50045967	.	G	T	138.9	PASS	DPR=0.336;XRX	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL:RS	0/1:18:0.336:0.061:0.000:139:0.00:17.37:7.72:0.00:0.00:8,8:-13.89,0.00,-18.88	0/1:22:0.475:0.017:0.000:152:6.32:7.76:25.27:0.00:0.00:15,7:-15.22,0.00,-47.54:G,15,0.012,T,7,0.005
+5	50046139	.	A	G	860.6	PASS	DPR=0.466	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:25:0.466:0.021:0.000:74:0.00:10.51:0.09:0.00:0.00:G,25,0.021:0,25:-86.06,-7.39,0.00	1/1:44:0.949:0.035:0.000:131:0.00:4.94:3.16:0.00:0.00:G,44,0.035:0,44:-154.99,-13.11,0.00
+5	50053015	.	G	A	2278.1	PASS	DPR=1.175	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/1:63:1.175:0.042:0.000:187:0.00:4.17:7.76:0.00:0.00:A,63,0.042:0,63:-227.81,-18.70,0.00	1/1:45:0.971:0.033:0.000:133:0.00:3.91:0.43:0.00:0.00:A,45,0.033:0,45:-160.56,-13.28,0.00
+5	50055472	.	T	TT	29.2	PASS	DPR=0.261;XRX	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL	0/1:14:0.261:0.002:0.000:29:15.51:4.34:5.58:0.00:0.00:12,2:-2.92,0.00,-16.25	.
+5	50055472	.	T	TTT	78.3	PASS	DPR=0.237;XRX	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL	.	0/1:11:0.237:0.029:0.000:78:1.78:8.69:4.94:0.29:0.00:7,4:-7.83,0.00,-13.34
+5	50057729	.	G	A,T	463.8	PASS	DPR=0.578	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/0:31:0.578:0.075:0.000:412:0.63:2.48:0.63:0.00:0.00:A,17,0.064,G,14,0.011:14,17:-46.38,0.00,-41.19	1/2:41:0.884:0.136:0.000:495:0.48:2.86:8.95:0.00:0.02:A,22,0.017,T,19,0.118:0,22,19:-125.36,-55.88,-49.52,-69.96,0.00,-64.49
+5	50122658	.	TT	T	51.9	PASS	DPR=0.485;XRX	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL	0/1:26:0.485:0.069:0.000:52:33.41:6.51:0.33:0.00:0.00:23,3:-5.19,0.00,-60.01	1/0:29:0.625:0.268:0.000:9:46.80:4.34:0.07:0.00:0.00:27,2:-0.93,-0.05,-80.29
+5	52096650	.	T	G	5.6	PASS	DPR=0.877	GT:DP:DPR:RE:AR:GQ:ABP:SBP:RPB:PPB:PUR:RS:AD:GL	1/0:47:0.877:1.042:0.000:6:27.19:23.89:0.05:0.00:0.04:C,1,0.050,G,11,0.759,T,35,0.232:35,11:-0.56,-0.14,-102.56	.

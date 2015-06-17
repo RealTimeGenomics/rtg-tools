@@ -1,0 +1,8 @@
+# PED format pedigree
+# fam-id	ind-id	pat-id	mat-id	sex	phen
+0	sm-dad	0	0	1	0
+0	sm-daughter1	sm-dad	sm-mom	0	0
+0	sm-daughter2	sm-dad	sm-mom	0	0
+0	sm-mom	0	0	2	0
+0	sm-son1	sm-dad	sm-mom	0	0
+0	sm-son2	sm-dad	sm-mom	0	0

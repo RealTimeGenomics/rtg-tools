@@ -1,0 +1,27 @@
+Parent GT: 1 1/1
+Children:
+   0/1          1  50.00%
+   1/1          1  50.00%
+Total: 2
+
+Parent GT: -1 1
+Children:
+     0          1  50.00%
+     1          1  50.00%
+Total: 2
+
+Parent GT: 0/0 1/1
+Children:
+   1/2          1 100.00%
+Total: 1
+
+Parent GT: 0/1 0/1
+Children:
+   0/1          1 100.00%
+Total: 1
+
+Parent GT: 0/1 0/2
+Children:
+   0/2          1 100.00%
+Total: 1
+

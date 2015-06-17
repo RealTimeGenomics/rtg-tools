@@ -1,0 +1,33 @@
+##fileformat=VCFv4.1
+##fileDate=20121211
+##source=RTGvPOST-2.7 build c5deca9 (2012-12-11)
+##CL=snp -o snp -t c:\Workspace\rtg\internal/com/rtg/regression/data/snp_chr22/tiny/template_sdf --Xpriors human -m default --max-hits 1 c:\Workspace\rtg\internal/com/rtg/regression/data/snp_chr22/input/mated.sam.gz c:\Workspace\rtg\internal/com/rtg/regression/data/snp_chr22/input/unmated.sam.gz -Z
+##RUN-ID=984e69ac-c8ee-43f5-8a50-8ed63ffa3d16
+##reference=c:\Workspace\rtg\internal\com\rtg\regression\data\snp_chr22\tiny\template_sdf
+##contig=<ID=gi|89161203|ref|NC_000022.9|NC_000022,length=70070>
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="Coverage threshold that was applied">
+##INFO=<ID=ZZ,Number=A,Type=Integer,Description="Test info field with alt allele values">
+##INFO=<ID=ZY,Number=G,Type=Integer,Description="Test info field with genotype values">
+##FILTER=<ID=OC,Description="Coverage threshold exceeded">
+##FILTER=<ID=a10.0,Description="Ambiguity exceeded 10.0">
+##FILTER=<ID=RC,Description="RTG variant is a complex region">
+##FILTER=<ID=RX,Description="RTG variant contained within hypercomplex region">
+##FILTER=<ID=RCEQUIV,Description="RTG variant is equivalent to the previous variant">
+##FILTER=<ID=OTHER,Description="Variant is invalid for unknown reasons">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Genotype Quality">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="Ambiguity Ratio">
+##FORMAT=<ID=AB,Number=1,Type=Float,Description="Allele Balance">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+##FORMAT=<ID=ZX,Number=A,Type=Integer,Description="Test format field with alt allele values">
+##FORMAT=<ID=ZW,Number=G,Type=Integer,Description="Test format field with genotype values">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLEA
+gi|89161203|ref|NC_000022.9|NC_000022	100	.	G	A,C	386.1	PASS	.	GT:ZX	1/2:1,2
+gi|89161203|ref|NC_000022.9|NC_000022	137	.	G	A,C	386.1	PASS	.	GT:ZX	1/2:1,2
+gi|89161203|ref|NC_000022.9|NC_000022	1539	.	G	T,A	429.5	PASS	.	GT:ZX	1/2:1,2
+gi|89161203|ref|NC_000022.9|NC_000022	2566	.	TGG	CCC	687.5	PASS	XRX	GT:ZW	1/1:1,2
+gi|89161203|ref|NC_000022.9|NC_000022	2580	.	TGG	CCC	687.5	PASS	XRX	GT:ZX	1/1:1

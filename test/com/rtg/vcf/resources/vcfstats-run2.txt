@@ -1,0 +1,26 @@
+Failed Filters               : 0
+Passed Filters               : 134
+Complex Called               : 15
+SNPs                         : 40
+MNPs                         : 1
+Insertions                   : 2
+Deletions                    : 1
+Indels                       : 0
+Same as reference            : 90
+De Novo Genotypes            : 2
+Phased Genotypes             : 72.4% (97/134)
+SNP Transitions/Transversions: 2.47 (42/17)
+Total Haploid                : 5
+Haploid SNPs                 : 4
+Haploid MNPs                 : 0
+Haploid Insertions           : 1
+Haploid Deletions            : 0
+Haploid Indels               : 0
+Total Het/Hom ratio          : 0.86 (18/21)
+SNP Het/Hom ratio            : 0.89 (17/19)
+MNP Het/Hom ratio            : 0.00 (0/1)
+Insertion Het/Hom ratio      : - (1/0)
+Deletion Het/Hom ratio       : 0.00 (0/1)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : 2.00 (2/1)
+Indel/SNP+MNP ratio          : 0.07 (3/41)

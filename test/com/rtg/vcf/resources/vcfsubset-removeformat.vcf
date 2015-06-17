@@ -1,0 +1,35 @@
+##fileformat=VCFv4.1
+##reference=GRCh37
+##ALT=<ID=DEL,Description="Deletion">
+##FILTER=<ID=NAH,Description="Nah">
+##FILTER=<ID=YEA,Description="Yeah">
+##INFO=<ID=LDAF,Number=1,Type=Float,Description="MLE Allele Frequency Accounting for LD">
+##INFO=<ID=AVGPOST,Number=1,Type=Float,Description="Average posterior probability from MaCH/Thunder">
+##INFO=<ID=RSQ,Number=1,Type=Float,Description="Genotype imputation quality from MaCH/Thunder">
+##INFO=<ID=ERATE,Number=1,Type=Float,Description="Per-marker Mutation rate from MaCH/Thunder">
+##INFO=<ID=THETA,Number=1,Type=Float,Description="Per-marker Transition rate from MaCH/Thunder">
+##INFO=<ID=CIEND,Number=2,Type=Integer,Description="Confidence interval around END for imprecise variants">
+##INFO=<ID=CIPOS,Number=2,Type=Integer,Description="Confidence interval around POS for imprecise variants">
+##INFO=<ID=END,Number=1,Type=Integer,Description="End position of the variant described in this record">
+##INFO=<ID=HOMLEN,Number=.,Type=Integer,Description="Length of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=HOMSEQ,Number=.,Type=String,Description="Sequence of base pair identical micro-homology at event breakpoints">
+##INFO=<ID=SVLEN,Number=1,Type=Integer,Description="Difference in length between REF and ALT alleles">
+##INFO=<ID=SVTYPE,Number=1,Type=String,Description="Type of structural variant">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Alternate Allele Count">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total Allele Count">
+##INFO=<ID=AA,Number=1,Type=String,Description="Ancestral Allele, ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/pilot_data/technical/reference/ancestral_alignments/README">
+##INFO=<ID=AF,Number=1,Type=Float,Description="Global Allele Frequency based on AC/AN">
+##INFO=<ID=AMR_AF,Number=1,Type=Float,Description="Allele Frequency for samples from AMR based on AC/AN">
+##INFO=<ID=ASN_AF,Number=1,Type=Float,Description="Allele Frequency for samples from ASN based on AC/AN">
+##INFO=<ID=AFR_AF,Number=1,Type=Float,Description="Allele Frequency for samples from AFR based on AC/AN">
+##INFO=<ID=EUR_AF,Number=1,Type=Float,Description="Allele Frequency for samples from EUR based on AC/AN">
+##INFO=<ID=VT,Number=1,Type=String,Description="indicates what type of variant the line represents">
+##INFO=<ID=SNPSOURCE,Number=.,Type=String,Description="indicates if a snp was called when analysing the low coverage or exome alignment data">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=GL,Number=.,Type=Float,Description="Genotype Likelihoods">
+##SAMPLE=<ID=HG00096,Description="Torgue corporation question:">
+##SAMPLE=<ID=HG00097,Description="EXPLOOOSIIIOONNNSSSS?">
+##SAMPLE=<ID=HG00100,Description="That sentence had too many syllables. APOLOGISE!">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	HG00096	HG00097	HG00099	HG00100
+X	60034	.	ACC	A	256	NAH	AVGPOST=0.9664;LDAF=0.0610;THETA=0.0087;ERATE=0.0027;RSQ=0.7797;AC=117;AN=2184;VT=INDEL;AF=0.05;ASN_AF=0.07;AMR_AF=0.05;AFR_AF=0.09;EUR_AF=0.02	GT:GL	0|0:0,0,0	0|1:-4.60,-0.30,0.00	0|0:0.00,-0.60,-11.40	0|0:0.00,-0.80,-5.40
+X	60052	rs186434315	T	A	100	YEA;NAH	AC=752;AN=2184;VT=SNP;AA=.;AVGPOST=0.9538;RSQ=0.9370;SNPSOURCE=LOWCOV;LDAF=0.3410;ERATE=0.0006;THETA=0.0058;AF=0.34;ASN_AF=0.21;AMR_AF=0.35;AFR_AF=0.33;EUR_AF=0.46	GT:GL	0|1:-0.18,-0.47,-2.40	0|0:-0.07,-0.83,-4.40	0|1:-0.07,-0.85,-5.00	0|0:-0.11,-0.66,-3.85

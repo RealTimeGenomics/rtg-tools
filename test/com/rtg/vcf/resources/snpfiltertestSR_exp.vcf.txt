@@ -1,0 +1,4 @@
+
+Total records : 20
+Filtered due to same as reference : 2
+Remaining records : 18

@@ -1,0 +1,17 @@
+digraph Ped {
+  ratio ="auto";
+  mincross = 2.0;
+  labelloc = "t";
+  label="My Title";
+
+  {
+    node0 -> node2 [dir=none];
+    node1 -> node2 [dir=none];
+    node2 [shape=diamond,style=filled,label="",height=.1,width=.1];
+  }
+  node2 -> node3 [];
+  node0 [label="father", shape=box, style=filled, fillcolor=grey];
+  node1 [label="mother", shape=oval, style=filled, fillcolor=pink];
+  node3 [label="child", shape=box, style=filled, fillcolor=grey];
+}
+

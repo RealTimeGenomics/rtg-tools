@@ -1,0 +1,59 @@
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : Optimus
+   Primary Dns Suffix  . . . . . . . : 
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : 18londonst.co.nz
+
+Ethernet adapter Local Area Connection:
+
+   Connection-specific DNS Suffix  . : 18londonst.co.nz
+   Description . . . . . . . . . . . : NVIDIA nForce Networking Controller
+   Physical Address. . . . . . . . . : 00-15-F2-02-EB-DD
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv4 Address. . . . . . . . . . . : 10.0.201.19(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Lease Obtained. . . . . . . . . . : Friday, 8 May 2009 12:45:33 p.m.
+   Lease Expires . . . . . . . . . . : Monday, 11 May 2009 5:25:32 p.m.
+   Default Gateway . . . . . . . . . : 10.0.201.1
+   DHCP Server . . . . . . . . . . . : 10.0.201.6
+   DNS Servers . . . . . . . . . . . : 10.0.201.6
+                                       10.0.201.75
+   Primary WINS Server . . . . . . . : 10.0.201.75
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Ethernet adapter VMware Network Adapter VMnet1:
+
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet1
+   Physical Address. . . . . . . . . : 00-50-56-C0-00-01
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::1029:6962:ce3e:50c3%12(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 192.168.93.1(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Ethernet adapter VMware Network Adapter VMnet8:
+
+   Connection-specific DNS Suffix  . : 
+   Description . . . . . . . . . . . : VMware Virtual Ethernet Adapter for VMnet8
+   Physical Address. . . . . . . . . : 00-50-56-C0-00-08
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+   Link-local IPv6 Address . . . . . : fe80::bdbe:d800:8841:6e0d%14(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 192.168.229.1(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . : 
+   DNS Servers . . . . . . . . . . . : fec0:0:0:ffff::1%1
+                                       fec0:0:0:ffff::2%1
+                                       fec0:0:0:ffff::3%1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+

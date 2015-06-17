@@ -1,0 +1,42 @@
+##fileformat=VCFv4.1
+##fileDate=20111212
+##source=RTGvPOST-2.4 build  (2011-12-12)
+##CL=null
+##RUN-ID=2ba07311-139d-40cf-b602-49631cdc75c8
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="Coverage threshold that was applied">
+##INFO=<ID=AVR,Number=1,Type=Float,Description="AVR score">
+##FILTER=<ID=OC,Description="Coverage threshold exceeded">
+##FILTER=<ID=a1000.0,Description="Ambiguity exceeded 1000.0">
+##FILTER=<ID=RC,Description="RTG variant is a complex region">
+##FILTER=<ID=RX,Description="RTG variant contained within hypercomplex region">
+##FILTER=<ID=RCEQUIV,Description="RTG variant is equivalent to the previous variant">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="Ambiguity Ratio">
+##FORMAT=<ID=AB,Number=1,Type=Float,Description="Allele Balance">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE	SAMPLE2
+g1	1	.	A	C	.	PASS	.	GT:DP:RE:GQ:AVR	0/0:5:0.000:31.0:0.22	0/0:5:0.000:31.0:0.38
+g1	8	.	A	C	.	PASS	.	GT:DP:RE:GQ:AVR	0/0:7:0.000:31.0:0.23	0/0:7:0.000:31.0:0.37
+g1	11	.	A	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:2:1.002:36.0:A,2,1.002:0.24	0/0:2:1.002:36.0:A,2,1.002:0.36
+g1	54	.	T	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:2:1.002:36.0:T,2,1.002:0.25	0/0:2:1.002:36.0:T,2,1.002:0.35
+g1	65	.	C	G	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:3:1.504:37.0:C,3,1.504:0.26	0/0:3:1.504:37.0:C,3,1.504:0.34
+g1	76	.	G	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:5:2.506:41.0:G,5,2.506:0.27	0/0:5:2.506:41.0:G,5,2.506:0.33
+g1	87	.	A	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:5:2.506:43.0:A,5,2.506:0.28	0/0:5:2.506:43.0:A,5,2.506:0.32
+g1	98	.	C	G	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:5:2.506:41.0:C,5,2.506:0.29	0/0:5:2.506:41.0:C,5,2.506:0.31
+g1	109	.	T	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:5:2.506:43.0:T,5,2.506:0.3	0/0:5:2.506:43.0:T,5,2.506:0.3
+g1	110	.	G	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:5:2.506:41.0:G,5,2.506:0.31	0/0:5:2.506:41.0:G,5,2.506:0.29
+g1	115	.	G	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:4:2.005:20.0:C,2,1.002,T,2,1.002:0.32	0/0:4:2.005:20.0:C,2,1.002,T,2,1.002:0.28
+g1	125	.	T	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:4:2.005:41.0:T,4,2.005:0.33	0/0:4:2.005:41.0:T,4,2.005:0.27
+g1	135	.	C	G	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:3:1.504:37.0:C,3,1.504:0.34	0/0:3:1.504:37.0:C,3,1.504:0.26
+g1	145	.	A	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:1:0.501:33.0:A,1,0.501:0.35	0/0:1:0.501:33.0:A,1,0.501:0.25
+g1	155	.	G	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:1:0.501:31.0:G,1,0.501:0.36	0/0:1:0.501:31.0:G,1,0.501:0.24
+g1	165	.	C	G	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:1:0.501:31.0:C,1,0.501:0.37	0/0:1:0.501:31.0:C,1,0.501:0.23
+g1	175	.	T	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:1:0.501:34.0:T,1,0.501:0.38	0/0:1:0.501:34.0:T,1,0.501:0.22
+g1	185	.	A	C	.	a1000.0	.	GT:DP:RE:GQ:RS:AVR	0/1:1:0.501:33.0:A,1,0.501:0.39	0/0:1:0.501:33.0:A,1,0.501:0.21
+g1	195	.	G	C	.	PASS	.	GT:DP:RE:GQ:AVR	0/1:7:0.000:48.0:0.4	0/0:7:0.000:48.0:0.2
+g1	205	.	G	C	.	PASS	.	GT:DP:RE:GQ:AVR	0/1:7:0.000:48.0:0.41	0/0:7:0.000:48.0:0.19

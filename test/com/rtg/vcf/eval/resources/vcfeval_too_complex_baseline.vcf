@@ -1,0 +1,110 @@
+##fileformat=VCFv4.1
+##FILTER=<ID=PASS,Description="All filters passed">
+##fileDate=20140319
+##phasing=RTG
+##reference=file:///projects/scratch-data-backup/justin.zook/references/human_g1k_v37.fasta
+##source=NIST_RTG_PlatinumGenomes_Integration
+##variants_justified=left
+##CL=vcfmerge --stats -o ../NISTPedigreeIntegration/NIST_RTG_PlatGen_merged_highconfidence_v0.1test4.vcf.gz ../NISTPedigreeIntegration/RTGPHQ_NISTcons2.19_2.6_2d5YNR_tp.vcf.gz ../NISTPedigreeIntegration/RTGPHQ_NISTcons2.19_FN_RTGPHI_TP_PlatGen_inclfilt_tp.vcf.gz ../NISTPedigreeIntegration/RTGPHQ_NISTcons2.19_FN_RTGPHI_FP_PlatGen_inclfilt_tp.vcf.gz ../NISTPedigreeIntegration/RTGPHQ_NISTcons2.19_FN_RTGPHI_FP_PlatGen_inclfilt_fp.vcf.gz ../NISTPedigreeIntegration/RTGNISTAllnewvPlatGenNISTAllnew_tp.vcf.gz ../NISTPedigreeIntegration/RTGNISTAllnewvPlatGenNISTAllnew_fp.vcf.gz ../NISTPedigreeIntegration/RTGNISTAllnewvPlatGenNISTAllnew_fn.vcf.gz
+##RUN-ID=b0a6767e-55c9-434b-ae1a-8b6b32950060
+##CL=vcffilter -i ../NISTPedigreeIntegration/NIST_RTG_PlatGen_merged_highconfidence_v0.1.vcf --include-bed ../NISTPedigreeIntegration/union13callableMQonlymerged_addcert_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs_v2.19_2mindatasets_5minYesNoRatio_AddRTGPlatGenConf_filtNISTclustergt9_v0.1.bed -o ../NISTPedigreeIntegration/NIST_RTG_PlatGen_merged_highconfidence_v0.1_NISTAll_NISTPed01.vcf.gz
+##RUN-ID=dae28c83-8185-4ee5-80b5-db5ccd367ac4
+##CL=vcffilter -i NISTAll_NISTPed01_inclfilt/tp.vcf.gz --include-bed /data/results/justin/SRA/NA12878/NISTPedigreeIntegration/union13callableMQonlymerged_addcert_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs_v2.19_2mindatasets_5minYesNoRatio_AddRTGPlatGenConf_filtNISTclustergt9_RemNISTfilt_RemPartComp_RemRep_RemPartComp_v0.2.bed -o /data/results/justin/SRA/NA12878/NISTPedigreeIntegration/NIST_RTG_PlatGen_merged_highconfidence_v0.2.vcf.gz
+##RUN-ID=a9902d66-cf9f-4b75-acc2-b595721ff9e2
+##contig=<ID=11,length=10000>
+##FILTER=<ID=Uncertain,Description="Uncertain genotype due to reason in filter INFO field">
+##INFO=<ID=Callers,Number=.,Type=String,Description="Algorithms identifying this variant site.">
+##INFO=<ID=isPolymorphic,Number=1,Type=Flag,Description="Sites that are polymorphic in the CEPH1493 pedigree.">
+##INFO=<ID=HammingDistance,Number=1,Type=Integer,Description="Number of GT mismatches across the pedigree with the given Phasing.">
+##INFO=<ID=editDistance,Number=1,Type=Integer,Description="The number of genotype edits to the second most likely inheritance consistent genotype vector.">
+##INFO=<ID=callers,Number=.,Type=String,Description="List of callers producing this variant.">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each ALT allele, in the same order as listed">
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency, for each ALT allele, in the same order as listed">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##INFO=<ID=DP,Number=1,Type=Integer,Description="Approximate read depth; some reads may have been filtered">
+##INFO=<ID=DPSum,Number=1,Type=Integer,Description="Total read depth summed across all datasets, excluding MQ0 reads">
+##INFO=<ID=Entropy,Number=1,Type=Float,Description="Shannon entropy of variant flanking regions, 12bp on both sides">
+##INFO=<ID=HRun,Number=1,Type=Integer,Description="Largest Contiguous Homopolymer Run of Variant Allele In Either Direction">
+##INFO=<ID=HapNoVar,Number=1,Type=Integer,Description="Number of datasets for which HaplotypeCaller called a variant within 35bp and did not call a variant at this location">
+##INFO=<ID=LEN,Number=A,Type=Integer,Description="allele length">
+##INFO=<ID=NoCG,Number=0,Type=Flag,Description="Present if no consensus was reached for arbitration of all datasets, so we looked at all datasets except Complete Genomics since it may have a different representation of complex variants">
+##INFO=<ID=NoPLTot,Number=1,Type=Integer,Description="Number of datasets with likelihood ratio > 20 for a genotype different from the called genotype">
+##INFO=<ID=PL454WG,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~16x 454 whole genome sequencing from 1000 Genomes Project, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLCG,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~73x Complete Genomics whole genome sequencing, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLHSWEx,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~66x 2x100bp Illumina exome sequencing from Broad Institute, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLHSWG,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~68x 2x100bp Illumina whole genome sequencing from Broad Institute, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLILL250,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~50x 2x250bp Illumina PCR-free whole genome sequencing from Broad Institute, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLILLCLIA,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~80x 2x100bp Illumina whole genome sequencing from Illumina CLIA lab, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLILLWEx,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~30x 2x54bp Illumina exome sequencing from Broad Institute, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLILLWG,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~39x 2x44bp Illumina whole genome sequencing from Broad Institute, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLIllPCRFree,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~56x 2x100bp Illumina PCR-free whole genome sequencing from Illumina Platinum Genomes Project, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLIonEx,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~80x mean 237bp Ion Torrent exome sequencing from Life Technologies, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLPlatGen,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~190x 2x100bp Illumina PCR-free whole genome sequencing from Illumina Platinum Genomes Project, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLXIll,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~37x 2x100bp Illumina whole genome sequencing from X Prize, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLXPSolWGLS,Number=.,Type=String,Description="Genotype likelihoods (PL) for ~24x 50bpx35bp SOLiD whole genome sequencing from X Prize, preceded by filtering info if this dataset was not used due to evidence of bias">
+##INFO=<ID=PLminsum,Number=1,Type=Integer,Description="Net Genotype quality across all datasets, defined as difference between most likely and next most likely genotype likelihoods">
+##INFO=<ID=PLminsumOverDP,Number=1,Type=Float,Description="Net Genotype quality across all datasets, defined as difference between most likely and next most likely genotype likelihoods, divided by the depth of coverage">
+##INFO=<ID=RPA,Number=.,Type=Integer,Description="Number of times tandem repeat unit is repeated, for each allele (including reference)">
+##INFO=<ID=RU,Number=1,Type=String,Description="Tandem repeat unit (bases)">
+##INFO=<ID=TYPE,Number=A,Type=String,Description="The type of allele, either snp, mnp, ins, del, or complex.">
+##INFO=<ID=TrancheABQDmin2,Number=1,Type=Float,Description="2nd lowest VQSR tranche for the called genotype for annotations associated with abnormal allele balance (AB and QD)">
+##INFO=<ID=TrancheAlignmin2,Number=1,Type=Float,Description="2nd lowest VQSR tranche for the called genotype for annotations associated with local alignment errors (distance from the end of the read and clipping)">
+##INFO=<ID=TrancheMapmin2,Number=1,Type=Float,Description="2nd lowest VQSR tranche for the called genotype for annotations associated with mapping errors (mapping quality and depth of coverage)">
+##INFO=<ID=TrancheSSEmin2,Number=1,Type=Float,Description="2nd lowest VQSR tranche for the called genotype for annotations associated with systematic sequencing errors (strand bias and neighboring base quality)">
+##INFO=<ID=YesPLtot,Number=1,Type=Integer,Description="Number of datasets with likelihood ratio > 20 for the called genotype">
+##INFO=<ID=datasetcalls,Number=1,Type=Integer,Description="Number of datasets with any genotype call at this position">
+##INFO=<ID=filter,Number=1,Type=String,Description="Reason for filtering this genotype as uncertain">
+##INFO=<ID=geno,Number=1,Type=Integer,Description="Most probable genotype, corresponding to the minimum entry in the PL field (e.g., 1=0/0,2=0/1,3=1/1,4=0/2,etc)">
+##INFO=<ID=genoMapGood,Number=1,Type=Integer,Description="Number of datasets calling this genotype with VQSR mapping tranche <= 95">
+##INFO=<ID=platformbias,Number=.,Type=String,Description="Names of platforms that have at more than twice as many incorrect than correct genotypes at this location, indicating platform-specific bias (ill=Illumina,sol=SOLiD,454=454,ion=Ion Torrent,cg=Complete Genomics)">
+##INFO=<ID=platformnames,Number=.,Type=String,Description="Names of platforms that called this genotype (ill=Illumina,sol=SOLiD,454=454,ion=Ion Torrent,cg=Complete Genomics)">
+##INFO=<ID=platforms,Number=1,Type=Integer,Description="Number of different platforms that called this genotype">
+##INFO=<ID=source,Number=.,Type=String,Description="Source of calls: NISTPASS=NIST high-confidence v2.19; NISTUncertain=NIST less confident v2.19; RTGPHQ=Real Time Genomics phased pedigree calls; RTGPHQ=Real Time Genomics phase inconsistent calls; PlatGen=Illumina Platinum Genomes phased pedigree calls.">
+##INFO=<ID=varType,Number=1,Type=String,Description="Type of variant">
+##INFO=<ID=DPR,Number=1,Type=Float,Description="RTG Ratio of combined read depth for variant to expected combined read depth">
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="RTG Coverage threshold that was applied">
+##INFO=<ID=PHC,Number=0,Type=Flag,Description="RTG The phasing of children in this variant is compatible with known phasing pattern">
+##INFO=<ID=PHR,Number=2,Type=String,Description="RTG The phasing of children in this variant has been repaired by altering one samples GT, the two strings are the sample that was repaired and the old GT">
+##INFO=<ID=PHI,Number=.,Type=Character,Description="RTG The phasing of children in this variant is incompatible with known phasing pattern, 'C' -> consistent or 'I' -> inconsistent for each child in the order of children in the samples.">
+##INFO=<ID=PHIC,Number=1,Type=Integer,Description="RTG Count of the minimum number of inconsistent children.">
+##INFO=<ID=PHQ,Number=1,Type=Integer,Description="RTG Phred-scaled probability that the phasing consistency would have been obtained by chance.">
+##INFO=<ID=AFGT,Number=.,Type=String,Description="RTG List of alternate GT values for father that would make call consistent.">
+##INFO=<ID=AMGT,Number=.,Type=String,Description="RTG List of alternate GT values for mother that would make call consistent.">
+##INFO=<ID=PGC,Number=4,Type=Integer,Description="RTG The number of children in each phasing group (00, 01, 10, 11)">
+##INFO=<ID=PGDR,Number=4,Type=Float,Description="RTG The average DPR of children in each phasing group (00, 01, 10, 11)">
+##FORMAT=<ID=DPR,Number=1,Type=Float,Description="RTG Ratio of read depth to expected read depth">
+##FORMAT=<ID=RE,Number=1,Type=Float,Description="RTG Total Error">
+##FORMAT=<ID=AR,Number=1,Type=Float,Description="RTG Ambiguity Ratio">
+##FORMAT=<ID=RQ,Number=1,Type=Float,Description="RTG sample quality">
+##FORMAT=<ID=DN,Number=1,Type=Character,Description="RTG Indicates whether call is a putative de novo mutation">
+##FORMAT=<ID=DNP,Number=1,Type=Float,Description="RTG Phred scaled probability that the call is due to a de novo mutation">
+##FORMAT=<ID=ABP,Number=1,Type=Float,Description="RTG Phred scaled probability that allele imbalance is present">
+##FORMAT=<ID=SBP,Number=1,Type=Float,Description="RTG Phred scaled probability that strand bias is present">
+##FORMAT=<ID=RPB,Number=1,Type=Float,Description="RTG Phred scaled probability that read position bias is present">
+##FORMAT=<ID=PPB,Number=1,Type=Float,Description="RTG Phred scaled probability that there is a bias in the proportion of alignments that are properly paired">
+##FORMAT=<ID=PUR,Number=1,Type=Float,Description="RTG Ratio of placed unmapped reads to mapped reads">
+##FORMAT=<ID=RS,Number=.,Type=String,Description="RTG Support Statistics">
+##FORMAT=<ID=AD,Number=.,Type=Integer,Description="RTG Allelic depths for the ref and alt alleles in the order listed">
+##FORMAT=<ID=GL,Number=G,Type=Float,Description="RTG Log_10 scaled genotype likelihoods. As defined in VCF specifications">
+##FORMAT=<ID=AVR,Number=1,Type=Float,Description="RTG AVR score">
+##FORMAT=<ID=PS,Number=1,Type=Integer,Description="RTG Phase set for the genotype">
+##FORMAT=<ID=DP,Number=1,Type=Integer,Description="For RTG, read depth of Illumina.  For NIST, total read depth summed across all datasets, excluding MQ0 reads">
+##FORMAT=<ID=GQ,Number=1,Type=Integer,Description="Net Genotype quality across all datasets, defined as difference between most likely and next most likely genotype likelihoods">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Net Genotype across all datasets">
+##FORMAT=<ID=PL,Number=G,Type=Integer,Description="Normalized, Phred-scaled likelihoods summed across all unfiltered datasets for genotypes as defined in the VCF specification">
+##FORMAT=<ID=ED,Number=1,Type=String,Description="Per-sample edit distance">
+##INFO=<ID=allalts,Number=1,Type=Integer,Description="All ALT alleles originally considered at this position">
+##INFO=<ID=PLNCIIonWG,Number=3,Type=Integer,Description="PLNCIIonWG">
+##bcftools_annotateVersion=1.1-78-gd3f44e1+htslib-1.1-85-g83a4e30
+##bcftools_annotateCommand=annotate -h PLNCIIonWG.hdr -Ou
+##bcftools_viewVersion=1.1-78-gd3f44e1+htslib-1.1-85-g83a4e30
+##bcftools_viewCommand=view -s NA12878 -v indels -T /lustre/scratch113/teams/sandhu/resources/ftp.ncbi.nih.gov/giab/ftp/data/NA12878/variant_calls/GIAB_integration/union13callableMQonlymerged_addcert_nouncert_excludesimplerep_excludesegdups_excludedecoy_excludeRepSeqSTRs_noCNVs_v2.19_2mindatasets_5minYesNoRatio_AddRTGPlatGenConf_filtNISTclustergt9_RemNISTfilt_RemPartComp_RemRep_RemPartComp_v0.2.bed.gz -O z -o out_bt_view/NIST_RTG_PlatGen_merged_highconfidence_v0.2_Allannotate.indels.vcf.gz
+##bcftools_viewVersion=1.2+htslib-1.2.1
+##bcftools_viewCommand=view -r 11:70670000-70680000 out_bt_view/NIST_RTG_PlatGen_merged_highconfidence_v0.2_Allannotate.indels.vcf.gz
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878
+11	1881	.	A	ATT	19309.8	PASS	DP=911;DPR=1.038;PGC=4,2,3,2;PGDR=0.969,1.243,1.024,0.995;PHQ=65;source=NISTUncertain,RTGPHQ,PlatGen;PHC;XRX;AC=1;AN=2	GT:DP:DPR:RE:AR:RQ:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL:AVR:PS	0|1:46:0.907:0.17:0:1113.7:563:0:2.59:0.72:0:0:21,21:-111.37,0,-56.31:0.4691:197169
+11	3532	.	G	GC	29977.9	PASS	DP=765;DPR=0.871;PGC=4,2,3,2;PGDR=0.795,1.07,0.868,0.966;PHQ=0;source=NISTPASS,RTGPHQ;PHC;XRX;AC=2;AN=2	GT:DP:DPR:RE:AR:RQ:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL:AVR	1/1:33:0.651:0.076:0:1546.5:193:1.05:0.07:4.09:0.03:0:2,31:-154.65,-19.26,0:0.498
+11	3795	.	AACACACACAC	A,AACACACAC	22573.6	PASS	DP=637;DPR=0.726;PGC=4,2,3,2;PGDR=0.748,0.777,0.616,0.783;PHQ=96;source=NISTUncertain,RTGPHQ;PHC;XRX;AC=1,1;AN=2	GT:DP:DPR:RE:AR:RQ:GQ:DN:DNP:ABP:SBP:RPB:PPB:PUR:AD:GL:AVR:PS	1|2:43:0.848:1.507:0:1577.1:554:.:.:0.31:1.5:1.59:0.01:0:2,15,0,13:-157.71,-55.41,-133.9,-133.39,-111.21,-182.01,-94.41,0,-77.8,-79.95:0.1697:197169
+11	5739	.	CT	C	26903.7	PASS	DP=734;DPR=0.836;PGC=4,2,3,2;PGDR=0.712,0.857,0.915,0.808;PHQ=0;source=NISTPASS,RTGPHQ;PHC;XRX;AC=2;AN=2	GT:DP:DPR:RE:AR:RQ:GQ:ABP:SBP:RPB:PPB:PUR:AD:GL:AVR	1/1:41:0.808:0.201:0:1737.5:224:1.91:0:7.45:0:0:2,38:-173.75,-22.49,0:0.5009

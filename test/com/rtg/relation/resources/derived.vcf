@@ -1,0 +1,12 @@
+##fileformat=VCFv4.1
+##SAMPLE=<ID=child,Sex=MALE>
+##SAMPLE=<ID=child-cells1,Sex=MALE>
+##SAMPLE=<ID=child-cells2,Sex=MALE>
+##SAMPLE=<ID=child-cells3,Sex=MALE>
+##SAMPLE=<ID=father,Sex=MALE>
+##SAMPLE=<ID=mother,Sex=FEMALE>
+##PEDIGREE=<Child=child,Mother=mother,Father=father>
+##PEDIGREE=<Derived=child-cells1,Original=child>
+##PEDIGREE=<Derived=child-cells2,Original=child>
+##PEDIGREE=<Derived=child-cells3,Original=child-cells1>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	child	child-cells1	child-cells2	child-cells3	father	mother

@@ -1,0 +1,45 @@
+# Reference specification for hg18 see http://genome.ucsc.edu/cgi-bin/hgTracks?hgsid=184117571&chromInfoPage=
+version	1
+
+# Unless otherwise specified, assume diploid linear. Well-formed chromosomes should be explicitly listed 
+# separately so this applies primarily to unplaced contigs and decoy sequences
+either	def	diploid	linear
+
+# List the autosomal chromosomes explicitly. These are used to help determine "normal" coverage levels
+# during mapping and variant calling
+either	seq	chr1	diploid	linear
+either	seq	chr2	diploid	linear
+either	seq	chr3	diploid	linear
+either	seq	chr4	diploid	linear
+either	seq	chr5	diploid	linear
+either	seq	chr6	diploid	linear
+either	seq	chr7	diploid	linear
+either	seq	chr8	diploid	linear
+either	seq	chr9	diploid	linear
+either	seq	chr10	diploid	linear
+either	seq	chr11	diploid	linear
+either	seq	chr12	diploid	linear
+either	seq	chr13	diploid	linear
+either	seq	chr14	diploid	linear
+either	seq	chr15	diploid	linear
+either	seq	chr16	diploid	linear
+either	seq	chr17	diploid	linear
+either	seq	chr18	diploid	linear
+either	seq	chr19	diploid	linear
+either	seq	chr20	diploid	linear
+either	seq	chr21	diploid	linear
+either	seq	chr22	diploid	linear
+
+# Define how the male and female get the X and Y chromosomes 
+male	seq	chrX	haploid	linear	chrY
+male	seq	chrY	haploid	linear	chrX
+female	seq	chrX	diploid	linear
+female	seq	chrY	none	linear
+#PAR1 pseudoautosomal region
+male	dup	chrX:1-2709520	chrY:1-2709520
+#PAR2 pseudoautosomal region
+male	dup	chrX:154584238-154913754	chrY:57443438-57772954
+
+# And the mitochondria
+either	seq	chrM	polyploid	circular
+

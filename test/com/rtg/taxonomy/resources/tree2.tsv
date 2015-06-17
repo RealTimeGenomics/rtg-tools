@@ -1,0 +1,16 @@
+#RTG taxonomy version 1.0
+#taxID	parentID	rank	name
+1	-1	no rank	root
+10239	1	superkingdom	Viruses
+12333	10239	no rank	unclassified phages
+156614	12333	no rank	environmental samples
+156657	156614	species	Cyanophage clone SE5
+156658	156614	species	Cyanophage clone SE6
+156659	156614	species	Cyanophage clone SE7
+156660	156614	species	Cyanophage clone SE8
+156661	156614	species	Cyanophage clone SE11
+156662	156614	species	Cyanophage clone SE12
+156663	156614	species	Cyanophage clone SE9
+156664	156614	species	Cyanophage clone SE13
+156665	156614	species	Cyanophage clone SE14
+156666	156614	species	Cyanophage clone SE15

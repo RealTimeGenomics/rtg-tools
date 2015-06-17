@@ -1,0 +1,15 @@
+##fileformat=VCFv4.1
+##contig=<ID=chr2,length=10000>
+##contig=<ID=chr3,length=10000>
+##contig=<ID=1,length=10000000>
+##INFO=<ID=XRX,Number=0,Type=Flag,Description="RTG variant was called using complex caller">
+##INFO=<ID=RCE,Number=0,Type=Flag,Description="RTG variant is equivalent to the previous variant">
+##INFO=<ID=CT,Number=1,Type=Integer,Description="Coverage threshold that was applied">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	sample3
+chr2	100	.	A	C,G	.	PASS	.	GT	1/1	2/2
+chr2	200	.	A	C	.	PASS	.	GT	1/1	.
+chr2	900	.	A	G	.	PASS	CT=123	GT	.	1/1
+chr3	200	.	A	G	.	PASS	.	GT	.	1/1
+chr3	300	.	A	C	.	PASS	.	GT	1/1	.
+chr3	500	.	A	C,G	.	PASS	.	GT	1/1	2/2

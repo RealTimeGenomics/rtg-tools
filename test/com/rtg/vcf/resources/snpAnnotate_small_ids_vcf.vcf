@@ -1,0 +1,18 @@
+##fileformat=VCFv4.1
+##extraline=foo
+##extraline2=bar
+##contig=<ID=chr2,length=10000>
+##contig=<ID=chr3,length=10000>
+##INFO=<ID=NAA,Number=1,Type=Integer,Description="Number of alternative alleles">
+##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each alternative allele, in the same order as listed">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total number of alleles in called genotypes">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=ZY,Number=1,Type=String,Description="Zygosity of sample. 'e'=>heterozygous, 'o'=>homozygous">
+##FORMAT=<ID=PD,Number=1,Type=String,Description="Ploidy of sample. 'h'=>haploid, 'd'=>diploid">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	sample2
+chr2	100	label1	A	C,G	.	PASS	NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d
+chr2	200	label1	A	C	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
+chr2	900	label2	A	G	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
+chr3	200	label4	A	G	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
+chr3	300	label3;label4	A	C	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
+chr3	500	.	A	C,G	.	PASS	NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d

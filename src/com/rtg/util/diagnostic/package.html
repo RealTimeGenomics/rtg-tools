@@ -1,0 +1,34 @@
+<body>
+<p>Classes associated with the SLIM logging, error, warning, and progress reporting systems.
+</p>
+
+<p>The main class controlling the diagnostic system is <code>Diagnostic</code>.
+It contains static methods for registering with the diagnostic system and methods
+to generate various kinds of diagnostics.
+</p>
+
+<p><b>How to add a new diagnostic</b><p>
+
+<p>First determine whether your diagnostic is an error, warning, or progress event. 
+Create an extra value in the appropriate enumeration; 
+that is, <code>ErrorType</code>, <code>WarningType</code>, or <code>ProgressType</code>, respectively. 
+The new entry should specify the number of parameters associated with the warning message. 
+Update the corresponding test class.</p>
+
+<p>Next, add a default message to resource bundle (<code>Diagnostics.properties</code>), 
+using <tt>%1</tt>, <tt>%2</tt>, etc., to indicate positions where the parameters are to be substituted into the message.  
+Add foreign language translations as required.</p>
+
+<p>Run some tests to make sure your message is working as expected. This includes the tests in <code>ErrorTypeTest</code></p>
+
+<p>Run the <code>checkstyle-extras-jar</code> ant task in  the <code>build.xml</code> file. 
+This creates a new <code>internal/checkstyle-cartesian.jar</code> file (in Eclipse you will need to refresh this).
+Copy this to your Eclipse applications directory 
+(something like <code>eclipse3.2/plugins/com.atlassw.tools.eclipse.checkstyle_4.3.2/extension-libraries</code>).
+Exit from Eclipse and do a clean start.</p>
+
+<p>Let all other Eclipse users know so they can update their versions of this file.</p>
+
+<p>Please can someone make this simpler. The whole process is a pain in the butt. </p>
+
+</body>

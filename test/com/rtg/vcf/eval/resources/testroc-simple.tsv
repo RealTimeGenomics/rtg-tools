@@ -1,0 +1,7 @@
+#total baseline variants: 6
+#score	true_positives	false_positives
+50.000	1.000	0
+40.000	1.000	1
+30.004	2.000	1
+20.043	2.000	2
+10.414	3.000	2

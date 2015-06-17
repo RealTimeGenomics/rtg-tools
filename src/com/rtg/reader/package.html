@@ -1,0 +1,45 @@
+<body>
+  <p>Provides interfaces and classes for performing the preread step and accessing the preread data.</p>
+  
+  <h2>Overview</h2>
+  <p>The goal of the preread phase is to create a well defined set of sequence data for later use in as either query or subject data by SLIM.</p>
+  <h2>Source</h2>
+  <p>Sequence data is read from one or many files. Initially just in FASTA format, but other formats will be supported later.</p>
+  <p>The original source of the files will not be remembered after the preread phase.
+  <h2>Structure</h2>
+  <p>All files will be limited to a set length (2GB is the current suggestion) so that they will be portable across different file systems, 
+    this setting will be handled by a parameter. 
+  	When a file hits the length cap it will be carried over into a new file.<br>
+  	Proposed files (each leaf is a file):</p>
+  	<ul>
+  	  <li>Sequence Data
+  	  	<ul>
+  	  	  <li>Actual sequence data</li>
+  	  	  <li>Pointers to sequence data</li>
+  	  	  <li>index (number of sequences per file)</li>
+  	  	</ul>
+  	  </li>
+  	  <li>Sequence Names
+  	    <ul>
+  	      <li>Actual sequence names</li>
+  	      <li>Pointers to sequence names</li>
+  	      <li>index (number of sequences per file)</li>
+  	    </ul>
+  	  </li>
+  	  <li>Main index file (for global data about the sequence)</li>
+  	</ul>
+
+  <h3>Sequence Data</h3>
+  <p>Contains numerical representation of tides in binary form. These may potentially be bit packed, but initially will probably be 1 byte per tide.<br>
+    The Pointer file will contain offsets to beginning of sequences contained in the data file for each sequence. 
+    Initially these will probably be represented by a single 32-bit integer however this will have to vary depending on the size of the corresponding data
+    file (if it is large enough that 32 bits isn't enough), or if bit packing means that we need to index to a sub byte level.</p>
+  <h3>Sequence Names</h3>
+  <p>These are being stored separately because it is assumed in most situations where sequence data is required names may not be.<br>
+    Names will be written in plain ASCII in the 32 to 126 range, probably terminated by some value outside that range. The pointer file 
+    will behave similarly to the sequence data one.</p>
+  <h3>Index Files</h3>
+  <p>Simply records how many sequences are in each pair of sequence files or label files.</p>
+  <h3>Main index file</h3>
+  <p>This will store global information like the number of sequences, the length of the longest sequence, and other useful information.</p>
+</body>

@@ -1,0 +1,6 @@
+chr2	100	.	A	C,G	.	PASS	ANN=label1;NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d
+chr2	200	.	A	C	.	PASS	ANN=label1;NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
+chr2	900	.	A	G	.	PASS	ANN=label2;NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
+chr3	200	.	A	G	.	PASS	ANN=label4;NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
+chr3	300	.	A	C	.	PASS	ANN=label3,label4;NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
+chr3	500	.	A	C,G	.	PASS	NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d

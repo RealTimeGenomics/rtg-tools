@@ -1,0 +1,7 @@
+
+Total records : 15
+Filtered due to RC : 3
+Filtered due to RX : 9
+Filtered due to a1000.0 : 1
+Filtered due to same as reference : 1
+Remaining records : 1

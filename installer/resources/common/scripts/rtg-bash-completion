@@ -1,0 +1,104 @@
+# bash programmable completion for rtg commands and flags
+# To use this, you need to source the file. e.g.:
+# . /path/to/rtg-bash-completion
+
+
+# Main bash completion function
+function _complete_rtg() {
+    local cur prev opts cmd flagtype
+    local cachedir=$HOME/.rtg-completion
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+ 
+    #echo "$(date)" >~/.rtgcomp
+    #echo "ARGS=$@" >>~/.rtgcomp
+    #echo "COMP_LINE=$COMP_LINE" >>~/.rtgcomp
+    #echo "COMP_CWORD=${COMP_CWORD}" >>~/.rtgcomp
+    #echo "COMP_WORDS=${COMP_WORDS[@]}" >>~/.rtgcomp
+    #echo "cur=$cur prev=$prev" >>~/.rtgcomp
+    if [ "${prev}" == "rtg" ]; then
+        opts="$(rtg --Xhelp 2>&1 | sed -n '/^\t[a-z]/s/^\s\+\(\S\+\).*/\1/p')"
+        COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
+        return 0
+    elif [ $COMP_CWORD -gt 0 ]; then
+        cmd="${COMP_WORDS[1]}"
+        #echo "cmd=$cmd" >>~/.rtgcomp
+        
+        case ${cur} in
+            --X*)
+                opts="$(_complete_rtghelp $cmd --Xhelp | sed -n '/^ \+-/s/.*\(--X[^= ]\+\)[= ].*/\1/p')"
+                #echo "cmd-help=$opts" >>~/.rtgcomp
+                COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
+                #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
+                return 0
+                ;;
+            -*)
+                opts="$(_complete_rtghelp $cmd --help | sed -n '/^ \+-/s/.*\(--[^= ]\+\)[= ].*/\1/p')"
+                #echo "cmd-help=$opts" >>~/.rtgcomp
+                COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
+                #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
+                return 0
+                ;;
+            *)
+                if [ "${prev:0:1}" == "-" ]; then
+                    flagtype="$(_complete_rtghelp $cmd --help | sed -n -e "/ \+${prev}.*=[A-Z]\+/s/.*=\([A-Z]\+\)\s.*/\1/p")"
+                else   # Completion for anonymous flags
+                    flagtype="$(_complete_rtghelp $cmd --help | sed -n -e "/^   \+[A-Z]\++\? \+/{s/^ \+\([A-Z]\+\).*/\1/p;q}")"
+                fi
+                #echo "flagtype=$flagtype" >>~/.rtgcomp
+                case ${flagtype} in
+	            FILE)
+                        #echo "files=$opts" >>~/.rtgcomp
+	                COMPREPLY=( $(compgen -o dirnames -f ${cur}) )
+                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
+                        return 0
+                        ;;
+	            DIR|SDF)
+                        #echo "dir/sdf=$opts" >>~/.rtgcomp
+	                COMPREPLY=( $(compgen -o dirnames -d ${cur}) )
+                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
+                        return 0
+                        ;;
+                    *)
+                        enumfile=$cachedir/$cmd.$prev
+                        if [ -f $enumfile ]; then
+                            #echo "enum flag type $flagtype" >>~/.rtgcomp
+	                    COMPREPLY=( $(compgen -W "$(cat $enumfile)" -- ${cur}) )
+                        else
+                            #echo "unknown flag type $flagtype" >>~/.rtgcomp
+                            oifs="$IFS"
+                            IFS=$'\n' 
+                            COMPREPLY=( $(compgen -f -- ${cur}) )
+                            IFS="$oifs"
+                        fi
+                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
+                        return 0
+                        ;;
+                esac
+                ;;
+        esac
+    fi
+}
+
+# Helper for completion that caches help output per command. Use cache
+# whenever it exists and we are running the same command as last time.
+# Also automatically works out options for enums (e.g. --sex, --format
+# --machine) and stashes into $HOME/.rtg-completion/$1.<flagname> for later
+# retrieval.
+function _complete_rtghelp () {
+    local cachedir=$HOME/.rtg-completion
+    [ -d $cachedir ] || mkdir $cachedir
+    local cache=$cachedir/$1.$2
+    local lastcmd=$cachedir/lastcmd
+    [ -f $cache ] && [ -f $lastcmd ] && [ "$1" == "$(cat $lastcmd)" ] || { 
+        TERMCAP=:CO#500: rtg $1 $2 >$cache
+        gawk 'match($0,/(--[^=]+)=.*\(Must be one of \[([^]]+)\]/,a){gsub(",","",a[2]);file="'$cachedir/$1.'"a[1]; print a[2]>file}' <$cache
+        echo $1 >$lastcmd 
+    }
+    cat $cache
+}
+
+
+complete -o filenames -F _complete_rtg rtg
+

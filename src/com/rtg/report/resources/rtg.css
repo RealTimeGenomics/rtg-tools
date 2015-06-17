@@ -1,0 +1,73 @@
+body {
+        margin: 0%;
+	background-color: rgb(240, 250, 255);
+}
+div#dbody {
+        margin-left: 2%;
+        margin-right: 2%;
+	background-color: #ffffff;
+	margin-top: 10px;
+}
+h1 {
+        margin: 0%;
+	padding: 25px 25px 25px 25px;
+        background-color: #109FCD;
+        color: #ffffff;
+}
+h2 {
+	color: #37AFD4;
+	padding: 25px 25px 25px 25px;
+}
+
+div#dheader {
+    margin-left: 0%;
+    margin-right: 0%;
+    padding: 10px 25px 10px 25px;
+    background-color: #109FCD;
+    background-image: url("rtg_logo.png");
+    background-repeat: no-repeat;
+    background-position: 20px 10px;
+    text-indent: 260px;
+    height: 70px;
+}
+
+div#dheader h1 {
+    margin-top: 20px;
+    padding: 0px 0px 0px 0px;
+    color: #ffffff;
+    background-color: transparent;
+}
+
+a#lheader {
+    text-decoration:none;
+}
+
+a#lheader a:hover {
+    text-decoration:none;
+}
+
+table.sample {
+        margin-left: auto;
+        margin-right: auto;
+	padding: 0px;
+	background-color: rgb(200, 230, 240);
+}
+table.sample tr {
+        padding: 0px;
+        margin: 0px;
+}
+table.sample th {
+	padding: 5px 5px 2px 5px;
+        font-weight: bold;
+}
+table.sample td {
+	padding: 1px 2px 1px 2px;
+	background-color: rgb(230, 250, 255);
+}
+
+li.checked {
+  list-style-image:url("check.png");
+}
+li.crossed {
+  list-style-image:url("cross.png");
+}

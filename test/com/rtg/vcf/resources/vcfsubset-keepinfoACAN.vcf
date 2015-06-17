@@ -1,0 +1,16 @@
+##fileformat=VCFv4.1
+##reference=GRCh37
+##ALT=<ID=DEL,Description="Deletion">
+##FILTER=<ID=NAH,Description="Nah">
+##FILTER=<ID=YEA,Description="Yeah">
+##INFO=<ID=AC,Number=.,Type=Integer,Description="Alternate Allele Count">
+##INFO=<ID=AN,Number=1,Type=Integer,Description="Total Allele Count">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DS,Number=1,Type=Float,Description="Genotype dosage from MaCH/Thunder">
+##FORMAT=<ID=GL,Number=.,Type=Float,Description="Genotype Likelihoods">
+##SAMPLE=<ID=HG00096,Description="Torgue corporation question:">
+##SAMPLE=<ID=HG00097,Description="EXPLOOOSIIIOONNNSSSS?">
+##SAMPLE=<ID=HG00100,Description="That sentence had too many syllables. APOLOGISE!">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	HG00096	HG00097	HG00099	HG00100
+X	60034	.	ACC	A	256	NAH	AC=117;AN=2184	GT:DS:GL	0|0:0.150:0,0,0	0|1:1.000:-4.60,-0.30,0.00	0|0:0.000:0.00,-0.60,-11.40	0|0:0.500:0.00,-0.80,-5.40
+X	60052	rs186434315	T	A	100	YEA;NAH	AC=752;AN=2184	GT:DS:GL	0|1:1.000:-0.18,-0.47,-2.40	0|0:0.000:-0.07,-0.83,-4.40	0|1:0.600:-0.07,-0.85,-5.00	0|0:0.350:-0.11,-0.66,-3.85

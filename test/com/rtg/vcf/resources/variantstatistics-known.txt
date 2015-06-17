@@ -1,0 +1,44 @@
+Identified Variants          : known only
+Failed Filters               : 2
+Passed Filters               : 4
+Complex Called               : 2
+
+Sample Name: EM0231
+SNPs                         : 1
+MNPs                         : 0
+Insertions                   : 2
+Deletions                    : 0
+Indels                       : 0
+Same as reference            : 1
+SNP Transitions/Transversions: - (1/0)
+Total Het/Hom ratio          : - (3/0)
+SNP Het/Hom ratio            : - (1/0)
+MNP Het/Hom ratio            : - (0/0)
+Insertion Het/Hom ratio      : - (2/0)
+Deletion Het/Hom ratio       : - (0/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : - (2/0)
+Indel/SNP+MNP ratio          : 2.00 (2/1)
+
+Sample Name: EM0231_T1
+SNPs                         : 2
+MNPs                         : 0
+Insertions                   : 0
+Deletions                    : 0
+Indels                       : 0
+Same as reference            : 2
+SNP Transitions/Transversions: 1.00 (1/1)
+Total Haploid                : 1
+Haploid SNPs                 : 1
+Haploid MNPs                 : 0
+Haploid Insertions           : 0
+Haploid Deletions            : 0
+Haploid Indels               : 0
+Total Het/Hom ratio          : - (1/0)
+SNP Het/Hom ratio            : - (1/0)
+MNP Het/Hom ratio            : - (0/0)
+Insertion Het/Hom ratio      : - (0/0)
+Deletion Het/Hom ratio       : - (0/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : - (0/0)
+Indel/SNP+MNP ratio          : 0.00 (0/2)
