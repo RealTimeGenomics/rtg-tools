@@ -181,9 +181,9 @@ public class RocContainer {
     final double precision = ContingencyTable.precision(truePositive, falsePositive);
     final double recall = ContingencyTable.recall(truePositive, falseNegative);
     table.addRow(threshold,
-      Integer.toString((int) truePositive),
-      Integer.toString((int) falsePositive),
-      Integer.toString((int) falseNegative),
+      Long.toString(Math.round(truePositive)),
+      Long.toString(Math.round(falsePositive)),
+      Long.toString(Math.round(falseNegative)),
       Utils.realFormat(precision, 4),
       Utils.realFormat(recall, 4),
       Utils.realFormat(ContingencyTable.fMeasure(precision, recall), 4));
