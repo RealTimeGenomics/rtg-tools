@@ -34,8 +34,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import com.rtg.util.Resources;
+import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.test.FileHelper;
+import com.rtg.util.io.TestDirectory;
 
 import htsjdk.samtools.util.RuntimeIOException;
 import junit.framework.TestCase;
@@ -113,8 +114,7 @@ public class BamReaderTest extends TestCase {
   }
 
   public void testArrays() throws Exception {
-    final File tmpDir = FileUtils.createTempDir("bamreader", "blah");
-    try {
+    try (final TestDirectory tmpDir = new TestDirectory("bamreader")) {
       final File samFile = new File(tmpDir, "sam.sam");
       final File bamFile = new File(tmpDir, "sam.bam");
       final File bamIndex = new File(tmpDir, "sam.bai");
@@ -184,10 +184,8 @@ public class BamReaderTest extends TestCase {
         assertFalse(br.isSam());
         assertEquals(5, br.getNumFields());
 
-        assertTrue(br.getHeaderLines().contains("@HD\tVN:1.4\tSO:coordinate\n@SQ\tSN:simulatedSequence\tLN:10000\n@PG\tID:rtg"));
+        TestUtils.containsAll(br.getHeaderLines(), "@HD", "@SQ\tSN:simulatedSequence\tLN:10000", "@PG\tID:rtg");
       }
-    } finally {
-      FileHelper.deleteAll(tmpDir);
     }
   }
 }
