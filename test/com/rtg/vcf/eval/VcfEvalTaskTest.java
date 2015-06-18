@@ -37,32 +37,30 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.OutputParams;
 import com.rtg.mode.SequenceType;
-import com.rtg.reader.MockSequencesReader;
+import com.rtg.reader.MockArraySequencesReader;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SdfId;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.MathUtils;
-import com.rtg.util.Pair;
+import com.rtg.util.PosteriorUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.util.test.NanoRegression;
-import com.rtg.util.PosteriorUtils;
-import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -289,7 +287,8 @@ public class VcfEvalTaskTest extends TestCase {
     } else {
       assertTrue(homoLines[0].startsWith("#total baseline variants: "));
     }
-    assertTrue(homoLines[1].startsWith("#score\t"));
+    assertTrue(homoLines[1].startsWith("#score field: "));
+    assertTrue(homoLines[2].startsWith("#score\t"));
     mNano.check(label, roc);
   }
 
@@ -348,12 +347,15 @@ public class VcfEvalTaskTest extends TestCase {
     checkRoc("trickyxrx", TRICKY_TEMPLATE, EMPTY, CALLED_ONLY_TRICKY_XRX, BASELINE_ONLY_TRICKY_XRX);
   }
 
-  private static final String[] FP_EMPTY = {
-      "seq 1 . A T 1 PASS . GT:GQ 1/1:" + PosteriorUtils.phredIfy(1 * MathUtils.LOG_10)
+  private static final String[] FN_ROC_EMPTY = {
+    "seq 20 . C A 0.0 PASS . GT 0/1"
+  };
+  private static final String[] FP_ROC_EMPTY = {
+      "seq 1 . A T 1 PASS . GT 1/1"  // No GQ so will be omitted from ROC
   };
 
   public void testROCEmpty() throws IOException, UnindexableDataException {
-    checkRoc("rocempty", TRICKY_TEMPLATE, EMPTY, FP_EMPTY, EMPTY);
+    checkRoc("rocempty", TRICKY_TEMPLATE, EMPTY, FP_ROC_EMPTY, FN_ROC_EMPTY);
   }
 
   public void testOutsideRef() throws IOException, UnindexableDataException {
@@ -443,19 +445,19 @@ public class VcfEvalTaskTest extends TestCase {
       generated = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
       detected = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
       VcfEvalTask.checkHeader(generated, detected, idA);
-      assertTrue(ps.toString().contains("Template ID mismatch, baseline variants were not created from the given template"));
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline variants were not created from the given reference"));
       ps.reset();
 
       generated = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
       detected = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
       VcfEvalTask.checkHeader(generated, detected, idA);
-      assertTrue(ps.toString().contains("Template ID mismatch, called variants were not created from the given template"));
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, called variants were not created from the given reference"));
       ps.reset();
 
       generated = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
       detected = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
       VcfEvalTask.checkHeader(generated, detected, new SdfId(0));
-      assertTrue(ps.toString().contains("Template ID mismatch, baseline and called variants were created with different templates"));
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline and called variants were created with different references"));
 
       ps.reset();
     } finally {
@@ -472,12 +474,23 @@ public class VcfEvalTaskTest extends TestCase {
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz.tbi", tabix);
       final File input2 = new File(dir, "snp_only_2.vcf.gz");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz", input2);
-      Collection<Pair<String, Integer>> names = new ArrayList<>();
-      for (int seq = 1; seq < 32; seq++) {
-        names.add(new Pair<>("simulatedSequence" + seq, -1));
+
+      try {
+        final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, 32, 27);
+        VcfEvalTask.getVariants(VcfEvalParams.builder().callsFile(input).baseLineFile(input).create(), templateReader);
+        fail("Expected detection of no sequence name overlap");
+      } catch (NoTalkbackSlimException e) {
+        // Expected
       }
-      final MockSequencesReader templateReader = new MockSequencesReader(SequenceType.DNA, 32, 27);
-      assertTrue(VcfEvalTask.getVariants(names, VcfEvalParams.builder().callsFile(input).baseLineFile(input).create(), templateReader) instanceof TabixVcfRecordSet);
+
+      String[] names = new String[31];
+      int[] lengths = new int[31];
+      for (int seq = 1; seq < 32; seq++) {
+        names[seq - 1] = "simulatedSequence" + seq;
+        lengths[seq - 1] = 1000;
+      }
+      final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, lengths, names);
+      assertTrue(VcfEvalTask.getVariants(VcfEvalParams.builder().callsFile(input).baseLineFile(input).create(), templateReader) instanceof TabixVcfRecordSet);
     }
   }
 

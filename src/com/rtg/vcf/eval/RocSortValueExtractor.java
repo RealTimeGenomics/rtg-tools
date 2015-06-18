@@ -47,5 +47,10 @@ public abstract class RocSortValueExtractor {
     double getSortValue(VcfRecord rec, int sampleNo) {
       return 0;
     }
+
+    @Override
+    public String toString() {
+      return "TEST";
+    }
   };
 }

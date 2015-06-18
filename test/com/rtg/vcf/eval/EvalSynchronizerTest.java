@@ -125,7 +125,7 @@ public class EvalSynchronizerTest extends TestCase {
       try (final TestDirectory dir = new TestDirectory()) {
         final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
         new TabixIndexer(fake).saveVcfIndex();
-        final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, RocSortOrder.DESCENDING);
+        final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
         final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -173,7 +173,7 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, RocSortOrder.DESCENDING);
+      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());
@@ -210,7 +210,7 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, RocSortOrder.DESCENDING);
+      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());

@@ -40,7 +40,6 @@ import java.io.PrintStream;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -127,12 +126,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(baselineReader, callReader, templateSequences.getSdfId());
     }
 
-    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
-    for (long i = 0; i < templateSequences.names().length(); i++) {
-      nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
-    }
-
-    final VariantSet variants = getVariants(nameOrdering, params, templateSequences);
+    final VariantSet variants = getVariants(params, templateSequences);
     if (!output.exists() && !output.mkdirs()) {
       throw new IOException("Unable to create directory \"" + output.getPath() + "\"");
     }
@@ -175,18 +169,20 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     for (long i = 0; i < names.length(); i++) {
       nameMap.put(names.name(i), i);
     }
-    final EvalSynchronizer sync = new EvalSynchronizer(variants, tp, fp, fn, tpBase, params.baselineFile(), params.callsFile(), params.sortOrder());
-    sync.mRoc.addFilter(RocFilter.ALL, new File(output, FULL_ROC_FILE));
-    sync.mRoc.addFilter(RocFilter.HETEROZYGOUS, new File(output, HETEROZYGOUS_FILE));
-    sync.mRoc.addFilter(RocFilter.HOMOZYGOUS, new File(output, HOMOZYGOUS_FILE));
+    final String rocLabel = getRocSortValueExtractor(params).toString();
+    final RocContainer roc = new RocContainer(params.sortOrder(), rocLabel);
+    roc.addFilter(RocFilter.ALL, new File(output, FULL_ROC_FILE));
+    roc.addFilter(RocFilter.HETEROZYGOUS, new File(output, HETEROZYGOUS_FILE));
+    roc.addFilter(RocFilter.HOMOZYGOUS, new File(output, HOMOZYGOUS_FILE));
     if (params.rtgStats()) {
-      sync.mRoc.addFilter(RocFilter.SIMPLE, new File(output, SIMPLE_FILE));
-      sync.mRoc.addFilter(RocFilter.COMPLEX, new File(output, COMPLEX_FILE));
-      sync.mRoc.addFilter(RocFilter.HETEROZYGOUS_SIMPLE, new File(output, HETEROZYGOUS_SIMPLE_FILE));
-      sync.mRoc.addFilter(RocFilter.HETEROZYGOUS_COMPLEX, new File(output, HETEROZYGOUS_COMPLEX_FILE));
-      sync.mRoc.addFilter(RocFilter.HOMOZYGOUS_SIMPLE, new File(output, HOMOZYGOUS_SIMPLE_FILE));
-      sync.mRoc.addFilter(RocFilter.HOMOZYGOUS_COMPLEX, new File(output, HOMOZYGOUS_COMPLEX_FILE));
+      roc.addFilter(RocFilter.SIMPLE, new File(output, SIMPLE_FILE));
+      roc.addFilter(RocFilter.COMPLEX, new File(output, COMPLEX_FILE));
+      roc.addFilter(RocFilter.HETEROZYGOUS_SIMPLE, new File(output, HETEROZYGOUS_SIMPLE_FILE));
+      roc.addFilter(RocFilter.HETEROZYGOUS_COMPLEX, new File(output, HETEROZYGOUS_COMPLEX_FILE));
+      roc.addFilter(RocFilter.HOMOZYGOUS_SIMPLE, new File(output, HOMOZYGOUS_SIMPLE_FILE));
+      roc.addFilter(RocFilter.HOMOZYGOUS_COMPLEX, new File(output, HOMOZYGOUS_COMPLEX_FILE));
     }
+    final EvalSynchronizer sync = new EvalSynchronizer(variants, tp, fp, fn, tpBase, params.baselineFile(), params.callsFile(), roc);
 
     final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
     threadPool.enableBasicProgress(templateSequences.numberSequences());
@@ -202,17 +198,17 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     if (variants.getNumberOfSkippedCalledVariants() > 0) {
       Diagnostic.warning("There were " + variants.getNumberOfSkippedCalledVariants() + " called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.");
     }
-    if (sync.mRoc.getNumberOfIgnoredVariants() > 0) {
-      Diagnostic.warning("There were " + sync.mRoc.getNumberOfIgnoredVariants() + " variants not included in ROC data files due to missing or invalid scores.");
+    if (roc.getNumberOfIgnoredVariants() > 0) {
+      Diagnostic.warning("There were " + roc.getNumberOfIgnoredVariants() + " variants not included in ROC data files due to missing or invalid " + rocLabel + " values.");
     }
     Diagnostic.developerLog("Writing ROC");
-    sync.mRoc.writeRocs(sync.mTruePositives + sync.mFalseNegatives, zip);
+    roc.writeRocs(sync.mTruePositives + sync.mFalseNegatives, zip);
     if (params.outputSlopeFiles()) {
       produceSlopeFiles(params.directory(), zip, params.rtgStats());
     }
     writePhasingInfo(sync, params.directory());
 
-    sync.mRoc.writeSummary(new File(params.directory(), CommonFlags.SUMMARY_FILE), sync.mTruePositives, sync.mFalsePositives, sync.mFalseNegatives);
+    roc.writeSummary(new File(params.directory(), CommonFlags.SUMMARY_FILE), sync.mTruePositives, sync.mFalsePositives, sync.mFalseNegatives);
   }
 
   private static void writePhasingInfo(EvalSynchronizer sync, File outDir) throws IOException {
@@ -256,17 +252,17 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
   /**
    * Builds a variant set of the best type for the supplied files
-   * @param nameOrdering the ordering of the names for output / processing
    * @param params the parameters
-   * @param templateSequencesReader template sequences
+   * @param templateSequences template sequences
    * @return a VariantSet for the provided files
    * @throws IOException if IO is broken
    */
-  static VariantSet getVariants(Collection<Pair<String, Integer>> nameOrdering, VcfEvalParams params, SequencesReader templateSequencesReader) throws IOException {
+  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences) throws IOException {
     final File calls = params.callsFile();
     final File baseline = params.baselineFile();
     final String sampleName = params.sampleName();
     final RocSortValueExtractor extractor = getRocSortValueExtractor(params);
+
     final ReferenceRanges<String> ranges;
     if (params.bedRegionsFile() != null) {
       Diagnostic.developerLog("Loading BED regions");
@@ -274,8 +270,14 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     } else if (params.restriction() != null) {
       ranges = SamRangeUtils.createExplicitReferenceRange(params.restriction());
     } else {
-      ranges = SamRangeUtils.createFullReferenceRanges(templateSequencesReader);
+      ranges = SamRangeUtils.createFullReferenceRanges(templateSequences);
     }
+
+    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
+    for (long i = 0; i < templateSequences.names().length(); i++) {
+      nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
+    }
+
     return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, sampleName, extractor, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
   }
 
@@ -307,7 +309,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     return fieldType.getExtractor(fieldName, params.sortOrder());
   }
 
-  static void checkHeader(BufferedReader baselineReader, BufferedReader callsReader, SdfId templateSdfId) throws IOException {
+  static void checkHeader(BufferedReader baselineReader, BufferedReader callsReader, SdfId referenceSdfId) throws IOException {
     final ArrayList<String> baselineHeader = readHeader(baselineReader);
     final ArrayList<String> callsHeader = readHeader(callsReader);
 
@@ -320,16 +322,16 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final SdfId baselineTemplateSdfId = getSdfId(baselineHeader);
     final SdfId callsTemplateSdfId = getSdfId(callsHeader);
 
-    if (!baselineTemplateSdfId.check(templateSdfId)) {
-      Diagnostic.warning("Template ID mismatch, baseline variants were not created from the given template");
+    if (!baselineTemplateSdfId.check(referenceSdfId)) {
+      Diagnostic.warning("Reference template ID mismatch, baseline variants were not created from the given reference");
     }
 
-    if (!callsTemplateSdfId.check(templateSdfId)) {
-      Diagnostic.warning("Template ID mismatch, called variants were not created from the given template");
+    if (!callsTemplateSdfId.check(referenceSdfId)) {
+      Diagnostic.warning("Reference template ID mismatch, called variants were not created from the given reference");
     }
 
     if (!baselineTemplateSdfId.check(callsTemplateSdfId)) {
-      Diagnostic.warning("Template ID mismatch, baseline and called variants were created with different templates");
+      Diagnostic.warning("Reference template ID mismatch, baseline and called variants were created with different references");
     }
   }
 

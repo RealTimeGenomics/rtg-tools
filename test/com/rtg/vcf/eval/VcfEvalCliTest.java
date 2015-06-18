@@ -143,7 +143,7 @@ public class VcfEvalCliTest extends AbstractCliTest {
         , "-b" , mutations.getPath()
         , "-t" , template.getPath()
     };
-    assertEquals(0, new VcfEvalCli().mainInit(flagStrings, TestUtils.getNullOutputStream(), System.err /*SimpleTestUtils.getNullPrintStream()*/));
+    assertEquals(1, new VcfEvalCli().mainInit(flagStrings, TestUtils.getNullOutputStream(), System.err /*SimpleTestUtils.getNullPrintStream()*/));
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {

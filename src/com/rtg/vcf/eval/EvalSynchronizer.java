@@ -55,10 +55,7 @@ class EvalSynchronizer {
   private final Queue<String> mNames = new LinkedList<>();
   private final VariantSet mVariantSet;
 
-  final RocContainer mRoc;
-  int mTruePositives = 0;
-  int mFalseNegatives = 0;
-  int mFalsePositives = 0;
+  private final RocContainer mRoc;
   private final OutputStream mTp;
   private final OutputStream mTpBase;
   private final OutputStream mFp;
@@ -70,6 +67,9 @@ class EvalSynchronizer {
   private int mUnphasable = 0;
   private int mMisPhasings = 0;
   private int mCorrectPhasings = 0;
+  int mTruePositives = 0;
+  int mFalseNegatives = 0;
+  int mFalsePositives = 0;
 
   /**
    *
@@ -80,9 +80,9 @@ class EvalSynchronizer {
    * @param tpBase True positives (baseline version) are written here, may be null.
    * @param baseLineFile tabix indexed base line VCF file
    * @param callsFile tabix indexed calls VCF file
-   * @param sortOrder the sort order for the ROC
+   * @param roc the container for ROC data
    */
-  EvalSynchronizer(VariantSet vs, OutputStream tp, OutputStream fp, OutputStream fn, OutputStream tpBase, File baseLineFile, File callsFile, RocSortOrder sortOrder) {
+  EvalSynchronizer(VariantSet vs, OutputStream tp, OutputStream fp, OutputStream fn, OutputStream tpBase, File baseLineFile, File callsFile, RocContainer roc) {
     mVariantSet = vs;
     mTp = tp;
     mFp = fp;
@@ -90,7 +90,7 @@ class EvalSynchronizer {
     mTpBase = tpBase;
     mBaseLineFile = baseLineFile;
     mCallsFile = callsFile;
-    mRoc = new RocContainer(sortOrder);
+    mRoc = roc;
   }
 
   /**

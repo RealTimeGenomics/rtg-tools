@@ -47,6 +47,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Pair;
@@ -96,6 +97,16 @@ class TabixVcfRecordSet implements VariantSet {
     Collections.addAll(basenames, new TabixIndexReader(TabixIndexer.indexFileName(baselineFile)).sequenceNames());
     final Set<String> callnames = new TreeSet<>();
     Collections.addAll(callnames, new TabixIndexReader(TabixIndexer.indexFileName(calledFile)).sequenceNames());
+    if (Collections.disjoint(basenames, callnames)) {
+      throw new NoTalkbackSlimException("There were no sequence names in common between the supplied baseline and called variant sets. Check they use the same reference and are non-empty.");
+    }
+
+    final Set<String> union = new HashSet<>(basenames);
+    union.addAll(callnames);
+    if (disjoint(union, referenceNameOrdering)) {
+      throw new NoTalkbackSlimException("There were no sequence names in common between the reference and the supplied variant sets."
+        + " Check the correct reference is being used.");
+    }
     final Set<String> referenceNames = new HashSet<>();
     for (Pair<String, Integer> orderedNameLength : referenceNameOrdering) {
       final String name = orderedNameLength.getA();
@@ -129,7 +140,21 @@ class TabixVcfRecordSet implements VariantSet {
           Diagnostic.warning("Call set variants for sequence " + name + " will be ignored as this sequence is not contained in the reference.");
         }
       }
+    } else {
+      if (mNames.size() == 0) {
+        throw new NoTalkbackSlimException("After applying regions there were no sequence names in common between the reference and the supplied variant sets."
+          + " Check the regions supplied by --" + CommonFlags.RESTRICTION_FLAG + " or --" + CommonFlags.BED_REGIONS_FLAG + " are correct.");
+      }
     }
+  }
+
+  private boolean disjoint(Set<String> names, Collection<Pair<String, Integer>> referenceNameOrdering) {
+    for (Pair<String, Integer> pair : referenceNameOrdering) {
+      if (names.contains(pair.getA())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

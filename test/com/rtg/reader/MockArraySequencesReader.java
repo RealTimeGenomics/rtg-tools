@@ -138,7 +138,12 @@ public class MockArraySequencesReader extends MockSequencesReader {
             return mNames[(int) id];
           }
         }
-      };
+
+      @Override
+      public long length() {
+        return mNames == null ? super.length() : mNames.length;
+      }
+    };
   }
 
 }

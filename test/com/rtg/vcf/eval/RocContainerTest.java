@@ -44,7 +44,7 @@ import junit.framework.TestCase;
 public class RocContainerTest extends TestCase {
   public void test() throws IOException {
     try (final TestDirectory dir = new TestDirectory("roc")) {
-      final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING);
+      final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING, null);
       final File allFile = new File(dir, "all.txt.gz");
       roc.addFilter(RocFilter.ALL, allFile);
       final DetectedVariant v = new DetectedVariant(VcfReader.vcfLineToRecord(DetectedVariantTest.SHORT_LINE), 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
@@ -58,9 +58,9 @@ public class RocContainerTest extends TestCase {
       roc.writeRocs(5, true);
       final String all = FileHelper.gzFileToString(allFile);
       TestUtils.containsAll(all,
-              "0.100\t5.000\t2",
-              "0.200\t3.000\t1",
-              "0.300\t1.500\t0");
+              "0.100\t5.00\t2",
+              "0.200\t3.00\t1",
+              "0.300\t1.50\t0");
     }
   }
 }

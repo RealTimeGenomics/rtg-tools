@@ -1,4 +1,5 @@
 #total baseline variants: 2
+#score field: GQ (FORMAT)
 #score	true_positives	false_positives
 25.600	1.00	0.00
 22.600	2.00	0.00

@@ -62,6 +62,10 @@ public enum RocScoreField {
             throw new NoTalkbackSlimException("Invalid QUAL value = " + rec.getQuality());
           }
         }
+        @Override
+        public String toString() {
+          return "QUAL";
+        }
       };
     }
   },
@@ -78,6 +82,10 @@ public enum RocScoreField {
           }
           return val;
         }
+        @Override
+        public String toString() {
+          return fieldName + " (INFO)";
+        }
       };
     }
   },
@@ -93,6 +101,10 @@ public enum RocScoreField {
             return 0;
           }
           return val;
+        }
+        @Override
+        public String toString() {
+          return fieldName + " (FORMAT)";
         }
       };
     }
@@ -120,6 +132,10 @@ public enum RocScoreField {
             return 0;
           }
           return val;
+        }
+        @Override
+        public String toString() {
+          return fieldName + " (derived)";
         }
       };
     }

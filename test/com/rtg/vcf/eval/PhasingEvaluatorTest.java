@@ -243,7 +243,7 @@ public class PhasingEvaluatorTest extends TestCase {
       new TabixIndexer(calls).saveVcfIndex();
       final File baseline = FileHelper.stringToGzFile(variants.mBaselineVcf.toString(), new File(dir, "baseline.vcf.gz"));
       new TabixIndexer(baseline).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(variants, tp.outputStream(), fp.outputStream(), fn.outputStream(), null, baseline, calls, RocSortOrder.DESCENDING);
+      final EvalSynchronizer sync = new EvalSynchronizer(variants, tp.outputStream(), fp.outputStream(), fn.outputStream(), null, baseline, calls, new RocContainer(RocSortOrder.DESCENDING, null));
       final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
       final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
       eval.run();

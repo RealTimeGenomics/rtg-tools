@@ -53,6 +53,8 @@ import com.rtg.util.io.LineWriter;
 /**
  */
 public class RocContainer {
+
+  final String mFieldLabel;
   int mNoScoreVariants = 0;
   final List<SortedMap<Double, RocPoint>> mRocs = new ArrayList<>();
   final List<RocFilter> mFilters = new ArrayList<>();
@@ -62,8 +64,9 @@ public class RocContainer {
   /**
    * Constructor
    * @param sortOrder the sort order that ensures that "good" scores are sorted before "bad" scores
+   * @param fieldLabel the label for the field being used as the scoring attribute
    */
-  public RocContainer(RocSortOrder sortOrder) {
+  public RocContainer(RocSortOrder sortOrder, String fieldLabel) {
     switch (sortOrder) {
       case ASCENDING:
         mComparator = new AscendingDoubleComparator();
@@ -73,6 +76,7 @@ public class RocContainer {
         mComparator = new DescendingDoubleComparator();
         break;
     }
+    mFieldLabel = fieldLabel;
   }
 
   /**
@@ -121,8 +125,11 @@ public class RocContainer {
   private static final String HEADER = "#total baseline variants: ";
   private static final String HEADER2 = "#score true_positives false_positives".replaceAll(" ", "\t");
   private static final String HEADER3 = " false_negatives precision sensitivity f_measure".replaceAll(" ", "\t");
-  private static void rocHeader(LineWriter out, int totalVariants, boolean extraMetrics) throws IOException {
+  private void rocHeader(LineWriter out, int totalVariants, boolean extraMetrics) throws IOException {
     out.writeln(HEADER + totalVariants);
+    if (mFieldLabel != null) {
+      out.writeln("#score field: " + mFieldLabel);
+    }
     out.write(HEADER2);
     if (extraMetrics) {
       out.write(HEADER3);
@@ -154,7 +161,7 @@ public class RocContainer {
             final double precision = ContingencyTable.precision(tp, fp);
             final double recall = ContingencyTable.recall(tp, fn);
             final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-            os.write("\t"+ Utils.realFormat(fn, 2)
+            os.write("\t" + Utils.realFormat(fn, 2)
               + "\t" + Utils.realFormat(precision, 4)
               + "\t" + Utils.realFormat(recall, 4)
               + "\t" + Utils.realFormat(fMeasure, 4));
@@ -173,10 +180,10 @@ public class RocContainer {
       table.addRow("Threshold", "True-pos", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
       table.addSeparator();
 
-      final int totalRocPositives = truePositives + falseNegatives - mNoScoreVariants;
+      final int totalRocPositives = totalPositives - mNoScoreVariants;
       final RocPoint best = (totalRocPositives > 0) ? bestFMeasure(totalRocPositives) : null;
       if (best == null) {
-        Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed.");
+        Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SORT_FIELD);
       } else {
         addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, best.mFp, totalRocPositives - best.mTp);
       }
