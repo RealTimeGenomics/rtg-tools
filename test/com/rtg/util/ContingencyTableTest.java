@@ -55,5 +55,7 @@ public class ContingencyTableTest extends TestCase {
     final double recall = ContingencyTable.recall(eval.truePositives(), eval.falseNegatives());
     assertEquals(0.91, recall, 0.01);
     assertEquals(0.77, ContingencyTable.fMeasure(precision, recall), 0.01);
+
+    assertEquals(0, ContingencyTable.fMeasure(0, 0), 0.01);
   }
 }

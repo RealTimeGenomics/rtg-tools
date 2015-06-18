@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -41,11 +42,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.rtg.util.ContingencyTable;
+import com.rtg.util.MathUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TextTable;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.LineWriter;
 
 /**
  */
@@ -117,9 +120,14 @@ public class RocContainer {
 
   private static final String HEADER = "#total baseline variants: ";
   private static final String HEADER2 = "#score true_positives false_positives".replaceAll(" ", "\t");
-  private static void rocHeader(OutputStream out, int totalVariants) throws IOException {
-    out.write((HEADER + totalVariants + StringUtils.LS).getBytes());
-    out.write((HEADER2 + StringUtils.LS).getBytes());
+  private static final String HEADER3 = " false_negatives precision sensitivity f_measure".replaceAll(" ", "\t");
+  private static void rocHeader(LineWriter out, int totalVariants, boolean extraMetrics) throws IOException {
+    out.writeln(HEADER + totalVariants);
+    out.write(HEADER2);
+    if (extraMetrics) {
+      out.write(HEADER3);
+    }
+    out.newLine();
   }
 
   /**
@@ -130,22 +138,28 @@ public class RocContainer {
    */
   public void writeRocs(int totalBaselineVariants, boolean zip) throws IOException {
     for (int i = 0; i < mOutputFiles.size(); i++) {
-      double tp = 0.0;
-      int fp = 0;
-      try (OutputStream os = FileUtils.createOutputStream(FileUtils.getZippedFileName(zip, mOutputFiles.get(i)), zip)) {
-        rocHeader(os, totalBaselineVariants);
+      try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(FileUtils.getZippedFileName(zip, mOutputFiles.get(i)), zip)))) {
+        double tp = 0.0;
+        double fp = 0.0;
+        final boolean extraMetrics = mFilters.get(i) == RocFilter.ALL && totalBaselineVariants > 0;
+        rocHeader(os, totalBaselineVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : mRocs.get(i).entrySet()) {
           final RocPoint p = me.getValue();
           tp += p.mTp;
           fp += p.mFp;
-          final StringBuilder sb = new StringBuilder();
-          sb.append(Utils.realFormat(me.getKey(), 3));
-          sb.append("\t");
-          sb.append(Utils.realFormat(tp, 3));
-          sb.append("\t");
-          sb.append(Integer.toString(fp));
-          sb.append(StringUtils.LS);
-          os.write(sb.toString().getBytes());
+          os.write(Utils.realFormat(me.getKey(), 3) + "\t" + Utils.realFormat(tp, 2) + "\t" + Utils.realFormat(fp, 2));
+
+          if (extraMetrics) {
+            final double fn = totalBaselineVariants - tp;
+            final double precision = ContingencyTable.precision(tp, fp);
+            final double recall = ContingencyTable.recall(tp, fn);
+            final double fMeasure = ContingencyTable.fMeasure(precision, recall);
+            os.write("\t"+ Utils.realFormat(fn, 2)
+              + "\t" + Utils.realFormat(precision, 4)
+              + "\t" + Utils.realFormat(recall, 4)
+              + "\t" + Utils.realFormat(fMeasure, 4));
+          }
+          os.newLine();
         }
       }
     }
@@ -180,13 +194,14 @@ public class RocContainer {
   private static void addRow(final TextTable table, String threshold, double truePositive, double falsePositive, double falseNegative) {
     final double precision = ContingencyTable.precision(truePositive, falsePositive);
     final double recall = ContingencyTable.recall(truePositive, falseNegative);
+    final double fMeasure = ContingencyTable.fMeasure(precision, recall);
     table.addRow(threshold,
-      Long.toString(Math.round(truePositive)),
-      Long.toString(Math.round(falsePositive)),
-      Long.toString(Math.round(falseNegative)),
+      Long.toString(MathUtils.round(truePositive)),
+      Long.toString(MathUtils.round(falsePositive)),
+      Long.toString(MathUtils.round(falseNegative)),
       Utils.realFormat(precision, 4),
       Utils.realFormat(recall, 4),
-      Utils.realFormat(ContingencyTable.fMeasure(precision, recall), 4));
+      Utils.realFormat(fMeasure, 4));
   }
 
   // Find the threshold entry (from the ALL filter) that maximises f-measure, as an (arbitrary but) fair comparison point
@@ -195,7 +210,7 @@ public class RocContainer {
       final RocFilter filter = mFilters.get(i);
       if (filter == RocFilter.ALL) {
         double tp = 0.0;
-        int fp = 0;
+        double fp = 0.0;
         double best = -1;
         RocPoint bestPoint = null;
         for (final Map.Entry<Double, RocPoint> me : mRocs.get(i).entrySet()) {
@@ -219,9 +234,9 @@ public class RocContainer {
   private static final class RocPoint {
     double mThreshold;
     double mTp;
-    int mFp;
+    double mFp;
 
-    private RocPoint(double threshold, double tp, int fp) {
+    private RocPoint(double threshold, double tp, double fp) {
       mThreshold = threshold;
       mTp = tp;
       mFp = fp;

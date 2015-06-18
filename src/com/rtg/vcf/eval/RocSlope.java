@@ -77,7 +77,7 @@ public final class RocSlope {
         assert split.length >= 3;
         final double pos = Double.parseDouble(split[0]);
         final int y = (int) Double.parseDouble(split[1]);
-        final int x = Integer.parseInt(split[2]);
+        final int x = (int) Double.parseDouble(split[2]);
         //System.err.println("pos=" + pos + " x=" + x + " y=" + y);
         final int size = stack.size();
         if (size == 0) {

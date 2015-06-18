@@ -31,6 +31,7 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,11 +40,11 @@ import com.rtg.launcher.OutputParams;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Pair;
-import com.rtg.util.StringUtils;
-import com.rtg.util.TestUtils;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -52,6 +53,25 @@ import junit.framework.TestCase;
 /**
  */
 public class PathTest extends TestCase {
+
+  protected NanoRegression mNano;
+
+  @Override
+  public void setUp() throws IOException {
+    Diagnostic.setLogStream();
+    mNano = new NanoRegression(this.getClass());
+  }
+
+  @Override
+  public void tearDown() throws IOException {
+    Diagnostic.setLogStream();
+    try {
+      mNano.finish();
+    } finally {
+      mNano = null;
+    }
+  }
+
 
   public void testBestPath() {
     final byte[] template = {1, 1, 1, 1};
@@ -604,7 +624,7 @@ public class PathTest extends TestCase {
       VcfEvalTask.evaluateCalls(mep);
 
       final String weightedroc = FileUtils.fileToString(new File(output, "weighted_roc.tsv"));
-      TestUtils.containsAll(weightedroc, "99.000\t1.000\t0" + StringUtils.LS, "75.000\t1.000\t1" + StringUtils.LS);
+      mNano.check("path-noinfite-roc.tsv", weightedroc);
     }
   }
 }

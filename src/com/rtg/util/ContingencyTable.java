@@ -161,7 +161,8 @@ public class ContingencyTable {
    * @return f-measure score
    */
   public static double fMeasure(double precision, double recall) {
-    return 2 * precision * recall / (precision + recall);
+    final double sum = precision + recall;
+    return sum == 0 ? 0 : 2 * precision * recall / sum;
   }
 
 }

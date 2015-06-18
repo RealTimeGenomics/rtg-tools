@@ -1,3 +1,4 @@
 #total baseline variants: 1
 #score	true_positives	false_positives	false_negatives	precision	sensitivity	f_measure
-2.000	1.00	0.00	0.00	1.0000	1.0000	1.0000
+99.000	1.00	0.00	0.00	1.0000	1.0000	1.0000
+75.000	1.00	1.00	0.00	0.5000	1.0000	0.6667
