@@ -56,6 +56,7 @@ import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -94,8 +95,14 @@ class TabixVcfRecordSet implements VariantSet {
     mMaxLength = maxLength;
 
     final Set<String> basenames = new TreeSet<>();
+    for (ContigField c : mBaseLineHeader.getContigLines()) {
+      basenames.add(c.getId());
+    }
     Collections.addAll(basenames, new TabixIndexReader(TabixIndexer.indexFileName(baselineFile)).sequenceNames());
     final Set<String> callnames = new TreeSet<>();
+    for (ContigField c : mCalledHeader.getContigLines()) {
+      callnames.add(c.getId());
+    }
     Collections.addAll(callnames, new TabixIndexReader(TabixIndexer.indexFileName(calledFile)).sequenceNames());
     if (Collections.disjoint(basenames, callnames)) {
       throw new NoTalkbackSlimException("There were no sequence names in common between the supplied baseline and called variant sets. Check they use the same reference and are non-empty.");
