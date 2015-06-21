@@ -95,16 +95,19 @@ class TabixVcfRecordSet implements VariantSet {
     mMaxLength = maxLength;
 
     final Set<String> basenames = new TreeSet<>();
-    for (ContigField c : mBaseLineHeader.getContigLines()) {
-      basenames.add(c.getId());
-    }
     Collections.addAll(basenames, new TabixIndexReader(TabixIndexer.indexFileName(baselineFile)).sequenceNames());
     final Set<String> callnames = new TreeSet<>();
-    for (ContigField c : mCalledHeader.getContigLines()) {
-      callnames.add(c.getId());
-    }
     Collections.addAll(callnames, new TabixIndexReader(TabixIndexer.indexFileName(calledFile)).sequenceNames());
-    if (Collections.disjoint(basenames, callnames)) {
+
+    final Set<String> basedeclarednames = new TreeSet<>(basenames);
+    for (ContigField c : mBaseLineHeader.getContigLines()) {
+      basedeclarednames.add(c.getId());
+    }
+    final Set<String> calldeclarednames = new TreeSet<>(callnames);
+    for (ContigField c : mCalledHeader.getContigLines()) {
+      calldeclarednames.add(c.getId());
+    }
+    if (Collections.disjoint(basedeclarednames, calldeclarednames)) {
       throw new NoTalkbackSlimException("There were no sequence names in common between the supplied baseline and called variant sets. Check they use the same reference and are non-empty.");
     }
 
