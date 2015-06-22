@@ -91,7 +91,6 @@ public class ReferenceRanges<T> {
     final RangeList<T> ranges;
     if (mAllAvailable) {
       throw new UnsupportedOperationException("Cannot create sub-restriction on 'All Available' ranges");
-      //ranges = new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, (T) "seqName")); // XXX Huh? what is this constant for. Can't be null because that denotes "empty range"
     } else {
       ranges = mByName.get(seqName);
     }
