@@ -59,7 +59,7 @@ public class SdfSubsetTest extends AbstractCliTest {
   }
 
   public void testValidator() throws Exception {
-    final String err = checkHandleFlagsErr("-i", "genome", "-o", "out");
+    final String err = checkHandleFlagsErr("-i", "genome", "-o", "no-such-dir");
     TestUtils.containsAll(err, "Sequences to extract must be specified");
   }
 
