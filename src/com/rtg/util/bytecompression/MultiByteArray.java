@@ -129,13 +129,13 @@ public class MultiByteArray extends ByteArray {
     int block = (int) (offset >> mBits);
     int blockpos = (int) (offset & mMask);
     int destpos = 0;
-    int todo = count;
+    int remaining = count;
 
-    while (todo > 0) {
-      final int amountToCopy = Math.min(todo, mChunkSize - blockpos);
+    while (remaining > 0) {
+      final int amountToCopy = Math.min(remaining, mChunkSize - blockpos);
       System.arraycopy(mData[block], blockpos, dest, destpos, amountToCopy);
       destpos += amountToCopy;
-      todo -= amountToCopy;
+      remaining -= amountToCopy;
       block++;
       blockpos = 0;
     }
@@ -158,13 +158,13 @@ public class MultiByteArray extends ByteArray {
     int block = (int) (offset >> mBits);
     int blockpos = (int) (offset & mMask);
     int srcpos = bOffset;
-    int todo = count;
+    int remaining = count;
 
-    while (todo > 0) {
-      final int amountToCopy = Math.min(todo, mChunkSize - blockpos);
+    while (remaining > 0) {
+      final int amountToCopy = Math.min(remaining, mChunkSize - blockpos);
       System.arraycopy(src, srcpos, mData[block], blockpos, amountToCopy);
       srcpos += amountToCopy;
-      todo -= amountToCopy;
+      remaining -= amountToCopy;
       block++;
       blockpos = 0;
     }

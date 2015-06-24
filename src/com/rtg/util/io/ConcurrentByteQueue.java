@@ -120,16 +120,16 @@ public class ConcurrentByteQueue implements Integrity {
     //assert !mClosed; // This is possible if an exception has happened
     boolean wasEmpty = mSize == 0;
     int from = off;
-    int todo = len;
-    while (todo > 0 && !mClosed) { // To allow reading thread to kill when exception occurs in underlying writing
+    int remaining = len;
+    while (remaining > 0 && !mClosed) { // To allow reading thread to kill when exception occurs in underlying writing
       final int freeSpaceStart = (mStart + mSize) % mBuf.length;
       final int freeSize = mBuf.length - mSize;
       final int spaceUntilEnd = mBuf.length - freeSpaceStart;
-      final int copied = Math.min(todo, Math.min(freeSize, spaceUntilEnd));
+      final int copied = Math.min(remaining, Math.min(freeSize, spaceUntilEnd));
       if (copied > 0) {
         System.arraycopy(buf, from, mBuf, freeSpaceStart, copied);
         mSize += copied;
-        todo -= copied;
+        remaining -= copied;
         from += copied;
       } else {
         // wait until the reader has cleared some space
