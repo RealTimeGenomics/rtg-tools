@@ -33,11 +33,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.cli.CommandLine;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.WarningType;
+import com.rtg.util.intervals.LongRange;
 
 
 /**
@@ -113,7 +113,7 @@ public class AlternatingSequencesWriter extends SequencesWriter {
         }
         if (mCheckDuplicateNames) {
           if (name.equals(dataSource.name())) {
-            throw new NoTalkbackSlimException("More than one read-pair with the same name in input.");
+            throw new NoTalkbackSlimException("More than one read-pair with the name " + name + " in input.");
           }
           name = dataSource.name();
         }

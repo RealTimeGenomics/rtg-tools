@@ -81,22 +81,20 @@ public final class MappedSamBamSequenceDataSource extends SamBamSequenceDataSour
         if (pair == null) {
           mRecordMap.put(rec.getReadName(), rec);
         } else {
-          placePairedRecord(rec);
-          placePairedRecord(pair);
-          if (mRecords[0] == null || mRecords[1] == null) {
-            final SamSequence r = mRecords[0] == null ? mRecords[1] : mRecords[0];
-
+          if (rec.getFirstOfPairFlag() == pair.getFirstOfPairFlag()) {
             if (mDuplicates < 5) {
-              Diagnostic.warning("Read " + r.getReadName() + " is duplicated in SAM input.");
+              Diagnostic.warning("Read " + rec.getReadName() + " is duplicated in SAM input.");
               if (mDuplicates == 4) {
                 Diagnostic.warning("Subsequent warnings of this type will not be shown.");
               }
             }
             mRecordMap.put(rec.getReadName(), rec);
             mDuplicates++;
-
             continue;
           }
+
+          placePairedRecord(rec);
+          placePairedRecord(pair);
           return haveNextRecords();
         }
       }

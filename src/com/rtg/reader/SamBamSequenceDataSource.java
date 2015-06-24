@@ -135,17 +135,15 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   protected boolean placePairedRecord(SamSequence record) {
     if (record != null) {
       checkRecordPaired(record);
-      if (record.getFirstOfPairFlag()) {
-        mRecords[1] = record;
-      } else {
-        mRecords[0] = record;
-      }
+      mRecords[record.getFirstOfPairFlag() ? 1 : 0] = record;
       return true;
     }
     return false;
   }
 
+  // Fill mRecords with new records
   protected boolean nextRecords() throws IOException {
+    Arrays.fill(mRecords, null);
     if (mPaired) {
       if (placePairedRecord(nextRecord())) {
         if (placePairedRecord(nextRecord())) {
