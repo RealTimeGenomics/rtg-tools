@@ -205,7 +205,7 @@ public final class Talkback {
     if (logContents.length() > 41e3) {
       logContents = logContents.substring(0, 10000) + "...\n\n(middle of log excluded due to being oversize)\n\n..." + logContents.substring(logContents.length() - 30000);
       if (prompt) {
-        System.err.println("The log file is oversized, sending truncated log.  Please send the full log file ('" + filename + "') to Real Time Genomics at " + Constants.SUPPORT_EMAIL_ADDR);
+        System.err.println("The log file is oversized, sending truncated log.  Please send the full log file ('" + filename + "') to Real Time Genomics at " + Constants.TALKBACK_EMAIL_ADDR);
       }
     }
     final StringBuilder postData = new StringBuilder();
