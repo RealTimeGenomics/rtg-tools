@@ -68,12 +68,12 @@ import com.rtg.vcf.header.VcfNumber;
 
 
 /**
- * Takes 2 files and produces intersection for SNP's, the output directory contains 4 files
+ * Takes two files and produces intersection for SNP's, the output directory contains four files:
  * <ul>
- * <li><code> same.vcf </code> - file containing same calls at same location, it has 2 lines per entry, first from -i and second from -I</li>
- * <li><code> different.vcf </code> - file containing different calls at same location, it has 2 lines per entry, first from -i and second from -I</li>
- * <li><code> first-only.vcf </code> - file containing call from file given to -i flag, that was not called in -I file
- * <li><code> second-only.vcf </code> - file containing call from file given to -I flag, that was not called in -i file
+ * <li><code>same.vcf</code>: file containing same calls at same location, it has two lines per entry, first from -i and second from -I</li>
+ * <li><code>different.vcf</code>: file containing different calls at same location, it has two lines per entry, first from -i and second from -I</li>
+ * <li><code>first-only.vcf</code>: file containing calls from file given to -i flag, that was not called in -I file
+ * <li><code>second-only.vcf</code>: file containing calls from file given to -I flag, that was not called in -i file
  * </ul>
  *
  * Two calls are considered to be same iff both calls have
