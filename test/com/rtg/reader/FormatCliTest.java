@@ -512,8 +512,7 @@ public class FormatCliTest extends AbstractCliTest {
 
   public void testInputTestingFlags() throws IOException {
     Diagnostic.setLogStream();
-    final File dir = FileUtils.createTempDir("format", "test");
-    try {
+    try (TestDirectory dir = new TestDirectory("format")) {
       final File input = new File(dir, "in");
       FileUtils.stringToFile("", input);
       final File outDir = new File(dir, "out");
@@ -529,15 +528,12 @@ public class FormatCliTest extends AbstractCliTest {
           "Either specify individual input files or left and right files, not both.");
       TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-r", input.getPath(), input.getPath()),
           "Either specify individual input files or left and right files, not both.");
-    } finally {
-      FileHelper.deleteAll(dir);
     }
   }
 
   public void testFormatflag() throws IOException {
     Diagnostic.setLogStream();
-    final File que = FileHelper.createTempDirectory();
-    try {
+    try (TestDirectory que = new TestDirectory("format")) {
       final File f = new File(que, "in");
       FileUtils.stringToFile("", f);
       final String[] args = {
@@ -547,8 +543,6 @@ public class FormatCliTest extends AbstractCliTest {
       };
       final String err = checkHandleFlagsErr(args);
       assertTrue(err, err.contains("Invalid value \"embl\" for \"-f\""));
-    } finally {
-      FileHelper.deleteAll(que);
     }
   }
 
@@ -568,22 +562,20 @@ public class FormatCliTest extends AbstractCliTest {
 
   public void testOutputAsFileflag() throws IOException {
     Diagnostic.setLogStream();
-    final File que = File.createTempFile("preread", "query");
-    try {
+    try (TestDirectory dir = new TestDirectory("format")) {
+      File que = new File(dir, "query");
+      FileUtils.stringToFile("", que);
       final String[] args = {
         "-o", que.getPath(),
         que.getPath(),
       };
       final String result = checkHandleFlagsErr(args);
       assertTrue(result, result.replaceAll("\\s+", " ").contains("The directory \"" + que.getPath() + "\" already exists. Please remove it first or choose a different directory."));
-    } finally {
-      FileHelper.deleteAll(que);
     }
   }
 
   public void testSolexa13Format() throws Exception {
-    final File tempDir = FileUtils.createTempDir("junit", "test");
-    try {
+    try (TestDirectory tempDir = new TestDirectory("format")) {
       final File outputDir = new File(tempDir, JUNITOUT);
       ByteArrayOutputStream out = new ByteArrayOutputStream();
       ByteArrayOutputStream err = new ByteArrayOutputStream();
@@ -601,8 +593,6 @@ public class FormatCliTest extends AbstractCliTest {
       out.flush();
       ps.flush();
       assertTrue("error was: " + err.toString(), err.toString().contains("Unrecognized symbols appeared before label symbol. Last sequence read was: \"<none>\""));
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
     }
   }
 
@@ -724,12 +714,28 @@ public class FormatCliTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int errorCode = new FormatCli().mainInit(args, out.outputStream(), err.printStream());
-      assertEquals(err.toString(), 0, errorCode);
+      String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
+      TestUtils.containsAll(err, "1 reads missing a pair");
+      try (final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE)) {
+        assertEquals(2, rightReader.numberSequences());
+
+        final StringBuilder sb = new StringBuilder();
+        final SequencesIterator it = rightReader.iterator();
+        while (it.nextSequence()) {
+          sb.append(it.currentName());
+        }
+        TestUtils.containsAll(sb.toString(), "48218590", "48851323");
+      }
+    }
+  }
+  public void testHandleDupAndSupplemental() throws IOException {
+    try (TestDirectory dir = new TestDirectory()) {
+      final File input = new File(dir, "input.sam");
+      final File output = new File(dir, "output");
+      FileHelper.resourceToFile("com/rtg/reader/resources/mated-dups.sam", input);
+      String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
+      TestUtils.containsAll(err, "Read 48851323 is duplicated in SAM input", "1 reads missing a pair", "1 records ignored as duplicates in input");
 
       try (final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE)) {
         assertEquals(2, rightReader.numberSequences());
@@ -748,13 +754,9 @@ public class FormatCliTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "I am not here"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int errorCode = new FormatCli().mainInit(args, out.outputStream(), err.printStream());
-      assertFalse(err.toString(), errorCode == 0);
-      TestUtils.containsAll(err.toString(), "No read group information matching \"I am not here\" present in the input file");
+      String err = checkMainInitBadFlags(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "I am not here");
+      TestUtils.containsAll(err, "No read group information matching \"I am not here\" present in the input file");
     }
   }
 
@@ -763,9 +765,9 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "input.sam");
       final File input2 = new File(dir, "input2.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input.getPath(), input2.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.sam", input2);
+      final String[] args = {input.getPath(), input2.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1"};
       final MemoryPrintStream out = new MemoryPrintStream();
       final MemoryPrintStream err = new MemoryPrintStream();
       final String expected = "@RG\tID:rg1\tSM:sm1\tPL:ILLUMINA";

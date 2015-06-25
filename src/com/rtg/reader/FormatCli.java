@@ -280,7 +280,7 @@ public final class FormatCli extends LoggedCli {
    * @param mappedSam true to use mapped SAM / BAM implementation
    * @param flattenPaired if <code>paired</code> is false then this will load both arms into a single SDF
    * @param samReadGroup sam read group ID to restrict output to
-   * @param dedupSecondary true to de-duplicate secondary alignments by name
+   * @param dedupSecondary true to de-duplicate secondary alignments by name, only needed if input mappings include reads that do not contain a primary alignment (e.g. RTG ambiguous mappings)
    * @return the data source
    */
   public static SequenceDataSource getDnaDataSource(List<File> files, InputFormat format, PrereadArm arm, boolean mappedSam, boolean flattenPaired, String samReadGroup, boolean dedupSecondary) {
@@ -293,15 +293,24 @@ public final class FormatCli extends LoggedCli {
     } else if (format == InputFormat.SOLEXA1_3) {
       return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA1_3, true, arm);
     } else if (format == InputFormat.SAM_SE || format == InputFormat.SAM_PE) {
-      SamFilter readGroupFilter = samReadGroup == null ? null : new SamBamSequenceDataSource.FilterReadGroups(samReadGroup);
+      final List<SamFilter> filters = new ArrayList<>();
+      int filterFlags = SamBamConstants.SAM_SUPPLEMENTARY_ALIGNMENT; // Always ignore supplementary alignments
+      if (!dedupSecondary) {
+        filterFlags |= SamBamConstants.SAM_SECONDARY_ALIGNMENT;
+      }
+      filters.add(new DefaultSamFilter(new SamFilterParams.SamFilterParamsBuilder().requireUnsetFlags(filterFlags).create()));
+      if (samReadGroup != null) {
+        filters.add(new SamBamSequenceDataSource.FilterReadGroups(samReadGroup));
+      }
+      if (dedupSecondary) {
+        filters.add(new DuplicateSamFilter());
+      }
       final boolean paired = format == InputFormat.SAM_PE;
       if (mappedSam) {
-        final SamFilterParams primaryOnlyFilter = new SamFilterParams.SamFilterParamsBuilder().requireUnsetFlags(SamBamConstants.SAM_SECONDARY_ALIGNMENT).create();
-        final SamFilter dupFilter = dedupSecondary ? new DuplicateSamFilter() : new DefaultSamFilter(primaryOnlyFilter);
-        readGroupFilter = readGroupFilter == null ? dupFilter : new SamFilterChain(readGroupFilter, dupFilter);
-        return MappedSamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, readGroupFilter);
+        return MappedSamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, new SamFilterChain(filters));
+      } else {
+        return SamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, new SamFilterChain(filters));
       }
-      return SamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, readGroupFilter);
     } else {
       throw new BadFormatCombinationException("Invalid file format=" + format);
     }
@@ -607,16 +616,6 @@ public final class FormatCli extends LoggedCli {
         mWriter.processSequences(mIncludeQuality, mIncludeNames);
       }
     }
-  }
-
-
-  /**
-   * Main program for building and searching. Use -h to get help.
-   * @param args command line arguments.
-   */
-  //We need the generic parameters here because of compiler bugs.
-  public static void main(final String[] args) {
-    new FormatCli().mainExit(args);
   }
 
   @Override

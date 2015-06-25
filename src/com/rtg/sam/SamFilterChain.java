@@ -29,6 +29,8 @@
  */
 package com.rtg.sam;
 
+import java.util.Collection;
+
 import htsjdk.samtools.SAMRecord;
 
 /**
@@ -44,6 +46,14 @@ public class SamFilterChain implements SamFilter {
    */
   public SamFilterChain(SamFilter... filters) {
     mFilters = filters;
+  }
+
+  /**
+   * Construct a chain of SAM filters
+   * @param filters the filters to chain
+   */
+  public SamFilterChain(Collection<SamFilter> filters) {
+    mFilters = filters.toArray(new SamFilter[filters.size()]);
   }
 
   @Override

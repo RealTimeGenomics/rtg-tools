@@ -51,7 +51,8 @@ public final class SamBamConstants {
       SAM_READ_IS_FIRST_IN_PAIR = 0x0040,
       SAM_READ_IS_SECOND_IN_PAIR = 0x0080,
       SAM_SECONDARY_ALIGNMENT = 0x0100,
-      SAM_PCR_OR_OPTICAL_DUPLICATE = 0x0400;
+      SAM_PCR_OR_OPTICAL_DUPLICATE = 0x0400,
+      SAM_SUPPLEMENTARY_ALIGNMENT = 0x0800;
 
   /**
    * The fixed field positions in SAM records.

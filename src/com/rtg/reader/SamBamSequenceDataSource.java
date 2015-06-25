@@ -47,6 +47,7 @@ import com.rtg.util.array.ArrayUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 import htsjdk.samtools.SAMFileHeader.SortOrder;
+import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SamReader;
 
@@ -202,7 +203,8 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
     }
     @Override
     public boolean acceptRecord(SAMRecord next) {
-      return next.getReadGroup().getId().equals(mReadGroupId);
+      final SAMReadGroupRecord readGroup = next.getReadGroup();
+      return readGroup != null && readGroup.getId().equals(mReadGroupId);
     }
   }
 
