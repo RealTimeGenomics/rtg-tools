@@ -132,7 +132,7 @@ public class VcfUtilsTest extends TestCase {
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/0", "A", "T"), 0, true));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord(".", "A", "T"), 0, true));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("./0", "A", "T"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("./1", "A", "T"), 0, false));
+    assertFalse(VcfUtils.skipRecordForSample(makeRecord("./1", "A", "T"), 0, false));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "<DEL>"), 0, true));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T]bar:198982]"), 0, true));
   }
