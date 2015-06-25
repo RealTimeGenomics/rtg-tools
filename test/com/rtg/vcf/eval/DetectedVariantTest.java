@@ -113,8 +113,9 @@ public class DetectedVariantTest extends TestCase {
 
   static final String SNP_LINE2 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T,C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/2:4:0.02:12.8";
   static final String SNP_LINE3 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "0/1:4:0.02:12.8";
+  static final String SNP_LINE4 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "./1:4:0.02:12.8";
   public void testHeterozygousSnpConstruction() throws Exception {
-    final DetectedVariant variant = getDetectedVariant(SNP_LINE2);
+    DetectedVariant variant = getDetectedVariant(SNP_LINE2);
     assertEquals(22, variant.getStart());
     assertEquals(12.8, variant.getSortValue(), 0.1);
     assertEquals(1, variant.nt(true).length);
@@ -122,17 +123,30 @@ public class DetectedVariantTest extends TestCase {
     assertEquals(1, variant.nt(false).length);
     assertEquals(2, variant.nt(false)[0]);
 
+    // Test half-call  ./1, no squash
+    variant = getDetectedVariant(SNP_LINE4);
+    assertEquals(1, variant.nt(true).length);
+    assertEquals(0, variant.nt(true)[0]);
+    assertEquals(4, variant.nt(false)[0]);
+
     // Test squashing ploidy  1/2 -> 2/2
-    final DetectedVariant v2 = getDetectedVariant(SNP_LINE2, true);
-    assertEquals(1, v2.nt(true).length);
-    assertEquals(2, v2.nt(true)[0]);
-    assertNull(v2.nt(false));
+    variant = getDetectedVariant(SNP_LINE2, true);
+    assertEquals(1, variant.nt(true).length);
+    assertEquals(2, variant.nt(true)[0]);
+    assertNull(variant.nt(false));
 
     // Test squashing ploidy  0/1 -> 1/1
-    final DetectedVariant v3 = getDetectedVariant(SNP_LINE3, true);
-    assertEquals(1, v3.nt(true).length);
-    assertEquals(4, v3.nt(true)[0]);
-    assertNull(v3.nt(false));
+    variant = getDetectedVariant(SNP_LINE3, true);
+    assertEquals(1, variant.nt(true).length);
+    assertEquals(4, variant.nt(true)[0]);
+    assertNull(variant.nt(false));
+
+    // Test squashing ploidy  ./1 -> 1/1
+    variant = getDetectedVariant(SNP_LINE4, true);
+    assertEquals(1, variant.nt(true).length);
+    assertEquals(4, variant.nt(true)[0]);
+    assertNull(variant.nt(false));
+
   }
 
   static final String INSERT_LINE = "someKindOfName" + TAB + "22" + TAB + "." + TAB + "A" + TAB + "AACT" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";

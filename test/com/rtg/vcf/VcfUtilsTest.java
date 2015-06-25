@@ -60,6 +60,7 @@ public class VcfUtilsTest extends TestCase {
     checkSplit(new int[] {-1}, VcfUtils.splitGt("."));
     checkSplit(new int[] {1}, VcfUtils.splitGt("1"));
     checkSplit(new int[] {0, 1}, VcfUtils.splitGt("0|1"));
+    checkSplit(new int[] {1, -1}, VcfUtils.splitGt("1|."));
     checkSplit(new int[] {-1, -1}, VcfUtils.splitGt(".|."));
     checkSplit(new int[] {123}, VcfUtils.splitGt("123"));
     checkSplit(new int[] {123, 321}, VcfUtils.splitGt("123/321"));
@@ -90,8 +91,10 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.isNonVariantGt("1"));
     assertFalse(VcfUtils.isNonVariantGt("0/1"));
     assertFalse(VcfUtils.isNonVariantGt("0|1"));
+    assertFalse(VcfUtils.isNonVariantGt("./1"));
     assertTrue(VcfUtils.isNonVariantGt("."));
     assertTrue(VcfUtils.isNonVariantGt("./."));
+    assertTrue(VcfUtils.isNonVariantGt("./0"));
     assertTrue(VcfUtils.isNonVariantGt("0"));
     assertTrue(VcfUtils.isNonVariantGt("0|0|0"));
   }
@@ -102,6 +105,8 @@ public class VcfUtilsTest extends TestCase {
     assertTrue(VcfUtils.isNonMissingGt("0|1"));
     assertFalse(VcfUtils.isNonMissingGt("."));
     assertFalse(VcfUtils.isNonMissingGt("./."));
+    assertTrue(VcfUtils.isNonMissingGt("./0"));
+    assertTrue(VcfUtils.isNonMissingGt("./1"));
     assertTrue(VcfUtils.isNonMissingGt("0"));
     assertTrue(VcfUtils.isNonMissingGt("0|0|0"));
   }
@@ -125,8 +130,9 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("FAIL"), 0, false));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("FAIL"), 0, true));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/0", "A", "T"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("-1", "A", "T"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("-1/0", "A", "T"), 0, true));
+    assertTrue(VcfUtils.skipRecordForSample(makeRecord(".", "A", "T"), 0, true));
+    assertTrue(VcfUtils.skipRecordForSample(makeRecord("./0", "A", "T"), 0, true));
+    assertTrue(VcfUtils.skipRecordForSample(makeRecord("./1", "A", "T"), 0, false));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "<DEL>"), 0, true));
     assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T]bar:198982]"), 0, true));
   }
