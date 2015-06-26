@@ -326,7 +326,7 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * @return Id
+   * @return id field, caller responsibility to split on ";" for multiple ids
    */
   public String getId() {
     return mId == null ? MISSING : mId;
@@ -375,7 +375,11 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addAltCall(String altCall) {
-    mAltCalls.add(altCall);
+    if (MISSING.equals(altCall)) {
+      throw new IllegalArgumentException("Attempt to add missing value '.' as explicit ALT allele");
+    } else {
+      mAltCalls.add(altCall);
+    }
     return this;
   }
 

@@ -523,11 +523,11 @@ public final class VcfUtils {
     // Can only strip previous nucleotide if all alleles have the same first char
     final Character c = rec.getRefCall().charAt(0);
     for (final String alt : rec.getAltCalls()) {
-      if (alt.equals(VcfRecord.MISSING) || !c.equals(alt.charAt(0))) {
+      if (!c.equals(alt.charAt(0))) {
         return false;
       }
     }
-    return true;
+    return !rec.getAltCalls().isEmpty();
   }
 
   /**

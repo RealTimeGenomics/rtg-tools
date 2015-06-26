@@ -49,7 +49,6 @@ public class NumberOfAltAllelesAnnotationTest extends TestCase {
     final NumberOfAltAllelesAnnotation ann = new NumberOfAltAllelesAnnotation();
     VcfRecord rec = new VcfRecord();
     rec.setRefCall("A");
-    rec.addAltCall(".");
     assertEquals(0, ann.getValue(rec, 0).intValue());
     rec.setRefCall("A");
     rec.addAltCall("T");

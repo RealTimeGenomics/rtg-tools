@@ -30,8 +30,6 @@
 
 package com.rtg.vcf.annotation;
 
-import java.util.List;
-
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -49,14 +47,7 @@ public class NumberOfAltAllelesAnnotation extends AbstractDerivedAnnotation {
 
   @Override
   public Integer getValue(VcfRecord record, int sampleNumber) {
-    final List<String> alleles = record.getAltCalls();
-    int missingCount = 0;
-    for (String allele : alleles) {
-      if (VcfRecord.MISSING.equals(allele)) {
-        missingCount++;
-      }
-    }
-    return record.getAltCalls().size() - missingCount;
+    return record.getAltCalls().size();
   }
 
   @Override

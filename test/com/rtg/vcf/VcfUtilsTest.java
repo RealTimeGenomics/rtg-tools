@@ -124,6 +124,12 @@ public class VcfUtilsTest extends TestCase {
     return record;
   }
 
+  public void testHasRedundantFirstNucleotide() {
+    assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/1", "A", "T")));
+    assertTrue(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/1", "A", "AT")));
+    assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/0", "A")));
+  }
+
   public void testSkipRecordForSample() {
     assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T"), 0, true));
     assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("PASS"), 0, true));

@@ -53,7 +53,7 @@ public enum RocScoreField {
         @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           final String qualStr = rec.getQuality();
-          if (qualStr.equals(VcfRecord.MISSING)) {
+          if (VcfRecord.MISSING.equals(qualStr)) {
             return Double.NaN;
           }
           try {

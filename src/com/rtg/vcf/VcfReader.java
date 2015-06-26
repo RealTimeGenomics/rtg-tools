@@ -197,20 +197,20 @@ public class VcfReader implements Closeable {
     rec.setStart(Integer.parseInt(field[POS_FIELD]) - 1);
     rec.setId(StringUtils.deepCopy(field[ID_FIELD]));
     rec.setRefCall(StringUtils.deepCopy(field[REF_FIELD]));
-    final String[] altSplit = StringUtils.split(field[ALT_FIELD], ',');
-    for (final String anAltSplit : altSplit) {
-      if (!anAltSplit.equals(".")) {
+    if (!VcfRecord.MISSING.equals(field[ALT_FIELD])) {
+      final String[] altSplit = StringUtils.split(field[ALT_FIELD], ',');
+      for (final String anAltSplit : altSplit) {
         rec.addAltCall(StringUtils.deepCopy(anAltSplit));
       }
     }
     rec.setQuality(field[QUAL_FIELD]);  // "." or float.
     final String[] filterSplit = StringUtils.split(field[FILTER_FIELD], ';');
     for (final String aFilterSplit : filterSplit) {
-      if (!aFilterSplit.equals(".")) {
+      if (!VcfRecord.MISSING.equals(aFilterSplit)) {
         rec.addFilter(StringUtils.deepCopy(aFilterSplit));
       }
     }
-    if (!field[INFO_FIELD].equals(VcfRecord.MISSING)) {
+    if (!VcfRecord.MISSING.equals(field[INFO_FIELD])) {
       final String[] infoSplit = StringUtils.split(field[INFO_FIELD], ';');
       for (final String anInfoSplit : infoSplit) {
         final String info = StringUtils.deepCopy(anInfoSplit);
