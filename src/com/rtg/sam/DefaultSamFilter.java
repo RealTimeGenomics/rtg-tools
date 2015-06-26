@@ -56,7 +56,7 @@ public class DefaultSamFilter implements SamFilter {
    * @param rec record
    * @return true if record should be accepted for processing
    */
-  public static boolean acceptRecord(final SamFilterParams params, final SAMRecord rec) {
+  private static boolean acceptRecord(final SamFilterParams params, final SAMRecord rec) {
     final int flags = rec.getFlags();
     if ((flags & params.requireUnsetFlags()) != 0) {
       return false;
@@ -79,10 +79,16 @@ public class DefaultSamFilter implements SamFilter {
       return false;
     }
 
+    final Integer nh = SamUtils.getNHOrIH(rec);
     final int maxNH = params.maxAlignmentCount();
-    if (maxNH >= 0) {
-      final Integer nh = SamUtils.getNHOrIH(rec);
-      if (nh != null && nh > maxNH) {
+    if (maxNH >= 0 && nh != null && nh > maxNH) {
+        return false;
+    }
+    if (params.excludeVariantInvalid()) {
+      if (nh != null && nh == 0) {
+        return false;
+      }
+      if (!rec.getReadUnmappedFlag() && rec.getAlignmentStart() <= 0) {
         return false;
       }
     }

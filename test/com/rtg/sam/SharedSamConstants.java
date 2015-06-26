@@ -213,13 +213,12 @@ public final class SharedSamConstants {
       + "4" + TAB + "0" + TAB + "g1" + TAB +  "6" + TAB + "255" + TAB + "8M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "GACTGCTC" + TAB + "````````" + TAB + "AS:i:1" + TAB + "IH:i:0" + LS
       + "5" + TAB + "0" + TAB + "g1" + TAB + "11" + TAB + "255" + TAB + "8M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "TTCAGCTA" + TAB + "````````" + TAB + "AS:i:1" + TAB + "IH:i:1" + LS
       ;
+
   /** Unmapped records. */
   public static final String SAM_UNMAPPED = ""
       + "238" + TAB + "77" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "*" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "CCATCAATAGAATCCGTTCGCCAGCATTCTCTAAATGATCAGGAGCCCATTAGCGACGGCAGAAGTTGGCTC" + TAB + "555555555555555555555555555555555555555555555555555555555555555555555555" + TAB + "XC:A:d" + LS
       + "1245" + TAB + "141" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "*" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "CAGAGCTACTTGTCATCGGTTCCATCCCAGCTGGACTCGTGCATGGCCACGCGGTTATGCTAAAAGGTAGAC" + TAB + "555555555555555555555555555555555555555555555555555555555555555555555555" + LS
       ;
-
-
 
   /** Multiple sequence reference */
   public static final String REF_SEQS_M = ""

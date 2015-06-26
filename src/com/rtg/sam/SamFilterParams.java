@@ -59,6 +59,7 @@ public class SamFilterParams {
     protected boolean mExcludeUnmapped = false;
     protected boolean mExcludeDuplicates = false;
     protected boolean mExcludeUnplaced = false;
+    protected boolean mExcludeVariantInvalid = false;
     protected int mRequireUnsetFlags = 0;
     protected int mRequireSetFlags = 0;
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
@@ -157,6 +158,16 @@ public class SamFilterParams {
     }
 
     /**
+     * Exclude records which are invalid for the variant caller (e.g. records with NH=0).
+     * @param val true to exclude records invalid in the variant caller
+     * @return this builder, so calls can be chained.
+     */
+    public SamFilterParamsBuilder excludeVariantInvalid(final boolean val) {
+      mExcludeVariantInvalid = val;
+      return this;
+    }
+
+    /**
      * Specify mask indicating SAM flags that must be unset. Any record with any
      * of these flags set will be excluded. Default is not checking any of these flags.
      * @param flags mask indicating flags that must be unset.
@@ -244,6 +255,7 @@ public class SamFilterParams {
   private final boolean mExcludeUnmated;
   private final boolean mExcludeUnplaced;
   private final boolean mFindAndRemoveDuplicates; //detected version
+  private final boolean mExcludeVariantInvalid;
 
   private final SamRegionRestriction mRestriction;
   private final File mBedRegionsFile;
@@ -257,6 +269,7 @@ public class SamFilterParams {
     mMaxASMatedValue = builder.mMaxASMatedValue;
     mMaxASUnmatedValue = builder.mMaxASUnmatedValue;
     mExcludeUnplaced = builder.mExcludeUnplaced;
+    mExcludeVariantInvalid = builder.mExcludeVariantInvalid;
 
     int requireUnsetFlags = builder.mRequireUnsetFlags;
     if (builder.mExcludeDuplicates) {
@@ -323,6 +336,14 @@ public class SamFilterParams {
    */
   public boolean excludeUnmated() {
     return mExcludeUnmated;
+  }
+
+  /**
+   * True if NH=0 and other records invalid for the variant caller should be excluded.
+   * @return exclusion status
+   */
+  public boolean excludeVariantInvalid() {
+    return mExcludeVariantInvalid;
   }
 
   /**
@@ -403,15 +424,16 @@ public class SamFilterParams {
   @Override
   public String toString() {
     return "SamFilterParams"
-    + " minMapQ=" + minMapQ()
-    + " maxAlignmentCount=" + maxAlignmentCount()
-    + " maxMatedAlignmentScore=" + maxMatedAlignmentScore()
-    + " maxUnmatedAlignmentScore=" + maxUnmatedAlignmentScore()
-    + " excludeUnmated=" + excludeUnmated()
-    + " excludeUnplaced=" + excludeUnplaced()
-    + " requireSetFlags=" + requireSetFlags()
-    + " requireUnsetFlags=" + requireUnsetFlags()
-    + " regionTemplate=" + restrictionTemplate();
+      + " minMapQ=" + minMapQ()
+      + " maxAlignmentCount=" + maxAlignmentCount()
+      + " maxMatedAlignmentScore=" + maxMatedAlignmentScore()
+      + " maxUnmatedAlignmentScore=" + maxUnmatedAlignmentScore()
+      + " excludeUnmated=" + excludeUnmated()
+      + " excludeUnplaced=" + excludeUnplaced()
+      + " excludeVariantInvalid=" + excludeVariantInvalid()
+      + " requireSetFlags=" + requireSetFlags()
+      + " requireUnsetFlags=" + requireUnsetFlags()
+      + " regionTemplate=" + restrictionTemplate();
   }
 
 }

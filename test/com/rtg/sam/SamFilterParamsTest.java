@@ -65,7 +65,7 @@ public class SamFilterParamsTest extends TestCase {
       .excludeUnmapped(false)
       .excludeDuplicates(true)
       .create();
-    assertEquals("SamFilterParams minMapQ=10 maxAlignmentCount=42 maxMatedAlignmentScore=43 maxUnmatedAlignmentScore=44 excludeUnmated=" + true + " excludeUnplaced=" + false + " requireSetFlags=0 requireUnsetFlags=1026 regionTemplate=" + null, p.toString());
+    assertEquals("SamFilterParams minMapQ=10 maxAlignmentCount=42 maxMatedAlignmentScore=43 maxUnmatedAlignmentScore=44 excludeUnmated=" + true + " excludeUnplaced=" + false + " excludeVariantInvalid=" + false + " requireSetFlags=0 requireUnsetFlags=1026 regionTemplate=" + null, p.toString());
     assertEquals(42, p.maxAlignmentCount());
     assertEquals(new IntegerOrPercentage(43), p.maxMatedAlignmentScore());
     assertEquals(new IntegerOrPercentage(44), p.maxUnmatedAlignmentScore());
@@ -80,9 +80,10 @@ public class SamFilterParamsTest extends TestCase {
       .excludeUnmated(true)
       .excludeUnmapped(true)
       .excludeUnplaced(true)
+      .excludeVariantInvalid(true)
       .requireSetFlags(256)
       .create();
-    assertEquals("SamFilterParams minMapQ=-1 maxAlignmentCount=-1 maxMatedAlignmentScore=null maxUnmatedAlignmentScore=44 excludeUnmated=" + true + " excludeUnplaced=" + true + " requireSetFlags=256 requireUnsetFlags=4 regionTemplate=" + null, p.toString());
+    assertEquals("SamFilterParams minMapQ=-1 maxAlignmentCount=-1 maxMatedAlignmentScore=null maxUnmatedAlignmentScore=44 excludeUnmated=" + true + " excludeUnplaced=" + true + " excludeVariantInvalid=" + true + " requireSetFlags=256 requireUnsetFlags=4 regionTemplate=" + null, p.toString());
     assertEquals(-1, p.maxAlignmentCount());
     assertEquals(null, p.maxMatedAlignmentScore());
     assertEquals(new IntegerOrPercentage(44), p.maxUnmatedAlignmentScore());

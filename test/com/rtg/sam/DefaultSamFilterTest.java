@@ -37,43 +37,53 @@ import junit.framework.TestCase;
  */
 public class DefaultSamFilterTest extends TestCase {
 
-
   public void testFilterRecordByFlags() {
     final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder();
     final SAMRecord rec = new SAMRecord(new SAMFileHeader()); // Not unmapped but alignment position == 0
     rec.setReadUnmappedFlag(true);      // Unmapped with alignment position == 0
-    assertTrue(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertTrue(new DefaultSamFilter(builder.create()).acceptRecord(rec));
     builder.excludeUnmapped(true);
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
 
     rec.setReadUnmappedFlag(false);      // Mapped with alignment position == 10
     rec.setAlignmentStart(10);
-    assertTrue(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertTrue(new DefaultSamFilter(builder.create()).acceptRecord(rec));
 
     rec.setDuplicateReadFlag(true);      // Now a duplicate
-    assertTrue(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertTrue(new DefaultSamFilter(builder.create()).acceptRecord(rec));
     builder.excludeDuplicates(true);
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
     builder.excludeDuplicates(false);
 
     rec.setReadPairedFlag(true); // Now paired-end
 
     builder.excludeUnmated(true);
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
-    rec.setProperPairFlag(true); // Now properly paired (i.e. no longer unmated
-    assertTrue(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
+    rec.setProperPairFlag(true); // Now properly paired (i.e. no longer unmated)
+    assertTrue(new DefaultSamFilter(builder.create()).acceptRecord(rec));
 
     builder.excludeMated(true);
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
-
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
   }
 
   public void testFilterUnplaced() {
     final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder().excludeUnplaced(true);
     final SAMRecord rec = new SAMRecord(new SAMFileHeader()); // Not unmapped but alignment position == 0
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
     rec.setReadUnmappedFlag(true);      // Unmapped with alignment position == 0
-    assertFalse(DefaultSamFilter.acceptRecord(builder.create(), rec));
+    assertFalse(new DefaultSamFilter(builder.create()).acceptRecord(rec));
+  }
+
+  public void testVariantInvalids() {
+    final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder().excludeVariantInvalid(true);
+    final DefaultSamFilter filter = new DefaultSamFilter(builder.create());
+    final SAMRecord rec = new SAMRecord(new SAMFileHeader()); // Not unmapped but alignment position == 0
+    rec.setAlignmentStart(0);
+    assertFalse(filter.acceptRecord(rec));
+    rec.setAlignmentStart(1);
+    assertTrue(filter.acceptRecord(rec));
+    rec.setAttribute("NH", 0);
+    assertFalse(filter.acceptRecord(rec));
   }
 
 }
