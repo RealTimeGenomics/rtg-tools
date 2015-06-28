@@ -152,6 +152,10 @@ public class GenomeRelationshipsTest extends TestCase {
     assertEquals(4, genomeRelationships.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(genomeRelationships, RelationshipType.PARENT_CHILD, true)).length);  // ff, fm, f, m
     assertEquals(2, genomeRelationships.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(genomeRelationships, RelationshipType.PARENT_CHILD, false)).length); // f, c
     assertEquals(3, genomeRelationships.genomes(new GenomeRelationships.FounderGenomeFilter(genomeRelationships, false)).length);  // ff, fm, m
+
+    genomeRelationships.addGenome("child-tumor", Sex.MALE);
+    genomeRelationships.addRelationship(RelationshipType.ORIGINAL_DERIVED, "child", "child-tumor");
+    assertEquals(3, genomeRelationships.genomes(new GenomeRelationships.FounderGenomeFilter(genomeRelationships, false)).length);  // ff, fm, m
   }
 
   public void testFilter() {

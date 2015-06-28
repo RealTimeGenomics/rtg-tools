@@ -558,7 +558,6 @@ public class GenomeRelationships {
    */
   public static class PrimaryGenomeFilter implements GenomeFilter {
     final GenomeRelationships mPed;
-
     /**
      * Accepts genomes that are marked as primary
      * @param ped the pedigree indicating whether the genome is primary
@@ -566,7 +565,6 @@ public class GenomeRelationships {
     public PrimaryGenomeFilter(GenomeRelationships ped) {
       mPed = ped;
     }
-
     @Override
     public boolean accept(String genome) {
       return mPed.hasGenome(genome) && Boolean.valueOf(mPed.getProperties(genome).getProperty(PRIMARY_GENOME_PROPERTY));
@@ -578,7 +576,6 @@ public class GenomeRelationships {
    */
   public static class DiseasedGenomeFilter implements GenomeFilter {
     final GenomeRelationships mPed;
-
     /**
      * Accepts genomes that are marked as primary
      * @param ped the pedigree indicating whether each genome is diseased
@@ -586,7 +583,6 @@ public class GenomeRelationships {
     public DiseasedGenomeFilter(GenomeRelationships ped) {
       mPed = ped;
     }
-
     @Override
     public boolean accept(String genome) {
       return mPed.isDiseased(genome);
@@ -599,7 +595,6 @@ public class GenomeRelationships {
   public static class GenomeSexFilter implements GenomeFilter {
     final GenomeRelationships mPed;
     final Sex mSex;
-
     /**
      * Accepts genomes that are marked as primary
      * @param ped the pedigree indicating the sex of each genome
@@ -609,10 +604,30 @@ public class GenomeRelationships {
       mPed = ped;
       mSex = sex;
     }
-
     @Override
     public boolean accept(String genome) {
       return mSex == mPed.getSex(genome);
+    }
+  }
+
+  /** Accepts genomes that are accepted by any one of multiple delegates */
+  public static class OrGenomeFilter implements GenomeFilter {
+    final GenomeFilter[] mDelegates;
+    /**
+     * Accepts genomes that are accepted by any of the delegate filters
+     * @param filters the delegate filters
+     */
+    public OrGenomeFilter(GenomeFilter... filters) {
+      mDelegates = filters;
+    }
+    @Override
+    public boolean accept(String genome) {
+      for (GenomeFilter filter : mDelegates) {
+        if (filter.accept(genome)) {
+          return true;
+        }
+      }
+      return false;
     }
   }
 
@@ -621,7 +636,6 @@ public class GenomeRelationships {
    */
   public static class InvertGenomeFilter implements GenomeFilter {
     final GenomeFilter mDelegate;
-
     /**
      * Accepts genomes that are rejected by the delegate filter
      * @param filter the delegate filter
@@ -629,7 +643,6 @@ public class GenomeRelationships {
     public InvertGenomeFilter(GenomeFilter filter) {
       mDelegate = filter;
     }
-
     @Override
     public boolean accept(String genome) {
       return !mDelegate.accept(genome);
@@ -640,14 +653,15 @@ public class GenomeRelationships {
    * Accepts genomes that are founders (i.e. have no parents) or half-founders (have only 1 parent)
    */
   public static class FounderGenomeFilter extends InvertGenomeFilter {
-
     /**
      * Accepts genomes that are founders (i.e. have no parents)
      * @param ped the ped containing genome relationships
      * @param includeHalfs if true, include those individuals that have only 1 parent
      */
     public FounderGenomeFilter(GenomeRelationships ped, boolean includeHalfs) {
-      super(new GenomeRelationships.HasRelationshipGenomeFilter(ped, Relationship.RelationshipType.PARENT_CHILD, false, includeHalfs ? 2 : 1));
+      super(new GenomeRelationships.OrGenomeFilter(
+        new GenomeRelationships.HasRelationshipGenomeFilter(ped, Relationship.RelationshipType.PARENT_CHILD, false, includeHalfs ? 2 : 1),
+        new GenomeRelationships.HasRelationshipGenomeFilter(ped, RelationshipType.ORIGINAL_DERIVED, false, 1)));
     }
   }
 
