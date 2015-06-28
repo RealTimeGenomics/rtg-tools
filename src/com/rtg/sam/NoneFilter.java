@@ -33,7 +33,7 @@ package com.rtg.sam;
 import htsjdk.samtools.SAMRecord;
 
 /**
- * Filter that accepts every rcord.
+ * Filter that accepts every record.
  */
 public class NoneFilter implements SamFilter {
 
