@@ -90,7 +90,6 @@ public class Sdf2FastaTest extends AbstractCliTest {
   public void testWorks() throws Exception {
     final File xd = FileHelper.createTempDirectory();
     final File fastaDirectory = FileHelper.createTempDirectory();
-    final File jUnitMy = new File(fastaDirectory, "junitmy");
     try {
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(new ByteArrayInputStream(">test\nacgt\n>bob\ntagt\naccc\n>cat\ncat\n>dog\nccc".getBytes()));
@@ -102,7 +101,6 @@ public class Sdf2FastaTest extends AbstractCliTest {
       try {
         x = new File(fastaDirectory, "junitmy.fasta");
         checkMainInitOk("-i", xd.toString(), "-o", x.toString(), "-Z");
-        //Sdf2Fasta.doPrereadToFasta(sr, jUnitMy.getPath() ".fasta", 1, 0, false, false);
         checkContent1(x);
       } finally {
         sr.close();
@@ -110,7 +108,6 @@ public class Sdf2FastaTest extends AbstractCliTest {
       sr = SequencesReaderFactory.createDefaultSequencesReader(xd);
       try {
         checkMainInitOk("-i", xd.toString(), "-o", x.toString(), "-l", "3", "-Z");
-        //Sdf2Fasta.doPrereadToFasta(sr, jUnitMy.getPath(), ".fasta", 1, 3, false, false);
         checkContent2(x);
       } finally {
         sr.close();

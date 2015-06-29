@@ -103,6 +103,25 @@ public final class ReaderTestUtils {
 
   /**
    * Construct a pre-reader directory containing the specified fasta sequence.
+   * @param inputDnaSequenceLeft the left sequence.
+   * @param inputDnaSequenceRight the right sequence.
+   * @param dir SDF dir
+   * @param sdfId Id to use for SDF, <code>null</code> for default
+   * @return SDF-ID actually used for SDF
+   * @throws IOException if an IO Error occured
+   */
+  public static SdfId createPairedReaderDNAFastq(final String inputDnaSequenceLeft, final String inputDnaSequenceRight, final File dir, SdfId sdfId) throws IOException {
+    final SdfId id;
+    try (SequencesReader sr1 = getReaderDNAFastq(inputDnaSequenceLeft, new File(dir, "left"), false)) {
+      id = sr1.getSdfId();
+      final SequencesReader sr2 = getReaderDNAFastq(inputDnaSequenceRight, new File(dir, "right"), false);
+      sr2.close();
+    }
+    return id;
+  }
+
+  /**
+   * Construct a pre-reader directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where pre-reader placed.
    * @return SequencesReader using the directory.

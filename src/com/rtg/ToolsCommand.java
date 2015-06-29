@@ -34,6 +34,7 @@ import java.io.PrintStream;
 
 import com.rtg.graph.RocPlotCli;
 import com.rtg.reader.FormatCli;
+import com.rtg.reader.Sdf2Sam;
 import com.rtg.reader.Sdf2Fasta;
 import com.rtg.reader.Sdf2Fastq;
 import com.rtg.reader.SdfStatistics;
@@ -68,6 +69,9 @@ public final class ToolsCommand {
 
   /** For converting Slim's data format into FASTQ format */
   static final Command SDF2FASTQ = new Command(new Sdf2Fastq(), CommandCategory.FORMAT, ReleaseLevel.GA);
+
+  /** For converting SDF into SAM/BAM format */
+  static final Command SDF2SAM = new Command(new Sdf2Sam(), CommandCategory.FORMAT, ReleaseLevel.BETA);
 
   /** BGZips an input file (for use with index module) */
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -134,7 +138,7 @@ public final class ToolsCommand {
   /* This field determines the display order of the commands in the help / license output */
   private static final Command[] DISPLAY_ORDER = {
     // Formatting
-    FORMAT, SDF2FASTA, SDF2FASTQ,
+    FORMAT, SDF2FASTA, SDF2FASTQ, SDF2SAM,
 
     // Utility
     BGZIP, INDEX, EXTRACT,                        // General purpose
