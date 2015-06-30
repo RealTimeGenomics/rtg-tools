@@ -180,12 +180,11 @@ public class RocContainer {
       table.addRow("Threshold", "True-pos", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
       table.addSeparator();
 
-      final int totalRocPositives = totalPositives - mNoScoreVariants;
-      final RocPoint best = (totalRocPositives > 0) ? bestFMeasure(totalRocPositives) : null;
+      final RocPoint best = bestFMeasure(totalPositives);
       if (best == null) {
         Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SORT_FIELD);
       } else {
-        addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, best.mFp, totalRocPositives - best.mTp);
+        addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, best.mFp, totalPositives - best.mTp);
       }
       addRow(table, "None", truePositives, falsePositives, falseNegatives);
       summary = table.toString();
