@@ -162,42 +162,38 @@ public abstract class VcfSampleFilter extends AbstractVcfFilter {
       mMaxDenovoScore = maxQuality;
     }
 
+    private boolean withinScoreCriteria(VcfRecord record, int sampleIndex) {
+      final Double dnp = record.getSampleDouble(sampleIndex, VcfUtils.FORMAT_DENOVO_SCORE);
+      return dnp == null || dnp >= mMinDenovoScore && dnp <= mMaxDenovoScore;
+    }
+
+    private boolean isDenovo(VcfRecord record, int sampleIndex) {
+      return "Y".equals(record.getSampleString(sampleIndex, VcfUtils.FORMAT_DENOVO));
+    }
+
     @Override
     boolean acceptCondition(VcfRecord record) {
       assert mSamples.length == 1;
-      for (int sampleIndex : mSamples) {
-        if (!"Y".equals(record.getSampleString(sampleIndex, VcfUtils.FORMAT_DENOVO))) {
-          if (mSampleFailed != null) {
-            mSampleFailed[sampleIndex] = true;
+      final int sampleIndex = mSamples[0];
+      if (isDenovo(record, sampleIndex)) {
+        if (withinScoreCriteria(record, sampleIndex)) {
+          boolean result = true;
+          for (int i = 0; i < record.getNumberOfSamples(); i++) {
+            if (i != sampleIndex
+              && isDenovo(record, i)
+              && withinScoreCriteria(record, i)) {
+              result = false;
+            }
           }
-          return false;
+          return result;
         }
       }
-      boolean result = false;
-      for (int sampleIndex : mSamples) {
-        final Double dnp = record.getSampleDouble(sampleIndex, VcfUtils.FORMAT_DENOVO_SCORE);
-        if (dnp != null) {
-          if (dnp >= mMinDenovoScore && dnp <= mMaxDenovoScore) {
-            result = true;
-            for (int i = 0; i < record.getNumberOfSamples(); i++) {
-              final Double otherDnp = record.getSampleDouble(i, VcfUtils.FORMAT_DENOVO_SCORE);
-              final String otherDn = record.getSampleString(i, VcfUtils.FORMAT_DENOVO);
-              if (i != sampleIndex && "Y".equals(otherDn) && otherDnp != null && otherDnp >= mMinDenovoScore && otherDnp <= mMaxDenovoScore) {
-                result = false;
-              }
-            }
-            return result;
-          } else {
-            if (mSampleFailed != null) {
-              mSampleFailed[sampleIndex] = true;
-            }
-            return false;
-          }
-
-        }
+      if (mSampleFailed != null) {
+        mSampleFailed[sampleIndex] = true;
       }
-      return result;
+      return false;
     }
+
     @Override
     boolean acceptSample(VcfRecord record, int index) {
       throw new IllegalArgumentException("De novo filter is a bit weird don't call this");
