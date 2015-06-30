@@ -574,6 +574,19 @@ public final class CommonFlags {
   }
 
   /**
+   * Checks the supplied output file is not '-', for commands that do not allow writing to stdout.
+   * @param outfile the output file
+   * @return false if validation failed
+   */
+  public static boolean validateNotStdout(File outfile) {
+    if (isStdio(outfile)) {
+      Diagnostic.error("This command does not support sending output to stdout");
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Get the region defined by the start read and end read flags.
    * @param flags the flags to get the region from
    * @return the region to process
