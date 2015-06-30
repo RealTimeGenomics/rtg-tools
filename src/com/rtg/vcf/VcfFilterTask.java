@@ -359,7 +359,7 @@ class VcfFilterTask {
           throw new NoTalkbackSlimException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());
         }
         final String gt = sampleGts.get(sampleIndex);
-        if (VcfUtils.isMissingGt(gt) || VcfUtils.isVariantGt(gt)) {
+        if (VcfUtils.isVariantGt(gt)) {
           return false;
         }
       }
