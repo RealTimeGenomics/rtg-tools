@@ -384,18 +384,29 @@ public final class MathUtils {
   }
 
   /**
-   * Get Hoeffding probability number
+   * Get Hoeffding probability number, in phred space, with protection for no trials.
    * @param trials the number of trials measured
    * @param observed the observed number of trials matching the condition
    * @param prob the expected probability of a trial matching the condition
-   * @return the Hoeffding probability, or null if there are zero trials
+   * @return the phred-scaled Hoeffding probability, or null if there are zero trials
    */
-  public static Double hoeffdingPhred(int trials, int observed, double prob) {
+  public static Double hoeffdingPhred(long trials, long observed, double prob) {
     if (trials == 0) {
       return null;
     }
-    final double hoeffding = -2 * Math.pow(trials * prob - observed, 2) / trials;
+    final double hoeffding = hoeffdingLn(trials, observed, prob);
     return lnToPhred(hoeffding);
+  }
+
+  /**
+   * Get Hoeffding probability number, in ln space
+   * @param trials the number of trials measured
+   * @param observed the observed number of trials matching the condition
+   * @param prob the expected probability of a trial matching the condition
+   * @return the ln-scaled Hoeffding probability, or null if there are zero trials
+   */
+  public static double hoeffdingLn(long trials, long observed, double prob) {
+    return -2 * Math.pow(trials * prob - observed, 2) / trials;
   }
 
   /**
