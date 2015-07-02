@@ -390,7 +390,7 @@ public final class MathUtils {
    * @param prob the expected probability of a trial matching the condition
    * @return the phred-scaled Hoeffding probability, or null if there are zero trials
    */
-  public static Double hoeffdingPhred(long trials, long observed, double prob) {
+  public static Double hoeffdingPhred(double trials, double observed, double prob) {
     if (trials == 0) {
       return null;
     }
@@ -405,7 +405,7 @@ public final class MathUtils {
    * @param prob the expected probability of a trial matching the condition
    * @return the ln-scaled Hoeffding probability, or null if there are zero trials
    */
-  public static double hoeffdingLn(long trials, long observed, double prob) {
+  public static double hoeffdingLn(double trials, double observed, double prob) {
     return -2 * Math.pow(trials * prob - observed, 2) / trials;
   }
 
