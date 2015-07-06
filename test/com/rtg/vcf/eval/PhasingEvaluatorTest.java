@@ -47,6 +47,7 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -243,7 +244,10 @@ public class PhasingEvaluatorTest extends TestCase {
       new TabixIndexer(calls).saveVcfIndex();
       final File baseline = FileHelper.stringToGzFile(variants.mBaselineVcf.toString(), new File(dir, "baseline.vcf.gz"));
       new TabixIndexer(baseline).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(variants, tp.outputStream(), fp.outputStream(), fn.outputStream(), null, baseline, calls, new RocContainer(RocSortOrder.DESCENDING, null));
+      final EvalSynchronizer sync = new EvalSynchronizer(variants,
+        new VcfWriter(new VcfHeader(), tp.outputStream()),  new VcfWriter(new VcfHeader(), fp.outputStream()),
+        new VcfWriter(new VcfHeader(), fn.outputStream()), null,
+        baseline, calls, new RocContainer(RocSortOrder.DESCENDING, null));
       final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
       final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
       eval.run();

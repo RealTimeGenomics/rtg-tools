@@ -365,7 +365,7 @@ public class Path extends IntegralAbstract implements Comparable<Path> {
   }
 
   /**
-   * Find a weighting for all the calls in a path.
+   * Find a weighting for all the TP calls in a path.
    * this is done by sync points, within each <code>SyncPoint</code>
    *
    *       weight = number of TP in baseline / number of TP in called

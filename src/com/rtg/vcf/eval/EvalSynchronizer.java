@@ -31,7 +31,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,6 +46,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.VcfWriter;
 
 /**
  * When running VcfEvalTask in multithreading fashion keep reading and output in order for each chromosome being evaluated.
@@ -56,10 +56,10 @@ class EvalSynchronizer {
   private final VariantSet mVariantSet;
 
   private final RocContainer mRoc;
-  private final OutputStream mTp;
-  private final OutputStream mTpBase;
-  private final OutputStream mFp;
-  private final OutputStream mFn;
+  private final VcfWriter mTpCalls;
+  private final VcfWriter mTpBase;
+  private final VcfWriter mFp;
+  private final VcfWriter mFn;
   private final File mBaseLineFile;
   private final File mCallsFile;
   private final Object mVariantLock = new Object();
@@ -72,9 +72,8 @@ class EvalSynchronizer {
   int mFalsePositives = 0;
 
   /**
-   *
    * @param vs the set of variants to evaluate
-   * @param tp True positives are written to this
+   * @param tpCalls True positives are written to this
    * @param fp false positives are written here
    * @param fn false negatives are written here
    * @param tpBase True positives (baseline version) are written here, may be null.
@@ -82,12 +81,12 @@ class EvalSynchronizer {
    * @param callsFile tabix indexed calls VCF file
    * @param roc the container for ROC data
    */
-  EvalSynchronizer(VariantSet vs, OutputStream tp, OutputStream fp, OutputStream fn, OutputStream tpBase, File baseLineFile, File callsFile, RocContainer roc) {
+  EvalSynchronizer(VariantSet vs, VcfWriter tpCalls, VcfWriter fp, VcfWriter fn, VcfWriter tpBase, File baseLineFile, File callsFile, RocContainer roc) {
     mVariantSet = vs;
-    mTp = tp;
+    mTpCalls = tpCalls;
+    mTpBase = tpBase;
     mFp = fp;
     mFn = fn;
-    mTpBase = tpBase;
     mBaseLineFile = baseLineFile;
     mCallsFile = callsFile;
     mRoc = roc;
@@ -99,14 +98,12 @@ class EvalSynchronizer {
    * @param variants a collection of variants
    * @param vcfReader the VCF reader to get the VCF records from for output
    * @param <T> Type of variant
-   * @return the number of variants written
    * @throws IOException IO exceptions require too many comments.
    */
-  private static <T extends Variant> int writeVariants(OutputStream out, VcfReader vcfReader, Collection<T> variants) throws IOException {
+  private static <T extends Variant> void writeVariants(VcfWriter out, VcfReader vcfReader, Collection<T> variants) throws IOException {
     if (variants == null) {
-      return 0;
+      return;
     }
-    int written = 0;
     for (final Variant v : variants) {
       final DetectedVariant dv = (DetectedVariant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
       VcfRecord rec = null;
@@ -125,13 +122,11 @@ class EvalSynchronizer {
         }
       }
       if (rec != null) {
-        out.write((rec.toString() + "\n").getBytes());
-        written++;
+        out.write(rec);
       } else {
         throw new SlimException("Variant object \"" + v.toString() + "\"" + " does not have a corresponding VCF record in given reader");
       }
     }
-    return written;
   }
 
   /**
@@ -188,23 +183,23 @@ class EvalSynchronizer {
       }
     }
     if (tp != null) {
-      try (final VcfReader tpReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
-        writeVariants(mTp, tpReader, tp);
+      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
+        writeVariants(mTpCalls, callsReader, tp);
       }
     }
     if (fp != null) {
-      try (final VcfReader fpReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
-        writeVariants(mFp, fpReader, fp);
-      }
-    }
-    if (fn != null) {
-      try (final VcfReader fnReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
-        writeVariants(mFn, fnReader, fn);
+      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
+        writeVariants(mFp, callsReader, fp);
       }
     }
     if (mTpBase != null && tpbase != null) {
-      try (final VcfReader tpBaseReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
-        writeVariants(mTpBase, tpBaseReader, tpbase);
+      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
+        writeVariants(mTpBase, baselineReader, tpbase);
+      }
+    }
+    if (fn != null) {
+      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
+        writeVariants(mFn, baselineReader, fn);
       }
     }
     synchronized (mNames) {

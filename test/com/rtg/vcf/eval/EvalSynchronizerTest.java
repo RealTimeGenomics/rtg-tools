@@ -50,6 +50,7 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -113,7 +114,8 @@ public class EvalSynchronizerTest extends TestCase {
   private static final String NAME1_RECS = REC1_1 + "\n" + REC2_1 + "\n" + REC3_1 + "\n" + REC4_1 + "\n" + REC5_1 + "\n" + REC6_1 + "\n";
   private static final String NAME2_RECS = REC1_2 + "\n" + REC2_2 + "\n" + REC3_2 + "\n" + REC4_2 + "\n" + REC5_2 + "\n" + REC6_2 + "\n";
 
-  private static final String FAKE_VCF = VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n" + NAME1_RECS + NAME2_RECS;
+  private static final String FAKE_HEADER = VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n";
+  private static final String FAKE_VCF = FAKE_HEADER + NAME1_RECS + NAME2_RECS;
 
   public void testEvalSynchronizer() throws IOException, UnindexableDataException {
     final MemoryPrintStream mp = new MemoryPrintStream();
@@ -125,7 +127,15 @@ public class EvalSynchronizerTest extends TestCase {
       try (final TestDirectory dir = new TestDirectory()) {
         final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
         new TabixIndexer(fake).saveVcfIndex();
-        final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
+        final VcfHeader header = new VcfHeader();
+        header.addLine(VcfHeader.VERSION_LINE);
+        header.addSampleName("SAMPLE");
+        final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+          new VcfWriter(header, tp),
+          new VcfWriter(header, fp),
+          new VcfWriter(header, fn),
+          null,
+          fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
         final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -152,9 +162,9 @@ public class EvalSynchronizerTest extends TestCase {
         });
         simpleThreadPool.terminate();
 
-        assertEquals(REC2_1 + "\n" + REC1_2 + "\n", tp.toString());
-        assertEquals(REC4_1 + "\n" + REC3_2 + "\n", fp.toString());
-        assertEquals(REC6_1 + "\n" + REC5_2 + "\n", fn.toString());
+        assertEquals(FAKE_HEADER + REC2_1 + "\n" + REC1_2 + "\n", tp.toString());
+        assertEquals(FAKE_HEADER + REC4_1 + "\n" + REC3_2 + "\n", fp.toString());
+        assertEquals(FAKE_HEADER + REC6_1 + "\n" + REC5_2 + "\n", fn.toString());
         assertEquals(32, sync.mTruePositives);
         assertEquals("name3", sync.nextSet().getA());
         assertEquals(null, sync.nextSet());
@@ -173,7 +183,10 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
+      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+        new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
+        new VcfWriter(new VcfHeader(), fn), null,
+        fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());
@@ -210,12 +223,15 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(), tp, fp, fn, null, fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
+
+      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+        new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
+        new VcfWriter(new VcfHeader(), fn), null,
+        fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
       final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());
       assertEquals("name2", pair2.getA());
-
 
       final Exception[] internalException = new Exception[1];
       final Thread t = new Thread() {

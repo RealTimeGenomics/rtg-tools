@@ -63,6 +63,7 @@ import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.VcfWriter;
 
 
 /**
@@ -139,30 +140,17 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final File fnFile = new File(output, FN_FILE_NAME + zipExt);
     final File tpBaseFile = outputTpBase ? new File(output, TPBASE_FILE_NAME + zipExt) : null;
 
-    try (final OutputStream tp = FileUtils.createOutputStream(tpFile, zip, false);
-        final OutputStream fp = FileUtils.createOutputStream(fpFile, zip, false);
-        final OutputStream fn = FileUtils.createOutputStream(fnFile, zip, false);
-        final OutputStream tpBase = outputTpBase ? FileUtils.createOutputStream(tpBaseFile, zip, false) : null) {
+    try (final VcfWriter tp = new VcfWriter(variants.calledHeader(), tpFile, null, zip, true);
+         final VcfWriter fp = new VcfWriter(variants.calledHeader(), fpFile, null, zip, true);
+         final VcfWriter fn = new VcfWriter(variants.baseLineHeader(), fnFile, null, zip, true);
+         final VcfWriter tpBase = outputTpBase ? new VcfWriter(variants.baseLineHeader(), tpBaseFile, null, zip, true) : null) {
       evaluateCalls(params, templateSequences, output, variants, tp, fp, fn, tpBase);
-    }
-    if (zip) {
-      VcfUtils.createVcfTabixIndex(tpFile);
-      VcfUtils.createVcfTabixIndex(fpFile);
-      VcfUtils.createVcfTabixIndex(fnFile);
-      if (tpBaseFile != null) {
-        VcfUtils.createVcfTabixIndex(tpBaseFile);
-      }
     }
   }
 
-  private static void evaluateCalls(VcfEvalParams params, SequencesReader templateSequences, File output, VariantSet variants, OutputStream tp, OutputStream fp, OutputStream fn, OutputStream tpBase) throws IOException {
+  private static void evaluateCalls(VcfEvalParams params, SequencesReader templateSequences, File output, VariantSet variants,
+                                    VcfWriter tp, VcfWriter fp, VcfWriter fn, VcfWriter tpBase) throws IOException {
     final boolean zip = params.outputParams().isCompressed();
-    tp.write(variants.calledHeader().toString().getBytes());
-    fp.write(variants.calledHeader().toString().getBytes());
-    fn.write(variants.baseLineHeader().toString().getBytes());
-    if (tpBase != null) {
-      tpBase.write(variants.baseLineHeader().toString().getBytes());
-    }
 
     final PrereadNamesInterface names = templateSequences.names();
     final Map<String, Long> nameMap = new HashMap<>();

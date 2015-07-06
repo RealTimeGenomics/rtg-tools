@@ -33,9 +33,9 @@ package com.rtg.vcf.eval;
 import java.util.Arrays;
 
 import com.rtg.mode.DnaUtils;
-import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.Utils;
 import com.rtg.util.integrity.IntegralAbstract;
+import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
  */
