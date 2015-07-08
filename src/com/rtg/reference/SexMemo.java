@@ -33,6 +33,8 @@ package com.rtg.reference;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.rtg.reader.SequencesReader;
 import com.rtg.reference.ReferenceGenome.DefaultFallback;
@@ -50,6 +52,8 @@ public class SexMemo {
 
   // Per sex, per reference sequence containing PAR regions, a list of those regions with their effective ploidy
   private final MyFrickenMap[] mParMap;
+
+  private final Set<String> mAutosomes;
 
   /**
    * Contain a list of PAR regions along with their effective ploidy.
@@ -70,6 +74,7 @@ public class SexMemo {
     final Sex[] sexValues = Sex.values();
     mReferences = new ReferenceGenome[sexValues.length];
     mParMap = new MyFrickenMap[sexValues.length];
+    mAutosomes = new HashSet<>();
     for (final Sex sex : sexValues) {
       final ReferenceGenome referenceGenome = reader == null ? null : new ReferenceGenome(reader, sex, ploidy);
       mReferences[sex.ordinal()] = referenceGenome;
@@ -77,6 +82,9 @@ public class SexMemo {
 
       if (referenceGenome != null) {
         for (ReferenceSequence rs : referenceGenome.sequences()) {
+          if (sex == Sex.EITHER && rs.isSpecified() && rs.ploidy() == Ploidy.DIPLOID) {
+            mAutosomes.add(rs.name());
+          }
           if (rs.hasDuplicates()) {
             final String refName = rs.name();
             final EffectivePloidyList result = new EffectivePloidyList();
@@ -96,6 +104,16 @@ public class SexMemo {
       }
       mParMap[sex.ordinal()] = parmap;
     }
+  }
+
+  /**
+   * Returns true if the supplied reference sequence name is an autosome, that is, has been explicitly
+   * listed in the reference configuration and not as a sex chromosome.
+   * @param refName name of the sequence
+   * @return true if the sequence is an autosome
+   */
+  public boolean isAutosome(String refName) {
+    return mAutosomes.contains(refName);
   }
 
   /**

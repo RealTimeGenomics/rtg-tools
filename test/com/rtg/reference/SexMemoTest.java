@@ -63,6 +63,7 @@ public class SexMemoTest extends TestCase {
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.FEMALE, "t"));
+        assertFalse(sx.isAutosome("t"));
       }
     }
   }
@@ -76,6 +77,7 @@ public class SexMemoTest extends TestCase {
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.HAPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
         assertEquals(Ploidy.HAPLOID, sx.getEffectivePloidy(Sex.FEMALE, "t"));
+        assertFalse(sx.isAutosome("t"));
       }
     }
   }
@@ -90,6 +92,7 @@ public class SexMemoTest extends TestCase {
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.FEMALE, "t"));
+        assertFalse(sx.isAutosome("t"));
       }
     }
   }
@@ -97,7 +100,7 @@ public class SexMemoTest extends TestCase {
   public void testVariousPloids() throws IOException {
     //Diagnostic.setLogStream();
     try (final TestDirectory tempDir = new TestDirectory("sexmemo")) {
-      final File genomeDir = ReaderTestUtils.getDNADir(">s1\n" + RandomDna.random(4000) + "\n>s2\n" + RandomDna.random(5000) + "\n>s3\nacgt\n", tempDir, false, true, true);
+      final File genomeDir = ReaderTestUtils.getDNADir(">s1\n" + RandomDna.random(4000) + "\n>s2\n" + RandomDna.random(5000) + "\n>s3\nacgt\n>s4\nacgt\n", tempDir, false, true, true);
       final File refFile = new File(genomeDir, ReferenceGenome.REFERENCE_FILE);
       try (FileOutputStream fo = new FileOutputStream(refFile, true)) {
         fo.write(("female" + TAB + "seq" + TAB + "s1" + TAB + "diploid" + TAB + "circular" + LS
@@ -106,7 +109,8 @@ public class SexMemoTest extends TestCase {
             + "male" + TAB + "seq" + TAB + "s2" + TAB + "haploid" + TAB + "circular" + TAB + "s1" + LS
             + "male" + TAB + "dup" + TAB + "s1:1000-3000" + TAB + "s2:2000-4000" + LS
             + LS
-            + "either" + TAB + "seq" + TAB + "s3" + TAB + "polyploid" + TAB + "circular" + LS
+          + "either" + TAB + "seq" + TAB + "s3" + TAB + "polyploid" + TAB + "circular" + LS
+          + "either" + TAB + "seq" + TAB + "s4" + TAB + "diploid" + TAB + "linear" + LS
             + LS).getBytes());
       }
       try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(genomeDir)) {
@@ -116,9 +120,11 @@ public class SexMemoTest extends TestCase {
         assertEquals(Ploidy.NONE, sx.getRealPloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.HAPLOID, sx.getRealPloidy(Sex.MALE, "s1"));
         assertEquals(Ploidy.DIPLOID, sx.getRealPloidy(Sex.FEMALE, "s1"));
+        assertFalse(sx.isAutosome("s1"));
         assertEquals(Ploidy.HAPLOID, sx.getRealPloidy(Sex.MALE, "s2"));
         assertEquals(Ploidy.NONE, sx.getRealPloidy(Sex.FEMALE, "s2"));
         assertEquals(Ploidy.HAPLOID, sx.getRealPloidy(Sex.MALE, "s2"));
+        assertFalse(sx.isAutosome("s2"));
 
         // Some PAR specific queries
         assertEquals(999, sx.getParBoundary(Sex.MALE, new SequenceNameLocusSimple("s1", 0, 2000)));
@@ -130,6 +136,10 @@ public class SexMemoTest extends TestCase {
 
         assertEquals(Ploidy.POLYPLOID, sx.getRealPloidy(Sex.FEMALE, "s3"));
         assertEquals(Ploidy.HAPLOID, sx.getEffectivePloidy(Sex.FEMALE, "s3"));
+        assertFalse(sx.isAutosome("s3"));
+
+        assertEquals(Ploidy.DIPLOID, sx.getRealPloidy(Sex.FEMALE, "s4"));
+        assertTrue(sx.isAutosome("s4"));
       }
     }
   }
