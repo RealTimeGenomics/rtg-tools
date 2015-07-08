@@ -137,13 +137,10 @@ public class VcfEvalCliTest extends AbstractCliTest {
     new TabixIndexer(mutations).saveVcfIndex();
     final File template = new File(mDir, "template");
     ReaderTestUtils.getReaderDNA(">t" + StringUtils.LS + "A", template, null);
-    final String[] flagStrings = {
-        "-o" , out.getPath()
-        , "-c" , calls.getPath()
-        , "-b" , mutations.getPath()
-        , "-t" , template.getPath()
-    };
-    assertEquals(1, new VcfEvalCli().mainInit(flagStrings, TestUtils.getNullOutputStream(), System.err /*SimpleTestUtils.getNullPrintStream()*/));
+    checkMainInitBadFlags("-o", out.getPath()
+      , "-c", calls.getPath()
+      , "-b", mutations.getPath()
+      , "-t", template.getPath());
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
