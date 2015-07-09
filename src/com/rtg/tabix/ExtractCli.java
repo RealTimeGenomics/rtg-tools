@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -136,6 +137,27 @@ public class ExtractCli extends AbstractCli {
     flags.addRequiredSet(region);
   }
 
+  private RegionRestriction[] mergeOverlappingRegions(final RegionRestriction[] regions) {
+    if (regions.length <= 1) {
+      // Short-circuit the common case of 1 specified region
+      return regions;
+    }
+    Arrays.sort(regions, new IntervalComparator());
+    final List<RegionRestriction> mergedRegions = new ArrayList<>();
+    RegionRestriction current = regions[0];
+    for (int k = 1; k < regions.length; k++) {
+      final RegionRestriction region = regions[k];
+      if (!current.getSequenceName().equals(region.getSequenceName()) || region.getStart() > current.getEnd()) {
+        mergedRegions.add(current);
+        current = region;
+      } else {
+        current = new RegionRestriction(current.getSequenceName(), current.getStart(), region.getEnd());
+      }
+    }
+    mergedRegions.add(current);
+    return mergedRegions.toArray(new RegionRestriction[mergedRegions.size()]);
+  }
+
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final File input = (File) mFlags.getAnonymousValue(0);
@@ -143,7 +165,7 @@ public class ExtractCli extends AbstractCli {
       throw new NoTalkbackSlimException("" + input.getPath() + " is not in bgzip format. Cannot extract records.");
     }
     final List<Object> rStrings = mFlags.getAnonymousValues(1);
-    final RegionRestriction[] regions;
+    RegionRestriction[] regions;
     if (rStrings.isEmpty()) {
       regions = new RegionRestriction[] {null};
     } else {
@@ -152,7 +174,7 @@ public class ExtractCli extends AbstractCli {
         regions[i] = new RegionRestriction((String) rStrings.get(i));
       }
     }
-    Arrays.sort(regions, new IntervalComparator());
+    regions = mergeOverlappingRegions(regions);
     final boolean headerOnly = mFlags.isSet(HEADER_ONLY_FLAG);
     final boolean printHeader = headerOnly || mFlags.isSet(HEADER_FLAG);
     if (SamUtils.isBAMFile(input)) {
