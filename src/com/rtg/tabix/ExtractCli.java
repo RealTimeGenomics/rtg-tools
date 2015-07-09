@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.List;
 
 import com.rtg.launcher.AbstractCli;
@@ -48,6 +49,7 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 
@@ -150,6 +152,7 @@ public class ExtractCli extends AbstractCli {
         regions[i] = new RegionRestriction((String) rStrings.get(i));
       }
     }
+    Arrays.sort(regions, new IntervalComparator());
     final boolean headerOnly = mFlags.isSet(HEADER_ONLY_FLAG);
     final boolean printHeader = headerOnly || mFlags.isSet(HEADER_FLAG);
     if (SamUtils.isBAMFile(input)) {
