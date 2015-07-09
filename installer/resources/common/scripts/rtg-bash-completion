@@ -1,7 +1,11 @@
-# bash programmable completion for rtg commands and flags
+#
+# Provides bash programmable completion for rtg commands and flags.
 # To use this, you need to source the file. e.g.:
+#
 # . /path/to/rtg-bash-completion
-
+#
+# To enable permanently, put that command into your $HOME/.bashrc
+#
 
 # Main bash completion function
 function _complete_rtg() {

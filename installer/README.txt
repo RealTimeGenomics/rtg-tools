@@ -15,7 +15,7 @@ allocation and other configuration options. It is recommended that
 these wrapper scripts be used rather than directly accessing the Java
 JAR.
 
-For individual use, follow these quick start instructions.  
+For individual use, follow these quick start instructions.
 
 No-JRE:
 
@@ -34,8 +34,21 @@ Linux/MacOS X:
   copy the license file from Real Time Genomics into the RTG
   distribution directory.
 
-  Test for success by entering './rtg version' at the command
-  line.  The first time rtg is executed you will be prompted with some 
+  In a terminal, cd to the installation directory and test for success
+  by entering './rtg version'
+
+  On MacOS X, depending on your operating system version and
+  configuration regarding unsigned applications, you may encounter the
+  error message:
+
+  -bash: rtg: /usr/bin/env: bad interpreter: Operation not permitted
+
+  If this occurs, you must clear the OS X quarantine attribute with
+  the command:
+
+  xattr -d com.apple.quarantine rtg
+
+  The first time rtg is executed you will be prompted with some
   questions to customize your installation. Follow the prompts.
 
   Enter './rtg help' for a list of rtg commands.  Help for any individual
@@ -64,7 +77,7 @@ Windows:
   distribution directory.
 
   Test for success by entering 'rtg version' at the command line.  The
-  first time rtg is executed you will be prompted with some 
+  first time rtg is executed you will be prompted with some
   questions to customize your installation. Follow the prompts.
 
   Enter 'rtg help' for a list of rtg commands.  Help for any individual
@@ -76,12 +89,17 @@ Windows:
   script or as an environment variable.
 
 
-Using quick start installation steps, an individual can execute RTG software 
-in a remote computing environment without the need to establish root privileges.
-Include the necessary data files in directories within the workspace and upload
-the entire workspace to the remote system (either stand-alone or cluster).  
+The scripts subdirectory contains demos, helper scripts, and example
+configuration files, and comprehensive documentation is contained in
+the RTG Operations Manual.
 
-For data center deployment and instructions for editing scripts, 
+Using the above quick start installation steps, an individual can
+execute RTG software in a remote computing environment without the
+need to establish root privileges.  Include the necessary data files
+in directories within the workspace and upload the entire workspace to
+the remote system (either stand-alone or cluster).
+
+For data center deployment and instructions for editing scripts,
 please consult the Administration chapter of the RTG Operations Manual.
 
 A discussion group is now available for general questions, tips, and other
@@ -124,8 +142,8 @@ Other patents pending
 Third Party Software Used
 =========================
 
-RTG software uses the open source Picard library
-(https://sourceforge.net/projects/picard/) for reading and writing SAM
+RTG software uses the open source htsjdk library
+(https://github.com/samtools/htsjdk) for reading and writing SAM
 files, under the terms of following license:
 
 The MIT License
@@ -157,17 +175,17 @@ RTG software uses the bzip2 library included in the open source Ant project
 following license:
 
 Copyright 1999-2010 The Apache Software Foundation
- 
+
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
 the License at
- 
+
 http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
-CONDITIONS OF ANY KIND, either express or implied. See the License for the 
-specific language governing permissions and limitations under the License. 
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.
 
 -------------------------
 
@@ -238,4 +256,3 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
