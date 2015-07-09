@@ -171,7 +171,7 @@ public class VcfEvalCliTest extends AbstractCliTest {
     FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
     new TabixIndexer(baseline).saveVcfIndex();
     new TabixIndexer(calls).saveVcfIndex();
-    final String[] fullArgs = appendArgs(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z", "--slope-files");
+    final String[] fullArgs = appendArgs(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z", "--Xslope-files");
     if (expectWarn) {
       final String stderr = checkMainInitWarn(fullArgs);
       mNano.check(id + "_err.txt", stderr);

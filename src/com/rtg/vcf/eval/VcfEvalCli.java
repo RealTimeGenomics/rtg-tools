@@ -70,8 +70,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   static final String SORT_FIELD = "vcf-score-field";
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String BASELINE_TP = "baseline-tp";
-  private static final String SLOPE_FILES = "slope-files";
 
+  private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
 
