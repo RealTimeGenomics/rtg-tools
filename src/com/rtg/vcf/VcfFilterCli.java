@@ -328,7 +328,7 @@ public final class VcfFilterCli extends AbstractCli {
     }
 
     static String getMinMaxMessage(final String flag, final double val, final double min, final double max, boolean maxInclusive) {
-      return "The specified flag \"--" + flag + "\" has invalid value \"" + val + "\". It should be greater than or equal to " + min + " and less than " + (maxInclusive ? "or equal to " : "") + getDoubleString(max) + ".";
+      return "The specified flag \"--" + flag + "\" has invalid value \"" + val + "\". It should be greater than or equal to " + min + " and less than " + (maxInclusive && max != Double.MAX_VALUE ? "or equal to " : "") + getDoubleString(max) + ".";
     }
 
     static String getDoubleString(final double val) {
