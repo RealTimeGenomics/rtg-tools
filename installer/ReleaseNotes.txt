@@ -86,7 +86,7 @@ features, see the RTG Operations Manual.
   downstream processing tools.
 
 * somatic: VCF output changes to bring the somatic representation in
-  line with TGCA 1.2 VCF specification. In particular:
+  line with TCGA 1.2 VCF specification. In particular:
 
   * Calls include a new FORMAT field SS that indicates the somatic
     status for the derived (tumor) sample. This field replaces the

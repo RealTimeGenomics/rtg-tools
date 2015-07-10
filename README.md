@@ -2,7 +2,8 @@
 
 Copyright (c) 2014 Real Time Genomics Ltd
 
-This software is provided under the Simplified BSD License. See [LICENSE.txt](LICENSE.txt)
+This software is provided under the Simplified BSD License. See
+[LICENSE.txt](LICENSE.txt)
 
 ---
 
@@ -26,19 +27,39 @@ To build the RTG Tools package which can be locally installed and run:
 
     $ ant zip-nojre
 
-This will create an installation zip file under 'dist'.
+This will create an installation zip file under `dist`.
 
 ## Installation
 
-Unzip the installation zip file in your installation location and follow the instructions contained in the README.txt. This build will use the system Java by default, so ensure it is Java 1.7 or later.
+Uncompress the installation zip:
+
+    $ cd /where/you/want/to/install/
+    $ unzip /path/to/rtg-tools/dist/rtg-tools-VERSION-nojre.zip
+
+Follow the instructions contained in the `README.txt`. This build will
+use the system Java by default, so ensure it is Java 1.7 or later.
+
+You can use the commands in RTG Tools to format your own reference
+datasets, or download common
+[pre-formatted references](http://realtimegenomics.com/news/pre-formatted-reference-datasets/)
+from our website.
+
+A PDF user manual is included in the installation directory or can be
+[viewed online](installer/resources/tools/RTGOperationsManual.pdf).
 
 ## Release history
 
-See [doc/ReleaseNotes.txt](doc/ReleaseNotes.txt) for release history details.
+See [doc/ReleaseNotes.txt](doc/ReleaseNotes.txt) for full release
+history details.
 
 ## Support
 
-An [rtg-users](https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users) discussion group is now available for general questions, tips, and other discussions.
+An
+[rtg-users](https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users)
+discussion group is now available for general questions, tips, and
+other discussions.
 
-To be informed of new software releases, subscribe to the low-traffic [rtg-announce](https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-announce) group.
+To be informed of new software releases, subscribe to the low-traffic
+[rtg-announce](https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-announce)
+group.
 
