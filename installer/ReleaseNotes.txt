@@ -1,8 +1,195 @@
-=== Release Notes for RTG.VERSION ===
+# Release Notes for RTG.VERSION
 
 Below are the release notes for RTG Core, upon which RTG.VERSION
-is built.  Not all features described below may be included in this
+is based.  Not all features described below may be included in this
 product.
+
+RTG Core 3.5 (2015-07-10)
+-------------------------
+
+Major features of this release:
+
+* Several improvements to somatic calling, including the ability to
+  specify site-specific somatic priors, control of output for
+  gain-of-reference and loss-of-heterozygosity events, and changes to
+  the VCF according to TCGA VCF specification:
+  https://wiki.nci.nih.gov/display/TCGA/TCGA+Variant+Call+Format+%28VCF%29+1.2+Specification+-+Unofficial
+  Note that these changes in VCF format compared to previous versions
+  may require users to update their existing scripts for the changes.
+
+* Improvements to variant evaluation with vcfeval, primarily the
+  ability to perform evaluation restricted to individual regions or
+  sets of regions (for example GiaB high-confidence intervals or exome
+  target regions), as well as the inclusion of more accuracy metrics,
+  both as a new summary file and included in the weighted ROC data
+  file.
+
+* Improvements to metagenomic species reference database
+  management. Several new options allow better customization of a
+  species reference, and extraction of genomic information for
+  individual species contained within the reference database.
+
+Detailed changes are listed below by area.  Please read these through
+fully, as some command-line flags have changed, so updates to your
+pipeline scripts may be required. For more information on new
+features, see the RTG Operations Manual.
+
+### Basic Formatting and Mapping
+
+* format/map: When formatting or mapping reads supplied as SAM/BAM
+  input data, any alignments marked as supplementary are ignored.
+  Note that if the input data has already been aligned, it is
+  recommended that the BAM file be shuffled to avoid biases during
+  mapping arising from the data being presented in chromosomal
+  order. See the user manual for more information.
+
+* sdf2fasta/sdf2fastq: These commands have new flags --names and
+  --id-file that operate the same as their counterpart in sdfsubset.
+
+* sdfsubset: This command has new flags --start-id and --end-id that
+  allow specifying a range of sequences by ID.
+
+* sdf2sam: This new command to allows the extraction of reads from SDF
+  in the form of unaligned SAM/BAM.  This has a benefit over
+  extraction as FASTQ in that some metadata (such as read group
+  information) is preserved, paired end data is stored in a single
+  file, and quality encoding is inherent in the format.
+
+### Variant Calling and Analysis
+
+* somatic: Now allows the user to specify a BED file containing
+  per-site somatic priors, which can be used (for example) to reduce
+  the somatic prior at sites typical of false positives (e.g. presence
+  in dbSNP) or increase the somatic prior at sites known to harbour
+  somatic variants (e.g. presence in COSMIC).  For more information
+  see the user manual.
+
+* somatic: At the end of variant calling, the somatic caller produces
+  an estimate of somatic sample contamination.  Previously this
+  estimate was only available in the log file, but in this release
+  this computation has been greatly improved, and the contamination
+  estimate is now included in the standard summary statistics.
+
+* somatic: "Gain of reference" calls are now disabled by default.
+  These can be included by specifying the new flag
+  --include-gain-of-reference.
+
+* somatic: Calls that are indicative of loss of heterozygosity (LOH)
+  calls are not produced by default (since loss of heterozygosity
+  analysis is most useful in conjunction with additional data such as
+  germline variant calls or CNV data).  These calls can be produced if
+  desired by specifying --loh with a prior greater than 0).
+
+* somatic: When LOH calls are enabled, previously they were output in
+  haploid GT representation, now they use the ploidy appropriate for
+  the chromosome (according to the reference), for compatibility with
+  downstream processing tools.
+
+* somatic: VCF output changes to bring the somatic representation in
+  line with TGCA 1.2 VCF specification. In particular:
+
+  * Calls include a new FORMAT field SS that indicates the somatic
+    status for the derived (tumor) sample. This field replaces the
+    previous SOMATIC INFO field.
+
+  * Calls include a new FORMAT field SSC which contains the somatic
+    score for the derived (tumor) sample. This field replaces the
+    previous RSS INFO field.
+
+* lineage: Supports the input of pedigree in the form of VCF header
+  annotations as output by the somatic caller, in the form:
+
+  ##PEDIGREE=<Derived=TUMORSAMPLENAME,Original=NORMALSAMPLENAME>
+
+* population: Fixed a rare case where sometimes after complex call
+  simplification, the only sample genotype containing a non-ref allele
+  was a member of the pedigree not being output, and in this case the
+  QUAL score was the 10log10 prob(no variant) rather than 10log10
+  prob(variant) as required by the VCF specification. This has been
+  addressed.
+
+* vcfmerge: Added a new flag --force-merge-all to always attempt to
+  merge headers containing conflicting descriptions.
+
+* vcfeval: Now outputs a summary containing various accuracy
+  metrics. A first set of statistics is computed from the full set of
+  variants evaluated (these will typically have highest sensitivity
+  but potentially poor precision if the input call set has not been
+  filtered). A second set of statistics is computed based on the ROC
+  curve information, selected at a threshold which maximises the
+  F-measure statistic (this provides some balance between sensitivity
+  and precision, so may be a fairer point to gather statistics for
+  cross-caller comparison).
+
+* vcfeval: The weighted_roc.tsv file now includes columns containing
+  additional accuracy metrics.
+
+* vcfeval: Improved the detection that alerts the user when chromosome
+  names are incompatible between reference, baseline, calls, and bed
+  regions (if used). Improvements to other error and warning messages.
+
+* vcfeval: Added a new flag --bed-regions to supply a BED file
+  containing a list of regions that the VCF records must overlap with
+  in order to be included in analysis.  For example, a common use case
+  is to restrict to only evaluating calls contained within the GIAB
+  high-confidence regions, or only within regions corresponding to
+  exome target regions.
+
+* vcfeval: Added a new flag --region to specify a single region to
+  evaluate variants within. This is useful when evaluating calls on a
+  single chromosome or within a small region of interest.
+
+* vcfeval: Fixed a case where a ref-only call (i.e. containing no
+  alts) could get output instead of an indel with a padding base at
+  the same position.
+
+* vcfeval: Disabled the output of slope analysis data files by default,
+  as these are fairly special purpose (primary ROC files are still
+  output). They can be re-enabled if desired by using the new
+  expert/experimental flag --Xslope-files.
+
+* vcffilter: The --remove-all-same-as-ref flag now does not consider a
+  sample with missing GT as being variant, since the intent of this
+  flag is to retain only records where at least one sample is called
+  as variant.
+
+* vcfannotate: Added two new flags --info-id and --info-description to
+  allow specifying the name of the INFO ID and Description fields
+  added to the header during annotation. These flags only take effect
+  if the VCF header does not already contain an INFO declaration with
+  that ID.
+
+### Metagenomics
+
+* taxfilter: Added a new flag --subtree which allows selecting entire
+  taxonomic subtrees for inclusion in the output taxonomy.
+
+* taxfilter: Added a new flag --remove-sequences to allow the removal
+  of sequence data associated with specific taxon ids.
+
+* sdf2fasta: Added a new flag --taxons to allow interpreting any
+  supplied ID as a taxon ID and all sequences assigned to such taxon
+  ID will be output. This provides an easy way to extract genomic
+  sequence for any species from the reference SDF.
+
+### Other
+
+* genomesim: Added a new flag --prefix to specify a prefix for
+  generated sequence names.
+
+* many: Update the base library used for SAM/BAM input and output to
+  htsjdk 1.128.
+
+* many: VCF reading now detects cases where a header specifies a field
+  declaration using an ID that is already in use, preventing duplicate
+  header declarations.
+
+* extract: Fix a regression where extracting from VCF without any
+  region specified would include the VCF header.
+
+
+Previous releases
+=================
 
 RTG Core 3.4.5 (2015-05-22)
 ---------------------------
@@ -30,9 +217,6 @@ This release primarily includes bugfixes and minor improvements:
 * rocplot: Minor improvements to file chooser handling, and also
   include F-measure as an additional accuracy statistic in the status
   bar.
-
-
-Previous releases:
 
 RTG Core 3.4.4 (2015-04-20)
 ---------------------------
@@ -195,7 +379,7 @@ pipeline scripts may be required. For more information on new
 features, see the RTG Operations Manual.
 
 
-== Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * map/cgmap/mapf: As an alternative to supplying --sex to specify the
   sex of the individual being mapped, you may specify a pedigree file
@@ -231,7 +415,7 @@ features, see the RTG Operations Manual.
   used with the --merge option, not regular multi-file calibration)
 
 
-=== Variant Calling
+### Variant Calling
 
 * snp/family/population/somatic: New flag --bed-regions, adds the
   ability to only perform calling on the regions specified via a BED
@@ -319,7 +503,7 @@ features, see the RTG Operations Manual.
   flag.
 
 
-=== Metagenomics
+### Metagenomics
 
 * ncbi2tax: New tool to generate an RTG taxonomy file from NCBI
   taxonomy dump.
@@ -331,7 +515,7 @@ features, see the RTG Operations Manual.
   reference SDF.
 
 
-=== Other
+### Other
 
 * sdfsubseq: The output sequence name is the same as the input
   sequence if the coordinates are unchanged.
@@ -443,7 +627,7 @@ fully, as some command-line flags have changed, so updates to your
 pipeline scripts may be required.
 
 
-== Basic Formatting and Mapping
+## Basic Formatting and Mapping
 
 * cg2sdf: New flag --sam-rg allows the specification of a SAM read
   group to be stored in the resulting SDF.  Note that this means the
@@ -535,7 +719,7 @@ pipeline scripts may be required.
   the variable penalties for Ns that have been introduced to mapping.
 
 
-=== Variant Calling
+### Variant Calling
 
 * all variant callers: Calls now include the GL field for increased
   compatibility with downstream tools such as Beagle and PolyMutt.
@@ -621,7 +805,7 @@ pipeline scripts may be required.
   both as an interactive GUI or generate a static PNG image.
 
 
-=== Other
+### Other
 
 * extract: New flag --header-only to output only the header for the
   file of interest.
@@ -729,7 +913,7 @@ fully, as some command-line flags have changed, so updates to your
 pipeline scripts may be required.
 
 
-== Basic Mapping
+### Basic Mapping
 
 * map/cgmap/mapf: The default outputs of these commands have been
   changed.  Rather than outputting separate block-compressed SAM files
@@ -740,7 +924,7 @@ pipeline scripts may be required.
   obtain the old behaviour: --sam will output SAM rather than BAM,
   and --no-merge will cause separate output files to be produced.
 
-== Variant Calling
+### Variant Calling
 
 * snp/family/population: The ambiguity ratio VCF annotation was not
   being output for complex variant calls.
@@ -875,7 +1059,7 @@ Detailed changes are listed below by area.  Please read these through
 fully, as some command-line flags have changed, so updates to your
 pipeline scripts may be required.
 
-== Basic Mapping
+### Basic Mapping
 
 * format/map/mapf/mapx: Input FASTQ that is badly formed due to a
   mismatch between the sequence names given in the "@" vs the "+"
@@ -934,7 +1118,7 @@ pipeline scripts may be required.
 * coverage: Fixed handling of zero length reference sequences.
 
 
-== Variant Calling
+### Variant Calling
 
 * family/population: These commands automatically perform detection of
   de novo variants in children. This evaluation is represented by two
@@ -1009,7 +1193,7 @@ pipeline scripts may be required.
   in representation of equivalent calls.
 
 
-== Other
+### Other
 
 * many: Fixed confusing reporting of out-of-disk space errors in
   multi-threaded situations.
@@ -1025,7 +1209,7 @@ Below are the major changes in this release. Please read these through
 fully, as some command-line flags and output file names have changed,
 so updates to your pipeline scripts may be required.
 
-== Metagenomics
+### Metagenomics
 
 * mapf: Added the flag --sam-rg. This allows you to specify the
   platform from which the reads originate (in particular, when the
@@ -1082,7 +1266,7 @@ so updates to your pipeline scripts may be required.
   call several RTG commands in sequence and output an HTML report
   containing summary information and links to primary output files.
 
-== Basic mapping
+### Basic mapping
 
 * map/cgmap: These commands now automatically output an HTML report
   containing mapping summary statistics and graphs useful for QC.
@@ -1114,7 +1298,7 @@ so updates to your pipeline scripts may be required.
   breakdowns of the proportion of the reference genome (or exome when
   appropriate) at the various coverage levels.
 
-== Variant calling
+### Variant calling
 
 * snp/family/population/somatic: The regions.bed file describing the
   types of processing occurring across the genome contains some new
@@ -1140,7 +1324,7 @@ so updates to your pipeline scripts may be required.
   known only or novel only variants, as determined by whether the VCF
   record has an identifier set (i.e.: column 3 of the record).
 
-== Other
+### Other
 
 * many: We have added the ability to log the usage of RTG commands to
   a server. Depending on your license, it may be a requirement to have
@@ -1266,7 +1450,7 @@ RTG Investigator 2.7 (2012-09-22)
 
 Changes in this release:
 
-== Basic mapping
+### Basic mapping
 
 * cgmap: Removed the --read-names flag, as the Complete Genomics raw
   reads files do not contain read names.
@@ -1287,7 +1471,7 @@ Changes in this release:
 * coverage: The reference SDF is now optional. If not supplied, non-n
   coverage statistics will not be computed.
 
-== Metagenomics
+### Metagenomics
 
 * species: Added the ability to supply unmapped reads SAM files, in
   which case it will compute a new statistic, which is the percentage
@@ -1298,7 +1482,7 @@ Changes in this release:
   was not checking whether input mappings were in fact coordinate
   sorted. This is now fixed.
 
-== Variant calling
+### Variant calling
 
 * all callers: Fixed an exception that could occur on short reference sequences
   containing few calls.
@@ -1375,7 +1559,7 @@ Changes in this release:
 * vcfstats: New flag --allele-lengths to output a histogram of variant
   lengths, broken out by variant type.
 
-== Other
+### Other
 
 * all variant callers/coverage/cnv/sammerge/readsimeval: These modules
   contain a new flag, --min-mapq that allows filtering the input SAM
@@ -2051,7 +2235,7 @@ RTG Investigator 2.2.1 (2011-07-14)
   example, it is easy to forget to include quotes when a property
   needs spaces). Also, the default rtg.cfg sets RTG_JAVA_OPTS to
   disable the JVM use of the popcount instruction until Oracle bug
-  #7063674 is fixed.
+  number 7063674 is fixed.
 
 * many commands: included a workaround for a bug in gzip decompression
   that is present in many recent versions of the JRE. This allows us
