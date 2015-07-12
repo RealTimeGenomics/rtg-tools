@@ -14,6 +14,7 @@
   <property name="build.test" location="${build.dir}/test"/>
   <property name="build.junit" location="${build.dir}/junit"/>
   <property name="build.text" location="${build.dir}/text"/>
+  <property name="build.executable" location="${build.dir}/executable"/>
   <property name="build.misc" location="${build.dir}/misc"/>
 
   <property name="build.sysclasspath" value="ignore"/>
@@ -145,6 +146,13 @@
     <resources refid="tools.jar-test"/>
   </union>
 
+  <fileset id="common-resources" dir="${public.tools.basedir}/installer/resources/common"/>
+
+  <union id="tools-resources">
+    <fileset refid="common-resources" />
+    <fileset dir="${public.tools.basedir}/installer/resources/tools"/>
+  </union>
+
 
   <!-- Targets -->
 
@@ -159,6 +167,7 @@
     <mkdir dir="${build.src}"/>
     <mkdir dir="${build.test}"/>
     <mkdir dir="${build.text}"/>
+    <mkdir dir="${build.executable}"/>
     <mkdir dir="${build.junit}"/>
     <mkdir dir="${build.misc}"/>
   </target>
@@ -377,31 +386,45 @@
     </copy>
   </target>
 
-  <zipfileset id="common-resources" dir="${public.tools.basedir}/installer/resources/common" includes="**/*" />
-  <union id="tools-resources">
-    <zipfileset refid="common-resources" />
-    <zipfileset dir="${public.tools.basedir}/installer/resources/tools" includes="**/*" />
-  </union>
+  <target name="zip-exes">
+    <union id="executable-resources">
+      <fileset dir="${public.tools.basedir}/installer" includes="rtg"/>
+      <restrict>
+        <resources refid="${resources}-resources"/>
+        <rsel:name xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors" name="**/*.sh"/>
+      </restrict>
+    </union>
+    <union id="non-executable-resources">
+      <fileset dir="${public.tools.basedir}/installer" includes="rtg.bat"/>
+      <restrict>
+        <resources refid="${resources}-resources"/>
+        <rsel:not xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors">
+          <rsel:name name="**/*.sh"/>
+        </rsel:not>
+      </restrict>
+    </union>
+    <copy todir="${build.executable}">
+      <resources refid="executable-resources"/>
+    </copy>
+  </target>
 
-  <target name="zip-base" depends="zip-init,zip-jars,zip-text">
+  <target name="zip-base" depends="zip-init,zip-jars,zip-text,zip-exes">
     <zip destfile="${zipfile.base}" duplicate="fail">
       <mappedresources>
-        <union refid="${resources}-resources"/>
+        <resources refid="non-executable-resources"/>
         <globmapper from="*" to="${zipversion}/*"/>
       </mappedresources>
       <zipfileset prefix="${zipversion}" dir="${build.text}" includes="*.txt" />
+      <zipfileset prefix="${zipversion}" dir="${build.executable}" filemode="755"/>
       <zipfileset fullpath="${zipversion}/RTG.jar" dir="${build.dir}" includes="${rtg-jar-for-zip}"/>
       <zipfileset fullpath="${zipversion}/third-party/gzipfix.jar" dir="${tools.src.lib.dir}" includes="gzipfix.jar" />
     </zip>
   </target>
 
   <target name="zip-nojre" depends="zip-base" description="Create the distributable zip file without JRE.">
-    <zip destfile="${zipfile.nojre}">
-      <zipfileset src="${zipfile.base}"/>
-      <zipfileset prefix="${zipversion}" dir="${public.tools.basedir}/installer" includes="rtg" filemode="755"/>
-      <zipfileset prefix="${zipversion}" dir="${public.tools.basedir}/installer" includes="rtg.bat"/>
-    </zip>
+    <copy file="${zipfile.base}" tofile="${zipfile.nojre}"/>
   </target>
+
 
   <!--
      Targets that exist to make things bearable for developers running
