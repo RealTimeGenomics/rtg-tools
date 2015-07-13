@@ -5,7 +5,7 @@
   <property name="tools.src.lib.dir" location="${public.tools.basedir}/lib"/>
   <property name="tools.test.dir" location="${public.tools.basedir}/test"/>
   <property name="tools.test.lib.dir" location="${public.tools.basedir}/testLib"/>
-  <property name="buildtools.dir" location="${public.tools.basedir}/tools"/> <!-- Libraries supporting the build process itself -->
+  <property name="buildtools.dir" location="${public.tools.basedir}/buildLib"/> <!-- Libraries supporting the build process itself -->
 
   <property name="dist.dir" location="${public.tools.basedir}/dist"/>
   <property name="build.dir" location="${public.tools.basedir}/build"/>
