@@ -224,9 +224,11 @@ public class VcfHeader {
   private <T extends IdField<T>> void addIdField(List<T> dest, T field) {
     for (T f : dest) {
       if (f.getId().equals(field.getId())) {
-        throw new IllegalArgumentException("VCF header contains multiple field declarations with the same ID=" + field.getId() + StringUtils.LS
-          + f.toString() + StringUtils.LS
-          + field.toString());
+        if (!f.equals(field)) {
+          throw new IllegalArgumentException("VCF header contains multiple field declarations with the same ID=" + field.getId() + StringUtils.LS
+            + f.toString() + StringUtils.LS
+            + field.toString());
+        }
       }
     }
     dest.add(field);

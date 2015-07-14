@@ -131,7 +131,13 @@ public class VcfRecord implements SequenceNameLocus {
       final String refCall = merged.getRefCall();
       final int lengthDiff = merged.getRefCall().length() - vcf.getRefCall().length();
       for (int j = 0; j < vcf.mAltCalls.size(); j++) {
-        final String newCall = vcf.mAltCalls.get(j) + refCall.substring(refCall.length() - lengthDiff);
+        final String oldAlt = vcf.mAltCalls.get(j);
+        final String newCall;
+        if (VariantType.getSymbolicAlleleType(oldAlt) == null) {
+          newCall = oldAlt;
+        } else {
+          newCall = oldAlt + refCall.substring(refCall.length() - lengthDiff);
+        }
         if (!newCall.equals(refCall)) {
           int altIndex = merged.mAltCalls.indexOf(newCall);
           if (altIndex == -1) {
@@ -190,6 +196,9 @@ public class VcfRecord implements SequenceNameLocus {
               final int[] splitGt = VcfUtils.splitGt(gtStr);
               for (int gti = 0; gti < splitGt.length; gti++) {
                 if (splitGt[gti] != -1) {
+                  if (splitGt[gti] >= gtMap[i].length) {
+                    throw new IllegalArgumentException("Invalid GT " + gtStr + " in input record: " + records[i]);
+                  }
                   splitGt[gti] = gtMap[i][splitGt[gti]];
                 }
               }

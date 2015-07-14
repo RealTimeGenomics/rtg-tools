@@ -205,7 +205,7 @@ public class VcfMerge extends AbstractCli {
         posZip.nextPosition(callback);
       }
     } catch (final IllegalArgumentException iae) {
-      throw new IOException("Problem in VCF header: " + iae.getMessage());
+      throw new NoTalkbackSlimException("Problem in VCF: " + iae.getMessage());
     }
     if (!stdout) {
       if (stats != null) {
