@@ -4,7 +4,7 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
-RTG Core 3.5 (2015-07-10)
+RTG Core 3.5 (2015-07-16)
 -------------------------
 
 Major features of this release:
@@ -54,6 +54,10 @@ features, see the RTG Operations Manual.
   extraction as FASTQ in that some metadata (such as read group
   information) is preserved, paired end data is stored in a single
   file, and quality encoding is inherent in the format.
+
+* chrstats: Reduce false positives in sex inconsistency detection that
+  were due to applying the (tighter) sex-chromosome threshold also to
+  autosomes. This threshold is now applied to sex-chromosomes only.
 
 ### Variant Calling and Analysis
 
@@ -110,6 +114,12 @@ features, see the RTG Operations Manual.
 
 * vcfmerge: Added a new flag --force-merge-all to always attempt to
   merge headers containing conflicting descriptions.
+
+* vcfmerge: Previously vcfmerge would not process records containing
+  symbolic alleles. These are now accepted.
+
+* vcfmerge: More graceful handling when encountering records with a GT
+  that refers to a non-existent ALT.
 
 * vcfeval: Now outputs a summary containing various accuracy
   metrics. A first set of statistics is computed from the full set of
