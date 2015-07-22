@@ -94,6 +94,8 @@ public class PerSampleVariantStatistics {
   protected long mHaploidSymbolicSvs = 0;
 
   protected long mMissingGenotype = 0;
+  protected long mPartialCalls = 0;
+  protected long mPolyploidCalls = 0;
 
   protected final Histogram[] mAlleleLengths;
 
@@ -142,6 +144,10 @@ public class PerSampleVariantStatistics {
     values.add(mTotalSymbolicSvs > 0 ? Long.toString(mTotalSymbolicSvs) : null);
     names.add("Same as reference");
     values.add(Long.toString(mTotalUnchanged));
+    names.add("Half Calls");
+    values.add(mPartialCalls > 0 ? Long.toString(mPartialCalls) : null);
+    names.add("Polyploid Calls");
+    values.add(mPolyploidCalls > 0 ? Long.toString(mPolyploidCalls) : null);
     names.add("Missing Genotype");
     values.add(mMissingGenotype > 0 ? Long.toString(mMissingGenotype) : null);
     final long totalNonMissingGenotypes = mTotalSnps + mTotalMnps + mTotalInsertions + mTotalDeletions + mTotalIndels + mTotalUnchanged;

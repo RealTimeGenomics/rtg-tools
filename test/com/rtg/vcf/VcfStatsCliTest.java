@@ -44,7 +44,6 @@ import com.rtg.util.test.FileHelper;
  */
 public class VcfStatsCliTest extends AbstractCliTest {
 
-
   @Override
   protected AbstractCli getCli() {
     return new VcfStatsCli();

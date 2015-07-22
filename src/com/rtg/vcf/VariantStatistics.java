@@ -60,6 +60,8 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class VariantStatistics extends AbstractStatistics {
 
+  private static final int MISSING_ALLELE = -1;
+
   protected long mTotalFiltered = 0;
   protected long mTotalNoGenotype = 0;
   protected long mTotalVariants = 0; // Does not include filtered or no-call records.
@@ -236,7 +238,7 @@ public class VariantStatistics extends AbstractStatistics {
       }
     }
 
-    ///per sample stats
+    // per sample stats
     for (final Entry<String, PerSampleVariantStatistics> e : mPerSampleStats.entrySet()) {
       if (mPerSampleStats.size() > 1) {
         out.append(StringUtils.LS).append("Sample Name: ").append(e.getKey()).append(StringUtils.LS);
@@ -306,23 +308,28 @@ public class VariantStatistics extends AbstractStatistics {
         final int[] splitGt = VcfUtils.splitGt(gtStr);
         if (splitGt.length == 1) {
           final int alleleindex = splitGt[0];
-          if (alleleindex == -1) {
+          if (alleleindex == MISSING_ALLELE) {
             sampleStats.mMissingGenotype++;
           } else {
             tallyNonFiltered(ref, alleles[alleleindex], alleles[alleleindex], Ploidy.HAPLOID, sampleStats);
           }
         } else if (splitGt.length == 2) { // Regular diploid call
-          if (splitGt[0] == -1 || splitGt[1] == -1) {
-            sampleStats.mMissingGenotype++;
+          if (splitGt[0] == MISSING_ALLELE || splitGt[1] == MISSING_ALLELE) {
+            if (splitGt[0] == MISSING_ALLELE && splitGt[1] == MISSING_ALLELE) {
+              sampleStats.mMissingGenotype++;
+            } else {
+              sampleStats.mPartialCalls++;
+            }
           } else {
             tallyNonFiltered(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
           }
         } else {
           Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
+          sampleStats.mPolyploidCalls++;
         }
         if (mShowAlleleCountHistograms) {
           for (int alleleId : splitGt) {
-            if (alleleId != -1) {
+            if (alleleId != MISSING_ALLELE) {
               altAlleles.add(alleleId);
             }
           }
@@ -337,7 +344,7 @@ public class VariantStatistics extends AbstractStatistics {
 
   protected void tallyNonFiltered(String ref, String predA, String predB, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
     if (ref.equals(predA) && ref.equals(predB)) { // Identity
-      sampleStats.mTotalUnchanged += 1;
+      sampleStats.mTotalUnchanged++;
     } else {
       tallyNonIdentity(ref, predA, predB, ploidy, sampleStats);
     }

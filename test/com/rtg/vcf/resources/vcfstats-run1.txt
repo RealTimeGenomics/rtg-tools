@@ -32,7 +32,8 @@ Insertions                   : 5
 Deletions                    : 2
 Indels                       : 0
 Same as reference            : 31
-Missing Genotype             : 3
+Half Calls                   : 1
+Missing Genotype             : 2
 SNP Transitions/Transversions: 1.94 (70/36)
 Total Het/Hom ratio          : 6.14 (86/14)
 SNP Het/Hom ratio            : 5.57 (78/14)
