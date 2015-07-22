@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import com.rtg.launcher.AbstractStatistics;
 import com.rtg.reference.Ploidy;
@@ -72,11 +73,14 @@ public class VariantStatistics extends AbstractStatistics {
   protected long mExcessHypotheses = 0; // Only for those where over-hypotheses short-circuit used
   protected long mNoHypotheses = 0; // Only for those where no-hypotheses short-circuit used
 
+  protected long mAlleleCountMismatch = 0; // Counts records where not all declared genotypes are used
+
   protected boolean mShowLengthHistograms = false; // whether to collect data and display histograms for allele lengths
   protected boolean mShowAlleleCountHistograms = false; // whether to collect data and display histograms for alleles per variant site
   protected final Histogram mAltAlleleCounts = new Histogram();
 
   protected String mReference;
+
   /**
    * @param outputDirectory The base output directory to generate statistics and reports in. May be null if no statistics or reports are to be generated.
    */
@@ -221,6 +225,10 @@ public class VariantStatistics extends AbstractStatistics {
 
   @Override
   public String getStatistics() {
+    if (mAlleleCountMismatch > 0) {
+      Diagnostic.warning("A total of " + mAlleleCountMismatch + " declared-referenced allele count mismatches occurred.");
+    }
+
     final StringBuilder out = new StringBuilder();
     final Pair<List<String>, List<String>> outputStatistics = statisticsMap();
     printCounts(outputStatistics.getA(), outputStatistics.getB(), out);
@@ -327,19 +335,25 @@ public class VariantStatistics extends AbstractStatistics {
           Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
           sampleStats.mPolyploidCalls++;
         }
-        if (mShowAlleleCountHistograms) {
-          for (int alleleId : splitGt) {
-            if (alleleId != MISSING_ALLELE) {
-              altAlleles.add(alleleId);
-            }
+        for (int alleleId : splitGt) {
+          if (alleleId != MISSING_ALLELE) {
+            altAlleles.add(alleleId);
           }
         }
       }
     }
 
+    if (mOnlySample == null && !isAlleleCountMatch(alleles.length, altAlleles) && ++mAlleleCountMismatch <= 5) {
+      Diagnostic.warning(rec.getSequenceName() + ":" + rec.getOneBasedStart()
+        + " Declared " + alleles.length + " alleles but " + altAlleles.size() + " alleles referenced in genotypes.");
+    }
     if (mShowAlleleCountHistograms) {
       mAltAlleleCounts.increment(altAlleles.size());
     }
+  }
+
+  private boolean isAlleleCountMatch(final int declaredAlleles, final Set<Integer> observedAlleles) {
+    return observedAlleles.contains(0) ? declaredAlleles == observedAlleles.size() : declaredAlleles - 1 == observedAlleles.size();
   }
 
   protected void tallyNonFiltered(String ref, String predA, String predB, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
