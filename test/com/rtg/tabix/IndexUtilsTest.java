@@ -35,6 +35,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rtg.launcher.GlobalFlags;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
@@ -53,13 +55,17 @@ public class IndexUtilsTest extends TestCase {
     + "0" + TAB + "0" + TAB + "t" + TAB + "1" + TAB + "255" + TAB + "10S43M2S" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAATCGCTAGGTTCGACTTGGTTAACAACAACGCCTGGGGCTTTTTGG" + TAB + "*\n"
     + "1" + TAB + "0" + TAB + "t" + TAB + "42" + TAB + "255" + TAB + "10S40M2S" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAATTATTCTGGAAAGCAATGCCAGGCAGGGGCAGGTGGCCACGG" + TAB + "*\n";
 
+  @Override
+  public void setUp() {
+    GlobalFlags.resetAccessedStatus();
+    Diagnostic.setLogStream();
+  }
 
   public void testCompress() throws Exception {
     try (final TestDirectory tmpDir = new TestDirectory()) {
-      ArrayList<File> files = new ArrayList<>();
+      final ArrayList<File> files = new ArrayList<>();
       files.add(FileUtils.stringToFile(SAM_CLIP, new File(tmpDir, "sam.sam")));
-      List<File> bzFiles = IndexUtils.ensureBlockCompressed(files);
-
+      final List<File> bzFiles = IndexUtils.ensureBlockCompressed(files);
       final File samFile = bzFiles.get(0);
       new TabixIndexer(samFile).saveSamIndex();
       assertTrue(samFile.exists());
@@ -67,7 +73,6 @@ public class IndexUtilsTest extends TestCase {
       final MemoryPrintStream mps = new MemoryPrintStream();
       final int code = new ExtractCli().mainInit(new String[] {samFile.getPath(), "--header"}, mps.outputStream(), mps.printStream());
       assertEquals(mps.toString(), 0, code);
-
       assertEquals(SAM_CLIP, mps.toString());
     }
   }
