@@ -45,14 +45,14 @@ import junit.framework.TestCase;
 public class TabixHeaderTest extends TestCase {
 
   public void test() throws IOException {
-    TabixHeader th1;
+    final TabixHeader th1;
     try (BlockCompressedInputStream is = new BlockCompressedInputStream(Resources.getResourceAsStream("com/rtg/tabix/resources/tabixmerge1.sam.gz.tbi"))) {
       th1 = TabixHeader.readHeader(is);
       assertEquals(4, th1.getNumSequences());
       checkOptions(th1.getOptions());
       assertTrue(Arrays.equals(new String[]{"simulatedSequence1", "simulatedSequence2", "simulatedSequence3", "simulatedSequence4"}, th1.getSequenceNamesUnpacked()));
     }
-    TabixHeader th2;
+    final TabixHeader th2;
     try (BlockCompressedInputStream is2 = new BlockCompressedInputStream(Resources.getResourceAsStream("com/rtg/tabix/resources/tabixmerge2.sam.gz.tbi"))) {
       th2 = TabixHeader.readHeader(is2);
       assertEquals(5, th2.getNumSequences());

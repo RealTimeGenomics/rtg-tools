@@ -42,8 +42,8 @@ import junit.framework.TestSuite;
 public class ExternalCommandTest extends TestCase {
 
   public void test() throws IOException {
-    String s = "a test";
-    InputStream in = new ByteArrayInputStream(s.getBytes());
+    final String s = "a test";
+    final InputStream in = new ByteArrayInputStream(s.getBytes());
     assertEquals(s, ExternalCommand.readAll(in));
   }
 

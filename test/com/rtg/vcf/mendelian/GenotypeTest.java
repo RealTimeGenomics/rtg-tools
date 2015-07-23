@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 public class GenotypeTest extends TestCase {
 
   public void testDip() throws IOException {
-    Genotype gt = new Genotype(new int[] {1, 0});
+    final Genotype gt = new Genotype(new int[] {1, 0});
     assertEquals(2, gt.length());
     assertEquals(0, gt.get(0));
     assertEquals(1, gt.get(1));
@@ -50,7 +50,7 @@ public class GenotypeTest extends TestCase {
   }
 
   public void testHap() throws IOException {
-    Genotype gt = new Genotype(new int[]{2});
+    final Genotype gt = new Genotype(new int[]{2});
     assertEquals(1, gt.length());
     assertEquals(2, gt.get(0));
     assertEquals("2", gt.toString());

@@ -47,8 +47,8 @@ public class BasicLinkedListNodeTest extends TestCase {
   }
 
   public void test() {
-    String[] values = {"a", "b", "c", "d"};
-    BasicLinkedListNode<String> f = getList(values);
+    final String[] values = {"a", "b", "c", "d"};
+    final BasicLinkedListNode<String> f = getList(values);
     assertEquals("a", f.getValue());
     assertEquals(4, f.size());
     Iterator<String> it = f.iterator();
@@ -58,8 +58,8 @@ public class BasicLinkedListNodeTest extends TestCase {
     }
     assertFalse(it.hasNext());
 
-    BasicLinkedListNode<String> firstSide = new BasicLinkedListNode<>("first", f);
-    BasicLinkedListNode<String> secondSide = new BasicLinkedListNode<>("second", f);
+    final BasicLinkedListNode<String> firstSide = new BasicLinkedListNode<>("first", f);
+    final BasicLinkedListNode<String> secondSide = new BasicLinkedListNode<>("second", f);
     assertEquals(5, firstSide.size());
     assertEquals(5, secondSide.size());
 
@@ -83,8 +83,8 @@ public class BasicLinkedListNodeTest extends TestCase {
   }
 
   public void testNotSupported() {
-    BasicLinkedListNode<String> list = new BasicLinkedListNode<>("second", null);
-    Iterator<String> it = list.iterator();
+    final BasicLinkedListNode<String> list = new BasicLinkedListNode<>("second", null);
+    final Iterator<String> it = list.iterator();
     try {
       it.remove();
       fail("Expected exception not thrown");

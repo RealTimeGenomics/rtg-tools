@@ -49,7 +49,7 @@ public class ClosedFileInputStreamTest extends TestCase {
     try {
       final File data = new File(dir, "data");
       final Random r = new Random();
-      byte[] hundy = new byte[10 * 1024 * 1024];
+      final byte[] hundy = new byte[10 * 1024 * 1024];
       r.nextBytes(hundy);
       FileHelper.streamToFile(new ByteArrayInputStream(hundy), data);
       assertTrue(Arrays.equals(hundy, IOUtils.readData(new ClosedFileInputStream(data))));

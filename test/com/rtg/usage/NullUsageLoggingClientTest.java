@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 public class NullUsageLoggingClientTest extends TestCase {
 
   public void test() {
-    UsageLoggingClient client = new NullUsageLoggingClient();
+    final UsageLoggingClient client = new NullUsageLoggingClient();
     client.recordBeginning("foo", UUID.randomUUID());
     client.recordEnd(1, "foo", UUID.randomUUID(), true);
   }

@@ -55,7 +55,7 @@ public class MappedSamBamSequenceDataSourceTest extends SamBamSequenceDataSource
   @Override
   public void testErrors() throws IOException {
     try (TestDirectory td = new TestDirectory()) {
-      File f = new File(td, "blah.sam");
+      final File f = new File(td, "blah.sam");
       Diagnostic.setLogStream();
       // No Qualities
       FileUtils.stringToFile(SAM_HEADER + String.format(SAM_LINE_SINGLE, SAM_NL, "n", "ACGT", "*"), f);

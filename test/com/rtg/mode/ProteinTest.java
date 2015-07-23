@@ -55,7 +55,7 @@ public class ProteinTest extends TestCase {
     // Check toString of values
     final String methodName = "values";
     Method m = Protein.class.getMethod(methodName);
-    Protein[] r = (Protein[]) m.invoke(null);
+    final Protein[] r = (Protein[]) m.invoke(null);
     assertEquals("[X, *, A, R, N, D, C, Q, E, G, H, I, L, K, M, F, P, S, T, W, Y, V]", Arrays.toString(r));
     final String valueOfMethod = "valueOf";
     m = Protein.class.getMethod(valueOfMethod, String.class);

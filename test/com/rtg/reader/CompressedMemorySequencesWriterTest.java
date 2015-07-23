@@ -55,8 +55,8 @@ public class CompressedMemorySequencesWriterTest extends TestCase {
   private static final String FASTQ = "@sequence_the_first\n" + SEQUENCE_1 + "\n+sequence_the_first\n" + QUALITY_1 + "\n@sequence_the_second\n" + SEQUENCE_2 + "\n+sequence_the_second\n" + QUALITY_2;
 
   public void testFasta() throws IOException {
-    SequencesWriter sw = new SequencesWriter(getFastaSource(FASTA), null, PrereadType.UNKNOWN, true);
-    CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
+    final SequencesWriter sw = new SequencesWriter(getFastaSource(FASTA), null, PrereadType.UNKNOWN, true);
+    final CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
     assertEquals(2, cmsr.numberSequences());
     assertEquals("sequence_the_first", cmsr.name(0));
     assertEquals(16L, cmsr.length(0));
@@ -71,8 +71,8 @@ public class CompressedMemorySequencesWriterTest extends TestCase {
   }
 
   public void testFastq() throws IOException {
-    SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
-    CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
+    final SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
+    final CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
     assertEquals(2, cmsr.numberSequences());
     assertEquals("sequence_the_first", cmsr.name(0));
     assertEquals(16L, cmsr.length(0));
@@ -94,24 +94,24 @@ public class CompressedMemorySequencesWriterTest extends TestCase {
   }
 
   public void testFastqRegion() throws IOException {
-    SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
-    CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), new LongRange(0, 1));
+    final SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
+    final CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), new LongRange(0, 1));
     assertEquals(1, cmsr.numberSequences());
     assertEquals("sequence_the_first", cmsr.name(0));
     assertEquals(16L, cmsr.length(0));
-    byte[] exp = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
-    byte[] res = cmsr.read(0);
+    final byte[] exp = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
+    final byte[] res = cmsr.read(0);
     assertTrue("Exp: " + Arrays.toString(exp) + "\nact: " + Arrays.toString(res), Arrays.equals(exp, res));
-    byte[] expQual = {4, 61, 5, 9, 4, 61, 5, 9, 4, 61, 5, 9, 4, 61, 5, 9};
-    byte[] resQual = cmsr.readQuality(0);
+    final byte[] expQual = {4, 61, 5, 9, 4, 61, 5, 9, 4, 61, 5, 9, 4, 61, 5, 9};
+    final byte[] resQual = cmsr.readQuality(0);
     assertTrue("Exp: " + Arrays.toString(expQual) + "\nact: " + Arrays.toString(resQual), Arrays.equals(expQual, resQual));
   }
 
   public void testFastqRegionLarge() throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     Diagnostic.setLogStream(new PrintStream(baos));
-    SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
-    CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), new LongRange(0, 10));
+    final SequencesWriter sw = new SequencesWriter(getFastqSource(FASTQ), null, PrereadType.UNKNOWN, true);
+    final CompressedMemorySequencesReader cmsr = sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), new LongRange(0, 10));
 
     assertTrue("missing out of range message", baos.toString().contains("The end sequence id \"10\" is out of range, it must be from \"1\" to \"2\". Defaulting end to \"2\""));
 

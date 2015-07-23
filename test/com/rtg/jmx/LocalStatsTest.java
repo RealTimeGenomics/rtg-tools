@@ -38,7 +38,7 @@ import junit.framework.TestSuite;
 public class LocalStatsTest extends TestCase {
 
   public void test() {
-    RecordStats rs = LocalStats.getLocalStats("err", 5, "sda", "eth0");
+    final RecordStats rs = LocalStats.getLocalStats("err", 5, "sda", "eth0");
     assertNotNull(rs);
   }
 

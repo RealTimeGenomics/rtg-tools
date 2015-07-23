@@ -72,13 +72,13 @@ public class SamRangeUtilsTest extends TestCase {
     final ByteArrayInputStream bis = new ByteArrayInputStream(SAM_HEADER.getBytes());
     final SAMFileHeader header = SamUtils.getSingleHeader(bis);
 
-    ReferenceRanges<String> refRanges = SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("g1"));
+    final ReferenceRanges<String> refRanges = SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("g1"));
 
     assertNull(refRanges.get("g0"));
     assertNull(refRanges.get("g2"));
     assertNotNull(refRanges.get("g1"));
 
-    RangeList<String> seqRanges = refRanges.get("g1");
+    final RangeList<String> seqRanges = refRanges.get("g1");
     assertNotNull(seqRanges.find(100));
     assertNull(seqRanges.find(1000));
 
@@ -115,14 +115,14 @@ public class SamRangeUtilsTest extends TestCase {
     final ByteArrayInputStream bis = new ByteArrayInputStream(SAM_HEADER.getBytes());
     final SAMFileHeader header = SamUtils.getSingleHeader(bis);
 
-    ReferenceRanges<String> refRanges = SamRangeUtils.createFullReferenceRanges(header);
+    final ReferenceRanges<String> refRanges = SamRangeUtils.createFullReferenceRanges(header);
 
     assertNotNull(refRanges.get("g0"));
     assertNotNull(refRanges.get("g1"));
     assertNotNull(refRanges.get("g2"));
     assertNull(refRanges.get("g3"));
 
-    RangeList<String> seqRanges = refRanges.get("g1");
+    final RangeList<String> seqRanges = refRanges.get("g1");
     assertNotNull(seqRanges.find(100));
     assertNull(seqRanges.find(1000));
   }
@@ -131,7 +131,7 @@ public class SamRangeUtilsTest extends TestCase {
     final ByteArrayInputStream bis = new ByteArrayInputStream(SAM_HEADER.getBytes());
     final SAMFileHeader header = SamUtils.getSingleHeader(bis);
 
-    ReferenceRanges<String> refRanges = SamRangeUtils.createFullReferenceRanges(header);
+    final ReferenceRanges<String> refRanges = SamRangeUtils.createFullReferenceRanges(header);
     refRanges.setIdMap(SamUtils.getSequenceIdLookup(header.getSequenceDictionary()));
 
     assertNotNull(refRanges.get(0));
@@ -139,7 +139,7 @@ public class SamRangeUtilsTest extends TestCase {
     assertNotNull(refRanges.get(2));
     assertNull(refRanges.get(3));
 
-    RangeList<String> seqRanges = refRanges.get(1);
+    final RangeList<String> seqRanges = refRanges.get(1);
     assertNotNull(seqRanges.find(100));
     assertNull(seqRanges.find(1000));
   }
@@ -148,8 +148,8 @@ public class SamRangeUtilsTest extends TestCase {
     final ByteArrayInputStream bis = new ByteArrayInputStream(SAM_HEADER.getBytes());
     final SAMFileHeader header = SamUtils.getSingleHeader(bis);
 
-    SamFilterParams params = new SamFilterParams.SamFilterParamsBuilder().create();
-    ReferenceRanges<String> refRanges = SamRangeUtils.createReferenceRanges(header, params);
+    final SamFilterParams params = new SamFilterParams.SamFilterParamsBuilder().create();
+    final ReferenceRanges<String> refRanges = SamRangeUtils.createReferenceRanges(header, params);
     assertEquals(3, refRanges.sequenceNames().size());
 
   }

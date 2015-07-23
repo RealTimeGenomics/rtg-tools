@@ -47,7 +47,7 @@ public class ProteinFastaSymbolTableTest extends TestCase {
    * Test method for {@link ProteinFastaSymbolTable#scanResidue(int)}.
    */
   public final void testScanResidue() {
-    ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
+    final ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
     assertEquals(Protein.A, t.scanResidue('A'));
     assertEquals(Protein.C, t.scanResidue('C'));
     assertEquals(Protein.D, t.scanResidue('D'));
@@ -83,7 +83,7 @@ public class ProteinFastaSymbolTableTest extends TestCase {
    * Test method for {@link ProteinFastaSymbolTable#unknownResidue()}.
    */
   public final void testUnknownResidue() {
-    ProteinFastaSymbolTable table = new ProteinFastaSymbolTable();
+    final ProteinFastaSymbolTable table = new ProteinFastaSymbolTable();
     assertEquals(Protein.X, table.unknownResidue());
   }
 
@@ -91,7 +91,7 @@ public class ProteinFastaSymbolTableTest extends TestCase {
    * Test method for {@link ProteinFastaSymbolTable#getSequenceType()}.
    */
   public final void testGetSequenceType() {
-    ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
+    final ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
     assertEquals(SequenceType.PROTEIN, t.getSequenceType());
   }
 

@@ -143,10 +143,10 @@ public class FalseSeekableStreamTest extends TestCase {
     try {
       final FalseSeekableStream fss = new FalseSeekableStream(getStream());
       try {
-        byte[] first = new byte[10];
-        byte[] second = new byte[10];
-        int len1 = basic.read(first);
-        int len2 = fss.read(second);
+        final byte[] first = new byte[10];
+        final byte[] second = new byte[10];
+        final int len1 = basic.read(first);
+        final int len2 = fss.read(second);
         assertEquals(len1, len2);
         assertTrue(Arrays.equals(first, second));
       } finally {
@@ -162,10 +162,10 @@ public class FalseSeekableStreamTest extends TestCase {
     try {
       final FalseSeekableStream fss = new FalseSeekableStream(getStream());
       try {
-        byte[] first = new byte[10];
-        byte[] second = new byte[10];
-        int len1 = basic.read(first, 2, 8);
-        int len2 = fss.read(second, 2, 8);
+        final byte[] first = new byte[10];
+        final byte[] second = new byte[10];
+        final int len1 = basic.read(first, 2, 8);
+        final int len2 = fss.read(second, 2, 8);
         assertEquals(len1, len2);
         assertTrue(Arrays.equals(first, second));
       } finally {
@@ -190,7 +190,7 @@ public class FalseSeekableStreamTest extends TestCase {
   public void testSkip() throws IOException {
     final FalseSeekableStream fss = new FalseSeekableStream(getStream());
     try {
-      long len = fss.skip(3);
+      final long len = fss.skip(3);
       assertEquals(3, (int) len);
       fail();
     } catch (UnsupportedOperationException e) {

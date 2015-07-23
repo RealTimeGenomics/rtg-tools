@@ -40,20 +40,20 @@ import junit.framework.TestCase;
 public class ReferenceRangesTest extends TestCase {
 
   public void testRanges() {
-    ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
+    final ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
     for (int i = 0; i < 1000; i++) {
       acc.addRangeData("sequence1", new RangeList.RangeData<>(i * 100, i * 100 + 50, "region" + i));
       acc.addRangeData("sequence3", new RangeList.RangeData<>(i * 100, i * 100 + 50, "region" + i));
     }
 
-    ReferenceRanges<String> ranges = acc.getReferenceRanges();
+    final ReferenceRanges<String> ranges = acc.getReferenceRanges();
     assertTrue(ranges.containsSequence("sequence1"));
     assertFalse(ranges.containsSequence("sequence2"));
     assertTrue(ranges.containsSequence("sequence3"));
     assertTrue(ranges.get("sequence1").getRangeList().size() == 1000);
     assertTrue(ranges.get("sequence1").getFullRangeList().size() == 2001);
 
-    Map<String, Integer> ids = new HashMap<>();
+    final Map<String, Integer> ids = new HashMap<>();
     ids.put("sequence1", 42);
     ids.put("sequence2", 43);
     ids.put("sequence3", 44);
@@ -63,12 +63,12 @@ public class ReferenceRangesTest extends TestCase {
     assertFalse(ranges.containsSequence(12));
     assertTrue(ranges.get(42).getRangeList().size() == 1000);
 
-    ReferenceRanges<String> ranges2 = ranges.forSequence("sequence2");
+    final ReferenceRanges<String> ranges2 = ranges.forSequence("sequence2");
     assertFalse(ranges2.containsSequence("sequence1"));
     assertFalse(ranges2.containsSequence("sequence2"));
     assertFalse(ranges2.containsSequence("sequence3"));
 
-    ReferenceRanges<String> ranges1 = ranges.forSequence("sequence1");
+    final ReferenceRanges<String> ranges1 = ranges.forSequence("sequence1");
     assertTrue(ranges1.containsSequence("sequence1"));
     assertFalse(ranges1.containsSequence("sequence2"));
     assertFalse(ranges1.containsSequence("sequence3"));

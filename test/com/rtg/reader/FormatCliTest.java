@@ -563,7 +563,7 @@ public class FormatCliTest extends AbstractCliTest {
   public void testOutputAsFileflag() throws IOException {
     Diagnostic.setLogStream();
     try (TestDirectory dir = new TestDirectory("format")) {
-      File que = new File(dir, "query");
+      final File que = new File(dir, "query");
       FileUtils.stringToFile("", que);
       final String[] args = {
         "-o", que.getPath(),
@@ -715,7 +715,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
+      final String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
       TestUtils.containsAll(err, "1 reads missing a pair");
       try (final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE)) {
         assertEquals(2, rightReader.numberSequences());
@@ -734,7 +734,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
       FileHelper.resourceToFile("com/rtg/reader/resources/mated-dups.sam", input);
-      String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
+      final String err = checkMainInitWarn(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1", "--Xdedup-secondary-alignments");
       TestUtils.containsAll(err, "Read 48851323 is duplicated in SAM input", "1 reads missing a pair", "1 records ignored as duplicates in input");
 
       try (final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE)) {
@@ -755,7 +755,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      String err = checkMainInitBadFlags(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "I am not here");
+      final String err = checkMainInitBadFlags(input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "I am not here");
       TestUtils.containsAll(err, "No read group information matching \"I am not here\" present in the input file");
     }
   }

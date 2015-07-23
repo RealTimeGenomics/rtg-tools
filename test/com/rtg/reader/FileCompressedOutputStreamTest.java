@@ -50,21 +50,21 @@ public class FileCompressedOutputStreamTest extends TestCase {
   public void testSomeMethod() throws IOException {
     final File dir = FileUtils.createTempDir("cstreamtest", "test");
     try {
-      PortableRandom pr = new PortableRandom(42);
-      byte[] b = new byte[1000000];
+      final PortableRandom pr = new PortableRandom(42);
+      final byte[] b = new byte[1000000];
       for (int i = 0; i < b.length; i++) {
         b[i] = (byte) pr.nextInt(CompressedMemorySequencesReader.MAX_QUAL_VALUE);
       }
-      CompressedByteArray bwba = new CompressedByteArray(b.length, CompressedMemorySequencesReader.MAX_QUAL_VALUE, false);
+      final CompressedByteArray bwba = new CompressedByteArray(b.length, CompressedMemorySequencesReader.MAX_QUAL_VALUE, false);
       bwba.set(0, b, b.length);
-      File f = new File(dir, "cstreamtest");
+      final File f = new File(dir, "cstreamtest");
       try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(f))) {
         bwba.dumpCompressedValues(dos, b.length);
       }
-      File fo = new File(dir, "costreamtest");
+      final File fo = new File(dir, "costreamtest");
       try (FileCompressedOutputStream out = new FileCompressedOutputStream(fo, CompressedMemorySequencesReader.MAX_QUAL_VALUE)) {
         for (int i = 0; i < b.length; ) {
-          int amount = pr.nextInt(b.length - i + 1);
+          final int amount = pr.nextInt(b.length - i + 1);
           out.write(b, i, amount);
           i += amount;
           if (pr.nextInt(4) < 1) {
@@ -72,8 +72,8 @@ public class FileCompressedOutputStreamTest extends TestCase {
           }
         }
       }
-      byte[] exp = FileBitwiseOutputStreamTest.fileToByteArray(f);
-      byte[] res = FileBitwiseOutputStreamTest.fileToByteArray(fo);
+      final byte[] exp = FileBitwiseOutputStreamTest.fileToByteArray(f);
+      final byte[] res = FileBitwiseOutputStreamTest.fileToByteArray(fo);
       assertEquals(exp.length, res.length);
       for (int i = 0; i < exp.length; i++) {
         assertEquals("i: " + i + " exp: " + exp[i] + " res: " + res[i], exp[i], res[i]);
@@ -87,8 +87,8 @@ public class FileCompressedOutputStreamTest extends TestCase {
   public void testCanRead() throws IOException {
     final File dir = FileUtils.createTempDir("bwstreamtest", "test");
     try {
-      PortableRandom pr = new PortableRandom(42);
-      byte[] b = new byte[1000000];
+      final PortableRandom pr = new PortableRandom(42);
+      final byte[] b = new byte[1000000];
       for (int i = 0; i < b.length; i++) {
         b[i] = (byte) pr.nextInt(CompressedMemorySequencesReader.MAX_QUAL_VALUE);
       }
@@ -99,7 +99,7 @@ public class FileCompressedOutputStreamTest extends TestCase {
       } finally {
         fos.close();
       }
-      byte[] res = new byte[b.length];
+      final byte[] res = new byte[b.length];
       try (FileCompressedInputStream fis = new FileCompressedInputStream(outF, CompressedMemorySequencesReader.MAX_QUAL_VALUE, fos.values(), false)) {
         int pos = 0;
         int len;

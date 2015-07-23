@@ -78,7 +78,7 @@ public class TaxonNodeTest extends TestCase {
     final TaxonNode root = new TaxonNode(1, "root", "root");
     nodes.put(1, root);
     for (int i = 2; i <= 10; i++) {
-      TaxonNode node = new TaxonNode(i, "node" + i, "rank" + i);
+      final TaxonNode node = new TaxonNode(i, "node" + i, "rank" + i);
       nodes.put(i, node);
       nodes.get((i - 2) / 3 + 1).addChild(node);
     }
@@ -87,7 +87,7 @@ public class TaxonNodeTest extends TestCase {
     assertEquals(10, traverse.size());
 
     int i = 0;
-    int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
+    final int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
     for (TaxonNode tn : traverse) {
       assertEquals(ids[i], tn.getId());
       if (tn.getId() != 1) {

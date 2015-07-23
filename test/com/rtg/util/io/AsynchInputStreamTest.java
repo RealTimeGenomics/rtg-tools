@@ -55,7 +55,7 @@ public class AsynchInputStreamTest extends TestCase {
   }
 
   public void testReadSmall() throws IOException {
-    File file = File.createTempFile("test", "gzipasynch");
+    final File file = File.createTempFile("test", "gzipasynch");
     try {
       try (AsynchInputStream input = getStream(file, EXAMPLE1)) {
         final byte[] buf = new byte[100];
@@ -73,9 +73,9 @@ public class AsynchInputStreamTest extends TestCase {
 
   public void testEarlyClose() throws IOException {
     Diagnostic.setLogStream();
-    File file = File.createTempFile("test", "gzipasynch");
+    final File file = File.createTempFile("test", "gzipasynch");
     try {
-      AsynchInputStream input = getStream(file, EXAMPLE1);
+      final AsynchInputStream input = getStream(file, EXAMPLE1);
       input.close(); // check that this does not throw an exception
       // Note: it would be nice to check that the close has stopped the
       // input from being read, but we do not know how far the thread has
@@ -91,7 +91,7 @@ public class AsynchInputStreamTest extends TestCase {
 
   public void testMarkNotSupported() throws IOException {
     Diagnostic.setLogStream();
-    File file = File.createTempFile("test", "gzipasynch");
+    final File file = File.createTempFile("test", "gzipasynch");
     try {
       try (AsynchInputStream input = getStream(file, EXAMPLE1)) {
         assertFalse(input.markSupported());

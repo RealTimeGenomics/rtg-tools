@@ -62,7 +62,7 @@ public class InvalidParamsExceptionTest extends TestCase {
   public void testOtherConstructor() {
     final LogStream rec = new LogRecord();
     Diagnostic.setLogStream(rec);
-    DiagnosticListener listener = new DiagnosticListener() {
+    final DiagnosticListener listener = new DiagnosticListener() {
       @Override
       public void close() {
       }

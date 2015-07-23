@@ -45,21 +45,21 @@ import junit.framework.TestCase;
 public class FileBitwiseInputStreamTest extends TestCase {
 
   public void testSomeMethod() throws IOException {
-    PortableRandom pr = new PortableRandom(42);
-    byte[] b = new byte[1000000];
+    final PortableRandom pr = new PortableRandom(42);
+    final byte[] b = new byte[1000000];
     for (int i = 0; i < b.length; i++) {
       b[i] = (byte) pr.nextInt(5);
     }
-    BitwiseByteArray bwba = new BitwiseByteArray(b.length, 3);
+    final BitwiseByteArray bwba = new BitwiseByteArray(b.length, 3);
     bwba.set(0, b, b.length);
-    File f = File.createTempFile("bwstreamtest", "test");
+    final File f = File.createTempFile("bwstreamtest", "test");
     try {
       try (DataOutputStream dos = new DataOutputStream(new FileOutputStream(f))) {
         bwba.dumpCompressedValues(dos, b.length);
       }
       try (FileBitwiseInputStream fbs = new FileBitwiseInputStream(f, 3, b.length, true)) {
         for (int i = 0; i < 1000; i++) {
-          int pos = pr.nextInt(b.length);
+          final int pos = pr.nextInt(b.length);
           fbs.seek(pos);
           assertEquals(bwba.get(pos), (byte) fbs.read());
         }
@@ -68,7 +68,7 @@ public class FileBitwiseInputStreamTest extends TestCase {
           assertEquals(bwba.get(i), (byte) fbs.read());
         }
         fbs.seek(0);
-        byte[] buf = new byte[1000];
+        final byte[] buf = new byte[1000];
         int pos1 = 0;
         int len;
         while ((len = fbs.read(buf, 0, buf.length)) > 0) {

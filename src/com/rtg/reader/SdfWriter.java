@@ -296,7 +296,7 @@ public class SdfWriter extends AbstractSdfWriter {
   @Override
   public boolean endSequence() throws IOException {
     endSequenceStatistics();
-    boolean result;
+    final boolean result;
     if (mHaveStartedWritingSequenceData) {
       if (mHasNames) {
         writeSequenceLabel(mCurrentLabel);

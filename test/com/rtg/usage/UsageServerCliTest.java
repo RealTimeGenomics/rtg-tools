@@ -69,7 +69,7 @@ public class UsageServerCliTest extends TestCase {
       final Runnable run = new Runnable() {
         @Override
         public void run() {
-          int returncode = cli.mainInit(new String[] {"-p", "3283"}, ps.outputStream(), ps.printStream());
+          final int returncode = cli.mainInit(new String[] {"-p", "3283"}, ps.outputStream(), ps.printStream());
           synchronized (cli.mSync) {
             code[0] = returncode;
           }

@@ -40,8 +40,8 @@ import junit.framework.TestSuite;
 public class NetworkStatsTest extends TestCase {
 
   public void test() throws IOException {
-    NetworkStats ds = new NetworkStats("rubbish");
-    StringBuffer sb = new StringBuffer();
+    final NetworkStats ds = new NetworkStats("rubbish");
+    final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
     assertEquals(0, sb.length());
     ds.addColumnLabelsTop(sb);
@@ -53,8 +53,8 @@ public class NetworkStatsTest extends TestCase {
   }
 
   public void test2() throws IOException {
-    NetworkStats ds = new NetworkStats("eth0");
-    StringBuffer sb = new StringBuffer();
+    final NetworkStats ds = new NetworkStats("eth0");
+    final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
     assertEquals(0, sb.length());
 

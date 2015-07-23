@@ -60,8 +60,8 @@ public class OrientedVariantTest extends TestCase {
     assertFalse(ov.equals(null));
 
     final Variant v2 = new MockVariant(0, 0, new byte[] {0, 1, 2}, new byte[] {1});
-    OrientedVariant ov3 = new OrientedVariant(v2, true);
-    OrientedVariant ov4 = new OrientedVariant(v2, false);
+    final OrientedVariant ov3 = new OrientedVariant(v2, true);
+    final OrientedVariant ov4 = new OrientedVariant(v2, false);
     assertEquals(1, ov3.compareTo(ov4));
     assertEquals(-1, ov4.compareTo(ov3));
   }

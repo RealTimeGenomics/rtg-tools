@@ -186,7 +186,7 @@ public class ConcurrentByteQueueTest extends TestCase {
      * @param delays Each bit that is set causes a delay in one of the threads.
      */
     public void run(long delays) {
-      Thread[] thread = new Thread[mSequence.length];
+      final Thread[] thread = new Thread[mSequence.length];
       long bits = delays;
       final long mask = (2L << mSteps) - 1;
       for (int i = 0; i < thread.length; i++) {
@@ -241,7 +241,7 @@ public class ConcurrentByteQueueTest extends TestCase {
           while (pos < out.length) {
             final int request = out.length - pos;
             begin("read " + request);
-            int read = mQueue.read(out, pos, out.length - pos);
+            final int read = mQueue.read(out, pos, out.length - pos);
             if (read == -1) {
               end();
               break;
@@ -259,7 +259,7 @@ public class ConcurrentByteQueueTest extends TestCase {
     };
 
     final PortableRandom rand = new PortableRandom(42);
-    ConcurrentTester tester = new ConcurrentTester(reader, writer);
+    final ConcurrentTester tester = new ConcurrentTester(reader, writer);
     for (int run = 0; run < 4; run++) {
       //System.err.println("===== run " + run + " =====");
       Arrays.fill(out, (byte) 0);

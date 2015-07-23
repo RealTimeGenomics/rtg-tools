@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class CommonFlagCategoriesTest extends TestCase {
 
   public void testSetCategories() {
-    CFlags flags = new CFlags();
+    final CFlags flags = new CFlags();
     flags.registerOptional("a", "a").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerOptional("b", "b").setCategory(CommonFlagCategories.REPORTING);
     flags.registerOptional("c", "c").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);

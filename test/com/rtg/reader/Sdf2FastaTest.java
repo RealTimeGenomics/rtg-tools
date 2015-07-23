@@ -320,7 +320,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
 
       // One without tax
       final File smallSdf = ReaderTestUtils.getDNADir(dir);
-      String err = checkMainInitBadFlags("-i", smallSdf.getPath(), "-o", "-", "--taxons", "41431");
+      final String err = checkMainInitBadFlags("-i", smallSdf.getPath(), "-o", "-", "--taxons", "41431");
       TestUtils.containsAll(err, "does not contain taxonomy");
 
       // One with tax
@@ -330,7 +330,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
 
       checkMainInitOk("-i", fullSdf.getPath(), "-o", faOut.getPath(), "--taxons", "41431");
 
-      String faout = FileHelper.gzFileToString(faOut);
+      final String faout = FileHelper.gzFileToString(faOut);
       TestUtils.containsAll(faout,
         "gi|218169684|gb|CP001289.1|",
         "gi|218165370|gb|CP001287.1|",

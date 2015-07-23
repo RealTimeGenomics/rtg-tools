@@ -62,7 +62,7 @@ public class EnvironmentTest extends TestCase {
   }
 
   public void test() {
-    HashSet<String> emptyKeys = new HashSet<>();
+    final HashSet<String> emptyKeys = new HashSet<>();
     emptyKeys.add("user.variant");
     emptyKeys.add("exe4j.tempDir");
     emptyKeys.add("user.timezone");
@@ -72,7 +72,7 @@ public class EnvironmentTest extends TestCase {
     emptyKeys.add("user.script");
     emptyKeys.add("regression.update");
 
-    String vmName = System.getProperty("java.vm.name", "");
+    final String vmName = System.getProperty("java.vm.name", "");
     if (vmName.startsWith("IBM J9")) {
       emptyKeys.add("com.ibm.util.extralibs.properties");
       emptyKeys.add("java.awt.fonts");
@@ -80,7 +80,7 @@ public class EnvironmentTest extends TestCase {
       emptyKeys.add("sun.java2d.fontpath");
     }
 
-    HashMap<String, String> hs = Environment.getEnvironmentMap();
+    final HashMap<String, String> hs = Environment.getEnvironmentMap();
     //Set<String> st = hs.keySet();
     //String[] keys = st.toArray(new String[st.size()]);
     for (final Map.Entry<String, String> entry : hs.entrySet()) {
@@ -105,8 +105,8 @@ public class EnvironmentTest extends TestCase {
     assertEquals(Environment.OS_FREEMEM, "os.freememory");
     assertEquals(Environment.OS_TOTALMEM, "os.totalmemory");
 
-    HashMap<String, String> hs = Environment.getEnvironmentMap();
-    Collection<String> st = hs.keySet();
+    final HashMap<String, String> hs = Environment.getEnvironmentMap();
+    final Collection<String> st = hs.keySet();
 
     assertTrue(!st.isEmpty());
     assertTrue(!hs.isEmpty());
@@ -134,7 +134,7 @@ public class EnvironmentTest extends TestCase {
   }
 
   public void testVaules() {
-    HashMap<String, String> hs = Environment.getEnvironmentMap();
+    final HashMap<String, String> hs = Environment.getEnvironmentMap();
     hs.put(Environment.OS_FREEMEM, "200000");
     assertEquals(hs.get(Environment.OS_FREEMEM), "200000");
   }

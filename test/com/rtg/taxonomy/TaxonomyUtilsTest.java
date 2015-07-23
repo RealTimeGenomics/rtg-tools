@@ -57,14 +57,14 @@ public class TaxonomyUtilsTest extends TestCase {
       try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(fullSdf)) {
         assertTrue(TaxonomyUtils.hasTaxonomyInfo(reader));
 
-        Taxonomy tax = TaxonomyUtils.loadTaxonomy(reader);
+        final Taxonomy tax = TaxonomyUtils.loadTaxonomy(reader);
         assertEquals(20, tax.size());
 
-        Map<String, Integer> nameLookup = TaxonomyUtils.loadTaxonomyMapping(reader);
+        final Map<String, Integer> nameLookup = TaxonomyUtils.loadTaxonomyMapping(reader);
         assertEquals(44, nameLookup.size());
         assertEquals(12, new HashSet<>(nameLookup.values()).size());
 
-        MultiMap<Integer, Long> idLookup = TaxonomyUtils.loadTaxonomyIdMapping(reader);
+        final MultiMap<Integer, Long> idLookup = TaxonomyUtils.loadTaxonomyIdMapping(reader);
         assertEquals(12, idLookup.size());
         assertEquals(44, idLookup.allValues().size());
       }

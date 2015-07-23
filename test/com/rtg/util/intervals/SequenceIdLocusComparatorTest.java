@@ -37,8 +37,8 @@ public class SequenceIdLocusComparatorTest extends TestCase {
 
 
   public void testCompare() {
-    SequenceIdLocus pos1 = new SequenceIdLocusSimple(10, 100, 102);
-    SequenceIdLocusComparator comp = new SequenceIdLocusComparator();
+    final SequenceIdLocus pos1 = new SequenceIdLocusSimple(10, 100, 102);
+    final SequenceIdLocusComparator comp = new SequenceIdLocusComparator();
 
     assertTrue(comp.compare(pos1, new SequenceIdLocusSimple(11, 99, 101)) < 0);
     assertTrue(comp.compare(pos1, new SequenceIdLocusSimple(9, 99, 101)) > 0);

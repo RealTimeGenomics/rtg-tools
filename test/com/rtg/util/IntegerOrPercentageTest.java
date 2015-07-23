@@ -38,12 +38,12 @@ import junit.framework.TestCase;
  */
 public class IntegerOrPercentageTest extends TestCase {
   public void testConstructor() {
-    IntegerOrPercentage p = new IntegerOrPercentage("10%");
+    final IntegerOrPercentage p = new IntegerOrPercentage("10%");
     assertTrue(p.isPercentage());
     assertEquals(10, p.getValue(100));
     assertEquals(200, p.getValue(2000));
     assertEquals("10%", p.toString());
-    IntegerOrPercentage q = new IntegerOrPercentage("10");
+    final IntegerOrPercentage q = new IntegerOrPercentage("10");
     assertFalse(q.isPercentage());
     assertEquals(10, q.getValue(100));
     assertEquals(10, q.getValue(2000));
@@ -55,7 +55,7 @@ public class IntegerOrPercentageTest extends TestCase {
     assertEquals(0, q.compareTo(q));
     assertEquals(0, q.compareTo(q));
 
-    IntegerOrPercentage r = new IntegerOrPercentage(15);
+    final IntegerOrPercentage r = new IntegerOrPercentage(15);
     assertFalse(r.isPercentage());
     assertEquals(15, r.getValue(100));
     assertEquals(15, r.getValue(2000));

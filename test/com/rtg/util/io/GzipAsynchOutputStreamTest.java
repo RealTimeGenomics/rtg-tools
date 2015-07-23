@@ -41,7 +41,7 @@ public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
 
   public void testNullFile() throws IOException {
     try {
-      GzipAsynchOutputStream out = new GzipAsynchOutputStream(null);
+      final GzipAsynchOutputStream out = new GzipAsynchOutputStream(null);
       try {
         fail("IllegalArgumentException expected");
       } finally {
@@ -56,7 +56,7 @@ public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
   public void testFlush() throws IOException {
     final File file = File.createTempFile("test", "gzipasynch");
     try {
-      GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
+      final GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
       try {
         for (int i = 0; i < 1028; i++) {
           out.write((int) 'a');

@@ -88,9 +88,9 @@ public class DataInMemoryTest extends TestCase {
     final File dir = FileUtils.createTempDir("test", "dir");
     try {
       ReaderTestUtils.getReaderDNAFastq(SEQ_DATA, dir, new SdfId(), 20);
-      IndexFile f = new IndexFile(dir);
+      final IndexFile f = new IndexFile(dir);
 
-      DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 5);
+      final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 5);
       assertEquals(35, mem.lengthBetween(0, 1));
       assertEquals(6, mem.lengthBetween(1, 2));
       assertEquals(17, mem.lengthBetween(2, 3));
@@ -99,7 +99,7 @@ public class DataInMemoryTest extends TestCase {
       assertEquals(58, mem.lengthBetween(1, 4));
       for (int i = 0; i < LENGTHS.length; i++) {
         for (int j = i + 1; j < LENGTHS.length; j++) {
-          int[] lengths = mem.sequenceLengths(i, j);
+          final int[] lengths = mem.sequenceLengths(i, j);
           assertTrue(Arrays.equals(Arrays.copyOfRange(LENGTHS, i, j), lengths));
         }
       }
@@ -222,8 +222,8 @@ public class DataInMemoryTest extends TestCase {
     final File dir = FileUtils.createTempDir("test", "dir");
     try {
       ReaderTestUtils.getReaderDNAFastq(SEQ_DATA, dir, new SdfId(), 20);
-      IndexFile f = new IndexFile(dir);
-      DataInMemory.PointerLoader foo = new DataInMemory.PointerLoader(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
+      final IndexFile f = new IndexFile(dir);
+      final DataInMemory.PointerLoader foo = new DataInMemory.PointerLoader(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
       foo.loadPointers();
       for (int i = 0; i < POINTERS.length; i++) {
         assertTrue("i: " + i + " EXP: " + Arrays.toString(POINTERS[i]) + " ACT: " + Arrays.toString(foo.mPointers[i]),  Arrays.equals(POINTERS[i], foo.mPointers[i]));
@@ -237,9 +237,9 @@ public class DataInMemoryTest extends TestCase {
     final File dir = FileUtils.createTempDir("test", "dir");
     try {
       ReaderTestUtils.getReaderDNAFastq(SEQ_DATA, dir, new SdfId(), 20);
-      IndexFile f = new IndexFile(dir);
+      final IndexFile f = new IndexFile(dir);
 
-      DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
+      final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
       assertTrue(Arrays.equals(LENGTHS, mem.sequenceLengths(0, 5)));
       for (int i = 0; i < LENGTHS.length; i++) {
         assertEquals("i: "  + i, LENGTHS[i], mem.length(i));

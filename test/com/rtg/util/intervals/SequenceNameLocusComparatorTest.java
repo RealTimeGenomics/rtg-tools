@@ -37,8 +37,8 @@ public class SequenceNameLocusComparatorTest extends TestCase {
 
 
   public void testCompare() {
-    SequenceNameLocus pos1 = new SequenceNameLocusSimple("10", 100, 102);
-    SequenceNameLocusComparator comp = new SequenceNameLocusComparator();
+    final SequenceNameLocus pos1 = new SequenceNameLocusSimple("10", 100, 102);
+    final SequenceNameLocusComparator comp = new SequenceNameLocusComparator();
 
     assertTrue(comp.compare(pos1, new SequenceNameLocusSimple("11", 99, 101)) < 0);
     assertTrue(comp.compare(pos1, new SequenceNameLocusSimple("09", 99, 101)) > 0);

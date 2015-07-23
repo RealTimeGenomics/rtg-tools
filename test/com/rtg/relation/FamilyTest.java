@@ -179,13 +179,13 @@ public class FamilyTest extends TestCase {
         + "genome daughter sex=female" + StringUtils.LS
         + "parent-child male daughter" + StringUtils.LS
         + "parent-child female daughter" + StringUtils.LS;
-    Family fam = Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(rel))));
+    final Family fam = Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(rel))));
     assertEquals("male", fam.getFather());
     assertEquals("female", fam.getMother());
   }
 
   public void testMultiFamily() {
-    GenomeRelationships pedigree = new GenomeRelationships();
+    final GenomeRelationships pedigree = new GenomeRelationships();
     pedigree.addGenome("father", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
     pedigree.addGenome("mother", GenomeRelationships.SEX_FEMALE);
     pedigree.addGenome("child", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
@@ -204,9 +204,9 @@ public class FamilyTest extends TestCase {
     pedigree.addParentChild("fatherfather", "father");
     pedigree.addParentChild("fathermother", "father");
 
-    Set<Family> families = Family.getFamilies(pedigree, false, null);
+    final Set<Family> families = Family.getFamilies(pedigree, false, null);
     assertEquals(3, families.size());
-    Family[] afamilies = families.toArray(new Family[families.size()]);
+    final Family[] afamilies = families.toArray(new Family[families.size()]);
     assertEquals("father", afamilies[0].getFather());
     assertEquals("mother", afamilies[0].getMother());
     assertEquals("child", afamilies[0].getChildren()[0]);

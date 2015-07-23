@@ -105,7 +105,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
       assertEquals("", str);
       assertTrue(outFile.isFile());
-      String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      final String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
       mNano.check("snpAnnotate_small_vcf_ids_exp.vcf", actual, false);
     }
   }
@@ -125,7 +125,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       }
       assertEquals("", str);
       assertTrue(outFile.isFile());
-      String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      final String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
       mNano.check(id + "_exp.vcf", actual, false);
     }
   }

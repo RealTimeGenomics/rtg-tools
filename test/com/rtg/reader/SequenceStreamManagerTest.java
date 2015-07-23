@@ -66,7 +66,7 @@ public class SequenceStreamManagerTest extends DefaultSequencesReaderTest {
       try (InputStream is = Resources.getResourceAsStream("com/rtg/reader/resources/sdfver8.arch")) {
         SimpleArchive.unpackArchive(is, mDir);
         try (SequencesReader sr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-          byte[] buff = new byte[(int) sr.maxLength()];
+          final byte[] buff = new byte[(int) sr.maxLength()];
           for (long seq = 0; seq < sr.numberSequences(); seq++) {
             sr.read(seq, buff);
           }
@@ -76,7 +76,7 @@ public class SequenceStreamManagerTest extends DefaultSequencesReaderTest {
         }
       }
       try (SequencesReader sr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-        byte[] buff = new byte[(int) sr.maxLength()];
+        final byte[] buff = new byte[(int) sr.maxLength()];
         try {
           for (long seq = 0; seq < sr.numberSequences(); seq++) {
             sr.read(seq, buff);

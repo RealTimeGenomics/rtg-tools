@@ -42,8 +42,8 @@ public class RecordStatsTest extends TestCase {
   private static final String LS = System.lineSeparator();
 
   public void test() throws IOException {
-    StringBuffer sb = new StringBuffer();
-    RecordStats ds = new RecordStats(sb, 10000);
+    final StringBuffer sb = new StringBuffer();
+    final RecordStats ds = new RecordStats(sb, 10000);
     ds.addStats(new MonStats() {
         @Override
         public void addHeader(Appendable out) throws IOException {

@@ -357,7 +357,7 @@ public class SequencesWriterTest extends TestCase {
     sw.processSequences();
 
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      SequencesIterator it = dsr.iterator();
+      final SequencesIterator it = dsr.iterator();
       assertTrue(it.nextSequence());
       assertEquals("12345", it.currentName());
       final byte[] q = new byte[6];

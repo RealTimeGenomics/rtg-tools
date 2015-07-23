@@ -47,7 +47,7 @@ public class UsageMessageTest extends TestCase {
   public void test() throws Exception {
     final UUID uuid = new UUID(1234, 5678);
     final UsageMessage us = UsageMessage.startMessage("009", uuid.toString(), "rtg version test", "testclass");
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     us.setDate(sdf.parse(FIRST_DATE));
     final String firstLine = us.formatLine(null);
     final UsageMessage us2 = UsageMessage.setMessage("009", uuid.toString(), "rtg version test", "testclass", "999", "Success");
@@ -64,7 +64,7 @@ public class UsageMessageTest extends TestCase {
   public void test2() throws Exception {
     final UUID uuid = new UUID(1234, 5678);
     final UsageMessage us = UsageMessage.startMessage("009", uuid.toString(), "rtg version test", "testclass");
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     us.setDate(sdf.parse(FIRST_DATE));
     us.setUsername("bob");
     us.setHostname("jimbo");

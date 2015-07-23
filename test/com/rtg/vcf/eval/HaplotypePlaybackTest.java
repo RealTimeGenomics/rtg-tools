@@ -39,8 +39,8 @@ import junit.framework.TestCase;
 public class HaplotypePlaybackTest extends TestCase {
 
   public void testSimpleBase() {
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //snp C at 1
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2}, null), true));
     //insert G at 4
@@ -48,13 +48,13 @@ public class HaplotypePlaybackTest extends TestCase {
     //delete length 1 at 6
     path.addVariant(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, null), true));
 
-    byte[] expected = {2, 1, 1, 3, 1, 1, 2, 1, 1};
+    final byte[] expected = {2, 1, 1, 3, 1, 1, 2, 1, 1};
     check(expected, path);
   }
 
   public void testMoreComplex() {
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), false));
     //insert A -> C:GA at 4
@@ -62,28 +62,28 @@ public class HaplotypePlaybackTest extends TestCase {
     //delete A -> i:T at 6
     path.addVariant(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, new byte[] {4}), false));
 
-    byte[] expected = {3, 3, 3, 1, 1, 2, 1, 4, 2, 1, 1};
+    final byte[] expected = {3, 3, 3, 1, 1, 2, 1, 4, 2, 1, 1};
     check(expected, path);
   }
 
   public void testInsertPriorToSnp() {
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //insert GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(2, 2, new byte[] {3, 3, 3}, null), true));
     //snp C at 2
     path.addVariant(new OrientedVariant(new MockVariant(2, 3, new byte[] {2}, null), true));
 
-    byte[] expected = {1, 3, 3, 3, 2, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] expected = {1, 3, 3, 3, 2, 1, 1, 1, 1, 2, 1, 1};
     check(expected, path);
   }
 
 
   public void testMoreComplexAlternate() {
                                // 1  2  3  4  5  6  7  8  9
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
                                // 2441  1  31 4     3  1  1
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
     //insert A -> C:GA at 4
@@ -96,7 +96,7 @@ public class HaplotypePlaybackTest extends TestCase {
     //C -> G:T
     path.addVariant(new OrientedVariant(new MockVariant(7, 8, new byte[] {3}, new byte[] {4}), true));
 
-    byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
+    final byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
     TestUtils.containsAll(path.toString()
         , "HaplotypePlayback: position=-1 inPosition=-1"
         , "current:1:2 CTT:GGG"
@@ -120,9 +120,9 @@ public class HaplotypePlaybackTest extends TestCase {
   }
 
   public void testCopy() {
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
                                // 2441  1  31 1     3  1  1
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
     assertEquals(path.toString(), path.copy().toString());
@@ -131,17 +131,17 @@ public class HaplotypePlaybackTest extends TestCase {
 
   public void testPartialUpdated() {
                                // 1  2  3  4  5  6  7  8  9
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
                                // 2441  1  31 1     3  1  1
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     assertEquals(null, path.currentVariant());
     //mnp A -> CTT:GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
     //insert A -> C:GA at 4
-    OrientedVariant first = new OrientedVariant(new MockVariant(4, 5, new byte[] {2}, new byte[] {3, 1}), false);
+    final OrientedVariant first = new OrientedVariant(new MockVariant(4, 5, new byte[] {2}, new byte[] {3, 1}), false);
     path.addVariant(first);
 
-    byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
+    final byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
     int i = 0;
     while (i < 7) {
       path.next();
@@ -151,7 +151,7 @@ public class HaplotypePlaybackTest extends TestCase {
     }
     assertEquals(first, path.currentVariant());
     //A -> G:T
-    OrientedVariant next = new OrientedVariant(new MockVariant(5, 6, new byte[] {3}, new byte[] {4}), false);
+    final OrientedVariant next = new OrientedVariant(new MockVariant(5, 6, new byte[] {3}, new byte[] {4}), false);
     path.addVariant(next);
     //delete A -> i:T
     path.addVariant(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, new byte[] {4}), true));
@@ -177,16 +177,16 @@ public class HaplotypePlaybackTest extends TestCase {
 
   public void testComparable() {
                                // 1  2  3  4  5  6  7  8  9
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
                                // 2441  1  31 1     3  1  1
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
     //insert A -> C:GA at 4
     path.addVariant(new OrientedVariant(new MockVariant(4, 5, new byte[] {2}, new byte[] {3, 1}), false));
 
     assertEquals(0, path.compareTo(path));
-    HaplotypePlayback copy = path.copy();
+    final HaplotypePlayback copy = path.copy();
     assertTrue(path.equals(copy));
     assertTrue(path.hashCode() == copy.hashCode());
     copy.addVariant(new OrientedVariant(new MockVariant(5, 6, new byte[] {3}, new byte[] {4}), false));
@@ -199,13 +199,13 @@ public class HaplotypePlaybackTest extends TestCase {
     assertEquals(1, path.compareTo(copy));
     assertEquals(-1, copy.compareTo(path));
 
-    HaplotypePlayback pathAdvanced = path.copy();
+    final HaplotypePlayback pathAdvanced = path.copy();
     pathAdvanced.next();
     assertEquals(-1, path.compareTo(pathAdvanced));
     assertEquals(1, pathAdvanced.compareTo(path));
 
-    HaplotypePlayback path2 = new HaplotypePlayback(template);
-    HaplotypePlayback copy2 = path2.copy();
+    final HaplotypePlayback path2 = new HaplotypePlayback(template);
+    final HaplotypePlayback copy2 = path2.copy();
     assertEquals(0, path2.compareTo(copy2));
 
     path2.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
@@ -219,11 +219,11 @@ public class HaplotypePlaybackTest extends TestCase {
   }
   public void testComparable2() {
                                // 1  2  3  4  5  6  7  8  9
-    byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
                                // 2441  1  31 1     3  1  1
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2, 4, 4}, new byte[] {3, 3, 3}), true));
-    HaplotypePlayback copy = path.copy();
+    final HaplotypePlayback copy = path.copy();
     path.next();
     path.next();
     copy.next();
@@ -232,14 +232,14 @@ public class HaplotypePlaybackTest extends TestCase {
   }
 
   public void testMoveForward() {
-    byte[] template = {1, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4, 1, 1, 2, 1, 1};
-    HaplotypePlayback path = new HaplotypePlayback(template);
+    final byte[] template = {1, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4, 1, 1, 2, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
     //snp C at 0
     path.addVariant(new OrientedVariant(new MockVariant(1, 2, new byte[] {2}, null), true));
     //snp A at
     path.addVariant(new OrientedVariant(new MockVariant(14, 15, new byte[] {1}, null), true));
 
-    byte[] expected = {2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4, 1, 1, 1, 1, 1};
+    final byte[] expected = {2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4, 1, 1, 1, 1, 1};
     int i = -1;
     while (path.templatePosition() < 4) {
       path.next();

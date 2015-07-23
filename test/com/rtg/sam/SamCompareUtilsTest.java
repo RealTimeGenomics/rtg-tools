@@ -45,9 +45,9 @@ public class SamCompareUtilsTest extends TestCase {
   public void test() {
     final SAMFileHeader header = new SAMFileHeader();
     header.setSequenceDictionary(new SAMSequenceDictionary(Arrays.asList(new SAMSequenceRecord("raga", 100), new SAMSequenceRecord("yaga", 100), new SAMSequenceRecord("zaga", 100))));
-    SAMRecord rec1 = new SAMRecord(header);
+    final SAMRecord rec1 = new SAMRecord(header);
     rec1.setReferenceIndex(1);
-    SAMRecord rec2 = new SAMRecord(header);
+    final SAMRecord rec2 = new SAMRecord(header);
     rec2.setReferenceIndex(2);
     assertEquals(-1, SamCompareUtils.compareSamRecords(rec1, rec2));
     assertEquals(1, SamCompareUtils.compareSamRecords(rec2, rec1));

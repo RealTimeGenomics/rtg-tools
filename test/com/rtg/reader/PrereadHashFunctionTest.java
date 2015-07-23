@@ -42,12 +42,12 @@ public class PrereadHashFunctionTest extends TestCase {
   }
 
   public void testInit() {
-    PrereadHashFunction prf = new PrereadHashFunction();
+    final PrereadHashFunction prf = new PrereadHashFunction();
     assertEquals(0L, prf.getHash());
   }
 
   public void testInt() {
-    PrereadHashFunction prf = new PrereadHashFunction();
+    final PrereadHashFunction prf = new PrereadHashFunction();
     for (int i = 0 ; i < 1000; i++) {
       prf.irvineHash(i);
     }
@@ -55,7 +55,7 @@ public class PrereadHashFunctionTest extends TestCase {
   }
 
   public void testLong() {
-    PrereadHashFunction prf = new PrereadHashFunction();
+    final PrereadHashFunction prf = new PrereadHashFunction();
     for (long l = 0 ; l < 1000; l++) {
       prf.irvineHash(l);
     }
@@ -63,14 +63,14 @@ public class PrereadHashFunctionTest extends TestCase {
   }
 
   public void testOutput() {
-    PrereadHashFunction prf = new PrereadHashFunction();
+    final PrereadHashFunction prf = new PrereadHashFunction();
     prf.irvineHash(5);
     prf.irvineHash("PrereadHashFunction");
     assertEquals(-139924295097060585L, prf.getHash());
   }
 
   public void testString() {
-    PrereadHashFunction prf = new PrereadHashFunction();
+    final PrereadHashFunction prf = new PrereadHashFunction();
     prf.irvineHash("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
     assertEquals(-159429765726103168L, prf.getHash());
   }

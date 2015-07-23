@@ -47,7 +47,7 @@ public class AlleleCountInGenotypesAnnotationTest extends TestCase {
 
   public void test() {
     final AlleleCountInGenotypesAnnotation ann = new AlleleCountInGenotypesAnnotation();
-    VcfRecord record = new VcfRecord();
+    final VcfRecord record = new VcfRecord();
     record.setNumberOfSamples(4);
     record.setRefCall("G");
     record.addAltCall("A");

@@ -127,7 +127,7 @@ public class GenomeRelationshipsTest extends TestCase {
   }
 
   private GenomeRelationships makeFamily() {
-    GenomeRelationships genomeRelationships = new GenomeRelationships();
+    final GenomeRelationships genomeRelationships = new GenomeRelationships();
     genomeRelationships.addGenome("fatherfather", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
     genomeRelationships.addGenome("fathermother", GenomeRelationships.SEX_FEMALE);
     genomeRelationships.addGenome("father", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
@@ -141,7 +141,7 @@ public class GenomeRelationshipsTest extends TestCase {
   }
 
   public void testQueries() {
-    GenomeRelationships genomeRelationships = makeFamily();
+    final GenomeRelationships genomeRelationships = makeFamily();
     assertEquals(3, genomeRelationships.relationships("father").length);
     assertEquals(3, genomeRelationships.relationships("father", new RelationshipTypeFilter(RelationshipType.PARENT_CHILD)).length);
     assertEquals(1, genomeRelationships.relationships("father", new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new FirstInRelationshipFilter("father")).length);
@@ -159,16 +159,16 @@ public class GenomeRelationshipsTest extends TestCase {
   }
 
   public void testFilter() {
-    GenomeRelationships genomeRelationships = makeFamily();
+    final GenomeRelationships genomeRelationships = makeFamily();
     assertEquals(5, genomeRelationships.genomes().length);
 
-    GenomeRelationships individuals = genomeRelationships.filterByRelationships(new Relationship.NotFilter(new RelationshipTypeFilter(RelationshipType.PARENT_CHILD)));
+    final GenomeRelationships individuals = genomeRelationships.filterByRelationships(new Relationship.NotFilter(new RelationshipTypeFilter(RelationshipType.PARENT_CHILD)));
     assertEquals(5, individuals.genomes().length);
     assertEquals(0, individuals.relationships(RelationshipType.PARENT_CHILD).length);
   }
 
   public void testNumberOfConnectedGroups() {
-    GenomeRelationships gr = new GenomeRelationships();
+    final GenomeRelationships gr = new GenomeRelationships();
     gr.addGenome("father");
     gr.addGenome("mother");
     gr.addGenome("son");
@@ -176,7 +176,7 @@ public class GenomeRelationshipsTest extends TestCase {
     gr.addParentChild("father", "son");
     gr.addParentChild("mother", "son");
 
-    ArrayList<String> genomes = new ArrayList<>();
+    final ArrayList<String> genomes = new ArrayList<>();
     genomes.add("father");
     genomes.add("mother");
     genomes.add("son");

@@ -93,10 +93,10 @@ public class SdfSplitterTest extends AbstractCliTest {
   private static final Residue[][] EXPECTED_SEQUENCES;
   private static final Residue[][] EXPECTED_SEQUENCES_2;
   static {
-    Residue a = DNA.A;
-    Residue c = DNA.C;
-    Residue g = DNA.G;
-    Residue t = DNA.T;
+    final Residue a = DNA.A;
+    final Residue c = DNA.C;
+    final Residue g = DNA.G;
+    final Residue t = DNA.T;
     EXPECTED_SEQUENCES = new Residue[][] {
       //test
       {a, c, g, t, g, t,
@@ -162,13 +162,13 @@ public class SdfSplitterTest extends AbstractCliTest {
     Diagnostic.setLogStream();
     try (TestDirectory inDir = new TestDirectory("prereadsplitter-test.in");
          TestDirectory outDir = new TestDirectory("prereadsplitter-testout")) {
-      ArrayList<InputStream> al = new ArrayList<>();
+      final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream(TEST_INPUT_STRING));
-      FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
               new DNAFastaSymbolTable());
-      SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
+      final SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
-      ArrayList<File> inDirs = new ArrayList<>();
+      final ArrayList<File> inDirs = new ArrayList<>();
       inDirs.add(inDir);
       SdfSplitter.split(inDirs, outDir, 100, true, false, false);
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "000000"))) {
@@ -184,18 +184,18 @@ public class SdfSplitterTest extends AbstractCliTest {
     Diagnostic.setLogStream();
     try (TestDirectory inDir = new TestDirectory("prereadsplitter-test.in");
          TestDirectory outDir = new TestDirectory("prereadsplitter-testout")) {
-      ArrayList<InputStream> al = new ArrayList<>();
+      final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream(TEST_INPUT_STRING));
-      FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
               new DNAFastaSymbolTable());
-      SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
+      final SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
-      ArrayList<File> inDirs = new ArrayList<>();
+      final ArrayList<File> inDirs = new ArrayList<>();
       inDirs.add(inDir);
       SdfSplitter.split(inDirs, outDir, 1, true, false, false);
       for (int j = 0; j < EXPECTED_SEQUENCES.length; j++) {
-        SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "00000" + j));
-        SequencesIterator it = dsr.iterator();
+        final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "00000" + j));
+        final SequencesIterator it = dsr.iterator();
         assertEquals("j: " + j, 1, dsr.numberSequences());
         try {
           assertTrue(it.nextSequence());
@@ -216,7 +216,7 @@ public class SdfSplitterTest extends AbstractCliTest {
       FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
       SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
-      ArrayList<File> inDirs = new ArrayList<>();
+      final ArrayList<File> inDirs = new ArrayList<>();
       inDirs.add(inDir);
 
       al = new ArrayList<>();
@@ -228,7 +228,7 @@ public class SdfSplitterTest extends AbstractCliTest {
 
       SdfSplitter.split(inDirs, outDir, 100, false, false, false);
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "000000"))) {
-        SequencesIterator it = dsr.iterator();
+        final SequencesIterator it = dsr.iterator();
         for (int j = 0; j < EXPECTED_SEQUENCES.length; j++) {
           assertTrue("j: " + j, it.nextSequence());
           assertEquals("j: " + j, EXPECTED_SEQUENCE_NAMES[j], it.currentName());

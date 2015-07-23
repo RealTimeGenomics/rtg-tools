@@ -40,7 +40,7 @@ public class QuickSortTest extends TestCase {
 
 
   public void testSort() {
-    PortableRandom pr = new PortableRandom();
+    final PortableRandom pr = new PortableRandom();
     final long seed = pr.getSeed();
     try {
       final int[] unsorted = new int[100000];
@@ -48,7 +48,7 @@ public class QuickSortTest extends TestCase {
         unsorted[i] = Math.abs(pr.nextInt());
       }
       final int[] unsorted2 = Arrays.copyOf(unsorted, unsorted.length);
-      QuickSort.SortProxy proxy = new QuickSort.SortProxy() {
+      final QuickSort.SortProxy proxy = new QuickSort.SortProxy() {
 
         @Override
         public int compare(long index1, long index2) {
@@ -57,7 +57,7 @@ public class QuickSortTest extends TestCase {
 
         @Override
         public void swap(long index1, long index2) {
-          int temp = unsorted[(int) index1];
+          final int temp = unsorted[(int) index1];
           unsorted[(int) index1] = unsorted[(int) index2];
           unsorted[(int) index2] = temp;
         }

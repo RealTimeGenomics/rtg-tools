@@ -98,7 +98,7 @@ public class FlagTest extends TestCase {
   }
 
   public void testHashCode() {
-    Flag anon = new Flag(null, null, "anonymous flag", 1, 1, Integer.class, "int", null, "");
+    final Flag anon = new Flag(null, null, "anonymous flag", 1, 1, Integer.class, "int", null, "");
     assertEquals(0, anon.hashCode());
   }
 

@@ -57,10 +57,10 @@ public class SimplePrereadNamesTest extends TestCase {
     assertEquals("third", sprn.name(2));
     assertEquals("fourth", sprn.name(3));
     assertEquals(62, sprn.bytes());
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     sprn.writeName(sb, 2);
     assertEquals("third", sb.toString());
-    MemoryPrintStream mps = new MemoryPrintStream();
+    final MemoryPrintStream mps = new MemoryPrintStream();
     sprn.writeName(mps.outputStream(), 1);
     assertEquals("second", mps.toString());
   }

@@ -112,7 +112,7 @@ public class VcfUtilsTest extends TestCase {
   }
 
   private VcfRecord makeRecord(String gt, String ref, String... alts) {
-    VcfRecord record = new VcfRecord();
+    final VcfRecord record = new VcfRecord();
     record.setSequence("foo");
     record.setStart(42);
     record.setRefCall(ref);

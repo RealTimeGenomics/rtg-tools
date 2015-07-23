@@ -86,11 +86,11 @@ public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
   @Override
   public void testResidueCountsWithDusterOnDNA() throws Exception {
     //create data source
-    ArrayList<InputStream> al = new ArrayList<>();
+    final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
     ds.setDusting(true);
-    SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
+    final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
     try (SequencesReader dsr = createSequencesReader(mDir)) {
       final SequencesIterator it = dsr.iterator();
@@ -113,10 +113,10 @@ public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
   @Override
   public void testResidueCountsWithoutDusterOnDNA() throws Exception {
     //create data source
-    ArrayList<InputStream> al = new ArrayList<>();
+    final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    FastaSequenceDataSource ds = new FastaSequenceDataSource(al,  new DNAFastaSymbolTable());
-    SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,  new DNAFastaSymbolTable());
+    final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
     //testing the read (stolen from SequencesWriterTest)

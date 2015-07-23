@@ -70,7 +70,7 @@ public class SequenceIndex {
   }
 
   void addChunk(final int bin, final long chunkBegin, final long chunkEnd) {
-    ArrayList<SequenceIndexChunk> chunks;
+    final ArrayList<SequenceIndexChunk> chunks;
     if (!mBins.containsKey(bin)) {
       chunks = new ArrayList<>();
       mBins.put(bin, chunks);

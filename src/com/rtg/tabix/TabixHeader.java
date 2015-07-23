@@ -82,7 +82,7 @@ public class TabixHeader {
 
   static TabixHeader mergeHeaders(TabixHeader firstHeader, TabixHeader nextHeader) {
     int startPos = 0;
-    int numSequences;
+    final int numSequences;
     if (firstHeader.mNumSequences > 0 && nextHeader.mNumSequences > 0
             && firstHeader.mSequenceNamesUnpacked[firstHeader.mNumSequences - 1].equals(nextHeader.mSequenceNamesUnpacked[0])) {
       final byte[] secondNames = nextHeader.mSequenceNames;

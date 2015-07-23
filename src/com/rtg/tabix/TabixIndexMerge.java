@@ -110,7 +110,7 @@ public final class TabixIndexMerge {
     int nextArrayIndex = 0;
     final ArrayList<SequenceIndex> ret = new ArrayList<>();
     for (final String currName : jointNames) {
-      SequenceIndex currIndex;
+      final SequenceIndex currIndex;
       if (masterArrayIndex < masterNames.length) {
         assert masterNames[masterArrayIndex].equals(currName);
         currIndex = master[masterArrayIndex];

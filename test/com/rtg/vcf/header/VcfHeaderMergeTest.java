@@ -200,12 +200,12 @@ public class VcfHeaderMergeTest extends TestCase {
   }
 
   public void testForce() {
-    VcfHeader a = new VcfHeader();
+    final VcfHeader a = new VcfHeader();
     a.addMetaInformationLine(VERSION_LINE);
     a.addMetaInformationLine(FORMAT_META_LINE_1);
     a.addMetaInformationLine(INFO_META_LINE_1);
     a.addSampleName("sample");
-    VcfHeader b = new VcfHeader();
+    final VcfHeader b = new VcfHeader();
     b.addMetaInformationLine(VERSION_LINE);
     b.addMetaInformationLine(FORMAT_META_LINE_1X);
     b.addMetaInformationLine(INFO_META_LINE_1X);

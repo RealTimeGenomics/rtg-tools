@@ -51,10 +51,10 @@ public class FloatValueTest extends TestCase {
   }
 
   public void test() {
-    FloatValue val = new FloatValue(5.23f);
+    final FloatValue val = new FloatValue(5.23f);
 
     assertEquals("5.23", val.toString());
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     val.toString(sb);
     assertEquals("5.23", sb.toString());
 

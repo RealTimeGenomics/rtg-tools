@@ -38,7 +38,7 @@ public class FilterFieldTest extends TestCase {
 
   public void testSomeMethod() {
     final String io = "##FILTER=<ID=yo, Description=\"fun for the whole family\">";
-    FilterField f = new FilterField(io);
+    final FilterField f = new FilterField(io);
     assertEquals(io.replaceAll(",\\s+", ","), f.toString());
     assertEquals("yo", f.getId());
     assertEquals("fun for the whole family", f.getDescription());

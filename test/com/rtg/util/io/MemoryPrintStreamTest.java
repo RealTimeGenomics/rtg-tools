@@ -44,7 +44,7 @@ public class MemoryPrintStreamTest extends TestCase {
   public void testWriting() throws IOException {
     try (final MemoryPrintStream mps = new MemoryPrintStream()) {
       new Throwable().printStackTrace(mps.printStream());
-      String result = mps.toString();
+      final String result = mps.toString();
       assertTrue(result.contains("MemoryPrintStreamTest"));
       assertTrue(StringUtils.split(mps.toString(), '\n').length > 3);
     }

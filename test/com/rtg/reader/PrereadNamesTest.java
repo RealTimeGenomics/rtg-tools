@@ -136,7 +136,7 @@ public class PrereadNamesTest extends TestCase {
           + ">823456" + LS + "ACGT" + LS;                  //6  12 file5
 
   public void testLoadPointersSplit() throws Exception {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
     //long[] seqIndex = {2, 1, 1, 1, 1};
     final DataFileIndex seqIndex = DataFileIndex.loadLabelDataFileIndex(new IndexFile(mDir).dataIndexVersion(), mDir);
@@ -159,7 +159,7 @@ public class PrereadNamesTest extends TestCase {
   }
 
   public void testLoadPointersSplit2() throws Exception {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
     //long[] seqIndex = {2, 1, 1, 1, 1};
     final DataFileIndex seqIndex = DataFileIndex.loadLabelDataFileIndex(new IndexFile(mDir).dataIndexVersion(), mDir);
@@ -181,9 +181,9 @@ public class PrereadNamesTest extends TestCase {
 
 
   public void testPartialLoad() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    PrereadNames names = new PrereadNames(mDir, new LongRange(3, 8));
+    final PrereadNames names = new PrereadNames(mDir, new LongRange(3, 8));
     assertEquals(5, names.length());
     assertEquals("3234567890123456789", names.name(0));
     assertEquals("423456", names.name(1));
@@ -194,9 +194,9 @@ public class PrereadNamesTest extends TestCase {
   }
 
   public void testPartialLoad2() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    PrereadNames names = new PrereadNames(mDir, new LongRange(5, 8));
+    final PrereadNames names = new PrereadNames(mDir, new LongRange(5, 8));
     assertEquals(3, names.length());
     assertEquals("523456", names.name(0));
     assertEquals("623456", names.name(1));
@@ -205,9 +205,9 @@ public class PrereadNamesTest extends TestCase {
   }
 
   public void testFullLoad() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
+    final PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
 
     assertEquals("0234567890123456", names.name(0));
     assertEquals("1234567890123456", names.name(1));
@@ -222,7 +222,7 @@ public class PrereadNamesTest extends TestCase {
 
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     final StringWriter sb = new StringWriter();
-    int[] reads = {4, 5, 3, 8};
+    final int[] reads = {4, 5, 3, 8};
     try {
       for (int read : reads) {
         bos.write(" ".getBytes());
@@ -233,21 +233,21 @@ public class PrereadNamesTest extends TestCase {
     } finally {
       bos.close();
     }
-    String expected = " 423456 523456 3234567890123456789 823456";
+    final String expected = " 423456 523456 3234567890123456789 823456";
     assertEquals(expected, bos.toString());
     assertEquals(expected, sb.toString());
   }
   public void testEmpty() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(1L), 20);
     reader.close();
-    PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
+    final PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
     assertEquals(0, names.length());
   }
 
   public void testEmptyRegion() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    PrereadNames names = new PrereadNames(mDir, new LongRange(2, 2));
+    final PrereadNames names = new PrereadNames(mDir, new LongRange(2, 2));
     assertEquals(0, names.length());
   }
 

@@ -37,8 +37,8 @@ public class IntervalComparatorTest extends TestCase {
 
 
   public void testCompare() {
-    SequenceNameLocus pos1 = new SequenceNameLocusSimple("10", 100, 102);
-    IntervalComparator comp = new IntervalComparator();
+    final SequenceNameLocus pos1 = new SequenceNameLocusSimple("10", 100, 102);
+    final IntervalComparator comp = new IntervalComparator();
 
     assertTrue(comp.compare(pos1, new SequenceNameLocusSimple("10", 100, 102)) == 0);
     assertTrue(comp.compare(pos1, new SequenceNameLocusSimple("10", 101, 103)) < 0);

@@ -40,11 +40,11 @@ import junit.framework.TestSuite;
 public class MonUtilsTest extends TestCase {
 
   public void test() throws IOException {
-    double n = 0.13213;
+    final double n = 0.13213;
     assertEquals("0.13", MonUtils.NF2.format(n));
     assertEquals("0.1", MonUtils.NF1.format(n));
     assertEquals("0", MonUtils.NF0.format(n));
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
     MonUtils.pad(sb, "0", 3);
     assertEquals("  0", sb.toString());
 

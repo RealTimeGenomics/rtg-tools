@@ -46,7 +46,7 @@ public class SequenceToTaxonIdsTest extends TestCase {
    */
   public void testSequenceToIds() throws IOException {
     final String example = "1000\tmysequence1\n5454\tmysequence2 has extra stuff going on\n";
-    Map<String, Integer> result = SequenceToTaxonIds.sequenceToIds(new StringReader(example));
+    final Map<String, Integer> result = SequenceToTaxonIds.sequenceToIds(new StringReader(example));
     assertTrue(result.size() == 2);
     assertTrue(result.containsKey("mysequence1"));
     assertEquals(1000, (int) result.get("mysequence1"));

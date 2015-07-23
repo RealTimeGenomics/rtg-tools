@@ -40,8 +40,8 @@ import junit.framework.TestSuite;
 public class DiskStatsTest extends TestCase {
 
   public void test() throws IOException {
-    DiskStats ds = new DiskStats("rubbish");
-    StringBuffer sb = new StringBuffer();
+    final DiskStats ds = new DiskStats("rubbish");
+    final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
     assertEquals(sb.toString(), 0, sb.length());
     sb.setLength(0);
@@ -56,8 +56,8 @@ public class DiskStatsTest extends TestCase {
   }
 
   public void test2() throws IOException {
-    DiskStats ds = new DiskStats("sda");
-    StringBuffer sb = new StringBuffer();
+    final DiskStats ds = new DiskStats("sda");
+    final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
     assertEquals(0, sb.length());
 

@@ -106,7 +106,7 @@ public class SlimExceptionTest extends TestCase {
   }
 
   private void checkExceptionLogging(final SlimException e) throws IOException {
-    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     try {
       final PrintStream ps = new PrintStream(bos);
       Diagnostic.setLogStream(ps);

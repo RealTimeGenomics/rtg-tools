@@ -275,7 +275,7 @@ public class UsageServerTest extends TestCase {
         }
 
         try {
-          HttpURLConnection http = client.openConnection();
+          final HttpURLConnection http = client.openConnection();
           http.setConnectTimeout(1000);
           http.setReadTimeout(1000);
           http.setRequestMethod("GET");

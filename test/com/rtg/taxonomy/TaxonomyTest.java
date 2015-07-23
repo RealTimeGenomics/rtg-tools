@@ -93,7 +93,7 @@ public class TaxonomyTest extends TestCase {
   public void testAddNode() {
     final Taxonomy tax = makeTaxonomy();
     int i = 0;
-    int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
+    final int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
     for (TaxonNode tn : tax.getRoot().depthFirstTraversal()) {
       assertEquals(ids[i], tn.getId());
       if (tn.getId() != 1) {
@@ -207,7 +207,7 @@ public class TaxonomyTest extends TestCase {
     assertTrue(tax.isConsistent());
 
     for (int i = 10; i >= 3; i--) {
-      int parId = (i - 2) / 3 + 1;
+      final int parId = (i - 2) / 3 + 1;
       tax.addNode(i, parId, "node" + i, "rank" + i);
       assertFalse("i:" + i, tax.isConsistent());
       assertTrue("i:" + i, tax.getInconsistencyReason().contains("does not have a name."));
@@ -220,7 +220,7 @@ public class TaxonomyTest extends TestCase {
     assertNotNull(tax.getRoot());
 
     int i = 0;
-    int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
+    final int[] ids = {1, 2, 5, 6, 7, 3, 8, 9, 10, 4};
     for (TaxonNode tn : tax.getRoot().depthFirstTraversal()) {
       assertEquals(ids[i], tn.getId());
       if (tn.getId() != 1) {

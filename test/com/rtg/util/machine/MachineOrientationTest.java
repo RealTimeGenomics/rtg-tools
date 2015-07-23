@@ -94,24 +94,24 @@ public class MachineOrientationTest extends TestCase {
   public void testUnjumbleableIllumina() throws IOException {
     final MachineType illumina = MachineType.ILLUMINA_PE;
     final MachineOrientation orientationIllumina = illumina.orientation();
-    SAMRecord rec = readOneSamRecord(SAM_REC1);
+    final SAMRecord rec = readOneSamRecord(SAM_REC1);
     assertTrue(orientationIllumina.firstOnTemplate(rec));
     assertTrue(orientationIllumina.hasValidMate(rec));
 
-    SAMRecord rec2 = readOneSamRecord(SAM_REC2);
+    final SAMRecord rec2 = readOneSamRecord(SAM_REC2);
     assertFalse(orientationIllumina.firstOnTemplate(rec2));
     assertTrue(orientationIllumina.hasValidMate(rec2));
 
-    SAMRecord rec3 = readOneSamRecord(SAM_REC3);
+    final SAMRecord rec3 = readOneSamRecord(SAM_REC3);
     assertFalse(orientationIllumina.hasValidMate(rec3));
 
-    SAMRecord rec4 = readOneSamRecord(SAM_REC4);
+    final SAMRecord rec4 = readOneSamRecord(SAM_REC4);
     assertFalse(orientationIllumina.hasValidMate(rec4));
 
-    SAMRecord rec5 = readOneSamRecord(SAM_REC5);
+    final SAMRecord rec5 = readOneSamRecord(SAM_REC5);
     assertFalse(orientationIllumina.hasValidMate(rec5));
 
-    SAMRecord rec6 = readOneSamRecord(SAM_REC6);
+    final SAMRecord rec6 = readOneSamRecord(SAM_REC6);
     assertFalse(orientationIllumina.hasValidMate(rec6));
 
   }
@@ -119,20 +119,20 @@ public class MachineOrientationTest extends TestCase {
   public void testUnjumbleableCg() throws IOException {
     final MachineType cg = MachineType.COMPLETE_GENOMICS;
     final MachineOrientation orientationCg = cg.orientation();
-    SAMRecord rec = readOneSamRecord(SAM_REC8);
+    final SAMRecord rec = readOneSamRecord(SAM_REC8);
     assertTrue(orientationCg.hasValidMate(rec));
 
-    SAMRecord rec7 = readOneSamRecord(SAM_REC7);
+    final SAMRecord rec7 = readOneSamRecord(SAM_REC7);
     assertFalse(orientationCg.hasValidMate(rec7));
 
-    SAMRecord rec4 = readOneSamRecord(SAM_REC4);
+    final SAMRecord rec4 = readOneSamRecord(SAM_REC4);
     assertTrue(orientationCg.hasValidMate(rec4));
     assertTrue(orientationCg.firstOnTemplate(rec4));
 
-    SAMRecord rec5 = readOneSamRecord(SAM_REC5);
+    final SAMRecord rec5 = readOneSamRecord(SAM_REC5);
     assertFalse(orientationCg.hasValidMate(rec5));
 
-    SAMRecord rec6 = readOneSamRecord(SAM_REC6);
+    final SAMRecord rec6 = readOneSamRecord(SAM_REC6);
     assertFalse(orientationCg.hasValidMate(rec6));
 
   }
@@ -145,7 +145,7 @@ public class MachineOrientationTest extends TestCase {
       final String inn = input.getPath();
 
       final SAMRecord rec;
-      File samfile = new File(inn + FS + OUT_SAM);
+      final File samfile = new File(inn + FS + OUT_SAM);
       try (SamReader reader = SamUtils.makeSamReader(FileUtils.createInputStream(samfile, false))) {
         final CloseableIterator<SAMRecord> iterator = reader.iterator();
         if (iterator.hasNext()) {

@@ -107,12 +107,12 @@ public class LoggedCliTest extends TestCase {
   }
 
   public void testLogging() throws Exception {
-    FakeCli tlcli = new FakeCli(mDir, 0, false);
+    final FakeCli tlcli = new FakeCli(mDir, 0, false);
 
     tlcli.initFlags();
     assertEquals(0, tlcli.mainExec(TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
 
-    File newFile = new File(mDir, "new");
+    final File newFile = new File(mDir, "new");
     assertTrue(newFile.exists());
     assertTrue(tlcli.mBools[0]);
 
@@ -142,12 +142,12 @@ public class LoggedCliTest extends TestCase {
   }
 
   public void testLoggingFail() throws Exception {
-    FakeCli tlcli = new FakeCli(mDir, 1, false);
+    final FakeCli tlcli = new FakeCli(mDir, 1, false);
     tlcli.initFlags();
 
     assertEquals(1, tlcli.mainExec(TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
 
-    File newFile = new File(mDir, "new");
+    final File newFile = new File(mDir, "new");
     assertTrue(newFile.exists());
     assertTrue(tlcli.mBools[0]);
 
@@ -174,7 +174,7 @@ public class LoggedCliTest extends TestCase {
   }
 
   public void testLoggingThrown() throws Exception {
-    FakeCli tlcli = new FakeCli(mDir, 0, true);
+    final FakeCli tlcli = new FakeCli(mDir, 0, true);
     tlcli.initFlags();
 
     try {
@@ -184,7 +184,7 @@ public class LoggedCliTest extends TestCase {
       //expected
     }
 
-    File newFile = new File(mDir, "new");
+    final File newFile = new File(mDir, "new");
     assertTrue(newFile.exists());
     assertTrue(tlcli.mBools[0]);
 
@@ -217,7 +217,7 @@ public class LoggedCliTest extends TestCase {
     final File dir = FileUtils.createTempDir("loggedclitest", "blah");
 
     try {
-      LoggedCli tlcli = new LoggedCli() {
+      final LoggedCli tlcli = new LoggedCli() {
 
         @Override
         protected int mainExec(OutputStream out, LogStream log) {
@@ -244,11 +244,11 @@ public class LoggedCliTest extends TestCase {
       };
 
       // Can we create a directory
-      ByteArrayOutputStream errbaos = new ByteArrayOutputStream();
+      final ByteArrayOutputStream errbaos = new ByteArrayOutputStream();
       tlcli.createDirectory(tlcli.outputDirectory());
       tlcli.cleanDirectory();
       tlcli.initFlags();
-      File newFile = new File(dir, "new");
+      final File newFile = new File(dir, "new");
       assertTrue(newFile.exists());
 
       // Output directory now already exists. We should not delete it when we run

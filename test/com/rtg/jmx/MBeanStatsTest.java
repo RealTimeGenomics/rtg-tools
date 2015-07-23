@@ -42,8 +42,8 @@ public class MBeanStatsTest extends TestCase {
   private static final String LS = System.lineSeparator();
 
   public void test() throws IOException {
-    MBeanStats ds = new MBeanStats();
-    StringBuffer sb = new StringBuffer();
+    final MBeanStats ds = new MBeanStats();
+    final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
     assertEquals(8, sb.toString().split(LS).length);
   }

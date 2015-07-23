@@ -483,8 +483,8 @@ public class VcfEvalTaskTest extends TestCase {
         // Expected
       }
 
-      String[] names = new String[31];
-      int[] lengths = new int[31];
+      final String[] names = new String[31];
+      final int[] lengths = new int[31];
       for (int seq = 1; seq < 32; seq++) {
         names[seq - 1] = "simulatedSequence" + seq;
         lengths[seq - 1] = 1000;

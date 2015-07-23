@@ -59,12 +59,12 @@ public class MultiMapTest extends TestCase {
     ;
 
   public void testDefaultCon() {
-    MultiMap<Integer, String> mm = new MultiMap<>();
+    final MultiMap<Integer, String> mm = new MultiMap<>();
     checkMap(mm, EXPECTED);
   }
 
   public void testCon() {
-    MultiMap<Integer, String> mm = new MultiMap<>(new HashMap<Integer, Collection<String>>()
+    final MultiMap<Integer, String> mm = new MultiMap<>(new HashMap<Integer, Collection<String>>()
         , new MultiMapFactory<String>() {
       @Override
       public Collection<String> createCollection() {

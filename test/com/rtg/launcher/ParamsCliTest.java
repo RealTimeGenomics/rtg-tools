@@ -169,7 +169,7 @@ public class ParamsCliTest extends TestCase {
     final File dir = FileUtils.createTempDir("paramscli", "test");
     try {
       final MemoryPrintStream err = new MemoryPrintStream();
-      TestParamsCli cli = new TestParamsCli(false, false, dir);
+      final TestParamsCli cli = new TestParamsCli(false, false, dir);
       final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
       assertEquals(err.toString(), 0, code);
       assertTrue(cli.hasRan());
@@ -186,7 +186,7 @@ public class ParamsCliTest extends TestCase {
     final File dir = FileUtils.createTempDir("paramscli", "test");
     try {
       final MemoryPrintStream err = new MemoryPrintStream();
-      TestParamsCli cli = new TestParamsCli(true, false, dir);
+      final TestParamsCli cli = new TestParamsCli(true, false, dir);
       final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
       assertEquals(err.toString(), 1, code);
       assertTrue(err.toString().contains("Test error"));
@@ -204,7 +204,7 @@ public class ParamsCliTest extends TestCase {
     final File dir = FileUtils.createTempDir("paramscli", "test");
     try {
       final MemoryPrintStream err = new MemoryPrintStream();
-      TestParamsCli cli = new TestParamsCli(true, true, dir);
+      final TestParamsCli cli = new TestParamsCli(true, true, dir);
       final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
       assertEquals(err.toString(), 1, code);
       assertTrue(err.toString().contains("Test error"));
@@ -221,7 +221,7 @@ public class ParamsCliTest extends TestCase {
   public void testCheckFiles() throws IOException, InvalidParamsException {
     final File dir = FileUtils.createTempDir("paramscli", "test");
     try {
-      ArrayList<Object> files = new ArrayList<>();
+      final ArrayList<Object> files = new ArrayList<>();
       final File created = new File(dir, "exists");
       final File fobar = new File(dir, "fobar");
       assertTrue(created.createNewFile());

@@ -39,8 +39,8 @@ import junit.framework.TestCase;
 public class CappedConcurrentLinkedListTest extends TestCase {
 
   public void test() {
-    CappedConcurrentLinkedList<Integer> ll = new CappedConcurrentLinkedList<>(1, 0);
-    Integer one = 1;
+    final CappedConcurrentLinkedList<Integer> ll = new CappedConcurrentLinkedList<>(1, 0);
+    final Integer one = 1;
     ll.add(one);
     assertEquals(one, ll.peek());
     assertEquals(one, ll.poll());
@@ -54,7 +54,7 @@ public class CappedConcurrentLinkedListTest extends TestCase {
   /**
    */
   public void testUnsupported() {
-    CappedConcurrentLinkedList<Integer> ll = new CappedConcurrentLinkedList<>(1, 0);
+    final CappedConcurrentLinkedList<Integer> ll = new CappedConcurrentLinkedList<>(1, 0);
     try {
       ll.addAll(null);
       fail();

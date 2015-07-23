@@ -76,7 +76,7 @@ public class GzipAsynchInputStreamTest extends AsynchInputStreamTest {
       long count = 0;
       //    final long t1 = System.nanoTime();
       try (GZIPOutputStream output = new GZIPOutputStream(new FileOutputStream(tempOut))) {
-        InputStream input;
+        final InputStream input;
         if (asynch) {
           final GzipAsynchInputStream asynchInput = new GzipAsynchInputStream(temp, bufSize - 1, gzipSize - 1);
           assertEquals(bufSize - 1, asynchInput.mQueue.maxSize());

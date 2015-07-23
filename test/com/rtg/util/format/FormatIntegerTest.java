@@ -217,7 +217,7 @@ public class FormatIntegerTest extends TestCase {
 
     final FormatInteger fmt = new FormatInteger(12);
 
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     assertEquals("            ", fmt.blanks(sb).toString());
 
     //sb = new StringBuilder();
@@ -237,7 +237,7 @@ public class FormatIntegerTest extends TestCase {
 
   public void testFormatNull() {
 
-    FormatInteger fi = new FormatInteger(10);
+    final FormatInteger fi = new FormatInteger(10);
     try {
       fi.format(null, 10);
       fail("should throw nullPointerException");
@@ -246,7 +246,7 @@ public class FormatIntegerTest extends TestCase {
 
 
   public static Test suite() {
-    TestSuite suite = new TestSuite();
+    final TestSuite suite = new TestSuite();
     suite.addTest(new TestSuite(FormatIntegerTest.class));
     return suite;
   }

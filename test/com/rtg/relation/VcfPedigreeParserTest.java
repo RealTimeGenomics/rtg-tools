@@ -114,7 +114,7 @@ public class VcfPedigreeParserTest extends TestCase {
   public void testNoInformationWarning() throws IOException {
     final GenomeRelationships ped = new GenomeRelationships();
     final PedigreeField f = new PedigreeField("##PEDIGREE=<Sibling=>");
-    MemoryPrintStream mps = new MemoryPrintStream();
+    final MemoryPrintStream mps = new MemoryPrintStream();
     Diagnostic.setLogStream(mps.printStream());
     VcfPedigreeParser.parsePedLine(ped, f);
     assertTrue(mps.toString().contains("Pedigree line contains no pedigree information: ##PEDIGREE=<Sibling=>"));

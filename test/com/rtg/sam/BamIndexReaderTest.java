@@ -53,8 +53,8 @@ public class BamIndexReaderTest extends TestCase {
       final File index = new File(dir, "mated.bam.bai");
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.bam.bai", index);
       final SAMFileHeader header = SamUtils.getSingleHeader(bam);
-      BamIndexReader tir = new BamIndexReader(index, header.getSequenceDictionary());
-      VirtualOffsets positions = tir.getFilePointers(SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("simulatedSequence", 0, 5000)));
+      final BamIndexReader tir = new BamIndexReader(index, header.getSequenceDictionary());
+      final VirtualOffsets positions = tir.getFilePointers(SamRangeUtils.createExplicitReferenceRange(header, new SamRegionRestriction("simulatedSequence", 0, 5000)));
       assertEquals(151L, positions.start(0));
       assertEquals((446375L << 16) | 49187, positions.end(0));
     } finally {

@@ -173,16 +173,16 @@ public final class ByteArrayIOUtilsTest extends TestCase {
     }
 
 
-    ByteBuffer bb1 = ByteBuffer.wrap(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
-    long l1 = bb1.order(ByteOrder.LITTLE_ENDIAN).asLongBuffer().get();
+    final ByteBuffer bb1 = ByteBuffer.wrap(new byte[] {1, 2, 3, 4, 5, 6, 7, 8});
+    final long l1 = bb1.order(ByteOrder.LITTLE_ENDIAN).asLongBuffer().get();
     assertEquals(l1 /*578437695752307201L*/, ByteArrayIOUtils.bytesToLongLittleEndian(new byte[] {1, 2, 3, 4, 5, 6, 7, 8}, 0));
     bs = new byte[8];
     ByteArrayIOUtils.longToBytesLittleEndian(578437695752307201L, bs, 0);
     assertTrue(Arrays.equals(new byte[] {1, 2, 3, 4, 5, 6, 7, 8}, bs));
 
 
-    ByteBuffer bb = ByteBuffer.wrap(new byte[] {80, 77, -108, -128, 0, 0, 0, 0});
-    long l = bb.order(ByteOrder.LITTLE_ENDIAN).asLongBuffer().get();
+    final ByteBuffer bb = ByteBuffer.wrap(new byte[] {80, 77, -108, -128, 0, 0, 0, 0});
+    final long l = bb.order(ByteOrder.LITTLE_ENDIAN).asLongBuffer().get();
     assertEquals(l, ByteArrayIOUtils.bytesToLongLittleEndian(new byte[] {80, 77, -108, -128, 0, 0, 0, 0}, 0));
     try {
       ByteArrayIOUtils.convertToLongArray(new byte[16], new long[1]);

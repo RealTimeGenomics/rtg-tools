@@ -38,7 +38,7 @@ public class AltFieldTest extends TestCase {
 
   public void testSomeMethod() {
     final String io = "##ALT=<ID=yo, Description=\"fun for the whole family\">";
-    AltField f = new AltField(io);
+    final AltField f = new AltField(io);
     assertEquals(io.replaceAll(",\\s+", ","), f.toString());
     assertEquals("yo", f.getId());
     assertEquals("fun for the whole family", f.getDescription());

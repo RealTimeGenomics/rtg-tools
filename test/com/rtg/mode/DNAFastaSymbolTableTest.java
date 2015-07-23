@@ -47,7 +47,7 @@ public class DNAFastaSymbolTableTest extends TestCase {
    * Test method for {@link DNAFastaSymbolTable#scanResidue(int)}.
    */
   public final void testScanResidue() {
-    DNAFastaSymbolTable t = new DNAFastaSymbolTable();
+    final DNAFastaSymbolTable t = new DNAFastaSymbolTable();
     assertEquals(DNA.A, t.scanResidue('A'));
     assertEquals(DNA.C, t.scanResidue('C'));
     assertEquals(DNA.G, t.scanResidue('G'));
@@ -62,7 +62,7 @@ public class DNAFastaSymbolTableTest extends TestCase {
    * Test method for {@link DNAFastaSymbolTable#unknownResidue()}.
    */
   public final void testUnknownResidue() {
-    DNAFastaSymbolTable table = new DNAFastaSymbolTable();
+    final DNAFastaSymbolTable table = new DNAFastaSymbolTable();
     assertEquals(DNA.N, table.unknownResidue());
   }
 
@@ -70,7 +70,7 @@ public class DNAFastaSymbolTableTest extends TestCase {
    * Test method for {@link DNAFastaSymbolTable#getSequenceType()}.
    */
   public final void testGetSequenceType() {
-    DNAFastaSymbolTable t = new DNAFastaSymbolTable();
+    final DNAFastaSymbolTable t = new DNAFastaSymbolTable();
     assertEquals(SequenceType.DNA, t.getSequenceType());
   }
 

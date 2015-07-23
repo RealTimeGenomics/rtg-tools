@@ -85,7 +85,7 @@ public class GenotypeProportionsTest extends TestCase {
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }
-    MemoryPrintStream mps = new MemoryPrintStream();
+    final MemoryPrintStream mps = new MemoryPrintStream();
     prop.writeResults(mps.printStream());
     mNano.check(resultName, mps.toString());
   }

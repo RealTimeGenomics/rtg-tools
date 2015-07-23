@@ -44,7 +44,7 @@ public class SamRegionRestrictionTest extends TestCase {
 
   public void testSomeMethod() {
     SamRegionRestriction srr = new SamRegionRestriction("fooo");
-    SAMSequenceDictionary sdd = new SAMSequenceDictionary();
+    final SAMSequenceDictionary sdd = new SAMSequenceDictionary();
     sdd.addSequence(new SAMSequenceRecord("fooo", 9876));
     assertEquals(0, srr.resolveStart());
     assertEquals(9876, srr.resolveEnd(sdd));
@@ -77,7 +77,7 @@ public class SamRegionRestrictionTest extends TestCase {
     } catch (IllegalArgumentException e) {
       assertEquals("Malformed range in restriction: \"fooo:-2-3\"", e.getMessage());
     }
-    SamRegionRestriction srr = new SamRegionRestriction("fooo:1-2");
+    final SamRegionRestriction srr = new SamRegionRestriction("fooo:1-2");
     assertEquals("fooo", srr.getSequenceName());
     assertEquals(0, srr.getStart());
     assertEquals(2, srr.getEnd());

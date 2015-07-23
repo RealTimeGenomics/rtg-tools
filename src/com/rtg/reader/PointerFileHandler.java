@@ -163,7 +163,7 @@ abstract class PointerFileHandler {
     final long remaining = pointerRoller.randomAccessFile().length() - pointerRoller.randomAccessFile().getPosition();
     if (remaining >= mEntrySize) {
       readChecksums(pointerRoller.randomAccessFile());
-      int nextseqpos;
+      final int nextseqpos;
       nextseqpos = readInt(pointerRoller.randomAccessFile()); //.readInt();
       length = nextseqpos - seqpos;
     } else if (mChecksumSize > 0 && remaining >= mChecksumSize) {

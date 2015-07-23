@@ -62,7 +62,7 @@ class LabelStreamManager extends AbstractStreamManager {
     final long seqpos = readInt(mPointers.randomAccessFile()); //.readInt();
     final long length;
     if (mPointers.randomAccessFile().length() - mPointers.randomAccessFile().getPosition() >= 4L) {
-      int nextseqpos;
+      final int nextseqpos;
       nextseqpos = readInt(mPointers.randomAccessFile()); //.readInt();
       length = nextseqpos - seqpos;
     } else {

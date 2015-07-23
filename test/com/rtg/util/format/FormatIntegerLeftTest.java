@@ -188,7 +188,7 @@ public class FormatIntegerLeftTest extends TestCase {
   }
 
   public void testToString() {
-    FormatIntegerLeft left = new FormatIntegerLeft(12);
+    final FormatIntegerLeft left = new FormatIntegerLeft(12);
 
     StringBuilder buff = new StringBuilder(11);
     buff = left.format(buff, 54555L);

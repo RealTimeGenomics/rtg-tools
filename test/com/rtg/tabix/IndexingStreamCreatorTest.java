@@ -46,12 +46,12 @@ public class IndexingStreamCreatorTest extends TestCase {
   public void testIt() throws IOException {
     try (TestDirectory dir = new TestDirectory("isct")) {
       final File vcfFile = new File(dir, "thingy.vcf.gz");
-      VcfHeader header = new VcfHeader();
+      final VcfHeader header = new VcfHeader();
       header.addCommonHeader();
       header.addSampleName("sample");
       try (IndexingStreamCreator streamHandler = new IndexingStreamCreator(vcfFile, System.out, true, new TabixIndexer.VcfIndexerFactory(), true)) {
         try (VcfWriter writer = new VcfWriter(header, streamHandler.createStreamsAndStartThreads())) {
-          VcfRecord rec = new VcfRecord();
+          final VcfRecord rec = new VcfRecord();
           rec.setNumberOfSamples(1);
           rec.setSequence("foo");
           rec.setStart(1000);

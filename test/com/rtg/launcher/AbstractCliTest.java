@@ -136,7 +136,7 @@ public abstract class AbstractCliTest extends TestCase {
   protected String checkHandleFlagsOut(String... args) {
     final StringWriter writer = new StringWriter();
     final MemoryPrintStream err = new MemoryPrintStream();
-    boolean val = mCli.handleFlags(args, writer, err.printStream());
+    final boolean val = mCli.handleFlags(args, writer, err.printStream());
     assertTrue(err.toString(), val);
     return writer.toString();
   }

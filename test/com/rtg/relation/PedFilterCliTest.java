@@ -48,7 +48,7 @@ public class PedFilterCliTest extends AbstractCliTest {
   }
 
   private GenomeRelationships makeTestPed() {
-    GenomeRelationships genomeRelationships = new GenomeRelationships();
+    final GenomeRelationships genomeRelationships = new GenomeRelationships();
     genomeRelationships.addGenome("father", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
     genomeRelationships.addGenome("mother", GenomeRelationships.SEX_FEMALE);
     genomeRelationships.addGenome("child", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
@@ -63,7 +63,7 @@ public class PedFilterCliTest extends AbstractCliTest {
       final GenomeRelationships ped = makeTestPed();
       FileUtils.stringToFile(PedFileParser.toString(ped), relationFile);
 
-      String output = checkMainInitOk("--vcf", relationFile.toString());
+      final String output = checkMainInitOk("--vcf", relationFile.toString());
       mNano.check("pedfilter-tovcf.txt", StringUtils.grepMinusV(output, "^##(RUN-ID|CL|fileDate|source)"));
     }
   }

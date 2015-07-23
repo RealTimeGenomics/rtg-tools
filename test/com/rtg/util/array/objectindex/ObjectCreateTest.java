@@ -70,7 +70,7 @@ public class ObjectCreateTest extends TestCase {
     final ObjectIndex<Integer> index = ObjectCreate.createIndex(0);
     index.integrity();
     final ObjectIndex<Integer> i = ObjectCreate.createIndex(20);
-    boolean test = i instanceof ObjectArray;
+    final boolean test = i instanceof ObjectArray;
     assertTrue(test);
   }
 }

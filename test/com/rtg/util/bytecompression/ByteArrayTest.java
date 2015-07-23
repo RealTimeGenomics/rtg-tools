@@ -98,7 +98,7 @@ public class ByteArrayTest extends TestCase {
     final byte[] data = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0};
 
     for (int size = 1; size < data.length; size++) {
-      ByteArray array = getByteArray(100, 7);
+      final ByteArray array = getByteArray(100, 7);
       long offset = 1L;  // because our get goes one byte before offset.
       while (offset < array.length()) {
         final int safeWrite = Math.min(size, (int) (array.length() - offset));

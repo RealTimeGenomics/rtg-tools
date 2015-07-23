@@ -46,7 +46,7 @@ public class EnumHelperTest extends TestCase {
   }
 
   public void testEnum() {
-    EnumHelper<BidirectionalFrame> helper = new EnumHelper<>(BidirectionalFrame.class, new BidirectionalFrame[] {BidirectionalFrame.FORWARD, BidirectionalFrame.REVERSE});
+    final EnumHelper<BidirectionalFrame> helper = new EnumHelper<>(BidirectionalFrame.class, new BidirectionalFrame[] {BidirectionalFrame.FORWARD, BidirectionalFrame.REVERSE});
     try {
       helper.valueOf("temp");
       fail();

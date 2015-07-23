@@ -181,7 +181,7 @@ public class PrereadVerifierTest extends TestCase {
             continue;
           }
           assertTrue("PlaceToMutate fail, seed was: " + rnd.getSeed(), placeToMutate < size && placeToMutate >= 0);
-          String desc;
+          final String desc;
           try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
             f.seek(placeToMutate);
             final int current = f.readByte();
@@ -268,7 +268,7 @@ public class PrereadVerifierTest extends TestCase {
           if (size > 1) {
             final int placeToTruncate = size == 32 ? 24 : rnd.nextInt((int) size);
             assertTrue("PlaceToTruncate fail, seed was: " + rnd.getSeed(), placeToTruncate < size && placeToTruncate >= 0);
-            String desc;
+            final String desc;
             try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
               f.setLength(placeToTruncate);
               desc = "Truncated target " + t + "/" + targets.length + " " + target.getPath() + " (length " + size + ") to " + placeToTruncate

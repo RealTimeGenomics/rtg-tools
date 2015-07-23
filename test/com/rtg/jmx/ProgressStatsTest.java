@@ -42,8 +42,8 @@ import junit.framework.TestSuite;
 public class ProgressStatsTest extends TestCase {
 
   public void test() throws IOException {
-    ProgressStats ds = new ProgressStats();
-    StringBuffer sb = new StringBuffer();
+    final ProgressStats ds = new ProgressStats();
+    final StringBuffer sb = new StringBuffer();
     CommandLine.setCommandArgs("a", "simple", "command", "line");
     ds.addHeader(sb);
     assertTrue(sb.toString().startsWith("# Command line "));

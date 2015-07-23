@@ -103,7 +103,7 @@ public class MultiByteArrayTest extends TestCase {
     }
     // check the multi-getter.
     for (int start = 0; start < 8; start++) {
-      byte[] out = new byte[data.length];
+      final byte[] out = new byte[data.length];
       mba.get(out, start, data.length);
       for (int i = 0; i < data.length; i++) {
         assertEquals(data[(i + start) % data.length], out[i]);

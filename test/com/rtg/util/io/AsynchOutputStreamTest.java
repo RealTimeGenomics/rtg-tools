@@ -74,7 +74,7 @@ public class AsynchOutputStreamTest extends TestCase {
   public void testBufferSize() throws IOException {
     final File file = File.createTempFile("test", "gzipasynch");
     try {
-      GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
+      final GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
       checkWrite(file, out, 1024);
     } finally {
       assertTrue(FileHelper.deleteAll(file));
@@ -145,7 +145,7 @@ public class AsynchOutputStreamTest extends TestCase {
   public void testThreadName() throws IOException {
     final File file = File.createTempFile("test", "gzipasynch");
     try (FileOutputStream os = new FileOutputStream(file)) {
-      AsynchOutputStream out = new AsynchOutputStream(os);
+      final AsynchOutputStream out = new AsynchOutputStream(os);
       try {
         assertEquals("AsynchOutputStream", out.mThread.getName());
       } finally {

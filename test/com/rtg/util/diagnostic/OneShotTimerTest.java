@@ -55,8 +55,8 @@ public class OneShotTimerTest extends TestCase {
     final String s = ba.toString();
     //System.err.println(s);
     assertTrue(s.contains(" Timer One_timer "));
-    double time = Double.parseDouble(s.substring(s.lastIndexOf(' ')));
-    double timeActual = (finish - start) / 1000000000.0;
+    final double time = Double.parseDouble(s.substring(s.lastIndexOf(' ')));
+    final double timeActual = (finish - start) / 1000000000.0;
     assertEquals(time, timeActual, 0.1);
     pr.close();
     ba.close();

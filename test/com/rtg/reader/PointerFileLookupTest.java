@@ -35,13 +35,13 @@ import junit.framework.TestCase;
  */
 public class PointerFileLookupTest extends TestCase {
   public void testSpanning() {
-    int[][] pointers = {
+    final int[][] pointers = {
             new int[] {0, 35, 60}, //sequences 0 and start of 1
             new int[] {20, 19},    //end of 1, sequence 2
             new int[] {40},        //cont
             new int[] {3}          //fin
     };
-    PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
+    final PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
     assertEquals(0, p.lookup(0));
     assertEquals(0, p.lookup(1));
     assertEquals(1, p.lookup(2));
@@ -53,13 +53,13 @@ public class PointerFileLookupTest extends TestCase {
   }
 
   public void testNormal() {
-    int[][] pointers = {
+    final int[][] pointers = {
             new int[] {0, 35, 60, 90},
             new int[] {20, 19, 40, 60},
             new int[] {40, 50, 60, 70},
             new int[] {30, 40, 100, 200}
     };
-    PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
+    final PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
     assertEquals(0, p.lookup(0));
     assertEquals(0, p.lookup(1));
     assertEquals(0, p.lookup(2));
@@ -80,10 +80,10 @@ public class PointerFileLookupTest extends TestCase {
   }
 
   public void testSingleFile() {
-    int[][] pointers = {
+    final int[][] pointers = {
             new int[] {0, 35, 60, 90, 100}, //sequences 0, 1, 2, 3
     };
-    PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
+    final PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
     assertEquals(0, p.lookup(0));
     assertEquals(0, p.lookup(1));
     assertEquals(0, p.lookup(2));
@@ -92,11 +92,11 @@ public class PointerFileLookupTest extends TestCase {
     assertEquals(0, p.startSeq(0));
   }
   public void testDoubleFile() {
-    int[][] pointers = {
+    final int[][] pointers = {
             new int[] {0, 35, 60, 90, 100}, //sequences 0, 1, 2, 3
             new int[] {0, 35, 60, 90, 100}, //sequences 4, 5, 6, 7
     };
-    PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
+    final PointerFileLookup p = PointerFileLookup.generateLookup(pointers);
     assertEquals(0, p.lookup(0));
     assertEquals(0, p.lookup(1));
     assertEquals(0, p.lookup(2));

@@ -429,7 +429,7 @@ public class VariantStatisticsTest extends TestCase {
     try {
       FileUtils.stringToFile(VCF, vcfFile);
       final MemoryPrintStream ps = new MemoryPrintStream();
-      int res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--allele-lengths"}, ps.outputStream(), ps.printStream());
+      final int res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--allele-lengths"}, ps.outputStream(), ps.printStream());
       assertEquals(ps.toString(), 0, res);
       final String outVariant = ps.toString();
       mNano.check("variantstatistics2.txt", outVariant.substring(outVariant.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);

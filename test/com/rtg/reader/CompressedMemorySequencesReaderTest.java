@@ -261,10 +261,10 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
           + "@r5" + LS + "ACGTAC" + LS                                        //6  84 file4
           + "+" + LS + "EEEEEE" + LS;
   public void testPartialFastq() throws Exception {
-    SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, false);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, false);
     reader.close();
 
-    SequencesIterator cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(3, 5)).iterator();
+    final SequencesIterator cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(3, 5)).iterator();
 
     cmsr.nextSequence();
     checkFastq(cmsr, "r3", "ACGTACGTACGTACGTACGT");
@@ -275,7 +275,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
   }
 
   public void testOverEndFastq() throws Exception {
-    SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, false);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, false);
     reader.close();
 
     new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(3, 8));
@@ -283,7 +283,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
   }
 
   void checkFastq(SequencesIterator it, String name, String read) throws IOException {
-      byte[] readBytes = new byte[it.currentLength()];
+      final byte[] readBytes = new byte[it.currentLength()];
       it.readCurrent(readBytes);
       assertEquals(name, it.currentName());
       assertEquals(read, DnaUtils.bytesToSequenceIncCG(readBytes));
@@ -297,19 +297,19 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     reader.close();
 
     final CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, LongRange.NONE);
-    byte[] foo = new byte[6];
+    final byte[] foo = new byte[6];
     cmsr.readQuality(0, foo, 4, 6);
-    String qual = "EFGHIJ";
+    final String qual = "EFGHIJ";
     for (int i = 0; i < foo.length; i++) {
       assertEquals(qual.charAt(i) - '!', foo[i]);
     }
   }
 
   public void testFastqEnd() throws Exception {
-    SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, 20, false);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNAFastq(POSITIONS_FASTQ, mDir, 20, false);
     reader.close();
 
-    SequencesIterator cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(5, 6)).iterator();
+    final SequencesIterator cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(5, 6)).iterator();
 
     cmsr.nextSequence();
     checkFastq(cmsr, "r5", "ACGTAC");
@@ -323,8 +323,8 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     ReaderTestUtils.getReaderDNAFastq("", dir, false).close();
     ReaderTestUtils.getReaderDNAFastq("", otherDir, false).close();
 
-    CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(dir, new IndexFile(dir), 5, true, false, new LongRange(0, 0));
-    CompressedMemorySequencesReader other = new CompressedMemorySequencesReader(otherDir, new IndexFile(dir), 5, true, false, new LongRange(0, 0));
+    final CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(dir, new IndexFile(dir), 5, true, false, new LongRange(0, 0));
+    final CompressedMemorySequencesReader other = new CompressedMemorySequencesReader(otherDir, new IndexFile(dir), 5, true, false, new LongRange(0, 0));
     assertTrue(cmsr.equals(cmsr));
     assertFalse(cmsr.equals(null));
     assertFalse(cmsr.equals(other));
@@ -332,16 +332,16 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
   }
 
   public void testEmptyFastq() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNAFastq("", mDir, false);
+    final SequencesReader reader = ReaderTestUtils.getReaderDNAFastq("", mDir, false);
     reader.close();
-    CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(0, 0));
+    final CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(0, 0));
     assertEquals(0, cmsr.numberSequences());
 
   }
   public void testEmptyFasta() throws IOException {
-    SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(0L));
+    final SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(0L));
     reader.close();
-    CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(0, 0));
+    final CompressedMemorySequencesReader cmsr = new CompressedMemorySequencesReader(mDir, new IndexFile(mDir), 5, true, false, new LongRange(0, 0));
     assertEquals(0, cmsr.numberSequences());
 
   }

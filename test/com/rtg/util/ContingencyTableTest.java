@@ -36,7 +36,7 @@ import junit.framework.TestCase;
 public class ContingencyTableTest extends TestCase {
 
   public void test() {
-    ContingencyTable eval = new ContingencyTable(100, 50, 25, 10);
+    final ContingencyTable eval = new ContingencyTable(100, 50, 25, 10);
 
     assertEquals(100.0, eval.truePositives());
     assertEquals(50.0, eval.falsePositives());

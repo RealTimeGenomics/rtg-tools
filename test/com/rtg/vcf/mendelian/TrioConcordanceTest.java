@@ -38,7 +38,7 @@ import junit.framework.TestCase;
 public class TrioConcordanceTest extends TestCase {
 
   public void testConcordance() throws IOException {
-    TrioConcordance tc = new TrioConcordance("child", "father", "mother");
+    final TrioConcordance tc = new TrioConcordance("child", "father", "mother");
 
     for (int i = 0; i < 25; i++) {
       tc.add(new Genotype("0/0"), new Genotype("0/0"), new Genotype("0/0"));

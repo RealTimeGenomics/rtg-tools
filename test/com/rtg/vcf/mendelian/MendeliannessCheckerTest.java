@@ -116,7 +116,7 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       try {
         final MendeliannessChecker chk = (MendeliannessChecker) getCli();
 
-        int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath(), "-Z", "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath()}, bos, new PrintStream(bos));
+        final int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath(), "-Z", "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath()}, bos, new PrintStream(bos));
         assertEquals(0, ret);
       } finally {
         bos.close();
@@ -134,7 +134,7 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       final ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
       try {
         final MendeliannessChecker chk = (MendeliannessChecker) getCli();
-        int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath()}, bos3, new PrintStream(bos));
+        final int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath()}, bos3, new PrintStream(bos));
         assertEquals(0, ret);
       } finally {
         bos3.close();

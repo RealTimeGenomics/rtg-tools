@@ -49,7 +49,7 @@ public class FlagCountExceptionTest extends TestCase {
    * Test method for {@link com.rtg.util.cli.FlagCountException#FlagCountException(java.lang.String)}.
    */
   public final void testFlagCountException() {
-    FlagCountException fex = new FlagCountException("This is flag count exception");
+    final FlagCountException fex = new FlagCountException("This is flag count exception");
     try {
       throw fex;
     } catch (final FlagCountException ex) {

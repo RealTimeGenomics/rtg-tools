@@ -75,7 +75,7 @@ public class CompressedByteArrayTest extends TestCase {
     final byte[] data = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0};
 
     for (int size = 1; size < data.length; size++) {
-      CompressedByteArray array = new CompressedByteArray(100, 22, 2, 9, false);
+      final CompressedByteArray array = new CompressedByteArray(100, 22, 2, 9, false);
       long offset = 1L;  // because our get goes one byte before offset.
       while (offset < array.length()) {
         final int safeWrite = Math.min(size, (int) (array.length() - offset));
@@ -96,7 +96,7 @@ public class CompressedByteArrayTest extends TestCase {
   }
 
   public void testSetOrder() {
-    CompressedByteArray cba = new CompressedByteArray(100, 22, false);
+    final CompressedByteArray cba = new CompressedByteArray(100, 22, false);
     final byte[] data = {1, 3, 5, 7, 9, 11, 13};
     cba.set(0, data, data.length);
     try {

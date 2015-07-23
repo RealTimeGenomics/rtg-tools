@@ -86,7 +86,7 @@ public class IOUtilsTest extends TestCase {
   public void testReadAllFile() throws IOException {
     final File a = FileHelper.createTempFile();
     try {
-      PrintStream fw = new PrintStream(a);
+      final PrintStream fw = new PrintStream(a);
       fw.print(STRING);
       fw.close();
 
@@ -120,9 +120,9 @@ public class IOUtilsTest extends TestCase {
 
 
   public void testReadData() {
-    String s = "Hobbits live in small holes in the ground";
+    final String s = "Hobbits live in small holes in the ground";
     try {
-      byte[] r = IOUtils.readData(new ByteArrayInputStream(s.getBytes()));
+      final byte[] r = IOUtils.readData(new ByteArrayInputStream(s.getBytes()));
       assertTrue(r != null);
       assertEquals(s, new String(r));
     } catch (final IOException e) {
@@ -132,9 +132,9 @@ public class IOUtilsTest extends TestCase {
 
 
   public void testReadDataEmpty() {
-    String s = "";
+    final String s = "";
     try {
-      byte[] r = IOUtils.readData(new ByteArrayInputStream(s.getBytes()));
+      final byte[] r = IOUtils.readData(new ByteArrayInputStream(s.getBytes()));
       assertTrue(r != null);
       assertEquals(s, new String(r));
     } catch (final IOException e) {
@@ -145,7 +145,7 @@ public class IOUtilsTest extends TestCase {
 
   public void testReadDataZeroLength() {
     try {
-      byte[] r = IOUtils.readData(new ByteArrayInputStream(new byte[0]));
+      final byte[] r = IOUtils.readData(new ByteArrayInputStream(new byte[0]));
       assertTrue(r != null);
       assertEquals(0, r.length);
     } catch (final IOException e) {

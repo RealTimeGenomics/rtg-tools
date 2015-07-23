@@ -53,7 +53,7 @@ public class NullValueTest extends TestCase {
   public void test() {
     assertEquals("--", NullValue.NULL.toString());
 
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
     NullValue.NULL.toString(sb);
     assertEquals("--", sb.toString());
     assertEquals(2, NullValue.NULL.maxLength());

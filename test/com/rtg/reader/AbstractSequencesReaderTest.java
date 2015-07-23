@@ -116,7 +116,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
       assertEquals("ACCTT", DnaUtils.bytesToSequenceIncCG(data));
 
       // Direct access to seq4
-      int seqId = 0;                            // Or should this be 3
+      final int seqId = 0;                            // Or should this be 3
       assertEquals("seq4", dsr.name(seqId));
       assertEquals(4, dsr.length(seqId));
       data = new byte[dsr.length(seqId)];

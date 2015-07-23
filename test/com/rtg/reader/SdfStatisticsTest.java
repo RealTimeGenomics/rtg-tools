@@ -372,7 +372,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
       try (PrintStream err = new PrintStream(bos)) {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
-          int code = new SdfStatistics().mainInit(new String[]{"-n", "-q", dir.getPath()}, out, err);
+          final int code = new SdfStatistics().mainInit(new String[]{"-n", "-q", dir.getPath()}, out, err);
           assertEquals(bos.toString(), 0, code);
         } finally {
           out.close();
@@ -418,8 +418,8 @@ public class SdfStatisticsTest extends AbstractCliTest {
     final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Collections.singletonList(Resources.getResourceAsStream(fastqRes)), FastQScoreType.PHRED);
     final SequencesWriter sw = new SequencesWriter(fastq, newDir, 1000000, PrereadType.UNKNOWN, false);
     sw.processSequences();
-    byte[][] newData;
-    byte[][] newQuality;
+    final byte[][] newData;
+    final byte[][] newQuality;
     try (SequencesReader dsrNew = SequencesReaderFactory.createDefaultSequencesReader(newDir)) {
       newData = readAllData(dsrNew);
       newQuality = readAllQuality(dsrNew);

@@ -51,7 +51,7 @@ public class PloidyAnnotation extends AbstractDerivedFormatAnnotation {
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
     final ArrayList<String> sampleValues = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
-    Object value;
+    final Object value;
     if (sampleValues == null || sampleValues.size() < (sampleNumber + 1)) {
       value = null;
     } else {

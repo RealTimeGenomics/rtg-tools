@@ -57,11 +57,11 @@ public class SamRestrictingIteratorTest extends TestCase {
   + "11" + "\t" + "0" + "\t" + "g1" + "\t" + "24" + "\t" + "255" + "\t" + "9M" + "\t" + "*" + "\t" + "0" + "\t" + "0" + "\t" + "TCGACTGGT" + "\t" + "`````````" + "\t" + "AS:i:1" + StringUtils.LS;
 
   public void testIterator() throws IOException {
-    ByteArrayInputStream baos = new ByteArrayInputStream(SAM.getBytes());
+    final ByteArrayInputStream baos = new ByteArrayInputStream(SAM.getBytes());
     final SamReader reader = SamUtils.makeSamReader(baos);
-    ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(reader.getFileHeader(), new SamRegionRestriction("g1", 22, 23));
-    SamRestrictingIterator it = new SamRestrictingIterator(reader.iterator(), ranges); //these positions are 0-based
-    int[] expectedLocs = {15, 15, 17, 18, 18, 23};
+    final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(reader.getFileHeader(), new SamRegionRestriction("g1", 22, 23));
+    final SamRestrictingIterator it = new SamRestrictingIterator(reader.iterator(), ranges); //these positions are 0-based
+    final int[] expectedLocs = {15, 15, 17, 18, 18, 23};
     int i = 0;
     while (it.hasNext()) {
       final SAMRecord r = it.next();
@@ -85,9 +85,9 @@ public class SamRestrictingIteratorTest extends TestCase {
     + "11" + "\t" + "0" + "\t" + "g1" + "\t" + "240" + "\t" + "255" + "\t" + "9M" + "\t" + "*" + "\t" + "0" + "\t" + "0" + "\t" + "TCGACTGGT" + "\t" + "`````````" + "\t" + "AS:i:1" + StringUtils.LS;
 
   public void testIterator2() throws IOException {
-    ByteArrayInputStream baos = new ByteArrayInputStream(SAM2.getBytes());
+    final ByteArrayInputStream baos = new ByteArrayInputStream(SAM2.getBytes());
     final SamReader reader = SamUtils.makeSamReader(baos);
-    ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(reader.getFileHeader(),
+    final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(reader.getFileHeader(),
       new SamRegionRestriction("g1", 149, 169),
       new SamRegionRestriction("g1", 180, 185),
       new SamRegionRestriction("g1", 186, 189),
@@ -95,8 +95,8 @@ public class SamRestrictingIteratorTest extends TestCase {
       new SamRegionRestriction("g2", RegionRestriction.MISSING, RegionRestriction.MISSING)
       );
     //System.err.println(ranges);
-    SamRestrictingIterator it = new SamRestrictingIterator(reader.iterator(), ranges); //these positions are 0-based
-    int[] expectedLocs = {150, 150, 180, 180};
+    final SamRestrictingIterator it = new SamRestrictingIterator(reader.iterator(), ranges); //these positions are 0-based
+    final int[] expectedLocs = {150, 150, 180, 180};
     int i = 0;
     while (it.hasNext()) {
       final SAMRecord r = it.next();

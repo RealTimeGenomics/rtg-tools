@@ -239,7 +239,7 @@ public class VcfRecordTest extends TestCase {
     h3.addSampleName("sample3");
     r1 = createRecord("chr1", 50, "A", 0, 1, "C");
     r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
-    VcfRecord r3 = createRecord("chr1", 50, "AC", 0, 1, "AG");
+    final VcfRecord r3 = createRecord("chr1", 50, "AC", 0, 1, "AG");
     mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2, r3}, new VcfHeader[] {h1, h2, h3}, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(2, mergedArr.length);
     merged = mergedArr[0];
@@ -363,7 +363,7 @@ public class VcfRecordTest extends TestCase {
     final VcfRecord[] recs = {rec, rec2};
     final VcfRecord[] mergedArr = VcfRecord.mergeRecords(recs, new VcfHeader[] {h1, h1}, h1, VcfMerge.alleleBasedFormats(h1), true);
     assertEquals(1, mergedArr.length);
-    VcfRecord merged = mergedArr[0];
+    final VcfRecord merged = mergedArr[0];
     assertEquals("b;c;a", merged.getId());
   }
 
@@ -411,7 +411,7 @@ public class VcfRecordTest extends TestCase {
   }
 
   public void testSetMethods() {
-    VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(3);
     rec.padFormatAndSample("PAD");
     assertNull(rec.getFormatAndSample().get("PAD"));
