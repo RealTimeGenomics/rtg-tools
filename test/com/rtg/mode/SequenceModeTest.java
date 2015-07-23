@@ -89,7 +89,7 @@ public class SequenceModeTest extends TestCase {
     assertEquals(SequenceType.DNA, BIDIRECTIONAL.type());
     assertEquals(SequenceType.DNA, UNIDIRECTIONAL.type());
     assertEquals(SequenceType.DNA, TRANSLATED.type());
-    assertEquals("PROTEIN", SequenceMode.PROTEIN.name());
+    assertEquals("PROTEIN", PROTEIN.name());
   }
 
   /**
@@ -181,7 +181,7 @@ public class SequenceModeTest extends TestCase {
       }
     }
     try {
-      checkIntExt(SequenceMode.TRANSLATED, TranslatedFrame.FORWARD3, Integer.MAX_VALUE / 6, 0);
+      checkIntExt(TRANSLATED, TranslatedFrame.FORWARD3, Integer.MAX_VALUE / 6, 0);
       fail("RuntimeException expected");
     } catch (final RuntimeException e) {
       assertEquals("Internal id out of range. id=357913941 frame=FORWARD3 frame ord=2 internal id=2147483648", e.getMessage());
@@ -199,7 +199,7 @@ public class SequenceModeTest extends TestCase {
 
   public void testRE() {
     try {
-      SequenceMode.BIDIRECTIONAL.internalId(1, 5, BidirectionalFrame.FORWARD);
+      BIDIRECTIONAL.internalId(1, 5, BidirectionalFrame.FORWARD);
       fail();
     } catch (final RuntimeException e) {
       assertEquals("Internal id out of range. id=1 frame=FORWARD internal id=-8", e.getMessage());

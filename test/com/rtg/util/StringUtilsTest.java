@@ -64,9 +64,9 @@ public class StringUtilsTest extends TestCase {
   }
 
   public void test() {
-    final int length = StringUtils.LS.length();
+    final int length = LS.length();
     assertTrue(length == 1 || length == 2);
-    assertTrue(StringUtils.LS.equals("\n") || StringUtils.LS.equals("\r\n"));
+    assertTrue(LS.equals("\n") || LS.equals("\r\n"));
   }
 
   public void testSpaces() {
@@ -100,10 +100,10 @@ public class StringUtilsTest extends TestCase {
 
   private static final String LE_1 = "abcde\nhijkl\npnods\n";
   private static final String LE_2 = "abcde\r\nhijkl\r\npnods\r\n";
-  private static final String EXP_LE = "abcde" + StringUtils.LS + "hijkl" + StringUtils.LS + "pnods" + StringUtils.LS;
+  private static final String EXP_LE = "abcde" + LS + "hijkl" + LS + "pnods" + LS;
   private static final String LE_3 = "abcde\n\nhijkl\n\npnods\n\n";
   private static final String LE_4 = "abcde\r\n\r\nhijkl\r\n\r\npnods\r\n\r\n";
-  private static final String EXP_LE_2 = "abcde" + StringUtils.LS + StringUtils.LS + "hijkl" + StringUtils.LS + StringUtils.LS + "pnods" + StringUtils.LS + StringUtils.LS;
+  private static final String EXP_LE_2 = "abcde" + LS + LS + "hijkl" + LS + LS + "pnods" + LS + LS;
 
   public void testConvertLineEndings() {
     assertEquals(EXP_LE, StringUtils.convertLineEndings(LE_1));
@@ -224,11 +224,11 @@ public class StringUtilsTest extends TestCase {
 
   public void testGrep() {
     final String in =
-        "asdf one"  + StringUtils.LS
-        + "asdf two" + StringUtils.LS
-        + "fdsa one" + StringUtils.LS
-        + "asdf three" + StringUtils.LS
-        + "fdsa two" + StringUtils.LS;
+        "asdf one"  + LS
+        + "asdf two" + LS
+        + "fdsa one" + LS
+        + "asdf three" + LS
+        + "fdsa two" + LS;
     final String result = "fdsa one" + LS + "fdsa two" + LS;
     assertEquals(result, StringUtils.grep(in, "fdsa"));
     assertEquals(result, StringUtils.grepMinusV(in, "asdf"));

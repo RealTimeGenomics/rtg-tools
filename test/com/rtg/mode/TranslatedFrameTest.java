@@ -55,12 +55,12 @@ public class TranslatedFrameTest extends TestCase {
    */
   public final void test() {
     TestUtils.testPseudoEnum(TranslatedFrame.class, "[FORWARD1, FORWARD2, FORWARD3, REVERSE1, REVERSE2, REVERSE3]");
-    assertEquals(TranslatedFrame.FORWARD1, TranslatedFrame.REVERSE1.getReverse());
-    assertEquals(TranslatedFrame.FORWARD2, TranslatedFrame.REVERSE2.getReverse());
-    assertEquals(TranslatedFrame.FORWARD3, TranslatedFrame.REVERSE3.getReverse());
-    assertEquals(TranslatedFrame.REVERSE1, TranslatedFrame.FORWARD1.getReverse());
-    assertEquals(TranslatedFrame.REVERSE2, TranslatedFrame.FORWARD2.getReverse());
-    assertEquals(TranslatedFrame.REVERSE3, TranslatedFrame.FORWARD3.getReverse());
+    assertEquals(FORWARD1, REVERSE1.getReverse());
+    assertEquals(FORWARD2, REVERSE2.getReverse());
+    assertEquals(FORWARD3, REVERSE3.getReverse());
+    assertEquals(REVERSE1, FORWARD1.getReverse());
+    assertEquals(REVERSE2, FORWARD2.getReverse());
+    assertEquals(REVERSE3, FORWARD3.getReverse());
     final byte[] codon = TranslatedFrame.populateCodonAminoArray(new DNA[0]);
     assertEquals(512, codon.length);
     for (byte aCodon : codon) {
@@ -107,24 +107,24 @@ public class TranslatedFrameTest extends TestCase {
    * Test method for {@link com.rtg.mode.TranslatedFrame#display()}.
    */
   public final void testDisplay() {
-    assertEquals("+1", TranslatedFrame.FORWARD1.display());
-    assertEquals("+2", TranslatedFrame.FORWARD2.display());
-    assertEquals("+3", TranslatedFrame.FORWARD3.display());
-    assertEquals("-1", TranslatedFrame.REVERSE1.display());
-    assertEquals("-2", TranslatedFrame.REVERSE2.display());
-    assertEquals("-3", TranslatedFrame.REVERSE3.display());
+    assertEquals("+1", FORWARD1.display());
+    assertEquals("+2", FORWARD2.display());
+    assertEquals("+3", FORWARD3.display());
+    assertEquals("-1", REVERSE1.display());
+    assertEquals("-2", REVERSE2.display());
+    assertEquals("-3", REVERSE3.display());
   }
 
   /**
    * Test method for {@link com.rtg.mode.TranslatedFrame#isForward()}.
    */
   public final void testIsForward() {
-    assertTrue(TranslatedFrame.FORWARD1.isForward());
-    assertTrue(TranslatedFrame.FORWARD2.isForward());
-    assertTrue(TranslatedFrame.FORWARD3.isForward());
-    assertFalse(TranslatedFrame.REVERSE1.isForward());
-    assertFalse(TranslatedFrame.REVERSE2.isForward());
-    assertFalse(TranslatedFrame.REVERSE3.isForward());
+    assertTrue(FORWARD1.isForward());
+    assertTrue(FORWARD2.isForward());
+    assertTrue(FORWARD3.isForward());
+    assertFalse(REVERSE1.isForward());
+    assertFalse(REVERSE2.isForward());
+    assertFalse(REVERSE3.isForward());
   }
 
   /**
@@ -149,21 +149,21 @@ public class TranslatedFrameTest extends TestCase {
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeF1() {
-    checkCode(TranslatedFrame.FORWARD1, 0, new Protein[] {Protein.X, Protein.T, Protein.R});
+    checkCode(FORWARD1, 0, new Protein[] {Protein.X, Protein.T, Protein.R});
   }
 
   /**
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeF2() {
-    checkCode(TranslatedFrame.FORWARD2, 1, new Protein[] {Protein.T, Protein.R, Protein.V});
+    checkCode(FORWARD2, 1, new Protein[] {Protein.T, Protein.R, Protein.V});
   }
 
   /**
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeF3() {
-    checkCode(TranslatedFrame.FORWARD3, 2, new Protein[] {Protein.R, Protein.V, Protein.Y});
+    checkCode(FORWARD3, 2, new Protein[] {Protein.R, Protein.V, Protein.Y});
   }
 
   private void checkCode(final Frame f, final int offset, final Protein[] exp) {
@@ -190,21 +190,21 @@ public class TranslatedFrameTest extends TestCase {
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeR1() {
-    checkCodeR(TranslatedFrame.REVERSE1, new Protein[] {Protein.V, Protein.Y, Protein.T});
+    checkCodeR(REVERSE1, new Protein[] {Protein.V, Protein.Y, Protein.T});
   }
 
   /**
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeR2() {
-    checkCodeR(TranslatedFrame.REVERSE2, new Protein[] {Protein.Y, Protein.T, Protein.R});
+    checkCodeR(REVERSE2, new Protein[] {Protein.Y, Protein.T, Protein.R});
   }
 
   /**
    * Test method for {@link com.rtg.mode.TranslatedFrame#code(byte[], int, int)}.
    */
   public final void testCodeR3() {
-    checkCodeR(TranslatedFrame.REVERSE3, new Protein[] {Protein.T, Protein.R, Protein.V});
+    checkCodeR(REVERSE3, new Protein[] {Protein.T, Protein.R, Protein.V});
   }
 
   private void checkCodeR(final Frame f, final Protein[] exp) {
@@ -317,7 +317,7 @@ public class TranslatedFrameTest extends TestCase {
 
 
   public void testFirstValidForward() {
-    final Frame f = TranslatedFrame.FORWARD1;
+    final Frame f = FORWARD1;
     assertEquals(0, f.calculateFirstValid(0, Integer.MAX_VALUE, Integer.MIN_VALUE));
     assertEquals(2, f.calculateFirstValid(1, Integer.MAX_VALUE, Integer.MIN_VALUE));
     assertEquals(1, f.calculateFirstValid(2, Integer.MAX_VALUE, Integer.MIN_VALUE));
@@ -366,7 +366,7 @@ public class TranslatedFrameTest extends TestCase {
 //  }
 
   public void testLastValidReverse() {
-    final Frame f = TranslatedFrame.REVERSE1;
+    final Frame f = REVERSE1;
     assertEquals(6, f.calculateLastValid(1, 7, 10));
     assertEquals(6, f.calculateLastValid(4, 6, 10));
     assertEquals(4, f.calculateLastValid(0, 6, 10));

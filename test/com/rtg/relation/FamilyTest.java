@@ -36,8 +36,6 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.Set;
 
-import com.rtg.util.StringUtils;
-
 import junit.framework.TestCase;
 
 /**
@@ -46,14 +44,14 @@ public class FamilyTest extends TestCase {
 
   /** Relations for testing. */
   public static final String RELATIONS = ""
-      + "genome father sex=male disease=" + false + StringUtils.LS
-      + "genome mother disease=" + true + StringUtils.LS
-      + "genome childa disease=" + false + StringUtils.LS
-      + "genome childb disease=" + true + StringUtils.LS
-      + "parent-child father childa" + StringUtils.LS
-      + "parent-child father childb" + StringUtils.LS
-      + "parent-child mother childa" + StringUtils.LS
-      + "parent-child mother childb" + StringUtils.LS
+      + "genome father sex=male disease=" + false + LS
+      + "genome mother disease=" + true + LS
+      + "genome childa disease=" + false + LS
+      + "genome childb disease=" + true + LS
+      + "parent-child father childa" + LS
+      + "parent-child father childb" + LS
+      + "parent-child mother childa" + LS
+      + "parent-child mother childb" + LS
       ;
 
 
@@ -171,14 +169,14 @@ public class FamilyTest extends TestCase {
   }
 
   public void testNormal() throws Exception {
-    final String rel = "genome male sex=male" + StringUtils.LS
-        + "genome female sex=female" + StringUtils.LS
-        + "genome son sex=male" + StringUtils.LS
-        + "parent-child male son" + StringUtils.LS
-        + "parent-child female son" + StringUtils.LS
-        + "genome daughter sex=female" + StringUtils.LS
-        + "parent-child male daughter" + StringUtils.LS
-        + "parent-child female daughter" + StringUtils.LS;
+    final String rel = "genome male sex=male" + LS
+        + "genome female sex=female" + LS
+        + "genome son sex=male" + LS
+        + "parent-child male son" + LS
+        + "parent-child female son" + LS
+        + "genome daughter sex=female" + LS
+        + "parent-child male daughter" + LS
+        + "parent-child female daughter" + LS;
     final Family fam = Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(rel))));
     assertEquals("male", fam.getFather());
     assertEquals("female", fam.getMother());

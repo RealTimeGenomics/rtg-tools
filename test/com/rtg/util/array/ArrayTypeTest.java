@@ -145,11 +145,11 @@ public class ArrayTypeTest extends TestCase {
   }
 
   private void check(final long len) {
-    check(ArrayType.LONG, len);
-    check(ArrayType.INTEGER, len);
-    check(ArrayType.SHORT, len);
-    check(ArrayType.BYTE, len);
-    check(ArrayType.ZERO, len);
+    check(LONG, len);
+    check(INTEGER, len);
+    check(SHORT, len);
+    check(BYTE, len);
+    check(ZERO, len);
   }
 
   private void check(final ArrayType at, final long len) {
@@ -158,7 +158,7 @@ public class ArrayTypeTest extends TestCase {
   }
 
   public void testZero() {
-    final ExtensibleIndex ix = ArrayType.ZERO.createUnsigned(1);
+    final ExtensibleIndex ix = ZERO.createUnsigned(1);
     assertEquals(0, ix.get(0));
   }
 
@@ -192,7 +192,7 @@ public class ArrayTypeTest extends TestCase {
 
   public void testBadBytes() {
     try {
-      ArrayType.LONG.bytes(-1);
+      LONG.bytes(-1);
       fail("exception expected");
     } catch (final RuntimeException e) {
       assertEquals("size must be positive:-1", e.getMessage());

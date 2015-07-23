@@ -48,8 +48,8 @@ public class SequenceTypeTest extends TestCase {
    */
   public final void test() throws ObjectStreamException {
     TestUtils.testPseudoEnum(SequenceType.class, "[DNA, PROTEIN]");
-    assertEquals(SequenceType.DNA, SequenceType.DNA.readResolve());
-    assertEquals(SequenceType.PROTEIN, SequenceType.PROTEIN.readResolve());
+    assertEquals(DNA, DNA.readResolve());
+    assertEquals(PROTEIN, PROTEIN.readResolve());
   }
 
   /**
@@ -62,7 +62,7 @@ public class SequenceTypeTest extends TestCase {
     assertEquals(20, PROTEIN.numberKnownCodes());
     assertEquals(22, PROTEIN.numberCodes());
     assertEquals(com.rtg.mode.Protein.values().length, PROTEIN.firstValid() + PROTEIN.numberKnownCodes());
-    assertEquals("DNA", SequenceType.DNA.name());
+    assertEquals("DNA", DNA.name());
   }
 
   /**
