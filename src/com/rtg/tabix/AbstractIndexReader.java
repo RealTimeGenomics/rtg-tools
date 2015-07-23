@@ -156,7 +156,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
     int binStart = 4;
     for (int i = 0; i < numBins; i++) {
       //find out bin id and number of chunks
-      binNum[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart + 0);
+      binNum[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart);
       final int numChunks = binNumChunks[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart + 4);
       final int chunkStart = binStart + 8;
       final int chunkSize = numChunks * 16; //check for overflow
