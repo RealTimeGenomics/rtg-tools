@@ -38,16 +38,16 @@ import java.util.Stack;
 
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.Pair;
+import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.integrity.IntegralAbstract;
 
 /**
  * Record a path that reconciles two sequences of variants. Also provides
  * method to find a best path.
  *
  */
-public class Path extends IntegralAbstract implements Comparable<Path> {
+public class Path implements Comparable<Path> {
 
   final HalfPath mCalledPath;
   final HalfPath mBaselinePath;
@@ -158,14 +158,6 @@ public class Path extends IntegralAbstract implements Comparable<Path> {
     return true;
   }
 
-  @Override
-  public void toString(StringBuilder sb) {
-  }
-
-  @Override
-  public boolean integrity() {
-    return true;
-  }
   private static List<OrientedVariant> getIncluded(HalfPath path) {
     final List<OrientedVariant> list = new ArrayList<>();
     if (path.getIncluded() == null) {
@@ -189,28 +181,28 @@ public class Path extends IntegralAbstract implements Comparable<Path> {
   }
 
   /**
-   * @return the set of variants included on A side
+   * @return the set of variants included on call side
    */
   public List<OrientedVariant> getCalledIncluded() {
     return getIncluded(mCalledPath);
   }
 
   /**
-   * @return the set of variants excluded on A side
+   * @return the set of variants excluded on call side
    */
   public List<Variant> getCalledExcluded() {
     return getExcluded(mCalledPath);
   }
 
   /**
-   * @return the set of variants included on B side
+   * @return the set of variants included on baseline side
    */
   public List<OrientedVariant> getBaselineIncluded() {
     return getIncluded(mBaselinePath);
   }
 
   /**
-   * @return the set of variants excluded on B side
+   * @return the set of variants excluded on baseline side
    */
   public List<Variant> getBaselineExcluded() {
     return getExcluded(mBaselinePath);
@@ -246,28 +238,21 @@ public class Path extends IntegralAbstract implements Comparable<Path> {
     exclude.exclude(side, var, varIndex);
     paths.add(exclude);
 
-    // Create a path extension that includes this variant in the default phase
-    final Path include = new Path(this, syncPoints);
-    include.include(side, new OrientedVariant(var, true), varIndex);
-    assert !include.equals(exclude);
-    assert include.compareTo(exclude) != 0;
-    paths.add(include);
-
-    // If the variant is heterozygous we need to also add the variant in the alternate phase
-    if (var.ntAlleleB() != null) {
-      final Path hetero = new Path(this, syncPoints);
-      hetero.include(side, new OrientedVariant(var, false), varIndex);
-      paths.add(hetero);
+    // Create a path extension that includes this variant in the possible phases
+    for (OrientedVariant o : var.orientations()) {
+      final Path include = new Path(this, syncPoints);
+      include.include(side, o, varIndex);
+      paths.add(include);
     }
 
     return paths;
   }
 
-  Collection<Path> addAVariant(Variant var, int varIndex) {
+  Collection<Path> addCallVariant(Variant var, int varIndex) {
     return addVariant(true, var, varIndex);
   }
 
-  Collection<Path> addBVariant(Variant var, int varIndex) {
+  Collection<Path> addBaselineVariant(Variant var, int varIndex) {
     return addVariant(false, var, varIndex);
   }
 
@@ -325,12 +310,12 @@ public class Path extends IntegralAbstract implements Comparable<Path> {
 
   @Override
   public int hashCode() {
-    return Utils.hash(new Object[] {mCalledPath, mBaselinePath});
+    return Utils.pairHash(mCalledPath.hashCode(), mBaselinePath.hashCode());
   }
 
   @Override
   public String toString() {
-    return "Path:" + LS + "baseline=" + mBaselinePath + "called=" + mCalledPath + "syncpoints(0-based)=" + HalfPath.listToString(this.mSyncPointList);
+    return "Path:" + StringUtils.LS + "baseline=" + mBaselinePath + "called=" + mCalledPath + "syncpoints(0-based)=" + HalfPath.listToString(this.mSyncPointList);
   }
   public List<SyncPoint> getSyncPoints() {
     return getSyncPointsList(mSyncPointList, getCalledIncluded(), getBaselineIncluded());

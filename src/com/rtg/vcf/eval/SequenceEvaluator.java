@@ -135,11 +135,13 @@ class SequenceEvaluator implements IORunnable {
     }
   }
 
-  private void merge(List<Variant> falsePositives, List<? extends Variant> b) {
+  private void merge(List<Variant> falsePositives, List<OrientedVariant> b) {
     if (b.size() == 0) {
       return;
     }
-    falsePositives.addAll(b);
+    for (OrientedVariant v : b) {
+      falsePositives.add(v.variant());
+    }
     Collections.sort(falsePositives, new IntervalComparator());
 
   }

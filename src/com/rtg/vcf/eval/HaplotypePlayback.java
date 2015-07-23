@@ -99,7 +99,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mPositionInVariant == INVALID) {
       return mTemplatePosition < mTemplate.length ? mTemplate[mTemplatePosition] : DnaUtils.UNKNOWN_RESIDUE;
     }
-    return mNextVariant.nt(mNextVariant.isAlleleA())[mPositionInVariant];
+    return mNextVariant.nt()[mPositionInVariant];
   }
 
   /**
@@ -118,11 +118,11 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mNextVariant == null) {
       return true;
     }
-    if (mPositionInVariant != INVALID && mPositionInVariant < mNextVariant.nt(mNextVariant.isAlleleA()).length - 1) {
+    if (mPositionInVariant != INVALID && mPositionInVariant < mNextVariant.nt().length - 1) {
       return false;
     }
     for (OrientedVariant v : mVariants) {
-      if (v.nt(v.isAlleleA()).length > 0) {
+      if (v.nt().length > 0) {
         return false;
       }
     }
@@ -150,7 +150,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mNextVariant != null) {
       while (true) {
         //dont forget that variant may come back to back
-        final byte[] norm = mNextVariant.nt(mNextVariant.isAlleleA());
+        final byte[] norm = mNextVariant.nt();
         if (mPositionInVariant != norm.length) { // Haven't reached the end of the current variant.
           //this also catches the case when mPositionInVariant == INVALID
           assert integrity();
@@ -274,10 +274,10 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
       Exam.assertTrue(toString(), mNextVariant == null || mTemplatePosition <= mNextVariant.getStart());
     } else {
       Exam.assertTrue(mNextVariant != null && mTemplatePosition == mNextVariant.getStart());
-      if (!(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt(mNextVariant.isAlleleA()).length)) {
+      if (!(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt().length)) {
         System.err.println(this);
       }
-      Exam.assertTrue(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt(mNextVariant.isAlleleA()).length);
+      Exam.assertTrue(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt().length);
     }
     return true;
   }
@@ -328,11 +328,12 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
       }
 
     }
-      if (thatIt.hasNext()) {
-        return -1;
-      }
+    if (thatIt.hasNext()) {
+      return -1;
+    }
     return 0;
   }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -343,7 +344,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
 
   @Override
   public int hashCode() {
-    int hash = Utils.hash(new Object[] {this.templatePosition(), this.mNextVariant, this.mPositionInVariant});
+    int hash = Utils.pairHash(this.templatePosition(), mNextVariant == null ? 0 : mNextVariant.hashCode(), this.mPositionInVariant);
     for (final OrientedVariant v : this.mVariants) {
       hash = Utils.pairHash(hash, v.hashCode());
     }

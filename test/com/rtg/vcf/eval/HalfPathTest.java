@@ -61,11 +61,11 @@ public class HalfPathTest extends TestCase {
                            //     2, 1  1 31  1     2  1  1
     final HalfPath path = new HalfPath(template);
     assertEquals(0, path.getVariantEndPosition());
-    final OrientedVariant included = new OrientedVariant(new MockVariant(1, 2, new byte[] {2}, null), true);
+    final OrientedVariant included = OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, null), true);
     path.include(included, 0);
     assertEquals(1, path.getVariantEndPosition());
-    path.include(new OrientedVariant(new MockVariant(4, 4, new byte[] {3}, null), true), 1);
-    path.include(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, null), true), 2);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, null), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 2);
 
     final MockVariant excluded = new MockVariant(3, 4, new byte[] {3}, null);
     path.exclude(excluded, 3);
@@ -90,9 +90,9 @@ public class HalfPathTest extends TestCase {
                            //     2, 1  1 31  1     2  1  1
                            //     2, 1  1431  1     2  1  1
     final HalfPath path = new HalfPath(template);
-    path.include(new OrientedVariant(new MockVariant(1, 2, new byte[] {2}, new byte[] {1}), false), 0);
-    path.include(new OrientedVariant(new MockVariant(4, 4, new byte[] {3}, new byte[] {4, 3}), true), 1);
-    path.include(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, null), true), 2);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, new byte[]{1}), false), 0);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, new byte[]{4, 3}), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 2);
 
     final byte[] expected = {1, 1, 1, 3, 1, 1, 2, 1, 1};
     final byte[] expectedMinus = {2, 1, 1, 4, 3, 1, 1, 2, 1, 1};
@@ -110,7 +110,6 @@ public class HalfPathTest extends TestCase {
       i++;
     }
     assertEquals(Math.max(expected.length, expectedMinus.length), i);
-
   }
 
   public void testCompare() {
@@ -121,14 +120,14 @@ public class HalfPathTest extends TestCase {
     assertFalse(path.finishedHaplotypeB());
     assertEquals(0, path.getVariantEndPosition());
 
-    path.include(new OrientedVariant(new MockVariant(1, 2, new byte[] {2}, new byte[] {1}), false), 0);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, new byte[]{1}), false), 0);
     assertEquals(1, path.getVariantEndPosition());
-    path.include(new OrientedVariant(new MockVariant(4, 4, new byte[] {3}, new byte[] {4, 3}), true), 1);
-    path.include(new OrientedVariant(new MockVariant(6, 7, new byte[] {}, null), true), 2);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, new byte[]{4, 3}), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 2);
     final HalfPath copy = new HalfPath(path);
     assertEquals(0, path.compareTo(copy));
-    final OrientedVariant var = new OrientedVariant(new MockVariant(10, 11, new byte[] {2}, null), true);
-    final OrientedVariant reverse = new OrientedVariant(new MockVariant(10, 11, new byte[] {3}, new byte[] {2}), false);
+    final OrientedVariant var = OrientedVariantTest.createOrientedVariant(new MockVariant(10, 11, new byte[]{2}, null), true);
+    final OrientedVariant reverse = OrientedVariantTest.createOrientedVariant(new MockVariant(10, 11, new byte[]{3}, new byte[]{2}), false);
 
     copy.include(var, 3);
     assertEquals(-1, path.compareTo(copy));
@@ -156,7 +155,7 @@ public class HalfPathTest extends TestCase {
     path.step();
     copy.step();
     assertEquals(-1, path.compareTo(copy));
-    final OrientedVariant both = new OrientedVariant(new MockVariant(12, 12, new byte[] {1, 2, 3}, null), true);
+    final OrientedVariant both = OrientedVariantTest.createOrientedVariant(new MockVariant(12, 12, new byte[]{1, 2, 3}, null), true);
     path.include(both, 5);
     copy.include(both, 5);
     while (path.getPosition() < 12) {
@@ -180,8 +179,8 @@ public class HalfPathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
     final HalfPath path = new HalfPath(template);
     final HalfPath copy = new HalfPath(template);
-    path.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, new byte[] {4, 3}), true), 0);
-    copy.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, new byte[] {4, 3}), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 0);
+    copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 1);
     path.step();
     path.step();
     copy.step();
@@ -193,8 +192,8 @@ public class HalfPathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
     final HalfPath path = new HalfPath(template);
     final HalfPath copy = new HalfPath(template);
-    path.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, null), true), 0);
-    copy.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, new byte[] {4, 3}), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 0);
+    copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 1);
     assertEquals(1, copy.compareTo(path));
     assertEquals(-1, path.compareTo(copy));
   }
@@ -203,8 +202,8 @@ public class HalfPathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
     final HalfPath path = new HalfPath(template);
     final HalfPath copy = new HalfPath(template);
-    path.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, null), true), 0);
-    copy.include(new OrientedVariant(new MockVariant(2, 3, new byte[] {3, 4}, null), true), 1);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 0);
+    copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 1);
     assertEquals(0, copy.compareTo(path));
   }
 
@@ -214,7 +213,7 @@ public class HalfPathTest extends TestCase {
     path.step();
     path.step();
     assertEquals(1, path.getPosition());
-    path.include(new OrientedVariant(new MockVariant(3, 4, new byte[] {2, 3, 4}, new byte[] {4}), true), 0);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 4, new byte[]{2, 3, 4}, new byte[]{4}), true), 0);
     path.step();
     path.step();
     path.step();
@@ -224,7 +223,7 @@ public class HalfPathTest extends TestCase {
     path2.step();
     path2.step();
     assertEquals(1, path2.getPosition());
-    path2.include(new OrientedVariant(new MockVariant(3, 4, new byte[] {4}, new byte[] {2, 3, 4}), true), 1);
+    path2.include(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 4, new byte[]{4}, new byte[]{2, 3, 4}), true), 1);
     path2.step();
     path2.step();
     path2.step();
@@ -235,10 +234,10 @@ public class HalfPathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
     final HalfPath path = new HalfPath(template);
     assertFalse(path.toString().contains("minus:"));
-    path.include(new OrientedVariant(new MockVariant(3, 4, new byte[] {3}, new byte[] {4}), true), 0);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 4, new byte[]{3}, new byte[]{4}), true), 0);
     path.exclude(new MockVariant(5, 6, new byte[] {2}, new byte[] {4}), 1);
     path.exclude(new MockVariant(5, 6, new byte[] {2}, new byte[] {4}), 2);
-    path.include(new OrientedVariant(new MockVariant(8, 9, new byte[] {3}, new byte[] {4}), true), 3);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(8, 9, new byte[]{3}, new byte[]{4}), true), 3);
     TestUtils.containsAll(path.toString()
         , "included:"
         , "[8:9 G:T+, 3:4 G:T+]"
@@ -273,7 +272,7 @@ public class HalfPathTest extends TestCase {
     int varIndex = 0;
     for (final String var : CALLS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(new OrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true), varIndex++);
     }
     StringBuilder sb = new StringBuilder();
     path.step();
@@ -287,7 +286,7 @@ public class HalfPathTest extends TestCase {
     varIndex = 0;
     for (final String var : MUTATIONS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(new OrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true), varIndex++);
     }
     sb = new StringBuilder();
     path.step();

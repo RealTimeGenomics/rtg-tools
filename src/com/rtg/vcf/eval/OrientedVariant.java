@@ -31,64 +31,83 @@
 package com.rtg.vcf.eval;
 
 import com.rtg.util.Utils;
-import com.rtg.util.integrity.Exam;
-import com.rtg.util.integrity.IntegralAbstract;
 import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
- * Reference to a variant that selects one side of heterozygous cases and
- * also records a position in the variant chosen.
+ * Reference to a variant that has a defined phasing with respect to a haplotype.
  */
-public class OrientedVariant extends IntegralAbstract implements Comparable<OrientedVariant>, Variant {
+public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNameLocus {
 
   private final Variant mVariant;
 
+  private final boolean mHeterozygous;
   private final boolean mIsAlleleA;
+  private final int mAlleleId;
+  private final int mOtherAlleleId;
 
   private double mWeight;
 
   /**
+   * Create a homozygous variant
    * @param variant the variant
-   * @param isAlleleA are we taking the A allele
+   * @param alleleId the allele selected for the A haplotype
    */
-  public OrientedVariant(Variant variant, boolean isAlleleA) {
-    super();
-    mVariant = variant;
-    mIsAlleleA = isAlleleA;
+  public OrientedVariant(Variant variant, int alleleId) {
+    this(variant, true, alleleId, alleleId);
   }
 
   /**
-   * @return the variant.
+   * Create a variant
+   * @param variant the variant
+   * @param isAlleleA are we taking the A allele from the original GT
+   * @param alleleId the allele selected for the A haplotype
+   * @param otherAlleleId the allele selected for the B haplotype (for a haploid comparison
+   * this should be the same as the primary allele id)
+   */
+  public OrientedVariant(Variant variant, boolean isAlleleA, int alleleId, int otherAlleleId) {
+    mVariant = variant;
+    mAlleleId = alleleId;
+    mHeterozygous = otherAlleleId != alleleId;
+    mOtherAlleleId = otherAlleleId;
+    mIsAlleleA = isAlleleA;
+    //assert mVariant != null;
+    //assert nt(mAlleleId) != null;
+  }
+
+  // Get this variant oriented on the other haplotype.
+  OrientedVariant other() {
+    assert isHeterozygous();
+    return new OrientedVariant(mVariant, !mIsAlleleA, mOtherAlleleId, mAlleleId);
+  }
+
+  /**
+   * @return the parent variant.
    */
   Variant variant() {
     return mVariant;
   }
 
-
   @Override
   public int compareTo(OrientedVariant that) {
-    final int varPos = this.getStart() - that.getStart();
+    final int varPos = Integer.compare(this.getStart(), that.getStart());
     if (varPos != 0) {
       return varPos;
     }
-
-    if (this.mIsAlleleA == that.mIsAlleleA) {
-      return 0;
+    final int id = Boolean.compare(mIsAlleleA, that.mIsAlleleA);
+    if (id != 0) {
+      return id;
     }
-    return mIsAlleleA ? +1 : -1;
+    return Integer.compare(mAlleleId, that.mAlleleId);
   }
 
   @Override
   public int hashCode() {
-    return Utils.hash(new Object[] {
-        mIsAlleleA
-        , mVariant
-    });
+    return Utils.pairHash(Boolean.valueOf(mIsAlleleA).hashCode(), mAlleleId, mVariant.hashCode());
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+      if (obj == null) {
       return false;
     }
     if (obj.getClass() != this.getClass()) {
@@ -98,23 +117,42 @@ public class OrientedVariant extends IntegralAbstract implements Comparable<Orie
   }
 
   @Override
-  public void toString(StringBuilder sb) {
-    sb.append(mVariant.toString());
-    sb.append(mIsAlleleA ? "+" : "-");
-  }
-
-  @Override
-  public boolean integrity() {
-    Exam.assertNotNull(mVariant);
-    Exam.assertNotNull(mVariant.nt(mIsAlleleA));
-    return true;
+  public String toString() {
+    return mVariant.toString() + (isAlleleA() ? "+" : "-");
   }
 
   /**
-   * @return true if this is oriented on the A allele
+   * @return the id of the allele this variant is oriented on
+   */
+  public int alleleId() {
+    return mAlleleId;
+  }
+
+  /**
+   * @return true if this is oriented on the A haplotype
    */
   public boolean isAlleleA() {
     return mIsAlleleA;
+  }
+
+  /**
+   * The allele of the oriented genotype.
+   * @return the allele (may be null (skip) or zero length)
+   */
+  public byte[] nt() {
+    return mVariant.nt(mAlleleId);
+  }
+
+  /**
+   * @return true if the genotype is heterozygous (i.e. diploid with different alleles)
+   */
+  public boolean isHeterozygous() {
+    return mHeterozygous;
+  }
+
+  @Override
+  public String getSequenceName() {
+    return mVariant.getSequenceName();
   }
 
   @Override
@@ -142,21 +180,6 @@ public class OrientedVariant extends IntegralAbstract implements Comparable<Orie
     return mVariant.getLength();
   }
 
-  @Override
-  public byte[] nt(boolean alleleA) {
-    return mVariant.nt(alleleA);
-  }
-
-  @Override
-  public byte[] ntAlleleA() {
-    return mVariant.ntAlleleA();
-  }
-
-  @Override
-  public byte[] ntAlleleB() {
-    return mVariant.ntAlleleB();
-  }
-
   /**
    * @param weight  set the weight
    */
@@ -171,13 +194,4 @@ public class OrientedVariant extends IntegralAbstract implements Comparable<Orie
     return mWeight;
   }
 
-  @Override
-  public boolean isPhased() {
-    return mVariant.isPhased();
-  }
-
-  @Override
-  public String getSequenceName() {
-    return mVariant.getSequenceName();
-  }
 }

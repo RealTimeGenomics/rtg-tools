@@ -41,18 +41,19 @@ import com.rtg.vcf.VcfUtils;
 
 
 /**
- * Class for holding information parsed from a SNP detection file
+ * Holds information about a single variant that has not yet been oriented in a haplotype
  */
 public class DetectedVariant implements Comparable<DetectedVariant>, Variant {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
 
   private final String mSequenceName;
-  private final double mSortValue;
   private final int mStart;
   private final int mEnd;
   private final byte[][] mPrediction;
   private final boolean mPhased;
+  private final boolean mSquashPloidy;
+  private final double mSortValue;
   private final EnumSet<RocFilter> mFilters = EnumSet.noneOf(RocFilter.class);
 
   /**
@@ -68,25 +69,53 @@ public class DetectedVariant implements Comparable<DetectedVariant>, Variant {
     final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
     mStart = rec.getStart() + (hasPreviousNt ? 1 : 0);
     mEnd = rec.getEnd();
+    mSquashPloidy = squashPloidy;
+
     final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(sampleNo);
-    final int[] gtArray = VcfUtils.splitGt(gt);
     mPhased = gt.contains("" + VcfUtils.PHASED_SEPARATOR);
+
+    final int[] gtArray = VcfUtils.splitGt(gt);
     assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
-    mPrediction = new byte[VcfUtils.isHomozygous(rec, sampleNo) || squashPloidy ? 1 : 2][];
-    if (squashPloidy) {
-      final int gtId = gtArray.length == 1 ? gtArray[0] : Math.max(gtArray[0], gtArray[1]);
-      mPrediction[0] = DnaUtils.encodeString(getAllele(rec, gtId, hasPreviousNt));
+
+    if (mSquashPloidy) {
+
+      int numAlts = 0;
+      for (final int gtId : gtArray) {
+        if (gtId > 0) {
+          numAlts++;
+        }
+      }
+      mPrediction = new byte[numAlts][];
+      int j = 0;
+      for (final int gtId : gtArray) {
+        if (gtId > 0) {
+          mPrediction[j++] = DnaUtils.encodeString(getAllele(rec, gtId, hasPreviousNt));
+        }
+      }
+
     } else {
+      mPrediction = new byte[VcfUtils.isHomozygous(rec, sampleNo) ? 1 : 2][];
       for (int i = 0; i < mPrediction.length; i++) {
         mPrediction[i] = DnaUtils.encodeString(getAllele(rec, gtArray[i], hasPreviousNt));
         //System.err.println(rec.getPosition() + " " + gtArray[i] + " " + getAllele(gtArray[i]));
       }
     }
+
     for (final RocFilter filter : RocFilter.values()) {
       if (filter.accept(rec, sampleNo)) {
         mFilters.add(filter);
       }
     }
+  }
+
+  DetectedVariant(String seq, int start, int end, byte[][] alleles, boolean phased) {
+    mSequenceName = seq;
+    mStart = start;
+    mEnd = end;
+    mPhased = phased;
+    mSortValue = Double.NaN;
+    mPrediction = alleles;
+    mSquashPloidy = false;
   }
 
   private static String getAllele(VcfRecord rec, int allele, boolean hasPreviousNt) {
@@ -152,10 +181,11 @@ public class DetectedVariant implements Comparable<DetectedVariant>, Variant {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
-    sb.append(DnaUtils.bytesToSequenceIncCG(ntAlleleA()));
-    final byte[] bAllele = ntAlleleB();
-    if (bAllele != null) {
-      sb.append(":").append(DnaUtils.bytesToSequenceIncCG(bAllele));
+    for (int i = 0; i < numAlleles(); i++) {
+      if (i > 0) {
+        sb.append(":");
+      }
+      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
     }
     sb.append(")");
     return sb.toString();
@@ -187,29 +217,40 @@ public class DetectedVariant implements Comparable<DetectedVariant>, Variant {
   }
 
   @Override
-  public byte[] nt(boolean alleleA) {
-    if (mPrediction.length == 2) {
-      return mPrediction[alleleA ? 0 : 1];
-    } else if (alleleA) {
-      return mPrediction[0];
-    } else {
-      return null;
-    }
+  public byte[] nt(int alleleId) {
+    return alleleId < 0 ? null : mPrediction[alleleId];
   }
 
-  @Override
-  public byte[] ntAlleleA() {
-    return nt(true);
-  }
-
-  @Override
-  public byte[] ntAlleleB() {
-    return nt(false);
+  int numAlleles() {
+    return mPrediction.length;
   }
 
   @Override
   public boolean isPhased() {
     return mPhased;
+  }
+
+  @Override
+  public OrientedVariant[] orientations() {
+    if (mSquashPloidy) {
+      final OrientedVariant[] pos = new OrientedVariant[mPrediction.length];
+      for (int i = 0 ; i < mPrediction.length; i++) {
+        pos[i] = new OrientedVariant(this, i);
+      }
+      return pos;
+    } else if (mPrediction.length == 2) {
+      // If the variant is heterozygous we need both phases
+      return new OrientedVariant[]{
+        new OrientedVariant(this, true, 0, 1),
+        new OrientedVariant(this, false, 1, 0)
+      };
+    } else {
+      assert mPrediction.length == 1;
+      // Homozygous / haploid
+      return new OrientedVariant[] {
+        new OrientedVariant(this, 0)
+      };
+    }
   }
 
   /**

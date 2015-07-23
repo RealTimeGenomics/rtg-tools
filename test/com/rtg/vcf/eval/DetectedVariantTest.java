@@ -37,9 +37,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.rtg.mode.DnaUtils;
+import com.rtg.util.PosteriorUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
-import com.rtg.util.PosteriorUtils;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -106,9 +106,14 @@ public class DetectedVariantTest extends TestCase {
     final DetectedVariant variant = getDetectedVariant(SNP_LINE);
     assertEquals(22, variant.getStart());
     assertEquals(12.8, variant.getSortValue(), 0.1);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(4, variant.nt(true)[0]);
-    assertNull(variant.nt(false));
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(4, variant.nt(0)[0]);
+    assertNull(variant.nt(-1));
+    try {
+      variant.nt(1);
+      fail();
+    } catch (ArrayIndexOutOfBoundsException ignored) {
+    }
   }
 
   static final String SNP_LINE2 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T,C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/2:4:0.02:12.8";
@@ -116,36 +121,61 @@ public class DetectedVariantTest extends TestCase {
   static final String SNP_LINE4 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "./1:4:0.02:12.8";
   public void testHeterozygousSnpConstruction() throws Exception {
     DetectedVariant variant = getDetectedVariant(SNP_LINE2);
+    // Normal het call 1/2
     assertEquals(22, variant.getStart());
     assertEquals(12.8, variant.getSortValue(), 0.1);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(4, variant.nt(true)[0]);
-    assertEquals(1, variant.nt(false).length);
-    assertEquals(2, variant.nt(false)[0]);
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(4, variant.nt(0)[0]);
+    assertEquals(1, variant.nt(1).length);
+    assertEquals(2, variant.nt(1)[0]);
+    OrientedVariant[] pos = variant.orientations();
+    assertEquals(2, pos.length);
+    assertTrue(pos[0].isAlleleA());
+    assertFalse(pos[1].isAlleleA());
+    assertTrue(pos[0].isHeterozygous());
+    assertTrue(pos[1].isHeterozygous());
+    assertEquals(0, pos[0].alleleId()); // REF allele doesn't get counted in ids
+    assertEquals(1, pos[1].alleleId());
 
     // Test half-call  ./1, no squash
     variant = getDetectedVariant(SNP_LINE4);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(0, variant.nt(true)[0]);
-    assertEquals(4, variant.nt(false)[0]);
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(0, variant.nt(0)[0]);
+    assertEquals(4, variant.nt(1)[0]);
 
-    // Test squashing ploidy  1/2 -> 2/2
+    // Test squashing ploidy  1/2 -> 1, 2
     variant = getDetectedVariant(SNP_LINE2, true);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(2, variant.nt(true)[0]);
-    assertNull(variant.nt(false));
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(4, variant.nt(0)[0]);
+    assertEquals(2, variant.nt(1)[0]);
+    pos = variant.orientations();
+    assertEquals(2, pos.length);
+    assertTrue(pos[0].isAlleleA());
+    assertTrue(pos[1].isAlleleA());
+    assertFalse(pos[0].isHeterozygous());
+    assertFalse(pos[1].isHeterozygous());
+    assertEquals(0, pos[0].alleleId()); // REF allele doesn't get counted in ids
+    assertEquals(1, pos[1].alleleId());
 
-    // Test squashing ploidy  0/1 -> 1/1
+    // Test squashing ploidy  0/1 -> 1
     variant = getDetectedVariant(SNP_LINE3, true);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(4, variant.nt(true)[0]);
-    assertNull(variant.nt(false));
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(4, variant.nt(0)[0]);
+    try {
+      variant.nt(1);
+      fail();
+    } catch (ArrayIndexOutOfBoundsException ignored) {
+    }
 
-    // Test squashing ploidy  ./1 -> 1/1
+    // Test squashing ploidy  ./1 -> 1
     variant = getDetectedVariant(SNP_LINE4, true);
-    assertEquals(1, variant.nt(true).length);
-    assertEquals(4, variant.nt(true)[0]);
-    assertNull(variant.nt(false));
+    assertEquals(1, variant.nt(0).length);
+    assertEquals(4, variant.nt(0)[0]);
+    try {
+      variant.nt(1);
+      fail();
+    } catch (ArrayIndexOutOfBoundsException ignored) {
+    }
 
   }
 
@@ -170,17 +200,22 @@ public class DetectedVariantTest extends TestCase {
     assertEquals(22, variant.getStart());
     assertEquals(12.8, variant.getSortValue(), 1);
 
-    assertEquals(3, variant.nt(true).length);
-    assertEquals(2, variant.nt(true)[0]);
-    assertEquals(4, variant.nt(true)[1]);
-    assertNull(variant.nt(false));
+    assertEquals(3, variant.nt(0).length);
+    assertEquals(2, variant.nt(0)[0]);
+    assertEquals(4, variant.nt(0)[1]);
+    try {
+      variant.nt(1);
+      fail();
+    } catch (ArrayIndexOutOfBoundsException ignored) {
+    }
+
   }
 
   static final String UNCHANGED_LINE = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
   public void testUnchangedConstructor() throws Exception {
     final DetectedVariant variant = getDetectedVariant(UNCHANGED_LINE);
     assertEquals(22, variant.getStart());
-    assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(true)));
+    assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(0)));
     assertEquals(12.8, variant.getSortValue(), 0.1);
   }
 
@@ -188,7 +223,7 @@ public class DetectedVariantTest extends TestCase {
   public void testShortConstructor() throws Exception {
     final DetectedVariant variant = getDetectedVariant(SHORT_LINE);
     assertEquals(22, variant.getStart());
-    assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(true)));
+    assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(0)));
     assertTrue(Double.isNaN(variant.getSortValue()));
   }
 
@@ -223,14 +258,14 @@ public class DetectedVariantTest extends TestCase {
     final DetectedVariant v = getDetectedVariant(line);
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());
-    checkArray(new byte[] {4}, v.ntAlleleA());
-    checkArray(new byte[] {3}, v.ntAlleleB());
+    checkArray(new byte[] {4}, v.nt(0));
+    checkArray(new byte[] {3}, v.nt(1));
     final String line2 = "simulatedSequence1 2180 . C G,T 31.0 PASS . GT 1/2".replaceAll(" ", "\t");
     final DetectedVariant v2 = getDetectedVariant(line2);
     assertEquals(2179, v2.getStart());
     assertEquals(2180, v2.getEnd());
-    checkArray(new byte[] {3}, v2.ntAlleleA());
-    checkArray(new byte[] {4}, v2.ntAlleleB());
+    checkArray(new byte[] {3}, v2.nt(0));
+    checkArray(new byte[] {4}, v2.nt(1));
   }
 
   public void testAllFieldsPresent() throws Exception {
@@ -239,8 +274,8 @@ public class DetectedVariantTest extends TestCase {
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());
     assertEquals(31.0, v.getSortValue(), 0.1);
-    checkArray(new byte[] {3}, v.ntAlleleA());
-    checkArray(new byte[] {4}, v.ntAlleleB());
+    checkArray(new byte[] {3}, v.nt(0));
+    checkArray(new byte[] {4}, v.nt(1));
   }
 
   public void testComplexHandling() throws Exception {

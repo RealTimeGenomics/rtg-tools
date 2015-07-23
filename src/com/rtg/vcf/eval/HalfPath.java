@@ -30,15 +30,15 @@
 
 package com.rtg.vcf.eval;
 
+import static com.rtg.util.StringUtils.LS;
+
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.Utils;
-import com.rtg.util.integrity.Exam;
-import com.rtg.util.integrity.IntegralAbstract;
 
 /**
  * One half of a path that reconciles two sequences of variants.
  */
-public class HalfPath extends IntegralAbstract implements Comparable<HalfPath> {
+public class HalfPath implements Comparable<HalfPath> {
 
   private final HaplotypePlayback mHaplotypeA;
   private HaplotypePlayback mHaplotypeB;
@@ -104,17 +104,17 @@ public class HalfPath extends IntegralAbstract implements Comparable<HalfPath> {
     mLastVariant = var.variant();
 
     // Lazy creation of the B haplotype
-    if (mHaplotypeB == null && var.ntAlleleB() != null) {
+    if (mHaplotypeB == null && var.isHeterozygous()) {
       mHaplotypeB = mHaplotypeA.copy();
     }
 
     mHaplotypeA.addVariant(var);
 
     if (mHaplotypeB != null) {
-      if (var.ntAlleleB() == null) { // Homozygous variant
+      if (!var.isHeterozygous()) {
         mHaplotypeB.addVariant(var);
-      } else { // Add the other side of the heterozygous variant.
-        mHaplotypeB.addVariant(new OrientedVariant(var.variant(), !var.isAlleleA()));
+      } else { // Add the other side of the heterozygous diploid variant.
+        mHaplotypeB.addVariant(var.other());
       }
     }
   }
@@ -298,7 +298,13 @@ public class HalfPath extends IntegralAbstract implements Comparable<HalfPath> {
   }
 
   @Override
-  public void toString(StringBuilder sb) {
+  public int hashCode() {
+    return Utils.pairHash(mHaplotypeB == null ? 0 : mHaplotypeB.hashCode(), mHaplotypeA.hashCode(), mVariantEndPosition);
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append(" +:");
     sb.append(mHaplotypeA.templatePosition() + 1);
     if (!mHaplotypeA.isOnTemplate()) {
@@ -318,14 +324,7 @@ public class HalfPath extends IntegralAbstract implements Comparable<HalfPath> {
     sb.append("excluded:");
     sb.append(listToString(mExcluded));
     sb.append(LS);
-  }
-  @Override
-  public int hashCode() {
-    return Utils.hash(new Object[] {
-      mHaplotypeB
-      , mHaplotypeA
-      , mVariantEndPosition
-    });
+    return sb.toString();
   }
 
   static <T> String listToString(BasicLinkedListNode<T> list) {
@@ -342,12 +341,4 @@ public class HalfPath extends IntegralAbstract implements Comparable<HalfPath> {
     sb.append("]");
     return sb.toString();
   }
-
-  @Override
-  public boolean integrity() {
-    Exam.assertNotNull(mHaplotypeA);
-
-    return true;
-  }
-
 }

@@ -30,22 +30,11 @@
 
 package com.rtg.vcf.eval;
 
-import java.util.Arrays;
-
 import com.rtg.mode.DnaUtils;
-import com.rtg.util.Utils;
-import com.rtg.util.integrity.IntegralAbstract;
-import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
  */
-public class MockVariant extends IntegralAbstract implements Variant {
-
-  private final int mStart;
-  private final int mEnd;
-  private final byte[] mPlus;
-  private final byte[] mMinus;
-  private final boolean mPhased;
+public class MockVariant extends DetectedVariant {
 
   /**
    * @param start one-based start position of mutation
@@ -55,17 +44,17 @@ public class MockVariant extends IntegralAbstract implements Variant {
    * @param phased does this call have phasing information
    */
   public MockVariant(int start, int end, byte[] plus, byte[] minus, boolean phased) {
-    super();
-    mStart = start - 1;
-    mEnd = end - 1;
-    mPlus = Arrays.copyOf(plus, plus.length);
-    if (minus != null) {
-      mMinus = Arrays.copyOf(minus, minus.length);
-    } else {
-      mMinus = null;
-    }
-    mPhased = phased;
+    super("", start - 1, end - 1, toPreds(plus, minus), phased);
   }
+
+  static byte[][] toPreds(byte[] plus, byte[] minus) {
+    if (minus == null) {
+      return new byte[][] {plus};
+    } else {
+      return new byte[][] {plus, minus};
+    }
+  }
+
   /**
    * Assumes not phased
    * @param start one-based start position of mutation
@@ -78,90 +67,15 @@ public class MockVariant extends IntegralAbstract implements Variant {
   }
 
   @Override
-  public int getEnd() {
-    return mEnd;
-  }
-
-  @Override
-  public boolean overlaps(SequenceNameLocus other) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean contains(String sequence, int pos) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getLength() {
-    return getEnd() - getStart();
-  }
-
-  @Override
-  public byte[] nt(boolean strand) {
-    return strand ? ntAlleleA() : ntAlleleB();
-  }
-
-  @Override
-  public byte[] ntAlleleB() {
-    if (mMinus != null) {
-      return Arrays.copyOf(mMinus, mMinus.length);
-    } else {
-      return null;
-    }
-  }
-
-  @Override
-  public byte[] ntAlleleA() {
-    return Arrays.copyOf(mPlus, mPlus.length);
-  }
-
-  @Override
-  public int getStart() {
-    return mStart;
-  }
-
-  @Override
-  public boolean integrity() {
-    return true;
-  }
-
-  @Override
-  public void toString(StringBuilder sb) {
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
     sb.append(getStart() + 1).append(":").append(getEnd() + 1).append(" ");
-    sb.append(DnaUtils.bytesToSequenceIncCG(mPlus));
-    if (mMinus != null) {
-      sb.append(":").append(DnaUtils.bytesToSequenceIncCG(mMinus));
+    for (int i = 0; i < numAlleles(); i++) {
+      if (i > 0) {
+        sb.append(":");
+      }
+      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
     }
-  }
-
-  @Override
-  public boolean isPhased() {
-    return mPhased;
-  }
-
-  @Override
-  public int hashCode() {
-    return Utils.pairHash(mStart, mEnd);
-  }
-
-  @Override
-  public boolean equals(final Object o2) {
-    if (this == o2) {
-      return true;
-    }
-    if (o2 == null) {
-      return false;
-    }
-    if (!(o2 instanceof MockVariant)) {
-      return false;
-    }
-    final MockVariant other = (MockVariant) o2;
-    return mStart == other.mStart && mEnd == other.mEnd;
-  }
-
-  @Override
-  public String getSequenceName() {
-    return "";
+    return sb.toString();
   }
 }

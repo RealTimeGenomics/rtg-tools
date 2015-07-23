@@ -95,8 +95,8 @@ public class PathTest extends TestCase {
     assertEquals(best.hashCode(), best2.hashCode());
   }
 
-  private void addVar(List<OrientedVariant> list, Variant v, boolean include) {
-    list.add(new OrientedVariant(v, include));
+  private void addVar(List<OrientedVariant> list, DetectedVariant v, boolean include) {
+    list.add(OrientedVariantTest.createOrientedVariant(v, include));
   }
   private List<Variant> getVariations(List<OrientedVariant> list) {
     final List<Variant> mutations = new ArrayList<>();
@@ -490,16 +490,16 @@ public class PathTest extends TestCase {
 
   public void testHeterozygousInsert()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2,  1};
-    final OrientedVariant[] a = {
-        new OrientedVariant(getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 7 . T TT 0.0 PASS . GT 0/1"), false)
-      , new OrientedVariant(getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1"), true)
+    final Variant[] a = {
+        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 7 . T TT 0.0 PASS . GT 0/1") // XXX, false)
+      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
-    final OrientedVariant[] b = {
-        new OrientedVariant(getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 4 . T TT 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1"), true)
+    final Variant[] b = {
+        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 4 . T TT 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final double[] expectedWeights = {1.0, 1.0};
@@ -522,16 +522,16 @@ public class PathTest extends TestCase {
 
   public void testHeterozygousDelete()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
-    final OrientedVariant[] a = {
-        new OrientedVariant(getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 6 . TT T 0.0 PASS . GT 1/0"), false)
-      , new OrientedVariant(getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1"), true)
+    final Variant[] a = {
+        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 6 . TT T 0.0 PASS . GT 1/0") //XXX, false)
+      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
-    final OrientedVariant[] b = {
-        new OrientedVariant(getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 4 . TT T 0.0 PASS . GT 1/1"), true)
-      , new OrientedVariant(getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1"), true)
+    final Variant[] b = {
+        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 4 . TT T 0.0 PASS . GT 1/1")
+      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final double[] expectedWeights = {1.0, 1.0};
@@ -593,8 +593,8 @@ public class PathTest extends TestCase {
 
   public void testPastEndOfTemplate() {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
-    final OrientedVariant[] a = {new OrientedVariant(getDetectedVariant("seq 12 . C T 0.0 PASS . GT 1/1"), true)};
-    final List<OrientedVariant> al = Arrays.asList(a);
+    final Variant[] a = {getDetectedVariant("seq 12 . C T 0.0 PASS . GT 1/1")};
+    final List<Variant> al = Arrays.asList(a);
     //Testing that having variants outside the template will not attempt to advance the path past the end of the
     //template when the path is in sync
     PathFinder.bestPath(template, "seq", al, al);

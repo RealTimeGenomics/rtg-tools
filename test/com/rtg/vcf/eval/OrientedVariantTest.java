@@ -37,17 +37,23 @@ import junit.framework.TestCase;
  */
 public class OrientedVariantTest extends TestCase {
 
+  public static OrientedVariant createOrientedVariant(DetectedVariant variant, boolean isAlleleA) {
+    return new OrientedVariant(variant, isAlleleA,
+      isAlleleA ? 0 : 1,
+      variant.numAlleles() == 1
+        ? isAlleleA ? 0 : 1
+        : isAlleleA ? 1 : 0);
+  }
+
   public void test() {
-    final Variant v = new MockVariant(0, 0, new byte[] {0, 1, 2}, null);
-    final OrientedVariant ov = new OrientedVariant(v, true);
+    final MockVariant v = new MockVariant(0, 0, new byte[] {0, 1, 2}, null);
+    final OrientedVariant ov = createOrientedVariant(v, true);
     assertEquals("0:0 NAC+", ov.toString());
     assertTrue(ov.equals(ov));
     assertEquals(-1, ov.getStart());
     assertEquals(-1, ov.getEnd());
-    assertEquals(3, ov.nt(true).length);
-    assertEquals(3, ov.ntAlleleA().length);
-    assertNull(ov.ntAlleleB());
-    final OrientedVariant ov2 = new OrientedVariant(new MockVariant(1, 2, new byte[] {1, 1, 1}, new byte[] {2, 2, 2}), false);
+    assertEquals(3, ov.nt().length);
+    final OrientedVariant ov2 = createOrientedVariant(new MockVariant(1, 2, new byte[]{1, 1, 1}, new byte[]{2, 2, 2}), false);
     assertEquals("1:2 AAA:CCC-", ov2.toString());
     assertFalse(ov.equals(ov2));
     assertFalse(ov.hashCode() == ov2.hashCode());
@@ -56,12 +62,13 @@ public class OrientedVariantTest extends TestCase {
     assertEquals(0, ov.compareTo(ov));
     assertEquals(-1, ov.compareTo(ov2));
     assertEquals(1, ov2.compareTo(ov));
+    assertEquals(2, ov2.nt()[0]);
     assertFalse(ov.equals("not an OrientedVariant"));
     assertFalse(ov.equals(null));
 
-    final Variant v2 = new MockVariant(0, 0, new byte[] {0, 1, 2}, new byte[] {1});
-    final OrientedVariant ov3 = new OrientedVariant(v2, true);
-    final OrientedVariant ov4 = new OrientedVariant(v2, false);
+    final MockVariant v2 = new MockVariant(0, 0, new byte[] {0, 1, 2}, new byte[] {1});
+    final OrientedVariant ov3 = createOrientedVariant(v2, true);
+    final OrientedVariant ov4 = createOrientedVariant(v2, false);
     assertEquals(1, ov3.compareTo(ov4));
     assertEquals(-1, ov4.compareTo(ov3));
   }

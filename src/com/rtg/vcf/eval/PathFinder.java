@@ -134,7 +134,7 @@ public final class PathFinder {
         currentMaxPos = Math.max(currentMaxPos, aVar.getStart());
         //Adding a new variant to A side
         // if (DUMP) System.err.println("Add alternatives to called " + aVar);
-        addIfBetter(head.addAVariant(aVar, aVarIndex), sortedPaths);
+        addIfBetter(head.addCallVariant(aVar, aVarIndex), sortedPaths);
         continue;
       }
       final int bVarIndex = nextVariant(head.mBaselinePath, mBaseLineVariants);
@@ -143,7 +143,7 @@ public final class PathFinder {
         currentMaxPos = Math.max(currentMaxPos, bVar.getStart());
         //Adding a new variant to B side
         // if (DUMP) System.err.println("Add alternatives to baseline " + bVar);
-        addIfBetter(head.addBVariant(bVar, bVarIndex), sortedPaths);
+        addIfBetter(head.addBaselineVariant(bVar, bVarIndex), sortedPaths);
         continue;
       }
 
@@ -259,11 +259,7 @@ public final class PathFinder {
     if (firstSize == secondSize) {
       // At this point try to break ties arbitrarily based on allele ordering
       if (firstIncluded != null && secondIncluded != null) {
-        if (firstIncluded.getValue().isAlleleA() && !secondIncluded.getValue().isAlleleA()) {
-          return first;
-        } else if (secondIncluded.getValue().isAlleleA()) {
-          return second;
-        }
+        return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
       }
     }
     return firstSize > secondSize ? first : second;

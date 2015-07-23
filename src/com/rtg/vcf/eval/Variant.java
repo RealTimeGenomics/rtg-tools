@@ -37,26 +37,19 @@ import com.rtg.util.intervals.SequenceNameLocus;
 public interface Variant extends SequenceNameLocus {
 
   /**
-   * One allele of the variant as determined by allele parameter.
-   * @param alleleA if true select the A allele.
-   * @return the allele (may be null or zero length)
+   * One allele of the variant as determined by <code>alleleId</code> parameter.
+   * @param alleleId the index of the allele.
+   * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
    */
-  byte[] nt(boolean alleleA);
+  byte[] nt(int alleleId);
 
   /**
-   * The first allele of the variant. Always non null but may be zero length.
-   * @return the A allele
-   */
-  byte[] ntAlleleA();
-
-  /**
-   * Second allele of the variant. Will be null if homozygous and may be zero length.
-   * @return the B allele, or null if homozygous
-   */
-  byte[] ntAlleleB();
-
-  /**
-   * @return true if the call has phasing information
+   * @return true if the call has (external) phasing information
    */
   boolean isPhased();
+
+  /**
+   * @return the possible oriented variants for this variant
+   */
+  OrientedVariant[] orientations();
 }

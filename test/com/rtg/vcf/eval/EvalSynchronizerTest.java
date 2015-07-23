@@ -145,18 +145,20 @@ public class EvalSynchronizerTest extends TestCase {
         simpleThreadPool.execute(new IORunnable() {
           @Override
           public void run() throws IOException {
-            sync.write("name2", Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false))
-                , Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC3_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false))
-                , Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC5_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
+            sync.write("name2",
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)),
+              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC3_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)),
+              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC5_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
             sync.addVariants(10, 0, 0);
           }
         });
         simpleThreadPool.execute(new IORunnable() {
           @Override
           public void run() throws IOException {
-            sync.write("name1", Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC2_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false))
-                , Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC4_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false))
-                , Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC6_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
+            sync.write("name1",
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC2_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)),
+              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC4_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)),
+              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC6_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
             sync.addVariants(22, 0, 0);
           }
         });
@@ -196,7 +198,7 @@ public class EvalSynchronizerTest extends TestCase {
       simpleThreadPool.execute(new IORunnable() {
         @Override
         public void run() throws IOException {
-          sync.write("name2", Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null, null, null);
+          sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)), null, null, null);
           fail("Should have aborted in thread");
         }
       });
@@ -238,7 +240,7 @@ public class EvalSynchronizerTest extends TestCase {
         @Override
         public void run() {
           try {
-            sync.write("name2", Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null, null, null);
+            sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)), null, null, null);
           } catch (final IllegalStateException e) {
             internalException[0] = e;
           } catch (final IOException e) {

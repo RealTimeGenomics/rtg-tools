@@ -42,6 +42,7 @@ import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -100,11 +101,11 @@ class EvalSynchronizer {
    * @param <T> Type of variant
    * @throws IOException IO exceptions require too many comments.
    */
-  private static <T extends Variant> void writeVariants(VcfWriter out, VcfReader vcfReader, Collection<T> variants) throws IOException {
+  private static <T extends SequenceNameLocus> void writeVariants(VcfWriter out, VcfReader vcfReader, Collection<T> variants) throws IOException {
     if (variants == null) {
       return;
     }
-    for (final Variant v : variants) {
+    for (final SequenceNameLocus v : variants) {
       final DetectedVariant dv = (DetectedVariant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
       VcfRecord rec = null;
       while (vcfReader.hasNext()) {
@@ -169,7 +170,7 @@ class EvalSynchronizer {
    * @param tpbase True positive variant calls (baseline, equiv with calls)
    * @throws IOException when IO fails
    */
-  void write(String sequenceName, Collection<? extends Variant> tp, Collection<? extends Variant> fp, Collection<? extends Variant> fn, Collection<? extends Variant> tpbase) throws IOException {
+  void write(String sequenceName, Collection<OrientedVariant> tp, Collection<? extends SequenceNameLocus> fp, Collection<? extends SequenceNameLocus> fn, Collection<OrientedVariant> tpbase) throws IOException {
     synchronized (mNames) {
       // wait for our turn to write results. Keeping output in order.
       while (!mNames.peek().equals(sequenceName)) {
