@@ -58,7 +58,7 @@ abstract class AbstractStreamManager {
   protected DataFileIndex mIndex;
   private int mIndexPos;
   protected File mDir;
-  private long mNumberSequences;
+  private final long mNumberSequences;
 
   protected int mIndexedSequenceFileNumber = -1;
 

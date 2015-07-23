@@ -34,9 +34,9 @@ package com.rtg.util.cli;
  * of flags in the order they were set.
  */
 public class FlagValue {
-  private Flag mFlag;
+  private final Flag mFlag;
 
-  private Object mValue;
+  private final Object mValue;
 
   FlagValue(final Flag flag, final Object value) {
     mFlag = flag;

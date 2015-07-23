@@ -808,7 +808,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
 
     private ErrorEvent mEvent;
 
-    private MemoryPrintStream mWarnings = new MemoryPrintStream();
+    private final MemoryPrintStream mWarnings = new MemoryPrintStream();
 
     @Override
     public void handleDiagnosticEvent(final DiagnosticEvent<?> event) {

@@ -48,7 +48,7 @@ import com.rtg.util.io.SeekableStream;
 public class FileCompressedInputStream extends SeekableStream {
 
   /** The total number of values stored. */
-  private long mSize;
+  private final long mSize;
 
   /** How many values we compress into each bit-field (via multiplication). */
   private final int mPerBitfield;
@@ -69,7 +69,7 @@ public class FileCompressedInputStream extends SeekableStream {
    * A lookup table: given a bit-field with value <code>val</code>,
    * <code>mValue[i][v]</code> is the value of the <code>i'th</code> field in that bit-field.
    */
-  private byte[][] mValue;
+  private final byte[][] mValue;
 
 
 

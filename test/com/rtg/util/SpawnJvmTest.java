@@ -231,7 +231,7 @@ public final class SpawnJvmTest extends TestCase {
    */
   static class ProcessOutput {
     String mStdOut;
-    private String mStdErr;
+    private final String mStdErr;
     private int mRetCode;
 
     public ProcessOutput(final String input, final int maxMem, final String className, final String... args) throws IOException {

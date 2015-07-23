@@ -38,14 +38,14 @@ import java.io.IOException;
  *
  */
 public class Adjacency implements Comparable<Adjacency> {
-  private String mThisChromosome;
-  private int mThisEnd;
-  private boolean mThisForward;
-  private String mThisBases;
+  private final String mThisChromosome;
+  private final int mThisEnd;
+  private final boolean mThisForward;
+  private final String mThisBases;
 
-  private String mMateChromosome;
-  private int mMateStart;
-  private boolean mMateForward;
+  private final String mMateChromosome;
+  private final int mMateStart;
+  private final boolean mMateForward;
 
   /**
    * @param chr name of the current chromosome.

@@ -104,9 +104,9 @@ public abstract class BidirectionalFrame implements Frame, PseudoEnum {
     return values()[value];
   }
 
-  private String mDisplay;
-  private String mName;
-  private int mOrdinal;
+  private final String mDisplay;
+  private final String mName;
+  private final int mOrdinal;
 
   private BidirectionalFrame(final int ordinal, final String name, final String display) {
     mDisplay = display;

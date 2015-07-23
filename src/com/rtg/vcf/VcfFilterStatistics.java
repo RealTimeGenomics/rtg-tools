@@ -65,7 +65,7 @@ class VcfFilterStatistics implements Statistics {
     , COMBINED_READ_DEPTH_FILTERED_COUNT
   }
 
-  private int[] mValues = new int[Stat.values().length];
+  private final int[] mValues = new int[Stat.values().length];
   final MultiSet<String> mFilterTags = new MultiSet<>(new TreeMap<String, Counter>()); // valid filter tags - input file specific
   final MultiSet<String> mInfoTags = new MultiSet<>(new TreeMap<String, Counter>()); // valid info tags - input file specific
   private boolean mPosteriorFiltering;

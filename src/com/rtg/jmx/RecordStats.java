@@ -41,10 +41,10 @@ public class RecordStats implements Runnable {
 
   private static final String LS = System.lineSeparator();
 
-  private ArrayList<MonStats> mStats = new ArrayList<>();
+  private final ArrayList<MonStats> mStats = new ArrayList<>();
 
-  private Appendable mOut;
-  private int mDelay;
+  private final Appendable mOut;
+  private final int mDelay;
   private static final int REPEAT_HEADER = 30;
   private boolean mRun = true;
 

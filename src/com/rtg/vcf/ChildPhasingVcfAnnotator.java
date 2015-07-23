@@ -47,7 +47,7 @@ public class ChildPhasingVcfAnnotator implements VcfAnnotator {
 
   private VcfHeader mHeader = null;
 
-  private Collection<Family> mFamilies;
+  private final Collection<Family> mFamilies;
 
   /**
    * Constructor. All children within the supplied families will be phased with respect to their parents.

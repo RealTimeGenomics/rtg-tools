@@ -73,8 +73,8 @@ public final class ListenerType implements PseudoEnum, Serializable {
   }
 
 
-  private String mName;
-  private int mOrdinal;
+  private final String mName;
+  private final int mOrdinal;
 
   private ListenerType(final int ordinal, final String name) {
     mName = name;

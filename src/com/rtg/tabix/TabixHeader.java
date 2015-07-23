@@ -47,7 +47,7 @@ public class TabixHeader {
   private final int mNumSequences;
   private final TabixIndexer.TabixOptions mOptions;
   private final byte[] mSequenceNames;
-  private String[] mSequenceNamesUnpacked;
+  private final String[] mSequenceNamesUnpacked;
 
   TabixHeader(int numSequences, TabixIndexer.TabixOptions options, byte[] sequenceNames) {
     mNumSequences = numSequences;

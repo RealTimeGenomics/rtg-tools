@@ -48,7 +48,7 @@ class RollingIndex {
   DataOutputStream mOutput;
   private long mCurrent;
   private long mDataSize;
-  private File mFile;
+  private final File mFile;
 
   public RollingIndex(final File file) {
     mCurrent = 0;

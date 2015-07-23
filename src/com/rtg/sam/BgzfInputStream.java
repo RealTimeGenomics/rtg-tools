@@ -53,8 +53,8 @@ public class BgzfInputStream extends InputStream {
 
   private long mBlockStartPos;
   private long mBlockEndPos;
-  private BgzfBlock mCurrentBlock;
-  private Inflater mInflater;
+  private final BgzfBlock mCurrentBlock;
+  private final Inflater mInflater;
   private final CRC32 mCrc;
 
   private int mDataPosition;

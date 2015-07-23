@@ -68,9 +68,9 @@ public class LoggedCliTest extends TestCase {
 
   private static final class FakeCli extends LoggedCli {
 
-    private File mDir;
-    private int mCode;
-    private boolean mThrow;
+    private final File mDir;
+    private final int mCode;
+    private final boolean mThrow;
 
     public FakeCli(File dir, int code, boolean throwException) {
       mDir = dir;

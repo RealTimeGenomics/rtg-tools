@@ -65,7 +65,7 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
   private final boolean mGrow;
 
   /** All the data is packed into these longs. */
-  private CommonIndex mData;
+  private final CommonIndex mData;
 
   /** How many values we compress into each bit-field (via multiplication). */
   private final int mPerBitfield;

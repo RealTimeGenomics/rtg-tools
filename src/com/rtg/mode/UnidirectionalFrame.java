@@ -56,8 +56,8 @@ public final class UnidirectionalFrame implements Frame, PseudoEnum {
     throw new UnsupportedOperationException("Not supported");
   }
 
-  private int mOrdinal;
-  private String mName;
+  private final int mOrdinal;
+  private final String mName;
 
   private UnidirectionalFrame(final int ordinal, final String name) {
     mOrdinal = ordinal;

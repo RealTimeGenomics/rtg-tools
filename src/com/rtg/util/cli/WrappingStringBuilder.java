@@ -38,7 +38,7 @@ import com.rtg.util.StringUtils;
  */
 public class WrappingStringBuilder {
 
-  private StringBuilder mSB = new StringBuilder();
+  private final StringBuilder mSB = new StringBuilder();
   private String mPrefix = "";
   private int mWrapWidth = 0;
   private int mLineStart = 0;

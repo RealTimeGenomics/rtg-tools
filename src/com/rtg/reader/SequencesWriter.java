@@ -57,7 +57,7 @@ public class SequencesWriter {
   //Stats
 //  private static final int MAX_WARNINGS = 5;
 //  private final boolean mSkipEmptySequences = false; //Boolean.valueOf(System.getProperty("skip-empty-sequences", "false")); // If true, don't pass empty sequences to sdf writer
-  private int mEmptySequenceCount = 0;
+  private final int mEmptySequenceCount = 0;
 
   private long mExcludedSequencesCount = 0;
   private long mExcludedResiduesCount;

@@ -36,14 +36,13 @@ import com.rtg.util.StringUtils;
 
 /**
  * Utility methods for storing and retrieving the command line arguments.
- *
  */
 public final class CommandLine {
 
   private static String[] sCommandArgs;
   private static String sCommandLine;
 
-  private static UUID sRunId = UUID.randomUUID();
+  private static final UUID RUN_ID = UUID.randomUUID();
 
   private CommandLine() {
   }
@@ -86,6 +85,6 @@ public final class CommandLine {
    * @return a UUID for this instance of Slim
    */
   public static UUID getRunId() {
-    return sRunId;
+    return RUN_ID;
   }
 }
