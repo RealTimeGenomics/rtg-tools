@@ -248,25 +248,23 @@ public final class PathFinder {
   }
 
   static Path better(Path first, Path second) {
-    final BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
-    final BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
-    final int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-    final int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
+    BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
+    int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
+    int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
+    firstIncluded =  first == null ? null : first.mBaselinePath.getIncluded();
+    secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
+    firstSize += firstIncluded == null ? 0 : firstIncluded.size();
+    secondSize += secondIncluded == null ? 0 : secondIncluded.size();
     if (firstSize == secondSize) {
-      final BasicLinkedListNode<OrientedVariant> firstBaseline =  first == null ? null : first.mBaselinePath.getIncluded();
-      final BasicLinkedListNode<OrientedVariant> secondBaseline = second == null ? null : second.mBaselinePath.getIncluded();
-      final int firstBaseSize = firstBaseline == null ? 0 : firstBaseline.size();
-      final int secondBaseSize = secondBaseline == null ? 0 : secondBaseline.size();
-      if (firstBaseSize == secondBaseSize) {
-        if (firstBaseline != null && secondBaseline != null) {
-          if (firstBaseline.getValue().isAlleleA() && !secondBaseline.getValue().isAlleleA()) {
-            return first;
-          } else if (secondBaseline.getValue().isAlleleA()) {
-            return second;
-          }
+      // At this point try to break ties arbitrarily based on allele ordering
+      if (firstIncluded != null && secondIncluded != null) {
+        if (firstIncluded.getValue().isAlleleA() && !secondIncluded.getValue().isAlleleA()) {
+          return first;
+        } else if (secondIncluded.getValue().isAlleleA()) {
+          return second;
         }
       }
-      return firstBaseSize > secondBaseSize ? first : second;
     }
     return firstSize > secondSize ? first : second;
   }
