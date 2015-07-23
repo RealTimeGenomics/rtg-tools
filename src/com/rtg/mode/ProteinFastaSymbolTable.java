@@ -52,7 +52,7 @@ public class ProteinFastaSymbolTable extends FastaSymbolTable {
     if (code == '*') {
       return Protein.STOP;
     }
-    switch (code & (~32)) {
+    switch (code & ~32) {
     case (int) 'A':
       return Protein.A;
     case (int) 'C':

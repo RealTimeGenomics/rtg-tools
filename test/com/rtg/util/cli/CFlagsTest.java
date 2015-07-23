@@ -200,7 +200,7 @@ public class CFlagsTest extends TestCase {
     assertTrue(mFlags.getValue("long").equals(Long.valueOf("64234")));
 
     assertTrue(mFlags.isSet("double"));
-    assertTrue((mFlags.getValue("double")).equals(Double.valueOf("64324.234")));
+    assertTrue(mFlags.getValue("double").equals(Double.valueOf("64324.234")));
 
     assertTrue(mFlags.isSet("file"));
     assertTrue(mFlags.getValue("file").equals(new File("afilename")));

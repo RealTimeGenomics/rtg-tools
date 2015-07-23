@@ -172,13 +172,13 @@ public final class CommonFlags {
    */
   public static boolean validateStartEnd(CFlags flags, String startFlag, String endFlag) {
     if (flags.isSet(startFlag)) {
-      if (((Long) flags.getValue(startFlag)) < 0) {
+      if ((Long) flags.getValue(startFlag) < 0) {
         flags.error("--" + startFlag + " should be positive");
         return false;
       }
     }
     if (flags.isSet(endFlag)) {
-      if (((Long) flags.getValue(endFlag)) < 1) {
+      if ((Long) flags.getValue(endFlag) < 1) {
         flags.error("--" + endFlag + " should be greater than 0");
         return false;
       }

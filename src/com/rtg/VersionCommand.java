@@ -124,7 +124,7 @@ public final class VersionCommand {
   }
 
   static String getRamString(final int percentageAllocated, final double maxMemory, final double totalMemory) {
-    return ((int) maxMemory) / 10.0 + "GB of " + ((int) totalMemory) / 10.0 + "GB RAM can be used by rtg "
+    return (int) maxMemory / 10.0 + "GB of " + (int) totalMemory / 10.0 + "GB RAM can be used by rtg "
     + "(" + percentageAllocated + "%)";
   }
 

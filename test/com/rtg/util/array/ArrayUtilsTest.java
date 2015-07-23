@@ -143,7 +143,7 @@ public class ArrayUtilsTest extends TestCase {
       final int size = ArrayUtils.readInts(intArray, saved, 0, 1);
       assertEquals(numbers.length, size);
       for (int i = 0; i < numbers.length; i++) {
-        assertEquals(((long) numbers[i]) + 1L, saved.get(i));
+        assertEquals((long) numbers[i] + 1L, saved.get(i));
       }
     } finally {
       assertTrue(intArray.delete());
@@ -162,7 +162,7 @@ public class ArrayUtilsTest extends TestCase {
       final int size = ArrayUtils.readInts(intArray, 1, 6, saved, 0, 1);
       assertEquals(numbers.length - 2, size);
       for (int i = 1; i < numbers.length - 1; i++) {
-        assertEquals(((long) numbers[i]) + 1L, saved.get(i - 1));
+        assertEquals((long) numbers[i] + 1L, saved.get(i - 1));
       }
     } finally {
       assertTrue(intArray.delete());

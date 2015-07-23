@@ -623,7 +623,7 @@ public final class Diagnostic {
     return sLastProgress;
   }
 
-  private static final String OOM_ERROR_MESSAGE = StringUtils.LS + (new ErrorEvent(ErrorType.NOT_ENOUGH_MEMORY).getMessage()) + StringUtils.LS;
+  private static final String OOM_ERROR_MESSAGE = StringUtils.LS + new ErrorEvent(ErrorType.NOT_ENOUGH_MEMORY).getMessage() + StringUtils.LS;
   private static final byte[] OOM_ERROR_MESSAGE_BYTES = OOM_ERROR_MESSAGE.getBytes();
   private static final OutputStream OOM_ERROR_STREAM = FileUtils.getStderrAsOutputStream();
 

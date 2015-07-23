@@ -150,7 +150,7 @@ public final class RocSlope {
       if (mDeltay == 0) {
         return 0.0;
       }
-      return ((double) mDeltay) / mDeltax;
+      return (double) mDeltay / mDeltax;
     }
 
     private int endX() {

@@ -68,7 +68,7 @@ public class ClassPathSuite extends TestSuite {
   }
 
   private Class<?>[] getTestClasses() {
-    final List<Class<?>> testClasses = new LinkedList<Class<?>>();
+    final List<Class<?>> testClasses = new LinkedList<>();
 
     for (String each : CLASSPATH.split(File.pathSeparator)) {
       final File root = new File(each);

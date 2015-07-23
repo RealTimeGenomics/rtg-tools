@@ -65,7 +65,7 @@ public final class ChooseMemory {
       return;
     }
 
-    final double percentage = ((Integer) flags.getAnonymousValue(0)) / 100.0;
+    final double percentage = (Integer) flags.getAnonymousValue(0) / 100.0;
     final int megs = (int) (Environment.getTotalMemory() * percentage / 1024.0 / 1024.0);
     System.out.println((megs < 1024 ? 1024 : megs) + "m");
   }

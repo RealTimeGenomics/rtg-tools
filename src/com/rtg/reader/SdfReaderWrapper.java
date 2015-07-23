@@ -235,6 +235,7 @@ public final class SdfReaderWrapper implements Closeable {
    * Closes the internal Sequence Readers
    * @throws IOException when one of the Sequence Readers close methods fails
    */
+  @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
     try (SequencesReader ignored = mSingle) {

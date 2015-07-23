@@ -87,9 +87,9 @@ public final class ByteArrayIOUtilsTest extends TestCase {
 
   public void testConvertToIntArray() throws IOException {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try (DataOutputStream dos = new DataOutputStream(bos)) {
-      for (int i = 0; i < TEST_ARRAY_INT.length; i++) {
-        dos.writeInt(TEST_ARRAY_INT[i]);
+    try (final DataOutputStream dos = new DataOutputStream(bos)) {
+      for (final int a : TEST_ARRAY_INT) {
+        dos.writeInt(a);
       }
     }
     final byte[] bytes = bos.toByteArray();

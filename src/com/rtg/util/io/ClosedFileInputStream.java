@@ -106,6 +106,7 @@ public final class ClosedFileInputStream extends htsjdk.samtools.seekablestream.
   /**
    * @return current position within the file
    */
+  @Override
   public long position() {
     return mFilePointer;
   }

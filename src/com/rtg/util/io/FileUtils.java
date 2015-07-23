@@ -123,7 +123,7 @@ public final class FileUtils {
    * URLs
    */
   public static String patchURLForUNC(final String url) {
-    return ((url.length() > 8) && (url.startsWith("file://")) && (url.charAt(7) != '/') && (url
+    return ((url.length() > 8) && url.startsWith("file://") && (url.charAt(7) != '/') && (url
         .charAt(7) != '\\')) ? "file://\\\\" + url.substring(7) : url;
   }
 

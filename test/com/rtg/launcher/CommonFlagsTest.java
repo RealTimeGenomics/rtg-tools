@@ -114,18 +114,17 @@ public class CommonFlagsTest extends TestCase {
         }
 
         for (int i = 0; i < files.length; i++) {
-
           assertEquals("files[" + i + "]=" + files[i].getPath() + " was " + (i < 5 ? "not " : "") + "contained in the string", i < 5, baos.toString().contains(files[i].getPath() + " is not a valid SDF"));
         }
 
-        for (int i = 0; i < files.length; i++) {
-          assertTrue(files[i].delete());
-          assertTrue(files[i].mkdir());
+        for (final File file : files) {
+          assertTrue(file.delete());
+          assertTrue(file.mkdir());
         }
         baos.reset();
         try {
           CommonFlags.getFileList(flags, listFlag, null, false);
-                  System.err.println(baos.toString());
+          //System.err.println(baos.toString());
           fail();
         } catch (final NoTalkbackSlimException e) {
           assertTrue(e.getMessage(), e.getMessage().contains("There were 5 invalid input file paths"));

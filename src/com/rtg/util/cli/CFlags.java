@@ -714,7 +714,7 @@ public final class CFlags {
       setPendingParseMessage(pendingRequired);
       success = false;
     }
-    if (success && (mValidator != null) && (!mValidator.isValid(this))) {
+    if (success && (mValidator != null) && !mValidator.isValid(this)) {
       success = false;
     }
     if (!success && (mInvalidFlagHandler != null)) {

@@ -91,7 +91,7 @@ public final class MathUtils {
       return Math.log(nn);
     }
     if (n == 2 || n == (nn - 2)) {
-      return Math.log(((double) nn) * (nn - 1) / 2.0);
+      return Math.log((double) nn * (nn - 1) / 2.0);
     }
     return logFactorial(nn) - logFactorial(n) - logFactorial(nn - n);
   }

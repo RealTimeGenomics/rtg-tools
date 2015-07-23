@@ -250,7 +250,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
   @Override
   public boolean integrity() {
     Exam.assertTrue(mDirectory.isDirectory());
-    if (!(Exam.assertTrue(mSequenceManager != null && mLabelManager != null))) {
+    if (!Exam.assertTrue(mSequenceManager != null && mLabelManager != null)) {
       return false; //for findbugs benefit
     }
     Exam.assertTrue(mSequenceType.ordinal() == mIndex.getSequenceType());

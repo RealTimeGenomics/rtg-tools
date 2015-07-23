@@ -423,7 +423,7 @@ public class BamReader extends SamBamReader {
     }
     final byte[] qual = new byte[length];
     for (int i = 0; i < length; i++) {
-      qual[i] = (byte) (((byte) '!') + buf[offset + i]);
+      qual[i] = (byte) ((byte) '!' + buf[offset + i]);
     }
     return new String(qual, 0, length);
   }
@@ -581,7 +581,7 @@ public class BamReader extends SamBamReader {
         case 'S':
           return ByteArrayIOUtils.bytesToShortLittleEndian(mCurrentAlignment, pos + 3);
         default:
-          throw new IllegalArgumentException("Not an implemented int type: " + ((char) mCurrentAlignment[pos + 2]));
+          throw new IllegalArgumentException("Not an implemented int type: " + (char) mCurrentAlignment[pos + 2]);
       }
     } else {
       return Integer.MIN_VALUE;

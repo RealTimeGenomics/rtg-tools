@@ -329,7 +329,7 @@ public final class DnaUtils {
   public static String phredToFastq(final byte[] buffer, final int offset, final int length, final boolean reverse) {
     final char[] chars = new char[length];
     for (int i = 0; i < length; i++) {
-      chars[reverse ? length - i - 1 : i] = (char) ((buffer[offset + i]) + 33);
+      chars[reverse ? length - i - 1 : i] = (char) (buffer[offset + i] + 33);
     }
     return new String(chars);
   }
