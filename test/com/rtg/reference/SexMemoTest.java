@@ -56,7 +56,6 @@ public class SexMemoTest extends TestCase {
   public void testDiploidDefault() throws IOException {
     Diagnostic.setLogStream();
     try (final TestDirectory genomeDir = new TestDirectory("sexmemo")) {
-      ;
       try (SequencesReader reader = ReaderTestUtils.getReaderDNA(">t\nacgt", genomeDir, null)) {
         final SexMemo sx = new SexMemo(reader, DefaultFallback.DIPLOID);
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.EITHER, "t"));
