@@ -54,7 +54,7 @@ public enum MetaType {
   }
   private final String mToString;
 
-  private MetaType(String toString) {
+  MetaType(String toString) {
     mToString = toString;
   }
 

@@ -48,7 +48,7 @@ public enum VcfNumberType {
   private final boolean mFixed;
   private final String mToString;
 
-  private VcfNumberType(boolean fixedString, String str) {
+  VcfNumberType(boolean fixedString, String str) {
     mFixed = fixedString;
     mToString = str;
   }

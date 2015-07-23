@@ -62,7 +62,7 @@ public enum DerivedAnnotations {
 
   private final AbstractDerivedAnnotation mAnnotation;
 
-  private DerivedAnnotations(AbstractDerivedAnnotation annotation) {
+  DerivedAnnotations(AbstractDerivedAnnotation annotation) {
     assert name().equals(annotation.getName());
     mAnnotation = annotation;
   }

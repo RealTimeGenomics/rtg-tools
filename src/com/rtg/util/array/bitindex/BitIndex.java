@@ -77,7 +77,7 @@ public final class BitIndex extends AbstractIndex implements ExtensibleIndex {
   /**
    * The type of array to use inside the index
    */
-  public static enum IndexType {
+  public enum IndexType {
     /** Choose chunked or single based on the length */
     DEFAULT,
     /** Use an array of arrays */

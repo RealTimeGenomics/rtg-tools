@@ -59,7 +59,7 @@ public class IndexerCli extends AbstractCli {
   /**
    * Supported formats for indexer
    */
-  public static enum IndexFormat {
+  public enum IndexFormat {
     /** <code>SAM</code> format */
     SAM,
     /** <code>BAM</code> format */

@@ -63,7 +63,7 @@ public class Timer extends AbstractTimer implements Integrity {
   /** The time of the last start. */
   private long mStart;
 
-  static enum State {
+  enum State {
     UNINITIALIZED, STOPPED, RUNNING
   }
 

@@ -76,7 +76,7 @@ public class ReferenceGenome {
   /**
    * Default fall-back method enumeration
    */
-  public static enum DefaultFallback {
+  public enum DefaultFallback {
     /** Use diploid default reference */
     DIPLOID,
     /** Use haploid default reference */

@@ -44,7 +44,7 @@ public enum Ploidy {
 
   private final int mCount;
 
-  private Ploidy(int count) {
+  Ploidy(int count) {
     mCount = count;
   }
 

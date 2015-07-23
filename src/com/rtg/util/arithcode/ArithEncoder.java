@@ -134,7 +134,7 @@ public final class ArithEncoder extends ArithCoder {
    */
   private int mBitsToFollow; // implied = 0;
 
-  private static enum State {
+  private enum State {
     CLOSED,
     END_BLOCK,
     ENCODING
