@@ -118,45 +118,47 @@ public class VcfEvalTaskTest extends TestCase {
     check(TEMPLATE, both, calledOnly, baselineOnly, tpOut, fpOut, fnOut, false, sortField);
   }
   private void check(String ref, String[] both, String[] calledOnly, String[] baselineOnly, String[] tpOut, String[] fpOut, String[] fnOut, boolean zip, String sortField) throws IOException, UnindexableDataException {
-    createInput(both, calledOnly, baselineOnly);
+    try (TestDirectory tdir = new TestDirectory()) {
+      createInput(tdir, both, calledOnly, baselineOnly);
 
-    final File calls = new File(mDir, "calls.vcf.gz");
-    final File mutations = new File(mDir, "mutations.vcf.gz");
-    final File out = FileUtils.createTempDir("out", zip ? "zip" : "notZipped", mDir);
-    final File template = new File(mDir, "template");
-    //System.err.println("baseline \n" + FileUtils.fileToString(mutations));
-    //System.err.println("calls \n" + FileUtils.fileToString(calls));
-    ReaderTestUtils.getReaderDNA(ref, template, null).close();
-    final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final File calls = new File(tdir, "calls.vcf.gz");
+      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File out = FileUtils.createTempDir("out", zip ? "zip" : "notZipped", tdir);
+      final File template = new File(tdir, "template");
+      //System.err.println("baseline \n" + FileUtils.fileToString(mutations));
+      //System.err.println("calls \n" + FileUtils.fileToString(calls));
+      ReaderTestUtils.getReaderDNA(ref, template, null).close();
+      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
         .templateFile(template).outputParams(new OutputParams(out, false, zip)).scoreField(sortField).create();
-    VcfEvalTask.evaluateCalls(params);
-    final String zipSuffix = zip ? ".gz" : "";
-    final File tpOutFile = new File(out, "tp.vcf" + zipSuffix);
-    final File fpOutFile = new File(out, "fp.vcf" + zipSuffix);
-    final File fnOutFile = new File(out, "fn.vcf" + zipSuffix);
-    final String tpResults = fileToString(tpOutFile, zip);
-    final String fpResults = fileToString(fpOutFile, zip);
-    final String fnResults = fileToString(fnOutFile, zip);
-    final String header = "##fileformat=VCFv4.1\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
-    if (zip) {
-      assertTrue(new File(out, "tp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
-      assertTrue(new File(out, "fp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
-      assertTrue(new File(out, "fn.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
-    }
+      VcfEvalTask.evaluateCalls(params);
+      final String zipSuffix = zip ? ".gz" : "";
+      final File tpOutFile = new File(out, "tp.vcf" + zipSuffix);
+      final File fpOutFile = new File(out, "fp.vcf" + zipSuffix);
+      final File fnOutFile = new File(out, "fn.vcf" + zipSuffix);
+      final String tpResults = fileToString(tpOutFile, zip);
+      final String fpResults = fileToString(fpOutFile, zip);
+      final String fnResults = fileToString(fnOutFile, zip);
+      final String header = "##fileformat=VCFv4.1\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
+      if (zip) {
+        assertTrue(new File(out, "tp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
+        assertTrue(new File(out, "fp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
+        assertTrue(new File(out, "fn.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
+      }
 
-    //System.err.println("TP \n" + tpResults);
-    //System.err.println("FP \n" + fpResults);
-    //System.err.println("FN \n" + fnResults);
-    TestUtils.containsAll(tpResults, tpOut);
-    TestUtils.containsAll(tpResults, header.replaceAll("\t", " "));
-    TestUtils.containsAll(fpResults, fpOut);
-    TestUtils.containsAll(fpResults, header.replaceAll("\t", " "));
-    TestUtils.containsAll(fnResults, fnOut);
-    TestUtils.containsAll(fnResults, header.replaceAll("\t", " "));
-    final File phase = new File(out, "phasing.txt");
-    assertTrue(phase.exists());
-    final String phasing = FileUtils.fileToString(phase);
-    TestUtils.containsAll(phasing, "Correct phasings: ", "Incorrect phasings: ", "Unresolvable phasings: ");
+      //System.err.println("TP \n" + tpResults);
+      //System.err.println("FP \n" + fpResults);
+      //System.err.println("FN \n" + fnResults);
+      TestUtils.containsAll(tpResults, tpOut);
+      TestUtils.containsAll(tpResults, header.replaceAll("\t", " "));
+      TestUtils.containsAll(fpResults, fpOut);
+      TestUtils.containsAll(fpResults, header.replaceAll("\t", " "));
+      TestUtils.containsAll(fnResults, fnOut);
+      TestUtils.containsAll(fnResults, header.replaceAll("\t", " "));
+      final File phase = new File(out, "phasing.txt");
+      assertTrue(phase.exists());
+      final String phasing = FileUtils.fileToString(phase);
+      TestUtils.containsAll(phasing, "Correct phasings: ", "Incorrect phasings: ", "Unresolvable phasings: ");
+    }
   }
   private String fileToString(File f, boolean zip) throws IOException {
     final String result;
@@ -168,9 +170,9 @@ public class VcfEvalTaskTest extends TestCase {
     return result.replaceAll("\t", " ");
   }
 
-  private void createInput(String[] both, String[] calledOnly, String[] baselineOnly) throws IOException, UnindexableDataException {
-    final File calls = new File(mDir, "calls.vcf.gz");
-    final File mutations = new File(mDir, "mutations.vcf.gz");
+  private void createInput(File dir, String[] both, String[] calledOnly, String[] baselineOnly) throws IOException, UnindexableDataException {
+    final File calls = new File(dir, "calls.vcf.gz");
+    final File mutations = new File(dir, "mutations.vcf.gz");
     final TreeMap<DetectedVariant, String> callList = new TreeMap<>();
     final TreeMap<DetectedVariant, String> mutationList = new TreeMap<>();
     for (final String var : both) {
@@ -242,40 +244,42 @@ public class VcfEvalTaskTest extends TestCase {
     checkRoc(label, template, both, calledOnly, baselineOnly, checktotal, false);
   }
   private void checkRoc(String label, String template, String[] both, String[] calledOnly, String[] baselineOnly, boolean checktotal, boolean rtgStats) throws IOException, UnindexableDataException {
-    createInput(both, calledOnly, baselineOnly);
+    try (TestDirectory tdir = new TestDirectory()) {
+      createInput(tdir, both, calledOnly, baselineOnly);
 
-    final File calls = new File(mDir, "calls.vcf.gz");
-    final File mutations = new File(mDir, "mutations.vcf.gz");
-    final File out = FileUtils.createTempDir("out-rtgstats-" + rtgStats, "", mDir);
-    final File genome = new File(mDir, "template");
-    ReaderTestUtils.getReaderDNA(template, genome, null).close();
-    final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final File calls = new File(tdir, "calls.vcf.gz");
+      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File out = FileUtils.createTempDir("out-rtgstats-" + rtgStats, "", tdir);
+      final File genome = new File(tdir, "template");
+      ReaderTestUtils.getReaderDNA(template, genome, null).close();
+      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
         .templateFile(genome).outputParams(new OutputParams(out, false, false))
         .rtgStats(rtgStats)
         .create();
-    VcfEvalTask.evaluateCalls(params);
-    final int tpCount = both.length;
-    final int fnCount = baselineOnly.length;
+      VcfEvalTask.evaluateCalls(params);
+      final int tpCount = both.length;
+      final int fnCount = baselineOnly.length;
 
-    mNano.check(label + "-summary.txt", FileUtils.fileToString(new File(out, CommonFlags.SUMMARY_FILE)));
-    checkRocResults(label + "-weighted.tsv", new File(out, VcfEvalTask.FULL_ROC_FILE), checktotal, tpCount, fnCount);
-    checkRocResults(label + "-homo.tsv", new File(out, VcfEvalTask.HOMOZYGOUS_FILE), checktotal, tpCount, fnCount);
-    checkRocResults(label + "-hetero.tsv", new File(out, VcfEvalTask.HETEROZYGOUS_FILE), checktotal, tpCount, fnCount);
-    if (rtgStats) {
-      checkRocResults(label + "-simple.tsv", new File(out, VcfEvalTask.SIMPLE_FILE), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-complex.tsv", new File(out, VcfEvalTask.COMPLEX_FILE), checktotal, tpCount, fnCount);
-    } else {
-      assertFalse(new File(out, VcfEvalTask.SIMPLE_FILE).exists());
-      assertFalse(new File(out, VcfEvalTask.COMPLEX_FILE).exists());
-    }
+      mNano.check(label + "-summary.txt", FileUtils.fileToString(new File(out, CommonFlags.SUMMARY_FILE)));
+      checkRocResults(label + "-weighted.tsv", new File(out, VcfEvalTask.FULL_ROC_FILE), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-homo.tsv", new File(out, VcfEvalTask.HOMOZYGOUS_FILE), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-hetero.tsv", new File(out, VcfEvalTask.HETEROZYGOUS_FILE), checktotal, tpCount, fnCount);
+      if (rtgStats) {
+        checkRocResults(label + "-simple.tsv", new File(out, VcfEvalTask.SIMPLE_FILE), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-complex.tsv", new File(out, VcfEvalTask.COMPLEX_FILE), checktotal, tpCount, fnCount);
+      } else {
+        assertFalse(new File(out, VcfEvalTask.SIMPLE_FILE).exists());
+        assertFalse(new File(out, VcfEvalTask.COMPLEX_FILE).exists());
+      }
 
-    final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
         .templateFile(genome).outputParams(new OutputParams(out, false, false))
         .sortOrder(RocSortOrder.ASCENDING)
         .rtgStats(rtgStats)
         .create();
-    VcfEvalTask.evaluateCalls(paramsrev);
-    checkRocResults(label + "-weighted-rev.tsv", new File(out, VcfEvalTask.FULL_ROC_FILE), checktotal, tpCount, fnCount);
+      VcfEvalTask.evaluateCalls(paramsrev);
+      checkRocResults(label + "-weighted-rev.tsv", new File(out, VcfEvalTask.FULL_ROC_FILE), checktotal, tpCount, fnCount);
+    }
   }
 
   private void checkRocResults(String label, final File out, boolean checktotal, final int tpCount, final int fnCount) throws IOException {
@@ -359,30 +363,33 @@ public class VcfEvalTaskTest extends TestCase {
   }
 
   public void testOutsideRef() throws IOException, UnindexableDataException {
-    createInput(new String[]{"seq 28 . A G 0.0 PASS . GT 1/1"}, new String[]{"seq 30 . C T 0.0 PASS . GT 0/1"}, new String[]{});
-    final File calls = new File(mDir, "calls.vcf.gz");
-    final File mutations = new File(mDir, "mutations.vcf.gz");
-    final File out = FileUtils.createTempDir("outsideRef", "out", mDir);
-    final File template = new File(mDir, "template");
+    try (TestDirectory tdir = new TestDirectory()) {
 
-    ReaderTestUtils.getReaderDNA(TEMPLATE, template, null).close();
-    final MemoryPrintStream ps = new MemoryPrintStream();
-    Diagnostic.setLogStream(ps.printStream());
-    try {
-      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
-        .restriction(new RegionRestriction("seq", 0, 300))
-        .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
-      VcfEvalTask.evaluateCalls(params);
-    } finally {
-      Diagnostic.setLogStream();
+      createInput(tdir, new String[]{"seq 28 . A G 0.0 PASS . GT 1/1"}, new String[]{"seq 30 . C T 0.0 PASS . GT 0/1"}, new String[]{});
+      final File calls = new File(tdir, "calls.vcf.gz");
+      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File out = FileUtils.createTempDir("outsideRef", "out", tdir);
+      final File template = new File(tdir, "template");
+
+      ReaderTestUtils.getReaderDNA(TEMPLATE, template, null).close();
+      final MemoryPrintStream ps = new MemoryPrintStream();
+      Diagnostic.setLogStream(ps.printStream());
+      try {
+        final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+          .restriction(new RegionRestriction("seq", 0, 300))
+          .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
+        VcfEvalTask.evaluateCalls(params);
+      } finally {
+        Diagnostic.setLogStream();
+      }
+      TestUtils.containsAll(ps.toString(),
+        "Variant in calls at seq:28 starts outside the length of the reference sequence (27).",
+        "Variant in baseline at seq:28 starts outside the length of the reference sequence (27).",
+        "Variant in calls at seq:30 starts outside the length of the reference sequence (27).",
+        "There were 1 baseline variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.",
+        "There were 2 called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length."
+      );
     }
-    TestUtils.containsAll(ps.toString(),
-      "Variant in calls at seq:28 starts outside the length of the reference sequence (27).",
-      "Variant in baseline at seq:28 starts outside the length of the reference sequence (27).",
-      "Variant in calls at seq:30 starts outside the length of the reference sequence (27).",
-      "There were 1 baseline variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.",
-      "There were 2 called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length."
-    );
   }
 
   public void testGetSdfId() {
