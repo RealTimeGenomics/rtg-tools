@@ -64,16 +64,16 @@ public class EvalSynchronizerTest extends TestCase {
     int mSetId = 0;
 
     @Override
-    public Pair<String, Map<VariantSetType, List<DetectedVariant>>> nextSet() {
+    public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
       if (mSetId >= 3) {
         return null;
       }
       mSetId++;
-      final HashMap<VariantSetType, List<DetectedVariant>> result = new HashMap<>();
-      final List<DetectedVariant> empty = Collections.emptyList();
+      final HashMap<VariantSetType, List<Variant>> result = new HashMap<>();
+      final List<Variant> empty = Collections.emptyList();
       result.put(VariantSetType.CALLS, empty);
       result.put(VariantSetType.BASELINE, empty);
-      return new Pair<String, Map<VariantSetType, List<DetectedVariant>>>("name" + mSetId, result);
+      return new Pair<String, Map<VariantSetType, List<Variant>>>("name" + mSetId, result);
     }
 
     @Override
@@ -136,8 +136,8 @@ public class EvalSynchronizerTest extends TestCase {
           new VcfWriter(header, fn),
           null,
           fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
-        final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
-        final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
+        final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
+        final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
         assertEquals("name2", pair2.getA());
 
@@ -146,9 +146,9 @@ public class EvalSynchronizerTest extends TestCase {
           @Override
           public void run() throws IOException {
             sync.write("name2",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)),
-              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC3_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)),
-              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC5_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
             sync.addVariants(10, 0, 0);
           }
         });
@@ -156,9 +156,9 @@ public class EvalSynchronizerTest extends TestCase {
           @Override
           public void run() throws IOException {
             sync.write("name1",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC2_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)),
-              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC4_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)),
-              Arrays.asList(new DetectedVariant(VcfReader.vcfLineToRecord(REC6_1), 0, RocSortValueExtractor.NULL_EXTRACTOR, false)), null);
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
             sync.addVariants(22, 0, 0);
           }
         });
@@ -189,8 +189,8 @@ public class EvalSynchronizerTest extends TestCase {
         new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
         new VcfWriter(new VcfHeader(), fn), null,
         fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
-      final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
-      final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
+      final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
+      final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());
       assertEquals("name2", pair2.getA());
 
@@ -198,7 +198,7 @@ public class EvalSynchronizerTest extends TestCase {
       simpleThreadPool.execute(new IORunnable() {
         @Override
         public void run() throws IOException {
-          sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)), null, null, null);
+          sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)), null, null, null);
           fail("Should have aborted in thread");
         }
       });
@@ -230,8 +230,8 @@ public class EvalSynchronizerTest extends TestCase {
         new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
         new VcfWriter(new VcfHeader(), fn), null,
         fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
-      final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair = sync.nextSet();
-      final Pair<String, Map<VariantSetType, List<DetectedVariant>>> pair2 = sync.nextSet();
+      final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
+      final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
       assertEquals("name1", pair.getA());
       assertEquals("name2", pair2.getA());
 
@@ -240,7 +240,7 @@ public class EvalSynchronizerTest extends TestCase {
         @Override
         public void run() {
           try {
-            sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(new DetectedVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR, false), true)), null, null, null);
+            sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)), null, null, null);
           } catch (final IllegalStateException e) {
             internalException[0] = e;
           } catch (final IOException e) {

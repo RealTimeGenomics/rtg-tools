@@ -55,11 +55,11 @@ import junit.framework.TestCase;
 /**
  */
 public class PhasingEvaluatorTest extends TestCase {
-  static List<DetectedVariant> makeVariantList(List<String> variants, StringBuilder sb) {
-    final List<DetectedVariant> callList = new ArrayList<>();
+  static List<Variant> makeVariantList(List<String> variants, StringBuilder sb) {
+    final List<Variant> callList = new ArrayList<>();
     for (String s : variants) {
       final String vartab = s.replaceAll(" ", "\t");
-      callList.add(new DetectedVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false));
+      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR));
       sb.append(vartab).append("\n");
     }
     return callList;
@@ -67,7 +67,7 @@ public class PhasingEvaluatorTest extends TestCase {
   }
   private static class MockVariantSet implements VariantSet {
     boolean mSent = false;
-    Map<VariantSetType, List<DetectedVariant>> mMap;
+    Map<VariantSetType, List<Variant>> mMap;
     StringBuilder mBaselineVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
     StringBuilder mCallsVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
     public MockVariantSet(List<String> base, List<String> calls) {
@@ -76,8 +76,8 @@ public class PhasingEvaluatorTest extends TestCase {
       mMap.put(VariantSetType.CALLS, makeVariantList(calls, mCallsVcf));
     }
     @Override
-    public Pair<String, Map<VariantSetType, List<DetectedVariant>>> nextSet() {
-      final Map<VariantSetType, List<DetectedVariant>> map;
+    public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
+      final Map<VariantSetType, List<Variant>> map;
       if (!mSent) {
          map = mMap;
         mSent = true;

@@ -57,7 +57,7 @@ public class VcfRecordTabixCallableTest extends TestCase {
       ranges.put("simulatedSequence2", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence2")));
       ranges.put("simulatedSequence13", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence13")));
       final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), "simulatedSequence13", -1, VariantSetType.BASELINE, null, RocSortValueExtractor.NULL_EXTRACTOR, true, false, 100);
-      List<DetectedVariant> set = runner.call().mVariants;
+      List<Variant> set = runner.call().mVariants;
       assertEquals(2, set.size());
       final VcfRecordTabixCallable runner2 = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence2"), "simulatedSequence2", -1, VariantSetType.BASELINE, null, RocSortValueExtractor.NULL_EXTRACTOR, true, false, 100);
       set = runner2.call().mVariants;

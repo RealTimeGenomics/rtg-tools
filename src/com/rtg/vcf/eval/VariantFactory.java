@@ -27,55 +27,19 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf.eval;
 
-import com.rtg.mode.DnaUtils;
+import com.rtg.vcf.VcfRecord;
 
 /**
+ * Creates variants for evaluation from VCF records.
  */
-public class MockVariant extends Variant {
+public interface VariantFactory {
 
   /**
-   * @param start one-based start position of mutation
-   * @param end one-based end position of mutation
-   * @param plus nucleotides on the plus strand
-   * @param minus nucleotides on the minus strand
-   * @param phased does this call have phasing information
+   * Construct a Variant by inspecting a <code>VcfRecord</code> object.
+   * @param rec VCF record to convert to Variant
+   * @return the Variant
    */
-  public MockVariant(int start, int end, byte[] plus, byte[] minus, boolean phased) {
-    super("", start - 1, end - 1, toPreds(plus, minus), phased, Double.NaN);
-  }
-
-  static byte[][] toPreds(byte[] plus, byte[] minus) {
-    if (minus == null) {
-      return new byte[][] {plus};
-    } else {
-      return new byte[][] {plus, minus};
-    }
-  }
-
-  /**
-   * Assumes not phased
-   * @param start one-based start position of mutation
-   * @param end one-based end position of mutation
-   * @param plus nucleotides on the plus strand
-   * @param minus nucleotides on the minus strand
-   */
-  public MockVariant(int start, int end, byte[] plus, byte[] minus) {
-    this(start, end, plus, minus, false);
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(getStart() + 1).append(":").append(getEnd() + 1).append(" ");
-    for (int i = 0; i < numAlleles(); i++) {
-      if (i > 0) {
-        sb.append(":");
-      }
-      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
-    }
-    return sb.toString();
-  }
+  Variant variant(VcfRecord rec);
 }

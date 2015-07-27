@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfReader;
@@ -46,6 +47,8 @@ import com.rtg.vcf.header.VcfHeader;
  * A callable which loads VcfRecords for given template
  */
 public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
+
+  private static final boolean ANY_ALT_BASELINE = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_ANY_ALLELE_BASELINE);
 
   private final File mInput;
   private final ReferenceRanges<String> mRanges;
@@ -75,17 +78,30 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   @Override
   public LoadedVariants call() throws Exception {
     int skipped = 0;
-    final List<DetectedVariant> list = new ArrayList<>();
+    final List<Variant> list = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(mInput, mRanges)) {
       final VcfHeader header = reader.getHeader();
       final String label = mType == VariantSetType.BASELINE ? "baseline" : "calls";
       final int sampleId = VcfUtils.getSampleIndexOrDie(header, mSampleName, label);
-      DetectedVariant last = null;
+      final VariantFactory fact;
+      final boolean anyAltComparison = mType == VariantSetType.BASELINE && ANY_ALT_BASELINE;
+      if (anyAltComparison) {
+        fact = new SquashPloidyVariant.AnyAltFactory(mExtractor);
+      } else if (mSquashPloidy) {
+        fact = new SquashPloidyVariant.Factory(sampleId, mExtractor);
+      } else {
+        fact = new Variant.Factory(sampleId, mExtractor);
+      }
+      Variant last = null;
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
 
-        // Skip non-variant, SV, and possibly fail variants
-        if (VcfUtils.skipRecordForSample(rec, sampleId, mPassOnly)) {
+        if (mPassOnly && rec.isFiltered()) {
+          continue;
+        }
+
+        // Skip non-variant, SV
+        if (!anyAltComparison && !VcfUtils.hasDefinedVariantGt(rec, sampleId)) {
           continue;
         }
 
@@ -108,7 +124,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
         }
 
         // Skip overlapping variants
-        final DetectedVariant v = new DetectedVariant(rec, sampleId, mExtractor, mSquashPloidy);
+        final Variant v = fact.variant(rec);
         if (last != null) {
           if (v.getStart() < last.getEnd()) {
             Diagnostic.userLog("Overlapping variants aren't supported, skipping current variant from " + label + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);

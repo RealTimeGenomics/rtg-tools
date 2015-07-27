@@ -173,31 +173,31 @@ public class VcfEvalTaskTest extends TestCase {
   private void createInput(File dir, String[] both, String[] calledOnly, String[] baselineOnly) throws IOException, UnindexableDataException {
     final File calls = new File(dir, "calls.vcf.gz");
     final File mutations = new File(dir, "mutations.vcf.gz");
-    final TreeMap<DetectedVariant, String> callList = new TreeMap<>();
-    final TreeMap<DetectedVariant, String> mutationList = new TreeMap<>();
+    final TreeMap<Variant, String> callList = new TreeMap<>();
+    final TreeMap<Variant, String> mutationList = new TreeMap<>();
     for (final String var : both) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      callList.put(new DetectedVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR, false), rec.toString());
-      mutationList.put(new DetectedVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR, false), rec.toString());
+      callList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      mutationList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
     for (final String var : calledOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      callList.put(new DetectedVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR, false), rec.toString());
+      callList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
     for (final String var : baselineOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      mutationList.put(new DetectedVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR, false), rec.toString());
+      mutationList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
     try (BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
       callOut.write(CALLS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
-      for (final Entry<DetectedVariant, String> var : callList.entrySet()) {
+      for (final Entry<Variant, String> var : callList.entrySet()) {
         callOut.write(var.getValue() + "\n");
       }
     }
     new TabixIndexer(calls).saveVcfIndex();
     try (BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(mutations, true, false)))) {
       mutOut.write(MUTATIONS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
-      for (final Entry<DetectedVariant, String> var : mutationList.entrySet()) {
+      for (final Entry<Variant, String> var : mutationList.entrySet()) {
         mutOut.write(var.getValue() + "\n");
       }
     }
@@ -631,14 +631,14 @@ public class VcfEvalTaskTest extends TestCase {
   public void testPositionComparator() {
     final IntervalComparator vc = new IntervalComparator();
     final VcfRecord rec = VcfReader.vcfLineToRecord("chr10 11 . G T 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final DetectedVariant v = new DetectedVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
+    final Variant v = VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR);
 
 
     final VcfRecord rec2 = VcfReader.vcfLineToRecord("chr10 12 . G T 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final DetectedVariant v2 = new DetectedVariant(rec2, 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
+    final Variant v2 = VariantTest.createVariant(rec2, 0, RocSortValueExtractor.NULL_EXTRACTOR);
 
     final VcfRecord rec3 = VcfReader.vcfLineToRecord("chr10 11 . GT TT 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final DetectedVariant v3 = new DetectedVariant(rec3, 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
+    final Variant v3 = VariantTest.createVariant(rec3, 0, RocSortValueExtractor.NULL_EXTRACTOR);
 
     assertEquals(-1, vc.compare(v, v2));
     assertEquals(1, vc.compare(v2, v));

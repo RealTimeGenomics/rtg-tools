@@ -40,14 +40,14 @@ import com.reeltwo.jumble.annotations.JumbleIgnore;
 class LoadedVariants {
 
   final int mSkippedDuringLoading;
-  final List<DetectedVariant> mVariants;
+  final List<Variant> mVariants;
 
   /**
    * Construct the holder
    * @param variants the variants that were loaded
    * @param skipped a count of the number of variants skipped during loading
    */
-  public LoadedVariants(List<DetectedVariant> variants, int skipped) {
+  public LoadedVariants(List<Variant> variants, int skipped) {
     mVariants = variants;
     mSkippedDuringLoading = skipped;
   }

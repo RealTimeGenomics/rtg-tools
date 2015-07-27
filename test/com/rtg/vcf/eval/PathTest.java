@@ -45,7 +45,6 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.util.test.NanoRegression;
-import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -95,7 +94,7 @@ public class PathTest extends TestCase {
     assertEquals(best.hashCode(), best2.hashCode());
   }
 
-  private void addVar(List<OrientedVariant> list, DetectedVariant v, boolean include) {
+  private void addVar(List<OrientedVariant> list, Variant v, boolean include) {
     list.add(OrientedVariantTest.createOrientedVariant(v, include));
   }
   private List<Variant> getVariations(List<OrientedVariant> list) {
@@ -435,16 +434,11 @@ public class PathTest extends TestCase {
 //    }
 //  }
 
-  private DetectedVariant getDetectedVariant(String vcfLine) {
-    final String linetab = vcfLine.replaceAll(" ", "\t");
-    return new DetectedVariant(VcfReader.vcfLineToRecord(linetab), 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
-  }
-
-  public void testWithDetectedVariant() {
+  public void testWithVariant() {
     final String line = "simulatedSequence1 3 . C T,G 0.0 PASS . GT 1/2";
-    final DetectedVariant v = getDetectedVariant(line);
+    final Variant v = VariantTest.createVariant(line);
     final String line2 = "simulatedSequence1 3 . C G,T 31.0 PASS . GT 1/2";
-    final DetectedVariant v2 = getDetectedVariant(line2);
+    final Variant v2 = VariantTest.createVariant(line2);
 
     final byte[] template = {1, 1, 2, 4, 4};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -456,10 +450,10 @@ public class PathTest extends TestCase {
   }
 
   public void testDontCrossTheStreams() {
-    final DetectedVariant vA = getDetectedVariant("simulatedSequence1 1 . A T,G 0.0 PASS . GT 1/2");
-    final DetectedVariant vA2 = getDetectedVariant("simulatedSequence1 1 . A G,T 0.0 PASS . GT 1/2");
-    final DetectedVariant v = getDetectedVariant("simulatedSequence1 3 . C T,G 0.0 PASS . GT 1/2");
-    final DetectedVariant v2 = getDetectedVariant("simulatedSequence1 3 . C G,T 31.0 PASS . GT 1/2");
+    final Variant vA = VariantTest.createVariant("simulatedSequence1 1 . A T,G 0.0 PASS . GT 1/2");
+    final Variant vA2 = VariantTest.createVariant("simulatedSequence1 1 . A G,T 0.0 PASS . GT 1/2");
+    final Variant v = VariantTest.createVariant("simulatedSequence1 3 . C T,G 0.0 PASS . GT 1/2");
+    final Variant v2 = VariantTest.createVariant("simulatedSequence1 3 . C G,T 31.0 PASS . GT 1/2");
 
     final byte[] template = {1, 1, 2, 4, 4};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -477,8 +471,8 @@ public class PathTest extends TestCase {
     final String line = "chr22 4 . A ACTAGA 25.5 PASS . GT 0/1";
 //    final String line2 = "chr22 3 e i GACTA:i".replaceAll(" ", "\t");
     final String line2 = "chr22 2 . A AGACTA 0.0 PASS . GT 0/1";
-    final DetectedVariant v1 = getDetectedVariant(line);
-    final DetectedVariant v2 = getDetectedVariant(line2);
+    final Variant v1 = VariantTest.createVariant(line);
+    final Variant v2 = VariantTest.createVariant(line2);
 
     final byte[] template = {1, 1, 3, 1, 1, 2, 2};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -491,15 +485,15 @@ public class PathTest extends TestCase {
   public void testHeterozygousInsert()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2,  1};
     final Variant[] a = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 7 . T TT 0.0 PASS . GT 0/1") // XXX, false)
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 7 . T TT 0.0 PASS . GT 0/1") // XXX, false)
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final Variant[] b = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 4 . T TT 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 4 . T TT 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final double[] expectedWeights = {1.0, 1.0};
@@ -523,15 +517,15 @@ public class PathTest extends TestCase {
   public void testHeterozygousDelete()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
     final Variant[] a = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 6 . TT T 0.0 PASS . GT 1/0") //XXX, false)
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 6 . TT T 0.0 PASS . GT 1/0") //XXX, false)
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final Variant[] b = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 4 . TT T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 4 . TT T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final double[] expectedWeights = {1.0, 1.0};
@@ -548,15 +542,15 @@ public class PathTest extends TestCase {
   public void testNop()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
     final Variant[] a = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 3 . AT A 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 6 . T TT 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 3 . AT A 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 6 . T TT 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final Variant[] b = {
-        getDetectedVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , getDetectedVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
     final double[] expectedWeights = {1, 0, 0, 1.0};
@@ -574,13 +568,13 @@ public class PathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
     final Variant[] a = {
       //insert GGG at 2
-      getDetectedVariant("seq 1 . A AGGG 0.0 PASS . GT 1/1"),
+      VariantTest.createVariant("seq 1 . A AGGG 0.0 PASS . GT 1/1"),
       //snp C at 2
-      getDetectedVariant("seq 2 . A C 0.0 PASS . GT 1/1")
+      VariantTest.createVariant("seq 2 . A C 0.0 PASS . GT 1/1")
     };
     final Variant[] b = {
       //insert A-> GGGC at 2
-      getDetectedVariant("seq 2 . A GGGC 0.0 PASS . GT 1/1")
+      VariantTest.createVariant("seq 2 . A GGGC 0.0 PASS . GT 1/1")
     };
     final double[] expectedWeights = {0.5, 0.5};
 
@@ -593,7 +587,7 @@ public class PathTest extends TestCase {
 
   public void testPastEndOfTemplate() {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
-    final Variant[] a = {getDetectedVariant("seq 12 . C T 0.0 PASS . GT 1/1")};
+    final Variant[] a = {VariantTest.createVariant("seq 12 . C T 0.0 PASS . GT 1/1")};
     final List<Variant> al = Arrays.asList(a);
     //Testing that having variants outside the template will not attempt to advance the path past the end of the
     //template when the path is in sync

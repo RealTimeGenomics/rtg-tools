@@ -37,7 +37,7 @@ import junit.framework.TestCase;
  */
 public class OrientedVariantTest extends TestCase {
 
-  public static OrientedVariant createOrientedVariant(DetectedVariant variant, boolean isAlleleA) {
+  public static OrientedVariant createOrientedVariant(Variant variant, boolean isAlleleA) {
     return new OrientedVariant(variant, isAlleleA,
       isAlleleA ? 0 : 1,
       variant.numAlleles() == 1

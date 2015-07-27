@@ -92,7 +92,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       expected.remove("simulatedSequence12");
       // All other sequences either not contained in reference (N<32), or not in both baseline and calls (45)
 
-      Pair<String, Map<VariantSetType, List<DetectedVariant>>> current;
+      Pair<String, Map<VariantSetType, List<Variant>>> current;
       while ((current = set.nextSet()) != null) {
         final String currentName = current.getA();
         assertTrue("unexpected sequence <" + currentName + ">", expected.contains(currentName));

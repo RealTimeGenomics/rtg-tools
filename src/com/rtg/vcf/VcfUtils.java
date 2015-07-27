@@ -455,30 +455,23 @@ public final class VcfUtils {
   }
 
   /**
-   * Check if we can skip a record as not variant for the specified sample.
-   * if <code>passOnly</code> is true, all records which have failed filters will be skipped.
-   * if the record is same as reference or has no GT field it will be skipped.
+   * Check if the record contains a well-defined variant genotype for the specified sample.
+   * Returns false if the record has no GT field, or if the GT is same as reference or refers to symbolic alleles.
    *
    * @param rec record to check
    * @param sampleId sample if to check
-   * @param passOnly allow only PASS records
-   * @return true if skipped, false otherwise
+   * @return true if a well defined genotype is present, false otherwise
    */
-  public static boolean skipRecordForSample(VcfRecord rec, int sampleId, boolean passOnly) {
+  public static boolean hasDefinedVariantGt(VcfRecord rec, int sampleId) {
     if (sampleId >= rec.getNumberOfSamples()) {
       throw new IllegalArgumentException("Record did not contain enough samples: " + rec.toString());
     }
-    if (passOnly && rec.isFiltered()) {
-      //System.err.println("skipping due to failedfilter");
-      return true;
-    }
-    if (!rec.getFormatAndSample().containsKey(FORMAT_GENOTYPE)) { //skip we do not have any GT info
-      //System.err.println("skipping due to no genotype");
-      return true;
+    if (!rec.getFormatAndSample().containsKey(FORMAT_GENOTYPE)) {
+      return false;
     }
     final String gt = rec.getFormatAndSample().get(FORMAT_GENOTYPE).get(sampleId);
     final VariantType type = VariantType.getType(rec, splitGt(gt));
-    return type.isNonVariant() || type.isSvType(); // Skip SV variants
+    return !type.isNonVariant() && !type.isSvType();
   }
 
   /**

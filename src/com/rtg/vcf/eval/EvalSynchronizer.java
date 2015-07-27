@@ -106,7 +106,7 @@ class EvalSynchronizer {
       return;
     }
     for (final SequenceNameLocus v : variants) {
-      final DetectedVariant dv = (DetectedVariant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
+      final Variant dv = (Variant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
       VcfRecord rec = null;
       while (vcfReader.hasNext()) {
         final VcfRecord r = vcfReader.next();
@@ -117,7 +117,7 @@ class EvalSynchronizer {
 
         final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(r);
         final SequenceNameLocusSimple adjusted = new SequenceNameLocusSimple(r.getSequenceName(), r.getStart() + (hasPreviousNt ? 1 : 0), r.getEnd());
-        if (DetectedVariant.NATURAL_COMPARATOR.compare(adjusted, dv) == 0) {
+        if (Variant.NATURAL_COMPARATOR.compare(adjusted, dv) == 0) {
           rec = r;
           break;
         }
@@ -135,8 +135,8 @@ class EvalSynchronizer {
    * @return the next pair of sequence name and variant set or null if no more remain
    * @throws IOException when IO fails
    */
-  synchronized Pair<String, Map<VariantSetType, List<DetectedVariant>>> nextSet() throws IOException {
-    final Pair<String, Map<VariantSetType, List<DetectedVariant>>> set = mVariantSet.nextSet();
+  synchronized Pair<String, Map<VariantSetType, List<Variant>>> nextSet() throws IOException {
+    final Pair<String, Map<VariantSetType, List<Variant>>> set = mVariantSet.nextSet();
     if (set == null) {
       return null;
     }
@@ -147,7 +147,7 @@ class EvalSynchronizer {
     return set;
   }
 
-  void addRocLine(RocLine line, DetectedVariant v) {
+  void addRocLine(RocLine line, Variant v) {
     synchronized (mVariantLock) {
       mRoc.addRocLine(line.mPrimarySortValue, line.mWeight, v);
     }

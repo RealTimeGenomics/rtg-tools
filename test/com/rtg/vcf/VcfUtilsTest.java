@@ -131,16 +131,13 @@ public class VcfUtilsTest extends TestCase {
   }
 
   public void testSkipRecordForSample() {
-    assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T"), 0, true));
-    assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("PASS"), 0, true));
-    assertFalse(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("FAIL"), 0, false));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T").addFilter("FAIL"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/0", "A", "T"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord(".", "A", "T"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("./0", "A", "T"), 0, true));
-    assertFalse(VcfUtils.skipRecordForSample(makeRecord("./1", "A", "T"), 0, false));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "<DEL>"), 0, true));
-    assertTrue(VcfUtils.skipRecordForSample(makeRecord("0/1", "A", "T]bar:198982]"), 0, true));
+    assertTrue(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "T"), 0));
+    assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/0", "A", "T"), 0));
+    assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord(".", "A", "T"), 0));
+    assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("./0", "A", "T"), 0));
+    assertTrue(VcfUtils.hasDefinedVariantGt(makeRecord("./1", "A", "T"), 0));
+    assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "<DEL>"), 0));
+    assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "T]bar:198982]"), 0));
   }
 
   public void testZippedVcfFileName() {

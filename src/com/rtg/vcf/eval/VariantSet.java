@@ -44,7 +44,7 @@ public interface VariantSet {
   /**
    * @return the variants for the next sequence or null if there are no more.
    */
-  Pair<String, Map<VariantSetType, List<DetectedVariant>>> nextSet();
+  Pair<String, Map<VariantSetType, List<Variant>>> nextSet();
 
   /**
    * @return header for baseline files

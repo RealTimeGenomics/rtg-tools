@@ -173,8 +173,8 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   @Override
-  public Pair<String, Map<VariantSetType, List<DetectedVariant>>> nextSet() {
-    final Map<VariantSetType, List<DetectedVariant>> map = new HashMap<>();
+  public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
+    final Map<VariantSetType, List<Variant>> map = new HashMap<>();
     final Iterator<Pair<String, Integer>> iterator = mNames.iterator();
     if (!iterator.hasNext()) {
       return null;

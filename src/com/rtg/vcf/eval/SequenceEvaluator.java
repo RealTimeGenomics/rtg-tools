@@ -59,9 +59,10 @@ class SequenceEvaluator implements IORunnable {
     mTemplate = template;
     mNameMap = nameMap;
   }
+
   @Override
   public void run() throws IOException {
-    final Pair<String, Map<VariantSetType, List<DetectedVariant>>> setPair = mSynchronize.nextSet();
+    final Pair<String, Map<VariantSetType, List<Variant>>> setPair = mSynchronize.nextSet();
     if (setPair == null) {
       return;
     }
@@ -72,17 +73,17 @@ class SequenceEvaluator implements IORunnable {
     }
     final byte[] template = mTemplate.read(sequenceId);
 
-    final Map<VariantSetType, List<DetectedVariant>> set = setPair.getB();
+    final Map<VariantSetType, List<Variant>> set = setPair.getB();
 
-    final Collection<DetectedVariant> baseLineCalls = set.get(VariantSetType.BASELINE);
-    final Collection<DetectedVariant> calledCalls = set.get(VariantSetType.CALLS);
+    final Collection<Variant> baseLineCalls = set.get(VariantSetType.BASELINE);
+    final Collection<Variant> calledCalls = set.get(VariantSetType.CALLS);
 
     if (baseLineCalls == null || baseLineCalls.size() == 0) {
       mSynchronize.write(currentName, null, calledCalls, null, null);
       if (calledCalls != null) {
         Diagnostic.developerLog("Number of called variants: " + calledCalls.size());
 
-        for (final DetectedVariant v : calledCalls) {
+        for (final Variant v : calledCalls) {
           mSynchronize.addRocLine(new RocLine(v.getSequenceName(), v.getStart(), v.getSortValue(), 0.0, false), v);
         }
       }
@@ -120,15 +121,14 @@ class SequenceEvaluator implements IORunnable {
 
       double tpTotal = 0.0;
       for (final OrientedVariant v : truePositives) {
-        final DetectedVariant dv = (DetectedVariant) v.variant();
+        final Variant dv = v.variant();
         mSynchronize.addRocLine(new RocLine(dv.getSequenceName(), dv.getStart(), dv.getSortValue(), v.getWeight(), true), dv);
         tpTotal += v.getWeight();
       }
       if (tpTotal - baselineTruePositives.size() > 0.001) {
         throw new SlimException("true positives does not match baseline number tp weighted= " + tpTotal + " baseline = " + baselineTruePositives.size());
       }
-      for (final Variant v : falsePositives) {
-        final DetectedVariant dv = (DetectedVariant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
+      for (final Variant dv : falsePositives) {
         // System.out.println(dv);
         mSynchronize.addRocLine(new RocLine(dv.getSequenceName(), dv.getStart(), dv.getSortValue(), 0.0, false), dv);
       }

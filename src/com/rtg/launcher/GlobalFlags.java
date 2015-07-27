@@ -134,6 +134,9 @@ public final class GlobalFlags {
   /** Should the random tree builder push missing values down during the build process. */
   public static final String TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
+  /** Experimental comparison for haploid comparison against any-allele in record */
+  public static final String VCFEVAL_ANY_ALLELE_BASELINE = "com.rtg.variant.eval.any-baseline-allele";
+
   /** Specify the maximum number of simultaneous paths before vcfeval skips a region */
   public static final String VCFEVAL_MAX_PATHS = "com.rtg.variant.eval.max-paths";
 
@@ -197,6 +200,7 @@ public final class GlobalFlags {
     // when there are lots of missing values.
     registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
 
+    registerFlag(VCFEVAL_ANY_ALLELE_BASELINE, Boolean.class, false);
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 5000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(ALTERNATE_ROC_SLOPE_CALCULATION);

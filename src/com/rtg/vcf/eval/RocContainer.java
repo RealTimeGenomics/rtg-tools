@@ -103,7 +103,7 @@ public class RocContainer {
    * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
    * @param v detected variant
    */
-  public void addRocLine(double primarySortValue, double weight, DetectedVariant v) {
+  public void addRocLine(double primarySortValue, double weight, Variant v) {
     if (Double.isNaN(primarySortValue) || Double.isInfinite(primarySortValue)) {
       mNoScoreVariants++;
     } else {

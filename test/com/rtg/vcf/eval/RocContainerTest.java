@@ -47,7 +47,7 @@ public class RocContainerTest extends TestCase {
       final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING, null);
       final File allFile = new File(dir, "all.txt.gz");
       roc.addFilter(RocFilter.ALL, allFile);
-      final DetectedVariant v = new DetectedVariant(VcfReader.vcfLineToRecord(DetectedVariantTest.SHORT_LINE), 0, RocSortValueExtractor.NULL_EXTRACTOR, false);
+      final Variant v = VariantTest.createVariant(VcfReader.vcfLineToRecord(VariantTest.SHORT_LINE), 0, RocSortValueExtractor.NULL_EXTRACTOR);
       roc.addRocLine(0.1, 1.0, v);
       roc.addRocLine(0.1, 0.0, v);
       roc.addRocLine(0.2, 0.0, v);
