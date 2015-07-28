@@ -57,7 +57,8 @@ public final class VcfEvalParams extends OutputModuleParams {
     File mTemplateFile;
     RocSortOrder mSortOrder = RocSortOrder.DESCENDING;
     String mScoreField = VcfUtils.FORMAT_GENOTYPE_QUALITY;
-    String mSampleName;
+    String mBaselineSample;
+    String mCallsSample;
     boolean mUseAllRecords = false;
     int mNumberThreads = 1;
     private boolean mSquashPloidy = false;
@@ -118,13 +119,24 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
-     * Sets the sample name to use in multiple sample VCF input.
+     * Sets the baseline sample name to use in multiple sample VCF input.
      *
      * @param sampleName the sample name to use in multiple sample VCF input.
      * @return this builder, so calls can be chained.
      */
-    public VcfEvalParamsBuilder sampleName(final String sampleName) {
-      mSampleName = sampleName;
+    public VcfEvalParamsBuilder baselineSample(final String sampleName) {
+      mBaselineSample = sampleName;
+      return self();
+    }
+
+    /**
+     * Sets the calls sample name to use in multiple sample VCF input.
+     *
+     * @param sampleName the sample name to use in multiple sample VCF input.
+     * @return this builder, so calls can be chained.
+     */
+    public VcfEvalParamsBuilder callsSample(final String sampleName) {
+      mCallsSample = sampleName;
       return self();
     }
 
@@ -244,7 +256,8 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final File mBedRegionsFile;
   private final String mScoreField;
   private final RocSortOrder mSortOrder;
-  private final String mSampleName;
+  private final String mBaselineSample;
+  private final String mCallsSample;
   private final int mNumberThreads;
   private final boolean mUseAllRecords;
   private final boolean mSquashPloidy;
@@ -266,7 +279,8 @@ public final class VcfEvalParams extends OutputModuleParams {
     mBedRegionsFile = builder.mBedRegionsFile;
     mSortOrder = builder.mSortOrder;
     mScoreField = builder.mScoreField;
-    mSampleName = builder.mSampleName;
+    mBaselineSample = builder.mBaselineSample;
+    mCallsSample = builder.mCallsSample;
     mNumberThreads = builder.mNumberThreads;
     mUseAllRecords = builder.mUseAllRecords;
     mSquashPloidy = builder.mSquashPloidy;
@@ -332,11 +346,18 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
-   * Get the sample name for multiple sample VCF input.
-   * @return the sample name to use for multiple sample VCF input.
+   * Get the baseline sample name for multiple sample VCF input.
+   * @return the baseline sample name to use for multiple sample VCF input.
    */
-  public String sampleName() {
-    return mSampleName;
+  public String baselineSample() {
+    return mBaselineSample;
+  }
+  /**
+   * Get the calls sample name for multiple sample VCF input.
+   * @return the calls sample name to use for multiple sample VCF input.
+   */
+  public String callsSample() {
+    return mCallsSample;
   }
 
   /**
@@ -392,7 +413,7 @@ public final class VcfEvalParams extends OutputModuleParams {
 
   @Override
   public String toString() {
-    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", sample name=" + mSampleName + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", max length=" + mMaxLength + ", rtg stats=" + mRtgStats + ", baseline tp=" + mOutputBaselineTp + ", output params=" + super.toString();
+    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", max length=" + mMaxLength + ", rtg stats=" + mRtgStats + ", baseline tp=" + mOutputBaselineTp + ", output params=" + super.toString();
   }
 
 }

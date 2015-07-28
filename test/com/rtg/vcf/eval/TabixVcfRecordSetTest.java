@@ -83,7 +83,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       for (int seq = 1; seq < 32; seq++) {
         ranges.put("simulatedSequence" + seq, new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
       }
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, names, null, RocSortValueExtractor.NULL_EXTRACTOR, true, false, 100);
+      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, names, null, null, RocSortValueExtractor.NULL_EXTRACTOR, true, false, 100);
 
       final Set<String> expected = new HashSet<>();
       for (int seq = 1; seq < 32; seq++) {

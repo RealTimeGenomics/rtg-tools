@@ -248,7 +248,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences) throws IOException {
     final File calls = params.callsFile();
     final File baseline = params.baselineFile();
-    final String sampleName = params.sampleName();
+    final String baselineSample = params.baselineSample();
+    final String callsSample = params.callsSample();
     final RocSortValueExtractor extractor = getRocSortValueExtractor(params);
 
     final ReferenceRanges<String> ranges;
@@ -266,7 +267,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 
-    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, sampleName, extractor, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
+    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, extractor, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
   }
 
   private static RocSortValueExtractor getRocSortValueExtractor(VcfEvalParams params) {

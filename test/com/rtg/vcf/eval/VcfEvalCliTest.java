@@ -148,7 +148,11 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {
-    check(false, "vcfeval_small_region", "--sample", "sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
+    check(false, "vcfeval_small_region", "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
+  }
+
+  public void testNanoSmallDiffSamples() throws IOException, UnindexableDataException {
+    check(false, "vcfeval_small_samples", "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoTooComplex() throws IOException, UnindexableDataException {

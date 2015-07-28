@@ -66,7 +66,8 @@ class TabixVcfRecordSet implements VariantSet {
 
   private final File mBaselineFile;
   private final File mCallsFile;
-  private final String mSampleName;
+  private final String mBaselineSampleName;
+  private final String mCallsSampleName;
   private final Collection<Pair<String, Integer>> mNames = new ArrayList<>();
   private final ReferenceRanges<String> mRanges;
   private final VcfHeader mBaseLineHeader;
@@ -79,14 +80,18 @@ class TabixVcfRecordSet implements VariantSet {
   private int mBaselineSkipped;
   private int mCallsSkipped;
 
-  TabixVcfRecordSet(File baselineFile, File calledFile, ReferenceRanges<String> ranges, Collection<Pair<String, Integer>> referenceNameOrdering, String sampleName, RocSortValueExtractor extractor, boolean passOnly, boolean squashPloidy, int maxLength) throws IOException {
+  TabixVcfRecordSet(File baselineFile, File calledFile,
+                    ReferenceRanges<String> ranges, Collection<Pair<String, Integer>> referenceNameOrdering,
+                    String baselineSample, String callsSample,
+                    RocSortValueExtractor extractor, boolean passOnly, boolean squashPloidy, int maxLength) throws IOException {
     if (referenceNameOrdering == null) {
       throw new NullPointerException();
     }
     mBaselineFile = baselineFile;
     mCallsFile = calledFile;
     mRanges = ranges;
-    mSampleName = sampleName;
+    mBaselineSampleName = baselineSample;
+    mCallsSampleName = callsSample;
     mBaseLineHeader = VcfUtils.getHeader(baselineFile);
     mCalledHeader = VcfUtils.getHeader(calledFile);
     mPassOnly = passOnly;
@@ -181,8 +186,8 @@ class TabixVcfRecordSet implements VariantSet {
     final ExecutorService executor = Executors.newFixedThreadPool(2);
     try {
       final ReferenceRanges<String> subRanges = mRanges.forSequence(currentName);
-      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, currentName, currentLength, VariantSetType.BASELINE, mSampleName, mExtractor, mPassOnly, mSquashPloidy, mMaxLength));
-      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, currentName, currentLength, VariantSetType.CALLS, mSampleName, mExtractor, mPassOnly, mSquashPloidy, mMaxLength));
+      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, currentName, currentLength, VariantSetType.BASELINE, mBaselineSampleName, mExtractor, mPassOnly, mSquashPloidy, mMaxLength));
+      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, currentName, currentLength, VariantSetType.CALLS, mCallsSampleName, mExtractor, mPassOnly, mSquashPloidy, mMaxLength));
       executor.execute(baseFuture);
       executor.execute(callFuture);
       final LoadedVariants baseVars = baseFuture.get();

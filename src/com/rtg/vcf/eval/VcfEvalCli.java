@@ -46,6 +46,7 @@ import com.rtg.launcher.ParamsCli;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -112,7 +113,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length").setCategory(INPUT_OUTPUT);
     flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
-    flags.registerOptional(SAMPLE, String.class, "STRING", "the name of the sample to select (required when using multi-sample VCF files)").setCategory(FILTERING);
+    flags.registerOptional(SAMPLE, String.class, "STRING", "the name of the sample to select. Use <baseline_sample>,<calls_sample> to select different sample names for baseline and calls. (Required when using multi-sample VCF files)").setCategory(FILTERING);
     flags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status. Default is to only process records where FILTER is \".\" or \"PASS\"").setCategory(FILTERING);
     flags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls").setCategory(FILTERING);
 
@@ -179,6 +180,28 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       if (!CommonFlags.validateRegions(flags)) {
         return false;
       }
+
+      if (flags.isSet(SAMPLE)) {
+        final String sample = (String) flags.getValue(SAMPLE);
+        if (sample.length() == 0) {
+          flags.setParseMessage("Supplied sample name cannot be empty");
+          return false;
+        }
+        final String[] samples = StringUtils.split(sample, ',');
+        if (samples.length > 2) {
+          flags.setParseMessage("Invalid sample name specification " + sample + ". At most 1 comma is permitted");
+          return false;
+        }
+        if (samples[0].length() == 0) {
+          flags.setParseMessage("Invalid sample name specification " + sample + ". Supplied baseline sample name cannot be empty");
+          return false;
+        }
+        final String callsSample = samples.length == 2 ? samples[1] : samples[0];
+        if (callsSample.length() == 0) {
+          flags.setParseMessage("Invalid sample name specification " + sample + ". Supplied calls sample name cannot be empty");
+          return false;
+        }
+      }
       return true;
     }
   }
@@ -204,11 +227,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.name(mFlags.getName());
     builder.outputParams(new OutputParams(outputDirectory(), false, !mFlags.isSet(CommonFlags.NO_GZIP)));
     builder.templateFile((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG));
-    final File baseLine = (File) mFlags.getValue(BASELINE);
+    final File baseline = (File) mFlags.getValue(BASELINE);
     final File calls = (File) mFlags.getValue(CALLS);
-    checkTabix(baseLine);
+    checkTabix(baseline);
     checkTabix(calls);
-    builder.baseLineFile(baseLine).callsFile(calls);
+    builder.baseLineFile(baseline).callsFile(calls);
     builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
     builder.scoreField((String) mFlags.getValue(SORT_FIELD));
     builder.maxLength((Integer) mFlags.getValue(MAX_LENGTH));
@@ -219,7 +242,10 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.bedRegionsFile((File) mFlags.getValue(CommonFlags.BED_REGIONS_FLAG));
     }
     if (mFlags.isSet(SAMPLE)) {
-      builder.sampleName((String) mFlags.getValue(SAMPLE));
+      final String sample = (String) mFlags.getValue(SAMPLE);
+      final String[] samples = StringUtils.split(sample, ',');
+      builder.baselineSample(samples[0]);
+      builder.callsSample(samples.length == 2 ? samples[1] : samples[0]);
     }
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
