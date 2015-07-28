@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
+
 import com.rtg.mode.DnaUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -39,17 +41,26 @@ import com.rtg.vcf.VcfUtils;
 public final class SquashPloidyVariant extends Variant {
 
   // Creates a haploid variant for each alt allele referenced by the sample GT
-  static class Factory implements VariantFactory {
+  static class GtAltFactory implements VariantFactory {
     private final RocSortValueExtractor mExtractor;
     private final int mSampleNo;
 
-    public Factory(int sampleNo, RocSortValueExtractor extractor) {
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     * @param extractor ROC value extractor implementation to use
+     */
+    GtAltFactory(int sampleNo, RocSortValueExtractor extractor) {
       mSampleNo = sampleNo;
       mExtractor = extractor;
     }
 
     @Override
     public Variant variant(VcfRecord rec) {
+      // Currently we skip non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
       final String seqName = rec.getSequenceName();
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
@@ -71,7 +82,7 @@ public final class SquashPloidyVariant extends Variant {
         }
       }
       final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-      final SquashPloidyVariant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
+      final Variant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
       for (final RocFilter filter : RocFilter.values()) {
         if (filter.accept(rec, mSampleNo)) {
           var.mFilters.add(filter);
@@ -83,16 +94,23 @@ public final class SquashPloidyVariant extends Variant {
 
 
   // Creates a haploid variant for each alt allele declared in the variant record
-  static class AnyAltFactory implements VariantFactory {
+  static class HaploidAltFactory implements VariantFactory {
 
     private final RocSortValueExtractor mExtractor;
 
-    public AnyAltFactory(RocSortValueExtractor extractor) {
+    /**
+     * Constructor
+     * @param extractor ROC value extractor implementation to use
+     */
+    HaploidAltFactory(RocSortValueExtractor extractor) {
       mExtractor = extractor;
     }
 
     @Override
     public Variant variant(VcfRecord rec) {
+      if (rec.getAltCalls().size() == 0) {
+        return null;
+      } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
       final String seqName = rec.getSequenceName();
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
@@ -107,21 +125,67 @@ public final class SquashPloidyVariant extends Variant {
         sortValue = mExtractor.getSortValue(rec, -1);
       } catch (IndexOutOfBoundsException ignored) {
       }
-      final SquashPloidyVariant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
+      final Variant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
+      var.mFilters.add(RocFilter.ALL);
+      return var;
+    }
+  }
+
+  // Creates all possible diploid variants that include any of the alt alleles declared in the variant record
+  static class DiploidAltFactory implements VariantFactory {
+
+    private final RocSortValueExtractor mExtractor;
+
+    /**
+     * Constructor
+     * @param extractor ROC value extractor implementation to use
+     */
+    DiploidAltFactory(RocSortValueExtractor extractor) {
+      mExtractor = extractor;
+    }
+
+    @Override
+    public Variant variant(final VcfRecord rec) {
+      if (rec.getAltCalls().size() == 0) {
+        return null;
+      } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
+      final String seqName = rec.getSequenceName();
+      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
+      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
+      final int end = rec.getEnd();
+      final byte[][] alleles = new byte[1 + rec.getAltCalls().size()][];
+      for (int gtId = 0; gtId < alleles.length; gtId++) {
+        alleles[gtId] = DnaUtils.encodeString(getAllele(rec, gtId, hasPreviousNt));
+      }
+      double sortValue = Double.NaN;
+      try {
+        sortValue = mExtractor.getSortValue(rec, -1);
+      } catch (IndexOutOfBoundsException ignored) {
+      }
+      final Variant var = new Variant(seqName, start, end, alleles, false, sortValue) {
+        @Override
+        public OrientedVariant[] orientations() {
+          final OrientedVariant[] pos = new OrientedVariant[numAlleles() * numAlleles() - 1];
+          int v = 0;
+          for (int i = 1 ; i < numAlleles(); i++) {
+            for (int j = 0; j < i; j++) {
+              pos[v++] = new OrientedVariant(this, true, i, j);
+              pos[v++] = new OrientedVariant(this, false, j, i);
+            }
+            pos[v++] = new OrientedVariant(this, true, i, i);
+          }
+          assert v == pos.length : rec.toString() + Arrays.toString(pos);
+          return pos;
+        }
+      };
       var.mFilters.add(RocFilter.ALL);
       return var;
     }
   }
 
 
-
   private SquashPloidyVariant(String seq, int start, int end, byte[][] alleles, double sortValue) {
     super(seq, start, end, alleles, false, sortValue);
-  }
-
-  @Override
-  public boolean isPhased() {
-    return false;
   }
 
   @Override

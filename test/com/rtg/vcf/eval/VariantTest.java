@@ -241,16 +241,9 @@ public class VariantTest extends TestCase {
     checkArray(new byte[] {4}, v.nt(1));
   }
 
-  public void testComplexHandling() throws Exception {
-    final String line = "simulatedSequence1 2180 . C A 0.0" + TAB + "RC" + TAB + "." + TAB + "GT" + TAB + "0/0".replaceAll(" ", "\t");
-    final Variant v = createVariant(line);
-    assertEquals(2179, v.getStart());
-  }
-
   public void testMissingGT() throws Exception {
     final String line = "simulatedSequence1 2180 . C A 0.0 PASS . GT .".replaceAll(" ", "\t");
-    final Variant v = createVariant(line);
-    assertEquals(2179, v.getStart());
+    assertNull(createVariant(line)); // Current default factory skips those with missing GT
   }
 
 }

@@ -68,6 +68,10 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
 
     @Override
     public Variant variant(VcfRecord rec) {
+      // Currently we skip both non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
       final String seqName = rec.getSequenceName();
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
@@ -214,10 +218,10 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   }
 
   /**
-     * One allele of the variant as determined by <code>alleleId</code> parameter.
-     * @param alleleId the index of the allele.
-     * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
-     */
+   * One allele of the variant as determined by <code>alleleId</code> parameter.
+   * @param alleleId the index of the allele.
+   * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
+   */
   public byte[] nt(int alleleId) {
     return alleleId < 0 ? null : mAlleles[alleleId];
   }
@@ -227,15 +231,15 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   }
 
   /**
-     * @return true if the call has (external) phasing information
-     */
+   * @return true if the call has (external) phasing information
+   */
   public boolean isPhased() {
     return mPhased;
   }
 
   /**
-     * @return the possible oriented variants for this variant
-     */
+   * @return the possible oriented variants for this variant
+   */
   public OrientedVariant[] orientations() {
     if (mAlleles.length == 2) {
       // If the variant is heterozygous we need both phases

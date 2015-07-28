@@ -39,7 +39,8 @@ public interface VariantFactory {
   /**
    * Construct a Variant by inspecting a <code>VcfRecord</code> object.
    * @param rec VCF record to convert to Variant
-   * @return the Variant
+   * @return the Variant or null if the record didn't contain data that could be converted according to the factory.
    */
   Variant variant(VcfRecord rec);
+
 }

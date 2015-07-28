@@ -46,11 +46,15 @@ import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.MathUtils;
 import com.rtg.util.Pair;
 import com.rtg.util.PosteriorUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -109,4 +113,29 @@ public class TabixVcfRecordSetTest extends TestCase {
       assertTrue("these sequences weren't used: " + expected, expected.isEmpty());
     }
   }
+
+
+  public void testMissingSample() throws Exception {
+    final MemoryPrintStream mp = new MemoryPrintStream();
+    Diagnostic.setLogStream(mp.printStream());
+    try {
+      try (final TestDirectory dir = new TestDirectory("indexercli")) {
+        final File input = new File(dir, "foo.vcf.gz");
+        FileHelper.resourceToFile("com/rtg/sam/resources/vcf.txt.gz", input);
+        final File tabix = new File(dir, "foo.vcf.gz.tbi");
+        FileHelper.resourceToFile("com/rtg/sam/resources/vcf.txt.gz.tbi", tabix);
+        final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
+        ranges.put("20", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "20")));
+        try {
+          TabixVcfRecordSet.getFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", RocSortValueExtractor.NULL_EXTRACTOR, false);
+          fail();
+        } catch (NoTalkbackSlimException e) {
+          TestUtils.containsAll(e.toString(), "Sample \"asdf\" not found in calls VCF");
+        }
+      }
+    } finally {
+      Diagnostic.setLogStream();
+    }
+  }
+
 }

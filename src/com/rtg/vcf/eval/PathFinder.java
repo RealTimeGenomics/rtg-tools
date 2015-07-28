@@ -37,7 +37,6 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
  * Find the path through the two sequences of variants that best reconciles them.
@@ -55,7 +54,7 @@ public final class PathFinder {
   private final Variant[] mCalledVariants;
   private final Variant[] mBaseLineVariants;
 
-  private <T extends SequenceNameLocus> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
+  private <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
     mTemplate = template;
     mTemplateName = templateName;
 
@@ -77,7 +76,7 @@ public final class PathFinder {
    * @param <T> the type parameter
    * @return the best path (non-null).
    */
-  public static <T extends SequenceNameLocus> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
+  public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
     return new PathFinder(template, templateName, calledVariants, baseLineVariants).bestPath();
   }
 

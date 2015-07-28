@@ -134,17 +134,15 @@ public final class GlobalFlags {
   /** Should the random tree builder push missing values down during the build process. */
   public static final String TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
-  /** Experimental comparison for haploid comparison against any-allele in record */
-  public static final String VCFEVAL_ANY_ALLELE_BASELINE = "com.rtg.variant.eval.any-baseline-allele";
-
+  //vcfeval
+  /** Custom variant factoryies */
+  public static final String VCFEVAL_VARIANT_FACTORY = "com.rtg.vcf.eval.custom-variant-factory";
   /** Specify the maximum number of simultaneous paths before vcfeval skips a region */
-  public static final String VCFEVAL_MAX_PATHS = "com.rtg.variant.eval.max-paths";
-
+  public static final String VCFEVAL_MAX_PATHS = "com.rtg.vcf.eval.max-paths";
   /** Specify the maximum number of iterations since last sync point before vcfeval skips a region */
-  public static final String VCFEVAL_MAX_ITERATIONS = "com.rtg.variant.eval.max-iterations";
-
+  public static final String VCFEVAL_MAX_ITERATIONS = "com.rtg.vcf.eval.max-iterations";
   /** Turn on alternate ROC slope calculation */
-  public static final String ALTERNATE_ROC_SLOPE_CALCULATION = "com.rtg.variant.eval.RocSlope.alt-roc-slope";
+  public static final String ALTERNATE_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.RocSlope.alt-roc-slope";
 
   /** Level of BAM compression to use during recalibration (probably also works for SAM merge). */
   public static final String GZIP_LEVEL = "com.rtg.calibrate.Recalibrate.gzip-level";
@@ -200,7 +198,7 @@ public final class GlobalFlags {
     // when there are lots of missing values.
     registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
 
-    registerFlag(VCFEVAL_ANY_ALLELE_BASELINE, Boolean.class, false);
+    registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 5000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(ALTERNATE_ROC_SLOPE_CALCULATION);

@@ -35,43 +35,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
-import com.rtg.vcf.header.VcfHeader;
 
 /**
  * A callable which loads VcfRecords for given template
  */
 public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
 
-  private static final boolean ANY_ALT_BASELINE = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_ANY_ALLELE_BASELINE);
-
   private final File mInput;
   private final ReferenceRanges<String> mRanges;
-  private final String mSampleName;
   private final int mTemplateLength;
   private final VariantSetType mType;
-  private final RocSortValueExtractor mExtractor;
+  private final VariantFactory mFactory;
   private final boolean mPassOnly;
-  private final boolean mSquashPloidy;
   private final int mMaxLength;
 
-  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, String templateName, Integer templateLength, VariantSetType type, String sample, RocSortValueExtractor extractor, boolean passOnly, boolean squashPloidy, int maxLength) {
+  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength) {
     if (!ranges.containsSequence(templateName)) {
       throw new IllegalArgumentException("Ranges supplied do not contain reference sequence " + templateName);
     }
     mInput = file;
     mRanges = ranges;
-    mSampleName = sample;
+    mFactory = factory;
     mTemplateLength = templateLength;
     mType = type;
-    mExtractor = extractor;
     mPassOnly = passOnly;
-    mSquashPloidy = squashPloidy;
     mMaxLength = maxLength;
   }
 
@@ -80,28 +71,11 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     int skipped = 0;
     final List<Variant> list = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(mInput, mRanges)) {
-      final VcfHeader header = reader.getHeader();
-      final String label = mType == VariantSetType.BASELINE ? "baseline" : "calls";
-      final int sampleId = VcfUtils.getSampleIndexOrDie(header, mSampleName, label);
-      final VariantFactory fact;
-      final boolean anyAltComparison = mType == VariantSetType.BASELINE && ANY_ALT_BASELINE;
-      if (anyAltComparison) {
-        fact = new SquashPloidyVariant.AnyAltFactory(mExtractor);
-      } else if (mSquashPloidy) {
-        fact = new SquashPloidyVariant.Factory(sampleId, mExtractor);
-      } else {
-        fact = new Variant.Factory(sampleId, mExtractor);
-      }
       Variant last = null;
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
 
         if (mPassOnly && rec.isFiltered()) {
-          continue;
-        }
-
-        // Skip non-variant, SV
-        if (!anyAltComparison && !VcfUtils.hasDefinedVariantGt(rec, sampleId)) {
           continue;
         }
 
@@ -111,28 +85,32 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           length = Math.max(alt.length(), length);
         }
         if (mMaxLength > -1 && length > mMaxLength) {
-          Diagnostic.userLog("Variant in " + label + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " exceeds maximum length, skipping.");
+          Diagnostic.userLog("Variant allele in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " has length (" + length + ") exceeding maximum allele length (" + mMaxLength + "), skipping.");
           skipped++;
           continue;
         }
         
         // Skip variants with starts falling outside the expected length of the template sequence
         if (mTemplateLength >= 0 && rec.getStart() >= mTemplateLength) {
-          Diagnostic.userLog("Variant in " + label + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " starts outside the length of the reference sequence (" + mTemplateLength + ").");
+          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " starts outside the length of the reference sequence (" + mTemplateLength + ").");
           skipped++;
           continue;
         }
 
+        final Variant v = mFactory.variant(rec);
+        if (v == null) { // Just wasn't variant according to the factory
+          continue;
+        }
+
         // Skip overlapping variants
-        final Variant v = fact.variant(rec);
         if (last != null) {
           if (v.getStart() < last.getEnd()) {
-            Diagnostic.userLog("Overlapping variants aren't supported, skipping current variant from " + label + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
+            Diagnostic.userLog("Overlapping variants aren't supported, skipping current variant from " + mType.label() + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
             skipped++;
             continue;
           }
           if ((v.getStart() == last.getStart()) && (v.getStart() == v.getEnd()) && (last.getStart() == last.getEnd())) { // Pure inserts where ordering is ambiguous
-            Diagnostic.userLog("Ambiguous inserts aren't supported, skipping current variant from " + label + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
+            Diagnostic.userLog("Ambiguous inserts aren't supported, skipping current variant from " + mType.label() + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
             skipped++;
             continue;
           }

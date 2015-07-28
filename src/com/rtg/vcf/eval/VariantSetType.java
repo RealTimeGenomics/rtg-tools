@@ -30,11 +30,18 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Locale;
+
 /**
  */
 public enum VariantSetType {
   /** indicates that a set of variants represents baseline variants, e.g. generated variants or "the truth" */
   BASELINE
   /** indicates that a set of variants represents calls that have been produced from a read set */
-  , CALLS
+  , CALLS;
+
+  /** @return a short readable label for the type. */
+  public String label() {
+    return name().toLowerCase(Locale.ROOT);
+  }
 }

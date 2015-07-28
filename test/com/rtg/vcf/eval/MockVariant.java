@@ -36,17 +36,6 @@ import com.rtg.mode.DnaUtils;
  */
 public class MockVariant extends Variant {
 
-  /**
-   * @param start one-based start position of mutation
-   * @param end one-based end position of mutation
-   * @param plus nucleotides on the plus strand
-   * @param minus nucleotides on the minus strand
-   * @param phased does this call have phasing information
-   */
-  public MockVariant(int start, int end, byte[] plus, byte[] minus, boolean phased) {
-    super("", start - 1, end - 1, toPreds(plus, minus), phased, Double.NaN);
-  }
-
   static byte[][] toPreds(byte[] plus, byte[] minus) {
     if (minus == null) {
       return new byte[][] {plus};
@@ -63,7 +52,7 @@ public class MockVariant extends Variant {
    * @param minus nucleotides on the minus strand
    */
   public MockVariant(int start, int end, byte[] plus, byte[] minus) {
-    this(start, end, plus, minus, false);
+    super("", start - 1, end - 1, toPreds(plus, minus), false, Double.NaN);
   }
 
   @Override
