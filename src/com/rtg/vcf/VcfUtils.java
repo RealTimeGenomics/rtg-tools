@@ -53,74 +53,73 @@ import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
 
 /**
- *
- *
+ * Utility functions and constants for VCF records and files.
  */
 public final class VcfUtils {
 
   private VcfUtils() { }
 
-  /** Character used to separate alleles in unphased genotypes */
+  /** Character used to separate alleles in unphased genotypes. */
   public static final char UNPHASED_SEPARATOR = '/';
 
-  /** Character used to separate alleles in phased genotypes */
+  /** Character used to separate alleles in phased genotypes. */
   public static final char PHASED_SEPARATOR = '|';
 
-  /** VCF file suffix */
+  /** VCF file suffix. */
   public static final String VCF_SUFFIX = ".vcf";
 
-  /** character indicating field value separator */
+  /** Character indicating field value separator. */
   public static final char VALUE_SEPARATOR = ';';
 
-  /** character indicating field value is missing */
+  /** Character indicating field value is missing. */
   public static final char MISSING_VALUE = '.';
 
-  /** QUAL column label */
+  /** QUAL column label. */
   public static final String QUAL = "QUAL";
 
-  /** pass filter flag */
+  /** Pass filter flag. */
   public static final String FILTER_PASS = "PASS";
 
-  /** missing field (e.g. filter/QUAL) */
+  /** Missing field (e.g. filter/QUAL). */
   public static final String MISSING_FIELD = "" + MISSING_VALUE;
 
-  /** confidence interval for POS columns */
+  /** Confidence interval for POS columns. */
   public static final String CONFIDENCE_INTERVAL_POS = "CIPOS";
 
-  /** allele frequency for alt alleles */
+  /** Allele frequency for alt alleles. */
   public static final String INFO_ALLELE_FREQ = "AF";
 
-  /** allele frequency for alt alleles */
+  /** Allele frequency for alt alleles. */
   public static final MetaType INFO_ALLELE_FREQ_TYPE = MetaType.FLOAT;
 
-  /** allele frequency for alt alleles */
+  /** Allele frequency for alt alleles. */
   public static final VcfNumber INFO_ALLELE_FREQ_NUM = new VcfNumber("A");
 
-  /** allele frequency for alt alleles */
+  /** Allele frequency for alt alleles. */
   public static final String INFO_ALLELE_FREQ_DESC = "Allele Frequency";
 
-  /** combined depth field */
+  /** Combined depth field. */
   public static final String INFO_COMBINED_DEPTH = "DP";
 
-  /** genotype format field */
+  /** Genotype format field. */
   public static final String FORMAT_GENOTYPE = "GT";
 
-  /** AVR score format field */
+  /** AVR score format field. */
   public static final String FORMAT_AVR = "AVR";
 
-  /** genotype quality format field */
+  /** Genotype quality format field. */
   public static final String FORMAT_GENOTYPE_QUALITY = "GQ";
 
-  /** sample depth field */
+  /** Sample depth field. */
   public static final String FORMAT_SAMPLE_DEPTH = "DP";
 
-  /** ambiguity ratio field */
+  /** Ambiguity ratio field. */
   public static final String FORMAT_AMBIGUITY_RATIO = "AR";
 
-  /** VCF FORMAT field used to indicate de novo alleles */
+  /** VCF FORMAT field used to indicate de novo alleles. */
   public static final String FORMAT_DENOVO = "DN";
 
-  /** VCF FORMAT field used to indicate de novo score */
+  /** VCF FORMAT field used to indicate de novo score. */
   public static final String FORMAT_DENOVO_SCORE = "DNP";
 
   private static int alleleId(char c) {
@@ -134,7 +133,7 @@ public final class VcfUtils {
   }
 
   private static int alleleId(String gt, int start, int length) {
-    return (length == 1)
+    return length == 1
       ? alleleId(gt.charAt(start))
       : Integer.parseInt(gt.substring(start, start + length));
   }
@@ -182,7 +181,8 @@ public final class VcfUtils {
   }
 
   /**
-   * @param f file
+   * Check if the supplied file is has an extension indicative of VCF.
+   * @param f file to test
    * @return true if file has <code>vcf</code> or gzipped <code>vcf</code> extension
    */
   public static boolean isVcfExtension(File f) {
@@ -226,8 +226,8 @@ public final class VcfUtils {
 
 
   /**
-   * If GT is either missing or is same as reference then return true
-   * @param gt gt to check
+   * If GT is either missing or is same as reference then return true.
+   * @param gt GT to check
    * @return true if gt does not represent a variant, false otherwise
    */
   public static boolean isNonVariantGt(String gt) {
@@ -248,8 +248,8 @@ public final class VcfUtils {
   }
 
   /**
-   * If GT is not missing and not the same as reference then return true
-   * @param gt gt to check
+   * If GT is not missing and not the same as reference then return true.
+   * @param gt GT to check
    * @return true if gt represents a variant, false otherwise
    */
   public static boolean isVariantGt(String gt) {
@@ -257,8 +257,8 @@ public final class VcfUtils {
   }
 
   /**
-   * If any of the GT is non missing return true
-   * @param gt gt to check
+   * If any of the GT is non missing return true.
+   * @param gt GT to check
    * @return true if gt is not entirely should be skipped, false otherwise
    */
   public static boolean isNonMissingGt(String gt) {
@@ -278,8 +278,8 @@ public final class VcfUtils {
   }
 
   /**
-   * If all sub-alleles of the GT is missing return true
-   * @param gt gt to check
+   * If all sub-alleles of the GT is missing return true.
+   * @param gt GT to check
    * @return true if gt should be skipped, false otherwise
    */
   public static boolean isMissingGt(String gt) {
@@ -287,10 +287,10 @@ public final class VcfUtils {
   }
 
   /**
-   * Returns the VCF header for given file
+   * Returns the VCF header for given file.
    * @param input file to read VCF header from
    * @return The VcfHeader
-   * @throws IOException if error
+   * @throws IOException if an I/O error occurs
    */
   public static VcfHeader getHeader(final File input) throws IOException {
     try (VcfReader reader = VcfReader.openVcfReader(input)) {
@@ -302,6 +302,7 @@ public final class VcfUtils {
   // The following could all be moved to VcfRecord itself
 
   /**
+   * Test if a VCF record was produced by the RTG complex caller.
    * @param rec record to look up
    * @return true if the record was produced by the complex caller
    */
@@ -320,6 +321,7 @@ public final class VcfUtils {
   }
 
   /**
+   * Get the value of a particular field for a sample in the form of a double.
    * @param rec VCF record
    * @param sample index of sample to extract value from
    * @param field string ID of field to extract
@@ -366,19 +368,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Tests if the given sample genotype in a record is homozygous or not
-   * @param rec record to check
-   * @param sample sample number
-   * @return true iff homozygous
-   * @throws NoTalkbackSlimException if the sample is missing GT filed or invalid sample number
-   */
-  public static boolean isSnp(VcfRecord rec, int sample) {
-    final int[] gtArray = validateGT(rec, sample);
-    return isHomozygous(gtArray) && !isIdentity(gtArray);
-  }
-
-  /**
-   * Tests if the given sample genotype in a record is homozygous or not
+   * Tests if the given sample genotype in a record is homozygous or not.
    * @param rec record to check
    * @param sample sample number
    * @return true iff homozygous
@@ -390,7 +380,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Tests if the given sample genotype in a record is heterozygous or not
+   * Tests if the given sample genotype in a record is heterozygous or not.
    * @param rec record to check
    * @param sample sample number
    * @return true iff heterozygous
@@ -402,7 +392,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Tests if the given sample genotype in a record is haploid or not
+   * Tests if the given sample genotype in a record is haploid or not.
    * @param rec record to check
    * @param sample sample number
    * @return true iff haploid
@@ -414,7 +404,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Tests if the given sample genotype in a record is diploid or not
+   * Tests if the given sample genotype in a record is diploid or not.
    * @param rec record to check
    * @param sample sample number
    * @return true iff diploid
@@ -508,7 +498,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Determines if this record has a redundant leading base (e.g. for indels)
+   * Determines if this record has a redundant leading base (e.g. for indels).
    * @param rec the record to examine
    * @return true if the leading base of the variant is redundant.
    */
@@ -551,7 +541,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Create a tabix index for a VCF file
+   * Create a tabix index for a VCF file.
    * @param fileToIndex the VCF file
    * @throws IOException if there is a problem
    */
@@ -564,7 +554,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Create a new instance from the specified VCF file
+   * Create a new instance from the specified VCF file.
    * @param f a pointer to the VCF file
    * @return a new <code>ReferenceRegions</code> or null if the argument is null
    * @throws java.io.IOException when reading the file fails
@@ -580,7 +570,7 @@ public final class VcfUtils {
   }
 
   /**
-   * Create a new instance from the specified VCF file
+   * Create a new instance from the specified VCF file.
    * @param reader the VCF reader
    * @return a new <code>ReferenceRegions</code>
    * @throws java.io.IOException when reading the file fails

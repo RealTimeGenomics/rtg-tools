@@ -55,7 +55,7 @@ class VcfFilterTask {
 
   protected final VcfFilterStatistics mVcfFilterStatistics = new VcfFilterStatistics();
 
-  //overlap filtering
+  // overlap filtering
   protected String mEndRef = "";
   protected int mEndPosition = -1;
 
