@@ -64,25 +64,12 @@ import junit.framework.TestSuite;
 
 /**
  * Test class for corresponding class.
- *
  */
 public class FormatCliTest extends AbstractCliTest {
 
   @Override
   protected AbstractCli getCli() {
     return new FormatCli();
-  }
-
-  public static Test suite() {
-    return new TestSuite(FormatCliTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
   }
 
   public void testHelp() {

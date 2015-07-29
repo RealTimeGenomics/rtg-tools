@@ -30,32 +30,10 @@
 package com.rtg.util.array.objectindex;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Test Chunks
  */
 public class SmallChunksTest extends ObjectChunksTest {
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(SmallChunksTest.class);
-  }
-
-  public static Test suite() {
-    return new TestSuite(SmallChunksTest.class);
-  }
-
-  /**
-   * Constructor for ChunksTest.
-   */
-  public SmallChunksTest(final String arg0) {
-    super(arg0);
-  }
 
   @Override
   protected ObjectIndex<Integer> create(final long length) {

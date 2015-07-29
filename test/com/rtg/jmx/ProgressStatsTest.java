@@ -33,9 +33,7 @@ import java.io.IOException;
 
 import com.rtg.util.cli.CommandLine;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -49,18 +47,5 @@ public class ProgressStatsTest extends TestCase {
     assertTrue(sb.toString().startsWith("# Command line "));
     assertTrue(sb.toString().contains("a simple command line"));
   }
-
-  public static Test suite() {
-    return new TestSuite(ProgressStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ProgressStatsTest.class);
-  }
-
 }
 

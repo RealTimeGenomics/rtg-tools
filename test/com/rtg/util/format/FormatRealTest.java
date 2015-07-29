@@ -33,20 +33,8 @@ package com.rtg.util.format;
 import junit.framework.TestCase;
 
 /**
- * Tests FormatReal. Run from the command line with:<p>
- *
- * <code>
- * java junit.textui.TestRunner com.rtg.util.format.FormatRealTest<br>
- * java junit.swingui.TestRunner com.rtg.util.format.FormatRealTest<br>
- * java com.rtg.util.format.FormatRealTest<br>
- * </code>
- *
  */
 public class FormatRealTest extends TestCase {
-
-  public FormatRealTest(final String name) {
-    super(name);
-  }
 
   @Override
   public void setUp() {

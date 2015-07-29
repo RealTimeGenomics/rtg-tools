@@ -31,19 +31,11 @@ package com.rtg.util.array;
 
 import com.rtg.util.PortableRandom;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * JUnit tests for QuickSort.
- *
  */
 public class IndexSorterTest extends TestCase {
-
-  public IndexSorterTest(final String name) {
-    super(name);
-  }
 
   private CommonIndex dynamic(final int[] x) {
     final CommonIndex a = com.rtg.util.array.intindex.IntCreate.createIndex(x.length);
@@ -245,19 +237,6 @@ public class IndexSorterTest extends TestCase {
       // expected
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(IndexSorterTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 
 

@@ -29,35 +29,13 @@
  */
 package com.rtg.util.array.shortindex;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * Test Create
  */
 public class ShortCreateTest extends TestCase {
 
   private static final long FREE_LIMIT = 2L * Integer.MAX_VALUE + 200000000L; //allow 200m of freeboard
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ShortCreateTest.class);
-  }
-
-  public static Test suite() {
-    return new TestSuite(ShortCreateTest.class);
-  }
-
-  /**
-   * Constructor for CreateTest.
-   */
-  public ShortCreateTest(final String arg0) {
-    super(arg0);
-  }
 
   public void testBad() {
     try {

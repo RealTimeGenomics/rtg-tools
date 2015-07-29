@@ -44,14 +44,6 @@ public abstract class AbstractObjectIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  /**
-   * Constructor (needed for JUnit)
-   * @param name A string which names the tests.
-   */
-  public AbstractObjectIndexTest(final String name) {
-    super(name);
-  }
-
   protected abstract ObjectIndex<Integer> create(final long length);
 
   protected abstract ObjectIndex<Integer> create(final long length, final int bits);

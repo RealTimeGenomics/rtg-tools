@@ -39,14 +39,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Tests for FileHelper.
- *
  */
 public class FileHelperTest extends TestCase {
-
-  public FileHelperTest(final String name) {
-    super(name);
-  }
 
   public void testCreateTempFile() throws Exception {
     final File f = FileHelper.createTempFile();

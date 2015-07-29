@@ -47,26 +47,13 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * JUnit tests for the FileUtils class.
- *
  */
 public class FileUtilsTest extends TestCase {
 
   protected File mTmp = null;
-
-  /**
-   * Constructor (needed for JUnit)
-   *
-   * @param name A string which names the object.
-   */
-  public FileUtilsTest(final String name) {
-    super(name);
-  }
 
   @Override
   public void setUp() throws Exception {
@@ -335,10 +322,6 @@ public class FileUtilsTest extends TestCase {
   }
   */
 
-  public static Test suite() {
-    return new TestSuite(FileUtilsTest.class);
-  }
-
   public void testCattedGZipFiles() throws IOException {
     final File tmpDir = FileUtils.createTempDir("testGzipCatting", "test");
     try {
@@ -356,15 +339,6 @@ public class FileUtilsTest extends TestCase {
     }
 
   }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 
   private static class NonSkippingStream extends InputStream {
     private final InputStream mStream;

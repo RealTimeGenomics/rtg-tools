@@ -40,31 +40,17 @@ import com.rtg.util.diagnostic.DiagnosticEvent;
 import com.rtg.util.diagnostic.DiagnosticListener;
 import com.rtg.util.diagnostic.InformationEvent;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests corresponding class
  */
-
 public class ConcatSequenceDataSourceTest extends TestCase {
   private static final Residue A = DNA.A;
   private static final Residue C = DNA.C;
   private static final Residue G = DNA.G;
   private static final Residue T = DNA.T;
   private static final Residue N = DNA.N;
-
-  public static Test suite() {
-    return new TestSuite(ConcatSequenceDataSourceTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void testEmpty() {
     Diagnostic.setLogStream();

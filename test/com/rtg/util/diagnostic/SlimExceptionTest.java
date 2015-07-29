@@ -34,32 +34,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 
 /**
  * Tests the corresponding class.
- *
  */
 public class SlimExceptionTest extends TestCase {
-
-  //    public SlimExceptionTest(final String name) {
-  //        super(name);
-  //    }
-
-  public static Test suite() {
-    return new TestSuite(SlimExceptionTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void test() throws IOException {
     final DiagnosticListener l = new DiagnosticListener() {

@@ -30,33 +30,13 @@
 package com.rtg.util.test;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the corresponding class.
  *
  */
 public class RandomDnaTest extends TestCase {
-
-  /**
-   * Constructor (needed for JUnit)
-   * @param name A string which names the object.
-   */
-  public RandomDnaTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(RandomDnaTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void test() {
     final String s = RandomDna.random(10000);

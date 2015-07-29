@@ -38,25 +38,6 @@ import junit.framework.TestSuite;
  */
 public class ObjectArrayTest extends AbstractObjectIndexTest {
 
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ObjectArrayTest.class);
-  }
-
-  public static Test suite() {
-    return new TestSuite(ObjectArrayTest.class);
-  }
-
-  /**
-   * Constructor for ArrayTest.
-   */
-  public ObjectArrayTest(final String arg0) {
-    super(arg0);
-  }
-
   @Override
   protected ObjectIndex<Integer> create(final long length) {
     return new ObjectArray<>(length);

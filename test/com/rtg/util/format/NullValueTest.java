@@ -30,25 +30,11 @@
 package com.rtg.util.format;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
 public class NullValueTest extends TestCase {
-
-  /**
-   */
-  public NullValueTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    final TestSuite suite = new TestSuite();
-    suite.addTest(new TestSuite(NullValueTest.class));
-    return suite;
-  }
 
   public void test() {
     assertEquals("--", NullValue.NULL.toString());

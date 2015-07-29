@@ -31,9 +31,7 @@ package com.rtg.jmx;
 
 import java.io.IOException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -72,18 +70,5 @@ public class NetworkStatsTest extends TestCase {
       assertFalse(sb.toString().contains("n/a"));
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(NetworkStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(NetworkStatsTest.class);
-  }
-
 }
 

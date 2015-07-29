@@ -30,26 +30,12 @@
 package com.rtg.util.array.objectindex;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Test Chunks
  */
 public class ObjectChunksTest extends AbstractObjectIndexTest {
 
   private static final int CHUNK_BITS = 29;
-
-  public static Test suite() {
-    return new TestSuite(ObjectChunksTest.class);
-  }
-
-  /**
-   * Constructor for ChunksTest.
-   */
-  public ObjectChunksTest(final String arg0) {
-    super(arg0);
-  }
 
   @Override
   protected ObjectIndex<Integer> create(final long length) {

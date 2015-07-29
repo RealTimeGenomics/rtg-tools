@@ -63,11 +63,6 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   protected abstract SequencesReader createSequencesReader(final File dir, LongRange region) throws IOException;
 
-
-  public static Test suite() {
-    return new TestSuite(AbstractSequencesReaderTest.class);
-  }
-
   protected File mDir;
 
   @Override

@@ -38,31 +38,12 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 
 import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the corresponding class.
- *
  */
 public class DiagnosticTest extends TestCase {
-
-  /**
-   */
-  public DiagnosticTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(DiagnosticTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   @Override
   public void setUp() {

@@ -31,9 +31,7 @@ package com.rtg.jmx;
 
 import java.io.IOException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -70,18 +68,5 @@ public class DiskStatsTest extends TestCase {
       assertTrue(sb.length() > 0);
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(DiskStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(DiskStatsTest.class);
-  }
-
 }
 

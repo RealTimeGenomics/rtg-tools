@@ -37,16 +37,9 @@ import java.util.ArrayList;
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  */
 public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
-
-  public static Test suite() {
-    return new TestSuite(ReverseComplementingReaderTest.class);
-  }
 
   @Override
   protected SequencesReader createSequencesReader(final File dir) throws IOException {

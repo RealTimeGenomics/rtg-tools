@@ -59,17 +59,8 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Test class for FastqSequenceDataSource
- *
  */
 public class FastqSequenceDataSourceTest extends TestCase {
-  public FastqSequenceDataSourceTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(FastqSequenceDataSourceTest.class);
-  }
 
   private InputStream createStream(final String data) {
     return new ByteArrayInputStream(data.getBytes());

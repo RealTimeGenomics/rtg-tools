@@ -37,25 +37,12 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Test the corresponding class.
  */
 public class TsvSequenceDataSourceTest extends TestCase {
-
-  public static Test suite() {
-    return new TestSuite(TsvSequenceDataSourceTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   private File mSample = null;
   private File mSampleBzip2 = null;

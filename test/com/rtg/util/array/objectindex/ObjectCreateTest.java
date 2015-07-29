@@ -30,33 +30,12 @@
 package com.rtg.util.array.objectindex;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Test Create
  */
 public class ObjectCreateTest extends TestCase {
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ObjectCreateTest.class);
-  }
-
-  public static Test suite() {
-    return new TestSuite(ObjectCreateTest.class);
-  }
-
-  /**
-   * Constructor for CreateTest.
-   */
-  public ObjectCreateTest(final String arg0) {
-    super(arg0);
-  }
 
   public void testBad() {
     try {

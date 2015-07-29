@@ -30,27 +30,11 @@
 package com.rtg.util.format;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- *
- *
  */
 public class BitsTest extends TestCase {
-
-  /**
-   */
-  public BitsTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    final TestSuite suite = new TestSuite();
-    suite.addTest(new TestSuite(BitsTest.class));
-    return suite;
-  }
 
   public void test() {
     final Bits b = new Bits(5.5f);

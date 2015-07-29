@@ -39,7 +39,6 @@ import java.util.Iterator;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
@@ -47,13 +46,11 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.DiagnosticEvent;
 import com.rtg.util.diagnostic.DiagnosticListener;
 import com.rtg.util.diagnostic.ErrorType;
+import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 /**
  * Tests corresponding class
@@ -372,17 +369,5 @@ public class Cg2SdfTest extends AbstractCliTest {
       assertEquals(expected, rightReader.samReadGroup());
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(Cg2SdfTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 

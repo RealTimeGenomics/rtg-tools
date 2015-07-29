@@ -46,7 +46,7 @@ public final class ParseRocFile {
   }
 
   /**
-   * loads ROC file into data bundle
+   * Loads ROC file into data bundle.
    * @param progressBarDelegate called every 100 lines with progress, and at end with file stats
    * @param is input data. this stream is closed by this method.
    * @param shortName name for line

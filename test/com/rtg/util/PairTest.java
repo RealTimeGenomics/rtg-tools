@@ -29,29 +29,12 @@
  */
 package com.rtg.util;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
 public class PairTest extends TestCase {
 
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(PairTest.class);
-  }
-
-  public static Test suite() {
-    return new TestSuite(PairTest.class);
-  }
-
-  /*
-   * Test method for 'com.reeltwo.art.generator.Pair'
-   */
   public final void test() {
     final Pair<String, Integer> p = new Pair<>("abc", 0);
     assertEquals("abc:0", p.toString());
@@ -67,9 +50,6 @@ public class PairTest extends TestCase {
     assertEquals(1388221096, p.hashCode()); // a regression test - hard to work out what it will be
   }
 
-  /*
-   * Test method for 'com.reeltwo.art.generator.Pair'
-   */
   public final void testEquals() {
     final Object[][] groups = {
       {new Pair<>("", 0), new Pair<>("", 0) },

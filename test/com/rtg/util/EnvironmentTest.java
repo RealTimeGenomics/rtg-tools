@@ -39,27 +39,10 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 
 public class EnvironmentTest extends TestCase {
-
-  public EnvironmentTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(EnvironmentTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void test() {
     final HashSet<String> emptyKeys = new HashSet<>();

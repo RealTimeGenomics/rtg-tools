@@ -33,9 +33,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -46,18 +44,5 @@ public class ExternalCommandTest extends TestCase {
     final InputStream in = new ByteArrayInputStream(s.getBytes());
     assertEquals(s, ExternalCommand.readAll(in));
   }
-
-  public static Test suite() {
-    return new TestSuite(ExternalCommandTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ExternalCommandTest.class);
-  }
-
 }
 

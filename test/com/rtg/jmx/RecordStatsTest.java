@@ -31,9 +31,7 @@ package com.rtg.jmx;
 
 import java.io.IOException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -78,18 +76,5 @@ public class RecordStatsTest extends TestCase {
     assertTrue(sb.toString(), sb.toString().contains("Data"));
     assertEquals(1, sb.toString().split(LS).length);
   }
-
-  public static Test suite() {
-    return new TestSuite(RecordStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(RecordStatsTest.class);
-  }
-
 }
 

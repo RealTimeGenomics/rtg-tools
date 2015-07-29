@@ -44,31 +44,12 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.SimpleArchive;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Test class for corresponding class.
- *
  */
 public class IndexFileTest extends TestCase {
-
-  public IndexFileTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(IndexFileTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void testDetectNewerVersion() throws IOException {
     final File dir = ReaderTestUtils.getDNADir("");

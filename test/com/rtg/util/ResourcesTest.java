@@ -34,25 +34,13 @@ import java.io.InputStream;
 
 import com.rtg.util.io.IOUtils;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests for <code>Resources</code>.
  *
  */
 public class ResourcesTest extends TestCase {
-
-  /**
-   * Constructor (needed for JUnit)
-   *
-   * @param name A string which names the tests.
-   *
-   */
-  public ResourcesTest(final String name) {
-    super(name);
-  }
 
   public void testResources() throws IOException {
     InputStream i = Resources.getResourceAsStream("com/rtg/util/resources/ethwinout.txt");
@@ -94,14 +82,5 @@ public class ResourcesTest extends TestCase {
 //    }
 //    assertTrue(found);
 //  }
-
-  public static Test suite() {
-    return new TestSuite(ResourcesTest.class);
-  }
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 

@@ -31,9 +31,7 @@ package com.rtg.jmx;
 
 import java.io.IOException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -47,18 +45,5 @@ public class MBeanStatsTest extends TestCase {
     ds.addHeader(sb);
     assertEquals(8, sb.toString().split(LS).length);
   }
-
-  public static Test suite() {
-    return new TestSuite(MBeanStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(MBeanStatsTest.class);
-  }
-
 }
 

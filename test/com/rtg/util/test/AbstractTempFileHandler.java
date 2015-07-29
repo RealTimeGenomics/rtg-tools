@@ -42,24 +42,14 @@ public abstract class AbstractTempFileHandler extends TestCase {
 
   protected File mTempDir;
 
-  /**
-   * Setup method
-   * @throws Exception any exception
-   */
   @Override
   public void setUp() throws Exception {
     mTempDir = FileUtils.createTempDir(this.getClass().getName(), "test");
   }
 
-  /**
-   * Tear down
-   * @throws Exception any exception
-   */
   @Override
   public void tearDown() throws Exception {
     assertTrue(FileHelper.deleteAll(mTempDir));
     mTempDir = null;
   }
-
-
 }

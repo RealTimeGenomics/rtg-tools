@@ -33,31 +33,13 @@ import java.io.ObjectStreamException;
 
 import com.rtg.util.TestUtils;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests for InformationType.
  *
  */
 public class InformationTypeTest extends TestCase {
-
-  /**
-   */
-  public InformationTypeTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(InformationTypeTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void testEnum() {
     TestUtils.testPseudoEnum(InformationType.class, "[INFO_USER, PROCESSING_ITEM_N_OF_N]");

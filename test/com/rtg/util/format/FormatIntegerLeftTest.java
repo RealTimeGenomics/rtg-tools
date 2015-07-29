@@ -30,21 +30,11 @@
 package com.rtg.util.format;
 
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * Test class for FormatIntegerLeft. <p>
  */
 public class FormatIntegerLeftTest extends TestCase {
-
-  /**
-   */
-  public FormatIntegerLeftTest(final String s) {
-    super(s);
-  }
-
 
   static final int[] TST_DATA =
     new int[]{0, 1, -1, 123, -123, Integer.MAX_VALUE, Integer.MIN_VALUE};
@@ -215,23 +205,6 @@ public class FormatIntegerLeftTest extends TestCase {
       fail("should throw nullPointerException");
     } catch (final NullPointerException e) { }
   }
-
-
-  public static Test suite() {
-    final TestSuite suite = new TestSuite();
-    suite.addTest(new TestSuite(FormatIntegerLeftTest.class));
-    return suite;
-  }
-
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 
 

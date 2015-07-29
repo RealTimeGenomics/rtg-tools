@@ -46,24 +46,9 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
- * Test for PrereadSplitter
- *
  */
 public class SdfSplitterTest extends AbstractCliTest {
-
-
-
-  public static Test suite() {
-    return new TestSuite(SdfSplitterTest.class);
-  }
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.runAndWait(suite());
-  }
 
   @Override
   protected AbstractCli getCli() {

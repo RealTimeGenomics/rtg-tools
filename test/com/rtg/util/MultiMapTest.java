@@ -34,9 +34,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 
 
@@ -44,13 +42,6 @@ import junit.framework.TestSuite;
  * Test class for MultiMap.
  */
 public class MultiMapTest extends TestCase {
-  /**
-   * Constructor (needed for JUnit)
-   * @param name A string which names the object.
-   */
-  public MultiMapTest(final String name) {
-    super(name);
-  }
 
   private static final String EXPECTED = ""
     + "{" + StringUtils.LS
@@ -107,19 +98,6 @@ public class MultiMapTest extends TestCase {
     assertEquals(1, mm.values().size());
     assertEquals(Arrays.asList("5", "6", "7", "10"), mm.get(10));
     assertEquals(expected, mm.toString());
-  }
-
-  public static Test suite() {
-    return new TestSuite(MultiMapTest.class);
-  }
-
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
   }
 }
 

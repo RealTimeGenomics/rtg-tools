@@ -37,13 +37,8 @@ import com.rtg.util.TestUtils;
 import junit.framework.TestCase;
 
 /**
- *
  */
 public class NoTalkbackSlimExceptionTest extends TestCase {
-
-  public NoTalkbackSlimExceptionTest(String name) {
-    super(name);
-  }
 
   public final void testNoTalkbackSlimExceptionString() {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();

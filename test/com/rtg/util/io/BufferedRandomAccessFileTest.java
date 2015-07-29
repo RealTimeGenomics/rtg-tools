@@ -35,25 +35,12 @@ import java.io.RandomAccessFile;
 
 import com.rtg.util.PortableRandom;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * JUnit tests for the BufferedRandomAccessFile class.
- *
  */
 public class BufferedRandomAccessFileTest extends TestCase {
   protected File mTmp = null;
-
-  /**
-   * Constructor (needed for JUnit)
-   *
-   * @param name A string which names the object.
-   */
-  public BufferedRandomAccessFileTest(final String name) {
-    super(name);
-  }
 
   @Override
   public void setUp() throws Exception {
@@ -288,18 +275,4 @@ public class BufferedRandomAccessFileTest extends TestCase {
       }
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(BufferedRandomAccessFileTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   *
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }

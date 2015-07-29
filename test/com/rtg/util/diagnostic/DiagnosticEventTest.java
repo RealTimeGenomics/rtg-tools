@@ -36,30 +36,10 @@ import java.io.PrintStream;
 import com.rtg.util.EnumHelper;
 import com.rtg.util.PseudoEnum;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Tests the corresponding class.
- *
  */
 public final class DiagnosticEventTest extends AbstractDiagnosticEventTest {
-
-  /**
-   */
-  public DiagnosticEventTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(DiagnosticEventTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   @Override
   public DiagnosticEvent<?> getEvent() {

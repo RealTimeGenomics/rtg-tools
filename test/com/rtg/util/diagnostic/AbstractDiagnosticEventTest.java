@@ -34,15 +34,8 @@ import junit.framework.TestCase;
 
 /**
  * Tests the corresponding class.
- *
  */
 public abstract class AbstractDiagnosticEventTest extends TestCase {
-
-  /**
-   */
-  public AbstractDiagnosticEventTest(final String name) {
-    super(name);
-  }
 
   public abstract DiagnosticEvent<?> getEvent();
 

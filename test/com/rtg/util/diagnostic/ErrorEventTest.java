@@ -30,30 +30,10 @@
 package com.rtg.util.diagnostic;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Tests the corresponding class.
- *
  */
 public class ErrorEventTest extends AbstractDiagnosticEventTest {
-
-  /**
-   */
-  public ErrorEventTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(ErrorEventTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   @Override
   public DiagnosticEvent<?> getEvent() {

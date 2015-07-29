@@ -32,30 +32,11 @@ package com.rtg.util.integrity;
 import com.rtg.util.Utils;
 import com.rtg.util.integrity.Exam.ExamException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * Test class for FormatIntegerLeft. <p>
- *
- * Run from the command line with:<p>
- *
- * <code>
- * java junit.textui.TestRunner com.rtg.util.integrity.AssertTest<br>
- * java junit.swingui.TestRunner com.rtg.util.integrity.AssertTest
- * <br>
- * java com.rtg.util.integrity.AssertTest<br>
- * </code>
- *
  */
 public class ExamTest extends TestCase {
-
-  /**
-   */
-  public ExamTest(final String s) {
-    super(s);
-  }
 
   public void testTrue() {
     assertTrue(Exam.assertTrue(true));
@@ -432,20 +413,6 @@ public class ExamTest extends TestCase {
       assertEquals(msg, ex.getMessage());
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(ExamTest.class);
-  }
-
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 
 

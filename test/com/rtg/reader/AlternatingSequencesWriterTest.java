@@ -32,10 +32,11 @@ package com.rtg.reader;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.launcher.GlobalFlags;
 import com.rtg.mode.DnaUtils;
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
+import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
@@ -47,9 +48,8 @@ import junit.framework.TestCase;
  */
 public class AlternatingSequencesWriterTest extends TestCase {
 
-
   public void testAlternation() throws Exception {
-
+    GlobalFlags.resetAccessedStatus();
     final File tempDir = FileUtils.createTempDir("cg2sdftest", "version2");
     try {
 

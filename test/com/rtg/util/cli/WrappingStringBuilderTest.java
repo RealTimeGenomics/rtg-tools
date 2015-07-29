@@ -29,33 +29,13 @@
  */
 package com.rtg.util.cli;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the corresponding class.
  *
  */
 public class WrappingStringBuilderTest extends TestCase {
-
-  /**
-   */
-  public WrappingStringBuilderTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(WrappingStringBuilderTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(new TestSuite(WrappingStringBuilderTest.class));
-  }
 
   private static final String LS = System.lineSeparator();
 

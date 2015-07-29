@@ -47,33 +47,11 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
 import com.rtg.util.test.HttpServer;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
- * Tests for the Talkback class.
- *
  */
 public class TalkbackTest extends TestCase {
-
-  /**
-   */
-  public TalkbackTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(TalkbackTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   @Override
   public void setUp() {

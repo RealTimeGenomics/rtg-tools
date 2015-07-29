@@ -38,6 +38,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
 
+import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.MD5Utils;
@@ -54,6 +55,7 @@ import junit.framework.TestCase;
 public class UsageServerCliTest extends TestCase {
 
   public void test() throws Exception {
+    GlobalFlags.resetAccessedStatus();
     try (TestDirectory dir = new TestDirectory(); TestDirectory configDir = new TestDirectory()) {
       final File configFile = UsageConfiguration.createSimpleConfigurationFile(new File(configDir, "config"), dir.getPath(), null);
       final UsageServerCli cli = new UsageServerCli() {

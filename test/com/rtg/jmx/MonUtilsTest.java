@@ -31,9 +31,7 @@ package com.rtg.jmx;
 
 import java.io.IOException;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -52,19 +50,5 @@ public class MonUtilsTest extends TestCase {
     MonUtils.padRight(sb, "0", 3);
     assertEquals("0  ", sb.toString());
   }
-
-
-  public static Test suite() {
-    return new TestSuite(MonUtilsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(MonUtilsTest.class);
-  }
-
 }
 

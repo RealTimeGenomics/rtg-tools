@@ -65,26 +65,8 @@ import junit.framework.TestSuite;
 
 
 /**
- * Test class for SequencesWriter
- *
  */
 public class SequencesWriterTest extends TestCase {
-
-  public SequencesWriterTest(final String name) {
-    super(name);
-  }
-
-  public static Test suite() {
-    return new TestSuite(SequencesWriterTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   private File mDir = null;
 

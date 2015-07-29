@@ -41,9 +41,7 @@ import com.rtg.util.EnumHelper;
 import com.rtg.util.PseudoEnum;
 import com.rtg.util.TestUtils;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the CFlags class.
@@ -685,21 +683,5 @@ public class CFlagsTest extends TestCase {
     assertEquals(TestMyEnum.ONE, mFlags.getAnonymousValue(0));
   }
 
-  public static Test suite() {
-    return new TestSuite(CFlagsTest.class);
-  }
-
-  /**
-   * Main method needed to.create a self runnable class
-   *
-   * @param args The command line arguments.
-   */
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(new TestSuite(CFlagsTest.class));
-  }
 }
 

@@ -29,9 +29,7 @@
  */
 package com.rtg.jmx;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -41,18 +39,5 @@ public class LocalStatsTest extends TestCase {
     final RecordStats rs = LocalStats.getLocalStats("err", 5, "sda", "eth0");
     assertNotNull(rs);
   }
-
-  public static Test suite() {
-    return new TestSuite(LocalStatsTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(LocalStatsTest.class);
-  }
-
 }
 

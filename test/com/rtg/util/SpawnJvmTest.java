@@ -35,9 +35,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests for <code>SpawnJvm</code>.
@@ -46,15 +44,6 @@ import junit.framework.TestSuite;
 public final class SpawnJvmTest extends TestCase {
 
   private static final String LS = System.lineSeparator();
-
-  /**
-   * Constructor (needed for JUnit)
-   *
-   * @param name A string which names the tests.
-   */
-  public SpawnJvmTest(final String name) {
-    super(name);
-  }
 
   static final class MaxMem {
     private MaxMem() {
@@ -86,6 +75,7 @@ public final class SpawnJvmTest extends TestCase {
   static final class Rot13 {
     private Rot13() {
     }
+
     /**
    * Main to run from tests from command line.
    * @param args ignored.
@@ -257,19 +247,6 @@ public final class SpawnJvmTest extends TestCase {
       }
     }
   }
-
-  public static Test suite() {
-    return new TestSuite(SpawnJvmTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 }
 
 

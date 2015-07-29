@@ -32,31 +32,12 @@ package com.rtg.util.diagnostic;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the corresponding class.
- *
  */
 public class ParallelProgressTest extends TestCase {
-
-  /**
-   */
-  public ParallelProgressTest(final String name) {
-    super(name);
-  }
-  public static Test suite() {
-    return new TestSuite(ParallelProgressTest.class);
-  }
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   @Override
   public void tearDown() {

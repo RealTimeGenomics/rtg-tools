@@ -47,9 +47,6 @@ import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  */
 public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
@@ -57,10 +54,6 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
   @Override
   protected SequencesReader createSequencesReader(final File dir, LongRange region) throws IOException {
     return SequencesReaderFactory.createDefaultSequencesReader(dir, region);
-  }
-
-  public static Test suite() {
-    return new TestSuite(DefaultSequencesReaderTest.class);
   }
 
   private File mOutDir = null;
@@ -77,14 +70,6 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
     super.tearDown();
     FileHelper.deleteAll(mOutDir);
     mOutDir = null;
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
   }
 
   private static class TestRaf extends RandomAccessFile {

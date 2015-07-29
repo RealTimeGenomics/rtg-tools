@@ -51,21 +51,13 @@ import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
- * Tests for CompressedMemorySequencesReader
  */
 public class CompressedMemorySequencesReaderTest extends AbstractSequencesReaderTest {
 
   @Override
   protected SequencesReader createSequencesReader(final File dir, LongRange region) throws IOException {
     return CompressedMemorySequencesReader.createSequencesReader(dir, true, false, region, false);
-  }
-
-  public static Test suite() {
-    return new TestSuite(CompressedMemorySequencesReaderTest.class);
   }
 
   public void testCRC() {
@@ -110,8 +102,6 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
 
     new MyMemorySequencesReader(new byte[][] {DnaUtils.encodeArray(seqString.getBytes())},
         new String[] {"seq1"}, new long[] {35}, 35, 35, SequenceType.DNA);
-
-
   }
 
   public void testRoll() throws Exception {

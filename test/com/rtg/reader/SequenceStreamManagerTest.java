@@ -39,26 +39,9 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.SimpleArchive;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
- *
- *
  */
 public class SequenceStreamManagerTest extends DefaultSequencesReaderTest {
-
-  public static Test suite() {
-    return new TestSuite(SequenceStreamManagerTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
 
   public void testTruncateFile() throws IOException {
     final File temp = FileUtils.createTempDir("reader", "ssm");
