@@ -482,9 +482,10 @@ public class VcfEvalTaskTest extends TestCase {
       final File input2 = new File(dir, "snp_only_2.vcf.gz");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz", input2);
 
+      final VcfEvalParams params = VcfEvalParams.builder().callsFile(input).baseLineFile(input).create();
       try {
         final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, 32, 27);
-        VcfEvalTask.getVariants(VcfEvalParams.builder().callsFile(input).baseLineFile(input).create(), templateReader);
+        VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader));
         fail("Expected detection of no sequence name overlap");
       } catch (NoTalkbackSlimException e) {
         // Expected
@@ -497,7 +498,7 @@ public class VcfEvalTaskTest extends TestCase {
         lengths[seq - 1] = 1000;
       }
       final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, lengths, names);
-      assertTrue(VcfEvalTask.getVariants(VcfEvalParams.builder().callsFile(input).baseLineFile(input).create(), templateReader) instanceof TabixVcfRecordSet);
+      assertTrue(VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader)) instanceof TabixVcfRecordSet);
     }
   }
 

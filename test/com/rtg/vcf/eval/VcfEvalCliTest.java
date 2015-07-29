@@ -144,19 +144,19 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
-    check(false, "vcfeval_small", "--sample", "sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small", false, false, true, "--sample", "sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {
-    check(false, "vcfeval_small_region", "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
+    check("vcfeval_small_region", false, false, false, "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
   }
 
   public void testNanoSmallDiffSamples() throws IOException, UnindexableDataException {
-    check(false, "vcfeval_small_samples", "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small_samples", false, false, false, "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoTooComplex() throws IOException, UnindexableDataException {
-    check(true, "vcfeval_too_complex");
+    check("vcfeval_too_complex", true, false, false);
   }
 
   private String[] appendArgs(String[] args, String...moreArgs) {
@@ -165,7 +165,7 @@ public class VcfEvalCliTest extends AbstractCliTest {
     return result;
   }
 
-  private void check(boolean expectWarn, String id, String... args) throws IOException, UnindexableDataException {
+  private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, String... args) throws IOException, UnindexableDataException {
     final File template = new File(mDir, "template");
     final File baseline = new File(mDir, "baseline.vcf.gz");
     final File calls = new File(mDir, "calls.vcf.gz");
@@ -175,14 +175,22 @@ public class VcfEvalCliTest extends AbstractCliTest {
     FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
     new TabixIndexer(baseline).saveVcfIndex();
     new TabixIndexer(calls).saveVcfIndex();
-    final String[] fullArgs = appendArgs(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z", "--Xslope-files");
+    String[] fullArgs = appendArgs(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
+    if (checkSlope) {
+      fullArgs = appendArgs(fullArgs, "--Xslope-files");
+    }
     if (expectWarn) {
       final String stderr = checkMainInitWarn(fullArgs);
       mNano.check(id + "_err.txt", stderr);
     } else {
       checkMainInitOk(fullArgs);
     }
-    mNano.check(id + "_weighted_slope.txt", FileUtils.fileToString(new File(output, "weighted_slope.tsv")));
     mNano.check(id + "_weighted_roc.txt", FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
+    if (checkSlope) {
+      mNano.check(id + "_weighted_slope.txt", FileUtils.fileToString(new File(output, "weighted_slope.tsv")));
+    }
+    if (checkTp) {
+      mNano.check(id + "_tp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "tp.vcf"))));
+    }
   }
 }

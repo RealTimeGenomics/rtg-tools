@@ -51,9 +51,11 @@ import junit.framework.TestCase;
 public class VariantTest extends TestCase {
 
   private static final RocSortValueExtractor DEFAULT_EXTRACTOR = RocScoreField.FORMAT.getExtractor(VcfUtils.FORMAT_GENOTYPE_QUALITY, RocSortOrder.DESCENDING);
-
   static Variant createVariant(VcfRecord rec, int sampleNo, RocSortValueExtractor extractor) {
-    return new Variant.Factory(sampleNo, extractor).variant(rec);
+    return createVariant(rec, 0, sampleNo, extractor);
+  }
+  static Variant createVariant(VcfRecord rec, int id, int sampleNo, RocSortValueExtractor extractor) {
+    return new Variant.Factory(sampleNo, extractor).variant(rec, id);
   }
   static Variant createVariant(String var, int sampleNo, RocSortValueExtractor extractor) {
     final String vartab = var.replaceAll(" ", TAB);
@@ -198,7 +200,7 @@ public class VariantTest extends TestCase {
     final Variant a2 = createVariant("a" + TAB + 2 + TAIL);
     final Variant b = createVariant("b" + TAB + 2 + TAIL);
     final Variant c = createVariant("c" + TAB + 2 + TAIL);
-    TestUtils.testOrder(new Variant[][] {{a1a, a1b}, {a2}, {b}, {c}}, true);
+    TestUtils.testOrder(new Variant[][]{{a1a, a1b}, {a2}, {b}, {c}}, true);
   }
 
   public void testEquals() throws Exception {
@@ -238,7 +240,7 @@ public class VariantTest extends TestCase {
     assertEquals(2180, v.getEnd());
     assertEquals(31.0, v.getSortValue(), 0.1);
     checkArray(new byte[] {3}, v.nt(0));
-    checkArray(new byte[] {4}, v.nt(1));
+    checkArray(new byte[]{4}, v.nt(1));
   }
 
   public void testMissingGT() throws Exception {

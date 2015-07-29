@@ -47,7 +47,7 @@ public class SquashPloidyVariantTest extends TestCase {
   private Variant createVariant(String var) {
     final String vartab = var.replaceAll(" ", TAB);
     final VcfRecord rec = VcfReader.vcfLineToRecord(vartab);
-    return new SquashPloidyVariant.GtAltFactory(0, DEFAULT_EXTRACTOR).variant(rec);
+    return new SquashPloidyVariant.GtAltFactory(0, DEFAULT_EXTRACTOR).variant(rec, 0);
   }
 
   static final String SNP_LINE2 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T,C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/2:4:0.02:12.8";

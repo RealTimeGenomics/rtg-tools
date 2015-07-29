@@ -52,7 +52,7 @@ public class MockVariant extends Variant {
    * @param minus nucleotides on the minus strand
    */
   public MockVariant(int start, int end, byte[] plus, byte[] minus) {
-    super("", start - 1, end - 1, toPreds(plus, minus), false, Double.NaN);
+    super(0, "", start - 1, end - 1, toPreds(plus, minus), false, Double.NaN);
   }
 
   @Override

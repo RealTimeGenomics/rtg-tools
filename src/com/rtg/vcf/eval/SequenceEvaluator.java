@@ -84,7 +84,7 @@ class SequenceEvaluator implements IORunnable {
         Diagnostic.developerLog("Number of called variants: " + calledCalls.size());
 
         for (final Variant v : calledCalls) {
-          mSynchronize.addRocLine(new RocLine(v.getSequenceName(), v.getStart(), v.getSortValue(), 0.0, false), v);
+          mSynchronize.addRocLine(new RocLine(currentName, v.getStart(), v.getSortValue(), 0.0, false), v);
         }
       }
     } else if (calledCalls == null || calledCalls.size() == 0) {
@@ -122,7 +122,7 @@ class SequenceEvaluator implements IORunnable {
       double tpTotal = 0.0;
       for (final OrientedVariant v : truePositives) {
         final Variant dv = v.variant();
-        mSynchronize.addRocLine(new RocLine(dv.getSequenceName(), dv.getStart(), dv.getSortValue(), v.getWeight(), true), dv);
+        mSynchronize.addRocLine(new RocLine(currentName, dv.getStart(), dv.getSortValue(), v.getWeight(), true), dv);
         tpTotal += v.getWeight();
       }
       if (tpTotal - baselineTruePositives.size() > 0.001) {
@@ -130,7 +130,7 @@ class SequenceEvaluator implements IORunnable {
       }
       for (final Variant dv : falsePositives) {
         // System.out.println(dv);
-        mSynchronize.addRocLine(new RocLine(dv.getSequenceName(), dv.getStart(), dv.getSortValue(), 0.0, false), dv);
+        mSynchronize.addRocLine(new RocLine(currentName, dv.getStart(), dv.getSortValue(), 0.0, false), dv);
       }
     }
   }

@@ -127,7 +127,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(baselineReader, callReader, templateSequences.getSdfId());
     }
 
-    final VariantSet variants = getVariants(params, templateSequences);
+    final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
+    final VariantSet variants = getVariants(params, templateSequences, ranges);
     if (!output.exists() && !output.mkdirs()) {
       throw new IOException("Unable to create directory \"" + output.getPath() + "\"");
     }
@@ -144,11 +145,11 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
          final VcfWriter fp = new VcfWriter(variants.calledHeader(), fpFile, null, zip, true);
          final VcfWriter fn = new VcfWriter(variants.baseLineHeader(), fnFile, null, zip, true);
          final VcfWriter tpBase = outputTpBase ? new VcfWriter(variants.baseLineHeader(), tpBaseFile, null, zip, true) : null) {
-      evaluateCalls(params, templateSequences, output, variants, tp, fp, fn, tpBase);
+      evaluateCalls(params, ranges, templateSequences, output, variants, tp, fp, fn, tpBase);
     }
   }
 
-  private static void evaluateCalls(VcfEvalParams params, SequencesReader templateSequences, File output, VariantSet variants,
+  private static void evaluateCalls(VcfEvalParams params, ReferenceRanges<String> ranges, SequencesReader templateSequences, File output, VariantSet variants,
                                     VcfWriter tp, VcfWriter fp, VcfWriter fn, VcfWriter tpBase) throws IOException {
     final boolean zip = params.outputParams().isCompressed();
 
@@ -170,7 +171,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       roc.addFilter(RocFilter.HOMOZYGOUS_SIMPLE, new File(output, HOMOZYGOUS_SIMPLE_FILE));
       roc.addFilter(RocFilter.HOMOZYGOUS_COMPLEX, new File(output, HOMOZYGOUS_COMPLEX_FILE));
     }
-    final EvalSynchronizer sync = new EvalSynchronizer(variants, tp, fp, fn, tpBase, params.baselineFile(), params.callsFile(), roc);
+    final EvalSynchronizer sync = new EvalSynchronizer(ranges, variants, tp, fp, fn, tpBase, params.baselineFile(), params.callsFile(), roc);
 
     final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
     threadPool.enableBasicProgress(templateSequences.numberSequences());
@@ -242,16 +243,26 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
    * Builds a variant set of the best type for the supplied files
    * @param params the parameters
    * @param templateSequences template sequences
+   * @param ranges controls which regions the variants will be loaded from
    * @return a VariantSet for the provided files
    * @throws IOException if IO is broken
    */
-  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences) throws IOException {
+  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences, ReferenceRanges<String> ranges) throws IOException {
     final File calls = params.callsFile();
     final File baseline = params.baselineFile();
     final String baselineSample = params.baselineSample();
     final String callsSample = params.callsSample();
     final RocSortValueExtractor extractor = getRocSortValueExtractor(params);
 
+    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
+    for (long i = 0; i < templateSequences.names().length(); i++) {
+      nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
+    }
+
+    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, extractor, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
+  }
+
+  static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {
     final ReferenceRanges<String> ranges;
     if (params.bedRegionsFile() != null) {
       Diagnostic.developerLog("Loading BED regions");
@@ -261,13 +272,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     } else {
       ranges = SamRangeUtils.createFullReferenceRanges(templateSequences);
     }
-
-    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
-    for (long i = 0; i < templateSequences.names().length(); i++) {
-      nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
-    }
-
-    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, extractor, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
+    return ranges;
   }
 
   private static RocSortValueExtractor getRocSortValueExtractor(VcfEvalParams params) {

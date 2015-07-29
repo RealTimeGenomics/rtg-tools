@@ -56,7 +56,7 @@ public final class SquashPloidyVariant extends Variant {
     }
 
     @Override
-    public Variant variant(VcfRecord rec) {
+    public Variant variant(VcfRecord rec, int id) {
       // Currently we skip non-variant and SV
       if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
@@ -82,7 +82,7 @@ public final class SquashPloidyVariant extends Variant {
         }
       }
       final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-      final Variant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
+      final Variant var = new SquashPloidyVariant(id, seqName, start, end, alleles, sortValue);
       for (final RocFilter filter : RocFilter.values()) {
         if (filter.accept(rec, mSampleNo)) {
           var.mFilters.add(filter);
@@ -107,7 +107,7 @@ public final class SquashPloidyVariant extends Variant {
     }
 
     @Override
-    public Variant variant(VcfRecord rec) {
+    public Variant variant(VcfRecord rec, int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
       } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
@@ -125,7 +125,7 @@ public final class SquashPloidyVariant extends Variant {
         sortValue = mExtractor.getSortValue(rec, -1);
       } catch (IndexOutOfBoundsException ignored) {
       }
-      final Variant var = new SquashPloidyVariant(seqName, start, end, alleles, sortValue);
+      final Variant var = new SquashPloidyVariant(id, seqName, start, end, alleles, sortValue);
       var.mFilters.add(RocFilter.ALL);
       return var;
     }
@@ -145,7 +145,7 @@ public final class SquashPloidyVariant extends Variant {
     }
 
     @Override
-    public Variant variant(final VcfRecord rec) {
+    public Variant variant(final VcfRecord rec, final int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
       } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
@@ -162,7 +162,7 @@ public final class SquashPloidyVariant extends Variant {
         sortValue = mExtractor.getSortValue(rec, -1);
       } catch (IndexOutOfBoundsException ignored) {
       }
-      final Variant var = new Variant(seqName, start, end, alleles, false, sortValue) {
+      final Variant var = new Variant(id, seqName, start, end, alleles, false, sortValue) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos = new OrientedVariant[numAlleles() * numAlleles() - 1];
@@ -184,8 +184,8 @@ public final class SquashPloidyVariant extends Variant {
   }
 
 
-  private SquashPloidyVariant(String seq, int start, int end, byte[][] alleles, double sortValue) {
-    super(seq, start, end, alleles, false, sortValue);
+  private SquashPloidyVariant(int id, String seq, int start, int end, byte[][] alleles, double sortValue) {
+    super(id, seq, start, end, alleles, false, sortValue);
   }
 
   @Override

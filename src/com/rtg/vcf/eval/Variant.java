@@ -46,6 +46,7 @@ import com.rtg.vcf.VcfUtils;
 public class Variant implements Comparable<Variant>, SequenceNameLocus {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
+  private int mId;
 
 
   /**
@@ -67,7 +68,7 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
     }
 
     @Override
-    public Variant variant(VcfRecord rec) {
+    public Variant variant(VcfRecord rec, int id) {
       // Currently we skip both non-variant and SV
       if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
@@ -91,7 +92,7 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
         //System.err.println(rec.getPosition() + " " + gtArray[i] + " " + getAllele(gtArray[i]));
       }
 
-      final Variant var = new Variant(seqName, start, end, alleles, phased, sortValue);
+      final Variant var = new Variant(id, seqName, start, end, alleles, phased, sortValue);
       for (final RocFilter filter : RocFilter.values()) {
         if (filter.accept(rec, mSampleNo)) {
           var.mFilters.add(filter);
@@ -110,7 +111,8 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   private final double mSortValue;
   protected final EnumSet<RocFilter> mFilters = EnumSet.noneOf(RocFilter.class);
 
-  Variant(String seq, int start, int end, byte[][] alleles, boolean phased, double sortValue) {
+  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased, double sortValue) {
+    mId = id;
     mSequenceName = new String(seq.toCharArray());
     mStart = start;
     mEnd = end;
@@ -171,6 +173,11 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   @Override
   public int hashCode() {
     return Utils.pairHash(getStart(), getSequenceName().hashCode());
+  }
+
+  /** @return the ID assigned to this variant */
+  public int getId() {
+    return mId;
   }
 
   @Override

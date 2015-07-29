@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.IORunnable;
@@ -46,6 +47,8 @@ import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
 import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -130,7 +133,8 @@ public class EvalSynchronizerTest extends TestCase {
         final VcfHeader header = new VcfHeader();
         header.addLine(VcfHeader.VERSION_LINE);
         header.addSampleName("SAMPLE");
-        final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+        final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
+        final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
           new VcfWriter(header, tp),
           new VcfWriter(header, fp),
           new VcfWriter(header, fn),
@@ -146,9 +150,9 @@ public class EvalSynchronizerTest extends TestCase {
           @Override
           public void run() throws IOException {
             sync.write("name2",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 0, RocSortValueExtractor.NULL_EXTRACTOR)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 3, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 5, 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
             sync.addVariants(10, 0, 0);
           }
         });
@@ -156,9 +160,9 @@ public class EvalSynchronizerTest extends TestCase {
           @Override
           public void run() throws IOException {
             sync.write("name1",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 0, RocSortValueExtractor.NULL_EXTRACTOR)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
+              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 4, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 6, 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
             sync.addVariants(22, 0, 0);
           }
         });
@@ -185,7 +189,8 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+      final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
+      final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
         new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
         new VcfWriter(new VcfHeader(), fn), null,
         fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
@@ -225,8 +230,8 @@ public class EvalSynchronizerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-
-      final EvalSynchronizer sync = new EvalSynchronizer(new MockVariantSet(),
+      final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
+      final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
         new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
         new VcfWriter(new VcfHeader(), fn), null,
         fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));

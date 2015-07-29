@@ -69,11 +69,13 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   @Override
   public LoadedVariants call() throws Exception {
     int skipped = 0;
+    int id = 0;
     final List<Variant> list = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(mInput, mRanges)) {
       Variant last = null;
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
+        id++;
 
         if (mPassOnly && rec.isFiltered()) {
           continue;
@@ -97,7 +99,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           continue;
         }
 
-        final Variant v = mFactory.variant(rec);
+        final Variant v = mFactory.variant(rec, id);
         if (v == null) { // Just wasn't variant according to the factory
           continue;
         }

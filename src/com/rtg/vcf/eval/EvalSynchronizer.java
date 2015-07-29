@@ -41,12 +41,10 @@ import com.rtg.util.Pair;
 import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.SlimException;
-import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocus;
-import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
 
 /**
@@ -54,6 +52,7 @@ import com.rtg.vcf.VcfWriter;
  */
 class EvalSynchronizer {
   private final Queue<String> mNames = new LinkedList<>();
+  private ReferenceRanges<String> mRanges;
   private final VariantSet mVariantSet;
 
   private final RocContainer mRoc;
@@ -73,6 +72,7 @@ class EvalSynchronizer {
   int mFalsePositives = 0;
 
   /**
+   * @param ranges the regions from which variants are being loaded
    * @param vs the set of variants to evaluate
    * @param tpCalls True positives are written to this
    * @param fp false positives are written here
@@ -82,7 +82,8 @@ class EvalSynchronizer {
    * @param callsFile tabix indexed calls VCF file
    * @param roc the container for ROC data
    */
-  EvalSynchronizer(VariantSet vs, VcfWriter tpCalls, VcfWriter fp, VcfWriter fn, VcfWriter tpBase, File baseLineFile, File callsFile, RocContainer roc) {
+  EvalSynchronizer(ReferenceRanges<String> ranges, VariantSet vs, VcfWriter tpCalls, VcfWriter fp, VcfWriter fn, VcfWriter tpBase, File baseLineFile, File callsFile, RocContainer roc) {
+    mRanges = ranges;
     mVariantSet = vs;
     mTpCalls = tpCalls;
     mTpBase = tpBase;
@@ -105,19 +106,15 @@ class EvalSynchronizer {
     if (variants == null) {
       return;
     }
+    int id = 0;
     for (final SequenceNameLocus v : variants) {
       final Variant dv = (Variant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
       VcfRecord rec = null;
       while (vcfReader.hasNext()) {
         final VcfRecord r = vcfReader.next();
+        id++;
 
-        // XXX This loop should be applying the same filtering criteria that were applied when the variants were initially loaded
-        // Currently if the input had multiple records with the same position and ref allele (some of which were ignored during initial
-        // loading), the first one will be output, which may not be correct.
-
-        final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(r);
-        final SequenceNameLocusSimple adjusted = new SequenceNameLocusSimple(r.getSequenceName(), r.getStart() + (hasPreviousNt ? 1 : 0), r.getEnd());
-        if (Variant.NATURAL_COMPARATOR.compare(adjusted, dv) == 0) {
+        if (id == dv.getId()) {
           rec = r;
           break;
         }
@@ -183,23 +180,24 @@ class EvalSynchronizer {
         }
       }
     }
+    final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
     if (tp != null) {
-      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
+      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, subRanges)) {
         writeVariants(mTpCalls, callsReader, tp);
       }
     }
     if (fp != null) {
-      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, new RegionRestriction(sequenceName))) {
+      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, subRanges)) {
         writeVariants(mFp, callsReader, fp);
       }
     }
     if (mTpBase != null && tpbase != null) {
-      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
+      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, subRanges)) {
         writeVariants(mTpBase, baselineReader, tpbase);
       }
     }
     if (fn != null) {
-      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, new RegionRestriction(sequenceName))) {
+      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, subRanges)) {
         writeVariants(mFn, baselineReader, fn);
       }
     }

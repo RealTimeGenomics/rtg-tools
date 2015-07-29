@@ -40,6 +40,7 @@ import java.util.Map;
 
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
+import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.Pair;
@@ -57,9 +58,11 @@ import junit.framework.TestCase;
 public class PhasingEvaluatorTest extends TestCase {
   static List<Variant> makeVariantList(List<String> variants, StringBuilder sb) {
     final List<Variant> callList = new ArrayList<>();
+    int id = 0;
     for (String s : variants) {
       final String vartab = s.replaceAll(" ", "\t");
-      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR));
+      id++;
+      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), id, 0, RocSortValueExtractor.NULL_EXTRACTOR));
       sb.append(vartab).append("\n");
     }
     return callList;
@@ -244,11 +247,11 @@ public class PhasingEvaluatorTest extends TestCase {
       new TabixIndexer(calls).saveVcfIndex();
       final File baseline = FileHelper.stringToGzFile(variants.mBaselineVcf.toString(), new File(dir, "baseline.vcf.gz"));
       new TabixIndexer(baseline).saveVcfIndex();
-      final EvalSynchronizer sync = new EvalSynchronizer(variants,
+      final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
+      final EvalSynchronizer sync = new EvalSynchronizer(SamRangeUtils.createFullReferenceRanges(reader), variants,
         new VcfWriter(new VcfHeader(), tp.outputStream()),  new VcfWriter(new VcfHeader(), fp.outputStream()),
         new VcfWriter(new VcfHeader(), fn.outputStream()), null,
         baseline, calls, new RocContainer(RocSortOrder.DESCENDING, null));
-      final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
       final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
       eval.run();
       assertEquals("correctphasings: " + sync.getCorrectPhasings() + ", misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedCorrect, sync.getCorrectPhasings());
