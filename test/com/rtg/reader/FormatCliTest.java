@@ -59,9 +59,6 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Test class for corresponding class.
  */

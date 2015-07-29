@@ -54,9 +54,7 @@ import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */

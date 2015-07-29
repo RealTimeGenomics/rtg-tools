@@ -48,9 +48,7 @@ import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests for <code>SequencesReader</code> implementations

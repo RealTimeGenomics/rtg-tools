@@ -59,10 +59,7 @@ import com.rtg.util.intervals.LongRange;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.Assert;
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 
 /**
  */

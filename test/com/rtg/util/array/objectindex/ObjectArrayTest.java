@@ -30,9 +30,6 @@
 package com.rtg.util.array.objectindex;
 
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
-
 /**
  * Test Array
  */
