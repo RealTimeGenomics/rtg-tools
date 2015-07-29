@@ -880,4 +880,28 @@ public final class TestUtils {
     }
     return ret.toString();
   }
+
+  /**
+   * Takes a VCF string and strips out header fields that typically change from run to run.
+   * @param vcfString the full VCF string
+   * @return the sanitized VCF
+   */
+  public static String sanitizeVcfHeader(String vcfString) {
+    return vcfString.replace("Version", "")
+      .replaceAll("##CL=.*\n", "")
+      .replaceAll("##TEMPLATE-SDF-ID=.*\n", "")
+      .replaceAll("##RUN-ID=.*\n", "")
+      .replaceAll("##fileDate=.*\n", "")
+      .replaceAll("##reference=.*\n", "")
+      .replaceAll("##source=.*\n", "");
+  }
+
+  /**
+   * Takes a VCF string and strips out all of the header except the CHROM line.
+   * @param vcfString the full VCF string
+   * @return the sanitized VCF
+   */
+  public static String stripVcfHeader(String vcfString) {
+    return vcfString.replaceAll("##.*\n", "");
+  }
 }
