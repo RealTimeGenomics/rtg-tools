@@ -35,14 +35,8 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the corresponding class
- *
  */
-
 public class SingleByteArrayTest extends TestCase {
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(SingleByteArrayTest.class);
-  }
 
   public void test() throws Exception {
     final SingleByteArray sba = new SingleByteArray(10);

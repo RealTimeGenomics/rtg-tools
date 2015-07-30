@@ -40,14 +40,8 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the corresponding class
- *
  */
-
 public class MultiByteArrayTest extends TestCase {
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(MultiByteArrayTest.class);
-  }
 
   public void test() throws Exception {
     Diagnostic.setLogStream();

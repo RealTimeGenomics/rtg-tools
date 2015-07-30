@@ -31,9 +31,7 @@ package com.rtg;
 
 import com.rtg.util.TestUtils;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests corresponding class
@@ -42,17 +40,5 @@ public class ReleaseLevelTest extends TestCase {
 
   public void testClass() {
     TestUtils.testEnum(ReleaseLevel.class, "[ALPHA, BETA, GA]");
-  }
-
-  public static Test suite() {
-    return new TestSuite(ReleaseLevelTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(new TestSuite(ReleaseLevelTest.class));
   }
 }

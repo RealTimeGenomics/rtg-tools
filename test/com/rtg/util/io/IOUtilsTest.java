@@ -40,7 +40,6 @@ import java.net.URL;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Tests the IOUtils class. Run from the command line with:<p>
@@ -153,8 +152,4 @@ public class IOUtilsTest extends TestCase {
     }
   }
 
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(new TestSuite(IOUtilsTest.class));
-  }
 }

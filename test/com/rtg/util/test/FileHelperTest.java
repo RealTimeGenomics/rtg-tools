@@ -34,9 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  */
@@ -210,22 +208,5 @@ public class FileHelperTest extends TestCase {
   public void testDeleteAllBad() {
     assertTrue(FileHelper.deleteAll(new File("there-is-no-file-called-this-i-hope")));
   }
-
-  /**
-   * Adds tests to suite to be run by main
-   * @return The test suite.
-   */
-  public static Test suite() {
-    return new TestSuite(FileHelperTest.class);
-  }
-
-  /**
-   * Main to run from tests from command line.
-   * @param args ignored.
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
-  }
-
 
 }

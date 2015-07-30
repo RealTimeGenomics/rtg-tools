@@ -34,12 +34,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import junit.framework.TestCase;
 
 /**
- *
  */
 public class WorkerThreadTest extends TestCase {
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(WorkerThreadTest.class);
-  }
 
   public void testThread() {
     final AtomicInteger val = new AtomicInteger();

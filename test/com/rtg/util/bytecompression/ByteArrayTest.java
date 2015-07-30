@@ -33,14 +33,8 @@ import junit.framework.TestCase;
 
 /**
  * Tests for the corresponding class
- *
  */
-
 public class ByteArrayTest extends TestCase {
-
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ByteArrayTest.class);
-  }
 
   protected ByteArray getByteArray(long size, int bits) {
     return ByteArray.allocate(size);

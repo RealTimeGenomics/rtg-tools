@@ -43,14 +43,6 @@ import junit.framework.TestCase;
  */
 public final class ByteArrayIOUtilsTest extends TestCase {
 
-  /**
-   * run the tests
-   * @param args ignored
-   */
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(ByteArrayIOUtilsTest.class);
-  }
-
   //last two are a bit of jumble meta-gaming
   private static final long[] TEST_ARRAY_LONG = {5L, 3L, 9L, 2752435L,
                                                 Long.MAX_VALUE, Long.MIN_VALUE,
