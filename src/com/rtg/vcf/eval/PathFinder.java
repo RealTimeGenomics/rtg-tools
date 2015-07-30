@@ -44,8 +44,9 @@ import com.rtg.util.diagnostic.Diagnostic;
 @TestClass("com.rtg.vcf.eval.PathTest")
 public final class PathFinder {
 
-  //private static final boolean DUMP = false;
+  private static final boolean DUMP = false;
 
+  private static final String MAXIMIZE_MODE = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
   private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
   private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
 
@@ -53,6 +54,7 @@ public final class PathFinder {
   private final String mTemplateName;
   private final Variant[] mCalledVariants;
   private final Variant[] mBaseLineVariants;
+  private int mCurrentMaxPos;
 
   private <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
     mTemplate = template;
@@ -90,7 +92,7 @@ public final class PathFinder {
     int currentIterations = 0;
     int currentMaxIterations = 0;
     int currentMax = 0;
-    int currentMaxPos = 0;
+    mCurrentMaxPos = 0;
     Path lastSyncPath = null;
     int lastSyncPos = 0;
     String lastWarnMessage = null;
@@ -98,7 +100,7 @@ public final class PathFinder {
       currentMax = Math.max(currentMax, sortedPaths.size());
       currentMaxIterations = Math.max(currentMaxIterations, currentIterations++);
       Path head = sortedPaths.pollFirst();
-      // if (DUMP) System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (currentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n\nHead: " + head);
+      if (DUMP) System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n\nHead: " + head);
       if (sortedPaths.size() == 0) { // Only one path currently in play
         if (lastWarnMessage != null) { // Issue a warning if we encountered problems during the previous region
           Diagnostic.warning(lastWarnMessage);
@@ -115,12 +117,12 @@ public final class PathFinder {
         lastSyncPos = currentSyncPos;
         lastSyncPath = head;
       } else if (sortedPaths.size() > MAX_COMPLEXITY || currentIterations > MAX_ITERATIONS) {
-        lastWarnMessage = "Evaluation too complex (" + sortedPaths.size() + " unresolved paths, " + currentIterations + " iterations) at reference region " + mTemplateName + ":" + (lastSyncPos + 1) + "-" + (currentMaxPos + 2) + ". Variants in this region will not be included in results.";
+        lastWarnMessage = "Evaluation too complex (" + sortedPaths.size() + " unresolved paths, " + currentIterations + " iterations) at reference region " + mTemplateName + ":" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 2) + ". Variants in this region will not be included in results.";
         sortedPaths.clear();    // Drop all paths currently in play
         currentIterations = 0;
         head = lastSyncPath;    // Create new head containing path up until last sync point
-        skipVariantsTo(head.mCalledPath, mCalledVariants, currentMaxPos + 1);
-        skipVariantsTo(head.mBaselinePath, mBaseLineVariants, currentMaxPos + 1);
+        skipVariantsTo(head.mCalledPath, mCalledVariants, mCurrentMaxPos + 1);
+        skipVariantsTo(head.mBaselinePath, mBaseLineVariants, mCurrentMaxPos + 1);
       }
       if (head.finished()) {
         // Path is done. Remember the best
@@ -128,22 +130,10 @@ public final class PathFinder {
         best = better(best, new Path(head, syncPoints));
         continue;
       }
-      final int aVarIndex = nextVariant(head.mCalledPath, mCalledVariants);
-      final Variant aVar = (aVarIndex == -1) ? null : mCalledVariants[aVarIndex];
-      if (aVar != null && head.mCalledPath.isNew(aVar)) {
-        currentMaxPos = Math.max(currentMaxPos, aVar.getStart());
-        //Adding a new variant to A side
-        // if (DUMP) System.err.println("Add alternatives to called " + aVar);
-        addIfBetter(head.addCallVariant(aVar, aVarIndex), sortedPaths);
+      if (enqueueVariant(sortedPaths, head, true)) {
         continue;
       }
-      final int bVarIndex = nextVariant(head.mBaselinePath, mBaseLineVariants);
-      final Variant bVar = (bVarIndex == -1) ? null : mBaseLineVariants[bVarIndex];
-      if (bVar != null && head.mBaselinePath.isNew(bVar)) {
-        currentMaxPos = Math.max(currentMaxPos, bVar.getStart());
-        //Adding a new variant to B side
-        // if (DUMP) System.err.println("Add alternatives to baseline " + bVar);
-        addIfBetter(head.addBaselineVariant(bVar, bVarIndex), sortedPaths);
+      if (enqueueVariant(sortedPaths, head, false)) {
         continue;
       }
 
@@ -151,21 +141,36 @@ public final class PathFinder {
 
       if (head.inSync()) {
         skipToNextVariant(head);
-        // if (DUMP) System.err.println("In sync, skipping: " + head);
-        // } else {
-        // if (DUMP) System.err.println("Not in sync");
+        if (DUMP) System.err.println("In sync, skipping: " + head);
+      } else {
+        if (DUMP) System.err.println("Not in sync");
       }
 
       if (head.matches()) {
-        // if (DUMP) System.err.println("Head matches, keeping");
+        if (DUMP) System.err.println("Head matches, keeping");
         addIfBetter(head, sortedPaths);
-        // } else {
-        // if (DUMP) System.err.println("Head mismatch, discard");
+      } else {
+        if (DUMP) System.err.println("Head mismatch, discard");
       }
     }
     //System.err.println("Best: " + best);
     Diagnostic.userLog("Reference " + mTemplateName + " had maximum path complexity of " + maxPaths + " at " + maxPathsRegion);
     return best;
+  }
+
+  private boolean enqueueVariant(TreeSet<Path> paths, Path head, boolean side) {
+    final Variant[] variants = side ? mCalledVariants : mBaseLineVariants;
+    final HalfPath halfPath = side ? head.mCalledPath : head.mBaselinePath;
+    final int aVarIndex = nextVariant(halfPath, variants);
+    if (aVarIndex != -1) {
+      final Variant aVar = variants[aVarIndex];
+      mCurrentMaxPos = Math.max(mCurrentMaxPos, aVar.getStart());
+      //Adding a new variant to side
+      if (DUMP) System.err.println("Add alternatives to " + (side ? "called " : "baseline ") + aVar);
+      addIfBetter(head.addVariant(side, aVar, aVarIndex), paths);
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -187,7 +192,7 @@ public final class PathFinder {
 
 
   /**
-   * Move the path to just before the next variant
+   * Move the path to just before the next variant for either side
    * @param head the path to skip forward
    */
   private void skipToNextVariant(final Path head) {
@@ -213,22 +218,21 @@ public final class PathFinder {
     }
   }
 
-
-  /* Gets the next variant that should be enqueued to the supplied HalfPath at the current position, or null if there is none  */
+  /* Gets the index of the next variant if it should be enqueued to the supplied HalfPath at the current position,
+   or -1 if there is none to be enqueued at the current position */
   static int nextVariant(HalfPath path, Variant[] variants) {
     final int nextIdx = path.getVariantIndex() + 1;
     if (nextIdx >= variants.length) {
       return -1;
     }
     final Variant nextVar = variants[nextIdx];
-
-    final int startPos;
-    if (path.wantsFutureVariantBases()) {
-      startPos = Math.max(path.getVariantEndPosition(), path.getPosition() + 1);
-    } else {
-      startPos = path.getPosition() + 1;
+    if (nextVar.getStart() <= path.getPosition() + 1) {
+      return nextIdx;
     }
-    return nextVar.getStart() == startPos ? nextIdx : -1;
+    if (path.wantsFutureVariantBases() && nextVar.getStart() <= path.getVariantEndPosition()) {
+      return nextIdx;
+    }
+    return -1;
   }
 
   private static void addIfBetter(Collection<Path> add, TreeSet<Path> sortedPaths) {
@@ -248,6 +252,18 @@ public final class PathFinder {
   }
 
   static Path better(Path first, Path second) {
+    switch (MAXIMIZE_MODE) {
+      case "calls":
+        return betterMaxCalls(first, second);
+      case "default":
+      case "sum":
+      default:
+        return betterMaxSum(first, second);
+    }
+  }
+
+  static Path betterMaxSum(Path first, Path second) {
+    // Prefer paths that maximise total number of included variants (baseline + called)
     BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
     BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
     int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
@@ -260,6 +276,29 @@ public final class PathFinder {
       // At this point try to break ties arbitrarily based on allele ordering
       if (firstIncluded != null && secondIncluded != null) {
         return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
+      }
+    }
+    return firstSize > secondSize ? first : second;
+  }
+
+  static Path betterMaxCalls(Path first, Path second) {
+    // Prefer paths that maximise the number of called variants included
+    // Better for integrating a sample into population alleles
+    BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
+    int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
+    int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
+    if (firstSize == secondSize) {
+      firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
+      secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
+      firstSize = firstIncluded == null ? 0 : firstIncluded.size();
+      secondSize = secondIncluded == null ? 0 : secondIncluded.size();
+
+      if (firstSize == secondSize) {
+        // At this point try to break ties arbitrarily based on allele ordering
+        if (firstIncluded != null && secondIncluded != null) {
+          return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
+        }
       }
     }
     return firstSize > secondSize ? first : second;

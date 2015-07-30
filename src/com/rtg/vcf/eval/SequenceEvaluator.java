@@ -100,7 +100,13 @@ class SequenceEvaluator implements IORunnable {
       //find the best path for variant calls
       final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
 
-      //System.out.println(path);
+//      System.out.println(best);
+//      System.out.println("#### dumping baseline " + currentName + " haplotypes");
+//      best.mBaselinePath.dumpHaplotypes();
+//      System.out.println("#### dumping call " + currentName + " haplotypes");
+//      best.mCalledPath.dumpHaplotypes();
+//      System.out.println("### done");
+
       List<OrientedVariant> truePositives = best.getCalledIncluded();
       final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
       final List<Variant> falsePositives = best.getCalledExcluded();

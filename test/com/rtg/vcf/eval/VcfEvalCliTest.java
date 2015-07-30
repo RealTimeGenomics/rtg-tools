@@ -148,19 +148,24 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoTricky() throws IOException, UnindexableDataException {
+    // Tricky cases where the notion of equivalence depends on the treatment of reference bases in the calls
+
     //check("vcfeval_small_tricky", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1");
     //check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1");
     //check("vcfeval_small_tricky", true, false, true, false, "--vcf-score-field", "QUAL", "--region", "14");
 
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory), e.g.
-    check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--XXcom.rtg.vcf.eval.custom-variant-factory=default-trim,default-trim");
+    check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1",
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=default-trim,default-trim");
 
     // Variant on 21 requires ref base removal AND variant overlap consideration to be independent for each haplotype (not currently implemented)
   }
 
   public void testNanoTricky2() throws IOException, UnindexableDataException {
-    //check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1");
-    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--squash-ploidy", "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim");
+    // Default of maximizing the sum of baseline and calls variants leaves one out. Switching to maximizing calls includes them all.
+    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--squash-ploidy",
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim",
+      "--XXcom.rtg.vcf.eval.maximize=calls");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {

@@ -230,21 +230,16 @@ public class Path implements Comparable<Path> {
     paths.add(exclude);
 
     // Create a path extension that includes this variant in the possible phases
-    for (OrientedVariant o : var.orientations()) {
-      final Path include = new Path(this, syncPoints);
-      include.include(side, o, varIndex);
-      paths.add(include);
+    if ((side ? mCalledPath : mBaselinePath).isNew(var)) {
+      for (OrientedVariant o : var.orientations()) {
+        final Path include = new Path(this, syncPoints);
+        include.include(side, o, varIndex);
+        paths.add(include);
+        //}
+      }
     }
 
     return paths;
-  }
-
-  Collection<Path> addCallVariant(Variant var, int varIndex) {
-    return addVariant(true, var, varIndex);
-  }
-
-  Collection<Path> addBaselineVariant(Variant var, int varIndex) {
-    return addVariant(false, var, varIndex);
   }
 
   void moveForward(int position) {

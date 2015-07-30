@@ -31,6 +31,7 @@
 package com.rtg.vcf.eval;
 
 import com.rtg.util.TestUtils;
+import com.rtg.util.diagnostic.SlimException;
 
 import junit.framework.TestCase;
 
@@ -50,6 +51,25 @@ public class HaplotypePlaybackTest extends TestCase {
 
     final byte[] expected = {2, 1, 1, 3, 1, 1, 2, 1, 1};
     check(expected, path);
+  }
+
+  public void testOutOfOrder() {
+    final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
+    //snp C at 1
+    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, null), true));
+    //delete length 1 at 4
+    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 5, new byte[]{}, null), true));
+    //insert G at 4
+    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, null), true));
+
+    final byte[] expected = {2, 1, 1, 3, 1, 1, 2, 1, 1};
+    try {
+      check(expected, path);
+      fail();
+    } catch (SlimException e) {
+      assertTrue(e.getMessage().contains("Out of order"));
+    }
   }
 
   public void testMoreComplex() {

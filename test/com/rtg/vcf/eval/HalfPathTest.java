@@ -64,12 +64,16 @@ public class HalfPathTest extends TestCase {
     final OrientedVariant included = OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, null), true);
     path.include(included, 0);
     assertEquals(1, path.getVariantEndPosition());
-    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, null), true), 1);
-    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 2);
 
     final MockVariant excluded = new MockVariant(3, 4, new byte[] {3}, null);
-    path.exclude(excluded, 3);
+    path.exclude(excluded, 1);
     assertEquals(3, path.getVariantEndPosition());
+
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, null), true), 2);
+    path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 3);
+
+    assertEquals(6, path.getVariantEndPosition());
+
     assertTrue(asList(path.getIncluded()).contains(included));
     assertTrue(asList(path.getExcluded()).contains(excluded));
 

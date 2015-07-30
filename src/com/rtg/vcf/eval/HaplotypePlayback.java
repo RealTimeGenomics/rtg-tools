@@ -38,6 +38,7 @@ import java.util.Queue;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.Utils;
+import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.integrity.Exam;
 import com.rtg.util.integrity.Integrity;
 
@@ -50,7 +51,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
   /** Sorted list of variants yet to be processed. */
   private final Queue<OrientedVariant> mVariants;
 
-  private final byte[] mTemplate;
+  final byte[] mTemplate;
 
   /** Position in template (start of current variant if one is active). 0 based.*/
   private int mTemplatePosition = -1;
@@ -84,11 +85,19 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
    */
   public void addVariant(OrientedVariant v) {
     //System.err.println("Adding Variant: " + v);
+    assert v.getStart() > mTemplatePosition;
+    if (v.getStart() == v.getEnd() && v.nt().length == 0) { // Adding the opposite side of a pure insert is redundant
+      return;
+    }
+    if (v.nt() == null) {  // Allow null nt to indicate no playback on one side
+      return;
+    }
     if (mNextVariant == null) {
       mNextVariant = v;
     } else {
       mVariants.add(v);
     }
+    assert integrity();
   }
 
   /**
@@ -172,7 +181,9 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
         }
         mPositionInVariant = 0;
         //System.err.println("templatePosition=" + mTemplatePosition + " varStartPosition=" + mNextVariant.variant().getStart() + " in " + mNextVariant);
-        assert mTemplatePosition == mNextVariant.getStart();
+        if (mTemplatePosition != mNextVariant.getStart()) {
+          throw new SlimException("Out of order variants during replay: pos=" + mTemplatePosition + " variant=" + mNextVariant);
+        }
       }
     }
     assert integrity();

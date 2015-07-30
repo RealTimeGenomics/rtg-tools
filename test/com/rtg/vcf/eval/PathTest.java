@@ -130,6 +130,7 @@ public class PathTest extends TestCase {
     assertEquals(excludeCount, excluded.size());
   }
 
+  // Any variant with isAlleleA true is expected to be included, and isAlleleA false is expected to be excluded
   private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide) {
     final Path best = PathFinder.bestPath(template, "currentName", getVariations(aSide), getVariations(bSide));
     //System.err.println("*****************************");
@@ -151,7 +152,7 @@ public class PathTest extends TestCase {
     addVar(aSide, new MockVariant(2, 3, new byte[] {3}, null), true);
     addVar(aSide, new MockVariant(4, 5, new byte[] {}, null), true);
 
-    addVar(bSide, new MockVariant(2, 3, new byte[] {3}, null), true);
+    addVar(bSide, new MockVariant(2, 3, new byte[]{3}, null), true);
     addVar(bSide, new MockVariant(5, 6, new byte[] {}, null), true);
     check(template, aSide, bSide);
   }
@@ -281,14 +282,14 @@ public class PathTest extends TestCase {
     //delete at end
     //disagee
     addVar(aSide, new MockVariant(8, 8, new byte[] {}, new byte[] {3, 3, 3}), true);
-    addVar(bSide, new MockVariant(8, 8, new byte[] {3}, null), true);
+    addVar(bSide, new MockVariant(8, 8, new byte[]{3}, null), true);
     check(template, aSide, bSide);
     aSide.clear();
     bSide.clear();
 
     //agree
-    addVar(aSide, new MockVariant(8, 8, new byte[] {}, new byte[] {3, 3, 3}), true);
-    addVar(bSide, new MockVariant(8, 8, new byte[] {3, 3, 3}, new byte[] {}), true);
+    addVar(aSide, new MockVariant(8, 8, new byte[]{}, new byte[]{3, 3, 3}), true);
+    addVar(bSide, new MockVariant(8, 8, new byte[]{3, 3, 3}, new byte[]{}), true);
     check(template, aSide, bSide);
     aSide.clear();
     bSide.clear();
@@ -412,33 +413,32 @@ public class PathTest extends TestCase {
     check(template, aSide, bSide);
   }
 
-//  public void testOverlappingError() {
-//    Diagnostic.setLogStream(SimpleTestUtils.getNullPrintStream());
-//    try {
-//      byte[] template = {1, 1, 3, 1, 2};
-//      List<OrientedVariant> aSide = new ArrayList<>();
-//      List<OrientedVariant> bSide = new ArrayList<>();
-//      addVar(aSide, new MockVariant(1, 3, new byte[] {2}, null), false);
-//      addVar(aSide, new MockVariant(2, 4, new byte[] {2}, null), false);
-//
-//      addVar(bSide, new MockVariant(1, 1, new byte[] {3}, null), false);
-//      try {
-//        check(template, aSide, bSide);
-//        fail("Expected an exception");
-//      } catch (NoTalkbackSlimException e) {
-//        // Expected
-//        assertTrue(e.getMessage().contains("Overlapping variants aren't supported"));
-//      }
-//    } finally {
-//      Diagnostic.setLogStream();
-//    }
-//  }
+  public void testOverlappingExclude() {
+    final byte[] template = {1, 1, 3, 1, 2};
+    final List<OrientedVariant> aSide = new ArrayList<>();
+    final List<OrientedVariant> bSide = new ArrayList<>();
+    addVar(aSide, VariantTest.createVariant("seq 1 . AA C 0.0 PASS . GT 1/1"), false);
+    addVar(aSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1"), false);
+
+    addVar(bSide, VariantTest.createVariant("seq 1 . A G 0.0 PASS . GT 1/1"), false);
+    check(template, aSide, bSide);
+  }
+
+  public void testOverlappingInclude() {
+    final byte[] template = {1, 1, 3, 1, 2};
+    final List<OrientedVariant> aSide = new ArrayList<>();
+    final List<OrientedVariant> bSide = new ArrayList<>();
+    addVar(aSide, VariantTest.createVariant("seq 1 . AA C 0.0 PASS . GT 1/1"), false);
+    addVar(aSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1"), true);
+
+    addVar(bSide, VariantTest.createVariant("seq 1 . A G 0.0 PASS . GT 1/1"), false);
+    addVar(bSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1"), true);
+    check(template, aSide, bSide);
+  }
 
   public void testWithVariant() {
-    final String line = "simulatedSequence1 3 . C T,G 0.0 PASS . GT 1/2";
-    final Variant v = VariantTest.createVariant(line);
-    final String line2 = "simulatedSequence1 3 . C G,T 31.0 PASS . GT 1/2";
-    final Variant v2 = VariantTest.createVariant(line2);
+    final Variant v = VariantTest.createVariant("seq 3 . C T,G 0.0 PASS . GT 1/2");
+    final Variant v2 = VariantTest.createVariant("seq 3 . C G,T 31.0 PASS . GT 1/2");
 
     final byte[] template = {1, 1, 2, 4, 4};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -450,10 +450,10 @@ public class PathTest extends TestCase {
   }
 
   public void testDontCrossTheStreams() {
-    final Variant vA = VariantTest.createVariant("simulatedSequence1 1 . A T,G 0.0 PASS . GT 1/2");
-    final Variant vA2 = VariantTest.createVariant("simulatedSequence1 1 . A G,T 0.0 PASS . GT 1/2");
-    final Variant v = VariantTest.createVariant("simulatedSequence1 3 . C T,G 0.0 PASS . GT 1/2");
-    final Variant v2 = VariantTest.createVariant("simulatedSequence1 3 . C G,T 31.0 PASS . GT 1/2");
+    final Variant vA = VariantTest.createVariant("seq 1 . A T,G 0.0 PASS . GT 1/2");
+    final Variant vA2 = VariantTest.createVariant("seq 1 . A G,T 0.0 PASS . GT 1/2");
+    final Variant v = VariantTest.createVariant("seq 3 . C T,G 0.0 PASS . GT 1/2");
+    final Variant v2 = VariantTest.createVariant("seq 3 . C G,T 31.0 PASS . GT 1/2");
 
     final byte[] template = {1, 1, 2, 4, 4};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -467,12 +467,8 @@ public class PathTest extends TestCase {
   }
 
   public void testRealWordTricky() {
-//    final String line = "chr22 5 e ga.a CTAGA:i 25.5 42 4.578 GAA 19 2.071 GACTAGAA 18 1.962 GTCTAGAA 1 0.109 G~ 1 0.109 TACTAGAA 1 0.109 ~A 2 0.218".replaceAll(" ", "\t");
-    final String line = "chr22 4 . A ACTAGA 25.5 PASS . GT 0/1";
-//    final String line2 = "chr22 3 e i GACTA:i".replaceAll(" ", "\t");
-    final String line2 = "chr22 2 . A AGACTA 0.0 PASS . GT 0/1";
-    final Variant v1 = VariantTest.createVariant(line);
-    final Variant v2 = VariantTest.createVariant(line2);
+    final Variant v1 = VariantTest.createVariant("chr22 4 . A ACTAGA 25.5 PASS . GT 0/1");
+    final Variant v2 = VariantTest.createVariant("chr22 2 . A AGACTA 0.0 PASS . GT 0/1");
 
     final byte[] template = {1, 1, 3, 1, 1, 2, 2};
     final List<OrientedVariant> aSide = new ArrayList<>();

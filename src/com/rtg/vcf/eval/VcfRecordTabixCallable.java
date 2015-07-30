@@ -72,7 +72,6 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     int id = 0;
     final List<Variant> list = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(mInput, mRanges)) {
-      Variant last = null;
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
         id++;
@@ -104,20 +103,6 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           continue;
         }
 
-        // Skip overlapping variants
-        if (last != null) {
-          if (v.getStart() < last.getEnd()) {
-            Diagnostic.userLog("Overlapping variants aren't supported, skipping current variant from " + mType.label() + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
-            skipped++;
-            continue;
-          }
-          if ((v.getStart() == last.getStart()) && (v.getStart() == v.getEnd()) && (last.getStart() == last.getEnd())) { // Pure inserts where ordering is ambiguous
-            Diagnostic.userLog("Ambiguous inserts aren't supported, skipping current variant from " + mType.label() + ".\nPrevious variant: " + last + "\nCurrent variant:  " + v);
-            skipped++;
-            continue;
-          }
-        }
-        last = v;
         list.add(v);
       }
     }

@@ -66,7 +66,6 @@ import com.rtg.vcf.header.VcfHeader;
  */
 class TabixVcfRecordSet implements VariantSet {
 
-  private static final String CUSTOM_FACTORY = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
 
   private final File mBaselineFile;
   private final File mCallsFile;
@@ -166,8 +165,9 @@ class TabixVcfRecordSet implements VariantSet {
 
   static VariantFactory getFactory(VariantSetType mType, VcfHeader header, String mSampleName, RocSortValueExtractor mExtractor, boolean mSquashPloidy) {
     String f = mSquashPloidy ? "squash" : "default";
-    if (CUSTOM_FACTORY.length() > 0) {
-      final String[] f2 = StringUtils.split(CUSTOM_FACTORY, ',');
+    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
+    if (customFactory.length() > 0) {
+      final String[] f2 = StringUtils.split(customFactory, ',');
       if (mType == VariantSetType.BASELINE) {
         f = f2[0];
       } else {
