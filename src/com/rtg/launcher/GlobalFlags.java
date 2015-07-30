@@ -135,7 +135,7 @@ public final class GlobalFlags {
   public static final String TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
   //vcfeval
-  /** Custom variant factoryies */
+  /** Custom variant factories */
   public static final String VCFEVAL_VARIANT_FACTORY = "com.rtg.vcf.eval.custom-variant-factory";
   /** Specify the maximum number of simultaneous paths before vcfeval skips a region */
   public static final String VCFEVAL_MAX_PATHS = "com.rtg.vcf.eval.max-paths";
