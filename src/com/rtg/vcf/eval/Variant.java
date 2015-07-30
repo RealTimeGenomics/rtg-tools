@@ -29,6 +29,7 @@
  */
 package com.rtg.vcf.eval;
 
+import java.util.Comparator;
 import java.util.EnumSet;
 
 import com.rtg.mode.DnaUtils;
@@ -46,8 +47,12 @@ import com.rtg.vcf.VcfUtils;
 public class Variant implements Comparable<Variant>, SequenceNameLocus {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
-  private int mId;
-
+  static final Comparator<Variant> ID_COMPARATOR = new Comparator<Variant>() {
+    @Override
+    public int compare(Variant o1, Variant o2) {
+      return Integer.compare(o1.getId(), o2.getId());
+    }
+  };
 
   /**
    * Construct Variants corresponding to the GT of a specified sample.
@@ -103,6 +108,7 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   }
 
 
+  private final int mId;
   private final String mSequenceName;
   private final int mStart;
   private final int mEnd;

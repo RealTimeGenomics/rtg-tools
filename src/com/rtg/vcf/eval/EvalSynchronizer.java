@@ -167,7 +167,7 @@ class EvalSynchronizer {
    * @param tpbase True positive variant calls (baseline, equiv with calls)
    * @throws IOException when IO fails
    */
-  void write(String sequenceName, Collection<OrientedVariant> tp, Collection<? extends SequenceNameLocus> fp, Collection<? extends SequenceNameLocus> fn, Collection<OrientedVariant> tpbase) throws IOException {
+  void write(String sequenceName, Collection<OrientedVariant> tp, Collection<Variant> fp, Collection<Variant> fn, Collection<OrientedVariant> tpbase) throws IOException {
     synchronized (mNames) {
       // wait for our turn to write results. Keeping output in order.
       while (!mNames.peek().equals(sequenceName)) {

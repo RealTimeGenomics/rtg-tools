@@ -110,6 +110,12 @@ class SequenceEvaluator implements IORunnable {
       truePositives = calls.getA();
       merge(falsePositives, calls.getB());
 
+      // Sort by ID to ensure the ordering matches what is needed for variant writing
+      Collections.sort(truePositives, OrientedVariant.ID_COMPARATOR);
+      Collections.sort(baselineTruePositives, OrientedVariant.ID_COMPARATOR);
+      Collections.sort(falsePositives, Variant.ID_COMPARATOR);
+      Collections.sort(falseNegatives, Variant.ID_COMPARATOR);
+
       mSynchronize.addVariants(baselineTruePositives.size(), falsePositives.size(), falseNegatives.size());
       Diagnostic.developerLog("Writing variants...");
 

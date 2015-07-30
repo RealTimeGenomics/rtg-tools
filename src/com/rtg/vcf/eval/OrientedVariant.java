@@ -30,6 +30,8 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Comparator;
+
 import com.rtg.util.Utils;
 import com.rtg.util.intervals.SequenceNameLocus;
 
@@ -37,6 +39,13 @@ import com.rtg.util.intervals.SequenceNameLocus;
  * Reference to a variant that has a defined phasing with respect to a haplotype.
  */
 public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNameLocus {
+
+  static final Comparator<OrientedVariant> ID_COMPARATOR = new Comparator<OrientedVariant>() {
+    @Override
+    public int compare(OrientedVariant o1, OrientedVariant o2) {
+      return Integer.compare(o1.variant().getId(), o2.variant().getId());
+    }
+  };
 
   private final Variant mVariant;
 
