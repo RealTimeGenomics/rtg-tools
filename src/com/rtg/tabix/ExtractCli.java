@@ -50,9 +50,9 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.SequenceNameLocusComparator;
 
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriter;
@@ -142,7 +142,7 @@ public class ExtractCli extends AbstractCli {
       // Short-circuit the common case of 1 specified region
       return regions;
     }
-    Arrays.sort(regions, new IntervalComparator());
+    Arrays.sort(regions, new SequenceNameLocusComparator());
     final List<RegionRestriction> mergedRegions = new ArrayList<>();
     RegionRestriction current = regions[0];
     for (int k = 1; k < regions.length; k++) {
