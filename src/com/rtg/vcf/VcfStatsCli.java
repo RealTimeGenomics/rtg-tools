@@ -75,8 +75,7 @@ public class VcfStatsCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerExtendedHelp();
     mFlags.setDescription("Display statistics from a set of VCF files.");
-    mFlags.registerOptional("Xvariant", "calculate statistics via Variant API rather than VcfRecord API")
-      .setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional("Xvariant", "calculate statistics via Variant API rather than VcfRecord API").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(SAMPLE, String.class, "STRING", "only calculate statistics for the specified sample (Default is to include all samples)")
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
@@ -145,7 +144,6 @@ public class VcfStatsCli extends AbstractCli {
           for (String sample : samples) {
             if (!header.getSampleNames().contains(sample)) {
               Diagnostic.warning("Specified sample '" + sample + "' is not contained in file: " + vcffile);
-              continue;
             }
           }
         }

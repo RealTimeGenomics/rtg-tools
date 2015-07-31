@@ -67,6 +67,7 @@ public abstract class AbstractStatistics implements Statistics {
   /**
    * Method to get the statistics to print or log.
    * May return null if nothing is to be printed or logged.
+   *
    * @return the statistics string or null.
    */
   protected abstract String getStatistics();
@@ -74,16 +75,16 @@ public abstract class AbstractStatistics implements Statistics {
   @Override
   public void printStatistics(OutputStream reportStream) throws IOException {
     final String stats = getStatistics();
-        if (stats != null) {
-          if (reportStream != null) {
-            //print to output stream (std out often)
-            reportStream.write(stats.getBytes());
+    if (stats != null) {
+      if (reportStream != null) {
+        //print to output stream (std out often)
+        reportStream.write(stats.getBytes());
 
-            //now log to diagnostic
-            final String[] lines = stats.split(StringUtils.LS);
-            for (final String line : lines) {
-              Diagnostic.userLog(line);
-            }
+        //now log to diagnostic
+        final String[] lines = stats.split(StringUtils.LS);
+        for (final String line : lines) {
+          Diagnostic.userLog(line);
+        }
       }
       //write to summary file if we have an output directory
       if (mOutputDirectory != null && mOutputDirectory.isDirectory()) {

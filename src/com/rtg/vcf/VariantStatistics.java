@@ -390,7 +390,7 @@ public class VariantStatistics extends AbstractStatistics {
   }
 
   protected void tallyNonIdentity(String refA, String refB, String predA, String predB, VariantType typeA, VariantType typeB, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
-    //Based on ref and preds determine:
+    // Based on ref and preds determine:
     //   haploid vs heterozygous vs homozygous
     //   Kind of variant: SNP, MNP, INS, DEL, INDEL, COMPLEX
     //   Transition (A <-> G) (C <-> T) vs Transversion (all others) for SNP's only
@@ -577,7 +577,7 @@ public class VariantStatistics extends AbstractStatistics {
   Pair<List<String>, Map<String, List<String>>> perSampleMap() {
     List<String> names = new ArrayList<>();
     final Map<String, List<String>> values = new LinkedHashMap<>();
-    ///per sample stats
+    // per sample stats
     int length = 0;
     for (final Entry<String, PerSampleVariantStatistics> e : mPerSampleStats.entrySet()) {
       final Pair<List<String>, List<String>> statistics = e.getValue().getStatistics();
@@ -597,7 +597,7 @@ public class VariantStatistics extends AbstractStatistics {
       }
       if (!present) {
         names.remove(i);
-        for (List<String> stats : values.values()) {
+        for (final List<String> stats : values.values()) {
           stats.remove(i);
         }
       }
@@ -608,7 +608,7 @@ public class VariantStatistics extends AbstractStatistics {
   public void generateReport() throws IOException {
     final HtmlReportHelper helper = getReportHelper();
     helper.copyResources(ReportUtils.TEMPLATE_DIR + "/rtg_logo.png", ReportUtils.TEMPLATE_DIR + "/rtg.css"); //copy resources up here to create the report files sub dir as well
-//    write html
+    // write html
     final HashMap<String, Object> replBody = new HashMap<>();
     final Pair<List<String>, List<String>> outputStatistics = statisticsMap();
     replBody.put("commandLine", CommandLine.getCommandLine());
