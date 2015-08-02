@@ -1,0 +1,2 @@
+There were 4 variants not included in ROC data files due to missing or invalid QUAL values.
+Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --vcf-score-field
