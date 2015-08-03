@@ -176,7 +176,7 @@ public final class PathFinder {
    */
   private void skipVariantsTo(HalfPath path, Variant[] variants, int maxPos) {
     int varIndex = path.getVariantIndex();
-    while (varIndex < variants.length && variants[varIndex].getStart() < maxPos) {
+    while (varIndex < variants.length && (varIndex == -1 || variants[varIndex].getStart() < maxPos)) {
       varIndex++;
     }
     varIndex--;

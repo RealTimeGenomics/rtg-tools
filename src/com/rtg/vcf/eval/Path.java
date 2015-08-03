@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
@@ -158,54 +159,44 @@ public class Path implements Comparable<Path> {
     return true;
   }
 
-  private static List<OrientedVariant> getIncluded(HalfPath path) {
-    final List<OrientedVariant> list = new ArrayList<>();
-    if (path.getIncluded() == null) {
-      return list;
-    }
-    for (final OrientedVariant orientedVariant : path.getIncluded()) {
-      list.add(0, orientedVariant);
-    }
-    return list;
-  }
-
-  private static List<Variant> getExcluded(HalfPath path) {
-    final List<Variant> list = new ArrayList<>();
-    if (path.getExcluded() == null) {
-      return list;
-    }
-    for (final Variant variant : path.getExcluded()) {
-      list.add(0, variant);
-    }
-    return list;
-  }
-
   /**
    * @return the set of variants included on call side
    */
   public List<OrientedVariant> getCalledIncluded() {
-    return getIncluded(mCalledPath);
+    return toReversedList(mCalledPath.getIncluded());
   }
 
   /**
    * @return the set of variants excluded on call side
    */
   public List<Variant> getCalledExcluded() {
-    return getExcluded(mCalledPath);
+    return toReversedList(mCalledPath.getExcluded());
   }
 
   /**
    * @return the set of variants included on baseline side
    */
   public List<OrientedVariant> getBaselineIncluded() {
-    return getIncluded(mBaselinePath);
+    return toReversedList(mBaselinePath.getIncluded());
   }
 
   /**
    * @return the set of variants excluded on baseline side
    */
   public List<Variant> getBaselineExcluded() {
-    return getExcluded(mBaselinePath);
+    return toReversedList(mBaselinePath.getExcluded());
+  }
+
+  private static <T> List<T> toReversedList(BasicLinkedListNode<T> input) {
+    if (input == null) {
+      return new ArrayList<>();
+    }
+    final List<T> list = new ArrayList<>(input.size());
+    for (final T orientedVariant : input) {
+      list.add(orientedVariant);
+    }
+    Collections.reverse(list);
+    return list;
   }
 
   void include(boolean side, OrientedVariant var, int varIndex) {
