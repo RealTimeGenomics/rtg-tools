@@ -329,7 +329,11 @@ public class VariantStatistics extends AbstractStatistics {
               sampleStats.mPartialCalls++;
             }
           } else {
-            tallyNonFiltered(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
+            try {
+              tallyNonFiltered(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
+            } catch (final ArrayIndexOutOfBoundsException e) {
+              Diagnostic.warning("Skipping record with illegal genotype: " + rec);
+            }
           }
         } else {
           Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
