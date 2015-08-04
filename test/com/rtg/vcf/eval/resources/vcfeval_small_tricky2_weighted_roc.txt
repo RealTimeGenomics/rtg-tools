@@ -1,3 +1,3 @@
-#total baseline variants: 3
+#total baseline variants: 7
 #score field: QUAL
 #score	true_positives	false_positives	false_negatives	precision	sensitivity	f_measure
