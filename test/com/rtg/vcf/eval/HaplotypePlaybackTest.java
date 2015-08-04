@@ -80,9 +80,9 @@ public class HaplotypePlaybackTest extends TestCase {
 
 
   public void testMoreComplexAlternate() {
-                               // 1  2  3  4  5  6  7  8  9
+                          // 1  2  3  4  5  6  7  8  9
     final byte[] template = {1, 1, 1, 1, 1, 1, 2, 1, 1};
-                               // 2441  1  31 4     3  1  1
+                          // 2441  1  31 4     3  1  1
     final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
     path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}), true));
@@ -98,21 +98,41 @@ public class HaplotypePlaybackTest extends TestCase {
 
     final byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
     TestUtils.containsAll(path.toString()
-        , "HaplotypePlayback: position=-1 inPosition=-1"
-        , "current:1:2 CTT:GGG"
-        , "future:");
+      , "HaplotypePlayback: position=-1 inPosition=-1"
+      , "current:1:2 CTT:GGG"
+      , "future:");
     check(expected, path);
     TestUtils.containsAll(path.toString()
-        , "HaplotypePlayback: position=8 inPosition=-1"
-        , "current:" + null
-        , "future:");
+      , "HaplotypePlayback: position=8 inPosition=-1"
+      , "current:" + null
+      , "future:");
+  }
+
+  public void testBackToBack() {
+    final byte[] template = {1, 4, 1, 1, 1};
+    final HaplotypePlayback path = new HaplotypePlayback(template);
+    // snp T -> T:G at 2
+    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{4}, new byte[]{3}), false));
+    // insert CC after 2
+    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 3, new byte[]{}, new byte[]{2, 2}), false));
+    final byte[] expected = {1, 3, 2, 2, 1, 1, 1};
+    TestUtils.containsAll(path.toString()
+      , "HaplotypePlayback: position=-1 inPosition=-1"
+      , "current:2:3 T:G-"
+      , "future:[3:3 :CC-]");
+    check(expected, path);
+    //System.out.println(path.toString());
+    TestUtils.containsAll(path.toString()
+      , "HaplotypePlayback: position=4 inPosition=-1"
+      , "current:" + null
+      , "future:");
   }
 
   private void check(byte[] expected, HaplotypePlayback path) {
     int i = 0;
     while (path.hasNext()) {
       path.next();
-      //System.err.println(path.nt());
+      //System.err.println(path.nt() + " " + path.toString());
       assertEquals(expected[i], path.nt());
       i++;
     }

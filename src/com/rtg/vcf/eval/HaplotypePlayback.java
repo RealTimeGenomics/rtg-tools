@@ -171,7 +171,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
           break;
         }
         mPositionInVariant = 0;
-        //System.err.println("templatePosition=" + mTemplatePosition + " varPosition=" + (mNextVariant.variant().start() - 1));
+        //System.err.println("templatePosition=" + mTemplatePosition + " varStartPosition=" + mNextVariant.variant().getStart() + " in " + mNextVariant);
         assert mTemplatePosition == mNextVariant.getStart();
       }
     }
