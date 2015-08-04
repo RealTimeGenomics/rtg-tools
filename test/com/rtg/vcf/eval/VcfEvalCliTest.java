@@ -163,8 +163,15 @@ public class VcfEvalCliTest extends AbstractCliTest {
 
   public void testNanoTricky2() throws IOException, UnindexableDataException {
     // Default of maximizing the sum of baseline and calls variants leaves one out. Switching to maximizing calls includes them all.
-    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--squash-ploidy",
+    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1",
       "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim",
+      "--XXcom.rtg.vcf.eval.maximize=calls");
+  }
+
+  public void testNanoTricky3() throws IOException, UnindexableDataException {
+    // XXX currenly fails to do the right thing
+    check("vcfeval_small_tricky3", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1",
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=hap-alt,squash",
       "--XXcom.rtg.vcf.eval.maximize=calls");
   }
 
