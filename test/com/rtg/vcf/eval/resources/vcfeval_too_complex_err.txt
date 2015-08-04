@@ -1,2 +1,1 @@
-Evaluation too complex (5001 unresolved paths, 12286 iterations) at reference region 11:3795-3824. Variants in this region will not be included in results.
-There were 4 called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.
+Evaluation too complex (5002 unresolved paths, 10984 iterations) at reference region 11:3795-3833. Variants in this region will not be included in results.

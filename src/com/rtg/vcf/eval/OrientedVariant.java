@@ -97,15 +97,19 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   @Override
   public int compareTo(OrientedVariant that) {
-    final int varPos = Integer.compare(this.getStart(), that.getStart());
-    if (varPos != 0) {
-      return varPos;
-    }
-    final int id = Boolean.compare(mIsAlleleA, that.mIsAlleleA);
+    int id = Integer.compare(this.variant().getId(), that.variant().getId());
     if (id != 0) {
       return id;
     }
-    return Integer.compare(mAlleleId, that.mAlleleId);
+    id = Boolean.compare(mIsAlleleA, that.mIsAlleleA);
+    if (id != 0) {
+      return id;
+    }
+    id = Integer.compare(mAlleleId, that.mAlleleId);
+    if (id != 0) {
+      return id;
+    }
+    return Integer.compare(mOtherAlleleId, that.mOtherAlleleId);
   }
 
   @Override

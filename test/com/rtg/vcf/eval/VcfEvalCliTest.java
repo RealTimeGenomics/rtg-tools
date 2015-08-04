@@ -169,10 +169,9 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoTricky3() throws IOException, UnindexableDataException {
-    // XXX currenly fails to do the right thing
+    // Has two alternative variants starting at exactly the same position, needs overlap handling, now works.
     check("vcfeval_small_tricky3", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=hap-alt,squash",
-      "--XXcom.rtg.vcf.eval.maximize=calls");
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=hap-alt,squash");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {

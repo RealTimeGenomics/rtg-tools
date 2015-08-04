@@ -309,11 +309,11 @@ public class PathTest extends TestCase {
     final byte[] template = {1, 1, 1, 1, 1, 1, 2};
     final List<OrientedVariant> aSide = new ArrayList<>();
     final List<OrientedVariant> bSide = new ArrayList<>();
-    addVar(aSide, new MockVariant(2, 3, new byte[] {3}, new byte[] {1}), false);
-    addVar(aSide, new MockVariant(3, 4, new byte[] {2}, new byte[] {1}), true);
+    addVar(aSide, new MockVariant(2, 3, new byte[] {3}, new byte[] {1}, 0), false);
+    addVar(aSide, new MockVariant(3, 4, new byte[] {2}, new byte[] {1}, 1), true);
 
-    addVar(bSide, new MockVariant(2, 3, new byte[] {3}, null), false);
-    addVar(bSide, new MockVariant(3, 4, new byte[] {1}, new byte[] {2}), true);
+    addVar(bSide, new MockVariant(2, 3, new byte[] {3}, null, 0), false);
+    addVar(bSide, new MockVariant(3, 4, new byte[] {1}, new byte[] {2}, 1), true);
     check(template, aSide, bSide);
   }
   public void testInsertion() {
@@ -428,11 +428,11 @@ public class PathTest extends TestCase {
     final byte[] template = {1, 1, 3, 1, 2};
     final List<OrientedVariant> aSide = new ArrayList<>();
     final List<OrientedVariant> bSide = new ArrayList<>();
-    addVar(aSide, VariantTest.createVariant("seq 1 . AA C 0.0 PASS . GT 1/1"), false);
-    addVar(aSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1"), true);
+    addVar(aSide, VariantTest.createVariant("seq 1 . AA C 0.0 PASS . GT 1/1", 0), false);
+    addVar(aSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1", 1), true);
 
-    addVar(bSide, VariantTest.createVariant("seq 1 . A G 0.0 PASS . GT 1/1"), false);
-    addVar(bSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1"), true);
+    addVar(bSide, VariantTest.createVariant("seq 1 . A G 0.0 PASS . GT 1/1", 0), false);
+    addVar(bSide, VariantTest.createVariant("seq 2 . AG C 0.0 PASS . GT 1/1", 1), true);
     check(template, aSide, bSide);
   }
 

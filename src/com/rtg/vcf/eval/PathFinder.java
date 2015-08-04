@@ -46,7 +46,6 @@ public final class PathFinder {
 
   private static final boolean DUMP = false;
 
-  private static final String MAXIMIZE_MODE = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
   private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
   private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
 
@@ -55,8 +54,11 @@ public final class PathFinder {
   private final Variant[] mCalledVariants;
   private final Variant[] mBaseLineVariants;
   private int mCurrentMaxPos;
+  private final String mMaximizeMode;
 
   private <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
+    mMaximizeMode = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
+    Diagnostic.developerLog("Path finder maximisation: " + mMaximizeMode);
     mTemplate = template;
     mTemplateName = templateName;
 
@@ -235,13 +237,13 @@ public final class PathFinder {
     return -1;
   }
 
-  private static void addIfBetter(Collection<Path> add, TreeSet<Path> sortedPaths) {
+  private void addIfBetter(Collection<Path> add, TreeSet<Path> sortedPaths) {
     for (final Path p : add) {
       addIfBetter(p, sortedPaths);
     }
   }
 
-  private static void addIfBetter(Path add, TreeSet<Path> sortedPaths) {
+  private void addIfBetter(Path add, TreeSet<Path> sortedPaths) {
     if (sortedPaths.contains(add)) {
       final Path other = sortedPaths.floor(add);
       sortedPaths.remove(add);
@@ -251,8 +253,8 @@ public final class PathFinder {
     }
   }
 
-  static Path better(Path first, Path second) {
-    switch (MAXIMIZE_MODE) {
+  private Path better(Path first, Path second) {
+    switch (mMaximizeMode) {
       case "calls":
         return betterMaxCalls(first, second);
       case "default":
@@ -262,7 +264,7 @@ public final class PathFinder {
     }
   }
 
-  static Path betterMaxSum(Path first, Path second) {
+  private static Path betterMaxSum(Path first, Path second) {
     // Prefer paths that maximise total number of included variants (baseline + called)
     BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
     BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
@@ -281,7 +283,7 @@ public final class PathFinder {
     return firstSize > secondSize ? first : second;
   }
 
-  static Path betterMaxCalls(Path first, Path second) {
+  private static Path betterMaxCalls(Path first, Path second) {
     // Prefer paths that maximise the number of called variants included
     // Better for integrating a sample into population alleles
     BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();

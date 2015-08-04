@@ -46,14 +46,14 @@ public class OrientedVariantTest extends TestCase {
   }
 
   public void test() {
-    final MockVariant v = new MockVariant(0, 0, new byte[] {0, 1, 2}, null);
+    final MockVariant v = new MockVariant(0, 0, new byte[] {0, 1, 2}, null, 0);
     final OrientedVariant ov = createOrientedVariant(v, true);
     assertEquals("0:0 NAC+", ov.toString());
     assertTrue(ov.equals(ov));
     assertEquals(-1, ov.getStart());
     assertEquals(-1, ov.getEnd());
     assertEquals(3, ov.nt().length);
-    final OrientedVariant ov2 = createOrientedVariant(new MockVariant(1, 2, new byte[]{1, 1, 1}, new byte[]{2, 2, 2}), false);
+    final OrientedVariant ov2 = createOrientedVariant(new MockVariant(1, 2, new byte[]{1, 1, 1}, new byte[]{2, 2, 2}, 1), false);
     assertEquals("1:2 AAA:CCC-", ov2.toString());
     assertFalse(ov.equals(ov2));
     assertFalse(ov.hashCode() == ov2.hashCode());
@@ -66,7 +66,7 @@ public class OrientedVariantTest extends TestCase {
     assertFalse(ov.equals("not an OrientedVariant"));
     assertFalse(ov.equals(null));
 
-    final MockVariant v2 = new MockVariant(0, 0, new byte[] {0, 1, 2}, new byte[] {1});
+    final MockVariant v2 = new MockVariant(0, 0, new byte[] {0, 1, 2}, new byte[] {1}, 2);
     final OrientedVariant ov3 = createOrientedVariant(v2, true);
     final OrientedVariant ov4 = createOrientedVariant(v2, false);
     assertEquals(1, ov3.compareTo(ov4));

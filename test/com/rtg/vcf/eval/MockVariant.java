@@ -55,6 +55,18 @@ public class MockVariant extends Variant {
     super(0, "", start - 1, end - 1, toPreds(plus, minus), false, Double.NaN);
   }
 
+  /**
+   * Assumes not phased
+   * @param start one-based start position of mutation
+   * @param end one-based end position of mutation
+   * @param plus nucleotides on the plus strand
+   * @param minus nucleotides on the minus strand
+   * @param id the variant id
+   */
+  public MockVariant(int start, int end, byte[] plus, byte[] minus, int id) {
+    super(id, "", start - 1, end - 1, toPreds(plus, minus), false, Double.NaN);
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();

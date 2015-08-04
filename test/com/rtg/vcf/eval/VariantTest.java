@@ -64,9 +64,11 @@ public class VariantTest extends TestCase {
   static VcfRecord createRecord(String var) {
     return VcfReader.vcfLineToRecord(var.replaceAll(" +", TAB));
   }
-
   static Variant createVariant(String var) {
-    return createVariant(var, 0, RocSortValueExtractor.NULL_EXTRACTOR);
+    return createVariant(createRecord(var), 0, 0, RocSortValueExtractor.NULL_EXTRACTOR);
+  }
+  static Variant createVariant(String var, int id) {
+    return createVariant(createRecord(var), id, 0, RocSortValueExtractor.NULL_EXTRACTOR);
   }
 
   public void test() {

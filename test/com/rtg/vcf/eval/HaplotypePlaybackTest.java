@@ -221,21 +221,24 @@ public class HaplotypePlaybackTest extends TestCase {
                                // 2441  1  31 1     3  1  1
     final HaplotypePlayback path = new HaplotypePlayback(template);
     //mnp A -> CTT:GGG at 2
-    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}), true));
+    final OrientedVariant ov1 = OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}, 1), true);
+    path.addVariant(ov1);
     //insert A -> C:GA at 4
-    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 5, new byte[]{2}, new byte[]{3, 1}), false));
+    final OrientedVariant ov3 = OrientedVariantTest.createOrientedVariant(new MockVariant(4, 5, new byte[]{2}, new byte[]{3, 1}, 3), false);
+    path.addVariant(ov3);
 
     assertEquals(0, path.compareTo(path));
     final HaplotypePlayback copy = path.copy();
     assertTrue(path.equals(copy));
     assertTrue(path.hashCode() == copy.hashCode());
-    copy.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(5, 6, new byte[]{3}, new byte[]{4}), false));
+    final MockVariant mv4 = new MockVariant(5, 6, new byte[]{3}, new byte[]{4}, 4);
+    copy.addVariant(OrientedVariantTest.createOrientedVariant(mv4, false));
     assertEquals(-1, path.compareTo(copy));
     assertEquals(1, copy.compareTo(path));
     assertFalse(path.equals(copy));
     assertFalse(path.hashCode() == copy.hashCode());
     assertFalse(path.equals(null));
-    path.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(5, 6, new byte[]{3}, new byte[]{4}), true));
+    path.addVariant(OrientedVariantTest.createOrientedVariant(mv4, true));
     assertEquals(1, path.compareTo(copy));
     assertEquals(-1, copy.compareTo(path));
 
@@ -248,11 +251,12 @@ public class HaplotypePlaybackTest extends TestCase {
     final HaplotypePlayback copy2 = path2.copy();
     assertEquals(0, path2.compareTo(copy2));
 
-    path2.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}), true));
+    path2.addVariant(ov1);
     assertEquals(1, path2.compareTo(copy2));
     assertEquals(-1, copy2.compareTo(path2));
 
-    copy2.addVariant(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}), true));
+    final OrientedVariant ov2 = OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{2, 4, 4}, new byte[]{3, 3, 3}, 2), true);
+    copy2.addVariant(ov2);
     assertEquals(-1, path2.compareTo(copy2));
     assertEquals(1, copy2.compareTo(path2));
 
