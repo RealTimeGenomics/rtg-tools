@@ -79,6 +79,7 @@ class SequenceEvaluator implements IORunnable {
     final Collection<Variant> calledCalls = set.get(VariantSetType.CALLS);
 
     if (baseLineCalls == null || baseLineCalls.size() == 0) {
+      mSynchronize.addVariants(0, calledCalls.size(), 0);
       mSynchronize.write(currentName, null, calledCalls, null, null);
       if (calledCalls != null) {
         Diagnostic.developerLog("Number of called variants: " + calledCalls.size());
@@ -89,6 +90,7 @@ class SequenceEvaluator implements IORunnable {
       }
     } else if (calledCalls == null || calledCalls.size() == 0) {
       Diagnostic.developerLog("Number of baseline variants: " + baseLineCalls.size());
+      mSynchronize.addVariants(0, 0, baseLineCalls.size());
       mSynchronize.write(currentName, null, null, baseLineCalls, null);
     } else {
 
