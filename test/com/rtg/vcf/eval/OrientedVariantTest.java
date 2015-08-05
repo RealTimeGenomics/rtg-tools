@@ -38,6 +38,7 @@ import junit.framework.TestCase;
 public class OrientedVariantTest extends TestCase {
 
   public static OrientedVariant createOrientedVariant(Variant variant, boolean isAlleleA) {
+    assert variant instanceof CompactVariant;
     return new OrientedVariant(variant, isAlleleA,
       isAlleleA ? 0 : 1,
       variant.numAlleles() == 1

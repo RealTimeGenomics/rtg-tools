@@ -55,7 +55,7 @@ public class VariantTest extends TestCase {
     return createVariant(rec, 0, sampleNo, extractor);
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo, RocSortValueExtractor extractor) {
-    return new VariantFactory.Default(sampleNo, extractor).variant(rec, id);
+    return new VariantFactory.Default(sampleNo).variant(rec, id);
   }
   static Variant createVariant(String var, int sampleNo, RocSortValueExtractor extractor) {
     return createVariant(createRecord(var), sampleNo, extractor);
@@ -76,7 +76,6 @@ public class VariantTest extends TestCase {
     final VcfRecord rec = createRecord(vcf);
     final Variant v = createVariant(rec, 0, DEFAULT_EXTRACTOR);
     assertEquals(22, v.getStart());
-    assertTrue(Double.isNaN(v.getSortValue()));
     assertEquals("someKindOfName", rec.getSequenceName());
   }
 
@@ -116,7 +115,6 @@ public class VariantTest extends TestCase {
   public void testSnpConstruction() throws Exception {
     final Variant variant = createVariant(SNP_LINE, 0, DEFAULT_EXTRACTOR);
     assertEquals(22, variant.getStart());
-    assertEquals(12.8, variant.getSortValue(), 0.1);
     assertEquals(1, variant.nt(0).length);
     assertEquals(4, variant.nt(0)[0]);
     assertNull(variant.nt(-1));
@@ -243,7 +241,6 @@ public class VariantTest extends TestCase {
     final Variant v = createVariant(line, 0, DEFAULT_EXTRACTOR);
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());
-    assertEquals(31.0, v.getSortValue(), 0.1);
     checkArray(new byte[] {3}, v.nt(0));
     checkArray(new byte[]{4}, v.nt(1));
   }

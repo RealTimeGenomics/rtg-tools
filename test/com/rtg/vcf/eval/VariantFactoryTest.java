@@ -33,7 +33,6 @@ package com.rtg.vcf.eval;
 import static com.rtg.mode.DNA.C;
 import static com.rtg.mode.DNA.T;
 import static com.rtg.util.StringUtils.TAB;
-import static com.rtg.vcf.eval.RocSortValueExtractor.NULL_EXTRACTOR;
 
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -53,15 +52,15 @@ public class VariantFactoryTest extends TestCase {
   private VariantFactory factory(String name) {
     switch (name) {
       case VariantFactory.DiploidAltsFactory.NAME:
-        return new VariantFactory.DiploidAltsFactory(NULL_EXTRACTOR);
+        return new VariantFactory.DiploidAltsFactory();
       case VariantFactory.HaploidAltsFactory.NAME:
-        return new VariantFactory.HaploidAltsFactory(NULL_EXTRACTOR);
+        return new VariantFactory.HaploidAltsFactory();
       case VariantFactory.HaploidGtAltFactory.NAME:
-        return new VariantFactory.HaploidGtAltFactory(0, NULL_EXTRACTOR);
+        return new VariantFactory.HaploidGtAltFactory(0);
       case VariantFactory.TrimmedGtFactory.NAME:
-        return new VariantFactory.TrimmedGtFactory(0, NULL_EXTRACTOR);
+        return new VariantFactory.TrimmedGtFactory(0);
       case VariantFactory.Default.NAME:
-        return new VariantFactory.Default(0, NULL_EXTRACTOR);
+        return new VariantFactory.Default(0);
       default:
         throw new RuntimeException("Unknown variant factory: " + name);
     }

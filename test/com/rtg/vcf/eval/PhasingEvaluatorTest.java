@@ -44,11 +44,9 @@ import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.Pair;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
-import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -56,6 +54,7 @@ import junit.framework.TestCase;
 /**
  */
 public class PhasingEvaluatorTest extends TestCase {
+
   static List<Variant> makeVariantList(List<String> variants, StringBuilder sb) {
     final List<Variant> callList = new ArrayList<>();
     int id = 0;
@@ -66,17 +65,21 @@ public class PhasingEvaluatorTest extends TestCase {
       sb.append(vartab).append("\n");
     }
     return callList;
-
   }
+
   private static class MockVariantSet implements VariantSet {
     boolean mSent = false;
     Map<VariantSetType, List<Variant>> mMap;
     StringBuilder mBaselineVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
     StringBuilder mCallsVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
+    final VcfHeader mHeader;
     public MockVariantSet(List<String> base, List<String> calls) {
       mMap = new EnumMap<>(VariantSetType.class);
       mMap.put(VariantSetType.BASELINE, makeVariantList(base, mBaselineVcf));
       mMap.put(VariantSetType.CALLS, makeVariantList(calls, mCallsVcf));
+      mHeader = new VcfHeader();
+      mHeader.addLine(VcfHeader.VERSION_LINE);
+      mHeader.addSampleName("SAMPLE");
     }
     @Override
     public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
@@ -92,12 +95,12 @@ public class PhasingEvaluatorTest extends TestCase {
 
     @Override
     public VcfHeader baseLineHeader() {
-      throw new UnsupportedOperationException();
+      return mHeader;
     }
 
     @Override
     public VcfHeader calledHeader() {
-      throw new UnsupportedOperationException();
+      return mHeader;
     }
 
     @Override
@@ -110,6 +113,7 @@ public class PhasingEvaluatorTest extends TestCase {
       return 0;
     }
   }
+
   public void testPhasing() throws IOException, UnindexableDataException {
     final int expectedUnphasable = 0;
     final int expectedMisPhasings = 1;
@@ -122,8 +126,8 @@ public class PhasingEvaluatorTest extends TestCase {
         , "10 13 . G T 0.0 PASS . GT 1|0"
     ));
     checkPhasing(expectedCorrect, expectedUnphasable, expectedMisPhasings, variants);
-
   }
+
   public void testDoublePhasing() throws IOException, UnindexableDataException {
     final int expectedUnphasable = 0;
     final int expectedMisPhasings = 2;
@@ -185,8 +189,8 @@ public class PhasingEvaluatorTest extends TestCase {
         , "10 25 . G T 0.0 PASS . GT 1|0"
     ));
     checkPhasing(expectedCorrect, expectedUnphasable, expectedMisPhasings, variants);
-
   }
+
   public void testCluster() throws IOException, UnindexableDataException {
     final int expectedUnphasable = 0;
     final int expectedMisPhasings = 2;
@@ -239,24 +243,19 @@ public class PhasingEvaluatorTest extends TestCase {
   }
 
   private void checkPhasing(int expectedCorrect, int expectedUnphasable, int expectedMisPhasings, MockVariantSet variants) throws IOException, UnindexableDataException {
-    final MemoryPrintStream tp = new MemoryPrintStream();
-    final MemoryPrintStream fp = new MemoryPrintStream();
-    final MemoryPrintStream fn = new MemoryPrintStream();
     try (final TestDirectory dir = new TestDirectory()) {
       final File calls = FileHelper.stringToGzFile(variants.mCallsVcf.toString(), new File(dir, "calls.vcf.gz"));
       new TabixIndexer(calls).saveVcfIndex();
       final File baseline = FileHelper.stringToGzFile(variants.mBaselineVcf.toString(), new File(dir, "baseline.vcf.gz"));
       new TabixIndexer(baseline).saveVcfIndex();
       final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
-      final EvalSynchronizer sync = new EvalSynchronizer(SamRangeUtils.createFullReferenceRanges(reader), variants,
-        new VcfWriter(new VcfHeader(), tp.outputStream()),  new VcfWriter(new VcfHeader(), fp.outputStream()),
-        new VcfWriter(new VcfHeader(), fn.outputStream()), null,
-        baseline, calls, new RocContainer(RocSortOrder.DESCENDING, null));
-      final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
-      eval.run();
-      assertEquals("correctphasings: " + sync.getCorrectPhasings() + ", misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedCorrect, sync.getCorrectPhasings());
-      assertEquals("misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedMisPhasings, sync.getMisPhasings());
-      assertEquals(expectedUnphasable, sync.getUnphasable());
+      try (final DefaultEvalSynchronizer sync = new DefaultEvalSynchronizer(baseline, calls, variants, SamRangeUtils.createFullReferenceRanges(reader), null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, false)) {
+        final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
+        eval.run();
+        assertEquals("correctphasings: " + sync.getCorrectPhasings() + ", misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedCorrect, sync.getCorrectPhasings());
+        assertEquals("misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedMisPhasings, sync.getMisPhasings());
+        assertEquals(expectedUnphasable, sync.getUnphasable());
+      }
     }
   }
 }

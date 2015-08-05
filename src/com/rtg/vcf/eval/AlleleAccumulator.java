@@ -1,0 +1,184 @@
+/*
+ * Copyright (c) 2014. Real Time Genomics Limited.
+ *
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the
+ *    distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+package com.rtg.vcf.eval;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.io.FileUtils;
+import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.header.VcfHeader;
+
+/**
+ * Output a population alleles VCF that incorporates a new sample, including any new alleles
+ * contained only in the call-set.
+ * Path finding should use variant factory <code>dip-alt,default-trim-id</code>
+ */
+public class AlleleAccumulator extends MergingEvalSynchronizer {
+
+  protected final VcfWriter mAlleles;
+  protected final VcfWriter mAuxiliary;
+  protected int mCalledNotInPath;
+  protected int mBaselineNotInPath;
+
+
+  /**
+   * @param baseLineFile tabix indexed base line VCF file
+   * @param callsFile tabix indexed calls VCF file
+   * @param variants the set of variants to evaluate
+   * @param ranges the regions from which variants are being loaded
+   * @param output the output directory into which result files are written
+   * @param zip true if output files should be compressed
+   * @throws IOException if there is a problem opening output files
+   */
+  AlleleAccumulator(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges);
+
+    final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
+    final VcfHeader h = variants.baseLineHeader().copy();
+    h.removeAllSamples();
+    mAlleles = new VcfWriter(h, new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new population alleles (old + new sample alleles)
+    mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
+  }
+
+  @Override
+  protected void resetRecordFields(VcfRecord rec) {
+    rec.removeInfo("STATUS");
+    rec.getFormatAndSample().clear();
+    rec.setNumberOfSamples(0);
+  }
+
+  @Override
+  protected void handleUnknownBaseline() throws IOException {
+    mBrv.setInfo("STATUS", "B-NotInPath"); // Should never happen for us.
+    mAlleles.write(mBrv);
+    mBaselineNotInPath++;
+  }
+
+  @Override
+  protected void handleUnknownCall() throws IOException {
+    mCrv.setInfo("STATUS", "C-NotInPath"); // Was skipped during loading, probably OK to just silently drop.
+    mAuxiliary.write(mCrv);
+    mCalledNotInPath++;
+  }
+
+  @Override
+  protected void handleKnownCall() throws IOException {
+    if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
+      mCrv.addInfo("STATUS", "C-TP-BDiff");
+      mAuxiliary.write(mCrv);
+    } else { // Excluded (novel or self-inconsistent) or too-hard
+      assert mCv instanceof AlleleIdVariant || mCv instanceof SkippedVariant;
+      final String label = mCv instanceof AlleleIdVariant ? "-FP" : "-TooHard";
+      mCrv.addInfo("STATUS", "C" + label + "=" + mCv.toString());  // Only output used alleles
+      final AlleleIdVariant ov = (AlleleIdVariant) ((mCv instanceof AlleleIdVariant) ? mCv : ((SkippedVariant) mCv).variant());
+      final List<String> newAlts = new ArrayList<>();
+      addCallAllele(newAlts, ov.alleleA());
+      if (ov.alleleA() != ov.alleleB()) {
+        addCallAllele(newAlts, ov.alleleB());
+      }
+      mCrv.getAltCalls().clear();
+      mCrv.getAltCalls().addAll(newAlts);
+      mAlleles.write(mCrv);
+    }
+  }
+
+  @Override
+  protected void handleKnownBaseline() throws IOException {
+    final String status = (mBv instanceof OrientedVariant)
+      ? "B-TP=" + mBv.toString()
+      : (mBv instanceof SkippedVariant) ? "B-TooHard" : "B-FN";
+    mBrv.addInfo("STATUS", status);
+    mAlleles.write(mBrv);
+  }
+
+  @Override
+  protected void handleKnownBoth() throws IOException {
+    if (mCv instanceof OrientedVariant) {
+      mCrv.addInfo("STATUS", "C-TP-BSame"); // Log the sample version of matched variants, probably fine to silently drop
+      mAuxiliary.write(mCrv);
+    } else {
+      // Merge records into b, adding any new ALT from c, flush c
+      assert mCv instanceof AlleleIdVariant || mCv instanceof SkippedVariant;
+      final AlleleIdVariant ov = (AlleleIdVariant) ((mCv instanceof AlleleIdVariant) ? mCv : ((SkippedVariant) mCv).variant());
+      addCallAlleleToBaseline(ov.alleleA());
+      if (ov.alleleA() != ov.alleleB()) {
+        addCallAlleleToBaseline(ov.alleleB());
+      }
+      final String label = mCv instanceof AlleleIdVariant ? "-FP" : "-TooHard";
+      mCrv.addInfo("STATUS", "C-Merged" + label); // Interesting, we added a new allele from this sample to existing site
+      mAuxiliary.write(mCrv);
+    }
+  }
+
+  private void addCallAlleleToBaseline(int gtId) {
+    if (gtId > 0) {
+      final String alt = mCrv.getAltCalls().get(gtId - 1);
+      if (!mBrv.getAltCalls().contains(alt)) {
+        mBrv.addAltCall(alt);
+        mBrv.addInfo("STATUS", "B-Merged-" + alt); // Baseline counterpart to C-FP-Merged
+      }
+    }
+  }
+
+  void addCallAllele(List<String> newAlts, int gtId) {
+    if (gtId > 0) {
+      final String alt = mCrv.getAltCalls().get(gtId - 1);
+      if (!newAlts.contains(alt)) {
+        newAlts.add(alt);
+      }
+    }
+  }
+
+  @Override
+  void finish() throws IOException {
+    super.finish();
+    if (mBaselineNotInPath > 0) {
+      Diagnostic.userLog("There were " + mBaselineNotInPath + " baseline records not in the path");
+    }
+    if (mCalledNotInPath > 0) {
+      Diagnostic.userLog("There were " + mCalledNotInPath + " call records not in the path");
+    }
+  }
+
+  @Override
+  @SuppressWarnings("try")
+  public void close() throws IOException {
+    try (VcfWriter ignored = mAlleles;
+         VcfWriter ignored2 = mAuxiliary) {
+      // done for nice closing side effects
+    }
+  }
+}

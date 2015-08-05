@@ -29,6 +29,7 @@
  */
 package com.rtg.vcf.eval;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
@@ -40,91 +41,39 @@ import java.util.Queue;
 import com.rtg.util.Pair;
 import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.intervals.SequenceNameLocus;
-import com.rtg.vcf.VcfReader;
-import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfWriter;
 
 /**
- * When running VcfEvalTask in multithreading fashion keep reading and output in order for each chromosome being evaluated.
+ * When running VcfEvalTask in multithreading fashion keeps reading and output in order for each chromosome being evaluated.
  */
-class EvalSynchronizer {
-  private final Queue<String> mNames = new LinkedList<>();
-  private ReferenceRanges<String> mRanges;
-  private final VariantSet mVariantSet;
+public abstract class EvalSynchronizer implements Closeable {
 
-  private final RocContainer mRoc;
-  private final VcfWriter mTpCalls;
-  private final VcfWriter mTpBase;
-  private final VcfWriter mFp;
-  private final VcfWriter mFn;
-  private final File mBaseLineFile;
-  private final File mCallsFile;
-  private final Object mVariantLock = new Object();
-  private final Object mPhasingLock = new Object();
-  private int mUnphasable = 0;
-  private int mMisPhasings = 0;
-  private int mCorrectPhasings = 0;
-  int mTruePositives = 0;
-  int mFalseNegatives = 0;
-  int mFalsePositives = 0;
-
-  /**
-   * @param ranges the regions from which variants are being loaded
-   * @param vs the set of variants to evaluate
-   * @param tpCalls True positives are written to this
-   * @param fp false positives are written here
-   * @param fn false negatives are written here
-   * @param tpBase True positives (baseline version) are written here, may be null.
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
-   * @param roc the container for ROC data
-   */
-  EvalSynchronizer(ReferenceRanges<String> ranges, VariantSet vs, VcfWriter tpCalls, VcfWriter fp, VcfWriter fn, VcfWriter tpBase, File baseLineFile, File callsFile, RocContainer roc) {
-    mRanges = ranges;
-    mVariantSet = vs;
-    mTpCalls = tpCalls;
-    mTpBase = tpBase;
-    mFp = fp;
-    mFn = fn;
-    mBaseLineFile = baseLineFile;
-    mCallsFile = callsFile;
-    mRoc = roc;
+  protected enum Classification {
+    TP_CALL,
+    FP,
+    TP_BASE,
+    FN
   }
 
-  /**
-   * Dump all of the variants in a Collection to an output stream
-   * @param out where to write the variants
-   * @param variants a collection of variants
-   * @param vcfReader the VCF reader to get the VCF records from for output
-   * @param <T> Type of variant
-   * @throws IOException IO exceptions require too many comments.
-   */
-  private static <T extends SequenceNameLocus> void writeVariants(VcfWriter out, VcfReader vcfReader, Collection<T> variants) throws IOException {
-    if (variants == null) {
-      return;
-    }
-    int id = 0;
-    for (final SequenceNameLocus v : variants) {
-      final Variant dv = (Variant) (v instanceof OrientedVariant ? ((OrientedVariant) v).variant() : v);
-      VcfRecord rec = null;
-      while (vcfReader.hasNext()) {
-        final VcfRecord r = vcfReader.next();
-        id++;
+  protected final ReferenceRanges<String> mRanges;
+  protected final VariantSet mVariantSet;
+  protected final File mBaseLineFile;
+  protected final File mCallsFile;
+  private final Queue<String> mNames = new LinkedList<>();
+  private final Object mPhasingLock = new Object();
 
-        if (id == dv.getId()) {
-          rec = r;
-          break;
-        }
-      }
-      if (rec != null) {
-        out.write(rec);
-      } else {
-        throw new SlimException("Variant object \"" + v.toString() + "\"" + " does not have a corresponding VCF record in given reader");
-      }
-    }
+  /**
+   * Constructor
+   * @param baseLineFile file containing the baseline VCF records
+   * @param callsFile file containing the call VCF records
+   * @param variants returns separate sets of variants for each chromosome being processed
+   * @param ranges the ranges that variants are being read from
+   */
+  public EvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
+    mBaseLineFile = baseLineFile;
+    mCallsFile = callsFile;
+    mRanges = ranges;
+    mVariantSet = variants;
   }
 
   /**
@@ -144,30 +93,15 @@ class EvalSynchronizer {
     return set;
   }
 
-  void addRocLine(RocLine line, Variant v) {
-    synchronized (mVariantLock) {
-      mRoc.addRocLine(line.mPrimarySortValue, line.mWeight, v);
-    }
-  }
-  void addPhasings(int misPhasings, int correctPhasings, int unphasable) {
-    synchronized (mPhasingLock) {
-      mMisPhasings += misPhasings;
-      mUnphasable += unphasable;
-      mCorrectPhasings += correctPhasings;
-    }
-  }
-
   /**
    * Write the sets of variants to the appropriate output files. Will block until all previous sequences have been written by other threads.
    *
    * @param sequenceName current sequence name
-   * @param tp True positive variant calls (calls, equiv with baseline)
-   * @param fp False positive variant calls (calls, not in baseline)
-   * @param fn False negative variant calls (baseline, not in calls)
-   * @param tpbase True positive variant calls (baseline, equiv with calls)
+   * @param baseline variants (either oriented if true positive, or variant if excluded)
+   * @param calls variants (either oriented if true positive, or variant if excluded)
    * @throws IOException when IO fails
    */
-  void write(String sequenceName, Collection<OrientedVariant> tp, Collection<Variant> fp, Collection<Variant> fn, Collection<OrientedVariant> tpbase) throws IOException {
+  void write(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException {
     synchronized (mNames) {
       // wait for our turn to write results. Keeping output in order.
       while (!mNames.peek().equals(sequenceName)) {
@@ -180,27 +114,10 @@ class EvalSynchronizer {
         }
       }
     }
-    final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
-    if (tp != null) {
-      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, subRanges)) {
-        writeVariants(mTpCalls, callsReader, tp);
-      }
-    }
-    if (fp != null) {
-      try (final VcfReader callsReader = VcfReader.openVcfReader(mCallsFile, subRanges)) {
-        writeVariants(mFp, callsReader, fp);
-      }
-    }
-    if (mTpBase != null && tpbase != null) {
-      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, subRanges)) {
-        writeVariants(mTpBase, baselineReader, tpbase);
-      }
-    }
-    if (fn != null) {
-      try (final VcfReader baselineReader = VcfReader.openVcfReader(mBaseLineFile, subRanges)) {
-        writeVariants(mFn, baselineReader, fn);
-      }
-    }
+
+    Diagnostic.developerLog("Writing variants for " + sequenceName);
+    writeInternal(sequenceName, baseline, calls);
+
     synchronized (mNames) {
       // We are done with a sequence so take it off the queue
       mNames.remove();
@@ -208,29 +125,23 @@ class EvalSynchronizer {
     }
   }
 
-  /**
-   * Increment the count of variants evaluated in all sequences across threads.
-   * @param truePositives increase the count of true positives by this much
-   * @param falsePositives increase the count of false positives by this much
-   * @param falseNegatives increase the count of false negatives by this much
-   */
-  void addVariants(int truePositives, int falsePositives, int falseNegatives) {
-    synchronized (mVariantLock) {
-      mTruePositives += truePositives;
-      mFalseNegatives += falseNegatives;
-      mFalsePositives += falsePositives;
-      Diagnostic.developerLog("Number of baseline variants processed: " + (mTruePositives + mFalseNegatives));
+  abstract void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException;
+
+  void addPhasingCounts(int misPhasings, int correctPhasings, int unphasable) {
+    synchronized (mPhasingLock) {
+      addPhasingCountsInternal(misPhasings, correctPhasings, unphasable);
     }
   }
 
-  int getUnphasable() {
-    return mUnphasable;
+  abstract void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable);
+
+  void finish() throws IOException {
+    if (mVariantSet.getNumberOfSkippedBaselineVariants() > 0) {
+      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedBaselineVariants() + " baseline variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.");
+    }
+    if (mVariantSet.getNumberOfSkippedCalledVariants() > 0) {
+      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedCalledVariants() + " called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.");
+    }
   }
 
-  int getMisPhasings() {
-    return mMisPhasings;
-  }
-  int getCorrectPhasings() {
-    return mCorrectPhasings;
-  }
 }

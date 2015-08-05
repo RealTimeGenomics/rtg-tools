@@ -60,17 +60,14 @@ public interface VariantFactory {
 
     static final String NAME = "default";
 
-    private final RocSortValueExtractor mExtractor;
     private final int mSampleNo;
 
     /**
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     * @param extractor ROC value extractor implementation to use
      */
-    public Default(int sampleNo, RocSortValueExtractor extractor) {
+    public Default(int sampleNo) {
       mSampleNo = sampleNo;
-      mExtractor = extractor;
     }
 
     @Override
@@ -85,23 +82,67 @@ public interface VariantFactory {
       assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
 
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
+      final String seqName = rec.getSequenceName();
+      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
+      final int end = rec.getEnd();
+      final boolean phased = VcfUtils.isPhasedGt(gt);
+
+      // Treats missing value as distinct value ("N")
       final byte[][] alleles = new byte[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2][];
       for (int i = 0; i < alleles.length; i++) {
         alleles[i] = DnaUtils.encodeString(Variant.getAllele(rec, gtArray[i], hasPreviousNt));
       }
+
+      return new CompactVariant(id, seqName, start, end, alleles, phased);
+    }
+  }
+
+  /**
+   * Construct Variants corresponding to the GT of a specified sample.
+   * The only allele trimming done is a single leading
+   * padding base, and only if it is shared by all alleles.
+   * Path finding will require full genotype to match.
+   */
+  class DefaultId implements VariantFactory {
+
+    static final String NAME = "default-id";
+
+    private final int mSampleNo;
+
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     */
+    public DefaultId(int sampleNo) {
+      mSampleNo = sampleNo;
+    }
+
+    @Override
+    public Variant variant(VcfRecord rec, int id) {
+      // Currently we skip both non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
+
+      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final int[] gtArray = VcfUtils.splitGt(gt);
+      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+
+      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
+      final String seqName = rec.getSequenceName();
       final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
       final int end = rec.getEnd();
-
-      final String seqName = rec.getSequenceName();
       final boolean phased = VcfUtils.isPhasedGt(gt);
-      final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-      final Variant var = new Variant(id, seqName, start, end, alleles, phased, sortValue);
-      for (final RocFilter filter : RocFilter.values()) {
-        if (filter.accept(rec, mSampleNo)) {
-          var.mFilters.add(filter);
-        }
+
+      // Treats missing value as ref
+      final byte[][] alleles = new byte[rec.getAltCalls().size() + 1][];
+      for (int i = 0; i < alleles.length; i++) {
+        alleles[i] = DnaUtils.encodeString(Variant.getAllele(rec, i, hasPreviousNt));
       }
-      return var;
+      final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
+
+      return new AlleleIdVariant(id, seqName, start, end, alleles, alleleA, alleleB, phased);
     }
   }
 
@@ -114,17 +155,14 @@ public interface VariantFactory {
 
     static final String NAME = "default-trim";
 
-    private final RocSortValueExtractor mExtractor;
     private final int mSampleNo;
 
     /**
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     * @param extractor ROC value extractor implementation to use
      */
-    public TrimmedGtFactory(int sampleNo, RocSortValueExtractor extractor) {
+    public TrimmedGtFactory(int sampleNo) {
       mSampleNo = sampleNo;
-      mExtractor = extractor;
     }
 
     @Override
@@ -161,14 +199,67 @@ public interface VariantFactory {
 
       final String seqName = rec.getSequenceName();
       final boolean phased = VcfUtils.isPhasedGt(gt);
-      final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-      final Variant var = new Variant(id, seqName, start, end, alleles, phased, sortValue);
-      for (final RocFilter filter : RocFilter.values()) {
-        if (filter.accept(rec, mSampleNo)) {
-          var.mFilters.add(filter);
+
+      return new CompactVariant(id, seqName, start, end, alleles, phased);
+    }
+  }
+
+  /**
+   * Construct Variants corresponding to the GT of a specified sample.
+   * This version performs trimming of all common leading/trailing bases that match REF.
+   * Path finding will require full genotype to match, but will be more permissive of padding bases.
+   */
+  class TrimmedGtIdFactory implements VariantFactory {
+
+    static final String NAME = "default-trim-id";
+
+    private final int mSampleNo;
+
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     */
+    public TrimmedGtIdFactory(int sampleNo) {
+      mSampleNo = sampleNo;
+    }
+
+    @Override
+    public Variant variant(VcfRecord rec, int id) {
+      // Currently we skip both non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
+
+      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final int[] gtArray = VcfUtils.splitGt(gt);
+      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+
+      final String[] allAlleles = VcfUtils.getAlleleStrings(rec, false);
+      for (int i = 1; i < allAlleles.length; i++) {
+        if (!(gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i))) {
+          allAlleles[i] = null;
         }
       }
-      return var;
+      final int stripLeading = StringUtils.longestPrefix(allAlleles);
+      final int stripTrailing = StringUtils.longestSuffix(allAlleles, stripLeading);
+      for (int i = 0; i < allAlleles.length; i++) {
+        if (allAlleles[i] != null) {
+          allAlleles[i] = StringUtils.clip(allAlleles[i], stripLeading, stripTrailing);
+        }
+      }
+
+      final byte[][] alleles = new byte[rec.getAltCalls().size() + 1][];
+      for (int i = 0; i < alleles.length; i++) {
+        alleles[i] = allAlleles[i] == null ? null : DnaUtils.encodeString(allAlleles[i]);
+      }
+      final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
+      final String seqName = rec.getSequenceName();
+      final int start = rec.getStart() + stripLeading;
+      final int end = rec.getEnd() - stripTrailing;
+      final boolean phased = VcfUtils.isPhasedGt(gt);
+
+      return new AlleleIdVariant(id, seqName, start, end, alleles, alleleA, alleleB, phased);
     }
   }
 
@@ -180,17 +271,14 @@ public interface VariantFactory {
 
     static final String NAME = "squash";
 
-    private final RocSortValueExtractor mExtractor;
     private final int mSampleNo;
 
     /**
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     * @param extractor ROC value extractor implementation to use
      */
-    HaploidGtAltFactory(int sampleNo, RocSortValueExtractor extractor) {
+    HaploidGtAltFactory(int sampleNo) {
       mSampleNo = sampleNo;
-      mExtractor = extractor;
     }
 
     @Override
@@ -224,14 +312,8 @@ public interface VariantFactory {
         }
         prev = gtId;
       }
-      final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-      final Variant var = new SquashPloidyVariant(id, seqName, start, end, alleles, sortValue);
-      for (final RocFilter filter : RocFilter.values()) {
-        if (filter.accept(rec, mSampleNo)) {
-          var.mFilters.add(filter);
-        }
-      }
-      return var;
+
+      return new SquashPloidyVariant(id, seqName, start, end, alleles);
     }
   }
 
@@ -242,16 +324,6 @@ public interface VariantFactory {
   class HaploidAltsFactory implements VariantFactory {
 
     static final String NAME = "hap-alt";
-
-    private final RocSortValueExtractor mExtractor;
-
-    /**
-     * Constructor
-     * @param extractor ROC value extractor implementation to use
-     */
-    HaploidAltsFactory(RocSortValueExtractor extractor) {
-      mExtractor = extractor;
-    }
 
     @Override
     public Variant variant(VcfRecord rec, int id) {
@@ -267,14 +339,8 @@ public interface VariantFactory {
       for (int gtId = 0; gtId < alleles.length; gtId++) {
         alleles[gtId] = DnaUtils.encodeString(Variant.getAllele(rec, gtId + 1, hasPreviousNt));
       }
-      double sortValue = Double.NaN;
-      try {
-        sortValue = mExtractor.getSortValue(rec, -1);
-      } catch (IndexOutOfBoundsException ignored) {
-      }
-      final Variant var = new SquashPloidyVariant(id, seqName, start, end, alleles, sortValue);
-      var.mFilters.add(RocFilter.ALL);
-      return var;
+
+      return new SquashPloidyVariant(id, seqName, start, end, alleles);
     }
   }
 
@@ -285,16 +351,6 @@ public interface VariantFactory {
   class DiploidAltsFactory implements VariantFactory {
 
     static final String NAME = "dip-alt";
-
-    private final RocSortValueExtractor mExtractor;
-
-    /**
-     * Constructor
-     * @param extractor ROC value extractor implementation to use
-     */
-    DiploidAltsFactory(RocSortValueExtractor extractor) {
-      mExtractor = extractor;
-    }
 
     @Override
     public Variant variant(final VcfRecord rec, final int id) {
@@ -309,12 +365,8 @@ public interface VariantFactory {
       for (int gtId = 0; gtId < alleles.length; gtId++) {
         alleles[gtId] = DnaUtils.encodeString(Variant.getAllele(rec, gtId, hasPreviousNt));
       }
-      double sortValue = Double.NaN;
-      try {
-        sortValue = mExtractor.getSortValue(rec, -1);
-      } catch (IndexOutOfBoundsException ignored) {
-      }
-      final Variant var = new Variant(id, seqName, start, end, alleles, false, sortValue) {
+
+      return new Variant(id, seqName, start, end, alleles, false) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos = new OrientedVariant[numAlleles() * numAlleles() - 1];
@@ -330,8 +382,6 @@ public interface VariantFactory {
           return pos;
         }
       };
-      var.mFilters.add(RocFilter.ALL);
-      return var;
     }
   }
 }

@@ -45,7 +45,12 @@ import com.rtg.util.Utils;
  */
 public class HalfPath implements Comparable<HalfPath> {
 
-  private static final Variant SENTINEL = new Variant(-1, "", -1, 0, null, false, Double.NaN);
+  private static final Variant SENTINEL = new Variant(-1, "", -1, 0, null, false) {
+    @Override
+    public OrientedVariant[] orientations() {
+      throw new UnsupportedOperationException();
+    }
+  };
 
   private final HaplotypePlayback mHaplotypeA;
   private HaplotypePlayback mHaplotypeB;

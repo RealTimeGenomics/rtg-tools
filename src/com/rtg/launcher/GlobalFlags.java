@@ -140,6 +140,8 @@ public final class GlobalFlags {
   //vcfeval
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
   public static final String VCFEVAL_MAXIMIZE_MODE = "com.rtg.vcf.eval.maximize";
+  /** Custom variant path result processor */
+  public static final String VCFEVAL_PATH_PROCESSOR = "com.rtg.vcf.eval.custom-path-processor";
   /** Custom variant factories */
   public static final String VCFEVAL_VARIANT_FACTORY = "com.rtg.vcf.eval.custom-variant-factory";
   /** Specify the maximum number of simultaneous paths before vcfeval skips a region */
@@ -205,6 +207,7 @@ public final class GlobalFlags {
     registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
 
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
+    registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 5000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);

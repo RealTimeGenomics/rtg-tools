@@ -30,8 +30,10 @@
 package com.rtg.vcf.eval;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +43,6 @@ import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.IntervalComparator;
 
 /**
@@ -72,31 +73,15 @@ class SequenceEvaluator implements IORunnable {
       throw new NoTalkbackSlimException("Sequence " + currentName + " is not contained in the reference.");
     }
     final byte[] template = mTemplate.read(sequenceId);
-
     final Map<VariantSetType, List<Variant>> set = setPair.getB();
-
     final Collection<Variant> baseLineCalls = set.get(VariantSetType.BASELINE);
     final Collection<Variant> calledCalls = set.get(VariantSetType.CALLS);
+    Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
+    Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
-    if (baseLineCalls == null || baseLineCalls.size() == 0) {
-      mSynchronize.addVariants(0, calledCalls.size(), 0);
-      mSynchronize.write(currentName, null, calledCalls, null, null);
-      if (calledCalls != null) {
-        Diagnostic.developerLog("Number of called variants: " + calledCalls.size());
-
-        for (final Variant v : calledCalls) {
-          mSynchronize.addRocLine(new RocLine(currentName, v.getStart(), v.getSortValue(), 0.0, false), v);
-        }
-      }
-    } else if (calledCalls == null || calledCalls.size() == 0) {
-      Diagnostic.developerLog("Number of baseline variants: " + baseLineCalls.size());
-      mSynchronize.addVariants(0, 0, baseLineCalls.size());
-      mSynchronize.write(currentName, null, null, baseLineCalls, null);
+    if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
+      mSynchronize.write(currentName, baseLineCalls, calledCalls);
     } else {
-
-      Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
-      Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
-
       //find the best path for variant calls
       final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
 
@@ -107,46 +92,71 @@ class SequenceEvaluator implements IORunnable {
 //      best.mCalledPath.dumpHaplotypes();
 //      System.out.println("### done");
 
+      // A Bunch of postprocessing that could probably be done in bestPath
       List<OrientedVariant> truePositives = best.getCalledIncluded();
       final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
       final List<Variant> falsePositives = best.getCalledExcluded();
       final List<Variant> falseNegatives = best.getBaselineExcluded();
 
-      final Pair<List<OrientedVariant>, List<OrientedVariant>> calls = Path.calculateWeights(best, truePositives, baselineTruePositives);
+      final Pair<List<OrientedVariant>, List<OrientedVariant>> newcalls = Path.calculateWeights(best, truePositives, baselineTruePositives);
       // this step is currently necessary as sometimes you can (rarely) have variants included in the best path
       // but they do not correspond to any variant in baseline. // E.g. two variants which when both replayed cancel each other out.
-      truePositives = calls.getA();
-      merge(falsePositives, calls.getB());
+      truePositives = newcalls.getA();
+      merge(falsePositives, newcalls.getB());
 
+      Diagnostic.developerLog("Merging variant result lists for " + currentName + "...");
+      List<VariantId> baseline = new ArrayList<>(baselineTruePositives.size() + falseNegatives.size());
+      baseline.addAll(baselineTruePositives);
+      baseline.addAll(falseNegatives);
+      List<VariantId> calls = new ArrayList<>(truePositives.size() + falsePositives.size());
+      calls.addAll(truePositives);
+      calls.addAll(falsePositives);
       // Sort by ID to ensure the ordering matches what is needed for variant writing
-      Collections.sort(truePositives, OrientedVariant.ID_COMPARATOR);
-      Collections.sort(baselineTruePositives, OrientedVariant.ID_COMPARATOR);
-      Collections.sort(falsePositives, Variant.ID_COMPARATOR);
-      Collections.sort(falseNegatives, Variant.ID_COMPARATOR);
+      Collections.sort(baseline, Variant.ID_COMPARATOR);
+      Collections.sort(calls, Variant.ID_COMPARATOR);
 
-      mSynchronize.addVariants(baselineTruePositives.size(), falsePositives.size(), falseNegatives.size());
-      Diagnostic.developerLog("Writing variants...");
+      // Merge any variants that were unable to be processed during path finding due to too-hard regions
+      Diagnostic.developerLog("Checking for variants from skipped regions for " + currentName + "...");
+      baseline = insertSkipped(baseline, baseLineCalls);
+      calls = insertSkipped(calls, calledCalls);
 
       final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
-      mSynchronize.addPhasings(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
+      mSynchronize.addPhasingCounts(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
 
-      mSynchronize.write(currentName, truePositives, falsePositives, falseNegatives, baselineTruePositives);
-      Diagnostic.developerLog("Generating ROC data...");
+      Diagnostic.developerLog("Ready to write variants for " + currentName + "...");
+      mSynchronize.write(currentName, baseline, calls);
+    }
+  }
 
-      double tpTotal = 0.0;
-      for (final OrientedVariant v : truePositives) {
-        final Variant dv = v.variant();
-        mSynchronize.addRocLine(new RocLine(currentName, dv.getStart(), dv.getSortValue(), v.getWeight(), true), dv);
-        tpTotal += v.getWeight();
+  private boolean isSortedById(Collection<? extends VariantId> c) {
+    VariantId last = null;
+    for (VariantId v : c) {
+      if (last != null && v.getId() <= last.getId()) {
+        return false;
       }
-      if (tpTotal - baselineTruePositives.size() > 0.001) {
-        throw new SlimException("true positives does not match baseline number tp weighted= " + tpTotal + " baseline = " + baselineTruePositives.size());
+      last = v;
+    }
+    return true;
+  }
+
+  private List<VariantId> insertSkipped(List<VariantId> outVars, Collection<Variant> inVars) {
+    assert isSortedById(inVars) : "inVars are not sorted";
+    assert isSortedById(outVars) : " outVars are not sorted";
+    final List<VariantId> result = new ArrayList<>(outVars.size());
+    final Iterator<VariantId> outIt = outVars.iterator();
+    VariantId outVar = null;
+    for (Variant inVar : inVars) {
+      if (outVar == null && outIt.hasNext()) {
+        outVar = outIt.next();
       }
-      for (final Variant dv : falsePositives) {
-        // System.out.println(dv);
-        mSynchronize.addRocLine(new RocLine(currentName, dv.getStart(), dv.getSortValue(), 0.0, false), dv);
+      if (outVar != null && outVar.getId() == inVar.getId()) {
+        result.add(outVar);
+        outVar = null;
+      } else {
+        result.add(new SkippedVariant(inVar));
       }
     }
+    return result;
   }
 
   private void merge(List<Variant> falsePositives, List<OrientedVariant> b) {

@@ -36,6 +36,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -101,16 +102,17 @@ public class RocContainer {
    * add single result to ROC
    * @param primarySortValue normally the posterior score
    * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
-   * @param v detected variant
+   * @param filters specifies which roc lines the point will be added to
    */
-  public void addRocLine(double primarySortValue, double weight, Variant v) {
+  public void addRocLine(double primarySortValue, double weight, EnumSet<RocFilter> filters) {
     if (Double.isNaN(primarySortValue) || Double.isInfinite(primarySortValue)) {
       mNoScoreVariants++;
     } else {
       for (int i = 0; i < mFilters.size(); i++) {
         final SortedMap<Double, RocPoint> map = mRocs.get(i);
         final RocFilter filter = mFilters.get(i);
-        if (v.filterAccept(filter)) {
+
+        if (filters.contains(filter)) {
           final RocPoint point = new RocPoint(primarySortValue, weight, weight > 0.0 ? 0 : 1);
           final RocPoint old = map.put(primarySortValue, point);
           if (old != null) {

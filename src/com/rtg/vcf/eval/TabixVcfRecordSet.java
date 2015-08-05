@@ -84,7 +84,7 @@ class TabixVcfRecordSet implements VariantSet {
   TabixVcfRecordSet(File baselineFile, File calledFile,
                     ReferenceRanges<String> ranges, Collection<Pair<String, Integer>> referenceNameOrdering,
                     String baselineSample, String callsSample,
-                    RocSortValueExtractor extractor, boolean passOnly, boolean squashPloidy, int maxLength) throws IOException {
+                    boolean passOnly, boolean squashPloidy, int maxLength) throws IOException {
     if (referenceNameOrdering == null) {
       throw new NullPointerException();
     }
@@ -159,11 +159,11 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
 
-    mBaselineFactory = getFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, extractor, squashPloidy);
-    mCallsFactory = getFactory(VariantSetType.CALLS, mCalledHeader, callsSample, extractor, squashPloidy);
+    mBaselineFactory = getFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, squashPloidy);
+    mCallsFactory = getFactory(VariantSetType.CALLS, mCalledHeader, callsSample, squashPloidy);
   }
 
-  static VariantFactory getFactory(VariantSetType mType, VcfHeader header, String mSampleName, RocSortValueExtractor mExtractor, boolean mSquashPloidy) {
+  static VariantFactory getFactory(VariantSetType mType, VcfHeader header, String sampleName, boolean mSquashPloidy) {
     String f = mSquashPloidy ? "squash" : "default";
     final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
     if (customFactory.length() > 0) {
@@ -176,15 +176,19 @@ class TabixVcfRecordSet implements VariantSet {
     }
     switch (f) {
       case VariantFactory.DiploidAltsFactory.NAME:
-        return new VariantFactory.DiploidAltsFactory(mExtractor);
+        return new VariantFactory.DiploidAltsFactory();
       case VariantFactory.HaploidAltsFactory.NAME:
-        return new VariantFactory.HaploidAltsFactory(mExtractor);
+        return new VariantFactory.HaploidAltsFactory();
       case VariantFactory.HaploidGtAltFactory.NAME:
-        return new VariantFactory.HaploidGtAltFactory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+        return new VariantFactory.HaploidGtAltFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
       case VariantFactory.TrimmedGtFactory.NAME:
-        return new VariantFactory.TrimmedGtFactory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+        return new VariantFactory.TrimmedGtFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+      case VariantFactory.TrimmedGtIdFactory.NAME:
+        return new VariantFactory.TrimmedGtIdFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
       case VariantFactory.Default.NAME:
-        return new VariantFactory.Default(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+        return new VariantFactory.Default(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+      case VariantFactory.DefaultId.NAME:
+        return new VariantFactory.DefaultId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
       default:
         throw new RuntimeException("Unknown variant factory: " + f);
     }

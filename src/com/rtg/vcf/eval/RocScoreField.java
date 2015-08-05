@@ -51,6 +51,10 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
+        RocSortOrder getSortOrder() {
+          return order;
+        }
+        @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           final String qualStr = rec.getQuality();
           if (VcfRecord.MISSING.equals(qualStr)) {
@@ -75,6 +79,10 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
+        RocSortOrder getSortOrder() {
+          return order;
+        }
+        @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           final double val = VcfUtils.getDoubleInfoFieldFromRecord(rec, fieldName);
           if (MathUtils.approxEquals(val, 0, 0.00000001)) {
@@ -94,6 +102,10 @@ public enum RocScoreField {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
+        @Override
+        RocSortOrder getSortOrder() {
+          return order;
+        }
         @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           final double val = VcfUtils.getDoubleFormatFieldFromRecord(rec, sampleNo, fieldName);
@@ -122,6 +134,10 @@ public enum RocScoreField {
       }
       final AbstractDerivedAnnotation anno = derived.getAnnotation();
       return new RocSortValueExtractor() {
+        @Override
+        RocSortOrder getSortOrder() {
+          return order;
+        }
         @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           final Double val = (Double) anno.getValue(rec, sampleNo);

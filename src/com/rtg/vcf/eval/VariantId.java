@@ -27,63 +27,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf.eval;
 
-import com.rtg.util.Utils;
+import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
- * Represents a line of ROC output (i.e. a point on a ROC curve)
+ *
  */
-class RocLine implements Comparable<RocLine> {
-  final String mSequence;
-  final int mPos;
-  final double mPrimarySortValue;
-  final double mWeight;
-  final boolean mCorrect;
+public interface VariantId extends SequenceNameLocus {
 
-  RocLine(String sequence, int pos, double primarySortValue, double weight, boolean correct) {
-    super();
-    mSequence = sequence;
-    mPos = pos;
-    mPrimarySortValue = primarySortValue;
-    mWeight = weight;
-    mCorrect = correct;
-  }
-
-  @Override
-  public int compareTo(RocLine other) {
-    final int order = Double.compare(other.mPrimarySortValue, this.mPrimarySortValue);
-    if (order != 0) {
-      return order;
-    }
-    if (!this.mCorrect && other.mCorrect) {
-      return -1;
-    } else if (this.mCorrect && !other.mCorrect) {
-      return 1;
-    }
-    final int sequence = this.mSequence.compareTo(other.mSequence);
-    if (sequence != 0) {
-      return sequence;
-    }
-    return this.mPos - other.mPos;
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    if (other == null) {
-      return false;
-    }
-    if (!other.getClass().equals(getClass())) {
-      return false;
-    }
-    final RocLine o = (RocLine) other;
-    return compareTo(o) == 0;
-  }
-
-  @Override
-  public int hashCode() {
-    return Utils.hash(new Object[] {mSequence, mPos, mPrimarySortValue, mCorrect});
-  }
-
+  /** @return the ID assigned to this variant */
+  int getId();
 }

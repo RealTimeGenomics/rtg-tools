@@ -30,13 +30,14 @@
 package com.rtg.vcf.eval;
 
 /**
- * A Variant that offers only haploid alternatives.
+ * A Variant that offers only haploid alternatives from all the available alleles.
+ * OrientedVariant allele ids may not correspond to GT indexing.
  */
 public final class SquashPloidyVariant extends Variant {
 
 
-  SquashPloidyVariant(int id, String seq, int start, int end, byte[][] alleles, double sortValue) {
-    super(id, seq, start, end, alleles, false, sortValue);
+  SquashPloidyVariant(int id, String seq, int start, int end, byte[][] alleles) {
+    super(id, seq, start, end, alleles, false);
   }
 
   @Override

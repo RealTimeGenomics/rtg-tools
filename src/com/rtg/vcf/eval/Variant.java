@@ -30,7 +30,6 @@
 package com.rtg.vcf.eval;
 
 import java.util.Comparator;
-import java.util.EnumSet;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.Utils;
@@ -42,12 +41,12 @@ import com.rtg.vcf.VcfRecord;
 /**
  * Holds information about a single variant that has not yet been oriented in a haplotype
  */
-public class Variant implements Comparable<Variant>, SequenceNameLocus {
+public abstract class Variant implements Comparable<Variant>, VariantId {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
-  static final Comparator<Variant> ID_COMPARATOR = new Comparator<Variant>() {
+  static final Comparator<VariantId> ID_COMPARATOR = new Comparator<VariantId>() {
     @Override
-    public int compare(Variant o1, Variant o2) {
+    public int compare(VariantId o1, VariantId o2) {
       return Integer.compare(o1.getId(), o2.getId());
     }
   };
@@ -58,16 +57,13 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   private final int mEnd;
   private final byte[][] mAlleles;
   private final boolean mPhased;
-  private final double mSortValue;
-  protected final EnumSet<RocFilter> mFilters = EnumSet.noneOf(RocFilter.class);
 
-  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased, double sortValue) {
+  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
     mId = id;
     mSequenceName = new String(seq.toCharArray());
     mStart = start;
     mEnd = end;
     mPhased = phased;
-    mSortValue = sortValue;
     mAlleles = alleles;
   }
 
@@ -110,7 +106,7 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
     return Utils.pairHash(getStart(), getSequenceName().hashCode());
   }
 
-  /** @return the ID assigned to this variant */
+  @Override
   public int getId() {
     return mId;
   }
@@ -182,36 +178,6 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
   /**
    * @return the possible oriented variants for this variant
    */
-  public OrientedVariant[] orientations() {
-    if (mAlleles.length == 2) {
-      // If the variant is heterozygous we need both phases
-      return new OrientedVariant[]{
-        new OrientedVariant(this, true, 0, 1),
-        new OrientedVariant(this, false, 1, 0)
-      };
-    } else {
-      assert mAlleles.length == 1;
-      // Homozygous / haploid
-      return new OrientedVariant[] {
-        new OrientedVariant(this, 0)
-      };
-    }
-  }
+  public abstract OrientedVariant[] orientations();
 
-  /**
-   * Get if the detected variant is accepted by the given <code>RocFilter</code>
-   * @param filter the filter to check
-   * @return true if the variant is accepted by the given filter, false otherwise
-   */
-  public boolean filterAccept(RocFilter filter) {
-    return mFilters.contains(filter);
-  }
-
-  /**
-   * Get the sort value for ROC curves
-   * @return the sort value
-   */
-  public double getSortValue() {
-    return mSortValue;
-  }
 }

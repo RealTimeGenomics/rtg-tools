@@ -29,10 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -45,7 +43,6 @@ import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
-import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
@@ -53,7 +50,6 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
-import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -62,10 +58,15 @@ import junit.framework.TestCase;
  *         Date: 12/12/11
  *         Time: 10:57 AM
  */
-public class EvalSynchronizerTest extends TestCase {
+public class DefaultEvalSynchronizerTest extends TestCase {
   private static class MockVariantSet implements VariantSet {
     int mSetId = 0;
-
+    final VcfHeader mHeader;
+    MockVariantSet() {
+      mHeader = new VcfHeader();
+      mHeader.addLine(VcfHeader.VERSION_LINE);
+      mHeader.addSampleName("SAMPLE");
+    }
     @Override
     public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
       if (mSetId >= 3) {
@@ -81,12 +82,12 @@ public class EvalSynchronizerTest extends TestCase {
 
     @Override
     public VcfHeader baseLineHeader() {
-      return null;
+      return mHeader;
     }
 
     @Override
     public VcfHeader calledHeader() {
-      return null;
+      return mHeader;
     }
 
     @Override
@@ -124,9 +125,6 @@ public class EvalSynchronizerTest extends TestCase {
     final MemoryPrintStream mp = new MemoryPrintStream();
     Diagnostic.setLogStream(mp.printStream());
     try {
-      final ByteArrayOutputStream tp = new ByteArrayOutputStream();
-      final ByteArrayOutputStream fp = new ByteArrayOutputStream();
-      final ByteArrayOutputStream fn = new ByteArrayOutputStream();
       try (final TestDirectory dir = new TestDirectory()) {
         final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
         new TabixIndexer(fake).saveVcfIndex();
@@ -134,12 +132,52 @@ public class EvalSynchronizerTest extends TestCase {
         header.addLine(VcfHeader.VERSION_LINE);
         header.addSampleName("SAMPLE");
         final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-        final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
-          new VcfWriter(header, tp),
-          new VcfWriter(header, fp),
-          new VcfWriter(header, fn),
-          null,
-          fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
+        try (final DefaultEvalSynchronizer sync = new DefaultEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, false)) {
+          final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
+          final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
+          assertEquals("name1", pair.getA());
+          assertEquals("name2", pair2.getA());
+
+          final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
+          simpleThreadPool.execute(new IORunnable() {
+            @Override
+            public void run() throws IOException {
+              sync.write("name2",
+                Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 5, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+                Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0, RocSortValueExtractor.NULL_EXTRACTOR), true), VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 3, 0, RocSortValueExtractor.NULL_EXTRACTOR)));
+            }
+          });
+          simpleThreadPool.execute(new IORunnable() {
+            @Override
+            public void run() throws IOException {
+              sync.write("name1",
+                Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 6, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
+                Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0, RocSortValueExtractor.NULL_EXTRACTOR), true), VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 4, 0, RocSortValueExtractor.NULL_EXTRACTOR)));
+            }
+          });
+          simpleThreadPool.terminate();
+
+          assertEquals(2, sync.mCallTruePositives);
+          assertEquals(2, sync.mFalseNegatives);
+          assertEquals(2, sync.mFalsePositives);
+          assertEquals("name3", sync.nextSet().getA());
+          assertEquals(null, sync.nextSet());
+        }
+        assertEquals(FAKE_HEADER + REC2_1 + "\n" + REC1_2 + "\n", FileHelper.fileToString(new File(dir, "tp.vcf")));
+        assertEquals(FAKE_HEADER + REC4_1 + "\n" + REC3_2 + "\n", FileHelper.fileToString(new File(dir, "fp.vcf")));
+        assertEquals(FAKE_HEADER + REC6_1 + "\n" + REC5_2 + "\n", FileHelper.fileToString(new File(dir, "fn.vcf")));
+      }
+    } finally {
+      Diagnostic.setLogStream();
+    }
+  }
+
+  public void testAbort() throws IOException, UnindexableDataException {
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
+      new TabixIndexer(fake).saveVcfIndex();
+      final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
+      try (final DefaultEvalSynchronizer sync = new DefaultEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, false)) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -149,113 +187,54 @@ public class EvalSynchronizerTest extends TestCase {
         simpleThreadPool.execute(new IORunnable() {
           @Override
           public void run() throws IOException {
-            sync.write("name2",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 3, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 5, 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
-            sync.addVariants(10, 0, 0);
+            sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)));
+            fail("Should have aborted in thread");
           }
         });
         simpleThreadPool.execute(new IORunnable() {
           @Override
           public void run() throws IOException {
-            sync.write("name1",
-              Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0, RocSortValueExtractor.NULL_EXTRACTOR), true)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 4, 0, RocSortValueExtractor.NULL_EXTRACTOR)),
-              Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 6, 0, RocSortValueExtractor.NULL_EXTRACTOR)), null);
-            sync.addVariants(22, 0, 0);
+            throw new IOException();
           }
         });
-        simpleThreadPool.terminate();
+        try {
+          simpleThreadPool.terminate();
+        } catch (final IOException e) {
 
-        assertEquals(FAKE_HEADER + REC2_1 + "\n" + REC1_2 + "\n", tp.toString());
-        assertEquals(FAKE_HEADER + REC4_1 + "\n" + REC3_2 + "\n", fp.toString());
-        assertEquals(FAKE_HEADER + REC6_1 + "\n" + REC5_2 + "\n", fn.toString());
-        assertEquals(32, sync.mTruePositives);
-        assertEquals("name3", sync.nextSet().getA());
-        assertEquals(null, sync.nextSet());
-      }
-      assertTrue(mp.toString().contains("Number of baseline variants processed: 32"));
-      assertTrue(mp.toString().contains("Number of baseline variants processed: 22") || mp.toString().contains("Number of baseline variants processed: 10"));
-    } finally {
-      Diagnostic.setLogStream();
-    }
-
-  }
-  public void testAbort() throws IOException, UnindexableDataException {
-    final ByteArrayOutputStream tp = new ByteArrayOutputStream();
-    final OutputStream fp = TestUtils.getNullOutputStream();
-    final OutputStream fn = TestUtils.getNullOutputStream();
-    try (final TestDirectory dir = new TestDirectory()) {
-      final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
-      new TabixIndexer(fake).saveVcfIndex();
-      final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
-        new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
-        new VcfWriter(new VcfHeader(), fn), null,
-        fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
-      final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
-      final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
-      assertEquals("name1", pair.getA());
-      assertEquals("name2", pair2.getA());
-
-      final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
-      simpleThreadPool.execute(new IORunnable() {
-        @Override
-        public void run() throws IOException {
-          sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)), null, null, null);
-          fail("Should have aborted in thread");
         }
-      });
-      simpleThreadPool.execute(new IORunnable() {
-        @Override
-        public void run() throws IOException {
-          throw new IOException();
-        }
-      });
-      try {
-        simpleThreadPool.terminate();
-      } catch (final IOException e) {
-
       }
     }
   }
-
 
 
   public void testInterrupt() throws IOException, InterruptedException, UnindexableDataException {
-    final ByteArrayOutputStream tp = new ByteArrayOutputStream();
-    final OutputStream fp = TestUtils.getNullOutputStream();
-    final OutputStream fn = TestUtils.getNullOutputStream();
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      final EvalSynchronizer sync = new EvalSynchronizer(ranges, new MockVariantSet(),
-        new VcfWriter(new VcfHeader(), tp), new VcfWriter(new VcfHeader(), fp),
-        new VcfWriter(new VcfHeader(), fn), null,
-        fake, fake, new RocContainer(RocSortOrder.DESCENDING, null));
-      final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
-      final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
-      assertEquals("name1", pair.getA());
-      assertEquals("name2", pair2.getA());
+      try (final DefaultEvalSynchronizer sync = new DefaultEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, false)) {
+        final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
+        final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
+        assertEquals("name1", pair.getA());
+        assertEquals("name2", pair2.getA());
 
-      final Exception[] internalException = new Exception[1];
-      final Thread t = new Thread() {
-        @Override
-        public void run() {
-          try {
-            sync.write("name2", Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)), null, null, null);
-          } catch (final IllegalStateException e) {
-            internalException[0] = e;
-          } catch (final IOException e) {
+        final Exception[] internalException = new Exception[1];
+        final Thread t = new Thread() {
+          @Override
+          public void run() {
+            try {
+              sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0, RocSortValueExtractor.NULL_EXTRACTOR), true)));
+            } catch (final IllegalStateException e) {
+              internalException[0] = e;
+            } catch (final IOException e) {
+            }
           }
-        }
-      };
-      t.start();
-      t.interrupt();
-      t.join();
-      assertEquals("Interrupted. Unexpectedly", internalException[0].getMessage());
+        };
+        t.start();
+        t.interrupt();
+        t.join();
+        assertEquals("Interrupted. Unexpectedly", internalException[0].getMessage());
+      }
     }
   }
 }

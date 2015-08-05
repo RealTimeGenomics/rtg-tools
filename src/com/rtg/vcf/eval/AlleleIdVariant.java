@@ -33,50 +33,56 @@ package com.rtg.vcf.eval;
 import com.rtg.mode.DnaUtils;
 
 /**
+ * A Variant that offers orientations where the variant IDs correspond to original GT allele indexing.
  */
-public class MockVariant extends CompactVariant {
+public class AlleleIdVariant extends Variant {
 
-  static byte[][] toPreds(byte[] plus, byte[] minus) {
-    if (minus == null) {
-      return new byte[][] {plus};
-    } else {
-      return new byte[][] {plus, minus};
-    }
+  private final int mAlleleA; // First allele in GT
+  private final int mAlleleB; // Second allele in GT
+
+  AlleleIdVariant(int id, String seq, int start, int end, byte[][] alleles,
+                  int alleleA, int alleleB, boolean phased) {
+    super(id, seq, start, end, alleles, phased);
+    mAlleleA = alleleA;
+    mAlleleB = alleleB;
   }
 
-  /**
-   * Assumes not phased
-   * @param start one-based start position of mutation
-   * @param end one-based end position of mutation
-   * @param plus nucleotides on the plus strand
-   * @param minus nucleotides on the minus strand
-   */
-  public MockVariant(int start, int end, byte[] plus, byte[] minus) {
-    super(0, "", start - 1, end - 1, toPreds(plus, minus), false);
+  /** @return the allele ID of the first allele in the GT */
+  public int alleleA() {
+    return mAlleleA;
   }
 
-  /**
-   * Assumes not phased
-   * @param start one-based start position of mutation
-   * @param end one-based end position of mutation
-   * @param plus nucleotides on the plus strand
-   * @param minus nucleotides on the minus strand
-   * @param id the variant id
-   */
-  public MockVariant(int start, int end, byte[] plus, byte[] minus, int id) {
-    super(id, "", start - 1, end - 1, toPreds(plus, minus), false);
+  /** @return the allele ID of the second allele in the GT */
+  public int alleleB() {
+    return mAlleleB;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(getStart() + 1).append(":").append(getEnd() + 1).append(" ");
-    for (int i = 0; i < numAlleles(); i++) {
-      if (i > 0) {
-        sb.append(":");
-      }
-      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
+    sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
+    sb.append(DnaUtils.bytesToSequenceIncCG(nt(mAlleleA)));
+    if (mAlleleB != mAlleleA) {
+      sb.append(":");
+      sb.append(DnaUtils.bytesToSequenceIncCG(nt(mAlleleB)));
     }
+    sb.append(")");
     return sb.toString();
+  }
+
+  @Override
+  public OrientedVariant[] orientations() {
+    if (mAlleleA != mAlleleB) {
+      // If the variant is heterozygous we need both phases
+      return new OrientedVariant[]{
+        new OrientedVariant(this, true, mAlleleA, mAlleleB),
+        new OrientedVariant(this, false, mAlleleB, mAlleleA)
+      };
+    } else {
+      // Homozygous / haploid
+      return new OrientedVariant[] {
+        new OrientedVariant(this, mAlleleA)
+      };
+    }
   }
 }

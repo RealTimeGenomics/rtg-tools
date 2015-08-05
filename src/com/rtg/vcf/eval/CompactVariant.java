@@ -30,34 +30,30 @@
 
 package com.rtg.vcf.eval;
 
-import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.vcf.VcfRecord;
-
 /**
- * Class template for value extractor.
+ * A Variant that offers orientations assuming the alleles array has all redundant alleles removed.
  */
-@TestClass("com.rtg.vcf.eval.RocScoreFieldTest")
-public abstract class RocSortValueExtractor {
+public class CompactVariant extends Variant {
 
-  abstract double getSortValue(VcfRecord rec, int sampleNo);
 
-  abstract RocSortOrder getSortOrder();
+  CompactVariant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
+    super(id, seq, start, end, alleles, phased);
+  }
 
-  /** Dummy null extractor for testing purposes */
-  public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {
-    @Override
-    double getSortValue(VcfRecord rec, int sampleNo) {
-      return 0;
+  @Override
+  public OrientedVariant[] orientations() {
+    if (numAlleles() == 2) {
+      // If the variant is heterozygous we need both phases
+      return new OrientedVariant[]{
+        new OrientedVariant(this, true, 0, 1),
+        new OrientedVariant(this, false, 1, 0)
+      };
+    } else {
+      assert numAlleles() == 1;
+      // Homozygous / haploid
+      return new OrientedVariant[] {
+        new OrientedVariant(this, 0)
+      };
     }
-
-    @Override
-    RocSortOrder getSortOrder() {
-      return RocSortOrder.ASCENDING;
-    }
-
-    @Override
-    public String toString() {
-      return "TEST";
-    }
-  };
+  }
 }

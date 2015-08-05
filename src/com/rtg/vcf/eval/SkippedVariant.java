@@ -27,37 +27,55 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf.eval;
 
-import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.vcf.VcfRecord;
+import com.rtg.util.intervals.SequenceNameLocus;
 
-/**
- * Class template for value extractor.
- */
-@TestClass("com.rtg.vcf.eval.RocScoreFieldTest")
-public abstract class RocSortValueExtractor {
+/** Wraps a variant that had to be skipped from path finding due to being within a region of very dense variation */
+final class SkippedVariant implements VariantId {
+  private final Variant mVariant;
 
-  abstract double getSortValue(VcfRecord rec, int sampleNo);
+  SkippedVariant(Variant v) {
+    mVariant = v;
+  }
 
-  abstract RocSortOrder getSortOrder();
+  /** @return the underlying variant that was skipped */
+  public Variant variant() {
+    return mVariant;
+  }
 
-  /** Dummy null extractor for testing purposes */
-  public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {
-    @Override
-    double getSortValue(VcfRecord rec, int sampleNo) {
-      return 0;
-    }
+  @Override
+  public int getId() {
+    return mVariant.getId();
+  }
 
-    @Override
-    RocSortOrder getSortOrder() {
-      return RocSortOrder.ASCENDING;
-    }
+  @Override
+  public String getSequenceName() {
+    return mVariant.getSequenceName();
+  }
 
-    @Override
-    public String toString() {
-      return "TEST";
-    }
-  };
+  @Override
+  public boolean overlaps(SequenceNameLocus other) {
+    return mVariant.overlaps(other);
+  }
+
+  @Override
+  public boolean contains(String sequence, int pos) {
+    return mVariant.contains(sequence, pos);
+  }
+
+  @Override
+  public int getStart() {
+    return mVariant.getStart();
+  }
+
+  @Override
+  public int getEnd() {
+    return mVariant.getEnd();
+  }
+
+  @Override
+  public int getLength() {
+    return mVariant.getLength();
+  }
 }

@@ -538,15 +538,15 @@ public class PathTest extends TestCase {
   public void testNop()  {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
     final Variant[] a = {
-        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 3 . AT A 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 6 . T TT 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1", 0)
+      , VariantTest.createVariant("seq 3 . AT A 0.0 PASS . GT 1/1", 1)
+      , VariantTest.createVariant("seq 6 . T TT 0.0 PASS . GT 1/1", 2)
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1", 3)
     };
 
     final Variant[] b = {
-        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
+        VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1", 0)
+      , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1", 1)
     };
 
     final double[] expectedWeights = {1, 0, 0, 1.0};

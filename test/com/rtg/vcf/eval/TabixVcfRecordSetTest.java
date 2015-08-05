@@ -87,7 +87,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       for (int seq = 1; seq < 32; seq++) {
         ranges.put("simulatedSequence" + seq, new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
       }
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, names, null, null, RocSortValueExtractor.NULL_EXTRACTOR, true, false, 100);
+      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, names, null, null, true, false, 100);
 
       final Set<String> expected = new HashSet<>();
       for (int seq = 1; seq < 32; seq++) {
@@ -127,7 +127,7 @@ public class TabixVcfRecordSetTest extends TestCase {
         final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
         ranges.put("20", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "20")));
         try {
-          TabixVcfRecordSet.getFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", RocSortValueExtractor.NULL_EXTRACTOR, false);
+          TabixVcfRecordSet.getFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", false);
           fail();
         } catch (NoTalkbackSlimException e) {
           TestUtils.containsAll(e.toString(), "Sample \"asdf\" not found in calls VCF");
