@@ -64,6 +64,9 @@ public final class GlobalFlags {
   /** Test early termination for p-values */
   public static final String SPECIES_TERMINATION_TARGET_FLAG = "com.rtg.species.ltermination-target";
 
+  /** Allow shut off of principle component analysis in similarity. */
+  public static final String SIMILARITY_PCA_FLAG = "com.rtg.similarity.pca";
+
   //Edit distance factory
   /** Specify how many reads to log */
   public static final String EDIT_DIST_LOGGING_AMOUNT_FLAG = "com.rtg.alignment.EditDistanceFactory.logging-amount";
@@ -159,6 +162,7 @@ public final class GlobalFlags {
     // Metagenomics
     registerFlag(SPECIES_LTERMINATION_FLAG, Double.class, 0.1);
     registerFlag(SPECIES_TERMINATION_TARGET_FLAG, Double.class, 0.01);
+    registerFlag(SIMILARITY_PCA_FLAG, Boolean.class, true);
 
     //Edit distance factory
     registerFlag(EDIT_DIST_LOGGING_AMOUNT_FLAG, Integer.class, 0);
