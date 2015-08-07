@@ -53,30 +53,6 @@ public class VcfAltCleaner implements VcfAnnotator {
     return res;
   }
 
-  private String encode(final int v) {
-    return v == -1 ? "." : String.valueOf(v);
-  }
-
-  private String rebuildGt(final String original, final int[] recode) {
-    switch (recode.length) {
-      case 0: // missing
-        return original;
-      case 1: // haploid
-        return encode(recode[0]);
-      case 2: // diploid
-        return encode(recode[0]) + (original.contains("/") ? "/" : "|") + encode(recode[1]);
-      default: // polyploid
-        // todo triploid or larger, really ought to preserve phasing
-        final StringBuilder sb = new StringBuilder();
-        for (final int c : recode) {
-          if (sb.length() > 0) {
-            sb.append("/");
-          }
-          sb.append(encode(c));
-        }
-        return sb.toString();
-    }
-  }
 
   @Override
   public void annotate(final VcfRecord rec) {
@@ -113,7 +89,7 @@ public class VcfAltCleaner implements VcfAnnotator {
             splitGt[j] = alleleCodeRemap[splitGt[j]];
           }
         }
-        rec.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, rebuildGt(gt, splitGt), k);
+        rec.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(VcfUtils.isPhasedGt(gt), splitGt), k);
       }
     }
   }

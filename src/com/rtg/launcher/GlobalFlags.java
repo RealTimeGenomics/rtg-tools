@@ -288,7 +288,7 @@ public final class GlobalFlags {
   public static boolean initialAccessCheck() {
     boolean bad = false;
     for (final String flag : ACCESSED_FLAGS) {
-      Diagnostic.warning("Flag: " + flag + " is accessed before flag registration");
+      Diagnostic.warning("Flag: --" + flag + " is accessed before flag registration");
       bad = true;
     }
     resetAccessedStatus();
@@ -301,7 +301,7 @@ public final class GlobalFlags {
   public static boolean finalAccessCheck() {
     for (final Flag f : FLAGS) {
       if (f.isSet() && !ACCESSED_FLAGS.contains(f.getName())) {
-        Diagnostic.warning("Flag: " + f.getName() + " is set but never accessed.");
+        Diagnostic.warning("Flag: --" + f.getName() + " is set but never accessed.");
         resetAccessedStatus();
         return false;
       }

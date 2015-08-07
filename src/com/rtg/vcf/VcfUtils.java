@@ -138,6 +138,10 @@ public final class VcfUtils {
       : Integer.parseInt(gt.substring(start, start + length));
   }
 
+  private static String encodeId(final int v) {
+    return v == -1 ? MISSING_FIELD : String.valueOf(v);
+  }
+
   /**
    * Utility method for splitting a VCF genotype subfield into an array of
    * numeric allele identifiers.
@@ -177,6 +181,36 @@ public final class VcfUtils {
         throw new NumberFormatException("Malformed GT '" + gt + "'"); // NFE is for consistency with the parseInt stuff
       }
       return result;
+    }
+  }
+
+  /**
+   * Utility method for creating a VCF genotype subfield from an array of
+   * numeric allele identifiers.
+   *
+   * @param phased if true, use the phased separator
+   * @param gt a VCF genotype subfield (the <code>GT</code> value).
+   * @return a new <code>int[]</code> containing one int per allele. Any missing values ('.') will be assigned index -1.
+   * @throws NumberFormatException if the subfield is malformed.
+   */
+  public static String joinGt(boolean phased, int... gt) {
+    final char sep = phased ? PHASED_SEPARATOR : UNPHASED_SEPARATOR;
+    switch (gt.length) {
+      case 0: // missing
+        return MISSING_FIELD;
+      case 1: // haploid
+        return encodeId(gt[0]);
+      case 2: // diploid
+        return encodeId(gt[0]) + sep + encodeId(gt[1]);
+      default: // polyploid
+        final StringBuilder sb = new StringBuilder();
+        for (final int c : gt) {
+          if (sb.length() > 0) {
+            sb.append(sep);
+          }
+          sb.append(encodeId(c));
+        }
+        return sb.toString();
     }
   }
 
@@ -254,6 +288,14 @@ public final class VcfUtils {
    */
   public static boolean isVariantGt(String gt) {
     return !isNonVariantGt(gt);
+  }
+
+  /**
+   * @param gt GT to check
+   * @return true if gt represents a phased genotype
+   */
+  public static boolean isPhasedGt(String gt) {
+    return gt.indexOf(PHASED_SEPARATOR) >= 0;
   }
 
   /**

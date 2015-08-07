@@ -108,7 +108,7 @@ public class GlobalFlagsTest extends TestCase {
       final FormatCli cli = new FormatCli();
       cli.mainInit(new String[]{"-o", td.getPath() + "/meh", f.getPath(), "--XX" + TEST_FLAG, "33"}, mps.outputStream(), err.printStream());
 
-      assertTrue(err.toString(), err.toString().contains("XX" + TEST_FLAG + " is set but never accessed"));
+      assertTrue(err.toString(), err.toString().contains("--XX" + TEST_FLAG + " is set but never accessed"));
 
     }
   }
