@@ -49,13 +49,13 @@ public class OrientedVariantTest extends TestCase {
   public void test() {
     final MockVariant v = new MockVariant(0, 0, new byte[] {0, 1, 2}, null, 0);
     final OrientedVariant ov = createOrientedVariant(v, true);
-    assertEquals("0:0 NAC+", ov.toString());
+    assertEquals("0-0 (NACx)", ov.toString());
     assertTrue(ov.equals(ov));
     assertEquals(-1, ov.getStart());
     assertEquals(-1, ov.getEnd());
-    assertEquals(3, ov.nt().length);
+    assertEquals(3, ov.allele().nt().length);
     final OrientedVariant ov2 = createOrientedVariant(new MockVariant(1, 2, new byte[]{1, 1, 1}, new byte[]{2, 2, 2}, 1), false);
-    assertEquals("1:2 AAA:CCC-", ov2.toString());
+    assertEquals("1-2 (AAAv:CCC^)", ov2.toString());
     assertFalse(ov.equals(ov2));
     assertFalse(ov.hashCode() == ov2.hashCode());
     assertTrue(ov.isAlleleA());
@@ -63,7 +63,7 @@ public class OrientedVariantTest extends TestCase {
     assertEquals(0, ov.compareTo(ov));
     assertEquals(-1, ov.compareTo(ov2));
     assertEquals(1, ov2.compareTo(ov));
-    assertEquals(2, ov2.nt()[0]);
+    assertEquals(2, ov2.allele().nt()[0]);
     assertFalse(ov.equals("not an OrientedVariant"));
     assertFalse(ov.equals(null));
 

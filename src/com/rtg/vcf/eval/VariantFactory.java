@@ -77,9 +77,9 @@ public interface VariantFactory {
         return null;
       }
 
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+      assert gtArray.length == 1 || gtArray.length == 2;
 
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final String seqName = rec.getSequenceName();
@@ -88,9 +88,9 @@ public interface VariantFactory {
       final boolean phased = VcfUtils.isPhasedGt(gt);
 
       // Treats missing value as distinct value ("N")
-      final byte[][] alleles = new byte[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2][];
+      final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
       for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = DnaUtils.encodeString(Variant.getAllele(rec, gtArray[i], hasPreviousNt));
+        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtArray[i], hasPreviousNt)));
       }
 
       return new CompactVariant(id, seqName, start, end, alleles, phased);
@@ -98,7 +98,7 @@ public interface VariantFactory {
   }
 
   /**
-   * Construct Variants corresponding to the GT of a specified sample.
+   * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
    * The only allele trimming done is a single leading
    * padding base, and only if it is shared by all alleles.
    * Path finding will require full genotype to match.
@@ -124,9 +124,9 @@ public interface VariantFactory {
         return null;
       }
 
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+      assert gtArray.length == 1 || gtArray.length == 2;
 
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final String seqName = rec.getSequenceName();
@@ -135,9 +135,9 @@ public interface VariantFactory {
       final boolean phased = VcfUtils.isPhasedGt(gt);
 
       // Treats missing value as ref
-      final byte[][] alleles = new byte[rec.getAltCalls().size() + 1][];
+      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
       for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = DnaUtils.encodeString(Variant.getAllele(rec, i, hasPreviousNt));
+        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, i, hasPreviousNt)));
       }
       final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
@@ -172,9 +172,9 @@ public interface VariantFactory {
         return null;
       }
 
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+      assert gtArray.length == 1 || gtArray.length == 2;
 
       final String[] allAlleles = VcfUtils.getAlleleStrings(rec, false);
       for (int i = 1; i < allAlleles.length; i++) {
@@ -183,21 +183,21 @@ public interface VariantFactory {
         }
       }
       final int stripLeading = StringUtils.longestPrefix(allAlleles);
-      final int stripTrailing = StringUtils.longestSuffix(allAlleles, stripLeading);
+      final int stripTrailing = StringUtils.longestSuffix(stripLeading, allAlleles);
       for (int i = 0; i < allAlleles.length; i++) {
         if (allAlleles[i] != null) {
           allAlleles[i] = StringUtils.clip(allAlleles[i], stripLeading, stripTrailing);
         }
       }
-      final byte[][] alleles = new byte[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2][];
-      for (int i = 0; i < alleles.length; i++) {
-        final int allele = gtArray[i];
-        alleles[i] = DnaUtils.encodeString(allele == -1 ? "N" : allAlleles[allele]);
-      }
+      final String seqName = rec.getSequenceName();
       final int start = rec.getStart() + stripLeading;
       final int end = rec.getEnd() - stripTrailing;
+      final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
+      for (int i = 0; i < alleles.length; i++) {
+        final int allele = gtArray[i];
+        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(allele == -1 ? "N" : allAlleles[allele]));
+      }
 
-      final String seqName = rec.getSequenceName();
       final boolean phased = VcfUtils.isPhasedGt(gt);
 
       return new CompactVariant(id, seqName, start, end, alleles, phased);
@@ -205,9 +205,9 @@ public interface VariantFactory {
   }
 
   /**
-   * Construct Variants corresponding to the GT of a specified sample.
+   * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
    * This version performs trimming of all common leading/trailing bases that match REF.
-   * Path finding will require full genotype to match, but will be more permissive of padding bases.
+   * Path finding will require full genotype to match, but will be more permissive of reference overlaps.
    */
   class TrimmedGtIdFactory implements VariantFactory {
 
@@ -230,36 +230,50 @@ public interface VariantFactory {
         return null;
       }
 
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
+      assert gtArray.length == 1 || gtArray.length == 2;
 
-      final String[] allAlleles = VcfUtils.getAlleleStrings(rec, false);
-      for (int i = 1; i < allAlleles.length; i++) {
-        if (!(gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i))) {
-          allAlleles[i] = null;
-        }
-      }
-      final int stripLeading = StringUtils.longestPrefix(allAlleles);
-      final int stripTrailing = StringUtils.longestSuffix(allAlleles, stripLeading);
-      for (int i = 0; i < allAlleles.length; i++) {
-        if (allAlleles[i] != null) {
-          allAlleles[i] = StringUtils.clip(allAlleles[i], stripLeading, stripTrailing);
-        }
-      }
-
-      final byte[][] alleles = new byte[rec.getAltCalls().size() + 1][];
-      for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = allAlleles[i] == null ? null : DnaUtils.encodeString(allAlleles[i]);
-      }
-      final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
-      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
+      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
       final String seqName = rec.getSequenceName();
-      final int start = rec.getStart() + stripLeading;
-      final int end = rec.getEnd() - stripTrailing;
+      int start = Integer.MAX_VALUE;
+      int end = Integer.MIN_VALUE;
+      for (int i = 0; i < alleles.length; i++) {
+        if (gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
+          final Allele allele = getAllele(rec, i, true);
+          if (allele != null) {
+            alleles[i] = allele;
+            start = Math.min(start, alleles[i].getStart());
+            end = Math.max(end, alleles[i].getEnd());
+          }
+        }
+      }
+      final int alleleA = gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
       final boolean phased = VcfUtils.isPhasedGt(gt);
 
       return new AlleleIdVariant(id, seqName, start, end, alleles, alleleA, alleleB, phased);
+    }
+
+    // Create an Allele from a VCF record.
+    // If trim is enabled, remove all leading and trailing bases agreeing with ref, and adjust position accordingly.
+    // If the resulting allele is a no-op, return null
+    protected static Allele getAllele(VcfRecord rec, int allele, boolean trim) {
+      if (allele == -1) {
+        return null;
+      }
+      final String ref = rec.getRefCall();
+      if (allele == 0) {
+        return trim ? null : new Allele(rec, DnaUtils.encodeString(ref));
+      }
+      final String alt = rec.getAllele(allele);
+      if (trim) {
+        final int stripLeading = StringUtils.longestPrefix(ref, alt);
+        final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
+        return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
+          DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
+      }
+      return new Allele(rec, DnaUtils.encodeString(alt));
     }
   }
 
@@ -303,12 +317,12 @@ public interface VariantFactory {
         }
         prev = gtId;
       }
-      final byte[][] alleles = new byte[numAlts][];
+      final Allele[] alleles = new Allele[numAlts];
       int j = 0;
       prev = -1;
       for (final int gtId : gtArray) {
         if (gtId > 0 && gtId != prev) {
-          alleles[j++] = DnaUtils.encodeString(Variant.getAllele(rec, gtId, hasPreviousNt));
+          alleles[j++] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtId, hasPreviousNt)));
         }
         prev = gtId;
       }
@@ -335,9 +349,9 @@ public interface VariantFactory {
       final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
       final int end = rec.getEnd();
 
-      final byte[][] alleles = new byte[rec.getAltCalls().size()][];
+      final Allele[] alleles = new Allele[rec.getAltCalls().size()];
       for (int gtId = 0; gtId < alleles.length; gtId++) {
-        alleles[gtId] = DnaUtils.encodeString(Variant.getAllele(rec, gtId + 1, hasPreviousNt));
+        alleles[gtId] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtId + 1, hasPreviousNt)));
       }
 
       return new SquashPloidyVariant(id, seqName, start, end, alleles);

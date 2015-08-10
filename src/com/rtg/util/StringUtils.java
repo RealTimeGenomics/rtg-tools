@@ -453,16 +453,16 @@ public final class StringUtils {
    * @param strings strings to test
    * @return longest common prefix
    */
-  public static int longestPrefix(final String[] strings) {
-    return longestPrefix(strings, 0);
+  public static int longestPrefix(final String... strings) {
+    return longestPrefix(0, strings);
   }
   /**
    * Return the length of the longest common prefix of the supplied strings.
-   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @param rightOffset effective right edge of strings (i.e. do not find prefix going into this region)
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @return longest common prefix
    */
-  public static int longestPrefix(final String[] strings, final int rightOffset) {
+  public static int longestPrefix(final int rightOffset, final String... strings) {
     if (strings.length <= 1) {
       return strings.length == 0 ? 0 : strings[0].length();
     }
@@ -480,11 +480,11 @@ public final class StringUtils {
 
   /**
    * Return the length of the longest common suffix of the supplied strings.
-   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @param leftOffset effective left edge of strings (i.e. do not find suffix going into this region)
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @return longest common suffix
    */
-  public static int longestSuffix(final String[] strings, final int leftOffset) {
+  public static int longestSuffix(final int leftOffset, final String... strings) {
     if (strings.length <= 1) {
       return strings.length == 0 ? 0 : strings[0].length();
     }
@@ -506,7 +506,7 @@ public final class StringUtils {
    * @return longest common suffix
    */
   public static int longestSuffix(final String[] strings) {
-    return longestSuffix(strings, 0);
+    return longestSuffix(0, strings);
   }
 
   /**

@@ -30,8 +30,6 @@
 
 package com.rtg.vcf.eval;
 
-import com.rtg.mode.DnaUtils;
-
 /**
  */
 public class MockVariant extends CompactVariant {
@@ -52,7 +50,7 @@ public class MockVariant extends CompactVariant {
    * @param minus nucleotides on the minus strand
    */
   public MockVariant(int start, int end, byte[] plus, byte[] minus) {
-    super(0, "", start - 1, end - 1, toPreds(plus, minus), false);
+    this(start, end, plus, minus, 0);
   }
 
   /**
@@ -64,7 +62,18 @@ public class MockVariant extends CompactVariant {
    * @param id the variant id
    */
   public MockVariant(int start, int end, byte[] plus, byte[] minus, int id) {
-    super(id, "", start - 1, end - 1, toPreds(plus, minus), false);
+    this(start, end, toPreds(plus, minus), id);
+  }
+
+  /**
+   * Assumes not phased
+   * @param start one-based start position of mutation
+   * @param end one-based end position of mutation
+   * @param alleles the alleles
+   * @param id the variant id
+   */
+  public MockVariant(int start, int end, byte[][] alleles, int id) {
+    super(id, "", start - 1, end - 1, toAlleles("", start - 1, end - 1, alleles), false);
   }
 
   @Override
@@ -75,7 +84,7 @@ public class MockVariant extends CompactVariant {
       if (i > 0) {
         sb.append(":");
       }
-      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
+      sb.append(alleleStr(i));
     }
     return sb.toString();
   }

@@ -33,15 +33,15 @@ import java.util.Comparator;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.Utils;
-import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
-import com.rtg.vcf.VcfRecord;
+import com.rtg.util.intervals.SequenceNameLocusSimple;
+import com.rtg.vcf.VcfUtils;
 
 
 /**
  * Holds information about a single variant that has not yet been oriented in a haplotype
  */
-public abstract class Variant implements Comparable<Variant>, VariantId {
+public abstract class Variant extends SequenceNameLocusSimple implements Comparable<Variant>, VariantId {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
   static final Comparator<VariantId> ID_COMPARATOR = new Comparator<VariantId>() {
@@ -52,19 +52,33 @@ public abstract class Variant implements Comparable<Variant>, VariantId {
   };
 
   private final int mId;
-  private final String mSequenceName;
-  private final int mStart;
-  private final int mEnd;
-  private final byte[][] mAlleles;
+  private final Allele[] mAlleles;
   private final boolean mPhased;
 
-  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
+  Variant(int id, String seq, int start, int end) {
+    super(seq, start, end);
     mId = id;
-    mSequenceName = new String(seq.toCharArray());
-    mStart = start;
-    mEnd = end;
+    mAlleles = null;
+    mPhased = false;
+  }
+
+  Variant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
+    super(seq, start, end);
+    mId = id;
     mPhased = phased;
     mAlleles = alleles;
+  }
+
+  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
+    this(id, seq, start, end, toAlleles(seq, start, end, alleles), phased);
+  }
+
+  static Allele[] toAlleles(String seq, int start, int end, byte[][] alleles) {
+    final Allele[] result = new Allele[alleles.length];
+    for (int i = 0; i < result.length; i++) {
+      result[i] = new Allele(seq, start, end, alleles[i]);
+    }
+    return result;
   }
 
   protected static String getAllele(VcfRecord rec, int allele, boolean hasPreviousNt) {
@@ -112,11 +126,6 @@ public abstract class Variant implements Comparable<Variant>, VariantId {
   }
 
   @Override
-  public String getSequenceName() {
-    return mSequenceName;
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
@@ -124,35 +133,10 @@ public abstract class Variant implements Comparable<Variant>, VariantId {
       if (i > 0) {
         sb.append(":");
       }
-      sb.append(DnaUtils.bytesToSequenceIncCG(nt(i)));
+      sb.append(alleleStr(i));
     }
     sb.append(")");
     return sb.toString();
-  }
-
-  @Override
-  public int getStart() {
-    return mStart;
-  }
-
-  @Override
-  public int getEnd() {
-    return mEnd;
-  }
-
-  @Override
-  public boolean overlaps(SequenceNameLocus other) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean contains(String sequence, int pos) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getLength() {
-    return getEnd() - getStart();
   }
 
   /**
@@ -160,8 +144,40 @@ public abstract class Variant implements Comparable<Variant>, VariantId {
    * @param alleleId the index of the allele.
    * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
    */
-  public byte[] nt(int alleleId) {
+  public Allele allele(int alleleId) {
     return alleleId < 0 ? null : mAlleles[alleleId];
+  }
+
+  /**
+   * The bases of allele of the variant as determined by <code>alleleId</code> parameter.
+   * @param alleleId the index of the allele.
+   * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
+   */
+  public byte[] nt(int alleleId) {
+    final Allele a = allele(alleleId);
+    return a == null ? null : a.nt();
+  }
+
+  /**
+   * Gets a human-readable representation of an allele. '.' indicates a no-call allele, '*' indicates
+   * an allele that has been removed from the variant (and takes no part in haplotype replay), otherwise the DNA bases.
+   * If an individual allele is anchored differently to the enclosing variant, it's genomic position is also listed.
+   * @param alleleId the allele id within the variant
+   * @return the String
+   */
+  public String alleleStr(int alleleId) {
+    if (alleleId < 0) {
+      return VcfUtils.MISSING_FIELD;
+    }
+    final Allele a = allele(alleleId);
+    if (a == null) {
+      return "*";
+    }
+    String pos = "";
+    if (a.getStart() != getStart() || a.getEnd() != getEnd()) {
+      pos = "<" + (a.getStart() + 1) + "-" + (a.getEnd() + 1) + ">";
+    }
+    return pos + DnaUtils.bytesToSequenceIncCG(a.nt());
   }
 
   int numAlleles() {

@@ -27,25 +27,60 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf.eval;
 
+import com.rtg.mode.DnaUtils;
+import com.rtg.util.intervals.SequenceNameLocus;
+import com.rtg.util.intervals.SequenceNameLocusSimple;
+
 /**
- * A Variant that offers only haploid alternatives from all the available alleles.
- * OrientedVariant allele ids may not correspond to GT indexing.
+ * Hold a variant allele, one allele of a genotype.
  */
-public final class SquashPloidyVariant extends Variant {
+public class Allele extends SequenceNameLocusSimple {
 
+  private final byte[] mNt;
 
-  SquashPloidyVariant(int id, String seq, int start, int end, Allele[] alleles) {
-    super(id, seq, start, end, alleles, false);
+  public Allele(String seq, int start, int end, byte[] nt) {
+    super(seq, start, end);
+    if (nt == null) {
+      throw new NullPointerException();
+    }
+    mNt = nt;
+  }
+
+  public Allele(SequenceNameLocus locus, byte[] nt) {
+    this(locus.getSequenceName(), locus.getStart(), locus.getEnd(), nt);
+  }
+
+  /**
+   * @return the bases of the allele (may be zero length for a deletion)
+   */
+  byte[] nt() {
+    return mNt;
+  }
+
+  public int compareTo(Allele that) {
+    final int varPos = this.getStart() - that.getStart();
+    if (varPos != 0) {
+      return varPos;
+    }
+
+    final int length = this.mNt.length - that.mNt.length;
+    if (length != 0) {
+      return length;
+    }
+    for (int i = 0; i < length; i++) {
+      final int diff = this.mNt[i] - that.mNt[i];
+      if (diff != 0) {
+        return diff;
+      }
+    }
+    return 0;
   }
 
   @Override
-  public OrientedVariant[] orientations() {
-    final OrientedVariant[] pos = new OrientedVariant[numAlleles()];
-    for (int i = 0 ; i < numAlleles(); i++) {
-      pos[i] = new OrientedVariant(this, i);
-    }
-    return pos;
+  public String toString() {
+    return String.valueOf(getStart() + 1) + ":" + (getEnd() + 1) + "(" + DnaUtils.bytesToSequenceIncCG(mNt) + ")";
   }
 }

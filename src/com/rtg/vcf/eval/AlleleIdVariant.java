@@ -30,8 +30,6 @@
 
 package com.rtg.vcf.eval;
 
-import com.rtg.mode.DnaUtils;
-
 /**
  * A Variant that offers orientations where the variant IDs correspond to original GT allele indexing.
  */
@@ -40,7 +38,7 @@ public class AlleleIdVariant extends Variant {
   private final int mAlleleA; // First allele in GT
   private final int mAlleleB; // Second allele in GT
 
-  AlleleIdVariant(int id, String seq, int start, int end, byte[][] alleles,
+  AlleleIdVariant(int id, String seq, int start, int end, Allele[] alleles,
                   int alleleA, int alleleB, boolean phased) {
     super(id, seq, start, end, alleles, phased);
     mAlleleA = alleleA;
@@ -61,10 +59,10 @@ public class AlleleIdVariant extends Variant {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
-    sb.append(DnaUtils.bytesToSequenceIncCG(nt(mAlleleA)));
+    sb.append(alleleStr(mAlleleA));
     if (mAlleleB != mAlleleA) {
       sb.append(":");
-      sb.append(DnaUtils.bytesToSequenceIncCG(nt(mAlleleB)));
+      sb.append(alleleStr(mAlleleB));
     }
     sb.append(")");
     return sb.toString();

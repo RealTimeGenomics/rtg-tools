@@ -36,7 +36,7 @@ package com.rtg.vcf.eval;
 public class CompactVariant extends Variant {
 
 
-  CompactVariant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
+  CompactVariant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
     super(id, seq, start, end, alleles, phased);
   }
 

@@ -34,6 +34,7 @@ import static com.rtg.mode.DNA.C;
 import static com.rtg.mode.DNA.T;
 import static com.rtg.util.StringUtils.TAB;
 
+import com.rtg.mode.DnaUtils;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 
@@ -51,16 +52,27 @@ public class VariantFactoryTest extends TestCase {
 
   private VariantFactory factory(String name) {
     switch (name) {
-      case VariantFactory.DiploidAltsFactory.NAME:
-        return new VariantFactory.DiploidAltsFactory();
-      case VariantFactory.HaploidAltsFactory.NAME:
-        return new VariantFactory.HaploidAltsFactory();
-      case VariantFactory.HaploidGtAltFactory.NAME:
-        return new VariantFactory.HaploidGtAltFactory(0);
-      case VariantFactory.TrimmedGtFactory.NAME:
-        return new VariantFactory.TrimmedGtFactory(0);
       case VariantFactory.Default.NAME:
         return new VariantFactory.Default(0);
+
+      case VariantFactory.DefaultId.NAME:
+        return new VariantFactory.DefaultId(0);
+
+      case VariantFactory.TrimmedGtFactory.NAME:
+        return new VariantFactory.TrimmedGtFactory(0);
+
+      case VariantFactory.TrimmedGtIdFactory.NAME:
+        return new VariantFactory.TrimmedGtIdFactory(0);
+
+      case VariantFactory.HaploidGtAltFactory.NAME:
+        return new VariantFactory.HaploidGtAltFactory(0);
+
+      case VariantFactory.HaploidAltsFactory.NAME:
+        return new VariantFactory.HaploidAltsFactory();
+
+      case VariantFactory.DiploidAltsFactory.NAME:
+        return new VariantFactory.DiploidAltsFactory();
+
       default:
         throw new RuntimeException("Unknown variant factory: " + name);
     }
@@ -108,20 +120,69 @@ public class VariantFactoryTest extends TestCase {
   }
 
   static final String SNP_LINE5 = "chr 23 . AA T,ATTA . PASS . GT 0/2";
+  static final String SNP_LINE6 = "chr 23 . T A,TAAA . PASS . GT 2|1";
+  static final String SNP_LINE7 = "chr 23 . T A,TAAA . PASS . GT 2|.";
 
   public void testTrimmedGtPloidy() throws Exception {
     // Test trimming ploidy  AA:ATTA -> :TT
     VariantFactory fact = factory(VariantFactory.TrimmedGtFactory.NAME);
     Variant variant = createVariant(fact, SNP_LINE5);
     assertEquals(23, variant.getStart());
-    assertEquals(23, variant.getStart());
+    assertEquals(23, variant.getEnd());
     assertEquals(2, variant.numAlleles());
-    assertEquals(0, variant.nt(0).length);
-    assertEquals(2, variant.nt(1).length);
-    assertEquals(T.ordinal(), variant.nt(1)[0]);
-    assertEquals(T.ordinal(), variant.nt(1)[1]);
-    final OrientedVariant[] pos = variant.orientations();
+    assertEquals("", DnaUtils.bytesToSequenceIncCG(variant.nt(0)));
+    assertEquals("TT", DnaUtils.bytesToSequenceIncCG(variant.nt(1)));
+    OrientedVariant[] pos = variant.orientations();
     assertEquals(2, pos.length);
+
+    variant = createVariant(fact, SNP_LINE6);
+    assertEquals(22, variant.getStart());
+    assertEquals(23, variant.getEnd());
+    assertEquals(2, variant.numAlleles());
+    assertEquals(4, variant.nt(0).length);
+    assertEquals("TAAA", DnaUtils.bytesToSequenceIncCG(variant.nt(0)));
+    assertEquals("A", DnaUtils.bytesToSequenceIncCG(variant.nt(1)));
+    pos = variant.orientations();
+    assertEquals(2, pos.length);
+  }
+
+  public void testTrimmedGtIdPloidy() throws Exception {
+    // Test trimming ploidy  AA:ATTA -> :TT
+    VariantFactory fact = factory(VariantFactory.TrimmedGtIdFactory.NAME);
+    Variant variant = createVariant(fact, SNP_LINE5);
+    assertEquals(23, variant.getStart());
+    assertEquals(23, variant.getStart());
+    assertEquals(3, variant.numAlleles());
+    assertEquals(null, variant.allele(0));
+    assertEquals(null, variant.allele(1));
+    assertEquals("TT", DnaUtils.bytesToSequenceIncCG(variant.allele(2).nt()));
+    OrientedVariant[] pos = variant.orientations();
+    assertEquals(2, pos.length);
+
+    variant = createVariant(fact, SNP_LINE6);
+    assertEquals(22, variant.getStart());
+    assertEquals(23, variant.getEnd());
+    assertEquals(3, variant.numAlleles());
+    assertEquals(null, variant.allele(0));
+    Allele allele = variant.allele(1);
+    assertEquals("A", DnaUtils.bytesToSequenceIncCG(allele.nt()));
+    assertEquals(22, allele.getStart());
+    assertEquals(23, allele.getEnd());
+    allele = variant.allele(2);
+    assertEquals("AAA", DnaUtils.bytesToSequenceIncCG(allele.nt()));
+    assertEquals(23, allele.getStart());
+    assertEquals(23, allele.getEnd());
+    assertEquals("chr:23-24 (<24-24>AAA:A)", variant.toString());
+    pos = variant.orientations();
+    assertEquals(2, pos.length);
+    assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
+
+    variant = createVariant(fact, SNP_LINE7);
+    assertEquals("chr:24-24 (AAA:.)", variant.toString());
+    pos = variant.orientations();
+    assertEquals(2, pos.length);
+    assertEquals("chr:24-24 (.v:*:*:AAA^)", pos[0].toString());
+
   }
 
 }

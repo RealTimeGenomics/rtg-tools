@@ -121,7 +121,31 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   @Override
   public String toString() {
-    return mVariant.toString() + (isAlleleA() ? "+" : "-");
+    final StringBuilder sb = new StringBuilder();
+    if (getSequenceName().length() > 0) {
+      sb.append(getSequenceName()).append(":");
+    }
+    sb.append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
+    final int firstAllele = (mAlleleId == -1 || mOtherAlleleId == -1) ? -1 : 0;
+    for (int i = firstAllele; i < mVariant.numAlleles(); i++) {
+      if (i > firstAllele) {
+        sb.append(":");
+      }
+      sb.append(mVariant.alleleStr(i));
+
+      // Add haplotype indicator ^ - selected for A, v - selected for B, x - selected for both (homozygous)
+      if (i == mAlleleId) {
+        if (i == mOtherAlleleId) {
+          sb.append("x");
+        } else {
+          sb.append("^");
+        }
+      } else if (i == mOtherAlleleId) {
+        sb.append("v");
+      }
+    }
+    sb.append(")");
+    return sb.toString();
   }
 
   /**
@@ -132,7 +156,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
   }
 
   /**
-   * @return true if this is oriented on the A haplotype
+   * @return true if this is oriented on the A GT haplotype
    */
   public boolean isAlleleA() {
     return mIsAlleleA;
@@ -142,8 +166,8 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * The allele of the oriented genotype.
    * @return the allele (may be null (skip) or zero length)
    */
-  public byte[] nt() {
-    return mVariant.nt(mAlleleId);
+  public Allele allele() {
+    return mAlleleId == -1 ? null : mVariant.allele(mAlleleId);
   }
 
   /**

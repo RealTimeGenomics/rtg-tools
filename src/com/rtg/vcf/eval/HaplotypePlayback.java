@@ -59,6 +59,8 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
   /** Position in variant. INVALID if not currently in variant. 0 based. */
   private int mPositionInVariant;
 
+  private int mLastVariantEnd = -1;
+
   /** Variant that currently in or next one. */
   private OrientedVariant mNextVariant;
 
@@ -76,6 +78,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     mNextVariant = old.mNextVariant;
     mTemplatePosition = old.mTemplatePosition;
     mPositionInVariant = old.mPositionInVariant;
+    mLastVariantEnd = old.mLastVariantEnd;
     assert globalIntegrity();
   }
 
@@ -86,18 +89,28 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
   public void addVariant(OrientedVariant v) {
     //System.err.println("Adding Variant: " + v);
     assert v.getStart() > mTemplatePosition;
-    if (v.getStart() == v.getEnd() && v.nt().length == 0) { // Adding the opposite side of a pure insert is redundant
+    final Allele a = v.allele();
+    if (a == null) {  // Allow null allele to indicate no playback
       return;
     }
-    if (v.nt() == null) {  // Allow null nt to indicate no playback on one side
+    if (a.getStart() == a.getEnd() && a.nt().length == 0) { // Adding the opposite side of a pure insert is redundant
       return;
     }
+    mLastVariantEnd = a.getEnd();
     if (mNextVariant == null) {
       mNextVariant = v;
     } else {
       mVariants.add(v);
     }
     assert integrity();
+  }
+
+  /**
+   * @param var the variant to check
+   * @return true if the variant can be added to this HaplotypePlayback
+   */
+  public boolean isNew(OrientedVariant var) {
+    return var.allele() == null || var.allele().getStart() >= mLastVariantEnd;
   }
 
   /**
@@ -108,7 +121,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mPositionInVariant == INVALID) {
       return mTemplatePosition < mTemplate.length ? mTemplate[mTemplatePosition] : DnaUtils.UNKNOWN_RESIDUE;
     }
-    return mNextVariant.nt()[mPositionInVariant];
+    return mNextVariant.allele().nt()[mPositionInVariant];
   }
 
   /**
@@ -127,11 +140,11 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mNextVariant == null) {
       return true;
     }
-    if (mPositionInVariant != INVALID && mPositionInVariant < mNextVariant.nt().length - 1) {
+    if (mPositionInVariant != INVALID && mPositionInVariant < mNextVariant.allele().nt().length - 1) {
       return false;
     }
     for (OrientedVariant v : mVariants) {
-      if (v.nt().length > 0) {
+      if (v.allele().nt().length > 0) {
         return false;
       }
     }
@@ -148,7 +161,7 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     }
     if (isOnTemplate()) {
       mTemplatePosition++;
-      if (mNextVariant != null && mNextVariant.getStart() == mTemplatePosition) { // Position to consume the variant
+      if (mNextVariant != null && mNextVariant.allele().getStart() == mTemplatePosition) { // Position to consume the variant
         mPositionInVariant = 0;
       }
     } else {
@@ -159,14 +172,14 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
     if (mNextVariant != null) {
       while (true) {
         //dont forget that variant may come back to back
-        final byte[] norm = mNextVariant.nt();
+        final byte[] norm = mNextVariant.allele().nt();
         if (mPositionInVariant != norm.length) { // Haven't reached the end of the current variant.
           //this also catches the case when mPositionInVariant == INVALID
           assert integrity();
           break;
         }
         // Finished variant, so position for next baseStart consuming next variant from the queue (which may be a deletion, in
-        mTemplatePosition = mNextVariant.getEnd();
+        mTemplatePosition = mNextVariant.allele().getEnd();
         mPositionInVariant = INVALID;
         if (!mVariants.isEmpty()) {
           mNextVariant = mVariants.poll();
@@ -175,14 +188,14 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
           assert integrity();
           break;
         }
-        if (mTemplatePosition < mNextVariant.getStart()) {
+        if (mTemplatePosition < mNextVariant.allele().getStart()) {
           assert integrity();
           break;
         }
         mPositionInVariant = 0;
         //System.err.println("templatePosition=" + mTemplatePosition + " varStartPosition=" + mNextVariant.variant().getStart() + " in " + mNextVariant);
-        if (mTemplatePosition != mNextVariant.getStart()) {
-          throw new SlimException("Out of order variants during replay: pos=" + mTemplatePosition + " variant=" + mNextVariant);
+        if (mTemplatePosition != mNextVariant.allele().getStart()) {
+          throw new SlimException("Out of order variants during replay: pos=" + mTemplatePosition + " variant=" + mNextVariant + " allele=" + mNextVariant.allele());
         }
       }
     }
@@ -282,13 +295,13 @@ public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlaybac
       Exam.assertTrue(mVariants.isEmpty());
     }
     if (mPositionInVariant == HaplotypePlayback.INVALID) {
-      Exam.assertTrue(toString(), mNextVariant == null || mTemplatePosition <= mNextVariant.getStart());
+      Exam.assertTrue(toString(), mNextVariant == null || mTemplatePosition <= mNextVariant.allele().getStart());
     } else {
-      Exam.assertTrue(mNextVariant != null && mTemplatePosition == mNextVariant.getStart());
-      if (!(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt().length)) {
+      Exam.assertTrue(mNextVariant != null && mTemplatePosition == mNextVariant.allele().getStart());
+      if (!(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.allele().nt().length)) {
         System.err.println(this);
       }
-      Exam.assertTrue(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.nt().length);
+      Exam.assertTrue(0 <= mPositionInVariant && mPositionInVariant < mNextVariant.allele().nt().length);
     }
     return true;
   }

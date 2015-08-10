@@ -45,7 +45,7 @@ import com.rtg.util.Utils;
  */
 public class HalfPath implements Comparable<HalfPath> {
 
-  private static final Variant SENTINEL = new Variant(-1, "", -1, 0, null, false) {
+  private static final Variant SENTINEL = new Variant(-1, "", -1, 0) {
     @Override
     public OrientedVariant[] orientations() {
       throw new UnsupportedOperationException();
@@ -60,7 +60,7 @@ public class HalfPath implements Comparable<HalfPath> {
 
   private int mVariantEndPosition; // End of last variant added  XXX May be more optimal and still OK to use end of last variant included.
   private int mVariantIndex = -1;  // Index of last variant added
-  Variant mLastVariant = SENTINEL; // Last variant included
+  private Variant mLastVariant = SENTINEL; // Last variant included
 
   private boolean mFinishedTypeA;
   private boolean mFinishedTypeB;
@@ -128,9 +128,12 @@ public class HalfPath implements Comparable<HalfPath> {
    * @param var the variant to check
    * @return true if the variant starts later than the end of the last included one.
    */
-  public boolean isNew(Variant var) {
-    return mLastVariant == null
-      || var.getStart() >= mLastVariant.getEnd();
+  public boolean isNew(OrientedVariant var) {
+    if (mLastVariant == null || var.getStart() >= mLastVariant.getEnd()) {
+      return true; // Can be added without considering overlapping
+    }
+    // Check if we can include this variant by overlapping
+    return mHaplotypeA.isNew(var) && (mHaplotypeB == null || mHaplotypeB.isNew(var.other()));
   }
 
   void exclude(Variant var, int varIndex) {

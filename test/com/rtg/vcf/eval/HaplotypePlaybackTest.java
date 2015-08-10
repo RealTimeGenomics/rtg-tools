@@ -119,7 +119,7 @@ public class HaplotypePlaybackTest extends TestCase {
     final byte[] expected = {2, 4 , 4, 1, 1, 3, 1, 4, 3, 1, 1};
     TestUtils.containsAll(path.toString()
       , "HaplotypePlayback: position=-1 inPosition=-1"
-      , "current:1:2 CTT:GGG"
+      , "current:1-2 (CTT^:GGGv)"
       , "future:");
     check(expected, path);
     TestUtils.containsAll(path.toString()
@@ -138,8 +138,8 @@ public class HaplotypePlaybackTest extends TestCase {
     final byte[] expected = {1, 3, 2, 2, 1, 1, 1};
     TestUtils.containsAll(path.toString()
       , "HaplotypePlayback: position=-1 inPosition=-1"
-      , "current:2:3 T:G-"
-      , "future:[3:3 :CC-]");
+      , "current:2-3 (Tv:G^)"
+      , "future:[3-3 (v:CC^)]");
     check(expected, path);
     //System.out.println(path.toString());
     TestUtils.containsAll(path.toString()

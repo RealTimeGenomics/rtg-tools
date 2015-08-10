@@ -244,7 +244,7 @@ public class HalfPathTest extends TestCase {
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(8, 9, new byte[]{3}, new byte[]{4}), true), 3);
     TestUtils.containsAll(path.toString()
         , "included:"
-        , "[8:9 G:T+, 3:4 G:T+]"
+        , "[8-9 (G^:Tv), 3-4 (G^:Tv)]"
         , "excluded:"
         , "[5:6 C:T, 5:6 C:T]");
 
