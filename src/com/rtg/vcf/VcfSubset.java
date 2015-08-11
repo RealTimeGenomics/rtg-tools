@@ -81,6 +81,8 @@ public class VcfSubset extends AbstractCli {
   private static final String REMOVE_FORMAT = "remove-format";
   private static final String KEEP_FORMAT = "keep-format";
 
+  private static final String REMOVE_UNUSED_ALTS = "Xremove-unused-alts";
+
   @Override
   public String moduleName() {
     return MODULE_NAME;
@@ -120,6 +122,9 @@ public class VcfSubset extends AbstractCli {
     // Contents of FORMAT
     mFlags.registerOptional(REMOVE_FORMAT, String.class, "STRING", "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(KEEP_FORMAT, String.class, "STRING", "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+
+    // Contents of ALT
+    mFlags.registerOptional(REMOVE_UNUSED_ALTS, "remove unused ALT alleles").setCategory(FILTERING);
 
     mFlags.setValidator(new VcfSubsetValidator());
   }
@@ -183,6 +188,7 @@ public class VcfSubset extends AbstractCli {
     private VcfAnnotator processFlags(List<VcfAnnotator> annotators, VcfHeader header, String removeFlag, String keepFlag, String fieldname) {
       return processFlags(annotators, header, removeFlag, keepFlag, null, fieldname, true);
     }
+
     private VcfAnnotator processFlags(List<VcfAnnotator> annotators, VcfHeader header, String removeFlag, String keepFlag, String removeAllFlag, String fieldname, boolean checkHeader) {
       if (removeAllFlag != null && mFlags.isSet(removeAllFlag)) {
         final VcfAnnotator annotator = makeAnnotator(true);
@@ -325,6 +331,10 @@ public class VcfSubset extends AbstractCli {
         }
       };
       final VcfFormatStripper formatStripper = (VcfFormatStripper) formatAnnAdder.processFlags(annotators, header, REMOVE_FORMAT, KEEP_FORMAT, "Format");
+
+      if (mFlags.isSet(REMOVE_UNUSED_ALTS)) {
+        annotators.add(new VcfAltCleaner());
+      }
 
       int skippedRecords = 0;
       for (final VcfAnnotator annotator : annotators) {
