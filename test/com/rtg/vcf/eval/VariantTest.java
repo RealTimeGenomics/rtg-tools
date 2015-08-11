@@ -55,7 +55,7 @@ public class VariantTest extends TestCase {
     return createVariant(rec, 0, sampleNo, extractor);
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo, RocSortValueExtractor extractor) {
-    return new VariantFactory.Default(sampleNo).variant(rec, id);
+    return new VariantFactory.DefaultGt(sampleNo).variant(rec, id);
   }
   static Variant createVariant(String var, int sampleNo, RocSortValueExtractor extractor) {
     return createVariant(createRecord(var), sampleNo, extractor);

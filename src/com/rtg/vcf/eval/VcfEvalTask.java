@@ -114,15 +114,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     for (long i = 0; i < names.length(); i++) {
       nameMap.put(names.name(i), i);
     }
-    final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
 
-    final String pathProcessor = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR); // How to process path finding results
-    try (final EvalSynchronizer sync = "alleles".equals(pathProcessor)
-      ? new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed())
-      : "recode".equals(pathProcessor)
-      ? new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed())
-      : new DefaultEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputBaselineTp(), params.outputSlopeFiles(), params.rtgStats())) {
-
+    try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
       for (int i = 0; i < templateSequences.numberSequences(); i++) {
@@ -133,6 +126,28 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
       sync.finish();
     }
+  }
+
+  private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {
+    final File outdir = params.directory();
+    final EvalSynchronizer processor;
+    final String pathProcessor = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR);
+    switch (pathProcessor) {
+      case "alleles":
+        processor = new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        break;
+      case "hap-alleles":
+        processor = new SquashedAlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        break;
+      case "recode":
+        processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        break;
+      default:
+        final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
+        processor = new DefaultEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputBaselineTp(), params.outputSlopeFiles(), params.rtgStats());
+        break;
+    }
+    return processor;
   }
 
 

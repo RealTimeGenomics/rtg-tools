@@ -27,33 +27,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
-import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Output a population alleles VCF that incorporates a new sample, including any new alleles
  * contained only in the call-set.
- * Path finding should use variant factory <code>dip-alt,default-trim-id</code>
+ * Path finding should use variant factory <code>dip-alt,squash-id</code>
  */
-public class AlleleAccumulator extends MergingEvalSynchronizer {
+public class SquashedAlleleAccumulator extends AlleleAccumulator {
 
-  protected final VcfWriter mAlleles;
-  protected final VcfWriter mAuxiliary;
-  protected int mCalledNotInPath;
-  protected int mBaselineNotInPath;
-
+  protected final VcfWriter mAlternate;
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -64,17 +58,15 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @throws IOException if there is a problem opening output files
    */
-  AlleleAccumulator(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
+  SquashedAlleleAccumulator(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges, output, zip);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final VcfHeader h = variants.baseLineHeader().copy();
-    h.removeAllSamples();
-    mAlleles = new VcfWriter(h, new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new population alleles (old + new sample alleles)
-    mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
+    mAlternate = new VcfWriter(variants.calledHeader(), new File(output, "alternate.vcf" + zipExt), null, zip, true); // Contains sample calls after subtraction of matched alleles from double-alt cases
   }
 
-  protected void resetRecordFields(VcfRecord rec) {
+  @Override
+  protected void resetBaselineRecordFields(VcfRecord rec) {
     rec.setId();
     rec.setQuality(null);
     rec.getFilters().clear();
@@ -84,34 +76,15 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
   }
 
   @Override
-  protected void resetBaselineRecordFields(VcfRecord rec) {
-    resetRecordFields(rec);
-  }
-
-  @Override
   protected void resetCallRecordFields(VcfRecord rec) {
-    resetRecordFields(rec);
-  }
-
-  @Override
-  protected void handleUnknownBaseline() throws IOException {
-    mBrv.setInfo("STATUS", "B-NotInPath"); // Should never happen for us.
-    mAlleles.write(mBrv);
-    mBaselineNotInPath++;
-  }
-
-  @Override
-  protected void handleUnknownCall() throws IOException {
-    mCrv.setInfo("STATUS", "C-NotInPath"); // Was skipped during loading, probably OK to just silently drop.
-    mAuxiliary.write(mCrv);
-    mCalledNotInPath++;
+    rec.getInfo().clear();
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
-      mAuxiliary.write(mCrv);
+      writeResidual((OrientedVariant) mCv);
     } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
       final AlleleIdVariant v = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
       writeNonRedundant(v, "C-TooHard=" + mCv.toString());
@@ -123,19 +96,10 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
   }
 
   @Override
-  protected void handleKnownBaseline() throws IOException {
-    final String status = (mBv instanceof OrientedVariant)
-      ? "B-TP=" + mBv.toString()
-      : (mBv instanceof SkippedVariant) ? "B-TooHard" : "B-FN";
-    mBrv.addInfo("STATUS", status);
-    mAlleles.write(mBrv);
-  }
-
-  @Override
   protected void handleKnownBoth() throws IOException {
     if (mCv instanceof OrientedVariant) {
       mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
-      mAuxiliary.write(mCrv);
+      writeResidual((OrientedVariant) mCv);
     } else if (mCv instanceof SkippedVariant) { // Too hard, merge records into b, adding any new ALT from c, flush c
       final AlleleIdVariant ov = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
       mergeIntoBaseline(ov, "C-TooHard");
@@ -146,69 +110,60 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
     }
   }
 
+  private void writeResidual(OrientedVariant ov) throws IOException {
+    // If the original variant contained multiple ALTs, null out the one used and then write to alternate, otherwise write to alternate as-is
+    final AlleleIdVariant v = (AlleleIdVariant) ov.variant();
+    int remaining = -1;
+    int numAlts = 0;
+    if (v.numAlleles() > 2) {
+      for (int i = 1; i < v.numAlleles(); i++) {
+        if (v.allele(i) != null) {
+          numAlts++;
+          if (i != ov.alleleId()) {
+            if (remaining != -1) {
+              throw new IllegalStateException("Cannot have two remaining ALT alleles");
+            }
+            remaining = i;
+          }
+        }
+      }
+    }
+    if (numAlts > 1) {
+      if (remaining == -1) {
+        throw new IllegalStateException("Cannot have two " + numAlts + " alts without a remaining ALT alleles");
+      }
+      final List<String> alts = mCrv.getAltCalls();
+      final String alt = alts.get(remaining - 1);
+      alts.clear();
+      alts.add(alt);
+      mCrv.getFormatAndSample().clear();
+      mCrv.setNumberOfSamples(1);
+      mCrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1");
+    }
+    mAlternate.write(mCrv);
+  }
+
+  @Override
   protected void writeNonRedundant(AlleleIdVariant v, String status) throws IOException {
     mCrv.addInfo("STATUS", status);
-    final List<String> newAlts = new ArrayList<>();
-    addCallAllele(newAlts, v.alleleA());
-    if (v.alleleA() != v.alleleB()) {
-      addCallAllele(newAlts, v.alleleB());
-    }
-    mCrv.getAltCalls().clear();
-    mCrv.getAltCalls().addAll(newAlts);
-    Collections.sort(mCrv.getAltCalls());
-    mAlleles.write(mCrv);
-  }
-
-  protected void mergeIntoBaseline(AlleleIdVariant v, String status) throws IOException {
-    boolean merged = addCallAlleleToBaseline(v.alleleA());
-    if (v.alleleA() != v.alleleB()) {
-      merged |= addCallAlleleToBaseline(v.alleleB());
-    }
-    if (merged) {
-      Collections.sort(mBrv.getAltCalls());
-    }
-    mCrv.addInfo("STATUS", status + (merged ? "-Merged" : "-BSame")); // If merged, interesting, we added a new allele from this sample to existing site
-    mAuxiliary.write(mCrv);
-  }
-
-  private boolean addCallAlleleToBaseline(int gtId) {
-    if (gtId > 0) {
-      final String alt = mCrv.getAltCalls().get(gtId - 1);
-      if (!mBrv.getAltCalls().contains(alt)) {
-        mBrv.addAltCall(alt);
-        mBrv.addInfo("STATUS", "B-Merged-" + alt); // Baseline counterpart to C-FP-Merged
-        return true;
-      }
-    }
-    return false;
-  }
-
-  void addCallAllele(List<String> newAlts, int gtId) {
-    if (gtId > 0) {
-      final String alt = mCrv.getAltCalls().get(gtId - 1);
-      if (!newAlts.contains(alt)) {
-        newAlts.add(alt);
-      }
-    }
+    mAlternate.write(mCrv); // Write as-is to the alternate
+    // Prepare for usual incorporation
+    mCrv.getFormatAndSample().clear();
+    mCrv.setNumberOfSamples(0);
+    mCrv.setInfo("STATUS");
+    super.writeNonRedundant(v, status);
   }
 
   @Override
   void finish() throws IOException {
     super.finish();
-    if (mBaselineNotInPath > 0) {
-      Diagnostic.userLog("There were " + mBaselineNotInPath + " baseline records not in the path");
-    }
-    if (mCalledNotInPath > 0) {
-      Diagnostic.userLog("There were " + mCalledNotInPath + " call records not in the path");
-    }
   }
 
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
-    try (VcfWriter ignored = mAlleles;
-         VcfWriter ignored2 = mAuxiliary) {
-      // done for nice closing side effects
+    try (VcfWriter ignored = mAlternate) {
+      super.close();
     }
   }
 }

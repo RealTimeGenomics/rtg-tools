@@ -40,7 +40,6 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   private final Variant mVariant;
 
-  private final boolean mHeterozygous;
   private final boolean mIsAlleleA;
   private final int mAlleleId;
   private final int mOtherAlleleId;
@@ -50,7 +49,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
   /**
    * Create a homozygous variant
    * @param variant the variant
-   * @param alleleId the allele selected for the A haplotype
+   * @param alleleId the allele selected
    */
   public OrientedVariant(Variant variant, int alleleId) {
     this(variant, true, alleleId, alleleId);
@@ -60,14 +59,13 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * Create a variant
    * @param variant the variant
    * @param isAlleleA are we taking the A allele from the original GT
-   * @param alleleId the allele selected for the A haplotype
-   * @param otherAlleleId the allele selected for the B haplotype (for a haploid comparison
+   * @param alleleId the allele selected for the haplotype
+   * @param otherAlleleId the allele selected for the otherhaplotype (for a haploid comparison
    * this should be the same as the primary allele id)
    */
   public OrientedVariant(Variant variant, boolean isAlleleA, int alleleId, int otherAlleleId) {
     mVariant = variant;
     mAlleleId = alleleId;
-    mHeterozygous = otherAlleleId != alleleId;
     mOtherAlleleId = otherAlleleId;
     mIsAlleleA = isAlleleA;
     //assert mVariant != null;
@@ -174,7 +172,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * @return true if the genotype is heterozygous (i.e. diploid with different alleles)
    */
   public boolean isHeterozygous() {
-    return mHeterozygous;
+    return mOtherAlleleId != mAlleleId;
   }
 
   @Override

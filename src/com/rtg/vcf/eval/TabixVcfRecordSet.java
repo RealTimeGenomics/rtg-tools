@@ -175,20 +175,27 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
     switch (f) {
-      case VariantFactory.DiploidAltsFactory.NAME:
-        return new VariantFactory.DiploidAltsFactory();
-      case VariantFactory.HaploidAltsFactory.NAME:
-        return new VariantFactory.HaploidAltsFactory();
-      case VariantFactory.HaploidGtAltFactory.NAME:
-        return new VariantFactory.HaploidGtAltFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-      case VariantFactory.TrimmedGtFactory.NAME:
-        return new VariantFactory.TrimmedGtFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-      case VariantFactory.TrimmedGtIdFactory.NAME:
-        return new VariantFactory.TrimmedGtIdFactory(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-      case VariantFactory.Default.NAME:
-        return new VariantFactory.Default(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-      case VariantFactory.DefaultId.NAME:
-        return new VariantFactory.DefaultId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+      case VariantFactory.DiploidAlts.NAME:
+        return new VariantFactory.DiploidAlts();
+
+      case VariantFactory.HaploidAlts.NAME:
+        return new VariantFactory.HaploidAlts();
+
+      case VariantFactory.HaploidAltTrimmedGtId.NAME:
+        return new VariantFactory.HaploidAltTrimmedGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+
+      case VariantFactory.HaploidAltGt.NAME:
+        return new VariantFactory.HaploidAltGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+
+      case VariantFactory.TrimmedGtId.NAME:
+        return new VariantFactory.TrimmedGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+
+      case VariantFactory.DefaultGt.NAME:
+        return new VariantFactory.DefaultGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+
+      case VariantFactory.DefaultGtId.NAME:
+        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+
       default:
         throw new RuntimeException("Unknown variant factory: " + f);
     }

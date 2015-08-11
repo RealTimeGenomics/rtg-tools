@@ -39,18 +39,12 @@ import java.util.List;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.Utils;
+import com.rtg.util.intervals.Range;
 
 /**
  * One half of a path that reconciles two sequences of variants.
  */
 public class HalfPath implements Comparable<HalfPath> {
-
-  private static final Variant SENTINEL = new Variant(-1, "", -1, 0) {
-    @Override
-    public OrientedVariant[] orientations() {
-      throw new UnsupportedOperationException();
-    }
-  };
 
   private final HaplotypePlayback mHaplotypeA;
   private HaplotypePlayback mHaplotypeB;
@@ -58,9 +52,9 @@ public class HalfPath implements Comparable<HalfPath> {
   private BasicLinkedListNode<OrientedVariant> mIncluded;
   private BasicLinkedListNode<Variant> mExcluded;
 
-  private int mVariantEndPosition; // End of last variant added  XXX May be more optimal and still OK to use end of last variant included.
   private int mVariantIndex = -1;  // Index of last variant added
-  private Variant mLastVariant = SENTINEL; // Last variant included
+  private int mVariantEndPosition; // End of last variant added
+  private int mIncludedVariantEndPosition = 0; // Last variant included
 
   private boolean mFinishedTypeA;
   private boolean mFinishedTypeB;
@@ -85,41 +79,59 @@ public class HalfPath implements Comparable<HalfPath> {
     mHaplotypeB = path.mHaplotypeB == null ? null : path.mHaplotypeB.copy();
     mVariantEndPosition = path.mVariantEndPosition;
     mVariantIndex = path.mVariantIndex;
-    mLastVariant = path.mLastVariant;
+    mIncludedVariantEndPosition = path.mIncludedVariantEndPosition;
     mFinishedTypeA = path.mFinishedTypeA;
     mFinishedTypeB = path.mFinishedTypeB;
   }
 
-  void dumpHaplotypes() {
+  String dumpHaplotypes() {
+    return dumpHaplotypes(new Range(0, mHaplotypeA.mTemplate.length));
+  }
+
+  String dumpHaplotypes(Range region) {
     final List<OrientedVariant> included = new ArrayList<>();
     if (mIncluded != null) {
       for (final OrientedVariant v : mIncluded) {
-        included.add(v);
+        // Note, this only includes variants that are contained within the requested range, otherwise we cannot
+        // determine the start and end position of the haplotypes (which may be mid variant playback).
+        if (v.getEnd() <= region.getEnd() && v.getStart() >= region.getStart()) {
+          included.add(v);
+        }
       }
     }
     Collections.reverse(included);
 
-    System.out.print("A: ");
-    System.out.println(replayAll(included));
+    final StringBuilder sb = new StringBuilder(region.toString());
+    sb.append(' ');
+    sb.append(replayAll(included, region));
 
-    for (int i = 0; i < included.size(); i++) {
-      included.set(i, included.get(i).other());
+    if (mHaplotypeB != null) {
+      for (int i = 0; i < included.size(); i++) {
+        included.set(i, included.get(i).other());
+      }
+      sb.append("|").append(replayAll(included, region));
     }
-
-    System.out.print("B: ");
-    System.out.println(replayAll(included));
+    return sb.toString();
   }
 
   // Return the full haplotype sequence with respect to the given variants
-  private String replayAll(List<OrientedVariant> included) {
+  private String replayAll(List<OrientedVariant> included, Range region) {
     final StringBuilder sb = new StringBuilder();
     final HaplotypePlayback haplotype = new HaplotypePlayback(mHaplotypeA.mTemplate);
     for (OrientedVariant v : included) {
       haplotype.addVariant(v);
     }
+    if (region.getStart() > 0) {
+      haplotype.moveForward(region.getStart() - 1);
+    }
     while (haplotype.hasNext()) {
       haplotype.next();
-      sb.append(DnaUtils.getBase(haplotype.nt()));
+      if (haplotype.templatePosition() >= region.getEnd()) {
+        break;
+      }
+      if (haplotype.templatePosition() >= region.getStart()) {
+        sb.append(!haplotype.isOnTemplate() ? DnaUtils.getBaseLower(haplotype.nt()) : DnaUtils.getBase(haplotype.nt()));
+      }
     }
     return sb.toString();
   }
@@ -129,7 +141,7 @@ public class HalfPath implements Comparable<HalfPath> {
    * @return true if the variant starts later than the end of the last included one.
    */
   public boolean isNew(OrientedVariant var) {
-    if (mLastVariant == null || var.getStart() >= mLastVariant.getEnd()) {
+    if (var.getStart() >= mIncludedVariantEndPosition) {
       return true; // Can be added without considering overlapping
     }
     // Check if we can include this variant by overlapping
@@ -149,7 +161,7 @@ public class HalfPath implements Comparable<HalfPath> {
     mIncluded = new BasicLinkedListNode<>(var, mIncluded);
     mVariantEndPosition = Math.max(mVariantEndPosition, var.getEnd());
     mVariantIndex = varIndex;
-    mLastVariant = var.variant();
+    mIncludedVariantEndPosition = Math.max(mIncludedVariantEndPosition, var.variant().getEnd());
 
     // Lazy creation of the B haplotype
     if (mHaplotypeB == null && var.isHeterozygous()) {
@@ -293,6 +305,16 @@ public class HalfPath implements Comparable<HalfPath> {
       mHaplotypeB.moveForward(position);
     }
     mHaplotypeA.moveForward(position);
+  }
+
+  boolean matches(HalfPath other) {
+    if (!finishedHaplotypeA() && !other.finishedHaplotypeA() && nextHaplotypeABase() != other.nextHaplotypeABase()) {
+      return false;
+    }
+    if (!finishedHaplotypeB() && !other.finishedHaplotypeB() && nextHaplotypeBBase() != other.nextHaplotypeBBase()) {
+      return false;
+    }
+    return true;
   }
 
   @Override

@@ -263,13 +263,7 @@ public class Path implements Comparable<Path> {
   }
 
   boolean matches() {
-    if (!mCalledPath.finishedHaplotypeA() && !mBaselinePath.finishedHaplotypeA() && mCalledPath.nextHaplotypeABase() != mBaselinePath.nextHaplotypeABase()) {
-      return false;
-    }
-    if (!mCalledPath.finishedHaplotypeB() && !mBaselinePath.finishedHaplotypeB() && mCalledPath.nextHaplotypeBBase() != mBaselinePath.nextHaplotypeBBase()) {
-      return false;
-    }
-    return true;
+    return mCalledPath.matches(mBaselinePath);
   }
 
   @Override

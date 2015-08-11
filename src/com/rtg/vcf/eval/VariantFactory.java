@@ -33,6 +33,7 @@ import java.util.Arrays;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.StringUtils;
+import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -56,7 +57,7 @@ public interface VariantFactory {
    * padding base, and only if it is shared by all alleles.
    * Path finding will require full genotype to match.
    */
-  class Default implements VariantFactory {
+  class DefaultGt implements VariantFactory {
 
     static final String NAME = "default";
 
@@ -66,7 +67,7 @@ public interface VariantFactory {
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      */
-    public Default(int sampleNo) {
+    public DefaultGt(int sampleNo) {
       mSampleNo = sampleNo;
     }
 
@@ -90,11 +91,27 @@ public interface VariantFactory {
       // Treats missing value as distinct value ("N")
       final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
       for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtArray[i], hasPreviousNt)));
+        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(getAllele(rec, gtArray[i], hasPreviousNt)));
       }
 
       return new CompactVariant(id, seqName, start, end, alleles, phased);
     }
+
+    protected static String getAllele(VcfRecord rec, int allele, boolean hasPreviousNt) {
+      if (allele == -1) {
+        return "N"; // Missing allele
+      }
+      final String localAllele = rec.getAllele(allele);
+      if (hasPreviousNt) {
+        if (localAllele.length() == 1) {
+          return "";
+        }
+        return localAllele.substring(1);
+      } else {
+        return localAllele;
+      }
+    }
+
   }
 
   /**
@@ -103,7 +120,7 @@ public interface VariantFactory {
    * padding base, and only if it is shared by all alleles.
    * Path finding will require full genotype to match.
    */
-  class DefaultId implements VariantFactory {
+  class DefaultGtId implements VariantFactory {
 
     static final String NAME = "default-id";
 
@@ -113,7 +130,7 @@ public interface VariantFactory {
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      */
-    public DefaultId(int sampleNo) {
+    public DefaultGtId(int sampleNo) {
       mSampleNo = sampleNo;
     }
 
@@ -137,7 +154,7 @@ public interface VariantFactory {
       // Treats missing value as ref
       final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
       for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, i, hasPreviousNt)));
+        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(DefaultGt.getAllele(rec, i, hasPreviousNt)));
       }
       final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
@@ -147,69 +164,11 @@ public interface VariantFactory {
   }
 
   /**
-   * Construct Variants corresponding to the GT of a specified sample.
-   * This version performs trimming of all common leading/trailing bases that match REF.
-   * Path finding will require full genotype to match, but will be more permissive of padding bases.
-   */
-  class TrimmedGtFactory implements VariantFactory {
-
-    static final String NAME = "default-trim";
-
-    private final int mSampleNo;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     */
-    public TrimmedGtFactory(int sampleNo) {
-      mSampleNo = sampleNo;
-    }
-
-    @Override
-    public Variant variant(VcfRecord rec, int id) {
-      // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
-        return null;
-      }
-
-      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2;
-
-      final String[] allAlleles = VcfUtils.getAlleleStrings(rec, false);
-      for (int i = 1; i < allAlleles.length; i++) {
-        if (!(gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i))) {
-          allAlleles[i] = null;
-        }
-      }
-      final int stripLeading = StringUtils.longestPrefix(allAlleles);
-      final int stripTrailing = StringUtils.longestSuffix(stripLeading, allAlleles);
-      for (int i = 0; i < allAlleles.length; i++) {
-        if (allAlleles[i] != null) {
-          allAlleles[i] = StringUtils.clip(allAlleles[i], stripLeading, stripTrailing);
-        }
-      }
-      final String seqName = rec.getSequenceName();
-      final int start = rec.getStart() + stripLeading;
-      final int end = rec.getEnd() - stripTrailing;
-      final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
-      for (int i = 0; i < alleles.length; i++) {
-        final int allele = gtArray[i];
-        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(allele == -1 ? "N" : allAlleles[allele]));
-      }
-
-      final boolean phased = VcfUtils.isPhasedGt(gt);
-
-      return new CompactVariant(id, seqName, start, end, alleles, phased);
-    }
-  }
-
-  /**
    * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
    * This version performs trimming of all common leading/trailing bases that match REF.
    * Path finding will require full genotype to match, but will be more permissive of reference overlaps.
    */
-  class TrimmedGtIdFactory implements VariantFactory {
+  class TrimmedGtId implements VariantFactory {
 
     static final String NAME = "default-trim-id";
 
@@ -219,7 +178,7 @@ public interface VariantFactory {
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      */
-    public TrimmedGtIdFactory(int sampleNo) {
+    public TrimmedGtId(int sampleNo) {
       mSampleNo = sampleNo;
     }
 
@@ -233,32 +192,47 @@ public interface VariantFactory {
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       assert gtArray.length == 1 || gtArray.length == 2;
-
-      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
-      final String seqName = rec.getSequenceName();
-      int start = Integer.MAX_VALUE;
-      int end = Integer.MIN_VALUE;
-      for (int i = 0; i < alleles.length; i++) {
-        if (gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
-          final Allele allele = getAllele(rec, i, true);
-          if (allele != null) {
-            alleles[i] = allele;
-            start = Math.min(start, alleles[i].getStart());
-            end = Math.max(end, alleles[i].getEnd());
-          }
-        }
-      }
+      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, gtArray);
+      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
       final int alleleA = gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
       final boolean phased = VcfUtils.isPhasedGt(gt);
+      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, phased);
+    }
 
-      return new AlleleIdVariant(id, seqName, start, end, alleles, alleleA, alleleB, phased);
+
+    // Return alleles, one per REF/ALT declared in the record.
+    // Each allele has leading/trailing ref bases removed and position adjusted accordingly.
+    // If gtArray is not null, only populate alleles referenced by the array
+    static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray) {
+      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
+      for (int i = 0; i < alleles.length; i++) {
+        if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
+          final Allele allele = TrimmedGtId.getAllele(rec, i, true);
+          if (allele != null) {
+            alleles[i] = allele;
+          }
+        }
+      }
+      return alleles;
+    }
+
+    static Range getAlleleBounds(Allele[] alleles) {
+      int start = Integer.MAX_VALUE;
+      int end = Integer.MIN_VALUE;
+      for (final Allele allele : alleles) {
+        if (allele != null) {
+          start = Math.min(start, allele.getStart());
+          end = Math.max(end, allele.getEnd());
+        }
+      }
+      return new Range(start, end);
     }
 
     // Create an Allele from a VCF record.
     // If trim is enabled, remove all leading and trailing bases agreeing with ref, and adjust position accordingly.
     // If the resulting allele is a no-op, return null
-    protected static Allele getAllele(VcfRecord rec, int allele, boolean trim) {
+    static Allele getAllele(VcfRecord rec, int allele, boolean trim) {
       if (allele == -1) {
         return null;
       }
@@ -281,7 +255,7 @@ public interface VariantFactory {
    * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
    * Path finding will match any variants where there are any non-ref allele matches.
    */
-  class HaploidGtAltFactory implements VariantFactory {
+  class HaploidAltGt implements VariantFactory {
 
     static final String NAME = "squash";
 
@@ -291,7 +265,7 @@ public interface VariantFactory {
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      */
-    HaploidGtAltFactory(int sampleNo) {
+    HaploidAltGt(int sampleNo) {
       mSampleNo = sampleNo;
     }
 
@@ -322,20 +296,80 @@ public interface VariantFactory {
       prev = -1;
       for (final int gtId : gtArray) {
         if (gtId > 0 && gtId != prev) {
-          alleles[j++] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtId, hasPreviousNt)));
+          alleles[j++] = new Allele(seqName, start, end, DnaUtils.encodeString(DefaultGt.getAllele(rec, gtId, hasPreviousNt)));
         }
         prev = gtId;
       }
 
-      return new SquashPloidyVariant(id, seqName, start, end, alleles);
+      return new Variant(id, seqName, start, end, alleles, false) {
+        @Override
+        public OrientedVariant[] orientations() {
+          final OrientedVariant[] pos = new OrientedVariant[numAlleles()];
+          for (int i = 0 ; i < numAlleles(); i++) {
+            pos[i] = new OrientedVariant(this, i);
+          }
+          return pos;
+        }
+      };
     }
   }
+
+  /**
+   * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
+   * Path finding will match any variants where there are any non-ref allele matches.
+   */
+  class HaploidAltTrimmedGtId implements VariantFactory {
+
+    static final String NAME = "squash-trim-id";
+
+    private final int mSampleNo;
+
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     */
+    HaploidAltTrimmedGtId(int sampleNo) {
+      mSampleNo = sampleNo;
+    }
+
+    @Override
+    public Variant variant(VcfRecord rec, int id) {
+      // Currently we skip non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
+
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
+      final int[] gtArray = VcfUtils.splitGt(gt);
+      assert gtArray.length == 1 || gtArray.length == 2;
+      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, gtArray);
+      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+      final int alleleA = gtArray[0] > 0 ? gtArray[0] : gtArray[1];
+      final int alleleB = gtArray.length == 1 || gtArray[1] < 1 ? alleleA : gtArray[1];
+      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, false) {
+        @Override
+        public OrientedVariant[] orientations() {
+          final OrientedVariant[] pos;
+          if (alleleA == alleleB) {
+            pos = new OrientedVariant[1];
+            pos[0] = new OrientedVariant(this, alleleA);
+          } else {
+            pos = new OrientedVariant[2];
+            pos[0] = new OrientedVariant(this, alleleA);
+            pos[1] = new OrientedVariant(this, alleleB);
+          }
+          return pos;
+        }
+      };
+    }
+  }
+
 
   /**
    * Creates a haploid oriented variant for every ALT allele declared in the variant record.
    * Used to perform allele matching against the full set of declared alleles rather than those in a sample column.
    */
-  class HaploidAltsFactory implements VariantFactory {
+  class HaploidAlts implements VariantFactory {
 
     static final String NAME = "hap-alt";
 
@@ -344,25 +378,29 @@ public interface VariantFactory {
       if (rec.getAltCalls().size() == 0) {
         return null;
       } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
-      final String seqName = rec.getSequenceName();
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
 
-      final Allele[] alleles = new Allele[rec.getAltCalls().size()];
-      for (int gtId = 0; gtId < alleles.length; gtId++) {
-        alleles[gtId] = new Allele(seqName, start, end, DnaUtils.encodeString(Variant.getAllele(rec, gtId + 1, hasPreviousNt)));
-      }
+      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
+      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
 
-      return new SquashPloidyVariant(id, seqName, start, end, alleles);
+      return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
+        @Override
+        public OrientedVariant[] orientations() {
+          final OrientedVariant[] pos = new OrientedVariant[numAlleles() - 1];
+          for (int i = 0 ; i < pos.length; i++) {
+            pos[i] = new OrientedVariant(this, i + 1);
+          }
+          return pos;
+        }
+      };
     }
   }
 
   /**
    * Creates all possible non-ref diploid variants using any of the ALT alleles declared in the variant record.
    * Used to perform sample genotype matching against the possibilities defined by the full set of declared alleles.
+   * Includes all combinations of half calls (instead of using REF).
    */
-  class DiploidAltsFactory implements VariantFactory {
+  class DiploidAlts implements VariantFactory {
 
     static final String NAME = "dip-alt";
 
@@ -371,24 +409,22 @@ public interface VariantFactory {
       if (rec.getAltCalls().size() == 0) {
         return null;
       } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
-      final String seqName = rec.getSequenceName();
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
-      final byte[][] alleles = new byte[1 + rec.getAltCalls().size()][];
-      for (int gtId = 0; gtId < alleles.length; gtId++) {
-        alleles[gtId] = DnaUtils.encodeString(Variant.getAllele(rec, gtId, hasPreviousNt));
-      }
 
-      return new Variant(id, seqName, start, end, alleles, false) {
+      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
+      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+
+      return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos = new OrientedVariant[numAlleles() * numAlleles() - 1];
           int v = 0;
           for (int i = 1 ; i < numAlleles(); i++) {
-            for (int j = 0; j < i; j++) {
+            for (int j = -1; j < i; j++) {
               pos[v++] = new OrientedVariant(this, true, i, j);
               pos[v++] = new OrientedVariant(this, false, j, i);
+              if (j == -1) {
+                j++; // Jump from . to first allele
+              }
             }
             pos[v++] = new OrientedVariant(this, true, i, i);
           }

@@ -37,6 +37,7 @@ import com.rtg.mode.DNA;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.TestUtils;
+import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfReader;
 
 import junit.framework.TestCase;
@@ -239,14 +240,18 @@ public class HalfPathTest extends TestCase {
     final HalfPath path = new HalfPath(template);
     assertFalse(path.toString().contains("minus:"));
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 4, new byte[]{3}, new byte[]{4}), true), 0);
-    path.exclude(new MockVariant(5, 6, new byte[] {2}, new byte[] {4}), 1);
-    path.exclude(new MockVariant(5, 6, new byte[] {2}, new byte[] {4}), 2);
+    path.exclude(new MockVariant(5, 6, new byte[]{2}, new byte[]{4}), 1);
+    path.exclude(new MockVariant(5, 6, new byte[]{2}, new byte[]{4}), 2);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(8, 9, new byte[]{3}, new byte[]{4}), true), 3);
     TestUtils.containsAll(path.toString()
-        , "included:"
-        , "[8-9 (G^:Tv), 3-4 (G^:Tv)]"
-        , "excluded:"
-        , "[5:6 C:T, 5:6 C:T]");
+      , "included:"
+      , "[8-9 (G^:Tv), 3-4 (G^:Tv)]"
+      , "excluded:"
+      , "[5:6 C:T, 5:6 C:T]");
+    assertEquals("1-17 AAgAAGCgAACGTACGT|AAtAAGCtAACGTACGT", path.dumpHaplotypes());
+    assertEquals("3-10 gAAGCgAA|tAAGCtAA", path.dumpHaplotypes(new Range(2, 10)));
+    assertEquals("4-8 AAGCg|AAGCt", path.dumpHaplotypes(new Range(3, 8)));
+    assertEquals("4-7 AAGC|AAGC", path.dumpHaplotypes(new Range(3, 7)));
 
   }
   private static final String[] CALLS_TRICKY = {

@@ -31,6 +31,10 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -38,7 +42,6 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
-import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Outputs a new sample genotype with respect to the population alleles
@@ -62,15 +65,22 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final VcfHeader h = variants.baseLineHeader().copy();
-    h.removeAllSamples();
-    mAlleles = new VcfWriter(h, new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new population alleles (old + new sample alleles)
-    mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
+    mAlleles = new VcfWriter(variants.calledHeader(), new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new representation of sample using population alleles
+    mAuxiliary = new VcfWriter(variants.calledHeader(), new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
   }
 
   @Override
-  protected void resetRecordFields(VcfRecord rec) {
-    rec.removeInfo("STATUS");
+  protected void resetBaselineRecordFields(VcfRecord rec) {
+    rec.getInfo().clear();
+    rec.setNumberOfSamples(1);
+  }
+
+  @Override
+  protected void resetCallRecordFields(VcfRecord rec) {
+    rec.setId();
+    rec.setQuality(null);
+    rec.getFilters().clear();
+    rec.getInfo().clear();
   }
 
   @Override
@@ -84,15 +94,15 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       // We don't have a baseline record at this position -- during allele accumulation this record was determined to be redundant / equivalent to other variants.
       // We have a good indication that it should have been possible to simplify this if the region were not too hard
       mCrv.addInfo("STATUS", "C-TooHard-BDiff");
+      normalize(mCrv);
       mAlleles.write(mCrv);
     } else {
       // Excluded, but we don't have a baseline call at this position.
-      // This should not happen if we have accumulated alleles
-      throw new IllegalStateException("C-NotInPath - should not happen. Record: " + mCrv.toString());
-//        assert mCv instanceof AlleleIdVariant || mCv instanceof SkippedVariant;
-//        final String label = mCv instanceof AlleleIdVariant ? "-FP" : "-TooHard";
-//        mCrv.addInfo("STATUS", "C" + label + "=" + mCv.toString());
-//        mAuxiliary.write(mCrv);
+      // This should not normally happen if we have accumulated all alleles
+      // Output the original representation
+      mCrv.addInfo("STATUS", "C-FP=" + mCv.toString());
+      normalize(mCrv);
+      mAlleles.write(mCrv);
     }
   }
 
@@ -103,24 +113,45 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       // Add the appropriate GT and output the record
       final OrientedVariant ov = (OrientedVariant) mBv;
       mBrv.getFormatAndSample().clear();
-      mBrv.setNumberOfSamples(1);
-      final String gt = "" + encode(ov.alleleId()) + VcfUtils.UNPHASED_SEPARATOR + encode(ov.other().alleleId());
-      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, gt);
+      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
+      normalize(mBrv);
       mAlleles.write(mBrv);
     } else if (mBv instanceof SkippedVariant) {
       // Expected sometimes, do nothing here (a relevant call will already have been output if needed during processBoth using its allele representation).
       mBrv.addInfo("STATUS", "B-TooHard");
+      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.MISSING_FIELD);
       mAuxiliary.write(mBrv);
     } else {
       // Excluded, this population variant is not in this sample, no need to output to primary.
       mBrv.addInfo("STATUS", "B-NotInSample");
+      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.MISSING_FIELD);
       mAuxiliary.write(mBrv);
     }
   }
 
-  private String encode(int id) {
-    return id == -1 ? VcfUtils.MISSING_FIELD : String.valueOf(id);
+  protected static void normalize(VcfRecord rec) {
+    final int[] gt = VcfUtils.getValidGt(rec, 0);
+    Arrays.sort(gt);
+    int lastId = -1;
+    final List<String> newAlts = new ArrayList<>();
+    for (int id : gt) {
+      if (id > 0 && id != lastId) {
+        newAlts.add(rec.getAllele(id));
+      }
+      lastId = id;
+    }
+    Collections.sort(newAlts);
+    for (int i = 0; i < gt.length; i++) {
+      if (gt[i] > 0) {
+        gt[i] = newAlts.indexOf(rec.getAllele(gt[i])) + 1;
+      }
+    }
+    Arrays.sort(gt);
+    rec.getAltCalls().clear();
+    rec.getAltCalls().addAll(newAlts);
+    rec.getFormatAndSample().clear();
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, gt));
   }
 
   @Override
@@ -132,15 +163,16 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       mAuxiliary.write(mCrv);
     } else if (mCv instanceof SkippedVariant) {
       // Happens in TooHard regions.
-      // Output a record using the current GT from this record
+      // Output the original representation
       mCrv.addInfo("STATUS", "C-TooHard");
+      normalize(mCrv);
       mAlleles.write(mCrv);
     } else {
-      // Excluded. This shouldn't happen except where the sample is self-inconsistent.
-      // What To Do?
-      assert mCv instanceof AlleleIdVariant || mCv instanceof SkippedVariant;
+      // Excluded. This shouldn't happen except where the sample is self-inconsistent or perhaps the population allele accumulation had to drop the site.
+      // Output the original representation
       mCrv.addInfo("STATUS", "C-Inconsistent");
-      mAuxiliary.write(mCrv);
+      normalize(mCrv);
+      mAlleles.write(mCrv);
     }
   }
 

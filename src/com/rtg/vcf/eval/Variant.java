@@ -81,21 +81,6 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
     return result;
   }
 
-  protected static String getAllele(VcfRecord rec, int allele, boolean hasPreviousNt) {
-    if (allele == -1) {
-      return "N"; // Missing allele
-    }
-    final String localAllele = rec.getAllele(allele);
-    if (hasPreviousNt) {
-      if (localAllele.length() == 1) {
-        return "";
-      }
-      return localAllele.substring(1);
-    } else {
-      return localAllele;
-    }
-  }
-
   @Override
   public int compareTo(final Variant o2) {
     return NATURAL_COMPARATOR.compare(this, o2);

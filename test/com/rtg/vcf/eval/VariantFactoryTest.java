@@ -52,26 +52,26 @@ public class VariantFactoryTest extends TestCase {
 
   private VariantFactory factory(String name) {
     switch (name) {
-      case VariantFactory.Default.NAME:
-        return new VariantFactory.Default(0);
+      case VariantFactory.DefaultGt.NAME:
+        return new VariantFactory.DefaultGt(0);
 
-      case VariantFactory.DefaultId.NAME:
-        return new VariantFactory.DefaultId(0);
+      case VariantFactory.DefaultGtId.NAME:
+        return new VariantFactory.DefaultGtId(0);
 
-      case VariantFactory.TrimmedGtFactory.NAME:
-        return new VariantFactory.TrimmedGtFactory(0);
+      case VariantFactory.TrimmedGtId.NAME:
+        return new VariantFactory.TrimmedGtId(0);
 
-      case VariantFactory.TrimmedGtIdFactory.NAME:
-        return new VariantFactory.TrimmedGtIdFactory(0);
+      case VariantFactory.HaploidAltGt.NAME:
+        return new VariantFactory.HaploidAltGt(0);
 
-      case VariantFactory.HaploidGtAltFactory.NAME:
-        return new VariantFactory.HaploidGtAltFactory(0);
+      case VariantFactory.HaploidAltTrimmedGtId.NAME:
+        return new VariantFactory.HaploidAltTrimmedGtId(0);
 
-      case VariantFactory.HaploidAltsFactory.NAME:
-        return new VariantFactory.HaploidAltsFactory();
+      case VariantFactory.HaploidAlts.NAME:
+        return new VariantFactory.HaploidAlts();
 
-      case VariantFactory.DiploidAltsFactory.NAME:
-        return new VariantFactory.DiploidAltsFactory();
+      case VariantFactory.DiploidAlts.NAME:
+        return new VariantFactory.DiploidAlts();
 
       default:
         throw new RuntimeException("Unknown variant factory: " + name);
@@ -84,7 +84,7 @@ public class VariantFactoryTest extends TestCase {
 
   public void testSquashPloidy() throws Exception {
     // Test squashing ploidy  1/2 -> 1, 2
-    VariantFactory fact = factory(VariantFactory.HaploidGtAltFactory.NAME);
+    VariantFactory fact = factory(VariantFactory.HaploidAltGt.NAME);
     Variant variant = createVariant(fact, SNP_LINE2);
     assertEquals(1, variant.nt(0).length);
     assertEquals(T.ordinal(), variant.nt(0)[0]);
@@ -123,32 +123,9 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE6 = "chr 23 . T A,TAAA . PASS . GT 2|1";
   static final String SNP_LINE7 = "chr 23 . T A,TAAA . PASS . GT 2|.";
 
-  public void testTrimmedGtPloidy() throws Exception {
-    // Test trimming ploidy  AA:ATTA -> :TT
-    VariantFactory fact = factory(VariantFactory.TrimmedGtFactory.NAME);
-    Variant variant = createVariant(fact, SNP_LINE5);
-    assertEquals(23, variant.getStart());
-    assertEquals(23, variant.getEnd());
-    assertEquals(2, variant.numAlleles());
-    assertEquals("", DnaUtils.bytesToSequenceIncCG(variant.nt(0)));
-    assertEquals("TT", DnaUtils.bytesToSequenceIncCG(variant.nt(1)));
-    OrientedVariant[] pos = variant.orientations();
-    assertEquals(2, pos.length);
-
-    variant = createVariant(fact, SNP_LINE6);
-    assertEquals(22, variant.getStart());
-    assertEquals(23, variant.getEnd());
-    assertEquals(2, variant.numAlleles());
-    assertEquals(4, variant.nt(0).length);
-    assertEquals("TAAA", DnaUtils.bytesToSequenceIncCG(variant.nt(0)));
-    assertEquals("A", DnaUtils.bytesToSequenceIncCG(variant.nt(1)));
-    pos = variant.orientations();
-    assertEquals(2, pos.length);
-  }
-
   public void testTrimmedGtIdPloidy() throws Exception {
     // Test trimming ploidy  AA:ATTA -> :TT
-    VariantFactory fact = factory(VariantFactory.TrimmedGtIdFactory.NAME);
+    VariantFactory fact = factory(VariantFactory.TrimmedGtId.NAME);
     Variant variant = createVariant(fact, SNP_LINE5);
     assertEquals(23, variant.getStart());
     assertEquals(23, variant.getStart());

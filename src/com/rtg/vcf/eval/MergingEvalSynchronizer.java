@@ -75,7 +75,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
         if (mBrv == null && br.hasNext()) {
           mBrv = br.next();
           mBid++;
-          resetRecordFields(mBrv);
+          resetBaselineRecordFields(mBrv);
         }
         if (mCv == null && cit.hasNext()) {
           mCv = cit.next();
@@ -83,7 +83,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
         if (mCrv == null && cr.hasNext()) {
           mCrv = cr.next();
           mCid++;
-          resetRecordFields(mCrv);
+          resetCallRecordFields(mCrv);
         }
 
         if (mBrv == null && mCrv == null) { // Finished
@@ -150,7 +150,9 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
     // Do nothing
   }
 
-  protected abstract void resetRecordFields(VcfRecord rec);
+  protected abstract void resetBaselineRecordFields(VcfRecord rec);
+
+  protected abstract void resetCallRecordFields(VcfRecord rec);
 
   /**
    * Process a baseline record where we can not associate a matching baseline variant.

@@ -44,12 +44,16 @@ import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.IntervalComparator;
+import com.rtg.util.intervals.Range;
+import com.rtg.util.intervals.SequenceNameLocusSimple;
 
 /**
  * Runs all the evaluation for a single reference sequence
  */
 @TestClass({"com.rtg.vcf.eval.VcfEvalTaskTest", "com.rtg.vcf.eval.PhasingEvaluatorTest"})
 class SequenceEvaluator implements IORunnable {
+
+  private static final boolean DUMP = Boolean.getBoolean("dump-haplotypes");
 
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;
@@ -85,12 +89,13 @@ class SequenceEvaluator implements IORunnable {
       //find the best path for variant calls
       final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
 
-//      System.out.println(best);
-//      System.out.println("#### dumping baseline " + currentName + " haplotypes");
-//      best.mBaselinePath.dumpHaplotypes();
-//      System.out.println("#### dumping call " + currentName + " haplotypes");
-//      best.mCalledPath.dumpHaplotypes();
-//      System.out.println("### done");
+      if (DUMP) {
+        System.out.println("#### " + best);
+        final Range interesting = new SequenceNameLocusSimple(currentName, best.getSyncPoints().get(0).getPos(), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
+        System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));
+        System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
+        System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
+      }
 
       // A Bunch of postprocessing that could probably be done in bestPath
       List<OrientedVariant> truePositives = best.getCalledIncluded();
