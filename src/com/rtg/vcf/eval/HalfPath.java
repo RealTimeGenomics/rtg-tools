@@ -111,11 +111,8 @@ public class HalfPath implements Comparable<HalfPath> {
     mHaplotypeA.addVariant(var);
 
     if (mHaplotypeB != null) {
-      if (!var.isHeterozygous()) {
-        mHaplotypeB.addVariant(var);
-      } else { // Add the other side of the heterozygous diploid variant.
-        mHaplotypeB.addVariant(var.other());
-      }
+      // Add the other side of the heterozygous diploid variant.
+      mHaplotypeB.addVariant(var.other());
     }
   }
 

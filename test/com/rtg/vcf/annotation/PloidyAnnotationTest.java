@@ -49,6 +49,8 @@ public class PloidyAnnotationTest extends TestCase {
     final PloidyAnnotation pdAnn = new PloidyAnnotation();
     final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(6);
+    rec.setRefCall("A");
+    rec.addAltCall("G");
     rec.addFormatAndSample("GT", "0/1");
     rec.addFormatAndSample("GT", ".");
     rec.addFormatAndSample("GT", "1/1");

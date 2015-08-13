@@ -49,7 +49,7 @@ public enum RocFilter {
   HOMOZYGOUS {
     @Override
     boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isHomozygous(rec, sample);
+      return VcfUtils.isHomozygousAlt(rec, sample);
     }
   },
   /** all heterozygous **/
@@ -77,14 +77,14 @@ public enum RocFilter {
   HOMOZYGOUS_COMPLEX {
     @Override
     boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygous(rec, sample);
+      return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(rec, sample);
     }
   },
   /** homozygous simple (non complex) calls **/
   HOMOZYGOUS_SIMPLE {
     @Override
     boolean accept(VcfRecord rec, int sample) {
-      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygous(rec, sample);
+      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(rec, sample);
     }
   },
   /** heterozygous complex calls **/

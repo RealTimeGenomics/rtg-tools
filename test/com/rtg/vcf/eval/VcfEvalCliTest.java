@@ -144,19 +144,28 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
-    check("vcfeval_small", false, false, true, "--sample", "sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small", false, false, true, false, "--sample", "sample1", "--vcf-score-field", "QUAL");
+  }
+
+  public void testNanoTricky() throws IOException, UnindexableDataException {
+    check("vcfeval_small_tricky", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1");
+
+    // Variant on 14 requires less conservative padding removal (use default-trim variant factory), e.g.
+    //check("vcfeval_small_tricky", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--XXcom.rtg.vcf.eval.custom-variant-factory=default-trim,default-trim");
+
+    // Variant on 21 requires variant overlap consideration to be independent for each haplotype
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {
-    check("vcfeval_small_region", false, false, false, "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
+    check("vcfeval_small_region", false, false, false, false, "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
   }
 
   public void testNanoSmallDiffSamples() throws IOException, UnindexableDataException {
-    check("vcfeval_small_samples", false, false, false, "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small_samples", false, false, false, false, "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoTooComplex() throws IOException, UnindexableDataException {
-    check("vcfeval_too_complex", true, false, false);
+    check("vcfeval_too_complex", true, false, false, false);
   }
 
   private String[] appendArgs(String[] args, String...moreArgs) {
@@ -165,7 +174,7 @@ public class VcfEvalCliTest extends AbstractCliTest {
     return result;
   }
 
-  private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, String... args) throws IOException, UnindexableDataException {
+  private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, boolean checkFp, String... args) throws IOException, UnindexableDataException {
     final File template = new File(mDir, "template");
     final File baseline = new File(mDir, "baseline.vcf.gz");
     final File calls = new File(mDir, "calls.vcf.gz");
@@ -191,6 +200,9 @@ public class VcfEvalCliTest extends AbstractCliTest {
     }
     if (checkTp) {
       mNano.check(id + "_tp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "tp.vcf"))));
+    }
+    if (checkFp) {
+      mNano.check(id + "_fp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "fp.vcf"))));
     }
   }
 }

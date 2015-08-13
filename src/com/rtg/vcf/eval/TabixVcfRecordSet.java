@@ -175,14 +175,16 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
     switch (f) {
-      case "dip-alt":
-        return new SquashPloidyVariant.DiploidAltFactory(mExtractor);
-      case "hap-alt":
-        return new SquashPloidyVariant.HaploidAltFactory(mExtractor);
-      case "squash":
-        return new SquashPloidyVariant.GtAltFactory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
-      case "default":
-        return new Variant.Factory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+      case VariantFactory.DiploidAltsFactory.NAME:
+        return new VariantFactory.DiploidAltsFactory(mExtractor);
+      case VariantFactory.HaploidAltsFactory.NAME:
+        return new VariantFactory.HaploidAltsFactory(mExtractor);
+      case VariantFactory.HaploidGtAltFactory.NAME:
+        return new VariantFactory.HaploidGtAltFactory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+      case VariantFactory.TrimmedGtFactory.NAME:
+        return new VariantFactory.TrimmedGtFactory(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
+      case VariantFactory.Default.NAME:
+        return new VariantFactory.Default(VcfUtils.getSampleIndexOrDie(header, mSampleName, mType.label()), mExtractor);
       default:
         throw new RuntimeException("Unknown variant factory: " + f);
     }

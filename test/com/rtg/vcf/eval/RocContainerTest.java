@@ -35,7 +35,6 @@ import java.io.IOException;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.vcf.VcfReader;
 
 import junit.framework.TestCase;
 
@@ -47,7 +46,7 @@ public class RocContainerTest extends TestCase {
       final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING, null);
       final File allFile = new File(dir, "all.txt.gz");
       roc.addFilter(RocFilter.ALL, allFile);
-      final Variant v = VariantTest.createVariant(VcfReader.vcfLineToRecord(VariantTest.SHORT_LINE), 0, RocSortValueExtractor.NULL_EXTRACTOR);
+      final Variant v = VariantTest.createVariant(VariantTest.SHORT_LINE, 0, RocSortValueExtractor.NULL_EXTRACTOR);
       roc.addRocLine(0.1, 1.0, v);
       roc.addRocLine(0.1, 0.0, v);
       roc.addRocLine(0.2, 0.0, v);

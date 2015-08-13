@@ -400,6 +400,18 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * Get the allele with the specified index
+   * @param allele the allele to retrieve
+   * @return the allele, or null if allele index is -1 (missing)
+   */
+  public String getAllele(int allele) {
+    if (allele > mAltCalls.size()) {
+      throw new IllegalArgumentException("Invalid allele number " + allele);
+    }
+    return allele == -1 ? null : allele == 0 ? getRefCall() : mAltCalls.get(allele - 1);
+  }
+
+  /**
    * @return quality
    */
   public String getQuality() {

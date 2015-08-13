@@ -85,8 +85,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   // Get this variant oriented on the other haplotype.
   OrientedVariant other() {
-    assert isHeterozygous();
-    return new OrientedVariant(mVariant, !mIsAlleleA, mOtherAlleleId, mAlleleId);
+    return isHeterozygous() ? new OrientedVariant(mVariant, !mIsAlleleA, mOtherAlleleId, mAlleleId) : this;
   }
 
   /**

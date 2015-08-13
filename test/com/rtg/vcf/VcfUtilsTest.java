@@ -34,6 +34,7 @@ package com.rtg.vcf;
 import java.io.File;
 import java.util.Arrays;
 
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.annotation.DerivedAnnotations;
 
 import junit.framework.TestCase;
@@ -57,15 +58,15 @@ public class VcfUtilsTest extends TestCase {
     assertTrue(Arrays.toString(actual), Arrays.equals(expected, actual));
   }
   public void testSplitGT() {
-    checkSplit(new int[] {-1}, VcfUtils.splitGt("."));
-    checkSplit(new int[] {1}, VcfUtils.splitGt("1"));
-    checkSplit(new int[] {0, 1}, VcfUtils.splitGt("0|1"));
-    checkSplit(new int[] {1, -1}, VcfUtils.splitGt("1|."));
-    checkSplit(new int[] {-1, -1}, VcfUtils.splitGt(".|."));
-    checkSplit(new int[] {123}, VcfUtils.splitGt("123"));
-    checkSplit(new int[] {123, 321}, VcfUtils.splitGt("123/321"));
-    checkSplit(new int[] {123, 321, 369}, VcfUtils.splitGt("123/321|369"));
-    checkSplit(new int[] {3, 2, 9, 8}, VcfUtils.splitGt("3/2|9/8"));
+    checkSplit(new int[]{-1}, VcfUtils.splitGt("."));
+    checkSplit(new int[]{1}, VcfUtils.splitGt("1"));
+    checkSplit(new int[]{0, 1}, VcfUtils.splitGt("0|1"));
+    checkSplit(new int[]{1, -1}, VcfUtils.splitGt("1|."));
+    checkSplit(new int[]{-1, -1}, VcfUtils.splitGt(".|."));
+    checkSplit(new int[]{123}, VcfUtils.splitGt("123"));
+    checkSplit(new int[]{123, 321}, VcfUtils.splitGt("123/321"));
+    checkSplit(new int[]{123, 321, 369}, VcfUtils.splitGt("123/321|369"));
+    checkSplit(new int[]{3, 2, 9, 8}, VcfUtils.splitGt("3/2|9/8"));
 
     try {
       checkSplit(new int[] {}, VcfUtils.splitGt("|"));
@@ -130,7 +131,25 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/0", "A")));
   }
 
-  public void testSkipRecordForSample() {
+  public void testGtProperties() {
+    VcfRecord rec = makeRecord("1/1", "A", "T");
+    try {
+      VcfUtils.getValidGt(rec, 1);
+      fail();
+    } catch (NoTalkbackSlimException ignored) {
+    }
+    int[] gt = VcfUtils.getValidGt(rec, 0);
+    assertTrue(VcfUtils.isHomozygousAlt(rec, 0));
+    assertFalse(VcfUtils.isHeterozygous(rec, 0));
+    assertTrue(VcfUtils.isHomozygous(gt));
+
+    rec = makeRecord("0/1", "A", "T");
+    gt = VcfUtils.getValidGt(rec, 0);
+    assertFalse(VcfUtils.isHomozygousAlt(rec, 0));
+    assertFalse(VcfUtils.isHomozygous(gt));
+  }
+
+  public void testHasDefinedVariantGt() {
     assertTrue(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "T"), 0));
     assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/0", "A", "T"), 0));
     assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord(".", "A", "T"), 0));

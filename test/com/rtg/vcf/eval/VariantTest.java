@@ -55,29 +55,33 @@ public class VariantTest extends TestCase {
     return createVariant(rec, 0, sampleNo, extractor);
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo, RocSortValueExtractor extractor) {
-    return new Variant.Factory(sampleNo, extractor).variant(rec, id);
+    return new VariantFactory.Default(sampleNo, extractor).variant(rec, id);
   }
   static Variant createVariant(String var, int sampleNo, RocSortValueExtractor extractor) {
-    final String vartab = var.replaceAll(" ", TAB);
-    return createVariant(VcfReader.vcfLineToRecord(vartab), sampleNo, extractor);
+    return createVariant(createRecord(var), sampleNo, extractor);
   }
+
+  static VcfRecord createRecord(String var) {
+    return VcfReader.vcfLineToRecord(var.replaceAll(" +", TAB));
+  }
+
   static Variant createVariant(String var) {
     return createVariant(var, 0, RocSortValueExtractor.NULL_EXTRACTOR);
   }
 
   public void test() {
-    final String vcf = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
-    final VcfRecord rec = VcfReader.vcfLineToRecord(vcf);
+    final String vcf = "someKindOfName 23 . A T 12.8 PASS . GT 1/1";
+    final VcfRecord rec = createRecord(vcf);
     final Variant v = createVariant(rec, 0, DEFAULT_EXTRACTOR);
     assertEquals(22, v.getStart());
     assertTrue(Double.isNaN(v.getSortValue()));
     assertEquals("someKindOfName", rec.getSequenceName());
   }
 
-  static final String ORDER_FIRST = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
-  static final String ORDER_SECOND = "someKindOfName" + TAB + "24" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
-  static final String ORDER_THIRD = "someOtherKindOfName" + TAB + "19" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
-  static final String ORDER_FOURTH = "someOtherKindOfName" + TAB + "55" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
+  static final String ORDER_FIRST = "someKindOfName 23 . A T 12.8 PASS . GT 1/1";
+  static final String ORDER_SECOND = "someKindOfName 24 . A T 12.8 PASS . GT 1/1";
+  static final String ORDER_THIRD = "someOtherKindOfName 19 . A T 12.8 PASS . GT 1/1";
+  static final String ORDER_FOURTH = "someOtherKindOfName 55 . A T 12.8 PASS . GT 1/1";
 
   public void testComparator() throws IOException {
     final ArrayList<Variant> allDetections = new ArrayList<>();
@@ -106,7 +110,7 @@ public class VariantTest extends TestCase {
     assertEquals(0, insert.compareTo(insert));
   }
 
-  static final String SNP_LINE = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
+  static final String SNP_LINE = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
   public void testSnpConstruction() throws Exception {
     final Variant variant = createVariant(SNP_LINE, 0, DEFAULT_EXTRACTOR);
     assertEquals(22, variant.getStart());
@@ -121,9 +125,8 @@ public class VariantTest extends TestCase {
     }
   }
 
-  static final String SNP_LINE2 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T,C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/2:4:0.02:12.8";
-  static final String SNP_LINE3 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "0/1:4:0.02:12.8";
-  static final String SNP_LINE4 = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "T" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "./1:4:0.02:12.8";
+  static final String SNP_LINE2 = "someKindOfName 23 . A T,C 12.8 PASS . GT:DP:RE:GQ 1/2:4:0.02:12.8";
+  static final String SNP_LINE4 = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ ./1:4:0.02:12.8";
   public void testHeterozygousSnpConstruction() throws Exception {
     Variant variant = createVariant(SNP_LINE2);
     // Normal het call 1/2
@@ -132,7 +135,7 @@ public class VariantTest extends TestCase {
     assertEquals(4, variant.nt(0)[0]);
     assertEquals(1, variant.nt(1).length);
     assertEquals(2, variant.nt(1)[0]);
-    OrientedVariant[] pos = variant.orientations();
+    final OrientedVariant[] pos = variant.orientations();
     assertEquals(2, pos.length);
     assertTrue(pos[0].isAlleleA());
     assertFalse(pos[1].isAlleleA());
@@ -141,14 +144,14 @@ public class VariantTest extends TestCase {
     assertEquals(0, pos[0].alleleId()); // REF allele doesn't get counted in ids
     assertEquals(1, pos[1].alleleId());
 
-    // Test half-call  ./1, no squash
+    // Test half-call  ./1
     variant = createVariant(SNP_LINE4);
     assertEquals(1, variant.nt(0).length);
     assertEquals(0, variant.nt(0)[0]);
     assertEquals(4, variant.nt(1)[0]);
   }
 
-  static final String INSERT_LINE = "someKindOfName" + TAB + "22" + TAB + "." + TAB + "A" + TAB + "AACT" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
+  static final String INSERT_LINE = "someKindOfName 22 . A AACT 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
   public void testInsertConstruction() throws Exception {
     final Variant variant = createVariant(INSERT_LINE);
     assertEquals(22, variant.getStart());
@@ -157,12 +160,12 @@ public class VariantTest extends TestCase {
   }
 
 
-  static final String DELETION_LINE = "someKindOfName" + TAB + "22" + TAB + "." + TAB + "GAGT" + TAB + "G" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
+  static final String DELETION_LINE = "someKindOfName 22 . GAGT G 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
   public void testDeletionConstructor() throws Exception {
     final Variant variant = createVariant(DELETION_LINE);
     assertEquals(22, variant.getStart());
   }
-  static final String MNP_LINE = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "AGT" + TAB + "CTC" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
+  static final String MNP_LINE = "someKindOfName 23 . AGT CTC 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
   public void testMnpConstructor() throws Exception {
     final Variant variant = createVariant(MNP_LINE);
     assertEquals(22, variant.getStart());
@@ -178,21 +181,21 @@ public class VariantTest extends TestCase {
 
   }
 
-  static final String UNCHANGED_LINE = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/1:4:0.02:12.8";
+  static final String UNCHANGED_LINE = "someKindOfName 23 . A C 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
   public void testUnchangedConstructor() throws Exception {
     final Variant variant = createVariant(UNCHANGED_LINE);
     assertEquals(22, variant.getStart());
     assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(0)));
   }
 
-  static final String SHORT_LINE = "someKindOfName" + TAB + "23" + TAB + "." + TAB + "A" + TAB + "C" + TAB + "0.0" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
+  static final String SHORT_LINE = "someKindOfName 23 . A C 0.0 PASS . GT 1/1";
   public void testShortConstructor() throws Exception {
     final Variant variant = createVariant(SHORT_LINE);
     assertEquals(22, variant.getStart());
     assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(0)));
   }
 
-  static final String TAIL = TAB + "." + TAB + "A" + TAB + "C" + TAB + "12.8" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/1";
+  static final String TAIL = TAB + ". A C 12.8 PASS . GT 1/1";
 
   public void testOrdering() throws Exception {
     final Variant a1a = createVariant("a" + TAB + 1 + TAIL);
@@ -219,7 +222,7 @@ public class VariantTest extends TestCase {
   }
 
   public void testVariantInterface() throws Exception {
-    final String line = "simulatedSequence1\t2180\t.\tC\tT,G\t0.0" + TAB + "PASS" + TAB + "." + TAB + "GT" + TAB + "1/2";
+    final String line = "simulatedSequence1\t2180\t.\tC\tT,G\t0.0 PASS . GT 1/2";
     final Variant v = createVariant(line);
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());
@@ -234,7 +237,7 @@ public class VariantTest extends TestCase {
   }
 
   public void testAllFieldsPresent() throws Exception {
-    final String line = ("simulatedSequence1 2180 . C G,T " + PosteriorUtils.phredIfy(45.8) + TAB + "PASS" + TAB + "." + TAB + "GT:DP:RE:GQ" + TAB + "1/2:35:0.697:31.0").replaceAll(" ", "\t");
+    final String line = ("simulatedSequence1 2180 . C G,T " + PosteriorUtils.phredIfy(45.8) + TAB + "PASS . GT:DP:RE:GQ 1/2:35:0.697:31.0").replaceAll(" ", "\t");
     final Variant v = createVariant(line, 0, DEFAULT_EXTRACTOR);
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());

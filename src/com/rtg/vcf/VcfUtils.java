@@ -215,6 +215,22 @@ public final class VcfUtils {
   }
 
   /**
+   * Check whether the split GT array references valid allele IDs
+   * @param rec the record containing ref and alt alleles
+   * @param gt the split GT.
+   * @return false if any of the GT elements are out of range.
+   */
+  public static boolean isValidGt(VcfRecord rec, int[] gt) {
+    final int maxId = rec.getAltCalls().size();
+    for (int gtId : gt) {
+      if (gtId < -1 || gtId > maxId) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Check if the supplied file is has an extension indicative of VCF.
    * @param f file to test
    * @return true if file has <code>vcf</code> or gzipped <code>vcf</code> extension
@@ -410,15 +426,15 @@ public final class VcfUtils {
   }
 
   /**
-   * Tests if the given sample genotype in a record is homozygous or not.
+   * Tests if the given sample genotype in a record is homozygous ALT.
    * @param rec record to check
    * @param sample sample number
    * @return true iff homozygous
    * @throws NoTalkbackSlimException if the sample is missing GT filed or invalid sample number
    */
-  public static boolean isHomozygous(VcfRecord rec, int sample) {
-    final int[] gtArray = validateGT(rec, sample);
-    return isHomozygous(gtArray) && !isIdentity(gtArray);
+  public static boolean isHomozygousAlt(VcfRecord rec, int sample) {
+    final int[] gtArray = getValidGt(rec, sample);
+    return isHomozygousAlt(gtArray);
   }
 
   /**
@@ -429,7 +445,7 @@ public final class VcfUtils {
    * @throws NoTalkbackSlimException if the sample is missing GT filed or invalid sample number
    */
   public static boolean isHeterozygous(VcfRecord rec, int sample) {
-    final int[] gtArray = validateGT(rec, sample);
+    final int[] gtArray = getValidGt(rec, sample);
     return isHeterozygous(gtArray);
   }
 
@@ -441,7 +457,7 @@ public final class VcfUtils {
    * @throws NoTalkbackSlimException if the sample is missing GT filed or invalid sample number
    */
   public static boolean isHaploid(VcfRecord rec, int sample) {
-    final int[] gtArray = validateGT(rec, sample);
+    final int[] gtArray = getValidGt(rec, sample);
     return gtArray.length == 1;
   }
 
@@ -453,37 +469,78 @@ public final class VcfUtils {
    * @throws NoTalkbackSlimException if the sample is missing GT filed or invalid sample number
    */
   public static boolean isDiploid(VcfRecord rec, int sample) {
-    final int[] gtArray = validateGT(rec, sample);
+    final int[] gtArray = getValidGt(rec, sample);
     return gtArray.length == 2;
   }
 
-  private static int[] validateGT(VcfRecord rec, int sample) {
-    final ArrayList<String> gtList = rec.getFormatAndSample().get(FORMAT_GENOTYPE);
-    if (gtList == null) {
-      throw new NoTalkbackSlimException("VCF record does not contain GT field, record: " + rec.toString());
-    }
-    if (sample > gtList.size()) {
-      throw new NoTalkbackSlimException("Invalid sample number " + sample + ", record: " + rec.toString());
-    }
-    final String gt = gtList.get(sample);
-    return splitGt(gt);
+  /**
+   * @param gt the genotype allele ids
+   * @return true if the GT is homozygous ALT
+   */
+  public static boolean isHomozygousAlt(int[] gt) {
+    return isHomozygous(gt) && !isHomozygousRef(gt);
   }
 
-  private static boolean isHomozygous(int[] gtArray) {
-    return gtArray.length == 1 || gtArray[0] == gtArray[1];
+  /**
+   * @param gt the genotype allele ids
+   * @return true if the GT is homozygous (including reference)
+   */
+  public static boolean isHomozygous(int[] gt) {
+    return gt.length == 1 || gt[0] == gt[1];
   }
 
-  private static boolean isHeterozygous(int[] gtArray) {
-    return gtArray.length != 1 && gtArray[0] != gtArray[1];
+  /**
+   * @param gt the genotype allele ids
+   * @return true if the GT is heterozygous
+   */
+  public static boolean isHeterozygous(int[] gt) {
+    return gt.length != 1 && gt[0] != gt[1];
   }
 
-  private static boolean isIdentity(int[] gt) {
+  /**
+   * @param gt the genotype allele ids
+   * @return true if the GT is homozygous REF
+   */
+  public static boolean isHomozygousRef(int[] gt) {
     for (int g : gt) {
       if (g != 0) {
         return false;
       }
     }
     return true;
+  }
+
+  /**
+   * Get the split GT for a sample, with validation checking
+   * @param rec record to extract the GT from
+   * @param sample the sample index
+   * @return the split GT field
+   * @throws NoTalkbackSlimException if the record does not contain GT values, the sample is invalid, or the GT itself is invalid.
+   */
+  public static int[] getValidGt(VcfRecord rec, int sample) {
+    final int[] gtArr = splitGt(getValidGtStr(rec, sample));
+    if (!isValidGt(rec, gtArr)) {
+      throw new NoTalkbackSlimException("VCF record GT contains allele ID out of range, record: " + rec.toString());
+    }
+    return gtArr;
+  }
+
+  /**
+   * Get the string GT for a sample, with validation checking
+   * @param rec record to extract the GT from
+   * @param sample the sample index
+   * @return the split GT field
+   * @throws NoTalkbackSlimException if the record does not contain GT values, or the sample is invalid.
+   */
+  public static String getValidGtStr(VcfRecord rec, int sample) {
+    final ArrayList<String> gtList = rec.getFormatAndSample().get(FORMAT_GENOTYPE);
+    if (gtList == null) {
+      throw new NoTalkbackSlimException("VCF record does not contain GT field, record: " + rec.toString());
+    }
+    if (sample >= gtList.size()) {
+      throw new NoTalkbackSlimException("Invalid sample number " + sample + ", record: " + rec.toString());
+    }
+    return gtList.get(sample);
   }
 
   /**

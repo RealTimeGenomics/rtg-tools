@@ -458,7 +458,7 @@ public final class StringUtils {
   }
   /**
    * Return the length of the longest common prefix of the supplied strings.
-   * @param strings strings to test
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @param rightOffset effective right edge of strings (i.e. do not find prefix going into this region)
    * @return longest common prefix
    */
@@ -471,7 +471,7 @@ public final class StringUtils {
     while (true) {
       clip++;
       for (int k = 1; k < strings.length; k++) {
-        if (!equalsLeft(a, strings[k], clip, rightOffset)) {
+        if (strings[k] != null && !equalsLeft(a, strings[k], clip, rightOffset)) {
           return clip;
         }
       }
@@ -480,7 +480,7 @@ public final class StringUtils {
 
   /**
    * Return the length of the longest common suffix of the supplied strings.
-   * @param strings strings to test
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
    * @param leftOffset effective left edge of strings (i.e. do not find suffix going into this region)
    * @return longest common suffix
    */
@@ -493,7 +493,7 @@ public final class StringUtils {
     while (true) {
       clip++;
       for (int k = 1; k < strings.length; k++) {
-        if (!equalsRight(a, strings[k], clip, leftOffset)) {
+        if (strings[k] != null && !equalsRight(a, strings[k], clip, leftOffset)) {
           return clip;
         }
       }
@@ -507,6 +507,17 @@ public final class StringUtils {
    */
   public static int longestSuffix(final String[] strings) {
     return longestSuffix(strings, 0);
+  }
+
+  /**
+   * Trims characters off the start and end of a string
+   * @param s the string to trim
+   * @param leftClip the number of characters off the left to trim
+   * @param rightClip the number of characters off the right to trim
+   * @return the trimmed string
+   */
+  public static String clip(final String s, final int leftClip, final int rightClip) {
+    return leftClip + rightClip >= s.length() ? "" : s.substring(leftClip, s.length() - rightClip);
   }
 
   /**
@@ -609,4 +620,5 @@ public final class StringUtils {
     }
     return new StringBuilder(str).reverse().toString();
   }
+
 }

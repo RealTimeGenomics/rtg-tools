@@ -1,0 +1,6 @@
+#total baseline variants: 2
+#score field: QUAL
+#score	true_positives	false_positives	false_negatives	precision	sensitivity	f_measure
+578.000	0.00	2.00	2.00	0.0000	0.0000	0.0000
+410.000	0.00	3.00	2.00	0.0000	0.0000	0.0000
+190.000	0.00	4.00	2.00	0.0000	0.0000	0.0000

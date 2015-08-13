@@ -34,11 +34,9 @@ import java.util.EnumSet;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.Utils;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 
 
 /**
@@ -53,60 +51,6 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
       return Integer.compare(o1.getId(), o2.getId());
     }
   };
-
-  /**
-   * Construct Variants corresponding to the GT of a specified sample.
-   */
-  static class Factory implements VariantFactory {
-
-    private final RocSortValueExtractor mExtractor;
-    private final int mSampleNo;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     * @param extractor ROC value extractor implementation to use
-     */
-    public Factory(int sampleNo, RocSortValueExtractor extractor) {
-      mSampleNo = sampleNo;
-      mExtractor = extractor;
-    }
-
-    @Override
-    public Variant variant(VcfRecord rec, int id) {
-      // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
-        return null;
-      }
-      final String seqName = rec.getSequenceName();
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
-
-      final double sortValue = mExtractor.getSortValue(rec, mSampleNo);
-
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
-      final boolean phased = gt.contains("" + VcfUtils.PHASED_SEPARATOR);
-
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2; //can only handle haploid or diploid
-
-      final byte[][] alleles = new byte[VcfUtils.isHomozygous(rec, mSampleNo) ? 1 : 2][];
-      for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = DnaUtils.encodeString(getAllele(rec, gtArray[i], hasPreviousNt));
-        //System.err.println(rec.getPosition() + " " + gtArray[i] + " " + getAllele(gtArray[i]));
-      }
-
-      final Variant var = new Variant(id, seqName, start, end, alleles, phased, sortValue);
-      for (final RocFilter filter : RocFilter.values()) {
-        if (filter.accept(rec, mSampleNo)) {
-          var.mFilters.add(filter);
-        }
-      }
-      return var;
-    }
-  }
-
 
   private final int mId;
   private final String mSequenceName;
@@ -131,29 +75,14 @@ public class Variant implements Comparable<Variant>, SequenceNameLocus {
     if (allele == -1) {
       return "N"; // Missing allele
     }
-    if (allele == 0) {
-      if (hasPreviousNt) {
-        if (rec.getRefCall().length() == 1) {
-          return "";
-        }
-        return rec.getRefCall().substring(1);
-      } else {
-        return rec.getRefCall();
+    final String localAllele = rec.getAllele(allele);
+    if (hasPreviousNt) {
+      if (localAllele.length() == 1) {
+        return "";
       }
+      return localAllele.substring(1);
     } else {
-      if (rec.getAltCalls().size() < allele) {
-        throw new NoTalkbackSlimException("Invalid allele number in record " + rec.toString());
-      } else {
-        final String localAllele = rec.getAltCalls().get(allele - 1);
-        if (hasPreviousNt) {
-          if (localAllele.length() == 1) {
-            return "";
-          }
-          return localAllele.substring(1);
-        } else {
-          return localAllele;
-        }
-      }
+      return localAllele;
     }
   }
 
