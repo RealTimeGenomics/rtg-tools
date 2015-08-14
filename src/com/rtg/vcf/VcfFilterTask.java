@@ -386,7 +386,8 @@ class VcfFilterTask {
       if (index <= 0) {
         refAlleleSeen = true;
       } else {
-        if (record.getAltCalls().get(index - 1).length() > 1) {
+        final List<String> altCalls = record.getAltCalls();
+        if (index <= altCalls.size() && altCalls.get(index - 1).length() > 1) {
           multiNucleotideCall = true;
         }
       }
