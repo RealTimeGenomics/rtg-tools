@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.Pair;
 import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -46,6 +47,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 /**
  * When running VcfEvalTask in multithreading fashion keeps reading and output in order for each chromosome being evaluated.
  */
+@TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
 public abstract class EvalSynchronizer implements Closeable {
 
   protected enum Classification {

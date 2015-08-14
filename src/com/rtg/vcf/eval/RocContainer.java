@@ -31,8 +31,10 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -143,11 +145,17 @@ public class RocContainer {
    * output ROC data to file
    * @param totalBaselineVariants total number of baseline variants
    * @param zip whether output should be compressed
+   * @param slope if true, write ROC slope file
    * @throws IOException if an IO error occurs
    */
-  public void writeRocs(int totalBaselineVariants, boolean zip) throws IOException {
+  public void writeRocs(int totalBaselineVariants, boolean zip, boolean slope) throws IOException {
+    Diagnostic.developerLog("Writing ROC");
+    if (getNumberOfIgnoredVariants() > 0) {
+      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not included in ROC data files due to missing or invalid " + mFieldLabel + " values.");
+    }
     for (int i = 0; i < mOutputFiles.size(); i++) {
-      try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(FileUtils.getZippedFileName(zip, mOutputFiles.get(i)), zip)))) {
+      final File rocFile = FileUtils.getZippedFileName(zip, mOutputFiles.get(i));
+      try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
         double tp = 0.0;
         double fp = 0.0;
         final boolean extraMetrics = mFilters.get(i) == RocFilter.ALL && totalBaselineVariants > 0;
@@ -170,6 +178,19 @@ public class RocContainer {
           }
           os.newLine();
         }
+      }
+      if (slope) {
+        produceSlopeFile(rocFile, zip);
+      }
+    }
+  }
+
+  private void produceSlopeFile(File input, boolean zip) throws IOException {
+    if (input.exists() && input.length() > 0) {
+      final File output = new File(input.getParentFile(), input.getName().replaceAll("_roc.tsv", "_slope.tsv"));
+      try (final PrintStream printOut = new PrintStream(FileUtils.createOutputStream(output, zip));
+           final InputStream in = zip ? FileUtils.createGzipInputStream(input, false) : FileUtils.createFileInputStream(input, false)) {
+        RocSlope.writeSlope(in, printOut);
       }
     }
   }

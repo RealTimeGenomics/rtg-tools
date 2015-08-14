@@ -30,6 +30,7 @@
 
 package com.rtg.vcf.eval;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
@@ -37,6 +38,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 /**
  * Hold a variant allele, one allele of a genotype.
  */
+@TestClass("com.rtg.vcf.eval.VariantTest")
 public class Allele extends SequenceNameLocusSimple {
 
   private final byte[] mNt;

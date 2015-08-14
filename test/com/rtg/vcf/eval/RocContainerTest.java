@@ -55,7 +55,7 @@ public class RocContainerTest extends TestCase {
       roc.addRocLine(0.2, 1.5, v);
       roc.addRocLine(0.1, 0.5, v);
       roc.addRocLine(0.3, 1.5, v);
-      roc.writeRocs(5, true);
+      roc.writeRocs(5, true, false);
       final String all = FileHelper.gzFileToString(allFile);
       TestUtils.containsAll(all,
               "0.100\t5.00\t2",

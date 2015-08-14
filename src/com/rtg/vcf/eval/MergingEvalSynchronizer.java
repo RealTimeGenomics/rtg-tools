@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -41,6 +42,7 @@ import com.rtg.vcf.VcfRecord;
 /**
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
  */
+@TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
 public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
 
   protected VcfRecord mBrv;
@@ -180,7 +182,9 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
 
   /**
    * Deal with the case where we have both call and baseline records with the
-   * same start and end position, and their matching variants
+   * same start and end position, and their matching variants.
+   * After this function the current call record and variant will be cleared, but the baseline will not.
+   * If the implementation is finished with the baseline record and variant, they should be explicitly cleared.
    */
   protected abstract void handleKnownBoth() throws IOException;
 }

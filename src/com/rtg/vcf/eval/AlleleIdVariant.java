@@ -30,9 +30,12 @@
 
 package com.rtg.vcf.eval;
 
+import com.reeltwo.jumble.annotations.TestClass;
+
 /**
  * A Variant that offers orientations where the variant IDs correspond to original GT allele indexing.
  */
+@TestClass("com.rtg.vcf.eval.VariantFactoryTest")
 public class AlleleIdVariant extends Variant {
 
   private final int mAlleleA; // First allele in GT

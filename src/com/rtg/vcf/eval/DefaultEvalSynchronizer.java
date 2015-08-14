@@ -27,22 +27,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.Collection;
 import java.util.EnumSet;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
@@ -50,7 +45,7 @@ import com.rtg.vcf.VcfWriter;
 /**
  * Creates typical vcfeval output files with separate VCF files and ROC files.
  */
-class DefaultEvalSynchronizer extends EvalSynchronizer {
+class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
 
   private static final String FN_FILE_NAME = "fn.vcf";
   private static final String FP_FILE_NAME = "fp.vcf";
@@ -71,14 +66,13 @@ class DefaultEvalSynchronizer extends EvalSynchronizer {
   private final VcfWriter mTpBase;
   private final VcfWriter mFp;
   private final VcfWriter mFn;
-  protected final RocContainer mRoc;
+  private final RocContainer mRoc;
   private final RocSortValueExtractor mRocExtractor;
   private final int mCallSampleNo;
   private final boolean mZip;
   private final boolean mSlope;
-  private final boolean mRtgStats;
   private final File mOutDir;
-  int mBaselineTruePositives = 0;
+  private int mBaselineTruePositives = 0;
   int mCallTruePositives = 0;
   int mFalseNegatives = 0;
   int mFalsePositives = 0;
@@ -120,7 +114,6 @@ class DefaultEvalSynchronizer extends EvalSynchronizer {
     mRocExtractor = extractor;
     mZip = zip;
     mSlope = slope;
-    mRtgStats = rtgStats;
     mOutDir = outdir;
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final File tpFile = new File(outdir, TP_FILE_NAME + zipExt);
@@ -135,18 +128,83 @@ class DefaultEvalSynchronizer extends EvalSynchronizer {
   }
 
   @Override
-  protected void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException {
-    final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
-    writeVariants(true, calls, subRanges);
-    writeVariants(false, baseline, subRanges);
-    Diagnostic.developerLog("Number of baseline variants processed: " + (mBaselineTruePositives + mFalseNegatives));
-  }
-
-  @Override
   protected void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
     mMisPhasings += misPhasings;
     mUnphasable += unphasable;
     mCorrectPhasings += correctPhasings;
+  }
+
+  @Override
+  protected void resetBaselineRecordFields(VcfRecord rec) {
+    // No-op
+  }
+
+  @Override
+  protected void resetCallRecordFields(VcfRecord rec) {
+    // No-op
+  }
+
+  @Override
+  protected void handleUnknownBaseline() throws IOException {
+    // No-op
+  }
+
+  @Override
+  protected void handleUnknownCall() throws IOException {
+    // No-op
+  }
+
+  @Override
+  protected void handleKnownCall() throws IOException {
+    if (mCv instanceof OrientedVariant) { // Included (but the baseline was at a different position. This is interesting)
+      //mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
+      mCallTruePositives++;
+      mTpCalls.write(mCrv);
+      addToROCContainer(((OrientedVariant) mCv).getWeight());
+    } else if (mCv instanceof SkippedVariant) { // Too-hard
+      // No-op
+    } else { // Excluded (FP or self-inconsistent)
+      mFalsePositives++;
+      mFp.write(mCrv);
+      addToROCContainer(0);
+    }
+  }
+
+  private void addToROCContainer(double weight) {
+    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
+    for (final RocFilter filter : RocFilter.values()) {
+      if (filter.accept(mCrv, mCallSampleNo)) {
+        filters.add(filter);
+      }
+    }
+    double score = Double.NaN;
+    try {
+      score = mRocExtractor.getSortValue(mCrv, mCallSampleNo);
+    } catch (IndexOutOfBoundsException ignored) {
+    }
+    mRoc.addRocLine(score, weight, filters);
+  }
+
+  @Override
+  protected void handleKnownBaseline() throws IOException {
+    if (mBv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
+      //mBrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
+      mBaselineTruePositives++;
+      if (mTpBase != null) {
+        mTpBase.write(mBrv);
+      }
+    } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
+      // No-op
+    } else { // Excluded (novel or self-inconsistent)
+      mFalseNegatives++;
+      mFn.write(mBrv);
+    }
+  }
+
+  @Override
+  protected void handleKnownBoth() throws IOException {
+    // Just deal with the call side first, and let the baseline call take care of itself
+    handleKnownCall();
   }
 
   int getUnphasable() {
@@ -162,108 +220,12 @@ class DefaultEvalSynchronizer extends EvalSynchronizer {
   }
 
 
-  /**
-   * Dump all of the variants in a Collection to an output stream
-   * @param calls true if the set we are processing is calls, false if baseline
-   * @param variants a collection of variants
-   * @param subRanges the regions being processed on the current sequence
-   * @throws IOException IO exceptions require too many comments.
-   */
-  private void writeVariants(boolean calls, Collection<? extends VariantId> variants, ReferenceRanges<String> subRanges) throws IOException {
-    if (variants.size() == 0) {
-      return;
-    }
-    final VcfWriter positive = calls ? mTpCalls : mTpBase;
-    final VcfWriter negative = calls ? mFp : mFn;
-    try (final VcfReader vcfReader = VcfReader.openVcfReader(calls ? mCallsFile : mBaseLineFile, subRanges)) {
-      int id = 0;
-      for (final VariantId v : variants) {
-        if (v instanceof SkippedVariant) {
-          continue;
-        }
-        final boolean included = v instanceof OrientedVariant;
-
-        final Classification status = calls
-          ? (included ? Classification.TP_CALL : Classification.FP)
-          : (included ? Classification.TP_BASE : Classification.FN);
-        switch (status) {
-          case TP_BASE:
-            mBaselineTruePositives++;
-            break;
-          case TP_CALL:
-            mCallTruePositives++;
-            break;
-          case FN:
-            mFalseNegatives++;
-            break;
-          case FP:
-            mFalsePositives++;
-            break;
-          default:
-            break;
-        }
-
-        final Variant dv = included ? ((OrientedVariant) v).variant() : (Variant) v;
-        final VcfWriter out = included ? positive : negative;
-        VcfRecord rec = null;
-        while (vcfReader.hasNext()) {
-          final VcfRecord r = vcfReader.next();
-          id++;
-
-          if (id == dv.getId()) {
-            rec = r;
-            break;
-          }
-        }
-
-        if (rec != null) {
-
-          if (calls) { // Add to ROC container
-            final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
-            for (final RocFilter filter : RocFilter.values()) {
-              if (filter.accept(rec, mCallSampleNo)) {
-                filters.add(filter);
-              }
-            }
-            double score = Double.NaN;
-            try {
-              score = mRocExtractor.getSortValue(rec, mCallSampleNo);
-            } catch (IndexOutOfBoundsException ignored) {
-            }
-            if (included) {
-              final OrientedVariant ov = (OrientedVariant) v;
-              mRoc.addRocLine(score, ov.getWeight(), filters);
-            } else {
-              mRoc.addRocLine(score, 0, filters);
-            }
-          }
-
-          if (out != null) {
-            out.write(rec);
-          }
-        } else {
-          throw new SlimException("Variant object \"" + v.toString() + "\"" + " does not have a corresponding VCF record in given reader");
-        }
-      }
-    }
-  }
-
   @Override
   void finish() throws IOException {
     super.finish();
-    if (mRoc.getNumberOfIgnoredVariants() > 0) {
-      final String rocLabel = mRocExtractor.toString();
-      Diagnostic.warning("There were " + mRoc.getNumberOfIgnoredVariants() + " variants not included in ROC data files due to missing or invalid " + rocLabel + " values.");
-    }
-    Diagnostic.developerLog("Writing ROC");
-    mRoc.writeRocs(mBaselineTruePositives + mFalseNegatives, mZip);
-    if (mSlope) {
-      produceSlopeFiles(mRtgStats);
-    }
+    mRoc.writeRocs(mBaselineTruePositives + mFalseNegatives, mZip, mSlope);
     writePhasingInfo();
-
     mRoc.writeSummary(new File(mOutDir, CommonFlags.SUMMARY_FILE), mBaselineTruePositives, mFalsePositives, mFalseNegatives);
-
   }
 
   private void writePhasingInfo() throws IOException {
@@ -272,40 +234,6 @@ class DefaultEvalSynchronizer extends EvalSynchronizer {
       + "Incorrect phasings: " + getMisPhasings() + StringUtils.LS
       + "Unresolvable phasings: " + getUnphasable() + StringUtils.LS, phasingFile);
   }
-
-  private void produceSlopeFiles(boolean rtgStats) throws IOException {
-    final String suffix = mZip ? FileUtils.GZ_SUFFIX : "";
-    final File fullFile = new File(mOutDir, FULL_ROC_FILE + suffix);
-    produceSlopeFile(fullFile, new File(mOutDir, "weighted_slope.tsv" + suffix));
-    final File heteroFile = new File(mOutDir, HETEROZYGOUS_FILE + suffix);
-    produceSlopeFile(heteroFile, new File(mOutDir, "heterozygous_slope.tsv" + suffix));
-    final File homoFile = new File(mOutDir, HOMOZYGOUS_FILE + suffix);
-    produceSlopeFile(homoFile, new File(mOutDir, "homozygous_slope.tsv" + suffix));
-    if (rtgStats) {
-      final File simpleFile = new File(mOutDir, SIMPLE_FILE + suffix);
-      produceSlopeFile(simpleFile, new File(mOutDir, "simple_slope.tsv" + suffix));
-      final File complexFile = new File(mOutDir, COMPLEX_FILE + suffix);
-      produceSlopeFile(complexFile, new File(mOutDir, "complex_slope.tsv" + suffix));
-      final File heteroSimpleFile = new File(mOutDir, HETEROZYGOUS_SIMPLE_FILE + suffix);
-      produceSlopeFile(heteroSimpleFile, new File(mOutDir, "heterozygous_simple_slope.tsv" + suffix));
-      final File heteroComplexFile = new File(mOutDir, HETEROZYGOUS_COMPLEX_FILE + suffix);
-      produceSlopeFile(heteroComplexFile, new File(mOutDir, "heterozygous_complex_slope.tsv" + suffix));
-      final File homoSimpleFile = new File(mOutDir, HOMOZYGOUS_SIMPLE_FILE + suffix);
-      produceSlopeFile(homoSimpleFile, new File(mOutDir, "homozygous_simple_slope.tsv" + suffix));
-      final File homoComplexFile = new File(mOutDir, HOMOZYGOUS_COMPLEX_FILE + suffix);
-      produceSlopeFile(homoComplexFile, new File(mOutDir, "homozygous_complex_slope.tsv" + suffix));
-    }
-  }
-
-  private void produceSlopeFile(File input, File output) throws IOException {
-    if (input.exists() && input.length() > 0) {
-      try (final PrintStream printOut = new PrintStream(FileUtils.createOutputStream(output, mZip));
-           final InputStream in = mZip ? FileUtils.createGzipInputStream(input, false) : FileUtils.createFileInputStream(input, false)) {
-        RocSlope.writeSlope(in, printOut);
-      }
-    }
-  }
-
 
   @Override
   @SuppressWarnings("try")

@@ -30,9 +30,12 @@
 
 package com.rtg.vcf.eval;
 
+import com.reeltwo.jumble.annotations.TestClass;
+
 /**
  * A Variant that offers orientations assuming the alleles array has all redundant alleles removed.
  */
+@TestClass("com.rtg.vcf.eval.VariantTest")
 public class CompactVariant extends Variant {
 
 
