@@ -43,6 +43,13 @@ public class Allele extends SequenceNameLocusSimple {
 
   private final byte[] mNt;
 
+  /**
+   * Construct an Allele
+   * @param seq chromosome name
+   * @param start start position (0-based inclusive)
+   * @param end end position (0-based exclusive)
+   * @param nt the bases of the allele which substitute for the based in the reference region
+   */
   public Allele(String seq, int start, int end, byte[] nt) {
     super(seq, start, end);
     if (nt == null) {
@@ -51,6 +58,11 @@ public class Allele extends SequenceNameLocusSimple {
     mNt = nt;
   }
 
+  /**
+   * Construct an Allele
+   * @param locus the reference region occupied by the Allele
+   * @param nt the bases of the allele which substitute for the based in the reference region
+   */
   public Allele(SequenceNameLocus locus, byte[] nt) {
     this(locus.getSequenceName(), locus.getStart(), locus.getEnd(), nt);
   }
@@ -60,25 +72,6 @@ public class Allele extends SequenceNameLocusSimple {
    */
   byte[] nt() {
     return mNt;
-  }
-
-  public int compareTo(Allele that) {
-    final int varPos = this.getStart() - that.getStart();
-    if (varPos != 0) {
-      return varPos;
-    }
-
-    final int length = this.mNt.length - that.mNt.length;
-    if (length != 0) {
-      return length;
-    }
-    for (int i = 0; i < length; i++) {
-      final int diff = this.mNt[i] - that.mNt[i];
-      if (diff != 0) {
-        return diff;
-      }
-    }
-    return 0;
   }
 
   @Override

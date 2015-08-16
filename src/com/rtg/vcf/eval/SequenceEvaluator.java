@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.launcher.GlobalFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
@@ -53,7 +54,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 @TestClass({"com.rtg.vcf.eval.VcfEvalTaskTest", "com.rtg.vcf.eval.PhasingEvaluatorTest"})
 class SequenceEvaluator implements IORunnable {
 
-  private static final boolean DUMP = Boolean.getBoolean("dump-haplotypes");
+  private static final boolean DUMP_BEST_PATH = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_DUMP_BEST_PATH);
 
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;
@@ -89,7 +90,7 @@ class SequenceEvaluator implements IORunnable {
       //find the best path for variant calls
       final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
 
-      if (DUMP) {
+      if (DUMP_BEST_PATH) {
         System.out.println("#### " + best);
         final Range interesting = new SequenceNameLocusSimple(currentName, best.getSyncPoints().get(0).getPos(), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
         System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));

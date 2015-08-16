@@ -32,10 +32,13 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.intervals.SequenceNameLocus;
+import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 
@@ -45,6 +48,8 @@ import com.rtg.vcf.VcfRecord;
 @TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
 public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
 
+  private static final Comparator<SequenceNameLocus> NATURAL_COMPARATOR = new SequenceNameLocusComparator();
+
   protected VcfRecord mBrv;
   protected VariantId mBv;
   protected VcfRecord mCrv;
@@ -52,6 +57,13 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   protected int mBid;
   protected int mCid;
 
+  /**
+   * Constructor
+   * @param baseLineFile file containing the baseline VCF records
+   * @param callsFile file containing the call VCF records
+   * @param variants returns separate sets of variants for each chromosome being processed
+   * @param ranges the ranges that variants are being read from
+   */
   public MergingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
     super(baseLineFile, callsFile, variants, ranges);
   }
@@ -95,9 +107,10 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
         } else if (mCrv == null) {
           processBaseline();
         } else { // Compare positions to work out which to process
-          if (mBrv.getStart() < mCrv.getStart() || (mCrv.getStart() == mBrv.getStart() && mBrv.getEnd() < mCrv.getEnd())) {
+          final int order = NATURAL_COMPARATOR.compare(mBrv, mCrv);
+          if (order < 0) {
             processBaseline();
-          } else if (mCrv.getStart() < mBrv.getStart() || (mCrv.getStart() == mBrv.getStart() && mCrv.getEnd() < mBrv.getEnd())) {
+          } else if (order > 0) {
             processCall();
           } else {
             processBoth();
@@ -152,31 +165,43 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
     // Do nothing
   }
 
+  /**
+   * Called immediately after each baseline VCF record is read.
+   * @param rec the newly read record
+   */
   protected abstract void resetBaselineRecordFields(VcfRecord rec);
 
+  /**
+   * Called immediately after each call VCF record is read.
+   * @param rec the newly read record
+   */
   protected abstract void resetCallRecordFields(VcfRecord rec);
 
   /**
    * Process a baseline record where we can not associate a matching baseline variant.
    * Usually where a variant was skipped during loading, for example failed or same-as-ref calls.
+   * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleUnknownBaseline() throws IOException;
 
   /**
    * Process a call record where we can not associate a matching call variant.
    * Usually where a variant was skipped during loading, for example failed or same-as-ref calls.
+   * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleUnknownCall() throws IOException;
 
   /**
    * Deal with the current called record and its matching called variant.
    * We have no baseline record at this start and end position
+   * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleKnownCall() throws IOException;
 
   /**
    * Deal with the current baseline record and its matching baseline variant.
    * We have no call record at this start and end position
+   * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleKnownBaseline() throws IOException;
 
@@ -185,6 +210,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
    * same start and end position, and their matching variants.
    * After this function the current call record and variant will be cleared, but the baseline will not.
    * If the implementation is finished with the baseline record and variant, they should be explicitly cleared.
+   * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleKnownBoth() throws IOException;
 }

@@ -44,7 +44,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 @TestClass("com.rtg.vcf.eval.PathTest")
 public final class PathFinder {
 
-  private static final boolean DUMP = false;
+  private static final boolean TRACE = false;
 
   private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
   private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
@@ -102,7 +102,9 @@ public final class PathFinder {
       currentMax = Math.max(currentMax, sortedPaths.size());
       currentMaxIterations = Math.max(currentMaxIterations, currentIterations++);
       Path head = sortedPaths.pollFirst();
-      if (DUMP) System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n\nHead: " + head);
+      if (TRACE) {
+        System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n\nHead: " + head);
+      }
       if (sortedPaths.size() == 0) { // Only one path currently in play
         if (lastWarnMessage != null) { // Issue a warning if we encountered problems during the previous region
           Diagnostic.warning(lastWarnMessage);
@@ -143,16 +145,24 @@ public final class PathFinder {
 
       if (head.inSync()) {
         skipToNextVariant(head);
-        if (DUMP) System.err.println("In sync, skipping: " + head);
+        if (TRACE) {
+          System.err.println("In sync, skipping: " + head);
+        }
       } else {
-        if (DUMP) System.err.println("Not in sync");
+        if (TRACE) {
+          System.err.println("Not in sync");
+        }
       }
 
       if (head.matches()) {
-        if (DUMP) System.err.println("Head matches, keeping");
+        if (TRACE) {
+          System.err.println("Head matches, keeping");
+        }
         addIfBetter(head, sortedPaths);
       } else {
-        if (DUMP) System.err.println("Head mismatch, discard");
+        if (TRACE) {
+          System.err.println("Head mismatch, discard");
+        }
       }
     }
     //System.err.println("Best: " + best);
@@ -168,7 +178,9 @@ public final class PathFinder {
       final Variant aVar = variants[aVarIndex];
       mCurrentMaxPos = Math.max(mCurrentMaxPos, aVar.getStart());
       //Adding a new variant to side
-      if (DUMP) System.err.println("Add alternatives to " + (side ? "called " : "baseline ") + aVar);
+      if (TRACE) {
+        System.err.println("Add alternatives to " + (side ? "called " : "baseline ") + aVar);
+      }
       addIfBetter(head.addVariant(side, aVar, aVarIndex), paths);
       return true;
     }

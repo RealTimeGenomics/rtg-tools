@@ -138,6 +138,8 @@ public final class GlobalFlags {
   public static final String TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
   //vcfeval
+  /** Output the best path found along with the haplotypes */
+  public static final String VCFEVAL_DUMP_BEST_PATH = "com.rtg.vcf.eval.dump-path";
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
   public static final String VCFEVAL_MAXIMIZE_MODE = "com.rtg.vcf.eval.maximize";
   /** Custom variant path result processor */
@@ -206,6 +208,7 @@ public final class GlobalFlags {
     // when there are lots of missing values.
     registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
 
+    registerFlag(VCFEVAL_DUMP_BEST_PATH, Boolean.class, false);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");

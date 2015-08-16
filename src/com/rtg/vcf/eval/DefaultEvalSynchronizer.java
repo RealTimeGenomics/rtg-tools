@@ -87,12 +87,12 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
-   * @param outdir the outdir directory into which result files are written
-   * @param zip true if outdir files should be compressed
+   * @param outdir the output directory into which result files are written
+   * @param zip true if output files should be compressed
    * @param outputTpBase true if the baseline true positive file should be written
-   * @param slope true to outdir ROC slope files
-   * @param rtgStats true to outdir additional ROC curves for RTG specific attributes
-   * @throws IOException if there is a problem opening outdir files
+   * @param slope true to output ROC slope files
+   * @param rtgStats true to output additional ROC curves for RTG specific attributes
+   * @throws IOException if there is a problem opening output files
    */
   DefaultEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                           String callsSampleName, RocSortValueExtractor extractor,

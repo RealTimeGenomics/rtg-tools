@@ -60,7 +60,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * @param variant the variant
    * @param isAlleleA are we taking the A allele from the original GT
    * @param alleleId the allele selected for the haplotype
-   * @param otherAlleleId the allele selected for the otherhaplotype (for a haploid comparison
+   * @param otherAlleleId the allele selected for the other haplotype (for a haploid comparison
    * this should be the same as the primary allele id)
    */
   public OrientedVariant(Variant variant, boolean isAlleleA, int alleleId, int otherAlleleId) {
