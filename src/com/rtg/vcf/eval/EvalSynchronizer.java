@@ -139,10 +139,10 @@ public abstract class EvalSynchronizer implements Closeable {
 
   void finish() throws IOException {
     if (mVariantSet.getNumberOfSkippedBaselineVariants() > 0) {
-      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedBaselineVariants() + " baseline variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.");
+      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedBaselineVariants() + " baseline variants skipped due to being too long or starting outside the expected reference sequence length.");
     }
     if (mVariantSet.getNumberOfSkippedCalledVariants() > 0) {
-      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedCalledVariants() + " called variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.");
+      Diagnostic.warning("There were " + mVariantSet.getNumberOfSkippedCalledVariants() + " called variants skipped due to being too long or starting outside the expected reference sequence length.");
     }
   }
 
