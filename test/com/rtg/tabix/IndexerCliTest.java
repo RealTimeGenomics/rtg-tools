@@ -36,12 +36,11 @@ import java.util.regex.Pattern;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.gzip.GzipUtils;
-import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -60,16 +59,13 @@ public class IndexerCliTest extends AbstractCliTest {
   }
 
   public void testFlags() throws IOException {
-    final File f = FileUtils.createTempDir("foo", "rah");
-    try {
+    try (final TestDirectory f = new TestDirectory("indexercli")) {
       checkHandleFlagsOut("-f", "sam", f.getPath());
       checkHandleFlagsOut("-f", "bam", f.getPath());
       checkHandleFlagsOut("-f", "vcf", f.getPath());
       checkHandleFlagsOut("-f", "coveragetsv", f.getPath());
       checkHandleFlagsErr("-f", "hobbit", f.getPath());
       checkHandleFlagsErr(f.getPath());
-    } finally {
-      assertTrue(f.delete());
     }
   }
 
@@ -82,15 +78,12 @@ public class IndexerCliTest extends AbstractCliTest {
       try (InputStream is = GzipUtils.createGzipInputStream(Resources.getResourceAsStream("com/rtg/sam/resources/test.sam.gz"))) {
         file4 = FileHelper.streamToFile(is, new File(dir, "test4.sam"));
       }
-      try (MemoryPrintStream out = new MemoryPrintStream();
-           MemoryPrintStream err = new MemoryPrintStream()) {
-          final int code = getCli().mainInit(new String[]{"-f", "sam", file1.getPath(), file2.getPath(), file3.getPath(), file4.getPath()}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 1, code);
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file1.getPath())), "Creating index for", "test1.sam.gz.tbi");
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file2.getPath())), "Creating index for", "test2.sam.gz.tbi");
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file3.getPath())), "Creating index for", "test3.sam.gz.tbi");
-          assertEquals("Cannot create index for " + file4.getPath() + " as it is not in bgzip format." + StringUtils.LS, err.toString());
-        }
+      final MainResult res = MainResult.run(getCli(), "-f", "sam", file1.getPath(), file2.getPath(), file3.getPath(), file4.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file1.getPath())), "Creating index for", "test1.sam.gz.tbi");
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file2.getPath())), "Creating index for", "test2.sam.gz.tbi");
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file3.getPath())), "Creating index for", "test3.sam.gz.tbi");
+      assertEquals("Cannot create index for " + file4.getPath() + " as it is not in bgzip format." + StringUtils.LS, res.err());
     }
   }
 
@@ -100,15 +93,12 @@ public class IndexerCliTest extends AbstractCliTest {
       final File file2 = FileHelper.resourceToFile("com/rtg/sam/resources/bam.bam", new File(dir, "bam2.bam"));
       final File file3 = FileHelper.resourceToFile("com/rtg/sam/resources/bam.bam", new File(dir, "bam3.bam"));
       final File file4 = FileHelper.resourceToFile("com/rtg/sam/resources/unmated.sam", new File(dir, "test4.sam"));
-      try (MemoryPrintStream out = new MemoryPrintStream();
-           MemoryPrintStream err = new MemoryPrintStream()) {
-          final int code = getCli().mainInit(new String[]{"-f", "bam", file1.getPath(), file2.getPath(), file3.getPath(), file4.getPath()}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 1, code);
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file1.getPath())), "Creating index for", "bam1.bam.bai");
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file2.getPath())), "Creating index for", "bam2.bam.bai");
-          TestUtils.containsAll(StringUtils.grep(out.toString(), Pattern.quote(file3.getPath())), "Creating index for", "bam3.bam.bai");
-          assertEquals("Cannot create index for " + file4.getPath() + " as it is not in bgzip format." + StringUtils.LS, err.toString());
-      }
+      final MainResult res = MainResult.run(getCli(), "-f", "bam", file1.getPath(), file2.getPath(), file3.getPath(), file4.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file1.getPath())), "Creating index for", "bam1.bam.bai");
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file2.getPath())), "Creating index for", "bam2.bam.bai");
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file3.getPath())), "Creating index for", "bam3.bam.bai");
+      assertEquals("Cannot create index for " + file4.getPath() + " as it is not in bgzip format." + StringUtils.LS, res.err());
     }
   }
 }

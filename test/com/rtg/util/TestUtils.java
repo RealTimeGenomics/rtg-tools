@@ -504,19 +504,6 @@ public final class TestUtils {
   }
 
   /**
-   * Append two arrays of strings.
-   * @param a first string array.
-   * @param b second string array.
-   * @return appended string array.
-   */
-  public static String[] append(final String[] a, final String[] b) {
-    final String[] c = new String[a.length + b.length];
-    System.arraycopy(a, 0, c, 0, a.length);
-    System.arraycopy(b, 0, c, a.length, b.length);
-    return c;
-  }
-
-  /**
    * Checks that the contents of a string match those contained in a resource.
    * @param resource the resource name
    * @param actual the actual string

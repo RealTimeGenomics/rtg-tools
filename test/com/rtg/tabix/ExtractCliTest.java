@@ -35,8 +35,8 @@ import java.io.IOException;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.BgzipFileHelper;
 import com.rtg.util.test.FileHelper;
@@ -74,65 +74,46 @@ public class ExtractCliTest extends AbstractCliTest {
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz.tbi", tabix);
       final File input = new File(dir, "snp_only.vcf.gz");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz", input);
-      try (MemoryPrintStream out = new MemoryPrintStream()) {
-        try (MemoryPrintStream err = new MemoryPrintStream()) {
-          int code = getCli().mainInit(new String[]{input.getPath(), "simulatedSequence19:500-1000"}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract500-1000", out.toString());
+      MainResult res = MainResult.run(getCli(), input.getPath(), "simulatedSequence19:500-1000");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract500-1000", res.out());
 
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath(), "simulatedSequence19:1000-5000"}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract1000-5000", out.toString());
+      res = MainResult.run(getCli(), input.getPath(), "simulatedSequence19:1000-5000");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract1000-5000", res.out());
 
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath(), "simulatedSequence19:500-5000"}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract500-5000", out.toString());
+      res = MainResult.run(getCli(), input.getPath(), "simulatedSequence19:500-5000");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract500-5000", res.out());
 
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath(), "simulatedSequence19:500-1000", "simulatedSequence19:1000-5000"}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract500-1000-5000", out.toString());
+      res = MainResult.run(getCli(), input.getPath(), "simulatedSequence19:500-1000", "simulatedSequence19:1000-5000");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract500-1000-5000", res.out());
 
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath()}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract-norestrict", out.toString());
+      res = MainResult.run(getCli(), input.getPath());
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract-norestrict", res.out());
 
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath(), "--header-only"}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, code);
-          mNano.check("extract-header-only", out.toString());
-        }
-      }
+      res = MainResult.run(getCli(), input.getPath(), "--header-only");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract-header-only", res.out());
     }
   }
 
   public void testErrors() throws IOException {
     try (TestDirectory dir = new TestDirectory("extractcli")) {
       File input = FileUtils.stringToFile("stuff", new File(dir, "afile"));
-      try (MemoryPrintStream out = new MemoryPrintStream()) {
-        try (MemoryPrintStream err = new MemoryPrintStream()) {
-          int code = getCli().mainInit(new String[]{input.getPath()}, out.outputStream(), err.printStream());
-          assertEquals(1, code);
-          assertTrue(err.toString().contains("bgzip format"));
-          assertTrue(err.toString().contains(input.getPath()));
-          input = BgzipFileHelper.bytesToBgzipFile("stuff".getBytes(), input);
-          out.reset();
-          err.reset();
-          code = getCli().mainInit(new String[]{input.getPath()}, out.outputStream(), err.printStream());
-          assertEquals(1, code);
-          assertTrue(err.toString().contains("Index not found"));
-          assertTrue(err.toString().contains(input.getPath()));
-          assertTrue(err.toString().contains(input.getPath() + TabixIndexer.TABIX_EXTENSION));
-        }
-      }
+      MainResult res = MainResult.run(getCli(), input.getPath());
+      assertEquals(1, res.rc());
+      assertTrue(res.err().contains("bgzip format"));
+      assertTrue(res.err().contains(input.getPath()));
+      input = BgzipFileHelper.bytesToBgzipFile("stuff".getBytes(), input);
+
+      res = MainResult.run(getCli(), input.getPath());
+      assertEquals(1, res.rc());
+      assertTrue(res.err().contains("Index not found"));
+      assertTrue(res.err().contains(input.getPath()));
+      assertTrue(res.err().contains(input.getPath() + TabixIndexer.TABIX_EXTENSION));
     }
   }
 

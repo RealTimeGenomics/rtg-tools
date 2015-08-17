@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
@@ -42,6 +41,7 @@ import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
+import com.rtg.util.Utils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
@@ -185,12 +185,6 @@ public class VcfEvalCliTest extends AbstractCliTest {
     check("vcfeval_too_complex", true, false, false, false);
   }
 
-  private String[] appendArgs(String[] args, String...moreArgs) {
-    final String[] result = Arrays.copyOf(args, args.length + moreArgs.length);
-    System.arraycopy(moreArgs, 0, result, args.length, moreArgs.length);
-    return result;
-  }
-
   private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, boolean checkFp, String... args) throws IOException, UnindexableDataException {
     final File template = new File(mDir, "template");
     final File baseline = new File(mDir, "baseline.vcf.gz");
@@ -201,9 +195,9 @@ public class VcfEvalCliTest extends AbstractCliTest {
     FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
     new TabixIndexer(baseline).saveVcfIndex();
     new TabixIndexer(calls).saveVcfIndex();
-    String[] fullArgs = appendArgs(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
+    String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
     if (checkSlope) {
-      fullArgs = appendArgs(fullArgs, "--Xslope-files");
+      fullArgs = Utils.append(fullArgs, "--Xslope-files");
     }
     if (expectWarn) {
       final String stderr = checkMainInitWarn(fullArgs);

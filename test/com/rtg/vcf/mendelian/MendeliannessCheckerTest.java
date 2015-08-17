@@ -29,13 +29,12 @@
  */
 package com.rtg.vcf.mendelian;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.io.IOUtils;
 import com.rtg.util.io.TestDirectory;
@@ -112,16 +111,9 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       final File file1 = FileHelper.resourceToFile("com/rtg/vcf/mendelian/resources/merge.vcf", new File(dir, "merge.vcf"));
       final File inconsistent = new File(dir, "failed.vcf");
       final File consistent = new File(dir, "nonfailed.vcf");
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        final MendeliannessChecker chk = (MendeliannessChecker) getCli();
-
-        final int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath(), "-Z", "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath()}, bos, new PrintStream(bos));
-        assertEquals(0, ret);
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString().replaceAll("Checking: [^\n]*\n", "Checking: \n");
+      final MainResult res = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath(), "-Z", "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath());
+      assertEquals(0, res.rc());
+      final String s = res.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
       //System.err.println(s);
       mNano.check("mendelian1", s);
       final String s2 = IOUtils.readAll(inconsistent);
@@ -131,15 +123,9 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       //System.err.println(s2);
       mNano.check("mendelian2b", s2b);
 
-      final ByteArrayOutputStream bos3 = new ByteArrayOutputStream();
-      try {
-        final MendeliannessChecker chk = (MendeliannessChecker) getCli();
-        final int ret = chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", file1.getPath()}, bos3, new PrintStream(bos));
-        assertEquals(0, ret);
-      } finally {
-        bos3.close();
-      }
-      final String s3 = bos3.toString().replaceAll("Checking: [^\n]*\n", "Checking: \n");
+      final MainResult res2 = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath());
+      assertEquals(0, res2.rc());
+      final String s3 = res2.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
       //System.err.println(s3);
       mNano.check("mendelian3", s3);
     }

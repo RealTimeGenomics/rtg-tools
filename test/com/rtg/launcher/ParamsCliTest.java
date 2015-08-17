@@ -40,15 +40,14 @@ import java.util.Collection;
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.Params;
-import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.CliDiagnosticListener;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogRecord;
 import com.rtg.util.io.LogStream;
 import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
@@ -73,14 +72,11 @@ public class ParamsCliTest extends TestCase {
   }
 
   public void test() throws IOException, InvalidParamsException {
-    final File outDir = FileHelper.createTempDirectory();
-    final ParamsCli<MockCliParams> cli = new MockCli(outDir);
-    try {
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-      assertEquals(1, cli.mainInit(new String[0], out, TestUtils.getNullPrintStream()));
-      assertEquals("Mock task did something", new String(out.toByteArray()));
-    } finally {
-      assertTrue(FileHelper.deleteAll(outDir));
+    try (final TestDirectory outDir = new TestDirectory("paramscli")) {
+      final ParamsCli<MockCliParams> cli = new MockCli(outDir);
+      final MainResult res = MainResult.run(cli);
+      assertEquals(1, res.rc());
+      assertEquals("Mock task did something", res.out());
     }
   }
 
@@ -166,61 +162,51 @@ public class ParamsCliTest extends TestCase {
   }
 
   public void testGood() throws IOException {
-    final File dir = FileUtils.createTempDir("paramscli", "test");
-    try {
-      final MemoryPrintStream err = new MemoryPrintStream();
+    try (final TestDirectory dir = new TestDirectory("paramscli")) {
       final TestParamsCli cli = new TestParamsCli(false, false, dir);
-      final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
-      assertEquals(err.toString(), 0, code);
+      final MainResult res = MainResult.run(cli);
+      assertEquals(res.err(), 0, res.rc());
       assertTrue(cli.hasRan());
       assertTrue(dir.exists());
       assertTrue(FileHelper.deleteAll(dir));
-      assertEquals(0, cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream()));
+      final MainResult res2 = MainResult.run(cli);
+      assertEquals(res2.err(), 0, res2.rc());
       assertTrue(dir.exists());
-    } finally {
-      assertTrue(!dir.exists() || FileHelper.deleteAll(dir));
     }
   }
 
   public void testMakeParamsHandling() throws IOException {
-    final File dir = FileUtils.createTempDir("paramscli", "test");
-    try {
-      final MemoryPrintStream err = new MemoryPrintStream();
+    try (final TestDirectory dir = new TestDirectory("paramscli")) {
       final TestParamsCli cli = new TestParamsCli(true, false, dir);
-      final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
-      assertEquals(err.toString(), 1, code);
-      assertTrue(err.toString().contains("Test error"));
+      final MainResult res = MainResult.run(cli);
+      assertEquals(res.err(), 1, res.rc());
+      assertTrue(res.err().contains("Test error"));
       assertFalse(cli.hasRan());
       assertTrue(dir.exists());
       assertTrue(FileHelper.deleteAll(dir));
-      assertEquals(1, cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream()));
+      final MainResult res2 = MainResult.run(cli);
+      assertEquals(res2.err(), 1, res2.rc());
       assertFalse(dir.exists());
-    } finally {
-      assertTrue(!dir.exists() || FileHelper.deleteAll(dir));
     }
   }
 
   public void testMakeParamsHandling2() throws IOException {
-    final File dir = FileUtils.createTempDir("paramscli", "test");
-    try {
-      final MemoryPrintStream err = new MemoryPrintStream();
+    try (final TestDirectory dir = new TestDirectory("paramscli")) {
       final TestParamsCli cli = new TestParamsCli(true, true, dir);
-      final int code = cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream());
-      assertEquals(err.toString(), 1, code);
-      assertTrue(err.toString().contains("Test error"));
+      final MainResult res = MainResult.run(cli);
+      assertEquals(res.err(), 1, res.rc());
+      assertTrue(res.err().contains("Test error"));
       assertFalse(cli.hasRan());
       assertTrue(dir.exists());
       assertTrue(FileHelper.deleteAll(dir));
-      assertEquals(1, cli.mainInit(new String[] {}, TestUtils.getNullOutputStream(), err.printStream()));
+      final MainResult res2 = MainResult.run(cli);
+      assertEquals(res2.err(), 1, res2.rc());
       assertFalse(dir.exists());
-    } finally {
-      assertTrue(!dir.exists() || FileHelper.deleteAll(dir));
     }
   }
 
   public void testCheckFiles() throws IOException, InvalidParamsException {
-    final File dir = FileUtils.createTempDir("paramscli", "test");
-    try {
+    try (final TestDirectory dir = new TestDirectory("paramscli")) {
       final ArrayList<Object> files = new ArrayList<>();
       final File created = new File(dir, "exists");
       final File fobar = new File(dir, "fobar");
@@ -244,8 +230,6 @@ public class ParamsCliTest extends TestCase {
       final Collection<File> collfiles = ParamsCli.checkFiles(files);
       assertEquals(1, collfiles.size());
       assertTrue(collfiles.contains(created));
-    } finally {
-      assertTrue(!dir.exists() || FileHelper.deleteAll(dir));
     }
   }
 

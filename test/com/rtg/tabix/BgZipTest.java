@@ -35,6 +35,7 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
 
@@ -51,96 +52,70 @@ public class BgZipTest extends AbstractCliTest {
   }
 
   public void testCompress() throws Exception {
-    final File dir = FileUtils.createTempDir("indexercli", "test");
-    try {
+    try (TestDirectory dir = new TestDirectory()) {
       final File file1 = FileHelper.resourceToFile("com/rtg/sam/resources/test.sam", new File(dir, "test1.sam"));
 
-      final BgZip cli = (BgZip) getCli();
-      final MemoryPrintStream mps = new MemoryPrintStream();
+      String out = checkMainInitOk(file1.getPath());
+      assertEquals(0, out.length());
 
-      cli.mainInit(new String[] {file1.getPath()}, mps.outputStream(), mps.printStream());
-      assertEquals(0, mps.toString().length());
+      out = checkMainInitOk("--decompress", "-c", new File(dir, "test1.sam.gz").getPath());
 
-      mps.reset();
-      cli.mainInit(new String[] {"--decompress", "-c", new File(dir, "test1.sam.gz").getPath()}, mps.outputStream(), mps.printStream());
-
-      assertTrue(mps.toString().length() > 1);
-      assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), mps.toString());
-    } finally {
-      FileHelper.deleteAll(dir);
+      assertTrue(out.length() > 1);
+      assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), out);
     }
   }
 
   public void testCompressToStdOut() throws Exception {
-    final File dir = FileUtils.createTempDir("indexercli", "test");
-    try {
+    try (TestDirectory dir = new TestDirectory()) {
       final File file1 = FileHelper.resourceToFile("com/rtg/sam/resources/test.sam", new File(dir, "test1.sam"));
 
-      final BgZip cli = (BgZip) getCli();
       final MemoryPrintStream mps = new MemoryPrintStream();
-
-      cli.mainInit(new String[] {"--stdout", file1.getPath()}, mps.outputStream(), mps.printStream());
+      getCli().mainInit(new String[]{"--stdout", file1.getPath()}, mps.outputStream(), mps.printStream());
       assertTrue(mps.toString().length() > 1);
       assertTrue(file1.exists());
-
       final File bgzippedOutFile = new File(dir, "out.gz");
       FileUtils.byteArrayToFile(mps.outputStream().toByteArray(), bgzippedOutFile);
 
-      mps.reset();
-      cli.mainInit(new String[] {"-d", "-c", bgzippedOutFile.getPath()}, mps.outputStream(), mps.printStream());
+      final String out = checkMainInitOk("-d", "-c", bgzippedOutFile.getPath());
 
-      assertTrue(mps.toString().length() > 1);
-      assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), mps.toString());
-    } finally {
-      FileHelper.deleteAll(dir);
+      assertTrue(out.length() > 1);
+      assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), out);
     }
   }
 
   public void testDecompress() throws Exception {
-    final File dir = FileUtils.createTempDir("indexercli", "test");
-    try {
+    try (TestDirectory dir = new TestDirectory()) {
       final File file1 = FileHelper.resourceToFile("com/rtg/sam/resources/test.sam.gz", new File(dir, "test1.sam.gz"));
 
-      final BgZip cli = (BgZip) getCli();
-      final MemoryPrintStream mps = new MemoryPrintStream();
-
-      assertEquals(0, cli.mainInit(new String[] {"--decompress", file1.getPath()}, mps.outputStream(), mps.printStream()));
+      final String out = checkMainInitOk("--decompress", file1.getPath());
 
       assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), FileUtils.fileToString(new File(dir, "test1.sam")));
-      assertEquals(0, mps.toString().length());
+      assertEquals(0, out.length());
       assertFalse(file1.exists());
-    } finally {
-      FileHelper.deleteAll(dir);
     }
   }
 
   public void testFailures() throws Exception {
-    final File dir = FileHelper.createTempDirectory();
-    try {
+    try (TestDirectory dir = new TestDirectory()) {
       final File file1 = new File(dir, "input");
-      final BgZip cli = (BgZip) getCli();
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      assertEquals(1, cli.mainInit(new String[] {"--decompress", file1.getPath()}, mps.outputStream(), mps.printStream()));
 
-      assertEquals("Error: The specified file, \"" + file1.getPath() + "\" does not exist.", mps.toString().trim());
+      String err = checkMainInitBadFlags("--decompress", file1.getPath());
+      assertEquals("Error: The specified file, \"" + file1.getPath() + "\" does not exist.", err.trim());
 
       FileUtils.stringToFile("", file1);
       final File fout = new File(dir, "input.gz");
       assertTrue(fout.createNewFile());
 
-      mps.reset();
-      assertEquals(1, cli.mainInit(new String[] {file1.getPath()}, mps.outputStream(), mps.printStream()));
-      assertEquals("Error: Output file \"" + fout.getPath() + "\" already exists.", mps.toString().trim());
-      assertEquals(0, cli.mainInit(new String[] {"-f", file1.getPath()}, mps.outputStream(), mps.printStream()));
+      err = checkMainInitBadFlags(file1.getPath());
+      assertEquals("Error: Output file \"" + fout.getPath() + "\" already exists.", err.trim());
+
+      checkMainInitOk("-f", file1.getPath());
 
       FileUtils.stringToFile("", file1);
-      mps.reset();
-      assertEquals(1, cli.mainInit(new String[] {"--decompress", file1.getPath()}, mps.outputStream(), mps.printStream()));
-      assertEquals("Error: Input file not in GZIP format", mps.toString().trim());
 
+      err = checkMainInitBadFlags("--decompress", file1.getPath());
+      assertEquals("Error: Input file not in GZIP format", err.trim());
 
-    } finally {
-      FileHelper.deleteAll(dir);
     }
 
   }

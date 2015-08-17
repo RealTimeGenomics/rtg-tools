@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 
-import com.rtg.util.Pair;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommandLine;
@@ -154,15 +153,13 @@ public abstract class AbstractCliTest extends TestCase {
    * it should run with return code 0.
    *
    * @param args command line arguments.
-   * @return a pair containing the contents of stdout and stderr, respectively.
+   * @return a result object containing the return code, and contents of stdout and stderr.
    */
-  protected Pair<String, String> checkMainInit(String... args) {
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    final MemoryPrintStream err = new MemoryPrintStream();
-    final int rc = mCli.mainInit(args, out, err.printStream());
+  protected MainResult checkMainInit(String... args) {
+    final MainResult result = MainResult.run(mCli, args);
     assertNotNull(mCli.mMainListener);
-    assertEquals(err.toString(), 0, rc);
-    return new Pair<>(out.toString(), err.toString());
+    assertEquals(result.err(), 0, result.rc());
+    return result;
   }
 
   /**
@@ -173,10 +170,10 @@ public abstract class AbstractCliTest extends TestCase {
    * @return the contents of stdout.
    */
   protected String checkMainInitOk(String... args) {
-    final Pair<String, String> res = checkMainInit(args);
-    final String err = res.getB();
+    final MainResult res = checkMainInit(args);
+    final String err = res.err();
     assertEquals("Error: " + err, "", err);
-    return res.getA();
+    return res.out();
   }
 
   /**
@@ -187,8 +184,8 @@ public abstract class AbstractCliTest extends TestCase {
    * @return the contents of stderr.
    */
   protected String checkMainInitWarn(String... args) {
-    final Pair<String, String> res = checkMainInit(args);
-    final String err = res.getB();
+    final MainResult res = checkMainInit(args);
+    final String err = res.err();
     assertTrue(err.length() > 0);
     return err;
   }
@@ -201,8 +198,8 @@ public abstract class AbstractCliTest extends TestCase {
    * @return the contents of stderr.
    */
   protected String checkMainInitBadFlags(String... args) {
-    final MemoryPrintStream err = new MemoryPrintStream();
-    assertEquals(1, mCli.mainInit(args, TestUtils.getNullOutputStream(), err.printStream()));
-    return err.toString();
+    final MainResult res = MainResult.run(mCli, args);
+    assertEquals(1, res.rc());
+    return res.err();
   }
 }

@@ -231,7 +231,7 @@ public class VcfMergeTest extends AbstractCliTest {
         "--stats",
         snpsA.toString(), snpsB.toString()));
       args.addAll(Arrays.asList(argsIn));
-      final String out = checkMainInit(args.toArray(new String[args.size()])).getA();
+      final String out = checkMainInit(args.toArray(new String[args.size()])).out();
       String actual = FileHelper.gzFileToString(output);
       actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
       assertTrue(new File(dir, output.getName() + ".tbi").isFile());

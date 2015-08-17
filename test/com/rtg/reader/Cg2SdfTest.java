@@ -30,15 +30,14 @@
 package com.rtg.reader;
 
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Iterator;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
@@ -48,7 +47,6 @@ import com.rtg.util.diagnostic.DiagnosticListener;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -64,12 +62,12 @@ public class Cg2SdfTest extends AbstractCliTest {
 
   public void testHelp() {
     checkHelp("rtg cg2sdf"
-        , "Converts Complete Genomics sequencing system reads to RTG SDF format"
-        , "-I,", "--input-list-file", "file containing a list of Complete Genomics files (1 per line)"
-        , "-o,", "name of output SDF"
-        , "FILE+", "file in Complete Genomics format. May be specified 0 or more times"
-        , "--max-unknowns=INT", "maximum number of Ns allowed in either side for a read (Default is 5)"
-        , "--no-quality", "does not include quality data in the resulting SDF"
+      , "Converts Complete Genomics sequencing system reads to RTG SDF format"
+      , "-I,", "--input-list-file", "file containing a list of Complete Genomics files (1 per line)"
+      , "-o,", "name of output SDF"
+      , "FILE+", "file in Complete Genomics format. May be specified 0 or more times"
+      , "--max-unknowns=INT", "maximum number of Ns allowed in either side for a read (Default is 5)"
+      , "--no-quality", "does not include quality data in the resulting SDF"
     );
     checkExtendedHelp("rtg cg2sdf"
         , "--Xcompress=BOOL", "compress sdf (Default is " + true + ")"
@@ -78,12 +76,9 @@ public class Cg2SdfTest extends AbstractCliTest {
   }
 
   public void testCFlagsA() throws Exception {
-    Diagnostic.setLogStream();
-
-    final File dir = FileUtils.createTempDir("cg2sdftest", "badfiles");
-    final File notexist = new File(dir, "no");
-    final File in = new File(dir, "fin");
-    try {
+    try (final TestDirectory dir = new TestDirectory("cg2sdf")) {
+      final File notexist = new File(dir, "no");
+      final File in = new File(dir, "fin");
       assertTrue(in.createNewFile());
       checkHandleFlagsOut("-o", notexist.getPath(), in.getPath());
       final CFlags flags = getCFlags();
@@ -91,8 +86,6 @@ public class Cg2SdfTest extends AbstractCliTest {
       assertTrue(it.hasNext());
       assertEquals(in.getPath(), ((File) it.next()).getPath());
       assertEquals(notexist.getPath(), ((File) flags.getValue(Cg2Sdf.OUTPUT_FLAG)).getPath());
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
     }
   }
 
@@ -103,35 +96,29 @@ public class Cg2SdfTest extends AbstractCliTest {
   };
 
   public void testCFlagsB() throws Exception {
-    Diagnostic.setLogStream();
-
-    final File dir = FileUtils.createTempDir("cg2sdftest", "badfiles");
-    final File in = new File(dir, "in");
-    final File outdir = new File(dir, "out");
-    try {
+    try (final TestDirectory dir = new TestDirectory("cg2sdf")) {
+      final File in = new File(dir, "in");
+      final File outdir = new File(dir, "out");
       TestUtils.containsAll(checkHandleFlagsErr(in.getPath()),
-                            "You must provide a value for -o SDF");
+        "You must provide a value for -o SDF");
       TestUtils.containsAll(checkHandleFlagsErr(in.getPath()),
-                            ERROR_FOOTER);
+        ERROR_FOOTER);
       TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath()),
-                            "No input files specified.");
+        "No input files specified.");
       assertTrue(in.createNewFile());
       assertTrue(outdir.mkdirs());
       TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath()),
-                            "The directory",
-                            "already exists. Please remove it first or choose a different directory.");
+        "The directory",
+        "already exists. Please remove it first or choose a different directory.");
 
       assertTrue(FileHelper.deleteAll(outdir));
 
       TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"),
-                            "The specified flag \"--max-unknowns\" has invalid value \"-1\". It should be greater than or equal to \"0\".");
+        "The specified flag \"--max-unknowns\" has invalid value \"-1\". It should be greater than or equal to \"0\".");
 
       final String err = checkHandleFlagsErr("-o", outdir.getPath(), "-I", "x");
       TestUtils.containsAll(err,
-                            "An error occurred reading " + getCFlags().getValue(CommonFlags.INPUT_LIST_FLAG));
-
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
+        "An error occurred reading " + getCFlags().getValue(CommonFlags.INPUT_LIST_FLAG));
     }
   }
 
@@ -142,9 +129,7 @@ public class Cg2SdfTest extends AbstractCliTest {
   }
 
   public void testCg2SdfWithBadFiles() throws Exception {
-
     final int[] fileNotFoundCount = new int[3];
-
     final DiagnosticListener dl = new DiagnosticListener() {
       @Override
       public void handleDiagnosticEvent(final DiagnosticEvent<?> event) {
@@ -169,34 +154,22 @@ public class Cg2SdfTest extends AbstractCliTest {
       }
     };
     Diagnostic.addListener(dl);
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
     try {
-      final PrintStream err = new PrintStream(bos);
       Diagnostic.setLogStream();
 
-      final File dir = FileUtils.createTempDir("cg2sdftest", "badfiles");
+      try (final TestDirectory dir = new TestDirectory("cg2sdf")) {
       final File in = new File(dir, "in");
       final File out = new File(dir, "out");
-      try {
-        assertEquals(1, new Cg2Sdf().mainInit(new String[] {in.getPath(), "-o", out.getPath()}, bout, err));
+        checkMainInitBadFlags(in.getPath(), "-o", out.getPath());
         assertEquals(0, fileNotFoundCount[0]);
         assertEquals(0, fileNotFoundCount[1]);
         assertEquals(1, fileNotFoundCount[2]);
         resetCounts(fileNotFoundCount);
-        //        System.err.println(bout.toString());
-        //        System.err.println(bos.toString());
         Diagnostic.setLogStream();
-        //make the input file
-        err.close();
-      } finally {
-        FileHelper.deleteAll(dir);
       }
     } finally {
       Diagnostic.removeListener(dl);
       Diagnostic.deleteLog();
-      bos.close();
-      bout.close();
     }
   }
 
@@ -223,24 +196,18 @@ public class Cg2SdfTest extends AbstractCliTest {
   };
 
   public void testNs() throws Exception {
-    final File tempDir = FileUtils.createTempDir("cg2sdftest", "ns");
-    try {
+    try (final TestDirectory tempDir = new TestDirectory("cg2sdf")) {
       final File out = new File(tempDir, "out");
       final File in = new File(tempDir, "in.tsv");
       FileUtils.stringToFile(">flags\treads\tscores\n1\tANAAANAAAACCCCCCCCCC\tABCDEFGHIJJIHGFEDCBA\n2\tANAAANNAAACCCCCNCCCC\tABCDEFGHIJJIHGFEDCBA\n", in);
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      new Cg2Sdf().mainInit(new String[] {"-o", out.getPath(), "--max-unknowns", "2", in.getPath()}, mps.outputStream(), mps.printStream());
-
-      TestUtils.containsAll(mps.toString(), EXPECTED_MSGS);
+      final String outStr = checkMainInitOk("-o", out.getPath(), "--max-unknowns", "2", in.getPath());
+      TestUtils.containsAll(outStr, EXPECTED_MSGS);
 
       final File summary = new File(out, "summary.txt");
       assertTrue(summary.exists());
       final String sum = FileUtils.fileToString(summary);
       TestUtils.containsAll(sum, EXPECTED_MSGS);
-
-    } finally {
-      FileHelper.deleteAll(tempDir);
     }
   }
 
@@ -250,104 +217,58 @@ public class Cg2SdfTest extends AbstractCliTest {
   }
 
   public void testCg2SdfWithVersion2() throws Exception {
-    Diagnostic.setLogStream();
-    final File tempDir = FileUtils.createTempDir("cg2sdftest", "version2");
-    try {
+    try (final TestDirectory tempDir = new TestDirectory("cg2sdf")) {
       final File dir = new File(tempDir, "output");
-      final ByteArrayOutputStream berr = new ByteArrayOutputStream();
-      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      final ByteArrayOutputStream boutleft = new ByteArrayOutputStream();
-      final ByteArrayOutputStream boutright = new ByteArrayOutputStream();
-      try {
-        final MemoryPrintStream out = new MemoryPrintStream();
-        final MemoryPrintStream err = new MemoryPrintStream();
-        Diagnostic.setLogStream();
-        final File sample = new File(tempDir, "sample.tsv.gz");
-        try {
-          FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample.tsv"), sample);
-          final int res = new Cg2Sdf().mainInit(new String[] {sample.getAbsolutePath(), "-o", dir.getAbsolutePath()}, out.outputStream(), err.printStream());
-          assertEquals(err.toString(), 0, res);
-          TestUtils.containsAll(out.toString(), "");
-          final int res2 = new SdfStatistics().mainInit(new String[] {dir.getAbsolutePath() + "/left"}, boutleft, err.printStream());
-          assertEquals(err.toString(), 0, res2);
-          TestUtils.containsAll(boutleft.toString(), "",
-            "DNA",
-            "CG",
-            "LEFT",
-            "Number of sequences: 3",
-            "Maximum length     : 10",
-            "Minimum length     : 10",
-            "N                  : 0",
-            "A                  : 15",
-            "C                  : 0",
-            "G                  : 10",
-            "T                  : 5",
-            "Total residues     : 30",
-            "Residue qualities  : yes");
-          final int res3 = new SdfStatistics().mainInit(new String[] {dir.getAbsolutePath() + "/right"}, boutright, err.printStream());
-          assertEquals(0, res3);
-          TestUtils.containsAll(boutright.toString(), "",
-            "DNA",
-            "CG",
-            "RIGHT",
-            "Number of sequences: 3",
-            "Maximum length     : 10",
-            "Minimum length     : 10",
-            "N                  : 0",
-            "A                  : 5",
-            "C                  : 10",
-            "G                  : 0",
-            "T                  : 15",
-            "Total residues     : 30",
-            "Residue qualities  : yes");
-        } finally {
-          assertTrue(sample.delete());
-        }
-      } finally {
-        berr.close();
-        bout.close();
-        boutleft.close();
-        boutright.close();
-      }
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
+      final File sample = new File(tempDir, "sample.tsv.gz");
+      FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample.tsv"), sample);
+      checkMainInitOk(sample.getAbsolutePath(), "-o", dir.getAbsolutePath());
+      final MainResult res2 = MainResult.run(new SdfStatistics(), dir.getAbsolutePath() + "/left");
+      assertEquals(0, res2.rc());
+      TestUtils.containsAll(res2.out(),
+        "DNA",
+        "CG",
+        "LEFT",
+        "Number of sequences: 3",
+        "Maximum length     : 10",
+        "Minimum length     : 10",
+        "N                  : 0",
+        "A                  : 15",
+        "C                  : 0",
+        "G                  : 10",
+        "T                  : 5",
+        "Total residues     : 30",
+        "Residue qualities  : yes");
+      final MainResult res3 = MainResult.run(new SdfStatistics(), dir.getAbsolutePath() + "/right");
+      assertEquals(0, res3.rc());
+      TestUtils.containsAll(res3.out(),
+        "DNA",
+        "CG",
+        "RIGHT",
+        "Number of sequences: 3",
+        "Maximum length     : 10",
+        "Minimum length     : 10",
+        "N                  : 0",
+        "A                  : 5",
+        "C                  : 10",
+        "G                  : 0",
+        "T                  : 15",
+        "Total residues     : 30",
+        "Residue qualities  : yes");
     }
   }
 
   public void testCg2SdfNoQuality() throws Exception {
-    Diagnostic.setLogStream();
-    final File tempDir = FileUtils.createTempDir("cg2sdftest", "noquality");
-    try {
+    try (final TestDirectory tempDir = new TestDirectory("cg2sdf")) {
       final File dir = new File(tempDir, "output");
-      final ByteArrayOutputStream berr = new ByteArrayOutputStream();
-      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      final ByteArrayOutputStream boutleft = new ByteArrayOutputStream();
-      final ByteArrayOutputStream boutright = new ByteArrayOutputStream();
-      try {
-        final MemoryPrintStream err = new MemoryPrintStream();
-        Diagnostic.setLogStream();
-        final File sample = new File(tempDir, "sample.tsv.gz");
-        try {
-          FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample.tsv"), sample);
-          final int res = new Cg2Sdf().mainInit(new String[] {sample.getAbsolutePath(), "-o", dir.getAbsolutePath(), "--no-quality"}, bout, err.printStream());
-          assertEquals(err.toString(), 0, res);
-          final int res2 = new SdfStatistics().mainInit(new String[] {dir.getAbsolutePath() + "/left"}, boutleft, err.printStream());
-          assertEquals(err.toString(), 0, res2);
-          assertTrue(!boutleft.toString().contains("Residue qualities  : yes"));
-          final int res3 = new SdfStatistics().mainInit(new String[] {dir.getAbsolutePath() + "/right"}, boutright, err.printStream());
-          assertEquals(err.toString(), 0, res3);
-          assertTrue(boutright.toString().contains("Residue qualities  : no"));
-        } finally {
-          assertTrue(sample.delete());
-        }
-      } finally {
-        berr.close();
-        bout.close();
-        boutleft.close();
-        boutright.close();
-      }
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
+      final File sample = new File(tempDir, "sample.tsv.gz");
+      FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample.tsv"), sample);
+      checkMainInitOk(sample.getAbsolutePath(), "-o", dir.getAbsolutePath(), "--no-quality");
+      final MainResult res2 = MainResult.run(new SdfStatistics(), dir.getAbsolutePath() + "/left");
+      assertEquals(res2.err(), 0, res2.rc());
+      assertTrue(!res2.out().contains("Residue qualities  : yes"));
+      final MainResult res3 = MainResult.run(new SdfStatistics(), dir.getAbsolutePath() + "/right");
+      assertEquals(res3.err(), 0, res3.rc());
+      assertTrue(res3.out().contains("Residue qualities  : no"));
     }
   }
 
@@ -357,12 +278,8 @@ public class Cg2SdfTest extends AbstractCliTest {
       final File output = new File(dir, "output");
       final String expected = "@RG\tID:rg999\tPL:COMPLETE\tSM:sample";
       final String custom = expected.replaceAll("\t", "\\\\t");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "--sam-rg", custom};
       FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample.tsv"), input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int errorCode = new Cg2Sdf().mainInit(args, out.outputStream(), err.printStream());
-      assertEquals(err.toString(), 0, errorCode);
+      checkMainInitOk(input.getPath(), "-o", output.getPath(), "--sam-rg", custom);
       final DefaultSequencesReader leftReader = new DefaultSequencesReader(new File(output, "left"), LongRange.NONE);
       assertEquals(expected, leftReader.samReadGroup());
       final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE);

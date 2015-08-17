@@ -366,7 +366,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
       final String[] args = {
           "-i", in.getPath(), "-o", out.getPath(), "-Z",
       };
-      final String output = checkMainInitOk(TestUtils.append(args, extraArgs));
+      final String output = checkMainInitOk(Utils.append(args, extraArgs));
       mNano.check(expResourceLoc + ".txt", output, true);
 
       final String o = StringUtils.grep(FileUtils.fileToString(out), "^[^#]").replaceAll("[\r|\n]+", "\n");
@@ -392,7 +392,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
       final String[] args = {
         "-i", in.getPath(), "-o", out.getPath(), "-Z",
       };
-      final String output = checkMainInitBadFlags(TestUtils.append(args, extraArgs));
+      final String output = checkMainInitBadFlags(Utils.append(args, extraArgs));
       mNano.check(expResourceLoc, output, true);
     } finally {
       assertTrue(FileHelper.deleteAll(dir));

@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -394,29 +395,25 @@ public class VariantStatisticsTest extends TestCase {
     final File vcfFile = FileHelper.createTempFile();
     try {
       FileUtils.stringToFile(VCF, vcfFile);
-      final MemoryPrintStream ps = new MemoryPrintStream();
-      int res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--Xvariant"}, ps.outputStream(), ps.printStream());
-      assertEquals(ps.toString(), 0, res);
-      final String outVariant = ps.toString();
+      MainResult res = MainResult.run(new VcfStatsCli(), vcfFile.getPath(), "--Xvariant");
+      assertEquals(res.err(), 0, res.rc());
+      final String outVariant = res.out();
       mNano.check("variantstatistics.txt", outVariant.substring(outVariant.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
 
-      ps.reset();
-      res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath()}, ps.outputStream(), ps.printStream());
-      assertEquals(ps.toString(), 0, res);
-      final String outVcfRecord = ps.toString();
+      res = MainResult.run(new VcfStatsCli(), vcfFile.getPath());
+      assertEquals(res.err(), 0, res.rc());
+      final String outVcfRecord = res.out();
       assertEquals(outVariant, outVcfRecord);
       mNano.check("variantstatistics.txt", outVcfRecord.substring(outVcfRecord.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
 
-      ps.reset();
-      res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--known"}, ps.outputStream(), ps.printStream());
-      assertEquals(ps.toString(), 0, res);
-      String outStats = ps.toString();
+      res = MainResult.run(new VcfStatsCli(), vcfFile.getPath(), "--known");
+      assertEquals(res.err(), 0, res.rc());
+      String outStats = res.out();
       mNano.check("variantstatistics-known.txt", outStats.substring(outStats.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
 
-      ps.reset();
-      res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--novel"}, ps.outputStream(), ps.printStream());
-      assertEquals(ps.toString(), 0, res);
-      outStats = ps.toString();
+      res = MainResult.run(new VcfStatsCli(), vcfFile.getPath(), "--novel");
+      assertEquals(res.err(), 0, res.rc());
+      outStats = res.out();
       mNano.check("variantstatistics-novel.txt", outStats.substring(outStats.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
     } finally {
       assertTrue(vcfFile.delete());
@@ -428,10 +425,9 @@ public class VariantStatisticsTest extends TestCase {
     final File vcfFile = FileHelper.createTempFile();
     try {
       FileUtils.stringToFile(VCF, vcfFile);
-      final MemoryPrintStream ps = new MemoryPrintStream();
-      final int res = new VcfStatsCli().mainInit(new String[] {vcfFile.getPath(), "--allele-lengths"}, ps.outputStream(), ps.printStream());
-      assertEquals(ps.toString(), 0, res);
-      final String outVariant = ps.toString();
+      final MainResult res = MainResult.run(new VcfStatsCli(), vcfFile.getPath(), "--allele-lengths");
+      assertEquals(res.err(), 0, res.rc());
+      final String outVariant = res.out();
       mNano.check("variantstatistics2.txt", outVariant.substring(outVariant.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
     } finally {
       assertTrue(vcfFile.delete());

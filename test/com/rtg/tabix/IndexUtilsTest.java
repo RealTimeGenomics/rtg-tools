@@ -35,10 +35,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 
 import junit.framework.TestCase;
@@ -57,7 +56,6 @@ public class IndexUtilsTest extends TestCase {
 
   @Override
   public void setUp() {
-    GlobalFlags.resetAccessedStatus();
     Diagnostic.setLogStream();
   }
 
@@ -70,10 +68,9 @@ public class IndexUtilsTest extends TestCase {
       new TabixIndexer(samFile).saveSamIndex();
       assertTrue(samFile.exists());
       assertTrue(new File(samFile.toString() + ".tbi").exists());
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      final int code = new ExtractCli().mainInit(new String[] {samFile.getPath(), "--header"}, mps.outputStream(), mps.printStream());
-      assertEquals(mps.toString(), 0, code);
-      assertEquals(SAM_CLIP, mps.toString());
+      final MainResult res = MainResult.run(new ExtractCli(), samFile.getPath(), "--header");
+      assertEquals(res.err(), 0, res.rc());
+      assertEquals(SAM_CLIP, res.out());
     }
   }
 }

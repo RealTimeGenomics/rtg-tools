@@ -33,12 +33,12 @@ import java.io.File;
 import java.io.IOException;
 
 import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.MainResult;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
@@ -64,10 +64,8 @@ public class AlternatingSequencesWriterTest extends TestCase {
       assertEquals(6, asw.mNumberOfSequences);
       assertEquals(60, asw.mTotalLength);
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-
-      new SdfStatistics().mainInit(new String[] {tempDir.getPath() + "/left"}, mps.outputStream(), mps.printStream());
-      TestUtils.containsAll(mps.toString(), "",
+      MainResult res = MainResult.run(new SdfStatistics(), tempDir.getPath() + "/left");
+      TestUtils.containsAll(res.out(), "",
         "DNA",
         "CG",
         "LEFT",
@@ -83,10 +81,8 @@ public class AlternatingSequencesWriterTest extends TestCase {
         "Residue qualities  : yes");
 
 
-      mps.reset();
-
-      new SdfStatistics().mainInit(new String[] {tempDir.getPath() + "/right"}, mps.outputStream(), mps.printStream());
-      TestUtils.containsAll(mps.toString(), "",
+      res = MainResult.run(new SdfStatistics(), tempDir.getPath() + "/right");
+      TestUtils.containsAll(res.out(), "",
         "DNA",
         "CG",
         "RIGHT",

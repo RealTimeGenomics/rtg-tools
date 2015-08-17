@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +42,7 @@ import java.util.ResourceBundle;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.reader.FormatCli.BadFormatCombinationException;
 import com.rtg.reader.FormatCli.PrereadExecutor;
@@ -137,60 +137,47 @@ public class FormatCliTest extends AbstractCliTest {
       FileUtils.stringToFile(">x\naCTGN\n>y\nACTGN\n", raw);
       final File list = new File(tempDir, "list");
       FileUtils.stringToFile(raw.getPath(), list);
-      testValidUse(new String[] {"-o", outputDir.getPath(), "-I", list.getPath(), "--duster", "--exclude", "y"}, outputDir);
+      testValidUse(new String[]{"-o", outputDir.getPath(), "-I", list.getPath(), "--duster", "--exclude", "y"}, outputDir);
     }
   }
 
   private void testValidUse(String[] args, File outputDir) throws IOException {
-    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-    try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-      try (PrintStream err = new PrintStream(bos)) {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        assertEquals(0, new FormatCli().mainInit(args, bout, err));
+    try (final TestDirectory tempDir = new TestDirectory("format")) {
+      final String outStr = checkMainInitOk(args);
+      TestUtils.containsAll(outStr, EXPECTED_MSG
+        , "Formatting FASTA data"
+        , "Input Data"
+        , "Files              : "
+        , StringUtils.LS + StringUtils.LS + "Output Data"
+        , "SDF-ID             : "
+        , "Number of sequences: 1" + StringUtils.LS
+        + "Total residues     : 5" + StringUtils.LS
+        + "Minimum length     : 5" + StringUtils.LS
+        + "Maximum length     : 5" + StringUtils.LS
+        + StringUtils.LS
+        + "There were 1 sequences skipped due to filters" + StringUtils.LS
+        + "There were 1 residues converted from lower case to unknowns");
 
-        final String outStr = bout.toString();
-        TestUtils.containsAll(outStr, EXPECTED_MSG
-          , "Formatting FASTA data"
-          , "Input Data"
-          , "Files              : "
-          , StringUtils.LS + StringUtils.LS + "Output Data"
-          , "SDF-ID             : "
-          , "Number of sequences: 1" + StringUtils.LS
-          + "Total residues     : 5" + StringUtils.LS
-          + "Minimum length     : 5" + StringUtils.LS
-          + "Maximum length     : 5" + StringUtils.LS
-          + StringUtils.LS
-          + "There were 1 sequences skipped due to filters" + StringUtils.LS
-          + "There were 1 residues converted from lower case to unknowns");
-
-        assertTrue(outputDir.isDirectory());
-        assertTrue(new File(outputDir, "mainIndex").exists());
-        final File summary = new File(outputDir, "summary.txt");
-        assertTrue(summary.exists());
-        final String sum = FileUtils.fileToString(summary);
-        assertTrue(sum, sum.contains(EXPECTED_MSG));
-        final File progress = new File(outputDir, "progress");
-        assertTrue(progress.exists());
-        final String prog = FileUtils.fileToString(progress);
-        TestUtils.containsAll(prog, "Formatting FASTA data");
-        final File outf = File.createTempFile("junit", ".fasta");
-        outf.deleteOnExit();
-        try {
-          assertEquals(0, new Sdf2Fasta().mainInit(new String[]{"-o", outf.getPath(), "-i", outputDir.getPath(), "-Z"}, out, err));
-          assertEquals(0, out.toString().length());
-          assertTrue(outf.exists());
-          assertFalse(outf.isDirectory());
-          try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
-            assertEquals(">x", r.readLine());
-            assertEquals("NCTGN", r.readLine());
-            assertNull(r.readLine());
-          }
-        } finally {
-          assertTrue(outf.delete());
-        }
+      assertTrue(outputDir.isDirectory());
+      assertTrue(new File(outputDir, "mainIndex").exists());
+      final File summary = new File(outputDir, "summary.txt");
+      assertTrue(summary.exists());
+      final String sum = FileUtils.fileToString(summary);
+      assertTrue(sum, sum.contains(EXPECTED_MSG));
+      final File progress = new File(outputDir, "progress");
+      assertTrue(progress.exists());
+      final String prog = FileUtils.fileToString(progress);
+      TestUtils.containsAll(prog, "Formatting FASTA data");
+      final File outf = new File(tempDir, "out.fasta");
+      MainResult.run(new Sdf2Fasta(), "-o", outf.getPath(), "-i", outputDir.getPath(), "-Z");
+      assertTrue(outf.exists());
+      assertFalse(outf.isDirectory());
+      try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
+        assertEquals(">x", r.readLine());
+        assertEquals("NCTGN", r.readLine());
+        assertNull(r.readLine());
       }
     }
-
   }
 
   public void testDuplicateError() throws Exception {
@@ -222,41 +209,33 @@ public class FormatCliTest extends AbstractCliTest {
     try (final TestDirectory tempDir = new TestDirectory("format")) {
       final File raw = new File(tempDir, "raw");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw);
-      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-        try (PrintStream err = new PrintStream(bos)) {
-          final File outputDir = new File(tempDir, JUNITOUT);
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          assertEquals(0, new FormatCli().mainInit(new String[]{"-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath()}, bout, err));
-          TestUtils.containsAll(bout.toString(), EXPECTED_FASTQ_MSG);
-          assertTrue(outputDir.isDirectory());
-          assertTrue(new File(outputDir, "mainIndex").exists());
-          final File summary = new File(outputDir, "summary.txt");
-          assertTrue(summary.exists());
-          final String sum = FileUtils.fileToString(summary);
-          assertTrue(sum, sum.contains(EXPECTED_FASTQ_MSG));
+      final File outputDir = new File(tempDir, JUNITOUT);
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      final String bout = checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath());
+      TestUtils.containsAll(bout, EXPECTED_FASTQ_MSG);
+      assertTrue(outputDir.isDirectory());
+      assertTrue(new File(outputDir, "mainIndex").exists());
+      final File summary = new File(outputDir, "summary.txt");
+      assertTrue(summary.exists());
+      final String sum = FileUtils.fileToString(summary);
+      assertTrue(sum, sum.contains(EXPECTED_FASTQ_MSG));
 
-          final File outf = new File(tempDir, "out.fasta");
-          //System.err.println("bos 1 ' " + bos.toString());
-          try (ByteArrayOutputStream bos1 = new ByteArrayOutputStream()) {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{outputDir.getAbsolutePath()}, bos1, TestUtils.getNullPrintStream()));
-            assertTrue(bos1.toString().contains("Sequence names     : yes"));
-            assertTrue(bos1.toString().contains("Residue qualities  : yes"));
-          }
+      final File outf = new File(tempDir, "out.fasta");
+      //System.err.println("bos 1 ' " + bos.toString());
+      MainResult res = MainResult.run(new SdfStatistics(), outputDir.getAbsolutePath());
+      assertEquals(res.err(), 0, res.rc());
+      assertTrue(res.out().contains("Sequence names     : yes"));
+      assertTrue(res.out().contains("Residue qualities  : yes"));
 
-          final int flag = new Sdf2Fasta().mainInit(new String[]{"-o", outf.getPath(), "-i", outputDir.getPath(), "-Z"}, out, err);
-          assertEquals(0, out.toString().length());
-          assertEquals(0, flag);
-          assertTrue(outf.exists());
-          assertFalse(outf.isDirectory());
-          try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
-            assertEquals(">x", r.readLine());
-            assertEquals("ACTGN", r.readLine());
-            assertNull(r.readLine());
-          }
-        }
-        bos.flush();
-        //System.err.println(bos.toString());
+      res = MainResult.run(new Sdf2Fasta(), "-o", outf.getPath(), "-i", outputDir.getPath(), "-Z");
+      assertEquals(res.err(), 0, res.rc());
+      assertEquals(0, res.out().length());
+      assertTrue(outf.exists());
+      assertFalse(outf.isDirectory());
+      try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
+        assertEquals(">x", r.readLine());
+        assertEquals("ACTGN", r.readLine());
+        assertNull(r.readLine());
       }
     }
   }
@@ -266,11 +245,10 @@ public class FormatCliTest extends AbstractCliTest {
       final File raw = new File(tempDir, "raw");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw);
       final File outputDir = new File(tempDir, JUNITOUT);
-      assertEquals(0, new FormatCli().mainInit(new String[] {"-o",  outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath(), "--no-names"}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
-      try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-        assertEquals(0, new SdfStatistics().mainInit(new String[]{outputDir.getAbsolutePath()}, bos, TestUtils.getNullPrintStream()));
-        assertTrue(bos.toString(), bos.toString().contains("Sequence names     : no"));
-      }
+      checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath(), "--no-names");
+      final MainResult res = MainResult.run(new SdfStatistics(), outputDir.getAbsolutePath());
+      assertEquals(res.err(), 0, res.rc());
+      assertTrue(res.out(), res.out().contains("Sequence names     : no"));
     }
   }
 
@@ -279,11 +257,10 @@ public class FormatCliTest extends AbstractCliTest {
       final File raw = new File(tempDir, "raw");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw);
       final File outputDir = new File(tempDir, JUNITOUT);
-      assertEquals(0, new FormatCli().mainInit(new String[] {"-o",  outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath(), "--no-quality"}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
-      try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-        assertEquals(0, new SdfStatistics().mainInit(new String[]{outputDir.getAbsolutePath()}, bos, TestUtils.getNullPrintStream()));
-        assertTrue(bos.toString(), bos.toString().contains("Residue qualities  : no"));
-      }
+      checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath(), "--no-quality");
+      final MainResult res = MainResult.run(new SdfStatistics(), outputDir.getAbsolutePath());
+      assertEquals(res.err(), 0, res.rc());
+      assertTrue(res.out(), res.out().contains("Residue qualities  : no"));
     }
   }
 
@@ -293,50 +270,44 @@ public class FormatCliTest extends AbstractCliTest {
       final File raw2 = new File(tempDir, "raw2");
       FileUtils.stringToFile(">x\n" + "aCTGN\n>y\nACTGN\n", raw1);
       FileUtils.stringToFile(">x\n" + "ACTGN\n>y\nACTGN\n", raw2);
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      final MemoryPrintStream mpsout = new MemoryPrintStream();
 
-          final File outputDir = new File(tempDir, JUNITOUT);
-          runFormat(outputDir, new String[] {"-o",  outputDir.getPath(), "-f", "fasta", "-l" , raw1.getPath(), "-r", raw2.getPath(), "--duster", "--exclude", "y", "--sam-rg", "@RG\\tID:id\\tSM:sm\\tPL:ILLUMINA"}, "@RG\tID:id\tSM:sm\tPL:ILLUMINA", mpsout, mps);
-          TestUtils.containsAll(mpsout.toString()
-              , "Formatting paired-end FASTA data"
-              , "Input Data" + StringUtils.LS
-              + "Files              : raw1 raw2" + StringUtils.LS
-              + "Format             : FASTA" + StringUtils.LS
-              + "Type               : DNA" + StringUtils.LS
-              + "Number of pairs    : 2" + StringUtils.LS
-              + "Number of sequences: 4" + StringUtils.LS
-              + "Total residues     : 20" + StringUtils.LS
-              + "Minimum length     : 5" + StringUtils.LS
-              + "Maximum length     : 5" + StringUtils.LS
-              + StringUtils.LS
-              + "Output Data" + StringUtils.LS
-              + "SDF-ID             : "
-              , "Number of pairs    : 1" + StringUtils.LS
-              + "Number of sequences: 2" + StringUtils.LS
-              + "Total residues     : 10" + StringUtils.LS
-              + "Minimum length     : 5" + StringUtils.LS
-              + "Maximum length     : 5" + StringUtils.LS
-              + StringUtils.LS
-              + "There were 1 pairs skipped due to filters" + StringUtils.LS
-              + "There were 1 residues converted from lower case to unknowns" + StringUtils.LS
-              );
+      final File outputDir = new File(tempDir, JUNITOUT);
+      final MainResult res = runFormat(outputDir, "@RG\tID:id\tSM:sm\tPL:ILLUMINA",
+        "-o",  outputDir.getPath(), "-f", "fasta", "-l" , raw1.getPath(), "-r", raw2.getPath(), "--duster", "--exclude", "y", "--sam-rg", "@RG\\tID:id\\tSM:sm\\tPL:ILLUMINA");
+      TestUtils.containsAll(res.out()
+        , "Formatting paired-end FASTA data"
+        , "Input Data" + StringUtils.LS
+          + "Files              : raw1 raw2" + StringUtils.LS
+          + "Format             : FASTA" + StringUtils.LS
+          + "Type               : DNA" + StringUtils.LS
+          + "Number of pairs    : 2" + StringUtils.LS
+          + "Number of sequences: 4" + StringUtils.LS
+          + "Total residues     : 20" + StringUtils.LS
+          + "Minimum length     : 5" + StringUtils.LS
+          + "Maximum length     : 5" + StringUtils.LS
+          + StringUtils.LS
+          + "Output Data" + StringUtils.LS
+          + "SDF-ID             : "
+        , "Number of pairs    : 1" + StringUtils.LS
+          + "Number of sequences: 2" + StringUtils.LS
+          + "Total residues     : 10" + StringUtils.LS
+          + "Minimum length     : 5" + StringUtils.LS
+          + "Maximum length     : 5" + StringUtils.LS
+          + StringUtils.LS
+          + "There were 1 pairs skipped due to filters" + StringUtils.LS
+          + "There were 1 residues converted from lower case to unknowns" + StringUtils.LS
+      );
 
-          assertTrue(outputDir.isDirectory());
-          assertTrue(new File(outputDir, "left").isDirectory());
-          assertTrue(new File(outputDir, "right").isDirectory());
-          assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
-          assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
-          final File progress = new File(outputDir, "progress");
-          assertTrue(progress.exists());
-          final String prog = FileUtils.fileToString(progress);
+      assertTrue(outputDir.isDirectory());
+      assertTrue(new File(outputDir, "left").isDirectory());
+      assertTrue(new File(outputDir, "right").isDirectory());
+      assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
+      assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
+      final File progress = new File(outputDir, "progress");
+      assertTrue(progress.exists());
+      final String prog = FileUtils.fileToString(progress);
 
-          TestUtils.containsAll(prog, "Formatting paired-end FASTA data", "paired-end prereader");
-
-      final String s = mps.toString();
-      if (s.length() != 0) {
-        assertEquals("The current environment (operating system, JVM or machine) has not been tested. There is a risk of performance degradation or failure." + StringUtils.LS, mps.toString());
-      }
+      TestUtils.containsAll(prog, "Formatting paired-end FASTA data", "paired-end prereader");
     }
   }
 
@@ -349,14 +320,13 @@ public class FormatCliTest extends AbstractCliTest {
       final MemoryPrintStream out = new MemoryPrintStream();
       final MemoryPrintStream err = new MemoryPrintStream();
       final File outputDir = new File(tempDir, JUNITOUT);
-      assertEquals(1, new FormatCli().mainInit(new String[] {"-o",  outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-l" , rawLeft.getPath(), "-r", rawRight.getPath()}, out.outputStream(), err.printStream()));
+      final String s = checkMainInitBadFlags("-o",  outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-l" , rawLeft.getPath(), "-r", rawRight.getPath());
 
       assertTrue(outputDir.isDirectory());
       assertTrue(new File(outputDir, "left").isDirectory());
       assertTrue(new File(outputDir, "right").isDirectory());
       assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
       assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
-      final String s = err.toString();
       assertTrue(s, s.contains("Invalid input, paired end data must have same number of sequences. Left had: 2 Right had: 1"));
       out.close();
       err.close();
@@ -370,34 +340,22 @@ public class FormatCliTest extends AbstractCliTest {
       final File raw2 = new File(tempDir, "raw2.fq");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw1);
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw2);
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final File outputDir = new File(tempDir, JUNITOUT);
-          assertEquals(bos.toString(), 0, new FormatCli().mainInit(new String[]{"-o", outputDir.getPath(), "-f", "cgfastq", "-l", raw1.getPath(), "-r", raw2.getPath()}, bout, err));
 
-          assertTrue(bout.toString().contains("Format             : CG"));
-          assertTrue(bout.toString().contains("Type               : DNA"));
-          assertTrue(bout.toString().contains("SDF-ID"));
-          assertTrue(bout.toString().contains("Number of sequences: 2"));
-          assertTrue(bout.toString().contains("Total residues     : 10"));
-          assertTrue(bout.toString().contains("Minimum length     : 5"));
-          assertTrue(bout.toString().contains("Maximum length     : 5"));
+      final File outputDir = new File(tempDir, JUNITOUT);
+      final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "cgfastq", "-l", raw1.getPath(), "-r", raw2.getPath());
+      assertTrue(out.contains("Format             : CG"));
+      assertTrue(out.contains("Type               : DNA"));
+      assertTrue(out.contains("SDF-ID"));
+      assertTrue(out.contains("Number of sequences: 2"));
+      assertTrue(out.contains("Total residues     : 10"));
+      assertTrue(out.contains("Minimum length     : 5"));
+      assertTrue(out.contains("Maximum length     : 5"));
 
-          assertTrue(outputDir.isDirectory());
-          assertTrue(new File(outputDir, "left").isDirectory());
-          assertTrue(new File(outputDir, "right").isDirectory());
-          assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
-          assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
-        }
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString();
-      if (s.length() != 0) {
-        assertEquals("The current environment (operating system, JVM or machine) has not been tested. There is a risk of performance degradation or failure." + StringUtils.LS, bos.toString());
-      }
+      assertTrue(outputDir.isDirectory());
+      assertTrue(new File(outputDir, "left").isDirectory());
+      assertTrue(new File(outputDir, "right").isDirectory());
+      assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
+      assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
     }
   }
 
@@ -410,67 +368,33 @@ public class FormatCliTest extends AbstractCliTest {
     + "Maximum length     : 22" + StringUtils.LS;
 
   public void testValidUseProtein() throws Exception {
-    final File raw = File.createTempFile("junit", "test");
-    try {
+    try (TestDirectory tempDir = new TestDirectory("format")) {
+      final File raw = new File(tempDir, "in.fasta");
       FileUtils.stringToFile(">x\nX*ARNDCQEGHILKMFPSTWYV\n", raw);
-      final File tempDir = FileUtils.createTempDir("junit", "test");
-      try {
-        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        try {
-          try (PrintStream err = new PrintStream(bos)) {
-            final File outputDir = new File(tempDir, JUNITOUT);
-            assertEquals(0, new FormatCli().mainInit(new String[]{"-o", outputDir.getPath(), "-p", raw.getPath()}, bout, err));
-            final String outStr = bout.toString();
-            assertTrue(outStr.contains(EXPECTED_PRT_MSG));
-            assertTrue(outputDir.isDirectory());
-            assertTrue(new File(outputDir, "mainIndex").exists());
-            final File summary = new File(outputDir, "summary.txt");
-            assertTrue(summary.exists());
-            final String sum = FileUtils.fileToString(summary);
-            assertTrue(sum, sum.contains(EXPECTED_PRT_MSG));
-            final File outf = File.createTempFile("junit", ".fasta");
-            outf.deleteOnExit();
-            try {
-              final ByteArrayOutputStream out = new ByteArrayOutputStream();
-              assertEquals(0, new Sdf2Fasta().mainInit(new String[]{"-o", outf.getPath(), "-i", outputDir.getPath(), "-Z"}, out, err));
-              assertEquals(0, out.toString().length());
-              assertTrue(outf.exists());
-              assertFalse(outf.isDirectory());
-              try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
-                assertEquals(">x", r.readLine());
-                assertEquals("X*ARNDCQEGHILKMFPSTWYV", r.readLine());
-                assertNull(r.readLine());
-              }
-            } finally {
-              assertTrue(outf.delete());
-            }
-          }
-        } finally {
-          bos.close();
-        }
-        final String s = bos.toString();
-        if (s.length() != 0) {
-          assertEquals("The current environment (operating system, JVM or machine) has not been tested. There is a risk of performance degradation or failure." + StringUtils.LS, bos.toString());
-        }
-      } finally {
-        assertTrue(FileHelper.deleteAll(tempDir));
+      final File outputDir = new File(tempDir, JUNITOUT);
+      final String outStr = checkMainInitOk("-o", outputDir.getPath(), "-p", raw.getPath());
+      assertTrue(outStr.contains(EXPECTED_PRT_MSG));
+      assertTrue(outputDir.isDirectory());
+      assertTrue(new File(outputDir, "mainIndex").exists());
+      final File summary = new File(outputDir, "summary.txt");
+      assertTrue(summary.exists());
+      final String sum = FileUtils.fileToString(summary);
+      assertTrue(sum, sum.contains(EXPECTED_PRT_MSG));
+      final File outf = new File(tempDir, "out.fasta");
+      final MainResult res = MainResult.run(new Sdf2Fasta(), "-o", outf.getPath(), "-i", outputDir.getPath(), "-Z");
+      assertEquals(0, res.out().length());
+      assertTrue(outf.exists());
+      assertFalse(outf.isDirectory());
+      try (BufferedReader r = new BufferedReader(new FileReader(outf))) {
+        assertEquals(">x", r.readLine());
+        assertEquals("X*ARNDCQEGHILKMFPSTWYV", r.readLine());
+        assertNull(r.readLine());
       }
-    } finally {
-      assertTrue(raw.delete());
     }
   }
 
   public void testBadUse() throws Exception {
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
-      try (PrintStream err = new PrintStream(bos)) {
-        assertEquals(1, new FormatCli().mainInit(new String[]{"--no-such-option"}, new ByteArrayOutputStream(), err));
-      }
-    } finally {
-      bos.close();
-    }
-    final String e = bos.toString();
+    final String e = checkMainInitBadFlags("--no-such-option");
     assertTrue(e.contains("Error: Unknown flag --no-such-option"));
   }
 
@@ -478,19 +402,10 @@ public class FormatCliTest extends AbstractCliTest {
                                             + "Error: There were 1 invalid input file paths" + StringUtils.LS;
 
   public void testBadFiles() throws Exception {
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          assertEquals(1, new FormatCli().mainInit(new String[]{"-o", "prereadertestshouldnthappen", File.separator + "in_a_small_hole_lived_a_hobbit"}, new ByteArrayOutputStream(), err));
-        }
-      } finally {
-        bos.close();
-      }
-      final String e = bos.toString();
+    try (TestDirectory dir = new TestDirectory("format")) {
+      final File out = new File(dir, "prereadertestshouldnthappen");
+      final String e = checkMainInitBadFlags("-o", out.getPath(), File.separator + "in_a_small_hole_lived_a_hobbit");
       assertEquals(e, EXPECTED_ERROR2, e);
-    } finally {
-      FileHelper.deleteAll(new File("prereadertestshouldnthappen"));
     }
   }
 
@@ -561,22 +476,13 @@ public class FormatCliTest extends AbstractCliTest {
   public void testSolexa13Format() throws Exception {
     try (TestDirectory tempDir = new TestDirectory("format")) {
       final File outputDir = new File(tempDir, JUNITOUT);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      ByteArrayOutputStream err = new ByteArrayOutputStream();
-      PrintStream ps = new PrintStream(err);
       final File input = new File(tempDir, "in");
       FileUtils.stringToFile("^", input);
-      assertEquals(1, new FormatCli().mainInit(new String[] {"-o", outputDir.getPath(), "-f", "fastq", "-q", "solexa1.2", input.getPath()}, out, ps));
-      out.flush();
-      ps.flush();
-      assertTrue("error was: " + err.toString(), err.toString().contains("Invalid value \"solexa1.2\" for \"-q\"."));
-      out = new ByteArrayOutputStream();
-      err = new ByteArrayOutputStream();
-      ps = new PrintStream(err);
-      assertEquals(1, new FormatCli().mainInit(new String[] {"-o", outputDir.getPath(), "-f", "fastq", "-q", "illumina", input.getPath()}, out, ps));
-      out.flush();
-      ps.flush();
-      assertTrue("error was: " + err.toString(), err.toString().contains("Unrecognized symbols appeared before label symbol. Last sequence read was: \"<none>\""));
+      String err = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "solexa1.2", input.getPath());
+      assertTrue("error was: " + err, err.contains("Invalid value \"solexa1.2\" for \"-q\"."));
+
+      err = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "illumina", input.getPath());
+      assertTrue("error was: " + err, err.contains("Unrecognized symbols appeared before label symbol. Last sequence read was: \"<none>\""));
     }
   }
 
@@ -585,13 +491,11 @@ public class FormatCliTest extends AbstractCliTest {
       final File outputDir = new File(tempDir, JUNITOUT);
       final File raw = new File(tempDir, "test");
       FileUtils.stringToFile(">x\nX*ARNDCQEGHILKMFPSTWYV\n", raw);
-      final MemoryPrintStream ps = new MemoryPrintStream();
-      assertEquals(1, new FormatCli().mainInit(new String[] {"-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-p", raw.getPath()}, ps.outputStream(), ps.printStream()));
-      TestUtils.containsAll(ps.toString(), "Incompatible sequence type and file format. format=FASTQ protein=" + true);
-      ps.reset();
+      String err = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-p", raw.getPath());
+      TestUtils.containsAll(err, "Incompatible sequence type and file format. format=FASTQ protein=" + true);
       final File outputDir2 = new File(tempDir, "blah");
-      assertEquals(1, new FormatCli().mainInit(new String[] {"-o", outputDir2.getPath(), "-f", "fasta", "--trim-threshold", "15", "-p",  raw.getPath()}, ps.outputStream(), ps.printStream()));
-      TestUtils.containsAll(ps.toString(), "Input must contain qualities to perform quality-based read trimming.");
+      err = checkMainInitBadFlags("-o", outputDir2.getPath(), "-f", "fasta", "--trim-threshold", "15", "-p",  raw.getPath());
+      TestUtils.containsAll(err, "Input must contain qualities to perform quality-based read trimming.");
     }
   }
 
@@ -649,12 +553,9 @@ public class FormatCliTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe"};
-      final String expected = "@RG\tID:rg1\tSM:sm1\tPL:ILLUMINA";
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      runFormat(output, args, expected, out, err);
+      runFormat(output, "@RG\tID:rg1\tSM:sm1\tPL:ILLUMINA",
+        input.getPath(), "-o", output.getPath(), "-f", "sam-pe");
     }
   }
 
@@ -662,35 +563,29 @@ public class FormatCliTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String expected = "@RG\tID:rg999\tPL:NOT_ILLUMINA\tSM:sample";
-      final String custom = expected.replaceAll("\t", "\\\\t");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--sam-rg", custom};
+      final String custom = "@RG\tID:rg999\tPL:NOT_ILLUMINA\tSM:sample".replaceAll("\t", "\\\\t");
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      runFormat(output, args, expected, out, err);
+      runFormat(output, "@RG\tID:rg999\tPL:NOT_ILLUMINA\tSM:sample",
+        input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--sam-rg", custom);
     }
   }
 
-  private void runFormat(File output, String[] args, String expected, MemoryPrintStream out, MemoryPrintStream err) throws IOException {
-    final int errorCode = new FormatCli().mainInit(args, out.outputStream(), err.printStream());
-    assertEquals(err.toString(), 0, errorCode);
+  private MainResult runFormat(File output, String expected, String... args) throws IOException {
+    final MainResult res = checkMainInit(args);
     final DefaultSequencesReader leftReader = new DefaultSequencesReader(new File(output, "left"), LongRange.NONE);
     assertEquals(expected, leftReader.samReadGroup());
     final DefaultSequencesReader rightReader = new DefaultSequencesReader(new File(output, "right"), LongRange.NONE);
     assertEquals(expected, rightReader.samReadGroup());
+    return res;
   }
 
   public void testSamRGFormatMultiple() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String expected = "@RG\tID:rg2\tSM:doggy\tPL:Sturdy";
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg2"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      runFormat(output, args, expected, out, err);
+      runFormat(output, "@RG\tID:rg2\tSM:doggy\tPL:Sturdy",
+        input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg2");
     }
   }
 
@@ -751,11 +646,8 @@ public class FormatCliTest extends AbstractCliTest {
       final File output = new File(dir, "output");
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.sam", input2);
-      final String[] args = {input.getPath(), input2.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1"};
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final String expected = "@RG\tID:rg1\tSM:sm1\tPL:ILLUMINA";
-      runFormat(output, args, expected, out, err);
+      runFormat(output, "@RG\tID:rg1\tSM:sm1\tPL:ILLUMINA",
+        input.getPath(), input2.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg1");
     }
   }
   public void testMultifileMissingFromSecond() throws IOException {
@@ -763,14 +655,10 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "input.sam");
       final File input2 = new File(dir, "input2.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input2.getPath(), input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg2"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
       FileHelper.resourceToFile("com/rtg/sam/resources/mated.sam", input2);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int errorCode = new FormatCli().mainInit(args, out.outputStream(), err.printStream());
-      assertFalse(err.toString(), errorCode == 0);
-      TestUtils.containsAll(err.toString(), "No read group information matching \"rg2\" present in the input file ");
+      final String err = checkMainInitBadFlags(input2.getPath(), input.getPath(), "-o", output.getPath(), "-f", "sam-pe", "--select-read-group", "rg2");
+      TestUtils.containsAll(err, "No read group information matching \"rg2\" present in the input file ");
     }
   }
 
@@ -778,13 +666,9 @@ public class FormatCliTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File input = new File(dir, "input.sam");
       final File output = new File(dir, "output");
-      final String[] args = {input.getPath(), "-o", output.getPath(), "-f", "sam-pe"};
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int errorCode = new FormatCli().mainInit(args, out.outputStream(), err.printStream());
-      assertFalse(err.toString(), errorCode == 0);
-      TestUtils.containsAll(err.toString(), "Multiple read group information present in the input file");
+      final String err = checkMainInitBadFlags(input.getPath(), "-o", output.getPath(), "-f", "sam-pe");
+      TestUtils.containsAll(err, "Multiple read group information present in the input file");
     }
   }
 }

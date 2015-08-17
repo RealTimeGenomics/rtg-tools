@@ -31,12 +31,10 @@ package com.rtg.reader;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -88,9 +86,8 @@ public class Sdf2FastaTest extends AbstractCliTest {
   }
 
   public void testWorks() throws Exception {
-    final File xd = FileHelper.createTempDirectory();
-    final File fastaDirectory = FileHelper.createTempDirectory();
-    try {
+    try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
+      final File xd = new File(dir, "sdf");
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(new ByteArrayInputStream(">test\nacgt\n>bob\ntagt\naccc\n>cat\ncat\n>dog\nccc".getBytes()));
       final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
@@ -99,7 +96,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
       File x;
       SequencesReader sr = SequencesReaderFactory.createDefaultSequencesReader(xd);
       try {
-        x = new File(fastaDirectory, "junitmy.fasta");
+        x = new File(dir, "junitmy.fasta");
         checkMainInitOk("-i", xd.toString(), "-o", x.toString(), "-Z");
         checkContent1(x);
       } finally {
@@ -112,23 +109,16 @@ public class Sdf2FastaTest extends AbstractCliTest {
       } finally {
         sr.close();
       }
-    } finally {
-      assertTrue(FileHelper.deleteAll(xd));
-      assertTrue(FileHelper.deleteAll(fastaDirectory));
     }
   }
 
   public void testBadArgs() throws Exception {
-    final File xd = FileHelper.createTempDirectory();
-    try {
+    try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
       final ArrayList<InputStream> al = new ArrayList<>();
       final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-      final SequencesWriter sw = new SequencesWriter(ds, xd, 300000, PrereadType.UNKNOWN, false);
+      final SequencesWriter sw = new SequencesWriter(ds, dir, 300000, PrereadType.UNKNOWN, false);
       sw.processSequences();
-      checkHandleFlagsErr("-i", xd.toString(), "-o", "junithi", "-l", "-1");
-    } finally {
-      //      assertTrue(new File("junithi.fasta").delete());
-      assertTrue(FileHelper.deleteAll(xd));
+      checkHandleFlagsErr("-i", dir.toString(), "-o", "junithi", "-l", "-1");
     }
   }
 
@@ -148,84 +138,39 @@ public class Sdf2FastaTest extends AbstractCliTest {
     }
   }
 
-  private void checkString(final String s) {
-    if (s.length() != 0) {
-      assertEquals("The current environment (operating system, JVM or machine) has not been tested. There is a risk of performance degradation or failure." + StringUtils.LS, s);
-    }
-  }
-
   private void runCommandWithNamedOutput(final String name, final String pathpr, final String content) throws Exception {
-    final File tempDir = FileUtils.createTempDir("PrereadToFasta", null);
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try (TestDirectory tempDir = new TestDirectory("sdf2fasta")) {
       final File output = new File(tempDir, name);
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          assertEquals(0, new Sdf2Fasta().mainInit(new String[]{"-o", output.getPath(), "-i", pathpr, "-Z"}, out, err));
-          assertEquals(0, out.toString().length());
-          if (name.toLowerCase(Locale.getDefault()).endsWith(".fa") || name.toLowerCase(Locale.getDefault()).endsWith(".fasta")) {
-            checkContent(new File(tempDir, name).getPath(), content);
-          } else {
-            checkContent(new File(tempDir, JUNITOUT + ".fasta").getPath(), content);
-          }
-        }
-      } finally {
-        bos.close();
+      checkMainInitOk("-o", output.getPath(), "-i", pathpr, "-Z");
+      if (name.toLowerCase(Locale.getDefault()).endsWith(".fa") || name.toLowerCase(Locale.getDefault()).endsWith(".fasta")) {
+        checkContent(new File(tempDir, name).getPath(), content);
+      } else {
+        checkContent(new File(tempDir, JUNITOUT + ".fasta").getPath(), content);
       }
-      checkString(bos.toString());
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
     }
   }
 
   private void runCommandWithNamedOutput(final String name, final String pathpr, final String contentLeft, String contentRight) throws Exception {
-    final File tempDir = FileUtils.createTempDir("PrereadToFasta", null);
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    try (TestDirectory tempDir = new TestDirectory("sdf2fasta")) {
       final File output = new File(tempDir, name);
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          assertEquals(0, new Sdf2Fasta().mainInit(new String[]{"-o", output.getPath(), "-i", pathpr, "-Z"}, out, err));
-          assertEquals(0, out.toString().length());
-          if (name.toLowerCase(Locale.getDefault()).endsWith(".fa") || name.toLowerCase(Locale.getDefault()).endsWith(".fasta")) {
-            final String ext = name.substring(name.lastIndexOf('.'));
-            checkContent(new File(tempDir, JUNITOUT + "_1" + ext).getPath(), contentLeft);
-            checkContent(new File(tempDir, JUNITOUT + "_2" + ext).getPath(), contentRight);
-          } else {
-            checkContent(new File(tempDir, JUNITOUT + "_1.fasta").getPath(), contentLeft);
-            checkContent(new File(tempDir, JUNITOUT + "_2.fasta").getPath(), contentRight);
-          }
-        }
-      } finally {
-        bos.close();
+      checkMainInitOk("-o", output.getPath(), "-i", pathpr, "-Z");
+      if (name.toLowerCase(Locale.getDefault()).endsWith(".fa") || name.toLowerCase(Locale.getDefault()).endsWith(".fasta")) {
+        final String ext = name.substring(name.lastIndexOf('.'));
+        checkContent(new File(tempDir, JUNITOUT + "_1" + ext).getPath(), contentLeft);
+        checkContent(new File(tempDir, JUNITOUT + "_2" + ext).getPath(), contentRight);
+      } else {
+        checkContent(new File(tempDir, JUNITOUT + "_1.fasta").getPath(), contentLeft);
+        checkContent(new File(tempDir, JUNITOUT + "_2.fasta").getPath(), contentRight);
       }
-      checkString(bos.toString());
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
     }
   }
 
   private void runCommandLineLength2(final String pathpr) throws Exception {
-    final File tempDir = FileUtils.createTempDir("PrereadToFasta", null);
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          assertEquals(0, new Sdf2Fasta().mainInit(new String[]{"-o", new File(tempDir, JUNITOUT).getPath(), "-i", pathpr, "-l", "2", "-Z"}, out, err));
-          assertEquals(0, out.toString().length());
-          final File f = new File(tempDir, JUNITOUT + ".fasta");
-          assertTrue(f.exists());
-          compareToFile(">x" + StringUtils.LS + "AC" + StringUtils.LS + "TG" + StringUtils.LS + "N" + StringUtils.LS, f);
-        }
-      } finally {
-        bos.close();
-      }
-      checkString(bos.toString());
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
+    try (TestDirectory tempDir = new TestDirectory("sdf2fasta")) {
+      checkMainInitOk("-o", new File(tempDir, JUNITOUT).getPath(), "-i", pathpr, "-l", "2", "-Z");
+      final File f = new File(tempDir, JUNITOUT + ".fasta");
+      assertTrue(f.exists());
+      compareToFile(">x" + StringUtils.LS + "AC" + StringUtils.LS + "TG" + StringUtils.LS + "N" + StringUtils.LS, f);
     }
   }
   private void createPreread(final String s, final File dir) throws IOException {
@@ -243,45 +188,30 @@ public class Sdf2FastaTest extends AbstractCliTest {
   }
 
   public void testValidUse() throws Exception {
-    final File dir = FileHelper.createTempDirectory();
-    try {
-      final File outDir = FileHelper.createTempDirectory();
+    try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
+      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, dir);
+      final String pathpr = dir.getPath();
       try {
-        createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, dir);
-        final String pathpr = dir.getPath();
-        try {
-          runCommandWithNamedOutput(JUNITOUT, pathpr, "ACTGN");
-          runCommandWithNamedOutput(JUNITOUT + ".FA", pathpr, "ACTGN");
-          runCommandWithNamedOutput(JUNITOUT + ".fasta", pathpr, "ACTGN");
-          runCommandLineLength2(pathpr);
-        } finally {
-          FileHelper.deleteAll(dir);
-        }
-        createPrereadProtein(dir);
-        try {
-          runCommandWithNamedOutput(JUNITOUT, pathpr, "X*ARNDCQEGHILKMFPSTWYV");
-        } finally {
-          FileHelper.deleteAll(dir);
-        }
+        runCommandWithNamedOutput(JUNITOUT, pathpr, "ACTGN");
+        runCommandWithNamedOutput(JUNITOUT + ".FA", pathpr, "ACTGN");
+        runCommandWithNamedOutput(JUNITOUT + ".fasta", pathpr, "ACTGN");
+        runCommandLineLength2(pathpr);
       } finally {
-      assertTrue(!outDir.exists() || FileHelper.deleteAll(outDir));
+        FileHelper.deleteAll(dir);
       }
-    } finally {
-      assertTrue(!dir.exists() || FileHelper.deleteAll(dir));
+      createPrereadProtein(dir);
+      runCommandWithNamedOutput(JUNITOUT, pathpr, "X*ARNDCQEGHILKMFPSTWYV");
     }
   }
 
   public void testValidUse2() throws Exception {
-    final File dir = FileHelper.createTempDirectory();
-    createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "left"));
-    createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "right"));
-    final String pathpr = dir.getPath();
-    try {
+    try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
+      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "left"));
+      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "right"));
+      final String pathpr = dir.getPath();
       runCommandWithNamedOutput(JUNITOUT, pathpr, "ACTGN", "ACTGN");
       runCommandWithNamedOutput(JUNITOUT + ".FA", pathpr, "ACTGN", "ACTGN");
       runCommandWithNamedOutput(JUNITOUT + ".fasta", pathpr, "ACTGN", "ACTGN");
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
     }
   }
 
@@ -304,14 +234,11 @@ public class Sdf2FastaTest extends AbstractCliTest {
           + "ACGGGT" + StringUtils.LS;
 
   public void testFullName() throws IOException {
-    final File dir = FileUtils.createTempDir("testsdf2fasta", "fullname");
-    try {
+    try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
       final File sdf = ReaderTestUtils.getDNADir(FULL_NAME_DATA, new File(dir, "sdf"));
       final File fasta = new File(dir, "fs.fasta.gz");
       checkMainInitOk("-i", sdf.getPath(), "-o", fasta.getPath());
       assertEquals(FULL_NAME_DATA, FileHelper.gzFileToString(fasta));
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
     }
   }
 

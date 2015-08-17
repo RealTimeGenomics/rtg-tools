@@ -384,8 +384,21 @@ public final class Utils {
   public static <A> A[] append(final A[] a, final A[] b) {
     final int alen = a.length;
     final int blen = b.length;
-    //
     final A[] res = Arrays.copyOf(a, alen + blen);
+    System.arraycopy(b, 0, res, alen, blen);
+    return res;
+  }
+
+  /**
+   * Append Strings to an array creating a new array for the result.
+   * @param a first array
+   * @param b second set of Strings
+   * @return the concatenation of a then b.
+   */
+  public static String[] append(final String[] a, final String... b) {
+    final int alen = a.length;
+    final int blen = b.length;
+    final String[] res = Arrays.copyOf(a, alen + blen);
     System.arraycopy(b, 0, res, alen, blen);
     return res;
   }

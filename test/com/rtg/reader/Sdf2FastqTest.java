@@ -35,11 +35,6 @@ import java.io.IOException;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.util.StringUtils;
-import com.rtg.util.TestUtils;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.DiagnosticEvent;
-import com.rtg.util.diagnostic.DiagnosticListener;
-import com.rtg.util.diagnostic.ErrorEvent;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -62,30 +57,9 @@ public class Sdf2FastqTest extends AbstractCliTest {
 
 
   public void testValidator() {
-    final int[] blah = new int[1];
-    final DiagnosticListener dl = new DiagnosticListener() {
-      @Override
-      public void handleDiagnosticEvent(DiagnosticEvent<?> event) {
-        if (event instanceof ErrorEvent) {
-          assertEquals("Error: Expected a nonnegative integer for parameter \"line-length\".", event.getMessage());
-          blah[0] += 1;
-        } else {
-          fail();
-        }
-      }
-      @Override
-      public void close() {
-      }
-    };
-    Diagnostic.addListener(dl);
-    try {
-      final Sdf2Fastq ptfq = new Sdf2Fastq();
-      assertEquals(1, ptfq.mainInit(new String[] {"-i", "blah", "-o", "blaho", "-l", "-3"}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
-      assertEquals(1, blah[0]);
-    } finally {
-      Diagnostic.removeListener(dl);
-    }
-  }
+    final String err = checkMainInitBadFlags("-i", "blah", "-o", "blaho", "-l", "-3");
+    assertTrue(err.contains("Error: Expected a nonnegative integer for parameter \"line-length\"."));
+}
 
   static final String FULL_NAME_DATA = ""
           + "@name suffix" + StringUtils.LS

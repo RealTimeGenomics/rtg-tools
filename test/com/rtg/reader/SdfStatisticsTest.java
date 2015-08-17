@@ -30,11 +30,9 @@
 package com.rtg.reader;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +40,7 @@ import java.util.Collections;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.Constants;
@@ -99,51 +98,31 @@ public class SdfStatisticsTest extends AbstractCliTest {
 
   public void testMain() throws Exception {
     final String fasta = ">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa";
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File preread = ReaderTestUtils.getDNADir(fasta, dir);
+      final String outString = checkMainInitOk("-n", preread.getPath());
+      //System.err.println(outString);
+      final String[] expected = {
+        "Location           : " + preread.getPath(),
+        "Type               : DNA",
+        "Number of sequences: 3",
+        "Maximum length     : 32",
+        "Minimum length     : 17",
+        "Sequence names     : yes",
+        StringUtils.LS + "N                  : 0",
+        StringUtils.LS + "A                  : 18",
+        StringUtils.LS + "C                  : 23",
+        StringUtils.LS + "G                  : 13",
+        StringUtils.LS + "T                  : 15",
+        "Total residues     : 69",
+        "Residue qualities  : no",
+        "SDF-ID             : ",
+        "Blocks of Ns       : 0",
+        "Longest block of Ns: 0"
 
-    final File preread = ReaderTestUtils.getDNADir(fasta);
-    preread.deleteOnExit();
-
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          try {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{"-n", preread.getPath()}, out, err));
-          } finally {
-            out.close();
-          }
-          final String outString = out.toString();
-          //System.err.println(outString);
-          final String[] expected = {
-            "Location           : " + preread.getPath(),
-            "Type               : DNA",
-            "Number of sequences: 3",
-            "Maximum length     : 32",
-            "Minimum length     : 17",
-            "Sequence names     : yes",
-            StringUtils.LS + "N                  : 0",
-            StringUtils.LS + "A                  : 18",
-            StringUtils.LS + "C                  : 23",
-            StringUtils.LS + "G                  : 13",
-            StringUtils.LS + "T                  : 15",
-            "Total residues     : 69",
-            "Residue qualities  : no",
-            "SDF-ID             : ",
-            "Blocks of Ns       : 0",
-            "Longest block of Ns: 0"
-
-          };
-          TestUtils.containsAll(outString, expected);
-          // TestUtils.containsAll(expected, outString);
-        }
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString();
-      assertEquals(0, s.length());
-    } finally {
-      assertTrue(FileHelper.deleteAll(preread));
+      };
+      TestUtils.containsAll(outString, expected);
+      // TestUtils.containsAll(expected, outString);
     }
   }
 
@@ -153,40 +132,27 @@ public class SdfStatisticsTest extends AbstractCliTest {
       final File preread = ReaderTestUtils.getDNADir(fasta, dir);
       final String readme = "This is a readme test.";
       FileUtils.stringToFile(readme, new File(dir, "readme.txt"));
-      try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-        final PrintStream err = new PrintStream(bos);
-        try {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          try {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{preread.getPath()}, out, err));
-          } finally {
-            out.close();
-          }
-          final String outString = out.toString();
-          final String[] expected = {
-            "Location           : " + preread.getPath(),
-            "Type               : DNA",
-            "Number of sequences: 3",
-            "Maximum length     : 32",
-            "Minimum length     : 17",
-            "Sequence names     : yes",
-            StringUtils.LS + "N                  : 0",
-            StringUtils.LS + "A                  : 18",
-            StringUtils.LS + "C                  : 23",
-            StringUtils.LS + "G                  : 13",
-            StringUtils.LS + "T                  : 15",
-            "Total residues     : 69",
-            "Residue qualities  : no",
-            "SDF-ID             : ",
-            "Additional Info:",
-            readme
+      final String outString = checkMainInitOk(preread.getPath());
+      final String[] expected = {
+        "Location           : " + preread.getPath(),
+        "Type               : DNA",
+        "Number of sequences: 3",
+        "Maximum length     : 32",
+        "Minimum length     : 17",
+        "Sequence names     : yes",
+        StringUtils.LS + "N                  : 0",
+        StringUtils.LS + "A                  : 18",
+        StringUtils.LS + "C                  : 23",
+        StringUtils.LS + "G                  : 13",
+        StringUtils.LS + "T                  : 15",
+        "Total residues     : 69",
+        "Residue qualities  : no",
+        "SDF-ID             : ",
+        "Additional Info:",
+        readme
 
-          };
-          TestUtils.containsAll(outString, expected);
-        } finally {
-          err.close();
-        }
-      }
+      };
+      TestUtils.containsAll(outString, expected);
     }
   }
 
@@ -194,15 +160,12 @@ public class SdfStatisticsTest extends AbstractCliTest {
   public void testLengths() throws IOException {
     final MemoryPrintStream ps = new MemoryPrintStream();
     final String fasta = ">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\nnaccccaccccacaaacccaann";
-
-    final File prereadDir = ReaderTestUtils.getDNADir(fasta);
-    try {
-      try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(prereadDir)) {
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File preread = ReaderTestUtils.getDNADir(fasta, dir);
+      try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(preread)) {
         SdfStatistics.printSequenceNameAndLength(reader, ps.printStream());
         TestUtils.containsAll(ps.toString(), "123456789012345678901\t32", "bob\t17", "hobos\t23");
       }
-    } finally {
-      assertTrue(FileHelper.deleteAll(prereadDir));
     }
   }
 
@@ -213,146 +176,86 @@ public class SdfStatisticsTest extends AbstractCliTest {
       + "+12345" + StringUtils.LS
       + "IIIIII" + StringUtils.LS;
 
-    final File preread = ReaderTestUtils.getDNAFastqDir(fastq, false);
-    preread.deleteOnExit();
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File preread = ReaderTestUtils.getDNAFastqDir(fastq, dir, false);
 
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          try {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{"-q", preread.getPath()}, out, err));
-          } finally {
-            out.close();
-          }
-          final String outString = out.toString();
-          //System.err.println(outString);
-          final String value = Double.toString(40.0);
-          final String[] expected = {"Location           : " + preread.getPath(),
-            "Maximum length     : 6",
-            "Minimum length     : 6",
-            "N                  : 0",
-            "A                  : 1",
-            "C                  : 1",
-            "G                  : 2",
-            "T                  : 2",
-            "Total residues     : 6",
-            "Residue qualities  : yes",
-            "Average quality    : " + value,
-            "Average qual / pos : ",
-            "                 1 : " + value,
-            "                 2 : " + value,
-            "                 3 : " + value,
-            "                 4 : " + value,
-            "                 5 : " + value,
-            "                 6 : " + value,
-          };
-          TestUtils.containsAll(outString, expected);
-        }
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString();
-      assertEquals(0, s.length());
-    } finally {
-      assertTrue(FileHelper.deleteAll(preread));
+      final String outString = checkMainInitOk("-q", preread.getPath());
+      final String value = Double.toString(40.0);
+      final String[] expected = {"Location           : " + preread.getPath(),
+        "Maximum length     : 6",
+        "Minimum length     : 6",
+        "N                  : 0",
+        "A                  : 1",
+        "C                  : 1",
+        "G                  : 2",
+        "T                  : 2",
+        "Total residues     : 6",
+        "Residue qualities  : yes",
+        "Average quality    : " + value,
+        "Average qual / pos : ",
+        "                 1 : " + value,
+        "                 2 : " + value,
+        "                 3 : " + value,
+        "                 4 : " + value,
+        "                 5 : " + value,
+        "                 6 : " + value,
+      };
+      TestUtils.containsAll(outString, expected);
     }
   }
 
   public void testMainWithNs() throws Exception {
     final String fasta = ">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\nnaccccaccccacaaacccaann";
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File preread = ReaderTestUtils.getDNADir(fasta, dir);
 
-    final File preread = FileUtils.createTempDir("testfasta", "dna");
-    preread.deleteOnExit();
-    final ArrayList<InputStream> inputStreams = new ArrayList<>();
-    inputStreams.add(new ByteArrayInputStream(fasta.getBytes()));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(inputStreams, new DNAFastaSymbolTable());
-    final SequencesWriter sequenceWriter = new SequencesWriter(ds, preread, Constants.MAX_FILE_SIZE, PrereadType.UNKNOWN, true);
-    CommandLine.setCommandArgs("blahrg");
-    sequenceWriter.setComment("blooo");
-    sequenceWriter.processSequences(false, false);
-    CommandLine.clearCommandArgs();
+      final ArrayList<InputStream> inputStreams = new ArrayList<>();
+      inputStreams.add(new ByteArrayInputStream(fasta.getBytes()));
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(inputStreams, new DNAFastaSymbolTable());
+      final SequencesWriter sequenceWriter = new SequencesWriter(ds, preread, Constants.MAX_FILE_SIZE, PrereadType.UNKNOWN, true);
+      CommandLine.setCommandArgs("blahrg");
+      sequenceWriter.setComment("blooo");
+      sequenceWriter.processSequences(false, false);
+      CommandLine.clearCommandArgs();
 
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          try {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{"-n", preread.getPath()}, out, err));
+      final String outString = checkMainInitOk("-n", preread.getPath());
 
-          } finally {
-            out.close();
-          }
-          final String outString = out.toString();
-          //System.err.println(outString);
-          TestUtils.containsAll(outString,
-            "Location           : " + preread.getPath(),
-            "Parameters         : blahrg",
-            "Comment            : blooo",
-            "Type               : DNA",
-            "Number of sequences: 3",
-            "Maximum length     : 32",
-            "Minimum length     : 17",
-            "Sequence names     : no",
-            StringUtils.LS + "N                  : 3",
-            StringUtils.LS + "A                  : 18",
-            StringUtils.LS + "C                  : 23",
-            StringUtils.LS + "G                  : 13",
-            StringUtils.LS + "T                  : 15",
-            "Total residues     : 72",
-            "Residue qualities  : no",
-            "Blocks of Ns       : 2",
-            "Longest block of Ns: 2",
-            "Source             : UNKNOWN",
-            "Paired arm         : UNKNOWN");
-          assertTrue(outString.contains("Histogram of N frequencies"));
-          assertTrue(outString.contains(" 0 : 2"));
-          assertTrue(outString.contains(" 3 : 1"));
-
-        }
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString();
-      assertEquals(0, s.length());
-    } finally {
-      assertTrue(FileHelper.deleteAll(preread));
+      TestUtils.containsAll(outString,
+        "Location           : " + preread.getPath(),
+        "Parameters         : blahrg",
+        "Comment            : blooo",
+        "Type               : DNA",
+        "Number of sequences: 3",
+        "Maximum length     : 32",
+        "Minimum length     : 17",
+        "Sequence names     : no",
+        StringUtils.LS + "N                  : 3",
+        StringUtils.LS + "A                  : 18",
+        StringUtils.LS + "C                  : 23",
+        StringUtils.LS + "G                  : 13",
+        StringUtils.LS + "T                  : 15",
+        "Total residues     : 72",
+        "Residue qualities  : no",
+        "Blocks of Ns       : 2",
+        "Longest block of Ns: 2",
+        "Source             : UNKNOWN",
+        "Paired arm         : UNKNOWN");
+      assertTrue(outString.contains("Histogram of N frequencies"));
+      assertTrue(outString.contains(" 0 : 2"));
+      assertTrue(outString.contains(" 3 : 1"));
     }
   }
 
   public void testMainWithPos() throws Exception {
     final String fasta = ">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\nnaccccaccccacaaacccaann";
 
-    final File preread = ReaderTestUtils.getDNADir(fasta);
-    preread.deleteOnExit();
-
-    try {
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        try (PrintStream err = new PrintStream(bos)) {
-          final ByteArrayOutputStream out = new ByteArrayOutputStream();
-          try {
-            assertEquals(0, new SdfStatistics().mainInit(new String[]{"-p", preread.getPath()}, out, err));
-
-          } finally {
-            out.close();
-          }
-          final String outString = out.toString();
-          //System.err.println(outString);
-          assertTrue(outString.contains("Histogram of N position frequencies"));
-          assertTrue(outString.contains(" 1 : 1"));
-          assertTrue(outString.contains("22 : 1"));
-          assertTrue(outString.contains("23 : 1"));
-        }
-      } finally {
-        bos.close();
-      }
-      final String s = bos.toString();
-      assertEquals(0, s.length());
-    } finally {
-      assertTrue(FileHelper.deleteAll(preread));
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File preread = ReaderTestUtils.getDNADir(fasta, dir);
+      final String outString = checkMainInitOk("-p", preread.getPath());
+      assertTrue(outString.contains("Histogram of N position frequencies"));
+      assertTrue(outString.contains(" 1 : 1"));
+      assertTrue(outString.contains("22 : 1"));
+      assertTrue(outString.contains("23 : 1"));
     }
 
   }
@@ -367,25 +270,9 @@ public class SdfStatisticsTest extends AbstractCliTest {
     } finally {
       archive.close();
     }
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
-      try (PrintStream err = new PrintStream(bos)) {
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-          final int code = new SdfStatistics().mainInit(new String[]{"-n", "-q", dir.getPath()}, out, err);
-          assertEquals(bos.toString(), 0, code);
-        } finally {
-          out.close();
-        }
-        final String outString = out.toString();
-        assertTrue("Expected to contain 'SDF Version        : " + version + "' in: " + StringUtils.LS + outString,
-          outString.contains("SDF Version        : " + version + StringUtils.LS));
-      }
-    } finally {
-      bos.close();
-    }
-    final String s = bos.toString();
-    assertEquals(0, s.length());
+    final String outString = checkMainInitOk("-n", "-q", dir.getPath());
+    assertTrue("Expected to contain 'SDF Version        : " + version + "' in: " + StringUtils.LS + outString,
+      outString.contains("SDF Version        : " + version + StringUtils.LS));
   }
 
   private static byte[][] readAllData(final SequencesReader sr) throws IOException {
@@ -435,14 +322,9 @@ public class SdfStatisticsTest extends AbstractCliTest {
   }
 
 
-
-
   public void checkSdfVersionX(long x) throws IOException {
-    final File testDir = FileUtils.createTempDir("sdfstats", "ver" + x);
-    try {
-      checkSdfVersion(x, testDir, "com/rtg/reader/resources/sdfver" + x + ".arch");
-    } finally {
-      assertTrue(FileHelper.deleteAll(testDir));
+    try (final TestDirectory dir = new TestDirectory("sdfstats-ver" + x)) {
+      checkSdfVersion(x, dir, "com/rtg/reader/resources/sdfver" + x + ".arch");
     }
   }
 
@@ -466,15 +348,12 @@ public class SdfStatisticsTest extends AbstractCliTest {
   }
 
   private static void createCurrentVersionFiles(File destDir) throws IOException {
-    final File dir = FileUtils.createTempDir("sdfver", "version" + IndexFile.VERSION);
-    try {
+    try (final TestDirectory dir = new TestDirectory("sdfversion" + IndexFile.VERSION)) {
       final File tempDir = new File(dir, "sdf");
       final File sdfIn = FileHelper.resourceToFile("com/rtg/reader/resources/sdfsrc.fastq", new File(dir, "sdfsrc.fastq"));
-      final int code = new FormatCli().mainInit(new String[] {"-o", tempDir.getPath(), "-f", "fastq", "-q", "sanger", sdfIn.getPath()}, FileUtils.getStdoutAsOutputStream(), System.err);
-      assertEquals(0, code);
+      final MainResult res = MainResult.run(new FormatCli(), "-o", tempDir.getPath(), "-f", "fastq", "-q", "sanger", sdfIn.getPath());
+      assertEquals(0, res.rc());
       SimpleArchive.writeArchive(new File(destDir, "sdfver" + IndexFile.VERSION + ".arch"), tempDir.listFiles());
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
     }
   }
 
@@ -484,22 +363,14 @@ public class SdfStatisticsTest extends AbstractCliTest {
       final File fullSdf = new File(dir, "sdf_full");
       final File sequences = new File(dir, "sequences.fasta");
       FileHelper.resourceToFile("com/rtg/reader/resources/sequences.fasta", sequences);
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      MemoryPrintStream err = new MemoryPrintStream();
+
       final FormatCli format = new FormatCli();
-      int rc = format.mainInit(new String[] {"-o", fullSdf.getAbsolutePath(), sequences.getAbsolutePath()}, out, err.printStream());
-      assertEquals("Error: " + err.toString(), "", err.toString());
-      assertEquals(0, rc);
+      MainResult res = MainResult.run(format, "-o", fullSdf.getAbsolutePath(), sequences.getAbsolutePath());
+      assertEquals("Error: " + res.err(), "", res.err());
+      assertEquals(0, res.rc());
       //System.err.println(out.toString());
 
-      err.close();
-      out.close();
-
-      out = new ByteArrayOutputStream();
-      err = new MemoryPrintStream();
-      rc = new SdfStatistics().mainInit(new String[] {"-n", fullSdf.getPath()}, out, err.printStream());
-      assertEquals(0, rc);
-      final String outString = out.toString();
+      final String outString = checkMainInitOk("-n", fullSdf.getPath());
       //System.err.println(outString);
       final String[] expected = {
           "Location           : " + fullSdf.getPath(),
@@ -520,18 +391,11 @@ public class SdfStatisticsTest extends AbstractCliTest {
           "Longest block of Ns: 0"
       };
       TestUtils.containsAll(outString, expected);
-      err.close();
-      out.close();
 
-      assertEquals(0, err.toString().length());
-      out = new ByteArrayOutputStream();
-      err = new MemoryPrintStream();
-      rc = new SdfStatistics().mainInit(new String[] {"-n", fullSdf.getPath(), "--taxonomy"}, out, err.printStream());
-      assertEquals(1, rc);
-      assertTrue(err.toString().contains("--taxonomy was specified but"));
-      assertTrue(err.toString().contains("is missing a 'taxonomy.tsv'"));
-      err.close();
-      out.close();
+      res = MainResult.run(getCli(), "-n", fullSdf.getPath(), "--taxonomy");
+      assertEquals(1, res.rc());
+      assertTrue(res.err().contains("--taxonomy was specified but"));
+      assertTrue(res.err().contains("is missing a 'taxonomy.tsv'"));
 
       // cp taxonomy files to sdf
       final File taxonomy = new File(fullSdf, "taxonomy.tsv");
@@ -539,12 +403,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
       final File taxonomyLookup = new File(fullSdf, "taxonomy_lookup.tsv");
       FileHelper.resourceToFile("com/rtg/reader/resources/taxonomy_lookup.tsv", taxonomyLookup);
 
-      out = new ByteArrayOutputStream();
-      err = new MemoryPrintStream();
-      rc = new SdfStatistics().mainInit(new String[] {"-n", fullSdf.getPath(), "--taxonomy"}, out, err.printStream());
-      assertEquals(0, rc);
-
-      final String outString2 = out.toString();
+      final String outString2 = checkMainInitOk("-n", fullSdf.getPath(), "--taxonomy");
       //System.err.println(outString2);
       final String[] expected2 = {
           "Location           : " + fullSdf.getPath(),
@@ -568,10 +427,6 @@ public class SdfStatisticsTest extends AbstractCliTest {
           "Other nodes        : 8"
       };
       TestUtils.containsAll(outString2, expected2);
-      err.close();
-      out.close();
-
-      assertEquals(0, err.toString().length());
     }
   }
 

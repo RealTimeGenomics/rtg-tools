@@ -39,13 +39,8 @@ import com.rtg.launcher.AbstractCliTest;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.DiagnosticEvent;
-import com.rtg.util.diagnostic.DiagnosticListener;
-import com.rtg.util.diagnostic.ErrorEvent;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
 
 /**
@@ -102,10 +97,7 @@ public class Sdf2QualaTest extends AbstractCliTest {
     try {
       final File sdf = ReaderTestUtils.getDNAFastqDir(Sdf2FastqTest.FULL_NAME_DATA, new File(dir, "sdf"), false);
       final File base = new File(dir, "fs");
-      final MemoryPrintStream out = new MemoryPrintStream();
-      final MemoryPrintStream err = new MemoryPrintStream();
-      final int code = getCli().mainInit(new String[] {"-i", sdf.getPath(), "-o", base.getPath()}, out.outputStream(), err.printStream());
-      assertEquals(err.toString(), 0, code);
+      checkMainInitOk("-i", sdf.getPath(), "-o", base.getPath());
       assertEquals(FULL_NAME_SEQ_DATA, FileHelper.gzFileToString(new File(base + ".fasta.gz")));
       assertEquals(FULL_NAME_QUAL_DATA, FileHelper.gzFileToString(new File(base + ".quala.gz")));
     } finally {
@@ -119,30 +111,8 @@ public class Sdf2QualaTest extends AbstractCliTest {
   }
 
   private void checkQualityBadValue(final int qual) {
-    final int[] blah = new int[1];
-    final DiagnosticListener dl = new DiagnosticListener() {
-      @Override
-      public void handleDiagnosticEvent(DiagnosticEvent<?> event) {
-        if (event instanceof ErrorEvent) {
-          final String msg = event.getMessage();
-          assertTrue(msg.startsWith("Error: The specified flag \"default-quality\" has invalid value \"" + qual + "\". It should be"));
-          blah[0] += 1;
-        } else {
-          fail();
-        }
-      }
-      @Override
-      public void close() {
-      }
-    };
-    Diagnostic.addListener(dl);
-    try {
-      final Sdf2Quala ptfq = new Sdf2Quala();
-      assertEquals(1, ptfq.mainInit(new String[] {"-i", "blah", "-o", "blaho", "-q", String.valueOf(qual)}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream()));
-      assertEquals(1, blah[0]);
-    } finally {
-      Diagnostic.removeListener(dl);
-    }
+    final String err = checkMainInitBadFlags("-i", "blah", "-o", "blaho", "-q", String.valueOf(qual));
+    TestUtils.containsAll(err, "Error: The specified flag \"default-quality\" has invalid value \"" + qual + "\". It should be");
   }
 
   public void testValidator() {

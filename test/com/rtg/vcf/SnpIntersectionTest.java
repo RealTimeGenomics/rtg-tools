@@ -277,19 +277,12 @@ public final class SnpIntersectionTest extends AbstractCliTest {
           "-o", outDirSecondFirst.getPath(),
           "-Z", "-c"};
     }
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    try {
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      final int code = ins.mainInit(argsForward, bos, mps.printStream());
-      assertEquals(mps.toString(), 0, code);
-    } finally {
-      bos.close();
-    }
 
+    final String out = checkMainInitOk(argsForward);
     //System.err.println(bos.toString());
     final String status = FileUtils.fileToString(new File(outDirFirstSecond, "summary.txt"));
     assertEquals(EXPECTED_MESSAGE1, status);
-    assertEquals(EXPECTED_MESSAGE1, bos.toString());
+    assertEquals(EXPECTED_MESSAGE1, out);
     final File firstOnlyForward = new File(outDirFirstSecond, "first-only.vcf" + gzipSuff);
     assertTrue(firstOnlyForward.exists());
     final File secondOnlyForward = new File(outDirFirstSecond, "second-only.vcf" + gzipSuff);
