@@ -140,7 +140,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         processor = new SquashedAlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
         break;
       case "recode":
-        processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
       default:
         final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());

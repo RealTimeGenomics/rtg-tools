@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -50,11 +51,13 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Outputs a new sample genotype with respect to the population alleles
  */
+@TestClass("com.rtg.vcf.eval.AlleleAccumulatorTest")
 public class SampleRecoder extends MergingEvalSynchronizer {
 
   protected final VcfWriter mSampleVcf;
   protected final VcfWriter mAuxiliary;
   protected int mCalledNotInPath;
+  protected int mCallSampleIndex;
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -63,14 +66,20 @@ public class SampleRecoder extends MergingEvalSynchronizer {
    * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
    * @param zip true if output files should be compressed
+   * @param sampleName the name of the sample being recoded
    * @throws IOException if there is a problem opening output files
    */
-  SampleRecoder(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
+  SampleRecoder(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip, String sampleName) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
+    mCallSampleIndex = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), sampleName, VariantSetType.CALLS.label());
     final VcfHeader h = variants.calledHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Recoding variant status"));
+    if (h.getNumberOfSamples() != 1) {
+      h.getSampleNames().clear();
+      h.addSampleName(sampleName == null ? "SAMPLE" : sampleName);
+    }
     mSampleVcf = new VcfWriter(h, new File(output, "sample.vcf" + zipExt), null, zip, true); // Primary output containing new representation of sample using population alleles
     mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true);
   }
@@ -100,14 +109,14 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       // We don't have a baseline record at this position -- during allele accumulation this record was determined to be redundant / equivalent to other variants.
       // We have a good indication that it should have been possible to simplify this if the region were not too hard
       mCrv.addInfo("STATUS", "C-TooHard-BDiff");
-      normalize(mCrv);
+      normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     } else {
       // Excluded, but we don't have a baseline call at this position.
       // This should not normally happen if we have accumulated all alleles
       // Output the original representation
       mCrv.addInfo("STATUS", "C-FP=" + mCv.toString());
-      normalize(mCrv);
+      normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     }
   }
@@ -121,7 +130,7 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       mBrv.getFormatAndSample().clear();
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
-      normalize(mBrv);
+      normalize(mBrv, 0);
       mSampleVcf.write(mBrv);
     } else if (mBv instanceof SkippedVariant) {
       // Expected sometimes, do nothing here (a relevant call will already have been output if needed during processBoth using its allele representation).
@@ -136,8 +145,8 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     }
   }
 
-  protected static void normalize(VcfRecord rec) {
-    final int[] gt = VcfUtils.getValidGt(rec, 0);
+  protected static void normalize(VcfRecord rec, int sampleIndex) {
+    final int[] gt = VcfUtils.getValidGt(rec, sampleIndex);
     Arrays.sort(gt);
     int lastId = -1;
     final List<String> newAlts = new ArrayList<>();
@@ -157,6 +166,7 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     rec.getAltCalls().clear();
     rec.getAltCalls().addAll(newAlts);
     rec.getFormatAndSample().clear();
+    rec.setNumberOfSamples(1);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, gt));
   }
 
@@ -173,13 +183,13 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       // Happens in TooHard regions.
       // Output the original representation
       mCrv.addInfo("STATUS", "C-TooHard");
-      normalize(mCrv);
+      normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     } else {
       // Excluded. This shouldn't happen except where the sample is self-inconsistent or perhaps the population allele accumulation had to drop the site.
       // Output the original representation
       mCrv.addInfo("STATUS", "C-Inconsistent");
-      normalize(mCrv);
+      normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     }
   }
