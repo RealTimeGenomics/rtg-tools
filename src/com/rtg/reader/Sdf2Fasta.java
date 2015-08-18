@@ -182,10 +182,6 @@ public class Sdf2Fasta extends AbstractCli {
             filter.transfer(new LongRange(startId, endId));
           }
         }
-      } catch (final IOException e) {
-        if (!e.getMessage().contains("Broken pipe")) { // Ignore broken pipe error so we don't die on | head etc.
-          throw e;
-        }
       }
       Diagnostic.deleteLog(); // was successful execution
       return 0;

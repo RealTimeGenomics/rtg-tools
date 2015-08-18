@@ -142,10 +142,6 @@ public final class Sdf2Fastq extends AbstractCli {
             filter.transfer(new LongRange(startId, endId));
           }
         }
-      } catch (final IOException e) {
-        if (!e.getMessage().contains("Broken pipe")) { // Ignore broken pipe error so we don't die on | head etc.
-          throw e;
-        }
       } catch (InvalidParamsException e) {
         e.printErrorNoLog();
         return 1;
