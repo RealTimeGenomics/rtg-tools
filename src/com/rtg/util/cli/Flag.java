@@ -56,11 +56,19 @@ import com.rtg.util.Utils;
 @TestClass(value = {"com.rtg.util.cli.CFlagsTest"})
 public class Flag implements Comparable<Flag> {
 
+  enum Level { DEFAULT, EXTENDED, EXPERIMENTAL }
+
+  static final String EXTENDED_FLAG_PREFIX = "X";
+
+  static final String EXPERIMENTAL_FLAG_PREFIX = "XX";
+
   private final Character mFlagChar;
 
   private final String mFlagName;
 
   private final String mFlagDescription;
+
+  private final Level mLevel;
 
   /** The maximum number of times the flag can occur. */
   private int mMaxCount;
@@ -139,6 +147,25 @@ public class Flag implements Comparable<Flag> {
     if (range != null) {
       setParameterRange(range);
     }
+
+    if (mFlagName != null) {
+      if (mFlagName.startsWith(EXPERIMENTAL_FLAG_PREFIX)) {
+        mLevel = Level.EXPERIMENTAL;
+      } else if (mFlagName.startsWith(EXTENDED_FLAG_PREFIX)) {
+        mLevel = Level.EXTENDED;
+      } else {
+        mLevel = Level.DEFAULT;
+      }
+    } else {
+      mLevel = Level.DEFAULT;
+    }
+  }
+
+  /**
+   * @return the flag level
+   */
+  Level level() {
+    return mLevel;
   }
 
   /**
@@ -154,7 +181,7 @@ public class Flag implements Comparable<Flag> {
     try {
       final String valueOfMethod = "valueOf";
       final Method m = type.getMethod(valueOfMethod, String.class);
-      if (!isStatic(m)) {
+      if (!Modifier.isStatic(m.getModifiers())) {
         return null;
       }
       final Class<?> returnType = m.getReturnType();
@@ -224,12 +251,10 @@ public class Flag implements Comparable<Flag> {
       if (m == null) {
         return false;
       }
-    } catch (final SecurityException e) {
-      return false;
-    } catch (final NoSuchMethodException e) {
+    } catch (final SecurityException | NoSuchMethodException e) {
       return false;
     }
-    if (!isStatic(m)) {
+    if (!Modifier.isStatic(m.getModifiers())) {
       return false;
     }
     final Class<?> returnType = m.getReturnType();
@@ -245,12 +270,10 @@ public class Flag implements Comparable<Flag> {
         return false;
       }
 
-    } catch (final SecurityException e) {
-      return false;
-    } catch (final NoSuchMethodException e) {
+    } catch (final SecurityException | NoSuchMethodException e) {
       return false;
     }
-    if (!isStatic(v)) {
+    if (!Modifier.isStatic(v.getModifiers())) {
       return false;
     }
     final Class<?> returnTypev = v.getReturnType();
@@ -258,10 +281,6 @@ public class Flag implements Comparable<Flag> {
       return false;
     }
     return true;
-  }
-
-  static boolean isStatic(final Method method) {
-    return Modifier.isStatic(method.getModifiers());
   }
 
   /**
@@ -504,12 +523,10 @@ public class Flag implements Comparable<Flag> {
         result.add(mParameterDefault);
       }
     }
-    //System.err.println(mFlagName + ":" + result);
     return Collections.unmodifiableList(result);
   }
 
   void reset() {
-    //System.err.println("reset");
     mParameter = new ArrayList<>();
   }
 
@@ -631,8 +648,8 @@ public class Flag implements Comparable<Flag> {
     return ret.toString();
   }
 
-  void appendLongFlagUsage(final WrappingStringBuilder wb, final int longestUsageLength, final boolean showExtended) {
-    if (!CFlags.displayFlag(showExtended, this)) {
+  void appendLongFlagUsage(final WrappingStringBuilder wb, final int longestUsageLength, final Flag.Level level) {
+    if (level != level()) {
       return;
     }
 
@@ -695,29 +712,8 @@ public class Flag implements Comparable<Flag> {
   private static final Set<String> BOOLEAN_AFFIRMATIVE = new HashSet<>();
   private static final Set<String> BOOLEAN_NEGATIVE = new HashSet<>();
   static {
-    BOOLEAN_AFFIRMATIVE.add("true");
-    BOOLEAN_AFFIRMATIVE.add("yes");
-    BOOLEAN_AFFIRMATIVE.add("y");
-    BOOLEAN_AFFIRMATIVE.add("t");
-    BOOLEAN_AFFIRMATIVE.add("1");
-    BOOLEAN_AFFIRMATIVE.add("on");
-    BOOLEAN_AFFIRMATIVE.add("aye");
-    BOOLEAN_AFFIRMATIVE.add("hai");
-    BOOLEAN_AFFIRMATIVE.add("ja");
-    BOOLEAN_AFFIRMATIVE.add("da");
-    BOOLEAN_AFFIRMATIVE.add("ya");
-    BOOLEAN_AFFIRMATIVE.add("positive");
-    BOOLEAN_AFFIRMATIVE.add("fer-shure");
-    BOOLEAN_AFFIRMATIVE.add("totally");
-    BOOLEAN_AFFIRMATIVE.add("affirmative");
-    BOOLEAN_AFFIRMATIVE.add("+5v");
-
-    BOOLEAN_NEGATIVE.add("false");
-    BOOLEAN_NEGATIVE.add("no");
-    BOOLEAN_NEGATIVE.add("n");
-    BOOLEAN_NEGATIVE.add("f");
-    BOOLEAN_NEGATIVE.add("0");
-    BOOLEAN_NEGATIVE.add("off");
+    BOOLEAN_AFFIRMATIVE.addAll(Arrays.asList("true", "yes", "y", "t", "1", "on", "aye", "hai", "ja", "da", "ya", "positive", "fer-shure", "totally", "affirmative", "+5v"));
+    BOOLEAN_NEGATIVE.addAll(Arrays.asList("false", "no", "n", "f", "0", "off"));
   }
 
   static Object instanceHelper(final Class<?> type, final String stringRep) {

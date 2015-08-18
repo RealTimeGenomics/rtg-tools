@@ -46,7 +46,7 @@ import com.rtg.util.Utils;
  */
 public final class RocSlope {
 
-  private static final boolean ALT_SLOPE = GlobalFlags.isSet(GlobalFlags.ALTERNATE_ROC_SLOPE_CALCULATION);
+  private static final boolean ALT_SLOPE = GlobalFlags.isSet(GlobalFlags.VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
 
   /**
    * Calculate the slope along an roc curve

@@ -151,7 +151,7 @@ public final class GlobalFlags {
   /** Specify the maximum number of iterations since last sync point before vcfeval skips a region */
   public static final String VCFEVAL_MAX_ITERATIONS = "com.rtg.vcf.eval.max-iterations";
   /** Turn on alternate ROC slope calculation */
-  public static final String ALTERNATE_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.RocSlope.alt-roc-slope";
+  public static final String VCFEVAL_ALT_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.alt-roc-slope";
 
   /** Level of BAM compression to use during recalibration (probably also works for SAM merge). */
   public static final String GZIP_LEVEL = "com.rtg.calibrate.Recalibrate.gzip-level";
@@ -193,8 +193,7 @@ public final class GlobalFlags {
 
     // Complex caller
     registerFlag(COMPLEX_CALLER_MAX_HYPOTH_FLAG, Integer.class, 20);
-    registerFlag(CALLER_PAR_AWARE, Boolean.class, false);
-    registerFlag(COMPLEX_REGION_INDEL_EXTENSION, Boolean.class, false);
+    registerFlag(COMPLEX_REGION_INDEL_EXTENSION);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_LIMIT, Integer.class, 3);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
 
@@ -208,13 +207,13 @@ public final class GlobalFlags {
     // when there are lots of missing values.
     registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
 
-    registerFlag(VCFEVAL_DUMP_BEST_PATH, Boolean.class, false);
+    registerFlag(VCFEVAL_DUMP_BEST_PATH);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 5000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
-    registerFlag(ALTERNATE_ROC_SLOPE_CALCULATION);
+    registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
     registerFlag(GZIP_LEVEL, Integer.class, AdjustableGZIPOutputStream.DEFAULT_GZIP_LEVEL);
   }
 
@@ -227,7 +226,7 @@ public final class GlobalFlags {
     if (type != null && def == null) {
       throw new IllegalArgumentException("Default value must be non-null for experimental flags with a type");
     }
-    FLAGS.add(new Flag(null, "XX" + name, "N/A", 0, 1, type, "N/A", def, CATEGORY));
+    FLAGS.add(new Flag(null, "XX" + name, "", 0, 1, type, type == null ? "" : type.getSimpleName(), def, CATEGORY));
   }
 
   private static void registerFlag(String name) {

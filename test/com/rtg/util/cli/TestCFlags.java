@@ -159,7 +159,7 @@ public final class TestCFlags {
   public static void checkExtendedUsage(final CFlags flags, final String... contains) {
     Assert.assertNotNull(flags);
     //System.err.println("Usage TestCFlags.java\n" + flags.getUsageString());
-    final String usage = flags.getExtendedUsageString().replaceAll("\\s+", " ");
+    final String usage = flags.getExtendedUsageString(Flag.Level.EXTENDED).replaceAll("\\s+", " ");
     Assert.assertNotNull(usage);
     if (contains != null) {
       TestUtils.containsAll(usage, contains);

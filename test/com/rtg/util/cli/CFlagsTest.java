@@ -206,7 +206,7 @@ public class CFlagsTest extends TestCase {
     // getOptional and getRequired
     final Collection<Flag> optional = mFlags.getOptional();
     assertNotNull(optional);
-    assertTrue(3 == optional.size()); // always has help
+    assertTrue(4 == optional.size()); // always has help / XXhelp
     assertFalse(optional.contains(mFlags.getFlag("boolean")));
     assertTrue(optional.contains(mFlags.getFlag("help"))); // always has help
     assertTrue(optional.contains(mFlags.getFlag("long")));

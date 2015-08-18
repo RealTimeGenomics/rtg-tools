@@ -54,7 +54,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 @TestClass({"com.rtg.vcf.eval.VcfEvalTaskTest", "com.rtg.vcf.eval.PhasingEvaluatorTest"})
 class SequenceEvaluator implements IORunnable {
 
-  private static final boolean DUMP_BEST_PATH = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_DUMP_BEST_PATH);
+  private static final boolean DUMP_BEST_PATH = GlobalFlags.isSet(GlobalFlags.VCFEVAL_DUMP_BEST_PATH);
 
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;

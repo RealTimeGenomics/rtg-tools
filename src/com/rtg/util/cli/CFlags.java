@@ -124,12 +124,14 @@ public final class CFlags {
     public void handleInvalidFlags(final CFlags flags) {
       final boolean help = flags.isSet(HELP_FLAG);
       final boolean xhelp = flags.isSet(EXTENDED_HELP_FLAG);
-      if (help || xhelp) {
-        if (help) {
-          flags.printUsage(true);
-        }
-        if (xhelp) {
-          flags.printExtendedUsage(true);
+      final boolean xxhelp = flags.isSet(EXPERIMENTAL_HELP_FLAG);
+      if (help || xhelp || xxhelp) {
+        if (xxhelp) {
+          flags.printExtendedUsage(Flag.Level.EXPERIMENTAL);
+        } else if (xhelp) {
+          flags.printExtendedUsage(Flag.Level.EXTENDED);
+        } else {
+          flags.printUsage();
         }
       } else {
         flags.error(flags.getInvalidFlagMsg());
@@ -139,12 +141,12 @@ public final class CFlags {
 
   static final String SHORT_FLAG_PREFIX = "-";
   static final String LONG_FLAG_PREFIX = "--";
-  static final String EXTENDED_FLAG_PREFIX = "X";
-  static final String EXPERIMENTAL_FLAG_PREFIX = "XX";
   /** The built-in flag that signals wants help about flag usage. */
   public static final String HELP_FLAG = "help";
   /** The built-in flag that signals wants help about extended flag usage. */
   public static final String EXTENDED_HELP_FLAG = "Xhelp";
+  /** The built-in flag that signals wants help about experimental flag usage. */
+  public static final String EXPERIMENTAL_HELP_FLAG = "XXhelp";
   private static final String USAGE_SUMMARY_PREFIX = "Usage: ";
   private static final String PARSE_ERROR_PREFIX = "Error: ";
   static final String REQUIRED_FLAG_USAGE_PREFIX = "Required flags: ";
@@ -213,6 +215,7 @@ public final class CFlags {
     mLongNames = new TreeMap<>();
     mShortNames = new TreeMap<>();
     registerOptional('h', HELP_FLAG, "print help on command-line flag usage");
+    registerOptional(EXPERIMENTAL_HELP_FLAG, "");
     setName(programName);
   }
 
@@ -1070,9 +1073,10 @@ public final class CFlags {
    * @return a <code>String</code> containing the full usage information. This
    * contains the usage header, usage for each flag and usage footer.
    * Program description is omitted.
+   * @param level the level of extended help that should be output
    */
-  public String getExtendedUsageString() {
-    return getExtendedUsageString(DEFAULT_WIDTH);
+  public String getExtendedUsageString(Flag.Level level) {
+    return getExtendedUsageString(DEFAULT_WIDTH, level);
   }
 
   /**
@@ -1089,10 +1093,28 @@ public final class CFlags {
       if (mCategories == null) {
         throw new IllegalStateException("Please set categories first");
       }
-      appendCategoryFlagUsage(usage, false);
+      appendCategoryFlagUsage(usage, Flag.Level.DEFAULT);
     } else {
-      appendLongFlagUsage(usage, false);
+      appendLongFlagUsage(usage, Flag.Level.DEFAULT);
     }
+    return usage.toString();
+  }
+
+  /**
+   * Get the usage string.
+   * @param width width of output
+   * @param level the level of extended help that should be output
+   * @return usage wrapped to given width
+   */
+  public String getExtendedUsageString(final int width, Flag.Level level) {
+    final WrappingStringBuilder usage = new WrappingStringBuilder();
+    usage.setWrapWidth(width);
+    appendUsageHeader(usage);
+    usage.append(LS);
+    usage.setWrapIndent(6);
+    usage.wrapText("Note: Extended command line options are often experimental and untested. These options may come and go between releases. Use them with caution!");
+    usage.append(LS);
+    appendLongFlagUsage(usage, level);
     return usage.toString();
   }
 
@@ -1106,13 +1128,13 @@ public final class CFlags {
     return results;
   }
 
-  private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final boolean showExtended) {
+  private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
     int longestUsageLength = 0;
     // Get longest string lengths for use below in pretty-printing.
     final int[] counts = new int[mCategories.length];
     for (Flag flag : mRegisteredFlags) {
       counts[getCategoryLocation(flag.getCategory())]++;
-      if (!displayFlag(showExtended, flag)) {
+      if (!displayFlag(flag, level)) {
         continue;
       }
       final String usageStr = flag.getFlagUsage();
@@ -1127,7 +1149,7 @@ public final class CFlags {
       int flagsCount = 0;
       while (flagItr.hasNext()) {
         final Flag flag = flagItr.next();
-        if (displayFlag(showExtended, flag)) {
+        if (displayFlag(flag, level)) {
           flagsCount++;
         }
       }
@@ -1136,14 +1158,14 @@ public final class CFlags {
         wb.append(mCategorie).append(LS);
         wb.setWrapIndent(longestUsageLength + 7);
         for (final Flag flag : flags) {
-          flag.appendLongFlagUsage(wb, longestUsageLength, showExtended);
+          flag.appendLongFlagUsage(wb, longestUsageLength, level);
         }
       }
     }
   }
 
-  static boolean displayFlag(boolean showExtended, Flag flag) {
-    return !(flag.getName() != null && flag.getName().startsWith(EXPERIMENTAL_FLAG_PREFIX)) && showExtended == (flag.getName() != null && flag.getName().startsWith(EXTENDED_FLAG_PREFIX));
+  static boolean displayFlag(Flag flag, Flag.Level level) {
+    return flag.level() == level;
   }
 
   private int getCategoryLocation(final String category) {
@@ -1153,23 +1175,6 @@ public final class CFlags {
       }
     }
     throw new IllegalArgumentException("category not found " + category);
-  }
-
-  /**
-   * Get the usage string.
-   * @param width width of output
-   * @return usage wrapped to given width
-   */
-  public String getExtendedUsageString(final int width) {
-    final WrappingStringBuilder usage = new WrappingStringBuilder();
-    usage.setWrapWidth(width);
-    appendUsageHeader(usage);
-    usage.append(LS);
-    usage.setWrapIndent(6);
-    usage.wrapText("Note: Extended command line options are often experimental and untested. These options may come and go between releases. Use them with caution!");
-    usage.append(LS);
-    appendLongFlagUsage(usage, true);
-    return usage.toString();
   }
 
   /**
@@ -1200,13 +1205,13 @@ public final class CFlags {
     return wb.toString();
   }
 
-  private void appendLongFlagUsage(final WrappingStringBuilder wb, final boolean showExtended) {
+  private void appendLongFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
     int longestUsageLength = 0;
     // Get longest string lengths for use below in pretty-printing.
     Iterator<Flag> flagItr = mRegisteredFlags.iterator();
     while (flagItr.hasNext()) {
       final Flag flag = flagItr.next();
-      if (displayFlag(showExtended, flag)) {
+      if (displayFlag(flag, level)) {
         final String usageStr = flag.getFlagUsage();
         if (usageStr.length() > longestUsageLength) {
           longestUsageLength = usageStr.length();
@@ -1219,7 +1224,7 @@ public final class CFlags {
     int requiredCount = 0;
     while (flagItr.hasNext()) {
       final Flag flag = flagItr.next();
-      if (displayFlag(showExtended, flag)) {
+      if (displayFlag(flag, level)) {
         requiredCount++;
       }
     }
@@ -1228,7 +1233,7 @@ public final class CFlags {
       wb.append(REQUIRED_FLAG_USAGE_PREFIX).append(LS);
       wb.setWrapIndent(longestUsageLength + 7);
       for (final Flag flag : required) {
-        flag.appendLongFlagUsage(wb, longestUsageLength, showExtended);
+        flag.appendLongFlagUsage(wb, longestUsageLength, level);
       }
     }
     // Then all the optional flags
@@ -1237,7 +1242,7 @@ public final class CFlags {
     int optionalCount = 0;
     while (flagItr.hasNext()) {
       final Flag flag = flagItr.next();
-      if (displayFlag(showExtended, flag)) {
+      if (displayFlag(flag, level)) {
         optionalCount++;
       }
     }
@@ -1247,33 +1252,24 @@ public final class CFlags {
       wb.append(OPTIONAL_FLAG_USAGE_PREFIX).append(LS);
       wb.setWrapIndent(longestUsageLength + 7);
       for (final Flag flag : optional) {
-        flag.appendLongFlagUsage(wb, longestUsageLength, showExtended);
+        flag.appendLongFlagUsage(wb, longestUsageLength, level);
       }
     }
   }
 
   /**
    * Prints the full usage information.
-   * @param printToStdout print to standard out
    */
-  public void printUsage(final boolean printToStdout) {
-    if (printToStdout) {
-      out(getUsageString());
-    } else {
-      error(getUsageString());
-    }
+  public void printUsage() {
+    out(getUsageString());
   }
 
   /**
-   * Prints the full usage information.
-   * @param printToStdout print to standard out
+   * Prints the usage information for extended flags.
+   * @param level the level of extended help that should be output
    */
-  public void printExtendedUsage(final boolean printToStdout) {
-    if (printToStdout) {
-      out(getExtendedUsageString());
-    } else {
-      error(getExtendedUsageString());
-    }
+  public void printExtendedUsage(Flag.Level level) {
+    out(getExtendedUsageString(level));
   }
 
   /**
@@ -1392,6 +1388,10 @@ public final class CFlags {
     final Flag f = getFlag(EXTENDED_HELP_FLAG);
     if (f != null) {
       f.setCategory(helpCategory);
+    }
+    final Flag f2 = getFlag(EXPERIMENTAL_HELP_FLAG);
+    if (f2 != null) {
+      f2.setCategory(helpCategory);
     }
   }
 }
