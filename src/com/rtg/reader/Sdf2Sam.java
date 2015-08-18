@@ -53,8 +53,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 
-import htsjdk.samtools.util.RuntimeIOException;
-
 /**
  * This class takes format directory and converts to FASTQ format
  */
@@ -123,10 +121,6 @@ public final class Sdf2Sam extends AbstractCli {
             final long endId = mFlags.isSet(END_SEQUENCE) ? (Long) mFlags.getValue(END_SEQUENCE) : LongRange.MISSING;
             filter.transfer(new LongRange(startId, endId));
           }
-        }
-      } catch (final IOException | RuntimeIOException e) {
-        if (!e.getMessage().contains("Broken pipe")) { // Ignore broken pipe error so we don't die on | head etc.
-          throw e;
         }
       } catch (InvalidParamsException e) {
         e.printErrorNoLog();

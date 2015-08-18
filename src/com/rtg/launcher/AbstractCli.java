@@ -221,11 +221,17 @@ public abstract class AbstractCli {
           return 1;
         }
       } catch (final IOException e) {
+        if (e.getMessage().contains("Broken pipe")) { // Ignore broken pipe error so we don't die on | head etc.
+          return 0;
+        }
         Diagnostic.errorNoLog(ErrorType.IO_ERROR, getChainedErrorMessage(e));
         return 1;
       } catch (final SAMException e) {
         if (e instanceof RuntimeIOException
             || e instanceof RuntimeEOFException) {
+          if (e.getMessage().contains("Broken pipe")) { // Ignore broken pipe error so we don't die on | head etc.
+            return 0;
+          }
           Diagnostic.errorNoLog(ErrorType.IO_ERROR, getChainedErrorMessage(e));
           return 1;
         }
