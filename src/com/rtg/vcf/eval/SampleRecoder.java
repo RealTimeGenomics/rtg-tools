@@ -48,7 +48,7 @@ import com.rtg.vcf.VcfWriter;
  */
 public class SampleRecoder extends MergingEvalSynchronizer {
 
-  protected final VcfWriter mAlleles;
+  protected final VcfWriter mSampleVcf;
   protected final VcfWriter mAuxiliary;
   protected int mCalledNotInPath;
 
@@ -65,8 +65,8 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mAlleles = new VcfWriter(variants.calledHeader(), new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new representation of sample using population alleles
-    mAuxiliary = new VcfWriter(variants.calledHeader(), new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
+    mSampleVcf = new VcfWriter(variants.calledHeader(), new File(output, "sample.vcf" + zipExt), null, zip, true); // Primary output containing new representation of sample using population alleles
+    mAuxiliary = new VcfWriter(variants.calledHeader(), new File(output, "aux.vcf" + zipExt), null, zip, true);
   }
 
   @Override
@@ -95,14 +95,14 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       // We have a good indication that it should have been possible to simplify this if the region were not too hard
       mCrv.addInfo("STATUS", "C-TooHard-BDiff");
       normalize(mCrv);
-      mAlleles.write(mCrv);
+      mSampleVcf.write(mCrv);
     } else {
       // Excluded, but we don't have a baseline call at this position.
       // This should not normally happen if we have accumulated all alleles
       // Output the original representation
       mCrv.addInfo("STATUS", "C-FP=" + mCv.toString());
       normalize(mCrv);
-      mAlleles.write(mCrv);
+      mSampleVcf.write(mCrv);
     }
   }
 
@@ -116,7 +116,7 @@ public class SampleRecoder extends MergingEvalSynchronizer {
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
       normalize(mBrv);
-      mAlleles.write(mBrv);
+      mSampleVcf.write(mBrv);
     } else if (mBv instanceof SkippedVariant) {
       // Expected sometimes, do nothing here (a relevant call will already have been output if needed during processBoth using its allele representation).
       mBrv.addInfo("STATUS", "B-TooHard");
@@ -159,20 +159,22 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     if (mCv instanceof OrientedVariant) {
       // Normal scenario where sample matches population alleles directly
       // Elsewhere we'll output the baseline version, but make a note here.
-      mCrv.addInfo("STATUS", "C-TP-BSame"); // We expect many of these, probably fine to silently drop
+      // We expect many of these, probably fine to silently drop, but interesting to see the status
+      final String status = (mBv instanceof OrientedVariant) ? "C-TP-BSame" : (mBv instanceof SkippedVariant) ? "C-TP-BSkipped" : "C-TP-BSwitched";
+      mCrv.addInfo("STATUS", status);
       mAuxiliary.write(mCrv);
     } else if (mCv instanceof SkippedVariant) {
       // Happens in TooHard regions.
       // Output the original representation
       mCrv.addInfo("STATUS", "C-TooHard");
       normalize(mCrv);
-      mAlleles.write(mCrv);
+      mSampleVcf.write(mCrv);
     } else {
       // Excluded. This shouldn't happen except where the sample is self-inconsistent or perhaps the population allele accumulation had to drop the site.
       // Output the original representation
       mCrv.addInfo("STATUS", "C-Inconsistent");
       normalize(mCrv);
-      mAlleles.write(mCrv);
+      mSampleVcf.write(mCrv);
     }
   }
 
@@ -201,7 +203,7 @@ public class SampleRecoder extends MergingEvalSynchronizer {
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
-    try (VcfWriter ignored = mAlleles;
+    try (VcfWriter ignored = mSampleVcf;
          VcfWriter ignored2 = mAuxiliary) {
       // done for nice closing side effects
     }
