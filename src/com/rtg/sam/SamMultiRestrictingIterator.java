@@ -42,6 +42,7 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.CloseableIterator;
+import htsjdk.samtools.util.RuntimeEOFException;
 import htsjdk.samtools.util.RuntimeIOException;
 
 /**
@@ -216,8 +217,8 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
     final SAMRecord ret = mNextRecord;
     try {
       populateNext(false);
-    } catch (IOException e) {
-      throw new RuntimeIOException("Problem reading file " + mLabel + ": " + e.getMessage(), e);
+    } catch (IOException | RuntimeIOException | RuntimeEOFException e) {
+      throw new RuntimeIOException(mLabel + ": " + e.getMessage(), e);
     }
     return ret;
   }
