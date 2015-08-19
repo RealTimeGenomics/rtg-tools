@@ -39,6 +39,10 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Output a population alleles VCF that incorporates a new sample, including any new alleles
@@ -62,7 +66,9 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     super(baseLineFile, callsFile, variants, ranges, output, zip);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mAlternate = new VcfWriter(variants.calledHeader(), new File(output, "alternate.vcf" + zipExt), null, zip, true); // Contains sample calls after subtraction of matched alleles from double-alt cases
+    final VcfHeader h = variants.calledHeader().copy();
+    h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
+    mAlternate = new VcfWriter(h, new File(output, "alternate.vcf" + zipExt), null, zip, true); // Contains sample calls after subtraction of matched alleles from double-alt cases
   }
 
   @Override

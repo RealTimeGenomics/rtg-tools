@@ -40,7 +40,10 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Output a population alleles VCF that incorporates a new sample, including any new alleles
@@ -70,6 +73,7 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader h = variants.baseLineHeader().copy();
     h.removeAllSamples();
+    h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
     mAlleles = new VcfWriter(h, new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new population alleles (old + new sample alleles)
     mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
   }

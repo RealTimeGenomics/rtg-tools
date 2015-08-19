@@ -42,6 +42,10 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Outputs a new sample genotype with respect to the population alleles
@@ -65,8 +69,10 @@ public class SampleRecoder extends MergingEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mSampleVcf = new VcfWriter(variants.calledHeader(), new File(output, "sample.vcf" + zipExt), null, zip, true); // Primary output containing new representation of sample using population alleles
-    mAuxiliary = new VcfWriter(variants.calledHeader(), new File(output, "aux.vcf" + zipExt), null, zip, true);
+    final VcfHeader h = variants.calledHeader().copy();
+    h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Recoding variant status"));
+    mSampleVcf = new VcfWriter(h, new File(output, "sample.vcf" + zipExt), null, zip, true); // Primary output containing new representation of sample using population alleles
+    mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true);
   }
 
   @Override
