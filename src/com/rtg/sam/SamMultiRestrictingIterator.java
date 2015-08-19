@@ -100,8 +100,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
     return ret;
   }
 
-
-  private void populateNext(boolean force) {
+  private void populateNext(boolean force) throws IOException {
     final SAMRecord previousRecord = mNextRecord;
     mNextRecord = null;
     if (force) {
@@ -161,36 +160,32 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
     }
   }
 
-  protected void advanceSubIterator() {
-    try {
-      if (mCurrentOffset < mOffsets.size()) {
-        if (mOffsets.start(mCurrentOffset) != mPreviousVirtualOffsetStart) {
-          //Diagnostic.developerLog("After region " + mCurrentRegion + ", opening new reader at offset " + VirtualOffsets.offsetToString(mOffsets.start(mCurrentOffset)) + " for region " + mOffsets.region(mCurrentOffset));
-          // Don't the current iterator here as it will axe off the underlying block compressed input stream, oddly only for SAM, not BAM
-          clearBuffered();
-          mStream.seek(mOffsets.start(mCurrentOffset));
-          // Warning: Confusing constructors being used here - the true is only used to force a different constructor
-          mCurrentIt = SamUtils.makeSamReader(mStream, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
+  protected void advanceSubIterator() throws IOException {
+    if (mCurrentOffset < mOffsets.size()) {
+      if (mOffsets.start(mCurrentOffset) != mPreviousVirtualOffsetStart) {
+        //Diagnostic.developerLog("After region " + mCurrentRegion + ", opening new reader at offset " + VirtualOffsets.offsetToString(mOffsets.start(mCurrentOffset)) + " for region " + mOffsets.region(mCurrentOffset));
+        // Don't the current iterator here as it will axe off the underlying block compressed input stream, oddly only for SAM, not BAM
+        clearBuffered();
+        mStream.seek(mOffsets.start(mCurrentOffset));
+        // Warning: Confusing constructors being used here - the true is only used to force a different constructor
+        mCurrentIt = SamUtils.makeSamReader(mStream, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
 
         //} else {
         //  Diagnostic.developerLog("After region " + mCurrentRegion + ", re-using existing reader for region " + mOffsets.region(mCurrentOffset));
 
-        }
-
-        mCurrentRegion = mOffsets.region(mCurrentOffset);
-        final int newTemplate = mHeader.getSequenceIndex(mCurrentRegion.getSequenceName());
-        if (newTemplate != mCurrentTemplate) {
-          mPreviousAlignmentStart = Integer.MIN_VALUE;
-        }
-        mPreviousVirtualOffsetStart = mOffsets.start(mCurrentOffset);
-        mCurrentTemplate = newTemplate;
-
-        mCurrentOffset++;
-      } else {
-        closeCurrent();
       }
-    } catch (IOException e) {
-      throw new RuntimeIOException(e.getMessage(), e);
+
+      mCurrentRegion = mOffsets.region(mCurrentOffset);
+      final int newTemplate = mHeader.getSequenceIndex(mCurrentRegion.getSequenceName());
+      if (newTemplate != mCurrentTemplate) {
+        mPreviousAlignmentStart = Integer.MIN_VALUE;
+      }
+      mPreviousVirtualOffsetStart = mOffsets.start(mCurrentOffset);
+      mCurrentTemplate = newTemplate;
+
+      mCurrentOffset++;
+    } else {
+      closeCurrent();
     }
   }
 
@@ -219,7 +214,11 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
       throw new NoSuchElementException();
     }
     final SAMRecord ret = mNextRecord;
-    populateNext(false);
+    try {
+      populateNext(false);
+    } catch (IOException e) {
+      throw new RuntimeIOException("Problem reading file " + mLabel + ": " + e.getMessage(), e);
+    }
     return ret;
   }
 
