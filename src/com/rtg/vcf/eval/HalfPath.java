@@ -361,7 +361,7 @@ public class HalfPath implements Comparable<HalfPath> {
 
   @Override
   public boolean equals(Object obj) {
-    return obj != null && compareTo((HalfPath) obj) == 0;
+    return obj instanceof HalfPath && compareTo((HalfPath) obj) == 0;
   }
 
   @Override
