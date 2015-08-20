@@ -81,6 +81,8 @@ public class VcfSubset extends AbstractCli {
   private static final String REMOVE_FORMAT = "remove-format";
   private static final String KEEP_FORMAT = "keep-format";
 
+  private static final String REMOVE_QUAL = "remove-qual";
+
   private static final String REMOVE_UNUSED_ALTS = "Xremove-unused-alts";
 
   @Override
@@ -122,6 +124,9 @@ public class VcfSubset extends AbstractCli {
     // Contents of FORMAT
     mFlags.registerOptional(REMOVE_FORMAT, String.class, "STRING", "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(KEEP_FORMAT, String.class, "STRING", "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+
+    // Contents of QUAL
+    mFlags.registerOptional(REMOVE_QUAL, "remove the QUAL field").setCategory(FILTERING);
 
     // Contents of ALT
     mFlags.registerOptional(REMOVE_UNUSED_ALTS, "remove unused ALT alleles").setCategory(FILTERING);
@@ -334,6 +339,9 @@ public class VcfSubset extends AbstractCli {
 
       if (mFlags.isSet(REMOVE_UNUSED_ALTS)) {
         annotators.add(new VcfAltCleaner());
+      }
+      if (mFlags.isSet(REMOVE_QUAL)) {
+        annotators.add(new VcfQualCleaner());
       }
 
       int skippedRecords = 0;
