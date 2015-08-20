@@ -94,14 +94,8 @@ public class Path implements Comparable<Path> {
 
     @Override
     public int compareTo(SyncPoint o) {
-      if (this.mPos < o.mPos) {
-        return -1;
-      } else if (this.mPos > o.mPos) {
-        return 1;
-      }
-      return 0;
+      return Integer.compare(mPos, o.mPos);
     }
-
   }
 
   /**
