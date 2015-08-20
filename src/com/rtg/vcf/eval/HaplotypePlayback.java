@@ -44,7 +44,7 @@ import com.rtg.util.integrity.Integrity;
 
 /**
  */
-public class HaplotypePlayback implements Integrity, Comparable<HaplotypePlayback> {
+public final class HaplotypePlayback implements Integrity, Comparable<HaplotypePlayback> {
 
   private static final int INVALID = -1;
 

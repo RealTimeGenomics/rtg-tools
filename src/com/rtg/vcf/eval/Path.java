@@ -48,7 +48,7 @@ import com.rtg.util.diagnostic.Diagnostic;
  * method to find a best path.
  *
  */
-public class Path implements Comparable<Path> {
+public final class Path implements Comparable<Path> {
 
   final HalfPath mCalledPath;
   final HalfPath mBaselinePath;

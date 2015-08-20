@@ -258,8 +258,11 @@ public final class PathFinder {
   private void addIfBetter(Path add, TreeSet<Path> sortedPaths) {
     if (sortedPaths.contains(add)) {
       final Path other = sortedPaths.floor(add);
-      sortedPaths.remove(add);
-      sortedPaths.add(better(add, other));
+      final Path best = better(add, other);
+      if (best == add) {
+        sortedPaths.remove(other);
+        sortedPaths.add(best);
+      }
     } else {
       sortedPaths.add(add);
     }

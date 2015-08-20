@@ -44,7 +44,7 @@ import com.rtg.util.intervals.Range;
 /**
  * One half of a path that reconciles two sequences of variants.
  */
-public class HalfPath implements Comparable<HalfPath> {
+public final class HalfPath implements Comparable<HalfPath> {
 
   private final HaplotypePlayback mHaplotypeA;
   private HaplotypePlayback mHaplotypeB;
