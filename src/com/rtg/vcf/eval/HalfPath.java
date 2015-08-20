@@ -47,7 +47,7 @@ import com.rtg.util.intervals.Range;
 public final class HalfPath implements Comparable<HalfPath> {
 
   private final HaplotypePlayback mHaplotypeA;
-  private HaplotypePlayback mHaplotypeB;
+  private final HaplotypePlayback mHaplotypeB;
 
   private BasicLinkedListNode<OrientedVariant> mIncluded;
   private BasicLinkedListNode<Variant> mExcluded;
@@ -65,7 +65,7 @@ public final class HalfPath implements Comparable<HalfPath> {
    */
   HalfPath(byte[] template) {
     mHaplotypeA = new HaplotypePlayback(template);
-    mHaplotypeB = null;
+    mHaplotypeB = mHaplotypeA.copy();
   }
 
   /**
@@ -76,7 +76,7 @@ public final class HalfPath implements Comparable<HalfPath> {
     mIncluded = path.mIncluded;
     mExcluded = path.mExcluded;
     mHaplotypeA = path.mHaplotypeA.copy();
-    mHaplotypeB = path.mHaplotypeB == null ? null : path.mHaplotypeB.copy();
+    mHaplotypeB = path.mHaplotypeB.copy();
     mVariantEndPosition = path.mVariantEndPosition;
     mVariantIndex = path.mVariantIndex;
     mIncludedVariantEndPosition = path.mIncludedVariantEndPosition;
@@ -105,12 +105,10 @@ public final class HalfPath implements Comparable<HalfPath> {
     sb.append(' ');
     sb.append(replayAll(included, region));
 
-    if (mHaplotypeB != null) {
-      for (int i = 0; i < included.size(); i++) {
-        included.set(i, included.get(i).other());
-      }
-      sb.append("|").append(replayAll(included, region));
+    for (int i = 0; i < included.size(); i++) {
+      included.set(i, included.get(i).other());
     }
+    sb.append("|").append(replayAll(included, region));
     return sb.toString();
   }
 
@@ -145,7 +143,7 @@ public final class HalfPath implements Comparable<HalfPath> {
       return true; // Can be added without considering overlapping
     }
     // Check if we can include this variant by overlapping
-    return mHaplotypeA.isNew(var) && (mHaplotypeB == null || mHaplotypeB.isNew(var.other()));
+    return mHaplotypeA.isNew(var) && mHaplotypeB.isNew(var.other());
   }
 
   void exclude(Variant var, int varIndex) {
@@ -163,17 +161,8 @@ public final class HalfPath implements Comparable<HalfPath> {
     mVariantIndex = varIndex;
     mIncludedVariantEndPosition = Math.max(mIncludedVariantEndPosition, var.variant().getEnd());
 
-    // Lazy creation of the B haplotype
-    if (mHaplotypeB == null && var.isHeterozygous()) {
-      mHaplotypeB = mHaplotypeA.copy();
-    }
-
     mHaplotypeA.addVariant(var);
-
-    if (mHaplotypeB != null) {
-      // Add the other side of the heterozygous diploid variant.
-      mHaplotypeB.addVariant(var.other());
-    }
+    mHaplotypeB.addVariant(var.other());
   }
 
   /**
@@ -181,7 +170,7 @@ public final class HalfPath implements Comparable<HalfPath> {
    * @return false indicates that no variants need to be immediately enqueued
    */
   boolean wantsFutureVariantBases() {
-    return mHaplotypeA.wantsFutureVariantBases() || (mHaplotypeB != null && mHaplotypeB.wantsFutureVariantBases());
+    return mHaplotypeA.wantsFutureVariantBases() || mHaplotypeB.wantsFutureVariantBases();
   }
 
   void step() {
@@ -190,9 +179,6 @@ public final class HalfPath implements Comparable<HalfPath> {
   }
 
   void haplotypeAStep() {
-    if (mHaplotypeB == null) {
-      mHaplotypeB = mHaplotypeA.copy();
-    }
     if (mHaplotypeA.hasNext()) {
       mHaplotypeA.next();
     } else {
@@ -201,9 +187,6 @@ public final class HalfPath implements Comparable<HalfPath> {
   }
 
   void haplotypeBStep() {
-    if (mHaplotypeB == null) {
-      mHaplotypeB = mHaplotypeA.copy();
-    }
     if (mHaplotypeB.hasNext()) {
       mHaplotypeB.next();
     } else {
@@ -269,9 +252,6 @@ public final class HalfPath implements Comparable<HalfPath> {
    * @return the leading reference
    */
   public int getPosition() {
-    if (mHaplotypeB == null) {
-      return mHaplotypeA.templatePosition();
-    }
     if (mHaplotypeA.templatePosition() > mHaplotypeB.templatePosition()) {
       return mHaplotypeA.templatePosition();
     } else {
@@ -294,17 +274,15 @@ public final class HalfPath implements Comparable<HalfPath> {
   }
 
   private byte nextBase(boolean haplotypeA) {
-    if (haplotypeA || mHaplotypeB == null) {
+    if (haplotypeA) {
       return mHaplotypeA.nt();
     } else {
       return mHaplotypeB.nt();
     }
   }
   void moveForward(int position) {
-    if (mHaplotypeB != null) {
-      mHaplotypeB.moveForward(position);
-    }
     mHaplotypeA.moveForward(position);
+    mHaplotypeB.moveForward(position);
   }
 
   boolean matches(HalfPath other) {
@@ -319,19 +297,8 @@ public final class HalfPath implements Comparable<HalfPath> {
 
   @Override
   public int compareTo(HalfPath that) {
-    final int c0 = this.mHaplotypeA.templatePosition() - that.mHaplotypeA.templatePosition();
-    if (c0 != 0) {
-      return c0;
-    }
-
-    if (this.mHaplotypeB == null && that.mHaplotypeB != null) {
-      return -1;
-    }
-    if (this.mHaplotypeB != null && that.mHaplotypeB == null) {
-      return +1;
-    }
     final int plus = this.mHaplotypeA.compareTo(that.mHaplotypeA);
-    if (this.mHaplotypeB == null || plus != 0) {
+    if (plus != 0) {
       return plus;
     }
     return this.mHaplotypeB.compareTo(that.mHaplotypeB);
@@ -342,9 +309,6 @@ public final class HalfPath implements Comparable<HalfPath> {
    * @return &lt; 0 if the B haplotype is leading, &gt; 0  if A haplotype is leading, 0 if in the same place
    */
   public int compareHaplotypePositions() {
-    if (mHaplotypeB == null) {
-      return 0;
-    }
     return mHaplotypeA.templatePosition() - mHaplotypeB.templatePosition();
   }
 
@@ -353,9 +317,6 @@ public final class HalfPath implements Comparable<HalfPath> {
    * @return true if the haplotypes are on the template.
    */
   public boolean isOnTemplate() {
-    if (mHaplotypeB == null) {
-      return mHaplotypeA.isOnTemplate();
-    }
     return mHaplotypeA.isOnTemplate() && mHaplotypeB.isOnTemplate();
   }
 
@@ -366,7 +327,7 @@ public final class HalfPath implements Comparable<HalfPath> {
 
   @Override
   public int hashCode() {
-    return Utils.pairHash(mHaplotypeB == null ? 0 : mHaplotypeB.hashCode(), mHaplotypeA.hashCode(), mVariantEndPosition);
+    return Utils.pairHash(mHaplotypeB.hashCode(), mHaplotypeA.hashCode(), mVariantEndPosition);
   }
 
   @Override
@@ -377,12 +338,10 @@ public final class HalfPath implements Comparable<HalfPath> {
     if (!mHaplotypeA.isOnTemplate()) {
       sb.append('^').append(mHaplotypeA.positionInVariant());
     }
-    if (mHaplotypeB != null) {
-      sb.append(" -:");
-      sb.append(mHaplotypeB.templatePosition() + 1);
-      if (!mHaplotypeB.isOnTemplate()) {
-        sb.append('^').append(mHaplotypeB.positionInVariant());
-      }
+    sb.append(" -:");
+    sb.append(mHaplotypeB.templatePosition() + 1);
+    if (!mHaplotypeB.isOnTemplate()) {
+      sb.append('^').append(mHaplotypeB.positionInVariant());
     }
     sb.append(LS);
     sb.append("included:");
