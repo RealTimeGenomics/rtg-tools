@@ -377,7 +377,7 @@ public interface VariantFactory {
     public Variant variant(VcfRecord rec, int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
-      } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
+      } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
 
       final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
       final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
@@ -408,7 +408,7 @@ public interface VariantFactory {
     public Variant variant(final VcfRecord rec, final int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
-      } // XXXLen ignore SV/symbolic alts, skip variants where there are no alts remaining.
+      } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
 
       final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
       final Range bounds = TrimmedGtId.getAlleleBounds(alleles);

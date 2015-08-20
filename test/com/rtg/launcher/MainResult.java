@@ -31,6 +31,7 @@ package com.rtg.launcher;
 
 import java.io.ByteArrayOutputStream;
 
+import com.rtg.util.Utils;
 import com.rtg.util.cli.CommandLine;
 import com.rtg.util.io.MemoryPrintStream;
 
@@ -50,7 +51,7 @@ public final class MainResult {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     final MemoryPrintStream err = new MemoryPrintStream();
     GlobalFlags.resetAccessedStatus();
-    CommandLine.setCommandArgs(args);
+    CommandLine.setCommandArgs(Utils.append(new String[] {cli.moduleName() }, args));
     final int rc = cli.mainInit(args, out, err.printStream());
     return new MainResult(rc, out.toString(), err.toString());
   }
