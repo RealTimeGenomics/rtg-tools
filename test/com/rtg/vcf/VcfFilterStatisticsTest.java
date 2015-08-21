@@ -43,10 +43,6 @@ import junit.framework.TestCase;
 @SuppressWarnings("fallthrough")
 public class VcfFilterStatisticsTest extends TestCase {
 
-  public void testEnum() {
-    TestUtils.testEnum(Stat.class, "[SAME_AS_REF_FILTERED_COUNT, ALL_SAME_AS_REF_FILTERED_COUNT, AMBIGOUS_FILTERED_COUNT, READ_DEPTH_FILTERED_COUNT, FAILED_KEEP_COUNT, NOT_SNP_COUNT, GENOTYPE_QUALITY_POSTERIOR_FILTERED_COUNT, QUALITY_FILTERED_COUNT, ALLELE_BALANCE_FILTERED_COUNT, DENSITY_WINDOW_COUNT, EXCLUDE_BED_COUNT, INCLUDE_BED_COUNT, WRITTEN_COUNT, TOTAL_COUNT, AVR_SCORE_FILTERED_COUNT, OVERLAP_COUNT, SNP_COUNT, DENOVO_SCORE, COMBINED_READ_DEPTH_FILTERED_COUNT]");
-  }
-
   public void test() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final MemoryPrintStream stream = new MemoryPrintStream();
