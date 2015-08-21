@@ -63,6 +63,7 @@ class VcfFilterStatistics implements Statistics {
     , SNP_COUNT
     , DENOVO_SCORE
     , COMBINED_READ_DEPTH_FILTERED_COUNT
+    , HOM_FILTERED_COUNT
   }
 
   private final int[] mValues = new int[Stat.values().length];
@@ -96,6 +97,7 @@ class VcfFilterStatistics implements Statistics {
       printCount(output, "allele balance", get(Stat.ALLELE_BALANCE_FILTERED_COUNT));
       printCount(output, "same as reference", get(Stat.SAME_AS_REF_FILTERED_COUNT));
       printCount(output, "all samples same as reference", get(Stat.ALL_SAME_AS_REF_FILTERED_COUNT));
+      printCount(output, "homozygous", get(Stat.HOM_FILTERED_COUNT));
       printCount(output, "not a SNP", get(Stat.NOT_SNP_COUNT));
       printCount(output, "simple SNP", get(Stat.SNP_COUNT));
       printCount(output, "not in keep set", get(Stat.FAILED_KEEP_COUNT));

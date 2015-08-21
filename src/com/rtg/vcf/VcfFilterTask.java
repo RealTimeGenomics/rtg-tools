@@ -65,6 +65,7 @@ class VcfFilterTask {
   protected int[] mSampleIndexes = null;
   protected boolean[] mSampleFailed = null;
   protected boolean mNonSampleSpecificFailed = false;
+  protected boolean mRemoveHom;
   protected boolean mRemoveSameAsRef;
   protected boolean mRemoveAllSameAsRef;
   protected boolean mSnpsOnly;
@@ -371,7 +372,7 @@ class VcfFilterTask {
 
   boolean acceptGtSpecific(VcfRecord record, int sampleIndex) {
     // Short circuit this if none of these filters enabled
-    if (!mSnpsOnly && !mNonSnpsOnly && !mRemoveSameAsRef) {
+    if (!mSnpsOnly && !mNonSnpsOnly && !mRemoveSameAsRef && !mRemoveHom) {
       return true;
     }
     final ArrayList<String> sampleGts = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
@@ -396,9 +397,15 @@ class VcfFilterTask {
       }
     }
 
-    if (mRemoveSameAsRef && allelesSame && refAlleleSeen) {
-      mVcfFilterStatistics.increment(Stat.SAME_AS_REF_FILTERED_COUNT);
-      return false;
+    if (allelesSame) {
+      if (mRemoveSameAsRef && refAlleleSeen) {
+        mVcfFilterStatistics.increment(Stat.SAME_AS_REF_FILTERED_COUNT);
+        return false;
+      }
+      if (mRemoveHom) {
+        mVcfFilterStatistics.increment(Stat.HOM_FILTERED_COUNT);
+        return false;
+      }
     }
     if (multiNucleotideCall) {
       if (mSnpsOnly) {

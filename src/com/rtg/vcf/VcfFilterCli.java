@@ -76,6 +76,7 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String EXCLUDE_VCF = "exclude-vcf";
 
   private static final String REMOVE_SAME_AS_REF = "remove-same-as-ref";
+  private static final String REMOVE_HOM = "remove-hom";
   private static final String REMOVE_ALL_SAME_AS_REF = "remove-all-same-as-ref";
 
   private static final String SNPS_ONLY = "snps-only";
@@ -164,6 +165,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(ALL_SAMPLES, "apply sample-specific criteria to all samples contained in the input VCF").setCategory(INPUT_OUTPUT);
 
     // FORMAT/GT
+    mFlags.registerOptional(REMOVE_HOM, "remove where sample is homozygous").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_SAME_AS_REF, "remove where sample is same as reference").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_ALL_SAME_AS_REF, "remove where all samples are same as reference").setCategory(FILTERING);
 
@@ -360,6 +362,7 @@ public final class VcfFilterCli extends AbstractCli {
     mVcfFilterTask.mResetFailedSampleGts =  mFlags.isSet(CLEAR_FAILED_SAMPLES);
 
     // These involve checking the specified sample field
+    mVcfFilterTask.mRemoveHom = mFlags.isSet(REMOVE_HOM);
     mVcfFilterTask.mRemoveSameAsRef = mFlags.isSet(REMOVE_SAME_AS_REF);
     mVcfFilterTask.mSnpsOnly = mFlags.isSet(SNPS_ONLY);
     mVcfFilterTask.mNonSnpsOnly = mFlags.isSet(NON_SNPS_ONLY);
@@ -403,6 +406,7 @@ public final class VcfFilterCli extends AbstractCli {
     }
 
     final String[] sampleFlags = {
+        REMOVE_HOM,
         REMOVE_SAME_AS_REF,
         SNPS_ONLY, NON_SNPS_ONLY,
         MIN_DEPTH, MAX_DEPTH,
