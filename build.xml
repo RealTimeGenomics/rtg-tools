@@ -448,6 +448,9 @@
     </antcall>
   </target>
 
+
+  <property name="test.jvm.args" value="" />
+
   <target name="runtest" depends="compile-src,compile-test" description="Run a unit test class. -Dtest.class=xxx">
     <fail unless="test.class" message="test.class property must be set"/>
     <property name="regression.root" refid="test.path" />
@@ -460,6 +463,7 @@
       <jvmarg value="-Dregression.root=${regression.root}" />
       <jvmarg value="-Dregression.update=${regression.update}" />
       <jvmarg value="-javaagent:${buildtools.dir}/handlechecker.jar" />
+      <jvmarg line="${test.jvm.args}" />
       <classpath>
         <resources refid="runtime.test.classpath" />
       </classpath>

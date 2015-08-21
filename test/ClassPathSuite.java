@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import com.rtg.util.PortableRandom;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -46,6 +48,7 @@ import junit.framework.TestSuite;
  */
 public class ClassPathSuite extends TestSuite {
 
+  private static final boolean SHUFFLE_TESTS = Boolean.getBoolean("junit.shuffle.tests");
   private static final String PACKAGE_PREFIX = System.getProperty("junit.package.prefix", "com.rtg");
   private static final String CLASSPATH = System.getProperty("java.class.path");
   private static final String CLASS_EXT = ".class";
@@ -60,10 +63,29 @@ public class ClassPathSuite extends TestSuite {
   ClassPathSuite(String packagePrefix) {
     mPackagePrefix = packagePrefix;
     final Class<?>[] testClasses = getTestClasses();
+    if (SHUFFLE_TESTS) { // Run test classes in random order to help detect any stray inter-test dependencies
+      shuffle(testClasses);
+    }
     System.err.println("Found " + testClasses.length + " test classes with package prefix \"" + mPackagePrefix + "\"");
     for (Class<?> c : testClasses) {
       //System.err.println("Adding tests from: " + c.getSimpleName());
       addTestSuite(c);
+    }
+  }
+
+  /**
+   * Randomize an array in place.
+   * @param arr a non-null array
+   * @param <T> the type of array elements.
+   */
+  public static <T> void shuffle(T[] arr) {
+    final PortableRandom r = new PortableRandom();
+    System.err.println("Shuffling tests with seed: " + r.getSeed());
+    for (int i = 0; i < arr.length; i++) {
+      final int z = r.nextInt(arr.length - i);
+      final T t = arr[i + z];
+      arr[i + z] = arr[i];
+      arr[i] = t;
     }
   }
 
