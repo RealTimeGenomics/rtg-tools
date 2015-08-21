@@ -29,57 +29,42 @@
  */
 package com.rtg.launcher;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-import com.rtg.util.Utils;
 import com.rtg.util.cli.CommandLine;
-import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.Talkback;
+import com.rtg.util.test.NanoRegression;
+
+import junit.framework.TestCase;
 
 /**
- * Simple object for holding the results of a command main execution.
+ * Since most of the nano regression tests run pseudo-command-lines, it helps to have
+ * a nice set up and tear down implementation that removes side effects.
  */
-public final class MainResult {
+public abstract class AbstractNanoTest extends TestCase {
 
-  /**
-   * Runs the main method of a cli class and collect the results for comparison in tests.
-   *
-   * @param cli the command module.
-   * @param args command line arguments.
-   * @return a result object containing the return code, and contents of stdout and stderr.
-   */
-  public static MainResult run(AbstractCli cli, String... args) {
-    final ByteArrayOutputStream out = new ByteArrayOutputStream();
-    final MemoryPrintStream err = new MemoryPrintStream();
+  protected NanoRegression mNano;
+
+  @Override
+  public void setUp() throws IOException {
     GlobalFlags.resetAccessedStatus();
-    CommandLine.setCommandArgs(Utils.append(new String[] {cli.moduleName() }, args));
-    final int rc = cli.mainInit(args, out, err.printStream());
     CommandLine.clearCommandArgs();
-    return new MainResult(rc, out.toString(), err.toString());
+    Diagnostic.setLogStream();
+    mNano = new NanoRegression(this.getClass());
   }
 
-  private final int mRc;
-  private final String mOut;
-  private final String mErr;
-
-  private MainResult(int rc, String out, String err) {
-    mRc = rc;
-    mOut = out;
-    mErr = err;
-  }
-
-  /** @return the result code */
-  public int rc() {
-    return mRc;
-  }
-
-  /** @return the contents of standard output */
-  public String out() {
-    return mOut;
-  }
-
-  /** @return the contents of standard error */
-  public String err() {
-    return mErr;
+  @Override
+  public void tearDown() throws IOException {
+    GlobalFlags.resetAccessedStatus();
+    CommandLine.clearCommandArgs();
+    Diagnostic.setLogStream();
+    Talkback.setModuleName(null);
+    try {
+      mNano.finish();
+    } finally {
+      mNano = null;
+    }
   }
 
 }

@@ -101,12 +101,4 @@ public class PedFilterCli extends AbstractCli {
     return 0;
   }
 
-
-  /**
-   * Command line entry point
-   * @param args command line params
-   */
-  public static void main(String[] args) {
-    new PedFilterCli().mainInit(args, System.out, System.err);
-  }
 }

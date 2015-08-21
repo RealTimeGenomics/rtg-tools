@@ -191,18 +191,6 @@ public final class ArrayUtils {
   }
 
   /**
-   * Reverse a byte array in place.
-   * @param arr the array to reverse.
-   */
-  public static void reverseArrayInPlace(final byte[] arr) {
-    for (int i = 0, j = arr.length - 1; i < j; i++, j--) {
-      final byte temp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = temp;
-    }
-  }
-
-  /**
    * Checks that a segment of an array is sorted.
    * @param arr1 primary array
    * @param start the first position to check (inclusive)
@@ -254,4 +242,5 @@ public final class ArrayUtils {
     }
     return true;
   }
+
 }

@@ -36,44 +36,29 @@ import java.io.StringWriter;
 
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.cli.CommandLine;
 import com.rtg.util.cli.TestCFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.MemoryPrintStream;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 
 /**
  * Abstract tests for AbstractCli subclasses
  *
  */
-public abstract class AbstractCliTest extends TestCase {
+public abstract class AbstractCliTest extends AbstractNanoTest {
 
   protected AbstractCli mCli;
 
-  protected NanoRegression mNano;
-
   @Override
   public void setUp() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    CommandLine.clearCommandArgs();
-    Diagnostic.setLogStream();
+    super.setUp();
     mCli = getCli();
-    mNano = new NanoRegression(this.getClass());
   }
 
   @Override
   public void tearDown() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    Diagnostic.setLogStream();
     mCli = null;
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
+    super.tearDown();
   }
 
   protected abstract AbstractCli getCli();

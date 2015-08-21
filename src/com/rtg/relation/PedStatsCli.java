@@ -190,13 +190,4 @@ public class PedStatsCli extends AbstractCli {
     }
     return 0;
   }
-
-
-  /**
-   * Command line entry point
-   * @param args command line params
-   */
-  public static void main(String[] args) {
-    new PedStatsCli().mainInit(args, System.out, System.err);
-  }
 }

@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.rtg.util.Utils;
 import com.rtg.util.array.longindex.LongCreate;
 import com.rtg.util.array.longindex.LongIndex;
 
@@ -171,7 +172,7 @@ public class ArrayUtilsTest extends TestCase {
 
   public void testReverseArrayInPlace() {
     final byte[] test = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-    ArrayUtils.reverseArrayInPlace(test);
+    Utils.reverseInPlace(test);
     for (int i = 0; i < test.length; i++) {
       assertEquals(9 - i, test[i]);
     }

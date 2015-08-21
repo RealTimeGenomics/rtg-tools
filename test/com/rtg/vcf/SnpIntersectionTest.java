@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -278,7 +277,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
           "-Z", "-c"};
     }
 
-    final String out = checkMainInitOk(argsForward);
+    String out = checkMainInitOk(argsForward);
     //System.err.println(bos.toString());
     final String status = FileUtils.fileToString(new File(outDirFirstSecond, "summary.txt"));
     assertEquals(EXPECTED_MESSAGE1, status);
@@ -305,15 +304,10 @@ public final class SnpIntersectionTest extends AbstractCliTest {
         "Start loading first file...",
         "Start loading second file...");
 
-    final ByteArrayOutputStream bos2 = new ByteArrayOutputStream();
-    try {
-      assertEquals(0, ins.mainInit(argsReverse, bos2, TestUtils.getNullPrintStream()));
-    } finally {
-      bos2.close();
-    }
+    out = checkMainInitOk(argsReverse);
     final String status2 = FileUtils.fileToString(new File(outDirSecondFirst, "summary.txt"));
     assertEquals(EXPECTED_MESSAGE2, status2);
-    assertEquals(EXPECTED_MESSAGE2, bos2.toString());
+    assertEquals(EXPECTED_MESSAGE2, out);
     final File firstOnlyReverse = new File(outDirSecondFirst, "first-only.vcf" + gzipSuff);
     assertTrue(firstOnlyReverse.exists());
     final File secondOnlyReverse = new File(outDirSecondFirst, "second-only.vcf" + gzipSuff);

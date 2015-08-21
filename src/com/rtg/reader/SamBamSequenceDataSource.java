@@ -43,7 +43,7 @@ import com.rtg.sam.SamFilter;
 import com.rtg.sam.SamFilterIterator;
 import com.rtg.sam.SamUtils;
 import com.rtg.sam.SkipInvalidRecordsIterator;
-import com.rtg.util.array.ArrayUtils;
+import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 import htsjdk.samtools.SAMFileHeader.SortOrder;
@@ -271,7 +271,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
     }
     if (mRecords[mRecordIndex].getReadNegativeStrandFlag()) {
       quals = Arrays.copyOf(quals, quals.length);
-      ArrayUtils.reverseArrayInPlace(quals);
+      Utils.reverseInPlace(quals);
     }
     return quals;
   }

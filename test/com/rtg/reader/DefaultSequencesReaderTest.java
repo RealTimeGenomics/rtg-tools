@@ -38,10 +38,9 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.rtg.ToolsEntry;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.DnaUtils;
-import com.rtg.util.TestUtils;
+import com.rtg.util.cli.CommandLine;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
@@ -134,39 +133,41 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
 
   public void testCopy() throws IOException {
     //set a command line.
-    new ToolsEntry().intMain(new String[]{"feh", "-f", "super feh"}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream());
-
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test1\nacgta\n"
-                      + ">test2\nagtcatg\n"
-                      + ">test3\nacgtttggct\n"
-                      + ">test4\natggcttagctacagt\n"
-                      + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
-                      + ">test6\na"));
-    //0, 5, 12, 22, 38,
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-            new DNAFastaSymbolTable());
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 20000, PrereadType.UNKNOWN, false);
-    sw.setComment("blah rag");
-    sw.processSequences();
-    try (SequencesReader r = createSequencesReader(mDir)) {
-      try (SequencesReader rCopy = r.copy()) {
-        assertEquals(r.dataChecksum(), rCopy.dataChecksum());
-        assertEquals(r.qualityChecksum(), rCopy.qualityChecksum());
-        assertEquals(r.nameChecksum(), rCopy.nameChecksum());
-        assertEquals(r.maxLength(), rCopy.maxLength());
-        assertEquals(r.minLength(), rCopy.minLength());
-        assertEquals(r.numberSequences(), rCopy.numberSequences());
-        assertEquals(r.sdfVersion(), rCopy.sdfVersion());
-        if (r instanceof AnnotatedSequencesReader) {
-          final AnnotatedSequencesReader rCast = (AnnotatedSequencesReader) r;
-          final AnnotatedSequencesReader rCopyCast = (AnnotatedSequencesReader) rCopy;
-          assertEquals(rCast.comment(), rCopyCast.comment());
-          assertEquals("feh -f \"super feh\"", rCopyCast.commandLine());
+    CommandLine.setCommandArgs("feh", "-f", "super feh");
+    try {
+      final ArrayList<InputStream> al = new ArrayList<>();
+      al.add(createStream(">test1\nacgta\n"
+        + ">test2\nagtcatg\n"
+        + ">test3\nacgtttggct\n"
+        + ">test4\natggcttagctacagt\n"
+        + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
+        + ">test6\na"));
+      //0, 5, 12, 22, 38,
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
+        new DNAFastaSymbolTable());
+      final SequencesWriter sw = new SequencesWriter(ds, mDir, 20000, PrereadType.UNKNOWN, false);
+      sw.setComment("blah rag");
+      sw.processSequences();
+      try (SequencesReader r = createSequencesReader(mDir)) {
+        try (SequencesReader rCopy = r.copy()) {
+          assertEquals(r.dataChecksum(), rCopy.dataChecksum());
+          assertEquals(r.qualityChecksum(), rCopy.qualityChecksum());
+          assertEquals(r.nameChecksum(), rCopy.nameChecksum());
+          assertEquals(r.maxLength(), rCopy.maxLength());
+          assertEquals(r.minLength(), rCopy.minLength());
+          assertEquals(r.numberSequences(), rCopy.numberSequences());
+          assertEquals(r.sdfVersion(), rCopy.sdfVersion());
+          if (r instanceof AnnotatedSequencesReader) {
+            final AnnotatedSequencesReader rCast = (AnnotatedSequencesReader) r;
+            final AnnotatedSequencesReader rCopyCast = (AnnotatedSequencesReader) rCopy;
+            assertEquals(rCast.comment(), rCopyCast.comment());
+            assertEquals("feh -f \"super feh\"", rCopyCast.commandLine());
+          }
         }
       }
+    } finally {
+      CommandLine.clearCommandArgs();
     }
-
   }
 
   static final String FASTA = ">r0" + LS + "ACGTACG" + LS

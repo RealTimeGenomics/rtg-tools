@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
-import com.rtg.ToolsEntry;
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.DnaUtils;
@@ -46,6 +45,7 @@ import com.rtg.util.PortableRandom;
 import com.rtg.util.TestUtils;
 import com.rtg.util.bytecompression.MultiByteArray;
 import com.rtg.util.bytecompression.MultiByteArrayTest;
+import com.rtg.util.cli.CommandLine;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
@@ -67,7 +67,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     assertEquals((byte) 0x37, crc(new byte[] {3}));
     assertEquals((byte) 0x94, crc(new byte[] {4}));
 
-    assertEquals((byte) 0xBB, crc(new byte[] {4, 0, 1, 3, 2, 3, 1, 4, 0, 2, 3, 3, 3}));
+    assertEquals((byte) 0xBB, crc(new byte[]{4, 0, 1, 3, 2, 3, 1, 4, 0, 2, 3, 3, 3}));
   }
 
   private byte crc(final byte[] data) {
@@ -131,23 +131,26 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
 
   public void testInfo() throws IOException {
     //set a command line
-    new ToolsEntry().intMain(new String[]{"aksfj", "-d", "djfk siduf"}, TestUtils.getNullOutputStream(), TestUtils.getNullPrintStream());
-
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob-the-builder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
-    sw.setComment("wejksfd boier sakrjoieje");
-    sw.processSequences();
-    final CompressedMemorySequencesReader msr = (CompressedMemorySequencesReader) SequencesReaderFactory.createMemorySequencesReader(mDir, true, LongRange.NONE);
-    checkDetails(msr);
-    final CompressedMemorySequencesReader msr2 = (CompressedMemorySequencesReader) msr.copy();
-    assertTrue(msr2 != msr);
-    checkDetails(msr2);
-    assertEquals("wejksfd boier sakrjoieje", msr.comment());
-    assertEquals("wejksfd boier sakrjoieje", msr2.comment());
-    assertEquals("aksfj -d \"djfk siduf\"", msr.commandLine());
-    assertEquals("aksfj -d \"djfk siduf\"", msr2.commandLine());
+    CommandLine.setCommandArgs("aksfj", "-d", "djfk siduf");
+    try {
+      final ArrayList<InputStream> al = new ArrayList<>();
+      al.add(createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob-the-builder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
+      sw.setComment("wejksfd boier sakrjoieje");
+      sw.processSequences();
+      final CompressedMemorySequencesReader msr = (CompressedMemorySequencesReader) SequencesReaderFactory.createMemorySequencesReader(mDir, true, LongRange.NONE);
+      checkDetails(msr);
+      final CompressedMemorySequencesReader msr2 = (CompressedMemorySequencesReader) msr.copy();
+      assertTrue(msr2 != msr);
+      checkDetails(msr2);
+      assertEquals("wejksfd boier sakrjoieje", msr.comment());
+      assertEquals("wejksfd boier sakrjoieje", msr2.comment());
+      assertEquals("aksfj -d \"djfk siduf\"", msr.commandLine());
+      assertEquals("aksfj -d \"djfk siduf\"", msr2.commandLine());
+    } finally {
+      CommandLine.clearCommandArgs();
+    }
   }
 
   private void checkDetails(final CompressedMemorySequencesReader msr) throws IOException {
