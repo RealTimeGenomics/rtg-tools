@@ -58,7 +58,7 @@ public class ParseRocFileTest extends TestCase {
           + "0.700\t406000.000\t11337" + StringUtils.LS
           + "0.533\t1971000.000\t1446920" + StringUtils.LS
           + "0.333\t2071000.000\t1646920" + StringUtils.LS
-          + "0.200\t2995295.000\t1864591" + StringUtils.LS;
+          + "None\t2995295.000\t1864591" + StringUtils.LS;
 
   public void test() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {

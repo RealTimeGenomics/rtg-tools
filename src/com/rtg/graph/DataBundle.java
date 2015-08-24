@@ -44,19 +44,19 @@ final class DataBundle {
   private static final int TOTAL_LABELS = 10;
 
   private final Point2D[] mPoints;
-  private final float[] mScores;
+  private final String[] mScores;
 
   private String mTitle;
   private final int mTotalVariants;
   private boolean mShow;
 
   private Point2D[] mRangedPoints = null;
-  private float[] mRangedScores = null;
+  private String[] mRangedScores = null;
   private TextPoint2D[] mRangedPosPoints = null;
 
-  DataBundle(String title, Point2D[] points, float[] scores, int totalVariants) {
+  DataBundle(String title, Point2D[] points, String[] labels, int totalVariants) {
     mPoints = points;
-    mScores = scores;
+    mScores = labels;
     mTitle = title;
     mTotalVariants = totalVariants;
     mShow = true;
@@ -80,7 +80,7 @@ final class DataBundle {
     final int smin = (int) (min * mScores.length);
     final int smax = (int) (max * mScores.length);
 
-    final ArrayList<Float> scores = new ArrayList<>();
+    final ArrayList<String> scores = new ArrayList<>();
     final ArrayList<Point2D> points = new ArrayList<>();
 
     for (int i = smin; i < smax; i++) {
@@ -89,7 +89,7 @@ final class DataBundle {
     }
 
     mRangedPoints = points.toArray(new Point2D[points.size()]);
-    mRangedScores = new float[scores.size()];
+    mRangedScores = new String[scores.size()];
     for (int i = 0; i < scores.size(); i++) {
       mRangedScores[i] = scores.get(i);
     }
@@ -125,7 +125,7 @@ final class DataBundle {
     if (countTotal != 0) {
       final int step = countTotal / TOTAL_LABELS;
       Point2D p = mRangedPoints[0];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), String.format("%.3g", mRangedScores[0])));
+      posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[0]));
       if (step != 0) {
         int c = 0;
         for (int i = 0; i < counts.size(); i++) {
@@ -133,14 +133,14 @@ final class DataBundle {
             c++;
             if (c != 0 && c % step == 0) {
               p = mRangedPoints[i];
-              posPoints.add(new TextPoint2D(p.getX(), p.getY(), String.format("%.3g", mRangedScores[i])));
+              posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[i]));
             }
           }
         }
       }
       final int end = mRangedScores.length - 1;
       p = mRangedPoints[end];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), String.format("%.3g", mRangedScores[end])));
+      posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[end]));
     }
     mRangedPosPoints = posPoints.toArray(new TextPoint2D[posPoints.size()]);
   }
