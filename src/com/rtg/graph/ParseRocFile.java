@@ -58,14 +58,14 @@ public final class ParseRocFile {
     int lines = 0;
     int totalVariants = -1;
     final ArrayList<Point2D> points = new ArrayList<>();
-    final ArrayList<Float> scores = new ArrayList<>();
+    final ArrayList<String> scores = new ArrayList<>();
 
     String line = null;
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
-      float prevScore = Float.MIN_VALUE;
+      String prevScore = null;
       float prevX = 0.0f;
       float prevY = 0.0f;
-      float score = 0.0f;
+      String score = String.format("%.3g", 0.0f);
       while ((line = br.readLine()) != null) {
         if (line.startsWith("#")) {
           if (line.contains("#total")) {
@@ -80,8 +80,13 @@ public final class ParseRocFile {
         }
         final float x = Float.parseFloat(linearr[2]); // False positives
         final float y = Float.parseFloat(linearr[1]); // True positives
-        score = Float.parseFloat(linearr[0]); // Score
-        if (Float.compare(score, prevScore) != 0) {
+        try {
+          final float numeric = Float.parseFloat(linearr[0]); // Score
+          score = String.format("%.3g", numeric);
+        } catch (final NumberFormatException e) {
+          score = linearr[0];
+        }
+        if (prevScore == null || score.compareTo(prevScore) != 0) {
           points.add(new Point2D(prevX, prevY));
           scores.add(score);
         }
@@ -99,11 +104,7 @@ public final class ParseRocFile {
     } catch (final NumberFormatException e) {
       throw new NoTalkbackSlimException("Malformed line: " + line + " in \"" + shortName + "\"");
     }
-    final float[] scoresArr = new float[scores.size()];
-    for (int i = 0; i < scores.size(); i++) {
-      scoresArr[i] = scores.get(i);
-    }
     progressBarDelegate.addFile(lines);
-    return new DataBundle(shortName, points.toArray(new Point2D[points.size()]), scoresArr, totalVariants);
+    return new DataBundle(shortName, points.toArray(new Point2D[points.size()]), scores.toArray(new String[scores.size()]), totalVariants);
   }
 }

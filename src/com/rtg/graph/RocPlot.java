@@ -336,7 +336,7 @@ public final class RocPlot {
 
   // Adds the notion of painting a current crosshair position
   @JumbleIgnore
-  private class RocZoomPlotPanel extends ZoomPlotPanel {
+  private static class RocZoomPlotPanel extends ZoomPlotPanel {
     private final PlotPanel mPlotPanel;
     private Point mCrosshair; // In TP / FP coordinates.
     RocZoomPlotPanel(PlotPanel plotPanel, Container container) {
