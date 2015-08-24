@@ -33,51 +33,28 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SdfId;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.TestUtils;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.Talkback;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.VcfMerge;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class AlleleAccumulatorTest extends TestCase {
-
-
-  private NanoRegression mNano = null;
-
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
-    mNano = new NanoRegression(this.getClass(), false);
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    Diagnostic.setLogStream();
-    // clear the module name so later tests don't report SlimException to the
-    // Talkback system
-    Talkback.setModuleName(null);
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class AlleleAccumulatorTest extends AbstractNanoTest {
 
   public void testAccumulate() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_small_recode");
+  }
+
+  public void endToEnd(String id) throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcfeval-accumulate")) {
       final File template = new File(dir, "template");
-      final String id = "vcfeval_small_recode";
       ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_template.fa"), template, new SdfId(0));
 
       final File empty = new File(dir, "empty.vcf.gz");
@@ -89,44 +66,51 @@ public class AlleleAccumulatorTest extends TestCase {
       new TabixIndexer(samples).saveVcfIndex();
 
       // Accumulate 4 samples into population alleles
-      File current = empty;
-      for (int i = 1; i < 5; i++) {
-        final File output = new File(dir, "accum" + i);
-        final MainResult res = MainResult.run(new VcfEvalCli(),
-          "-o", output.getPath(), "--sample", "SAMPLE" + i,
-          "-t", template.getPath(), "-b", current.getPath(), "-c", samples.getPath(),
-          "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
-          "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
-          "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
-        assertTrue(res.err(), i == 1 || res.rc() == 0);
-        current = new File(output, "alleles.vcf.gz");
-      }
-
-      // Check accumulated
+      final File current = accumulate(dir, template, samples, empty);
       mNano.check(id + "_alleles.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(current)));
 
       // Run recode of the original samples w.r.t. population alleles
-      final String[] mergeArgs = new String[6];
-      for (int i = 1; i < 5; i++) {
-        final File output = new File(dir, "recode" + i);
-        final MainResult res = MainResult.run(new VcfEvalCli(),
-          "-o", output.getPath(), "--sample", "SAMPLE" + i,
-          "-t", template.getPath(), "-b", current.getPath(), "-c", samples.getPath(),
-          "--XXcom.rtg.vcf.eval.custom-path-processor=recode",
-          "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
-          "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
-        assertTrue(res.err(), res.rc() == 0);
-        mergeArgs[i + 1] = new File(output, "sample.vcf.gz").getPath();
-      }
-
-      // Merge results into one VCF
-      final File merged = new File(dir, "recoded.vcf.gz");
-      mergeArgs[0] = "-o";
-      mergeArgs[1] = merged.getPath();
-      final MainResult res = MainResult.run(new VcfMerge(), mergeArgs);
-      assertTrue(res.err(), res.rc() == 0);
-
+      final File merged = recode(dir, template, samples, current);
       mNano.check(id + "_recoded.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(merged)));
     }
+  }
+
+  public File recode(TestDirectory dir, File template, File samples, File alleles) {
+    final String[] mergeArgs = new String[6];
+    for (int i = 1; i < 5; i++) {
+      final File output = new File(dir, "recode" + i);
+      final MainResult res = MainResult.run(new VcfEvalCli(),
+        "-o", output.getPath(), "--sample", "SAMPLE" + i,
+        "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
+        "--XXcom.rtg.vcf.eval.custom-path-processor=recode",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+        "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
+      assertTrue(res.err(), res.rc() == 0);
+      mergeArgs[i + 1] = new File(output, "sample.vcf.gz").getPath();
+    }
+
+    // Merge results into one VCF
+    final File merged = new File(dir, "recoded.vcf.gz");
+    mergeArgs[0] = "-o";
+    mergeArgs[1] = merged.getPath();
+    final MainResult res = MainResult.run(new VcfMerge(), mergeArgs);
+    assertTrue(res.err(), res.rc() == 0);
+    return merged;
+  }
+
+  public File accumulate(TestDirectory dir, File template, File samples, File initial) {
+    File alleles = initial;
+    for (int i = 1; i < 5; i++) {
+      final File output = new File(dir, "accum" + i);
+      final MainResult res = MainResult.run(new VcfEvalCli(),
+        "-o", output.getPath(), "--sample", "SAMPLE" + i,
+        "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
+        "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+        "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
+      assertTrue(res.err(), i == 1 || res.rc() == 0);
+      alleles = new File(output, "alleles.vcf.gz");
+    }
+    return alleles;
   }
 }
