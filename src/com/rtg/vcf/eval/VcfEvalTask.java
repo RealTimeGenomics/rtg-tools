@@ -142,6 +142,10 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       case "recode":
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
+      case "unified":
+        final RocSortValueExtractor rocExtractor1 = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
+        processor = new UnifiedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor1, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        break;
       default:
         final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
         processor = new DefaultEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputBaselineTp(), params.outputSlopeFiles(), params.rtgStats());

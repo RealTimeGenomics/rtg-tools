@@ -112,6 +112,19 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
   }
 
   @Override
+  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
+    // Deal with both as though they were at independent positions
+    if (unknownBaseline) {
+      handleUnknownBaseline();
+      mBrv = null;
+    }
+    if (unknownCall) {
+      handleUnknownCall();
+      mCrv = null;
+    }
+  }
+
+  @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());

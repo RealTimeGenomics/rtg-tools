@@ -57,9 +57,12 @@ public class VcfRecord implements SequenceNameLocus {
   /** VCF missing value string **/
   public static final String MISSING = "" + VcfUtils.MISSING_VALUE;
 
-  private static final String FORMAT_AND_SAMPLE_SEPARATOR = ":";
-  private static final String FILTER_AND_INFO_SEPARATOR = ";";
-  private static final String ALT_CALL_INFO_SEPARATOR = ",";
+  /** The character used to delimit subfields within FORMAT and SAMPLE fields */
+  public static final String FORMAT_AND_SAMPLE_SEPARATOR = ":";
+  /** The character used to delimit subfields within FILTER and INFO fields */
+  public static final String FILTER_AND_INFO_SEPARATOR = ";";
+  /** The character used to delimit ALT alleles and multi-valued subfield values */
+  public static final String ALT_CALL_INFO_SEPARATOR = ",";
 
   private String mSequence;
   private int mStart = -1;
@@ -100,7 +103,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @param dropUnmergeable if true, any non-mergeable FORMAT fields will be dropped, allowing merge to proceed.
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
-  static VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
+  public static VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
     final VcfRecord merged = new VcfRecord();
     merged.mSequence = records[0].mSequence;
     merged.mStart = records[0].mStart;

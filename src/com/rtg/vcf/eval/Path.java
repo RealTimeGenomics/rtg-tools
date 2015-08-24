@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
 
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.Pair;
@@ -290,22 +289,22 @@ public final class Path implements Comparable<Path> {
   public String toString() {
     return "Path:" + StringUtils.LS + "baseline=" + mBaselinePath + "called=" + mCalledPath + "syncpoints(0-based)=" + HalfPath.listToString(this.mSyncPointList);
   }
-  public List<SyncPoint> getSyncPoints() {
-    return getSyncPointsList(mSyncPointList, getCalledIncluded(), getBaselineIncluded());
+
+  public List<Integer> getSyncPoints() {
+    final List<Integer> result = new ArrayList<>();
+    for (final Integer syncpoint : mSyncPointList) {
+      result.add(syncpoint);
+    }
+    Collections.reverse(result);
+    return result;
   }
 
   // Counts the baseline and called variants between each sync point
-  static List<SyncPoint> getSyncPointsList(final BasicLinkedListNode<Integer> syncpoints, final List<OrientedVariant> baseLine, final List<OrientedVariant> called) {
-    // Push all the sync points onto a stack so we can process in reverse order.
-    final Stack<Integer> stack = new Stack<>();
-    for (final Integer syncpoint : syncpoints) {
-      stack.push(syncpoint);
-    }
+  static List<SyncPoint> getSyncPointsList(final List<Integer> syncpoints, final List<OrientedVariant> baseLine, final List<OrientedVariant> called) {
     final List<SyncPoint> list = new ArrayList<>();
     int basePos = 0;
     int callPos = 0;
-    while (!stack.isEmpty()) {
-      final int loc = stack.pop();
+    for (int loc : syncpoints) {
       int baseLineCount = 0;
       int calledCount = 0;
       while (basePos < baseLine.size() && baseLine.get(basePos).getStart() <= loc) {
@@ -322,6 +321,7 @@ public final class Path implements Comparable<Path> {
     return list;
   }
 
+
   /**
    * Find a weighting for all the TP calls in a path.
    * this is done by sync points, within each <code>SyncPoint</code>
@@ -333,14 +333,15 @@ public final class Path implements Comparable<Path> {
    * return 2 lists first for TP and second for FP, we create FP calls when current call is included but does not correspond to a TP (this can happen when two calls cancel each other out when replayed)
    *
    * @param best best path
-   * @param calledTruePositives called true positives
-   * @param baseLineTruePositives baseline true positives
-   *
    * @return pair of called true positive and false positives
    */
+  static Pair<List<OrientedVariant>, List<OrientedVariant>> calculateWeights(final Path best) {
+    return calculateWeights(best, best.getCalledIncluded(), best.getBaselineIncluded());
+  }
+
   static Pair<List<OrientedVariant>, List<OrientedVariant>> calculateWeights(final Path best, final List<OrientedVariant> calledTruePositives, final List<OrientedVariant> baseLineTruePositives) {
     assert best.mSyncPointList.size() >= 1;
-    final List<SyncPoint> syncpoints = getSyncPointsList(best.mSyncPointList, baseLineTruePositives, calledTruePositives);
+    final List<SyncPoint> syncpoints = getSyncPointsList(best.getSyncPoints(), baseLineTruePositives, calledTruePositives);
     //Diagnostic.warning("Best path sync points" + syncpoints);
     assert syncpoints.size() == best.mSyncPointList.size();
 

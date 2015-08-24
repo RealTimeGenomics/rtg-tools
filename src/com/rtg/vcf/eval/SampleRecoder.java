@@ -209,6 +209,19 @@ public class SampleRecoder extends MergingEvalSynchronizer {
   }
 
   @Override
+  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
+    // Deal with both as though they were at independent positions
+    if (unknownBaseline) {
+      handleUnknownBaseline();
+      mBrv = null;
+    }
+    if (unknownCall) {
+      handleUnknownCall();
+      mCrv = null;
+    }
+  }
+
+  @Override
   void finish() throws IOException {
     super.finish();
     if (mCalledNotInPath > 0) {

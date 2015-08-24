@@ -44,7 +44,6 @@ import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 
@@ -85,67 +84,74 @@ class SequenceEvaluator implements IORunnable {
     Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
     if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
-      mSynchronize.write(currentName, baseLineCalls, calledCalls);
+      mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList());
     } else {
       //find the best path for variant calls
       final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
 
       if (DUMP_BEST_PATH) {
         System.out.println("#### " + best);
-        final Range interesting = new SequenceNameLocusSimple(currentName, best.getSyncPoints().get(0).getPos(), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
+        final Range interesting = new SequenceNameLocusSimple(currentName, best.getSyncPoints().get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
         System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));
         System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
         System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
       }
 
-      // A Bunch of postprocessing that could probably be done in bestPath
-      List<OrientedVariant> truePositives = best.getCalledIncluded();
-      final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
-      final List<Variant> falsePositives = best.getCalledExcluded();
-      final List<Variant> falseNegatives = best.getBaselineExcluded();
-
-      final Pair<List<OrientedVariant>, List<OrientedVariant>> newcalls = Path.calculateWeights(best, truePositives, baselineTruePositives);
-      // this step is currently necessary as sometimes you can (rarely) have variants included in the best path
-      // but they do not correspond to any variant in baseline. // E.g. two variants which when both replayed cancel each other out.
-      truePositives = newcalls.getA();
-      merge(falsePositives, newcalls.getB());
-
-      Diagnostic.developerLog("Merging variant result lists for " + currentName + "...");
-      List<VariantId> baseline = new ArrayList<>(baselineTruePositives.size() + falseNegatives.size());
-      baseline.addAll(baselineTruePositives);
-      baseline.addAll(falseNegatives);
-      List<VariantId> calls = new ArrayList<>(truePositives.size() + falsePositives.size());
-      calls.addAll(truePositives);
-      calls.addAll(falsePositives);
-      // Sort by ID to ensure the ordering matches what is needed for variant writing
-      Collections.sort(baseline, Variant.ID_COMPARATOR);
-      Collections.sort(calls, Variant.ID_COMPARATOR);
-
-      // Merge any variants that were unable to be processed during path finding due to too-hard regions
-      Diagnostic.developerLog("Checking for variants from skipped regions for " + currentName + "...");
-      baseline = insertSkipped(baseline, baseLineCalls);
-      calls = insertSkipped(calls, calledCalls);
+      Diagnostic.developerLog("Post-processing variant result lists for " + currentName + "...");
+      final PathResult result = postProcess(best, baseLineCalls, calledCalls);
 
       final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
       mSynchronize.addPhasingCounts(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
 
       Diagnostic.developerLog("Ready to write variants for " + currentName + "...");
-      mSynchronize.write(currentName, baseline, calls);
+      mSynchronize.write(currentName, result.mBaseline, result.mCalled, result.mSyncPoints);
     }
   }
 
-  private boolean isSortedById(Collection<? extends VariantId> c) {
-    VariantId last = null;
-    for (VariantId v : c) {
-      if (last != null && v.getId() <= last.getId()) {
-        return false;
-      }
-      last = v;
+  private static final class PathResult {
+    final List<Integer> mSyncPoints;
+    final List<VariantId> mBaseline;
+    final List<VariantId> mCalled;
+
+    public PathResult(List<Integer> syncPoints, List<VariantId> baseline, List<VariantId> called) {
+      mSyncPoints = syncPoints;
+      mBaseline = baseline;
+      mCalled = called;
     }
-    return true;
   }
 
-  private List<VariantId> insertSkipped(List<VariantId> outVars, Collection<Variant> inVars) {
+  static PathResult postProcess(Path best, Collection<Variant> baseLineCalls, Collection<Variant> calledCalls) {
+    List<OrientedVariant> truePositives = best.getCalledIncluded();
+    final List<Variant> falsePositives = best.getCalledExcluded();
+    final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
+    final List<Variant> falseNegatives = best.getBaselineExcluded();
+
+    final Pair<List<OrientedVariant>, List<OrientedVariant>> newcalls = Path.calculateWeights(best, truePositives, baselineTruePositives);
+    // this step is currently necessary as sometimes you can (rarely) have variants included in the best path
+    // but they do not correspond to any variant in baseline.
+    // E.g. two variants which when both replayed cancel each other out.
+    truePositives = newcalls.getA();
+    for (OrientedVariant v : newcalls.getB()) {
+      falsePositives.add(v.variant());
+    }
+
+    final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, falseNegatives);
+    final List<VariantId> calls = mergeVariants(calledCalls, truePositives, falsePositives);
+    return new PathResult(best.getSyncPoints(), baseline, calls);
+  }
+
+  private static List<VariantId> mergeVariants(Collection<Variant> allVariants, List<OrientedVariant> included, List<Variant> excluded) {
+    List<VariantId> merged = new ArrayList<>(included.size() + excluded.size());
+    merged.addAll(included);
+    merged.addAll(excluded);
+    // Sort by ID to ensure the ordering matches what is needed for variant writing and skipped variant insertion
+    Collections.sort(merged, Variant.ID_COMPARATOR);
+    // Merge any variants that were unable to be processed during path finding due to too-hard regions
+    merged = insertSkipped(merged, allVariants);
+    return merged;
+  }
+
+  private static List<VariantId> insertSkipped(List<VariantId> outVars, Collection<Variant> inVars) {
     assert isSortedById(inVars) : "inVars are not sorted";
     assert isSortedById(outVars) : " outVars are not sorted";
     final List<VariantId> result = new ArrayList<>(outVars.size());
@@ -165,14 +171,14 @@ class SequenceEvaluator implements IORunnable {
     return result;
   }
 
-  private void merge(List<Variant> falsePositives, List<OrientedVariant> b) {
-    if (b.size() == 0) {
-      return;
+  private static boolean isSortedById(Collection<? extends VariantId> c) {
+    VariantId last = null;
+    for (VariantId v : c) {
+      if (last != null && v.getId() <= last.getId()) {
+        return false;
+      }
+      last = v;
     }
-    for (OrientedVariant v : b) {
-      falsePositives.add(v.variant());
-    }
-    Collections.sort(falsePositives, new IntervalComparator());
-
+    return true;
   }
 }

@@ -101,9 +101,10 @@ public abstract class EvalSynchronizer implements Closeable {
    * @param sequenceName current sequence name
    * @param baseline variants (either oriented if true positive, or variant if excluded)
    * @param calls variants (either oriented if true positive, or variant if excluded)
+   * @param syncPoints the list of sync points
    * @throws IOException when IO fails
    */
-  void write(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException {
+  void write(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException {
     synchronized (mNames) {
       // wait for our turn to write results. Keeping output in order.
       while (!mNames.peek().equals(sequenceName)) {
@@ -118,7 +119,7 @@ public abstract class EvalSynchronizer implements Closeable {
     }
 
     Diagnostic.developerLog("Writing variants for " + sequenceName);
-    writeInternal(sequenceName, baseline, calls);
+    writeInternal(sequenceName, baseline, calls, syncPoints);
 
     synchronized (mNames) {
       // We are done with a sequence so take it off the queue
@@ -127,7 +128,7 @@ public abstract class EvalSynchronizer implements Closeable {
     }
   }
 
-  abstract void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException;
+  abstract void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException;
 
   void addPhasingCounts(int misPhasings, int correctPhasings, int unphasable) {
     synchronized (mPhasingLock) {

@@ -55,7 +55,7 @@ public final class PhasingEvaluator {
   static PhasingResult countMisphasings(Path best) {
     final CallIterator baseline = new CallIterator(best.getBaselineIncluded(), best.getBaselineExcluded());
     final CallIterator calls = new CallIterator(best.getCalledIncluded(), best.getCalledExcluded());
-    final List<Path.SyncPoint> sync = best.getSyncPoints();
+    final List<Integer> sync = best.getSyncPoints();
 
     int misPhasings = 0;
     int unphaseable = 0;
@@ -67,19 +67,19 @@ public final class PhasingEvaluator {
     VariantSummary call = null;
     VariantSummary base = null;
     // Rather than assuming baseline is all phased, we'll be a bit more careful.
-    for (Path.SyncPoint point : sync) {
+    for (int point : sync) {
 
       // Collect all baseline variants in the sync region
       final List<VariantSummary> baselineSection = new ArrayList<>();
       do {
-        if (base != null && base.startPos() < point.getPos()) {
+        if (base != null && base.startPos() < point) {
           baselineSection.add(base);
           base = baseline.hasNext() ? baseline.next() : null;
         }
         if (base == null) {
           base = baseline.hasNext() ? baseline.next() : null;
         }
-      } while (base != null && base.startPos() < point.getPos());
+      } while (base != null && base.startPos() < point);
 
       // Collect all called variants in the sync region
       final List<VariantSummary> callSection = new ArrayList<>();
@@ -88,7 +88,7 @@ public final class PhasingEvaluator {
           callSection.add(call);
         }
         call = calls.hasNext() ? calls.next() : null;
-      } while (call != null && call.startPos() < point.getPos());
+      } while (call != null && call.startPos() < point);
 
       // We need all of these to be in the same phasing otherwise we can't tell which calls are swapped
       if (!groupInPhase(baselineSection)) {

@@ -495,11 +495,11 @@ public class PathTest extends TestCase {
     final double[] expectedWeights = {1.0, 1.0};
 
     final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
-    Path.calculateWeights(original, original.getCalledIncluded(), original.getBaselineIncluded());
+    Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
 
     final Path originalRev = PathFinder.bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
-    Path.calculateWeights(originalRev, originalRev.getCalledIncluded(), originalRev.getBaselineIncluded());
+    Path.calculateWeights(originalRev);
     check(originalRev.getCalledIncluded(), expectedWeights);
   }
 
@@ -527,11 +527,11 @@ public class PathTest extends TestCase {
     final double[] expectedWeights = {1.0, 1.0};
 
     final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
-    Path.calculateWeights(original, original.getCalledIncluded(), original.getBaselineIncluded());
+    Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
 
     final Path originalRev = PathFinder.bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
-    Path.calculateWeights(originalRev, originalRev.getCalledIncluded(), originalRev.getBaselineIncluded());
+    Path.calculateWeights(originalRev);
     check(originalRev.getCalledIncluded(), expectedWeights);
   }
 
@@ -554,7 +554,7 @@ public class PathTest extends TestCase {
     final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP
     assertEquals(2, original.getBaselineIncluded().size());
-    final Pair<List<OrientedVariant>, List<OrientedVariant>> result = Path.calculateWeights(original, original.getCalledIncluded(), original.getBaselineIncluded());
+    final Pair<List<OrientedVariant>, List<OrientedVariant>> result = Path.calculateWeights(original);
     assertEquals(2, result.getA().size()); // The NOP variants have been removed
     check(original.getCalledIncluded(), expectedWeights);
   }
@@ -575,7 +575,7 @@ public class PathTest extends TestCase {
     final double[] expectedWeights = {0.5, 0.5};
 
     final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
-    Path.calculateWeights(original, original.getCalledIncluded(), original.getBaselineIncluded());
+    Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
   }
 

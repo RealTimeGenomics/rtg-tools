@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -55,8 +56,10 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   protected VariantId mBv;
   protected VcfRecord mCrv;
   protected VariantId mCv;
-  protected int mBid;
-  protected int mCid;
+  protected int mBSyncStart;
+  protected int mCSyncStart;
+  private int mBid;
+  private int mCid;
 
   /**
    * Constructor
@@ -69,8 +72,21 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges);
   }
 
+  private int floorSyncPos(List<Integer> syncPoints, int vPos, int sId) {
+    final int vv = vPos - 1; // Sync positions are offset by 1 (really a region end)
+    final int lim = syncPoints.size() - 1;
+    int newId = sId;
+    while (newId > 0 && syncPoints.get(newId) > vv) {
+      newId--;
+    }
+    while (newId < lim && syncPoints.get(newId + 1) <= vv) {
+      newId++;
+    }
+    return newId;
+  }
+
   @Override
-  void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException {
+  void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException {
     final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
     try (final VcfSortRefiner br = new VcfSortRefiner(VcfReader.openVcfReader(mBaseLineFile, subRanges));
          final VcfSortRefiner cr = new VcfSortRefiner(VcfReader.openVcfReader(mCallsFile, subRanges))) {
@@ -82,10 +98,19 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
       mCv = null;
       mCrv = null;
       mCid = 0;
+      mBSyncStart = 0;
+      mCSyncStart = 0;
+
+      int bSid = 0;
+      int cSid = 0;
       while (true) {
         // Advance each iterator if need be
         if (mBv == null && bit.hasNext()) {
           mBv = bit.next();
+          if (!syncPoints.isEmpty()) {
+            bSid = floorSyncPos(syncPoints, mBv.getStart(), bSid);
+            mBSyncStart = syncPoints.get(bSid) + 1;
+          }
         }
         if (mBrv == null && br.hasNext()) {
           mBrv = br.next();
@@ -94,6 +119,10 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
         }
         if (mCv == null && cit.hasNext()) {
           mCv = cit.next();
+          if (!syncPoints.isEmpty()) {
+            cSid = floorSyncPos(syncPoints, mCv.getStart(), cSid);
+            mCSyncStart = syncPoints.get(cSid) + 1;
+          }
         }
         if (mCrv == null && cr.hasNext()) {
           mCrv = cr.next();
@@ -151,15 +180,21 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   /** Deal with the case where we have both call and baseline records with matching start and end position */
   private void processBoth() throws IOException {
     assert mCrv.getEnd() == mBrv.getEnd();
-    if (mCv == null || mCv.getId() != mCid) {
-      handleUnknownCall();
-      mCrv = null;
+    final boolean unknownCall = mCv == null || mCv.getId() != mCid;
+    final boolean unknownBaseline = mBv == null || mBv.getId() != mBid;
+    if (unknownCall || unknownBaseline) {
+      handleUnknownBoth(unknownBaseline, unknownCall);
+      if (mCrv != null && mBrv != null) {
+        throw new IllegalStateException("handleUnknownBoth did not advance a record");
+      }
     } else {
       handleKnownBoth();
       mCv = null;
       mCrv = null;
     }
   }
+
+
 
   @Override
   void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
@@ -180,6 +215,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
 
   /**
    * Process a baseline record where we can not associate a matching baseline variant.
+   * There is no call record at this position.
    * Usually where a variant was skipped during loading, for example failed or same-as-ref calls.
    * @throws IOException if an error occurs during result writing
    */
@@ -187,10 +223,22 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
 
   /**
    * Process a call record where we can not associate a matching call variant.
+   * There is no baseline record at this position.
    * Usually where a variant was skipped during loading, for example failed or same-as-ref calls.
    * @throws IOException if an error occurs during result writing
    */
   protected abstract void handleUnknownCall() throws IOException;
+
+  /**
+   * Handle the case where there are both a call and baseline record at the same position, but one
+   * or the other does not have a matching variant.
+   * Caller must explicitly clear one of baseline or call record (or both), or else
+   * processing will not advance.
+   * @param unknownBaseline true if the baseline record does not currently have a matching baseline variant
+   * @param unknownCall true if the call record does not currently have a matching call variant
+   * @throws IOException if an error occurs during result writing
+   */
+  protected abstract void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException;
 
   /**
    * Deal with the current called record and its matching called variant.

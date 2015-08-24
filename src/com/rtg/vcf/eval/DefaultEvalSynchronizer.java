@@ -134,6 +134,17 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
   }
 
   @Override
+  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
+    // Drop both the unknown records
+    if (unknownBaseline) {
+      mBrv = null;
+    }
+    if (unknownCall) {
+      mCrv = null;
+    }
+  }
+
+  @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included (but the baseline was at a different position. This is interesting)
       //mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
