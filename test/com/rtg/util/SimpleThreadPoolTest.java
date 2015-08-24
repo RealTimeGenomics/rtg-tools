@@ -72,9 +72,9 @@ public class SimpleThreadPoolTest extends TestCase {
   static void setDead() {
     sDead = true;
   }
-  static volatile boolean sTriedRunningAfterDead = false;
+  static volatile int sTriedRunningAfterDead = 0;
   static void setTriedRunningAfterDead() {
-    sTriedRunningAfterDead = true;
+    sTriedRunningAfterDead++;
   }
 
   private class RunAddJobs implements IORunnable {
@@ -158,7 +158,7 @@ public class SimpleThreadPoolTest extends TestCase {
     } catch (RuntimeException e) {
       assertEquals("my-aborting-job", e.getMessage());
     }
-    assertFalse(sTriedRunningAfterDead);
+    assertTrue(sTriedRunningAfterDead <= 1); // Rarely one will attempt to run, but should not get two
   }
 
 
