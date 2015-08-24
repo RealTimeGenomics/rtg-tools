@@ -44,12 +44,10 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogStream;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.TestCase;
-
 /**
  * Tests corresponding class
  */
-public class LoggedCliTest extends TestCase {
+public class LoggedCliTest extends AbstractCliTest {
 
   static final String MODULENAME = "loggedCliTest";
 
@@ -58,12 +56,19 @@ public class LoggedCliTest extends TestCase {
   @Override
   public void setUp() throws IOException {
     mDir = FileUtils.createTempDir("loggedclitest", "blah");
+    super.setUp();
   }
 
   @Override
-  public void tearDown() {
+  public void tearDown() throws IOException {
     assertTrue(FileHelper.deleteAll(mDir));
     mDir = null;
+    super.tearDown();
+  }
+
+  @Override
+  protected AbstractCli getCli() {
+    return new FakeCli(mDir, 0, false);
   }
 
   private static final class FakeCli extends LoggedCli {
