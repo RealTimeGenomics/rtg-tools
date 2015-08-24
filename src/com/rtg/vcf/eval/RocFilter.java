@@ -30,6 +30,8 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Locale;
+
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -38,11 +40,17 @@ import com.rtg.vcf.VcfUtils;
  */
 public enum RocFilter {
 
+
   /** accepts everything **/
   ALL {
     @Override
     boolean accept(VcfRecord rec, int sample) {
       return true;
+    }
+
+    @Override
+    String filename() {
+      return "weighted_roc.tsv";
     }
   },
   /** all homozygous **/
@@ -102,6 +110,8 @@ public enum RocFilter {
     }
   };
 
+  static final String ROC_EXT = "_roc.tsv";
+
   /**
    * Tests specified record
    * @param rec record to be tested
@@ -110,4 +120,11 @@ public enum RocFilter {
    */
   abstract boolean accept(VcfRecord rec, int sample);
 
+  /**
+   * Get the name of the default output file for this filter
+   * @return the output file name
+   */
+  String filename() {
+    return name().toLowerCase(Locale.ROOT) + ROC_EXT;
+  }
 }

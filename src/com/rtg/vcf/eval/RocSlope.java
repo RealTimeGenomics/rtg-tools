@@ -75,7 +75,12 @@ public final class RocSlope {
         }
         final String[] split = s.split("\t");
         assert split.length >= 3;
-        final double pos = Double.parseDouble(split[0]);
+        final double pos;
+        try {
+          pos = Double.parseDouble(split[0]);
+        } catch (NumberFormatException e) {
+          continue;  // Just skip lines without numeric score field.
+        }
         final int y = (int) Double.parseDouble(split[1]);
         final int x = (int) Double.parseDouble(split[2]);
         //System.err.println("pos=" + pos + " x=" + x + " y=" + y);

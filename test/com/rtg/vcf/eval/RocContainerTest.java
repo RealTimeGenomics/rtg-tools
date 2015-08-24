@@ -45,8 +45,7 @@ public class RocContainerTest extends TestCase {
   public void test() throws IOException {
     try (final TestDirectory dir = new TestDirectory("roc")) {
       final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING, null);
-      final File allFile = new File(dir, "all.txt.gz");
-      roc.addFilter(RocFilter.ALL, allFile);
+      roc.addFilter(RocFilter.ALL);
       EnumSet<RocFilter> v = EnumSet.of(RocFilter.ALL);
       roc.addRocLine(0.1, 1.0, v);
       roc.addRocLine(0.1, 0.0, v);
@@ -55,7 +54,8 @@ public class RocContainerTest extends TestCase {
       roc.addRocLine(0.2, 1.5, v);
       roc.addRocLine(0.1, 0.5, v);
       roc.addRocLine(0.3, 1.5, v);
-      roc.writeRocs(5, true, false);
+      roc.writeRocs(dir, 5, 0, 0, true, false);
+      final File allFile = new File(dir, "weighted_roc.tsv.gz");
       final String all = FileHelper.gzFileToString(allFile);
       TestUtils.containsAll(all,
               "0.100\t5.00\t2",

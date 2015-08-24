@@ -52,16 +52,6 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
   private static final String TP_FILE_NAME = "tp.vcf";
   private static final String TPBASE_FILE_NAME = "tp-baseline.vcf";
 
-  static final String FULL_ROC_FILE = "weighted_roc.tsv";
-  static final String HOMOZYGOUS_FILE = "homozygous_roc.tsv";
-  static final String HETEROZYGOUS_FILE = "heterozygous_roc.tsv";
-  static final String SIMPLE_FILE = "simple_roc.tsv";
-  static final String COMPLEX_FILE = "complex_roc.tsv";
-  private static final String HOMOZYGOUS_SIMPLE_FILE = "homozygous_simple_roc.tsv";
-  private static final String HOMOZYGOUS_COMPLEX_FILE = "homozygous_complex_roc.tsv";
-  private static final String HETEROZYGOUS_SIMPLE_FILE = "heterozygous_simple_roc.tsv";
-  private static final String HETEROZYGOUS_COMPLEX_FILE = "heterozygous_complex_roc.tsv";
-
   private final VcfWriter mTpCalls;
   private final VcfWriter mTpBase;
   private final VcfWriter mFp;
@@ -99,16 +89,9 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
                           File outdir, boolean zip, boolean outputTpBase, boolean slope, boolean rtgStats) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
     final RocContainer roc = new RocContainer(extractor.getSortOrder(), extractor.toString());
-    roc.addFilter(RocFilter.ALL, new File(outdir, FULL_ROC_FILE));
-    roc.addFilter(RocFilter.HETEROZYGOUS, new File(outdir, HETEROZYGOUS_FILE));
-    roc.addFilter(RocFilter.HOMOZYGOUS, new File(outdir, HOMOZYGOUS_FILE));
+    roc.addStandardFilters();
     if (rtgStats) {
-      roc.addFilter(RocFilter.SIMPLE, new File(outdir, SIMPLE_FILE));
-      roc.addFilter(RocFilter.COMPLEX, new File(outdir, COMPLEX_FILE));
-      roc.addFilter(RocFilter.HETEROZYGOUS_SIMPLE, new File(outdir, HETEROZYGOUS_SIMPLE_FILE));
-      roc.addFilter(RocFilter.HETEROZYGOUS_COMPLEX, new File(outdir, HETEROZYGOUS_COMPLEX_FILE));
-      roc.addFilter(RocFilter.HOMOZYGOUS_SIMPLE, new File(outdir, HOMOZYGOUS_SIMPLE_FILE));
-      roc.addFilter(RocFilter.HOMOZYGOUS_COMPLEX, new File(outdir, HOMOZYGOUS_COMPLEX_FILE));
+      roc.addExtraFilters();
     }
     mRoc = roc;
     mRocExtractor = extractor;
@@ -116,14 +99,10 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
     mSlope = slope;
     mOutDir = outdir;
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final File tpFile = new File(outdir, TP_FILE_NAME + zipExt);
-    final File fpFile = new File(outdir, FP_FILE_NAME + zipExt);
-    final File fnFile = new File(outdir, FN_FILE_NAME + zipExt);
-    final File tpBaseFile = outputTpBase ? new File(outdir, TPBASE_FILE_NAME + zipExt) : null;
-    mTpCalls = new VcfWriter(variants.calledHeader(), tpFile, null, zip, true);
-    mTpBase = outputTpBase ? new VcfWriter(variants.baseLineHeader(), tpBaseFile, null, zip, true) : null;
-    mFp = new VcfWriter(variants.calledHeader(), fpFile, null, zip, true);
-    mFn = new VcfWriter(variants.baseLineHeader(), fnFile, null, zip, true);
+    mTpCalls = new VcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), null, zip, true);
+    mTpBase = outputTpBase ? new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true) : null;
+    mFp = new VcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), null, zip, true);
+    mFn = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), null, zip, true);
     mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
   }
 
@@ -223,7 +202,7 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
   @Override
   void finish() throws IOException {
     super.finish();
-    mRoc.writeRocs(mBaselineTruePositives + mFalseNegatives, mZip, mSlope);
+    mRoc.writeRocs(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives, mZip, mSlope);
     writePhasingInfo();
     mRoc.writeSummary(new File(mOutDir, CommonFlags.SUMMARY_FILE), mBaselineTruePositives, mFalsePositives, mFalseNegatives);
   }

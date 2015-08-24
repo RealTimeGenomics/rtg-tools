@@ -57,12 +57,12 @@ import com.rtg.util.io.LineWriter;
  */
 public class RocContainer {
 
-  final String mFieldLabel;
-  int mNoScoreVariants = 0;
-  final List<SortedMap<Double, RocPoint>> mRocs = new ArrayList<>();
-  final List<RocFilter> mFilters = new ArrayList<>();
-  final List<File> mOutputFiles = new ArrayList<>();
-  final Comparator<Double> mComparator;
+  private static final String SLOPE_EXT = "_slope.tsv";
+  private final String mFieldLabel;
+  private final List<SortedMap<Double, RocPoint>> mRocs = new ArrayList<>();
+  private final List<RocFilter> mFilters = new ArrayList<>();
+  private final Comparator<Double> mComparator;
+  private int mNoScoreVariants = 0;
 
   /**
    * Constructor
@@ -92,12 +92,25 @@ public class RocContainer {
   /**
    * Add an ROC output file
    * @param filter filter to apply to calls, or <code>null</code> for all calls
-   * @param outputFile file to write output to.
    */
-  public void addFilter(RocFilter filter, File outputFile) {
+  public void addFilter(RocFilter filter) {
     mRocs.add(new TreeMap<Double, RocPoint>(mComparator));
     mFilters.add(filter);
-    mOutputFiles.add(outputFile);
+  }
+
+  void addStandardFilters() {
+    addFilter(RocFilter.ALL);
+    addFilter(RocFilter.HETEROZYGOUS);
+    addFilter(RocFilter.HOMOZYGOUS);
+  }
+
+  void addExtraFilters() {
+    addFilter(RocFilter.SIMPLE);
+    addFilter(RocFilter.COMPLEX);
+    addFilter(RocFilter.HETEROZYGOUS_SIMPLE);
+    addFilter(RocFilter.HETEROZYGOUS_COMPLEX);
+    addFilter(RocFilter.HOMOZYGOUS_SIMPLE);
+    addFilter(RocFilter.HOMOZYGOUS_COMPLEX);
   }
 
   /**
@@ -142,41 +155,38 @@ public class RocContainer {
   }
 
   /**
-   * output ROC data to file
-   * @param totalBaselineVariants total number of baseline variants
+   * output ROC data to files
+   * @param outDir directory into which ROC files are written
+   * @param truePositives total number of baseline true positives
+   * @param falsePositives total number of false positives
+   * @param falseNegatives total number of false negatives
    * @param zip whether output should be compressed
    * @param slope if true, write ROC slope file
    * @throws IOException if an IO error occurs
    */
-  public void writeRocs(int totalBaselineVariants, boolean zip, boolean slope) throws IOException {
+  public void writeRocs(File outDir, int truePositives, int falsePositives, int falseNegatives, boolean zip, boolean slope) throws IOException {
     Diagnostic.developerLog("Writing ROC");
     if (getNumberOfIgnoredVariants() > 0) {
-      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not included in ROC data files due to missing or invalid " + mFieldLabel + " values.");
+      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
     }
-    for (int i = 0; i < mOutputFiles.size(); i++) {
-      final File rocFile = FileUtils.getZippedFileName(zip, mOutputFiles.get(i));
+    final int totalBaselineVariants = truePositives + falseNegatives;
+    for (int i = 0; i < mFilters.size(); i++) {
+      final RocFilter filter = mFilters.get(i);
+      final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, filter.filename()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
         double tp = 0.0;
         double fp = 0.0;
-        final boolean extraMetrics = mFilters.get(i) == RocFilter.ALL && totalBaselineVariants > 0;
+        final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
         rocHeader(os, totalBaselineVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : mRocs.get(i).entrySet()) {
           final RocPoint p = me.getValue();
           tp += p.mTp;
           fp += p.mFp;
-          os.write(Utils.realFormat(me.getKey(), 3) + "\t" + Utils.realFormat(tp, 2) + "\t" + Utils.realFormat(fp, 2));
-
-          if (extraMetrics) {
-            final double fn = totalBaselineVariants - tp;
-            final double precision = ContingencyTable.precision(tp, fp);
-            final double recall = ContingencyTable.recall(tp, fn);
-            final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-            os.write("\t" + Utils.realFormat(fn, 2)
-              + "\t" + Utils.realFormat(precision, 4)
-              + "\t" + Utils.realFormat(recall, 4)
-              + "\t" + Utils.realFormat(fMeasure, 4));
-          }
-          os.newLine();
+          final String score = Utils.realFormat(me.getKey(), 3);
+          writeRocLine(os, score, totalBaselineVariants, tp, fp, extraMetrics);
+        }
+        if (extraMetrics && (Math.abs(tp - truePositives) > 0.001 || Math.abs(fp - falsePositives) > 0.001)) {
+          writeRocLine(os, "None", totalBaselineVariants, truePositives, falsePositives, extraMetrics);
         }
       }
       if (slope) {
@@ -185,9 +195,24 @@ public class RocContainer {
     }
   }
 
+  private void writeRocLine(LineWriter os, String score, int totalPositives, double truePositives, double falsePositives, boolean extraMetrics) throws IOException {
+    os.write(score + "\t" + Utils.realFormat(truePositives, 2) + "\t" + Utils.realFormat(falsePositives, 2));
+    if (extraMetrics) {
+      final double fn = totalPositives - truePositives;
+      final double precision = ContingencyTable.precision(truePositives, falsePositives);
+      final double recall = ContingencyTable.recall(truePositives, fn);
+      final double fMeasure = ContingencyTable.fMeasure(precision, recall);
+      os.write("\t" + Utils.realFormat(fn, 2)
+        + "\t" + Utils.realFormat(precision, 4)
+        + "\t" + Utils.realFormat(recall, 4)
+        + "\t" + Utils.realFormat(fMeasure, 4));
+    }
+    os.newLine();
+  }
+
   private void produceSlopeFile(File input, boolean zip) throws IOException {
     if (input.exists() && input.length() > 0) {
-      final File output = new File(input.getParentFile(), input.getName().replaceAll("_roc.tsv", "_slope.tsv"));
+      final File output = new File(input.getParentFile(), input.getName().replaceAll(RocFilter.ROC_EXT, SLOPE_EXT));
       try (final PrintStream printOut = new PrintStream(FileUtils.createOutputStream(output, zip));
            final InputStream in = zip ? FileUtils.createGzipInputStream(input, false) : FileUtils.createFileInputStream(input, false)) {
         RocSlope.writeSlope(in, printOut);

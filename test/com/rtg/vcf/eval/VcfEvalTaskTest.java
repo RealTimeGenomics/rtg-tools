@@ -261,15 +261,15 @@ public class VcfEvalTaskTest extends TestCase {
       final int fnCount = baselineOnly.length;
 
       mNano.check(label + "-summary.txt", FileUtils.fileToString(new File(out, CommonFlags.SUMMARY_FILE)));
-      checkRocResults(label + "-weighted.tsv", new File(out, DefaultEvalSynchronizer.FULL_ROC_FILE), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-homo.tsv", new File(out, DefaultEvalSynchronizer.HOMOZYGOUS_FILE), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-hetero.tsv", new File(out, DefaultEvalSynchronizer.HETEROZYGOUS_FILE), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-weighted.tsv", new File(out, RocFilter.ALL.filename()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOMOZYGOUS.filename()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HETEROZYGOUS.filename()), checktotal, tpCount, fnCount);
       if (rtgStats) {
-        checkRocResults(label + "-simple.tsv", new File(out, DefaultEvalSynchronizer.SIMPLE_FILE), checktotal, tpCount, fnCount);
-        checkRocResults(label + "-complex.tsv", new File(out, DefaultEvalSynchronizer.COMPLEX_FILE), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.SIMPLE.filename()), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.COMPLEX.filename()), checktotal, tpCount, fnCount);
       } else {
-        assertFalse(new File(out, DefaultEvalSynchronizer.SIMPLE_FILE).exists());
-        assertFalse(new File(out, DefaultEvalSynchronizer.COMPLEX_FILE).exists());
+        assertFalse(new File(out, RocFilter.SIMPLE.filename()).exists());
+        assertFalse(new File(out, RocFilter.COMPLEX.filename()).exists());
       }
 
       final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
@@ -278,7 +278,7 @@ public class VcfEvalTaskTest extends TestCase {
         .rtgStats(rtgStats)
         .create();
       VcfEvalTask.evaluateCalls(paramsrev);
-      checkRocResults(label + "-weighted-rev.tsv", new File(out, DefaultEvalSynchronizer.FULL_ROC_FILE), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-weighted-rev.tsv", new File(out, RocFilter.ALL.filename()), checktotal, tpCount, fnCount);
     }
   }
 
