@@ -38,9 +38,19 @@ import junit.framework.TestCase;
  */
 public class SpyTest extends TestCase {
 
+
+  @Override
+  public void setUp() {
+    Diagnostic.setLogStream();
+
+  }
+  @Override
+  public void tearDown() {
+    Diagnostic.setLogStream();
+  }
+
   public void test() {
     Diagnostic.clearListeners();
-    Diagnostic.setLogStream();
     final SpyCounter spy1 = new SpyCounter("foo1");
     final SpyCounter spy2 = new SpyCounter("bar2");
 

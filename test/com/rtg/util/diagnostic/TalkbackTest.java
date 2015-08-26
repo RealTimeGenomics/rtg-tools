@@ -40,11 +40,10 @@ import com.rtg.util.License;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CommandLine;
-import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogFile;
 import com.rtg.util.io.LogStream;
 import com.rtg.util.io.MemoryPrintStream;
-import com.rtg.util.test.FileHelper;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.HttpServer;
 
 import junit.framework.TestCase;
@@ -58,9 +57,12 @@ public class TalkbackTest extends TestCase {
     CommandLine.setCommandArgs();
     Talkback.setModuleName("TalkbackTest");
     Talkback.setTalkback(true);
+    Diagnostic.setLogStream();
+
   }
   @Override
   public void tearDown() {
+    CommandLine.clearCommandArgs();
     Talkback.setModuleName(null);
     Talkback.setTalkback(false);
     Diagnostic.setLogStream();
@@ -68,9 +70,7 @@ public class TalkbackTest extends TestCase {
 
   public void testPostTalkback1() throws IOException {
     if (License.checkLicense()) {
-      final File tmpDir = FileUtils.createTempDir("talkback", "pt1");
-      try {
-
+      try (final TestDirectory tmpDir = new TestDirectory("talkback")) {
         final PrintStream olderr = System.err;
         final MemoryPrintStream mps = new MemoryPrintStream();
         System.setErr(mps.printStream());
@@ -96,10 +96,6 @@ public class TalkbackTest extends TestCase {
         } finally {
           System.setErr(olderr);
         }
-
-      } finally {
-        Diagnostic.setLogStream();
-        FileHelper.deleteAll(tmpDir);
       }
     } else {
       System.err.println("WARNING: No key, talkback posting not tested");

@@ -68,6 +68,11 @@ public class FastaSequenceDataSourceTest extends TestCase {
     Diagnostic.setLogStream();
   }
 
+  @Override
+  public void tearDown() {
+    Diagnostic.setLogStream();
+  }
+
   private InputStream createStream(final String data) {
     return new ByteArrayInputStream(data.getBytes());
   }

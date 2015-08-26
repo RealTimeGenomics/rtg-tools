@@ -60,13 +60,22 @@ import junit.framework.TestCase;
  */
 public class FastqSequenceDataSourceTest extends TestCase {
 
+  @Override
+  public void setUp() {
+    Diagnostic.setLogStream();
+  }
+
+  @Override
+  public void tearDown() {
+    Diagnostic.setLogStream();
+  }
+
   private InputStream createStream(final String data) {
     return new ByteArrayInputStream(data.getBytes());
   }
 
   public void testOneSeq() throws IOException {
     //testing read() method
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -95,7 +104,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
 
   public void testOneSeq2() throws IOException {
     //testing read() method
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(
       "@12345" + StringUtils.LS
@@ -164,7 +172,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
   }
 
   public void testBadSeq() throws IOException {
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nacgt\n+test\n!~!~!\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -178,7 +185,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
   }
 
   public void testBadSeq2() throws IOException {
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("garbage@test\nacgt\n+test\n!~!~\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -207,7 +213,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     };
     Diagnostic.addListener(dl);
     try {
-      Diagnostic.setLogStream();
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename3\nacgt\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -239,7 +244,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     };
     Diagnostic.addListener(dl);
     try {
-      Diagnostic.setLogStream();
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename4\nacgt\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -272,7 +276,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     };
     Diagnostic.addListener(dl);
     try {
-      Diagnostic.setLogStream();
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename\nacgt\n+\n!~!\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -305,7 +308,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     };
     Diagnostic.addListener(dl);
     try {
-      Diagnostic.setLogStream();
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename2\nacgt\n+\n!~!\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -323,7 +325,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
   }
 
   public void testBadSeq5() throws IOException {
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nacgt\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -336,7 +337,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
   }
 
   public void testBadSeq6() throws IOException {
-    Diagnostic.setLogStream();
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nacgt\n+\n!!!\u007f"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
@@ -350,7 +350,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
 
   public void testOneSeqPlusQual() throws IOException {
     //testing read() method
-    Diagnostic.setLogStream();
     ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);

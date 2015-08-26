@@ -97,6 +97,13 @@ public class SamUtilsTest extends TestCase {
   @Override
   public void setUp() {
     GlobalFlags.resetAccessedStatus();
+    Diagnostic.setLogStream();
+  }
+
+  @Override
+  public void tearDown() {
+    GlobalFlags.resetAccessedStatus();
+    Diagnostic.setLogStream();
   }
 
   private static final String NL = "\n";  // SAM files always use \n.
@@ -114,7 +121,6 @@ public class SamUtilsTest extends TestCase {
 
   public void testCatFiles() throws IOException {
     final File main = FileUtils.createTempDir("samtests", "cat");
-    Diagnostic.setLogStream();
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       try {
@@ -138,7 +144,6 @@ public class SamUtilsTest extends TestCase {
 
   public void testCatFilesDeleteIntermediate() throws IOException {
     final File main = FileUtils.createTempDir("samtests", "cat");
-    Diagnostic.setLogStream();
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       try {
@@ -162,7 +167,6 @@ public class SamUtilsTest extends TestCase {
 
   public void testCatFilesGZ() throws IOException {
     final File main = FileUtils.createTempDir("samtests", "cat");
-    Diagnostic.setLogStream();
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       try {
@@ -186,7 +190,6 @@ public class SamUtilsTest extends TestCase {
 
   public void testCatFilesGZDeleteIntermediate() throws IOException {
     final File main = FileUtils.createTempDir("samtests", "cat");
-    Diagnostic.setLogStream();
     try {
       final ByteArrayOutputStream bos = new ByteArrayOutputStream();
       try {
@@ -209,7 +212,6 @@ public class SamUtilsTest extends TestCase {
   }
 
   public void testGuid() {
-    Diagnostic.setLogStream();
     try {
       final SAMFileHeader sf = new SAMFileHeader();
       sf.addComment("READ-SDF-ID:" + Long.toHexString(123456));
@@ -312,18 +314,14 @@ public class SamUtilsTest extends TestCase {
   public void testSamRunId() {
     final MemoryPrintStream mps = new MemoryPrintStream();
     Diagnostic.setLogStream(mps.printStream());
-    try {
-      final SAMFileHeader header = new SAMFileHeader();
-      header.addComment(SamUtils.RUN_ID_ATTRIBUTE + "booyahhhhh");
-      SamUtils.logRunId(header);
-      assertTrue(mps.toString().contains("Referenced SAM file with RUN-ID: booyahhhhh"));
-      mps.reset();
-      assertEquals("", mps.toString().trim());
-      SamUtils.logRunId(header);
-      assertEquals("", mps.toString().trim());
-    } finally {
-      Diagnostic.setLogStream();
-    }
+    final SAMFileHeader header = new SAMFileHeader();
+    header.addComment(SamUtils.RUN_ID_ATTRIBUTE + "booyahhhhh");
+    SamUtils.logRunId(header);
+    assertTrue(mps.toString().contains("Referenced SAM file with RUN-ID: booyahhhhh"));
+    mps.reset();
+    assertEquals("", mps.toString().trim());
+    SamUtils.logRunId(header);
+    assertEquals("", mps.toString().trim());
   }
 
   public void testCigarCodes() {
@@ -530,7 +528,6 @@ public class SamUtilsTest extends TestCase {
       };
     TestUtils.containsAll(bos.toString(), exp);
     assertTrue(FileHelper.deleteAll(alignmentsDir));
-    Diagnostic.setLogStream();
   }
 
   public void testReadGroupFailure() throws IOException {
@@ -557,7 +554,6 @@ public class SamUtilsTest extends TestCase {
     };
     TestUtils.containsAll(bos.toString(), exp);
     assertTrue(FileHelper.deleteAll(alignmentsDir));
-    Diagnostic.setLogStream();
   }
 
   public void testSamAgainstRef() throws IOException {
@@ -628,8 +624,6 @@ public class SamUtilsTest extends TestCase {
         final String log = bos.toString();
         assertTrue(log, log.contains("Input SAM files contain mismatching template GUIDs"));
       }
-
-      Diagnostic.setLogStream();
     }
   }
 
