@@ -211,6 +211,17 @@ public class VcfHeader {
   }
 
   /**
+   * Add contig lines corresponding to those present in a VCF header.
+   * @param header the SAM header.
+   */
+  public void addContigFields(VcfHeader header) {
+    for (ContigField c : header.getContigLines()) {
+      addContigField(c);
+    }
+  }
+
+
+  /**
    * Add contig lines corresponding to the sequences present in a sequences reader.
    * @param reader the sequences reader.
    * @throws IOException if an IO error occurs whilst reading
@@ -232,6 +243,14 @@ public class VcfHeader {
       }
     }
     dest.add(field);
+  }
+
+  /**
+   * Add an alt field
+   * @param field the new alt field
+   */
+  public void addContigField(ContigField field) {
+    addIdField(mContigLines, field);
   }
 
   /**
@@ -408,7 +427,7 @@ public class VcfHeader {
   public VcfHeader addMetaInformationLine(String line) {
     if (isMetaLine(line)) {
       if (isContigLine(line)) {
-        addIdField(mContigLines, parseContigLine(line));
+        addContigField(parseContigLine(line));
       } else if (isAltLine(line)) {
         addAltField(parseAltLine(line));
       } else if (isFilterLine(line)) {
@@ -773,5 +792,4 @@ public class VcfHeader {
       }
     }
   }
-
 }
