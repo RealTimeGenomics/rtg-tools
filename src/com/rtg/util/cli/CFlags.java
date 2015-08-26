@@ -91,19 +91,29 @@ public final class CFlags {
   public static final int DEFAULT_WIDTH;
 
   static {
-    int defaultWidth = 80;
+    // Try a couple of approaches to working out a larger default value, 80 is fairly cramped
+    int defaultWidth = getTermWidth("printenv TERMCAP", ":CO#([0-9]+):", 1);
+    if (defaultWidth == -1) {
+      defaultWidth = getTermWidth("stty -F /dev/tty size", "([0-9]+) ([0-9]+)", 2);
+    }
+    if (defaultWidth == -1) {
+      defaultWidth = getTermWidth("stty -f /dev/tty size", "([0-9]+) ([0-9]+)", 2);
+    }
+    DEFAULT_WIDTH = Math.max(80, Math.min(defaultWidth, 160));
+  }
 
-    try { // Have a crack at working out a larger default value
-      final Process p = Runtime.getRuntime().exec("stty -f /dev/tty size");
+  private static int getTermWidth(String command, String regex, int group) {
+    try {
+      final Process p = Runtime.getRuntime().exec(command);
       try {
         p.waitFor();
         final InputStream is = p.getInputStream();
         final byte[] b = new byte[is.available()];
         if (is.read(b) == b.length) {
-          final String columnsEnv = new String(b).toUpperCase(Locale.getDefault());
-          final Matcher m = Pattern.compile("([0-9]+) ([0-9]+)").matcher(columnsEnv);
+          final String commandOut = new String(b).toUpperCase(Locale.getDefault());
+          final Matcher m = Pattern.compile(regex).matcher(commandOut);
           if (m.find()) {
-            defaultWidth = Math.max(Integer.parseInt(m.group(2)), defaultWidth);
+            return Integer.parseInt(m.group(group));
           }
         }
       } finally {
@@ -112,10 +122,9 @@ public final class CFlags {
         p.getErrorStream().close();
       }
     } catch (final Throwable tt) {
-      // We really don't care, just fall back on the default
+      // We really don't care
     }
-
-    DEFAULT_WIDTH = defaultWidth;
+    return -1;
   }
 
   /** The default invalid flag handler. */
