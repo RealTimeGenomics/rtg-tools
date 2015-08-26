@@ -39,6 +39,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfSortRefiner;
 
 /**
  * A callable which loads VcfRecords for given template
@@ -71,7 +72,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     int skipped = 0;
     int id = 0;
     final List<Variant> list = new ArrayList<>();
-    try (VcfReader reader = VcfReader.openVcfReader(mInput, mRanges)) {
+    try (VcfSortRefiner reader = new VcfSortRefiner(VcfReader.openVcfReader(mInput, mRanges))) {
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
         id++;

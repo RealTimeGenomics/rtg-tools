@@ -1,0 +1,9 @@
+##fileformat=VCFv4.1
+##fileDate=20150807
+##reference=ref
+##contig=<ID=1,length=249250621,assembly=hg19>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	1508257	.	T	TG,TGG,TGGG	.	.	.
+1	1508257	.	TG	T	.	.	.
+1	1508257	.	TGG	T	.	.	.

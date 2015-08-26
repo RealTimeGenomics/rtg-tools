@@ -27,30 +27,41 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.util.intervals;
 
-import java.io.Serializable;
-import java.util.Comparator;
+package com.rtg.vcf;
+
+import java.io.File;
+import java.io.IOException;
+
+import com.rtg.launcher.AbstractNanoTest;
+import com.rtg.util.io.TestDirectory;
+import com.rtg.util.test.FileHelper;
 
 /**
- * Comparator for ordering SequenceNameLocus objects.
  */
-public class SequenceNameLocusComparator implements Comparator<SequenceNameLocus>, Serializable {
+public class VcfSortRefinerTest extends AbstractNanoTest {
 
-  /** A default comparator instance */
-  public static final SequenceNameLocusComparator SINGLETON = new SequenceNameLocusComparator();
+  public void testReordering() throws IOException {
+    checkReordering("vcf-sort-tweak");
+  }
 
-  @Override
-  public int compare(final SequenceNameLocus o1, final SequenceNameLocus o2) {
-    final int orderSequence = o1.getSequenceName().compareTo(o2.getSequenceName());
-    if (orderSequence != 0) {
-      return orderSequence;
+  public void testReordering2() throws IOException {
+    checkReordering("vcf-sort-tweak-2");
+  }
+
+  public void checkReordering(final String id) throws IOException {
+    try (TestDirectory td = new TestDirectory()) {
+      final File in = new File(td, id + ".vcf.gz");
+      FileHelper.stringToGzFile(mNano.loadReference(id + ".vcf"), in);
+      final File out = new File(td, "out.vcf");
+      try (final VcfSortRefiner t = new VcfSortRefiner(VcfReader.openVcfReader(in))) {
+        try (final VcfWriter w = new VcfWriter(t.getHeader(), out, null, false, false)) {
+          while (t.hasNext()) {
+            w.write(t.next());
+          }
+        }
+      }
+      mNano.check(id + "-out.vcf", FileHelper.fileToString(out));
     }
-    if (o1.getStart() < o2.getStart()) {
-      return -1;
-    } else if (o1.getStart() > o2.getStart()) {
-      return 1;
-    }
-    return o1.getEnd() - o2.getEnd();
   }
 }

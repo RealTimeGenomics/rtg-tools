@@ -41,6 +41,7 @@ import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfSortRefiner;
 
 /**
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
@@ -71,8 +72,8 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   @Override
   void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls) throws IOException {
     final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
-    try (final VcfReader br = VcfReader.openVcfReader(mBaseLineFile, subRanges);
-         final VcfReader cr = VcfReader.openVcfReader(mCallsFile, subRanges)) {
+    try (final VcfSortRefiner br = new VcfSortRefiner(VcfReader.openVcfReader(mBaseLineFile, subRanges));
+         final VcfSortRefiner cr = new VcfSortRefiner(VcfReader.openVcfReader(mCallsFile, subRanges))) {
       final Iterator<? extends VariantId> bit = baseline.iterator();
       final Iterator<? extends VariantId> cit = calls.iterator();
       mBv = null;

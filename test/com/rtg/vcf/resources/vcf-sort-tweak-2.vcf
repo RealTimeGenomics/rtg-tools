@@ -1,0 +1,31 @@
+##fileformat=VCFv4.1
+##contig=<ID=1,length=249250621,assembly=hg19>
+##contig=<ID=2,length=243199373,assembly=hg19>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE
+1	24518157	.	GGAGA	G	.	.	.	GT	1/.
+1	24518157	.	GGA	G	.	.	.	GT	1/1
+1	24518206	.	T	C	.	.	.	GT	1/.
+1	24518643	.	A	G	.	.	.	GT	1/1
+1	24518744	.	C	T	.	.	.	GT	1/0
+1	68831999	.	TTGTG	T	.	.	.	GT	1/.
+1	68831999	.	TTG	T	.	.	.	GT	1/1
+1	68832028	.	T	C	.	.	.	GT	1/1
+1	102853493	.	TA	T	.	.	.	GT	1/1
+1	102853493	.	TAA	T	.	.	.	GT	1/.
+1	102853740	.	T	A	.	.	.	GT	1/0
+1	208773126	.	GCACA	G	.	.	.	GT	1/.
+1	208773126	.	GCA	G	.	.	.	GT	1/1
+1	208775337	.	G	C	.	.	.	GT	1/0
+1	208776214	.	G	C	.	.	.	GT	1/0
+1	208776277	.	G	A	.	.	.	GT	1/0
+1	208776898	.	T	TTA	.	.	.	GT	1/0
+1	208777102	.	G	A	.	.	.	GT	1/0
+1	208777261	.	A	T	.	.	.	GT	1/0
+1	208777749	.	G	A	.	.	.	GT	1/1
+1	208777895	.	A	G	.	.	.	GT	1/0
+1	208778034	.	C	CT,CTT	.	.	.	GT	1/1
+1	208778056	.	A	G	.	.	.	GT	1/1
+1	225222217	.	TTGTGTGTGTGTG	T	.	.	.	GT	1/.
+1	225222509	.	CA	T	.	.	.	GT	1/1
+2	225222509	.	C	T	.	.	.	GT	1/1
