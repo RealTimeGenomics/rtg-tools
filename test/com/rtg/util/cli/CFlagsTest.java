@@ -655,12 +655,12 @@ public class CFlagsTest extends TestCase {
     bos.reset();
     f.setFlags("--Xhelp");
     err.flush();
-    TestUtils.containsAll(bos.toString(),
-      "Usage:  [OPTION]...",
+    TestUtils.containsAll(bos.toString().replaceAll("\\s+", " "),
+      "Usage: [OPTION]...",
       "Use them with caution",
       "Optional flags: ",
-      "      --Xhelp     print help on extended command-line flag usage",
-      "      --Xoptional Test of --X options");
+      " --Xhelp print help on extended command-line flag usage",
+      " --Xoptional Test of --X options");
   }
 
   public void testUnregister() {
