@@ -91,7 +91,8 @@ class SequenceEvaluator implements IORunnable {
 
       if (DUMP_BEST_PATH) {
         System.out.println("#### " + best);
-        final Range interesting = new SequenceNameLocusSimple(currentName, best.getSyncPoints().get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
+        final List<Integer> syncPoints = best.getSyncPoints();
+        final Range interesting = new SequenceNameLocusSimple(currentName, syncPoints.isEmpty() ? 0 : syncPoints.get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()));
         System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));
         System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
         System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));

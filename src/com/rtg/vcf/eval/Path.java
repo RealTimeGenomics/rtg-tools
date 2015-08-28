@@ -290,6 +290,11 @@ public final class Path implements Comparable<Path> {
     return "Path:" + StringUtils.LS + "baseline=" + mBaselinePath + "called=" + mCalledPath + "syncpoints(0-based)=" + HalfPath.listToString(this.mSyncPointList);
   }
 
+  /**
+   * Get the list of sync points for the path. Sync points are created when the path is in sync,
+   * at the reference position immediately before where a new variant is to be added.
+   * @return the sync point list
+   */
   public List<Integer> getSyncPoints() {
     final List<Integer> result = new ArrayList<>();
     for (final Integer syncpoint : mSyncPointList) {
@@ -300,7 +305,7 @@ public final class Path implements Comparable<Path> {
   }
 
   // Counts the baseline and called variants between each sync point
-  static List<SyncPoint> getSyncPointsList(final List<Integer> syncpoints, final List<OrientedVariant> baseLine, final List<OrientedVariant> called) {
+  private static List<SyncPoint> getSyncPointsList(final List<Integer> syncpoints, final List<OrientedVariant> baseLine, final List<OrientedVariant> called) {
     final List<SyncPoint> list = new ArrayList<>();
     int basePos = 0;
     int callPos = 0;
