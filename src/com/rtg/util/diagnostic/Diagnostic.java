@@ -296,21 +296,6 @@ public final class Diagnostic {
   }
 
   /**
-   * Set the stream to which progress messages are sent.  It is permissible,
-   * but unadvisable to set this to null, as setting it to null causes all
-   * logging information to be discarded.   By default to logging stream
-   * is System.err.
-   *
-   * @param logStream stream to use for logging
-   * @return the log stream created
-   */
-  public static LogStream setProgressStream(final PrintStream logStream) {
-    final LogStream ret = new LogSimple(logStream);
-    sProgressStream = ret;
-    return ret;
-  }
-
-  /**
    * Set the stream to which logging messages are sent.  It is permissible,
    * but unadvisable to set this to null, as setting it to null causes all
    * logging information to be discarded.

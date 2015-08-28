@@ -29,8 +29,11 @@
  */
 package com.rtg.util.diagnostic;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.io.File;
+
+import com.rtg.util.TestUtils;
+import com.rtg.util.io.FileUtils;
+import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
 
@@ -45,25 +48,23 @@ public class ParallelProgressTest extends TestCase {
   }
 
   public void test() throws Exception {
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    final File testDir = FileHelper.createTempDirectory();
     try {
-      try (PrintStream ps = new PrintStream(bos)) {
-        Diagnostic.setProgressStream(ps);
-        final ParallelProgress pp = new ParallelProgress("test");
-        pp.updateProgress(0);
-        pp.updateProgress(1);
-        pp.close();
-      }
+      Diagnostic.setLogStream(); // prevent the "switch log" message appearing on terminal
+      Diagnostic.switchLog(new File(testDir, "log"));
+      final ParallelProgress pp = new ParallelProgress("test");
+      pp.updateProgress(0);
+      pp.updateProgress(1);
+      pp.close();
+      final String t = FileHelper.fileToString(new File(testDir, FileUtils.PROGRESS_SUFFIX));
+      TestUtils.containsAll(t,
+        "Starting: test",
+        "Processed 0% of test",
+        "Processed 1% of test",
+        "Finished: test");
     } finally {
-      bos.close();
+      FileHelper.deleteAll(testDir);
     }
-    final String t = bos.toString();
-    //System.err.println(t);
-    assertTrue(t.contains("Starting: test"));
-    assertTrue(t.contains("Processed 0% of test"));
-    assertTrue(t.contains("Processed 1% of test"));
-    assertTrue(t.contains("Finished: test"));
   }
-
- }
+}
 

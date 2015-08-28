@@ -30,14 +30,16 @@
 package com.rtg.util;
 
 
+import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.SlimException;
+import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogRecord;
 import com.rtg.util.io.LogStream;
-import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
 
@@ -251,9 +253,9 @@ public class SimpleThreadPoolTest extends TestCase {
   }
 
   public void testProgress() throws IOException {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setProgressStream(mps.printStream());
+    final File testDir = FileHelper.createTempDirectory();
     try {
+      Diagnostic.switchLog(new File(testDir, "log"));
       final AtomicInteger val = new AtomicInteger();
       val.set(0);
       final IORunnable run = new IORunnable() {
@@ -269,21 +271,23 @@ public class SimpleThreadPoolTest extends TestCase {
       }
       stp.terminate();
       assertEquals(100, val.get());
-      assertTrue(mps.toString(), mps.toString().contains("Test: Starting 100 Jobs"));
+      final File progressFile = new File(testDir, FileUtils.PROGRESS_SUFFIX);
+      final String mps = FileHelper.fileToString(progressFile);
+      assertTrue(mps, mps.contains("Test: Starting 100 Jobs"));
       for (int i = 1; i <= 100; i++) {
-        assertTrue(mps.toString(), mps.toString().contains("Test: " + i + "/100 Jobs Finished"));
+        assertTrue(mps, mps.contains("Test: " + i + "/100 Jobs Finished"));
       }
-      mps.reset();
       final SimpleThreadPool stp1 = new SimpleThreadPool(25, "Test2", true);
       for (int i = 0; i < 100; i++) {
         stp1.execute(run);
       }
       stp1.terminate();
       assertEquals(200, val.get());
-      assertFalse(mps.toString(), mps.toString().contains("Starting"));
-      assertFalse(mps.toString(), mps.toString().contains("Finished"));
+      final String mps1 = FileHelper.fileToString(progressFile).substring(mps.length());
+      assertFalse(mps1, mps1.contains("Starting"));
+      assertFalse(mps1, mps1.contains("Finished"));
     } finally {
-      mps.close();
+      FileHelper.deleteAll(testDir);
     }
   }
 

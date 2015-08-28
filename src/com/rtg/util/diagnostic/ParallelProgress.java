@@ -42,7 +42,7 @@ public class ParallelProgress {
     private int mValue = 0;
 
     MyInteger(final int v) {
-      setValue(v);
+      mValue = v;
     }
 
     int getValue() {
@@ -69,7 +69,7 @@ public class ParallelProgress {
   }
 
   /**
-   * Update progress safe for multithread.
+   * Update progress, safe to use for multithreading.
    * @param value position in current thread
    */
   public synchronized void updateProgress(final int value) {
