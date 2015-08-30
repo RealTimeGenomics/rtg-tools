@@ -29,14 +29,14 @@
  */
 package com.rtg.vcf.eval;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.TreeSet;
-
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.diagnostic.Diagnostic;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.TreeSet;
 
 /**
  * Find the path through the two sequences of variants that best reconciles them.
@@ -221,14 +221,13 @@ public final class PathFinder {
       return -1;
     }
     final Variant nextVar = variants[nextIdx];
-
-    final int startPos;
-    if (path.wantsFutureVariantBases()) {
-      startPos = Math.max(path.getVariantEndPosition(), path.getPosition() + 1);
-    } else {
-      startPos = path.getPosition() + 1;
+    if (nextVar.getStart() <= path.getPosition() + 1) {
+      return nextIdx;
     }
-    return nextVar.getStart() == startPos ? nextIdx : -1;
+    if (path.wantsFutureVariantBases() && nextVar.getStart() <= path.getVariantEndPosition()) {
+      return nextIdx;
+    }
+    return -1;
   }
 
   private static void addIfBetter(Collection<Path> add, TreeSet<Path> sortedPaths) {
