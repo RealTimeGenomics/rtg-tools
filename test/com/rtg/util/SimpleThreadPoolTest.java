@@ -109,6 +109,8 @@ public class SimpleThreadPoolTest extends TestCase {
           mSched.execute(new IORunnable() {
             @Override
             public void run() {
+              // Note: This set-dead/throw-exception isn't atomic so it's possible that some
+              // "alreadydead" jobs are enqueued/executed before the exception is trapped/recognized
               setDead();
               throw new RuntimeException("my-aborting-job");
             }
@@ -148,7 +150,8 @@ public class SimpleThreadPoolTest extends TestCase {
 
   public void testAddingDuringAbort() throws IOException {
     // Tests to see whether we prevent adding more jobs when trying to shut down
-    final SimpleThreadPool pool = new SimpleThreadPool(3, "TestAbort", true);
+    final int numThreads = 3;
+    final SimpleThreadPool pool = new SimpleThreadPool(numThreads, "TestAbort", true);
 
     pool.execute(new RunAddJobs(pool, 30));
     pool.execute(new RunAddJobs(pool, 30));
@@ -160,7 +163,7 @@ public class SimpleThreadPoolTest extends TestCase {
     } catch (RuntimeException e) {
       assertEquals("my-aborting-job", e.getMessage());
     }
-    assertTrue(sTriedRunningAfterDead <= 1); // Rarely one will attempt to run, but should not get two
+    assertTrue(sTriedRunningAfterDead <= numThreads); // Rarely one will attempt to run, but should not get more then numThreads
   }
 
 
