@@ -30,16 +30,14 @@
 
 package com.rtg.vcf.eval;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.OutputParams;
 import com.rtg.mode.SequenceType;
@@ -60,40 +58,16 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class VcfEvalTaskTest extends TestCase {
-  private TestDirectory mDir = null;
-  NanoRegression mNano = null;
-  @Override
-  public void setUp() throws IOException {
-    mDir = new TestDirectory("vcfevaltask");
-    Diagnostic.setLogStream(TestUtils.getNullPrintStream());
-    mNano = new NanoRegression(this.getClass());
-  }
+public class VcfEvalTaskTest extends AbstractNanoTest {
 
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mDir.close();
-    } finally {
-      mDir = null;
-    }
-    Diagnostic.setLogStream();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+  private static final String HEADER_SDF_PREFIX = "##TEMPLATE-SDF-ID=";
 
   private static final String TEMPLATE = ">seq" + StringUtils.LS
     + "ACAGTCACGGTACGTACGTACGTACGT" + StringUtils.LS;
@@ -107,7 +81,7 @@ public class VcfEvalTaskTest extends TestCase {
 
   /** vcf header */
   private static final String CALLS_HEADER = VcfHeader.MINIMAL_HEADER + "\tRTG";
-  private static final String MUTATIONS_HEADER = VcfHeader.MINIMAL_HEADER + "\tRTG";
+  private static final String BASELINE_HEADER = VcfHeader.MINIMAL_HEADER + "\tRTG";
 
   public void test() throws IOException, UnindexableDataException {
     check(SIMPLE_BOTH, SIMPLE_CALLED_ONLY, SIMPLE_BASELINE_ONLY, TP_OUT, FP_OUT, FN_OUT, VcfUtils.FORMAT_GENOTYPE_QUALITY);
@@ -122,22 +96,19 @@ public class VcfEvalTaskTest extends TestCase {
       createInput(tdir, both, calledOnly, baselineOnly);
 
       final File calls = new File(tdir, "calls.vcf.gz");
-      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File baseline = new File(tdir, "baseline.vcf.gz");
       final File out = FileUtils.createTempDir("out", zip ? "zip" : "notZipped", tdir);
       final File template = new File(tdir, "template");
-      //System.err.println("baseline \n" + FileUtils.fileToString(mutations));
+      //System.err.println("baseline \n" + FileUtils.fileToString(baseline));
       //System.err.println("calls \n" + FileUtils.fileToString(calls));
       ReaderTestUtils.getReaderDNA(ref, template, null).close();
-      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .templateFile(template).outputParams(new OutputParams(out, false, zip)).scoreField(sortField).create();
       VcfEvalTask.evaluateCalls(params);
       final String zipSuffix = zip ? ".gz" : "";
-      final File tpOutFile = new File(out, "tp.vcf" + zipSuffix);
-      final File fpOutFile = new File(out, "fp.vcf" + zipSuffix);
-      final File fnOutFile = new File(out, "fn.vcf" + zipSuffix);
-      final String tpResults = fileToString(tpOutFile, zip);
-      final String fpResults = fileToString(fpOutFile, zip);
-      final String fnResults = fileToString(fnOutFile, zip);
+      final String tpResults = fileToString(new File(out, "tp.vcf" + zipSuffix), zip);
+      final String fpResults = fileToString(new File(out, "fp.vcf" + zipSuffix), zip);
+      final String fnResults = fileToString(new File(out, "fn.vcf" + zipSuffix), zip);
       final String header = "##fileformat=VCFv4.1\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
       if (zip) {
         assertTrue(new File(out, "tp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
@@ -172,13 +143,13 @@ public class VcfEvalTaskTest extends TestCase {
 
   private void createInput(File dir, String[] both, String[] calledOnly, String[] baselineOnly) throws IOException, UnindexableDataException {
     final File calls = new File(dir, "calls.vcf.gz");
-    final File mutations = new File(dir, "mutations.vcf.gz");
+    final File baseline = new File(dir, "baseline.vcf.gz");
     final TreeMap<Variant, String> callList = new TreeMap<>();
-    final TreeMap<Variant, String> mutationList = new TreeMap<>();
+    final TreeMap<Variant, String> baselineList = new TreeMap<>();
     for (final String var : both) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
       callList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
-      mutationList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      baselineList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
     for (final String var : calledOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
@@ -186,7 +157,7 @@ public class VcfEvalTaskTest extends TestCase {
     }
     for (final String var : baselineOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      mutationList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      baselineList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
     try (BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
       callOut.write(CALLS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
@@ -195,13 +166,13 @@ public class VcfEvalTaskTest extends TestCase {
       }
     }
     new TabixIndexer(calls).saveVcfIndex();
-    try (BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(mutations, true, false)))) {
-      mutOut.write(MUTATIONS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
-      for (final Entry<Variant, String> var : mutationList.entrySet()) {
+    try (BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseline, true, false)))) {
+      mutOut.write(BASELINE_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
+      for (final Entry<Variant, String> var : baselineList.entrySet()) {
         mutOut.write(var.getValue() + "\n");
       }
     }
-    new TabixIndexer(mutations).saveVcfIndex();
+    new TabixIndexer(baseline).saveVcfIndex();
 
   }
   //   12 3456 789 012 34567890 123 456789
@@ -248,11 +219,11 @@ public class VcfEvalTaskTest extends TestCase {
       createInput(tdir, both, calledOnly, baselineOnly);
 
       final File calls = new File(tdir, "calls.vcf.gz");
-      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File baseline = new File(tdir, "baseline.vcf.gz");
       final File out = FileUtils.createTempDir("out-rtgstats-" + rtgStats, "", tdir);
       final File genome = new File(tdir, "template");
       ReaderTestUtils.getReaderDNA(template, genome, null).close();
-      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .templateFile(genome).outputParams(new OutputParams(out, false, false))
         .rtgStats(rtgStats)
         .create();
@@ -272,7 +243,7 @@ public class VcfEvalTaskTest extends TestCase {
         assertFalse(new File(out, RocFilter.COMPLEX.filename()).exists());
       }
 
-      final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
+      final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .templateFile(genome).outputParams(new OutputParams(out, false, false))
         .sortOrder(RocSortOrder.ASCENDING)
         .rtgStats(rtgStats)
@@ -367,21 +338,17 @@ public class VcfEvalTaskTest extends TestCase {
 
       createInput(tdir, new String[]{"seq 28 . A G 0.0 PASS . GT 1/1"}, new String[]{"seq 30 . C T 0.0 PASS . GT 0/1"}, new String[]{});
       final File calls = new File(tdir, "calls.vcf.gz");
-      final File mutations = new File(tdir, "mutations.vcf.gz");
+      final File baseline = new File(tdir, "baseline.vcf.gz");
       final File out = FileUtils.createTempDir("outsideRef", "out", tdir);
       final File template = new File(tdir, "template");
 
       ReaderTestUtils.getReaderDNA(TEMPLATE, template, null).close();
       final MemoryPrintStream ps = new MemoryPrintStream();
       Diagnostic.setLogStream(ps.printStream());
-      try {
-        final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(mutations).callsFile(calls)
-          .restriction(new RegionRestriction("seq", 0, 300))
-          .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
-        VcfEvalTask.evaluateCalls(params);
-      } finally {
-        Diagnostic.setLogStream();
-      }
+      final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
+        .restriction(new RegionRestriction("seq", 0, 300))
+        .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
+      VcfEvalTask.evaluateCalls(params);
       TestUtils.containsAll(ps.toString(),
         "Variant in calls at seq:28 starts outside the length of the reference sequence (27).",
         "Variant in baseline at seq:28 starts outside the length of the reference sequence (27).",
@@ -392,85 +359,56 @@ public class VcfEvalTaskTest extends TestCase {
     }
   }
 
-  public void testGetSdfId() {
+  public void testGetSdfId() throws IOException {
     Diagnostic.setLogStream();
-    assertEquals(new SdfId(0), VcfEvalTask.getSdfId(null));
-    final String label = "##TEMPLATE-SDF-ID=";
-    final ArrayList<String> header = new ArrayList<>();
-    header.add(label + "blahtblah");
+    VcfHeader header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blahtblah");
     try {
       VcfEvalTask.getSdfId(header);
       fail();
     } catch (final NoTalkbackSlimException e) {
-      assertEquals("Invalid header line : " + label + "blahtblah", e.getMessage());
+      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blahtblah", e.getMessage());
     }
-    header.clear();
-    header.add(label + "blah");
+    header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blah");
     try {
       VcfEvalTask.getSdfId(header);
       fail();
     } catch (final NoTalkbackSlimException e) {
-      assertEquals("Invalid header line : " + label + "blah", e.getMessage());
+      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blah", e.getMessage());
     }
-    header.clear();
-    header.add(label + new SdfId(42).toString());
+    header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + new SdfId(42).toString());
     assertEquals(new SdfId(42), VcfEvalTask.getSdfId(header));
-  }
-
-  public void testPeek() throws IOException {
-    Diagnostic.setLogStream();
-    BufferedReader reader = new BufferedReader(new StringReader("ooogablah" + StringUtils.LS));
-    assertEquals("o", VcfEvalTask.peek(reader));
-    reader = new BufferedReader(new StringReader(""));
-    assertEquals("", VcfEvalTask.peek(reader));
   }
 
   public void testCheckHeader() throws IOException {
     final MemoryPrintStream ps = new MemoryPrintStream();
     Diagnostic.setLogStream(ps.printStream());
-    try {
-      final String label = "##TEMPLATE-SDF-ID=";
-      BufferedReader generated = new BufferedReader(new StringReader(""));
-      BufferedReader detected = new BufferedReader(new StringReader(""));
-      try {
-        VcfEvalTask.checkHeader(generated, detected, new SdfId(42));
-        fail();
-      } catch (final NoTalkbackSlimException ntse) {
-        assertEquals("No header found in baseline file", ntse.getMessage());
-      }
-      ps.reset();
-      final SdfId idA = new SdfId();
-      SdfId idB;
-      do {
-        idB = new SdfId();
-      } while (idA.check(idB));
-      generated = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
-      detected = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
-      VcfEvalTask.checkHeader(generated, detected, idA);
-      assertEquals("", ps.toString());
+    final SdfId idA = new SdfId();
+    SdfId idB;
+    do {
+      idB = new SdfId();
+    } while (idA.check(idB));
+    final VcfHeader hA = new VcfHeader();
+    hA.addMetaInformationLine(HEADER_SDF_PREFIX + idA.toString());
+    VcfEvalTask.checkHeader(hA, hA, idA);
+    assertEquals("", ps.toString());
 
-      generated = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
-      detected = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
-      VcfEvalTask.checkHeader(generated, detected, idA);
-      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline variants were not created from the given reference"));
-      ps.reset();
+    final VcfHeader hB = new VcfHeader();
+    hB.addMetaInformationLine(HEADER_SDF_PREFIX + idB.toString());
+    VcfEvalTask.checkHeader(hB, hA, idA);
+    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline variants were not created from the given reference"));
+    ps.reset();
 
-      generated = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
-      detected = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
-      VcfEvalTask.checkHeader(generated, detected, idA);
-      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, called variants were not created from the given reference"));
-      ps.reset();
+    VcfEvalTask.checkHeader(hA, hB, idA);
+    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, called variants were not created from the given reference"));
+    ps.reset();
 
-      generated = new BufferedReader(new StringReader(label + idB.toString() + StringUtils.LS));
-      detected = new BufferedReader(new StringReader(label + idA.toString() + StringUtils.LS));
-      VcfEvalTask.checkHeader(generated, detected, new SdfId(0));
-      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline and called variants were created with different references"));
+    VcfEvalTask.checkHeader(hB, hA, new SdfId(0));
+    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline and called variants were created with different references"));
 
-      ps.reset();
-    } finally {
-      Diagnostic.setLogStream();
-    }
-
+    ps.reset();
   }
 
   public void testGetVariants() throws IOException {
@@ -573,7 +511,7 @@ public class VcfEvalTaskTest extends TestCase {
 
   public void testZeroCountBug() throws IOException, UnindexableDataException {
     //the reconstructed reference after applying the FP is same as just applying the TP
-    //MutationEval will choose the 3 FP as a TP in comparison to 1 TP as it explains more mutations
+    //VcfEval will choose the 3 FP as a TP in comparison to 1 TP as it explains more baseline variants
     check(ZERO_COUNT_REF, ZERO_COUNT_TP, ZERO_COUNT_FP, EMPTY, ZERO_COUNT_FP, ZERO_COUNT_TP, EMPTY, false, VcfUtils.FORMAT_GENOTYPE_QUALITY);
   }
 

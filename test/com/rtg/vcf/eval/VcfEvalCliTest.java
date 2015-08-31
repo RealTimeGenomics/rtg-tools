@@ -43,7 +43,6 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -52,24 +51,6 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  */
 public class VcfEvalCliTest extends AbstractCliTest {
-  private TestDirectory mDir = null;
-
-  @Override
-  public void setUp() throws IOException {
-    super.setUp();
-    mDir = new TestDirectory("vcfevalcli");
-    Diagnostic.setLogStream(TestUtils.getNullPrintStream());
-
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    mDir.close();
-    mDir = null;
-    Diagnostic.setLogStream();
-    super.tearDown();
-  }
-
 
   @Override
   protected AbstractCli getCli() {
@@ -78,69 +59,69 @@ public class VcfEvalCliTest extends AbstractCliTest {
 
   public void testInitParams() {
     checkHelp("vcfeval [OPTION]... -b FILE -c FILE -o DIR -t SDF"
-        , "Evaluates"
-        , "called variants"
-        , "baseline variants"
-        , "directory for output"
-        , "reference genome"
-        , "--sample", "the name of the sample to select"
-        , "-f,", "--vcf-score-field", "the name of the VCF FORMAT field to use as the ROC score"
-        , "-O,", "--sort-order", "the order in which to sort the ROC scores"
-        , "--no-gzip", "-Z,", "do not gzip the output"
-              );
+      , "Evaluates"
+      , "called variants"
+      , "baseline variants"
+      , "directory for output"
+      , "reference genome"
+      , "--sample", "the name of the sample to select"
+      , "-f,", "--vcf-score-field", "the name of the VCF FORMAT field to use as the ROC score"
+      , "-O,", "--sort-order", "the order in which to sort the ROC scores"
+      , "--no-gzip", "-Z,", "do not gzip the output"
+    );
   }
 
   public void testValidator() throws IOException {
     final VcfEvalCli.VcfEvalFlagsValidator v = new VcfEvalCli.VcfEvalFlagsValidator();
     final CFlags flags =  new CFlags();
     VcfEvalCli.initFlags(flags);
-    final File out = new File(mDir, "out");
-    final File calls = new File(mDir, "calls");
-    final File mutations = new File(mDir, "mutations");
-    final File template = new File(mDir, "template");
-    final String[] flagStrings = {
-        "-o" , out.getPath()
-        , "-c" , calls.getPath()
-        , "-b" , mutations.getPath()
-        , "-t" , template.getPath()
-    };
-    flags.setValidator(null);
-    flags.setFlags(flagStrings);
-    assertFalse(v.isValid(flags));
-    assertTrue(flags.getParseMessage().contains("baseline VCF file doesn't exist"));
+    try (TestDirectory dir = new TestDirectory("vcfevalcli")) {
+      final File out = new File(dir, "out");
+      final File calls = new File(dir, "calls");
+      final File mutations = new File(dir, "mutations");
+      final File template = new File(dir, "template");
+      final String[] flagStrings = {
+        "-o", out.getPath()
+        , "-c", calls.getPath()
+        , "-b", mutations.getPath()
+        , "-t", template.getPath()
+      };
+      flags.setValidator(null);
+      flags.setFlags(flagStrings);
+      assertFalse(v.isValid(flags));
+      assertTrue(flags.getParseMessage().contains("baseline VCF file doesn't exist"));
 
-    assertTrue(mutations.createNewFile());
-    assertFalse(v.isValid(flags));
-    assertTrue(flags.getParseMessage().contains("calls VCF file doesn't exist"));
+      assertTrue(mutations.createNewFile());
+      assertFalse(v.isValid(flags));
+      assertTrue(flags.getParseMessage().contains("calls VCF file doesn't exist"));
 
-    assertTrue(calls.createNewFile());
-    assertFalse(v.isValid(flags));
+      assertTrue(calls.createNewFile());
+      assertFalse(v.isValid(flags));
 
-    ReaderTestUtils.getDNADir(">t" + StringUtils.LS + "ACGT" + StringUtils.LS, template);
-    assertTrue(v.isValid(flags));
+      ReaderTestUtils.getDNADir(">t" + StringUtils.LS + "ACGT" + StringUtils.LS, template);
+      assertTrue(v.isValid(flags));
 
-
-    assertTrue(out.mkdir());
-    assertFalse(v.isValid(flags));
-
-    FileHelper.deleteAll(out);
-
+      assertTrue(out.mkdir());
+      assertFalse(v.isValid(flags));
+    }
   }
 
   public void testEmpty() throws IOException, UnindexableDataException {
-    final File out = new File(mDir, "out");
-    final File calls = new File(mDir, "calls.vcf.gz");
-    FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", calls);
-    new TabixIndexer(calls).saveVcfIndex();
-    final File mutations = new File(mDir, "mutations.vcf.gz");
-    FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", mutations);
-    new TabixIndexer(mutations).saveVcfIndex();
-    final File template = new File(mDir, "template");
-    ReaderTestUtils.getReaderDNA(">t" + StringUtils.LS + "A", template, null);
-    checkMainInitBadFlags("-o", out.getPath()
-      , "-c", calls.getPath()
-      , "-b", mutations.getPath()
-      , "-t", template.getPath());
+    try (TestDirectory dir = new TestDirectory("vcfevalcli")) {
+      final File out = new File(dir, "out");
+      final File calls = new File(dir, "calls.vcf.gz");
+      FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", calls);
+      new TabixIndexer(calls).saveVcfIndex();
+      final File mutations = new File(dir, "mutations.vcf.gz");
+      FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", mutations);
+      new TabixIndexer(mutations).saveVcfIndex();
+      final File template = new File(dir, "template");
+      ReaderTestUtils.getReaderDNA(">t" + StringUtils.LS + "A", template, null);
+      checkMainInitBadFlags("-o", out.getPath()
+        , "-c", calls.getPath()
+        , "-b", mutations.getPath()
+        , "-t", template.getPath());
+    }
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
@@ -186,34 +167,36 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, boolean checkFp, String... args) throws IOException, UnindexableDataException {
-    final File template = new File(mDir, "template");
-    final File baseline = new File(mDir, "baseline.vcf.gz");
-    final File calls = new File(mDir, "calls.vcf.gz");
-    final File output = new File(mDir, "output");
-    ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_template.fa"), template, new SdfId(0));
-    FileHelper.stringToGzFile(mNano.loadReference(id + "_baseline.vcf"), baseline);
-    FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
-    new TabixIndexer(baseline).saveVcfIndex();
-    new TabixIndexer(calls).saveVcfIndex();
-    String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
-    if (checkSlope) {
-      fullArgs = Utils.append(fullArgs, "--Xslope-files");
-    }
-    if (expectWarn) {
-      final String stderr = checkMainInitWarn(fullArgs);
-      mNano.check(id + "_err.txt", stderr);
-    } else {
-      checkMainInitOk(fullArgs);
-    }
-    mNano.check(id + "_weighted_roc.txt", FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
-    if (checkSlope) {
-      mNano.check(id + "_weighted_slope.txt", FileUtils.fileToString(new File(output, "weighted_slope.tsv")));
-    }
-    if (checkTp) {
-      mNano.check(id + "_tp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "tp.vcf"))));
-    }
-    if (checkFp) {
-      mNano.check(id + "_fp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "fp.vcf"))));
+    try (TestDirectory dir = new TestDirectory("vcfevalcli")) {
+      final File template = new File(dir, "template");
+      final File baseline = new File(dir, "baseline.vcf.gz");
+      final File calls = new File(dir, "calls.vcf.gz");
+      final File output = new File(dir, "output");
+      ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_template.fa"), template, new SdfId(0));
+      FileHelper.stringToGzFile(mNano.loadReference(id + "_baseline.vcf"), baseline);
+      FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
+      new TabixIndexer(baseline).saveVcfIndex();
+      new TabixIndexer(calls).saveVcfIndex();
+      String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
+      if (checkSlope) {
+        fullArgs = Utils.append(fullArgs, "--Xslope-files");
+      }
+      if (expectWarn) {
+        final String stderr = checkMainInitWarn(fullArgs);
+        mNano.check(id + "_err.txt", stderr);
+      } else {
+        checkMainInitOk(fullArgs);
+      }
+      mNano.check(id + "_weighted_roc.txt", FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
+      if (checkSlope) {
+        mNano.check(id + "_weighted_slope.txt", FileUtils.fileToString(new File(output, "weighted_slope.tsv")));
+      }
+      if (checkTp) {
+        mNano.check(id + "_tp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "tp.vcf"))));
+      }
+      if (checkFp) {
+        mNano.check(id + "_fp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "fp.vcf"))));
+      }
     }
   }
 }

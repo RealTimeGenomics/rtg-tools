@@ -30,12 +30,9 @@
 
 package com.rtg.vcf.eval;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,18 +55,14 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.VcfHeader;
 
 
 /**
  * Works out if calls are consistent with a baseline or not, always produces an ROC curve
  */
 public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
-
-  private static BufferedReader getReader(final File f) throws IOException {
-    return new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true)));
-  }
 
   protected VcfEvalTask(VcfEvalParams params, OutputStream reportStream, NoStatistics stats) {
     super(params, reportStream, stats, null);
@@ -91,11 +84,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
     final File baseline = params.baselineFile();
     final File calls = params.callsFile();
-
-    try (final BufferedReader baselineReader = getReader(baseline);
-        final BufferedReader callReader = getReader(calls)) {
-      checkHeader(baselineReader, callReader, templateSequences.getSdfId());
-    }
+    checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
     final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
     final VariantSet variants = getVariants(params, templateSequences, ranges);
@@ -217,18 +206,9 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     return fieldType.getExtractor(fieldName, sortOrder);
   }
 
-  static void checkHeader(BufferedReader baselineReader, BufferedReader callsReader, SdfId referenceSdfId) throws IOException {
-    final ArrayList<String> baselineHeader = readHeader(baselineReader);
-    final ArrayList<String> callsHeader = readHeader(callsReader);
-
-    if (baselineHeader.size() == 0) {
-      throw new NoTalkbackSlimException("No header found in baseline file");
-    } else if (callsHeader.size() == 0) {
-      throw new NoTalkbackSlimException("No header found in calls file");
-    }
-
-    final SdfId baselineTemplateSdfId = getSdfId(baselineHeader);
-    final SdfId callsTemplateSdfId = getSdfId(callsHeader);
+  static void checkHeader(VcfHeader baseline, VcfHeader calls, SdfId referenceSdfId) throws IOException {
+    final SdfId baselineTemplateSdfId = getSdfId(baseline);
+    final SdfId callsTemplateSdfId = getSdfId(calls);
 
     if (!baselineTemplateSdfId.check(referenceSdfId)) {
       Diagnostic.warning("Reference template ID mismatch, baseline variants were not created from the given reference");
@@ -243,45 +223,20 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
   }
 
-  static ArrayList<String> readHeader(BufferedReader reader) throws IOException {
-    if (reader == null) {
-      return null;
-    }
-    final ArrayList<String> header = new ArrayList<>();
-    String line;
-    while ("#".equals(peek(reader)) && (line = reader.readLine()) != null) {
-      header.add(line);
-    }
-    return header;
-  }
-
-  static String peek(BufferedReader reader) throws IOException {
-    reader.mark(1);
-    final CharBuffer buff = CharBuffer.allocate(1);
-    if (reader.read(buff) == 1) {
-      buff.rewind();
-      reader.reset();
-      return buff.toString();
-    }
-    return "";
-  }
-
-  static SdfId getSdfId(ArrayList<String> header) {
-    if (header != null) {
-      for (final String s : header) {
-        if (s.startsWith("##TEMPLATE-SDF-ID=")) { //NOTE: this is brittle and VCF specific
-          final String[] split = s.split("=");
-          if (split.length != 2) {
-            throw new NoTalkbackSlimException("Invalid header line : " + s);
-          }
-          final SdfId sdfId;
-          try {
-           sdfId = new SdfId(split[1]);
-          } catch (final NumberFormatException ex) {
-            throw new NoTalkbackSlimException("Invalid header line : " + s);
-          }
-          return sdfId;
+  static SdfId getSdfId(VcfHeader header) {
+    for (final String s : header.getGenericMetaInformationLines()) {
+      if (s.startsWith("##TEMPLATE-SDF-ID=")) {
+        final String[] split = s.split("=");
+        if (split.length != 2) {
+          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
         }
+        final SdfId sdfId;
+        try {
+          sdfId = new SdfId(split[1]);
+        } catch (final NumberFormatException ex) {
+          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
+        }
+        return sdfId;
       }
     }
     return new SdfId(0);
