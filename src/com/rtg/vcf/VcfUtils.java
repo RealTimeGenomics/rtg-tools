@@ -116,6 +116,12 @@ public final class VcfUtils {
   /** Ambiguity ratio field. */
   public static final String FORMAT_AMBIGUITY_RATIO = "AR";
 
+  /** Allelic depth field. */
+  public static final String FORMAT_ALLELIC_DEPTH = "AD";
+
+  /** Somatic status field. */
+  public static final String FORMAT_SOMATIC_STATUS = "SS";
+
   /** VCF FORMAT field used to indicate de novo alleles. */
   public static final String FORMAT_DENOVO = "DN";
 
