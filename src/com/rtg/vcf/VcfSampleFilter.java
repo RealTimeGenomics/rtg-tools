@@ -86,7 +86,6 @@ public abstract class VcfSampleFilter extends AbstractVcfFilter {
     }
     @Override
     boolean acceptSample(VcfRecord record, int sampleIndex) {
-      // check ambiguity ratio
       final Double val = record.getSampleDouble(sampleIndex, mField);
       return val == null || !(val < mMin || val > mMax);
     }
@@ -107,7 +106,6 @@ public abstract class VcfSampleFilter extends AbstractVcfFilter {
     }
     @Override
     boolean acceptSample(VcfRecord record, int sampleIndex) {
-      // check ambiguity ratio
       final Integer val = record.getSampleInteger(sampleIndex, mField);
       return val == null || !(val < mMin || val > mMax);
     }

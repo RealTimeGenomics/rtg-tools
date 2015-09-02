@@ -71,7 +71,7 @@ public class OriginalAlleleFractionAnnotation extends AbstractDerivedFormatAnnot
   public Object getValue(VcfRecord record, int sampleNumber) {
     assert mHeader != null; // i.e. checkHeader method has been called before this
     if (sampleNumber >= mDerivedToOriginal.length) {
-      return null; // What sample would that be Willis?
+      return null; // No such sample
     }
     final int originalSample = mDerivedToOriginal[sampleNumber];
     if (originalSample < 0) {
