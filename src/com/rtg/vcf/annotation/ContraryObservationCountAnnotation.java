@@ -30,27 +30,24 @@
 
 package com.rtg.vcf.annotation;
 
-import com.rtg.util.TestUtils;
-
-import junit.framework.TestCase;
-
 /**
+ * The count of evidence that is considered contrary to the call made for this sample.
+ * For example, in a normal&ndash;cancer somatic call of 0/0 -&gt; 1/0, the <code>COC</code>
+ * value is the count of the somatic (1) allele in the normal sample.  Usually a high
+ * <code>COC</code> value indicates an unrealiable call.
  */
-public class DerivedAnnotationsTest extends TestCase {
+public class ContraryObservationCountAnnotation extends ContraryObservationFractionAnnotation {
 
-  public void testEnum() {
-    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, OAF, ZY, PD]");
-    assertTrue(DerivedAnnotations.IC.getAnnotation() instanceof InbreedingCoefficientAnnotation);
-    assertTrue(DerivedAnnotations.EP.getAnnotation() instanceof EquilibriumProbabilityAnnotation);
-    assertTrue(DerivedAnnotations.LAL.getAnnotation() instanceof LongestAlleleAnnotation);
-    assertTrue(DerivedAnnotations.QD.getAnnotation() instanceof QualOverDepthAnnotation);
-    assertTrue(DerivedAnnotations.NAA.getAnnotation() instanceof NumberOfAltAllelesAnnotation);
-    assertTrue(DerivedAnnotations.AC.getAnnotation() instanceof AlleleCountInGenotypesAnnotation);
-    assertTrue(DerivedAnnotations.AN.getAnnotation() instanceof NumberAllelesInGenotypesAnnotation);
-    assertTrue(DerivedAnnotations.GQD.getAnnotation() instanceof GenotypeQualityOverDepthAnnotation);
-    assertTrue(DerivedAnnotations.OAF.getAnnotation() instanceof ContraryObservationFractionAnnotation);
-    assertTrue(DerivedAnnotations.ZY.getAnnotation() instanceof ZygosityAnnotation);
-    assertTrue(DerivedAnnotations.PD.getAnnotation() instanceof PloidyAnnotation);
+  /**
+   * Construct a new contrary observation count format annotation.
+   */
+  public ContraryObservationCountAnnotation() {
+    super("COC", "Contrary observation count", AnnotationDataType.INTEGER);
+  }
+
+  @Override
+  protected Object getValue(final long ref, final long alt) {
+    return alt;
   }
 
 }

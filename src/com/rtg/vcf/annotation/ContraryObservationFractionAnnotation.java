@@ -40,19 +40,25 @@ import com.rtg.vcf.header.PedigreeField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
- * For a somatic call, the allele fraction for the somatic allele in the original sample.
- * A high value for this number (say, &gt; 0.03) indicates a likely poor somatic call.
+ * The fraction of evidence that is considered contrary to the call made for this sample.
+ * For example, in a normal&ndash;cancer somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
+ * value is the fraction of the somatic (1) allele in the normal sample.  Usually a high
+ * <code>COF</code> value indicates an unrealiable call.
  */
-public class OriginalAlleleFractionAnnotation extends AbstractDerivedFormatAnnotation {
+public class ContraryObservationFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
   private VcfHeader mHeader = null;
   private int[] mDerivedToOriginal = null;
 
+  protected ContraryObservationFractionAnnotation(final String field, final String description, final AnnotationDataType type) {
+    super(field, description, type);
+  }
+
   /**
-   * Constructor.
+   * Construct a new contrary observation fraction format annotation.
    */
-  public OriginalAlleleFractionAnnotation() {
-    super("OAF", "Fraction of somatic allele in the normal sample", AnnotationDataType.DOUBLE);
+  public ContraryObservationFractionAnnotation() {
+    this("COF", "Contrary observation fraction", AnnotationDataType.DOUBLE);
   }
 
   private void initSampleInfo(final VcfHeader header) {
@@ -67,9 +73,17 @@ public class OriginalAlleleFractionAnnotation extends AbstractDerivedFormatAnnot
     }
   }
 
+  protected Object getValue(final long ref, final long alt) {
+    final long total = alt + ref;
+    if (total == 0) {
+      return null; // Undefined (no coverage in the normal)
+    }
+    return alt / (double) total;
+  }
+
   @Override
-  public Object getValue(VcfRecord record, int sampleNumber) {
-    assert mHeader != null; // i.e. checkHeader method has been called before this
+  public Object getValue(final VcfRecord record, final int sampleNumber) {
+    assert mHeader != null; // i.e. checkHeader method must be called before this
     if (sampleNumber >= mDerivedToOriginal.length) {
       return null; // No such sample
     }
@@ -101,11 +115,7 @@ public class OriginalAlleleFractionAnnotation extends AbstractDerivedFormatAnnot
     }
     final long ref = Long.parseLong(adSplit[0]);
     final long alt = Long.parseLong(adSplit[1]);
-    final long total = alt + ref;
-    if (total == 0) {
-      return null; // Undefined (no coverage in the normal)
-    }
-    return alt / (double) total;
+    return getValue(ref, alt);
   }
 
   @Override

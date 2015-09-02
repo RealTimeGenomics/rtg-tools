@@ -41,17 +41,17 @@ import junit.framework.TestCase;
 
 /**
  */
-public class OriginalAlleleFractionAnnotationTest extends TestCase {
+public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testName() {
-    final OriginalAlleleFractionAnnotation an = new OriginalAlleleFractionAnnotation();
-    assertEquals("OAF", an.getName());
-    assertEquals("Fraction of somatic allele in the normal sample", an.getDescription());
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
+    assertEquals("COF", an.getName());
+    assertEquals("Contrary observation fraction", an.getDescription());
     assertEquals(AnnotationDataType.DOUBLE, an.getType());
-    assertEquals("Derived annotation OAF missing required fields in VCF header (FORMAT fields: SS AD GT)", an.checkHeader(new VcfHeader()));
+    assertEquals("Derived annotation COF missing required fields in VCF header (FORMAT fields: SS AD GT)", an.checkHeader(new VcfHeader()));
   }
 
-  private VcfHeader makeHeader() {
+  static VcfHeader makeHeader() {
     final VcfHeader header = new VcfHeader();
     header.addSampleName("normal");
     header.addSampleName("cancer");
@@ -63,7 +63,7 @@ public class OriginalAlleleFractionAnnotationTest extends TestCase {
   }
 
   public void testSomaticCase() {
-    final OriginalAlleleFractionAnnotation an = new OriginalAlleleFractionAnnotation();
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
     final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(2);
@@ -81,7 +81,7 @@ public class OriginalAlleleFractionAnnotationTest extends TestCase {
   }
 
   public void testGainOfReference() {
-    final OriginalAlleleFractionAnnotation an = new OriginalAlleleFractionAnnotation();
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
     final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(2);
@@ -99,7 +99,7 @@ public class OriginalAlleleFractionAnnotationTest extends TestCase {
   }
 
   public void testNonsomaticCase() {
-    final OriginalAlleleFractionAnnotation an = new OriginalAlleleFractionAnnotation();
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
     final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(2);
@@ -116,7 +116,7 @@ public class OriginalAlleleFractionAnnotationTest extends TestCase {
   }
 
   public void testNoCoverageInNormal() {
-    final OriginalAlleleFractionAnnotation an = new OriginalAlleleFractionAnnotation();
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
     final VcfRecord rec = new VcfRecord();
     rec.setNumberOfSamples(2);

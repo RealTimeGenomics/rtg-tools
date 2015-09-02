@@ -56,7 +56,7 @@ public enum DerivedAnnotations {
   /** GQ / DP for a single sample */
   GQD(new GenotypeQualityOverDepthAnnotation()),
   /** Allelic fraction of somatic allele in the original sample */
-  OAF(new OriginalAlleleFractionAnnotation()),
+  OAF(new ContraryObservationFractionAnnotation()),
   /** Zygosity */
   ZY(new ZygosityAnnotation()),
   /** Ploidy */

@@ -477,8 +477,7 @@ public final class VcfFilterCli extends AbstractCli {
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
     mVcfFilterTask.mFailFilterName = mFlags.isSet(FAIL_FLAG) ? (String) mFlags.getValue(FAIL_FLAG) : null;
     for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
-      final ExpressionSampleFilter exprFilter = new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, (String) expr);
-      mVcfFilterTask.mFilters.add(exprFilter);
+      mVcfFilterTask.mFilters.add(new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, (String) expr));
     }
 
     final File in = (File) mFlags.getValue(INPUT);
