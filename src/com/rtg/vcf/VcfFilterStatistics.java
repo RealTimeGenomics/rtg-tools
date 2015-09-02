@@ -64,6 +64,7 @@ class VcfFilterStatistics implements Statistics {
     , DENOVO_SCORE
     , COMBINED_READ_DEPTH_FILTERED_COUNT
     , HOM_FILTERED_COUNT
+    , USER_EXPRESSION_COUNT
   }
 
   private final int[] mValues = new int[Stat.values().length];
@@ -106,6 +107,7 @@ class VcfFilterStatistics implements Statistics {
       printCount(output, "include file", get(Stat.INCLUDE_BED_COUNT));
       printCount(output, "exclude file", get(Stat.EXCLUDE_BED_COUNT));
       printCount(output, "de novo score", get(Stat.DENOVO_SCORE));
+      printCount(output, "user supplied expression", get(Stat.USER_EXPRESSION_COUNT));
       //output.println("_Filtered due to other : " + m_Other_Filtered_COUNT);
       output.println("Remaining records : " + get(Stat.WRITTEN_COUNT));
 

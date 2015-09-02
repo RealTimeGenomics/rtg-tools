@@ -45,6 +45,7 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -108,6 +109,8 @@ public final class VcfFilterCli extends AbstractCli {
   // old filter flags
   private static final String MIN_POSTERIOR_SCORE = "Xmin-posterior-score";
   private static final String MAX_POSTERIOR_SCORE = "Xmax-posterior-score";
+
+  private static final String EXPR_FLAG = "Xexpr";
 
 
   private final VcfFilterTask mVcfFilterTask = new VcfFilterTask();
@@ -189,6 +192,8 @@ public final class VcfFilterCli extends AbstractCli {
     // Xflags
     mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, "float", "minimum allowed posterior score").setCategory(FILTERING);
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
+    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "format field expression (e.g. GQ>0.5)").setCategory(FILTERING);
+    expr.setMaxCount(Integer.MAX_VALUE);
 
     mFlags.setValidator(new VcfFilterValidator());
   }
@@ -359,7 +364,7 @@ public final class VcfFilterCli extends AbstractCli {
       }
     }
 
-    mVcfFilterTask.mResetFailedSampleGts =  mFlags.isSet(CLEAR_FAILED_SAMPLES);
+    mVcfFilterTask.mResetFailedSampleGts = mFlags.isSet(CLEAR_FAILED_SAMPLES);
 
     // These involve checking the specified sample field
     mVcfFilterTask.mRemoveHom = mFlags.isSet(REMOVE_HOM);
@@ -406,15 +411,16 @@ public final class VcfFilterCli extends AbstractCli {
     }
 
     final String[] sampleFlags = {
-        REMOVE_HOM,
-        REMOVE_SAME_AS_REF,
-        SNPS_ONLY, NON_SNPS_ONLY,
-        MIN_DEPTH, MAX_DEPTH,
-        MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY,
-        MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE,
-        MAX_AMBIGUITY_RATIO,
-        MIN_AVR_SCORE, MAX_AVR_SCORE,
-        MIN_DENOVO_SCORE, MAX_DENOVO_SCORE,
+      REMOVE_HOM,
+      REMOVE_SAME_AS_REF,
+      SNPS_ONLY, NON_SNPS_ONLY,
+      MIN_DEPTH, MAX_DEPTH,
+      MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY,
+      MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE,
+      MAX_AMBIGUITY_RATIO,
+      MIN_AVR_SCORE, MAX_AVR_SCORE,
+      MIN_DENOVO_SCORE, MAX_DENOVO_SCORE,
+      EXPR_FLAG,
     };
     mVcfFilterTask.mCheckingSample = false;
     for (final String flag : sampleFlags) {
@@ -470,6 +476,10 @@ public final class VcfFilterCli extends AbstractCli {
     }
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
     mVcfFilterTask.mFailFilterName = mFlags.isSet(FAIL_FLAG) ? (String) mFlags.getValue(FAIL_FLAG) : null;
+    for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
+      final ExpressionSampleFilter exprFilter = new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, (String) expr);
+      mVcfFilterTask.mFilters.add(exprFilter);
+    }
 
     final File in = (File) mFlags.getValue(INPUT);
     final File out = (File) mFlags.getValue(OUTPUT);
