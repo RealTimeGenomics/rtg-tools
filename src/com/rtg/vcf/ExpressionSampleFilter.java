@@ -33,7 +33,7 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
  * A VCF sample filter constructed from a somewhat general expression supporting simple
- * numerical comparision like <code>OAF>0.03</code>.
+ * numerical comparision like <code>OAF&gt;0.03</code>.
  */
 public class ExpressionSampleFilter extends VcfSampleFilter {
 
