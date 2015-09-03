@@ -51,12 +51,9 @@ public class IndexingStreamCreatorTest extends TestCase {
       header.addSampleName("sample");
       try (IndexingStreamCreator streamHandler = new IndexingStreamCreator(vcfFile, System.out, true, new TabixIndexer.VcfIndexerFactory(), true)) {
         try (VcfWriter writer = new VcfWriter(header, streamHandler.createStreamsAndStartThreads())) {
-          final VcfRecord rec = new VcfRecord();
-          rec.setNumberOfSamples(1);
-          rec.setSequence("foo");
-          rec.setStart(1000);
-          rec.setRefCall("A");
+          final VcfRecord rec = new VcfRecord("seq", 100, "A");
           rec.addAltCall("T");
+          rec.setNumberOfSamples(1);
           rec.addFormatAndSample("GT", "1/0");
           writer.write(rec);
         }

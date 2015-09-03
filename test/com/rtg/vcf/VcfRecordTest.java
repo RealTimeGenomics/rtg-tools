@@ -68,12 +68,9 @@ public class VcfRecordTest extends TestCase {
   }
 
   public void test() {
-    final VcfRecord rec = new VcfRecord();
-    rec.setSequence("chr1")
-    .setStart(1209)
-    .setId(".")
+    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
+    rec.setId(".")
     .setQuality("12.8")
-    .setRefCall("a")
     .addAltCall("c")
     .addAltCall("t")
     .addFilter("TEST1")
@@ -123,7 +120,7 @@ public class VcfRecordTest extends TestCase {
 
   public void testErrors() {
     try {
-      new VcfRecord().addInfo("x", "1").addInfo("x", "2");
+      new VcfRecord("chr1", 0, "a").addInfo("x", "1").addInfo("x", "2");
     } catch (final IllegalArgumentException ex) {
       assertEquals("key already present in the map key = x", ex.getMessage());
     }
@@ -132,13 +129,10 @@ public class VcfRecordTest extends TestCase {
 
   public void testError2() {
     try {
-      new VcfRecord()
-      .setSequence("chr1")
-      .setStart(1209)
-      .setNumberOfSamples(2)
+      final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
+      rec.setNumberOfSamples(2)
       .setId(".")
       .setQuality("12.8")
-      .setRefCall("a")
       .addAltCall("c")
       .addAltCall("t")
       .addFilter("TEST1")
@@ -328,12 +322,9 @@ public class VcfRecordTest extends TestCase {
   }
 
   public void testIdMerge() {
-    final VcfRecord rec = new VcfRecord();
-    rec.setSequence("chr1")
-    .setStart(1209)
-    .setId("b;c")
+    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
+    rec.setId("b;c")
     .setQuality("12.8")
-    .setRefCall("a")
     .addAltCall("c")
     .addAltCall("t")
     .addFilter("TEST1")
@@ -343,12 +334,9 @@ public class VcfRecordTest extends TestCase {
     .addFormatAndSample("GT", "0/0")
     .addFormatAndSample("GQ", "100")
     ;
-    final VcfRecord rec2 = new VcfRecord();
-    rec2.setSequence("chr1")
-    .setStart(1209)
-    .setId("a")
+    final VcfRecord rec2 = new VcfRecord("chr1", 1209, "a");
+    rec2.setId("a")
     .setQuality("12.8")
-    .setRefCall("a")
     .addAltCall("c")
     .addAltCall("t")
     .addFilter("TEST1")
@@ -411,7 +399,7 @@ public class VcfRecordTest extends TestCase {
   }
 
   public void testSetMethods() {
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(3);
     rec.padFormatAndSample("PAD");
     assertNull(rec.getFormatAndSample().get("PAD"));
@@ -435,7 +423,7 @@ public class VcfRecordTest extends TestCase {
   }
   public void testFilterHackery() {
     // Test that if a filter is added then PASS is removed
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addFilter("PASS");
     assertEquals(Arrays.asList("PASS"), rec.getFilters());
     rec.addFilter("a1.0");

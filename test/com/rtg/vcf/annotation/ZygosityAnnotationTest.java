@@ -47,9 +47,8 @@ public class ZygosityAnnotationTest extends TestCase {
 
   public void test() {
     final ZygosityAnnotation zyAnn = new ZygosityAnnotation();
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(3);
-    rec.setRefCall("A");
     rec.addAltCall("G");
     rec.addFormatAndSample("GT", "0/1");
     rec.addFormatAndSample("GT", ".");

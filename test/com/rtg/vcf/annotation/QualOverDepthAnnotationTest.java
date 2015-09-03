@@ -49,49 +49,49 @@ public class QualOverDepthAnnotationTest extends TestCase {
 
   public void test() {
     final QualOverDepthAnnotation ann = new QualOverDepthAnnotation();
-    VcfRecord rec = new VcfRecord();
+    VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.addInfo("DP", "123");
     assertEquals(8.029, ann.getValue(rec, -1), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.addInfo("DP", "0");
     assertEquals(Double.POSITIVE_INFINITY, ann.getValue(rec, -1), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.addInfo("DP", "123");
     assertNull(ann.getValue(rec, 23));
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     assertNull(ann.getValue(rec, 0));
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.addFormatAndSample("DP", "123");
     assertEquals(8.029, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.addFormatAndSample("DP", "0");
     assertEquals(Double.POSITIVE_INFINITY, ann.getValue(rec, -1), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("DP", "63");
     rec.addFormatAndSample("DP", "20");
     assertEquals(11.899, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.setNumberOfSamples(3);
     rec.addFormatAndSample("DP", "63");
     rec.addFormatAndSample("DP", "20");
     assertEquals(11.899, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.setNumberOfSamples(3);
     rec.addFormatAndSample("DP", "63");
@@ -99,7 +99,7 @@ public class QualOverDepthAnnotationTest extends TestCase {
     rec.addFormatAndSample("DP", "20");
     assertEquals(11.899, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.setNumberOfSamples(3);
     rec.addFormatAndSample("DP", "63");
@@ -107,7 +107,7 @@ public class QualOverDepthAnnotationTest extends TestCase {
     rec.addFormatAndSample("DP", "20");
     assertEquals(11.899, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord();
+    rec = new VcfRecord("seq", 0, "A");
     rec.setQuality("987.6");
     rec.addInfo("DP", "100");
     rec.setNumberOfSamples(3);

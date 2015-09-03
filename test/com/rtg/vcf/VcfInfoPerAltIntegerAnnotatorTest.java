@@ -71,13 +71,13 @@ public class VcfInfoPerAltIntegerAnnotatorTest extends TestCase {
     assertEquals(MetaType.INTEGER, header.getInfoLines().get(0).getType());
     assertEquals(VcfNumberType.ALTS, header.getInfoLines().get(0).getNumber().getNumberType());
     assertEquals(-1, header.getInfoLines().get(0).getNumber().getNumber());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     ann.annotate(rec);
     ann.annotate(rec);  // Test that doing a second time doesn't break it / add extra
     assertEquals(3, rec.getInfo().get("DUMMY").size());
     assertEquals("1", rec.getInfo().get("DUMMY").get(0));
     assertEquals("2", rec.getInfo().get("DUMMY").get(1));
     assertEquals("3", rec.getInfo().get("DUMMY").get(2));
-    assertEquals("null\t0\t.\tnull\t.\t.\t.\tDUMMY=1,2,3", rec.toString());
+    assertEquals("seq\t1\t.\tA\t.\t.\t.\tDUMMY=1,2,3", rec.toString());
   }
 }

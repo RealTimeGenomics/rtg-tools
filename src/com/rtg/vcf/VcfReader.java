@@ -188,15 +188,12 @@ public class VcfReader implements Closeable {
    * @return the corresponding record
    */
   public static VcfRecord vcfLineToRecord(String line) {
-    final VcfRecord rec = new VcfRecord();
     final String[] field = StringUtils.split(line, '\t');
     if (field.length < 8) {
       throw new IllegalArgumentException("Expected at least 8 fields");
     }
-    rec.setSequence(StringUtils.deepCopy(field[CHROM_FIELD]));
-    rec.setStart(Integer.parseInt(field[POS_FIELD]) - 1);
+    final VcfRecord rec = new VcfRecord(StringUtils.deepCopy(field[CHROM_FIELD]), Integer.parseInt(field[POS_FIELD]) - 1, StringUtils.deepCopy(field[REF_FIELD]));
     rec.setId(StringUtils.deepCopy(field[ID_FIELD]));
-    rec.setRefCall(StringUtils.deepCopy(field[REF_FIELD]));
     if (!VcfRecord.MISSING.equals(field[ALT_FIELD])) {
       final String[] altSplit = StringUtils.split(field[ALT_FIELD], ',');
       for (final String anAltSplit : altSplit) {

@@ -47,16 +47,13 @@ public class LongestAlleleAnnotationTest extends TestCase {
 
   public void test() {
     final LongestAlleleAnnotation lalAnn = new LongestAlleleAnnotation();
-    VcfRecord rec = new VcfRecord();
-    rec.setRefCall("AAA");
+    VcfRecord rec = new VcfRecord("seq", 0, "AAA");
     rec.addAltCall("A");
     assertEquals(3, ((Integer) lalAnn.getValue(rec, 0)).intValue());
-    rec = new VcfRecord();
-    rec.setRefCall("A");
+    rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("AAAA");
     assertEquals(4, ((Integer) lalAnn.getValue(rec, -1)).intValue());
-    rec = new VcfRecord();
-    rec.setRefCall("AA");
+    rec = new VcfRecord("seq", 0, "AA");
     rec.addAltCall("AAAA");
     rec.addAltCall("AAAAA");
     rec.addAltCall("A");

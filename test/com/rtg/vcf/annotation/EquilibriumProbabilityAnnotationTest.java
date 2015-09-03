@@ -49,9 +49,8 @@ public class EquilibriumProbabilityAnnotationTest extends TestCase {
 
   public void testHaploidNoCalculation() {
     final EquilibriumProbabilityAnnotation epAnn = new EquilibriumProbabilityAnnotation();
-    final VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A")
-        .addAltCall("C")
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.addAltCall("C")
         .setNumberOfSamples(3)
         .addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0")
         .addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, ".")

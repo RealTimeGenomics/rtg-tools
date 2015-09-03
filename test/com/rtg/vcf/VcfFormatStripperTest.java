@@ -45,12 +45,9 @@ import junit.framework.TestCase;
 public class VcfFormatStripperTest extends TestCase {
 
   private VcfRecord createTestRecord() {
-    final VcfRecord rec = new VcfRecord();
-    rec.setSequence("chr1")
-            .setStart(1209)
-            .setId(".")
+    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
+    rec.setId(".")
             .setQuality("12.8")
-            .setRefCall("a")
             .addAltCall("c")
             .addAltCall("t")
             .addFilter("TEST1")

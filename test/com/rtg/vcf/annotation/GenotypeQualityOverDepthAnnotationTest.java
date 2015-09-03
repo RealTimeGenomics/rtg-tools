@@ -47,7 +47,7 @@ public class GenotypeQualityOverDepthAnnotationTest extends TestCase {
 
   public void test() {
     final GenotypeQualityOverDepthAnnotation gqdAnn = new GenotypeQualityOverDepthAnnotation();
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(6);
     rec.addFormatAndSample("GQ", "30");
     rec.addFormatAndSample("GQ", "40");

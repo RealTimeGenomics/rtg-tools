@@ -66,13 +66,13 @@ public class VcfFormatIntegerAnnotatorTest extends TestCase {
     assertEquals("DUMMY-DESC", header.getFormatLines().get(0).getDescription());
     assertEquals(MetaType.INTEGER, header.getFormatLines().get(0).getType());
     assertEquals(1, header.getFormatLines().get(0).getNumber().getNumber());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     ann.annotate(rec);
     ann.annotate(rec); // Test that doing a second time doesn't break it / add extra
     assertEquals(2, rec.getFormatAndSample().get("DUMMY").size());
     assertEquals("0", rec.getFormatAndSample().get("DUMMY").get(0));
     assertEquals("17", rec.getFormatAndSample().get("DUMMY").get(1));
-    assertEquals("null\t0\t.\tnull\t.\t.\t.\t.\tDUMMY\t0\t17", rec.toString());
+    assertEquals("seq\t1\t.\tA\t.\t.\t.\t.\tDUMMY\t0\t17", rec.toString());
   }
 }

@@ -47,24 +47,19 @@ public class NumberOfAltAllelesAnnotationTest extends TestCase {
 
   public void test() {
     final NumberOfAltAllelesAnnotation ann = new NumberOfAltAllelesAnnotation();
-    VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A");
+    VcfRecord rec = new VcfRecord("seq", 0, "A");
     assertEquals(0, ann.getValue(rec, 0).intValue());
-    rec.setRefCall("A");
     rec.addAltCall("T");
     assertEquals(1, ann.getValue(rec, -2).intValue());
-    rec = new VcfRecord();
-    rec.setRefCall("A");
+    rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("AAAA");
     assertEquals(1, ann.getValue(rec, 1).intValue());
-    rec = new VcfRecord();
-    rec.setRefCall("AA");
+    rec = new VcfRecord("seq", 0, "AA");
     rec.addAltCall("AAAA");
     rec.addAltCall("AAAAA");
     rec.addAltCall("A");
     assertEquals(3, ann.getValue(rec, 1).intValue());
-    rec = new VcfRecord();
-    rec.setRefCall(".");
+    rec = new VcfRecord("seq", 0, ".");
     rec.addAltCall("AAAA");
     rec.addAltCall("AAAAA");
     rec.addAltCall("A");

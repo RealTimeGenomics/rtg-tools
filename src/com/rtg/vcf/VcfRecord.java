@@ -104,18 +104,19 @@ public class VcfRecord implements SequenceNameLocus {
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
   public static VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    final VcfRecord merged = new VcfRecord();
-    merged.mSequence = records[0].mSequence;
-    merged.mStart = records[0].mStart;
-
+    String newRefCall = records[0].mRefCall;
+    final int length = records[0].getLength();
     final Set<String> uniqueIds = new LinkedHashSet<>();
     for (final VcfRecord vcf : records) {
-      if (merged.mRefCall == null || merged.mRefCall.length() < vcf.mRefCall.length()) {
-        merged.mRefCall = vcf.mRefCall;
+      assert vcf.getLength() == length;
+      if (newRefCall.length() != vcf.mRefCall.length()) { // TODO: Handle gVCF merging
+        newRefCall = vcf.mRefCall;
       }
       final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
       Collections.addAll(uniqueIds, ids);
     }
+    final VcfRecord merged = new VcfRecord(records[0].mSequence, records[0].mStart, newRefCall);
+
     final StringBuilder idsb = new StringBuilder();
     int z = 0;
     for (final String id : uniqueIds) {
@@ -240,15 +241,25 @@ public class VcfRecord implements SequenceNameLocus {
     return merged;
   }
 
+  /**
+   * Perform merge operation on a set of records with the same start position, batching up into seperate merge operations for each reference span.
+   * @param records the records to merge
+   * @param headers the VcfHeader corresponding to each record
+   * @param destHeader the VcfHeader of of the destination VCF
+   * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
+   * @param preserveFormats if true, any non-mergeable FORMAT fields will be kept (resulting non-merged records), otherwise dropped, allowing merge to proceed.
+   * @return the merged records
+   */
   static VcfRecord[] mergeRecords(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean preserveFormats) {
-    final MultiMap<String, VcfRecord> recordSets = new MultiMap<>(true);
-    final MultiMap<String, VcfHeader> headerSets = new MultiMap<>(true);
+    assert records.length == headers.length;
+    final MultiMap<Integer, VcfRecord> recordSets = new MultiMap<>(true);
+    final MultiMap<Integer, VcfHeader> headerSets = new MultiMap<>(true);
     for (int i = 0; i < records.length; i++) {
-      recordSets.put(records[i].getRefCall(), records[i]);
-      headerSets.put(records[i].getRefCall(), headers[i]);
+      recordSets.put(records[i].getLength(), records[i]);
+      headerSets.put(records[i].getLength(), headers[i]);
     }
     final ArrayList<VcfRecord> ret = new ArrayList<>();
-    for (String key : recordSets.keySet()) {
+    for (Integer key : recordSets.keySet()) {
       final Collection<VcfRecord> recs = recordSets.get(key);
       final Collection<VcfHeader> heads = headerSets.get(key);
       final VcfRecord[] recsArray = recs.toArray(new VcfRecord[recs.size()]);
@@ -270,9 +281,15 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * Construct a new VcfRecord
+   * Construct a new standard (non gVCF) VcfRecord
+   * @param sequence the sequence name
+   * @param start the start position
+   * @param ref the ref allele
    */
-  public VcfRecord() {
+  public VcfRecord(String sequence, int start, String ref) {
+    mSequence = sequence;
+    mStart = start;
+    mRefCall = ref;
     mAltCalls = new ArrayList<>();
     mFilters = new ArrayList<>();
     mInfo = new LinkedHashMap<>();
@@ -310,31 +327,11 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * Set the sequence name
-   * @param sequence sequence name to set
-   * @return this, for call chaining
-   */
-  public VcfRecord setSequence(String sequence) {
-    mSequence = sequence;
-    return this;
-  }
-
-  /**
-   * Sets the current position of the record
-   * @param start position to set, 0-based
-   * @return this, for call chaining
-   */
-  public VcfRecord setStart(int start) {
-    mStart = start;
-    return this;
-  }
-
-  /**
    * Gets the one-based start position
    * @return the one-based start position
    */
   public int getOneBasedStart() {
-    return mStart + 1;
+    return getStart() + 1;
   }
 
   /**
@@ -377,6 +374,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord setRefCall(String ref) {
+    assert ref != null;
     mRefCall = ref;
     return this;
   }

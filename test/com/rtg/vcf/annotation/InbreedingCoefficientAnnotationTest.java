@@ -51,8 +51,7 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
 
   public void testHaploidNoCalculation() {
     final InbreedingCoefficientAnnotation icAnn = new InbreedingCoefficientAnnotation();
-    final VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("C");
     rec.setNumberOfSamples(3);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0");
@@ -86,8 +85,7 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
   }
 
   protected static VcfRecord makeOneAlleleRecord(int aa) {
-    final VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(aa);
     for (int i = 0; i < aa / 2; i++) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
@@ -99,8 +97,7 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
   }
 
   protected static VcfRecord makeTwoAlleleRecord(int aa, int ac, int cc) {
-    final VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("C");
     rec.setNumberOfSamples(aa + ac + cc);
     for (int i = 0; i < aa / 2; i++) {
@@ -122,8 +119,7 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
   }
 
   protected static VcfRecord makeThreeAlleleRecord(int aa, int ac, int ag, int cc, int cg, int gg) {
-    final VcfRecord rec = new VcfRecord();
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("C");
     rec.addAltCall("G");
     rec.setNumberOfSamples(aa + ac + ag + cc + cg + gg);

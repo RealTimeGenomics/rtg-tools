@@ -69,11 +69,11 @@ public class VcfInfoDoubleAnnotatorTest extends TestCase {
     assertEquals("DUMMY-DESC", header.getInfoLines().get(0).getDescription());
     assertEquals(MetaType.FLOAT, header.getInfoLines().get(0).getType());
     assertEquals(1, header.getInfoLines().get(0).getNumber().getNumber());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     ann.annotate(rec);
     ann.annotate(rec); // Test that doing a second time doesn't break it / add extra
     assertEquals(1, rec.getInfo().get("DUMMY").size());
     assertEquals("0.123", rec.getInfo().get("DUMMY").get(0));
-    assertEquals("null\t0\t.\tnull\t.\t.\t.\tDUMMY=0.123", rec.toString());
+    assertEquals("seq\t1\t.\tA\t.\t.\t.\tDUMMY=0.123", rec.toString());
   }
 }

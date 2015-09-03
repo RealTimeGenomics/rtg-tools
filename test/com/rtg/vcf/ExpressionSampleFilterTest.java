@@ -40,7 +40,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testEq() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR=1");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");
@@ -51,7 +51,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testNe() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR!=1");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");
@@ -62,7 +62,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testGt() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR>1");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");
@@ -73,7 +73,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testLt() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR<2");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");
@@ -84,7 +84,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testGe() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR>=2");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");
@@ -95,7 +95,7 @@ public class ExpressionSampleFilterTest extends TestCase {
   public void testLe() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR<=1");
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
     rec.addFormatAndSample("ATTR", "2");

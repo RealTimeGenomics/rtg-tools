@@ -65,10 +65,9 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
   public void testSomaticCase() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
-    final VcfRecord rec = new VcfRecord();
-    rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
+    rec.setNumberOfSamples(2);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, VcfUtils.MISSING_FIELD);
@@ -83,9 +82,8 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
   public void testGainOfReference() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
     rec.addAltCall("G");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
@@ -101,9 +99,8 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
   public void testNonsomaticCase() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
     rec.addAltCall("G");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
@@ -118,9 +115,8 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
   public void testNoCoverageInNormal() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     an.checkHeader(makeHeader());
-    final VcfRecord rec = new VcfRecord();
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
     rec.addAltCall("G");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");

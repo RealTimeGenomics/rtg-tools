@@ -47,11 +47,10 @@ public class AlleleCountInGenotypesAnnotationTest extends TestCase {
 
   public void test() {
     final AlleleCountInGenotypesAnnotation ann = new AlleleCountInGenotypesAnnotation();
-    final VcfRecord record = new VcfRecord();
-    record.setNumberOfSamples(4);
-    record.setRefCall("G");
+    final VcfRecord record = new VcfRecord("seq", 0, "G");
     record.addAltCall("A");
     record.addAltCall("C");
+    record.setNumberOfSamples(4);
     record.addFormatAndSample("GT", "1/0");
     record.addFormatAndSample("GT", "1/1");
     record.addFormatAndSample("GT", ".");
@@ -66,9 +65,8 @@ public class AlleleCountInGenotypesAnnotationTest extends TestCase {
 
   public void testNoAlt() {
     final AlleleCountInGenotypesAnnotation ann = new AlleleCountInGenotypesAnnotation();
-    final VcfRecord record = new VcfRecord();
+    final VcfRecord record = new VcfRecord("seq", 0, "G");
     record.setNumberOfSamples(4);
-    record.setRefCall("G");
     record.addFormatAndSample("GT", "0/0");
     record.addFormatAndSample("GT", ".");
     assertNull(ann.getValue(record, -1));

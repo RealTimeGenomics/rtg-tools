@@ -51,10 +51,9 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
   public void testSomaticCase() {
     final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
     an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeader());
-    final VcfRecord rec = new VcfRecord();
-    rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
+    rec.setNumberOfSamples(2);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, VcfUtils.MISSING_FIELD);
@@ -69,10 +68,9 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
   public void testGainOfReference() {
     final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
     an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeader());
-    final VcfRecord rec = new VcfRecord();
-    rec.setNumberOfSamples(2);
-    rec.setRefCall("A");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
+    rec.setNumberOfSamples(2);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, VcfUtils.MISSING_FIELD);
