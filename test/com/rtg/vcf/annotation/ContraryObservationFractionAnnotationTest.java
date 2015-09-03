@@ -128,4 +128,21 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     assertNull(an.getValue(rec, 1));
   }
 
+  public void testTriallelic() {
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
+    an.checkHeader(makeHeader());
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.setNumberOfSamples(2);
+    rec.addAltCall("G");
+    rec.addAltCall("C");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/2");
+    rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, VcfUtils.MISSING_FIELD);
+    rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, "2");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "5,5,2");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,1,5");
+    assertNull(an.getValue(rec, 0));
+    assertEquals(3.0 / 12.0, (Double) an.getValue(rec, 1), 1e-10);
+  }
+
 }
