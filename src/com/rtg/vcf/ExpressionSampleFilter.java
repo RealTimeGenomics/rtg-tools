@@ -86,14 +86,20 @@ public class ExpressionSampleFilter extends VcfSampleFilter {
     super(stats, VcfFilterStatistics.Stat.USER_EXPRESSION_COUNT);
     final String expr = expression.replace(" ", "");
     int k = 0;
-    while ("!=<>".indexOf(expr.charAt(k)) == -1) {
+    while (k < expr.length() && "!=<>".indexOf(expr.charAt(k)) == -1) {
       k++;
     }
     final int opStart = k;
     mField = expr.substring(0, opStart);
+    if (mField.isEmpty()) {
+      throw new NoTalkbackSlimException("Could not parse field in: " + expression);
+    }
     do {
       k++;
-    } while ("!=<>".indexOf(expr.charAt(k)) >= 0);
+    } while (k < expr.length() && "!=<>".indexOf(expr.charAt(k)) >= 0);
+    if (opStart >= expr.length()) {
+      throw new NoTalkbackSlimException("No operator found in: " + expression);
+    }
     final String operator = expr.substring(opStart, k);
     switch (operator) {
       case "=":
@@ -119,7 +125,11 @@ public class ExpressionSampleFilter extends VcfSampleFilter {
       default:
         throw new NoTalkbackSlimException("Invalid operator: " + operator);
     }
-    mValue = Double.parseDouble(expr.substring(k));
+    try {
+      mValue = Double.parseDouble(expr.substring(k));
+    } catch (final NumberFormatException e) {
+      throw new NoTalkbackSlimException("Failed to parse number in: " + expression);
+    }
   }
 
   @Override

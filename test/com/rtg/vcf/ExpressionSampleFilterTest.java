@@ -30,6 +30,8 @@
 
 package com.rtg.vcf;
 
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
+
 import junit.framework.TestCase;
 
 /**
@@ -83,7 +85,7 @@ public class ExpressionSampleFilterTest extends TestCase {
 
   public void testGe() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
-    final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR>=2");
+    final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR  >= 2");
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addFormatAndSample("ATTR", "1");
@@ -101,5 +103,45 @@ public class ExpressionSampleFilterTest extends TestCase {
     rec.addFormatAndSample("ATTR", "2");
     assertTrue(f.acceptSample(rec, 0));
     assertFalse(f.acceptSample(rec, 1));
+  }
+
+  public void testBadExpressions() {
+    final VcfFilterStatistics stats = new VcfFilterStatistics();
+    try {
+      new ExpressionSampleFilter(stats, "<=1");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
+    try {
+      new ExpressionSampleFilter(stats, "ATTR<!=1");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
+    try {
+      new ExpressionSampleFilter(stats, "ATTR<=1.0.0");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
+    try {
+      new ExpressionSampleFilter(stats, "ATTR!=");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
+    try {
+      new ExpressionSampleFilter(stats, "ATTR");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
+    try {
+      new ExpressionSampleFilter(stats, "");
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      // expected
+    }
   }
 }
