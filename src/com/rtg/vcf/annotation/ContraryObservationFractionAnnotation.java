@@ -73,12 +73,8 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     }
   }
 
-  protected Object getValue(final int ref, final int alt) {
-    final long total = alt + (long) ref;
-    if (total == 0) {
-      return null; // Undefined (no coverage in the normal)
-    }
-    return alt / (double) total;
+  protected Object getValue(final double contraryFraction, final int contraryCount) {
+    return Double.isNaN(contraryFraction) ? null : contraryFraction;
   }
 
   private int[] ad(final VcfRecord record, final int sample) {
@@ -87,10 +83,31 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
       return null;
     }
     final String[] adSplit = StringUtils.split(ad, ',');
-    if (adSplit.length != 2) {
+    final int[] res = new int[adSplit.length];
+    for (int k = 0; k < res.length; k++) {
+      res[k] = Integer.parseInt(adSplit[k]);
+    }
+    return res;
+  }
+
+  private boolean[] alleles(final VcfRecord record, final int sampleNumber) {
+    final int[] originalGt = VcfUtils.getValidGt(record, sampleNumber);
+    if (originalGt == null) {
       return null;
     }
-    return new int[] {Integer.parseInt(adSplit[0]), Integer.parseInt(adSplit[1])};
+    final boolean[] res = new boolean[record.getAltCalls().size() + 1];
+    for (final int allele : originalGt) {
+      res[allele] = true;
+    }
+    return res;
+  }
+
+  private int sum(final int... a) {
+    int s = 0;
+    for (final int v : a) {
+      s += v;
+    }
+    return s;
   }
 
   @Override
@@ -107,37 +124,28 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     if (ss == null || ss != 2) {
       return null; // Not a somatic call
     }
-    final int[] originalGt = VcfUtils.getValidGt(record, originalSample);
-    final int good;
-    final int contrary;
-    if (VcfUtils.isHomozygousRef(originalGt)) {
-      // Somatic call
-      assert !VcfUtils.isHomozygousRef(VcfUtils.getValidGt(record, sampleNumber));
-      final int[] ad = ad(record, originalSample);
-      if (ad == null) {
-        return null;
-      }
-      good = ad[0];
-      contrary = ad[1];
-    } else {
-      final int[] ad = ad(record, sampleNumber);
-      if (ad == null) {
-        return null;
-      }
-      final int[] derivedGt = VcfUtils.getValidGt(record, sampleNumber);
-      if (VcfUtils.isHomozygousRef(derivedGt)) {
-        // 0/1 -> 0/0, gain of reference
-        good = ad[0];
-        contrary = ad[1];
-      } else if (derivedGt.length == 2 && derivedGt[0] == derivedGt[1] && derivedGt[0] == 1) {
-        // 0/1 -> 1/1
-        good = ad[1];
-        contrary = ad[0];
-      } else {
-        return null;
+    final int[] originalAd = ad(record, originalSample);
+    final int[] derivedAd = ad(record, sampleNumber);
+    if (originalAd == null || derivedAd == null) {
+      return null; // Safety, should not happen on well-formed data
+    }
+    final boolean[] originalAlleles = alleles(record, originalSample);
+    final boolean[] derivedAlleles = alleles(record, sampleNumber);
+    if (originalAlleles == null || derivedAlleles == null) {
+      return null; // Safety, should not happen on well-formed data
+    }
+    assert originalAlleles.length == originalAd.length && originalAlleles.length == derivedAlleles.length && originalAlleles.length == derivedAd.length;
+    final double invOriginalAdSum = 1.0 / sum(originalAd);
+    final double invDerivedAdSum = 1.0 / sum(derivedAd);
+    int contraryCount = 0;
+    double contraryFraction = 0.0;
+    for (int k = 0; k < originalAlleles.length; k++) {
+      if (originalAlleles[k] ^ derivedAlleles[k]) {
+        contraryCount += originalAlleles[k] ? derivedAd[k] : originalAd[k];
+        contraryFraction += originalAlleles[k] ? derivedAd[k] * invDerivedAdSum : originalAd[k] * invOriginalAdSum;
       }
     }
-    return getValue(good, contrary);
+    return getValue(contraryFraction, contraryCount);
   }
 
   @Override
