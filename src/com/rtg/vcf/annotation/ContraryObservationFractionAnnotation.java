@@ -41,9 +41,9 @@ import com.rtg.vcf.header.VcfHeader;
 
 /**
  * The fraction of evidence that is considered contrary to the call made for this sample.
- * For example, in a normal&ndash;cancer somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
+ * For example, in a somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
  * value is the fraction of the somatic (1) allele in the normal sample.  Usually a high
- * <code>COF</code> value indicates an unrealiable call.
+ * <code>COF</code> value indicates an unreliable call.
  */
 public class ContraryObservationFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
