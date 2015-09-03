@@ -73,12 +73,24 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     }
   }
 
-  protected Object getValue(final long ref, final long alt) {
-    final long total = alt + ref;
+  protected Object getValue(final int ref, final int alt) {
+    final long total = alt + (long) ref;
     if (total == 0) {
       return null; // Undefined (no coverage in the normal)
     }
     return alt / (double) total;
+  }
+
+  private int[] ad(final VcfRecord record, final int sample) {
+    final String ad = record.getSampleString(sample, VcfUtils.FORMAT_ALLELIC_DEPTH);
+    if (ad == null) {
+      return null;
+    }
+    final String[] adSplit = StringUtils.split(ad, ',');
+    if (adSplit.length != 2) {
+      return null;
+    }
+    return new int[] {Integer.parseInt(adSplit[0]), Integer.parseInt(adSplit[1])};
   }
 
   @Override
@@ -96,26 +108,36 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
       return null; // Not a somatic call
     }
     final int[] originalGt = VcfUtils.getValidGt(record, originalSample);
-    final String ad;
+    final int good;
+    final int contrary;
     if (VcfUtils.isHomozygousRef(originalGt)) {
       // Somatic call
       assert !VcfUtils.isHomozygousRef(VcfUtils.getValidGt(record, sampleNumber));
-      ad = record.getSampleString(originalSample, VcfUtils.FORMAT_ALLELIC_DEPTH);
+      final int[] ad = ad(record, originalSample);
+      if (ad == null) {
+        return null;
+      }
+      good = ad[0];
+      contrary = ad[1];
     } else {
-      // Gain of reference, flip the logic, should be little ALT in the derived sample
-      assert VcfUtils.isHomozygousRef(VcfUtils.getValidGt(record, sampleNumber));
-      ad = record.getSampleString(sampleNumber, VcfUtils.FORMAT_ALLELIC_DEPTH);
+      final int[] ad = ad(record, sampleNumber);
+      if (ad == null) {
+        return null;
+      }
+      final int[] derivedGt = VcfUtils.getValidGt(record, sampleNumber);
+      if (VcfUtils.isHomozygousRef(derivedGt)) {
+        // 0/1 -> 0/0, gain of reference
+        good = ad[0];
+        contrary = ad[1];
+      } else if (derivedGt.length == 2 && derivedGt[0] == derivedGt[1] && derivedGt[0] == 1) {
+        // 0/1 -> 1/1
+        good = ad[1];
+        contrary = ad[0];
+      } else {
+        return null;
+      }
     }
-    if (ad == null) {
-      return null; // No AD information for the original
-    }
-    final String[] adSplit = StringUtils.split(ad, ',');
-    if (adSplit.length != 2) {
-      return null; // Not biallelic, these cases too hard for now
-    }
-    final long ref = Long.parseLong(adSplit[0]);
-    final long alt = Long.parseLong(adSplit[1]);
-    return getValue(ref, alt);
+    return getValue(good, contrary);
   }
 
   @Override

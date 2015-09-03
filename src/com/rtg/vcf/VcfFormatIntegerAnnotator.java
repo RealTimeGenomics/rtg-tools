@@ -53,6 +53,7 @@ public class VcfFormatIntegerAnnotator implements VcfAnnotator {
 
   @Override
   public void updateHeader(VcfHeader header) {
+    mAnnotation.checkHeader(header);
     header.ensureContains(new FormatField(mAnnotation.getName(), MetaType.INTEGER, new VcfNumber("1"), mAnnotation.getDescription()));
   }
 

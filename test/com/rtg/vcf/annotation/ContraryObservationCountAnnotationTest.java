@@ -61,7 +61,7 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6");
     assertNull(an.getValue(rec, 0));
-    assertEquals(1, ((Long) an.getValue(rec, 1)).longValue());
+    assertEquals(1, an.getValue(rec, 1));
     assertNull(an.getValue(rec, 2));
   }
 
@@ -78,7 +78,7 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6");
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,2");
     assertNull(an.getValue(rec, 0));
-    assertEquals(2, ((Long) an.getValue(rec, 1)).longValue());
+    assertEquals(2, an.getValue(rec, 1));
     assertNull(an.getValue(rec, 2));
   }
 }

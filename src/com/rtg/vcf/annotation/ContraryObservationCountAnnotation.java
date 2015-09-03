@@ -46,7 +46,7 @@ public class ContraryObservationCountAnnotation extends ContraryObservationFract
   }
 
   @Override
-  protected Object getValue(final long ref, final long alt) {
+  protected Object getValue(final int ref, final int alt) {
     return alt;
   }
 
