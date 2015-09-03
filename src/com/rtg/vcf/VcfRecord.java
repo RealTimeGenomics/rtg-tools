@@ -242,7 +242,7 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * Perform merge operation on a set of records with the same start position, batching up into seperate merge operations for each reference span.
+   * Perform merge operation on a set of records with the same start position, batching up into separate merge operations for each reference span.
    * @param records the records to merge
    * @param headers the VcfHeader corresponding to each record
    * @param destHeader the VcfHeader of of the destination VCF

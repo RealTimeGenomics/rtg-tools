@@ -32,9 +32,9 @@ package com.rtg.vcf.annotation;
 
 /**
  * The count of evidence that is considered contrary to the call made for this sample.
- * For example, in a normal&ndash;cancer somatic call of 0/0 -&gt; 1/0, the <code>COC</code>
+ * For example, in a <code>normal&ndash;cancer</code> somatic call of 0/0 -&gt; 1/0, the <code>COC</code>
  * value is the count of the somatic (1) allele in the normal sample.  Usually a high
- * <code>COC</code> value indicates an unrealiable call.
+ * <code>COC</code> value indicates an unreliable call.
  */
 public class ContraryObservationCountAnnotation extends ContraryObservationFractionAnnotation {
 

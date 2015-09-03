@@ -22,6 +22,7 @@ ls454
 PCR
 Tabix
 VCF
+gVCF
 HTML
 # this is horrible
 @RG\tID
