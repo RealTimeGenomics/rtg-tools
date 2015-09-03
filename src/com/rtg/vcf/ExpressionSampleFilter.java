@@ -38,12 +38,44 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 public class ExpressionSampleFilter extends VcfSampleFilter {
 
   private enum Operation {
-    EQ,
-    NE,
-    LT,
-    GT,
-    LE,
-    GE
+    EQ {
+      @Override
+      public boolean compare(double a, double b) {
+        return a == b;
+      }
+    },
+    NE {
+      @Override
+      public boolean compare(double a, double b) {
+        return a != b;
+      }
+    },
+    LT {
+      @Override
+      public boolean compare(double a, double b) {
+        return a < b;
+      }
+    },
+    GT {
+      @Override
+      public boolean compare(double a, double b) {
+        return a > b;
+      }
+    },
+    LE {
+      @Override
+      public boolean compare(double a, double b) {
+        return a <= b;
+      }
+    },
+    GE {
+      @Override
+      public boolean compare(double a, double b) {
+        return a >= b;
+      }
+    };
+
+    protected abstract boolean compare(final double a, final double b);
   }
 
   private final String mField;
@@ -93,24 +125,6 @@ public class ExpressionSampleFilter extends VcfSampleFilter {
   @Override
   boolean acceptSample(final VcfRecord record, final int index) {
     final Double val = record.getSampleDouble(index, mField);
-    if (val == null) {
-      return false;
-    }
-    final double v = val;
-    switch (mOp) {
-      default:
-      case EQ:
-        return mValue == v;
-      case NE:
-        return mValue != v;
-      case LT:
-        return v < mValue;
-      case GT:
-        return v > mValue;
-      case LE:
-        return v <= mValue;
-      case GE:
-        return v >= mValue;
-    }
+    return val != null && mOp.compare(val, mValue);
   }
 }
