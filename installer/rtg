@@ -2,11 +2,11 @@
 
 # Pre-flight safety-belts
 if [ "$(uname -s)" != "Linux" ] && [ "$(uname -s)" != "Darwin" ]; then
-    # Only linux is officially supported at this stage, if you comment this you are on your own :-)
+    # If you comment this check out you are on your own :-)
     echo "Sorry, only Linux and MacOS are supported."
     exit 1
 elif [ "$(uname -m)" != "x86_64" ]; then
-    # Only 64 bit is officially supported at this stage, if you comment this you are on your own :-)
+    # If you comment this check out you are on your own :-)
     echo "Sorry, you must be running a 64bit operating system."
     exit 1
 fi
@@ -206,8 +206,8 @@ if [ -z "$java_path" -o ! -x "$java_path" ] ; then
 fi
 
 RTG_MIN_MEM=-Xmx64m                  # Minimal memory just used for java version checking, log sending etc.
-version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | awk '/^java version/{gsub(/"/, "", $3); print $3}')
-if echo "$version" | awk '{if($1+0>=1.7){exit 1}else{exit 0}}' ; then
+version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | sed -n '/^.* version/s/.* version "\([0-9]\)\.\([0-9]*\).*/\1\2/p')
+if [ ! "$version" ] || [ ! "$version" -ge 17 ]; then
   echo "$RTG_JAVA is not Java 7 or later"
   exit 1
 fi
