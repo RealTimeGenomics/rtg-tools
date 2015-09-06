@@ -34,6 +34,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -91,14 +92,18 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     check(TEMPLATE, both, calledOnly, baselineOnly, tpOut, fpOut, fnOut, true, sortField);
     check(TEMPLATE, both, calledOnly, baselineOnly, tpOut, fpOut, fnOut, false, sortField);
   }
+
   private void check(String ref, String[] both, String[] calledOnly, String[] baselineOnly, String[] tpOut, String[] fpOut, String[] fnOut, boolean zip, String sortField) throws IOException, UnindexableDataException {
-    try (TestDirectory tdir = new TestDirectory()) {
+    try (final TestDirectory tdir = new TestDirectory()) {
+      assertTrue(tdir.isDirectory());
+      assertEquals(0, tdir.listFiles().length);
       createInput(tdir, both, calledOnly, baselineOnly);
 
       final File calls = new File(tdir, "calls.vcf.gz");
       final File baseline = new File(tdir, "baseline.vcf.gz");
-      final File out = FileUtils.createTempDir("out", zip ? "zip" : "notZipped", tdir);
       final File template = new File(tdir, "template");
+      final File out = FileUtils.createTempDir("out", zip ? "zip" : "notZipped", tdir);
+      assertTrue(out.isDirectory());
       //System.err.println("baseline \n" + FileUtils.fileToString(baseline));
       //System.err.println("calls \n" + FileUtils.fileToString(calls));
       ReaderTestUtils.getReaderDNA(ref, template, null).close();
@@ -106,7 +111,9 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
         .templateFile(template).outputParams(new OutputParams(out, false, zip)).scoreField(sortField).create();
       VcfEvalTask.evaluateCalls(params);
       final String zipSuffix = zip ? ".gz" : "";
-      final String tpResults = fileToString(new File(out, "tp.vcf" + zipSuffix), zip);
+      final File tpFile = new File(out, "tp.vcf" + zipSuffix);
+      assertTrue(Arrays.toString(out.listFiles()), tpFile.isFile());
+      final String tpResults = fileToString(tpFile, zip);
       final String fpResults = fileToString(new File(out, "fp.vcf" + zipSuffix), zip);
       final String fnResults = fileToString(new File(out, "fn.vcf" + zipSuffix), zip);
       final String header = "##fileformat=VCFv4.1\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
@@ -159,14 +166,14 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
       baselineList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
     }
-    try (BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
+    try (final BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
       callOut.write(CALLS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
       for (final Entry<Variant, String> var : callList.entrySet()) {
         callOut.write(var.getValue() + "\n");
       }
     }
     new TabixIndexer(calls).saveVcfIndex();
-    try (BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseline, true, false)))) {
+    try (final BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseline, true, false)))) {
       mutOut.write(BASELINE_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
       for (final Entry<Variant, String> var : baselineList.entrySet()) {
         mutOut.write(var.getValue() + "\n");
