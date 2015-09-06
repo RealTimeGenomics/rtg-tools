@@ -28,18 +28,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Discover all unit tests within class path, optionally matching a package prefix
@@ -78,7 +80,15 @@ public class ClassPathSuite extends TestSuite {
         scanZipFile(testClasses, root);
       }
     }
-    return testClasses.toArray(new Class<?>[testClasses.size()]);
+    final Class<?>[] result = testClasses.toArray(new Class<?>[testClasses.size()]);
+    // Make the order deterministic
+    Arrays.sort(result, new Comparator<Class<?>>() {
+      @Override
+      public int compare(Class<?> o1, Class<?> o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+    return result;
   }
 
   private void scanDirectory(List<Class<?>> classes, File root, File cur) {
