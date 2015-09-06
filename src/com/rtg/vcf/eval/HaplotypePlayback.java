@@ -360,10 +360,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    return compareTo((HaplotypePlayback) obj) == 0;
+    return obj instanceof HaplotypePlayback && compareTo((HaplotypePlayback) obj) == 0;
   }
 
   @Override
