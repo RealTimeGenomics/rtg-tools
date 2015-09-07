@@ -122,9 +122,22 @@ public final class FastaUtils {
     if (qualities == null) {
       return null;
     }
-    final byte[] result = new byte[qualities.length()];
-    for (int i = 0; i < result.length; i++) {
-      result[i] = asciiToRawQuality(qualities.charAt(i));
+    return asciiToRawQuality(qualities, 0, qualities.length());
+  }
+
+  /**
+   * @param qualities the ASCII quality values
+   * @param offset Where in buffer to start conversion.
+   * @param length the number of bytes from the input buffer to convert
+   * @return the raw quality values corresponding to the ASCII quality values
+   */
+  public static byte[] asciiToRawQuality(CharSequence qualities, int offset, int length) {
+    if (qualities == null) {
+      return null;
+    }
+    final byte[] result = new byte[length];
+    for (int j = offset, i = 0; i < result.length; i++, j++) {
+      result[i] = asciiToRawQuality(qualities.charAt(j));
     }
     return result;
   }

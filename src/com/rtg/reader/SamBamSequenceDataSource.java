@@ -185,8 +185,12 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
         return null;
       }
     } else {
-      return new SamSequence(mSamIterator.next());
+      return makeSamSequence(mSamIterator.next());
     }
+  }
+
+  protected SamSequence makeSamSequence(SAMRecord rec) {
+    return new SamSequence(rec);
   }
 
   /**

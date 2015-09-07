@@ -48,6 +48,7 @@ import com.rtg.reader.FormatCli.BadFormatCombinationException;
 import com.rtg.reader.FormatCli.PrereadExecutor;
 import com.rtg.reader.FormatCli.PrereadExecutor.SequenceProcessor;
 import com.rtg.util.Constants;
+import com.rtg.util.License;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
@@ -72,7 +73,7 @@ public class FormatCliTest extends AbstractCliTest {
   public void testHelp() {
     checkHelp("rtg format"
         , "Converts the contents of sequence data files (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format."
-        , "-f,", "--format=FORMAT", "format of input (Must be one of [fasta, fastq, cgfastq, sam-se, sam-pe]) (Default is fasta)"
+        , "-f,", "--format=FORMAT", "format of input (Must be one of [fasta, fastq"
         , "-q,", "--quality-format=FORMAT", "format of quality data for fastq files (use sanger for Illumina 1.8+) (Must be one of [sanger, solexa, illumina])"
         , "--input-list-file=FILE", "file containing a list of input read files (1 per line)"
         , "-l,", "--left=FILE", "left input file for FASTA/FASTQ paired end data"
@@ -320,7 +321,7 @@ public class FormatCliTest extends AbstractCliTest {
       final MemoryPrintStream out = new MemoryPrintStream();
       final MemoryPrintStream err = new MemoryPrintStream();
       final File outputDir = new File(tempDir, JUNITOUT);
-      final String s = checkMainInitBadFlags("-o",  outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-l" , rawLeft.getPath(), "-r", rawRight.getPath());
+      final String s = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", "-l", rawLeft.getPath(), "-r", rawRight.getPath());
 
       assertTrue(outputDir.isDirectory());
       assertTrue(new File(outputDir, "left").isDirectory());
@@ -335,27 +336,29 @@ public class FormatCliTest extends AbstractCliTest {
 
 
   public void testValidUseCG() throws Exception {
-    try (final TestDirectory tempDir = new TestDirectory("format")) {
-      final File raw1 = new File(tempDir, "raw1.fq");
-      final File raw2 = new File(tempDir, "raw2.fq");
-      FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw1);
-      FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw2);
+    if (License.isDeveloper()) {
+      try (final TestDirectory tempDir = new TestDirectory("format")) {
+        final File raw1 = new File(tempDir, "raw1.fq");
+        final File raw2 = new File(tempDir, "raw2.fq");
+        FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw1);
+        FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw2);
 
-      final File outputDir = new File(tempDir, JUNITOUT);
-      final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "cgfastq", "-l", raw1.getPath(), "-r", raw2.getPath());
-      assertTrue(out.contains("Format             : CG"));
-      assertTrue(out.contains("Type               : DNA"));
-      assertTrue(out.contains("SDF-ID"));
-      assertTrue(out.contains("Number of sequences: 2"));
-      assertTrue(out.contains("Total residues     : 10"));
-      assertTrue(out.contains("Minimum length     : 5"));
-      assertTrue(out.contains("Maximum length     : 5"));
+        final File outputDir = new File(tempDir, JUNITOUT);
+        final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "cg-fastq", "-l", raw1.getPath(), "-r", raw2.getPath());
+        assertTrue(out.contains("Format             : FASTQ_CG"));
+        assertTrue(out.contains("Type               : DNA"));
+        assertTrue(out.contains("SDF-ID"));
+        assertTrue(out.contains("Number of sequences: 2"));
+        assertTrue(out.contains("Total residues     : 10"));
+        assertTrue(out.contains("Minimum length     : 5"));
+        assertTrue(out.contains("Maximum length     : 5"));
 
-      assertTrue(outputDir.isDirectory());
-      assertTrue(new File(outputDir, "left").isDirectory());
-      assertTrue(new File(outputDir, "right").isDirectory());
-      assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
-      assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
+        assertTrue(outputDir.isDirectory());
+        assertTrue(new File(outputDir, "left").isDirectory());
+        assertTrue(new File(outputDir, "right").isDirectory());
+        assertTrue(new File(new File(outputDir, "left"), "mainIndex").exists());
+        assertTrue(new File(new File(outputDir, "right"), "mainIndex").exists());
+      }
     }
   }
 
@@ -502,7 +505,7 @@ public class FormatCliTest extends AbstractCliTest {
   public void testGetFormat() {
     assertEquals(InputFormat.FASTA, FormatCli.getFormat("fasta", null, true));
     assertEquals(InputFormat.FASTQ, FormatCli.getFormat("fastq", "sanger", true));
-    assertEquals(InputFormat.CG, FormatCli.getFormat("cgfastq", null, true));
+    //assertEquals(InputFormat.CG, FormatCli.getFormat("cgfastq", null, true));
     assertEquals(InputFormat.SOLEXA, FormatCli.getFormat("fastq", "solexa", true));
     assertEquals(InputFormat.SOLEXA1_3, FormatCli.getFormat("fastq", "illumina", true));
     try {
@@ -535,7 +538,7 @@ public class FormatCliTest extends AbstractCliTest {
   }
 
   public void testFormattingMessage() {
-    testMessage("CGFASTQ", InputFormat.CG);
+    testMessage("CGFASTQ", InputFormat.FASTQ_CG);
     testMessage("FASTA", InputFormat.FASTA);
     testMessage("FASTQ", InputFormat.FASTQ, InputFormat.SOLEXA, InputFormat.SOLEXA1_3);
     testMessage("SAM/BAM", InputFormat.SAM_PE, InputFormat.SAM_SE);
@@ -668,7 +671,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File output = new File(dir, "output");
       FileHelper.resourceToFile("com/rtg/reader/resources/mated.sam", input);
       final String err = checkMainInitBadFlags(input.getPath(), "-o", output.getPath(), "-f", "sam-pe");
-      TestUtils.containsAll(err, "Multiple read group information present in the input file");
+      TestUtils.containsAll(err, "Multiple read groups present in the input file");
     }
   }
 }

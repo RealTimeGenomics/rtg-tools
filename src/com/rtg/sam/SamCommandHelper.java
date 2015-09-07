@@ -109,10 +109,10 @@ public final class SamCommandHelper {
     final BufferedInputStream bis;
     final String errorSubString;
     if (fileMode) {
-      errorSubString = "file \"" + rgFile.getPath() + "\", please provide file";
+      errorSubString = "file \"" + rgFile.getPath() + "\", please provide a file";
       bis = FileUtils.createInputStream(rgFile, false);
     } else {
-      errorSubString = "string \"" + value + "\", please provide string";
+      errorSubString = "string \"" + value + "\", please provide a string";
       final String convertedValue = value.replaceAll("\\\\t", "\t");
       bis = new BufferedInputStream(new ByteArrayInputStream(convertedValue.getBytes()));
     }
@@ -122,14 +122,14 @@ public final class SamCommandHelper {
       final int readGroupCount = readGroups.size();
       if (readGroupCount == 0) {
         if (strict == ReadGroupStrictness.REQUIRED) {
-            throw new InvalidParamsException("No read group information present in the input " + errorSubString + " with single read group line");
+            throw new InvalidParamsException("No read group information present in the input " + errorSubString + " with a single read group");
         } else {
           return null;
         }
       }
       if (readGroupCount > 1) {
         if (strict == ReadGroupStrictness.REQUIRED || strict == ReadGroupStrictness.AT_MOST_ONE) {
-          throw new InvalidParamsException("Multiple read group information present in the input " + errorSubString + " with single read group line");
+          throw new InvalidParamsException("Multiple read groups present in the input " + errorSubString + " with a single read group");
         } else {
           return null;
         }
@@ -155,7 +155,7 @@ public final class SamCommandHelper {
     } else {
       format = FormatCli.SDF_FORMAT;
     }
-    return FormatCli.SAM_PE_FORMAT.equals(format) || FormatCli.SAM_SE_FORMAT.equals(format);
+    return FormatCli.SAM_PE_FORMAT.equals(format) || FormatCli.SAM_SE_FORMAT.equals(format) || FormatCli.CGSAM_FORMAT.equals(format);
   }
 
   /**

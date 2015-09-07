@@ -44,6 +44,6 @@ public class InputFormatTest extends TestCase {
   }
 
   public void testEnum() {
-    TestUtils.testEnum(InputFormat.class, "[FASTA, FASTQ, SOLEXA, SOLEXA1_3, CG, SAM_SE, SAM_PE]");
+    TestUtils.testEnum(InputFormat.class, "[FASTA, FASTQ, SOLEXA, SOLEXA1_3, FASTQ_CG, SAM_CG, SAM_SE, SAM_PE]");
   }
 }

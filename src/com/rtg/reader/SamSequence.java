@@ -47,9 +47,9 @@ public class SamSequence {
   private static final byte READ_STRAND_FLAG = 0x04;
   private static final byte NOT_PRIMARY_ALIGNMENT_FLAG = 0x08;
 
+  private final String mReadName;
   private final byte[] mReadBases;
   private final byte[] mBaseQualities;
-  private final String mReadName;
   private final byte mFlags;
 
   private final int mProjectedSplitReadPosition;
@@ -69,6 +69,14 @@ public class SamSequence {
     mProjectedSplitReadPosition = record.getAlignmentStart() * ((record.getFlags() & SamBamConstants.SAM_MATE_IS_REVERSE) != 0 ? 1 : -1);
   }
 
+  protected SamSequence(String readName, byte[] readBases, byte[] readQualities, byte flags, int projectedSplitReadPosition) {
+    mReadName = readName;
+    mReadBases = readBases;
+    mBaseQualities = readQualities;
+    mFlags = flags;
+    mProjectedSplitReadPosition = projectedSplitReadPosition;
+  }
+
   private SamSequence(SamSequence copy, String name) {
     mReadName = name;
     mFlags = copy.mFlags;
@@ -82,7 +90,7 @@ public class SamSequence {
     return new SamSequence(this, newName);
   }
 
-  private static byte getFlags(SAMRecord record) {
+  static byte getFlags(SAMRecord record) {
     byte flags = 0;
     if (record.getReadPairedFlag()) {
       flags ^= READ_PAIRED_FLAG;

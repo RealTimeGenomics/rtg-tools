@@ -62,7 +62,9 @@ import com.rtg.sam.SamFilterParams;
 import com.rtg.util.Constants;
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
+import com.rtg.util.License;
 import com.rtg.util.SimpleThreadPool;
+import com.rtg.util.Utils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
@@ -82,7 +84,6 @@ import htsjdk.samtools.SAMReadGroupRecord;
 /**
  * Perform the prereading of sequence data, into a format that is understood
  * by RTG.
- *
  */
 public final class FormatCli extends LoggedCli {
 
@@ -99,7 +100,9 @@ public final class FormatCli extends LoggedCli {
   /** CG TSV format */
   public static final String TSV_FORMAT = "tsv";
   /** CG FASTQ format */
-  public static final String CGFASTQ_FORMAT = "cgfastq";
+  public static final String CGFASTQ_FORMAT = "cg-fastq";
+  /** CG SAM format */
+  public static final String CGSAM_FORMAT = "cg-sam";
 
   private static final String XMAPPED_SAM = "Xmapped-sam";
   private static final String XDEDUP_SECONDARY = "Xdedup-secondary-alignments";
@@ -109,7 +112,6 @@ public final class FormatCli extends LoggedCli {
       super(string);
     }
   }
-
 
   /** Properties file with all non-logged strings used in the prereader. */
   static final String PREREAD_RESOURCE_BUNDLE = "com.rtg.reader.Prereader";
@@ -134,8 +136,6 @@ public final class FormatCli extends LoggedCli {
   private static final String READ_TRIM_FLAG = "trim-threshold";
   private static final String SELECT_READ_GROUP = "select-read-group";
 
-  private static final int MAX_FILES = Integer.MAX_VALUE;
-
   @Override
   public String moduleName() {
     return MODULE_NAME;
@@ -155,7 +155,11 @@ public final class FormatCli extends LoggedCli {
       mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
       final Flag formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, RESOURCE.getString("FORMAT_TYPE"), RESOURCE.getString("FORMAT_DESC"), RESOURCE.getString("FORMAT_FASTA")).setCategory(INPUT_OUTPUT);
-      formatFlag.setParameterRange(new String[]{FASTA_FORMAT, FASTQ_FORMAT, CGFASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT});
+      String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT };
+      if (License.isDeveloper()) {
+        formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
+      }
+      formatFlag.setParameterRange(formats);
       CommonFlags.initQualityFormatFlag(mFlags);
       mFlags.registerOptional(SELECT_READ_GROUP, String.class, "String", "when formatting from SAM/BAM input, only include reads with this read group ID").setCategory(FILTERING);
       mFlags.registerOptional('p', PROTEIN_FLAG, RESOURCE.getString("PROTEIN_DESC")).setCategory(INPUT_OUTPUT);
@@ -177,7 +181,7 @@ public final class FormatCli extends LoggedCli {
       SamCommandHelper.initSamRg(mFlags, "ILLUMINA", UTILITY);
       final Flag inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, RESOURCE.getString("INPUT_DESC"));
       inFlag.setMinCount(0);
-      inFlag.setMaxCount(MAX_FILES);
+      inFlag.setMaxCount(Integer.MAX_VALUE);
       inFlag.setCategory(INPUT_OUTPUT);
       mFlags.addRequiredSet(inFlag);
       mFlags.addRequiredSet(inputListFlag);
@@ -286,13 +290,13 @@ public final class FormatCli extends LoggedCli {
   public static SequenceDataSource getDnaDataSource(List<File> files, InputFormat format, PrereadArm arm, boolean mappedSam, boolean flattenPaired, String samReadGroup, boolean dedupSecondary) {
     if (format == InputFormat.FASTA) {
       return new FastaSequenceDataSource(files, new DNAFastaSymbolTable(), true, arm);
-    } else if (format == InputFormat.FASTQ || format == InputFormat.CG) {
+    } else if (format == InputFormat.FASTQ || format == InputFormat.FASTQ_CG) {
       return new FastqSequenceDataSource(files, FastQScoreType.PHRED, true, arm);
     } else if (format == InputFormat.SOLEXA) {
       return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA, true, arm);
     } else if (format == InputFormat.SOLEXA1_3) {
       return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA1_3, true, arm);
-    } else if (format == InputFormat.SAM_SE || format == InputFormat.SAM_PE) {
+    } else if (format.isSam()) {
       final List<SamFilter> filters = new ArrayList<>();
       int filterFlags = SamBamConstants.SAM_SUPPLEMENTARY_ALIGNMENT; // Always ignore supplementary alignments
       if (!dedupSecondary) {
@@ -305,11 +309,12 @@ public final class FormatCli extends LoggedCli {
       if (dedupSecondary) {
         filters.add(new DuplicateSamFilter());
       }
-      final boolean paired = format == InputFormat.SAM_PE;
-      if (mappedSam) {
-        return MappedSamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, new SamFilterChain(filters));
+      if (format == InputFormat.SAM_CG) {
+        return CgSamBamSequenceDataSource.fromInputFiles(files, flattenPaired, new SamFilterChain(filters));
+      } else if (mappedSam) {
+        return MappedSamBamSequenceDataSource.fromInputFiles(files, format.isPairedSam(), flattenPaired, new SamFilterChain(filters));
       } else {
-        return SamBamSequenceDataSource.fromInputFiles(files, paired, flattenPaired, new SamFilterChain(filters));
+        return SamBamSequenceDataSource.fromInputFiles(files, format.isPairedSam(), flattenPaired, new SamFilterChain(filters));
       }
     } else {
       throw new BadFormatCombinationException("Invalid file format=" + format);
@@ -402,7 +407,10 @@ public final class FormatCli extends LoggedCli {
         case SAM_PE:
           inputFileType = "SAM/BAM";
           break;
-        case CG:
+        case SAM_CG:
+          inputFileType = "CGSAM/BAM";
+          break;
+        case FASTQ_CG:
           inputFileType = "CGFASTQ";
           break;
         case FASTQ:
@@ -425,7 +433,7 @@ public final class FormatCli extends LoggedCli {
      */
     public void performPreread(final List<File> files) throws IOException {
       final SequencesWriter writer;
-      formattingMessage(mInputFormat == InputFormat.SAM_PE);
+      formattingMessage(mInputFormat.isPairedSam());
       final SequenceDataSource ds;
       if (mProtein) {
         if (mInputFormat != InputFormat.FASTA) {
@@ -437,7 +445,7 @@ public final class FormatCli extends LoggedCli {
       } else {
         ds = getDnaDataSource(files, mInputFormat, null, mMappedSam, false, mSamReadGroup, mDedupSecondary);
         ds.setDusting(mDusting);
-        if (mInputFormat == InputFormat.SAM_PE) {
+        if (mInputFormat.isPairedSam()) {
           writer = new AlternatingSequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed, mReadTrimQualityThreshold);
         } else {
           writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed, mReadTrimQualityThreshold);
@@ -449,8 +457,8 @@ public final class FormatCli extends LoggedCli {
 
       final Counts inputCounts = new Counts(writer.getNumberOfSequences() + writer.getNumberOfExcludedSequences(), writer.getTotalLength() + writer.getExcludedResidueCount(), ds.getMaxLength() , ds.getMinLength());
       final Counts outputCounts = new Counts(writer.getNumberOfSequences(), writer.getTotalLength(), writer.getMaxLength(), writer.getMinLength());
-      mNumSequences = mInputFormat == InputFormat.SAM_PE ? writer.getNumberOfSequences() / 2 : writer.getNumberOfSequences();
-      writeStats(files.toArray(new File[files.size()]), mInputFormat == InputFormat.SAM_PE, inputCounts, outputCounts, writer.getSdfId(), ds.getDusted());
+      mNumSequences = mInputFormat.isPairedSam() ? writer.getNumberOfSequences() / 2 : writer.getNumberOfSequences();
+      writeStats(files.toArray(new File[files.size()]), mInputFormat.isPairedSam(), inputCounts, outputCounts, writer.getSdfId(), ds.getDusted());
     }
 
     /**
@@ -490,38 +498,27 @@ public final class FormatCli extends LoggedCli {
       }
 
       final long leftSeqs = leftSequenceProc.mWriter.getNumberOfSequences();
-
       final long rightSeqs = rightSequenceProc.mWriter.getNumberOfSequences();
       if (leftSeqs != rightSeqs) {
         throw new NoTalkbackSlimException("Invalid input, paired end data must have same number of sequences. Left had: " + leftSeqs + " Right had: " + rightSeqs);
       }
-      final long leftSeqsExcluded = leftSequenceProc.mWriter.getNumberOfExcludedSequences();
-      final long rightSeqsExcluded = rightSequenceProc.mWriter.getNumberOfExcludedSequences();
       final long leftSeqsTotal = leftSequenceProc.mWriter.getTotalLength();
       final long rightSeqsTotal = rightSequenceProc.mWriter.getTotalLength();
-      final long leftSeqsExcludedResidue = leftSequenceProc.mWriter.getExcludedResidueCount();
-      final long rightSeqsExcludedResidue = rightSequenceProc.mWriter.getExcludedResidueCount();
-      final long leftSeqsMin = leftSequenceProc.mWriter.getMinLength();
-      final long rightSeqsMin = rightSequenceProc.mWriter.getMinLength();
-      final long leftSeqsMax = leftSequenceProc.mWriter.getMaxLength();
-      final long rightSeqsMax = rightSequenceProc.mWriter.getMaxLength();
 
-      final long inputSeqs = leftSeqs + leftSeqsExcluded + rightSeqs + rightSeqsExcluded;
-      final long inputResidues = leftSeqsTotal + leftSeqsExcludedResidue + rightSeqsTotal + rightSeqsExcludedResidue;
+      final long inputSeqs = leftSeqs + leftSequenceProc.mWriter.getNumberOfExcludedSequences() + rightSeqs + rightSequenceProc.mWriter.getNumberOfExcludedSequences();
+      final long inputResidues = leftSeqsTotal + leftSequenceProc.mWriter.getExcludedResidueCount() + rightSeqsTotal + rightSequenceProc.mWriter.getExcludedResidueCount();
       final long inMax = Math.max(leftds.getMaxLength(), rightds.getMaxLength());
       final long inMin = Math.min(leftds.getMinLength(), rightds.getMinLength());
       final Counts inputCounts = new Counts(inputSeqs, inputResidues, inMax, inMin);
 
       final long outputSeqs = leftSeqs + rightSeqs;
       final long outputResidues = leftSeqsTotal + rightSeqsTotal;
-      final long outMax = Math.max(leftSeqsMax, rightSeqsMax);
-      final long outMin = Math.min(leftSeqsMin , rightSeqsMin);
+      final long outMax = Math.max(leftSequenceProc.mWriter.getMaxLength(), rightSequenceProc.mWriter.getMaxLength());
+      final long outMin = Math.min(leftSequenceProc.mWriter.getMinLength(), rightSequenceProc.mWriter.getMinLength());
       final Counts outputCounts = new Counts(outputSeqs, outputResidues, outMax, outMin);
 
       final long dusted = leftds.getDusted() + rightds.getDusted();
-
       mNumSequences = outputSeqs / 2;
-
       writeStats(new File[] {leftFile, rightFile}, true, inputCounts, outputCounts, sdfId, dusted);
     }
 
@@ -589,7 +586,6 @@ public final class FormatCli extends LoggedCli {
     }
 
     static final class SequenceProcessor implements IORunnable {
-
       final SequencesWriter mWriter;
       private boolean mIncludeQuality;
       private boolean mIncludeNames;
@@ -756,40 +752,44 @@ public final class FormatCli extends LoggedCli {
    */
   public static InputFormat getFormat(String format, String qualityFormat, boolean usingQuality) {
     final InputFormat inputformat;
-    if (format.equals(FASTA_FORMAT)) {
-      inputformat = InputFormat.FASTA;
-    } else if (format.equals(FASTQ_FORMAT)) {
-      if (usingQuality) {
-        inputformat = getQualityFormat(qualityFormat);
-        if (inputformat == null) {
-          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
+    switch (format) {
+      case FASTA_FORMAT:
+        inputformat = InputFormat.FASTA;
+        break;
+      case FASTQ_FORMAT:
+        if (usingQuality) {
+          switch (qualityFormat) {
+            case CommonFlags.SANGER_FORMAT:
+              inputformat = InputFormat.FASTQ;
+              break;
+            case CommonFlags.SOLEXA_FORMAT:
+              inputformat = InputFormat.SOLEXA;
+              break;
+            case CommonFlags.ILLUMINA_FORMAT:
+              inputformat = InputFormat.SOLEXA1_3;
+              break;
+            default:
+              throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
+          }
+        } else {
+          inputformat = InputFormat.FASTQ;
         }
-      } else {
-        inputformat = InputFormat.FASTQ;
-      }
-    } else if (format.equals(CGFASTQ_FORMAT)) {
-      inputformat = InputFormat.CG;
-    } else if (format.equals(SAM_SE_FORMAT)) {
-      inputformat = InputFormat.SAM_SE;
-    } else if (format.equals(SAM_PE_FORMAT)) {
-      inputformat = InputFormat.SAM_PE;
-    } else {
-      throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid file format=" + format);
+        break;
+      case CGFASTQ_FORMAT:
+        inputformat = InputFormat.FASTQ_CG;
+        break;
+      case CGSAM_FORMAT:
+        inputformat = InputFormat.SAM_CG;
+        break;
+      case SAM_SE_FORMAT:
+        inputformat = InputFormat.SAM_SE;
+        break;
+      case SAM_PE_FORMAT:
+        inputformat = InputFormat.SAM_PE;
+        break;
+      default:
+        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid file format=" + format);
     }
     return inputformat;
   }
-
-  //assumes fastq is file format
-  static InputFormat getQualityFormat(String qualityFormat) {
-    if (qualityFormat.equals(CommonFlags.SANGER_FORMAT)) {
-      return InputFormat.FASTQ;
-    } else if (qualityFormat.equals(CommonFlags.SOLEXA_FORMAT)) {
-      return InputFormat.SOLEXA;
-    } else if (qualityFormat.equals(CommonFlags.ILLUMINA_FORMAT)) {
-      return InputFormat.SOLEXA1_3;
-    } else {
-      return null;
-    }
-  }
 }
-

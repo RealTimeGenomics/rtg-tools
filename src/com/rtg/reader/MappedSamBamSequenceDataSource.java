@@ -42,12 +42,12 @@ import com.rtg.util.diagnostic.Diagnostic;
 /**
  * Sequence data source for the pre-mapped SAM and BAM file inputs from Illumina
  */
-public final class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
+public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
 
   private final Map<String, SamSequence> mRecordMap;
   private long mDuplicates = 0;
 
-  private MappedSamBamSequenceDataSource(FileStreamIterator inputs, boolean paired, boolean flattenPaired, SamFilter filter) {
+  MappedSamBamSequenceDataSource(FileStreamIterator inputs, boolean paired, boolean flattenPaired, SamFilter filter) {
     super(inputs, paired, flattenPaired, filter);
     if (paired) {
       mRecordMap = new HashMap<>();

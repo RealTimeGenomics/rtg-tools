@@ -41,10 +41,42 @@ public enum InputFormat {
   SOLEXA,
   /** Solexa 1.3 */
   SOLEXA1_3,
-  /** CG */
-  CG,
+  /** CG FASTQ */
+  FASTQ_CG,
+  /** SAM/BAM containing CG attributes */
+  SAM_CG {
+    @Override
+    boolean isSam() {
+      return true;
+    }
+    @Override
+    boolean isPairedSam() {
+      return true;
+    }
+  },
   /** SAM/BAM single end */
-  SAM_SE,
+  SAM_SE {
+    @Override
+    boolean isSam() {
+      return true;
+    }
+  },
   /** SAM/BAM paired end */
-  SAM_PE
+  SAM_PE {
+    @Override
+    boolean isSam() {
+      return true;
+    }
+    @Override
+    boolean isPairedSam() {
+      return true;
+    }
+  };
+
+  boolean isSam() {
+    return false;
+  }
+  boolean isPairedSam() {
+    return false;
+  }
 }

@@ -194,10 +194,24 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
           }
 
           final byte[] readBytes = parts[READ_FIELD].getBytes();
-          copySequenceDataField(readBytes, 0, mLeftRead, 0, mCurrentLength);
-          copySequenceDataField(readBytes, mCurrentLength, mRightRead, 0, mCurrentLength);
-          copyQualityDataField(parts[QUALITY_FIELD], 0, mLeftQuality, 0, mCurrentLength);
-          copyQualityDataField(parts[QUALITY_FIELD], mCurrentLength, mRightQuality, 0, mCurrentLength);
+          if (mCurrentLength == CgUtils.CG2_PADDED_LENGTH) {
+            copySequenceDataField(readBytes, 0, mLeftRead, 0, CgUtils.CG2_PAD_POSITION);
+            copySequenceDataField(readBytes, CgUtils.CG2_PAD_POSITION + 1, mLeftRead, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+            copySequenceDataField(readBytes, CgUtils.CG2_PADDED_LENGTH, mRightRead, 0, CgUtils.CG2_PAD_POSITION);
+            copySequenceDataField(readBytes, CgUtils.CG2_PADDED_LENGTH + CgUtils.CG2_PAD_POSITION + 1, mRightRead, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+
+            copyQualityDataField(parts[QUALITY_FIELD], 0, mLeftQuality, 0, CgUtils.CG2_PAD_POSITION);
+            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PAD_POSITION + 1, mLeftQuality, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PADDED_LENGTH, mRightQuality, 0, CgUtils.CG2_PAD_POSITION);
+            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PADDED_LENGTH + CgUtils.CG2_PAD_POSITION + 1, mRightQuality, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+            mCurrentLength--;
+          } else {
+            copySequenceDataField(readBytes, 0, mLeftRead, 0, mCurrentLength);
+            copySequenceDataField(readBytes, mCurrentLength, mRightRead, 0, mCurrentLength);
+
+            copyQualityDataField(parts[QUALITY_FIELD], 0, mLeftQuality, 0, mCurrentLength);
+            copyQualityDataField(parts[QUALITY_FIELD], mCurrentLength, mRightQuality, 0, mCurrentLength);
+          }
 
           mSeqNo++;
           return true;
@@ -216,15 +230,13 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
         Diagnostic.warning(WarningType.BAD_TIDE, name(), Character.toString((char) src[i]), CHAR_TO_RESIDUE.unknownResidue().toString());
         residueByte = (byte) CHAR_TO_RESIDUE.unknownResidue().ordinal();
       }
-      dest[j] = residueByte; //(byte) tempResidue.ordinal();
+      dest[j] = residueByte;
     }
   }
 
   private void copyQualityDataField(String src, int srcPos, byte[] dest, int destPos, int length) {
-    char tempChar;
     for (int i = srcPos, j = destPos; i < srcPos + length; i++, j++) {
-      tempChar = src.charAt(i);
-      dest[j] = (byte) (tempChar - '!');
+      dest[j] = FastaUtils.asciiToRawQuality(src.charAt(i));
     }
   }
 

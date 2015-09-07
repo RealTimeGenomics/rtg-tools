@@ -88,12 +88,6 @@ import htsjdk.samtools.util.RuntimeIOException;
  */
 public final class SamUtils {
 
-  /** Length of CG raw reads */
-  public static final int CG_RAW_READ_LENGTH = 35;
-
-  /** The position of the overlap in a CG read (left arm). */
-  public static final int CG_OVERLAP_POSITION = 5;
-
 
   //Sam spec defined attributes
 
