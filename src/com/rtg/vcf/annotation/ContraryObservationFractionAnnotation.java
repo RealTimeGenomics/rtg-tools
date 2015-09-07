@@ -30,7 +30,7 @@
 
 package com.rtg.vcf.annotation;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rtg.util.StringUtils;
@@ -48,7 +48,7 @@ import com.rtg.vcf.header.VcfHeader;
 public class ContraryObservationFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
   private VcfHeader mHeader = null;
-  private int[] mDerivedToOriginal = null;
+  private List<List<Integer>> mSampleToAntecedents = null;
 
   protected ContraryObservationFractionAnnotation(final String field, final String description, final AnnotationDataType type) {
     super(field, description, type);
@@ -63,13 +63,28 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
 
   private void initSampleInfo(final VcfHeader header) {
     mHeader = header;
-    mDerivedToOriginal = new int[header.getNumberOfSamples()];
-    Arrays.fill(mDerivedToOriginal, -1);
+    mSampleToAntecedents = new ArrayList<>(header.getNumberOfSamples());
+    for (int k = 0; k < header.getNumberOfSamples(); k++) {
+      mSampleToAntecedents.add(new ArrayList<Integer>());
+    }
     final List<PedigreeField> pedigreeLines = mHeader.getPedigreeLines();
     for (final PedigreeField pedLine : pedigreeLines) {
       final String orig = pedLine.getOriginal();
       final String derived = pedLine.getDerived();
-      mDerivedToOriginal[header.getSampleIndex(derived)] = header.getSampleIndex(orig);
+      if (orig != null && derived != null) {
+        mSampleToAntecedents.get(header.getSampleIndex(derived)).add(header.getSampleIndex(orig));
+      }
+      final String child = pedLine.getChild();
+      if (child != null) {
+        final String father = pedLine.getFather();
+        if (father != null) {
+          mSampleToAntecedents.get(header.getSampleIndex(child)).add(header.getSampleIndex(father));
+        }
+        final String mother = pedLine.getMother();
+        if (mother != null) {
+          mSampleToAntecedents.get(header.getSampleIndex(child)).add(header.getSampleIndex(mother));
+        }
+      }
     }
   }
 
@@ -77,27 +92,49 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     return Double.isNaN(contraryFraction) ? null : contraryFraction;
   }
 
-  private int[] ad(final VcfRecord record, final int sample) {
+  private int[] ad(final int[] res, final VcfRecord record, final int sample) {
     final String ad = record.getSampleString(sample, VcfUtils.FORMAT_ALLELIC_DEPTH);
     if (ad == null) {
       return null;
     }
     final String[] adSplit = StringUtils.split(ad, ',');
-    final int[] res = new int[adSplit.length];
     for (int k = 0; k < res.length; k++) {
-      res[k] = Integer.parseInt(adSplit[k]);
+      res[k] += Integer.parseInt(adSplit[k]);
+    }
+    return res;
+  }
+
+  private int[] ad(final VcfRecord record, final int sample) {
+    return ad(new int[record.getAltCalls().size() + 1], record, sample);
+  }
+
+  private int[] ad(final VcfRecord record, final List<Integer> samples) {
+    final int[] res =new int[record.getAltCalls().size() + 1];
+    for (final int s : samples) {
+      ad(res, record, s);
+    }
+    return res;
+  }
+
+  private boolean[] alleles(final boolean[] res, final VcfRecord record, final int sampleNumber) {
+    final int[] originalGt = VcfUtils.getValidGt(record, sampleNumber);
+    if (originalGt == null) {
+      return null;
+    }
+    for (final int allele : originalGt) {
+      res[allele] = true;
     }
     return res;
   }
 
   private boolean[] alleles(final VcfRecord record, final int sampleNumber) {
-    final int[] originalGt = VcfUtils.getValidGt(record, sampleNumber);
-    if (originalGt == null) {
-      return null;
-    }
+    return alleles(new boolean[record.getAltCalls().size() + 1], record, sampleNumber);
+  }
+
+  private boolean[] alleles(final VcfRecord record, final List<Integer> samples) {
     final boolean[] res = new boolean[record.getAltCalls().size() + 1];
-    for (final int allele : originalGt) {
-      res[allele] = true;
+    for (final int s : samples) {
+      alleles(res, record, s);
     }
     return res;
   }
@@ -113,23 +150,23 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
     assert mHeader != null; // i.e. checkHeader method must be called before this
-    if (sampleNumber >= mDerivedToOriginal.length) {
+    if (sampleNumber >= mSampleToAntecedents.size()) {
       return null; // No such sample
     }
-    final int originalSample = mDerivedToOriginal[sampleNumber];
-    if (originalSample < 0) {
-      return null; // Not a derived sample
+    final List<Integer> antecendents = mSampleToAntecedents.get(sampleNumber);
+    if (antecendents.isEmpty()) {
+      return null; // Not aderived sample
     }
     final Integer ss = record.getSampleInteger(sampleNumber, VcfUtils.FORMAT_SOMATIC_STATUS);
     if (ss == null || ss != 2) {
       return null; // Not a somatic call
     }
-    final int[] originalAd = ad(record, originalSample);
+    final int[] originalAd = ad(record, antecendents);
     final int[] derivedAd = ad(record, sampleNumber);
     if (originalAd == null || derivedAd == null) {
       return null; // Safety, should not happen on well-formed data
     }
-    final boolean[] originalAlleles = alleles(record, originalSample);
+    final boolean[] originalAlleles = alleles(record, antecendents);
     final boolean[] derivedAlleles = alleles(record, sampleNumber);
     if (originalAlleles == null || derivedAlleles == null) {
       return null; // Safety, should not happen on well-formed data
