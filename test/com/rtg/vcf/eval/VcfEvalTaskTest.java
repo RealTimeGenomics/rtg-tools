@@ -138,6 +138,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       TestUtils.containsAll(phasing, "Correct phasings: ", "Incorrect phasings: ", "Unresolvable phasings: ");
     }
   }
+
   private String fileToString(File f, boolean zip) throws IOException {
     final String result;
     if (zip) {

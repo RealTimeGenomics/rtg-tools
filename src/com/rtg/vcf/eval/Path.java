@@ -270,14 +270,7 @@ public final class Path implements Comparable<Path> {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null) {
-      return false;
-    }
-
-    if (!o.getClass().equals(getClass())) {
-      return false;
-    }
-    return compareTo((Path) o) == 0;
+    return o instanceof Path && compareTo((Path) o) == 0;
   }
 
   @Override
