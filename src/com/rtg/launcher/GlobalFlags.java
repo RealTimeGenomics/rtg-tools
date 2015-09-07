@@ -107,9 +107,6 @@ public final class GlobalFlags {
   /** The maximum number of hypotheses that can comfortably be handled by the complex caller */
   public static final String COMPLEX_CALLER_MAX_HYPOTH_FLAG = "com.rtg.variant.bayes.multisample.ComplexCaller.max-hypoth";
 
-  /** Do calling aware of ploidy in PAR regions */
-  public static final String CALLER_PAR_AWARE = "com.rtg.variant.par-aware";
-
   /** Complex region extraction include indel lengths in interesting separation */
   public static final String COMPLEX_REGION_INDEL_EXTENSION = "com.rtg.variant.region-indel-extension";
 
