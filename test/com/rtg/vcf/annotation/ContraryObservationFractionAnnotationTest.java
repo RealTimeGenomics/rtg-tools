@@ -48,10 +48,10 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     assertEquals("COF", an.getName());
     assertEquals("Contrary observation fraction", an.getDescription());
     assertEquals(AnnotationDataType.DOUBLE, an.getType());
-    assertEquals("Derived annotation COF missing required fields in VCF header (FORMAT fields: SS AD GT)", an.checkHeader(new VcfHeader()));
+    assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)", an.checkHeader(new VcfHeader()));
   }
 
-  static VcfHeader makeHeader() {
+  static VcfHeader makeHeaderSomatic() {
     final VcfHeader header = new VcfHeader();
     header.addSampleName("normal");
     header.addSampleName("cancer");
@@ -64,7 +64,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testSomaticCase() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
-    an.checkHeader(makeHeader());
+    an.checkHeader(makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
     rec.setNumberOfSamples(2);
@@ -81,7 +81,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testGainOfReference() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
-    an.checkHeader(makeHeader());
+    an.checkHeader(makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addAltCall("G");
@@ -98,7 +98,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testNonsomaticCase() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
-    an.checkHeader(makeHeader());
+    an.checkHeader(makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addAltCall("G");
@@ -114,7 +114,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testNoCoverageInNormal() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
-    an.checkHeader(makeHeader());
+    an.checkHeader(makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addAltCall("G");
@@ -130,7 +130,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
 
   public void testTriallelic() {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
-    an.checkHeader(makeHeader());
+    an.checkHeader(makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(2);
     rec.addAltCall("G");
@@ -143,6 +143,83 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,1,5");
     assertNull(an.getValue(rec, 0));
     assertEquals(3.0 / 12.0, (Double) an.getValue(rec, 1), 1e-10);
+  }
+
+  static VcfHeader makeHeaderFamily() {
+    final VcfHeader header = new VcfHeader();
+    header.addSampleName("mother");
+    header.addSampleName("father");
+    header.addSampleName("child");
+    header.addLine(VcfHeader.PEDIGREE_STRING + "=<Mother=mother,Father=father,Child=child>");
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_DENOVO, MetaType.STRING, new VcfNumber("1"), "De novo status"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_ALLELIC_DEPTH, MetaType.INTEGER, VcfNumber.DOT, "Allelic depth"));
+    return header;
+  }
+
+  public void testDeNovoCase() {
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
+    an.checkHeader(makeHeaderFamily());
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.addAltCall("G");
+    rec.setNumberOfSamples(3);
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, VcfUtils.MISSING_FIELD);
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "N");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "Y");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6");
+    assertNull(an.getValue(rec, 0));
+    assertNull(an.getValue(rec, 1));
+    assertEquals(0.1, (Double) an.getValue(rec, 2), 1e-12);
+    assertNull(an.getValue(rec, 3));
+  }
+
+  public void testNonDeNovoCase() {
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
+    an.checkHeader(makeHeaderFamily());
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.addAltCall("G");
+    rec.setNumberOfSamples(3);
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, VcfUtils.MISSING_FIELD);
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "N");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "N");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6");
+    assertNull(an.getValue(rec, 0));
+    assertNull(an.getValue(rec, 1));
+    assertNull(an.getValue(rec, 2));
+    assertNull(an.getValue(rec, 3));
+  }
+
+  public void testDeNovoMultiallelicCase() {
+    final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
+    an.checkHeader(makeHeaderFamily());
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.addAltCall("G");
+    rec.addAltCall("C");
+    rec.addAltCall("T");
+    rec.setNumberOfSamples(3);
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/2");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "2/3");
+    rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, VcfUtils.MISSING_FIELD);
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "N");
+    rec.addFormatAndSample(VcfUtils.FORMAT_DENOVO, "Y");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "7,1,2,0");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "2,1,0,7");
+    rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6,0,0");
+    assertNull(an.getValue(rec, 0));
+    assertNull(an.getValue(rec, 1));
+    assertEquals(0.1, (Double) an.getValue(rec, 2), 1e-12);
+    assertNull(an.getValue(rec, 3));
   }
 
 }

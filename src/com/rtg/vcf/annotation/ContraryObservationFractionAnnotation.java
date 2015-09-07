@@ -42,8 +42,10 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * The fraction of evidence that is considered contrary to the call made for this sample.
  * For example, in a somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
- * value is the fraction of the somatic (1) allele in the normal sample.  Usually a high
- * <code>COF</code> value indicates an unreliable call.
+ * value is the fraction of the somatic (1) allele in the normal sample.
+ * These attributes are also applicable to de novo calls, where the evidence
+ * of the parents for the de novo allele is considered contrary.
+ * Usually a high <code>COF</code> value indicates an unreliable call.
  */
 public class ContraryObservationFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
@@ -158,8 +160,16 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
       return null; // Not aderived sample
     }
     final Integer ss = record.getSampleInteger(sampleNumber, VcfUtils.FORMAT_SOMATIC_STATUS);
-    if (ss == null || ss != 2) {
-      return null; // Not a somatic call
+    if (ss != null) {
+      if (ss != 2) {
+        return null; // Not a somatic call
+      }
+    } else {
+      // Might be a family de novo type call
+      final String deNovoStatus = record.getSampleString(sampleNumber, VcfUtils.FORMAT_DENOVO);
+      if (!"Y".equals(deNovoStatus)) {
+        return null; // Not a de novo
+      }
     }
     final int[] originalAd = ad(record, antecendents);
     final int[] derivedAd = ad(record, sampleNumber);
@@ -188,7 +198,13 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
   @Override
   public String checkHeader(VcfHeader header) {
     initSampleInfo(header);
-    return checkHeader(header, null, new String[]{VcfUtils.FORMAT_SOMATIC_STATUS, VcfUtils.FORMAT_ALLELIC_DEPTH, VcfUtils.FORMAT_GENOTYPE});
+    // Need either SS (for somatic caller) or DN (for family caller)
+    final String somaticStatus = checkHeader(header, null, new String[]{VcfUtils.FORMAT_SOMATIC_STATUS});
+    final String denovoStatus = checkHeader(header, null, new String[]{VcfUtils.FORMAT_DENOVO});
+    if (somaticStatus != null && denovoStatus != null) {
+      return "Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)";
+    }
+    return checkHeader(header, null, new String[]{VcfUtils.FORMAT_ALLELIC_DEPTH, VcfUtils.FORMAT_GENOTYPE});
   }
 
 }

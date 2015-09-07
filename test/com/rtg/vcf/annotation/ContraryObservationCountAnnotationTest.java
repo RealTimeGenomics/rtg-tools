@@ -45,12 +45,12 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
     assertEquals("COC", an.getName());
     assertEquals("Contrary observation count", an.getDescription());
     assertEquals(AnnotationDataType.INTEGER, an.getType());
-    assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS AD GT)", an.checkHeader(new VcfHeader()));
+    assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)", an.checkHeader(new VcfHeader()));
   }
 
   public void testSomaticCase() {
     final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
-    an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeader());
+    an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
     rec.setNumberOfSamples(2);
@@ -67,7 +67,7 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
 
   public void testGainOfReference() {
     final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
-    an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeader());
+    an.checkHeader(ContraryObservationFractionAnnotationTest.makeHeaderSomatic());
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
     rec.setNumberOfSamples(2);
