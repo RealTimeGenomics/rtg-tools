@@ -44,36 +44,48 @@ import junit.framework.TestCase;
  */
 public class GlobalFlagsTest extends TestCase {
 
-  private static final CFlags FLAGS = new CFlags();
 
   static final String TEST_FLAG = "test-flag";
   static final Integer TEST_DEFAULT = 20;
 
   static {
     GlobalFlags.registerFlag(TEST_FLAG, Integer.class, TEST_DEFAULT);
-    GlobalFlags.registerExperimentalFlags(FLAGS);
   }
+
+  private CFlags mFlags = null;
 
   @Override
   public void setUp() {
-    GlobalFlags.resetAccessedStatus();
+    mFlags = new CFlags();
+    GlobalFlags.registerExperimentalFlags(mFlags);
   }
 
-  public void test() {
-    FLAGS.setFlags();
-    assertEquals(TEST_DEFAULT, GlobalFlags.getFlag(TEST_FLAG).getValue());
-
+  @Override
+  public void tearDown() {
     GlobalFlags.resetAccessedStatus();
-    FLAGS.setFlags("--XX" + TEST_FLAG, "902");
+    mFlags = null;
+  }
+
+  public void testDefault() {
+    mFlags.setFlags();
+    assertEquals(TEST_DEFAULT, GlobalFlags.getFlag(TEST_FLAG).getValue());
+  }
+
+  public void testSet() {
+    mFlags.setFlags("--XX" + TEST_FLAG, "902");
     assertEquals(902, GlobalFlags.getFlag(TEST_FLAG).getValue());
     assertEquals(902, GlobalFlags.getIntegerValue(TEST_FLAG));
     assertTrue(GlobalFlags.isSet(TEST_FLAG));
   }
 
-  public void testAccessCheck() {
+  public void testAccessCheckOK() {
     assertTrue(GlobalFlags.initialAccessCheck());
-    FLAGS.setFlags("--XX" + TEST_FLAG, "902");
+    mFlags.setFlags("--XX" + TEST_FLAG, "902");
     assertTrue(GlobalFlags.initialAccessCheck());
+  }
+
+  public void testAccessCheckFail() {
+    mFlags.setFlags("--XX" + TEST_FLAG, "902");
     GlobalFlags.getIntegerValue(TEST_FLAG);
     final MemoryPrintStream mps = new MemoryPrintStream();
     Diagnostic.setLogStream(mps.printStream());
@@ -85,9 +97,9 @@ public class GlobalFlagsTest extends TestCase {
   }
 
   public void testUnused() {
-    FLAGS.setFlags();
+    mFlags.setFlags();
     assertTrue(GlobalFlags.finalAccessCheck());
-    FLAGS.setFlags("--XX" + TEST_FLAG, "34");
+    mFlags.setFlags("--XX" + TEST_FLAG, "34");
     final MemoryPrintStream mps = new MemoryPrintStream();
     Diagnostic.setLogStream(mps.printStream());
     try {

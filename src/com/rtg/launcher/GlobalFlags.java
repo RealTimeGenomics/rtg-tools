@@ -234,6 +234,7 @@ public final class GlobalFlags {
   }
 
   static void registerExperimentalFlags(CFlags flags) {
+    resetAccessedStatus();
     final String[] cat = flags.getCategories();
     if (cat != null) {
       final String[] copy = Arrays.copyOf(cat, cat.length + 1);
@@ -244,7 +245,6 @@ public final class GlobalFlags {
       flags.register(flag);
     }
     sFlags = flags;
-    resetAccessedStatus();
   }
 
   /**
@@ -319,11 +319,12 @@ public final class GlobalFlags {
   }
 
   /**
-   * Unsets list of flags which have been accessed.
+   * Unsets list of flags which have been accessed/set.
    * If your test is failing due to another test using a global flag, find THAT test
    * and put a call to this into the tear down method.
    */
   public static void resetAccessedStatus() {
     ACCESSED_FLAGS.clear();
+    sFlags = DEFAULT_FLAGS;
   }
 }
