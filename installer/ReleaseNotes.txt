@@ -4,6 +4,40 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
+
+RTG Core 3.5.1 (2015-09-07)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* coverage: Fix an exception that could occur if running with a
+  reference SDF supplied that had chromosomes in a different order
+  compared to the BAM sequence dictionary (typically this could occur
+  when running coverage on third-party BAMs)
+
+* extract: When extracting multiple regions these regions are now
+  sorted.
+
+* vcfeval: When an entire chromosome contained only baseline or only
+  called variants, the summary statistics for FP/FN were not being
+  incremented correctly.
+
+* vcfeval: Fixed a case where path-finding could get confused and drop
+  variants.
+
+* vcfeval: Speed improvement in post-processing.
+
+* many: Improved error reporting for commands that involve processing
+  multiple BAM files, so that the name of the particular file causing
+  the problem is included.
+
+* wrapper: Fixed the java version number check so that it works
+  correctly with openjdk 1.8
+
+
+Previous releases
+=================
+
 RTG Core 3.5 (2015-07-16)
 -------------------------
 
@@ -196,10 +230,6 @@ features, see the RTG Operations Manual.
 
 * extract: Fix a regression where extracting from VCF without any
   region specified would include the VCF header.
-
-
-Previous releases
-=================
 
 RTG Core 3.4.5 (2015-05-22)
 ---------------------------
