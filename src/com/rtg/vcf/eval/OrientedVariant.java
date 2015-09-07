@@ -108,13 +108,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   @Override
   public boolean equals(Object obj) {
-      if (obj == null) {
-      return false;
-    }
-    if (obj.getClass() != this.getClass()) {
-      return false;
-    }
-    return this.compareTo((OrientedVariant) obj) == 0;
+    return obj instanceof OrientedVariant && compareTo((OrientedVariant) obj) == 0;
   }
 
   @Override
