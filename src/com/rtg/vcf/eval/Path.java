@@ -82,13 +82,7 @@ public final class Path implements Comparable<Path> {
 
     @Override
     public boolean equals(Object obj) {
-      if (obj == null) {
-        return false;
-      }
-      if (!(obj instanceof SyncPoint)) {
-        return false;
-      }
-      return this.compareTo((SyncPoint) obj) == 0;
+      return obj instanceof SyncPoint && compareTo((SyncPoint) obj) == 0;
     }
 
     @Override
