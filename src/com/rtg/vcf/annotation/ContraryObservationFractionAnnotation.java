@@ -110,7 +110,7 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
   }
 
   private int[] ad(final VcfRecord record, final List<Integer> samples) {
-    final int[] res =new int[record.getAltCalls().size() + 1];
+    final int[] res = new int[record.getAltCalls().size() + 1];
     for (final int s : samples) {
       ad(res, record, s);
     }
