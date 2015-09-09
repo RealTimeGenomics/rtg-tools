@@ -18,7 +18,9 @@ to deal with differences in representation that commonly arise,
 particularly when dealing with complex variants or when comparing
 variants produced by different callers.  More details are in this
 presentation on
-[slideshare](http://www.slideshare.net/GenomeInABottle/140127-rtg-vcfeval-vcf-comparison-tool).
+[slideshare](http://www.slideshare.net/GenomeInABottle/140127-rtg-vcfeval-vcf-comparison-tool)
+and this manuscript on
+[bioRxiv](http://biorxiv.org/content/early/2015/08/02/023754).
 Comparison approaches based on normalization or decomposition can
 alleviate these problem but often fail to deal with more complex
 situations.
@@ -41,6 +43,11 @@ ongoing development.
 RTG Tools is available pre-packaged directly from our
 [website](http://realtimegenomics.com/products/rtg-tools/), or follow
 the instructions below to build from this repository.
+
+If you have a need for variant calling or metagenomics analysis,
+please consider our full analysis suite
+[RTG Core](http://realtimegenomics.com/products/rtg-core/).
+
 
 ## Support
 
