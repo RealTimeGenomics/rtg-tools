@@ -33,23 +33,57 @@ package com.rtg.vcf.eval;
 import com.reeltwo.jumble.annotations.TestClass;
 
 /**
- * A Variant that can be asked for alleles using original GT-style allele IDs, including -1 for missing value.
- * Assumes input allele array contains sufficient entries and offsets the allele ID when querying the underlying allele array
+ * A Variant that offers orientations where the allele IDs correspond to original GT allele indexing.
  */
 @TestClass("com.rtg.vcf.eval.VariantFactoryTest")
-public abstract class AlleleIdVariant extends Variant {
+public class GtIdVariant extends AlleleIdVariant {
 
-  AlleleIdVariant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
+  private final int mAlleleA; // First allele in GT
+  private final int mAlleleB; // Second allele in GT
+
+  GtIdVariant(int id, String seq, int start, int end, Allele[] alleles,
+              int alleleA, int alleleB, boolean phased) {
     super(id, seq, start, end, alleles, phased);
+    mAlleleA = alleleA;
+    mAlleleB = alleleB;
+  }
+
+  /** @return the allele ID of the first allele in the GT */
+  public int alleleA() {
+    return mAlleleA;
+  }
+
+  /** @return the allele ID of the second allele in the GT */
+  public int alleleB() {
+    return mAlleleB;
   }
 
   @Override
-  public Allele allele(int alleleId) {
-    return super.allele(alleleId + 1);
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
+    sb.append(alleleStr(mAlleleA));
+    if (mAlleleB != mAlleleA) {
+      sb.append(":");
+      sb.append(alleleStr(mAlleleB));
+    }
+    sb.append(")");
+    return sb.toString();
   }
 
   @Override
-  int numAlleles() {
-    return super.numAlleles() - 1;
+  public OrientedVariant[] orientations() {
+    if (mAlleleA != mAlleleB) {
+      // If the variant is heterozygous we need both phases
+      return new OrientedVariant[]{
+        new OrientedVariant(this, true, mAlleleA, mAlleleB),
+        new OrientedVariant(this, false, mAlleleB, mAlleleA)
+      };
+    } else {
+      // Homozygous / haploid
+      return new OrientedVariant[] {
+        new OrientedVariant(this, mAlleleA)
+      };
+    }
   }
 }

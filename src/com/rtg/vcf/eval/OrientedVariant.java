@@ -159,7 +159,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * @return the allele (may be null (skip) or zero length)
    */
   public Allele allele() {
-    return mAlleleId == -1 ? null : mVariant.allele(mAlleleId);
+    return mVariant.allele(mAlleleId);
   }
 
   /**

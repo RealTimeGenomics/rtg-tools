@@ -92,11 +92,11 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
       writeResidual((OrientedVariant) mCv);
     } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
-      final AlleleIdVariant v = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
+      final GtIdVariant v = (GtIdVariant) ((SkippedVariant) mCv).variant();
       writeNonRedundant(v, "C-TooHard=" + mCv.toString());
     } else { // Excluded (novel or self-inconsistent)
-      assert mCv instanceof AlleleIdVariant;
-      final AlleleIdVariant v = (AlleleIdVariant) mCv;
+      assert mCv instanceof GtIdVariant;
+      final GtIdVariant v = (GtIdVariant) mCv;
       writeNonRedundant(v, "C-FP=" + mCv.toString());
     }
   }
@@ -107,18 +107,18 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
       mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
       writeResidual((OrientedVariant) mCv);
     } else if (mCv instanceof SkippedVariant) { // Too hard, merge records into b, adding any new ALT from c, flush c
-      final AlleleIdVariant ov = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
+      final GtIdVariant ov = (GtIdVariant) ((SkippedVariant) mCv).variant();
       mergeIntoBaseline(ov, "C-TooHard");
     } else { // Excluded, merge records into b, adding any new ALT from c, flush c
-      assert mCv instanceof AlleleIdVariant;
-      final AlleleIdVariant ov = (AlleleIdVariant) mCv;
+      assert mCv instanceof GtIdVariant;
+      final GtIdVariant ov = (GtIdVariant) mCv;
       mergeIntoBaseline(ov, "C-FP");
     }
   }
 
   private void writeResidual(OrientedVariant ov) throws IOException {
     // If the original variant contained multiple ALTs, null out the one used and then write to alternate, otherwise write to alternate as-is
-    final AlleleIdVariant v = (AlleleIdVariant) ov.variant();
+    final GtIdVariant v = (GtIdVariant) ov.variant();
     int remaining = -1;
     int numAlts = 0;
     if (v.numAlleles() > 2) {
@@ -150,7 +150,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
   }
 
   @Override
-  protected void writeNonRedundant(AlleleIdVariant v, String status) throws IOException {
+  protected void writeNonRedundant(GtIdVariant v, String status) throws IOException {
     mCrv.addInfo("STATUS", status);
     mAlternate.write(mCrv); // Write as-is to the alternate
     // Prepare for usual incorporation

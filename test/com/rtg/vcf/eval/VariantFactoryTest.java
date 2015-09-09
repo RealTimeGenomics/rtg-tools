@@ -170,8 +170,8 @@ public class VariantFactoryTest extends TestCase {
     assertEquals("TT", DnaUtils.bytesToSequenceIncCG(variant.allele(2).nt()));
     OrientedVariant[] pos = variant.orientations();
     assertEquals(2, pos.length);
-    assertTrue(variant instanceof AlleleIdVariant);
-    AlleleIdVariant av = (AlleleIdVariant) variant;
+    assertTrue(variant instanceof GtIdVariant);
+    GtIdVariant av = (GtIdVariant) variant;
     assertEquals(0, av.alleleA());
     assertEquals(2, av.alleleB());
 
@@ -192,8 +192,8 @@ public class VariantFactoryTest extends TestCase {
     pos = variant.orientations();
     assertEquals(2, pos.length);
     assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
-    assertTrue(variant instanceof AlleleIdVariant);
-    av = (AlleleIdVariant) variant;
+    assertTrue(variant instanceof GtIdVariant);
+    av = (GtIdVariant) variant;
     assertEquals(2, av.alleleA());
     assertEquals(1, av.alleleB());
 
@@ -202,8 +202,8 @@ public class VariantFactoryTest extends TestCase {
     pos = variant.orientations();
     assertEquals(2, pos.length);
     assertEquals("chr:24-24 (.v:*:*:AAA^)", pos[0].toString());
-    assertTrue(variant instanceof AlleleIdVariant);
-    av = (AlleleIdVariant) variant;
+    assertTrue(variant instanceof GtIdVariant);
+    av = (GtIdVariant) variant;
     assertEquals(2, av.alleleA());
     assertEquals(-1, av.alleleB());
   }

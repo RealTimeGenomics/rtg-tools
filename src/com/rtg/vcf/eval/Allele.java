@@ -32,14 +32,22 @@ package com.rtg.vcf.eval;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.DnaUtils;
+import com.rtg.util.StringUtils;
+import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
+import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 
 /**
  * Hold a variant allele, one allele of a genotype.
  */
 @TestClass("com.rtg.vcf.eval.VariantTest")
 public class Allele extends SequenceNameLocusSimple {
+
+  private static final byte[] MISSING = {
+    0 // "N"
+  };
 
   private final byte[] mNt;
 
@@ -78,4 +86,78 @@ public class Allele extends SequenceNameLocusSimple {
   public String toString() {
     return String.valueOf(getStart() + 1) + ":" + (getEnd() + 1) + "(" + DnaUtils.bytesToSequenceIncCG(mNt) + ")";
   }
+
+
+  /**
+   * Return a full set of alleles, one per REF/ALT declared in the record and one for missing.
+   * Each allele has leading/trailing ref bases removed and position adjusted accordingly.
+   * So ref is like "skip"
+   * @param rec the record
+   * @param gtArray if not null, only populate alleles referenced by the GT array
+   * @param trim if set, remove all leading and trailing same-as-ref bases
+   * @param explicitMissing if set, treat missing allele as an explicit 'N', otherwise treat as skip  @return the set of alleles
+   * @return the set of alleles, with the first element corresponding to the missing allele (i.e. index = GT + 1)
+   */
+  static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray, boolean trim, boolean explicitMissing) {
+    final boolean removePaddingBase = !trim && VcfUtils.hasRedundantFirstNucleotide(rec);
+    final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
+    for (int i = -1; i < alleles.length - 1; i++) {
+      if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
+        alleles[i + 1] = getAllele(rec, i, trim, removePaddingBase, explicitMissing);
+      }
+    }
+    return alleles;
+  }
+
+  /**
+   * Construct a single allele
+   * @param rec the record
+   * @param allele the index of the allele, 0 is ref, -1 is missing
+   * @param trim if set, remove all leading and trailing same-as-ref bases
+   * @param removePaddingBase if set (and not otherwise trimming), remove the single leading base
+   * @param explicitMissing if set, treat missing allele as an explicit 'N', otherwise treat as skip
+   * @return the allele, or null if the allele should not result in a change to the haplotype
+   */
+  protected static Allele getAllele(VcfRecord rec, int allele, boolean trim, boolean removePaddingBase, boolean explicitMissing) {
+    if (allele == -1 && !explicitMissing) {
+      return null;
+    }
+    final String alleleStr;
+    if (allele == -1) {
+      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), MISSING);
+    } else if (trim) {
+      final String ref = rec.getRefCall();
+      if (allele == 0) {
+        return trim ? null : new Allele(rec, DnaUtils.encodeString(ref));
+      }
+      final String alt = rec.getAllele(allele);
+      final int stripLeading = StringUtils.longestPrefix(ref, alt);
+      final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
+      return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
+        DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
+    } else {
+      final String localAllele = rec.getAllele(allele);
+      if (removePaddingBase) {
+        alleleStr = localAllele.substring(1);
+      } else {
+        alleleStr = localAllele;
+      }
+      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), DnaUtils.encodeString(alleleStr));
+    }
+  }
+
+  // Determine the bounding reference span of a set of alleles
+  static Range getAlleleBounds(Allele[] alleles) {
+    int start = Integer.MAX_VALUE;
+    int end = Integer.MIN_VALUE;
+    for (final Allele allele : alleles) {
+      if (allele != null) {
+        start = Math.min(start, allele.getStart());
+        end = Math.max(end, allele.getEnd());
+      }
+    }
+    return new Range(start, end);
+  }
+
+
 }

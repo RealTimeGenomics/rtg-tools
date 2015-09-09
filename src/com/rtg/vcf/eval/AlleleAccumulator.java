@@ -130,11 +130,11 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
       mAuxiliary.write(mCrv);
     } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
-      final AlleleIdVariant v = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
+      final GtIdVariant v = (GtIdVariant) ((SkippedVariant) mCv).variant();
       writeNonRedundant(v, "C-TooHard=" + mCv.toString());
     } else { // Excluded (novel or self-inconsistent)
-      assert mCv instanceof AlleleIdVariant;
-      final AlleleIdVariant v = (AlleleIdVariant) mCv;
+      assert mCv instanceof GtIdVariant;
+      final GtIdVariant v = (GtIdVariant) mCv;
       writeNonRedundant(v, "C-FP=" + mCv.toString());
     }
   }
@@ -154,16 +154,16 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
       mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
       mAuxiliary.write(mCrv);
     } else if (mCv instanceof SkippedVariant) { // Too hard, merge records into b, adding any new ALT from c, flush c
-      final AlleleIdVariant ov = (AlleleIdVariant) ((SkippedVariant) mCv).variant();
+      final GtIdVariant ov = (GtIdVariant) ((SkippedVariant) mCv).variant();
       mergeIntoBaseline(ov, "C-TooHard");
     } else { // Excluded, merge records into b, adding any new ALT from c, flush c
-      assert mCv instanceof AlleleIdVariant;
-      final AlleleIdVariant ov = (AlleleIdVariant) mCv;
+      assert mCv instanceof GtIdVariant;
+      final GtIdVariant ov = (GtIdVariant) mCv;
       mergeIntoBaseline(ov, "C-FP");
     }
   }
 
-  protected void writeNonRedundant(AlleleIdVariant v, String status) throws IOException {
+  protected void writeNonRedundant(GtIdVariant v, String status) throws IOException {
     mCrv.addInfo("STATUS", status);
     final List<String> newAlts = new ArrayList<>();
     addCallAllele(newAlts, v.alleleA());
@@ -176,7 +176,7 @@ public class AlleleAccumulator extends MergingEvalSynchronizer {
     mAlleles.write(mCrv);
   }
 
-  protected void mergeIntoBaseline(AlleleIdVariant v, String status) throws IOException {
+  protected void mergeIntoBaseline(GtIdVariant v, String status) throws IOException {
     boolean merged = addCallAlleleToBaseline(v.alleleA());
     if (v.alleleA() != v.alleleB()) {
       merged |= addCallAlleleToBaseline(v.alleleB());

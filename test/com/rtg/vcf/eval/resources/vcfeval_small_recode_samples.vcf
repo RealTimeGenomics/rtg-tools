@@ -2,8 +2,8 @@
 ##contig=<ID=22,length=51304566,assembly=hg19>
 ##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each alternative allele, in the same order as listed">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1	SAMPLE2	SAMPLE3	SAMPLE4
-22	21	.	C	CCCT	.	.	AC=3	GT	0/1	.	1/1	.
+22	21	.	C	CCCT	.	.	AC=3	GT	./1	.	1/1	.
 22	23	.	ATTTA	CTC	.	.	AC=3	GT	.	1/0	.	1/1
-22	25	.	T	C	.	.	AC=3	GT	0/1	.	1/1	.
-22	27	.	AATGGTG	A	.	.	AC=3	GT	0/1	.	1/1	.
+22	25	.	T	C	.	.	AC=3	GT	./1	.	1/1	.
+22	27	.	AATGGTG	A	.	.	AC=3	GT	./1	.	1/1	.
 22	30	.	GGTG	CTA	.	.	AC=3	GT	.	1/0	.	1/1

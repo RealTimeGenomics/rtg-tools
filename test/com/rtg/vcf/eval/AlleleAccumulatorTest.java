@@ -84,6 +84,7 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
         "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
         "--XXcom.rtg.vcf.eval.custom-path-processor=recode",
         "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+        "--XXcom.rtg.vcf.eval.explicit-half-call",
         "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
       assertTrue(res.err(), res.rc() == 0);
       mergeArgs[i + 1] = new File(output, "sample.vcf.gz").getPath();

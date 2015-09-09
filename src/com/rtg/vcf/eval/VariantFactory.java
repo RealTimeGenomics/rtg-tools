@@ -29,10 +29,10 @@
  */
 package com.rtg.vcf.eval;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.rtg.mode.DnaUtils;
-import com.rtg.util.StringUtils;
+import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -56,6 +56,7 @@ public interface VariantFactory {
    * The only allele trimming done is a single leading
    * padding base, and only if it is shared by all alleles.
    * Path finding will require full genotype to match.
+   * Keep this for backward compatibility with previous versions of vcfeval.
    */
   class DefaultGt implements VariantFactory {
 
@@ -83,35 +84,14 @@ public interface VariantFactory {
       assert gtArray.length == 1 || gtArray.length == 2;
 
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final String seqName = rec.getSequenceName();
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
-      final boolean phased = VcfUtils.isPhasedGt(gt);
-
-      // Treats missing value as distinct value ("N")
       final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
       for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(getAllele(rec, gtArray[i], hasPreviousNt)));
+        final int gtId = gtArray[i];      // May be -1, we treat missing as distinct value
+        alleles[i] = Allele.getAllele(rec, gtId, false, hasPreviousNt, true);
       }
-
-      return new CompactVariant(id, seqName, start, end, alleles, phased);
+      final Range bounds = Allele.getAlleleBounds(alleles);
+      return new CompactVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, VcfUtils.isPhasedGt(gt));
     }
-
-    protected static String getAllele(VcfRecord rec, int allele, boolean hasPreviousNt) {
-      if (allele == -1) {
-        return "N"; // Missing allele
-      }
-      final String localAllele = rec.getAllele(allele);
-      if (hasPreviousNt) {
-        if (localAllele.length() == 1) {
-          return "";
-        }
-        return localAllele.substring(1);
-      } else {
-        return localAllele;
-      }
-    }
-
   }
 
   /**
@@ -144,22 +124,11 @@ public interface VariantFactory {
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       assert gtArray.length == 1 || gtArray.length == 2;
-
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final String seqName = rec.getSequenceName();
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
-      final boolean phased = VcfUtils.isPhasedGt(gt);
-
-      // Treats missing value as ref
-      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
-      for (int i = 0; i < alleles.length; i++) {
-        alleles[i] = new Allele(seqName, start, end, DnaUtils.encodeString(DefaultGt.getAllele(rec, i, hasPreviousNt)));
-      }
-      final int alleleA = gtArray[0] == -1 ? 0 : gtArray[0];
-      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1] == -1 ? 0 : gtArray[1];  // Treats missing value as ref
-
-      return new AlleleIdVariant(id, seqName, start, end, alleles, alleleA, alleleB, phased);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, false, true);
+      final Range bounds = Allele.getAlleleBounds(alleles);
+      final int alleleA = gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
     }
   }
 
@@ -173,6 +142,7 @@ public interface VariantFactory {
     static final String NAME = "default-trim-id";
 
     private final int mSampleNo;
+    private final boolean mExplicitHalfCall;
 
     /**
      * Constructor
@@ -180,6 +150,7 @@ public interface VariantFactory {
      */
     public TrimmedGtId(int sampleNo) {
       mSampleNo = sampleNo;
+      mExplicitHalfCall = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
     }
 
     @Override
@@ -192,68 +163,18 @@ public interface VariantFactory {
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       assert gtArray.length == 1 || gtArray.length == 2;
-      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, gtArray);
-      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, true, mExplicitHalfCall);
+      final Range bounds = Allele.getAlleleBounds(alleles);
       final int alleleA = gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
-      final boolean phased = VcfUtils.isPhasedGt(gt);
-      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, phased);
-    }
-
-
-    // Return alleles, one per REF/ALT declared in the record.
-    // Each allele has leading/trailing ref bases removed and position adjusted accordingly.
-    // If gtArray is not null, only populate alleles referenced by the array
-    static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray) {
-      final Allele[] alleles = new Allele[rec.getAltCalls().size() + 1];
-      for (int i = 0; i < alleles.length; i++) {
-        if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
-          final Allele allele = TrimmedGtId.getAllele(rec, i, true);
-          if (allele != null) {
-            alleles[i] = allele;
-          }
-        }
-      }
-      return alleles;
-    }
-
-    static Range getAlleleBounds(Allele[] alleles) {
-      int start = Integer.MAX_VALUE;
-      int end = Integer.MIN_VALUE;
-      for (final Allele allele : alleles) {
-        if (allele != null) {
-          start = Math.min(start, allele.getStart());
-          end = Math.max(end, allele.getEnd());
-        }
-      }
-      return new Range(start, end);
-    }
-
-    // Create an Allele from a VCF record.
-    // If trim is enabled, remove all leading and trailing bases agreeing with ref, and adjust position accordingly.
-    // If the resulting allele is a no-op, return null
-    static Allele getAllele(VcfRecord rec, int allele, boolean trim) {
-      if (allele == -1) {
-        return null;
-      }
-      final String ref = rec.getRefCall();
-      if (allele == 0) {
-        return trim ? null : new Allele(rec, DnaUtils.encodeString(ref));
-      }
-      final String alt = rec.getAllele(allele);
-      if (trim) {
-        final int stripLeading = StringUtils.longestPrefix(ref, alt);
-        final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
-        return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
-          DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
-      }
-      return new Allele(rec, DnaUtils.encodeString(alt));
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
     }
   }
 
   /**
    * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
    * Path finding will match any variants where there are any non-ref allele matches.
+   * Keep this for backward compatibility with previous versions of vcfeval.
    */
   class HaploidAltGt implements VariantFactory {
 
@@ -275,11 +196,7 @@ public interface VariantFactory {
       if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
       }
-      final String seqName = rec.getSequenceName();
       final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final int start = rec.getStart() + (hasPreviousNt ? 1 : 0);
-      final int end = rec.getEnd();
-
       final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       Arrays.sort(gtArray);
@@ -296,12 +213,12 @@ public interface VariantFactory {
       prev = -1;
       for (final int gtId : gtArray) {
         if (gtId > 0 && gtId != prev) {
-          alleles[j++] = new Allele(seqName, start, end, DnaUtils.encodeString(DefaultGt.getAllele(rec, gtId, hasPreviousNt)));
+          alleles[j++] = Allele.getAllele(rec, gtId, false, hasPreviousNt, true);
         }
         prev = gtId;
       }
 
-      return new Variant(id, seqName, start, end, alleles, false) {
+      return new CompactVariant(id, rec.getSequenceName(), rec.getStart() + (hasPreviousNt ? 1 : 0), rec.getEnd(), alleles, false) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos = new OrientedVariant[numAlleles()];
@@ -342,11 +259,11 @@ public interface VariantFactory {
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       assert gtArray.length == 1 || gtArray.length == 2;
-      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, gtArray);
-      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, true, false);
+      final Range bounds = Allele.getAlleleBounds(alleles);
       final int alleleA = gtArray[0] > 0 ? gtArray[0] : gtArray[1];
       final int alleleB = gtArray.length == 1 || gtArray[1] < 1 ? alleleA : gtArray[1];
-      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, false) {
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, false) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos;
@@ -379,10 +296,10 @@ public interface VariantFactory {
         return null;
       } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
 
-      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
-      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, null, true, false);
+      final Range bounds = Allele.getAlleleBounds(alleles);
 
-      return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
+      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
         @Override
         public OrientedVariant[] orientations() {
           final OrientedVariant[] pos = new OrientedVariant[numAlleles() - 1];
@@ -398,11 +315,18 @@ public interface VariantFactory {
   /**
    * Creates all possible non-ref diploid variants using any of the ALT alleles declared in the variant record.
    * Used to perform sample genotype matching against the possibilities defined by the full set of declared alleles.
-   * Includes all combinations of half calls (instead of using REF).
+   * Performs allele trimming (could make this optional?).
+   * Depending on configuration, includes all combinations of REF and half calls.
    */
   class DiploidAlts implements VariantFactory {
 
     static final String NAME = "dip-alt";
+
+    private final boolean mExplicitHalfCall;
+
+    DiploidAlts() {
+      mExplicitHalfCall = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
+    }
 
     @Override
     public Variant variant(final VcfRecord rec, final int id) {
@@ -410,26 +334,24 @@ public interface VariantFactory {
         return null;
       } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
 
-      final Allele[] alleles = TrimmedGtId.getTrimmedAlleles(rec, null);
-      final Range bounds = TrimmedGtId.getAlleleBounds(alleles);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, null, true, mExplicitHalfCall);
+      final Range bounds = Allele.getAlleleBounds(alleles);
 
-      return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
+      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false) {
         @Override
         public OrientedVariant[] orientations() {
-          final OrientedVariant[] pos = new OrientedVariant[numAlleles() * numAlleles() - 1];
-          int v = 0;
+          final ArrayList<OrientedVariant> pos = new ArrayList<>(numAlleles() * numAlleles() - 1);
           for (int i = 1 ; i < numAlleles(); i++) {
             for (int j = -1; j < i; j++) {
-              pos[v++] = new OrientedVariant(this, true, i, j);
-              pos[v++] = new OrientedVariant(this, false, j, i);
-              if (j == -1) {
-                j++; // Jump from . to first allele
+              pos.add(new OrientedVariant(this, true, i, j));
+              pos.add(new OrientedVariant(this, false, j, i));
+              if (j == -1 && !mExplicitHalfCall) {
+                j++; // Jump from . to first allele, so skips will match as missing
               }
             }
-            pos[v++] = new OrientedVariant(this, true, i, i);
+            pos.add(new OrientedVariant(this, true, i, i));
           }
-          assert v == pos.length : rec.toString() + Arrays.toString(pos);
-          return pos;
+          return pos.toArray(new OrientedVariant[pos.size()]);
         }
       };
     }
