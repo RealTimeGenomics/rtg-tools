@@ -208,7 +208,7 @@ public final class GlobalFlags {
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");
-    registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 5000);
+    registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 50000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
     registerFlag(GZIP_LEVEL, Integer.class, AdjustableGZIPOutputStream.DEFAULT_GZIP_LEVEL);
