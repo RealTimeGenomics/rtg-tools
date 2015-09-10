@@ -32,7 +32,7 @@ package com.rtg.vcf.eval;
 import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
- *
+ * Defines an integer identifier for a variant.
  */
 public interface VariantId extends SequenceNameLocus {
 

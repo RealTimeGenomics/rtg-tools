@@ -45,13 +45,11 @@ import com.rtg.util.diagnostic.Diagnostic;
 /**
  * Record a path that reconciles two sequences of variants. Also provides
  * method to find a best path.
- *
  */
 public final class Path implements Comparable<Path> {
 
   final HalfPath mCalledPath;
   final HalfPath mBaselinePath;
-  //private final byte[] mTemplate;
 
   final BasicLinkedListNode<Integer> mSyncPointList;
 
@@ -97,7 +95,6 @@ public final class Path implements Comparable<Path> {
    * @param template the template sequence to build a path for.
    */
   Path(byte[] template) {
-    //mTemplate = template;
     mCalledPath = new HalfPath(template);
     mBaselinePath = new HalfPath(template);
     mSyncPointList = null;
@@ -107,7 +104,6 @@ public final class Path implements Comparable<Path> {
   Path(Path parent, BasicLinkedListNode<Integer> syncPoints) {
     mCalledPath = new HalfPath(parent.mCalledPath);
     mBaselinePath = new HalfPath(parent.mBaselinePath);
-    //mTemplate = parent.mTemplate;
     mSyncPointList = syncPoints;
   }
 
@@ -318,7 +314,7 @@ public final class Path implements Comparable<Path> {
    * Find a weighting for all the TP calls in a path.
    * this is done by sync points, within each <code>SyncPoint</code>
    *
-   *       weight = number of TP in baseline / number of TP in called
+   * <code>weight = number of TP in baseline / number of TP in called</code>
    *
    * this will assure that the total number of TP we output will always reflect number of TP in baseline file
    *
@@ -357,12 +353,8 @@ public final class Path implements Comparable<Path> {
         v.setWeight(syncpoint.mBaselineTPCount / syncpoint.mCalledTPCount);
         tp.add(v);
       }
-
     }
     return new Pair<>(tp, fp);
   }
-
-
-
 
 }

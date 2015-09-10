@@ -75,7 +75,7 @@ public class AlleleIdVariant extends Variant {
   public OrientedVariant[] orientations() {
     if (mAlleleA != mAlleleB) {
       // If the variant is heterozygous we need both phases
-      return new OrientedVariant[]{
+      return new OrientedVariant[] {
         new OrientedVariant(this, true, mAlleleA, mAlleleB),
         new OrientedVariant(this, false, mAlleleB, mAlleleA)
       };

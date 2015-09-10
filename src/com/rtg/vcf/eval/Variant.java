@@ -39,7 +39,7 @@ import com.rtg.vcf.VcfUtils;
 
 
 /**
- * Holds information about a single variant that has not yet been oriented in a haplotype
+ * Holds information about a single variant that has not yet been oriented in a haplotype.
  */
 public abstract class Variant extends SequenceNameLocusSimple implements Comparable<Variant>, VariantId {
 
@@ -88,16 +88,7 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
 
   @Override
   public boolean equals(final Object o2) {
-    if (this == o2) {
-      return true;
-    }
-    if (o2 == null) {
-      return false;
-    }
-    if (!(o2 instanceof Variant)) {
-      return false;
-    }
-    return NATURAL_COMPARATOR.compare(this, (Variant) o2) == 0;
+    return this == o2 || (o2 instanceof Variant && NATURAL_COMPARATOR.compare(this, (Variant) o2) == 0);
   }
 
   @Override
