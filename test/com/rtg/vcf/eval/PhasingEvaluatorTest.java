@@ -44,6 +44,7 @@ import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.Pair;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
@@ -243,6 +244,7 @@ public class PhasingEvaluatorTest extends TestCase {
   }
 
   private void checkPhasing(int expectedCorrect, int expectedUnphasable, int expectedMisPhasings, MockVariantSet variants) throws IOException, UnindexableDataException {
+    Diagnostic.setLogStream();
     try (final TestDirectory dir = new TestDirectory()) {
       final File calls = FileHelper.stringToGzFile(variants.mCallsVcf.toString(), new File(dir, "calls.vcf.gz"));
       new TabixIndexer(calls).saveVcfIndex();
