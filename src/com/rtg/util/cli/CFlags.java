@@ -617,7 +617,7 @@ public final class CFlags {
   }
 
   /** Resets the list of flags received and their values. */
-  private void reset() {
+  public void reset() {
     mReceivedFlags = new ArrayList<>();
     for (final Flag f : mRegisteredFlags) {
       f.reset();

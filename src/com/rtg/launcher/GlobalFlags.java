@@ -322,6 +322,7 @@ public final class GlobalFlags {
    */
   public static void resetAccessedStatus() {
     ACCESSED_FLAGS.clear();
+    DEFAULT_FLAGS.reset();
     sFlags = DEFAULT_FLAGS;
   }
 }
