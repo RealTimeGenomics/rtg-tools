@@ -96,7 +96,7 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
 
   private int[] ad(final int[] res, final VcfRecord record, final int sample) {
     final String ad = record.getSampleString(sample, VcfUtils.FORMAT_ALLELIC_DEPTH);
-    if (ad != null) {
+    if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
       for (int k = 0; k < res.length; k++) {
         res[k] += Integer.parseInt(adSplit[k]);
@@ -121,7 +121,9 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     final int[] originalGt = VcfUtils.getValidGt(record, sampleNumber);
     if (originalGt != null) {
       for (final int allele : originalGt) {
-        res[allele] = true;
+        if (allele >= 0) {
+          res[allele] = true;
+        }
       }
     }
     return res;
