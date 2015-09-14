@@ -702,19 +702,24 @@ public final class CFlags {
         remaining.add(args[i]);
       }
     }
-    final boolean extendedHelpRegistered = getFlag(EXTENDED_HELP_FLAG) != null;
     if (!success) {
-      // Quickly scan unparsed args to see if it looks like they tried to ask for help
+      final boolean exHelpRegistered = getFlag(EXTENDED_HELP_FLAG) != null;
+      final boolean exexHelpRegistered = getFlag(EXPERIMENTAL_HELP_FLAG) != null;
+      // Quickly scan args to see if it looks like they tried to ask for help,
+      // even if it's in a position where a flag value was expected
       for (; i < args.length; i++) {
         if ((LONG_FLAG_PREFIX + HELP_FLAG).equals(args[i]) || (SHORT_FLAG_PREFIX + "h").equals(args[i])) {
           setFlag(getFlag(HELP_FLAG), null);
         }
-        if (extendedHelpRegistered && (LONG_FLAG_PREFIX + EXTENDED_HELP_FLAG).equals(args[i])) {
+        if (exHelpRegistered && (LONG_FLAG_PREFIX + EXTENDED_HELP_FLAG).equals(args[i])) {
           setFlag(getFlag(EXTENDED_HELP_FLAG), null);
+        }
+        if (exexHelpRegistered && (LONG_FLAG_PREFIX + EXPERIMENTAL_HELP_FLAG).equals(args[i])) {
+          setFlag(getFlag(EXPERIMENTAL_HELP_FLAG), null);
         }
       }
     }
-    if (isSet(HELP_FLAG) || extendedHelpRegistered && isSet(EXTENDED_HELP_FLAG)) {
+    if (isSet(HELP_FLAG) || isSet(EXTENDED_HELP_FLAG) || isSet(EXPERIMENTAL_HELP_FLAG)) {
       success = false;
     }
     if (success && !remaining.isEmpty()) {
