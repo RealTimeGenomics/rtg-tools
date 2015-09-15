@@ -281,7 +281,25 @@ public final class PathFinder {
     }
   }
 
+  private static boolean hasNoOp(Path path) {
+    return (path.mBSinceSync == 0 && path.mCSinceSync > 0)
+      || (path.mCSinceSync == 0 && path.mBSinceSync > 0);
+  }
+
   private static Path betterSum(Path first, Path second) {
+    // See if we have obvious no-ops we would rather drop
+    final boolean fSync = first != null && first.inSync();
+    final boolean sSync = second != null && second.inSync();
+    if (fSync && sSync) { // See if we have no-ops we would rather drop
+      if (hasNoOp(first)) {
+        Diagnostic.developerLog("Discard no-op path with (" + first.mBSinceSync + "," + first.mCSinceSync + ") at " + first.mCalledPath.getPosition());
+        return second;
+      } else if (hasNoOp(second)) {
+        Diagnostic.developerLog("Discard no-op path with (" + second.mBSinceSync + "," + second.mCSinceSync + ") at " + first.mCalledPath.getPosition());
+        return first;
+      }
+    }
+
     // Prefer paths that maximise total number of included variants (baseline + called)
     BasicLinkedListNode<OrientedVariant> firstIncluded =  first == null ? null : first.mCalledPath.getIncluded();
     BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
@@ -292,8 +310,31 @@ public final class PathFinder {
     firstSize += firstIncluded == null ? 0 : firstIncluded.size();
     secondSize += secondIncluded == null ? 0 : secondIncluded.size();
     if (firstSize == secondSize) {
-      // At this point try to break ties arbitrarily based on allele ordering
+      // Tie break equivalently scoring paths for greater aesthetics
       if (firstIncluded != null && secondIncluded != null) {
+
+        // Prefer solutions that minimize discrepencies between baseline and call counts since last sync point
+        final int fDelta = Math.abs(first.mBSinceSync - first.mCSinceSync);
+        final int sDelta = Math.abs(second.mBSinceSync - second.mCSinceSync);
+        if (fDelta != sDelta) {
+          return fDelta < sDelta ? first : second;
+        }
+
+        // Prefer solutions that sync more regularly (more likely to be "simpler")
+        final int syncDelta = (first.mSyncPointList == null ? 0 : first.mSyncPointList.getValue()) - (second.mSyncPointList == null ? 0 : second.mSyncPointList.getValue());
+        if (syncDelta != 0) {
+          return syncDelta > 0 ? first : second;
+        }
+
+        /*
+        Diagnostic.developerLog("Sum: Remaining break at: " + first.mBaselinePath.getPosition() + " sum = " + firstSize
+            + " first = (" + first.mBSinceSync + "," + first.mCSinceSync + ")"
+            + " second = (" + second.mBSinceSync + "," + second.mCSinceSync + ")"
+            + " " + first.inSync() + "," + second.inSync() + " syncdelta=" + syncDelta
+        );
+        */
+
+        // At this point break ties arbitrarily based on allele ordering
         return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
       }
     }

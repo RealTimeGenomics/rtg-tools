@@ -50,8 +50,9 @@ public final class Path implements Comparable<Path> {
 
   final HalfPath mCalledPath;
   final HalfPath mBaselinePath;
-
   final BasicLinkedListNode<Integer> mSyncPointList;
+  int mCSinceSync;
+  int mBSinceSync;
 
   static class SyncPoint implements Comparable<SyncPoint> {
     private final int mPos;
@@ -105,6 +106,8 @@ public final class Path implements Comparable<Path> {
     mCalledPath = new HalfPath(parent.mCalledPath);
     mBaselinePath = new HalfPath(parent.mBaselinePath);
     mSyncPointList = syncPoints;
+    mCSinceSync = parent.mCSinceSync;
+    mBSinceSync = parent.mBSinceSync;
   }
 
   /**
@@ -185,8 +188,10 @@ public final class Path implements Comparable<Path> {
   void include(boolean side, OrientedVariant var, int varIndex) {
     if (side) {
       mCalledPath.include(var, varIndex);
+      mCSinceSync++;
     } else {
       mBaselinePath.include(var, varIndex);
+      mBSinceSync++;
     }
   }
 
@@ -202,9 +207,11 @@ public final class Path implements Comparable<Path> {
     final ArrayList<Path> paths = new ArrayList<>();
     final BasicLinkedListNode<Integer> syncPoints;
     if (this.inSync()) {
-      syncPoints = new BasicLinkedListNode<>(this.mCalledPath.getPosition(), this.mSyncPointList);
+      syncPoints = new BasicLinkedListNode<>(mCalledPath.getPosition(), mSyncPointList);
+      mCSinceSync = 0;
+      mBSinceSync = 0;
     } else {
-      syncPoints = this.mSyncPointList;
+      syncPoints = mSyncPointList;
     }
 
     // Create a path extension that excludes this variant
