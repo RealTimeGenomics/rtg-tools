@@ -56,24 +56,10 @@ public final class PathFinder {
   private final PathPreference mMaximizeMode;
   private int mCurrentMaxPos;
 
-  private <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
-    final String mode = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
-    Diagnostic.developerLog("Path finder maximisation: " + mode);
-    switch (mode) {
-      case "calls":
-        mMaximizeMode = new MaxCallsMaxBaseline();
-        break;
-      case "calls-min-base":
-        mMaximizeMode = new MaxCallsMinBaseline();
-        break;
-      case "default":
-      case "sum":
-      default:
-        mMaximizeMode = new SumBoth();
-    }
-
+  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants, PathPreference maximizeMode) {
     mTemplate = template;
     mTemplateName = templateName;
+    mMaximizeMode = maximizeMode;
 
     mCalledVariants = calledVariants.toArray(new Variant[calledVariants.size()]);
     Arrays.sort(mCalledVariants, Variant.NATURAL_COMPARATOR);
@@ -94,7 +80,22 @@ public final class PathFinder {
    * @return the best path (non-null).
    */
   public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
-    return new PathFinder(template, templateName, calledVariants, baseLineVariants).bestPath();
+    final String mode = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
+    Diagnostic.developerLog("Path finder maximisation: " + mode);
+    final PathPreference maximiseMode;
+    switch (mode) {
+      case "calls":
+        maximiseMode = new MaxCallsMaxBaseline();
+        break;
+      case "calls-min-base":
+        maximiseMode = new MaxCallsMinBaseline();
+        break;
+      case "default":
+      case "sum":
+      default:
+        maximiseMode = new SumBoth();
+    }
+    return new PathFinder(template, templateName, calledVariants, baseLineVariants, maximiseMode).bestPath();
   }
 
   Path bestPath() {
@@ -281,11 +282,11 @@ public final class PathFinder {
     }
   }
 
-  private interface PathPreference {
+  interface PathPreference {
     Path better(Path first, Path second);
   }
 
-  private static final class SumBoth implements PathPreference {
+  static final class SumBoth implements PathPreference {
     private static boolean hasNoOp(Path path) {
       return (path.mBSinceSync == 0 && path.mCSinceSync > 0)
         || (path.mCSinceSync == 0 && path.mBSinceSync > 0);
@@ -348,7 +349,7 @@ public final class PathFinder {
     }
   }
 
-  private static final class MaxCallsMaxBaseline implements PathPreference {
+  static final class MaxCallsMaxBaseline implements PathPreference {
     @Override
     public Path better(Path first, Path second) {
       // Prefer paths that maximise the number of called variants included
@@ -374,7 +375,7 @@ public final class PathFinder {
     }
   }
 
-  private static final class MaxCallsMinBaseline implements PathPreference {
+  static final class MaxCallsMinBaseline implements PathPreference {
     @Override
     public Path better(Path first, Path second) {
       // Prefer paths that maximise the number of called variants included

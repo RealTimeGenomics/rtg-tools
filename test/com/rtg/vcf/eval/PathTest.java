@@ -528,7 +528,8 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1, 0, 0, 1.0};
 
-    final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
+    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(a), Arrays.asList(b), new PathFinder.MaxCallsMinBaseline());
+    final Path original = finder.bestPath();
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP
     assertEquals(2, original.getBaselineIncluded().size());
     final Pair<List<OrientedVariant>, List<OrientedVariant>> result = Path.calculateWeights(original);
