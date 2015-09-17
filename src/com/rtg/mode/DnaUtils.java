@@ -304,34 +304,4 @@ public final class DnaUtils {
     return encodeArray(a, a.length);
   }
 
-  /**
-   * Convert a FASTQ string to a byte array of phred scores.
-   * @param string the quality string to convert
-   * @return byte array of phred scores
-   */
-  public static byte[] fastqToPhred(final String string) {
-    final byte[] bytes = new byte[string.length()];
-    for (int i = 0; i < string.length(); i++) {
-      bytes[i] = (byte) (string.charAt(i) - 33);
-    }
-    return bytes;
-  }
-
-  /**
-   * Convert an array of bytes, in which each byte is a binary phred quality
-   * score, to printable ASCII representation of the quality scores.
-   * @param buffer Array of bytes in which each byte is a binary phred score.
-   * @param offset Where in buffer to start conversion.
-   * @param length How many bytes of buffer to convert.
-   * @param reverse if the binary phred score is to be reversed
-   * @return String with ASCII representation of those quality scores.
-   */
-  public static String phredToFastq(final byte[] buffer, final int offset, final int length, final boolean reverse) {
-    final char[] chars = new char[length];
-    for (int i = 0; i < length; i++) {
-      chars[reverse ? length - i - 1 : i] = (char) (buffer[offset + i] + 33);
-    }
-    return new String(chars);
-  }
-
 }

@@ -31,9 +31,7 @@ package com.rtg.reader;
 
 
 /**
- * Utility functions for manipulating files that are not provided in the File
- * class.
- *
+ * Utility functions for manipulating FASTA/FASTQ encoded data, e.g. between binary and ascii phred.
  */
 public final class FastaUtils {
 
@@ -96,8 +94,21 @@ public final class FastaUtils {
    * @return the quality string
    */
   public static String rawToAsciiString(byte[] quality, int length) {
+    return rawToAsciiString(quality, 0, length);
+  }
+
+  /**
+   * Converts an array of bytes into a sanger-encoded quality string
+   *
+   * @param quality buffer containing input qualities
+   * @param offset Where in buffer to start conversion.
+   * @param length the number of bytes from the input buffer to convert
+   * @return the quality string
+   */
+  public static String rawToAsciiString(byte[] quality, int offset, int length) {
     final StringBuilder b = new StringBuilder();
-    for (int i = 0; i < length; i++) {
+    final int end = offset + length;
+    for (int i = offset; i < end; i++) {
       b.append(rawToAsciiQuality(quality[i]));
     }
     return b.toString();

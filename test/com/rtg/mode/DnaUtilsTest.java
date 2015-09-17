@@ -84,15 +84,6 @@ public class DnaUtilsTest extends TestCase {
     assertEquals("tgcatgca", DnaUtils.reverseComplement("tgcatgca"));
   }
 
-  public void testPhredToFastq() {
-    final byte[] qualityScores = new byte[35];
-    for (int i = 0; i < qualityScores.length; i++) {
-      qualityScores[i] = (byte) i;
-    }
-    assertEquals("" + ((char) (4 + 33)), DnaUtils.phredToFastq(qualityScores, 4, 1, false));
-    assertEquals("" + ((char) (31 + 33)) + ((char) (30 + 33)), DnaUtils.phredToFastq(qualityScores, 30, 2, true));
-  }
-
   public void testEncodeString() {
     final String exp = "NACGT";
     final byte[] b = DnaUtils.encodeString(exp);

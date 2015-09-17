@@ -30,8 +30,6 @@
 
 package com.rtg.reader;
 
-import com.rtg.mode.DnaUtils;
-
 import junit.framework.TestCase;
 
 /**
@@ -42,7 +40,7 @@ public class GilletteReadTrimmerTest extends TestCase {
     final GilletteReadTrimmer grt15 = new GilletteReadTrimmer(15, 15);
     final GilletteReadTrimmer grt30 = new GilletteReadTrimmer(30, 15);
 
-    final byte[] quals = DnaUtils.fastqToPhred(raw);
+    final byte[] quals = FastaUtils.asciiToRawQuality(raw);
 
     assertEquals(expLenq15w15, grt15.getTrimPosition(quals, raw.length()));
     assertEquals(expLenq15w30, grt30.getTrimPosition(quals, raw.length()));
