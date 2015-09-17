@@ -45,6 +45,11 @@ import com.rtg.util.Utils;
 @TestClass("com.rtg.relation.GenomeRelationshipsTest")
 public class Relationship {
 
+  /** Key for contamination. */
+  public static final String CONTAMINATION = "contamination";
+  /** Key for reverse contamination. */
+  public static final String REVERSE_CONTAMINATION = "reverse-contamination";
+
   /**
    * Enumeration for relationship types. Add extras as needed.
    */
@@ -113,6 +118,11 @@ public class Relationship {
     return mProperties.get(propname);
   }
 
+  private Double getPropertyAsDouble(final String propName) {
+    final String value = getProperty(propName);
+    return value == null ? null : Double.parseDouble(value);
+  }
+
   /**
    * Get the contamination level for this relationship or null if no contamination
    * is specified.
@@ -120,11 +130,17 @@ public class Relationship {
    * @return contamination level
    */
   public Double getContamination() {
-    final String contamStr = getProperty("contamination");
-    if (contamStr == null) {
-      return null;
-    }
-    return Double.parseDouble(contamStr);
+    return getPropertyAsDouble(CONTAMINATION);
+  }
+
+  /**
+   * Get the reverse contamination level for this relationship or null if no reverse contamination
+   * is specified.
+   *
+   * @return contamination level
+   */
+  public Double getReverseContamination() {
+    return getPropertyAsDouble(REVERSE_CONTAMINATION);
   }
 
   @Override

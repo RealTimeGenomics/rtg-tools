@@ -296,7 +296,6 @@ public final class RocPlot {
         if (prefs.getInt(CHOOSER_WIDTH, -1) != -1 && prefs.getInt(CHOOSER_HEIGHT, -1) != -1) {
           mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
         }
-
         if (mFileChooser.showOpenDialog(checkControlPanel) == JFileChooser.APPROVE_OPTION) {
           final File f = mFileChooser.getSelectedFile();
           if (f != null) {
