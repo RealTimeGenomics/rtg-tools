@@ -50,6 +50,7 @@ public class MachineTypeTest extends TestCase {
     assertTrue(MachineType.ILLUMINA_PE.compatiblePlatform("Illumina"));
 
     assertTrue(MachineType.COMPLETE_GENOMICS.compatiblePlatform("Complete"));
+    assertTrue(MachineType.COMPLETE_GENOMICS.compatiblePlatform("Completegenomics"));
 
     assertTrue(MachineType.FOURFIVEFOUR_PE.compatiblePlatform("lS454"));
     assertTrue(MachineType.FOURFIVEFOUR_SE.compatiblePlatform("Ls454"));

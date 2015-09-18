@@ -44,26 +44,27 @@ public final class MachineType implements PseudoEnum {
 
   /** The platform type for Illumina, regardless of whether it is paired or single end */
   public static final String PLAT_ILLUMINA = "ILLUMINA";
+
   /** The platform type for 454, regardless of whether it is paired or single end */
   public static final String PLAT_454 = "LS454";
 
   /** Illumina single end. */
-  public static final MachineType ILLUMINA_SE = new MachineType(++sSequenceNumber, "illumina_se", "illumina", PLAT_ILLUMINA, null);
+  public static final MachineType ILLUMINA_SE = new MachineType(++sSequenceNumber, "illumina_se", "illumina", null, PLAT_ILLUMINA);
 
   /** Illumina paired end. */
-  public static final MachineType ILLUMINA_PE = new MachineType(++sSequenceNumber, "illumina_pe", "illumina", PLAT_ILLUMINA, MachineOrientation.FR);
+  public static final MachineType ILLUMINA_PE = new MachineType(++sSequenceNumber, "illumina_pe", "illumina", MachineOrientation.FR, PLAT_ILLUMINA);
 
-  /** Complete Genomics (paired end). */
-  public static final MachineType COMPLETE_GENOMICS = new MachineType(++sSequenceNumber, "complete_genomics", "complete", "COMPLETE", MachineOrientation.TANDEM);
+  /** Complete Genomics V1 (paired end). */
+  public static final MachineType COMPLETE_GENOMICS = new MachineType(++sSequenceNumber, "complete_genomics", "complete", MachineOrientation.TANDEM, "COMPLETE", "COMPLETEGENOMICS");
 
   /** Four Five Four paired end. */
-  public static final MachineType FOURFIVEFOUR_PE = new MachineType(++sSequenceNumber, "454_pe", "ls454_pe", PLAT_454, null);
+  public static final MachineType FOURFIVEFOUR_PE = new MachineType(++sSequenceNumber, "454_pe", "ls454_pe", null, PLAT_454);
 
   /** Four Five Four single end. */
-  public static final MachineType FOURFIVEFOUR_SE = new MachineType(++sSequenceNumber, "454_se", "ls454_se", PLAT_454, null);
+  public static final MachineType FOURFIVEFOUR_SE = new MachineType(++sSequenceNumber, "454_se", "ls454_se", null, PLAT_454);
 
   /** Ion Torrent (single end). */
-  public static final MachineType IONTORRENT = new MachineType(++sSequenceNumber, "iontorrent", "iontorrent", "IONTORRENT", null);
+  public static final MachineType IONTORRENT = new MachineType(++sSequenceNumber, "iontorrent", "iontorrent", null, "IONTORRENT");
 
   static final EnumHelper<MachineType> HELPER = new EnumHelper<>(MachineType.class, new MachineType[] {ILLUMINA_SE, ILLUMINA_PE, COMPLETE_GENOMICS, FOURFIVEFOUR_PE, FOURFIVEFOUR_SE, IONTORRENT});
 
@@ -88,9 +89,9 @@ public final class MachineType implements PseudoEnum {
   private final int mOrdinal;
   private final String mPriors;
   private final MachineOrientation mOrientation;
-  private final String mPlatform;
+  private final String[] mPlatform;
 
-  private MachineType(int ordinal, String name, String defaultPriors, String platform, MachineOrientation orientation) {
+  private MachineType(int ordinal, String name, String defaultPriors, MachineOrientation orientation, String... platform) {
     mName = name;
     mOrdinal = ordinal;
     mPriors = defaultPriors;
@@ -133,7 +134,7 @@ public final class MachineType implements PseudoEnum {
    * @return the string defining the platform of this machine type
    */
   public String platform() {
-    return mPlatform;
+    return mPlatform[0];
   }
 
   /**
@@ -142,7 +143,12 @@ public final class MachineType implements PseudoEnum {
    * @return if the two platforms are compatible
    */
   public boolean compatiblePlatform(final String platform) {
-    return mPlatform.equalsIgnoreCase(platform);
+    for (String p : mPlatform) {
+      if (p.equalsIgnoreCase(platform)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
