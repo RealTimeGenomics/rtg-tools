@@ -147,7 +147,7 @@ public final class GlobalFlags {
   public static final String VCFEVAL_MAX_PATHS = "com.rtg.vcf.eval.max-paths";
   /** Specify the maximum number of iterations since last sync point before vcfeval skips a region */
   public static final String VCFEVAL_MAX_ITERATIONS = "com.rtg.vcf.eval.max-iterations";
-  /** If set, treat the missing side of a half call as an explit token requiring a match */
+  /** If set, treat the missing side of a half call as an explicit token requiring a match */
   public static final String VCFEVAL_EXPLICIT_HALF_CALL = "com.rtg.vcf.eval.explicit-half-call";
   /** Turn on alternate ROC slope calculation */
   public static final String VCFEVAL_ALT_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.alt-roc-slope";
