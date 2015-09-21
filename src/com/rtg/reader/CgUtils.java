@@ -55,7 +55,7 @@ public final class CgUtils {
   }
 
   /**
-   * Strip single N padding that CG2 reads contain, if present.
+   * Strip single N padding that Complete Genomics v2 reads contain, if present.
    * @param seq input data to remove padding from. May be either DNA or quality data.
    * @param forward true if the data is in the normal, forward orientation
    * @return the data with any padding removed.
