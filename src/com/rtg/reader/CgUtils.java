@@ -47,9 +47,13 @@ public final class CgUtils {
   /** Length of Complete Genomics v2 reads, when it contains the single padding N */
   public static final int CG2_PADDED_LENGTH = CG2_RAW_LENGTH + 1;
 
+  /** The position of the overlap in a CG v2 read (both arms). */
+  public static final int CG2_OVERLAP_POSITION = 10;
+
   /** The position of the padding N base in padded v2 reads */
   public static final int CG2_PAD_POSITION = 19;
   private static final int CG2_PAD_POSITION_REV = 10;
+
 
   private CgUtils() {
   }
