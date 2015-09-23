@@ -95,83 +95,6 @@ public interface VariantFactory {
   }
 
   /**
-   * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
-   * The only allele trimming done is a single leading
-   * padding base, and only if it is shared by all alleles.
-   * Path finding will require full genotype to match.
-   */
-  class DefaultGtId implements VariantFactory {
-
-    static final String NAME = "default-id";
-
-    private final int mSampleNo;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     */
-    public DefaultGtId(int sampleNo) {
-      mSampleNo = sampleNo;
-    }
-
-    @Override
-    public Variant variant(VcfRecord rec, int id) {
-      // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
-        return null;
-      }
-
-      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2;
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, false, true);
-      final Range bounds = Allele.getAlleleBounds(alleles);
-      final int alleleA = gtArray[0];
-      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
-      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
-    }
-  }
-
-  /**
-   * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
-   * This version performs trimming of all common leading/trailing bases that match REF.
-   * Path finding will require full genotype to match, but will be more permissive of reference overlaps.
-   */
-  class TrimmedGtId implements VariantFactory {
-
-    static final String NAME = "default-trim-id";
-
-    private final int mSampleNo;
-    private final boolean mExplicitHalfCall;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     */
-    public TrimmedGtId(int sampleNo) {
-      mSampleNo = sampleNo;
-      mExplicitHalfCall = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
-    }
-
-    @Override
-    public Variant variant(VcfRecord rec, int id) {
-      // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
-        return null;
-      }
-
-      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2;
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, true, mExplicitHalfCall);
-      final Range bounds = Allele.getAlleleBounds(alleles);
-      final int alleleA = gtArray[0];
-      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
-      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
-    }
-  }
-
-  /**
    * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
    * Path finding will match any variants where there are any non-ref allele matches.
    * Keep this for backward compatibility with previous versions of vcfeval.
@@ -196,8 +119,7 @@ public interface VariantFactory {
       if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
       }
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final String gt = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(mSampleNo);
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       Arrays.sort(gtArray);
       int numAlts = 0;
@@ -208,6 +130,7 @@ public interface VariantFactory {
         }
         prev = gtId;
       }
+      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
       final Allele[] alleles = new Allele[numAlts];
       int j = 0;
       prev = -1;
@@ -232,21 +155,101 @@ public interface VariantFactory {
   }
 
   /**
-   * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
-   * Path finding will match any variants where there are any non-ref allele matches.
+   * Construct Variants corresponding to the GT of a specified sample, maintaining original allele IDs
+   * Trimming is configurable, by default the only allele trimming done is a single leading
+   * padding base, and only if it is shared by all alleles. If trimming is enabled, all common
+   * leading/trailing bases that match REF will be removed, causing path finding to be more
+   * permissive of reference overlaps.
+   * Path finding will require both sides of the genotype to match.
    */
-  class HaploidAltTrimmedGtId implements VariantFactory {
+  class DefaultGtId implements VariantFactory {
 
-    static final String NAME = "squash-trim-id";
+    static final String NAME = "default-id";
+    static final String TRIMMED_NAME = "default-trim-id";
 
     private final int mSampleNo;
+    private final boolean mTrim;
+    private final boolean mExplicitHalfCall;
+
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     * @param trimming if true, trim all leading/trailing bases that match REF from alleles
+     */
+    public DefaultGtId(int sampleNo, boolean trimming) {
+      this(sampleNo, trimming, GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL));
+    }
+
+    /**
+     * Constructor
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     * @param trimming if true, trim all leading/trailing bases that match REF from alleles
+     * @param explicitHalfCall if true, treat half call allele as a separate token
+     */
+    public DefaultGtId(int sampleNo, boolean trimming, boolean explicitHalfCall) {
+      mSampleNo = sampleNo;
+      mTrim = trimming;
+      mExplicitHalfCall = explicitHalfCall;
+    }
+
+    @Override
+    public Variant variant(VcfRecord rec, int id) {
+      // Currently we skip both non-variant and SV
+      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+        return null;
+      }
+
+      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
+      final int[] gtArray = VcfUtils.splitGt(gt);
+      assert gtArray.length == 1 || gtArray.length == 2;
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitHalfCall);
+      final Range bounds = Allele.getAlleleBounds(alleles);
+
+      final int alleleA = gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
+
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt)) {
+        @Override
+        public OrientedVariant[] orientations() {
+          if (alleleA() != alleleB()) {
+            // If the variant is heterozygous we need both phases
+            return new OrientedVariant[]{
+              new OrientedVariant(this, true, alleleA(), alleleB()),
+              new OrientedVariant(this, false, alleleB(), alleleA())
+            };
+          } else {
+            // Homozygous / haploid
+            return new OrientedVariant[]{
+              new OrientedVariant(this, alleleA())
+            };
+          }
+        }
+      };
+    }
+  }
+
+  /**
+   * Creates a haploid oriented variant for each ALT allele referenced by the sample GT.
+   * Trimming is configurable, by default the only allele trimming done is a single leading
+   * padding base, and only if it is shared by all alleles. If trimming is enabled, all common
+   * leading/trailing bases that match REF will be removed, causing path finding to be more
+   * permissive of reference overlaps.
+   * Path finding will match any variants where there are any non-ref allele matches.
+   */
+  class HaploidAltGtId implements VariantFactory {
+
+    static final String TRIMMED_NAME = "squash-trim-id";
+
+    private final int mSampleNo;
+    private final boolean mTrim;
 
     /**
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      */
-    HaploidAltTrimmedGtId(int sampleNo) {
+    HaploidAltGtId(int sampleNo, boolean trim) {
       mSampleNo = sampleNo;
+      mTrim = trim;
     }
 
     @Override
@@ -259,21 +262,25 @@ public interface VariantFactory {
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
       assert gtArray.length == 1 || gtArray.length == 2;
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, true, false);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, false);
       final Range bounds = Allele.getAlleleBounds(alleles);
-      final int alleleA = gtArray[0] > 0 ? gtArray[0] : gtArray[1];
-      final int alleleB = gtArray.length == 1 || gtArray[1] < 1 ? alleleA : gtArray[1];
-      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, false) {
+
+      final int alleleA = gtArray[0];
+      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
+
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt)) {
         @Override
         public OrientedVariant[] orientations() {
+          final int la = alleleA() > 0 ? alleleA() : alleleB();
+          final int lb = alleleB() > 0 ? alleleB() : alleleA();
           final OrientedVariant[] pos;
-          if (alleleA == alleleB) {
+          if (la == lb) {
             pos = new OrientedVariant[1];
-            pos[0] = new OrientedVariant(this, alleleA);
+            pos[0] = new OrientedVariant(this, la);
           } else {
             pos = new OrientedVariant[2];
-            pos[0] = new OrientedVariant(this, alleleA);
-            pos[1] = new OrientedVariant(this, alleleB);
+            pos[0] = new OrientedVariant(this, la);
+            pos[1] = new OrientedVariant(this, lb);
           }
           return pos;
         }

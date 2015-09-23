@@ -281,7 +281,7 @@ public class HalfPathTest extends TestCase {
     int varIndex = 0;
     for (final String var : CALLS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0), true), varIndex++);
     }
     StringBuilder sb = new StringBuilder();
     path.step();
@@ -295,7 +295,7 @@ public class HalfPathTest extends TestCase {
     varIndex = 0;
     for (final String var : MUTATIONS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0, RocSortValueExtractor.NULL_EXTRACTOR), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0), true), varIndex++);
     }
     sb = new StringBuilder();
     path.step();

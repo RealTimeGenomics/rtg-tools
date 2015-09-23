@@ -38,12 +38,19 @@ import junit.framework.TestCase;
 public class OrientedVariantTest extends TestCase {
 
   public static OrientedVariant createOrientedVariant(Variant variant, boolean isAlleleA) {
-    assert variant instanceof CompactVariant;
-    return new OrientedVariant(variant, isAlleleA,
-      isAlleleA ? 0 : 1,
-      variant.numAlleles() == 1
-        ? isAlleleA ? 0 : 1
-        : isAlleleA ? 1 : 0);
+    if (variant instanceof CompactVariant) {
+      return new OrientedVariant(variant, isAlleleA,
+        isAlleleA ? 0 : 1,
+        variant.numAlleles() == 1
+          ? isAlleleA ? 0 : 1
+          : isAlleleA ? 1 : 0);
+    } else if (variant instanceof GtIdVariant) {
+      final GtIdVariant av = (GtIdVariant) variant;
+      return new OrientedVariant(variant, isAlleleA, av.alleleA(), av.alleleB());
+    } else {
+      fail();
+      return null;
+    }
   }
 
   public void test() {

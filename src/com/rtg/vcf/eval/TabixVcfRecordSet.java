@@ -181,20 +181,22 @@ class TabixVcfRecordSet implements VariantSet {
       case VariantFactory.HaploidAlts.NAME:
         return new VariantFactory.HaploidAlts();
 
-      case VariantFactory.HaploidAltTrimmedGtId.NAME:
-        return new VariantFactory.HaploidAltTrimmedGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+      case VariantFactory.HaploidAltGtId.TRIMMED_NAME:
+        return new VariantFactory.HaploidAltGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), true);
 
       case VariantFactory.HaploidAltGt.NAME:
-        return new VariantFactory.HaploidAltGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+        //return new VariantFactory.HaploidAltGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+        return new VariantFactory.HaploidAltGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false);
 
-      case VariantFactory.TrimmedGtId.NAME:
-        return new VariantFactory.TrimmedGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-
-      case VariantFactory.DefaultGt.NAME:
-        return new VariantFactory.DefaultGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+      case VariantFactory.DefaultGtId.TRIMMED_NAME:
+        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), true);
 
       case VariantFactory.DefaultGtId.NAME:
-        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false);
+
+      case VariantFactory.DefaultGt.NAME:
+        //return new VariantFactory.DefaultGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
+        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false, true);
 
       default:
         throw new RuntimeException("Unknown variant factory: " + f);

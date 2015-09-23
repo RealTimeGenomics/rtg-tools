@@ -43,28 +43,28 @@ import junit.framework.TestCase;
  */
 public class VariantFactoryTest extends TestCase {
 
-  private Variant createVariant(VariantFactory fact, String var) {
+  static Variant createVariant(VariantFactory fact, String var) {
     final String vartab = var.replaceAll(" +", TAB);
     final VcfRecord rec = VcfReader.vcfLineToRecord(vartab);
     return fact.variant(rec, 0);
   }
 
-  private VariantFactory factory(String name) {
+  static VariantFactory factory(String name) {
     switch (name) {
       case VariantFactory.DefaultGt.NAME:
         return new VariantFactory.DefaultGt(0);
 
-      case VariantFactory.DefaultGtId.NAME:
-        return new VariantFactory.DefaultGtId(0);
-
-      case VariantFactory.TrimmedGtId.NAME:
-        return new VariantFactory.TrimmedGtId(0);
-
       case VariantFactory.HaploidAltGt.NAME:
         return new VariantFactory.HaploidAltGt(0);
 
-      case VariantFactory.HaploidAltTrimmedGtId.NAME:
-        return new VariantFactory.HaploidAltTrimmedGtId(0);
+      case VariantFactory.DefaultGtId.NAME:
+        return new VariantFactory.DefaultGtId(0, false);
+
+      case VariantFactory.DefaultGtId.TRIMMED_NAME:
+        return new VariantFactory.DefaultGtId(0, true);
+
+      case VariantFactory.HaploidAltGtId.TRIMMED_NAME:
+        return new VariantFactory.HaploidAltGtId(0, true);
 
       case VariantFactory.HaploidAlts.NAME:
         return new VariantFactory.HaploidAlts();
@@ -160,7 +160,7 @@ public class VariantFactoryTest extends TestCase {
 
   public void testTrimmedGtIdPloidy() throws Exception {
     // Test trimming ploidy  AA:ATTA -> :TT
-    VariantFactory fact = factory(VariantFactory.TrimmedGtId.NAME);
+    VariantFactory fact = factory(VariantFactory.DefaultGtId.TRIMMED_NAME);
     Variant variant = createVariant(fact, SNP_LINE5);
     assertEquals(23, variant.getStart());
     assertEquals(23, variant.getStart());

@@ -62,7 +62,7 @@ public class PhasingEvaluatorTest extends TestCase {
     for (String s : variants) {
       final String vartab = s.replaceAll(" ", "\t");
       id++;
-      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), id, 0, RocSortValueExtractor.NULL_EXTRACTOR));
+      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), id, 0));
       sb.append(vartab).append("\n");
     }
     return callList;

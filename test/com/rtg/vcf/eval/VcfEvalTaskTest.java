@@ -156,16 +156,16 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     final TreeMap<Variant, String> baselineList = new TreeMap<>();
     for (final String var : both) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      callList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
-      baselineList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      callList.put(VariantTest.createVariant(rec, 0), rec.toString());
+      baselineList.put(VariantTest.createVariant(rec, 0), rec.toString());
     }
     for (final String var : calledOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      callList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      callList.put(VariantTest.createVariant(rec, 0), rec.toString());
     }
     for (final String var : baselineOnly) {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
-      baselineList.put(VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR), rec.toString());
+      baselineList.put(VariantTest.createVariant(rec, 0), rec.toString());
     }
     try (final BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
       callOut.write(CALLS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
@@ -578,14 +578,14 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   public void testPositionComparator() {
     final IntervalComparator vc = new IntervalComparator();
     final VcfRecord rec = VcfReader.vcfLineToRecord("chr10 11 . G T 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final Variant v = VariantTest.createVariant(rec, 0, RocSortValueExtractor.NULL_EXTRACTOR);
+    final Variant v = VariantTest.createVariant(rec, 0);
 
 
     final VcfRecord rec2 = VcfReader.vcfLineToRecord("chr10 12 . G T 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final Variant v2 = VariantTest.createVariant(rec2, 0, RocSortValueExtractor.NULL_EXTRACTOR);
+    final Variant v2 = VariantTest.createVariant(rec2, 0);
 
     final VcfRecord rec3 = VcfReader.vcfLineToRecord("chr10 11 . GT TT 182.85 PASS . GT:AD:DP:GQ:PL 0/1:11,14:25:99:168,0,223".replaceAll(" ", "\t"));
-    final Variant v3 = VariantTest.createVariant(rec3, 0, RocSortValueExtractor.NULL_EXTRACTOR);
+    final Variant v3 = VariantTest.createVariant(rec3, 0);
 
     assertEquals(-1, vc.compare(v, v2));
     assertEquals(1, vc.compare(v2, v));
