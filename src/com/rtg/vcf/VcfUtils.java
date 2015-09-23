@@ -564,8 +564,8 @@ public final class VcfUtils {
     if (!rec.getFormatAndSample().containsKey(FORMAT_GENOTYPE)) {
       return false;
     }
-    final String gt = rec.getFormatAndSample().get(FORMAT_GENOTYPE).get(sampleId);
-    final VariantType type = VariantType.getType(rec, splitGt(gt));
+    final int[] gtArr = getValidGt(rec, sampleId);
+    final VariantType type = VariantType.getType(rec, gtArr);
     return !type.isNonVariant() && !type.isSvType();
   }
 
