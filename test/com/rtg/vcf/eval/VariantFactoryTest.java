@@ -44,98 +44,53 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE3 = "chr 23 . A T     . PASS . GT 0/1";
   static final String SNP_LINE4 = "chr 23 . A T     . PASS . GT ./1";
 
-  public void testSquashPloidy() throws Exception {
-    // Test squashing ploidy  1/2 -> 1, 2
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false);
-    AlleleIdVariant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
+  public void testUntrimmedGt() throws Exception {
+    // Test 1/2 -> 1, 2
+    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false, true);
+    Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
+    assertNull(variant.allele(-1));
     assertNull(variant.allele(0));
     assertNull(variant.allele(3));
     assertEquals(1, variant.nt(1).length);
     assertEquals(1, variant.nt(2).length);
     assertEquals("T", variant.alleleStr(1));
     assertEquals("C", variant.alleleStr(2));
-    OrientedVariant[] pos = Orientor.SQUASH_GT.orientations(variant);
-    assertEquals(2, pos.length);
-    assertTrue(pos[0].isAlleleA());
-    assertTrue(pos[1].isAlleleA());
-    assertFalse(pos[0].isHeterozygous());
-    assertFalse(pos[1].isHeterozygous());
-    assertEquals(1, pos[0].alleleId());
-    assertEquals(2, pos[1].alleleId());
 
-    // Test squashing ploidy  0/1 -> 1
+    // Test 0/1 -> 1
     variant = fact.variant(VariantTest.createRecord(SNP_LINE3), 0);
+    assertNull(variant.allele(-1));
     assertNotNull(variant.allele(0));
     assertEquals(1, variant.nt(1).length);
     assertEquals("T", variant.alleleStr(1));
-    pos = Orientor.SQUASH_GT.orientations(variant);
-    assertEquals(1, pos.length);
-    assertTrue(pos[0].isAlleleA());
-    assertFalse(pos[0].isHeterozygous());
-    assertEquals(1, pos[0].alleleId());
     try {
       variant.nt(2);
       fail();
     } catch (ArrayIndexOutOfBoundsException ignored) {
     }
 
-    // Test squashing ploidy  ./1 -> 1
+    // Test ./1 -> ., 1
     variant = fact.variant(VariantTest.createRecord(SNP_LINE4), 0);
+    assertNotNull(variant.allele(-1));
     assertNull(variant.allele(0));
     assertEquals(1, variant.nt(1).length);
     assertEquals(T.ordinal(), variant.nt(1)[0]);
-  }
-
-  public void testHapAlts() throws Exception {
-    // Test squashing ploidy  A T,C,G -> T, C, G
-    final AlleleIdVariant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
-    assertEquals(4, variant.numAlleles());
-    assertEquals(null, variant.allele(0));
-    assertEquals("T", variant.alleleStr(1));
-    assertEquals("C", variant.alleleStr(2));
-    assertEquals("G", variant.alleleStr(3));
-    final OrientedVariant[] pos = Orientor.SQUASH_POP.orientations(variant);
-    assertEquals(3, pos.length);
-    for (OrientedVariant ov : pos) {
-      assertTrue(ov.isAlleleA());
-      assertFalse(ov.isHeterozygous());
-    }
-    assertEquals(1, pos[0].alleleId()); // REF allele doesn't get counted in ids
-    assertEquals(2, pos[1].alleleId());
-    assertEquals(3, pos[2].alleleId());
-  }
-
-  public void testDipAlts() throws Exception {
-    // Test diploid combos  A T,C,G -> .:T, T:., T:T, .:C, C:., C:C, .:G, G:., G:G, T:C, C:T, T:G, G:T, C:G, G:C
-    final AlleleIdVariant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
-    assertEquals(4, variant.numAlleles());
-    final OrientedVariant[] pos = Orientor.RECODE_POP.orientations(variant);
-    assertEquals(15, pos.length);
-    assertEquals("chr:23-24 (.v:*:T^:C:G)", pos[0].toString()); // Het uses missing rather than REF
-    assertEquals("chr:23-24 (.^:*:Tv:C:G)", pos[1].toString());
-    assertEquals("chr:23-24 (*:Tx:C:G)", pos[2].toString());
-    assertEquals("chr:23-24 (.v:*:T:C^:G)", pos[3].toString());
-    assertEquals("chr:23-24 (*:T:C^:Gv)", pos[13].toString());
-    assertEquals("chr:23-24 (*:T:C:Gx)", pos[14].toString());
   }
 
   static final String SNP_LINE5 = "chr 23 . AA T,ATTA . PASS . GT 0/2";
   static final String SNP_LINE6 = "chr 23 . T A,TAAA . PASS . GT 2|1";
   static final String SNP_LINE7 = "chr 23 . T A,TAAA . PASS . GT 2|.";
 
-  public void testTrimmedGtPloidy() throws Exception {
-    // Test trimming ploidy  AA:ATTA -> :TT
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
-    AlleleIdVariant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
+  public void testTrimmedGt() throws Exception {
+    // Test  AA:ATTA -> :TT
+    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true, false);
+    Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
     assertEquals(23, variant.getStart());
     assertEquals(23, variant.getStart());
     assertEquals(3, variant.numAlleles());
     assertEquals(null, variant.allele(0));
     assertEquals(null, variant.allele(1));
-    assertEquals("TT", DnaUtils.bytesToSequenceIncCG(variant.allele(2).nt()));
-    OrientedVariant[] pos = Orientor.UNPHASED.orientations(variant);
-    assertEquals(2, pos.length);
+    assertEquals("TT", variant.alleleStr(2));
     assertTrue(variant instanceof GtIdVariant);
     GtIdVariant av = (GtIdVariant) variant;
     assertEquals(0, av.alleleA());
@@ -155,9 +110,6 @@ public class VariantFactoryTest extends TestCase {
     assertEquals(23, allele.getStart());
     assertEquals(23, allele.getEnd());
     assertEquals("chr:23-24 (<24-24>AAA:A)", variant.toString());
-    pos = Orientor.UNPHASED.orientations(variant);
-    assertEquals(2, pos.length);
-    assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
     assertTrue(variant instanceof GtIdVariant);
     av = (GtIdVariant) variant;
     assertEquals(2, av.alleleA());
@@ -165,13 +117,20 @@ public class VariantFactoryTest extends TestCase {
 
     variant = fact.variant(VariantTest.createRecord(SNP_LINE7), 0);
     assertEquals("chr:24-24 (AAA:.)", variant.toString());
-    pos = Orientor.UNPHASED.orientations(variant);
-    assertEquals(2, pos.length);
-    assertEquals("chr:24-24 (.v:*:*:AAA^)", pos[0].toString());
     assertTrue(variant instanceof GtIdVariant);
     av = (GtIdVariant) variant;
     assertEquals(2, av.alleleA());
     assertEquals(-1, av.alleleB());
+  }
+
+  public void testAlts() throws Exception {
+    final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
+    assertEquals(4, variant.numAlleles());
+    assertEquals(null, variant.allele(-1)); // missing allele is ignored
+    assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
+    assertEquals("T", variant.alleleStr(1));
+    assertEquals("C", variant.alleleStr(2));
+    assertEquals("G", variant.alleleStr(3));
   }
 
 }

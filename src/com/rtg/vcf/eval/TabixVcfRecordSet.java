@@ -173,16 +173,16 @@ class TabixVcfRecordSet implements VariantSet {
         return f.length == 1 ? f[0] : f[1];
       }
     } else {
-      return "default";
+      return "sample";
     }
   }
 
   static Orientor getOrientor(VariantSetType type, boolean squashPloidy) {
     final String f = getFactoryName(type);
     switch (f) {
-      case "default":
+      case "sample":
         return squashPloidy ? Orientor.SQUASH_GT : Orientor.UNPHASED;
-      case "alt":
+      case "all":
         return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
       default:
         throw new RuntimeException("Could not determine orientor for " + f);
@@ -190,20 +190,15 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   static VariantFactory getFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
+    final boolean explicitHalf = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
     final String f = getFactoryName(type);
-    final boolean trim;
-    final boolean explicitHalf;
-    if ("default".equals(f)) {
-      trim = relaxedRef;
-      explicitHalf = true;
-    } else {
-      trim = f.contains("trim");
-      explicitHalf = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
-    }
-    if (f.endsWith("alt")) {
-      return new VariantFactory.AllAlts();
-    } else {
-      return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), trim, explicitHalf);
+    switch (f) {
+      case "sample":
+        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitHalf);
+      case "all":
+        return new VariantFactory.AllAlts(relaxedRef, explicitHalf);
+      default:
+        throw new RuntimeException("Could not determine variant factory for " + f);
     }
   }
 

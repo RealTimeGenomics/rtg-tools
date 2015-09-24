@@ -84,8 +84,7 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
         "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
         "--ref-overlap",
         "--XXcom.rtg.vcf.eval.custom-path-processor=recode",
-        "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default",
-        "--XXcom.rtg.vcf.eval.explicit-half-call",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample",
         "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
       assertTrue(res.err(), res.rc() == 0);
       mergeArgs[i + 1] = new File(output, "sample.vcf.gz").getPath();
@@ -109,10 +108,12 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
         "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
         "--ref-overlap",
         "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
-        "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample",
+        "--XXcom.rtg.vcf.eval.explicit-half-call=false",
         "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
       assertTrue(res.err(), i == 1 || res.rc() == 0);
       alleles = new File(output, "alleles.vcf.gz");
+      assertTrue(res.err(), alleles.exists());
     }
     return alleles;
   }

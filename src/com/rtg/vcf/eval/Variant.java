@@ -40,8 +40,9 @@ import com.rtg.vcf.VcfUtils;
 
 /**
  * Holds information about a single variant that has not yet been oriented in a haplotype.
+ * A Variant can be asked for alleles using original GT-style allele IDs, including -1 for missing value.
  */
-public abstract class Variant extends SequenceNameLocusSimple implements Comparable<Variant>, VariantId {
+public class Variant extends SequenceNameLocusSimple implements Comparable<Variant>, VariantId {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
   static final Comparator<VariantId> ID_COMPARATOR = new Comparator<VariantId>() {
@@ -62,23 +63,20 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
     mPhased = false;
   }
 
-  Variant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
+  /**
+   * Construct the variant
+   * @param id the ID of the variant when read from the original input
+   * @param seq chromosome name
+   * @param start start position
+   * @param end end position
+   * @param alleles array of alleles where each entry corresponds to the allele for GT ID + 1
+   * @param phased true if the variant call was phased
+   */
+  public Variant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
     super(seq, start, end);
     mId = id;
     mPhased = phased;
     mAlleles = alleles;
-  }
-
-  Variant(int id, String seq, int start, int end, byte[][] alleles, boolean phased) {
-    this(id, seq, start, end, toAlleles(seq, start, end, alleles), phased);
-  }
-
-  static Allele[] toAlleles(String seq, int start, int end, byte[][] alleles) {
-    final Allele[] result = new Allele[alleles.length];
-    for (int i = 0; i < result.length; i++) {
-      result[i] = new Allele(seq, start, end, alleles[i]);
-    }
-    return result;
   }
 
   @Override
@@ -121,7 +119,7 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
    * @return the bases of the allele.  May be null (no substitution) or zero length (deletion)
    */
   public Allele allele(int alleleId) {
-    return alleleId < 0 ? null : mAlleles[alleleId];
+    return alleleId < -1 ? null : mAlleles[alleleId + 1];
   }
 
   /**
@@ -157,7 +155,7 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
   }
 
   int numAlleles() {
-    return mAlleles.length;
+    return mAlleles.length - 1;
   }
 
   /**

@@ -57,13 +57,15 @@ public class PathTest extends AbstractNanoTest {
     mutations.add(mutation);
     final MockVariant call = new MockVariant(2, 3, new byte[] {3}, null);
     calls.add(call);
-    final Path best = PathFinder.bestPath(template, "currentName", mutations, calls);
+    PathFinder f = new PathFinder(template, "currentName", mutations, calls, PathFinder.getPathPreference(), new MockOrientor(), new MockOrientor());
+    final Path best = f.bestPath();
 
     assertTrue(best.getCalledIncluded().get(0).variant().equals(mutation));
     assertTrue(best.getCalledExcluded().isEmpty());
     assertTrue(best.getBaselineIncluded().get(0).variant().equals(call));
     assertTrue(best.getBaselineExcluded().isEmpty());
-    final Path best2 = PathFinder.bestPath(template, "currentName", calls, mutations);
+    f = new PathFinder(template, "currentName", calls, mutations, PathFinder.getPathPreference(), new MockOrientor(), new MockOrientor());
+    final Path best2 = f.bestPath();
     assertTrue(best.equals(best2));
     assertTrue(best2.equals(best));
     assertFalse(best.equals(null));
@@ -107,9 +109,35 @@ public class PathTest extends AbstractNanoTest {
     assertEquals(excludeCount, excluded.size());
   }
 
+  static class MockOrientor implements Orientor {
+    @Override
+    public OrientedVariant[] orientations(Variant variant) {
+      if (variant.numAlleles() == 2) {
+        // If the variant is heterozygous we need both phases
+        return new OrientedVariant[]{
+          new OrientedVariant(variant, true, 0, 1),
+          new OrientedVariant(variant, false, 1, 0)
+        };
+      } else {
+        assert variant.numAlleles() == 1;
+        // Homozygous / haploid
+        return new OrientedVariant[] {
+          new OrientedVariant(variant, 0)
+        };
+      }
+    }
+  }
+
   // Any variant with isAlleleA true is expected to be included, and isAlleleA false is expected to be excluded
   private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide) {
-    final Path best = PathFinder.bestPath(template, "currentName", getVariations(aSide), getVariations(bSide));
+    final Variant v = aSide.size() > 0 ? aSide.get(0).variant() : bSide.get(0).variant();
+    final Orientor o = v instanceof MockVariant ? new MockOrientor() : Orientor.UNPHASED;
+    check(template, aSide, bSide, o);
+  }
+
+  private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide, Orientor o) {
+    final PathFinder f = new PathFinder(template, "currentName", getVariations(aSide), getVariations(bSide), PathFinder.getPathPreference(), o, o);
+    final Path best = f.bestPath();
     //System.err.println("*****************************");
     //System.err.println(best);
     //System.err.println("*****************************");

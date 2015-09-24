@@ -31,12 +31,9 @@ package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
 
-import com.reeltwo.jumble.annotations.TestClass;
-
 /**
  * Produces various orientations onto haplotypes of a variant
  */
-@TestClass(value = {"com.rtg.vcf.eval.VariantFactoryTest", "com.rtg.vcf.eval.VariantTest"})
 public interface Orientor {
 
   /**
@@ -44,7 +41,7 @@ public interface Orientor {
    * @param variant the variant
    * @return the oriented variants
    */
-  OrientedVariant[] orientations(AlleleIdVariant variant);
+  OrientedVariant[] orientations(Variant variant);
 
   /**
    * Produces orientations corresponding to the possible diploid phasings from the
@@ -53,7 +50,7 @@ public interface Orientor {
    */
   Orientor UNPHASED = new Orientor() {
     @Override
-    public OrientedVariant[] orientations(AlleleIdVariant variant) {
+    public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       if (gv.alleleA() != gv.alleleB()) {
         // If the variant is heterozygous we need both phases
@@ -77,7 +74,7 @@ public interface Orientor {
    */
   Orientor PHASED = new Orientor() {
     @Override
-    public OrientedVariant[] orientations(AlleleIdVariant variant) {
+    public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       if (gv.alleleA() != gv.alleleB()) {
         if (variant.isPhased()) {
@@ -106,7 +103,7 @@ public interface Orientor {
    */
   Orientor SQUASH_GT = new Orientor() {
     @Override
-    public OrientedVariant[] orientations(AlleleIdVariant variant) {
+    public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       assert gv.alleleA() > 0 || gv.alleleB() > 0;
       final int la = gv.alleleA() > 0 ? gv.alleleA() : gv.alleleB();
@@ -130,7 +127,7 @@ public interface Orientor {
    */
   Orientor SQUASH_POP = new Orientor() {
     @Override
-    public OrientedVariant[] orientations(AlleleIdVariant variant) {
+    public OrientedVariant[] orientations(Variant variant) {
       final OrientedVariant[] pos = new OrientedVariant[variant.numAlleles() - 1];
       for (int i = 0; i < pos.length; i++) {
         pos[i] = new OrientedVariant(variant, i + 1);
@@ -145,7 +142,7 @@ public interface Orientor {
    */
   Orientor RECODE_POP = new Orientor() {
     @Override
-    public OrientedVariant[] orientations(AlleleIdVariant variant) {
+    public OrientedVariant[] orientations(Variant variant) {
       final boolean explicitHalfCall = variant.allele(-1) != null;
       final ArrayList<OrientedVariant> pos = new ArrayList<>(variant.numAlleles() * variant.numAlleles() - 1);
       for (int i = 1; i < variant.numAlleles(); i++) {

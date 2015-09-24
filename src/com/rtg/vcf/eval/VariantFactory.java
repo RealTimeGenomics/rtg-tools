@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf.eval;
 
-import com.rtg.launcher.GlobalFlags;
 import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -47,48 +46,6 @@ public interface VariantFactory {
    */
   Variant variant(VcfRecord rec, int id);
 
-
-  /**
-   * Construct compact variants corresponding to the GT of a specified sample.
-   * The only allele trimming done is a single leading
-   * padding base, and only if it is shared by all alleles.
-   * Path finding will require full genotype to match.
-   * Keep this for backward compatibility with previous versions of vcfeval.
-   */
-  class CompactGt implements VariantFactory {
-
-    private final int mSampleNo;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     */
-    public CompactGt(int sampleNo) {
-      mSampleNo = sampleNo;
-    }
-
-    @Override
-    public CompactVariant variant(VcfRecord rec, int id) {
-      // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
-        return null;
-      }
-
-      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2;
-
-      final boolean hasPreviousNt = VcfUtils.hasRedundantFirstNucleotide(rec);
-      final Allele[] alleles = new Allele[VcfUtils.isHomozygousAlt(gtArray) ? 1 : 2];
-      for (int i = 0; i < alleles.length; i++) {
-        final int gtId = gtArray[i];      // May be -1, we treat missing as distinct value
-        alleles[i] = Allele.getAllele(rec, gtId, false, hasPreviousNt, true);
-      }
-      final Range bounds = Allele.getAlleleBounds(alleles);
-      return new CompactVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, VcfUtils.isPhasedGt(gt));
-    }
-  }
-
   /**
    * Construct Variants corresponding to the GT of a specified sample, only where the sample
    * is variant and maintaining original allele IDs.
@@ -102,15 +59,6 @@ public interface VariantFactory {
     private final int mSampleNo;
     private final boolean mTrim;
     private final boolean mExplicitHalfCall;
-
-    /**
-     * Constructor
-     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
-     * @param trimming if true, trim all leading/trailing bases that match REF from alleles
-     */
-    public SampleVariants(int sampleNo, boolean trimming) {
-      this(sampleNo, trimming, GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL));
-    }
 
     /**
      * Constructor
@@ -151,22 +99,33 @@ public interface VariantFactory {
    */
   class AllAlts implements VariantFactory {
 
+    private final boolean mTrim;
     private final boolean mExplicitHalfCall;
 
     AllAlts() {
-      mExplicitHalfCall = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
+      this(true, false);
+    }
+
+    /**
+     * Constructor
+     * @param trimming if true, trim all leading/trailing bases that match REF from alleles
+     * @param explicitHalfCall if true, treat half call allele as a separate token
+     */
+    public AllAlts(boolean trimming, boolean explicitHalfCall) {
+      mTrim = trimming;
+      mExplicitHalfCall = explicitHalfCall;
     }
 
     @Override
-    public AlleleIdVariant variant(final VcfRecord rec, final int id) {
+    public Variant variant(final VcfRecord rec, final int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
       } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
 
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, null, true, mExplicitHalfCall);
+      final Allele[] alleles = Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall);
       final Range bounds = Allele.getAlleleBounds(alleles);
 
-      return new AlleleIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false);
+      return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false);
     }
   }
 }

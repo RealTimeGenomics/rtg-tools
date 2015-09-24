@@ -119,13 +119,14 @@ public class Allele extends SequenceNameLocusSimple {
    * @return the allele, or null if the allele should not result in a change to the haplotype
    */
   protected static Allele getAllele(VcfRecord rec, int allele, boolean trim, boolean removePaddingBase, boolean explicitMissing) {
-    if (allele == -1 && !explicitMissing) {
-      return null;
-    }
-    final String alleleStr;
     if (allele == -1) {
-      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), MISSING);
-    } else if (trim) {
+      if (explicitMissing) {
+        return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), MISSING);
+      } else {
+        return null;
+      }
+    }
+    if (trim) {
       final String ref = rec.getRefCall();
       if (allele == 0) {
         return trim ? null : new Allele(rec, DnaUtils.encodeString(ref));
@@ -136,13 +137,9 @@ public class Allele extends SequenceNameLocusSimple {
       return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
         DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
     } else {
-      final String localAllele = rec.getAllele(allele);
-      if (removePaddingBase) {
-        alleleStr = localAllele.substring(1);
-      } else {
-        alleleStr = localAllele;
-      }
-      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), DnaUtils.encodeString(alleleStr));
+      final String alt = rec.getAllele(allele);
+      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(),
+        DnaUtils.encodeString(removePaddingBase ? alt.substring(1) : alt));
     }
   }
 

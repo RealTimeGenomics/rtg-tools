@@ -32,15 +32,24 @@ package com.rtg.vcf.eval;
 
 /**
  */
-public class MockVariant extends CompactVariant {
+public class MockVariant extends Variant {
 
   static byte[][] toPreds(byte[] plus, byte[] minus) {
     if (minus == null) {
-      return new byte[][] {plus};
+      return new byte[][] {null, plus};
     } else {
-      return new byte[][] {plus, minus};
+      return new byte[][] {null, plus, minus};
     }
   }
+
+  static Allele[] toAlleles(String seq, int start, int end, byte[][] alleles) {
+    final Allele[] result = new Allele[alleles.length];
+    for (int i = 0; i < result.length; i++) {
+      result[i] = alleles[i] == null ? null : new Allele(seq, start, end, alleles[i]);
+    }
+    return result;
+  }
+
 
   /**
    * Assumes not phased
