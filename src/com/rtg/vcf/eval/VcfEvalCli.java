@@ -70,6 +70,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String SAMPLE = "sample";
   static final String SORT_FIELD = "vcf-score-field";
   private static final String SQUASH_PLOIDY = "squash-ploidy";
+  private static final String REF_OVERLAP = "ref-overlap";
   private static final String BASELINE_TP = "baseline-tp";
 
   private static final String SLOPE_FILES = "Xslope-files";
@@ -115,7 +116,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
     flags.registerOptional(SAMPLE, String.class, "STRING", "the name of the sample to select. Use <baseline_sample>,<calls_sample> to select different sample names for baseline and calls. (Required when using multi-sample VCF files)").setCategory(FILTERING);
     flags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status. Default is to only process records where FILTER is \".\" or \"PASS\"").setCategory(FILTERING);
-    flags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls").setCategory(FILTERING);
+    flags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences").setCategory(FILTERING);
+    flags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref. Default is to only allow VCF anchor base overlap").setCategory(FILTERING);
 
     flags.registerOptional('f', SORT_FIELD, String.class, "STRING", "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO=<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, "STRING", "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
@@ -249,6 +251,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     }
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
+    builder.refOverlap(mFlags.isSet(REF_OVERLAP));
     builder.rtgStats(mFlags.isSet(RTG_STATS));
     builder.outputBaselineTp(mFlags.isSet(BASELINE_TP));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));

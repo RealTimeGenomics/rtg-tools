@@ -166,10 +166,4 @@ public abstract class Variant extends SequenceNameLocusSimple implements Compara
   public boolean isPhased() {
     return mPhased;
   }
-
-  /**
-   * @return the possible oriented variants for this variant
-   */
-  public abstract OrientedVariant[] orientations();
-
 }

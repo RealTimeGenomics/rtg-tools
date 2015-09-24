@@ -82,8 +82,9 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
       final MainResult res = MainResult.run(new VcfEvalCli(),
         "-o", output.getPath(), "--sample", "SAMPLE" + i,
         "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
+        "--ref-overlap",
         "--XXcom.rtg.vcf.eval.custom-path-processor=recode",
-        "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default",
         "--XXcom.rtg.vcf.eval.explicit-half-call",
         "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
       assertTrue(res.err(), res.rc() == 0);
@@ -106,8 +107,9 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
       final MainResult res = MainResult.run(new VcfEvalCli(),
         "-o", output.getPath(), "--sample", "SAMPLE" + i,
         "-t", template.getPath(), "-b", alleles.getPath(), "-c", samples.getPath(),
+        "--ref-overlap",
         "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
-        "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+        "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default",
         "--XXcom.rtg.vcf.eval.maximize=calls-min-base");
       assertTrue(res.err(), i == 1 || res.rc() == 0);
       alleles = new File(output, "alleles.vcf.gz");

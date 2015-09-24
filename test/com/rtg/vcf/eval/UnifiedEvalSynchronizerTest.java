@@ -49,9 +49,8 @@ import com.rtg.util.test.FileHelper;
 public class UnifiedEvalSynchronizerTest extends AbstractNanoTest {
 
   public void testCombined() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_combined", false,
-      "--XXcom.rtg.vcf.eval.custom-path-processor=unified",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=default-trim-id,default-trim-id");
+    endToEnd("vcfeval_combined", false, "--ref-overlap",
+      "--XXcom.rtg.vcf.eval.custom-path-processor=unified");
   }
 
   public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

@@ -62,6 +62,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     boolean mUseAllRecords = false;
     int mNumberThreads = 1;
     private boolean mSquashPloidy = false;
+    private boolean mRefOverlap = false;
     int mMaxLength = -1;
     boolean mRtgStats = false;
     boolean mOutputBaselineTp = false;
@@ -181,6 +182,15 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
+     * @param refOverlap true if overlaps may occur where either side is same-as-ref.
+     * @return this builder, so calls can be chained
+     */
+    public VcfEvalParamsBuilder refOverlap(boolean refOverlap) {
+      mRefOverlap = refOverlap;
+      return self();
+    }
+
+    /**
      * @param maxLength the maximum length variant to consider
      * @return this builder, so calls can be chained
      */
@@ -261,6 +271,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final int mNumberThreads;
   private final boolean mUseAllRecords;
   private final boolean mSquashPloidy;
+  private final boolean mRefOverlap;
   private final int mMaxLength;
   private final boolean mRtgStats;
   private final boolean mOutputBaselineTp;
@@ -284,6 +295,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mNumberThreads = builder.mNumberThreads;
     mUseAllRecords = builder.mUseAllRecords;
     mSquashPloidy = builder.mSquashPloidy;
+    mRefOverlap = builder.mRefOverlap;
     mMaxLength = builder.mMaxLength;
     mRtgStats = builder.mRtgStats;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
@@ -373,6 +385,13 @@ public final class VcfEvalParams extends OutputModuleParams {
    */
   public boolean squashPloidy() {
     return mSquashPloidy;
+  }
+
+  /**
+   * @return true if overlaps are permitted at same-as-ref bases
+   */
+  public boolean refOverlap() {
+    return mRefOverlap;
   }
 
   /**

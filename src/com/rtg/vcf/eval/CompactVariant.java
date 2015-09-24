@@ -43,7 +43,9 @@ public class CompactVariant extends Variant {
     super(id, seq, start, end, alleles, phased);
   }
 
-  @Override
+  /**
+   * @return the possible oriented variants for this variant
+   */
   public OrientedVariant[] orientations() {
     if (numAlleles() == 2) {
       // If the variant is heterozygous we need both phases

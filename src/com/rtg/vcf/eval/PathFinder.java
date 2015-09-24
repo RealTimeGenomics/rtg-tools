@@ -54,13 +54,16 @@ public final class PathFinder {
   private final Variant[] mCalledVariants;
   private final Variant[] mBaseLineVariants;
   private final PathPreference mMaximizeMode;
+  private final Orientor mBaselineOrientor;
+  private final Orientor mCallOrientor;
   private int mCurrentMaxPos;
 
-  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants, PathPreference maximizeMode) {
+  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants, PathPreference maximizeMode, Orientor callOrientor, Orientor baselineOrientor) {
     mTemplate = template;
     mTemplateName = templateName;
     mMaximizeMode = maximizeMode;
-
+    mCallOrientor = callOrientor;
+    mBaselineOrientor = baselineOrientor;
     mCalledVariants = calledVariants.toArray(new Variant[calledVariants.size()]);
     Arrays.sort(mCalledVariants, Variant.NATURAL_COMPARATOR);
 
@@ -80,6 +83,10 @@ public final class PathFinder {
    * @return the best path (non-null).
    */
   public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
+    return new PathFinder(template, templateName, calledVariants, baseLineVariants, getPathPreference(), Orientor.UNPHASED, Orientor.UNPHASED).bestPath();
+  }
+
+  static PathPreference getPathPreference() {
     final String mode = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
     Diagnostic.developerLog("Path finder maximisation: " + mode);
     final PathPreference maximiseMode;
@@ -95,7 +102,7 @@ public final class PathFinder {
       default:
         maximiseMode = new SumBoth();
     }
-    return new PathFinder(template, templateName, calledVariants, baseLineVariants, maximiseMode).bestPath();
+    return maximiseMode;
   }
 
   Path bestPath() {
@@ -187,6 +194,7 @@ public final class PathFinder {
   private boolean enqueueVariant(TreeSet<Path> paths, Path head, boolean side) {
     final Variant[] variants = side ? mCalledVariants : mBaseLineVariants;
     final HalfPath halfPath = side ? head.mCalledPath : head.mBaselinePath;
+    final Orientor orientor = side ? mCallOrientor : mBaselineOrientor;
     final int aVarIndex = nextVariant(halfPath, variants);
     if (aVarIndex != -1) {
       final Variant aVar = variants[aVarIndex];
@@ -195,7 +203,7 @@ public final class PathFinder {
       if (TRACE) {
         System.err.println("Add alternatives to " + (side ? "called " : "baseline ") + aVar);
       }
-      addIfBetter(head.addVariant(side, aVar, aVarIndex), paths);
+      addIfBetter(head.addVariant(side, aVar, aVarIndex, orientor), paths);
       return true;
     }
     return false;

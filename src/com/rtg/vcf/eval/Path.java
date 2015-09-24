@@ -203,7 +203,7 @@ public final class Path implements Comparable<Path> {
     }
   }
 
-  Collection<Path> addVariant(boolean side, Variant var, int varIndex) {
+  Collection<Path> addVariant(boolean side, Variant var, int varIndex, Orientor orientor) {
     final ArrayList<Path> paths = new ArrayList<>();
     final BasicLinkedListNode<Integer> syncPoints;
     if (this.inSync()) {
@@ -220,7 +220,7 @@ public final class Path implements Comparable<Path> {
     paths.add(exclude);
 
     // Create a path extension that includes this variant in the possible phases
-    for (OrientedVariant o : var.orientations()) {
+    for (OrientedVariant o : var instanceof AlleleIdVariant ? orientor.orientations((AlleleIdVariant) var) : ((CompactVariant) var).orientations()) { // XXXLen
       if ((side ? mCalledPath : mBaselinePath).isNew(o)) {
         final Path include = new Path(this, syncPoints);
         include.include(side, o, varIndex);

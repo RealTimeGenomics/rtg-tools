@@ -84,7 +84,7 @@ class TabixVcfRecordSet implements VariantSet {
   TabixVcfRecordSet(File baselineFile, File calledFile,
                     ReferenceRanges<String> ranges, Collection<Pair<String, Integer>> referenceNameOrdering,
                     String baselineSample, String callsSample,
-                    boolean passOnly, boolean squashPloidy, int maxLength) throws IOException {
+                    boolean passOnly, boolean relaxedRef, int maxLength) throws IOException {
     if (referenceNameOrdering == null) {
       throw new NullPointerException();
     }
@@ -159,47 +159,51 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
 
-    mBaselineFactory = getFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, squashPloidy);
-    mCallsFactory = getFactory(VariantSetType.CALLS, mCalledHeader, callsSample, squashPloidy);
+    mBaselineFactory = getFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, relaxedRef);
+    mCallsFactory = getFactory(VariantSetType.CALLS, mCalledHeader, callsSample, relaxedRef);
   }
 
-  static VariantFactory getFactory(VariantSetType mType, VcfHeader header, String sampleName, boolean mSquashPloidy) {
-    String f = mSquashPloidy ? "squash" : "default";
+  static String getFactoryName(VariantSetType type) {
     final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
     if (customFactory.length() > 0) {
-      final String[] f2 = StringUtils.split(customFactory, ',');
-      if (mType == VariantSetType.BASELINE) {
-        f = f2[0];
+      final String[] f = StringUtils.split(customFactory, ',');
+      if (type == VariantSetType.BASELINE) {
+        return f[0];
       } else {
-        f = f2.length == 1 ? f2[0] : f2[1];
+        return f.length == 1 ? f[0] : f[1];
       }
+    } else {
+      return "default";
     }
+  }
+
+  static Orientor getOrientor(VariantSetType type, boolean squashPloidy) {
+    final String f = getFactoryName(type);
     switch (f) {
-      case VariantFactory.DiploidAlts.NAME:
-        return new VariantFactory.DiploidAlts();
-
-      case VariantFactory.HaploidAlts.NAME:
-        return new VariantFactory.HaploidAlts();
-
-      case VariantFactory.HaploidAltGtId.TRIMMED_NAME:
-        return new VariantFactory.HaploidAltGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), true);
-
-      case VariantFactory.HaploidAltGt.NAME:
-        //return new VariantFactory.HaploidAltGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-        return new VariantFactory.HaploidAltGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false);
-
-      case VariantFactory.DefaultGtId.TRIMMED_NAME:
-        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), true);
-
-      case VariantFactory.DefaultGtId.NAME:
-        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false);
-
-      case VariantFactory.DefaultGt.NAME:
-        //return new VariantFactory.DefaultGt(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()));
-        return new VariantFactory.DefaultGtId(VcfUtils.getSampleIndexOrDie(header, sampleName, mType.label()), false, true);
-
+      case "default":
+        return squashPloidy ? Orientor.SQUASH_GT : Orientor.UNPHASED;
+      case "alt":
+        return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
       default:
-        throw new RuntimeException("Unknown variant factory: " + f);
+        throw new RuntimeException("Could not determine orientor for " + f);
+    }
+  }
+
+  static VariantFactory getFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
+    final String f = getFactoryName(type);
+    final boolean trim;
+    final boolean explicitHalf;
+    if ("default".equals(f)) {
+      trim = relaxedRef;
+      explicitHalf = true;
+    } else {
+      trim = f.contains("trim");
+      explicitHalf = GlobalFlags.isSet(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
+    }
+    if (f.endsWith("alt")) {
+      return new VariantFactory.AllAlts();
+    } else {
+      return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), trim, explicitHalf);
     }
   }
 

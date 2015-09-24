@@ -57,11 +57,11 @@ public class VariantTest extends TestCase {
     return createVariant(rec, 0, sampleNo);
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo) {
-    return new VariantFactory.DefaultGtId(sampleNo, false, true).variant(rec, id);
+    return new VariantFactory.SampleVariants(sampleNo, false, true).variant(rec, id);
   }
 
-  static Variant createCompactVariant(String var) {
-    return new VariantFactory.DefaultGt(0).variant(createRecord(var), 0);
+  static CompactVariant createCompactVariant(String var) {
+    return new VariantFactory.CompactGt(0).variant(createRecord(var), 0);
   }
 
   static Variant createVariant(String var) {
@@ -129,7 +129,7 @@ public class VariantTest extends TestCase {
   static final String SNP_LINE2 = "someKindOfName 23 . A T,C 12.8 PASS . GT:DP:RE:GQ 1/2:4:0.02:12.8";
   static final String SNP_LINE4 = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ ./1:4:0.02:12.8";
   public void testHeterozygousSnpConstruction() throws Exception {
-    Variant variant = createCompactVariant(SNP_LINE2);
+    CompactVariant variant = createCompactVariant(SNP_LINE2);
     // Normal het call 1/2
     assertEquals(22, variant.getStart());
     assertEquals(1, variant.nt(0).length);

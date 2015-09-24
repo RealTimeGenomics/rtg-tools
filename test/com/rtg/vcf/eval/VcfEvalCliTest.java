@@ -137,21 +137,20 @@ public class VcfEvalCliTest extends AbstractCliTest {
 
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory)
     // Variant on 21 requires ref base removal AND variant overlap consideration to be independent for each haplotype (use default-trim-id variant factory)
-    check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=default-trim-id,default-trim-id");
+    check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap");
   }
 
   public void testNanoTricky2() throws IOException, UnindexableDataException {
     // Default of maximizing the sum of baseline and calls variants leaves one out. Switching to maximizing calls includes them all.
-    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=dip-alt,default-trim-id",
+    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap",
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default",
       "--XXcom.rtg.vcf.eval.maximize=calls");
   }
 
   public void testNanoTricky3() throws IOException, UnindexableDataException {
     // Has two alternative variants starting at exactly the same position, needs overlap handling, now works.
-    check("vcfeval_small_tricky3", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=hap-alt,squash");
+    check("vcfeval_small_tricky3", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1", "--squash-ploidy", "--ref-overlap",
+      "--XXcom.rtg.vcf.eval.custom-variant-factory=alt,default");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {

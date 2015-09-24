@@ -58,11 +58,15 @@ class SequenceEvaluator implements IORunnable {
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;
   private final Map<String, Long> mNameMap;
+  private final Orientor mBaselineOrientor;
+  private final Orientor mCallsOrientor;
 
-  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template) {
+  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template, Orientor baselineOrientor, Orientor callsOrientor) {
     mSynchronize = variantSets;
     mTemplate = template;
     mNameMap = nameMap;
+    mBaselineOrientor = baselineOrientor;
+    mCallsOrientor = callsOrientor;
   }
 
   @Override
@@ -86,8 +90,11 @@ class SequenceEvaluator implements IORunnable {
     if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
       mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList());
     } else {
+
       //find the best path for variant calls
-      final Path best = PathFinder.bestPath(template, currentName, calledCalls, baseLineCalls);
+      final PathFinder f = new PathFinder(template, currentName, calledCalls, baseLineCalls, PathFinder.getPathPreference(), mCallsOrientor, mBaselineOrientor);
+
+      final Path best = f.bestPath();
 
       if (DUMP_BEST_PATH) {
         System.out.println("#### " + best);

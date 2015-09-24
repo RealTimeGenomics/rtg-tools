@@ -37,7 +37,7 @@ import com.reeltwo.jumble.annotations.TestClass;
  * Assumes input allele array contains sufficient entries and offsets the allele ID when querying the underlying allele array
  */
 @TestClass("com.rtg.vcf.eval.VariantFactoryTest")
-public abstract class AlleleIdVariant extends Variant {
+public class AlleleIdVariant extends Variant {
 
   AlleleIdVariant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
     super(id, seq, start, end, alleles, phased);

@@ -104,11 +104,14 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameMap.put(names.name(i), i);
     }
 
+    final Orientor bo = TabixVcfRecordSet.getOrientor(VariantSetType.BASELINE, params.squashPloidy());
+    final Orientor co = TabixVcfRecordSet.getOrientor(VariantSetType.CALLS, params.squashPloidy());
+
     try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
       for (int i = 0; i < templateSequences.numberSequences(); i++) {
-        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences.copy()));
+        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences.copy(), bo, co));
       }
 
       threadPool.terminate();
@@ -163,7 +166,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 
-    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.squashPloidy(), params.maxLength());
+    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
   }
 
   static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {

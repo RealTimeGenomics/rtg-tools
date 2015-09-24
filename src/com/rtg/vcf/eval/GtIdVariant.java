@@ -36,7 +36,7 @@ import com.reeltwo.jumble.annotations.TestClass;
  * A Variant that offers orientations where the allele IDs correspond to original GT allele indexing.
  */
 @TestClass("com.rtg.vcf.eval.VariantFactoryTest")
-public abstract class GtIdVariant extends AlleleIdVariant {
+public class GtIdVariant extends AlleleIdVariant {
 
   private final int mAlleleA; // First allele in GT
   private final int mAlleleB; // Second allele in GT
@@ -70,6 +70,4 @@ public abstract class GtIdVariant extends AlleleIdVariant {
     sb.append(")");
     return sb.toString();
   }
-
-  public abstract OrientedVariant[] orientations();
 }
