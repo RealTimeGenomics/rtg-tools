@@ -194,23 +194,29 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
           }
 
           final byte[] readBytes = parts[READ_FIELD].getBytes();
+          final byte[] qualityBytes = new byte[readBytes.length];
+          for (int i = 0; i < readBytes.length; i++) {
+            byte residueByte = mFastaSymbolLookupTable[readBytes[i]];
+            if (residueByte == (byte) 255) { //unrecognized character, print warning, shove in unknown
+              Diagnostic.warning(WarningType.BAD_TIDE, name(), Character.toString((char) readBytes[i]), CHAR_TO_RESIDUE.unknownResidue().toString());
+              residueByte = (byte) CHAR_TO_RESIDUE.unknownResidue().ordinal();
+            }
+            readBytes[i] = residueByte;
+            qualityBytes[i] = FastaUtils.asciiToRawQuality(parts[QUALITY_FIELD].charAt(i));
+          }
           if (mCurrentLength == CgUtils.CG2_PADDED_LENGTH) {
-            copySequenceDataField(readBytes, 0, mLeftRead, 0, CgUtils.CG2_PAD_POSITION);
-            copySequenceDataField(readBytes, CgUtils.CG2_PAD_POSITION + 1, mLeftRead, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
-            copySequenceDataField(readBytes, CgUtils.CG2_PADDED_LENGTH, mRightRead, 0, CgUtils.CG2_PAD_POSITION);
-            copySequenceDataField(readBytes, CgUtils.CG2_PADDED_LENGTH + CgUtils.CG2_PAD_POSITION + 1, mRightRead, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+            CgUtils.unPad(readBytes, 0, mLeftRead);
+            CgUtils.unPad(readBytes, CgUtils.CG2_PADDED_LENGTH, mRightRead);
 
-            copyQualityDataField(parts[QUALITY_FIELD], 0, mLeftQuality, 0, CgUtils.CG2_PAD_POSITION);
-            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PAD_POSITION + 1, mLeftQuality, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
-            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PADDED_LENGTH, mRightQuality, 0, CgUtils.CG2_PAD_POSITION);
-            copyQualityDataField(parts[QUALITY_FIELD], CgUtils.CG2_PADDED_LENGTH + CgUtils.CG2_PAD_POSITION + 1, mRightQuality, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION);
+            CgUtils.unPad(qualityBytes, 0, mLeftQuality);
+            CgUtils.unPad(qualityBytes, CgUtils.CG2_PADDED_LENGTH, mRightQuality);
             mCurrentLength--;
           } else {
-            copySequenceDataField(readBytes, 0, mLeftRead, 0, mCurrentLength);
-            copySequenceDataField(readBytes, mCurrentLength, mRightRead, 0, mCurrentLength);
+            System.arraycopy(readBytes, 0, mLeftRead, 0, mCurrentLength);
+            System.arraycopy(readBytes, mCurrentLength, mRightRead, 0, mCurrentLength);
 
-            copyQualityDataField(parts[QUALITY_FIELD], 0, mLeftQuality, 0, mCurrentLength);
-            copyQualityDataField(parts[QUALITY_FIELD], mCurrentLength, mRightQuality, 0, mCurrentLength);
+            System.arraycopy(qualityBytes, 0, mLeftQuality, 0, mCurrentLength);
+            System.arraycopy(qualityBytes, mCurrentLength, mRightQuality, 0, mCurrentLength);
           }
 
           mSeqNo++;
@@ -219,25 +225,6 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
       }
     }
     return false;
-  }
-
-  private void copySequenceDataField(byte[] src, int srcPos, byte[] dest, int destPos, int length) {
-    byte residueByte;
-    for (int i = srcPos, j = destPos; i < srcPos + length; i++, j++) {
-      residueByte = mFastaSymbolLookupTable[src[i]];
-      if (residueByte == (byte) 255) {
-        //unrecognized character, print warning, shove in unknown
-        Diagnostic.warning(WarningType.BAD_TIDE, name(), Character.toString((char) src[i]), CHAR_TO_RESIDUE.unknownResidue().toString());
-        residueByte = (byte) CHAR_TO_RESIDUE.unknownResidue().ordinal();
-      }
-      dest[j] = residueByte;
-    }
-  }
-
-  private void copyQualityDataField(String src, int srcPos, byte[] dest, int destPos, int length) {
-    for (int i = srcPos, j = destPos; i < srcPos + length; i++, j++) {
-      dest[j] = FastaUtils.asciiToRawQuality(src.charAt(i));
-    }
   }
 
   // First call to nextSequence() will make this true

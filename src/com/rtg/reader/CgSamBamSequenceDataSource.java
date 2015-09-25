@@ -83,14 +83,15 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
       if (expandedRead == null) {
         throw new NoTalkbackSlimException("Could not reconstruct read bases for record: " + rec.getSAMString());
       }
-      final String samQualities = new String(FastaUtils.rawToAsciiQuality(rec.getBaseQualities()));
-      final boolean hasQuality = samQualities.length() != 0;
-      if (!hasQuality) {
-        expandedQual = null;
-      } else if (legacyLegacy) {
-        expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyLegacyQualities(samQualities, gq, gc));
+      if (rec.getBaseQualities().length == 0) {
+        expandedQual = rec.getBaseQualities();
       } else {
-        expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyRead(samQualities, gq, gc));
+        final String samQualities = new String(FastaUtils.rawToAsciiQuality(rec.getBaseQualities()));
+        if (legacyLegacy) {
+          expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyLegacyQualities(samQualities, gq, gc));
+        } else {
+          expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyRead(samQualities, gq, gc));
+        }
       }
     }
 

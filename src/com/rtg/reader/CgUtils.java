@@ -59,15 +59,15 @@ public final class CgUtils {
   }
 
   /**
-   * Strip single N padding that Complete Genomics v2 reads contain, if present.
+   * Strip single padding base that Complete Genomics v2 reads contain, if present.
    * @param seq input data to remove padding from. May be either DNA or quality data.
    * @param forward true if the data is in the normal, forward orientation
-   * @return the data with any padding removed.
+   * @return the data with any padding removed. If the data is not v2, returns the original array.
    */
   public static byte[] unPad(byte[] seq, boolean forward) {
     if (seq.length == CG2_PADDED_LENGTH) {
       final int pos = forward ? CG2_PAD_POSITION : CG2_PAD_POSITION_REV;
-      assert seq[pos] == 0 || seq[pos] == FastaUtils.asciiToRawQuality('!');
+      assert seq[pos] == 0 || seq[pos] == 'N' || seq[pos] == FastaUtils.asciiToRawQuality('!');
       final byte[] result = new byte[seq.length - 1];
       System.arraycopy(seq, 0, result, 0, pos);
       System.arraycopy(seq, pos + 1, result, pos, seq.length - pos - 1);
@@ -75,5 +75,16 @@ public final class CgUtils {
     } else {
       return seq;
     }
+  }
+
+  /**
+   * Strip single padding base that Complete Genomics v2 reads contain, if present.
+   * @param src input data to remove padding from. May be either DNA or quality data.
+   * @param start start position within the source array to begin copying from
+   * @param dest destination array where unpadded data is copied
+   */
+  public static void unPad(byte[] src, int start, byte[] dest) {
+    System.arraycopy(src, start, dest, 0, CG2_PAD_POSITION);
+    System.arraycopy(src, start + CG2_PAD_POSITION + 1, dest, CG2_PAD_POSITION, CG2_RAW_LENGTH - CG2_PAD_POSITION);
   }
 }
