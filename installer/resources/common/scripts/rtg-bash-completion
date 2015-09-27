@@ -13,9 +13,8 @@ function _complete_rtg() {
     local cur prev opts cmd flagtype
     local cachedir=$HOME/.rtg-completion
     COMPREPLY=()
-    _get_comp_words_by_ref -n = cur prev
-    #cur="${COMP_WORDS[COMP_CWORD]}"
-    #prev="${COMP_WORDS[COMP_CWORD-1]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
  
     #echo "$(date)" >~/.rtgcomp
     #echo "ARGS=$@" >>~/.rtgcomp
@@ -25,7 +24,7 @@ function _complete_rtg() {
     #echo "cur=$cur prev=$prev" >>~/.rtgcomp
     if [ "${prev}" == "$rtg" ] || [ "${prev:0:4}" == "RTG_" ]; then
         #echo "prev=main" >>~/.rtgcomp
-        opts="$("$rtg" --Xhelp 2>&1 | sed -n '/^\t[a-z]/s/^\s\+\(\S\+\).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
+        opts="$("$rtg" --Xhelp 2>&1 | sed -E -n '/^'$'\t''[a-z]/s/^[[:blank:]][[:blank:]]*([[:graph:]][[:graph:]]*).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
         #echo "$opts" >>~/.rtgcomp
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
         return 0
@@ -37,7 +36,7 @@ function _complete_rtg() {
                 continue;
             elif [ "${cmd}" == "=" ]; then
                 continue;
-            elif [ "${COMP_WORDS[$cmdl]}" ]; then
+            elif [ "${COMP_WORDS[$cmdl]}" == "=" ]; then
                 continue;
             fi
             break;
@@ -46,21 +45,21 @@ function _complete_rtg() {
         
         case ${cur} in
             --XX*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --XXhelp | sed -n '/^ \+-/s/.*\(--XX[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --XXhelp | sed -n '/^  *-/s/.*\(--XX[^= ][^= ]*\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             --X*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --Xhelp | sed -n '/^ \+-/s/.*\(--X[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --Xhelp | sed -n '/^  *-/s/.*\(--X[^= ][^= ]*\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             -*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --help | sed -n '/^ \+-/s/.*\(--[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --help | sed -n '/^  *-/s/.*\(--[^= ][^= ]*\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
@@ -68,9 +67,9 @@ function _complete_rtg() {
                 ;;
             *)
                 if [ "${prev:0:1}" == "-" ]; then
-                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -n -e "/ \+${prev}.*=[A-Z]\+/s/.*=\([A-Z]\+\)\s.*/\1/p")"
+                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -E -n -e "/  *${prev}.*=[A-Z][A-Z]*/s/.*=([A-Z][A-Z]*)[[:blank:]].*/\1/p")"
                 else   # Completion for anonymous flags
-                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -n -e "/^   \+[A-Z]\++\? \+/{s/^ \+\([A-Z]\+\).*/\1/p;q}")"
+                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -E -n -e "/^    *[A-Z][A-Z]*\+?  */s/^  *([A-Z][A-Z]*).*/\1/p")"
                 fi
                 #echo "flagtype=$flagtype" >>~/.rtgcomp
                 case ${flagtype} in
@@ -121,8 +120,18 @@ function _complete_rtghelp () {
     local cache=$cachedir/$1.$2
     local lastcmd=$cachedir/lastcmd
     [ -f $cache ] && [ -f $lastcmd ] && [ "$1" == "$(cat $lastcmd)" ] || { 
-        "$rtg" $1 $2 2>/dev/null | tr '\n' '\a' | sed "s/\a           \+/ /g" | tr '\a' '\n' >$cache && \
-        <$cache awk 'match($0,/(--[^=]+)=.*\(Must be one of \[([^]]+)\]/,a){gsub(",","",a[2]);file="'$cachedir/$1.'"a[1]; print a[2]>file}'
+        "$rtg" $1 $2 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' >$cache && \
+        <$cache tr -d ',' | awk --posix 'match($0,/(--[^=]+)=.*\(Must be one of \[([^]]+)\]/)
+{
+  l=substr($0, RSTART, RLENGTH - 1);
+  if (match(l,/(--[^=]+)=/)) {
+    f=substr(l, RSTART, RLENGTH - 1)
+    if (match(l,/\(Must be one of \[([^]]+)/)) {
+      o=substr(l, RSTART+17, RLENGTH);
+      file="'$cachedir/$1.'"f; print o>file
+    }
+  }
+}'
         echo $1 >$lastcmd 
     }
     cat $cache
