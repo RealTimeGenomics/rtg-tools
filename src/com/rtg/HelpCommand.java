@@ -35,6 +35,7 @@ import java.util.Locale;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.rtg.util.Constants;
+import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
@@ -64,7 +65,10 @@ public final class HelpCommand extends Command {
 
   private static final String APPLICATION_NAME = Constants.APPLICATION_NAME;
 
-  static final String USAGE_STR = "Usage: " + APPLICATION_NAME + " COMMAND [OPTION]..." + StringUtils.LS + StringUtils.LS
+  static final String MEM_STR = "       " + APPLICATION_NAME + " RTG_MEM=16G COMMAND [OPTION]...  (e.g. to set maximum memory use to 16 GB)" + StringUtils.LS + StringUtils.LS;
+
+  static final String USAGE_STR = "Usage: " + APPLICATION_NAME + " COMMAND [OPTION]..." + StringUtils.LS
+                                + (Environment.OS_LINUX || Environment.OS_MAC_OS_X ? MEM_STR : StringUtils.LS)
                                 + "Type '" + APPLICATION_NAME + " help COMMAND' for help on a specific command." + StringUtils.LS
                                 + "The following commands are available:" + StringUtils.LS;
 

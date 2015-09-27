@@ -9,11 +9,13 @@
 
 # Main bash completion function
 function _complete_rtg() {
+    local rtg=$1
     local cur prev opts cmd flagtype
     local cachedir=$HOME/.rtg-completion
     COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    _get_comp_words_by_ref -n = cur prev
+    #cur="${COMP_WORDS[COMP_CWORD]}"
+    #prev="${COMP_WORDS[COMP_CWORD-1]}"
  
     #echo "$(date)" >~/.rtgcomp
     #echo "ARGS=$@" >>~/.rtgcomp
@@ -21,31 +23,44 @@ function _complete_rtg() {
     #echo "COMP_CWORD=${COMP_CWORD}" >>~/.rtgcomp
     #echo "COMP_WORDS=${COMP_WORDS[@]}" >>~/.rtgcomp
     #echo "cur=$cur prev=$prev" >>~/.rtgcomp
-    if [ "${prev}" == "rtg" ]; then
-        opts="$(rtg --Xhelp 2>&1 | sed -n '/^\t[a-z]/s/^\s\+\(\S\+\).*/\1/p')"
+    if [ "${prev}" == "$rtg" ] || [ "${prev:0:4}" == "RTG_" ]; then
+        #echo "prev=main" >>~/.rtgcomp
+        opts="$("$rtg" --Xhelp 2>&1 | sed -n '/^\t[a-z]/s/^\s\+\(\S\+\).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
+        #echo "$opts" >>~/.rtgcomp
         COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
         return 0
-    elif [ $COMP_CWORD -gt 0 ]; then
-        cmd="${COMP_WORDS[1]}"
+    elif [ $COMP_CWORD -gt 1 ]; then
+        # Crazy scan to find the subcommand name, handling RTG_MEM/RTG_JAVA_OPTS being split on = by bash
+        for ((cmdi=1, cmdl=0; cmdi < $COMP_CWORD; cmdi++, cmdl++)); do
+            cmd="${COMP_WORDS[$cmdi]}"
+            if [ "${cmd:0:4}" == "RTG_" ]; then
+                continue;
+            elif [ "${cmd}" == "=" ]; then
+                continue;
+            elif [ "${COMP_WORDS[$cmdl]}" ]; then
+                continue;
+            fi
+            break;
+        done
         #echo "cmd=$cmd" >>~/.rtgcomp
         
         case ${cur} in
             --XX*)
-                opts="$(_complete_rtghelp $cmd --XXhelp | sed -n '/^ \+-/s/.*\(--XX[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --XXhelp | sed -n '/^ \+-/s/.*\(--XX[^= ]\+\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             --X*)
-                opts="$(_complete_rtghelp $cmd --Xhelp | sed -n '/^ \+-/s/.*\(--X[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --Xhelp | sed -n '/^ \+-/s/.*\(--X[^= ]\+\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             -*)
-                opts="$(_complete_rtghelp $cmd --help | sed -n '/^ \+-/s/.*\(--[^= ]\+\)[= ].*/\1/p')"
+                opts="$(_complete_rtghelp "$rtg" $cmd --help | sed -n '/^ \+-/s/.*\(--[^= ]\+\)[= ].*/\1/p')"
                 #echo "cmd-help=$opts" >>~/.rtgcomp
                 COMPREPLY=($(compgen -W "${opts}" -- ${cur}))  
                 #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
@@ -53,9 +68,9 @@ function _complete_rtg() {
                 ;;
             *)
                 if [ "${prev:0:1}" == "-" ]; then
-                    flagtype="$(_complete_rtghelp $cmd --help | sed -n -e "/ \+${prev}.*=[A-Z]\+/s/.*=\([A-Z]\+\)\s.*/\1/p")"
+                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -n -e "/ \+${prev}.*=[A-Z]\+/s/.*=\([A-Z]\+\)\s.*/\1/p")"
                 else   # Completion for anonymous flags
-                    flagtype="$(_complete_rtghelp $cmd --help | sed -n -e "/^   \+[A-Z]\++\? \+/{s/^ \+\([A-Z]\+\).*/\1/p;q}")"
+                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -n -e "/^   \+[A-Z]\++\? \+/{s/^ \+\([A-Z]\+\).*/\1/p;q}")"
                 fi
                 #echo "flagtype=$flagtype" >>~/.rtgcomp
                 case ${flagtype} in
@@ -98,12 +113,15 @@ function _complete_rtg() {
 # --machine) and stashes into $HOME/.rtg-completion/$1.<flagname> for later
 # retrieval.
 function _complete_rtghelp () {
+    local rtg=$1
+    # echo "_complete_rtghelp $1 $2" >>~/.rtgcomp
+    shift
     local cachedir=$HOME/.rtg-completion
     [ -d $cachedir ] || mkdir $cachedir
     local cache=$cachedir/$1.$2
     local lastcmd=$cachedir/lastcmd
     [ -f $cache ] && [ -f $lastcmd ] && [ "$1" == "$(cat $lastcmd)" ] || { 
-        rtg $1 $2 | tr '\n' '\a' | sed "s/\a           \+/ /g" | tr '\a' '\n' >$cache
+        "$rtg" $1 $2 2>/dev/null | tr '\n' '\a' | sed "s/\a           \+/ /g" | tr '\a' '\n' >$cache && \
         <$cache awk 'match($0,/(--[^=]+)=.*\(Must be one of \[([^]]+)\]/,a){gsub(",","",a[2]);file="'$cachedir/$1.'"a[1]; print a[2]>file}'
         echo $1 >$lastcmd 
     }

@@ -74,6 +74,18 @@ public final class Environment {
   static final String HOST_NAME = "host.name";
 
   static final String VERSION_NOT_FOUND = "<not found>";
+
+  private static final String OS_NAME = System.getProperty("os.name");
+
+  /** True if we are running on Linux */
+  public static final boolean OS_LINUX = OS_NAME.startsWith("Linux");
+
+  /** True if we are running on Mac OS X */
+  public static final boolean OS_MAC_OS_X = OS_NAME.startsWith("Mac OS X");
+
+  /** True if we are running on Windows */
+  public static final boolean OS_WINDOWS = OS_NAME.startsWith("Windows");
+
   private Environment() { }
 
   /**
