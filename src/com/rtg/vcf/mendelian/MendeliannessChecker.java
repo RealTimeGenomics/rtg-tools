@@ -108,7 +108,7 @@ public final class MendeliannessChecker extends AbstractCli {
     mFlags.registerOptional(OUTPUT_CONSISTENT_FLAG, File.class, "FILE", "if set, output only consistent calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_FLAG, File.class, "FILE", "if set, output annotated calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_AGGREGATE_FLAG, File.class, "FILE", "if set, output aggregate genotype proportions to this file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(ALL_RECORDS_FLAG, "use all records, regardless of filters. Default is to only process records where FILTER is \".\" or \"PASS\"").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    mFlags.registerOptional(ALL_RECORDS_FLAG, "use all records, regardless of filters (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     mFlags.registerOptional(PHASE_FLAG, "phase calls based on pedigree").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     mFlags.registerOptional(CONCORDANCE_PCT_AGREEMENT, Double.class, "FLOAT", "percentage concordance required for consistent parentage", 99.0).setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     mFlags.registerOptional(CONCORDANCE_MIN_VARIANTS, Integer.class, "INT", "minimum number of variants needed to check concordance", 2000).setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
@@ -117,7 +117,7 @@ public final class MendeliannessChecker extends AbstractCli {
     mFlags.registerOptional('l', ALLOW_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     CommonFlags.initIndexFlags(mFlags);
 CommonFlags.initNoGzip(mFlags);
-    mFlags.registerOptional(PEDIGREE_FLAG, File.class, "file", "genome relationships PED file. The default is to extract pedigree information from VCF header fields").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    mFlags.registerOptional(PEDIGREE_FLAG, File.class, "file", "genome relationships PED file (Default is to extract pedigree information from VCF header fields)").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
   }
 
 

@@ -345,7 +345,7 @@ public final class CommonFlags {
    * @param flags flags to register with
    */
   public static void initThreadsFlag(CFlags flags) {
-      flags.registerOptional('T', THREADS_FLAG, Integer.class, INT, "number of threads. Defaults to the number of available cores").setCategory(CommonFlagCategories.UTILITY);
+      flags.registerOptional('T', THREADS_FLAG, Integer.class, INT, "number of threads (Default is the number of available cores)").setCategory(CommonFlagCategories.UTILITY);
   }
 
   /**
