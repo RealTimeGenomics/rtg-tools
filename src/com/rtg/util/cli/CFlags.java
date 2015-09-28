@@ -707,7 +707,7 @@ public final class CFlags {
       final boolean exexHelpRegistered = getFlag(EXPERIMENTAL_HELP_FLAG) != null;
       // Quickly scan args to see if it looks like they tried to ask for help,
       // even if it's in a position where a flag value was expected
-      for (; i < args.length; i++) {
+      for (i = 0; i < args.length; i++) {
         if ((LONG_FLAG_PREFIX + HELP_FLAG).equals(args[i]) || (SHORT_FLAG_PREFIX + "h").equals(args[i])) {
           setFlag(getFlag(HELP_FLAG), null);
         }
