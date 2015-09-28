@@ -45,7 +45,7 @@ import com.rtg.vcf.VcfWriter;
 /**
  * Creates typical vcfeval output files with separate VCF files and ROC files.
  */
-class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
+class DefaultEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   private static final String FN_FILE_NAME = "fn.vcf";
   private static final String FP_FILE_NAME = "fp.vcf";
@@ -146,17 +146,22 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
 
   @Override
   protected void handleKnownCall() throws IOException {
-    if (mCv instanceof OrientedVariant) { // Included (but the baseline was at a different position. This is interesting)
-      //mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
-      mCallTruePositives++;
-      mTpCalls.write(mCrv);
-      addToROCContainer(((OrientedVariant) mCv).getWeight());
-    } else if (mCv instanceof SkippedVariant) { // Too-hard
-      // No-op
-    } else { // Excluded (FP or self-inconsistent)
-      mFalsePositives++;
-      mFp.write(mCrv);
-      addToROCContainer(0);
+    switch (mCv.getStatus()) {
+      case VariantId.STATUS_SKIPPED:
+        break;
+      case VariantId.STATUS_GT_MATCH:
+        mCallTruePositives++;
+        mTpCalls.write(mCrv);
+        addToROCContainer(((OrientedVariant) mCv).getWeight());
+        break;
+      case VariantId.STATUS_ALLELE_MATCH: // Old-school format doesn't distinguish
+      case VariantId.STATUS_NO_MATCH:
+        mFalsePositives++;
+        mFp.write(mCrv);
+        addToROCContainer(0);
+        break;
+      default:
+        throw new RuntimeException("Unhandled variant status: " + mCv.getStatus());
     }
   }
 
@@ -177,17 +182,22 @@ class DefaultEvalSynchronizer extends MergingEvalSynchronizer {
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    if (mBv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
-      //mBrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
-      mBaselineTruePositives++;
-      if (mTpBase != null) {
-        mTpBase.write(mBrv);
-      }
-    } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
-      // No-op
-    } else { // Excluded (novel or self-inconsistent)
-      mFalseNegatives++;
-      mFn.write(mBrv);
+    switch (mBv.getStatus()) {
+      case VariantId.STATUS_SKIPPED:
+        break;
+      case VariantId.STATUS_GT_MATCH:
+        mBaselineTruePositives++;
+        if (mTpBase != null) {
+          mTpBase.write(mBrv);
+        }
+        break;
+      case VariantId.STATUS_ALLELE_MATCH:
+      case VariantId.STATUS_NO_MATCH:
+        mFalseNegatives++;
+        mFn.write(mBrv);
+        break;
+      default:
+        throw new RuntimeException("Unhandled variant status: " + mBv.getStatus());
     }
   }
 

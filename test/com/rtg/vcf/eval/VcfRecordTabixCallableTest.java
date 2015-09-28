@@ -53,7 +53,7 @@ public class VcfRecordTabixCallableTest extends TestCase {
       final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
       ranges.put("simulatedSequence2", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence2")));
       ranges.put("simulatedSequence13", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence13")));
-      final VariantFactory fact = TabixVcfRecordSet.getFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null, false);
+      final VariantFactory fact = TabixVcfRecordSet.getVariantFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null, false);
       final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100);
       List<Variant> set = runner.call().mVariants;
       assertEquals(2, set.size());

@@ -240,15 +240,15 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final int fnCount = baselineOnly.length;
 
       mNano.check(label + "-summary.txt", FileUtils.fileToString(new File(out, CommonFlags.SUMMARY_FILE)));
-      checkRocResults(label + "-weighted.tsv", new File(out, RocFilter.ALL.filename()), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOMOZYGOUS.filename()), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HETEROZYGOUS.filename()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-weighted.tsv", new File(out, RocFilter.ALL.fileName()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOMOZYGOUS.fileName()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HETEROZYGOUS.fileName()), checktotal, tpCount, fnCount);
       if (rtgStats) {
-        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.SIMPLE.filename()), checktotal, tpCount, fnCount);
-        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.COMPLEX.filename()), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.SIMPLE.fileName()), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.COMPLEX.fileName()), checktotal, tpCount, fnCount);
       } else {
-        assertFalse(new File(out, RocFilter.SIMPLE.filename()).exists());
-        assertFalse(new File(out, RocFilter.COMPLEX.filename()).exists());
+        assertFalse(new File(out, RocFilter.SIMPLE.fileName()).exists());
+        assertFalse(new File(out, RocFilter.COMPLEX.fileName()).exists());
       }
 
       final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
@@ -257,7 +257,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
         .rtgStats(rtgStats)
         .create();
       VcfEvalTask.evaluateCalls(paramsrev);
-      checkRocResults(label + "-weighted-rev.tsv", new File(out, RocFilter.ALL.filename()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-weighted-rev.tsv", new File(out, RocFilter.ALL.fileName()), checktotal, tpCount, fnCount);
     }
   }
 

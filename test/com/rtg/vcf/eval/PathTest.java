@@ -56,14 +56,14 @@ public class PathTest extends AbstractNanoTest {
     mutations.add(mutation);
     final MockVariant call = new MockVariant(2, 3, new byte[] {3}, null);
     calls.add(call);
-    PathFinder f = new PathFinder(template, "currentName", mutations, calls, PathFinder.getPathPreference(), new MockOrientor(), new MockOrientor());
+    PathFinder f = new PathFinder(template, "currentName", calls, mutations, new MockOrientor(), new MockOrientor(), PathFinder.getPathPreference());
     final Path best = f.bestPath();
 
     assertTrue(best.getCalledIncluded().get(0).variant().equals(mutation));
     assertTrue(best.getCalledExcluded().isEmpty());
     assertTrue(best.getBaselineIncluded().get(0).variant().equals(call));
     assertTrue(best.getBaselineExcluded().isEmpty());
-    f = new PathFinder(template, "currentName", calls, mutations, PathFinder.getPathPreference(), new MockOrientor(), new MockOrientor());
+    f = new PathFinder(template, "currentName", mutations, calls, new MockOrientor(), new MockOrientor(), PathFinder.getPathPreference());
     final Path best2 = f.bestPath();
     assertTrue(best.equals(best2));
     assertTrue(best2.equals(best));
@@ -135,7 +135,7 @@ public class PathTest extends AbstractNanoTest {
   }
 
   private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide, Orientor o) {
-    final PathFinder f = new PathFinder(template, "currentName", getVariations(aSide), getVariations(bSide), PathFinder.getPathPreference(), o, o);
+    final PathFinder f = new PathFinder(template, "currentName", getVariations(bSide), getVariations(aSide), o, o, PathFinder.getPathPreference());
     final Path best = f.bestPath();
     //System.err.println("*****************************");
     //System.err.println(best);
@@ -555,7 +555,7 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1, 0, 0, 1.0};
 
-    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(a), Arrays.asList(b), new PathFinder.MaxCallsMinBaseline(), Orientor.UNPHASED, Orientor.UNPHASED);
+    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(b), Arrays.asList(a), Orientor.UNPHASED, Orientor.UNPHASED, new PathFinder.MaxCallsMinBaseline());
     final Path original = finder.bestPath();
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP
     assertEquals(2, original.getBaselineIncluded().size());

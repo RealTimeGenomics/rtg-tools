@@ -50,6 +50,7 @@ import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -121,6 +122,17 @@ public class DefaultEvalSynchronizerTest extends TestCase {
   private static final String FAKE_HEADER = VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n";
   private static final String FAKE_VCF = FAKE_HEADER + NAME1_RECS + NAME2_RECS;
 
+  public static OrientedVariant createOrientedVariant(Variant variant, boolean isAlleleA) {
+    final OrientedVariant v = OrientedVariantTest.createOrientedVariant(variant, isAlleleA);
+    v.setStatus(VariantId.STATUS_GT_MATCH);
+    return v;
+  }
+  public static Variant createVariant(VcfRecord rec, int id) {
+    final Variant v = VariantTest.createVariant(rec, id, 0);
+    v.setStatus(VariantId.STATUS_NO_MATCH);
+    return v;
+  }
+
   public void testEvalSynchronizer() throws IOException, UnindexableDataException {
     final MemoryPrintStream mp = new MemoryPrintStream();
     Diagnostic.setLogStream(mp.printStream());
@@ -143,16 +155,16 @@ public class DefaultEvalSynchronizerTest extends TestCase {
             @Override
             public void run() throws IOException {
               sync.write("name2",
-                Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC5_2), 5, 0)),
-                Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0), true), VariantTest.createVariant(VcfReader.vcfLineToRecord(REC3_2), 3, 0)), Collections.<Integer>emptyList());
+                Arrays.asList(createVariant(VcfReader.vcfLineToRecord(REC5_2), 5)),
+                Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0), true), createVariant(VcfReader.vcfLineToRecord(REC3_2), 3)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
             }
           });
           simpleThreadPool.execute(new IORunnable() {
             @Override
             public void run() throws IOException {
               sync.write("name1",
-                Arrays.asList(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC6_1), 6, 0)),
-                Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), VariantTest.createVariant(VcfReader.vcfLineToRecord(REC4_1), 4, 0)), Collections.<Integer>emptyList());
+                Arrays.asList(createVariant(VcfReader.vcfLineToRecord(REC6_1), 6)),
+                Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReader.vcfLineToRecord(REC4_1), 4)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
             }
           });
           simpleThreadPool.terminate();
@@ -187,7 +199,7 @@ public class DefaultEvalSynchronizerTest extends TestCase {
         simpleThreadPool.execute(new IORunnable() {
           @Override
           public void run() throws IOException {
-            sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList());
+            sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
             fail("Should have aborted in thread");
           }
         });
@@ -223,7 +235,7 @@ public class DefaultEvalSynchronizerTest extends TestCase {
           @Override
           public void run() {
             try {
-              sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList());
+              sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
             } catch (final IllegalStateException e) {
               internalException[0] = e;
             } catch (final IOException e) {

@@ -58,15 +58,18 @@ class SequenceEvaluator implements IORunnable {
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;
   private final Map<String, Long> mNameMap;
-  private final Orientor mBaselineOrientor;
-  private final Orientor mCallsOrientor;
+  private final List<Pair<Orientor, Orientor>> mOrientors;
 
-  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template, Orientor baselineOrientor, Orientor callsOrientor) {
+  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template) {
+    this(variantSets, nameMap, template, Collections.singletonList(new Pair<>(Orientor.UNPHASED, Orientor.UNPHASED)));
+  }
+
+  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template, List<Pair<Orientor, Orientor>> orientors) {
+    assert orientors.size() == 1 || orientors.size() == 2;
     mSynchronize = variantSets;
     mTemplate = template;
     mNameMap = nameMap;
-    mBaselineOrientor = baselineOrientor;
-    mCallsOrientor = callsOrientor;
+    mOrientors = orientors;
   }
 
   @Override
@@ -88,11 +91,14 @@ class SequenceEvaluator implements IORunnable {
     Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
     if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
-      mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList());
+      setStatus(baseLineCalls, VariantId.STATUS_NO_MATCH);
+      setStatus(calledCalls, VariantId.STATUS_NO_MATCH);
+      mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
     } else {
 
       //find the best path for variant calls
-      final PathFinder f = new PathFinder(template, currentName, calledCalls, baseLineCalls, PathFinder.getPathPreference(), mCallsOrientor, mBaselineOrientor);
+      Pair<Orientor, Orientor> op = mOrientors.get(0);
+      final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), PathFinder.getPathPreference());
 
       final Path best = f.bestPath();
 
@@ -105,51 +111,58 @@ class SequenceEvaluator implements IORunnable {
         System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
       }
 
-      Diagnostic.developerLog("Post-processing variant result lists for " + currentName + "...");
-      final PathResult result = postProcess(best, baseLineCalls, calledCalls);
-
       final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
       mSynchronize.addPhasingCounts(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
 
-      Diagnostic.developerLog("Ready to write variants for " + currentName + "...");
-      mSynchronize.write(currentName, result.mBaseline, result.mCalled, result.mSyncPoints);
+      final List<OrientedVariant> truePositives = best.getCalledIncluded();
+      final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
+      Path.calculateWeights(best, truePositives, baselineTruePositives);
+
+      List<Variant> falsePositives = best.getCalledExcluded();
+      List<Variant> falseNegatives = best.getBaselineExcluded();
+      List<OrientedVariant> halfPositives = Collections.emptyList();
+      List<OrientedVariant> baselineHalfPositives = Collections.emptyList();
+
+      Path bestHap = null;
+      if (mOrientors.size() == 2) {  // Run haploid pathfinding on the FP / FN to find common alleles
+        op = mOrientors.get(1);
+        final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), PathFinder.getPathPreference());
+        bestHap = f2.bestPath();
+
+        halfPositives = bestHap.getCalledIncluded();
+        baselineHalfPositives = bestHap.getBaselineIncluded();
+        Path.calculateWeights(bestHap, halfPositives, baselineHalfPositives);
+        falsePositives = bestHap.getCalledExcluded();
+        falseNegatives = bestHap.getBaselineExcluded();
+      }
+
+      Diagnostic.developerLog("Post-processing variant result lists for " + currentName);
+      final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, baselineHalfPositives, falseNegatives);
+      final List<VariantId> calls = mergeVariants(calledCalls, truePositives, halfPositives, falsePositives);
+
+      mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.<Integer>emptyList());
     }
   }
 
-  private static final class PathResult {
-    final List<Integer> mSyncPoints;
-    final List<VariantId> mBaseline;
-    final List<VariantId> mCalled;
-
-    public PathResult(List<Integer> syncPoints, List<VariantId> baseline, List<VariantId> called) {
-      mSyncPoints = syncPoints;
-      mBaseline = baseline;
-      mCalled = called;
-    }
-  }
-
-  static PathResult postProcess(Path best, Collection<Variant> baseLineCalls, Collection<Variant> calledCalls) {
-    final List<OrientedVariant> truePositives = best.getCalledIncluded();
-    final List<Variant> falsePositives = best.getCalledExcluded();
-    final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
-    final List<Variant> falseNegatives = best.getBaselineExcluded();
-
-    Path.calculateWeights(best, truePositives, baselineTruePositives);
-
-    final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, falseNegatives);
-    final List<VariantId> calls = mergeVariants(calledCalls, truePositives, falsePositives);
-    return new PathResult(best.getSyncPoints(), baseline, calls);
-  }
-
-  private static List<VariantId> mergeVariants(Collection<Variant> allVariants, List<OrientedVariant> included, List<Variant> excluded) {
-    List<VariantId> merged = new ArrayList<>(included.size() + excluded.size());
+  private static List<VariantId> mergeVariants(Collection<Variant> allVariants, List<OrientedVariant> included, List<OrientedVariant> partial, List<Variant> excluded) {
+    setStatus(included, VariantId.STATUS_GT_MATCH);
+    setStatus(partial, VariantId.STATUS_ALLELE_MATCH);
+    setStatus(excluded, VariantId.STATUS_NO_MATCH);
+    List<VariantId> merged = new ArrayList<>(included.size() + partial.size() + excluded.size());
     merged.addAll(included);
+    merged.addAll(partial);
     merged.addAll(excluded);
     // Sort by ID to ensure the ordering matches what is needed for variant writing and skipped variant insertion
     Collections.sort(merged, Variant.ID_COMPARATOR);
     // Merge any variants that were unable to be processed during path finding due to too-hard regions
     merged = insertSkipped(merged, allVariants);
     return merged;
+  }
+
+  private static void setStatus(Collection<? extends VariantId> variants, byte status) {
+    for (VariantId v : variants) {
+      v.setStatus(status);
+    }
   }
 
   private static List<VariantId> insertSkipped(List<VariantId> outVars, Collection<Variant> inVars) {
@@ -166,7 +179,8 @@ class SequenceEvaluator implements IORunnable {
         result.add(outVar);
         outVar = null;
       } else {
-        result.add(new SkippedVariant(inVar));
+        inVar.setStatus(VariantId.STATUS_SKIPPED);
+        result.add(inVar);
       }
     }
     return result;

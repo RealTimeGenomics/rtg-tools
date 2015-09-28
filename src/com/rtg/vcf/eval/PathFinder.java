@@ -58,7 +58,7 @@ public final class PathFinder {
   private final Orientor mCallOrientor;
   private int mCurrentMaxPos;
 
-  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants, PathPreference maximizeMode, Orientor callOrientor, Orientor baselineOrientor) {
+  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> baseLineVariants, Collection<T> calledVariants, Orientor baselineOrientor, Orientor callOrientor, PathPreference maximizeMode) {
     mTemplate = template;
     mTemplateName = templateName;
     mMaximizeMode = maximizeMode;
@@ -83,7 +83,7 @@ public final class PathFinder {
    * @return the best path (non-null).
    */
   public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
-    return new PathFinder(template, templateName, calledVariants, baseLineVariants, getPathPreference(), Orientor.UNPHASED, Orientor.UNPHASED).bestPath();
+    return new PathFinder(template, templateName, baseLineVariants, calledVariants, Orientor.UNPHASED, Orientor.UNPHASED, getPathPreference()).bestPath();
   }
 
   static PathPreference getPathPreference() {
@@ -106,6 +106,7 @@ public final class PathFinder {
   }
 
   Path bestPath() {
+    Diagnostic.developerLog("Starting path-finding for " + mTemplateName + " using " + mBaselineOrientor + "," + mCallOrientor);
     // make it easy to find variants
     final TreeSet<Path> sortedPaths = new TreeSet<>();
     sortedPaths.add(new Path(mTemplate));

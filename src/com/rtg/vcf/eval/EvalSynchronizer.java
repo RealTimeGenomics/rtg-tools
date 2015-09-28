@@ -102,9 +102,11 @@ public abstract class EvalSynchronizer implements Closeable {
    * @param baseline variants (either oriented if true positive, or variant if excluded)
    * @param calls variants (either oriented if true positive, or variant if excluded)
    * @param syncPoints the list of sync points
+   * @param syncPoints2 the list of sync points from second pass (or empty list if no second pass)
    * @throws IOException when IO fails
    */
-  void write(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException {
+  void write(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException {
+    Diagnostic.developerLog("Waiting to write variants for " + sequenceName);
     synchronized (mNames) {
       // wait for our turn to write results. Keeping output in order.
       while (!mNames.peek().equals(sequenceName)) {
@@ -119,7 +121,8 @@ public abstract class EvalSynchronizer implements Closeable {
     }
 
     Diagnostic.developerLog("Writing variants for " + sequenceName);
-    writeInternal(sequenceName, baseline, calls, syncPoints);
+    writeInternal(sequenceName, baseline, calls, syncPoints, syncPoints2);
+    Diagnostic.developerLog("Finished writing variants for " + sequenceName);
 
     synchronized (mNames) {
       // We are done with a sequence so take it off the queue
@@ -128,7 +131,7 @@ public abstract class EvalSynchronizer implements Closeable {
     }
   }
 
-  abstract void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException;
+  abstract void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException;
 
   void addPhasingCounts(int misPhasings, int correctPhasings, int unphasable) {
     synchronized (mPhasingLock) {

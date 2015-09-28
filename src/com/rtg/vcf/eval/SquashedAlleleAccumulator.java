@@ -91,8 +91,8 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
       writeResidual((OrientedVariant) mCv);
-    } else if (mCv instanceof SkippedVariant) { // Too-hard, output this variant with just the used alleles
-      final GtIdVariant v = (GtIdVariant) ((SkippedVariant) mCv).variant();
+    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) { // Too-hard, output this variant with just the used alleles
+      final GtIdVariant v = (GtIdVariant) mCv;
       writeNonRedundant(v, "C-TooHard=" + mCv.toString());
     } else { // Excluded (novel or self-inconsistent)
       assert mCv instanceof GtIdVariant;
@@ -106,8 +106,8 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     if (mCv instanceof OrientedVariant) {
       mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
       writeResidual((OrientedVariant) mCv);
-    } else if (mCv instanceof SkippedVariant) { // Too hard, merge records into b, adding any new ALT from c, flush c
-      final GtIdVariant ov = (GtIdVariant) ((SkippedVariant) mCv).variant();
+    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) { // Too hard, merge records into b, adding any new ALT from c, flush c
+      final GtIdVariant ov = (GtIdVariant) mCv;
       mergeIntoBaseline(ov, "C-TooHard");
     } else { // Excluded, merge records into b, adding any new ALT from c, flush c
       assert mCv instanceof GtIdVariant;

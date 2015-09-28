@@ -252,7 +252,7 @@ public class PhasingEvaluatorTest extends TestCase {
       new TabixIndexer(baseline).saveVcfIndex();
       final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
       try (final DefaultEvalSynchronizer sync = new DefaultEvalSynchronizer(baseline, calls, variants, SamRangeUtils.createFullReferenceRanges(reader), null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, false)) {
-        final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader, Orientor.UNPHASED, Orientor.UNPHASED);
+        final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
         eval.run();
         assertEquals("correctphasings: " + sync.getCorrectPhasings() + ", misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedCorrect, sync.getCorrectPhasings());
         assertEquals("misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedMisPhasings, sync.getMisPhasings());

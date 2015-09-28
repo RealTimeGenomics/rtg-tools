@@ -172,7 +172,7 @@ public class RocContainer {
     final int totalBaselineVariants = truePositives + falseNegatives;
     for (int i = 0; i < mFilters.size(); i++) {
       final RocFilter filter = mFilters.get(i);
-      final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, filter.filename()));
+      final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, filter.fileName()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
         double tp = 0.0;
         double fp = 0.0;

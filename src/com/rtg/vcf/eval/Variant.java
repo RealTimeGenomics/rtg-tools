@@ -55,6 +55,7 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
   private final int mId;
   private final Allele[] mAlleles;
   private final boolean mPhased;
+  private byte mStatus = 0;
 
   Variant(int id, String seq, int start, int end) {
     super(seq, start, end);
@@ -97,6 +98,16 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
   @Override
   public int getId() {
     return mId;
+  }
+
+  @Override
+  public void setStatus(byte status) {
+    mStatus = status;
+  }
+
+  @Override
+  public byte getStatus() {
+    return mStatus;
   }
 
   @Override

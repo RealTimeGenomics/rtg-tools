@@ -48,7 +48,7 @@ import com.rtg.vcf.VcfSortRefiner;
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
  */
 @TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
-public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
+public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
 
   private static final Comparator<SequenceNameLocus> NATURAL_COMPARATOR = new SequenceNameLocusComparator();
 
@@ -56,10 +56,12 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   protected VariantId mBv;
   protected VcfRecord mCrv;
   protected VariantId mCv;
-  protected int mBSyncStart;
-  protected int mCSyncStart;
   private int mBid;
   private int mCid;
+  protected int mBSyncStart;
+  protected int mCSyncStart;
+  protected int mBSyncStart2;
+  protected int mCSyncStart2;
 
   /**
    * Constructor
@@ -68,7 +70,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
    * @param variants returns separate sets of variants for each chromosome being processed
    * @param ranges the ranges that variants are being read from
    */
-  public MergingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
+  public InterleavingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
     super(baseLineFile, callsFile, variants, ranges);
   }
 
@@ -86,7 +88,7 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
   }
 
   @Override
-  void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints) throws IOException {
+  void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException {
     final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
     try (final VcfSortRefiner br = new VcfSortRefiner(VcfReader.openVcfReader(mBaseLineFile, subRanges));
          final VcfSortRefiner cr = new VcfSortRefiner(VcfReader.openVcfReader(mCallsFile, subRanges))) {
@@ -100,9 +102,13 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
       mCid = 0;
       mBSyncStart = 0;
       mCSyncStart = 0;
+      mBSyncStart2 = 0;
+      mCSyncStart2 = 0;
 
       int bSid = 0;
       int cSid = 0;
+      int bSid2 = 0;
+      int cSid2 = 0;
       while (true) {
         // Advance each iterator if need be
         if (mBv == null && bit.hasNext()) {
@@ -110,6 +116,10 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
           if (!syncPoints.isEmpty()) {
             bSid = floorSyncPos(syncPoints, mBv.getStart(), bSid);
             mBSyncStart = syncPoints.get(bSid) + 1;
+          }
+          if (!syncPoints2.isEmpty()) {
+            bSid2 = floorSyncPos(syncPoints2, mBv.getStart(), bSid2);
+            mBSyncStart2 = syncPoints2.get(bSid2) + 1;
           }
         }
         if (mBrv == null && br.hasNext()) {
@@ -122,6 +132,10 @@ public abstract class MergingEvalSynchronizer extends EvalSynchronizer {
           if (!syncPoints.isEmpty()) {
             cSid = floorSyncPos(syncPoints, mCv.getStart(), cSid);
             mCSyncStart = syncPoints.get(cSid) + 1;
+          }
+          if (!syncPoints2.isEmpty()) {
+            cSid2 = floorSyncPos(syncPoints2, mCv.getStart(), cSid2);
+            mCSyncStart2 = syncPoints2.get(cSid2) + 1;
           }
         }
         if (mCrv == null && cr.hasNext()) {

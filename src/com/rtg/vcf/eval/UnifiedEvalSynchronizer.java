@@ -33,13 +33,10 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.rtg.launcher.CommonFlags;
-import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfAltCleaner;
@@ -51,42 +48,20 @@ import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
 
 /**
- * Creates typical vcfeval output files with separate VCF files and ROC files.
+ * Creates a single two-sample output VCF.
  */
-class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
+class UnifiedEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   private static final String OUTPUT_FILE_NAME = "output.vcf";
-  private static final String INFO_BASE = "BASE";
-  private static final String INFO_CALL = "CALL";
-  private static final String INFO_SYNCPOS = "SYNC";
-  private static final String INFO_CALL_WEIGHT = "CALL_WEIGHT";
-  private static final String STATUS_IGNORED = "IGN";
-  private static final String STATUS_HARD = "HARD";
-  private static final String STATUS_TP = "TP";
-  private static final String STATUS_FN = "FN";
-  private static final String STATUS_FP = "FP";
   private static final String SAMPLE_BASELINE = "BASELINE";
   private static final String SAMPLE_CALLS = "CALLS";
 
   private final VcfWriter mVcfOut;
-  private final RocContainer mRoc;
-  private final RocSortValueExtractor mRocExtractor;
-  private final int mBaselineSampleNo;
-  private final int mCallSampleNo;
-  private final boolean mZip;
-  private final boolean mSlope;
-  private final File mOutDir;
   private final VcfHeader mOutHeader;
   private final VcfRecord[] mInRecs = new VcfRecord[2];
   private final VcfHeader[] mInHeaders = new VcfHeader[2];
   private final VcfAltCleaner mAltCleaner = new VcfAltCleaner();
-  private int mBaselineTruePositives = 0;
-  int mCallTruePositives = 0;
-  int mFalseNegatives = 0;
-  int mFalsePositives = 0;
-  private int mUnphasable = 0;
-  private int mMisPhasings = 0;
-  private int mCorrectPhasings = 0;
+  protected final int mBaselineSampleNo;
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -106,25 +81,13 @@ class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
                           String baselineSampleName, String callsSampleName,
                           RocSortValueExtractor extractor,
                           File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
-    final RocContainer roc = new RocContainer(extractor.getSortOrder(), extractor.toString());
-    roc.addStandardFilters();
-    if (rtgStats) {
-      roc.addExtraFilters();
-    }
-    mRoc = roc;
-    mRocExtractor = extractor;
-    mZip = zip;
-    mSlope = slope;
-    mOutDir = outdir;
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats);
+    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();
     mOutHeader.addContigFields(variants.baseLineHeader());
-    mOutHeader.addInfoField(INFO_BASE, MetaType.STRING, new VcfNumber("1"), "Baseline genotype status");
-    mOutHeader.addInfoField(INFO_CALL, MetaType.STRING, new VcfNumber("1"), "Call genotype status");
-    mOutHeader.addInfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.");
-    mOutHeader.addInfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0");
+    addInfoHeaders(mOutHeader, null);
     mOutHeader.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype");
     mOutHeader.addSampleName(SAMPLE_BASELINE);
     mOutHeader.addSampleName(SAMPLE_CALLS);
@@ -135,15 +98,6 @@ class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
     mInHeaders[1].removeAllSamples();
     mInHeaders[1].addSampleName(SAMPLE_CALLS);
     mVcfOut = new VcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), null, zip, true);
-    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
-    mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
-  }
-
-  @Override
-  protected void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
-    mMisPhasings += misPhasings;
-    mUnphasable += unphasable;
-    mCorrectPhasings += correctPhasings;
   }
 
   @Override
@@ -202,72 +156,16 @@ class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
     }
   }
 
-
-  private Map<String, String> updateForCall(boolean unknown, Map<String, String> newInfo) {
-    final String status;
-    if (unknown) {
-      status = STATUS_IGNORED;
-    } else {
-      final String sync = Integer.toString(mCSyncStart + 1);
-      final String oldSync = newInfo.get(INFO_SYNCPOS);
-      newInfo.put(INFO_SYNCPOS, oldSync == null || oldSync.equals(sync) ? sync : (oldSync + VcfRecord.ALT_CALL_INFO_SEPARATOR + sync));
-      if (mCv instanceof OrientedVariant) {
-        mCallTruePositives++;
-        final double weight = ((OrientedVariant) mCv).getWeight();
-        if (Math.abs(weight - 1.0) > 0.001) {
-          newInfo.put(INFO_CALL_WEIGHT, String.format("%.3g", weight));
-        }
-        addToROCContainer(weight);
-        status = STATUS_TP;
-      } else if (mCv instanceof SkippedVariant) {
-        status = STATUS_HARD;
-      } else {
-        mFalsePositives++;
-        addToROCContainer(0);
-        status = STATUS_FP;
-      }
-    }
-    newInfo.put(INFO_CALL, status);
-    return newInfo;
-  }
-
-  private Map<String, String> updateForBaseline(boolean unknown, Map<String, String> newInfo) {
-    final String status;
-    if (unknown) {
-      status = STATUS_IGNORED;
-    } else {
-      final String sync = Integer.toString(mBSyncStart + 1);
-      final String oldSync = newInfo.get(INFO_SYNCPOS);
-      newInfo.put(INFO_SYNCPOS, oldSync == null || oldSync.equals(sync) ? sync : (sync + VcfRecord.ALT_CALL_INFO_SEPARATOR + oldSync));
-      if (mBv instanceof OrientedVariant) {
-        mBaselineTruePositives++;
-        status = STATUS_TP;
-      } else if (mCv instanceof SkippedVariant) {
-        status = STATUS_HARD;
-      } else {
-        mFalseNegatives++;
-        status = STATUS_FN;
-      }
-    }
-    newInfo.put(INFO_BASE, status);
-    return newInfo;
-
-  }
-
   protected void writeCall(Map<String, String> newInfo) throws IOException {
     resetRecordFields(mCrv, mCallSampleNo, 1);
-    for (Map.Entry<String, String> e : newInfo.entrySet()) {
-      mCrv.addInfo(e.getKey(), e.getValue());
-    }
+    setNewInfoFields(mCrv, newInfo);
     mAltCleaner.annotate(mCrv);
     mVcfOut.write(mCrv);
   }
 
   protected void writeBaseline(Map<String, String> newInfo) throws IOException {
     resetRecordFields(mBrv, mBaselineSampleNo, 0);
-    for (Map.Entry<String, String> e : newInfo.entrySet()) {
-      mBrv.addInfo(e.getKey(), e.getValue());
-    }
+    setNewInfoFields(mBrv, newInfo);
     mAltCleaner.annotate(mBrv);
     mVcfOut.write(mBrv);
   }
@@ -278,9 +176,7 @@ class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
     mInRecs[0] = mBrv;
     mInRecs[1] = mCrv;
     final VcfRecord rec = VcfRecord.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false);
-    for (Map.Entry<String, String> e : newInfo.entrySet()) {
-      rec.addInfo(e.getKey(), e.getValue());
-    }
+    setNewInfoFields(rec, newInfo);
     mAltCleaner.annotate(rec);
     mVcfOut.write(rec);
   }
@@ -300,49 +196,6 @@ class UnifiedEvalSynchronizer extends MergingEvalSynchronizer {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, destPos == 0 ? gtStr : VcfUtils.MISSING_FIELD);
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, destPos == 0 ? VcfUtils.MISSING_FIELD : gtStr);
     }
-  }
-
-  private void addToROCContainer(double weight) {
-    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
-    for (final RocFilter filter : RocFilter.values()) {
-      if (filter.accept(mCrv, mCallSampleNo)) {
-        filters.add(filter);
-      }
-    }
-    double score = Double.NaN;
-    try {
-      score = mRocExtractor.getSortValue(mCrv, mCallSampleNo);
-    } catch (IndexOutOfBoundsException ignored) {
-    }
-    mRoc.addRocLine(score, weight, filters);
-  }
-
-  int getUnphasable() {
-    return mUnphasable;
-  }
-
-  int getMisPhasings() {
-    return mMisPhasings;
-  }
-
-  int getCorrectPhasings() {
-    return mCorrectPhasings;
-  }
-
-
-  @Override
-  void finish() throws IOException {
-    super.finish();
-    mRoc.writeRocs(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives, mZip, mSlope);
-    writePhasingInfo();
-    mRoc.writeSummary(new File(mOutDir, CommonFlags.SUMMARY_FILE), mBaselineTruePositives, mFalsePositives, mFalseNegatives);
-  }
-
-  private void writePhasingInfo() throws IOException {
-    final File phasingFile = new File(mOutDir, "phasing.txt");
-    FileUtils.stringToFile("Correct phasings: " + getCorrectPhasings() + StringUtils.LS
-      + "Incorrect phasings: " + getMisPhasings() + StringUtils.LS
-      + "Unresolvable phasings: " + getUnphasable() + StringUtils.LS, phasingFile);
   }
 
   @Override

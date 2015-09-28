@@ -52,7 +52,6 @@ import com.rtg.launcher.GlobalFlags;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Pair;
-import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -159,39 +158,13 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
 
-    mBaselineFactory = getFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, relaxedRef);
-    mCallsFactory = getFactory(VariantSetType.CALLS, mCalledHeader, callsSample, relaxedRef);
+    mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, relaxedRef);
+    mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, relaxedRef);
   }
 
-  static String getFactoryName(VariantSetType type) {
-    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
-    if (customFactory.length() > 0) {
-      final String[] f = StringUtils.split(customFactory, ',');
-      if (type == VariantSetType.BASELINE) {
-        return f[0];
-      } else {
-        return f.length == 1 ? f[0] : f[1];
-      }
-    } else {
-      return "sample";
-    }
-  }
-
-  static Orientor getOrientor(VariantSetType type, boolean squashPloidy) {
-    final String f = getFactoryName(type);
-    switch (f) {
-      case "sample":
-        return squashPloidy ? Orientor.SQUASH_GT : Orientor.UNPHASED;
-      case "all":
-        return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
-      default:
-        throw new RuntimeException("Could not determine orientor for " + f);
-    }
-  }
-
-  static VariantFactory getFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
+  static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
     final boolean explicitHalf = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
-    final String f = getFactoryName(type);
+    final String f = VcfEvalTask.getFactoryName(type);
     switch (f) {
       case "sample":
         return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitHalf);

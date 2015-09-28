@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -51,6 +52,7 @@ import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
@@ -104,14 +106,19 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameMap.put(names.name(i), i);
     }
 
-    final Orientor bo = TabixVcfRecordSet.getOrientor(VariantSetType.BASELINE, params.squashPloidy());
-    final Orientor co = TabixVcfRecordSet.getOrientor(VariantSetType.CALLS, params.squashPloidy());
-
+    final List<Pair<Orientor, Orientor>> o;
+    if (GlobalFlags.isSet(GlobalFlags.VCFEVAL_TWO_PASS)) {
+      o = new ArrayList<>();
+      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false), getOrientor(VariantSetType.CALLS, false)));
+      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true), getOrientor(VariantSetType.CALLS, true)));
+    } else {
+      o = Collections.singletonList(new Pair<>(getOrientor(VariantSetType.BASELINE, params.squashPloidy()), getOrientor(VariantSetType.CALLS, params.squashPloidy())));
+    }
     try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
       for (int i = 0; i < templateSequences.numberSequences(); i++) {
-        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences.copy(), bo, co));
+        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences.copy(), o));
       }
 
       threadPool.terminate();
@@ -124,6 +131,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final File outdir = params.directory();
     final EvalSynchronizer processor;
     final String pathProcessor = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR);
+    final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
     switch (pathProcessor) {
       case "alleles":
         processor = new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
@@ -134,18 +142,45 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       case "recode":
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
+      case "annotate":
+        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        break;
       case "unified":
-        final RocSortValueExtractor rocExtractor1 = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
-        processor = new UnifiedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor1, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        processor = new UnifiedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
         break;
       default:
-        final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
         processor = new DefaultEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputBaselineTp(), params.outputSlopeFiles(), params.rtgStats());
         break;
     }
     return processor;
   }
 
+
+  static String getFactoryName(VariantSetType type) {
+    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
+    if (customFactory.length() > 0) {
+      final String[] f = StringUtils.split(customFactory, ',');
+      if (type == VariantSetType.BASELINE) {
+        return f[0];
+      } else {
+        return f.length == 1 ? f[0] : f[1];
+      }
+    } else {
+      return "sample";
+    }
+  }
+
+  static Orientor getOrientor(VariantSetType type, boolean squashPloidy) {
+    final String f = getFactoryName(type);
+    switch (f) {
+      case "sample":
+        return squashPloidy ? Orientor.SQUASH_GT : Orientor.UNPHASED;
+      case "all":
+        return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
+      default:
+        throw new RuntimeException("Could not determine orientor for " + f);
+    }
+  }
 
   /**
    * Builds a variant set of the best type for the supplied files

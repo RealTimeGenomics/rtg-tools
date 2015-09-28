@@ -50,6 +50,10 @@ public interface Orientor {
    */
   Orientor UNPHASED = new Orientor() {
     @Override
+    public String toString() {
+      return "unphased";
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       if (gv.alleleA() != gv.alleleB()) {
@@ -73,6 +77,10 @@ public interface Orientor {
    * Path finding will require matching both alleles.
    */
   Orientor PHASED = new Orientor() {
+    @Override
+    public String toString() {
+      return "phase-obeying";
+    }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
@@ -103,6 +111,10 @@ public interface Orientor {
    */
   Orientor SQUASH_GT = new Orientor() {
     @Override
+    public String toString() {
+      return "squash";
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       assert gv.alleleA() > 0 || gv.alleleB() > 0;
@@ -127,6 +139,10 @@ public interface Orientor {
    */
   Orientor SQUASH_POP = new Orientor() {
     @Override
+    public String toString() {
+      return "squash-all";
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final OrientedVariant[] pos = new OrientedVariant[variant.numAlleles() - 1];
       for (int i = 0; i < pos.length; i++) {
@@ -141,6 +157,10 @@ public interface Orientor {
    * population-allele-derived variant, with twists to help with sample recoding.
    */
   Orientor RECODE_POP = new Orientor() {
+    @Override
+    public String toString() {
+      return "recode-all";
+    }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final boolean explicitHalfCall = variant.allele(-1) != null;

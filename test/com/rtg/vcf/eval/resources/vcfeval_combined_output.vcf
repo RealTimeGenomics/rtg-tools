@@ -3,9 +3,9 @@
 ##contig=<ID=14,length=20>
 ##contig=<ID=18,length=31>
 ##contig=<ID=21,length=20>
+##INFO=<ID=SYNC,Number=.,Type=Integer,Description="Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.">
 ##INFO=<ID=BASE,Number=1,Type=String,Description="Baseline genotype status">
 ##INFO=<ID=CALL,Number=1,Type=String,Description="Call genotype status">
-##INFO=<ID=SYNC,Number=.,Type=Integer,Description="Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.">
 ##INFO=<ID=CALL_WEIGHT,Number=1,Type=Float,Description="Call weight (equivalent number of baseline variants). When unspecified, assume 1.0">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	BASELINE	CALLS

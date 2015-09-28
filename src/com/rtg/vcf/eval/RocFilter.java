@@ -49,7 +49,7 @@ public enum RocFilter {
     }
 
     @Override
-    String filename() {
+    String fileName() {
       return "weighted_roc.tsv";
     }
   },
@@ -124,7 +124,7 @@ public enum RocFilter {
    * Get the name of the default output file for this filter
    * @return the output file name
    */
-  String filename() {
+  String fileName() {
     return name().toLowerCase(Locale.ROOT) + ROC_EXT;
   }
 }

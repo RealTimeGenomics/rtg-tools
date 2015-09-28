@@ -32,10 +32,28 @@ package com.rtg.vcf.eval;
 import com.rtg.util.intervals.SequenceNameLocus;
 
 /**
- * Defines an integer identifier for a variant.
+ * Defines an integer identifier and status for a variant.
  */
 public interface VariantId extends SequenceNameLocus {
 
+  /** Variant was in a too-hard region */
+  byte STATUS_SKIPPED = 1;
+  /** Variant was included in diploid match */
+  byte STATUS_GT_MATCH = 2;
+  /** Variant was included during haploid matching */
+  byte STATUS_ALLELE_MATCH = 3;
+  /** Variant was excluded */
+  byte STATUS_NO_MATCH = 5;
+
   /** @return the ID assigned to this variant */
   int getId();
+
+  /**
+   * Sets evaluation status
+   * @param status the status value
+   */
+  void setStatus(byte status);
+
+  /** @return the status assigned to this variant */
+  byte getStatus();
 }
