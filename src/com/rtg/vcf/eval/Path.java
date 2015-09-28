@@ -37,7 +37,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.rtg.util.BasicLinkedListNode;
-import com.rtg.util.Pair;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -325,23 +324,20 @@ public final class Path implements Comparable<Path> {
    *
    * this will assure that the total number of TP we output will always reflect number of TP in baseline file
    *
-   * return 2 lists first for TP and second for FP, we create FP calls when current call is included but does not correspond to a TP (this can happen when two calls cancel each other out when replayed)
+   * if there are any call TP without corresponding baseline TP, these are simply assigned a weight of 0.
+   * (this can happen when two calls cancel each other out when replayed, although the default path finding now avoids this)
    *
    * @param best best path
-   * @return pair of called true positive and false positives
    */
-  static Pair<List<OrientedVariant>, List<OrientedVariant>> calculateWeights(final Path best) {
-    return calculateWeights(best, best.getCalledIncluded(), best.getBaselineIncluded());
+  static void calculateWeights(final Path best) {
+    calculateWeights(best, best.getCalledIncluded(), best.getBaselineIncluded());
   }
 
-  static Pair<List<OrientedVariant>, List<OrientedVariant>> calculateWeights(final Path best, final List<OrientedVariant> calledTruePositives, final List<OrientedVariant> baseLineTruePositives) {
+  static void calculateWeights(final Path best, final List<OrientedVariant> calledTruePositives, final List<OrientedVariant> baseLineTruePositives) {
     assert best.mSyncPointList.size() >= 1;
     final List<SyncPoint> syncpoints = getSyncPointsList(best.getSyncPoints(), baseLineTruePositives, calledTruePositives);
     //Diagnostic.warning("Best path sync points" + syncpoints);
     assert syncpoints.size() == best.mSyncPointList.size();
-
-    final List<OrientedVariant> tp = new ArrayList<>();
-    final List<OrientedVariant> fp = new ArrayList<>();
 
     final Iterator<SyncPoint> syncIterator = syncpoints.iterator();
     int syncStart = 0;
@@ -352,16 +348,14 @@ public final class Path implements Comparable<Path> {
         syncpoint = syncIterator.next();
       }
       if (syncpoint.mBaselineTPCount == 0) {
-        Diagnostic.developerLog("Best path called variant was bumped to FP due to no baseline TP within sync region "
+        Diagnostic.developerLog("Best path called variant was assigned weight of 0 due to no baseline TP within sync region "
             + v.getSequenceName() + ":" + (syncStart + 1) + "-" + (syncpoint.mPos + 1) + "\n"
             + "Bumped variant:  " + v);
-        fp.add(v);
+        v.setWeight(0);
       } else {
         v.setWeight(syncpoint.mBaselineTPCount / syncpoint.mCalledTPCount);
-        tp.add(v);
       }
     }
-    return new Pair<>(tp, fp);
   }
 
 }

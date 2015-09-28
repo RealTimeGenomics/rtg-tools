@@ -303,8 +303,8 @@ public final class PathFinder {
     @Override
     public Path better(Path first, Path second) {
       // See if we have obvious no-ops we would rather drop
-      final boolean fSync = first != null && first.inSync();
-      final boolean sSync = second != null && second.inSync();
+      final boolean fSync = first != null && (first.inSync() || first.finished());
+      final boolean sSync = second != null && (second.inSync() || second.finished());
       if (fSync && sSync) { // See if we have no-ops we would rather drop
         if (hasNoOp(first)) {
           Diagnostic.developerLog("Discard no-op path with (" + first.mBSinceSync + "," + first.mCSinceSync + ") at " + first.mCalledPath.getPosition());

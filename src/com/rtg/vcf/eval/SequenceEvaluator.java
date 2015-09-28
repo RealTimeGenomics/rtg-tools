@@ -129,19 +129,12 @@ class SequenceEvaluator implements IORunnable {
   }
 
   static PathResult postProcess(Path best, Collection<Variant> baseLineCalls, Collection<Variant> calledCalls) {
-    List<OrientedVariant> truePositives = best.getCalledIncluded();
+    final List<OrientedVariant> truePositives = best.getCalledIncluded();
     final List<Variant> falsePositives = best.getCalledExcluded();
     final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
     final List<Variant> falseNegatives = best.getBaselineExcluded();
 
-    final Pair<List<OrientedVariant>, List<OrientedVariant>> newcalls = Path.calculateWeights(best, truePositives, baselineTruePositives);
-    // this step is currently necessary as sometimes you can (rarely) have variants included in the best path
-    // but they do not correspond to any variant in baseline.
-    // E.g. two variants which when both replayed cancel each other out.
-    truePositives = newcalls.getA();
-    for (OrientedVariant v : newcalls.getB()) {
-      falsePositives.add(v.variant());
-    }
+    Path.calculateWeights(best, truePositives, baselineTruePositives);
 
     final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, falseNegatives);
     final List<VariantId> calls = mergeVariants(calledCalls, truePositives, falsePositives);

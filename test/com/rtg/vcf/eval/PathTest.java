@@ -39,7 +39,6 @@ import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.launcher.OutputParams;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.tabix.TabixIndexer;
-import com.rtg.util.Pair;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -279,7 +278,7 @@ public class PathTest extends AbstractNanoTest {
   }
 
   public void testBestPath13EdgeInsertion() {
-    //TODO currently all these have include=true due to inability to handle variants just off the edge of template
+    //TODO currently all these with include=true are due to inability to handle variants just off the edge of template
     //when fixed only the one labelled "agree" should have include=true
     final byte[] template = {1, 1, 1, 1, 1, 1, 2};
     final List<OrientedVariant> aSide = new ArrayList<>();
@@ -300,13 +299,13 @@ public class PathTest extends AbstractNanoTest {
     bSide.clear();
 
     //only in baseline
-    addVar(bSide, new MockVariant(8, 8, new byte[] {3, 3, 3}, new byte[] {}), true);
+    addVar(bSide, new MockVariant(8, 8, new byte[] {3, 3, 3}, new byte[] {}), false);
     check(template, aSide, bSide);
     aSide.clear();
     bSide.clear();
 
     //only in calls
-    addVar(aSide, new MockVariant(8, 8, new byte[] {}, new byte[] {3, 3, 3}), true);
+    addVar(aSide, new MockVariant(8, 8, new byte[] {}, new byte[] {3, 3, 3}), false);
     check(template, aSide, bSide);
   }
 
@@ -560,8 +559,7 @@ public class PathTest extends AbstractNanoTest {
     final Path original = finder.bestPath();
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP
     assertEquals(2, original.getBaselineIncluded().size());
-    final Pair<List<OrientedVariant>, List<OrientedVariant>> result = Path.calculateWeights(original);
-    assertEquals(2, result.getA().size()); // The NOP variants have been removed
+    Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
   }
 
@@ -597,6 +595,7 @@ public class PathTest extends AbstractNanoTest {
   }
 
   public void testNoInfiniloop() throws Exception {
+    // This has a variant that can play right at the end of the template
     final String templatefa = ">CFTR.8.500s\nTCATCACTAAGGTTAGCATGTAATAGTACAAGGAAGAATCAGTTGTATGTTAAATCTAATGTATAAAAAGTTTTATAAAATATCATATGTTTAGAGAGTATATTTCAAATATGTTGAATCCTAGTGCTTGGGTGCAAATTAACTTTAGAACACTAGTAAAATTATTTTATTAAGAAATAATTACTATTTCATTATTAAAATTCATATATAAGATGTAGCACAATGAGAGTATAAAGTAGATGTAATAATGCATTAATGCTATTCTGATTCTATAATATGTTTTTGCTCTCTTTTATAAATAGGATTTCTTACAAAAGCAAGAATATAAGACATTGGAATATAACTTAACGACTACAGAAGTAGTGATGGAGAATGTAACAGCCTTCTGGGAGGAGGTCAGATAATTTTTAAAAAATTGTTTGCTCTAAACACCTAACTGTTTTCTTCTTTGTGAATATGGCCTAATGGCGAATAAAATTAGAATGATGATATAACTGGTAGAACTGGAAGGAGGATCACT\n";
 
     final String generated = VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n"
