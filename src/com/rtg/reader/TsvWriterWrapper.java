@@ -45,9 +45,9 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
 
 /**
- * Wrapper for writing CG TSV format
+ * Wrapper for writing CG TSV format.
  */
-@TestClass("com.rtg.reader.Sdf2FastaTest")
+@TestClass({"com.rtg.reader.Sdf2FastaTest", "com.rtg.reader.Sdf2CgTest"})
 public class TsvWriterWrapper implements WriterWrapper {
 
   private static final String[] EXTS = {".tsv"};
@@ -55,7 +55,6 @@ public class TsvWriterWrapper implements WriterWrapper {
   private final SdfReaderWrapper mReader;
 
   private final LineWriter mOutput;
-
 
   /**
    * Convenience wrapper for writing.
@@ -152,9 +151,7 @@ public class TsvWriterWrapper implements WriterWrapper {
 
   @Override
   public void close() throws IOException {
-    if (mOutput != null) {
-      mOutput.close();
-    }
+    mOutput.close();
   }
 }
 
