@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 
-import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 
@@ -42,7 +41,6 @@ import htsjdk.samtools.SAMFileHeader;
 /**
  * When we are about to read sam files, this object just stores the file list, the filter params and the uber header
  */
-@TestClass("com.rtg.sam.DefaultSamFilterTest")
 public class SamReadingContext {
 
   private final Collection<File> mFiles;
@@ -136,12 +134,12 @@ public class SamReadingContext {
     return mReferenceRanges.get(sequenceId);
   }
 
-  /**
-   * @param sequenceName the sequence name of interest.
-   * @return the resolved ranges for the specified template sequence, or null if no ranges are being applied
-   * @throws java.lang.NullPointerException if no ranges are being applied
-   */
-  public RangeList<String> rangeList(String sequenceName) {
-    return mReferenceRanges.get(sequenceName);
-  }
+//  /**
+//   * @param sequenceName the sequence name of interest.
+//   * @return the resolved ranges for the specified template sequence, or null if no ranges are being applied
+//   * @throws java.lang.NullPointerException if no ranges are being applied
+//   */
+//  public RangeList<String> rangeList(String sequenceName) {
+//    return mReferenceRanges.get(sequenceName);
+//  }
 }
