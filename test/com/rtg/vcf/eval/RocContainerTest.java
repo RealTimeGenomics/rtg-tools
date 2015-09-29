@@ -36,6 +36,7 @@ import java.util.EnumSet;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+import com.rtg.vcf.VcfRecord;
 
 import junit.framework.TestCase;
 
@@ -44,7 +45,20 @@ import junit.framework.TestCase;
 public class RocContainerTest extends TestCase {
   public void test() throws IOException {
     try (final TestDirectory dir = new TestDirectory("roc")) {
-      final RocContainer roc = new RocContainer(RocSortOrder.DESCENDING, null);
+      final RocContainer roc = new RocContainer(new RocSortValueExtractor() {
+        @Override
+        double getSortValue(VcfRecord rec, int sampleNo) {
+          return 0;
+        }
+        @Override
+        RocSortOrder getSortOrder() {
+          return RocSortOrder.DESCENDING;
+        }
+        @Override
+        public String toString() {
+          return "TEST";
+        }
+      });
       roc.addFilter(RocFilter.ALL);
       EnumSet<RocFilter> v = EnumSet.of(RocFilter.ALL);
       roc.addRocLine(0.1, 1.0, v);

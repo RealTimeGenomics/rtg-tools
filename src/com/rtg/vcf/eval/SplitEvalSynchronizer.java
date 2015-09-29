@@ -32,9 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -57,7 +55,6 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
   private final VcfWriter mFp;
   private final VcfWriter mFn;
   private final RocContainer mRoc;
-  private final RocSortValueExtractor mRocExtractor;
   private final int mCallSampleNo;
   private final boolean mZip;
   private final boolean mSlope;
@@ -87,13 +84,12 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
                         String callsSampleName, RocSortValueExtractor extractor,
                         File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
-    final RocContainer roc = new RocContainer(extractor.getSortOrder(), extractor.toString());
+    final RocContainer roc = new RocContainer(extractor);
     roc.addStandardFilters();
     if (rtgStats) {
       roc.addExtraFilters();
     }
     mRoc = roc;
-    mRocExtractor = extractor;
     mZip = zip;
     mSlope = slope;
     mOutDir = outdir;
@@ -145,38 +141,28 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   @Override
   protected void handleKnownCall() throws IOException {
-    switch (mCv.getStatus()) {
+    final byte s = mCv.getStatus();
+    switch (s) {
       case VariantId.STATUS_SKIPPED:
         break;
       case VariantId.STATUS_GT_MATCH:
         mCallTruePositives++;
         mTpCalls.write(mCrv);
-        addToROCContainer(((OrientedVariant) mCv).getWeight());
+        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
         break;
       case VariantId.STATUS_ALLELE_MATCH: // Old-school format doesn't distinguish
       case VariantId.STATUS_NO_MATCH:
         mFalsePositives++;
         mFp.write(mCrv);
-        addToROCContainer(0);
+        addToROCContainer(0, s);
         break;
       default:
         throw new RuntimeException("Unhandled variant status: " + mCv.getStatus());
     }
   }
 
-  private void addToROCContainer(double weight) {
-    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
-    for (final RocFilter filter : RocFilter.values()) {
-      if (filter.accept(mCrv, mCallSampleNo)) {
-        filters.add(filter);
-      }
-    }
-    double score = Double.NaN;
-    try {
-      score = mRocExtractor.getSortValue(mCrv, mCallSampleNo);
-    } catch (IndexOutOfBoundsException ignored) {
-    }
-    mRoc.addRocLine(score, weight, filters);
+  private void addToROCContainer(double weight, byte status) {
+    mRoc.addRocLine(mCrv, mCallSampleNo, weight);
   }
 
   @Override
@@ -220,9 +206,10 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
   @Override
   void finish() throws IOException {
     super.finish();
-    mRoc.writeRocs(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives, mZip, mSlope);
+    mRoc.missingScoreWarning();
     writePhasingInfo();
-    mRoc.writeSummary(new File(mOutDir, CommonFlags.SUMMARY_FILE), mBaselineTruePositives, mFalsePositives, mFalseNegatives);
+    mRoc.writeRocs(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives, mZip, mSlope);
+    mRoc.writeSummary(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives);
   }
 
   private void writePhasingInfo() throws IOException {

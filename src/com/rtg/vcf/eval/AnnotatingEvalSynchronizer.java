@@ -59,12 +59,13 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
+   * @param dualRocs true to output additional ROC curves for allele-matches
    * @throws IOException if there is a problem opening output files
    */
   AnnotatingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                              String callsSampleName, RocSortValueExtractor extractor,
-                             File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats);
+                             File outdir, boolean zip, boolean slope, boolean rtgStats, boolean dualRocs) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats, dualRocs);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baseLineHeader().copy();
     CombinedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);

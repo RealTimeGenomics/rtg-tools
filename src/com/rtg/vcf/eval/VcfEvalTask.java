@@ -113,7 +113,10 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
 
     final List<Pair<Orientor, Orientor>> o;
-    if (params.twoPass() && !params.squashPloidy()) {
+    if (params.twoPass() && params.squashPloidy()) {
+      throw new IllegalStateException("Cannot run two-pass with squash-ploidy set");
+    }
+    if (params.twoPass()) {
       o = new ArrayList<>();
       o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false), getOrientor(VariantSetType.CALLS, false)));
       o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true), getOrientor(VariantSetType.CALLS, true)));
@@ -153,10 +156,10 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
       case MODE_ANNOTATE:
-        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
         break;
       case MODE_COMBINE:
-        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
         break;
       case MODE_SPLIT:
         if (params.twoPass()) {

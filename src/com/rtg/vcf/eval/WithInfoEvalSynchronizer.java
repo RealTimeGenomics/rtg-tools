@@ -32,10 +32,8 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.Map;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -62,8 +60,8 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
   static final String STATUS_FN_CA = "FN_CA";
   static final String STATUS_FP_CA = "FP_CA";
 
-  private final RocContainer mRoc;
-  private final RocSortValueExtractor mRocExtractor;
+  private final RocContainer mDefaultRoc;
+  private final RocContainer mAlleleRoc;
   private final boolean mZip;
   private final boolean mSlope;
   private final File mOutDir;
@@ -89,19 +87,27 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
+   * @param dualRocs true to output additional ROC curves for allele-matches
    * @throws IOException if there is a problem opening output files
    */
   WithInfoEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean rtgStats, boolean dualRocs) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
-    final RocContainer roc = new RocContainer(extractor.getSortOrder(), extractor.toString());
-    roc.addStandardFilters();
+    mDefaultRoc = new RocContainer(extractor);
+    mDefaultRoc.addStandardFilters();
     if (rtgStats) {
-      roc.addExtraFilters();
+      mDefaultRoc.addExtraFilters();
     }
-    mRoc = roc;
-    mRocExtractor = extractor;
+    if (dualRocs) {
+      mAlleleRoc = new RocContainer(extractor, "allele_");
+      mAlleleRoc.addStandardFilters();
+      if (rtgStats) {
+        mAlleleRoc.addExtraFilters();
+      }
+    } else {
+      mAlleleRoc = null;
+    }
     mZip = zip;
     mSlope = slope;
     mOutDir = outdir;
@@ -220,21 +226,13 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
   }
 
   protected void addToROCContainer(double weight, byte status) {
-    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
-    for (final RocFilter filter : RocFilter.values()) {
-      if (filter.accept(mCrv, mCallSampleNo)) {
-        filters.add(filter);
-      }
-    }
-    double score = Double.NaN;
-    try {
-      score = mRocExtractor.getSortValue(mCrv, mCallSampleNo);
-    } catch (IndexOutOfBoundsException ignored) {
-    }
-    if (status == VariantId.STATUS_ALLELE_MATCH) {
-      mRoc.addRocLine(score, 0, filters);
+    if (status == VariantId.STATUS_ALLELE_MATCH) { // Consider these FP for GT ROCs
+      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0);
     } else {
-      mRoc.addRocLine(score, weight, filters);
+      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, weight);
+    }
+    if (mAlleleRoc != null) {
+      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, weight);
     }
   }
 
@@ -254,11 +252,18 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
   @Override
   void finish() throws IOException {
     super.finish();
+    mDefaultRoc.missingScoreWarning();
+    writePhasingInfo();
+    if (mAlleleRoc != null) {
+      final int alleleTp = mBaselineTruePositives + mFalseNegativesCommonAllele;
+      mAlleleRoc.writeRocs(mOutDir, alleleTp, mFalsePositives, mFalseNegatives, mZip, mSlope);
+      // Do we want the allele-level summary too?
+      //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
+    }
     final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
     final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
-    mRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
-    writePhasingInfo();
-    mRoc.writeSummary(new File(mOutDir, CommonFlags.SUMMARY_FILE), mBaselineTruePositives, strictFp, strictFn);
+    mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
+    mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFp, strictFn);
   }
 
   private void writePhasingInfo() throws IOException {

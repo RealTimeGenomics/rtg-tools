@@ -259,7 +259,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
     final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);
     builder.outputMode(mode);
-    if (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE)) {
+    if (!mFlags.isSet(SQUASH_PLOIDY) && (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE))) {
       builder.twoPass(true);
     }
     return builder.create();

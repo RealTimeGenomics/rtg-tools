@@ -36,14 +36,15 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.MathUtils;
 import com.rtg.util.StringUtils;
@@ -52,6 +53,7 @@ import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
+import com.rtg.vcf.VcfRecord;
 
 /**
  */
@@ -59,18 +61,28 @@ public class RocContainer {
 
   private static final String SLOPE_EXT = "_slope.tsv";
   private final String mFieldLabel;
-  private final List<SortedMap<Double, RocPoint>> mRocs = new ArrayList<>();
-  private final List<RocFilter> mFilters = new ArrayList<>();
+  private final Map<RocFilter, SortedMap<Double, RocPoint>> mRocs = new HashMap<>();
   private final Comparator<Double> mComparator;
   private int mNoScoreVariants = 0;
+  private final RocSortValueExtractor mRocExtractor;
+  private String mFilePrefix;
 
   /**
    * Constructor
-   * @param sortOrder the sort order that ensures that "good" scores are sorted before "bad" scores
-   * @param fieldLabel the label for the field being used as the scoring attribute
+   * @param extractor responsible for extracting ROC scores from VCF records.
    */
-  public RocContainer(RocSortOrder sortOrder, String fieldLabel) {
-    switch (sortOrder) {
+  public RocContainer(RocSortValueExtractor extractor) {
+    this(extractor, "");
+  }
+
+  /**
+   * Constructor
+   * @param extractor responsible for extracting ROC scores from VCF records.
+   * @param filePrefix prefix attached to ROC output file names
+   */
+  public RocContainer(RocSortValueExtractor extractor, String filePrefix) {
+
+    switch (extractor.getSortOrder()) {
       case ASCENDING:
         mComparator = new AscendingDoubleComparator();
         break;
@@ -79,7 +91,9 @@ public class RocContainer {
         mComparator = new DescendingDoubleComparator();
         break;
     }
-    mFieldLabel = fieldLabel;
+    mFieldLabel = extractor.toString();
+    mFilePrefix = filePrefix;
+    mRocExtractor = extractor;
   }
 
   /**
@@ -94,8 +108,7 @@ public class RocContainer {
    * @param filter filter to apply to calls, or <code>null</code> for all calls
    */
   public void addFilter(RocFilter filter) {
-    mRocs.add(new TreeMap<Double, RocPoint>(mComparator));
-    mFilters.add(filter);
+    mRocs.put(filter, new TreeMap<Double, RocPoint>(mComparator));
   }
 
   void addStandardFilters() {
@@ -113,6 +126,31 @@ public class RocContainer {
     addFilter(RocFilter.HOMOZYGOUS_COMPLEX);
   }
 
+  Collection<RocFilter> filters() {
+    return mRocs.keySet();
+  }
+
+  /**
+   * add single result to ROC
+   * @param rec the VCF record to incorporate into the ROC curves
+   * @param sampleId the index of the sample column to use for score extraction
+   * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
+   */
+  public void addRocLine(VcfRecord rec, int sampleId, double weight) {
+    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
+    for (final RocFilter filter : filters()) {
+      if (filter.accept(rec, sampleId)) {
+        filters.add(filter);
+      }
+    }
+    double score = Double.NaN;
+    try {
+      score = mRocExtractor.getSortValue(rec, sampleId);
+    } catch (IndexOutOfBoundsException ignored) {
+    }
+    addRocLine(score, weight, filters);
+  }
+
   /**
    * add single result to ROC
    * @param primarySortValue normally the posterior score
@@ -123,17 +161,13 @@ public class RocContainer {
     if (Double.isNaN(primarySortValue) || Double.isInfinite(primarySortValue)) {
       mNoScoreVariants++;
     } else {
-      for (int i = 0; i < mFilters.size(); i++) {
-        final SortedMap<Double, RocPoint> map = mRocs.get(i);
-        final RocFilter filter = mFilters.get(i);
-
-        if (filters.contains(filter)) {
-          final RocPoint point = new RocPoint(primarySortValue, weight, weight > 0.0 ? 0 : 1);
-          final RocPoint old = map.put(primarySortValue, point);
-          if (old != null) {
-            point.mTp += old.mTp;
-            point.mFp += old.mFp;
-          }
+      for (RocFilter filter : filters) {
+        final SortedMap<Double, RocPoint> points = mRocs.get(filter);
+        final RocPoint point = new RocPoint(primarySortValue, weight, weight > 0.0 ? 0 : 1);
+        final RocPoint old = points.put(primarySortValue, point);
+        if (old != null) {
+          point.mTp += old.mTp;
+          point.mFp += old.mFp;
         }
       }
     }
@@ -166,19 +200,17 @@ public class RocContainer {
    */
   public void writeRocs(File outDir, int truePositives, int falsePositives, int falseNegatives, boolean zip, boolean slope) throws IOException {
     Diagnostic.developerLog("Writing ROC");
-    if (getNumberOfIgnoredVariants() > 0) {
-      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
-    }
     final int totalBaselineVariants = truePositives + falseNegatives;
-    for (int i = 0; i < mFilters.size(); i++) {
-      final RocFilter filter = mFilters.get(i);
-      final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, filter.fileName()));
+    for (Map.Entry<RocFilter, SortedMap<Double, RocPoint>> entry : mRocs.entrySet()) {
+      final RocFilter filter = entry.getKey();
+      final SortedMap<Double, RocPoint> points = entry.getValue();
+      final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, mFilePrefix + filter.fileName()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
         double tp = 0.0;
         double fp = 0.0;
         final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
         rocHeader(os, totalBaselineVariants, extraMetrics);
-        for (final Map.Entry<Double, RocPoint> me : mRocs.get(i).entrySet()) {
+        for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
           final RocPoint p = me.getValue();
           tp += p.mTp;
           fp += p.mFp;
@@ -192,6 +224,12 @@ public class RocContainer {
       if (slope) {
         produceSlopeFile(rocFile, zip);
       }
+    }
+  }
+
+  void missingScoreWarning() {
+    if (getNumberOfIgnoredVariants() > 0) {
+      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
     }
   }
 
@@ -220,7 +258,8 @@ public class RocContainer {
     }
   }
 
-  void writeSummary(File summaryFile, int truePositives, int falsePositives, int falseNegatives) throws IOException {
+  void writeSummary(File outDir, int truePositives, int falsePositives, int falseNegatives) throws IOException {
+    final File summaryFile = new File(outDir, mFilePrefix + CommonFlags.SUMMARY_FILE);
     final String summary;
     final int totalPositives = truePositives + falseNegatives;
     if (totalPositives > 0) {
@@ -260,27 +299,25 @@ public class RocContainer {
 
   // Find the threshold entry (from the ALL filter) that maximises f-measure, as an (arbitrary but) fair comparison point
   RocPoint bestFMeasure(int totalBaselineVariants) {
-    for (int i = 0; i < mFilters.size(); i++) {
-      final RocFilter filter = mFilters.get(i);
-      if (filter == RocFilter.ALL) {
-        double tp = 0.0;
-        double fp = 0.0;
-        double best = -1;
-        RocPoint bestPoint = null;
-        for (final Map.Entry<Double, RocPoint> me : mRocs.get(i).entrySet()) {
-          final RocPoint p = me.getValue();
-          tp += p.mTp;
-          fp += p.mFp;
-          final double precision = ContingencyTable.precision(tp, fp);
-          final double recall = ContingencyTable.recall(tp, totalBaselineVariants - tp);
-          final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-          if (fMeasure >= best) {
-            best = fMeasure;
-            bestPoint = new RocPoint(p.mThreshold, tp, fp);
-          }
+    final SortedMap<Double, RocPoint> points = mRocs.get(RocFilter.ALL);
+    if (points != null) {
+      double tp = 0.0;
+      double fp = 0.0;
+      double best = -1;
+      RocPoint bestPoint = null;
+      for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
+        final RocPoint p = me.getValue();
+        tp += p.mTp;
+        fp += p.mFp;
+        final double precision = ContingencyTable.precision(tp, fp);
+        final double recall = ContingencyTable.recall(tp, totalBaselineVariants - tp);
+        final double fMeasure = ContingencyTable.fMeasure(precision, recall);
+        if (fMeasure >= best) {
+          best = fMeasure;
+          bestPoint = new RocPoint(p.mThreshold, tp, fp);
         }
-        return bestPoint;
       }
+      return bestPoint;
     }
     return null;
   }
