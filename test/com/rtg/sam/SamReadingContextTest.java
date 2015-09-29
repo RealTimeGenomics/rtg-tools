@@ -52,6 +52,6 @@ public class SamReadingContextTest extends TestCase {
     assertEquals(42, sc.numThreads());
     assertEquals(params, sc.filterParams());
     assertEquals(header, sc.header());
-    assertFalse(sc.hasRegions());
+    assertTrue(sc.hasRegions());
   }
 }
