@@ -50,7 +50,7 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Creates a single two-sample output VCF.
  */
-class UnifiedEvalSynchronizer extends WithInfoEvalSynchronizer {
+class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   private static final String OUTPUT_FILE_NAME = "output.vcf";
   private static final String SAMPLE_BASELINE = "BASELINE";
@@ -77,10 +77,10 @@ class UnifiedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
    * @throws IOException if there is a problem opening output files
    */
-  UnifiedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
-                          String baselineSampleName, String callsSampleName,
-                          RocSortValueExtractor extractor,
-                          File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
+  CombinedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+                           String baselineSampleName, String callsSampleName,
+                           RocSortValueExtractor extractor,
+                           File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats);
     mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";

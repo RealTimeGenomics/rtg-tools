@@ -67,10 +67,10 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baseLineHeader().copy();
-    UnifiedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);
+    CombinedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);
     mBase = new VcfWriter(bh, new File(outdir, "baseline.vcf" + zipExt), null, zip, true);
     final VcfHeader ch = variants.calledHeader().copy();
-    UnifiedEvalSynchronizer.addInfoHeaders(ch, VariantSetType.CALLS);
+    CombinedEvalSynchronizer.addInfoHeaders(ch, VariantSetType.CALLS);
     mCalls = new VcfWriter(ch, new File(outdir, "calls.vcf" + zipExt), null, zip, true);
   }
 

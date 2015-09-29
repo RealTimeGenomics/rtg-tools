@@ -47,7 +47,7 @@ import com.rtg.vcf.VcfSortRefiner;
 /**
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
  */
-@TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
+@TestClass("com.rtg.vcf.eval.SplitEvalSynchronizerTest")
 public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
 
   private static final Comparator<SequenceNameLocus> NATURAL_COMPARATOR = new SequenceNameLocusComparator();

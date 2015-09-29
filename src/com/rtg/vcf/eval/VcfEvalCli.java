@@ -49,6 +49,7 @@ import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
@@ -71,7 +72,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   static final String SORT_FIELD = "vcf-score-field";
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String REF_OVERLAP = "ref-overlap";
-  private static final String BASELINE_TP = "baseline-tp";
+  private static final String OUTPUT_MODE = "output-mode";
 
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
@@ -118,12 +119,13 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
     flags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences").setCategory(FILTERING);
     flags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)").setCategory(FILTERING);
+    final Flag modeFlag = flags.registerOptional('m', OUTPUT_MODE, String.class, "STRING", "output mode", VcfEvalTask.MODE_SPLIT).setCategory(FILTERING);
+    modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE});
 
     flags.registerOptional('f', SORT_FIELD, String.class, "STRING", "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO=<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, "STRING", "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     flags.registerOptional(MAX_LENGTH, Integer.class, "INT", "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
     flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
-    flags.registerOptional(BASELINE_TP, "output an additional file containing the baseline version of true positive variants").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
 
     CommonFlags.initThreadsFlag(flags);
@@ -253,9 +255,13 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
     builder.refOverlap(mFlags.isSet(REF_OVERLAP));
     builder.rtgStats(mFlags.isSet(RTG_STATS));
-    builder.outputBaselineTp(mFlags.isSet(BASELINE_TP));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
+    final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);
+    builder.outputMode(mode);
+    if (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE)) {
+      builder.twoPass(true);
+    }
     return builder.create();
   }
 }

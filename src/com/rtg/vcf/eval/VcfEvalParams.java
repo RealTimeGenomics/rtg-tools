@@ -59,13 +59,14 @@ public final class VcfEvalParams extends OutputModuleParams {
     String mScoreField = VcfUtils.FORMAT_GENOTYPE_QUALITY;
     String mBaselineSample;
     String mCallsSample;
+    String mOutputMode = VcfEvalTask.MODE_SPLIT;
     boolean mUseAllRecords = false;
     int mNumberThreads = 1;
+    private boolean mTwoPass = false;
     private boolean mSquashPloidy = false;
     private boolean mRefOverlap = false;
     int mMaxLength = -1;
     boolean mRtgStats = false;
-    boolean mOutputBaselineTp = false;
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
@@ -142,6 +143,17 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
+     * Sets the run output mode.
+     *
+     * @param modeName the name of the output mode.
+     * @return this builder, so calls can be chained.
+     */
+    public VcfEvalParamsBuilder outputMode(final String modeName) {
+      mOutputMode = modeName;
+      return self();
+    }
+
+    /**
      * Sets the VCF ROC scoring field.
      *
      * @param scoreField the VCF format field to use as the ROC score.
@@ -169,6 +181,15 @@ public final class VcfEvalParams extends OutputModuleParams {
      */
     public VcfEvalParamsBuilder numberThreads(int value) {
       mNumberThreads = value;
+      return self();
+    }
+
+    /**
+     * @param twoPass true if we should run diploid followed by squash-ploidy evaluation
+     * @return this builder, so calls can be chained
+     */
+    public VcfEvalParamsBuilder twoPass(boolean twoPass) {
+      mTwoPass = twoPass;
       return self();
     }
 
@@ -219,15 +240,6 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
-     * @param outputBaselineTp if set, output the baseline version of the true positives file too
-     * @return this builder, so calls can be chained
-     */
-    public VcfEvalParamsBuilder outputBaselineTp(boolean outputBaselineTp) {
-      mOutputBaselineTp = outputBaselineTp;
-      return self();
-    }
-
-    /**
      * Sets a restriction on the records that will be processed. The format is a reference sequence name,
      * followed by an optional range specification. Only records that match the reference name and start
      * within the range (if specified) will be processed. A name of null indicates no filtering.
@@ -265,16 +277,17 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final RegionRestriction mRestriction;
   private final File mBedRegionsFile;
   private final String mScoreField;
+  private final String mOutputMode;
   private final RocSortOrder mSortOrder;
   private final String mBaselineSample;
   private final String mCallsSample;
   private final int mNumberThreads;
   private final boolean mUseAllRecords;
+  private final boolean mTwoPass;
   private final boolean mSquashPloidy;
   private final boolean mRefOverlap;
   private final int mMaxLength;
   private final boolean mRtgStats;
-  private final boolean mOutputBaselineTp;
   private final boolean mOutputSlopeFiles;
 
 
@@ -290,16 +303,17 @@ public final class VcfEvalParams extends OutputModuleParams {
     mBedRegionsFile = builder.mBedRegionsFile;
     mSortOrder = builder.mSortOrder;
     mScoreField = builder.mScoreField;
+    mOutputMode = builder.mOutputMode;
     mBaselineSample = builder.mBaselineSample;
     mCallsSample = builder.mCallsSample;
     mNumberThreads = builder.mNumberThreads;
     mUseAllRecords = builder.mUseAllRecords;
+    mTwoPass = builder.mTwoPass;
     mSquashPloidy = builder.mSquashPloidy;
     mRefOverlap = builder.mRefOverlap;
     mMaxLength = builder.mMaxLength;
     mRtgStats = builder.mRtgStats;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
-    mOutputBaselineTp = builder.mOutputBaselineTp;
   }
 
   /**
@@ -373,11 +387,27 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
+   * Get the run mode name.
+   * @return the run mode name.
+   */
+  public String outputMode() {
+    return mOutputMode;
+  }
+
+  /**
    * Get whether to use all VCF records for ROC or not
    * @return <code>true</code> if true all VCF records are used, if <code>false</code>, only PASS VCF records will be used.
    */
   public boolean useAllRecords() {
     return mUseAllRecords;
+  }
+
+  /**
+   * Get whether to run two-pass evaluation, diploid followed by squash on the false positives and false negatives.
+   * @return true if two evaluation passes should be made.
+   */
+  public boolean twoPass() {
+    return mTwoPass;
   }
 
   /**
@@ -421,18 +451,9 @@ public final class VcfEvalParams extends OutputModuleParams {
     return mOutputSlopeFiles;
   }
 
-
-
-  /**
-   * @return true if the baseline version of the true positives file should be output
-   */
-  public boolean outputBaselineTp() {
-    return mOutputBaselineTp;
-  }
-
   @Override
   public String toString() {
-    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", max length=" + mMaxLength + ", rtg stats=" + mRtgStats + ", baseline tp=" + mOutputBaselineTp + ", output params=" + super.toString();
+    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass + ", max length=" + mMaxLength + ", rtg stats=" + mRtgStats + ", output mode=" + mOutputMode + ", output params=" + super.toString();
   }
 
 }

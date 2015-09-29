@@ -46,11 +46,10 @@ import com.rtg.util.test.FileHelper;
 
 /**
  */
-public class UnifiedEvalSynchronizerTest extends AbstractNanoTest {
+public class CombinedEvalSynchronizerTest extends AbstractNanoTest {
 
   public void testCombined() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_combined", false, "--ref-overlap",
-      "--XXcom.rtg.vcf.eval.custom-path-processor=unified");
+    endToEnd("vcfeval_combined", false, "--ref-overlap", "--output-mode", "combine");
   }
 
   public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

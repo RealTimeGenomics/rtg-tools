@@ -66,6 +66,12 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
+  static final String MODE_ANNOTATE = "annotate";
+  static final String MODE_COMBINE = "combine";
+  static final String MODE_SPLIT = "split";
+  static final String MODE_RECODE = "recode";
+  static final String MODE_ALLELES = "alleles";
+
   protected VcfEvalTask(VcfEvalParams params, OutputStream reportStream, NoStatistics stats) {
     super(params, reportStream, stats, null);
   }
@@ -107,7 +113,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
 
     final List<Pair<Orientor, Orientor>> o;
-    if (GlobalFlags.isSet(GlobalFlags.VCFEVAL_TWO_PASS)) {
+    if (params.twoPass() && !params.squashPloidy()) {
       o = new ArrayList<>();
       o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false), getOrientor(VariantSetType.CALLS, false)));
       o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true), getOrientor(VariantSetType.CALLS, true)));
@@ -130,27 +136,36 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {
     final File outdir = params.directory();
     final EvalSynchronizer processor;
-    final String pathProcessor = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR);
+    final String outputMode = GlobalFlags.isSet(GlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
     final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
-    switch (pathProcessor) {
-      case "alleles":
-        processor = new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+    switch (outputMode) {
+      case MODE_ALLELES:
+        if (params.squashPloidy()) {
+          processor = new SquashedAlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        } else {
+          processor = new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+        }
         break;
-      case "hap-alleles":
-        processor = new SquashedAlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
-        break;
-      case "recode":
+      case MODE_RECODE:
+        if (params.squashPloidy()) {
+          throw new UnsupportedOperationException();
+        }
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
-      case "annotate":
+      case MODE_ANNOTATE:
         processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
         break;
-      case "unified":
-        processor = new UnifiedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+      case MODE_COMBINE:
+        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        break;
+      case MODE_SPLIT:
+        if (params.twoPass()) {
+          Diagnostic.warning("Split output mode does not support two-pass specific output");
+        }
+        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
         break;
       default:
-        processor = new DefaultEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputBaselineTp(), params.outputSlopeFiles(), params.rtgStats());
-        break;
+        throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);
     }
     return processor;
   }

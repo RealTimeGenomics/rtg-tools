@@ -45,17 +45,10 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 
 /**
- * When running VcfEvalTask in multithreading fashion keeps reading and output in order for each chromosome being evaluated.
+ * Handles vcfeval output writing, this base class ensures output is in order for each chromosome being evaluated.
  */
-@TestClass("com.rtg.vcf.eval.DefaultEvalSynchronizerTest")
+@TestClass("com.rtg.vcf.eval.SplitEvalSynchronizerTest")
 public abstract class EvalSynchronizer implements Closeable {
-
-  protected enum Classification {
-    TP_CALL,
-    FP,
-    TP_BASE,
-    FN
-  }
 
   protected final ReferenceRanges<String> mRanges;
   protected final VariantSet mVariantSet;

@@ -45,7 +45,7 @@ import com.rtg.vcf.VcfWriter;
 /**
  * Creates typical vcfeval output files with separate VCF files and ROC files.
  */
-class DefaultEvalSynchronizer extends InterleavingEvalSynchronizer {
+class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   private static final String FN_FILE_NAME = "fn.vcf";
   private static final String FP_FILE_NAME = "fp.vcf";
@@ -79,14 +79,13 @@ class DefaultEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
-   * @param outputTpBase true if the baseline true positive file should be written
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
    * @throws IOException if there is a problem opening output files
    */
-  DefaultEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
-                          String callsSampleName, RocSortValueExtractor extractor,
-                          File outdir, boolean zip, boolean outputTpBase, boolean slope, boolean rtgStats) throws IOException {
+  SplitEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+                        String callsSampleName, RocSortValueExtractor extractor,
+                        File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
     final RocContainer roc = new RocContainer(extractor.getSortOrder(), extractor.toString());
     roc.addStandardFilters();
@@ -100,7 +99,7 @@ class DefaultEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutDir = outdir;
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mTpCalls = new VcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), null, zip, true);
-    mTpBase = outputTpBase ? new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true) : null;
+    mTpBase = new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true);
     mFp = new VcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), null, zip, true);
     mFn = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), null, zip, true);
     mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
@@ -187,9 +186,7 @@ class DefaultEvalSynchronizer extends InterleavingEvalSynchronizer {
         break;
       case VariantId.STATUS_GT_MATCH:
         mBaselineTruePositives++;
-        if (mTpBase != null) {
-          mTpBase.write(mBrv);
-        }
+        mTpBase.write(mBrv);
         break;
       case VariantId.STATUS_ALLELE_MATCH:
       case VariantId.STATUS_NO_MATCH:

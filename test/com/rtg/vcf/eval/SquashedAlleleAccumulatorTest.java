@@ -51,7 +51,7 @@ public class SquashedAlleleAccumulatorTest extends AlleleAccumulatorTest {
   public File accumulate(TestDirectory dir, File template, File samples, File initial) {
     final String[] commonArgs = {
       "-t", template.getPath(), "--ref-overlap", "--squash-ploidy",
-      "--XXcom.rtg.vcf.eval.custom-path-processor=hap-alleles",
+      "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
       "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample",
       "--XXcom.rtg.vcf.eval.explicit-half-call=false",
       "--XXcom.rtg.vcf.eval.maximize=calls-min-base"
