@@ -82,7 +82,7 @@ public class TsvWriterWrapper implements WriterWrapper {
     }
     final String readType;
     switch (reader.maxLength()) {
-      case CgUtils.CG2_RAW_LENGTH:
+      case CgUtils.CG2_RAW_READ_LENGTH:
       case CgUtils.CG2_PADDED_LENGTH:
         readType = "V2";
         break;
@@ -129,10 +129,10 @@ public class TsvWriterWrapper implements WriterWrapper {
 
   private void writeSeq(SequencesReader reader, long seqId, byte[] buffer) throws IOException {
     final int length = reader.read(seqId, buffer);
-    if (length == CgUtils.CG2_RAW_LENGTH) {
+    if (length == CgUtils.CG2_RAW_READ_LENGTH) {
       mOutput.write(DnaUtils.bytesToSequenceIncCG(buffer, 0, CgUtils.CG2_PAD_POSITION));
       mOutput.write('N');
-      mOutput.write(DnaUtils.bytesToSequenceIncCG(buffer, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION));
+      mOutput.write(DnaUtils.bytesToSequenceIncCG(buffer, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_READ_LENGTH - CgUtils.CG2_PAD_POSITION));
     } else {
       mOutput.write(DnaUtils.bytesToSequenceIncCG(buffer, 0, length));
     }
@@ -140,10 +140,10 @@ public class TsvWriterWrapper implements WriterWrapper {
 
   private void writeQuality(SequencesReader reader, long seqId, byte[] buffer) throws IOException {
     final int length = reader.readQuality(seqId, buffer);
-    if (length == CgUtils.CG2_RAW_LENGTH) {
+    if (length == CgUtils.CG2_RAW_READ_LENGTH) {
       mOutput.write(FastaUtils.rawToAsciiString(buffer, 0, CgUtils.CG2_PAD_POSITION));
       mOutput.write('!');
-      mOutput.write(FastaUtils.rawToAsciiString(buffer, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_LENGTH - CgUtils.CG2_PAD_POSITION));
+      mOutput.write(FastaUtils.rawToAsciiString(buffer, CgUtils.CG2_PAD_POSITION, CgUtils.CG2_RAW_READ_LENGTH - CgUtils.CG2_PAD_POSITION));
     } else {
       mOutput.write(FastaUtils.rawToAsciiString(buffer, 0, length));
     }

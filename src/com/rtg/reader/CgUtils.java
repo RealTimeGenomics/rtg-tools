@@ -42,10 +42,10 @@ public final class CgUtils {
   public static final int CG_OVERLAP_POSITION = 5;
 
   /** Raw length of Complete Genomics v2 reads */
-  public static final int CG2_RAW_LENGTH = 29;
+  public static final int CG2_RAW_READ_LENGTH = 29;
 
   /** Length of Complete Genomics v2 reads, when it contains the single padding N */
-  public static final int CG2_PADDED_LENGTH = CG2_RAW_LENGTH + 1;
+  public static final int CG2_PADDED_LENGTH = CG2_RAW_READ_LENGTH + 1;
 
   /** The position of the overlap in a CG v2 read (both arms). */
   public static final int CG2_OVERLAP_POSITION = 10;
@@ -53,6 +53,25 @@ public final class CgUtils {
   /** The position of the padding N base in padded v2 reads */
   public static final int CG2_PAD_POSITION = 19;
   private static final int CG2_PAD_POSITION_REV = 10;
+
+  /** Most likely overlap. */
+  private static final int CG_EXPECTED_OVERLAP = 2;
+  /** Most likely length of the small gap. */
+  private static final int CG_EXPECTED_SMALL_GAP = 0;
+  /** Most likely length of the large gap. */
+  private static final int CG_EXPECTED_LARGE_GAP = 6;
+
+  /** Most likely overlap, v2. */
+  private static final int CG2_EXPECTED_OVERLAP = 3;
+
+  /** Most likely length of sum of gaps and overlap. */
+  public static final int CG_EXPECTED_LENGTH_OFFSET = CG_EXPECTED_SMALL_GAP + CG_EXPECTED_LARGE_GAP - CG_EXPECTED_OVERLAP;
+  /** Most likely template length spanned by whole CG read. */
+  public static final int CG_EXPECTED_LENGTH = CG_RAW_READ_LENGTH + CG_EXPECTED_LENGTH_OFFSET;
+  /** Most likely length of sum of gaps and overlap. */
+  public static final int CG2_EXPECTED_LENGTH_OFFSET = -CG2_EXPECTED_OVERLAP;
+  /** Most likely template length spanned by whole CG v2 read. */
+  public static final int CG2_EXPECTED_LENGTH = CG2_RAW_READ_LENGTH + CG2_EXPECTED_LENGTH_OFFSET;
 
 
   private CgUtils() {
@@ -85,6 +104,6 @@ public final class CgUtils {
    */
   public static void unPad(byte[] src, int start, byte[] dest) {
     System.arraycopy(src, start, dest, 0, CG2_PAD_POSITION);
-    System.arraycopy(src, start + CG2_PAD_POSITION + 1, dest, CG2_PAD_POSITION, CG2_RAW_LENGTH - CG2_PAD_POSITION);
+    System.arraycopy(src, start + CG2_PAD_POSITION + 1, dest, CG2_PAD_POSITION, CG2_RAW_READ_LENGTH - CG2_PAD_POSITION);
   }
 }
