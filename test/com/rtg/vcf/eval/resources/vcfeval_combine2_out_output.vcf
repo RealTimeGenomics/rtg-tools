@@ -1,0 +1,13 @@
+##fileformat=VCFv4.1
+##contig=<ID=1,length=100>
+##INFO=<ID=SYNC,Number=.,Type=Integer,Description="Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.">
+##INFO=<ID=BASE,Number=1,Type=String,Description="Baseline genotype status">
+##INFO=<ID=CALL,Number=1,Type=String,Description="Call genotype status">
+##INFO=<ID=CALL_WEIGHT,Number=1,Type=Float,Description="Call weight (equivalent number of baseline variants). When unspecified, assume 1.0">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	BASELINE	CALLS
+1	68	.	A	AT	.	.	SYNC=69;BASE=TP;CALL=IGN	GT	1|1	.
+1	69	.	T	TA	.	.	SYNC=69;BASE=TP;CALL=IGN	GT	1|1	.
+1	70	.	A	T,TT	.	.	SYNC=69;BASE=FN;CALL_WEIGHT=1.50;CALL=TP	GT	2|2	1|1
+1	83	.	AAT	A	.	.	SYNC=69;BASE=TP;CALL=IGN	GT	1|1	.
+1	85	.	T	A	.	.	BASE=IGN;SYNC=69;CALL_WEIGHT=1.50;CALL=TP	GT	.	1|1

@@ -55,14 +55,14 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
   public void endToEnd(String id) throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcfeval-accumulate")) {
       final File template = new File(dir, "template");
-      ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_template.fa"), template, new SdfId(0));
+      ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_in_template.fa"), template, new SdfId(0));
 
       final File empty = new File(dir, "empty.vcf.gz");
-      FileHelper.stringToGzFile(mNano.loadReference(id + "_empty.vcf"), empty);
+      FileHelper.stringToGzFile(mNano.loadReference(id + "_in_empty.vcf"), empty);
       new TabixIndexer(empty).saveVcfIndex();
 
       final File samples = new File(dir, "samples.vcf.gz");
-      FileHelper.stringToGzFile(mNano.loadReference(id + "_samples.vcf"), samples);
+      FileHelper.stringToGzFile(mNano.loadReference(id + "_in_samples.vcf"), samples);
       new TabixIndexer(samples).saveVcfIndex();
 
       // Accumulate 4 samples into population alleles

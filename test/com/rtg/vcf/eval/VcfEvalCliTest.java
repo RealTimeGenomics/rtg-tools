@@ -32,30 +32,18 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import com.rtg.launcher.AbstractCli;
-import com.rtg.launcher.AbstractCliTest;
 import com.rtg.reader.ReaderTestUtils;
-import com.rtg.reader.SdfId;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.StringUtils;
-import com.rtg.util.TestUtils;
-import com.rtg.util.Utils;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.header.VcfHeader;
 
-/**
- */
-public class VcfEvalCliTest extends AbstractCliTest {
-
-  @Override
-  protected AbstractCli getCli() {
-    return new VcfEvalCli();
-  }
+public class VcfEvalCliTest extends AbstractVcfEvalTest {
 
   public void testInitParams() {
     checkHelp("vcfeval [OPTION]... -b FILE -c FILE -o DIR -t SDF"
@@ -125,71 +113,49 @@ public class VcfEvalCliTest extends AbstractCliTest {
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
-    check("vcfeval_small", false, false, true, false, "--sample", "sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoTricky() throws IOException, UnindexableDataException {
     // Tricky cases where the notion of equivalence depends on the treatment of reference bases in the calls
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory)
     // Variant on 21 requires ref base removal AND variant overlap consideration to be independent for each haplotype
-    check("vcfeval_small_tricky", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap");
+    check("vcfeval_small_tricky", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap");
   }
 
   public void testNanoTricky2() throws IOException, UnindexableDataException {
     // Default of maximizing the sum of baseline and calls variants leaves one out. New path preference includes them all.
-    check("vcfeval_small_tricky2", true, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap",
+    check("vcfeval_small_tricky2", true, false, true, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap",
       "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample"
     );
   }
 
   public void testNanoTricky3() throws IOException, UnindexableDataException {
     // Has two alternative variants starting at exactly the same position, needs overlap handling, now works.
-    check("vcfeval_small_tricky3", false, false, true, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1", "--squash-ploidy", "--ref-overlap");
+    check("vcfeval_small_tricky3", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1", "--squash-ploidy", "--ref-overlap");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {
-    check("vcfeval_small_region", false, false, false, false, "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
+    check("vcfeval_small_region", false, false, false, "--sample", "sample1,sample1", "--vcf-score-field", "QUAL", "--region", "chr2:150-1000");
   }
 
   public void testNanoSmallDiffSamples() throws IOException, UnindexableDataException {
-    check("vcfeval_small_samples", false, false, false, false, "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small_samples", false, false, false, "--sample", "sample2,sample1", "--vcf-score-field", "QUAL");
   }
 
   public void testNanoTooComplex() throws IOException, UnindexableDataException {
-    check("vcfeval_too_complex", true, false, false, false);
+    check("vcfeval_too_complex", false, false, true);
   }
 
-  private void check(String id, boolean expectWarn, boolean checkSlope, boolean checkTp, boolean checkFp, String... args) throws IOException, UnindexableDataException {
-    try (TestDirectory dir = new TestDirectory("vcfevalcli")) {
-      final File template = new File(dir, "template");
-      final File baseline = new File(dir, "baseline.vcf.gz");
-      final File calls = new File(dir, "calls.vcf.gz");
-      final File output = new File(dir, "output");
-      ReaderTestUtils.getReaderDNA(mNano.loadReference(id + "_template.fa"), template, new SdfId(0));
-      FileHelper.stringToGzFile(mNano.loadReference(id + "_baseline.vcf"), baseline);
-      FileHelper.stringToGzFile(mNano.loadReference(id + "_calls.vcf"), calls);
-      new TabixIndexer(baseline).saveVcfIndex();
-      new TabixIndexer(calls).saveVcfIndex();
-      String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
-      if (checkSlope) {
-        fullArgs = Utils.append(fullArgs, "--Xslope-files");
-      }
-      if (expectWarn) {
-        final String stderr = checkMainInitWarn(fullArgs);
-        mNano.check(id + "_err.txt", stderr);
-      } else {
-        checkMainInitOk(fullArgs);
-      }
-      mNano.check(id + "_weighted_roc.txt", FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
-      if (checkSlope) {
-        mNano.check(id + "_weighted_slope.txt", FileUtils.fileToString(new File(output, "weighted_slope.tsv")));
-      }
-      if (checkTp) {
-        mNano.check(id + "_tp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "tp.vcf"))));
-      }
-      if (checkFp) {
-        mNano.check(id + "_fp.vcf", TestUtils.stripVcfHeader(FileUtils.fileToString(new File(output, "fp.vcf"))));
-      }
+  private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+    final ArrayList<String> files = new ArrayList<>();
+    files.add("weighted_roc.tsv");
+    if (checkTp) {
+      files.add("tp.vcf");
     }
+    if (checkFp) {
+      files.add("fp.vcf");
+    }
+    endToEnd(id, files.toArray(new String[files.size()]), expectWarn, args);
   }
 }

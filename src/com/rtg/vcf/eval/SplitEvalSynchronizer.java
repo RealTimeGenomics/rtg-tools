@@ -33,39 +33,29 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 
-import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
 
 /**
  * Creates typical vcfeval output files with separate VCF files and ROC files.
  */
-class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
+class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   private static final String FN_FILE_NAME = "fn.vcf";
   private static final String FP_FILE_NAME = "fp.vcf";
   private static final String TP_FILE_NAME = "tp.vcf";
   private static final String TPBASE_FILE_NAME = "tp-baseline.vcf";
+  private static final String FN_CA_FILE_NAME = "fn-ca.vcf";
+  private static final String FP_CA_FILE_NAME = "fp-ca.vcf";
 
   private final VcfWriter mTpCalls;
   private final VcfWriter mTpBase;
   private final VcfWriter mFp;
   private final VcfWriter mFn;
-  private final RocContainer mRoc;
-  private final int mCallSampleNo;
-  private final boolean mZip;
-  private final boolean mSlope;
-  private final File mOutDir;
-  private int mBaselineTruePositives = 0;
-  int mCallTruePositives = 0;
-  int mFalseNegatives = 0;
-  int mFalsePositives = 0;
-  private int mUnphasable = 0;
-  private int mMisPhasings = 0;
-  private int mCorrectPhasings = 0;
+  private final VcfWriter mFpCa;
+  private final VcfWriter mFnCa;
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -78,34 +68,25 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
+   * @param twoPass true to output additional ROC curves for allele-matches
    * @throws IOException if there is a problem opening output files
    */
   SplitEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                         String callsSampleName, RocSortValueExtractor extractor,
-                        File outdir, boolean zip, boolean slope, boolean rtgStats) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
-    final RocContainer roc = new RocContainer(extractor);
-    roc.addStandardFilters();
-    if (rtgStats) {
-      roc.addExtraFilters();
-    }
-    mRoc = roc;
-    mZip = zip;
-    mSlope = slope;
-    mOutDir = outdir;
+                        File outdir, boolean zip, boolean slope, boolean rtgStats, boolean twoPass) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats, twoPass);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mTpCalls = new VcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), null, zip, true);
     mTpBase = new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true);
     mFp = new VcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), null, zip, true);
     mFn = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), null, zip, true);
-    mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
-  }
-
-  @Override
-  protected void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
-    mMisPhasings += misPhasings;
-    mUnphasable += unphasable;
-    mCorrectPhasings += correctPhasings;
+    if (twoPass) {
+      mFpCa = new VcfWriter(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt), null, zip, true);
+      mFnCa = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt), null, zip, true);
+    } else {
+      mFpCa = null;
+      mFnCa = null;
+    }
   }
 
   @Override
@@ -150,7 +131,11 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
         mTpCalls.write(mCrv);
         addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
         break;
-      case VariantId.STATUS_ALLELE_MATCH: // Old-school format doesn't distinguish
+      case VariantId.STATUS_ALLELE_MATCH:
+        mFalsePositivesCommonAllele++;
+        (mFpCa != null ? mFpCa : mFp).write(mCrv);
+        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
+        break;
       case VariantId.STATUS_NO_MATCH:
         mFalsePositives++;
         mFp.write(mCrv);
@@ -159,10 +144,6 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
       default:
         throw new RuntimeException("Unhandled variant status: " + mCv.getStatus());
     }
-  }
-
-  private void addToROCContainer(double weight, byte status) {
-    mRoc.addRocLine(mCrv, mCallSampleNo, weight);
   }
 
   @Override
@@ -175,6 +156,9 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
         mTpBase.write(mBrv);
         break;
       case VariantId.STATUS_ALLELE_MATCH:
+        mFalseNegativesCommonAllele++;
+        (mFnCa != null ? mFnCa : mFn).write(mBrv);
+        break;
       case VariantId.STATUS_NO_MATCH:
         mFalseNegatives++;
         mFn.write(mBrv);
@@ -190,42 +174,15 @@ class SplitEvalSynchronizer extends InterleavingEvalSynchronizer {
     handleKnownCall();
   }
 
-  int getUnphasable() {
-    return mUnphasable;
-  }
-
-  int getMisPhasings() {
-    return mMisPhasings;
-  }
-
-  int getCorrectPhasings() {
-    return mCorrectPhasings;
-  }
-
-
-  @Override
-  void finish() throws IOException {
-    super.finish();
-    mRoc.missingScoreWarning();
-    writePhasingInfo();
-    mRoc.writeRocs(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives, mZip, mSlope);
-    mRoc.writeSummary(mOutDir, mBaselineTruePositives, mFalsePositives, mFalseNegatives);
-  }
-
-  private void writePhasingInfo() throws IOException {
-    final File phasingFile = new File(mOutDir, "phasing.txt");
-    FileUtils.stringToFile("Correct phasings: " + getCorrectPhasings() + StringUtils.LS
-      + "Incorrect phasings: " + getMisPhasings() + StringUtils.LS
-      + "Unresolvable phasings: " + getUnphasable() + StringUtils.LS, phasingFile);
-  }
-
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
     try (VcfWriter ignored = mTpBase;
          VcfWriter ignored2 = mTpCalls;
          VcfWriter ignored3 = mFn;
-         VcfWriter ignored4 = mFp) {
+         VcfWriter ignored4 = mFp;
+         VcfWriter ignored5 = mFnCa;
+         VcfWriter ignored6 = mFpCa) {
       // done for nice closing side effects
     }
   }

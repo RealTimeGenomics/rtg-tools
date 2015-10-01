@@ -162,10 +162,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
         break;
       case MODE_SPLIT:
-        if (params.twoPass()) {
-          Diagnostic.warning("Split output mode does not support two-pass specific output");
-        }
-        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats());
+        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);

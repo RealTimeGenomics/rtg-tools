@@ -75,7 +75,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
-   * @param dualRocs true to output additional ROC curves for allele-matches
+   * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @throws IOException if there is a problem opening output files
    */
   CombinedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,

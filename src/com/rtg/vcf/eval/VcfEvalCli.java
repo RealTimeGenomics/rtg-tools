@@ -77,6 +77,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
+  private static final String TWO_PASS = "Xtwo-pass";
 
   @Override
   public String moduleName() {
@@ -125,6 +126,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional('f', SORT_FIELD, String.class, "STRING", "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO=<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, "STRING", "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     flags.registerOptional(MAX_LENGTH, Integer.class, "INT", "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
+    flags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid pass followed by squash-ploidy pass on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
     flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
 
@@ -184,7 +186,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       if (!CommonFlags.validateRegions(flags)) {
         return false;
       }
-
+      if (!flags.checkNand(SQUASH_PLOIDY, TWO_PASS)) {
+        return false;
+      }
       if (flags.isSet(SAMPLE)) {
         final String sample = (String) flags.getValue(SAMPLE);
         if (sample.length() == 0) {
@@ -259,8 +263,12 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
     final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);
     builder.outputMode(mode);
-    if (!mFlags.isSet(SQUASH_PLOIDY) && (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE))) {
-      builder.twoPass(true);
+    if (mFlags.isSet(SQUASH_PLOIDY)) {
+      builder.twoPass(false); // Makes no sense
+    } else if (mFlags.isSet(TWO_PASS)) {
+      builder.twoPass((Boolean) mFlags.getValue(TWO_PASS)); // Explicit override
+    } else if (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE)) {
+      builder.twoPass(true); // Default the number of passes depending on output mode
     }
     return builder.create();
   }

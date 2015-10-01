@@ -34,11 +34,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import com.rtg.util.StringUtils;
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
@@ -46,7 +44,8 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Support output files with INFO field annotations containing variant status.
  */
-abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
+@TestClass("com.rtg.vcf.eval.CombineEvalSynchronizerTest")
+abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   static final String INFO_BASE = "BASE";
   static final String INFO_CALL = "CALL";
@@ -60,22 +59,6 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
   static final String STATUS_FN_CA = "FN_CA";
   static final String STATUS_FP_CA = "FP_CA";
 
-  private final RocContainer mDefaultRoc;
-  private final RocContainer mAlleleRoc;
-  private final boolean mZip;
-  private final boolean mSlope;
-  private final File mOutDir;
-  private int mBaselineTruePositives = 0;
-  protected final int mCallSampleNo;
-  private int mCallTruePositives = 0;
-  private int mFalseNegatives = 0;
-  private int mFalsePositives = 0;
-  private int mFalseNegativesCommonAllele = 0;
-  private int mFalsePositivesCommonAllele = 0;
-  private int mUnphasable = 0;
-  private int mMisPhasings = 0;
-  private int mCorrectPhasings = 0;
-
   /**
    * @param baseLineFile tabix indexed base line VCF file
    * @param callsFile tabix indexed calls VCF file
@@ -87,31 +70,13 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
-   * @param dualRocs true to output additional ROC curves for allele-matches
+   * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @throws IOException if there is a problem opening output files
    */
   WithInfoEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean rtgStats, boolean dualRocs) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
-    mDefaultRoc = new RocContainer(extractor);
-    mDefaultRoc.addStandardFilters();
-    if (rtgStats) {
-      mDefaultRoc.addExtraFilters();
-    }
-    if (dualRocs) {
-      mAlleleRoc = new RocContainer(extractor, "allele_");
-      mAlleleRoc.addStandardFilters();
-      if (rtgStats) {
-        mAlleleRoc.addExtraFilters();
-      }
-    } else {
-      mAlleleRoc = null;
-    }
-    mZip = zip;
-    mSlope = slope;
-    mOutDir = outdir;
-    mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats, dualRocs);
   }
 
   static void addInfoHeaders(VcfHeader header, VariantSetType type) {
@@ -216,61 +181,6 @@ abstract class WithInfoEvalSynchronizer extends InterleavingEvalSynchronizer {
     }
     newInfo.put(INFO_BASE, status);
     return newInfo;
-  }
-
-  @Override
-  protected void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
-    mMisPhasings += misPhasings;
-    mUnphasable += unphasable;
-    mCorrectPhasings += correctPhasings;
-  }
-
-  protected void addToROCContainer(double weight, byte status) {
-    if (status == VariantId.STATUS_ALLELE_MATCH) { // Consider these FP for GT ROCs
-      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0);
-    } else {
-      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, weight);
-    }
-    if (mAlleleRoc != null) {
-      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, weight);
-    }
-  }
-
-  int getUnphasable() {
-    return mUnphasable;
-  }
-
-  int getMisPhasings() {
-    return mMisPhasings;
-  }
-
-  int getCorrectPhasings() {
-    return mCorrectPhasings;
-  }
-
-
-  @Override
-  void finish() throws IOException {
-    super.finish();
-    mDefaultRoc.missingScoreWarning();
-    writePhasingInfo();
-    if (mAlleleRoc != null) {
-      final int alleleTp = mBaselineTruePositives + mFalseNegativesCommonAllele;
-      mAlleleRoc.writeRocs(mOutDir, alleleTp, mFalsePositives, mFalseNegatives, mZip, mSlope);
-      // Do we want the allele-level summary too?
-      //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
-    }
-    final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
-    final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
-    mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
-    mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFp, strictFn);
-  }
-
-  private void writePhasingInfo() throws IOException {
-    final File phasingFile = new File(mOutDir, "phasing.txt");
-    FileUtils.stringToFile("Correct phasings: " + getCorrectPhasings() + StringUtils.LS
-      + "Incorrect phasings: " + getMisPhasings() + StringUtils.LS
-      + "Unresolvable phasings: " + getUnphasable() + StringUtils.LS, phasingFile);
   }
 
   protected void setNewInfoFields(VcfRecord rec, Map<String, String> newInfo) {

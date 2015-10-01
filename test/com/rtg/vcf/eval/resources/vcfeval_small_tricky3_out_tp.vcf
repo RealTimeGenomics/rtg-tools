@@ -1,3 +1,8 @@
+##fileformat=VCFv4.1
+##contig=<ID=18,length=31>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##SAMPLE=<ID=sample1,Sex=FEMALE>
+##SAMPLE=<ID=dummy,Sex=FEMALE>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	dummy
 18	3	.	AC	TG	37499	PASS	.	GT	1|1	.
 18	7	.	T	G	37499	PASS	.	GT	1|1	.

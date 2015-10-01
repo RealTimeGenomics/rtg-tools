@@ -34,17 +34,13 @@ import java.io.IOException;
 
 import com.rtg.tabix.UnindexableDataException;
 
-public class CombinedEvalSynchronizerTest extends AbstractVcfEvalTest {
+public class AnnotatingEvalSynchronizerTest extends AbstractVcfEvalTest {
 
-  public void testCombined() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_combine", false, "--ref-overlap", "--output-mode", "combine");
-  }
-
-  public void testCombined2() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_combine2", false, "--sample", "sample1,sample2", "--ref-overlap", "--output-mode", "combine", "--squash-ploidy");
+  public void testAnnotate() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_annotate", false, "--ref-overlap", "--output-mode", "annotate");
   }
 
   public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
-    endToEnd(id, new String[] {"output.vcf"}, expectWarn, args);
+    endToEnd(id, new String[] {"baseline.vcf", "calls.vcf"}, expectWarn, args);
   }
 }

@@ -41,7 +41,7 @@ import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
- * Creates typical vcfeval output files with separate VCF files and ROC files.
+ * Outputs <code>baseline.vcf</code> and <code>calls.vcf</code>, each as original VCF records with additional status annotations.
  */
 class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
 
@@ -59,7 +59,7 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
    * @param rtgStats true to output additional ROC curves for RTG specific attributes
-   * @param dualRocs true to output additional ROC curves for allele-matches
+   * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @throws IOException if there is a problem opening output files
    */
   AnnotatingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
