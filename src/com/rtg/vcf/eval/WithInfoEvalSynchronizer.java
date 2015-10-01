@@ -44,7 +44,7 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Support output files with INFO field annotations containing variant status.
  */
-@TestClass("com.rtg.vcf.eval.CombineEvalSynchronizerTest")
+@TestClass("com.rtg.vcf.eval.CombinedEvalSynchronizerTest")
 abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   static final String INFO_BASE = "BASE";
