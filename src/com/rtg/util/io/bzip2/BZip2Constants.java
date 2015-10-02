@@ -38,7 +38,7 @@
 
 package com.rtg.util.io.bzip2;
 
-import com.reeltwo.jumble.annotations.TestClass;
+import com.reeltwo.jumble.annotations.JumbleIgnore;
 
 /**
  * Base class for both the compress and decompress classes.
@@ -49,7 +49,7 @@ import com.reeltwo.jumble.annotations.TestClass;
  * </p>
  *
  */
-@TestClass("com.rtg.util.io.bzip2.CBZip2InputStreamTest")
+@JumbleIgnore
 public final class BZip2Constants {
     private BZip2Constants() {
     }

@@ -91,9 +91,6 @@ public final class PathFinder {
     Diagnostic.developerLog("Path finder maximisation: " + mode);
     final PathPreference maximiseMode;
     switch (mode) {
-      case "calls":
-        maximiseMode = new MaxCallsMaxBaseline();
-        break;
       case "calls-min-base":
         maximiseMode = new MaxCallsMinBaseline();
         break;
@@ -358,32 +355,7 @@ public final class PathFinder {
     }
   }
 
-  static final class MaxCallsMaxBaseline implements PathPreference {
-    @Override
-    public Path better(Path first, Path second) {
-      // Prefer paths that maximise the number of called variants included
-      // Better for integrating a sample into population alleles
-      BasicLinkedListNode<OrientedVariant> firstIncluded = first == null ? null : first.mCalledPath.getIncluded();
-      BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
-      int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-      int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-      if (firstSize == secondSize) {
-        firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
-        secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
-        firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-        secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-
-        if (firstSize == secondSize) {
-          // At this point try to break ties arbitrarily based on allele ordering
-          if (firstIncluded != null && secondIncluded != null) {
-            return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
-          }
-        }
-      }
-      return firstSize > secondSize ? first : second;
-    }
-  }
-
+  @TestClass("com.rtg.vcf.eval.AlleleAccumulatorTest")
   static final class MaxCallsMinBaseline implements PathPreference {
     @Override
     public Path better(Path first, Path second) {
