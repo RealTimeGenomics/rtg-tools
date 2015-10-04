@@ -104,6 +104,9 @@ public final class GlobalFlags {
   /** If true, the population command will fall back to using forward backward when disagreeing calls are encountered (currently slow for large pops) */
   public static final String FAMILY_CALLER_FALLBACK_FLAG = "com.rtg.variant.bayes.multisample.FamilyCaller.fb-fallback";
 
+  /** If true, all-paths should attempt to use unrolled CG read, otherwise use the flattened representation */
+  public static final String COMPLEX_CALLER_UNROLL_CG_FLAG = "com.rtg.variant.bayes.EvidenceComplex.unroll-cg";
+
   /** The maximum number of hypotheses that can comfortably be handled by the complex caller */
   public static final String COMPLEX_CALLER_MAX_HYPOTH_FLAG = "com.rtg.variant.bayes.multisample.ComplexCaller.max-hypoth";
 
@@ -203,6 +206,7 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_LIMIT, Integer.class, 3);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
     registerFlag(COMPLEX_EVIDENCE_DETAILS);
+    registerFlag(COMPLEX_CALLER_UNROLL_CG_FLAG, Boolean.class, true);
 
     // Misc calling
     registerFlag(CALLER_N_MIN_DEPTH, Integer.class, 5);

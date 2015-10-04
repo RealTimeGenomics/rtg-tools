@@ -85,6 +85,8 @@ public final class ReadGroupUtils {
   public static MachineType platformToMachineType(SAMReadGroupRecord srgr, boolean paired) {
     if (MachineType.COMPLETE_GENOMICS.compatiblePlatform(srgr.getPlatform())) {
       return MachineType.COMPLETE_GENOMICS;
+    } else if (MachineType.COMPLETE_GENOMICS_2.compatiblePlatform(srgr.getPlatform())) {
+      return MachineType.COMPLETE_GENOMICS_2;
     } else if (MachineType.FOURFIVEFOUR_PE.compatiblePlatform(srgr.getPlatform()) || MachineType.FOURFIVEFOUR_SE.compatiblePlatform(srgr.getPlatform())) {
       if (paired) {
         return MachineType.FOURFIVEFOUR_PE;

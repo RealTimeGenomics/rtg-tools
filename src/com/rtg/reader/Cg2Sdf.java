@@ -189,6 +189,16 @@ public final class Cg2Sdf extends LoggedCli {
           minInputLength = s.getMinLength();
         }
       }
+      if (minInputLength != maxInputLength) {
+        Diagnostic.warning("Complete Genomics reads should be fixed length, but variable length reads were encountered");
+      } else if (samReadGroupRecord != null && samReadGroupRecord.getPlatform() != null) {
+        final String pl = samReadGroupRecord.getPlatform();
+        if (minInputLength == CgUtils.CG_RAW_READ_LENGTH && !MachineType.COMPLETE_GENOMICS.compatiblePlatform(pl)) {
+          Diagnostic.warning("For Complete Genomics v1 read structure the SAM read group platform should be set to: " + MachineType.COMPLETE_GENOMICS.platform() + ", not " + pl);
+        } else if (minInputLength == CgUtils.CG2_RAW_READ_LENGTH && !MachineType.COMPLETE_GENOMICS_2.compatiblePlatform(pl)) {
+          Diagnostic.warning("For Complete Genomics v2 read structure the SAM read group platform should be set to: " + MachineType.COMPLETE_GENOMICS_2.platform() + ", not " + pl);
+        }
+      }
 
       if (summaries != null) {
         final StringBuilder fileList = new StringBuilder();
@@ -254,12 +264,11 @@ public final class Cg2Sdf extends LoggedCli {
         if (mFlags.isSet(SamCommandHelper.SAM_RG)) {
           samReadGroupRecord = SamCommandHelper.validateAndCreateSamRG((String) mFlags.getValue(SamCommandHelper.SAM_RG), SamCommandHelper.ReadGroupStrictness.REQUIRED);
           final String platform = samReadGroupRecord.getPlatform();
-          if (!MachineType.COMPLETE_GENOMICS.compatiblePlatform(platform)) {
+          final MachineType mt = MachineType.COMPLETE_GENOMICS_2; // Default to new read structure
+          if (!mt.compatiblePlatform(platform)) {
             if (platform == null || platform.length() == 0) {
-              Diagnostic.warning("Read group platform not set, defaulting to \"" + MachineType.COMPLETE_GENOMICS.platform() + "\"");
-              samReadGroupRecord.setPlatform(MachineType.COMPLETE_GENOMICS.platform());
-            } else {
-              Diagnostic.warning("Read group platform is \"" + platform + "\", should be set to \"" + MachineType.COMPLETE_GENOMICS.platform() + "\"");
+              Diagnostic.warning("Read group platform not set, defaulting to \"" + mt.platform() + "\"");
+              samReadGroupRecord.setPlatform(mt.platform());
             }
           }
         } else {

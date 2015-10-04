@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class MachineTypeTest extends TestCase {
 
   public void test() {
-    TestUtils.testPseudoEnum(MachineType.class, "[illumina_se, illumina_pe, complete_genomics, 454_pe, 454_se, iontorrent]");
+    TestUtils.testPseudoEnum(MachineType.class, "[illumina_se, illumina_pe, complete_genomics, complete_genomics_2, 454_pe, 454_se, iontorrent]");
   }
 
   public void testCompatible() {
@@ -50,7 +50,7 @@ public class MachineTypeTest extends TestCase {
     assertTrue(MachineType.ILLUMINA_PE.compatiblePlatform("Illumina"));
 
     assertTrue(MachineType.COMPLETE_GENOMICS.compatiblePlatform("Complete"));
-    assertTrue(MachineType.COMPLETE_GENOMICS.compatiblePlatform("Completegenomics"));
+    assertTrue(MachineType.COMPLETE_GENOMICS_2.compatiblePlatform("Completegenomics"));
 
     assertTrue(MachineType.FOURFIVEFOUR_PE.compatiblePlatform("lS454"));
     assertTrue(MachineType.FOURFIVEFOUR_SE.compatiblePlatform("Ls454"));

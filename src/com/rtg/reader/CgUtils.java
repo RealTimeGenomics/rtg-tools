@@ -55,14 +55,14 @@ public final class CgUtils {
   private static final int CG2_PAD_POSITION_REV = 10;
 
   /** Most likely overlap. */
-  private static final int CG_EXPECTED_OVERLAP = 2;
+  public static final int CG_EXPECTED_OVERLAP = 2;
   /** Most likely length of the small gap. */
-  private static final int CG_EXPECTED_SMALL_GAP = 0;
+  public static final int CG_EXPECTED_SMALL_GAP = 0;
   /** Most likely length of the large gap. */
-  private static final int CG_EXPECTED_LARGE_GAP = 6;
+  public static final int CG_EXPECTED_LARGE_GAP = 6;
 
   /** Most likely overlap, v2. */
-  private static final int CG2_EXPECTED_OVERLAP = 3;
+  public static final int CG2_EXPECTED_OVERLAP = 3;
 
   /** Most likely length of sum of gaps and overlap. */
   public static final int CG_EXPECTED_LENGTH_OFFSET = CG_EXPECTED_SMALL_GAP + CG_EXPECTED_LARGE_GAP - CG_EXPECTED_OVERLAP;
@@ -84,7 +84,7 @@ public final class CgUtils {
    * @return the data with any padding removed. If the data is not v2, returns the original array.
    */
   public static byte[] unPad(byte[] seq, boolean forward) {
-    if (seq.length == CG2_PADDED_LENGTH) {
+    if (seq != null && seq.length == CG2_PADDED_LENGTH) {
       final int pos = forward ? CG2_PAD_POSITION : CG2_PAD_POSITION_REV;
       assert seq[pos] == 0 || seq[pos] == 'N' || seq[pos] == FastaUtils.asciiToRawQuality('!');
       final byte[] result = new byte[seq.length - 1];

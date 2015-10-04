@@ -55,7 +55,10 @@ public final class MachineType implements PseudoEnum {
   public static final MachineType ILLUMINA_PE = new MachineType(++sSequenceNumber, "illumina_pe", "illumina", MachineOrientation.FR, PLAT_ILLUMINA);
 
   /** Complete Genomics V1 (paired end). */
-  public static final MachineType COMPLETE_GENOMICS = new MachineType(++sSequenceNumber, "complete_genomics", "complete", MachineOrientation.TANDEM, "COMPLETE", "COMPLETEGENOMICS");
+  public static final MachineType COMPLETE_GENOMICS = new MachineType(++sSequenceNumber, "complete_genomics", "complete", MachineOrientation.TANDEM, "COMPLETE");
+
+  /** Complete Genomics V2 (paired end). */
+  public static final MachineType COMPLETE_GENOMICS_2 = new MachineType(++sSequenceNumber, "complete_genomics_2", "complete_2", MachineOrientation.TANDEM, "COMPLETEGENOMICS", "\"Complete Genomics\"");
 
   /** Four Five Four paired end. */
   public static final MachineType FOURFIVEFOUR_PE = new MachineType(++sSequenceNumber, "454_pe", "ls454_pe", null, PLAT_454);
@@ -66,7 +69,7 @@ public final class MachineType implements PseudoEnum {
   /** Ion Torrent (single end). */
   public static final MachineType IONTORRENT = new MachineType(++sSequenceNumber, "iontorrent", "iontorrent", null, "IONTORRENT");
 
-  static final EnumHelper<MachineType> HELPER = new EnumHelper<>(MachineType.class, new MachineType[] {ILLUMINA_SE, ILLUMINA_PE, COMPLETE_GENOMICS, FOURFIVEFOUR_PE, FOURFIVEFOUR_SE, IONTORRENT});
+  static final EnumHelper<MachineType> HELPER = new EnumHelper<>(MachineType.class, new MachineType[] {ILLUMINA_SE, ILLUMINA_PE, COMPLETE_GENOMICS, COMPLETE_GENOMICS_2, FOURFIVEFOUR_PE, FOURFIVEFOUR_SE, IONTORRENT});
 
   /**
    * @return list of the enum names
