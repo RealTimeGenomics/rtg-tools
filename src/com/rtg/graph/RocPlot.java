@@ -92,6 +92,7 @@ import com.reeltwo.plot.ui.PlotPanel;
 import com.reeltwo.plot.ui.ZoomPlotPanel;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Resources;
+import com.rtg.util.StringUtils;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -130,6 +131,7 @@ public final class RocPlot {
   private final JCheckBox mScoreCB;
   private final JCheckBox mSelectAllCB;
   private final JButton mOpenButton;
+  private final JButton mCommandButton;
   private final JTextField mTitleEntry;
   private JSplitPane mSplitPane;
   private final JLabel mStatusLabel;
@@ -169,6 +171,9 @@ public final class RocPlot {
     mSelectAllCB = new JCheckBox("Select / Deselect all");
     mTitleEntry = new JTextField("ROC");
     mOpenButton = new JButton("+");
+    mOpenButton.setToolTipText("Add a new ROC curve from a file");
+    mCommandButton = new JButton("Cmd");
+    mCommandButton.setToolTipText("Send equivalent rocplot command-line to terminal");
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
     mIconLabel = new JLabel(icon);
     mIconLabel.setBackground(new Color(16, 159, 205));
@@ -265,14 +270,13 @@ public final class RocPlot {
     rightPanel.add(controlPanel);
 
     final JPanel checkControlPanel = new JPanel(new GridBagLayout());
-    final GridBagConstraints openButtonConstraints = new GridBagConstraints();
-    openButtonConstraints.gridx = 0; openButtonConstraints.gridy = 0;
-    openButtonConstraints.anchor = GridBagConstraints.LINE_START;
-    checkControlPanel.add(mOpenButton, openButtonConstraints);
-    final GridBagConstraints selectAllConstraints = new GridBagConstraints();
-    selectAllConstraints.gridx = 0; selectAllConstraints.gridy = 1;
-//    selectAllConstraints.gridx = 2;
-    checkControlPanel.add(mSelectAllCB, selectAllConstraints);
+    final GridBagConstraints constraints = new GridBagConstraints();
+    constraints.gridx = 0; constraints.gridy = 0;
+    constraints.anchor = GridBagConstraints.LINE_START;
+    checkControlPanel.add(mOpenButton, constraints);
+    constraints.gridy++;
+    constraints.anchor = GridBagConstraints.CENTER;
+    checkControlPanel.add(mSelectAllCB, constraints);
 
     mSelectAllCB.addItemListener(new ItemListener() {
       @Override
@@ -314,6 +318,24 @@ public final class RocPlot {
         }
       }
     });
+    mCommandButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        final StringBuilder sb = new StringBuilder("rtg rocplot ");
+        sb.append("--").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+        if (mShowScores) {
+          sb.append(" --").append(RocPlotCli.SCORES_FLAG);
+        }
+        sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
+        for (final Component component : mRocLinesPanel.getComponents()) {
+          final RocLinePanel cp = (RocLinePanel) component;
+          if (cp.isSelected()) {
+            sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
+          }
+        }
+        System.out.println("Equivalent rocplot command:\n" + sb.toString() + "\n");
+      }
+    });
     final JPanel namePanel = new JPanel(new GridBagLayout());
     final GridBagConstraints checkConstraints = new GridBagConstraints();
     checkConstraints.gridx = 0; checkConstraints.gridy = 0;
@@ -325,6 +347,12 @@ public final class RocPlot {
     scrollConstraints.fill = GridBagConstraints.BOTH;
     mRocLinesPanel.setPreferredSize(new Dimension(mScrollPane.getViewport().getViewSize().width, mRocLinesPanel.getPreferredSize().height));
     namePanel.add(mScrollPane, scrollConstraints);
+
+    final GridBagConstraints cmdConstraints = new GridBagConstraints();
+    cmdConstraints.anchor = GridBagConstraints.LINE_START;
+    cmdConstraints.gridx = 0; cmdConstraints.gridy = 2;
+    namePanel.add(mCommandButton, cmdConstraints);
+
     rightPanel.add(namePanel);
 //    System.err.println("Scroll: " + mScrollPane.getSize());
 
@@ -451,6 +479,7 @@ public final class RocPlot {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
+        mIconLabel.setText(title);
         mTitleEntry.setText(title);
       }
     });
@@ -476,6 +505,14 @@ public final class RocPlot {
    */
   public void showOpenButton(boolean flag) {
     mOpenButton.setVisible(flag);
+  }
+
+  /**
+   * Set whether to show the command dump button
+   * @param flag show command dump button
+   */
+  public void showCommandButton(boolean flag) {
+    mCommandButton.setVisible(flag);
   }
 
   /**
