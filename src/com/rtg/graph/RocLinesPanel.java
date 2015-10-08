@@ -65,7 +65,7 @@ class RocLinesPanel extends Box {
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
-        mPlotOrder.add(cp.getText());
+        mPlotOrder.add(cp.getPath());
         add(cp);
       }
     });
@@ -101,7 +101,7 @@ class RocLinesPanel extends Box {
             //System.err.println("Move up ");
             if (i > 0) {
               mPlotOrder.remove(i);
-              mPlotOrder.add(i - 1, mPanel.getText());
+              mPlotOrder.add(i - 1, mPanel.getPath());
               remove(mPanel);
               add(mPanel, i - 1);
             }
@@ -109,7 +109,7 @@ class RocLinesPanel extends Box {
             //System.err.println("Move down ");
             if (i < components.length - 1) {
               mPlotOrder.remove(i);
-              mPlotOrder.add(i + 1, mPanel.getText());
+              mPlotOrder.add(i + 1, mPanel.getPath());
               remove(mPanel);
               add(mPanel, i + 1);
             }

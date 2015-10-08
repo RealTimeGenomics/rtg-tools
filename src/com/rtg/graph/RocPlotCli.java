@@ -60,12 +60,12 @@ import com.rtg.util.diagnostic.Diagnostic;
 public class RocPlotCli extends AbstractCli {
   private static final String HTML_FLAG = "Xhtml";
   private static final String APPLET_FLAG = "Xapplet";
-  private static final String TITLE_FLAG = "title";
-  private static final String SCORES_FLAG = "scores";
   private static final String HIDE_SIDEPANE_FLAG = "hide-sidepane";
   private static final String PNG_FLAG = "png";
-  private static final String LINE_WIDTH_FLAG = "line-width";
-  private static final String CURVE_FLAG = "curve";
+  static final String TITLE_FLAG = "title";
+  static final String SCORES_FLAG = "scores";
+  static final String LINE_WIDTH_FLAG = "line-width";
+  static final String CURVE_FLAG = "curve";
 
 
   static final String PNG_EXTENSION = ".png";
