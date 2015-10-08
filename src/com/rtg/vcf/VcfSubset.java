@@ -38,12 +38,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -212,13 +214,13 @@ public class VcfSubset extends AbstractCli {
           }
 
           final Set<String> infosset = new LinkedHashSet<>();
-          for (Object anInfoslist : infoslist) {
-            infosset.add((String) anInfoslist);
+          for (final Object anInfoslist : infoslist) {
+            Collections.addAll(infosset, StringUtils.split((String) anInfoslist, ','));
           }
 
           if (checkHeader) {
             final Set<String> infoHeaderStrings = new LinkedHashSet<>();
-            for (IdField<?> infoField : getHeaderFields(header)) {
+            for (final IdField<?> infoField : getHeaderFields(header)) {
               infoHeaderStrings.add(infoField.getId());
             }
 
@@ -227,7 +229,7 @@ public class VcfSubset extends AbstractCli {
 
             if (infossetdup.size() > 0) {
               final StringBuilder sb = new StringBuilder();
-              for (String s : infossetdup) {
+              for (final String s : infossetdup) {
                 sb.append(s).append(' ');
               }
               throw new NoTalkbackSlimException(fieldname + " fields not contained in VCF meta-information: " + sb.toString().trim());
@@ -256,7 +258,7 @@ public class VcfSubset extends AbstractCli {
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
     final File vcfFile = stdout ? null : FileUtils.getZippedFileName(gzip, output);
-    try (VcfReader reader = VcfReader.openVcfReader(input)) {
+    try (final VcfReader reader = VcfReader.openVcfReader(input)) {
       final VcfHeader header = reader.getHeader();
 
       final AnnotatorAdder sampleAnnAdder = new AnnotatorAdder() {
@@ -276,7 +278,7 @@ public class VcfSubset extends AbstractCli {
         void additionalChecks(Set<String> flagValues, VcfHeader header) {
           boolean fail = false;
           final StringBuilder sb = new StringBuilder();
-          for (String value : flagValues) {
+          for (final String value : flagValues) {
             if (!header.getSampleNames().contains(value)) {
               fail = true;
               sb.append(value).append(' ');
@@ -352,7 +354,7 @@ public class VcfSubset extends AbstractCli {
         formatStripper.updateHeader(header);
       }
       header.addRunInfo();
-      try (VcfWriter writer = new VcfWriter(header, vcfFile, out, gzip, index)) {
+      try (final VcfWriter writer = new VcfWriter(header, vcfFile, out, gzip, index)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
