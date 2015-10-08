@@ -320,19 +320,7 @@ public final class RocPlot {
     mCommandButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        final StringBuilder sb = new StringBuilder("rtg rocplot ");
-        sb.append("--").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
-        if (mShowScores) {
-          sb.append(" --").append(RocPlotCli.SCORES_FLAG);
-        }
-        sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
-        for (final Component component : mRocLinesPanel.getComponents()) {
-          final RocLinePanel cp = (RocLinePanel) component;
-          if (cp.isSelected()) {
-            sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
-          }
-        }
-        System.out.println("Equivalent rocplot command:\n" + sb.toString() + "\n");
+        System.out.println("Equivalent rocplot command:\n" + getCommand() + "\n");
       }
     });
     final JPanel namePanel = new JPanel(new GridBagLayout());
@@ -353,12 +341,27 @@ public final class RocPlot {
     namePanel.add(mCommandButton, cmdConstraints);
 
     rightPanel.add(namePanel);
-//    System.err.println("Scroll: " + mScrollPane.getSize());
 
     pane.add(mProgressBar, BorderLayout.SOUTH);
 
     mIconLabel.setText(mTitleEntry.getText());
     pane.add(mIconLabel, BorderLayout.NORTH);
+  }
+
+  private String getCommand() {
+    final StringBuilder sb = new StringBuilder("rtg rocplot ");
+    sb.append("--").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+    if (mShowScores) {
+      sb.append(" --").append(RocPlotCli.SCORES_FLAG);
+    }
+    sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
+    for (final Component component : mRocLinesPanel.getComponents()) {
+      final RocLinePanel cp = (RocLinePanel) component;
+      if (cp.isSelected()) {
+        sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
+      }
+    }
+    return sb.toString();
   }
 
   // Adds the notion of painting a current crosshair position
