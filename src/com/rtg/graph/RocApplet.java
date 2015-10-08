@@ -94,6 +94,7 @@ public class RocApplet extends JApplet {
           setGlassPane(mRocPlot.getZoomPlotPanel());
           getGlassPane().setVisible(true);
           mRocPlot.showOpenButton(false);
+          mRocPlot.showCommandButton(false);
 
           final String title = getParameter(PARAM_TITLE);
           if (title != null) {

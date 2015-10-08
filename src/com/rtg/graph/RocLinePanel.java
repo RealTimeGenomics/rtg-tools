@@ -209,13 +209,16 @@ class RocLinePanel extends JPanel {
     mRocPlot.showCurrentGraph();
   }
 
-  /*public boolean isSelected() {
-    return mData.get(mPath).show();
-    //return mCheckBox.isSelected();
-  }*/
+  public boolean isSelected() {
+    return mCheckBox.isSelected();
+  }
 
-  public String getText() {
+  public String getPath() {
     return mPath;
+  }
+
+  public String getLabel() {
+    return mTextField.getText();
   }
 
   public void addActionListener(ActionListener listener) {
