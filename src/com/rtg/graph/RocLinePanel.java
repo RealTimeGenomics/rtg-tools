@@ -96,7 +96,7 @@ class RocLinePanel extends JPanel {
       @Override
       public void focusLost(FocusEvent e) {
         //mData.get(path).setTitle(mTextField.getText());
-        mTextField.setText(mDataBundle.getTitle());
+        mDataBundle.setTitle(mTextField.getText());
         mTextField.setEditable(false);
         mTextField.getCaret().setVisible(false);
         mRocPlot.showCurrentGraph();
@@ -126,12 +126,10 @@ class RocLinePanel extends JPanel {
     mTextField.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 2) {
+        if (e.getClickCount() == 1) {
           mTextField.getCaret().setVisible(true);
           mTextField.setEditable(true);
           mTextField.requestFocus();
-        } else if (e.getClickCount() == 1 && !mTextField.isEditable()) {
-          setSelected(!mCheckBox.isSelected());
         }
       }
     });
