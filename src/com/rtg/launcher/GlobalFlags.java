@@ -125,6 +125,9 @@ public final class GlobalFlags {
   /** Minimum phred base quality to consider a piece of evidence. */
   public static final String MIN_BASE_QUALITY = "com.rtg.variant.bayes.Model.min-bq";
 
+  /** Print the details of complex evidence into the developer log. */
+  public static final String COMPLEX_EVIDENCE_DETAILS = "com.rtg.variant.complex.complex-evidence-details";
+
   //Assembler
   /** If more than this many hits are seen at a position, skip them all. */
   public static final String ASSEMBLER_MAX_HITS_PER_START_POS_FLAG = "com.rtg.assembler.maxhits";
@@ -197,6 +200,7 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_INDEL_EXTENSION);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_LIMIT, Integer.class, 3);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
+    registerFlag(COMPLEX_EVIDENCE_DETAILS);
 
     // Misc calling
     registerFlag(CALLER_N_MIN_DEPTH, Integer.class, 5);
