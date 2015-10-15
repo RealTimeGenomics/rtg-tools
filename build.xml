@@ -25,7 +25,7 @@
   </taskdef>
 
   <property name="product" value="RTG Tools" />
-  <property name="product.version" value="3.5.1-dev" />
+  <property name="product.version" value="3.5.2-dev" />
   <property name="resources" value="tools" />
   <property name="main.class" value="com.rtg.ToolsEntry" />
 
