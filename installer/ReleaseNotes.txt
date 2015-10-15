@@ -5,6 +5,41 @@ is based.  Not all features described below may be included in this
 product.
 
 
+RTG Core 3.5.2 (2015-10-15)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* many: When piping results from one command to another, and a later
+  command closes the pipe (e.g. head), this scenario no longer
+  produces an "Broken pipe" error message. This is consistent with the
+  behaviour of commonly used command-line tools.
+
+* rocplot: Updated to handle ROC data files that contain lines with
+  non-numeric score field. (In particular, future versions of vcfeval
+  will include additional data-points corresponding to variants with
+  no score provided)
+
+* rocplot: (GUI) Improvement to usability for curve renaming. Now a
+  single-click in the curve title area enters edit mode, with
+  RETURN/TAB to accept, ESC to cancel.
+
+* rocplot: (GUI) Add a button that prints an equivalent command line
+  to the terminal, for easy restarting with similar state,
+  particularly if curves files have been added interactively..
+
+* cgmap: Fix for sample sex being ignored when supplied via a pedigree
+  file rather than using explicit sex flag.
+
+* misc: Removed vestigial (and in RTG Tools' case, incorrect)
+  "Licensed to:" line from the version command output.
+
+* misc: Add BSD license text to the RTG Tools distributable zip.
+
+
+Previous releases
+=================
+
 RTG Core 3.5.1 (2015-09-07)
 ---------------------------
 
@@ -33,10 +68,6 @@ This release primarily includes bugfixes and minor improvements:
 
 * wrapper: Fixed the java version number check so that it works
   correctly with openjdk 1.8
-
-
-Previous releases
-=================
 
 RTG Core 3.5 (2015-07-16)
 -------------------------
