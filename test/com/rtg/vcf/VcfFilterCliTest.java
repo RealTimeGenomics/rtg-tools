@@ -206,12 +206,12 @@ public class VcfFilterCliTest extends AbstractCliTest {
   }
 
   public void testFlagValidator() throws IOException {
-    final File main = FileUtils.createTempDir("snpFilter", "flag1");
-    try {
+    try (final TestDirectory main = new TestDirectory("vcffiltercli")) {
+      final File foo = new File(main, "foo");
       final File out = new File(main, "out.gz");
       final File out2 = new File(main, "out.txt");
-      String err = checkHandleFlagsErr("-i", "foo", "-o", out.getPath());
-      TestUtils.containsAll(err, "Given file \"foo\" does not exist.");
+      String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
+      TestUtils.containsAll(TestUtils.unwrap(err), "Given file ", " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
@@ -314,8 +314,6 @@ public class VcfFilterCliTest extends AbstractCliTest {
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--fail", "BLAH", "--clear-failed-samples");
       TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --fail or --clear-failed-samples");
 
-    } finally {
-      assertTrue(FileHelper.deleteAll(main));
     }
   }
 

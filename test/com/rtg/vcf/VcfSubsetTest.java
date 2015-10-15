@@ -119,10 +119,11 @@ public class VcfSubsetTest extends AbstractCliTest {
   public void testValidation() throws Exception {
     try (TestDirectory main = new TestDirectory()) {
       final File in = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(main, "vcf.vcf.gz"));
+      final File foo = new File(main, "foo");
       final File out = new File(main, "out.gz");
       final File out2 = new File(main, "out.txt");
-      String err = checkHandleFlagsErr("-i", "foo", "-o", out.getPath());
-      TestUtils.containsAll(err, "Given file \"foo\" does not exist.");
+      String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
+      TestUtils.containsAll(TestUtils.unwrap(err), "Given file ", " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
