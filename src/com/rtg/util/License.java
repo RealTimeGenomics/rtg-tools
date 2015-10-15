@@ -137,7 +137,7 @@ public final class License {
   }
 
   public static String getPerson() {
-    return "RTG Core Non-commercial Use";
+    return null;
   }
 
   public static String getKeyPath() {
