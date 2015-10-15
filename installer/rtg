@@ -39,8 +39,8 @@ if [ ! -r "$THIS_DIR/rtg.cfg" ] ; then
     shopt -s nocasematch
     # Perform initial setup
 
-    if [ -r "$THIS_DIR/LICENSE.txt" ] ; then
-        # If this distribution includes an EULA, display and require agreement to it
+    if [ -r "$THIS_DIR/LICENSE.txt" ] && ! head -n 1 "$THIS_DIR/LICENSE.txt" | grep -q BSD; then
+        # If this distribution includes an EULA that requires display and agreement to it
         more "$THIS_DIR/LICENSE.txt"
 
         if [ -r "$THIS_DIR/rtg-license.txt" ]; then

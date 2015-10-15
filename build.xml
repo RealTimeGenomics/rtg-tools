@@ -370,6 +370,7 @@
   </target>
 
   <resources id="tools.zip.text">
+    <file file="${public.tools.basedir}/LICENSE.txt"/>
     <file file="${public.tools.basedir}/installer/README.txt"/>
     <file file="${public.tools.basedir}/installer/ReleaseNotes.txt"/>
   </resources>
