@@ -50,7 +50,7 @@ import junit.framework.TestSuite;
  */
 public class ClassPathSuite extends TestSuite {
 
-  private static final boolean SHUFFLE_TESTS = Boolean.getBoolean("junit.shuffle.tests");
+  private static final String SHUFFLE_TESTS = System.getProperty("junit.shuffle.tests");
   private static final String PACKAGE_PREFIX = System.getProperty("junit.package.prefix", "com.rtg");
   private static final String CLASSPATH = System.getProperty("java.class.path");
   private static final String CLASS_EXT = ".class";
@@ -65,7 +65,7 @@ public class ClassPathSuite extends TestSuite {
   ClassPathSuite(String packagePrefix) {
     mPackagePrefix = packagePrefix;
     final Class<?>[] testClasses = getTestClasses();
-    if (SHUFFLE_TESTS) { // Run test classes in random order to help detect any stray inter-test dependencies
+    if (SHUFFLE_TESTS != null) { // Run test classes in random order to help detect any stray inter-test dependencies
       shuffle(testClasses);
     }
     System.err.println("Found " + testClasses.length + " test classes with package prefix \"" + mPackagePrefix + "\"");
@@ -81,7 +81,7 @@ public class ClassPathSuite extends TestSuite {
    * @param <T> the type of array elements.
    */
   public static <T> void shuffle(T[] arr) {
-    final PortableRandom r = new PortableRandom();
+    final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.valueOf(SHUFFLE_TESTS));
     System.err.println("Shuffling tests with seed: " + r.getSeed());
     for (int i = 0; i < arr.length; i++) {
       final int z = r.nextInt(arr.length - i);
