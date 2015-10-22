@@ -120,6 +120,19 @@ public class PedigreeField {
     return mSamples.get(PEDIGREE_ORIGINAL);
   }
 
+  /**
+   * Relabel any occurrences of a sample name in this pedigree line.
+   * @param originalName original sample name
+   * @param newName new sample name
+   */
+  public void relabelSample(final String originalName, final String newName) {
+    for (final Map.Entry<String, String> e : mSamples.entrySet()) {
+      if (e.getValue().equals(originalName)) {
+        e.setValue(newName);
+      }
+    }
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(VcfHeader.PEDIGREE_STRING).append("=<");

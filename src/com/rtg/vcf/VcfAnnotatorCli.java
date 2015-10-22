@@ -66,6 +66,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String INFO_ID_FLAG = "info-id";
   private static final String INFO_DESCR_FLAG = "info-description";
   private static final String FILL_AN_AC_FLAG = "fill-an-ac";
+  private static final String RELABEL_FLAG = "relabel";
   private static final String X_DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
 
 
@@ -91,6 +92,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(VCF_IDS_FLAG, File.class, "file", "add variant IDs from VCF file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(INFO_ID_FLAG, String.class, "string", "the INFO ID for BED INFO annotations", "ANN").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(INFO_DESCR_FLAG, String.class, "string", "if the BED INFO field is not already declared, use this description in the header", "Annotation").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(RELABEL_FLAG, File.class, "file", "relabel samples according to \"old-name new-name\" pairs in specified file").setCategory(REPORTING);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     final List<String> derivedRange = new ArrayList<>();
@@ -189,6 +191,9 @@ public final class VcfAnnotatorCli extends AbstractCli {
     }
     for (DerivedAnnotations anno : annos) {
       annotators.add(VcfUtils.getAnnotator(anno));
+    }
+    if (mFlags.isSet(RELABEL_FLAG)) {
+      annotators.add(VcfSampleNameRelabeller.create((File) mFlags.getValue(RELABEL_FLAG)));
     }
 
     final File inputFile = (File) mFlags.getValue(INPUT_FLAG);

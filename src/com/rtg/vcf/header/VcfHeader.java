@@ -57,22 +57,18 @@ import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
 
 /**
- * Class holds VCF header lines and sample names
+ * Class holding VCF header lines and sample names.
  */
 public class VcfHeader {
 
-  /** current VCF version */
+  /** Current VCF version */
   public static final String VERSION = "4.1";
-
-  /** current VCF version */
+  /** Current VCF version */
   public static final String VERSION_VALUE = "VCFv" + VERSION;
-
   /** Comment character for VCF files */
   public static final char COMMENT_CHAR = '#';
-
-  /** string used to indicate meta lines */
+  /** String used to indicate meta lines */
   public static final String META_STRING = "##";
-
   /** Start of reference sequence lines*/
   public static final String CONTIG_STRING = META_STRING + "contig";
   /** Start of alt lines*/
@@ -87,13 +83,12 @@ public class VcfHeader {
   public static final String SAMPLE_STRING = META_STRING + "SAMPLE";
   /** Start of pedigree lines */
   public static final String PEDIGREE_STRING = META_STRING + "PEDIGREE";
-
-  /** file format line prefix */
+  /** File format line prefix */
   public static final String VERSION_LINE_PREFIX = META_STRING + "fileformat";
-  /** full version string */
+  /** Full version string */
   public static final String VERSION_LINE = VERSION_LINE_PREFIX + "=" + VERSION_VALUE;
 
-  /** header line for VCF files */
+  /** Header line for VCF files */
   public static final String HEADER_BASE = "" + COMMENT_CHAR
       + "CHROM" + TAB
       + "POS" + TAB
@@ -104,13 +99,10 @@ public class VcfHeader {
       + "FILTER" + TAB
       + "INFO";
 
-  /** header portion for format column */
+  /** Header portion for format column */
   public static final String FORMAT_HEADER_STRING = "FORMAT";
-
-  /** header line for VCF files with samples */
-  public static final String HEADER_LINE = HEADER_BASE
-          + TAB + FORMAT_HEADER_STRING;
-
+  /** Header line for VCF files with samples */
+  public static final String HEADER_LINE = HEADER_BASE + TAB + FORMAT_HEADER_STRING;
   /** Minimal string that can be used as a VCF header */
   public static final String MINIMAL_HEADER = VERSION_LINE + '\n' + HEADER_LINE;
 
@@ -128,9 +120,7 @@ public class VcfHeader {
   private final List<String> mSampleNames;
   private final HashMap<String, Integer> mNameToColumn;
 
-  /**
-   * create a new VCF header
-   */
+  /** Create a new VCF header */
   public VcfHeader() {
     mGenericMetaInformationLines = new ArrayList<>();
     mSampleNames = new ArrayList<>();
@@ -219,7 +209,6 @@ public class VcfHeader {
       addContigField(c);
     }
   }
-
 
   /**
    * Add contig lines corresponding to the sequences present in a sequences reader.
@@ -457,7 +446,7 @@ public class VcfHeader {
   }
 
   /**
-   * parse and add an arbitrary header/meta line
+   * Parse and add an arbitrary header/meta line.
    * @param line line to add
    * @return this for chaining
    */
@@ -498,18 +487,16 @@ public class VcfHeader {
     return this;
   }
 
-
   /**
-   * convert <code>contig</code> line into <code>ContigField</code> object
+   * Convert <code>contig</code> line into <code>ContigField</code> object
    * @param line the line
    * @return the object
    */
   public static ContigField parseContigLine(String line) {
     return new ContigField(line);
   }
-
   /**
-   * convert info line into <code>InfoField</code> object
+   * Convert info line into <code>InfoField</code> object
    * @param line the line
    * @return the object
    */
@@ -517,7 +504,7 @@ public class VcfHeader {
     return new InfoField(line);
   }
   /**
-   * convert alt line into <code>AltField</code> object
+   * Convert alt line into <code>AltField</code> object
    * @param line the line
    * @return the object
    */
@@ -525,34 +512,31 @@ public class VcfHeader {
     return new AltField(line);
   }
   /**
-   * convert filter line into <code>FilterField</code> object
+   * Convert filter line into <code>FilterField</code> object
    * @param line the line
    * @return the object
    */
   public static FilterField parseFilterLine(String line) {
     return new FilterField(line);
   }
-
   /**
-   * convert format line into <code>FormatField</code> object
+   * Convert format line into <code>FormatField</code> object
    * @param line the line
    * @return the object
    */
   public static FormatField parseFormatLine(String line) {
     return new FormatField(line);
   }
-
   /**
-   * convert format line into <code>SampleField</code> object
+   * Convert format line into <code>SampleField</code> object
    * @param line the line
    * @return the object
    */
   public static SampleField parseSampleLine(String line) {
     return new SampleField(line);
   }
-
   /**
-   * convert format line into <code>PedigreeField</code> object
+   * Convert format line into <code>PedigreeField</code> object
    * @param line the line
    * @return the object
    */
@@ -567,7 +551,6 @@ public class VcfHeader {
   public static boolean isVersionLine(String line) {
     return line.startsWith(VERSION_LINE_PREFIX + "=");
   }
-
   /**
    * @param line line of <code>VCF</code> file
    * @return if line is meta information
@@ -575,7 +558,6 @@ public class VcfHeader {
   public static boolean isMetaLine(String line) {
     return line.startsWith(META_STRING);
   }
-
   /**
    * @param line line of <code>VCF</code> file
    * @return if line is reference sequence line
@@ -583,7 +565,6 @@ public class VcfHeader {
   public static boolean isContigLine(String line) {
     return line.startsWith(CONTIG_STRING);
   }
-
   /**
    * @param line line of <code>VCF</code> file
    * @return if line is information line
@@ -628,7 +609,7 @@ public class VcfHeader {
   }
 
   /**
-   * add sample name
+   * Add sample name
    * @param name name to be added
    * @return this, for call chaining
    */
@@ -666,7 +647,6 @@ public class VcfHeader {
     for (int i = 0; i < mSampleNames.size(); i++) {
       mNameToColumn.put(mSampleNames.get(i), i);
     }
-
     //and clear out any sample lines
     final Iterator<SampleField> iterator = mSampleLines.iterator();
     while (iterator.hasNext()) {
@@ -698,6 +678,30 @@ public class VcfHeader {
    */
   public int getNumberOfSamples() {
     return mSampleNames.size();
+  }
+
+  /**
+   * Rename a sample and any other associated meta information.  If there is no sample with <code>originalName</code> then no action is taken.
+   * @param originalName original sample name
+   * @param newName new sample name
+   */
+  public void relabelSample(final String originalName, final String newName) {
+    final Integer index = getSampleIndex(originalName);
+    if (index != null) {
+      mSampleNames.set(index, newName);
+      mNameToColumn.remove(originalName);
+      mNameToColumn.put(newName, index);
+      for (int k = 0; k < mSampleLines.size(); k++) {
+        final SampleField sample = mSampleLines.get(k);
+        if (sample.getId().equals(originalName)) {
+          mSampleLines.set(k, new SampleField(sample.toString().replaceFirst(originalName, newName)));
+          break;
+        }
+      }
+      for (final PedigreeField pedigree : mPedigreeLines) {
+        pedigree.relabelSample(originalName, newName);
+      }
+    }
   }
 
   /**
