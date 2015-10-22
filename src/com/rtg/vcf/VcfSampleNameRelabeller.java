@@ -36,7 +36,6 @@ import java.io.LineNumberReader;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.VcfHeader;
@@ -44,7 +43,6 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * An annotator allowing for sample names to be changed.
  */
-@TestClass("com.rtg.vcf.VcfAnnotatorCliTest")
 public class VcfSampleNameRelabeller implements VcfAnnotator {
 
   private final Map<String, String> mSampleNameMap;
