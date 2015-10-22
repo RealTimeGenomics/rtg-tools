@@ -70,9 +70,9 @@ public class VcfSampleNameRelabeller implements VcfAnnotator {
   }
 
   /**
-   * Create a sample relabeller backed by a file.
+   * Create an instance backed by a file.
    * @param relabelFile file containing pairs of old names and new names
-   * @return relabeller
+   * @return annotator for relabelling samples
    * @throws IOException if an I/O error occurs.
    */
   public static VcfSampleNameRelabeller create(final File relabelFile) throws IOException {
