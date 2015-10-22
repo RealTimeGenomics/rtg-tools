@@ -157,6 +157,9 @@ public final class RocPlot {
     mZoomPP = new RocZoomPlotPanel(mPlotPanel, mMainPanel);
     mZoomPP.setOriginIsMin(true);
     mProgressBar = new JProgressBar(-1, -1);
+    mProgressBar.setVisible(true);
+    mProgressBar.setStringPainted(true);
+    mProgressBar.setIndeterminate(true);
     mProgressBarDelegate = new ProgressBarDelegate(mProgressBar);
     mStatusLabel = new JLabel();
     mPopup = new JPopupMenu();

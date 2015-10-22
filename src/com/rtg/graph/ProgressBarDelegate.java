@@ -58,10 +58,8 @@ public class ProgressBarDelegate implements ProgressDelegate {
       public void run() {
         if (progress < 0) {
           mProgressBar.setIndeterminate(false);
-        } else if (!mProgressBar.isStringPainted()) {
-          mProgressBar.setStringPainted(true);
+        } else {
           mProgressBar.setIndeterminate(true);
-          mProgressBar.setVisible(true);
         }
         mProgressBar.setString("" + progress);
       }
@@ -76,10 +74,10 @@ public class ProgressBarDelegate implements ProgressDelegate {
 
   @Override
   public void done() {
-    setProgress(-1);
     SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
+        mProgressBar.setIndeterminate(false);
         mProgressBar.setString("Loaded " + mTotalLines + " points from " + mTotalFiles + " files.");
       }
     });
