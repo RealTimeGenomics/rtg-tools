@@ -298,15 +298,19 @@ public class VariantStatistics extends AbstractStatistics {
     for (int i = 0; i < sampleNames.size(); i++) {
       final String sampleName = sampleNames.get(i);
       if (mOnlySample == null || mOnlySample.contains(sampleName)) {
+        final String gtStr = gts.get(i);
+        final int[] splitGt = VcfUtils.splitGt(gtStr);
+        if (!VcfUtils.isValidGt(rec, splitGt)) {
+          Diagnostic.warning("VCF record GT contains allele ID out of range, record: " + rec.toString());
+          continue;
+        }
         final PerSampleVariantStatistics sampleStats = ensurePerSampleStats(sampleName);
         if ((denovo != null) && "Y".equals(denovo.get(i))) {
           sampleStats.mDeNovo++;
         }
-        final String gtStr = gts.get(i);
-        if (gtStr.indexOf(VcfUtils.PHASED_SEPARATOR) != -1) {
+        if (VcfUtils.isPhasedGt(gtStr)) {
           sampleStats.mPhased++;
         }
-        final int[] splitGt = VcfUtils.splitGt(gtStr);
         if (splitGt.length == 1) {
           final int alleleindex = splitGt[0];
           if (alleleindex == MISSING_ALLELE) {
@@ -322,11 +326,7 @@ public class VariantStatistics extends AbstractStatistics {
               sampleStats.mPartialCalls++;
             }
           } else {
-            try {
-              tallyNonFiltered(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
-            } catch (final ArrayIndexOutOfBoundsException e) {
-              Diagnostic.warning("Skipping record with illegal genotype: " + rec);
-            }
+            tallyNonFiltered(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
           }
         } else {
           Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
