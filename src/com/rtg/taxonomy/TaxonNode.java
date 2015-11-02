@@ -145,7 +145,7 @@ public final class TaxonNode implements Comparable<TaxonNode> {
 
   @Override
   public boolean equals(Object other) {
-    return other != null && mId == ((TaxonNode) other).mId;
+    return other instanceof TaxonNode && mId == ((TaxonNode) other).mId;
   }
 
   @Override

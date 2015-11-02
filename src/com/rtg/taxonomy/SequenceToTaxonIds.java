@@ -40,13 +40,14 @@ import java.util.Map;
 import com.rtg.util.StringUtils;
 
 /**
+ * Utility methods providing support for a mapping from sequence id to taxonomy id.
  */
 public final class SequenceToTaxonIds {
 
   private SequenceToTaxonIds() { }
 
   /**
-   * Load a map from (short) sequence names to taxon ids supplied as tab separated input
+   * Load a map from (short) sequence names to taxon ids supplied as tab separated input.
    * @param tsv the input file
    * @return the map
    * @throws IOException if there are problems reading the input
@@ -56,7 +57,7 @@ public final class SequenceToTaxonIds {
   }
 
   /**
-   * Load a map from (short) sequence names to taxon ids supplied as tab separated input
+   * Load a map from (short) sequence names to taxon ids supplied as tab separated input.
    * @param input input source
    * @return the map
    * @throws IOException if there are problems reading the input

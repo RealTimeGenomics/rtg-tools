@@ -41,7 +41,7 @@ import com.rtg.util.MultiMap;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
- * Utilities to help with loading taxonomy information from an SDF
+ * Utilities to help with loading taxonomy information from an SDF.
  */
 public final class TaxonomyUtils {
 

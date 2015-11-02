@@ -44,7 +44,6 @@ import com.rtg.util.io.LineWriter;
 /**
  * RTG's version of a taxonomy tree, loosely based on the NCBI taxonomy tree.
  * Root node is expected to have an ID of 1.
- *
  */
 public class Taxonomy {
 
