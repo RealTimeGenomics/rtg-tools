@@ -67,7 +67,7 @@ public class VcfFormatDoubleAnnotator implements VcfAnnotator {
   @Override
   public void updateHeader(VcfHeader header) {
     mAnnotation.checkHeader(header);
-    header.ensureContains(new FormatField(mAnnotation.getName(), MetaType.FLOAT, new VcfNumber("1"), mAnnotation.getDescription()));
+    header.ensureContains(new FormatField(mAnnotation.getName(), MetaType.FLOAT, VcfNumber.ONE, mAnnotation.getDescription()));
   }
 
   @Override

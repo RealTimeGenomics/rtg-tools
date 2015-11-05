@@ -66,7 +66,7 @@ public class VcfInfoDoubleAnnotator implements VcfAnnotator {
 
   @Override
   public void updateHeader(VcfHeader header) {
-    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.FLOAT, new VcfNumber("1"), mAnnotation.getDescription()));
+    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.FLOAT, VcfNumber.ONE, mAnnotation.getDescription()));
   }
 
   @Override

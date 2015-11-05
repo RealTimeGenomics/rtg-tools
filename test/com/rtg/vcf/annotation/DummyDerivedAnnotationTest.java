@@ -69,8 +69,8 @@ public class DummyDerivedAnnotationTest extends TestCase {
     final AbstractDerivedAnnotation ann = new DummyDerivedAnnotation();
     assertEquals("Derived annotation DUMMY missing required fields in VCF header (INFO fields: II) (FORMAT fields: FF)", ann.checkHeader(null, new String[]{"II"}, new String[] {"FF"}));
     final VcfHeader header = new VcfHeader();
-    header.addInfoField("II", MetaType.INTEGER, new VcfNumber("1"), "Info Field");
-    header.addFormatField("FF", MetaType.INTEGER, new VcfNumber("1"), "Format Field");
+    header.addInfoField("II", MetaType.INTEGER, VcfNumber.ONE, "Info Field");
+    header.addFormatField("FF", MetaType.INTEGER, VcfNumber.ONE, "Format Field");
     final String res = ann.checkHeader(header, new String[]{"II"}, new String[] {"FF"});
     assertNull(res, res);
   }

@@ -118,7 +118,7 @@ public class QualOverDepthAnnotationTest extends TestCase {
 
     assertEquals("Derived annotation QD missing required fields in VCF header (INFO fields: DP)", ann.checkHeader(null));
     final VcfHeader header = new VcfHeader();
-    header.addFormatField("DP", MetaType.INTEGER, new VcfNumber("1"), "Depth");
+    header.addFormatField("DP", MetaType.INTEGER, VcfNumber.ONE, "Depth");
     assertNull(ann.checkHeader(header));
   }
 

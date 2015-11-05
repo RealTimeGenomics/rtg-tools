@@ -53,7 +53,7 @@ public class VcfInfoIntegerAnnotator implements VcfAnnotator {
 
   @Override
   public void updateHeader(VcfHeader header) {
-    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.INTEGER, new VcfNumber("1"), mAnnotation.getDescription()));
+    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.INTEGER, VcfNumber.ONE, mAnnotation.getDescription()));
   }
 
   @Override

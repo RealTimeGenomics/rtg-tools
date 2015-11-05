@@ -56,8 +56,8 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     header.addSampleName("normal");
     header.addSampleName("cancer");
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=cancer,Original=normal>");
-    header.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
-    header.addFormatField(new FormatField(VcfUtils.FORMAT_SOMATIC_STATUS, MetaType.INTEGER, new VcfNumber("1"), "Somatic status"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_SOMATIC_STATUS, MetaType.INTEGER, VcfNumber.ONE, "Somatic status"));
     header.addFormatField(new FormatField(VcfUtils.FORMAT_ALLELIC_DEPTH, MetaType.INTEGER, VcfNumber.DOT, "Allelic depth"));
     return header;
   }
@@ -151,8 +151,8 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     header.addSampleName("father");
     header.addSampleName("child");
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Mother=mother,Father=father,Child=child>");
-    header.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
-    header.addFormatField(new FormatField(VcfUtils.FORMAT_DENOVO, MetaType.STRING, new VcfNumber("1"), "De novo status"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype"));
+    header.addFormatField(new FormatField(VcfUtils.FORMAT_DENOVO, MetaType.STRING, VcfNumber.ONE, "De novo status"));
     header.addFormatField(new FormatField(VcfUtils.FORMAT_ALLELIC_DEPTH, MetaType.INTEGER, VcfNumber.DOT, "Allelic depth"));
     return header;
   }

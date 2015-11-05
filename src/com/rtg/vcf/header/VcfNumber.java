@@ -46,6 +46,8 @@ public class VcfNumber {
   public static final VcfNumber REF_ALTS = new VcfNumber("R");
   /** Singleton for genotype valued variant types */
   public static final VcfNumber GENOTYPES = new VcfNumber("G");
+  /** Singleton for single-valued variant types */
+  public static final VcfNumber ONE = new VcfNumber("1");
 
   /**
    * @param number number field from a meta line

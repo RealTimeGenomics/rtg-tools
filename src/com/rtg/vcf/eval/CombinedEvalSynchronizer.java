@@ -89,7 +89,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mOutHeader.addCommonHeader();
     mOutHeader.addContigFields(variants.baseLineHeader());
     addInfoHeaders(mOutHeader, null);
-    mOutHeader.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype");
+    mOutHeader.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype");
     mOutHeader.addSampleName(SAMPLE_BASELINE);
     mOutHeader.addSampleName(SAMPLE_CALLS);
     mInHeaders[0] = variants.baseLineHeader().copy();

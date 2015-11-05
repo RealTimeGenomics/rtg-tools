@@ -82,11 +82,11 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
   static void addInfoHeaders(VcfHeader header, VariantSetType type) {
     header.addInfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.");
     if (type == null || type == VariantSetType.BASELINE) {
-      header.addInfoField(INFO_BASE, MetaType.STRING, new VcfNumber("1"), "Baseline genotype status");
+      header.addInfoField(INFO_BASE, MetaType.STRING, VcfNumber.ONE, "Baseline genotype status");
     }
     if (type == null || type == VariantSetType.CALLS) {
-      header.addInfoField(INFO_CALL, MetaType.STRING, new VcfNumber("1"), "Call genotype status");
-      header.addInfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0");
+      header.addInfoField(INFO_CALL, MetaType.STRING, VcfNumber.ONE, "Call genotype status");
+      header.addInfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, VcfNumber.ONE, "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0");
     }
   }
 
