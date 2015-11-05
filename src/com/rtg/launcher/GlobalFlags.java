@@ -134,8 +134,11 @@ public final class GlobalFlags {
   /** Number of deviations to apply to insert distributions. */
   public static final String ASSEMBLER_INSERT_DEVIATIONS_FLAG = "com.rtg.assembler.insertdeviations";
 
+  // AVR
+  /** Allow prediction to continue even if the VCF does not declare all the attributes of the model. */
+  public static final String AVR_ALLOW_UNDECLARED_ATTRIBUTES = "com.rtg.avr.allow-undeclared";
   /** Should the random tree builder push missing values down during the build process. */
-  public static final String TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
+  public static final String AVR_TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
   //vcfeval
   /** After the first diploid pass, make a second squash-ploidy pass */
@@ -159,7 +162,6 @@ public final class GlobalFlags {
 
   /** Level of BAM compression to use during recalibration (probably also works for SAM merge). */
   public static final String GZIP_LEVEL = "com.rtg.calibrate.Recalibrate.gzip-level";
-
 
   private static CFlags sFlags;
   private static final Set<String> ACCESSED_FLAGS = new HashSet<>();
@@ -210,7 +212,8 @@ public final class GlobalFlags {
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
     // when there are lots of missing values.
-    registerFlag(TRAIN_ON_MISSING_VALUES, Boolean.class, false);
+    registerFlag(AVR_TRAIN_ON_MISSING_VALUES, Boolean.class, false);
+    registerFlag(AVR_ALLOW_UNDECLARED_ATTRIBUTES, Boolean.class, false);
 
     registerFlag(VCFEVAL_TWO_PASS);
     registerFlag(VCFEVAL_DUMP_BEST_PATH);
