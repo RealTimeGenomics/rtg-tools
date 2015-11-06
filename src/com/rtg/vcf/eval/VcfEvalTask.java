@@ -116,12 +116,13 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     if (params.twoPass() && params.squashPloidy()) {
       throw new IllegalStateException("Cannot run two-pass with squash-ploidy set");
     }
+    final boolean obeyPhase = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_OBEY_PHASE);
     if (params.twoPass()) {
       o = new ArrayList<>();
-      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false), getOrientor(VariantSetType.CALLS, false)));
-      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true), getOrientor(VariantSetType.CALLS, true)));
+      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false, obeyPhase), getOrientor(VariantSetType.CALLS, false, obeyPhase)));
+      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true, obeyPhase), getOrientor(VariantSetType.CALLS, true, obeyPhase)));
     } else {
-      o = Collections.singletonList(new Pair<>(getOrientor(VariantSetType.BASELINE, params.squashPloidy()), getOrientor(VariantSetType.CALLS, params.squashPloidy())));
+      o = Collections.singletonList(new Pair<>(getOrientor(VariantSetType.BASELINE, params.squashPloidy(), obeyPhase), getOrientor(VariantSetType.CALLS, params.squashPloidy(), obeyPhase)));
     }
     try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
@@ -185,11 +186,11 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
   }
 
-  static Orientor getOrientor(VariantSetType type, boolean squashPloidy) {
+  static Orientor getOrientor(VariantSetType type, boolean squashPloidy, boolean obeyPhase) {
     final String f = getFactoryName(type);
     switch (f) {
       case "sample":
-        return squashPloidy ? Orientor.SQUASH_GT : Orientor.UNPHASED;
+        return squashPloidy ? Orientor.SQUASH_GT : obeyPhase ? Orientor.PHASED : Orientor.UNPHASED;
       case "all":
         return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
       default:

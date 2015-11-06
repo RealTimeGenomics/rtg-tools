@@ -144,8 +144,8 @@ public final class GlobalFlags {
   public static final String AVR_TRAIN_ON_MISSING_VALUES = "com.rtg.ml.train-on-missing";
 
   //vcfeval
-  /** After the first diploid pass, make a second squash-ploidy pass */
-  public static final String VCFEVAL_TWO_PASS = "com.rtg.vcf.eval.two-pass";
+  /** Obey global phasing if present in the input VCF */
+  public static final String VCFEVAL_OBEY_PHASE = "com.rtg.vcf.eval.obey-phase";
   /** Output the best path found along with the haplotypes */
   public static final String VCFEVAL_DUMP_BEST_PATH = "com.rtg.vcf.eval.dump-path";
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
@@ -219,7 +219,7 @@ public final class GlobalFlags {
     registerFlag(AVR_TRAIN_ON_MISSING_VALUES, Boolean.class, false);
     registerFlag(AVR_ALLOW_UNDECLARED_ATTRIBUTES, Boolean.class, false);
 
-    registerFlag(VCFEVAL_TWO_PASS);
+    registerFlag(VCFEVAL_OBEY_PHASE, Boolean.class, false);
     registerFlag(VCFEVAL_DUMP_BEST_PATH);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
