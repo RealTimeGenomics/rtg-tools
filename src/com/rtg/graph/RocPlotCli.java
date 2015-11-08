@@ -45,6 +45,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.UIManager;
+
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.Pair;
@@ -181,6 +183,7 @@ public class RocPlotCli extends AbstractCli {
           Diagnostic.error("No graphics environment is available to open the rocplot GUI");
           return 1;
         }
+        UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
         final RocPlot rp = new RocPlot();
         rp.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG));
       }

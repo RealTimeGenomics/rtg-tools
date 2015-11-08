@@ -38,7 +38,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -61,7 +61,6 @@ import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -93,6 +92,7 @@ import com.reeltwo.plot.ui.ZoomPlotPanel;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -166,17 +166,16 @@ public final class RocPlot {
     mRocLinesPanel = new RocLinesPanel(this);
     mScrollPane = new JScrollPane(mRocLinesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     mScrollPane.setWheelScrollingEnabled(true);
-    //System.err.println("scroll: " + mScrollPane.getPreferredSize());
- //   mRocLinesPanel.setLayout(new GridLayout(0, 1));
     mLineWidthSlider = new JSlider(JSlider.HORIZONTAL, LINE_WIDTH_MIN, LINE_WIDTH_MAX, 1);
     mScoreCB = new JCheckBox("Show Scores");
     mScoreCB.setSelected(true);
     mSelectAllCB = new JCheckBox("Select / Deselect all");
     mTitleEntry = new JTextField("ROC");
-    mOpenButton = new JButton("+");
+    mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
+    mOpenButton = new JButton("Open...");
     mOpenButton.setToolTipText("Add a new ROC curve from a file");
     mCommandButton = new JButton("Cmd");
-    mCommandButton.setToolTipText("Send equivalent rocplot command-line to terminal");
+    mCommandButton.setToolTipText("Send the equivalent rocplot command-line to the terminal");
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
     mIconLabel = new JLabel(icon);
     mIconLabel.setBackground(new Color(16, 159, 205));
@@ -205,7 +204,7 @@ public final class RocPlot {
     mMainPanel.setLayout(new BorderLayout());
     final JPanel pane = new JPanel(new BorderLayout());
     pane.add(mPlotPanel, BorderLayout.CENTER);
-    final Box rightPanel = new Box(BoxLayout.Y_AXIS);
+    final JPanel rightPanel = new JPanel(new GridBagLayout());
     mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, rightPanel);
     mSplitPane.setContinuousLayout(true);
     mSplitPane.setOneTouchExpandable(true);
@@ -216,47 +215,24 @@ public final class RocPlot {
 
     mPopup.setLightWeightPopupEnabled(false);
     mPopup.add(mZoomPP.getZoomOutAction());
-
     mPopup.addSeparator();
     mPopup.add(mPlotPanel.getPrintAction());
     mPopup.add(mPlotPanel.getSaveImageAction());
     mPopup.add(mPlotPanel.getSnapShotAction());
-
-    // listener to show popup
-    mPlotPanel.addMouseListener(new PopupListener());
-
     mPopup.addSeparator();
 
-    //Set up the content pane.
+    mPlotPanel.addMouseListener(new PopupListener());
+
     mPlotPanel.setBackground(Color.WHITE);
     mPlotPanel.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
     mPlotPanel.setGraphShadowWidth(4);
 
-    final JPanel controlPanel = new JPanel(new GridLayout(0, 1));
-    controlPanel.add(new JLabel("Line Width", JLabel.CENTER));
-    mLineWidthSlider.setSnapToTicks(true);
-    mLineWidthSlider.setValue(mLineWidth);
-    //mLineWidthSlider.setPreferredSize(new Dimension(300, mLineWidthSlider.getPreferredSize().height));
-    mLineWidthSlider.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        mLineWidth = mLineWidthSlider.getValue();
-        showCurrentGraph();
-      }
-    });
-    controlPanel.add(mLineWidthSlider);
-
-    mScoreCB.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        mShowScores = mScoreCB.isSelected();
-        showCurrentGraph();
-      }
-    });
-    controlPanel.add(mScoreCB);
-
-    final JPanel titlePanel = new JPanel(new GridLayout(0, 1));
-    titlePanel.add(new JLabel("Title", JLabel.CENTER));
+    final GridBagConstraints c = new GridBagConstraints();
+    c.insets = new Insets(2, 2, 2, 2);
+    c.gridx = 0;
+    c.weightx = 1;    c.weighty = 0;
+    c.fill = GridBagConstraints.HORIZONTAL;    c.anchor = GridBagConstraints.CENTER;
+    rightPanel.add(new JLabel("Title", JLabel.CENTER), c);
     mTitleEntry.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
@@ -267,19 +243,29 @@ public final class RocPlot {
       }
 
     });
-    titlePanel.add(mTitleEntry);
-    controlPanel.add(titlePanel);
+    rightPanel.add(mTitleEntry, c);
 
-    rightPanel.add(controlPanel);
+    rightPanel.add(new JLabel("Line Width", JLabel.CENTER), c);
+    mLineWidthSlider.setSnapToTicks(true);
+    mLineWidthSlider.setValue(mLineWidth);
+    mLineWidthSlider.addChangeListener(new ChangeListener() {
+      @Override
+      public void stateChanged(ChangeEvent e) {
+        mLineWidth = mLineWidthSlider.getValue();
+        showCurrentGraph();
+      }
+    });
+    rightPanel.add(mLineWidthSlider, c);
 
-    final JPanel checkControlPanel = new JPanel(new GridBagLayout());
-    final GridBagConstraints constraints = new GridBagConstraints();
-    constraints.gridx = 0; constraints.gridy = 0;
-    constraints.anchor = GridBagConstraints.LINE_START;
-    checkControlPanel.add(mOpenButton, constraints);
-    constraints.gridy++;
-    constraints.anchor = GridBagConstraints.CENTER;
-    checkControlPanel.add(mSelectAllCB, constraints);
+    mScoreCB.addItemListener(new ItemListener() {
+      @Override
+      public void itemStateChanged(ItemEvent e) {
+        mShowScores = mScoreCB.isSelected();
+        showCurrentGraph();
+      }
+    });
+    mScoreCB.setAlignmentX(0);
+    rightPanel.add(mScoreCB, c);
 
     mSelectAllCB.addItemListener(new ItemListener() {
       @Override
@@ -303,15 +289,18 @@ public final class RocPlot {
         if (prefs.getInt(CHOOSER_WIDTH, -1) != -1 && prefs.getInt(CHOOSER_HEIGHT, -1) != -1) {
           mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
         }
-        if (mFileChooser.showOpenDialog(checkControlPanel) == JFileChooser.APPROVE_OPTION) {
+        if (mFileChooser.showOpenDialog(mMainPanel) == JFileChooser.APPROVE_OPTION) {
           final File f = mFileChooser.getSelectedFile();
           if (f != null) {
             try {
               loadFile(f, f.getCanonicalFile().getParentFile().getName(), true);
               updateProgress();
               showCurrentGraph();
-            } catch (final IOException e1) {
-              JOptionPane.showInternalMessageDialog(checkControlPanel, "Could not open file " + f.getPath());
+            } catch (final IOException | NoTalkbackSlimException e1) {
+              JOptionPane.showMessageDialog(mMainPanel,
+                "Could not open file: " + f.getPath() + "\n"
+                + (e1.getMessage().length() > 100 ? e1.getMessage().substring(0, 100) + "..." : e1.getMessage()),
+                "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
             }
             final Dimension r = mFileChooser.getSize();
             prefs.putInt(CHOOSER_WIDTH, (int) r.getWidth());
@@ -326,11 +315,13 @@ public final class RocPlot {
         System.out.println("Equivalent rocplot command:\n" + getCommand() + "\n");
       }
     });
+
     final JPanel namePanel = new JPanel(new GridBagLayout());
-    final GridBagConstraints checkConstraints = new GridBagConstraints();
-    checkConstraints.gridx = 0; checkConstraints.gridy = 0;
-    checkConstraints.anchor = GridBagConstraints.FIRST_LINE_START;
-    namePanel.add(checkControlPanel, checkConstraints);
+    c.fill = GridBagConstraints.NONE;           c.anchor = GridBagConstraints.LINE_START;
+    rightPanel.add(mOpenButton, c);
+    rightPanel.add(mSelectAllCB, c);
+    c.fill = GridBagConstraints.HORIZONTAL;     c.anchor = GridBagConstraints.CENTER;
+
     final GridBagConstraints scrollConstraints = new GridBagConstraints();
     scrollConstraints.gridx = 0; scrollConstraints.gridy = 1;
     scrollConstraints.weightx = 2; scrollConstraints.weighty = 2;
@@ -338,12 +329,16 @@ public final class RocPlot {
     mRocLinesPanel.setPreferredSize(new Dimension(mScrollPane.getViewport().getViewSize().width, mRocLinesPanel.getPreferredSize().height));
     namePanel.add(mScrollPane, scrollConstraints);
 
-    final GridBagConstraints cmdConstraints = new GridBagConstraints();
-    cmdConstraints.anchor = GridBagConstraints.LINE_START;
-    cmdConstraints.gridx = 0; cmdConstraints.gridy = 2;
-    namePanel.add(mCommandButton, cmdConstraints);
+    c.weighty = 1;
+    c.fill = GridBagConstraints.BOTH;
+    rightPanel.add(namePanel, c);
 
-    rightPanel.add(namePanel);
+    c.weighty = 0;
+    c.fill = GridBagConstraints.NONE;    c.anchor = GridBagConstraints.FIRST_LINE_START;
+    final Box b = Box.createHorizontalBox();
+    b.add(mOpenButton);
+    b.add(mCommandButton);
+    rightPanel.add(b, c);
 
     pane.add(mProgressBar, BorderLayout.SOUTH);
 
