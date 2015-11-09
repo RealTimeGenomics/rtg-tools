@@ -98,11 +98,7 @@ public final class ProteinScoringMatrix extends ScoringMatrix {
   public ProteinScoringMatrix(String matrixName) throws InvalidParamsException, IOException {
     final String mat = matrixName.toUpperCase(Locale.getDefault());
     final int len = Protein.values().length;
-    mScores = new int[len][];
-    //C# restrictions
-    for (int i = 0; i < len; i++) {
-      mScores[i] = new int[len];
-    }
+    mScores = new int[len][len];
     final String res = "com/rtg/mode/" + mat;
     try (InputStream in = Resources.getResourceAsStream(res)) {
       if (in == null) {
