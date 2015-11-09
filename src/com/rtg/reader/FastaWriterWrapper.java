@@ -71,13 +71,14 @@ public class FastaWriterWrapper implements WriterWrapper {
    * @param lineLength the maximum line length, 0 means no bound.
    * @param rename if true, rename sequences to their sequence id
    * @param gzip if true, compress the output.
+   * @param interleavePaired if true, paired end output should be interleaved into a single output
    * @throws IOException if there is a problem constructing the writer.
    */
-  public FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip) throws IOException {
-    this(baseOutput, reader, lineLength, rename, gzip, EXTS);
+  public FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired) throws IOException {
+    this(baseOutput, reader, lineLength, rename, gzip, interleavePaired, EXTS);
   }
 
-  protected FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, String[] extensions) throws IOException {
+  protected FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired, String[] extensions) throws IOException {
     assert reader != null;
     assert extensions.length > 0;
     mReader = reader;
@@ -105,11 +106,15 @@ public class FastaWriterWrapper implements WriterWrapper {
 
     if (mIsPaired) {
       mSingle = null;
-      mLeft = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + "_1" + ext), gzip);
-      if (CommonFlags.isStdio(output)) {
+      if (interleavePaired) {
+        mLeft = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + ext), gzip);
         mRight = mLeft;
       } else {
-        mRight = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + "_2" + ext), gzip);
+        if (CommonFlags.isStdio(output)) {
+          throw new NoTalkbackSlimException("Sending non-interleaved paired-end data to stdout is not supported.");
+        }
+        mLeft = getStream(output + "_1" + ext, gzip);
+        mRight = getStream(output + "_2" + ext, gzip);
       }
     } else {
       mLeft = null;

@@ -57,10 +57,11 @@ public final class FastqWriterWrapper extends FastaWriterWrapper {
    * @param rename if true, rename sequences to their sequence id
    * @param gzip if true, compress the output.
    * @param def the default quality value to use if input data does not contain quality scores.
+   * @param interleavePaired if true, paired end output should be interleaved into a single output
    * @throws IOException if there is a problem constructing the writer.
    */
-  public FastqWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, int def) throws IOException {
-    super(baseOutput, reader, lineLength, rename, gzip, EXTS);
+  public FastqWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, int def, boolean interleavePaired) throws IOException {
+    super(baseOutput, reader, lineLength, rename, gzip, interleavePaired, EXTS);
     if (reader.type() != SequenceType.DNA) {
       throw new InvalidParamsException(ErrorType.INFO_ERROR, "The input SDF contains protein data, which cannot be converted to FASTQ.");
     }

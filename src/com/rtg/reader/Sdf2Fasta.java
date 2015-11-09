@@ -60,6 +60,7 @@ public class Sdf2Fasta extends AbstractCli {
   static final String INPUT = "input";
   static final String OUTPUT = "output";
   static final String LINE_LENGTH = "line-length";
+  static final String INTERLEAVE = "interleave";
   static final String RENAME = "Xrename";
 
   static final String ID_FILE_FLAG = "id-file";
@@ -110,6 +111,7 @@ public class Sdf2Fasta extends AbstractCli {
     registerExtractorFlags(flags);
     flags.registerRequired('o', OUTPUT, File.class, "FILE", "output filename (extension added if not present). Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     flags.registerOptional('l', LINE_LENGTH, Integer.class, "INT", "maximum number of nucleotides to print on a line of output. A value of 0 indicates no limit", 0).setCategory(UTILITY);
+    flags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
     flags.registerOptional('R', RENAME, "rename the reads to their consecutive number; name of first read in file is '0'").setCategory(UTILITY);
     CommonFlags.initNoGzip(flags);
   }
@@ -155,7 +157,7 @@ public class Sdf2Fasta extends AbstractCli {
       final boolean rename = mFlags.isSet(RENAME);
 
       try (SdfReaderWrapper reader = new SdfReaderWrapper((File) mFlags.getValue(INPUT), false, false)) {
-        try (WriterWrapper writer = new FastaWriterWrapper((File) mFlags.getValue(OUTPUT), reader, lineLength, rename, gzip)) {
+        try (WriterWrapper writer = new FastaWriterWrapper((File) mFlags.getValue(OUTPUT), reader, lineLength, rename, gzip, mFlags.isSet(INTERLEAVE))) {
           final WrapperFilter filter;
           if (mFlags.isSet(NAMES_FLAG)) {
             filter = new NameWrapperFilter(reader, writer);

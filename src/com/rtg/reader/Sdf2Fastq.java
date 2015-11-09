@@ -34,6 +34,7 @@ import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.reader.Sdf2Fasta.END_SEQUENCE;
 import static com.rtg.reader.Sdf2Fasta.ID_FILE_FLAG;
 import static com.rtg.reader.Sdf2Fasta.INPUT;
+import static com.rtg.reader.Sdf2Fasta.INTERLEAVE;
 import static com.rtg.reader.Sdf2Fasta.LINE_LENGTH;
 import static com.rtg.reader.Sdf2Fasta.NAMES_FLAG;
 import static com.rtg.reader.Sdf2Fasta.OUTPUT;
@@ -117,7 +118,7 @@ public final class Sdf2Fastq extends AbstractCli {
       final int def = mFlags.isSet(DEFAULT_QUALITY) ? (Integer) mFlags.getValue(DEFAULT_QUALITY) + (int) '!' : -1;
 
       try (SdfReaderWrapper reader = new SdfReaderWrapper((File) mFlags.getValue(INPUT), false, false)) {
-        try (WriterWrapper writer = new FastqWriterWrapper((File) mFlags.getValue(OUTPUT), reader, lineLength, rename, gzip, def)) {
+        try (WriterWrapper writer = new FastqWriterWrapper((File) mFlags.getValue(OUTPUT), reader, lineLength, rename, gzip, def, mFlags.isSet(INTERLEAVE))) {
           final WrapperFilter filter;
           if (mFlags.isSet(NAMES_FLAG)) {
             filter = new NameWrapperFilter(reader, writer);
