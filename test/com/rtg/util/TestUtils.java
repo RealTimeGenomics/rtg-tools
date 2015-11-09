@@ -53,10 +53,9 @@ import junit.framework.Assert;
 
 /**
  * Utilities useful when doing testing.
- *
  */
 public final class TestUtils {
-  /** Prevent construction. */
+
   private TestUtils() {
   }
 
@@ -475,15 +474,6 @@ public final class TestUtils {
         }
       }
     });
-  }
-
-  /**
-   * Dummy method to aid conversion to C#
-   * @param t Throwable to add stack trace to
-   * @return the populated Throwable
-   */
-  public static Throwable fillStackTrace(final Throwable t) {
-    return t;
   }
 
   /**

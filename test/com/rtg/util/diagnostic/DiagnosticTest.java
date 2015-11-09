@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import com.rtg.util.StringUtils;
-import com.rtg.util.TestUtils;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
@@ -218,7 +217,7 @@ public class DiagnosticTest extends TestCase {
     try {
       try (PrintStream ps = new PrintStream(bos)) {
         Diagnostic.setLogStream(ps);
-        Diagnostic.userLog(TestUtils.fillStackTrace(new NullPointerException()));
+        Diagnostic.userLog(new NullPointerException());
       }
     } finally {
       bos.close();
@@ -255,8 +254,8 @@ public class DiagnosticTest extends TestCase {
           final PrintStream ps = new PrintStream(bos);
           ps.close(); // i.e. can't log to this stream
           Diagnostic.setLogStream(ps);
-          Diagnostic.userLog(TestUtils.fillStackTrace(new NullPointerException()));
-          Diagnostic.userLog(TestUtils.fillStackTrace(new IllegalArgumentException()));
+          Diagnostic.userLog(new NullPointerException());
+          Diagnostic.userLog(new IllegalArgumentException());
           assertEquals("", bos.toString().trim());
         }
       } finally {
