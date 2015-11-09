@@ -104,12 +104,13 @@ public class FastaWriterWrapper implements WriterWrapper {
     }
 
     if (mIsPaired) {
-      if (CommonFlags.isStdio(output)) {
-        throw new NoTalkbackSlimException("Sending paired-end data to stdout is not supported.");
-      }
       mSingle = null;
-      mLeft = getStream(output + "_1" + ext, gzip);
-      mRight = getStream(output + "_2" + ext, gzip);
+      mLeft = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + "_1" + ext), gzip);
+      if (CommonFlags.isStdio(output)) {
+        mRight = mLeft;
+      } else {
+        mRight = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + "_2" + ext), gzip);
+      }
     } else {
       mLeft = null;
       mRight = null;
