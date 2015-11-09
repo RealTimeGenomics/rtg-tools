@@ -127,9 +127,6 @@ public class FileCompressedOutputStream extends OutputStream {
       mBufferInUse = index + 1;
     }
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     try (final DataOutputStream out = mStream) {
@@ -141,9 +138,6 @@ public class FileCompressedOutputStream extends OutputStream {
       mBufferInUse = 0;
     }
   }
-
-  /**
-   */
   @Override
   public void flush() throws IOException {
     flushCurrent();
@@ -153,16 +147,10 @@ public class FileCompressedOutputStream extends OutputStream {
   public void write(int b) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
-
-  /**
-   */
   @Override
   public void write(byte[] b) throws IOException {
     write(b, 0, b.length);
   }
-
-  /**
-   */
   @Override
   public void write(byte[] b, int off, int len) throws IOException {
     set(mPos, b, off, len);

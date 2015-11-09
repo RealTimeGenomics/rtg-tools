@@ -89,9 +89,6 @@ public class FalseSeekableStream extends SeekableStream {
   public int available() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     mStream.close();

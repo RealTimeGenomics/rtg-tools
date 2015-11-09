@@ -167,9 +167,6 @@ public class AsynchOutputStream extends OutputStream {
     }
     checkException();
   }
-
-  /**
-   */
   @Override
   public void write(byte[] buf, int off, int len) throws IOException {
     if (mBufferCount + len >= mBuffer.length) {
@@ -187,9 +184,6 @@ public class AsynchOutputStream extends OutputStream {
       mBufferCount += len;
     }
   }
-
-  /**
-   */
   @Override
   public void write(int b) throws IOException {
     // throw new UnsupportedOperationException();

@@ -135,9 +135,6 @@ public class AsynchInputStream extends InputStream {
       }
     }
   }
-
-  /**
-   */
   @Override
   public int read(byte[] buf, int off, int len) throws IOException {
     checkException();
@@ -153,9 +150,6 @@ public class AsynchInputStream extends InputStream {
       throw new IOException("AsynchInputStream interrupted during read/3");
     }
   }
-
-  /**
-   */
   @Override
   public int read() throws IOException {
     throw new UnsupportedOperationException();

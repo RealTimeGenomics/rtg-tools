@@ -68,9 +68,6 @@ class FileStreamIterator implements Iterator<InputStream> {
       mProcessLabel = (arm == PrereadArm.LEFT ? "left" : "right") + " arm ";
     }
   }
-
-  /**
-   */
   @Override
   public boolean hasNext() {
     if (mNext != null) {
@@ -95,9 +92,6 @@ class FileStreamIterator implements Iterator<InputStream> {
     }
     return false;
   }
-
-  /**
-   */
   @Override
   public InputStream next() {
     if (mLast != null) {

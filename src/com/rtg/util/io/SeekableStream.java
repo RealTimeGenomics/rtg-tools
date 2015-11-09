@@ -71,9 +71,6 @@ public abstract class SeekableStream extends InputStream {
    * @exception  IOException  if an I/O error occurs.
    */
   public abstract long length() throws IOException;
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     super.close();

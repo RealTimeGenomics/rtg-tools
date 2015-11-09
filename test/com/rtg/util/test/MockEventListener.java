@@ -69,9 +69,6 @@ public final class MockEventListener implements DiagnosticListener {
   public DiagnosticEvent<?> getEvent() {
     return mEvent;
   }
-
-  /**
-   */
   @Override
   public void close() {
   }

@@ -49,17 +49,11 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
-
-/**
- */
 public class PrereadVerifierTest extends TestCase {
 
   private static final String LS = System.lineSeparator();
 
   private File mDir = null;
-
-  /**
-   */
   @Override
   public void setUp() throws Exception {
     mDir = FileHelper.createTempDirectory();

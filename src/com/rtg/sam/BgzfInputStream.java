@@ -117,9 +117,6 @@ public class BgzfInputStream extends InputStream {
     }
     return mUncompressBuf[mDataPosition++] & 0xFF;
   }
-
-  /**
-   */
   @Override
   public int read(byte[] buf, int offset, int length) throws IOException {
     if (offset + length > buf.length) {
@@ -241,9 +238,6 @@ public class BgzfInputStream extends InputStream {
     assert tot == block.mBlockSize + 1 : "tot: " + tot + " blocksize: " + block.mBlockSize;
     return tot;
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     mInputStream.close();

@@ -49,9 +49,6 @@ public class NotRandomRandom extends PortableRandom {
     mNextInt = 0;
     mNextBoolean = false;
   }
-
-  /**
-   */
   @Override
   public double nextDouble() {
     //System.err.println("next double" + mNextDouble );
@@ -63,9 +60,6 @@ public class NotRandomRandom extends PortableRandom {
     //System.err.println("nextDouble: " + rand);
     return rand;
   }
-
-  /**
-   */
   @Override
   public int nextInt(int max) {
     if (mNextInt >= max) {
@@ -76,9 +70,6 @@ public class NotRandomRandom extends PortableRandom {
     //System.err.println("nextInt: " + rand);
     return rand;
   }
-
-  /**
-   */
   @Override
   public boolean nextBoolean() {
     final boolean rand = mNextBoolean;

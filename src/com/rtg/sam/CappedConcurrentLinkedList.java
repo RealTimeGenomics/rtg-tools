@@ -216,16 +216,10 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
   public synchronized void clear() {
     throw new UnsupportedOperationException();
   }
-
-  /**
-   */
   @Override
   public synchronized boolean contains(Object o) {
     return mInternalQueue.contains(o);
   }
-
-  /**
-   */
   @Override
   public synchronized boolean containsAll(Collection<?> c) {
     return mInternalQueue.containsAll(c);
@@ -262,16 +256,10 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
   public synchronized boolean retainAll(Collection<?> c) {
     throw new UnsupportedOperationException();
   }
-
-  /**
-   */
   @Override
   public synchronized Object[] toArray() {
     return mInternalQueue.toArray();
   }
-
-  /**
-   */
   @Override
   public synchronized <T> T[] toArray(T[] a) {
     return mInternalQueue.toArray(a);

@@ -48,9 +48,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
-
-/**
- */
 public class FileUtilsTest extends TestCase {
 
   protected File mTmp = null;
@@ -350,9 +347,6 @@ public class FileUtilsTest extends TestCase {
     public int read() throws IOException {
       return mStream.read();
     }
-
-    /**
-     */
     @Override
     public int read(byte[] a, int b, int c) throws IOException {
       return mStream.read(a, b, c);

@@ -76,9 +76,6 @@ public class RandomAccessFileStream extends SeekableStream {
     }
     return (int) ret;
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     mRaf.close();

@@ -216,9 +216,6 @@ public class FileBitwiseInputStream extends SeekableStream {
     }
     return get(mPos++) & 0xff;
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     mStream.close();

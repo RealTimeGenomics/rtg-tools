@@ -227,9 +227,6 @@ public class FileCompressedInputStream extends SeekableStream {
     }
     return get(mPos++) & 0xff;
   }
-
-  /**
-   */
   @Override
   public void close() throws IOException {
     mStream.close();
