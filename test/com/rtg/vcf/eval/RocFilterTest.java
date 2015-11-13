@@ -52,7 +52,7 @@ public class RocFilterTest extends TestCase {
   private static final VcfRecord COMPLEX_IDENTITY_RECORD = VcfReader.vcfLineToRecord("chr1 250 . A . 20.0 PASS XRX GT 0/0".replaceAll(" ", "\t"));
 
   public void testEnum() {
-    TestUtils.testEnum(RocFilter.class, "[ALL, HOMOZYGOUS, HETEROZYGOUS, COMPLEX, SIMPLE, HOMOZYGOUS_COMPLEX, HOMOZYGOUS_SIMPLE, HETEROZYGOUS_COMPLEX, HETEROZYGOUS_SIMPLE]");
+    TestUtils.testEnum(RocFilter.class, "[ALL, HOMOZYGOUS, HETEROZYGOUS, SNP, NON_SNP, MNP, INDEL, COMPLEX, SIMPLE, HOMOZYGOUS_COMPLEX, HOMOZYGOUS_SIMPLE, HETEROZYGOUS_COMPLEX, HETEROZYGOUS_SIMPLE]");
   }
 
   public void testAll() {

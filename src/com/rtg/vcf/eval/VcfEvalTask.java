@@ -156,13 +156,13 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
       case MODE_ANNOTATE:
-        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
+        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_COMBINE:
-        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
+        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_SPLIT:
-        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.rtgStats(), params.twoPass());
+        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);

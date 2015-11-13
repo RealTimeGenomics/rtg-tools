@@ -59,7 +59,6 @@ public class VcfEvalParamsTest extends TestCase {
     VcfEvalParams.VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder = builder.name("blah").outputParams(new OutputParams(new File("out"), false, false)).baseLineFile(new File("mutations")).callsFile(new File("calls")).templateFile(new File("template")).maxLength(199);
     builder = builder.scoreField(VcfUtils.QUAL).sortOrder(RocSortOrder.ASCENDING).baselineSample("name").callsSample("name2");
-    builder.rtgStats(true);
     final VcfEvalParams params = builder.create();
     assertEquals("blah", params.name());
     assertEquals(VcfUtils.QUAL, params.scoreField());
@@ -73,7 +72,7 @@ public class VcfEvalParamsTest extends TestCase {
     assertEquals(199, params.maxLength());
     assertEquals(params.outputParams().directory(), params.directory());
     assertEquals(new File(new File("out"), "bbbb"), params.file("bbbb"));
-    assertTrue(params.rtgStats());
+    assertTrue(params.rocFilters().contains(RocFilter.ALL));
   }
 
   public void testOmnes() {

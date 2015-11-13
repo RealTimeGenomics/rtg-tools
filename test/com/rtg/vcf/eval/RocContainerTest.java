@@ -31,7 +31,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
 
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
@@ -60,7 +59,8 @@ public class RocContainerTest extends TestCase {
         }
       });
       roc.addFilter(RocFilter.ALL);
-      EnumSet<RocFilter> v = EnumSet.of(RocFilter.ALL);
+      //EnumSet<RocFilter> v = EnumSet.of(RocFilter.ALL);
+      final RocFilter v = RocFilter.ALL;
       roc.addRocLine(0.1, 1.0, v);
       roc.addRocLine(0.1, 0.0, v);
       roc.addRocLine(0.2, 0.0, v);

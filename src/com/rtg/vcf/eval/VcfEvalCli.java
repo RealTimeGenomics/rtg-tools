@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.Locale;
 
 import com.rtg.launcher.CommonFlags;
@@ -74,6 +75,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String REF_OVERLAP = "ref-overlap";
   private static final String OUTPUT_MODE = "output-mode";
 
+  private static final String ROC_SUBSET = "Xroc-subset";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
@@ -125,6 +127,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, "STRING", "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     final Flag modeFlag = flags.registerOptional('m', OUTPUT_MODE, String.class, "STRING", "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE});
+    flags.registerOptional('R', ROC_SUBSET, RocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
 
     flags.registerOptional(MAX_LENGTH, Integer.class, "INT", "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
     flags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
@@ -256,10 +259,27 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselineSample(samples[0]);
       builder.callsSample(samples.length == 2 ? samples[1] : samples[0]);
     }
+    final EnumSet<RocFilter> rocFilters;
+    if (!mFlags.isSet(ROC_SUBSET)) {
+      rocFilters = EnumSet.of(RocFilter.ALL, RocFilter.SNP, RocFilter.NON_SNP);
+    } else {
+      rocFilters = EnumSet.noneOf(RocFilter.class);
+      for (Object o : mFlags.getValues(ROC_SUBSET)) {
+        rocFilters.add((RocFilter) o);
+      }
+    }
+    if (mFlags.isSet(RTG_STATS)) {
+      rocFilters.add(RocFilter.SIMPLE);
+      rocFilters.add(RocFilter.COMPLEX);
+      rocFilters.add(RocFilter.HETEROZYGOUS_SIMPLE);
+      rocFilters.add(RocFilter.HETEROZYGOUS_COMPLEX);
+      rocFilters.add(RocFilter.HOMOZYGOUS_SIMPLE);
+      rocFilters.add(RocFilter.HOMOZYGOUS_COMPLEX);
+    }
+    builder.rocFilters(rocFilters);
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
     builder.refOverlap(mFlags.isSet(REF_OVERLAP));
-    builder.rtgStats(mFlags.isSet(RTG_STATS));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
     final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);

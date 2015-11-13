@@ -54,6 +54,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 
 /**
  */
@@ -65,7 +66,7 @@ public class RocContainer {
   private final Comparator<Double> mComparator;
   private int mNoScoreVariants = 0;
   private final RocSortValueExtractor mRocExtractor;
-  private String mFilePrefix;
+  private final String mFilePrefix;
 
   /**
    * Constructor
@@ -104,26 +105,23 @@ public class RocContainer {
   }
 
   /**
-   * Add an ROC output file
-   * @param filter filter to apply to calls, or <code>null</code> for all calls
+   * Add an ROC output file corresponding to a filtered view of the calls
+   * @param filter filtered curve to generate
    */
   public void addFilter(RocFilter filter) {
     mRocs.put(filter, new TreeMap<Double, RocPoint>(mComparator));
   }
 
-  void addStandardFilters() {
-    addFilter(RocFilter.ALL);
-    addFilter(RocFilter.HETEROZYGOUS);
-    addFilter(RocFilter.HOMOZYGOUS);
-  }
-
-  void addExtraFilters() {
-    addFilter(RocFilter.SIMPLE);
-    addFilter(RocFilter.COMPLEX);
-    addFilter(RocFilter.HETEROZYGOUS_SIMPLE);
-    addFilter(RocFilter.HETEROZYGOUS_COMPLEX);
-    addFilter(RocFilter.HOMOZYGOUS_SIMPLE);
-    addFilter(RocFilter.HOMOZYGOUS_COMPLEX);
+  /**
+   * Add ROC outputs for all the supplied filters to the container
+   * @param filters filtered curves to generate
+   */
+  void addFilters(EnumSet<RocFilter> filters) {
+    if (filters != null) {
+      for (RocFilter f : filters) {
+        addFilter(f);
+      }
+    }
   }
 
   Collection<RocFilter> filters() {
@@ -137,39 +135,36 @@ public class RocContainer {
    * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
    */
   public void addRocLine(VcfRecord rec, int sampleId, double weight) {
-    final EnumSet<RocFilter> filters = EnumSet.noneOf(RocFilter.class);
-    for (final RocFilter filter : filters()) {
-      if (filter.accept(rec, sampleId)) {
-        filters.add(filter);
-      }
-    }
     double score = Double.NaN;
     try {
       score = mRocExtractor.getSortValue(rec, sampleId);
     } catch (IndexOutOfBoundsException ignored) {
     }
-    addRocLine(score, weight, filters);
+    if (Double.isNaN(score) || Double.isInfinite(score)) {
+      mNoScoreVariants++;
+    } else {
+      final int[] gt = VcfUtils.getValidGt(rec, sampleId);
+      for (final RocFilter filter : filters()) {
+        if (filter.accept(rec, gt)) {
+          addRocLine(score, weight, filter);
+        }
+      }
+    }
   }
 
   /**
    * add single result to ROC
-   * @param primarySortValue normally the posterior score
+   * @param sortValue normally the posterior score
    * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
-   * @param filters specifies which roc lines the point will be added to
+   * @param filter specifies which roc line the point will be added to
    */
-  public void addRocLine(double primarySortValue, double weight, EnumSet<RocFilter> filters) {
-    if (Double.isNaN(primarySortValue) || Double.isInfinite(primarySortValue)) {
-      mNoScoreVariants++;
-    } else {
-      for (RocFilter filter : filters) {
-        final SortedMap<Double, RocPoint> points = mRocs.get(filter);
-        final RocPoint point = new RocPoint(primarySortValue, weight, weight > 0.0 ? 0 : 1);
-        final RocPoint old = points.put(primarySortValue, point);
-        if (old != null) {
-          point.mTp += old.mTp;
-          point.mFp += old.mFp;
-        }
-      }
+  void addRocLine(double sortValue, double weight, RocFilter filter) {
+    final RocPoint point = new RocPoint(sortValue, weight, weight > 0.0 ? 0 : 1);
+    final SortedMap<Double, RocPoint> points = mRocs.get(filter);
+    final RocPoint old = points.put(sortValue, point);
+    if (old != null) {
+      point.mTp += old.mTp;
+      point.mFp += old.mFp;
     }
   }
 

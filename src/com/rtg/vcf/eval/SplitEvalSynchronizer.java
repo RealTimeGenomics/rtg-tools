@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -67,14 +68,14 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
-   * @param rtgStats true to output additional ROC curves for RTG specific attributes
    * @param twoPass true to output additional ROC curves for allele-matches
+   * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
   SplitEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                         String callsSampleName, RocSortValueExtractor extractor,
-                        File outdir, boolean zip, boolean slope, boolean rtgStats, boolean twoPass) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats, twoPass);
+                        File outdir, boolean zip, boolean slope, boolean twoPass, EnumSet<RocFilter> rocFilters) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mTpCalls = new VcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), null, zip, true);
     mTpBase = new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true);

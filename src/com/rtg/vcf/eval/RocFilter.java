@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.util.Locale;
 
+import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -44,7 +45,7 @@ public enum RocFilter {
   /** accepts everything **/
   ALL {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
+    boolean accept(VcfRecord rec, int[] gt) {
       return true;
     }
 
@@ -56,57 +57,91 @@ public enum RocFilter {
   /** all homozygous **/
   HOMOZYGOUS {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isHomozygousAlt(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** all heterozygous **/
   HETEROZYGOUS {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isHeterozygous(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return VcfUtils.isHeterozygous(gt);
     }
   },
-  /** all complex calls **/
+  /** all SNPs **/
+  SNP {
+    @Override
+    boolean accept(VcfRecord rec, int[] gt) {
+      final VariantType type = VariantType.getType(rec, gt);
+      return type == VariantType.SNP;
+    }
+  },
+  /** non-SNPs **/
+  NON_SNP {
+    @Override
+    boolean accept(VcfRecord rec, int[] gt) {
+      final VariantType type = VariantType.getType(rec, gt);
+      return type != VariantType.SNP;
+    }
+  },
+  /** all MNPs (non-length changing) **/
+  MNP {
+    @Override
+    boolean accept(VcfRecord rec, int[] gt) {
+      final VariantType type = VariantType.getType(rec, gt);
+      return type == VariantType.MNP;
+    }
+  },
+  /** all indels (length changing) **/
+  INDEL {
+    @Override
+    boolean accept(VcfRecord rec, int[] gt) {
+      final VariantType type = VariantType.getType(rec, gt);
+      return type.isIndelType();
+    }
+  },
+
+  // RTG simple vs complex breakdowns
+  /** all RTG complex calls **/
   COMPLEX {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
+    boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec);
     }
   },
-  /** all simple (non complex) calls **/
+  /** all RTG simple (non complex) calls **/
   SIMPLE {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
+    boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec);
     }
   },
   /** homozygous complex calls **/
   HOMOZYGOUS_COMPLEX {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** homozygous simple (non complex) calls **/
   HOMOZYGOUS_SIMPLE {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** heterozygous complex calls **/
   HETEROZYGOUS_COMPLEX {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
   },
   /** heterozygous simple (non complex) calls **/
   HETEROZYGOUS_SIMPLE {
     @Override
-    boolean accept(VcfRecord rec, int sample) {
-      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(rec, sample);
+    boolean accept(VcfRecord rec, int[] gt) {
+      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
   };
 
@@ -118,7 +153,18 @@ public enum RocFilter {
    * @param sample sample number
    * @return if accepted returns true, false otherwise
    */
-  abstract boolean accept(VcfRecord rec, int sample);
+  boolean accept(VcfRecord rec, int sample) {
+    final int[] gt = VcfUtils.getValidGt(rec, sample);
+    return accept(rec, gt);
+  }
+
+  /**
+   * Tests specified record
+   * @param rec record to be tested
+   * @param gt the split GT field of the sample
+   * @return if accepted returns true, false otherwise
+   */
+  abstract boolean accept(VcfRecord rec, int[] gt);
 
   /**
    * Get the name of the default output file for this filter

@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EnumSet;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
@@ -71,25 +72,29 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
-   * @param rtgStats true to output additional ROC curves for RTG specific attributes
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
+   * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
   WithRocsEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean rtgStats, boolean dualRocs) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
     mDefaultRoc = new RocContainer(extractor);
-    mDefaultRoc.addStandardFilters();
-    if (rtgStats) {
-      mDefaultRoc.addExtraFilters();
-    }
+    mDefaultRoc.addFilters(rocFilters);
+
+//    mDefaultRoc.addStandardFilters();
+//    if (rtgStats) {
+//      mDefaultRoc.addExtraFilters();
+//    }
+
     if (dualRocs) {
       mAlleleRoc = new RocContainer(extractor, "allele_");
-      mAlleleRoc.addStandardFilters();
-      if (rtgStats) {
-        mAlleleRoc.addExtraFilters();
-      }
+      mAlleleRoc.addFilters(rocFilters);
+//      mAlleleRoc.addStandardFilters();
+//      if (rtgStats) {
+//        mAlleleRoc.addExtraFilters();
+//      }
     } else {
       mAlleleRoc = null;
     }

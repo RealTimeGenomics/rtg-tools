@@ -33,6 +33,7 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -74,15 +75,15 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @param slope true to output ROC slope files
-   * @param rtgStats true to output additional ROC curves for RTG specific attributes
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
+   * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
   CombinedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String baselineSampleName, String callsSampleName,
                            RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean rtgStats, boolean dualRocs) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, rtgStats, dualRocs);
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mOutHeader = new VcfHeader();

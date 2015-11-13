@@ -30,6 +30,7 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
+import java.util.EnumSet;
 
 import com.rtg.launcher.OutputModuleParams;
 import com.rtg.util.intervals.RegionRestriction;
@@ -66,10 +67,10 @@ public final class VcfEvalParams extends OutputModuleParams {
     private boolean mSquashPloidy = false;
     private boolean mRefOverlap = false;
     int mMaxLength = -1;
-    boolean mRtgStats = false;
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
+    private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HETEROZYGOUS, RocFilter.HOMOZYGOUS);
 
     @Override
     protected VcfEvalParamsBuilder self() {
@@ -220,13 +221,12 @@ public final class VcfEvalParams extends OutputModuleParams {
       return self();
     }
 
-
     /**
-     * @param rtgStats should RTG specific output be produced
+     * @param filters the set of ROC outputs to produce
      * @return this builder, so calls can be chained
      */
-    public VcfEvalParamsBuilder rtgStats(boolean rtgStats) {
-      mRtgStats = rtgStats;
+    public VcfEvalParamsBuilder rocFilters(EnumSet<RocFilter> filters) {
+      mRocFilters = filters;
       return self();
     }
 
@@ -287,7 +287,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final boolean mSquashPloidy;
   private final boolean mRefOverlap;
   private final int mMaxLength;
-  private final boolean mRtgStats;
+  private final EnumSet<RocFilter> mRocFilters;
   private final boolean mOutputSlopeFiles;
 
 
@@ -312,7 +312,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mSquashPloidy = builder.mSquashPloidy;
     mRefOverlap = builder.mRefOverlap;
     mMaxLength = builder.mMaxLength;
-    mRtgStats = builder.mRtgStats;
+    mRocFilters = builder.mRocFilters;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
   }
 
@@ -437,11 +437,12 @@ public final class VcfEvalParams extends OutputModuleParams {
   public int maxLength() {
     return mMaxLength;
   }
+
   /**
-   * @return true if RTG specific stats should be included in output
+   * @return a set of the ROC outputs to produce
    */
-  public boolean rtgStats() {
-    return mRtgStats;
+  public EnumSet<RocFilter> rocFilters() {
+    return mRocFilters;
   }
 
   /**
@@ -453,7 +454,7 @@ public final class VcfEvalParams extends OutputModuleParams {
 
   @Override
   public String toString() {
-    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass + ", max length=" + mMaxLength + ", rtg stats=" + mRtgStats + ", output mode=" + mOutputMode + ", output params=" + super.toString();
+    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass + ", max length=" + mMaxLength + ", roc filters=" + mRocFilters + ", output mode=" + mOutputMode + ", output params=" + super.toString();
   }
 
 }
