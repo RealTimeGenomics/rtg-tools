@@ -41,7 +41,7 @@ import junit.framework.TestCase;
  */
 public class MultiFamilyOrderingTest extends TestCase {
 
-  public void testSuperDuperUltraSimple() {
+  public void testSuperDuperUltraSimple() throws PedigreeException {
     final Set<Family> fams = new HashSet<>();
     final Family fam = new Family("father", "mother", "child1", "child2", "child3");
     fams.add(fam);
@@ -55,7 +55,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     //System.err.println(famsO);
   }
 
-  public void testMultiGen() {
+  public void testMultiGen() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen2 = new Family("child1", "dInLaw1", "gchild1", "gchild2");
@@ -78,7 +78,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2.getMotherDistinctMates());
   }
 
-  public void testMultiGenExtra() {
+  public void testMultiGenExtra() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen2 = new Family("child1", "dInLaw1", "gchild1", "gchild2");
@@ -100,7 +100,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2b.getMotherDistinctMates());
   }
 
-  public void testMultiGenDifferentFamilies() {
+  public void testMultiGenDifferentFamilies() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen2 = new Family("child1", "dInLaw1", "gchild1", "gchild2");
@@ -126,7 +126,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2b.getMotherDistinctMates());
   }
 
-  public void testGG() {
+  public void testGG() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen2 = new Family("child1", "dInLaw1", "gchild1", "gchild2");
@@ -158,7 +158,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen3.getMotherDistinctMates());
   }
 
-  public void testUnfaithful() {
+  public void testUnfaithful() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");
@@ -173,7 +173,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(2, gen1b.getFatherDistinctMates());
     assertEquals(1, gen1b.getMotherDistinctMates());
   }
-  public void testUnfaithfulWithGKids() {
+  public void testUnfaithfulWithGKids() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");
@@ -201,7 +201,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2b.getMotherDistinctMates());
   }
 
-  public void testUnfaithfulWithIncestuousHalfSibs() {
+  public void testUnfaithfulWithIncestuousHalfSibs() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");
@@ -224,7 +224,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2.getMotherDistinctMates());
   }
 
-  public void testBigDaddy() {
+  public void testBigDaddy() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen2 = new Family("father", "child2", "gchild1", "gchild2");
@@ -251,7 +251,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen4.getMotherDistinctMates());
   }
 
-  public void testBigDaddyNewWife() {
+  public void testBigDaddyNewWife() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");
@@ -278,7 +278,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen2b.getMotherDistinctMates());
   }
 
-  public void testBigDaddyGchild() {
+  public void testBigDaddyGchild() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");
@@ -306,7 +306,7 @@ public class MultiFamilyOrderingTest extends TestCase {
     assertEquals(1, gen3.getMotherDistinctMates());
   }
 
-  public void testBigDaddyAndBigMommaGchild() {
+  public void testBigDaddyAndBigMommaGchild() throws PedigreeException {
     final Set<Family> fams = new LinkedHashSet<>();
     final Family gen1 = new Family("father", "mother", "child1", "child2", "child3");
     final Family gen1b = new Family("father", "newWife", "child4", "child5");

@@ -93,8 +93,9 @@ public final class MultiFamilyOrdering {
    * As a side effect we also set the number of mates parents have in the family object
    * @param families the families to order
    * @return the ordered families
+   * @throws PedigreeException if cycles are detected in the pedigree
    */
-  public static List<Family> orderFamiliesAndSetMates(Set<Family> families) {
+  public static List<Family> orderFamiliesAndSetMates(Set<Family> families) throws PedigreeException {
     final MultiMap<String, Family> parents = new MultiMap<>(true);
     final HashMap<String, Integer> parentPairCounts = new HashMap<>();
     final HashMap<String, Family> parentPairToFamily = new HashMap<>();
@@ -153,7 +154,7 @@ public final class MultiFamilyOrdering {
       }
     }
     if (parentPairCounts.size() > 0) {
-      throw new IllegalArgumentException("Cycles in pedigree detected");
+      throw new PedigreeException("Cycles in pedigree detected, check pedigree structure");
     }
     //extra stuff
     for (Family f : families) {

@@ -41,6 +41,7 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.reference.Sex;
 import com.rtg.util.TextTable;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.LineWriter;
 
 /**
@@ -139,7 +140,12 @@ public class PedStatsCli extends AbstractCli {
         w.writeln(pedigree.toString());
 
       } else if (mFlags.isSet(ORDERING)) {      // ordering stuff
-        final List<Family> families = MultiFamilyOrdering.orderFamiliesAndSetMates(Family.getFamilies(pedigree, false, null));
+        final List<Family> families;
+        try {
+          families = MultiFamilyOrdering.orderFamiliesAndSetMates(Family.getFamilies(pedigree, false, null));
+        } catch (PedigreeException e) {
+          throw new NoTalkbackSlimException(e.getMessage());
+        }
         w.writeln("Families in processing order:");
         for (final Family f : families) {
           w.writeln(f.toString());
