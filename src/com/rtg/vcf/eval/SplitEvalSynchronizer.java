@@ -36,7 +36,6 @@ import java.util.EnumSet;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
 
 /**
@@ -88,16 +87,6 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
       mFpCa = null;
       mFnCa = null;
     }
-  }
-
-  @Override
-  protected void resetBaselineRecordFields(VcfRecord rec) {
-    // No-op
-  }
-
-  @Override
-  protected void resetCallRecordFields(VcfRecord rec) {
-    // No-op
   }
 
   @Override

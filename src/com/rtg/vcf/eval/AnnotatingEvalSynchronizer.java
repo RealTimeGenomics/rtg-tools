@@ -37,7 +37,6 @@ import java.util.LinkedHashMap;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -74,16 +73,6 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
     final VcfHeader ch = variants.calledHeader().copy();
     CombinedEvalSynchronizer.addInfoHeaders(ch, VariantSetType.CALLS);
     mCalls = new VcfWriter(ch, new File(outdir, "calls.vcf" + zipExt), null, zip, true);
-  }
-
-  @Override
-  protected void resetBaselineRecordFields(VcfRecord rec) {
-    // No-op
-  }
-
-  @Override
-  protected void resetCallRecordFields(VcfRecord rec) {
-    // No-op
   }
 
   @Override

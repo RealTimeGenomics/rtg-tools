@@ -103,14 +103,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   }
 
   @Override
-  protected void resetBaselineRecordFields(VcfRecord rec) {
-  }
-
-  @Override
-  protected void resetCallRecordFields(VcfRecord rec) {
-  }
-
-  @Override
   protected void handleUnknownBaseline() throws IOException {
     writeBaseline(updateForBaseline(true, new LinkedHashMap<String, String>()));
   }

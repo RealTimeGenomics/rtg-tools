@@ -219,13 +219,13 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
    * Called immediately after each baseline VCF record is read.
    * @param rec the newly read record
    */
-  protected abstract void resetBaselineRecordFields(VcfRecord rec);
+  protected void resetBaselineRecordFields(VcfRecord rec) { }
 
   /**
    * Called immediately after each call VCF record is read.
    * @param rec the newly read record
    */
-  protected abstract void resetCallRecordFields(VcfRecord rec);
+  protected void resetCallRecordFields(VcfRecord rec) { }
 
   /**
    * Process a baseline record where we can not associate a matching baseline variant.
