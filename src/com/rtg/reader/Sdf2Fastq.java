@@ -84,6 +84,7 @@ public final class Sdf2Fastq extends AbstractCli {
     Sdf2Fasta.registerTextExtractorFlags(mFlags);
 
     mFlags.registerOptional('q', DEFAULT_QUALITY, Integer.class, "INT", "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
+    mFlags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
 
     mFlags.setValidator(VALIDATOR);
   }

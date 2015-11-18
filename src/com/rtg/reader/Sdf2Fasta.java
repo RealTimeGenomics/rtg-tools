@@ -87,6 +87,7 @@ public class Sdf2Fasta extends AbstractCli {
 
     registerTextExtractorFlags(mFlags);
     mFlags.registerOptional(TAXID_FLAG, "interpret supplied sequence as taxon ids instead of numeric sequence ids").setCategory(FILTERING);
+    mFlags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
 
     mFlags.setValidator(VALIDATOR);
   }
@@ -111,7 +112,6 @@ public class Sdf2Fasta extends AbstractCli {
     registerExtractorFlags(flags);
     flags.registerRequired('o', OUTPUT, File.class, "FILE", "output filename (extension added if not present). Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     flags.registerOptional('l', LINE_LENGTH, Integer.class, "INT", "maximum number of nucleotides to print on a line of output. A value of 0 indicates no limit", 0).setCategory(UTILITY);
-    flags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
     flags.registerOptional('R', RENAME, "rename the reads to their consecutive number; name of first read in file is '0'").setCategory(UTILITY);
     CommonFlags.initNoGzip(flags);
   }
