@@ -203,10 +203,11 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Records skipped due to invalid sample fields: 2" + StringUtils.LS, checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--remove-format", "GT", "--remove-format", "DS", "--remove-format", "GL", "-Z"));
+      assertEquals("Records skipped due to invalid or incompatible sample fields: 1" + StringUtils.LS, checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--remove-format", "GT", "--remove-format", "DS", "-Z"));
 
       final String content = FileHelper.fileToString(out);
-      assertEquals("", StringUtils.grepMinusV(content, "^#")); //all the records get wiped out by keeping
+      final String nonheader = StringUtils.grepMinusV(content, "^#");
+      assertTrue(nonheader.startsWith("X\t60052"));
     }
   }
 }

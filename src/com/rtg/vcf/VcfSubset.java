@@ -373,7 +373,7 @@ public class VcfSubset extends AbstractCli {
         }
       }
       if (skippedRecords > 0) {
-        Diagnostic.warning("Records skipped due to invalid sample fields: " + skippedRecords);
+        Diagnostic.warning("Records skipped due to invalid or incompatible sample fields: " + skippedRecords);
       }
     }
     return 0;

@@ -38,7 +38,7 @@ import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
- * Removes unwanted Format field entries from a VCF record
+ * Removes unwanted FORMAT field entries from a VCF record
  */
 public class VcfFormatStripper implements VcfAnnotator {
 
@@ -73,6 +73,7 @@ public class VcfFormatStripper implements VcfAnnotator {
 
   @Override
   public void annotate(VcfRecord rec) {
+    mKeepRecord = true;
     if (mFormats == null || mFormats.size() == 0) {
       return;
     }
