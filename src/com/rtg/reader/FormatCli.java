@@ -672,7 +672,7 @@ public final class FormatCli extends LoggedCli {
             } else if (allRegularFiles) {
               for (File f : files) {
                 record = SamCommandHelper.validateAndCreateSamRG(f.getPath(), SamCommandHelper.ReadGroupStrictness.AT_MOST_ONE);
-                if (record != null && current != null && record != current) {
+                if (record != null && current != null && !record.equals(current)) {
                   throw new InvalidParamsException("Multiple read group information present in the input files, please select a SAM file with a single read group, select a read group with --" + SELECT_READ_GROUP + " or specify a read group header with --" + SamCommandHelper.SAM_RG);
                 }
                 if (record != null) {

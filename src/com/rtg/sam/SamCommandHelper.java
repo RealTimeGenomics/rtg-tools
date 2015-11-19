@@ -122,21 +122,21 @@ public final class SamCommandHelper {
       final int readGroupCount = readGroups.size();
       if (readGroupCount == 0) {
         if (strict == ReadGroupStrictness.REQUIRED) {
-            throw new InvalidParamsException("No read group information present in the input " + errorSubString + " with a single read group");
+            throw new InvalidParamsException("No read group information present in the input " + errorSubString + ". A single read group is required");
         } else {
           return null;
         }
       }
       if (readGroupCount > 1) {
         if (strict == ReadGroupStrictness.REQUIRED || strict == ReadGroupStrictness.AT_MOST_ONE) {
-          throw new InvalidParamsException("Multiple read groups present in the input " + errorSubString + " with a single read group");
+          throw new InvalidParamsException("Multiple read groups present in the input " + errorSubString + ". A single read group is required");
         } else {
           return null;
         }
       }
       final SAMReadGroupRecord samReadGroupRecord = readGroups.get(0);
       if (samReadGroupRecord.getSample() == null) {
-        Diagnostic.warning("Sample not specified in read group, it is recommended to set the sample tag.");
+        Diagnostic.warning("Sample not specified in read group, it is recommended that the sample be set.");
       }
       return samReadGroupRecord;
     } finally {
