@@ -55,14 +55,14 @@ public enum RocFilter {
     }
   },
   /** all homozygous **/
-  HOMOZYGOUS {
+  HOM("homozygous") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** all heterozygous **/
-  HETEROZYGOUS {
+  HET("heterozygous") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHeterozygous(gt);
@@ -103,42 +103,42 @@ public enum RocFilter {
 
   // RTG simple vs complex breakdowns
   /** all RTG complex calls **/
-  COMPLEX {
+  XRX {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec);
     }
   },
   /** all RTG simple (non complex) calls **/
-  SIMPLE {
+  NON_XRX {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec);
     }
   },
   /** homozygous complex calls **/
-  HOMOZYGOUS_COMPLEX {
+  HOM_XRX("homozygous_xrx") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** homozygous simple (non complex) calls **/
-  HOMOZYGOUS_SIMPLE {
+  HOM_NON_XRX("homozygous_non_xrx") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
   },
   /** heterozygous complex calls **/
-  HETEROZYGOUS_COMPLEX {
+  HET_XRX("heterozygous_xrx") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
   },
   /** heterozygous simple (non complex) calls **/
-  HETEROZYGOUS_SIMPLE {
+  HET_NON_XRX("heterozygous_non_xrx") {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
@@ -146,6 +146,16 @@ public enum RocFilter {
   };
 
   static final String ROC_EXT = "_roc.tsv";
+
+  private final String mBaseFilename;
+
+  RocFilter() {
+    this(null);
+  }
+
+  RocFilter(String baseFilename) {
+    mBaseFilename = baseFilename;
+  }
 
   /**
    * Tests specified record
@@ -171,6 +181,10 @@ public enum RocFilter {
    * @return the output file name
    */
   String fileName() {
-    return name().toLowerCase(Locale.ROOT) + ROC_EXT;
+    if (mBaseFilename != null) {
+      return mBaseFilename + ROC_EXT;
+    } else {
+      return name().toLowerCase(Locale.ROOT) + ROC_EXT;
+    }
   }
 }

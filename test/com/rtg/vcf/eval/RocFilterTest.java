@@ -52,7 +52,7 @@ public class RocFilterTest extends TestCase {
   private static final VcfRecord COMPLEX_IDENTITY_RECORD = VcfReader.vcfLineToRecord("chr1 250 . A . 20.0 PASS XRX GT 0/0".replaceAll(" ", "\t"));
 
   public void testEnum() {
-    TestUtils.testEnum(RocFilter.class, "[ALL, HOMOZYGOUS, HETEROZYGOUS, SNP, NON_SNP, MNP, INDEL, COMPLEX, SIMPLE, HOMOZYGOUS_COMPLEX, HOMOZYGOUS_SIMPLE, HETEROZYGOUS_COMPLEX, HETEROZYGOUS_SIMPLE]");
+    TestUtils.testEnum(RocFilter.class, "[ALL, HOM, HET, SNP, NON_SNP, MNP, INDEL, XRX, NON_XRX, HOM_XRX, HOM_NON_XRX, HET_XRX, HET_NON_XRX]");
   }
 
   public void testAll() {
@@ -69,7 +69,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHomozygous() {
-    final RocFilter f = RocFilter.HOMOZYGOUS;
+    final RocFilter f = RocFilter.HOM;
     assertTrue(f.accept(PASS_RECORD, 0));
     assertTrue(f.accept(FAIL_RECORD, 0));
     assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
@@ -82,7 +82,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHeterozygous() {
-    final RocFilter f = RocFilter.HETEROZYGOUS;
+    final RocFilter f = RocFilter.HET;
     assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
     assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
 
@@ -95,7 +95,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testComplex() {
-    final RocFilter f = RocFilter.COMPLEX;
+    final RocFilter f = RocFilter.XRX;
     assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
     assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
     assertTrue(f.accept(COMPLEX_IDENTITY_RECORD, 0));
@@ -109,7 +109,7 @@ public class RocFilterTest extends TestCase {
 
 
   public void testSimple() {
-    final RocFilter f = RocFilter.SIMPLE;
+    final RocFilter f = RocFilter.NON_XRX;
     assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
     assertTrue(f.accept(FAIL_RECORD, 0));
     assertTrue(f.accept(PASS_RECORD, 0));
@@ -122,7 +122,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHomozygousSimple() {
-    final RocFilter f = RocFilter.HOMOZYGOUS_SIMPLE;
+    final RocFilter f = RocFilter.HOM_NON_XRX;
     assertTrue(f.accept(FAIL_RECORD, 0));
     assertTrue(f.accept(PASS_RECORD, 0));
     assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
@@ -135,7 +135,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHomozygousComplex() {
-    final RocFilter f = RocFilter.HOMOZYGOUS_COMPLEX;
+    final RocFilter f = RocFilter.HOM_XRX;
     assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
 
     assertFalse(f.accept(FAIL_RECORD, 0));
@@ -148,7 +148,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHeterozygousSimple() {
-    final RocFilter f = RocFilter.HETEROZYGOUS_SIMPLE;
+    final RocFilter f = RocFilter.HET_NON_XRX;
     assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
 
     assertFalse(f.accept(FAIL_RECORD, 0));
@@ -161,7 +161,7 @@ public class RocFilterTest extends TestCase {
   }
 
   public void testHeterozygousComplex() {
-    final RocFilter f = RocFilter.HETEROZYGOUS_COMPLEX;
+    final RocFilter f = RocFilter.HET_XRX;
     assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
 
     assertFalse(f.accept(FAIL_RECORD, 0));

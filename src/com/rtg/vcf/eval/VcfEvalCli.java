@@ -271,12 +271,12 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       }
     }
     if (mFlags.isSet(RTG_STATS)) {
-      rocFilters.add(RocFilter.SIMPLE);
-      rocFilters.add(RocFilter.COMPLEX);
-      rocFilters.add(RocFilter.HETEROZYGOUS_SIMPLE);
-      rocFilters.add(RocFilter.HETEROZYGOUS_COMPLEX);
-      rocFilters.add(RocFilter.HOMOZYGOUS_SIMPLE);
-      rocFilters.add(RocFilter.HOMOZYGOUS_COMPLEX);
+      rocFilters.add(RocFilter.NON_XRX);
+      rocFilters.add(RocFilter.XRX);
+      rocFilters.add(RocFilter.HET_NON_XRX);
+      rocFilters.add(RocFilter.HET_XRX);
+      rocFilters.add(RocFilter.HOM_NON_XRX);
+      rocFilters.add(RocFilter.HOM_XRX);
     }
     builder.rocFilters(rocFilters);
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));

@@ -70,7 +70,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
-    private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HETEROZYGOUS, RocFilter.HOMOZYGOUS);
+    private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
     private boolean mObeyPhase = false;
 
     @Override
