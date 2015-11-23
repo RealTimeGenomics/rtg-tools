@@ -97,7 +97,7 @@
     <fileset dir="${tools.test.dir}">
       <include name="com/**/*.txt"/>
       <include name="com/**/*.properties"/>
-      <include name="com/rtg/**/resources/*"/>
+      <include name="com/rtg/**/resources/**/*"/>
       <include name="com/rtg/mode/BLOSUM*" />
       <include name="com/rtg/util/testFile"/>
       <include name="com/rtg/util/cli/spell.*"/>
