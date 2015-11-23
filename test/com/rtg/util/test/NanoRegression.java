@@ -182,12 +182,17 @@ public class NanoRegression {
 
     @Override
     public boolean hasReference(String id) {
-      return new File(mRepositoryDir, id).exists();
+      return getFileFromId(id).exists();
+    }
+
+    private File getFileFromId(String id) {
+      final String pathId = id.replace("/", System.getProperty("file.separator"));
+      return new File(mRepositoryDir, pathId);
     }
 
     @Override
     public String loadReference(String id) throws IOException {
-      return FileUtils.fileToString(new File(mRepositoryDir, id));
+      return FileUtils.fileToString(getFileFromId(id));
     }
 
     @Override
@@ -197,7 +202,7 @@ public class NanoRegression {
           throw new IOException("Could not create output directory: " + mRepositoryDir);
         }
       }
-      FileUtils.stringToFile(reference, new File(mRepositoryDir, id));
+      FileUtils.stringToFile(reference, getFileFromId(id));
     }
   }
 
