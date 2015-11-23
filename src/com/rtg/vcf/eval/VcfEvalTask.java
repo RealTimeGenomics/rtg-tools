@@ -116,7 +116,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     if (params.twoPass() && params.squashPloidy()) {
       throw new IllegalStateException("Cannot run two-pass with squash-ploidy set");
     }
-    final boolean obeyPhase = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_OBEY_PHASE);
+    final boolean obeyPhase = params.obeyPhase();
     if (params.twoPass()) {
       o = new ArrayList<>();
       o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false, obeyPhase), getOrientor(VariantSetType.CALLS, false, obeyPhase)));

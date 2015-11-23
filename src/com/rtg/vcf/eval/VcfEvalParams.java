@@ -71,6 +71,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
     private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HETEROZYGOUS, RocFilter.HOMOZYGOUS);
+    private boolean mObeyPhase = false;
 
     @Override
     protected VcfEvalParamsBuilder self() {
@@ -262,6 +263,16 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
+     * Obey global phasing if present in the input VCF
+     * @param obeyPhase true to obey phasing is present
+     * @return this builder
+     */
+    public VcfEvalParamsBuilder obeyPhase(boolean obeyPhase) {
+      mObeyPhase = obeyPhase;
+      return this;
+    }
+
+    /**
      * Creates a <code>VcfEvalParams</code> using the current builder
      * configuration.
      * @return the new <code>VcfEvalParams</code>
@@ -289,6 +300,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final int mMaxLength;
   private final EnumSet<RocFilter> mRocFilters;
   private final boolean mOutputSlopeFiles;
+  private final boolean mObeyPhase;
 
 
   /**
@@ -314,6 +326,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mMaxLength = builder.mMaxLength;
     mRocFilters = builder.mRocFilters;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
+    mObeyPhase = builder.mObeyPhase;
   }
 
   /**
@@ -443,6 +456,13 @@ public final class VcfEvalParams extends OutputModuleParams {
    */
   public EnumSet<RocFilter> rocFilters() {
     return mRocFilters;
+  }
+
+  /**
+   * @return if true obey global phasing if present in the input VCF
+   */
+  public boolean obeyPhase() {
+    return mObeyPhase;
   }
 
   /**

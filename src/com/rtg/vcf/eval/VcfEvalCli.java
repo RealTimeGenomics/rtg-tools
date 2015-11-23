@@ -80,6 +80,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
+  private static final String OBEY_PHASE = "Xobey-phase";
 
   @Override
   public String moduleName() {
@@ -133,6 +134,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
     flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
+    flags.registerOptional(OBEY_PHASE, Boolean.class, "BOOL", "obey global phasing if present in the input VCF", false).setCategory(FILTERING);
 
     CommonFlags.initThreadsFlag(flags);
     CommonFlags.initNoGzip(flags);
@@ -281,6 +283,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
     builder.refOverlap(mFlags.isSet(REF_OVERLAP));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));
+    builder.obeyPhase((Boolean) mFlags.getValue(OBEY_PHASE));
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
     final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);
     builder.outputMode(mode);

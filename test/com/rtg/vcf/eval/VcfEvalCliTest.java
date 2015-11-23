@@ -120,7 +120,7 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
     // Tricky cases where the notion of equivalence depends on the treatment of reference bases in the calls
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory)
     // Variant on 21 requires ref base removal AND variant overlap consideration to be independent for each haplotype
-    check("vcfeval_small_tricky", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap");
+    check("vcfeval_small_tricky/vcfeval_small_tricky", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap");
   }
 
   public void testNanoTricky2() throws IOException, UnindexableDataException {
@@ -133,6 +133,10 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
   public void testNanoTricky3() throws IOException, UnindexableDataException {
     // Has two alternative variants starting at exactly the same position, needs overlap handling, now works.
     check("vcfeval_small_tricky3", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1", "--squash-ploidy", "--ref-overlap");
+  }
+
+  public void testObeyPhasing() throws IOException, UnindexableDataException {
+    endToEnd("obeyphasing/obeyphasing", new String[] {"tp.vcf"}, false, "--Xobey-phase=true");
   }
 
   public void testNanoSmallRegion() throws IOException, UnindexableDataException {
