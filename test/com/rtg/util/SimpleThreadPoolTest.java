@@ -79,7 +79,7 @@ public class SimpleThreadPoolTest extends TestCase {
     sTriedRunningAfterDead++;
   }
 
-  private static final RuntimeException EXCEPTION = new RuntimeException("my-aborting-gob");
+  private static final RuntimeException EXCEPTION = new RuntimeException("my-aborting-job");
 
   private class RunAddJobs implements IORunnable {
     final boolean mAlreadyDead;
