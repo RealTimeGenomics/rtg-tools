@@ -36,6 +36,7 @@ import java.util.EnumSet;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfUtils;
@@ -80,28 +81,29 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
                            String callsSampleName, RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
-    mDefaultRoc = new RocContainer(extractor);
-    mDefaultRoc.addFilters(rocFilters);
 
-//    mDefaultRoc.addStandardFilters();
-//    if (rtgStats) {
-//      mDefaultRoc.addExtraFilters();
-//    }
-
-    if (dualRocs) {
+    int callSampleNo;
+    try {
+      callSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
+    } catch (NoTalkbackSlimException e) {
+      callSampleNo = -1;
+    }
+    mCallSampleNo = callSampleNo;
+    if (mCallSampleNo >= 0) {
+      mDefaultRoc = new RocContainer(extractor);
+      mDefaultRoc.addFilters(rocFilters);
+    } else {
+      mDefaultRoc = null;
+    }
+    if (mCallSampleNo >= 0 && dualRocs) {
       mAlleleRoc = new RocContainer(extractor, "allele_");
       mAlleleRoc.addFilters(rocFilters);
-//      mAlleleRoc.addStandardFilters();
-//      if (rtgStats) {
-//        mAlleleRoc.addExtraFilters();
-//      }
     } else {
       mAlleleRoc = null;
     }
     mZip = zip;
     mSlope = slope;
     mOutDir = outdir;
-    mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
   }
 
   @Override
@@ -112,10 +114,12 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   }
 
   protected void addToROCContainer(double weight, byte status) {
-    if (status == VariantId.STATUS_ALLELE_MATCH) { // Consider these FP for GT ROCs
-      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0);
-    } else {
-      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, weight);
+    if (mDefaultRoc != null) {
+      if (status == VariantId.STATUS_ALLELE_MATCH) { // Consider these FP for GT ROCs
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0);
+      } else {
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, weight);
+      }
     }
     if (mAlleleRoc != null) {
       mAlleleRoc.addRocLine(mCrv, mCallSampleNo, weight);
@@ -138,7 +142,9 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   @Override
   void finish() throws IOException {
     super.finish();
-    mDefaultRoc.missingScoreWarning();
+    if (mDefaultRoc != null) {
+      mDefaultRoc.missingScoreWarning();
+    }
     writePhasingInfo();
     if (mAlleleRoc != null) {
       final int alleleTp = mBaselineTruePositives + mFalseNegativesCommonAllele;
@@ -146,10 +152,12 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       // Do we want the allele-level summary too?
       //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
     }
-    final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
-    final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
-    mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
-    mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFp, strictFn);
+    if (mDefaultRoc != null) {
+      final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
+      final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
+      mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
+      mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFp, strictFn);
+    }
   }
 
   private void writePhasingInfo() throws IOException {
