@@ -59,6 +59,8 @@ public enum DerivedAnnotations {
   COC(new ContraryObservationCountAnnotation()),
   /** Allelic fraction of contrary observations */
   COF(new ContraryObservationFractionAnnotation()),
+  /** Allelic fraction of contrary observations */
+  VAF(new VariantAllelicFractionAnnotation()),
   /** Zygosity */
   ZY(new ZygosityAnnotation()),
   /** Ploidy */

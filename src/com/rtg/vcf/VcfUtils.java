@@ -609,11 +609,16 @@ public final class VcfUtils {
    */
   public static boolean hasRedundantFirstNucleotide(final VcfRecord rec) {
     // Can only strip previous nucleotide if all alleles have the same first char
-    final Character c = rec.getRefCall().charAt(0);
-    for (final String alt : rec.getAltCalls()) {
-      if (!c.equals(alt.charAt(0))) {
-        return false;
+    try {
+      final Character c = rec.getRefCall().charAt(0);
+      for (final String alt : rec.getAltCalls()) {
+        if (!c.equals(alt.charAt(0))) {
+          return false;
+        }
       }
+    } catch (Exception e) {
+      System.err.println("rec = " + rec);
+      throw e;
     }
     return !rec.getAltCalls().isEmpty();
   }
