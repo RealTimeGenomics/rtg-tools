@@ -79,6 +79,8 @@ public class SimpleThreadPoolTest extends TestCase {
     sTriedRunningAfterDead++;
   }
 
+  private static final RuntimeException EXCEPTION = new RuntimeException("my-aborting-gob");
+
   private class RunAddJobs implements IORunnable {
     final boolean mAlreadyDead;
     final int mMoreJobs;
@@ -112,7 +114,7 @@ public class SimpleThreadPoolTest extends TestCase {
               // Note: This set-dead/throw-exception isn't atomic so it's possible that some
               // "alreadydead" jobs are enqueued/executed before the exception is trapped/recognized
               setDead();
-              throw new RuntimeException("my-aborting-job");
+              throw EXCEPTION;
             }
           });
         }
