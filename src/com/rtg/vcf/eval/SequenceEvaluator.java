@@ -74,73 +74,75 @@ class SequenceEvaluator implements IORunnable {
 
   @Override
   public void run() throws IOException {
-    final Pair<String, Map<VariantSetType, List<Variant>>> setPair = mSynchronize.nextSet();
-    if (setPair == null) {
-      return;
-    }
-    final String currentName = setPair.getA();
-    final Long sequenceId = mNameMap.get(currentName);
-    if (sequenceId == null) {
-      throw new NoTalkbackSlimException("Sequence " + currentName + " is not contained in the reference.");
-    }
-    final byte[] template = mTemplate.read(sequenceId);
-    final Map<VariantSetType, List<Variant>> set = setPair.getB();
-    final Collection<Variant> baseLineCalls = set.get(VariantSetType.BASELINE);
-    final Collection<Variant> calledCalls = set.get(VariantSetType.CALLS);
-    Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
-    Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
-
-    if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
-      setStatus(baseLineCalls, VariantId.STATUS_NO_MATCH);
-      setStatus(calledCalls, VariantId.STATUS_NO_MATCH);
-      mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
-    } else {
-
-      //find the best path for variant calls
-      Pair<Orientor, Orientor> op = mOrientors.get(0);
-      final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), PathFinder.getPathPreference());
-
-      final Path best = f.bestPath();
-
-      if (DUMP_BEST_PATH) {
-        System.out.println("#### " + best);
-        final List<Integer> syncPoints = best.getSyncPoints();
-        final Range interesting = new SequenceNameLocusSimple(currentName, syncPoints.isEmpty() ? 0 : syncPoints.get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()) + 1);
-        System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));
-        System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
-        System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
+    try (SequencesReader tr = mTemplate.copy()) {
+      final Pair<String, Map<VariantSetType, List<Variant>>> setPair = mSynchronize.nextSet();
+      if (setPair == null) {
+        return;
       }
-
-      final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
-      mSynchronize.addPhasingCounts(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
-
-      final List<OrientedVariant> truePositives = best.getCalledIncluded();
-      final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
-      Path.calculateWeights(best, truePositives, baselineTruePositives);
-
-      List<Variant> falsePositives = best.getCalledExcluded();
-      List<Variant> falseNegatives = best.getBaselineExcluded();
-      List<OrientedVariant> halfPositives = Collections.emptyList();
-      List<OrientedVariant> baselineHalfPositives = Collections.emptyList();
-
-      Path bestHap = null;
-      if (mOrientors.size() == 2) {  // Run haploid pathfinding on the FP / FN to find common alleles
-        op = mOrientors.get(1);
-        final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), PathFinder.getPathPreference());
-        bestHap = f2.bestPath();
-
-        halfPositives = bestHap.getCalledIncluded();
-        baselineHalfPositives = bestHap.getBaselineIncluded();
-        Path.calculateWeights(bestHap, halfPositives, baselineHalfPositives);
-        falsePositives = bestHap.getCalledExcluded();
-        falseNegatives = bestHap.getBaselineExcluded();
+      final String currentName = setPair.getA();
+      final Long sequenceId = mNameMap.get(currentName);
+      if (sequenceId == null) {
+        throw new NoTalkbackSlimException("Sequence " + currentName + " is not contained in the reference.");
       }
+      final byte[] template = tr.read(sequenceId);
+      final Map<VariantSetType, List<Variant>> set = setPair.getB();
+      final Collection<Variant> baseLineCalls = set.get(VariantSetType.BASELINE);
+      final Collection<Variant> calledCalls = set.get(VariantSetType.CALLS);
+      Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
+      Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
-      Diagnostic.developerLog("Post-processing variant result lists for " + currentName);
-      final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, baselineHalfPositives, falseNegatives);
-      final List<VariantId> calls = mergeVariants(calledCalls, truePositives, halfPositives, falsePositives);
+      if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
+        setStatus(baseLineCalls, VariantId.STATUS_NO_MATCH);
+        setStatus(calledCalls, VariantId.STATUS_NO_MATCH);
+        mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
+      } else {
 
-      mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.<Integer>emptyList());
+        //find the best path for variant calls
+        Pair<Orientor, Orientor> op = mOrientors.get(0);
+        final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), PathFinder.getPathPreference());
+
+        final Path best = f.bestPath();
+
+        if (DUMP_BEST_PATH) {
+          System.out.println("#### " + best);
+          final List<Integer> syncPoints = best.getSyncPoints();
+          final Range interesting = new SequenceNameLocusSimple(currentName, syncPoints.isEmpty() ? 0 : syncPoints.get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()) + 1);
+          System.out.println("#### Template " + new Path(template).mBaselinePath.dumpHaplotypes(interesting));
+          System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
+          System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
+        }
+
+        final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
+        mSynchronize.addPhasingCounts(misPhasings.mMisPhasings, misPhasings.mCorrectPhasings, misPhasings.mUnphaseable);
+
+        final List<OrientedVariant> truePositives = best.getCalledIncluded();
+        final List<OrientedVariant> baselineTruePositives = best.getBaselineIncluded();
+        Path.calculateWeights(best, truePositives, baselineTruePositives);
+
+        List<Variant> falsePositives = best.getCalledExcluded();
+        List<Variant> falseNegatives = best.getBaselineExcluded();
+        List<OrientedVariant> halfPositives = Collections.emptyList();
+        List<OrientedVariant> baselineHalfPositives = Collections.emptyList();
+
+        Path bestHap = null;
+        if (mOrientors.size() == 2) {  // Run haploid pathfinding on the FP / FN to find common alleles
+          op = mOrientors.get(1);
+          final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), PathFinder.getPathPreference());
+          bestHap = f2.bestPath();
+
+          halfPositives = bestHap.getCalledIncluded();
+          baselineHalfPositives = bestHap.getBaselineIncluded();
+          Path.calculateWeights(bestHap, halfPositives, baselineHalfPositives);
+          falsePositives = bestHap.getCalledExcluded();
+          falseNegatives = bestHap.getBaselineExcluded();
+        }
+
+        Diagnostic.developerLog("Post-processing variant result lists for " + currentName);
+        final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, baselineHalfPositives, falseNegatives);
+        final List<VariantId> calls = mergeVariants(calledCalls, truePositives, halfPositives, falsePositives);
+
+        mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.<Integer>emptyList());
+      }
     }
   }
 

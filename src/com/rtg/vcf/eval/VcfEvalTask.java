@@ -87,17 +87,18 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
    */
   static void evaluateCalls(VcfEvalParams params) throws IOException {
     SdfUtils.validateHasNames(params.templateFile());
-    final SequencesReader templateSequences = SequencesReaderFactory.createMemorySequencesReader(params.templateFile(), true, LongRange.NONE);
-    SdfUtils.validateNoDuplicates(templateSequences, false);
+    try (final SequencesReader templateSequences = SequencesReaderFactory.createDefaultSequencesReader(params.templateFile(), LongRange.NONE)) {
+      SdfUtils.validateNoDuplicates(templateSequences, false);
 
-    final File baseline = params.baselineFile();
-    final File calls = params.callsFile();
-    checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
+      final File baseline = params.baselineFile();
+      final File calls = params.callsFile();
+      checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
-    final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
-    final VariantSet variants = getVariants(params, templateSequences, ranges);
+      final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
+      final VariantSet variants = getVariants(params, templateSequences, ranges);
 
-    evaluateCalls(params, ranges, templateSequences, variants);
+      evaluateCalls(params, ranges, templateSequences, variants);
+    }
   }
 
   private static void evaluateCalls(VcfEvalParams params, ReferenceRanges<String> ranges, SequencesReader templateSequences, VariantSet variants) throws IOException {
@@ -128,7 +129,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
       for (int i = 0; i < templateSequences.numberSequences(); i++) {
-        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences.copy(), o));
+        threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences, o));
       }
 
       threadPool.terminate();
