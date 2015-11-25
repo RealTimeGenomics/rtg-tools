@@ -58,7 +58,7 @@ public final class MachineType implements PseudoEnum {
   public static final MachineType COMPLETE_GENOMICS = new MachineType(++sSequenceNumber, "complete_genomics", "complete", MachineOrientation.TANDEM, "COMPLETE");
 
   /** Complete Genomics V2 (paired end). */
-  public static final MachineType COMPLETE_GENOMICS_2 = new MachineType(++sSequenceNumber, "complete_genomics_2", "complete_2", MachineOrientation.TANDEM, "COMPLETEGENOMICS", "\"Complete Genomics\"");
+  public static final MachineType COMPLETE_GENOMICS_2 = new MachineType(++sSequenceNumber, "complete_genomics_2", "completegenomics", MachineOrientation.TANDEM, "COMPLETEGENOMICS", "\"Complete Genomics\"");
 
   /** Four Five Four paired end. */
   public static final MachineType FOURFIVEFOUR_PE = new MachineType(++sSequenceNumber, "454_pe", "ls454_pe", null, PLAT_454);
