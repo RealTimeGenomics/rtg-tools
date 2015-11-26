@@ -486,7 +486,7 @@ public class PathTest extends AbstractNanoTest {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2,  1};
     final Variant[] a = {
         VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 7 . T TT 0.0 PASS . GT 0/1") // XXX, false)
+      , VariantTest.createVariant("seq 7 . T TT 0.0 PASS . GT 0/1")
       , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
@@ -518,7 +518,7 @@ public class PathTest extends AbstractNanoTest {
     final byte[] template = {1, 2, 1, 4, 4, 4, 4, 1, 2, 1};
     final Variant[] a = {
         VariantTest.createVariant("seq 2 . C T 0.0 PASS . GT 1/1")
-      , VariantTest.createVariant("seq 6 . TT T 0.0 PASS . GT 1/0") //XXX, false)
+      , VariantTest.createVariant("seq 6 . TT T 0.0 PASS . GT 1/0")
       , VariantTest.createVariant("seq 9 . C T 0.0 PASS . GT 1/1")
     };
 
