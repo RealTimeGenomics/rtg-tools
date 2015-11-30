@@ -62,7 +62,7 @@ class MergedIntervals {
    */
   void add(int start, int end) {
     final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(start);
-    final Map.Entry<Integer, Integer> endFloor = mIntervals.floorEntry(end);
+    final Map.Entry<Integer, Integer> endFloor = mIntervals.lowerEntry(end);
     final int actualStart;
     final int actualEnd;
     if (floor != null && start >= floor.getKey() && end <= floor.getValue()) {
@@ -83,7 +83,7 @@ class MergedIntervals {
     }
     //Remove any existing regions contained within the new bounds
     Map.Entry<Integer, Integer> overlappedRegion;
-    while ((overlappedRegion = mIntervals.floorEntry(actualEnd)) != null) {
+    while ((overlappedRegion = mIntervals.lowerEntry(actualEnd)) != null) {
       if (overlappedRegion.getKey() < actualStart) {
         break;
       }
@@ -107,7 +107,7 @@ class MergedIntervals {
    * @return true if the position provided falls entirely within the intervals
    */
   boolean enclosed(int start, int end) {
-    final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(end);
+    final Map.Entry<Integer, Integer> floor = mIntervals.lowerEntry(end);
     if (floor == null) {
       return false;
     } else if (end > floor.getValue()) {
@@ -124,7 +124,7 @@ class MergedIntervals {
    * @return true if the range specified is overlapped by the intervals
    */
   boolean overlapped(int start, int end) {
-    final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(end);
+    final Map.Entry<Integer, Integer> floor = mIntervals.lowerEntry(end);
     if (floor == null) {
       return false;
     } else {

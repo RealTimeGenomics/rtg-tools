@@ -239,4 +239,13 @@ public class ReferenceRegionsTest extends TestCase {
     assertTrue(regions.enclosed("monkey", 69, 80));
     assertTrue(regions.enclosed("monkey", 35, 80));
   }
+
+  public void testRealworldBadCase() {
+    final ReferenceRegions regions = new ReferenceRegions();
+    regions.add("1", 725911, 725926);
+    regions.add("1", 725927, 725936);
+    regions.add("1", 725937, 725941);
+    regions.add("1", 725944, 725959);
+    assertTrue(regions.overlapped("1", 725923, 725944));
+  }
 }
