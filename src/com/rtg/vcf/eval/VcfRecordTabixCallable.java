@@ -92,9 +92,9 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           continue;
         }
         
-        // Skip variants with starts falling outside the expected length of the template sequence
-        if (mTemplateLength >= 0 && rec.getStart() >= mTemplateLength) {
-          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " starts outside the length of the reference sequence (" + mTemplateLength + ").");
+        // Skip variants which end outside the length of the template sequence
+        if (mTemplateLength >= 0 && rec.getEnd() > mTemplateLength) {
+          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " ends outside the length of the reference sequence (" + mTemplateLength + ").");
           skipped++;
           continue;
         }

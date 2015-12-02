@@ -363,9 +363,9 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
         .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
       VcfEvalTask.evaluateCalls(params);
       TestUtils.containsAll(ps.toString(),
-        "Variant in calls at seq:28 starts outside the length of the reference sequence (27).",
-        "Variant in baseline at seq:28 starts outside the length of the reference sequence (27).",
-        "Variant in calls at seq:30 starts outside the length of the reference sequence (27).",
+        "Variant in calls at seq:28 ends outside the length of the reference sequence (27).",
+        "Variant in baseline at seq:28 ends outside the length of the reference sequence (27).",
+        "Variant in calls at seq:30 ends outside the length of the reference sequence (27).",
         "There were 1 baseline variants skipped due to being too long or starting outside the expected reference sequence length.",
         "There were 2 called variants skipped due to being too long or starting outside the expected reference sequence length."
       );

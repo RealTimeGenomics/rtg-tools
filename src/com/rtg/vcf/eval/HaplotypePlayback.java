@@ -157,7 +157,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
    */
   void next() {
     if (!hasNext()) {
-      throw new NoSuchElementException();
+      throw new NoSuchElementException("Attempt to fetch nucleotide past the end of the template");
     }
     if (isOnTemplate()) {
       mTemplatePosition++;
@@ -247,7 +247,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
   void moveForward(final int position) {
     assert position >= 0 && position <= mTemplate.length;
     if (!isOnTemplate()) {
-      throw new IllegalStateException();
+      throw new IllegalStateException("Attempt to move forward while still in a variant");
     }
     mTemplatePosition = position - 1;
     next();
