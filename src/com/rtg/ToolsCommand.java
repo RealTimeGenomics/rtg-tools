@@ -71,7 +71,7 @@ public final class ToolsCommand {
   static final Command SDF2FASTQ = new Command(new Sdf2Fastq(), CommandCategory.FORMAT, ReleaseLevel.GA);
 
   /** For converting SDF into SAM/BAM format */
-  static final Command SDF2SAM = new Command(new Sdf2Sam(), CommandCategory.FORMAT, ReleaseLevel.BETA);
+  static final Command SDF2SAM = new Command(new Sdf2Sam(), CommandCategory.FORMAT, ReleaseLevel.GA);
 
   /** BGZips an input file (for use with index module) */
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -113,10 +113,10 @@ public final class ToolsCommand {
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
   /** PED filter class */
-  static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
   /** PED stats class */
-  static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
   /** Roc plot tool */
   static final Command ROCPLOT = new Command(new RocPlotCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
