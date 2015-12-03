@@ -5,6 +5,217 @@ is based.  Not all features described below may be included in this
 product.
 
 
+RTG Core 3.6 (2015-12-03)
+-------------------------
+
+Major features of this release:
+
+* Further improvements to somatic variant calling which significantly
+  reduce the number of false positive calls while retaining somatic
+  calling sensitivity.  These improvements are achieved by
+  incorporating the presence of somatic-allele-supporting evidence in
+  the normal into the Bayesian computation.  Additional VCF
+  annotations quantifying these "contrary observations" are included
+  in the output.
+
+* De novo variant detection in families and pedigrees now incorporates
+  similar techniques for a reduction in false positives.
+
+* Our support for aligning and variant calling with reads produced by
+  Complete Genomics Inc has been extended to their newer 29 base-pair
+  read structure (these reads consisting of 10-9-10 sub-reads are
+  often represented as 30 base-pairs with a redundant N).
+
+* Several improvements to variant comparison with vcfeval, including
+  the improved handling of call sets containing overlapping variants,
+  and the ability to select alternative output modes depending on the
+  desired analysis workflow.
+
+Detailed changes are listed below by area.  Please read these through
+fully, as some command-line flags have changed, so updates to your
+pipeline scripts may be required.  For more information on new
+features, see the RTG Operations Manual.
+
+## Basic Formatting and Mapping
+
+* cg2sdf: Add support for formatting CGI TSV reads files containing
+  their version 2 reads.  These reads are typically represented as 30
+  base-pair arms (10-10-10 subread structure containing a redundant N
+  which is removed during formatting), although 29 base-pair arm
+  representation (10-9-10 subread structure) is also supported.
+
+* sdf2cg: This new command allows exporting SDF formatted Complete
+  Genomics read data to their TSV reads file format.
+
+* cgmap: Now supports aligning the version 2 read structure.  When
+  aligning CGI reads, an appropriate indexing mask must be selected
+  which is appropriate for the type of reads being mapped, so --mask
+  is now a required flag.
+
+* cgmap: Mask names have been changed to more clearly indicate which
+  version of CGI reads they are applicable to.  Available masks are
+  now "cg1" (formerly named "cgmaska15b1"), "cg1-fast" (formerly named
+  "cgmaska1b1", and "cg2" (a new mask for use with version 2 reads
+  which roughly equivalent in sensitivity to "cg1-fast").  Additional
+  masks may be available in future.
+
+### Variant Calling
+
+* somatic: Features an improvement to the Bayesian calculation to
+  better account for the presence of contrary evidence.  This has
+  resulted in a large reduction in false positives while maintaining
+  sensitivity.
+
+* population/family: These pedigree-based callers now contain similar
+  adjustments to the Bayesian calculation to better account for
+  contrary evidence of de novo variants.  This has resulted in a large
+  reduction in false positive de novos while maintaining sensitivity.
+
+* somatic/family/population: These callers produce additional
+  annotations in their output VCF that indicate the degree of contrary
+  observations for the novel allele.  The COC annotation contains a
+  simple count of the number of contrary observations and the COF
+  annotation contains the contrary observations as a fraction of total
+  observations.  Users who wish to adjust the sensitivity/precision
+  tradeoff of their de novo call sets may wish to use these attributes
+  for filtering.
+
+* family/population: The marking of equivalent complex calls was not
+  functioning for sex-aware calling on the Y chromosome when both
+  males and females are present, resulting in occasional additional
+  equivalent but differently represented variants present in the
+  output.
+
+* population: Better error handling when a the user supplies a
+  pedigree that contains cycles.
+
+* avrbuild: The new COC and COF annotations are now available as
+  derived annotations that can be used in model building.  One
+  interesting use of these attributes may be to build AVR models
+  specifically for predicting the correctness of de novo predictions.
+
+* snp/family/population/somatic: These variant callers all now include
+  support for CGI 29 base-pair read structure.
+
+* snp/family/population/somatic: The pre-built AVR models distributed
+  with RTG have all been rebuilt using current annotations and updated
+  training data.
+
+### Variant Processing and Analysis
+
+* vcfannotate: New option --relabel allows sample names in a VCF to be
+  changed.
+
+* vcfsubset: New flag --remove-qual to reset the QUAL field to '.'
+
+* vcfsubset: Fixed a bug where encountering a VCF record that did not
+  contain any FORMAT field specified in --keep-format would cause all
+  subsequent records to be dropped.
+
+* vcffilter: For convenience the existing flags --keep-format,
+  --remove-format, --keep-samples, etc. now support comma separated
+  lists, For example: --keep-format GQ,AVR.
+
+* vcffilter: New flag --remove-hom to exclude records where a sample
+  was called as homozygous.
+
+* vcfeval: New additional output modes that allow the selection of
+  output files that best suit the desired workflow.  These are
+  controlled via --output-mode flag and there are currently three
+  options available: split (the default, equivalent to previous
+  behaviour), annotate (outputs baseline and calls files augmented
+  with match status annotations), and combine (provides a simple
+  side-by-side two-column VCF). For more information, see the user
+  manual.
+
+* vcfeval: Removed option --baseline-tp, as the output of the baseline
+  version of true positive variants is now always performed.  When using
+  the default (split) output mode, these are output to tp-baseline.vcf
+  as before.
+
+* vcfeval: Added the ability to detect those FP and FN which have
+  common alleles (e.g.: zygosity errors).  Previously this could be
+  done manually by running vcfeval a second time using --squash-ploidy
+  on the fp.vcf and fn.vcf of an initial comparison, but now it is
+  automatically performed when running the new annotate or combine
+  output modes.
+
+* vcfeval: New flag --ref-overlap to allow matching variants where the
+  alleles would overlap as long as the overlap bases are the same as
+  ref.  Unambiguous VCFs should not need this option, but such cases
+  can arise when using unsophisticated callers or VCF merging tools.
+
+* vcfeval: Weighted ROC files now include a final data row that
+  includes the statistics corresponding to no threshold application
+  (and this includes any variants that were processed during path
+  finding but which do not contain any ROC score field).  In an ROC
+  plot, this final point may be visible as a "tick" at the end of the
+  curve.
+
+* vcfeval: The set of ROC data files that are produced are now for the
+  following three subsets of calls: all calls, snps only, and non-snps
+  only (e.g. indels, MNPs).  Some users were doing separate runs of
+  vcfeval on input sets filtered by category in order to get separate
+  statistics for snps vs indels, an approach which is prone to
+  misclassification of complex variants.
+
+* vcfeval: When processing multi-sample VCF files, it is now possible
+  to specify different sample names for baseline vs callset, via the
+  form: --sample baseline_sample,calls_sample.
+
+* vcfeval: Fixed a rare bug where if the input VCFs contained multiple
+  variants with the same reference position and length, the output
+  VCFs could contain the incorrect variant.
+
+* vcfeval: Fixed a crash that could occur when the input set contained
+  a variant that extended off the end of the reference sequence.
+
+* rocplot: (GUI) Fix several minor issues: initial paint was not laid
+  out correctly; very small ROC files would not display status info;
+  some UI layout improvements; and add a small amount display padding.
+
+* rocplot: (GUI) Malformed ROC data files now show an error dialog.
+
+### Metagenomics
+
+* similarity: This tool will now make use of available taxonomy
+  information in the case of a single supplied SDF, in order to allow
+  the easy computation of a neighbour joining tree from a reference
+  species database (or subset thereof).
+
+### Other
+
+* sdf2fasta/sdf2fastq: New flag --interleave to permit output of
+  paired end data to a single output in interleaved fashion
+  (i.e. alternating left and right arms).  This allows piping paired
+  end data for simple command-line processing (although there is also
+  sdf2sam which may be more applicable depending on the processing
+  desired).
+
+* cgsim: Added support for simulating reads with the CGI version 2
+  read structure, controlled via a new flag, --cg-read-version.
+
+* readsim: Add support for both versions of CGI read structures.  Use
+  --machine complete_genomics (the original 35 base pair read
+  structure) or --machine complete_genomics_2 (the newer 29 base pair
+  structure).
+
+* aview: New flag --unflatten to display unflattened CGI reads when
+  present.  At present only version 1 reads can be displayed in
+  unflattened form.
+
+* misc: bash completion for RTG commands and options now works on Mac
+  OS X (see scripts/rtg-bash-completion for instructions).
+
+* misc: The underlying htsjdk library used for SAM/BAM support has
+  been updated to version 1.141.
+
+* many: The JRE bundled with Linux/Windows builds is now 1.8.
+
+
+Previous releases
+=================
+
 RTG Core 3.5.2 (2015-10-15)
 ---------------------------
 
@@ -35,10 +246,6 @@ This release primarily includes bugfixes and minor improvements:
   "Licensed to:" line from the version command output.
 
 * misc: Add BSD license text to the RTG Tools distributable zip.
-
-
-Previous releases
-=================
 
 RTG Core 3.5.1 (2015-09-07)
 ---------------------------
