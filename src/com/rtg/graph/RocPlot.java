@@ -42,6 +42,8 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -236,12 +238,22 @@ public final class RocPlot {
     mTitleEntry.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+          mTitleEntry.setText(mIconLabel.getText());
+        }
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
           mIconLabel.setText(mTitleEntry.getText());
           showCurrentGraph();
         }
       }
 
+    });
+    mTitleEntry.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        mIconLabel.setText(mTitleEntry.getText());
+        showCurrentGraph();
+      }
     });
     rightPanel.add(mTitleEntry, c);
 
@@ -277,38 +289,7 @@ public final class RocPlot {
       }
     });
     mSelectAllCB.setSelected(true);
-    mOpenButton.addActionListener(new ActionListener() {
-
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        if (mFileChooserParent != null) {
-          mFileChooser.setCurrentDirectory(mFileChooserParent);
-        }
-
-        final Preferences prefs = Preferences.userNodeForPackage(RocPlot.this.getClass());
-        if (prefs.getInt(CHOOSER_WIDTH, -1) != -1 && prefs.getInt(CHOOSER_HEIGHT, -1) != -1) {
-          mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
-        }
-        if (mFileChooser.showOpenDialog(mMainPanel) == JFileChooser.APPROVE_OPTION) {
-          final File f = mFileChooser.getSelectedFile();
-          if (f != null) {
-            try {
-              loadFile(f, f.getCanonicalFile().getParentFile().getName(), true);
-              updateProgress();
-              showCurrentGraph();
-            } catch (final IOException | NoTalkbackSlimException e1) {
-              JOptionPane.showMessageDialog(mMainPanel,
-                "Could not open file: " + f.getPath() + "\n"
-                + (e1.getMessage().length() > 100 ? e1.getMessage().substring(0, 100) + "..." : e1.getMessage()),
-                "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
-            }
-            final Dimension r = mFileChooser.getSize();
-            prefs.putInt(CHOOSER_WIDTH, (int) r.getWidth());
-            prefs.putInt(CHOOSER_HEIGHT, (int) r.getHeight());
-          }
-        }
-      }
-    });
+    mOpenButton.addActionListener(new LoadFileListener());
     mCommandButton.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -344,6 +325,39 @@ public final class RocPlot {
 
     mIconLabel.setText(mTitleEntry.getText());
     pane.add(mIconLabel, BorderLayout.NORTH);
+  }
+
+  @JumbleIgnore
+  private class LoadFileListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      if (mFileChooserParent != null) {
+        mFileChooser.setCurrentDirectory(mFileChooserParent);
+      }
+
+      final Preferences prefs = Preferences.userNodeForPackage(RocPlot.this.getClass());
+      if (prefs.getInt(CHOOSER_WIDTH, -1) != -1 && prefs.getInt(CHOOSER_HEIGHT, -1) != -1) {
+        mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
+      }
+      if (mFileChooser.showOpenDialog(mMainPanel) == JFileChooser.APPROVE_OPTION) {
+        final File f = mFileChooser.getSelectedFile();
+        if (f != null) {
+          try {
+            loadFile(f, f.getCanonicalFile().getParentFile().getName(), true);
+            updateProgress();
+            showCurrentGraph();
+          } catch (final IOException | NoTalkbackSlimException e1) {
+            JOptionPane.showMessageDialog(mMainPanel,
+              "Could not open file: " + f.getPath() + "\n"
+                + (e1.getMessage().length() > 100 ? e1.getMessage().substring(0, 100) + "..." : e1.getMessage()),
+              "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
+          }
+          final Dimension r = mFileChooser.getSize();
+          prefs.putInt(CHOOSER_WIDTH, (int) r.getWidth());
+          prefs.putInt(CHOOSER_HEIGHT, (int) r.getHeight());
+        }
+      }
+    }
   }
 
   private String getCommand() {
