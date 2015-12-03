@@ -25,20 +25,30 @@ Comparison approaches based on normalization or decomposition can
 alleviate these problem but often fail to deal with more complex
 situations.
 
-RTG vcfeval performs variant comparison at the haplotype level, that
+RTG `vcfeval` performs variant comparison at the haplotype level, that
 is, it determines whether the genotypes asserted in the VCFs under
 comparison result in the same genomic sequence when applied to the
 reference genome.  This in itself is a non-trivial problem and naive
 approaches face a combinatorial explosion to determine the most
 accurate analysis.  To date, no other tool is capable of performing
-this analysis as accurately and as fast as RTG vcfeval.  RTG developed
-vcfeval for in-house use in 2010, and through our collaborations we
-found this tool to be highly useful outside of RTG.  In order to
-encourage wider adoption of best-practise methods for variant
-comparison and benchmarking, Real Time Genomics made RTG Tools freely
-available, and now this includes the source code under an OSI approved
-open source licence.  RTG Tools are mature, well tested, and under
-ongoing development.
+this analysis as accurately and as fast as RTG `vcfeval`.  RTG
+developed `vcfeval` for in-house use in 2010, and through our
+collaborations we found this tool to be highly useful outside of
+RTG. RTG vcfeval outputs VCF files containing the results of
+comparison, summary metrics, and ROC curve data files.
+
+In conjunction with `vcfeval`, the `rocplot` command provides an easy
+way to interactively examine the ROC curves from one or more `vcfeval`
+runs as an aid to selecting appropriate scoring attributes and
+filtering thresholds. A quick screen capture is shown below:
+
+![rocplot-screencap](rocplot-screencap.gif)
+
+In order to encourage wider adoption of best-practise methods for
+variant comparison and benchmarking, Real Time Genomics made RTG Tools
+freely available, and now this includes the source code under an OSI
+approved open source licence.  RTG Tools are mature, well tested, and
+under ongoing development.
 
 RTG Tools is available pre-packaged directly from our
 [website](http://realtimegenomics.com/products/rtg-tools/), or follow
