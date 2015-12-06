@@ -39,7 +39,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 
@@ -82,7 +81,6 @@ class RocLinePanel extends JPanel {
     mCheckBox.setSelected(true);
     mTextField = new JTextField();
     mTextField.setText(name);
-    mTextField.setEditable(false);
     mStatusBar = statusBar;
     mTextField.addMouseMotionListener(new MouseMotionAdapter() {
       @Override
@@ -95,10 +93,7 @@ class RocLinePanel extends JPanel {
 
       @Override
       public void focusLost(FocusEvent e) {
-        //mData.get(path).setTitle(mTextField.getText());
         mDataBundle.setTitle(mTextField.getText());
-        mTextField.setEditable(false);
-        mTextField.getCaret().setVisible(false);
         mRocPlot.showCurrentGraph();
       }
     });
@@ -110,28 +105,13 @@ class RocLinePanel extends JPanel {
       public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
           mTextField.setText(mDataBundle.getTitle());
-          mTextField.setEditable(false);
-          mTextField.getCaret().setVisible(false);
         }
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
           mDataBundle.setTitle(mTextField.getText());
-          mTextField.setEditable(false);
-          mTextField.getCaret().setVisible(false);
           mRocPlot.showCurrentGraph();
         }
       }
 
-    });
-
-    mTextField.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseClicked(MouseEvent e) {
-        if (e.getClickCount() == 1) {
-          mTextField.getCaret().setVisible(true);
-          mTextField.setEditable(true);
-          mTextField.requestFocus();
-        }
-      }
     });
 
     final Box textPanel = Box.createHorizontalBox();
