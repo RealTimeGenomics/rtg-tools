@@ -5,7 +5,7 @@ is based.  Not all features described below may be included in this
 product.
 
 
-RTG Core 3.6 (2015-12-03)
+RTG Core 3.6 (2015-12-07)
 -------------------------
 
 Major features of this release:
