@@ -82,11 +82,17 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
         if (childIndex != null) {
           final String father = pedLine.getFather();
           if (father != null) {
-            mSampleToAntecedents.get(childIndex).add(header.getSampleIndex(father));
+            final Integer fatherIndex = header.getSampleIndex(father);
+            if (fatherIndex != null) {
+              mSampleToAntecedents.get(childIndex).add(fatherIndex);
+            }
           }
           final String mother = pedLine.getMother();
           if (mother != null) {
-            mSampleToAntecedents.get(childIndex).add(header.getSampleIndex(mother));
+            final Integer motherIndex = header.getSampleIndex(mother);
+            if (motherIndex != null) {
+              mSampleToAntecedents.get(childIndex).add(motherIndex);
+            }
           }
         }
       }
@@ -158,9 +164,9 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     if (sampleNumber >= mSampleToAntecedents.size()) {
       return null; // No such sample
     }
-    final List<Integer> antecendents = mSampleToAntecedents.get(sampleNumber);
-    if (antecendents.isEmpty()) {
-      return null; // Not aderived sample
+    final List<Integer> antecedents = mSampleToAntecedents.get(sampleNumber);
+    if (antecedents.isEmpty()) {
+      return null; // Not a derived or child sample
     }
     final Integer ss = record.getSampleInteger(sampleNumber, VcfUtils.FORMAT_SOMATIC_STATUS);
     if (ss != null) {
@@ -174,12 +180,12 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
         return null; // Not a de novo
       }
     }
-    final int[] originalAd = ad(record, antecendents);
+    final int[] originalAd = ad(record, antecedents);
     final int[] derivedAd = ad(record, sampleNumber);
     if (originalAd == null || derivedAd == null) {
       return null; // Safety, should not happen on well-formed data
     }
-    final boolean[] originalAlleles = alleles(record, antecendents);
+    final boolean[] originalAlleles = alleles(record, antecedents);
     final boolean[] derivedAlleles = alleles(record, sampleNumber);
     if (originalAlleles == null || derivedAlleles == null) {
       return null; // Safety, should not happen on well-formed data
