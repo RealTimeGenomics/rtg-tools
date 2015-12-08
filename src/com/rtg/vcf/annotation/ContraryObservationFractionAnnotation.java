@@ -78,13 +78,16 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
       }
       final String child = pedLine.getChild();
       if (child != null) {
-        final String father = pedLine.getFather();
-        if (father != null) {
-          mSampleToAntecedents.get(header.getSampleIndex(child)).add(header.getSampleIndex(father));
-        }
-        final String mother = pedLine.getMother();
-        if (mother != null) {
-          mSampleToAntecedents.get(header.getSampleIndex(child)).add(header.getSampleIndex(mother));
+        final Integer childIndex = header.getSampleIndex(child);
+        if (childIndex != null) {
+          final String father = pedLine.getFather();
+          if (father != null) {
+            mSampleToAntecedents.get(childIndex).add(header.getSampleIndex(father));
+          }
+          final String mother = pedLine.getMother();
+          if (mother != null) {
+            mSampleToAntecedents.get(childIndex).add(header.getSampleIndex(mother));
+          }
         }
       }
     }
