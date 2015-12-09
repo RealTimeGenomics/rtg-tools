@@ -147,9 +147,11 @@ public abstract class AbstractIndexReader implements LocusIndex {
     //create linear index
     ByteArrayIOUtils.convertToLongArrayLittleEndian(linIndexBuf, linearIndex);
 
-    final boolean[] bins = new boolean[NUM_BINS];
+    final int[] bins = new int[NUM_BINS];
 
     // Extract bin chunk bounds info
+    final int[] binIdIndex = new int[NUM_BINS];
+    Arrays.fill(binIdIndex, -1);
     final int[] binNum = new int[numBins];
     final int[] binNumChunks = new int[numBins];
     final long[][] binChunkBounds = new long[numBins][];
@@ -157,6 +159,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
     for (int i = 0; i < numBins; i++) {
       //find out bin id and number of chunks
       binNum[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart);
+      binIdIndex[binNum[i]] = i;
       final int numChunks = binNumChunks[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart + 4);
       final int chunkStart = binStart + 8;
       final int chunkSize = numChunks * 16; //check for overflow
@@ -178,16 +181,17 @@ public abstract class AbstractIndexReader implements LocusIndex {
         throw new NoTalkbackSlimException("The requested region " + region + " contains coordinates greater than can be addressed by tabix/bam indexes");
       }
       final int linearBeg = beg >> LINEAR_INDEX_SHIFT;
-      reg2bins(bins, beg, end);
+      final int numBinsForRegion = reg2bins(bins, beg, end);
 
       long begFilePointer = -1;
       long endFilePointer = -1;
 
-      for (int i = 0; i < numBins; i++) {
-        final int binNo = binNum[i];
-        if (bins[binNo]) {
-          final int numChunks = binNumChunks[i];
-          final long[] chunkBounds = binChunkBounds[i];
+      for (int i = 0; i < numBinsForRegion; i++) {
+        final int binNo = bins[i];
+        final int binIndex = binIdIndex[binNo];
+        if (binIndex != -1) {
+          final int numChunks = binNumChunks[binIndex];
+          final long[] chunkBounds = binChunkBounds[binIndex];
           for (int k = 0, j = 0; k < numChunks; k++) {
             final long chunkBeg = chunkBounds[j++];
             final long chunkEnd = chunkBounds[j++];
@@ -221,31 +225,32 @@ public abstract class AbstractIndexReader implements LocusIndex {
   }
 
   /**
-   * Set bin status to true for all bins which overlap a region.
+   * Add bins in region to given array
    * @param bins array into which bin membership should be stored
    * @param beg 0-based start position (inclusive)
    * @param end 0-based end position (exclusive)
    */
-  private static void reg2bins(boolean[] bins, int beg, int end) {
-    Arrays.fill(bins, false);
+  private static int reg2bins(int[] bins, int beg, int end) {
     assert bins.length == NUM_BINS;
     final int cEnd = end - 1;
     int k;
-    bins[0] = true;
+    int i = 0;
+    bins[i++] = 0;
     for (k = 1 + (beg >> 26); k <= 1 + (cEnd >> 26); ++k) {
-      bins[k] = true;
+      bins[i++] = k;
     }
     for (k = 9 + (beg >> 23); k <= 9 + (cEnd >> 23); ++k) {
-      bins[k] = true;
+      bins[i++] = k;
     }
     for (k = 73 + (beg >> 20); k <= 73 + (cEnd >> 20); ++k) {
-      bins[k] = true;
+      bins[i++] = k;
     }
     for (k = 585 + (beg >> 17); k <= 585 + (cEnd >> 17); ++k) {
-      bins[k] = true;
+      bins[i++] = k;
     }
     for (k = 4681 + (beg >> 14); k <= 4681 + (cEnd >> 14); ++k) {
-      bins[k] = true;
+      bins[i++] = k;
     }
+    return i;
   }
 }
