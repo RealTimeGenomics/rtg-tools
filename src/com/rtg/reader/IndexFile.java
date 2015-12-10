@@ -371,6 +371,8 @@ public class IndexFile implements Integrity {
     headerHash.irvineHash(len);
     if (len == 0) {
       return "";
+    } else if (len < 0) {
+      throw new CorruptSdfException();
     } else {
       final byte[] bs = new byte[len];
       inputStream.readFully(bs);
