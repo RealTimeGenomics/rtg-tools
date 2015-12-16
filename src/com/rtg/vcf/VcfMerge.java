@@ -221,6 +221,7 @@ public class VcfMerge extends AbstractCli {
    */
   static class VcfPositionZipper implements Closeable {
     final File[] mFiles;
+    final VcfHeader[] mHeaders;
     final TabixIndexReader[] mIndexes;
     final RegionRestriction[] mRegions;
     final VcfReader[] mReaders;
@@ -232,15 +233,17 @@ public class VcfMerge extends AbstractCli {
       this(rr, null, null, vcfFiles);
     }
     public VcfPositionZipper(RegionRestriction rr, String[] extraHeaderLines, Set<String> forceMerge, File... vcfFiles) throws IOException {
-      mIndexes = new TabixIndexReader[vcfFiles.length];
-
       mFiles = vcfFiles;
       mReaders = new VcfReader[mFiles.length];
+      mHeaders = new VcfHeader[mFiles.length];
+      mIndexes = new TabixIndexReader[mFiles.length];
       VcfHeader current = null;
       int numSamples = 0;
       boolean warnNumSamples = true;
-      for (final File mFile : mFiles) {
-        try (VcfReader vr = new VcfReader(new BufferedReader(new InputStreamReader(GzipUtils.createGzipInputStream(new FileInputStream(mFile)))))) {
+      for (int i = 0; i < mFiles.length; i++) {
+        final File file = mFiles[i];
+        try (VcfReader vr = new VcfReader(new BufferedReader(new InputStreamReader(GzipUtils.createGzipInputStream(new FileInputStream(file)))))) {
+          mHeaders[i] = vr.getHeader();
           if (current != null) {
             current = VcfHeaderMerge.mergeHeaders(current, vr.getHeader(), forceMerge);
             if (current.getNumberOfSamples() != numSamples && warnNumSamples) {
@@ -316,7 +319,7 @@ public class VcfMerge extends AbstractCli {
 
         for (int i = 0; i < mReaders.length; i++) {
           if (mReaders[i] == null) {
-            mReaders[i] = new VcfReader(new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mFiles[i]);
+            mReaders[i] = new VcfReader(new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mHeaders[i]);
           }
           if (mReaders[i].hasNext()) {
             final int pos = mReaders[i].peek().getStart();
