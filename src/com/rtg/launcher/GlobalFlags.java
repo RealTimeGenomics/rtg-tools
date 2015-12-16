@@ -122,6 +122,9 @@ public final class GlobalFlags {
   /** Variant caller min depth for call-at-N triggering */
   public static final String CALLER_N_MIN_DEPTH = "com.rtg.variant.n-min-depth";
 
+  /** Expected frequency of the variant allele (default 0.5). */
+  public static final String CALLER_EXPECTED_ALLELE_FREQUENCY = "com.rtg.variant.base.Model.allele-frequency";
+
   /** Prior for random hypothesis when using random hypotheses. */
   public static final String ENTROPY_RANDOM_PRIOR_FLAG = "com.rtg.variant.bayes.EntropyRandom.random-prior";
 
@@ -208,6 +211,7 @@ public final class GlobalFlags {
 
     // Misc calling
     registerFlag(CALLER_N_MIN_DEPTH, Integer.class, 5);
+    registerFlag(CALLER_EXPECTED_ALLELE_FREQUENCY, Double.class, 0.5);
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
     registerFlag(ENTROPY_RANDOM_PRIOR_FLAG, Double.class, 0.0);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
