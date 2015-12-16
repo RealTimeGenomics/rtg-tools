@@ -47,8 +47,6 @@ import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.VcfHeader;
 
-import htsjdk.samtools.util.BlockCompressedInputStream;
-
 /**
  * Reads a <code>.vcf</code> input stream and converts it into VCF records.
  *
@@ -90,14 +88,12 @@ public class VcfReader implements Closeable {
   /**
    * Read VcfRecords from a region of a block-compressed file
    * @param reader source of record lines
-   * @param vcfFile file reader was generated from (will be read to obtain the VCF header information)
+   * @param header header for file currently being read (callers responsibility)
    * @throws IOException if an IO error occurs
    */
-  VcfReader(TabixLineReader reader, File vcfFile) throws IOException {
+  VcfReader(TabixLineReader reader, VcfHeader header) throws IOException {
     mIn = reader;
-    try (LineReader headerReader = new BrLineReader(new BufferedReader(new InputStreamReader(new BlockCompressedInputStream(vcfFile))))) {
-      mHeader = parseHeader(headerReader);
-    }
+    mHeader = header;
     mNumSamples = mHeader.getNumberOfSamples();
     setNext();
   }
@@ -129,7 +125,7 @@ public class VcfReader implements Closeable {
       if (stdin) {
         throw new IOException("Cannot apply region restrictions when reading from stdin");
       }
-      vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), f);
+      vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), VcfUtils.getHeader(f));
     }
     return vcfr;
   }
@@ -150,7 +146,7 @@ public class VcfReader implements Closeable {
       if (stdin) {
         throw new IOException("Cannot apply region restriction when reading from stdin");
       }
-      vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), f);
+      vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), VcfUtils.getHeader(f));
     }
     return vcfr;
   }
