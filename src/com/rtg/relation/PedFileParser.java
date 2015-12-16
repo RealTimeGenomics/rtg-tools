@@ -104,7 +104,7 @@ public final class PedFileParser {
    * @return structure containing relationships and link to mapping files.
    * @throws IOException if an IO error occurs
    */
-  static GenomeRelationships load(BufferedReader reader) throws IOException {
+  public static GenomeRelationships load(BufferedReader reader) throws IOException {
 
     final GenomeRelationships ped = new GenomeRelationships();
     String line;
