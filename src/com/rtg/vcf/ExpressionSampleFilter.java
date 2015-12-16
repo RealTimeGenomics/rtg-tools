@@ -37,50 +37,67 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
  */
 public class ExpressionSampleFilter extends VcfSampleFilter {
 
-  private enum Operation {
+  private interface Operation<T> {
+    boolean compare(final T a, final T b);
+  }
+
+  private enum OperationDouble implements Operation<Double> {
     EQ {
       @Override
-      public boolean compare(double a, double b) {
-        return a == b;
+      public boolean compare(Double a, Double b) {
+        return a.doubleValue() == b.doubleValue();
       }
     },
     NE {
       @Override
-      public boolean compare(double a, double b) {
-        return a != b;
+      public boolean compare(Double a, Double b) {
+        return a.doubleValue() != b.doubleValue();
       }
     },
     LT {
       @Override
-      public boolean compare(double a, double b) {
+      public boolean compare(Double a, Double b) {
         return a < b;
       }
     },
     GT {
       @Override
-      public boolean compare(double a, double b) {
+      public boolean compare(Double a, Double b) {
         return a > b;
       }
     },
     LE {
       @Override
-      public boolean compare(double a, double b) {
+      public boolean compare(Double a, Double b) {
         return a <= b;
       }
     },
     GE {
       @Override
-      public boolean compare(double a, double b) {
+      public boolean compare(Double a, Double b) {
         return a >= b;
       }
     };
+  }
 
-    protected abstract boolean compare(final double a, final double b);
+  private enum OperationObject implements Operation<Object> {
+    EQ {
+      @Override
+      public boolean compare(Object a, Object b) {
+        return a.equals(b);
+      }
+    },
+    NE {
+      @Override
+      public boolean compare(Object a, Object b) {
+        return !a.equals(b);
+      }
+    }
   }
 
   private final String mField;
-  private final Operation mOp;
-  private final double mValue;
+  private final Operation<?> mOp;
+  private final Object mValue;
 
   ExpressionSampleFilter(final VcfFilterStatistics stats, final String expression) {
     super(stats, VcfFilterStatistics.Stat.USER_EXPRESSION_COUNT);
@@ -101,40 +118,63 @@ public class ExpressionSampleFilter extends VcfSampleFilter {
       throw new NoTalkbackSlimException("No operator found in: " + expression);
     }
     final String operator = expr.substring(opStart, k);
-    switch (operator) {
-      case "=":
-      case "==":
-        mOp = Operation.EQ;
-        break;
-      case "!=":
-      case "<>":
-        mOp = Operation.NE;
-        break;
-      case "<":
-        mOp = Operation.LT;
-        break;
-      case ">":
-        mOp = Operation.GT;
-        break;
-      case "<=":
-        mOp = Operation.LE;
-        break;
-      case ">=":
-        mOp = Operation.GE;
-        break;
-      default:
-        throw new NoTalkbackSlimException("Invalid operator: " + operator);
-    }
+    final String value = expr.substring(k);
+    Object tempValue;
     try {
-      mValue = Double.parseDouble(expr.substring(k));
+      tempValue = Double.valueOf(value);
     } catch (final NumberFormatException e) {
-      throw new NoTalkbackSlimException("Failed to parse number in: " + expression);
+      tempValue = value;
+    }
+    mValue = tempValue;
+    if (mValue instanceof Double) {
+      switch (operator) {
+        case "=":
+        case "==":
+          mOp = OperationDouble.EQ;
+          break;
+        case "!=":
+        case "<>":
+          mOp = OperationDouble.NE;
+          break;
+        case "<":
+          mOp = OperationDouble.LT;
+          break;
+        case ">":
+          mOp = OperationDouble.GT;
+          break;
+        case "<=":
+          mOp = OperationDouble.LE;
+          break;
+        case ">=":
+          mOp = OperationDouble.GE;
+          break;
+        default:
+          throw new NoTalkbackSlimException("Invalid operator: " + operator);
+      }
+    } else {
+      switch (operator) {
+        case "=":
+        case "==":
+          mOp = OperationObject.EQ;
+          break;
+        case "!=":
+        case "<>":
+          mOp = OperationObject.NE;
+          break;
+        default:
+          throw new NoTalkbackSlimException("Invalid operator: " + operator);
+      }
     }
   }
 
   @Override
   boolean acceptSample(final VcfRecord record, final int index) {
-    final Double val = record.getSampleDouble(index, mField);
-    return val != null && mOp.compare(val, mValue);
+    if (mValue instanceof Double) {
+      final Double val = record.getSampleDouble(index, mField);
+      return val != null && ((OperationDouble) mOp).compare(val, (Double) mValue);
+    } else {
+      final String val = record.getSampleString(index, mField);
+      return val != null && ((OperationObject) mOp).compare(val, mValue);
+    }
   }
 }

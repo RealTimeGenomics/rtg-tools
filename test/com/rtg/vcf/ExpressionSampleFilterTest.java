@@ -50,6 +50,32 @@ public class ExpressionSampleFilterTest extends TestCase {
     assertFalse(f.acceptSample(rec, 1));
   }
 
+  public void testEqString() {
+    final VcfFilterStatistics stats = new VcfFilterStatistics();
+    final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR=foo");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.setNumberOfSamples(3);
+    rec.addFormatAndSample("ATTR", "foo");
+    rec.addFormatAndSample("ATTR", "fooo");
+    rec.addFormatAndSample("ATTR", "somethingelse");
+    assertTrue(f.acceptSample(rec, 0));
+    assertFalse(f.acceptSample(rec, 1));
+    assertFalse(f.acceptSample(rec, 2));
+  }
+
+  public void testNeString() {
+    final VcfFilterStatistics stats = new VcfFilterStatistics();
+    final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR!=foo");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.setNumberOfSamples(3);
+    rec.addFormatAndSample("ATTR", "foo");
+    rec.addFormatAndSample("ATTR", "fooo");
+    rec.addFormatAndSample("ATTR", "somethingelse");
+    assertFalse(f.acceptSample(rec, 0));
+    assertTrue(f.acceptSample(rec, 1));
+    assertTrue(f.acceptSample(rec, 2));
+  }
+
   public void testNe() {
     final VcfFilterStatistics stats = new VcfFilterStatistics();
     final ExpressionSampleFilter f = new ExpressionSampleFilter(stats, "ATTR!=1");
@@ -121,12 +147,6 @@ public class ExpressionSampleFilterTest extends TestCase {
     }
     try {
       new ExpressionSampleFilter(stats, "ATTR<=1.0.0");
-      fail();
-    } catch (final NoTalkbackSlimException e) {
-      // expected
-    }
-    try {
-      new ExpressionSampleFilter(stats, "ATTR!=");
       fail();
     } catch (final NoTalkbackSlimException e) {
       // expected
