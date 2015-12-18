@@ -60,14 +60,14 @@ public final class MathUtils {
         return 0.0;
       }
       throw new IllegalArgumentException("if probability is 0.0 then count must be 0. p:" + p
-          + " N:" + nn + " n:" + n);
+        + " N:" + nn + " n:" + n);
     }
     if (p == 1.0) {
       if (m == 0) {
         return 0.0;
       }
       throw new IllegalArgumentException("if probability is 1.0 then count must be 0. p:" + p
-          + " N:" + nn + " n:" + n);
+        + " N:" + nn + " n:" + n);
     }
     final double res = n * Math.log(p) + m * Math.log(1.0f - p) + logBinomial(nn, n);
     assert res <= 0;
