@@ -146,7 +146,8 @@ public class RocContainer {
       final int[] gt = VcfUtils.getValidGt(rec, sampleId);
       for (final RocFilter filter : filters()) {
         if (filter.accept(rec, gt)) {
-          addRocLine(score, weight, filter);
+          final int fpweight = weight > 0.0 ? 0 : 1;
+          addRocLine(score, weight, fpweight, filter);
         }
       }
     }
@@ -155,11 +156,12 @@ public class RocContainer {
   /**
    * add single result to ROC
    * @param sortValue normally the posterior score
-   * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
+   * @param tpweight amount to increment the true positive by
+   * @param fpweight amount to increment the false positive by
    * @param filter specifies which roc line the point will be added to
    */
-  void addRocLine(double sortValue, double weight, RocFilter filter) {
-    final RocPoint point = new RocPoint(sortValue, weight, weight > 0.0 ? 0 : 1);
+  void addRocLine(double sortValue, double tpweight, double fpweight, RocFilter filter) {
+    final RocPoint point = new RocPoint(sortValue, tpweight, fpweight);
     final SortedMap<Double, RocPoint> points = mRocs.get(filter);
     final RocPoint old = points.put(sortValue, point);
     if (old != null) {
