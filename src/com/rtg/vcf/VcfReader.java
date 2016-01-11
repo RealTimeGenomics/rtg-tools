@@ -51,7 +51,6 @@ import htsjdk.samtools.util.BlockCompressedInputStream;
 
 /**
  * Reads a <code>.vcf</code> input stream and converts it into VCF records.
- *
  */
 public class VcfReader implements Closeable {
 
