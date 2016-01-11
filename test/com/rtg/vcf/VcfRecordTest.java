@@ -70,18 +70,18 @@ public class VcfRecordTest extends TestCase {
   public void test() {
     final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
     rec.setId(".")
-    .setQuality("12.8")
-    .addAltCall("c")
-    .addAltCall("t")
-    .addFilter("TEST1")
-    .addFilter("TEST2")
-    .addInfo("DP", "23")
-    .addInfo("TEST", "45", "46", "47", "48")
-    .setNumberOfSamples(2)
-    .addFormatAndSample("GT", "0/0")
-    .addFormatAndSample("GT", "0/1")
-    .addFormatAndSample("GQ", "100")
-    .addFormatAndSample("GQ", "95")
+      .setQuality("12.8")
+      .addAltCall("c")
+      .addAltCall("t")
+      .addFilter("TEST1")
+      .addFilter("TEST2")
+      .addInfo("DP", "23")
+      .addInfo("TEST", "45", "46", "47", "48")
+      .setNumberOfSamples(2)
+      .addFormatAndSample("GT", "0/0")
+      .addFormatAndSample("GT", "0/1")
+      .addFormatAndSample("GQ", "100")
+      .addFormatAndSample("GQ", "95")
     ;
 
     assertEquals("chr1", rec.getSequenceName());
