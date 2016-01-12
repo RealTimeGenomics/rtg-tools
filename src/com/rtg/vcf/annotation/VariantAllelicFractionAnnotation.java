@@ -70,7 +70,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
   }
 
   private double sum(final double... a) {
-    int s = 0;
+    double s = 0;
     for (final double v : a) {
       s += v;
     }
