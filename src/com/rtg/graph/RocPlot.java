@@ -103,7 +103,7 @@ import com.rtg.util.io.FileUtils;
  *
  */
 @JumbleIgnore
-public final class RocPlot {
+public class RocPlot {
 
 
   /** Minimum allowed line width */
@@ -239,10 +239,10 @@ public final class RocPlot {
       @Override
       public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-          mTitleEntry.setText(mIconLabel.getText());
+          mTitleEntry.setText(mIconLabel.getText()); // revert edit
         }
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-          mIconLabel.setText(mTitleEntry.getText());
+          setTitle(mTitleEntry.getText());
           showCurrentGraph();
         }
       }
@@ -251,7 +251,7 @@ public final class RocPlot {
     mTitleEntry.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(FocusEvent e) {
-        mIconLabel.setText(mTitleEntry.getText());
+        setTitle(mTitleEntry.getText());
         showCurrentGraph();
       }
     });
@@ -652,9 +652,15 @@ public final class RocPlot {
 
 
   void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth) throws InterruptedException, InvocationTargetException, IOException {
-    final RocPlot rp = new RocPlot();
+    final JFrame frame = new JFrame();
+    final RocPlot rp = new RocPlot() {
+      @Override
+      public void setTitle(final String title) {
+        super.setTitle(title);
+        frame.setTitle("rtg rocplot - " + title);
+      }
+    };
     rp.setLineWidth(lineWidth);
-    final JFrame frame = new JFrame("ROC");
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
@@ -670,9 +676,7 @@ public final class RocPlot {
       }
     });
     rp.showScores(scores);
-    if (title != null) {
-      rp.setTitle(title);
-    }
+    rp.setTitle(title == null ? "ROC" : title);
     SwingUtilities.invokeAndWait(new Runnable() {
       @Override
       public void run() {
