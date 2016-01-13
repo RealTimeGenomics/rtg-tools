@@ -642,7 +642,7 @@ public final class FormatCli extends LoggedCli {
           final SAMReadGroupRecord samReadGroupRecord;
           if (mFlags.isSet(SamCommandHelper.SAM_RG)) {
             samReadGroupRecord = SamCommandHelper.validateAndCreateSamRG((String) mFlags.getValue(SamCommandHelper.SAM_RG), SamCommandHelper.ReadGroupStrictness.REQUIRED);
-          } else if (SamCommandHelper.isSamInput(mFlags)) {
+          } else if (SamCommandHelper.isSamInput(format)) {
             SAMReadGroupRecord record;
             SAMReadGroupRecord current = null;
             File currentFile = null;

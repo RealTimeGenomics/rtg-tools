@@ -34,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
 import com.rtg.reader.FormatCli;
 import com.rtg.util.InvalidParamsException;
@@ -145,16 +144,10 @@ public final class SamCommandHelper {
   }
 
   /**
-   * @param flags flags to check
+   * @param format the input format name
    * @return true if input is sam format
    */
-  public static boolean isSamInput(CFlags flags) {
-    final String format;
-    if (flags.isSet(FormatCli.FORMAT_FLAG)) {
-      format = flags.getValue(FormatCli.FORMAT_FLAG).toString().toLowerCase(Locale.getDefault());
-    } else {
-      format = FormatCli.SDF_FORMAT;
-    }
+  public static boolean isSamInput(String format) {
     return FormatCli.SAM_PE_FORMAT.equals(format) || FormatCli.SAM_SE_FORMAT.equals(format) || FormatCli.CGSAM_FORMAT.equals(format);
   }
 
