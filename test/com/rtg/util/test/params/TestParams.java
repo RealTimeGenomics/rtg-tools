@@ -341,7 +341,7 @@ public final class TestParams {
 
       if (name.equals("self")) {
         self = true;
-        final boolean ok = parameterTypes.length == 0 && (Modifier.isProtected(modifiers) || Modifier.isProtected(modifiers));
+        final boolean ok = parameterTypes.length == 0 && (Modifier.isProtected(modifiers) || Modifier.isPrivate(modifiers));
         error(ok, "Builder: self should have 0 parameters and be protected or private");
         continue;
       }
