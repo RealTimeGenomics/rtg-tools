@@ -224,7 +224,11 @@ public final class FormatCli extends LoggedCli {
         flags.setParseMessage("An error occurred reading " + flags.getValue(CommonFlags.INPUT_LIST_FLAG));
         return false;
       }
-      final String format = flags.getValue(FORMAT_FLAG).toString().toLowerCase(Locale.getDefault());
+      if (!validateQualityFormatFlags(flags, (String) flags.getValue(FORMAT_FLAG))) {
+        return false;
+      }
+      final boolean useQuality = !flags.isSet(NO_QUALITY);
+      final InputFormat inputformat = getFormat(flags, useQuality);
       if (files.size() == 0) {  //if no anonymous input files have been specified
         if (!leftFileSet && !rightFileSet) {
           flags.setParseMessage("No input files specified.");
@@ -235,7 +239,7 @@ public final class FormatCli extends LoggedCli {
         } else if (flags.isSet(PROTEIN_FLAG)) {
           flags.setParseMessage("Cannot set protein flag when left and right files are specified.");
           return false;
-        } else if (format.equals(SAM_SE_FORMAT) || format.equals(SAM_PE_FORMAT)) {
+        } else if (inputformat.isSam()) {
           flags.setParseMessage("Do not use left and right flags when using SAM input.");
           return false;
         }
@@ -253,14 +257,12 @@ public final class FormatCli extends LoggedCli {
         flags.setParseMessage("Either specify individual input files or left and right files, not both.");
         return false;
       }
-      if ((format.equals(SAM_PE_FORMAT) || format.equals(SAM_SE_FORMAT)) && flags.isSet(DUST_FLAG)) {
-        flags.setParseMessage("--" + DUST_FLAG + " is not supported when --" + FORMAT_FLAG + " is " + format + ".");
+      if (inputformat.isSam() && flags.isSet(DUST_FLAG)) {
+        flags.setParseMessage("--" + DUST_FLAG + " is not supported when --" + FORMAT_FLAG + " is " + flags.getValue(FORMAT_FLAG) + ".");
         return false;
       }
 
-      if (!validateQualityFormatFlags(flags, format)) {
-        return false;
-      }
+
       final File outputDir = (File) flags.getValue(CommonFlags.OUTPUT_FLAG);
       if (!CommonFlags.validateOutputDirectory(outputDir)) {
         return false;
@@ -268,7 +270,7 @@ public final class FormatCli extends LoggedCli {
       if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
         return false;
       }
-      if (flags.isSet(SELECT_READ_GROUP) && !(format.equals(SAM_SE_FORMAT) || format.equals(SAM_PE_FORMAT))) {
+      if (flags.isSet(SELECT_READ_GROUP) && !inputformat.isSam()) {
         flags.setParseMessage("--" + SELECT_READ_GROUP + " can only be used when formatting SAM/BAM");
         return false;
       }
@@ -621,19 +623,17 @@ public final class FormatCli extends LoggedCli {
       final File outputDir = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
       try (PrintStream summaryStream = new PrintStream(new FileOutputStream(new File(outputDir, CommonFlags.SUMMARY_FILE)))) {
         final List<File> files = InputFileUtils.removeRedundantPaths(CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false));
-        final String format = mFlags.getValue(FORMAT_FLAG).toString().toLowerCase(Locale.getDefault());
-        final String qualityFormat = mFlags.isSet(CommonFlags.QUALITY_FLAG) ? mFlags.getValue(CommonFlags.QUALITY_FLAG).toString().toLowerCase(Locale.getDefault()) : null;
         final ArrayList<String> namesToExclude = new ArrayList<>();
         for (final Object o : mFlags.getFlag(EXCLUDE_FLAG).getValues()) {
           namesToExclude.add((String) o);
         }
-        final InputFormat inputformat = getFormat(format, qualityFormat, true);
+        final boolean useQuality = !mFlags.isSet(NO_QUALITY);
+        final InputFormat inputformat = getFormat(mFlags, useQuality);
         if (mFlags.isSet(PROTEIN_FLAG)) {
           if (inputformat != InputFormat.FASTA) {
             throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Incompatible sequence type and file format. format=" + inputformat + " protein=" + true);
           }
         }
-        final boolean useQuality = !mFlags.isSet(NO_QUALITY);
         final boolean useNames = !mFlags.isSet(NO_NAMES);
         try {
           final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -642,7 +642,7 @@ public final class FormatCli extends LoggedCli {
           final SAMReadGroupRecord samReadGroupRecord;
           if (mFlags.isSet(SamCommandHelper.SAM_RG)) {
             samReadGroupRecord = SamCommandHelper.validateAndCreateSamRG((String) mFlags.getValue(SamCommandHelper.SAM_RG), SamCommandHelper.ReadGroupStrictness.REQUIRED);
-          } else if (SamCommandHelper.isSamInput(format)) {
+          } else if (inputformat.isSam()) {
             SAMReadGroupRecord record;
             SAMReadGroupRecord current = null;
             File currentFile = null;
@@ -744,52 +744,57 @@ public final class FormatCli extends LoggedCli {
   }
 
   /**
+   * Get the sequence data format from command line strings
+   * @param flags command line flags
+   * @param checkFastqQuality true if the FASTQ quality encoding should be checked
+   * @return the input format
+   */
+  public static InputFormat getFormat(CFlags flags, boolean checkFastqQuality) {
+    final String format = (String) flags.getValue(FORMAT_FLAG);
+    final String qualityFormat = (checkFastqQuality && flags.isSet(CommonFlags.QUALITY_FLAG)) ? (String) flags.getValue(CommonFlags.QUALITY_FLAG) : null;
+    return getFormat(format, qualityFormat, checkFastqQuality);
+  }
+
+  /**
    * Get the format from command line strings
    * @param format file format
    * @param qualityFormat quality data encoding
-   * @param usingQuality true if the quality values are going to be used
+   * @param checkFastqQuality true if FASTQ quality values are going to be used
    * @return the input format
    */
-  public static InputFormat getFormat(String format, String qualityFormat, boolean usingQuality) {
-    final InputFormat inputformat;
+  static InputFormat getFormat(String format, String qualityFormat, boolean checkFastqQuality) {
     switch (format) {
+      case SDF_FORMAT:
+        return InputFormat.SDF;
       case FASTA_FORMAT:
-        inputformat = InputFormat.FASTA;
-        break;
+        return InputFormat.FASTA;
       case FASTQ_FORMAT:
-        if (usingQuality) {
+        if (checkFastqQuality) {
           switch (qualityFormat) {
             case CommonFlags.SANGER_FORMAT:
-              inputformat = InputFormat.FASTQ;
-              break;
+              return InputFormat.FASTQ;
             case CommonFlags.SOLEXA_FORMAT:
-              inputformat = InputFormat.SOLEXA;
-              break;
+              return InputFormat.SOLEXA;
             case CommonFlags.ILLUMINA_FORMAT:
-              inputformat = InputFormat.SOLEXA1_3;
-              break;
+              return InputFormat.SOLEXA1_3;
             default:
               throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
           }
         } else {
-          inputformat = InputFormat.FASTQ;
+          return InputFormat.FASTQ;
         }
-        break;
+      case TSV_FORMAT:
+        return InputFormat.TSV_CG;
       case CGFASTQ_FORMAT:
-        inputformat = InputFormat.FASTQ_CG;
-        break;
+        return InputFormat.FASTQ_CG;
       case CGSAM_FORMAT:
-        inputformat = InputFormat.SAM_CG;
-        break;
+        return InputFormat.SAM_CG;
       case SAM_SE_FORMAT:
-        inputformat = InputFormat.SAM_SE;
-        break;
+        return InputFormat.SAM_SE;
       case SAM_PE_FORMAT:
-        inputformat = InputFormat.SAM_PE;
-        break;
+        return InputFormat.SAM_PE;
       default:
         throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid file format=" + format);
     }
-    return inputformat;
   }
 }

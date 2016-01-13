@@ -30,17 +30,21 @@
 package com.rtg.reader;
 
 /**
- * Input formats
+ * Sequence data input formats
  */
 public enum InputFormat {
+  /** SDF */
+  SDF,
   /** FASTA */
   FASTA,
-  /** FASTQ */
+  /** FASTQ, Sanger quality encoding */
   FASTQ,
-  /** Solexa earlier than version 1.3 */
+  /** FASTQ, Solexa earlier than version 1.3 quality encoding */
   SOLEXA,
-  /** Solexa 1.3 */
+  /** FASTQ, Solexa 1.3 quality encoding */
   SOLEXA1_3,
+  /** CG TSV */
+  TSV_CG,
   /** CG FASTQ */
   FASTQ_CG,
   /** SAM/BAM containing CG attributes */
@@ -50,7 +54,7 @@ public enum InputFormat {
       return true;
     }
     @Override
-    boolean isPairedSam() {
+    public boolean isPairedSam() {
       return true;
     }
   },
@@ -68,7 +72,7 @@ public enum InputFormat {
       return true;
     }
     @Override
-    boolean isPairedSam() {
+    public boolean isPairedSam() {
       return true;
     }
   };
@@ -76,7 +80,7 @@ public enum InputFormat {
   boolean isSam() {
     return false;
   }
-  boolean isPairedSam() {
+  public boolean isPairedSam() {
     return false;
   }
 }

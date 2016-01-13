@@ -866,12 +866,14 @@ public class IndexFile implements Integrity {
    */
   public static PrereadType typeFromFormat(InputFormat format) {
     switch(format) {
+      case SDF:
       case FASTA:
       case FASTQ:
       case SAM_PE:
       case SAM_SE:
         return PrereadType.UNKNOWN;
 
+      case TSV_CG:
       case FASTQ_CG:
       case SAM_CG:
         return PrereadType.CG;
