@@ -27,55 +27,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf;
+
+import java.util.List;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
- * A VCF sample filter constructed from a somewhat general expression supporting simple
- * numerical comparison like <code>OAF&gt;0.03</code>.
+ * A VCF info filter constructed from a somewhat general expression.
  */
-public class ExpressionSampleFilter extends VcfSampleFilter {
+public class ExpressionInfoFilter extends VcfInfoFilter {
 
   private final String mField;
   private final Operation<?> mOp;
   private final Object mValue;
 
-  static Operation<?> selectOp(final String operator, final Object mValue) {
-    if (mValue instanceof Double) {
-      switch (operator) {
-        case "=":
-        case "==":
-          return OperationDouble.EQ;
-        case "!=":
-        case "<>":
-          return OperationDouble.NE;
-        case "<":
-          return OperationDouble.LT;
-        case ">":
-          return OperationDouble.GT;
-        case "<=":
-          return OperationDouble.LE;
-        case ">=":
-          return OperationDouble.GE;
-        default:
-          throw new NoTalkbackSlimException("Invalid operator: " + operator);
-      }
-    } else {
-      switch (operator) {
-        case "=":
-        case "==":
-          return OperationObject.EQ;
-        case "!=":
-        case "<>":
-          return OperationObject.NE;
-        default:
-          throw new NoTalkbackSlimException("Invalid operator: " + operator);
-      }
-    }
-  }
-
-  ExpressionSampleFilter(final VcfFilterStatistics stats, final String expression) {
+  ExpressionInfoFilter(final VcfFilterStatistics stats, final String expression) {
     super(stats, VcfFilterStatistics.Stat.USER_EXPRESSION_COUNT);
     final String expr = expression.replace(" ", "");
     int k = 0;
@@ -102,17 +70,24 @@ public class ExpressionSampleFilter extends VcfSampleFilter {
       tempValue = value;
     }
     mValue = tempValue;
-    mOp = selectOp(operator, mValue);
+    mOp = ExpressionSampleFilter.selectOp(operator, mValue);
   }
 
   @Override
-  boolean acceptSample(final VcfRecord record, final int index) {
-    if (mValue instanceof Double) {
-      final Double val = record.getSampleDouble(index, mField);
-      return val != null && ((OperationDouble) mOp).compare(val, (Double) mValue);
-    } else {
-      final String val = record.getSampleString(index, mField);
-      return val != null && ((OperationObject) mOp).compare(val, mValue);
+  boolean acceptCondition(VcfRecord record) {
+    final List<String> vals = record.getInfo().get(mField);
+    if (vals != null) {
+      for (final String val : vals) {
+        if (mValue instanceof Double) {
+          final Double v = Double.valueOf(val);
+          if (((OperationDouble) mOp).compare(v, (Double) mValue)) {
+            return true;
+          }
+        } else if (((OperationObject) mOp).compare(val, mValue)) {
+          return true;
+        }
+      }
     }
+    return false;
   }
 }

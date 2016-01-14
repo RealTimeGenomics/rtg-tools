@@ -420,11 +420,15 @@ public final class VcfFilterCli extends AbstractCli {
       MAX_AMBIGUITY_RATIO,
       MIN_AVR_SCORE, MAX_AVR_SCORE,
       MIN_DENOVO_SCORE, MAX_DENOVO_SCORE,
-      EXPR_FLAG,
     };
     mVcfFilterTask.mCheckingSample = false;
     for (final String flag : sampleFlags) {
       mVcfFilterTask.mCheckingSample |= mFlags.isSet(flag);
+    }
+    for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
+      if (!((String) expr).startsWith("INFO.")) {
+        mVcfFilterTask.mCheckingSample = true;
+      }
     }
 
     mVcfFilterTask.mRemoveOverlapping = mFlags.isSet(REMOVE_OVERLAPPING);
@@ -477,7 +481,12 @@ public final class VcfFilterCli extends AbstractCli {
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
     mVcfFilterTask.mFailFilterName = mFlags.isSet(FAIL_FLAG) ? (String) mFlags.getValue(FAIL_FLAG) : null;
     for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
-      mVcfFilterTask.mFilters.add(new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, (String) expr));
+      final String e = (String) expr;
+      if (e.startsWith("INFO.")) {
+        mVcfFilterTask.mFilters.add(new ExpressionInfoFilter(mVcfFilterTask.mVcfFilterStatistics, e.substring("INFO.".length())));
+      } else {
+        mVcfFilterTask.mFilters.add(new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, e));
+      }
     }
 
     final File in = (File) mFlags.getValue(INPUT);
