@@ -76,30 +76,28 @@ public class SexMemo {
     mParMap = new MyFrickenMap[sexValues.length];
     mAutosomes = new HashSet<>();
     for (final Sex sex : sexValues) {
-      final ReferenceGenome referenceGenome = reader == null ? null : new ReferenceGenome(reader, sex, ploidy);
+      final ReferenceGenome referenceGenome = new ReferenceGenome(reader, sex, ploidy);
       mReferences[sex.ordinal()] = referenceGenome;
       final MyFrickenMap parmap = new MyFrickenMap();
 
-      if (referenceGenome != null) {
-        for (ReferenceSequence rs : referenceGenome.sequences()) {
-          if (sex == Sex.EITHER && rs.isSpecified() && rs.ploidy() == Ploidy.DIPLOID) {
-            mAutosomes.add(rs.name());
-          }
-          if (rs.hasDuplicates()) {
-            final String refName = rs.name();
-            final EffectivePloidyList result = new EffectivePloidyList();
-            for (Pair<RegionRestriction, RegionRestriction> dup : rs.duplicates()) {
-              final RegionRestriction r = dup.getA();
-              final RegionRestriction s = dup.getB();
-              if (refName.equals(r.getSequenceName())) {
-                result.add(new Pair<>(r, Ploidy.DIPLOID));
-              }
-              if (refName.equals(s.getSequenceName())) {
-                result.add(new Pair<>(s, Ploidy.NONE));
-              }
+      for (ReferenceSequence rs : referenceGenome.sequences()) {
+        if (sex == Sex.EITHER && rs.isSpecified() && rs.ploidy() == Ploidy.DIPLOID) {
+          mAutosomes.add(rs.name());
+        }
+        if (rs.hasDuplicates()) {
+          final String refName = rs.name();
+          final EffectivePloidyList result = new EffectivePloidyList();
+          for (Pair<RegionRestriction, RegionRestriction> dup : rs.duplicates()) {
+            final RegionRestriction r = dup.getA();
+            final RegionRestriction s = dup.getB();
+            if (refName.equals(r.getSequenceName())) {
+              result.add(new Pair<>(r, Ploidy.DIPLOID));
             }
-            parmap.put(refName, result);
+            if (refName.equals(s.getSequenceName())) {
+              result.add(new Pair<>(s, Ploidy.NONE));
+            }
           }
+          parmap.put(refName, result);
         }
       }
       mParMap[sex.ordinal()] = parmap;
@@ -136,9 +134,6 @@ public class SexMemo {
    */
   public Ploidy getEffectivePloidy(final Sex sex, String refName, int pos) {
     final ReferenceGenome referenceGenome = mReferences[sex.ordinal()];
-    if (referenceGenome == null) {
-      return Ploidy.DIPLOID; // default for diploid when no referecne file
-    }
     final ReferenceSequence rs =  referenceGenome.sequence(refName);
     if (rs == null) {
       return Ploidy.NONE;
@@ -186,9 +181,6 @@ public class SexMemo {
    */
   public Ploidy getRealPloidy(final Sex sex, final String refName, int pos) {
     final ReferenceGenome referenceGenome = mReferences[sex.ordinal()];
-    if (referenceGenome == null) {
-      return Ploidy.DIPLOID; // default for diploid when no referecne file
-    }
     final ReferenceSequence rs =  referenceGenome.sequence(refName);
     if (rs == null) {
       return Ploidy.NONE;
@@ -215,9 +207,6 @@ public class SexMemo {
    */
   public Ploidy getRealPloidy(final Sex sex, final String refName) {
     final ReferenceGenome referenceGenome = mReferences[sex.ordinal()];
-    if (referenceGenome == null) {
-      return Ploidy.DIPLOID; // default for diploid when no referecne file
-    }
     final ReferenceSequence rs =  referenceGenome.sequence(refName);
     if (rs == null) {
       return Ploidy.NONE;
