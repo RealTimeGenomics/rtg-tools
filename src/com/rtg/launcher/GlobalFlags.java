@@ -50,6 +50,7 @@ import com.rtg.util.io.AdjustableGZIPOutputStream;
  */
 public final class GlobalFlags {
 
+
   private GlobalFlags() { }
   //NOTE flag definitions should be placed here, to prevent circular dependencies
   //NOTE read class note
@@ -124,6 +125,9 @@ public final class GlobalFlags {
 
   /** Expected frequency of the variant allele (default 0.5). */
   public static final String CALLER_EXPECTED_ALLELE_FREQUENCY = "com.rtg.variant.base.Model.allele-frequency";
+
+  /** Method for computing the allele balance correction factor */
+  public static final String ALLELE_BALANCE_FACTOR = "com.rtg.variant.base.Model.allele-balance-factor";
 
   /** Prior for random hypothesis when using random hypotheses. */
   public static final String ENTROPY_RANDOM_PRIOR_FLAG = "com.rtg.variant.bayes.EntropyRandom.random-prior";
@@ -212,6 +216,7 @@ public final class GlobalFlags {
     // Misc calling
     registerFlag(CALLER_N_MIN_DEPTH, Integer.class, 5);
     registerFlag(CALLER_EXPECTED_ALLELE_FREQUENCY, Double.class, 0.5);
+    registerFlag(ALLELE_BALANCE_FACTOR, AlleleBalanceFactor.class, AlleleBalanceFactor.NONE);
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
     registerFlag(ENTROPY_RANDOM_PRIOR_FLAG, Double.class, 0.0);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
