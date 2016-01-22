@@ -151,11 +151,28 @@ public class RocPlot {
   private final JFileChooser mFileChooser = new JFileChooser();
   private File mFileChooserParent = null;
 
+  private static final Color[] PALETTE = {
+    new Color(0xFF4030),
+    new Color(0x30F030),
+    new Color(0x3030FF),
+    new Color(0xFF30FF),
+    new Color(0x30FFFF),
+    new Color(0xA05050),
+    new Color(0xF0C040),
+    new Color(0x707070),
+    new Color(0xC00000),
+    new Color(0x00C000),
+    new Color(0x0000C0),
+    new Color(0xC000C0),
+    new Color(0x00C0C0),
+    new Color(0xB0B0B0),
+  };
 
   /** Creates a new swing plot. */
   RocPlot() {
     mMainPanel = new JPanel();
     mPlotPanel = new PlotPanel(true);
+    mPlotPanel.setColors(PALETTE);
     mZoomPP = new RocZoomPlotPanel(mPlotPanel, mMainPanel);
     mZoomPP.setOriginIsMin(true);
     mProgressBar = new JProgressBar(-1, -1);
