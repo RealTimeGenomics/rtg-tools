@@ -5,6 +5,43 @@ is based.  Not all features described below may be included in this
 product.
 
 
+RTG Core 3.6.1 (2016-01-25)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* coverage: Fixed an exception that could occur when supplying a
+  reference SDF that did not contain all the sequences present in the
+  alignments.
+
+* family: Fixed an exception that could occur when supplying a family
+  pedigree involving members not present in the input mappings.
+
+* population: The COF/COC annotations for de novo calls that were
+  recently added to the family caller are now also produced by the
+  population command when appropriate.
+
+* map/cgmap: When mapping pre-formatted reads containing SAM read
+  group information embedded in the SDF and the input format was
+  explicitly specified as SDF via -F sdf, the read group info wasn't
+  being picked up. This is now fixed.
+
+* vcfmerge: Speed improvement when merging VCF files containing a
+  large number of contig header declarations.
+
+* many: Speed improvement when accessing indexed datafiles
+  (e.g. BED/BAM/VCF) that were being filtered by very large sets of
+  regions.
+
+* rocplot: Better error handling when trying to run the GUI on a
+  machine where a graphics environment is unavailable.
+
+* rocplot: (GUI) Update frame title when graph title changes.
+
+
+Previous releases
+=================
+
 RTG Core 3.6 (2015-12-07)
 -------------------------
 
@@ -211,10 +248,6 @@ features, see the RTG Operations Manual.
   been updated to version 1.141.
 
 * many: The JRE bundled with Linux/Windows builds is now 1.8.
-
-
-Previous releases
-=================
 
 RTG Core 3.5.2 (2015-10-15)
 ---------------------------
