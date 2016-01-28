@@ -242,7 +242,7 @@ public final class GlobalFlags {
     registerExperimentalFlags(DEFAULT_FLAGS);
   }
 
-  static void registerFlag(String name, Class<?> type, Object def) {
+  static <T> void registerFlag(String name, Class<T> type, T def) {
     if (type != null && def == null) {
       throw new IllegalArgumentException("Default value must be non-null for experimental flags with a type");
     }

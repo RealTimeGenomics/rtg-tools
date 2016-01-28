@@ -109,11 +109,12 @@ public class Flag implements Comparable<Flag> {
    * accepted. Maybe null for "switch" type flags.
    * @param paramDescription a description of the meaning of the flag.
    * @param paramDefault a default value that can be used for optional flags.
+   * @param <T> flag value type
    * @param category The flag category
    */
-  public Flag(final Character flagChar, final String flagName, final String flagDescription,
-      final int minCount, final int maxCount, final Class<?> paramType, final String paramDescription,
-      final Object paramDefault, final String category) {
+  public <T> Flag(final Character flagChar, final String flagName, final String flagDescription,
+      final int minCount, final int maxCount, final Class<T> paramType, final String paramDescription,
+      final T paramDefault, final String category) {
     if (flagDescription == null) {
       throw new NullPointerException();
     }

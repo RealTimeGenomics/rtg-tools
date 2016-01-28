@@ -31,10 +31,14 @@
 package com.rtg.launcher;
 
 /**
+ * Different ways of computing an allele balance correction
  * @author kurt
  */
 public enum AlleleBalanceFactor {
+  /** Don't adjust for allele balance */
   NONE,
+  /** Compute based on a binomial distribution */
   BINOMIAL,
+  /** Compute based on the hoeffding inequality */
   HOEFFDING;
 }

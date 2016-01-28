@@ -361,9 +361,10 @@ public final class CFlags {
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
    * @param defaultValue value the result will take on if not explicitly specified on command line.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerOptional(final String name, final Class<?> type, final String usage, final String description, final Object defaultValue) {
+  public <T> Flag registerOptional(final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
     return registerOptional(null, name, type, usage, description, defaultValue);
   }
 
@@ -398,9 +399,10 @@ public final class CFlags {
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
    * @param defaultValue default value.
+   * @param <T> Flags value type
    * @return the flag.
    */
-  public Flag registerOptional(final Character nameChar, final String name, final Class<?> type, final String usage, final String description, final Object defaultValue) {
+  public <T> Flag registerOptional(final Character nameChar, final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
     return register(new Flag(nameChar, name, description, 0, 1, type, usage, defaultValue, ""));
   }
 
