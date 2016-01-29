@@ -42,7 +42,7 @@ import com.rtg.util.PseudoEnum;
  *
  */
 public abstract class TranslatedFrame implements Frame, PseudoEnum {
-//public abstract class TranslatedFrame implements Frame<Residue>, PseudoEnum {
+
   /**
    * Normal forward direction - phase 1.
    */
@@ -63,12 +63,12 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
 
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidForward(offset, length, fullLength);
+      return f(offset);
     }
 
     @Override
     public int calculateLastValid(int offset, int length, int fullLength) {
-      return calculateLastValidForward(offset, length);
+      return length;
     }
 
     @Override
@@ -80,8 +80,6 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
     public Frame getReverse() {
       return REVERSE1;
     }
-
-
   };
 
   /**
@@ -106,12 +104,12 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
     }
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidForward(offset, length, fullLength);
+      return f(offset);
     }
 
     @Override
     public int calculateLastValid(int offset, int length, int fullLength) {
-      return calculateLastValidForward(offset, length);
+      return length;
     }
     @Override
     public boolean isForward() {
@@ -148,12 +146,12 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
     }
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidForward(offset, length, fullLength);
+      return f(offset);
     }
 
     @Override
     public int calculateLastValid(int offset, int length, int fullLength) {
-      return calculateLastValidForward(offset, length);
+      return length;
     }
 
     @Override
@@ -180,14 +178,13 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
       if (index < 0) {
         throw new ArrayIndexOutOfBoundsException(index);
       }
-//      final int i = length - index - 1;
       final int i = lastValid - index - 1;
       return codonToAmino(COMPLEMENT[codes[i]], COMPLEMENT[codes[i - 1]], COMPLEMENT[codes[i - 2]]);
     }
 
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidReverse(offset, length, fullLength);
+      return 0;
     }
 
     @Override
@@ -220,13 +217,12 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
       if (index < 0) {
         throw new ArrayIndexOutOfBoundsException(index);
       }
-//      final int i = length - index  - 2;
       final int i = lastValid - index - 2;
       return codonToAmino(COMPLEMENT[codes[i]], COMPLEMENT[codes[i - 1]], COMPLEMENT[codes[i - 2]]);
     }
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidReverse(offset, length, fullLength);
+      return 0;
     }
 
     @Override
@@ -257,13 +253,12 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
       if (index < 0) {
         throw new ArrayIndexOutOfBoundsException(index);
       }
-//      final int i = length - index  - 3;
       final int i = lastValid - index - 3;
       return codonToAmino(COMPLEMENT[codes[i]], COMPLEMENT[codes[i - 1]], COMPLEMENT[codes[i - 2]]);
     }
     @Override
     public int calculateFirstValid(int offset, int length, int fullLength) {
-      return calculateFirstValidReverse(offset, length, fullLength);
+      return 0;
     }
 
     @Override
@@ -338,25 +333,11 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
     return mPhase;
   }
 
-  static int calculateFirstValidForward(int offset, int length, int fullLength) {
-    return f(offset);
-  }
-
-  static int calculateFirstValidReverse(int offset, int length, int fullLength) {
-    return 0;
-    //return (fullLength - offset) % 3;
-  }
-
   // series is 0, 2, 1, 0, 2, 1
   // this is because at offset 1 our new array position is 2 to get the first nucleotide
   // in frame FORWARD1, similarly for offset 2 the array position is 1 and so on
   private static int f(int x) {
     return (2 * x + 3) % 3;
-  }
-
-  static int calculateLastValidForward(int offset, int length) {
-    return length;
-    //return length - ((offset + length) % 3);
   }
 
   static int calculateLastValidReverse(int offset, int length, int fullLength) {
@@ -411,21 +392,15 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
    * Converts three characters of a codon into the corresponding amino
    * acid.
    *
-   * @param c1 the <code>char</code> symbol for the first base in the
-   * codon.
-   * @param c2 the <code>char</code> symbol for the second base in the
-   * codon.
-   * @param c3 the <code>char</code> symbol for the third base in the
-   * codon.
-   * @return the <code>char</code> symbol for the corresponding amino
-   * acid.
+   * @param c1 the <code>char</code> symbol for the first base in the codon.
+   * @param c2 the <code>char</code> symbol for the second base in the codon.
+   * @param c3 the <code>char</code> symbol for the third base in the codon.
+   * @return the <code>char</code> symbol for the corresponding amino acid.
    */
   public static byte codonToAmino(final byte c1, final byte c2, final byte c3) {
-    //System.err.println("codonToAmino c1=" + c1 + ":" + DNA.values()[c1] + " c2=" + c2+ ":" + DNA.values()[c2] + " c3=" + c3+ ":" + DNA.values()[c3]);
     final int x1 = c1 << DNA_UNKNOWN_BITS2;
     final int x2 = c2 << DNA_UNKNOWN_BITS;
     final int x = x1 | x2 | c3;
-    //System.err.println("codonToAmino x=" + x + " res=" + res+ ":" + Protein.values()[res]);
     return CODON_TO_AMINO[x];
   }
 
