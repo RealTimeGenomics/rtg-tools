@@ -39,6 +39,6 @@ public enum AlleleBalanceFactor {
   NONE,
   /** Compute based on a binomial distribution */
   BINOMIAL,
-  /** Compute based on the hoeffding inequality */
+  /** Compute based on the Hoeffding inequality */
   HOEFFDING;
 }
