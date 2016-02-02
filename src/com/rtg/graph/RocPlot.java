@@ -408,11 +408,15 @@ public class RocPlot {
       final Mapping[] mapping = mPlotPanel.getMapping();
       if (mapping != null && mapping.length > 1 && mCrosshair != null) {
         Point p = new Point((int) mapping[0].worldToScreen(mCrosshair.x), (int) mapping[1].worldToScreen(mCrosshair.y));
-        p = SwingUtilities.convertPoint(mPlotPanel, p, this);
-        g.setColor(Color.BLACK);
-        final int size = 9;
-        g.drawLine(p.x - size, p.y - size, p.x + size, p.y + size);
-        g.drawLine(p.x - size, p.y + size, p.x + size, p.y - size);
+        final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
+          && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
+        if (inView) {
+          p = SwingUtilities.convertPoint(mPlotPanel, p, this);
+          g.setColor(Color.BLACK);
+          final int size = 9;
+          g.drawLine(p.x - size, p.y - size, p.x + size, p.y + size);
+          g.drawLine(p.x - size, p.y + size, p.x + size, p.y - size);
+        }
       }
     }
     void setCrossHair(Point p) {
@@ -626,9 +630,11 @@ public class RocPlot {
       final Mapping[] mapping = mPlotPanel.getMapping();
       final int maxVariants = ((RocGraph2D) mPlotPanel.getGraph()).getMaxVariants();
       if (mapping != null && mapping.length > 1) {
+        final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
+          && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
         final float fp = mapping[0].screenToWorld((float) p.getX());
         final float tp = mapping[1].screenToWorld((float) p.getY());
-        if (fp >= 0 && tp >= 0 && (fp + tp > 0)) {
+        if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
           mProgressBar.setString(getMetricString(tp, fp, maxVariants));
           mZoomPP.setCrossHair(new Point((int) fp, (int) tp));
         } else {
