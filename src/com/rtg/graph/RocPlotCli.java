@@ -157,7 +157,7 @@ public class RocPlotCli extends AbstractCli {
     try {
       final GraphicsDevice[] screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
       return screenDevices == null || screenDevices.length == 0;
-    } catch (InternalError | UnsatisfiedLinkError e) {
+    } catch (Error e) {
       Diagnostic.error(e.getMessage());
       return true;
     } catch (HeadlessException e) {
