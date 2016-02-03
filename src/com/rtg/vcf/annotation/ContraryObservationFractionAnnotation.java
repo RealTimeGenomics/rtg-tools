@@ -128,11 +128,9 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
 
   private boolean[] alleles(final boolean[] res, final VcfRecord record, final int sampleNumber) {
     final int[] originalGt = VcfUtils.getValidGt(record, sampleNumber);
-    if (originalGt != null) {
-      for (final int allele : originalGt) {
-        if (allele >= 0) {
-          res[allele] = true;
-        }
+    for (final int allele : originalGt) {
+      if (allele >= 0) {
+        res[allele] = true;
       }
     }
     return res;
@@ -182,17 +180,16 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     }
     final int[] originalAd = ad(record, antecedents);
     final int[] derivedAd = ad(record, sampleNumber);
-    if (originalAd == null || derivedAd == null) {
-      return null; // Safety, should not happen on well-formed data
+    final int oSum = sum(originalAd);
+    final int dSum = sum(derivedAd);
+    if (oSum == 0 || dSum == 0) {
+      return null;
     }
     final boolean[] originalAlleles = alleles(record, antecedents);
     final boolean[] derivedAlleles = alleles(record, sampleNumber);
-    if (originalAlleles == null || derivedAlleles == null) {
-      return null; // Safety, should not happen on well-formed data
-    }
     assert originalAlleles.length == originalAd.length && originalAlleles.length == derivedAlleles.length && originalAlleles.length == derivedAd.length;
-    final double invOriginalAdSum = 1.0 / sum(originalAd);
-    final double invDerivedAdSum = 1.0 / sum(derivedAd);
+    final double invOriginalAdSum = 1.0 / oSum;
+    final double invDerivedAdSum = 1.0 / dSum;
     int contraryCount = 0;
     double contraryFraction = 0.0;
     for (int k = 0; k < originalAlleles.length; k++) {

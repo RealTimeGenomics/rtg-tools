@@ -30,6 +30,8 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Objects;
+
 import com.reeltwo.jumble.annotations.TestClass;
 
 /**
@@ -56,6 +58,26 @@ public class GtIdVariant extends Variant {
   /** @return the allele ID of the second allele in the GT */
   public int alleleB() {
     return mAlleleB;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    if (!super.equals(o)) {
+      return false;
+    }
+    final GtIdVariant that = (GtIdVariant) o;
+    return Objects.equals(mAlleleA, that.mAlleleA) && Objects.equals(mAlleleB, that.mAlleleB);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(super.hashCode(), mAlleleA, mAlleleB);
   }
 
   @Override

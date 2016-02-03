@@ -192,18 +192,18 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
   abstract long getNumberOfSequences();
 
   protected IndexFile finish(long sizeLimit, long numberSequences) {
-      if (mNameHandler.mNoNameCount > 0) {
-        Diagnostic.warning(""); //Ugly way to separate the warning.
-        Diagnostic.warning("There were " + mNoSequenceData + " sequences with no name.");
-      }
-      if (mNameHandler.mSequenceLabelTooLong > 0) {
-        Diagnostic.warning(""); //Ugly way to separate the warning.
-        Diagnostic.warning("There were " + mNoSequenceData + " names too long and truncated.");
-      }
-      if (mNoSequenceData > 0) {
-        Diagnostic.warning(""); //Ugly way to separate the warning.
-        Diagnostic.warning("There were " + mNoSequenceData + " sequences with no data.");
-      }
+    if (mNameHandler.mNoNameCount > 0) {
+      Diagnostic.warning(""); //Ugly way to separate the warning.
+      Diagnostic.warning("There were " + mNameHandler.mNoNameCount + " sequences with no name.");
+    }
+    if (mNameHandler.mSequenceLabelTooLong > 0) {
+      Diagnostic.warning(""); //Ugly way to separate the warning.
+      Diagnostic.warning("There were " + mNameHandler.mSequenceLabelTooLong + " names too long and truncated.");
+    }
+    if (mNoSequenceData > 0) {
+      Diagnostic.warning(""); //Ugly way to separate the warning.
+      Diagnostic.warning("There were " + mNoSequenceData + " sequences with no data.");
+    }
 
     //check accidental protein
     if (mSequenceType == SequenceType.PROTEIN) {

@@ -32,8 +32,8 @@ package com.rtg.reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.Constants;
@@ -53,11 +53,6 @@ public class SequencesWriter {
   final SequenceDataSource mDataSource;
   final File mOutputDir;
   long mSizeLimit = SdfWriter.DEFAULT_SIZE_LIMIT;
-
-  //Stats
-//  private static final int MAX_WARNINGS = 5;
-//  private final boolean mSkipEmptySequences = false; //Boolean.valueOf(System.getProperty("skip-empty-sequences", "false")); // If true, don't pass empty sequences to sdf writer
-  private final int mEmptySequenceCount = 0;
 
   private long mExcludedSequencesCount = 0;
   private long mExcludedResiduesCount;
@@ -167,16 +162,6 @@ public class SequencesWriter {
     return mSizeLimit;
   }
 
-//  private void noSequenceWarning(String label) {
-//    if (mEmptySequenceCount < MAX_WARNINGS) {
-//      Diagnostic.warning(WarningType.NO_SEQUENCE, label);
-//    }
-//    mEmptySequenceCount++;
-//    if (mEmptySequenceCount == MAX_WARNINGS) {
-//      Diagnostic.warning("Subsequent warnings of this type will not be shown.");
-//    }
-//  }
-
   void processSingleSequence(final AbstractSdfWriter sdfWriter) throws IOException {
     final String label = mDataSource.name();
 
@@ -185,23 +170,15 @@ public class SequencesWriter {
       if (label.contains(s)) {
         mExcludedSequencesCount++;
         mExcludedResiduesCount += mDataSource.currentLength();
-        // Found a sequence that is supposed to be suppressed.
-        //while (mDataSource.read() != null) {
-        //  ;
-        //}
         return;
       }
     }
 
     final int length = mReadTrimmer != null && mDataSource.hasQualityData() ? mReadTrimmer.getTrimPosition(mDataSource.qualityData(), mDataSource.currentLength()) : mDataSource.currentLength();
     mExcludedResiduesCount += mDataSource.currentLength() - length;
-//    if (length == 0 && mSkipEmptySequences) {
-//      noSequenceWarning(label);
-//    } else {
-      sdfWriter.startSequence(label);
-      sdfWriter.write(mDataSource.sequenceData(), mDataSource.qualityData(), length);  //may write 0 length
-      sdfWriter.endSequence();
-//    }
+    sdfWriter.startSequence(label);
+    sdfWriter.write(mDataSource.sequenceData(), mDataSource.qualityData(), length);  //may write 0 length
+    sdfWriter.endSequence();
   }
 
   /**
@@ -244,10 +221,6 @@ public class SequencesWriter {
       if (dataSource.getWarningCount() > FastaSequenceDataSource.NUMBER_OF_TIDE_WARNINGS) {
         Diagnostic.warning(""); //Ugly way to separate the warning.
         Diagnostic.warning(WarningType.NUMBER_OF_BAD_TIDE, Long.toString(dataSource.getWarningCount()));
-      }
-      if (mEmptySequenceCount > 0) {
-        Diagnostic.warning(""); //Ugly way to separate the warning.
-        Diagnostic.warning("There were " + mEmptySequenceCount + " sequences with no data.");
       }
     } finally {
       mTotalLength += inSdfWriter.getTotalLength();
@@ -334,17 +307,17 @@ public class SequencesWriter {
   }
 
   /**
-   * @return the number Of Sequences
+   * @return the number of Sequences
    */
   public final long getNumberOfSequences() {
     return mNumberOfSequences;
   }
 
   /**
-   * @return the number of Sequences that were excluded
+   * @return the number of sequences that were excluded
    */
   public final long getNumberOfExcludedSequences() {
-    return mExcludedSequencesCount + mEmptySequenceCount;
+    return mExcludedSequencesCount;
   }
 
   /**
@@ -367,7 +340,7 @@ public class SequencesWriter {
    */
   public static void main(String[] args) throws Exception {
     final long start = System.currentTimeMillis();
-    final SequenceDataSource leftds = new FastaSequenceDataSource(Arrays.asList(new File(args[0])), new DNAFastaSymbolTable(), true, null);
+    final SequenceDataSource leftds = new FastaSequenceDataSource(Collections.singletonList(new File(args[0])), new DNAFastaSymbolTable(), true, null);
     final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<String>(), PrereadType.UNKNOWN, true, null);
     // perform the actual work
     writer.processSequences();

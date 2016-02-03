@@ -56,9 +56,6 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
 
   private double[] ad(final double[] res, final VcfRecord record, final int sample) {
     final String ad = record.getSampleString(sample, FORMAT_ADE);
-    if (ad == null) {
-      return null;
-    }
     if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
       for (int k = 0; k < res.length; k++) {
@@ -83,12 +80,15 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
     final Integer va = record.getSampleInteger(sampleNumber, FORMAT_VA);
+    if (va == null) {
+      return null;
+    }
     final double[] ad = ad(record, sampleNumber);
-    if (va == null || ad == null) {
+    final double sum = sum(ad);
+    if (sum == 0) {
       return null;
     }
     assert va <= ad.length && va > 0;
-    final double sum = sum(ad);
     final double vac = ad[va];
     assert sum > 0;
     assert vac > 0;
@@ -98,7 +98,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
 
   @Override
   public String checkHeader(VcfHeader header) {
-    // Need both VA and AD
+    // Need both VA and ADE
     return checkHeader(header, null, new String[]{FORMAT_ADE, FORMAT_VA});
   }
 
