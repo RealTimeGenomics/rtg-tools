@@ -27,35 +27,36 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.launcher;
+
+package com.rtg;
 
 import java.io.IOException;
 
-import com.rtg.AbstractTest;
-import com.rtg.util.test.NanoRegression;
+import com.rtg.launcher.GlobalFlags;
+import com.rtg.util.cli.CommandLine;
+import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.Talkback;
+
+import junit.framework.TestCase;
 
 /**
- * Since most of the nano regression tests run pseudo-command-lines, it helps to have
- * a nice set up and tear down implementation that removes side effects.
+ * Provides a nice set up and tear down implementation that removes side effects from a few globals we have.
  */
-public abstract class AbstractNanoTest extends AbstractTest {
-
-  protected NanoRegression mNano;
+public abstract class AbstractTest extends TestCase {
 
   @Override
   public void setUp() throws IOException {
-    super.setUp();
-    mNano = new NanoRegression(this.getClass());
+    GlobalFlags.resetAccessedStatus();
+    CommandLine.clearCommandArgs();
+    Diagnostic.setLogStream();
   }
 
   @Override
   public void tearDown() throws IOException {
-    super.tearDown();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
+    GlobalFlags.resetAccessedStatus();
+    CommandLine.clearCommandArgs();
+    Diagnostic.setLogStream();
+    Talkback.setModuleName(null);
   }
 
 }
