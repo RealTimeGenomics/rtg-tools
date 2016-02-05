@@ -56,7 +56,9 @@ public final class SequencesReaderFactory {
    */
   public static synchronized AnnotatedSequencesReader createDefaultSequencesReader(final File dir, LongRange region) throws IOException {
     try {
-      return new DefaultSequencesReader(dir, region);
+      final DefaultSequencesReader r = new DefaultSequencesReader(dir, region);
+      r.logSDF();
+      return r;
     } catch (final FileNotFoundException e) {
       // Slightly better I/O reporting than the default provided by AbstractCli
       if (dir.isDirectory()) {
