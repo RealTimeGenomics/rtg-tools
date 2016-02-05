@@ -29,9 +29,12 @@
  */
 package com.rtg.vcf.eval;
 
+import com.reeltwo.jumble.annotations.JumbleIgnore;
+
 /**
  * Indicates that a variant could not be created for processing by vcfeval.
  */
+@JumbleIgnore
 public class SkippedVariantException extends Exception {
   /**
    * Constructor
