@@ -366,8 +366,8 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
         "Variant in calls at seq:28 ends outside the length of the reference sequence (27).",
         "Variant in baseline at seq:28 ends outside the length of the reference sequence (27).",
         "Variant in calls at seq:30 ends outside the length of the reference sequence (27).",
-        "There were 1 baseline variants skipped due to being too long or starting outside the expected reference sequence length.",
-        "There were 2 called variants skipped due to being too long or starting outside the expected reference sequence length."
+        "There were 1 problematic baseline variants skipped during loading (see vcfeval.log for details).",
+        "There were 2 problematic called variants skipped during loading (see vcfeval.log for details)."
       );
     }
   }

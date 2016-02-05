@@ -56,7 +56,11 @@ public class VariantTest extends TestCase {
     return createVariant(rec, 0, sampleNo);
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo) {
-    return new VariantFactory.SampleVariants(sampleNo, false, true).variant(rec, id);
+    try {
+      return new VariantFactory.SampleVariants(sampleNo, false, true).variant(rec, id);
+    } catch (SkippedVariantException e) {
+      return null;
+    }
   }
 
   static Variant createVariant(String var) {
@@ -105,6 +109,15 @@ public class VariantTest extends TestCase {
     assertEquals(-1, insert.compareTo(snp));
     assertEquals(1, snp.compareTo(insert));
     assertEquals(0, insert.compareTo(insert));
+  }
+
+  public void testTriploid() throws Exception {
+    final VcfRecord rec = createRecord("someKindOfName 23 . A T,G 12.8 PASS . GT:DP:RE:GQ 1/1/2:4:0.02:12.8");
+    try {
+      new VariantFactory.SampleVariants(0, false, true).variant(rec, 0);
+      fail("Expected failure to process triploid call");
+    } catch (SkippedVariantException ignored) {
+    }
   }
 
   static final String SNP_LINE = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";

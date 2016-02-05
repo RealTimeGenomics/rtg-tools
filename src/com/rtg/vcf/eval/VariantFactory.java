@@ -42,9 +42,10 @@ public interface VariantFactory {
    * Construct a Variant by inspecting a <code>VcfRecord</code> object.
    * @param rec VCF record to convert to Variant
    * @param id the identifier to assign to this variant
-   * @return the Variant or null if the record didn't contain data that could be converted according to the factory.
+   * @return the Variant or null if the record was non-variant
+   * @throws SkippedVariantException if the variant contained data that could not be converted according to the factory.
    */
-  Variant variant(VcfRecord rec, int id);
+  Variant variant(VcfRecord rec, int id) throws SkippedVariantException;
 
   /**
    * Construct Variants corresponding to the GT of a specified sample, only where the sample
@@ -73,7 +74,7 @@ public interface VariantFactory {
     }
 
     @Override
-    public GtIdVariant variant(VcfRecord rec, int id) {
+    public GtIdVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
       // Currently we skip both non-variant and SV
       if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
@@ -81,7 +82,9 @@ public interface VariantFactory {
 
       final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
       final int[] gtArray = VcfUtils.splitGt(gt);
-      assert gtArray.length == 1 || gtArray.length == 2;
+      if (gtArray.length == 0 || gtArray.length > 2) {
+        throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
+      }
       final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitHalfCall);
       final Range bounds = Allele.getAlleleBounds(alleles);
 
