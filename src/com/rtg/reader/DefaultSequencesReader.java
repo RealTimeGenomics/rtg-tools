@@ -113,17 +113,16 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
       mLabelManager = null;
       mSuffixManager = null;
     }
-
-    logSDF(mIndex.getSdfId().toString());
   }
 
-  private void logSDF(String sdfID) {
+  void logSDF() {
     String lengthBetween;
     try {
       lengthBetween = String.valueOf(lengthBetween(0, numberSequences()));
     } catch (Exception e) {
       lengthBetween = "unable to determine";
     }
+    final String sdfID = mIndex.getSdfId().toString();
     Diagnostic.userLog("Referenced SDF-ID: " + sdfID + " Type: " + type() + " Sequences: " + numberSequences() + " Residues: " + lengthBetween + " Max-Length: " + maxLength() + " Min-Length: " + minLength());
   }
 
