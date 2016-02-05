@@ -1185,15 +1185,6 @@ public final class CFlags {
     return flag.level() == level;
   }
 
-  private int getCategoryLocation(final String category) {
-    for (int i = 0; i < mCategories.length; i++) {
-      if (mCategories[i].equals(category)) {
-        return i;
-      }
-    }
-    throw new IllegalArgumentException("category not found " + category);
-  }
-
   /**
    * Append the description text for this program, if one exists.
    * @param wb wrapping string builder

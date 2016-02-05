@@ -35,9 +35,11 @@ import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +47,8 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
+
+import javax.annotation.Nonnull;
 
 import com.rtg.util.Resources;
 import com.rtg.util.Utils;
@@ -922,6 +926,68 @@ public final class FileUtils {
       mOut2.write(b, off, len);
     }
 
+  }
+
+  /**
+   * Wraps {@link File#listFiles()} so it will throw an IOException instead of returning null
+   * @param f directory to list
+   * @return see {@link File#listFiles()}, except this method can never return null
+   * @throws IOException if {@link File#listFiles()} returns null
+   */
+  @Nonnull
+  public static File[] listFiles(File f) throws IOException {
+    final File[] ret = f.listFiles();
+    return handleListFilesResult(f, ret);
+  }
+
+  /**
+   * Wraps {@link File#listFiles(FilenameFilter)} so it will throw an IOException instead of returning null
+   * @param f directory to list
+   * @param filter see {@link File#listFiles(FilenameFilter)}
+   * @return see {@link File#listFiles(FilenameFilter)}, except this method can never return null
+   * @throws IOException if {@link File#listFiles(FilenameFilter)} returns null
+   */
+  @Nonnull
+  public static File[] listFiles(File f, FilenameFilter filter) throws IOException {
+    final File[] ret = f.listFiles(filter);
+    return handleListFilesResult(f, ret);
+  }
+
+  /**
+   * Wraps {@link File#listFiles(FileFilter)} so it will throw an IOException instead of returning null
+   * @param f directory to list
+   * @param filter see {@link File#listFiles(FileFilter)}
+   * @return see {@link File#listFiles(FileFilter)}, except this method can never return null
+   * @throws IOException if {@link File#listFiles(FileFilter)} returns null
+   */
+  @Nonnull
+  public static File[] listFiles(File f, FileFilter filter) throws IOException {
+    final File[] ret = f.listFiles(filter);
+    return handleListFilesResult(f, ret);
+  }
+
+  private static <T> T[] handleListFilesResult(File f, T[] result) throws IOException {
+    if (result == null) {
+      if (!f.isDirectory()) {
+        throw new IOException(String.format("Cannot list %s as it is not a directory", f.toString()));
+      } else {
+        throw new IOException(String.format("Cannot list %s", f.toString()));
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Wraps {@link File#list(FilenameFilter)} so it will throw an IOException instead of returning null
+   * @param f directory to list
+   * @param filter see {@link File#list(FilenameFilter)}
+   * @return see {@link File#list(FilenameFilter)}, except this method can never return null
+   * @throws IOException if {@link File#list(FilenameFilter)} returns null
+   */
+  @Nonnull
+  public static String[] list(File f, FilenameFilter filter) throws IOException {
+    final String[] ret = f.list(filter);
+    return handleListFilesResult(f, ret);
   }
 
 }
