@@ -451,21 +451,25 @@
 
 
   <property name="test.jvm.args" value="" />
+  <property name="junit.jar" value="${tools.test.lib.dir}/junit.jar"/>
+  <property name="junit.runner" value="junit.textui.TestRunner" />
 
   <target name="runtest" depends="compile-src,compile-test" description="Run a unit test class. -Dtest.class=xxx">
     <fail unless="test.class" message="test.class property must be set"/>
     <property name="regression.root" refid="test.path" />
-    <java classname="junit.textui.TestRunner" fork="true" failonerror="true" dir="${build.junit}">
+    <java classname="${junit.runner}" fork="true" failonerror="true" dir="${build.junit}">
       <arg line="${test.class}" />
       <jvmarg value="-server" />
       <jvmarg value="-ea" />
       <jvmarg value="-Djava.awt.headless=true" />
       <jvmarg value="-Drtg.developer=true" />
+      <jvmarg value="-Djunit.printFailures=true" />
       <jvmarg value="-Dregression.root=${regression.root}" />
       <jvmarg value="-Dregression.update=${regression.update}" />
       <jvmarg value="-javaagent:${buildtools.dir}/handlechecker.jar" />
       <jvmarg line="${test.jvm.args}" />
       <classpath>
+        <pathelement path="${junit.jar}"/>
         <resources refid="runtime.test.classpath" />
       </classpath>
     </java>
