@@ -99,12 +99,16 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           continue;
         }
 
-        final Variant v = mFactory.variant(rec, id);
-        if (v == null) { // Just wasn't variant according to the factory
-          continue;
+        try {
+          final Variant v = mFactory.variant(rec, id);
+          if (v == null) { // Just wasn't variant according to the factory
+            continue;
+          }
+          list.add(v);
+        } catch (SkippedVariantException e) {
+          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " was skipped: " + e.getMessage());
+          skipped++;
         }
-
-        list.add(v);
       }
     }
     return new LoadedVariants(list, skipped);
