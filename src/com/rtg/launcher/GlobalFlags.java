@@ -105,6 +105,9 @@ public final class GlobalFlags {
   /** If true, the population command will fall back to using forward backward when disagreeing calls are encountered (currently slow for large pops) */
   public static final String FAMILY_CALLER_FALLBACK_FLAG = "com.rtg.variant.bayes.multisample.FamilyCaller.fb-fallback";
 
+  /** If true perform early exit of family caller when enough precision is reached */
+  public static final String FAMILY_CALLER_SORTED_HYPOTHESES = "com.rtg.variant.bayes.multisample.FamilyPosterior.sorted-hypotheses";
+
   /** If true, all-paths should attempt to use unrolled CG read, otherwise use the flattened representation */
   public static final String COMPLEX_CALLER_UNROLL_CG_FLAG = "com.rtg.variant.bayes.EvidenceComplex.unroll-cg";
 
@@ -218,6 +221,7 @@ public final class GlobalFlags {
     registerFlag(CALLER_EXPECTED_ALLELE_FREQUENCY, Double.class, 0.5);
     registerFlag(ALLELE_BALANCE_FACTOR, AlleleBalanceFactor.class, AlleleBalanceFactor.NONE);
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
+    registerFlag(FAMILY_CALLER_SORTED_HYPOTHESES, Boolean.class, true);
     registerFlag(ENTROPY_RANDOM_PRIOR_FLAG, Double.class, 0.0);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
 
