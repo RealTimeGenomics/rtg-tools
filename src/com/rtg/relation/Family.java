@@ -31,8 +31,8 @@
 package com.rtg.relation;
 
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,7 +131,7 @@ public class Family {
    */
   public static Set<Family> getFamilies(GenomeRelationships pedigree, boolean sloppy, Set<String> samplesToKeep) {
     final Relationship.SampleRelationshipFilter sampleFilter = samplesToKeep != null ? new Relationship.SampleRelationshipFilter(samplesToKeep) : null;
-    final Map<Pair<String, String>, Set<String>> partials = new HashMap<>();
+    final Map<Pair<String, String>, Set<String>> partials = new LinkedHashMap<>();
     for (final String child : pedigree.genomes()) {
       final Relationship.RelationshipFilter[] filters = sampleFilter != null ? new Relationship.RelationshipFilter[] {new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child), sampleFilter} : new Relationship.RelationshipFilter[] {new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child)};
       final Relationship[] parents = pedigree.relationships(child, filters);

@@ -310,7 +310,7 @@
   </target>
 
   <target name="javadoc" depends="compile-src" description="Build javadocs">
-    <javadoc sourcepath="${src.path}" destdir="${build.dir}/javadocs" source="1.7"
+    <javadoc sourcepath="${src.path}" destdir="${build.dir}/javadocs" source="1.8"
              Author="true" Version="true" Package="true"
              useexternalfile="true" additionalparam="-quiet" docfilessubdirs="true">
       <tag name="has" enabled="false"/>

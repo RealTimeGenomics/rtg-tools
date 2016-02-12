@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +98,7 @@ public final class MultiFamilyOrdering {
    */
   public static List<Family> orderFamiliesAndSetMates(Set<Family> families) throws PedigreeException {
     final MultiMap<String, Family> parents = new MultiMap<>(true);
-    final HashMap<String, Integer> parentPairCounts = new HashMap<>();
+    final HashMap<String, Integer> parentPairCounts = new LinkedHashMap<>();
     final HashMap<String, Family> parentPairToFamily = new HashMap<>();
     for (Family f : families) {
       parents.put(f.getMother(), f);
