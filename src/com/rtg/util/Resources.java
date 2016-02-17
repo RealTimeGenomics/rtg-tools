@@ -130,7 +130,7 @@ public final class Resources {
       final ArrayList<String> strings = new ArrayList<>();
       final File dir = new File(url.toURI());
       for (final File f : dir.listFiles()) {
-        strings.add(StringUtils.FS.equals("/") ? f.getPath() : f.getPath().replaceAll("\\" + StringUtils.FS, "/"));
+        strings.add(StringUtils.FS.equals("/") ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
       }
       return strings.toArray(new String[strings.size()]);
     } else if (url.getProtocol().equals("jar")) {

@@ -111,25 +111,25 @@ public final class SpawnJvmTest extends TestCase {
   }
 
   public void testOutput() throws IOException {
-    assertEquals("0" + LS, runClass(null, "com.rtg.util.SpawnJvmTest$ArgsPrinter"));
+    assertEquals("0" + LS, runClass(null, ArgsPrinter.class.getName()));
 
-    assertEquals("3" + LS + "1" + LS + "2" + LS + "3" + LS, runClass(null, "com.rtg.util.SpawnJvmTest$ArgsPrinter", "1", "2", "3"));
+    assertEquals("3" + LS + "1" + LS + "2" + LS + "3" + LS, runClass(null, ArgsPrinter.class.getName(), "1", "2", "3"));
   }
 
   public void testInput() throws IOException {
-    assertEquals("nOPQrSTUvWXYZAbCDEFGhIJKlM" + LS, runClass("aBCDeFGHiJKLMNoPQRSTuVWXyZ" + LS, "com.rtg.util.SpawnJvmTest$Rot13"));
+    assertEquals("nOPQrSTUvWXYZAbCDEFGhIJKlM" + LS, runClass("aBCDeFGHiJKLMNoPQRSTuVWXyZ" + LS, Rot13.class.getName()));
   }
 
   public void testMemory1() throws IOException {
     final int bits = Integer.parseInt(System.getProperty("sun.arch.data.model"));
 
-    ProcessOutput streams = new ProcessOutput(null, 134217728, "com.rtg.util.SpawnJvmTest$MaxMem");
+    ProcessOutput streams = new ProcessOutput(null, 134217728, MaxMem.class.getName());
     if (streams.mRetCode == 0) {
       return; //doesn't fail reliably on some platforms (MacOSX succeeds)
     }
     assertTrue(streams.mRetCode != 0); //this was > 0 changed to see if windows 2008 return negative return code
 
-    streams = new ProcessOutput(null, 4096, "com.rtg.util.SpawnJvmTest$MaxMem");
+    streams = new ProcessOutput(null, 4096, MaxMem.class.getName());
     switch (bits) {
       case 32:
         assertEquals("", streams.mStdOut);
@@ -149,19 +149,19 @@ public final class SpawnJvmTest extends TestCase {
 
   public void testMemory2() throws IOException {
     for (int mb = 32; mb <= 1024; mb <<= 1) {
-      final long mem = Long.parseLong(runClass(null, mb, "com.rtg.util.SpawnJvmTest$MaxMem").trim());
+      final long mem = Long.parseLong(runClass(null, mb, MaxMem.class.getName()).trim());
       assertTrue(mem > mb * 1048576L * 0.87);
     }
 
     final String osWindows = "Windows";
     if (System.getProperty("os.name").startsWith(osWindows) && Environment.is64BitVM()) {
-    final long mem = Long.parseLong(runClass(null, 1436, "com.rtg.util.SpawnJvmTest$MaxMem").trim());
+    final long mem = Long.parseLong(runClass(null, 1436, MaxMem.class.getName()).trim());
     assertTrue(mem > 1436 * 1048576L * 0.87);
     }
   }
 
   public void testInteraction() throws IOException {
-    final Process p = SpawnJvm.spawn("com.rtg.util.SpawnJvmTest$Interactive");
+    final Process p = SpawnJvm.spawn(Interactive.class.getName());
     try {
       try (OutputStreamWriter out = new OutputStreamWriter(p.getOutputStream())) {
         final BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
