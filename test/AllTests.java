@@ -51,7 +51,15 @@ public class AllTests extends TestSuite {
     return new ClassPathSuite();
   }
 
-  public static void main(final String[] args) {
-    junit.textui.TestRunner.run(suite());
+  public static void main(final String[] args) throws ClassNotFoundException {
+    if (args.length > 0) {
+      final TestSuite t = new TestSuite();
+      for (final String arg : args) {
+        t.addTestSuite(ClassLoader.getSystemClassLoader().loadClass(arg));
+      }
+      junit.textui.TestRunner.run(t);
+    } else {
+      junit.textui.TestRunner.run(suite());
+    }
   }
 }
