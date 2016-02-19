@@ -52,7 +52,7 @@ public class QuickSortTest extends TestCase {
 
         @Override
         public int compare(long index1, long index2) {
-          return Integer.valueOf(unsorted[(int) index1]).compareTo(unsorted[(int) index2]);
+          return Integer.compare(unsorted[(int) index1], unsorted[(int) index2]);
         }
 
         @Override
