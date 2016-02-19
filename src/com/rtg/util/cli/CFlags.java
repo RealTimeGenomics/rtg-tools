@@ -1148,9 +1148,9 @@ public final class CFlags {
   private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
     int longestUsageLength = 0;
     // Get longest string lengths for use below in pretty-printing.
-    final int[] counts = new int[mCategories.length];
+    //final int[] counts = new int[mCategories.length];
     for (Flag flag : mRegisteredFlags) {
-      counts[getCategoryLocation(flag.getCategory())]++;
+      //counts[getCategoryLocation(flag.getCategory())]++;
       if (!displayFlag(flag, level)) {
         continue;
       }
