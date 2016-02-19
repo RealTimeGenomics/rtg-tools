@@ -762,6 +762,10 @@ public final class SamUtils {
     final HashSet<String> expectedSamplesSet = expectedSamples == null ? null : new HashSet<>(Arrays.asList(expectedSamples));
     boolean guidMismatch = false;
     for (final File file : files) {
+      if (!file.isFile()) {
+        errorMessage.append("Input file \"").append(file.getPath()).append("\" is not an ordinary file").append(StringUtils.LS);
+        continue;
+      }
       try (SamReader sfr = SamUtils.makeSamReader(file)) {
         if (first == null) {
           first = sfr.getFileHeader();

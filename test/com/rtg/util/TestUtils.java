@@ -779,6 +779,16 @@ public final class TestUtils {
   }
 
   /**
+   * Takes a SAM string and strips out header fields that typically change from run to run.
+   * @param samString the full SAM string
+   * @return the sanitized SAM
+   */
+  public static String sanitizeSAMHeader(String samString) {
+    return samString.replaceAll("@PG.*\n", "")
+      .replaceAll("@CO.*\n", "");
+  }
+
+  /**
    * Strips all lines starting with a character out of a string.
    *
    * @param text the textual output
@@ -881,4 +891,5 @@ public final class TestUtils {
   public static String stripVcfHeader(String vcfString) {
     return vcfString.replaceAll("##.*\n", "");
   }
+
 }
