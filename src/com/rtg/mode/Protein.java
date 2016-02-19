@@ -220,7 +220,7 @@ public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
 
   @Override
   public int compareTo(final Protein p) {
-    return Integer.valueOf(this.ordinal()).compareTo(p.ordinal());
+    return Integer.compare(ordinal(), p.ordinal());
   }
 
   @Override
