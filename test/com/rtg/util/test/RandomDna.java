@@ -85,7 +85,7 @@ public final class RandomDna {
    * @param args size of sequence
    */
   public static void main(final String[] args) {
-    if (args.length < 1 && args.length > 2) {
+    if (args.length < 1 || args.length > 2) {
       System.err.println("USAGE: total-size sequence-size");
       return;
     }
