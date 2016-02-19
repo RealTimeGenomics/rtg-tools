@@ -68,8 +68,8 @@ public class PedigreeField {
     if (mSamples.size() != other.mSamples.size()) {
         return false;
     }
-    for (final String key : mSamples.keySet()) {
-      if (!mSamples.get(key).equals(other.mSamples.get(key))) {
+    for (final Map.Entry<String, String> e : mSamples.entrySet()) {
+      if (!e.getValue().equals(other.mSamples.get(e.getKey()))) {
         return false;
       }
     }
