@@ -129,7 +129,7 @@ public class Allele extends SequenceNameLocusSimple {
     if (trim) {
       final String ref = rec.getRefCall();
       if (allele == 0) {
-        return trim ? null : new Allele(rec, DnaUtils.encodeString(ref));
+        return null;
       }
       final String alt = rec.getAllele(allele);
       final int stripLeading = StringUtils.longestPrefix(ref, alt);
