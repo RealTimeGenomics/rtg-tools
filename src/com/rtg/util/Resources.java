@@ -39,6 +39,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import com.rtg.util.io.FileUtils;
+
 /**
  * Functions for handling resources
  *
@@ -129,7 +131,7 @@ public final class Resources {
     if (url.getProtocol().equals("file")) {
       final ArrayList<String> strings = new ArrayList<>();
       final File dir = new File(url.toURI());
-      for (final File f : dir.listFiles()) {
+      for (final File f : FileUtils.listFiles(dir)) {
         strings.add(StringUtils.FS.equals("/") ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
       }
       return strings.toArray(new String[strings.size()]);
