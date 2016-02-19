@@ -66,7 +66,7 @@ public enum DerivedAnnotations {
   /** Ploidy */
   PD(new PloidyAnnotation());
 
-  private final AbstractDerivedAnnotation mAnnotation;
+  private final transient AbstractDerivedAnnotation mAnnotation;
 
   DerivedAnnotations(AbstractDerivedAnnotation annotation) {
     assert name().equals(annotation.getName());
