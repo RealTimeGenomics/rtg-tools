@@ -31,7 +31,6 @@
 package com.rtg.tabix;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +47,6 @@ import com.rtg.util.test.BgzipFileHelper;
 import com.rtg.util.test.FileHelper;
 
 import htsjdk.samtools.util.BlockCompressedInputStream;
-
 import junit.framework.TestCase;
 
 /**
@@ -186,13 +184,8 @@ public class TabixIndexerTest extends TestCase {
     assertEquals('#', options.mMeta);
     assertEquals(0, options.mSkip);
     assertFalse(options.mZeroBased);
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    try {
-      try (InputStream is = Resources.getResourceAsStream("com/rtg/sam/resources/mmmm.sam.gz")) {
-        assertNotNull(tif.getReader(is));
-      }
-    } finally {
-      os.close();
+    try (InputStream is = Resources.getResourceAsStream("com/rtg/sam/resources/mmmm.sam.gz")) {
+      assertNotNull(tif.getReader(is));
     }
 
     final BedIndexerFactory bif = new TabixIndexer.BedIndexerFactory(0);
@@ -204,13 +197,8 @@ public class TabixIndexerTest extends TestCase {
     assertEquals('#', options.mMeta);
     assertEquals(0, options.mSkip);
     assertTrue(options.mZeroBased);
-    os = new ByteArrayOutputStream();
-    try {
-      try (InputStream is = Resources.getResourceAsStream("com/rtg/sam/resources/mmmm.sam.gz")) {
-        assertNotNull(bif.getReader(is));
-      }
-    } finally {
-      os.close();
+    try (InputStream is = Resources.getResourceAsStream("com/rtg/sam/resources/mmmm.sam.gz")) {
+      assertNotNull(bif.getReader(is));
     }
   }
 
