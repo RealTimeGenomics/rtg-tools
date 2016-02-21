@@ -255,7 +255,6 @@ public final class SnpIntersectionTest extends AbstractCliTest {
     final File outDirSecondFirst = new File(topLevel, "out-reverse");
 
     final String gzipSuff = gzip ? FileUtils.GZ_SUFFIX : "";
-    final SnpIntersection ins = new SnpIntersection();
 
     final String[] argsForward;
     final String[] argsReverse;
