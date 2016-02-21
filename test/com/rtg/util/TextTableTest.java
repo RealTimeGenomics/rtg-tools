@@ -41,7 +41,7 @@ import junit.framework.TestCase;
  */
 public class TextTableTest extends TestCase {
 
-  NanoRegression mNano;
+  NanoRegression mNano = null;
 
   @Override
   public void setUp() throws IOException {

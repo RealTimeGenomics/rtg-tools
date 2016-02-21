@@ -47,11 +47,10 @@ import com.rtg.util.test.NanoRegression;
 import junit.framework.TestCase;
 
 /**
- * Test class
  */
 public class TabixLineReaderTest extends TestCase {
 
-  protected NanoRegression mNano;
+  protected NanoRegression mNano = null;
 
   @Override
   public void setUp() throws IOException {
