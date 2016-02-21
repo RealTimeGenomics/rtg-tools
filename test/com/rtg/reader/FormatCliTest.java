@@ -30,7 +30,6 @@
 package com.rtg.reader;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -211,7 +210,6 @@ public class FormatCliTest extends AbstractCliTest {
       final File raw = new File(tempDir, "raw");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw);
       final File outputDir = new File(tempDir, JUNITOUT);
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
       final String bout = checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath());
       TestUtils.containsAll(bout, EXPECTED_FASTQ_MSG);
       assertTrue(outputDir.isDirectory());
