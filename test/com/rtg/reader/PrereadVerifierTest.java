@@ -163,6 +163,7 @@ public class PrereadVerifierTest extends TestCase {
           }
           // Random mutate base preread
           final File[] targets = mDir.listFiles(new MyFileFilter());
+          assertNotNull(targets);
           assertTrue("Targets length > 0, seed was: " + rnd.getSeed(), targets.length > 0);
           final File target = targets[rnd.nextInt(targets.length)];
           // Following loss of precision ok, because of 1GB file size
@@ -247,6 +248,7 @@ public class PrereadVerifierTest extends TestCase {
           }
           // Random mutate base preread
           final File[] targets = mDir.listFiles(new MyFileFilter());
+          assertNotNull(targets);
           assertTrue("Targets > 0, seed was: " + rnd.getSeed(), targets.length > 0);
 
           final int t = rnd.nextInt(targets.length);
