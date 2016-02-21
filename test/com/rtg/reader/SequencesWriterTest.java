@@ -268,6 +268,7 @@ public class SequencesWriterTest extends TestCase {
         return false;
       }
     });
+    assertNotNull(files);
     Arrays.sort(files);
     assertEquals(4, files.length);
     assertEquals(20, files[0].length());
