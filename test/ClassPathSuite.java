@@ -114,12 +114,15 @@ public class ClassPathSuite extends TestSuite {
   }
 
   private void scanDirectory(List<Class<?>> classes, File root, File cur) {
-    for (File each : cur.listFiles()) {
-      if (each.isDirectory()) {
-        scanDirectory(classes, root, each);
-      } else {
-        if (each.getName().endsWith(CLASS_EXT)) {
-          addIfTest(classes, getClassName(each.getPath(), root.getPath()));
+    final File[] files = cur.listFiles();
+    if (files != null) {
+      for (File each : files) {
+        if (each.isDirectory()) {
+          scanDirectory(classes, root, each);
+        } else {
+          if (each.getName().endsWith(CLASS_EXT)) {
+            addIfTest(classes, getClassName(each.getPath(), root.getPath()));
+          }
         }
       }
     }
