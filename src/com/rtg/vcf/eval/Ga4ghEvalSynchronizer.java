@@ -62,13 +62,13 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String DECISION_FP = "FP";
   private static final String DECISION_OTHER = "N";
 
-  private static final String FORMAT_SUBTYPE = "BK";
-  private static final String SUBTYPE_GT_MATCH = "gtmatch";
-  private static final String SUBTYPE_ALLELE_MATCH = "almatch";
-  private static final String SUBTYPE_REGIONAL_MATCH = "loosematch"; // perhaps implement some loose positional comparison?
-  private static final String SUBTYPE_MISMATCH = "miss";
+  private static final String FORMAT_MATCH_KIND = "BK";
+  private static final String SUBTYPE_MISMATCH = ".";
+  private static final String SUBTYPE_GT_MATCH = "gm";
+  private static final String SUBTYPE_ALLELE_MATCH = "am";
+  private static final String SUBTYPE_REGIONAL_MATCH = "lm"; // perhaps implement some loose positional comparison?
 
-  private static final String FORMAT_EXTRA = "BT";
+  private static final String FORMAT_EXTRA = "BI";
   private static final String EXTRA_MULTI = "multi";
   private static final String EXTRA_TOO_HARD = "too-hard";
 
@@ -120,7 +120,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutHeader.addInfoField(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of truth variants). When unspecified, assume 1.0"));
     mOutHeader.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
     mOutHeader.addFormatField(new FormatField(FORMAT_DECISION, MetaType.STRING, new VcfNumber("1"), "Decision for call (TP/FP/FN/N)"));
-    mOutHeader.addFormatField(new FormatField(FORMAT_SUBTYPE, MetaType.STRING, new VcfNumber("1"), "Sub-type for decision (match/mismatch type)"));
+    mOutHeader.addFormatField(new FormatField(FORMAT_MATCH_KIND, MetaType.STRING, new VcfNumber("1"), "Sub-type for decision (match/mismatch type)"));
     mOutHeader.addFormatField(new FormatField(FORMAT_EXTRA, MetaType.STRING, new VcfNumber("1"), "Additional comparison information"));
     mOutHeader.addFormatField(new FormatField(FORMAT_ROC_SCORE, MetaType.FLOAT, new VcfNumber("1"), "Variant quality for ROC creation."));
     mOutHeader.addSampleName(SAMPLE_TRUTH);
@@ -234,13 +234,13 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
         case VariantId.STATUS_GT_MATCH:
           setRocScore(outRec);
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_GT_MATCH, QUERY); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
           sync = Integer.toString(mCSyncStart + 1);
           break;
         case VariantId.STATUS_ALLELE_MATCH:
           setRocScore(outRec);
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_ALLELE_MATCH, QUERY);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, QUERY);
           if (isMultiAllelicCall(((OrientedVariant) mCv).variant())) {
             outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY);
           }
@@ -249,7 +249,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
         case VariantId.STATUS_NO_MATCH:
           setRocScore(outRec);
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_MISMATCH, QUERY);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, QUERY);
           sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
           break;
         default:
@@ -284,12 +284,12 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
           break;
         case VariantId.STATUS_GT_MATCH:
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_GT_MATCH, TRUTH); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
           sync = Integer.toString(mBSyncStart + 1);
           break;
         case VariantId.STATUS_ALLELE_MATCH:
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_ALLELE_MATCH, TRUTH);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, TRUTH);
           if (isMultiAllelicCall(((OrientedVariant) mBv).variant())) {
             outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, TRUTH);
           }
@@ -297,7 +297,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
           break;
         case VariantId.STATUS_NO_MATCH:
           outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH);
-          outRec.setFormatAndSample(FORMAT_SUBTYPE, SUBTYPE_MISMATCH, TRUTH);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, TRUTH);
           sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
           break;
         default:
