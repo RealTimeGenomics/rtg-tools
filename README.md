@@ -82,7 +82,7 @@ group.
 
 ## Prerequisites for building from source
 
-* Java 1.7 or later
+* Java 1.8 or later
 * apache ant 1.9 or later
 
 ## Check out source code for RTG Tools
@@ -110,7 +110,7 @@ Uncompress the installation zip:
     $ unzip /path/to/rtg-tools/dist/rtg-tools-VERSION-nojre.zip
 
 Follow the instructions contained in the `README.txt`. This build will
-use the system Java by default, so ensure that it is Java 1.7 or
+use the system Java by default, so ensure that it is Java 1.8 or
 later.
 
 
