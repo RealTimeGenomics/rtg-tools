@@ -41,12 +41,24 @@ import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
+import com.rtg.util.io.IOIterator;
 
 /**
  * Loads a bunch of chromosomal regions and allows you to ask if a position falls within any of the regions
  */
 public class ReferenceRegions {
 
+  /**
+   * Create a new instance from the specified region iterator
+   * @param reader the reader supplying regions
+   * @return a new <code>ReferenceRegions</code>
+   * @throws java.io.IOException when reading the file fails
+   */
+  public static ReferenceRegions regions(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
+    final ReferenceRegions regions = new ReferenceRegions();
+    regions.add(reader);
+    return regions;
+  }
 
   final Map<String, MergedIntervals> mSequences;
 
@@ -54,7 +66,7 @@ public class ReferenceRegions {
    * Construct an empty region set
    */
   public ReferenceRegions() {
-    this(new LinkedHashMap<String, MergedIntervals>());
+    this(new LinkedHashMap<>());
   }
 
   /**
@@ -73,6 +85,17 @@ public class ReferenceRegions {
       mSequences.put(name, regions);
     }
     return regions;
+  }
+
+  /**
+   * Add all regions from an iterator to the set
+   * @param reader supplies the regions to add
+   * @throws java.io.IOException when reading the region stream fails
+   */
+  public void add(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
+    while (reader.hasNext()) {
+      add(reader.next());
+    }
   }
 
   /**

@@ -39,6 +39,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.io.ClosedFileInputStream;
+import com.rtg.util.io.IOIterator;
 
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.RuntimeIOException;
@@ -118,7 +119,7 @@ public class TabixLineReader implements LineReader {
     return mDelegate.readLine();
   }
 
-  private static class SingleRestrictionLineReader implements LineReader {
+  private static class SingleRestrictionLineReader implements LineReader, IOIterator<String> {
     private final BlockCompressedPositionReader mBCPositionReader;
     private final VirtualOffsets mRange;
     private final String mSequence;
@@ -153,12 +154,8 @@ public class TabixLineReader implements LineReader {
       return hasNext() ? next() : null;
     }
 
-    /**
-     * Check if there is another line to get.
-     * @return boolean true if there is another line to get
-     * @throws IOException if an IO error occurs
-     */
-    private boolean hasNext() throws IOException {
+    @Override
+    public boolean hasNext() throws IOException {
       if (mRange == null) {
         return false;
       }
@@ -179,11 +176,7 @@ public class TabixLineReader implements LineReader {
       return false;
     }
 
-    /**
-     * Get the next line.
-     * @return String the line.
-     * @throws IOException if an IO error occurs
-     */
+    @Override
     public String next() throws IOException {
       if (hasNext()) {
         final String ret = mCurrent;

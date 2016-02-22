@@ -31,7 +31,6 @@
 package com.rtg.vcf;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -45,12 +44,13 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Reads a <code>.vcf</code> input stream and converts it into VCF records.
  */
-public class VcfReader implements Closeable {
+public class VcfReader implements IOIterator<VcfRecord> {
 
   private static final int CHROM_FIELD = 0;
   private static final int POS_FIELD = 1;
@@ -247,21 +247,12 @@ public class VcfReader implements Closeable {
     return mHeader;
   }
 
-
-  /**
-   * Check if there is another record to get.
-   * @return boolean true if there is another record to get
-   */
+  @Override
   public boolean hasNext() {
     return mCurrent != null;
   }
 
-  /**
-   * Get the current VCF record and advance the reader
-   *
-   * @return the current VCF record
-   * @throws IOException when IO or format errors occur.
-   */
+  @Override
   public VcfRecord next() throws IOException {
     final VcfRecord result = peek();
     setNext();

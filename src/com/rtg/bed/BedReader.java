@@ -31,7 +31,6 @@
 package com.rtg.bed;
 
 import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -43,13 +42,14 @@ import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.TabixLineReader;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.IOIterator;
 
 import htsjdk.samtools.util.BlockCompressedInputStream;
 
 /**
  * BED file reader class.
  */
-public class BedReader implements Closeable {
+public class BedReader implements IOIterator<BedRecord> {
 
   private final LineReader mIn;
   private final BedHeader mHeader;
@@ -130,19 +130,12 @@ public class BedReader implements Closeable {
     return header;
   }
 
-  /**
-   * Check if there is another record to get.
-   * @return boolean true if there is another record to get
-   */
+  @Override
   public boolean hasNext() {
     return mCurrent != null;
   }
 
-  /**
-   * Read the next record, if any.
-   * @return the next record.
-   * @throws IOException when IO or format errors occur.
-   */
+  @Override
   public BedRecord next() throws IOException {
     if (mCurrent == null) {
       throw new IllegalStateException("No more records");

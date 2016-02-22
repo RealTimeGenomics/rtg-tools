@@ -27,59 +27,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.sam;
+package com.rtg.util.io;
 
 import java.io.Closeable;
-import java.util.Iterator;
-
-import htsjdk.samtools.SAMFileHeader;
+import java.io.IOException;
 
 /**
- * Interface for records derived from a SAM input source.
- * @param <T> record type
+ * Iterator for file/stream reading classes where IOExceptions may be thrown during the iteration
  */
-public interface RecordIterator<T> extends Iterator<T>, Closeable {
+public interface IOIterator<T> extends Closeable {
 
   /**
-   * Get the header for checking.
-   * @return the header.
+   * @return <code>true</code> iff the iteration has more elements.
+   * @throws IOException when I/O or format errors occur.
    */
-  SAMFileHeader header();
+  boolean hasNext() throws IOException;
 
   /**
-   * Gets the total number of records that were invalid.
-   * @return the sum of all invalid counts
+   * @return the next element in the iteration.
+   * @throws IOException when I/O or format errors occur.
    */
-  long getInvalidRecordsCount();
-
-  /**
-   * Gets the number of records that were ignored due to filtering criteria
-   * @return the count of records ignored due to user-filtering
-   */
-  long getFilteredRecordsCount();
-
-  /**
-   * Gets the number of records that were detected as duplicates and ignored
-   * @return the number of duplicate records filtered
-   */
-  long getDuplicateRecordsCount();
-
-  /**
-   * Gets the total number of records that were returned to the caller.
-   * @return the count of records returned to the caller.
-   */
-  long getOutputRecordsCount();
-
-  /**
-   * Gets the total number of input records.
-   * @return the count of all input records (regardless of validity or filtering status).
-   */
-  long getTotalRecordsCount();
-
-  /**
-   * Get the total number of nucleotides read (ignoring badly formatted records).
-   * @return the sum of all nucleotides.
-   */
-  long getTotalNucleotides();
+  T next() throws IOException;
 
 }

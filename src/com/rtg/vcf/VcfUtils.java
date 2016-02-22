@@ -672,24 +672,11 @@ public final class VcfUtils {
   public static ReferenceRegions regionsVcf(File f) throws IOException {
     if (f != null) {
       try (VcfReader reader = VcfReader.openVcfReader(f)) {
-        return regions(reader);
+        return ReferenceRegions.regions(reader);
       }
     } else {
       return null;
     }
   }
 
-  /**
-   * Create a new instance from the specified VCF file.
-   * @param reader the VCF reader
-   * @return a new <code>ReferenceRegions</code>
-   * @throws java.io.IOException when reading the file fails
-   */
-  public static ReferenceRegions regions(VcfReader reader) throws IOException {
-    final ReferenceRegions regions = new ReferenceRegions();
-    while (reader.hasNext()) {
-      regions.add(reader.next());
-    }
-    return regions;
-  }
 }

@@ -43,7 +43,6 @@ import com.rtg.bed.BedUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.vcf.VcfReader;
-import com.rtg.vcf.VcfUtils;
 
 import junit.framework.TestCase;
 
@@ -68,12 +67,12 @@ public class ReferenceRegionsTest extends TestCase {
 
   public void testBedRegions() throws IOException {
     final BedReader reader = new BedReader(new BufferedReader(new StringReader(BED)));
-    final ReferenceRegions regions = BedUtils.regions(reader);
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
     checkRegions(regions);
   }
   public void testVcfRegions() throws IOException {
     final VcfReader reader = new VcfReader(new BufferedReader(new StringReader(VCF)));
-    final ReferenceRegions regions = VcfUtils.regions(reader);
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
     checkRegions(regions);
   }
 
@@ -118,7 +117,7 @@ public class ReferenceRegionsTest extends TestCase {
         + "monkey 10 40 bar" + LS
     ).replaceAll(" ", "\t");
     final BedReader reader = new BedReader(new BufferedReader(new StringReader(bed)));
-    final ReferenceRegions regions = BedUtils.regions(reader);
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
     assertFalse(regions.enclosed("monkey", 9));
     for (int i = 10; i < 40; i++) {
       assertTrue(regions.enclosed("monkey", i));
@@ -131,7 +130,7 @@ public class ReferenceRegionsTest extends TestCase {
         + "monkey 23 40 bar" + LS
     ).replaceAll(" ", "\t");
     final BedReader reader = new BedReader(new BufferedReader(new StringReader(bed)));
-    final ReferenceRegions regions = BedUtils.regions(reader);
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
     assertFalse(regions.enclosed("monkey", 19));
     for (int i = 20; i < 40; i++) {
       assertTrue(regions.enclosed("monkey", i));
@@ -145,7 +144,7 @@ public class ReferenceRegionsTest extends TestCase {
         + "monkey 30 40 bar" + LS
     ).replaceAll(" ", "\t");
     final BedReader reader = new BedReader(new BufferedReader(new StringReader(bed)));
-    final ReferenceRegions regions = BedUtils.regions(reader);
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
     assertTrue(regions.enclosed("monkey", 25));
     assertFalse(regions.enclosed("monkey", 26));
     assertFalse(regions.enclosed("monkey", 29));

@@ -34,8 +34,8 @@ import java.io.IOException;
 
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
-import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -80,24 +80,10 @@ public final class BedUtils {
   public static ReferenceRegions regions(File f) throws IOException {
     if (f != null) {
       try (BedReader reader = BedReader.openBedReader(null, f, 0)) {
-        return regions(reader);
+        return ReferenceRegions.regions(reader);
       }
     } else {
       return null;
     }
-  }
-
-  /**
-   * Create a new instance from the specified BED file
-   * @param reader the BED reader
-   * @return a new <code>ReferenceRegions</code>
-   * @throws java.io.IOException when reading the file fails
-   */
-  public static ReferenceRegions regions(BedReader reader) throws IOException {
-    final ReferenceRegions regions = new ReferenceRegions();
-    while (reader.hasNext()) {
-      regions.add(reader.next());
-    }
-    return regions;
   }
 }
