@@ -81,7 +81,7 @@ public class ClassPathSuite extends TestSuite {
    * @param <T> the type of array elements.
    */
   public static <T> void shuffle(T[] arr) {
-    final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.valueOf(SHUFFLE_TESTS));
+    final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.parseLong(SHUFFLE_TESTS));
     System.err.println("Shuffling tests with seed: " + r.getSeed());
     for (int i = 0; i < arr.length; i++) {
       final int z = r.nextInt(arr.length - i);
