@@ -122,7 +122,7 @@ public class LoggedCliTest extends AbstractCliTest {
     assertTrue(tlcli.mBools[0]);
 
     File logFile = null;
-    for (File f : newFile.listFiles()) {
+    for (File f : FileUtils.listFiles(newFile)) {
       if (f.toString().equals(newFile.toString() + StringUtils.FS + MODULENAME + ".log")) {
         logFile = f;
       }
@@ -157,7 +157,7 @@ public class LoggedCliTest extends AbstractCliTest {
     assertTrue(tlcli.mBools[0]);
 
     File logFile = null;
-    for (File f : newFile.listFiles()) {
+    for (File f : FileUtils.listFiles(newFile)) {
       if (f.toString().equals(newFile.toString() + StringUtils.FS + MODULENAME + ".log")) {
         logFile = f;
       }
@@ -194,7 +194,7 @@ public class LoggedCliTest extends AbstractCliTest {
     assertTrue(tlcli.mBools[0]);
 
     File logFile = null;
-    for (File f : newFile.listFiles()) {
+    for (File f : FileUtils.listFiles(newFile)) {
       if (f.toString().equals(newFile.toString() + StringUtils.FS + MODULENAME + ".log")) {
         logFile = f;
       }
