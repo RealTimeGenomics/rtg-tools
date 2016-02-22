@@ -45,7 +45,7 @@ import junit.framework.TestCase;
  */
 public class ProteinScoringMatrixTest extends TestCase {
 
-  private ProteinScoringMatrix mMatrix;
+  private ProteinScoringMatrix mMatrix = null;
 
   /**
    * Set up the matrix

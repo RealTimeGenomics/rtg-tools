@@ -40,19 +40,13 @@ import junit.framework.TestCase;
  */
 public class ScoringMatrixTest extends TestCase {
 
-  private ScoringMatrix mMatrix;
+  private ScoringMatrix mMatrix = null;
 
-  /**
-   * Set up the matrix
-   */
   @Override
   public void setUp() throws IOException, InvalidParamsException {
     mMatrix = new ProteinScoringMatrix("BLOSUM62");
   }
 
-  /**
-   * Tear down the matrix
-   */
   @Override
   public void tearDown() {
     mMatrix = null;
