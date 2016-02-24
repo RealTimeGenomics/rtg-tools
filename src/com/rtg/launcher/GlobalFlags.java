@@ -29,6 +29,7 @@
  */
 package com.rtg.launcher;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -295,6 +296,14 @@ public final class GlobalFlags {
    */
   public static String getStringValue(String name) {
     return (String) getFlag(name).getValue();
+  }
+
+  /**
+   * @param name name of flag (without <code>XX</code> prefix)
+   * @return file representation of flag value
+   */
+  public static File getFileValue(String name) {
+    return (File) getFlag(name).getValue();
   }
 
   /**
