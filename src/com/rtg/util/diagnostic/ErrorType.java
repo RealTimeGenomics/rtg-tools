@@ -451,6 +451,9 @@ public final class ErrorType implements DiagnosticType, Serializable, PseudoEnum
   /** Mask params resulted in an invalid mask (skeleton etc) */
   public static final ErrorType INVALID_MASK_PARAMS = new ErrorType(++sCounter, "INVALID_MASK_PARAMS", 0);
 
+  /** The use of a blacklist is not supported for this read set */
+  public static final ErrorType BLACKLIST_LONG_READ_ONLY = new ErrorType(++sCounter, "BLACKLIST_LONG_READ_ONLY", 0);
+
   /** Number of parameters that must occur in conjunction with this warning. */
   private final int mParams;
 
@@ -567,7 +570,8 @@ public final class ErrorType implements DiagnosticType, Serializable, PseudoEnum
     NOT_A_PAIRED_END_SDF,
     LONG_READ_NOT_SUPPORTED,
     INVALID_QUALITY,
-    INVALID_MASK_PARAMS
+    INVALID_MASK_PARAMS,
+    BLACKLIST_LONG_READ_ONLY
   });
 
   /**
