@@ -30,7 +30,7 @@
 package com.rtg.util.array.atomic;
 
 /**
- * For atomicly updated arrays with long array indices
+ * For atomically updated arrays with long array indices
  */
 public interface AtomicIndex {
 
