@@ -29,16 +29,14 @@
  */
 package com.rtg.util.intervals;
 
+import java.util.BitSet;
 import java.util.Map;
 import java.util.TreeMap;
-
-import com.reeltwo.jumble.annotations.TestClass;
 
 /**
  * Store information about multiple intervals on a single sequence.
  * Overlapping regions are joined together into a single interval.
  */
-@TestClass("com.rtg.util.intervals.ReferenceRegionsTest")
 class MergedIntervals {
 
   /**
@@ -81,15 +79,63 @@ class MergedIntervals {
     } else {
       actualEnd = Math.max(endFloor.getValue(), end);
     }
-    //Remove any existing regions contained within the new bounds
+    removeContainedBy(actualStart, actualEnd);
+    mIntervals.put(actualStart, actualEnd);
+  }
+
+  /**
+   * Subtract a region from the set
+   * @param interval the region to subtract
+   */
+  void subtract(Interval interval) {
+    subtract(interval.getStart(), interval.getEnd());
+  }
+
+  /**
+   * Subtract a region from the set
+   * @param start 0-based inclusive start position of the region
+   * @param end 0-based exclusive end position of the region
+   */
+  void subtract(int start, int end) {
+    final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(start);
+    final Map.Entry<Integer, Integer> endFloor = mIntervals.lowerEntry(end);
+    if (endFloor == null) {
+      return; // query is to the left of all regions.
+    }
+    if (floor != null && floor.getKey() < end && floor.getValue() > start) {
+      // We have a region that overlaps query start
+      if (floor.getValue() > end) {
+        // Region completely encompasses query, split
+        mIntervals.put(end, floor.getValue());
+      }
+      mIntervals.put(floor.getKey(), start); // Truncate to start
+    } else if (endFloor.getKey() < end && endFloor.getValue() > end) {
+      // We have a region that overlaps end
+      mIntervals.put(end, endFloor.getValue());
+    }
+    removeContainedBy(start, end);
+  }
+
+  //Remove any existing regions completely within start and end
+  private void removeContainedBy(int start, int end) {
     Map.Entry<Integer, Integer> overlappedRegion;
-    while ((overlappedRegion = mIntervals.lowerEntry(actualEnd)) != null) {
-      if (overlappedRegion.getKey() < actualStart) {
+    while ((overlappedRegion = mIntervals.lowerEntry(end)) != null) {
+      if (overlappedRegion.getKey() < start) {
         break;
       }
       mIntervals.remove(overlappedRegion.getKey());
     }
-    mIntervals.put(actualStart, actualEnd);
+  }
+
+  /**
+   * @return a mask that can be used for fast containment tests
+   */
+  public BitSet mask() {
+    final BitSet mask = new BitSet();
+    for (Map.Entry<Integer, Integer> region : mIntervals.entrySet()) {
+      mask.set(region.getKey(), region.getValue());
+    }
+    return mask;
   }
 
   /**

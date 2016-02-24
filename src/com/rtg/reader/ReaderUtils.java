@@ -32,11 +32,17 @@ package com.rtg.reader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.rtg.util.InvalidParamsException;
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.ReferenceRegions;
 
 /**
  * Utility functions for manipulating files that are not provided in the File
@@ -182,5 +188,35 @@ public final class ReaderUtils {
       names.put(genome.name(l), genome.length(l));
     }
     return names;
+  }
+
+  /**
+   * Make a reference regions corresponding to the full length of all reference sequences
+   * @param sequencesReader sequences reader used to determine sequence names and lengths
+   * @return the ReferenceRegions
+   * @throws IOException if an I/O error occurs
+   */
+  public static ReferenceRegions fullReferenceRegions(SequencesReader sequencesReader) throws IOException {
+    final ReferenceRegions regions = new ReferenceRegions();
+    for (int k = 0; k < sequencesReader.numberSequences(); k++) {
+      regions.add(sequencesReader.names().name(k), 0, sequencesReader.length(k));
+    }
+    return regions;
+  }
+
+  /**
+   * Will throw <code>InvalidParamsException</code> if the regions defined are not in the given template.
+   * Note: this method assumes that the sequences reader provided has already been checked that it contains names.
+   * @param reader the template sequences that regions should be valid with respect to
+   * @param regions the regions to check
+   * @throws IOException if an IO error occurs
+   */
+  public static void validateRegions(SequencesReader reader, ReferenceRegions regions) throws IOException {
+    final List<String> missingChromosomes = new ArrayList<>();
+    final Map<String, Long> nameMap = getSequenceNameMap(reader);
+    missingChromosomes.addAll(regions.sequences().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList()));
+    if (missingChromosomes.size() > 0) {
+      throw new InvalidParamsException("The following sequences specified in the regions list are not present in the template: " + StringUtils.implode(missingChromosomes, ", "));
+    }
   }
 }

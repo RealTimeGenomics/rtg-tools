@@ -31,16 +31,12 @@
 package com.rtg.util.intervals;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
-import com.rtg.reader.ReaderUtils;
-import com.rtg.reader.SequencesReader;
-import com.rtg.util.InvalidParamsException;
-import com.rtg.util.StringUtils;
 import com.rtg.util.io.IOIterator;
 
 /**
@@ -77,6 +73,12 @@ public class ReferenceRegions {
     mSequences = map;
   }
 
+  /**
+   * @return the names of all sequences referenced by these regions
+   */
+  public Collection<String> sequences() {
+    return mSequences.keySet();
+  }
 
   private MergedIntervals getOrAdd(String name) {
     MergedIntervals regions = mSequences.get(name);
@@ -88,13 +90,24 @@ public class ReferenceRegions {
   }
 
   /**
-   * Add all regions from an iterator to the set
+   * Add all regions returned by an iterator to the set
    * @param reader supplies the regions to add
    * @throws java.io.IOException when reading the region stream fails
    */
   public void add(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
     while (reader.hasNext()) {
       add(reader.next());
+    }
+  }
+
+  /**
+   * Subtract all regions returned by iterator from the set
+   * @param reader supplies the regions to add
+   * @throws java.io.IOException when reading the region stream fails
+   */
+  public void subtract(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
+    while (reader.hasNext()) {
+      subtract(reader.next());
     }
   }
 
@@ -114,6 +127,26 @@ public class ReferenceRegions {
    */
   public void add(String sequence, int start, int end) {
     getOrAdd(sequence).add(start, end);
+  }
+
+  /**
+   * Subtract a new region from the set
+   * @param region the region to subtract
+   */
+  public void subtract(SequenceNameLocus region) {
+    final MergedIntervals intervals = mSequences.get(region.getSequenceName());
+    if (intervals != null) {
+      intervals.subtract(region);
+    }
+  }
+
+  /**
+   * @param sequence name of a sequence
+   * @return a mask that can be used for fast containment tests, or null if the sequence does not exist in the regions
+   */
+  public BitSet mask(String sequence) {
+    final MergedIntervals mergedIntervals = mSequences.get(sequence);
+    return mergedIntervals == null ? null : mergedIntervals.mask();
   }
 
   /**
@@ -186,22 +219,4 @@ public class ReferenceRegions {
     return map;
   }
 
-  /**
-   * Will throw <code>InvalidParamsException</code> if the regions defined are not in the given template.
-   * Note: this method assumes that the sequences reader provided has already been checked that it contains names.
-   * @param reader the template sequences reader to validate
-   * @throws IOException if an IO error occurs
-   */
-  public void validateTemplate(SequencesReader reader) throws IOException {
-    final List<String> missingChromosomes = new ArrayList<>();
-    final Map<String, Long> nameMap = ReaderUtils.getSequenceNameMap(reader);
-    for (final String chr : mSequences.keySet()) {
-      if (!nameMap.containsKey(chr)) {
-        missingChromosomes.add(chr);
-      }
-    }
-    if (missingChromosomes.size() > 0) {
-      throw new InvalidParamsException("The following sequences specified in the BED regions are not present in the template: " + StringUtils.implode(missingChromosomes, ", "));
-    }
-  }
 }

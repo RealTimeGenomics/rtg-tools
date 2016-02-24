@@ -37,22 +37,26 @@ import junit.framework.TestCase;
  */
 public class MergedIntervalsTest extends TestCase {
 
-
-  public void test() {
-    MergedIntervals mi = new MergedIntervals();
+  public MergedIntervals makeBaseIntervals() {
+    final MergedIntervals mi = new MergedIntervals();
     mi.add(5, 10);
     mi.add(20, 30);
     mi.add(31, 40);
     mi.add(200, 300);
     mi.add(310, 390);
     mi.add(400, 410);
+    return mi;
+  }
+
+  public void testSimple() {
+    final MergedIntervals mi = makeBaseIntervals();
     mi.add(300, 400);
 
     assertFalse(mi.overlapped(0, 4));
     assertFalse(mi.overlapped(0, 5));
     assertFalse(mi.overlapped(10, 20));
     assertFalse(mi.overlapped(30, 31));
-    assertTrue(mi.overlapped(0, 10));
+    assertTrue(mi.overlapped(0, 6));
     assertTrue(mi.overlapped(0, 20));
     assertTrue(mi.overlapped(0, 30));
     assertTrue(mi.overlapped(0, 500));
@@ -77,4 +81,100 @@ public class MergedIntervalsTest extends TestCase {
     assertTrue(mi.enclosed(390, 400));
   }
 
+  public void testSubtract() {
+    final MergedIntervals mi = makeBaseIntervals();
+
+    assertTrue(mi.overlapped(0, 6));
+    mi.subtract(5, 6);
+    assertFalse(mi.overlapped(0, 6));
+
+    assertTrue(mi.overlapped(9, 12));
+    mi.subtract(9, 10);
+    assertFalse(mi.overlapped(9, 12));
+
+    assertTrue(mi.overlapped(180, 220));
+    assertTrue(mi.overlapped(280, 302));
+    mi.subtract(200, 300);
+    assertFalse(mi.overlapped(180, 220));
+    assertFalse(mi.overlapped(280, 302));
+
+    assertTrue(mi.overlapped(0, 600));
+    mi.subtract(5, 500);
+    assertFalse(mi.overlapped(0, 600));
+  }
+
+  public void testOverlapMerging() {
+    final MergedIntervals regions = new MergedIntervals();
+    assertFalse(regions.enclosed(60, 70));
+    assertFalse(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(35, 70));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(60, 70);
+    assertTrue(regions.enclosed(60, 70));
+    assertFalse(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(35, 70));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(35, 63);
+    assertTrue(regions.enclosed(60, 70));
+    assertTrue(regions.enclosed(35, 63));
+    assertTrue(regions.enclosed(35, 70));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(69, 80);
+    assertTrue(regions.enclosed(60, 70));
+    assertTrue(regions.enclosed(35, 63));
+    assertTrue(regions.enclosed(35, 70));
+    assertTrue(regions.enclosed(69, 80));
+    assertTrue(regions.enclosed(35, 80));
+  }
+
+  public void testOverlapMerging2() {
+    final MergedIntervals regions = new MergedIntervals();
+    assertFalse(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(60, 70));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(35, 63);
+    assertTrue(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(60, 70));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(69, 80);
+    assertTrue(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(60, 70));
+    assertTrue(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(60, 70);
+    assertTrue(regions.enclosed(35, 63));
+    assertTrue(regions.enclosed(60, 70));
+    assertTrue(regions.enclosed(69, 80));
+    assertTrue(regions.enclosed(35, 80));
+  }
+
+  public void testOverlapMerging3() {
+    final MergedIntervals regions = new MergedIntervals();
+    assertFalse(regions.enclosed(35, 63));
+    assertFalse(regions.enclosed(69, 80));
+    assertFalse(regions.enclosed(60, 70));
+    assertFalse(regions.enclosed(35, 80));
+    regions.add(60, 70);
+    regions.add(40, 45);
+    regions.add(75, 77);
+    regions.add(35, 80);
+    assertTrue(regions.enclosed(35, 63));
+    assertTrue(regions.enclosed(60, 70));
+    assertTrue(regions.enclosed(69, 80));
+    assertTrue(regions.enclosed(35, 80));
+  }
+
+  public void testRealworldBadCase() {
+    final MergedIntervals regions = new MergedIntervals();
+    regions.add(725911, 725926);
+    regions.add(725927, 725936);
+    regions.add(725937, 725941);
+    regions.add(725944, 725959);
+    assertTrue(regions.overlapped(725923, 725944));
+  }
 }
