@@ -33,8 +33,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.rtg.launcher.AbstractCli;
@@ -52,7 +50,6 @@ import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
-import com.rtg.util.intervals.SequenceNameLocusComparator;
 
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriter;
@@ -73,12 +70,12 @@ public class ExtractCli extends AbstractCli {
    *
    * @param input input text file
    * @param tabix index for input file
-   * @param region the region to extract
+   * @param regions the regions to extract
    * @param out destination for output
    * @throws java.io.IOException if an IO error occurs
    */
-  public static void extractRecords(File input, File tabix, RegionRestriction region, OutputStream out) throws IOException {
-    try (TabixLineReader reader = new TabixLineReader(input, tabix, region)) {
+  public static void extractRecords(File input, File tabix, ReferenceRanges<String> regions, OutputStream out) throws IOException {
+    try (TabixLineReader reader = new TabixLineReader(input, tabix, regions)) {
       String line;
       while ((line = reader.readLine()) != null) {
         out.write(line.getBytes());
@@ -137,27 +134,6 @@ public class ExtractCli extends AbstractCli {
     flags.addRequiredSet(region);
   }
 
-  private RegionRestriction[] mergeOverlappingRegions(final RegionRestriction[] regions) {
-    if (regions.length <= 1) {
-      // Short-circuit the common case of 1 specified region
-      return regions;
-    }
-    Arrays.sort(regions, new SequenceNameLocusComparator());
-    final List<RegionRestriction> mergedRegions = new ArrayList<>();
-    RegionRestriction current = regions[0];
-    for (int k = 1; k < regions.length; k++) {
-      final RegionRestriction region = regions[k];
-      if (!current.getSequenceName().equals(region.getSequenceName()) || region.getStart() > current.getEnd()) {
-        mergedRegions.add(current);
-        current = region;
-      } else {
-        current = new RegionRestriction(current.getSequenceName(), current.getStart(), region.getEnd());
-      }
-    }
-    mergedRegions.add(current);
-    return mergedRegions.toArray(new RegionRestriction[mergedRegions.size()]);
-  }
-
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final File input = (File) mFlags.getAnonymousValue(0);
@@ -165,16 +141,16 @@ public class ExtractCli extends AbstractCli {
       throw new NoTalkbackSlimException("" + input.getPath() + " is not in bgzip format. Cannot extract records.");
     }
     final List<Object> rStrings = mFlags.getAnonymousValues(1);
-    RegionRestriction[] regions;
+    final ReferenceRanges<String> regions;
     if (rStrings.isEmpty()) {
-      regions = new RegionRestriction[] {null};
+      regions = new ReferenceRanges<>(true);
     } else {
-      regions = new RegionRestriction[rStrings.size()];
+      final RegionRestriction[] r = new RegionRestriction[rStrings.size()];
       for (int i = 0; i < rStrings.size(); i++) {
-        regions[i] = new RegionRestriction((String) rStrings.get(i));
+        r[i] = new RegionRestriction((String) rStrings.get(i));
       }
+      regions = SamRangeUtils.createExplicitReferenceRange(r);
     }
-    regions = mergeOverlappingRegions(regions);
     final boolean headerOnly = mFlags.isSet(HEADER_ONLY_FLAG);
     final boolean printHeader = headerOnly || mFlags.isSet(HEADER_FLAG);
     if (SamUtils.isBAMFile(input)) {
@@ -196,9 +172,7 @@ public class ExtractCli extends AbstractCli {
           extractHeader(input, (char) tir.getOptions().mMeta, out);
         }
         if (!headerOnly) {
-          for (final RegionRestriction region : regions) {
-            extractRecords(input, index, region, out);
-          }
+          extractRecords(input, index, regions, out);
         }
       }
     }
@@ -217,16 +191,13 @@ public class ExtractCli extends AbstractCli {
     }
   }
 
-  private static void extractSamBam(File f, RegionRestriction[] regions, OutputStream out, boolean printHeader, boolean headerOnly) throws IOException {
+  private static void extractSamBam(File f, ReferenceRanges<String> regions, OutputStream out, boolean printHeader, boolean headerOnly) throws IOException {
     final SAMFileHeader header = SamUtils.getSingleHeader(f);
     try (final SAMFileWriter writer = new SAMFileWriterFactory().makeSAMWriter(header, true, out, printHeader)) {
       if (!headerOnly) {
-        for (final RegionRestriction region : regions) {
-          final ReferenceRanges<String> rangeMap = region == null ? null : SamRangeUtils.createExplicitReferenceRange(region);
-          try (RecordIterator<SAMRecord> samfr = new SkipInvalidRecordsIterator(f.getPath(), new SamClosedFileReader(f, rangeMap, header))) {
-            while (samfr.hasNext()) {
-              writer.addAlignment(samfr.next());
-            }
+        try (RecordIterator<SAMRecord> samfr = new SkipInvalidRecordsIterator(f.getPath(), new SamClosedFileReader(f, regions, header))) {
+          while (samfr.hasNext()) {
+            writer.addAlignment(samfr.next());
           }
         }
       }

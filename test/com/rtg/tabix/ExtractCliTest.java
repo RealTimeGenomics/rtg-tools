@@ -68,7 +68,7 @@ public class ExtractCliTest extends AbstractCliTest {
     checkHandleFlagsOut("foo", "bar", "bang");
   }
 
-  public void testNormal() throws IOException {
+  public void testNormalVcf() throws IOException {
     try (TestDirectory dir = new TestDirectory("extractcli")) {
       final File tabix = new File(dir, "snp_only.vcf.gz.tbi");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz.tbi", tabix);
@@ -97,6 +97,18 @@ public class ExtractCliTest extends AbstractCliTest {
       res = MainResult.run(getCli(), input.getPath(), "--header-only");
       assertEquals(res.err(), 0, res.rc());
       mNano.check("extract-header-only", res.out());
+    }
+  }
+
+  public void testSamMulti() throws IOException {
+    try (TestDirectory dir = new TestDirectory("extractcli")) {
+      final File tabix = new File(dir, "test3.sam.gz.tbi");
+      FileHelper.resourceToFile("com/rtg/sam/resources/test3.sam.gz.tbi", tabix);
+      final File input = new File(dir, "test3.sam.gz");
+      FileHelper.resourceToFile("com/rtg/sam/resources/test3.sam.gz", input);
+      final MainResult res = MainResult.run(getCli(), input.getPath(), "simulatedSequence2", "simulatedSequence10", "simulatedSequence1");
+      assertEquals(res.err(), 0, res.rc());
+      mNano.check("extract-sam-multi", res.out());
     }
   }
 
