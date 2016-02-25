@@ -1,0 +1,12 @@
+0	99	simulatedSequence1	84	255	36M	=	269	221	ACCGGTGATCTACACTAGCCAAAGGGTGTGGGCAAG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	163	simulatedSequence1	109	255	36M	=	310	237	GTGTGGGCAAGAAACTACTGCTATACGAAGTATTAC	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+0	147	simulatedSequence1	269	255	36M	=	84	-221	GGCCGAGAGTTTGGCTTCCTTTACGTTCTTTGGCGG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	83	simulatedSequence1	310	255	36M	=	109	-237	CGTGATATGCCACAGCGCCTTCCAGACGCATAACAT	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+0	99	simulatedSequence2	84	255	36M	=	269	221	ACCGGTGATCTACACTAGCCAAAGGGTGTGGGCAAG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	163	simulatedSequence2	109	255	36M	=	310	237	GTGTGGGCAAGAAACTACTGCTATACGAAGTATTAC	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+0	147	simulatedSequence2	269	255	36M	=	84	-221	GGCCGAGAGTTTGGCTTCCTTTACGTTCTTTGGCGG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	83	simulatedSequence2	310	255	36M	=	109	-237	CGTGATATGCCACAGCGCCTTCCAGACGCATAACAT	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+0	99	simulatedSequence10	84	255	36M	=	269	221	ACCGGTGATCTACACTAGCCAAAGGGTGTGGGCAAG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	163	simulatedSequence10	109	255	36M	=	310	237	GTGTGGGCAAGAAACTACTGCTATACGAAGTATTAC	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+0	147	simulatedSequence10	269	255	36M	=	84	-221	GGCCGAGAGTTTGGCTTCCTTTACGTTCTTTGGCGG	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
+1	83	simulatedSequence10	310	255	36M	=	109	-237	CGTGATATGCCACAGCGCCTTCCAGACGCATAACAT	++++++++++++++++++++++++++++++++++++	AS:i:0	NM:i:0	MQ:i:255	XA:i:0	IH:i:1
