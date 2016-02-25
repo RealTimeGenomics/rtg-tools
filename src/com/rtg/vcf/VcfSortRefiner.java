@@ -34,7 +34,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.PriorityQueue;
 
-import com.rtg.util.intervals.SequenceNameLocusComparator;
+import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -45,10 +45,10 @@ import com.rtg.vcf.header.VcfHeader;
 public class VcfSortRefiner implements Closeable {
 
   private final VcfReader mIn;
-  private final PriorityQueue<VcfRecord> mCurrent = new PriorityQueue<>(1, SequenceNameLocusComparator.SINGLETON);
+  private final PriorityQueue<VcfRecord> mCurrent = new PriorityQueue<>(1, IntervalComparator.SINGLETON);
 
   /**
-   * Create a new VCF reader. In general you should use <code>VcfReader.openVcfReader</code> instead.
+   * Wraps around an existing VCF reader.
    *
    * @param in where to read from
    * @throws IOException when IO or format errors occur.

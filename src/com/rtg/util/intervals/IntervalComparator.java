@@ -38,6 +38,9 @@ import java.util.Comparator;
  */
 public final class IntervalComparator implements Comparator<Interval>, Serializable {
 
+  /** A default comparator instance */
+  public static final IntervalComparator SINGLETON = new IntervalComparator();
+
   @Override
   public int compare(Interval o1, Interval o2) {
 
