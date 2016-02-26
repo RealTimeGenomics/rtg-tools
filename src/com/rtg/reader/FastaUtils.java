@@ -157,4 +157,19 @@ public final class FastaUtils {
     return result;
   }
 
+  /**
+   * @param qualities the ASCII quality values
+   * @return the raw quality values corresponding to the ASCII quality values
+   */
+  public static byte[] asciiToRawQuality(byte[] qualities) {
+    if (qualities == null) {
+      return null;
+    }
+    final byte[] result = new byte[qualities.length];
+    for (int i = 0; i < qualities.length; i++) {
+      result[i] = asciiToRawQuality((char) qualities[i]);
+    }
+    return result;
+  }
+
 }

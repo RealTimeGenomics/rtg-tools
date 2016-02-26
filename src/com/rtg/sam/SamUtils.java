@@ -183,7 +183,7 @@ public final class SamUtils {
   /** Pseudo-CIGAR value for unmapped */
   public static final char CIGAR_UNMAPPED = 'u';
 
-  private static final char[] CIGAR_CODES = {CIGAR_SAME_OR_MISMATCH, CIGAR_INSERTION_INTO_REF, CIGAR_DELETION_FROM_REF, CIGAR_GAP_IN_READ, CIGAR_SOFT_CLIP, 'H', 'P', CIGAR_SAME, CIGAR_MISMATCH};
+  private static final char[] CIGAR_CODES = {CIGAR_SAME_OR_MISMATCH, CIGAR_INSERTION_INTO_REF, CIGAR_DELETION_FROM_REF, CIGAR_GAP_IN_READ, CIGAR_SOFT_CLIP, CIGAR_HARD_CLIP, 'P', CIGAR_SAME, CIGAR_MISMATCH};
 
   /** The attribute used in a comment line to indicate the SDF ID of the reads */
   public static final String READ_SDF_ATTRIBUTE = "READ-SDF-ID:";

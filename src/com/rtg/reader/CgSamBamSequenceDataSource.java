@@ -29,6 +29,7 @@
  */
 package com.rtg.reader;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.List;
 
@@ -72,39 +73,40 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
   public static SamSequence unrollCgRead(SAMRecord rec) {
     final int projectedSplit = rec.getAlignmentStart() * ((rec.getFlags() & SamBamConstants.SAM_MATE_IS_REVERSE) != 0 ? 1 : -1);
     final byte flags = SamSequence.getFlags(rec);
-    final String expandedRead;
+    final byte[] expandedRead;
     final byte[] expandedQual;
     if (rec.getReadUnmappedFlag()) {
-      expandedRead = new String(rec.getReadBases());
+      expandedRead = rec.getReadBases();
       expandedQual = rec.getBaseQualities();
     } else {
       final String gc = rec.getStringAttribute(SamUtils.ATTRIBUTE_CG_RAW_READ_INSTRUCTIONS);
       if (gc == null) {
         throw new NoTalkbackSlimException("SAM Record does not contain CGI read reconstruction attribute: " + rec.getSAMString());
       }
-      final String gq = SamUtils.allowEmpty(rec.getStringAttribute(SamUtils.ATTRIBUTE_CG_OVERLAP_QUALITY));
-      final String gs = SamUtils.allowEmpty(rec.getStringAttribute(SamUtils.ATTRIBUTE_CG_OVERLAP_BASES));
-      final boolean legacyLegacy = gq.length() == gs.length() / 2;
-      expandedRead = unrollLegacyRead(new String(rec.getReadBases()), gs, gc);
+      final byte[] gq = FastaUtils.asciiToRawQuality(SamUtils.allowEmpty(rec.getStringAttribute(SamUtils.ATTRIBUTE_CG_OVERLAP_QUALITY)));
+      final byte[] gs = SamUtils.allowEmpty(rec.getStringAttribute(SamUtils.ATTRIBUTE_CG_OVERLAP_BASES)).getBytes();
+      final boolean legacyLegacy = gq.length == gs.length / 2;
+      expandedRead = unrollLegacyRead(rec.getReadBases(), gs, gc);
       if (expandedRead == null) {
         throw new NoTalkbackSlimException("Could not reconstruct read bases for record: " + rec.getSAMString());
       }
       if (rec.getBaseQualities().length == 0) {
         expandedQual = rec.getBaseQualities();
       } else {
-        if (!legacyLegacy && gq.length() != gs.length()) {
+        if (!legacyLegacy && gq.length != gs.length) {
           throw new NoTalkbackSlimException("Unexpected length of CG quality information: " + rec.getSAMString());
         }
-        final String samQualities = new String(FastaUtils.rawToAsciiQuality(rec.getBaseQualities()));
+        final byte[] samQualities = rec.getBaseQualities();
         if (legacyLegacy) {
-          expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyLegacyQualities(samQualities, gq, gc));
+          expandedQual = unrollLegacyLegacyQualities(samQualities, gq, gc);
         } else {
-          expandedQual = FastaUtils.asciiToRawQuality(unrollLegacyRead(samQualities, gq, gc));
+          final byte[] bytes = unrollLegacyRead(samQualities, gq, gc);
+          expandedQual = bytes;
         }
       }
     }
 
-    final byte[] readBytes = CgUtils.unPad(expandedRead.getBytes(), !rec.getReadNegativeStrandFlag());
+    final byte[] readBytes = CgUtils.unPad(expandedRead, !rec.getReadNegativeStrandFlag());
     final byte[] readQual = CgUtils.unPad(expandedQual, !rec.getReadNegativeStrandFlag());
 
     return new SamSequence(rec.getReadName(), readBytes, readQual, flags, projectedSplit);
@@ -145,15 +147,15 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
    * @param gc the SAM attribute specifying how to reconstruct the read
    * @return the unrolled read bases
    */
-  public static String unrollLegacyRead(final String samRead, final String gs, final String gc) {
-    final int overlap = gs.length();
+  public static byte[] unrollLegacyRead(final byte[] samRead, final byte[] gs, final String gc) {
+    final int overlap = gs.length;
     if (overlap == 0) {
       return samRead;
     } else {
       if (gc == null) {
         return null;
       }
-      final StringBuilder sbRead = new StringBuilder();
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
       int lastCigarPos = 0;
       int readPos = 0;
       int attPos = 0;
@@ -167,10 +169,10 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
           return null;
         }
         if (gc.charAt(cigarPos) == 'S') {
-          if (readPos + cigarLen > samRead.length()) {
+          if (readPos + cigarLen > samRead.length) {
             return null;
           }
-          sbRead.append(samRead.substring(readPos, readPos + cigarLen));
+          baos.write(samRead, readPos, cigarLen);
           lastCigarPos = cigarPos + 1;
           readPos = readPos + cigarLen;
         } else {
@@ -178,19 +180,19 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
             return null;
           }
           final int consumed = cigarLen * 2;
-          if (attPos + consumed > gs.length()) {
+          if (attPos + consumed > gs.length) {
             return null;
           }
-          sbRead.append(gs.substring(attPos, attPos + consumed));
+          baos.write(gs, attPos, consumed);
           attPos = attPos + consumed;
           lastCigarPos = cigarPos + 1;
           readPos += cigarLen;
         }
       }
-      if (readPos != samRead.length() || lastCigarPos != gc.length() || attPos != gs.length()) {
+      if (readPos != samRead.length || lastCigarPos != gc.length() || attPos != gs.length) {
         return null;
       }
-      return sbRead.toString();
+      return baos.toByteArray();
     }
   }
 
@@ -203,8 +205,8 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
    * @param gc the SAM attribute specifying how to reconstruct the read
    * @return the unrolled read bases
    */
-  public static String unrollLegacyLegacyQualities(final String samQualities, final String gq, final String gc) {
-    final int overlap = gq.length();
+  public static byte[] unrollLegacyLegacyQualities(final byte[] samQualities, byte[] gq, final String gc) {
+    final int overlap = gq.length;
     final int gslength = overlap * 2;
     if (overlap == 0) {
       return samQualities;
@@ -212,7 +214,7 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
       if (gc == null) {
         return null;
       }
-      final StringBuilder sbQual = new StringBuilder();
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream();
       int lastCigarPos = 0;
       int readPos = 0;
       int attPos = 0;
@@ -227,7 +229,7 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
           return null;
         }
         if (gc.charAt(cigarPos) == 'S') {
-          sbQual.append(samQualities.substring(readPos, readPos + cigarLen));
+          baos.write(samQualities, readPos, cigarLen);
           lastCigarPos = cigarPos + 1;
           readPos = readPos + cigarLen;
         } else {
@@ -235,18 +237,18 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
           if (attPos + consumed > gslength) {
             return null;
           }
-          sbQual.append(samQualities.substring(readPos, readPos + cigarLen));
-          sbQual.append(gq.substring(att2Pos, att2Pos + cigarLen));
+          baos.write(samQualities, readPos, cigarLen);
+          baos.write(gq, att2Pos, cigarLen);
           att2Pos = att2Pos + cigarLen;
           attPos = attPos + consumed;
           lastCigarPos = cigarPos + 1;
           readPos += cigarLen;
         }
       }
-      if (readPos != samQualities.length() || lastCigarPos != gc.length() || attPos != gslength) {
+      if (readPos != samQualities.length || lastCigarPos != gc.length() || attPos != gslength) {
         return null;
       }
-      return sbQual.toString();
+      return baos.toByteArray();
     }
   }
 

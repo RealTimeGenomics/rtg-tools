@@ -427,6 +427,20 @@ public final class TestUtils {
   }
 
   /**
+   * Check if two <code>byte</code> arrays are equal - if not then print a message displaying them.
+   * @param a first array to be checked
+   * @param b second array to be checked
+   */
+  public static void assertEquals(final byte[] a, final byte[] b) {
+    if (Arrays.equals(a, b)) {
+      return;
+    }
+    final String msg =
+      "Expected: " + Arrays.toString(a) + " Actual:" + Arrays.toString(b);
+    Assert.fail(msg);
+  }
+
+  /**
    * Retrieves a field in the given object. Private fields are retrieved as well
    * as other ones.
    *
@@ -891,5 +905,4 @@ public final class TestUtils {
   public static String stripVcfHeader(String vcfString) {
     return vcfString.replaceAll("##.*\n", "");
   }
-
 }

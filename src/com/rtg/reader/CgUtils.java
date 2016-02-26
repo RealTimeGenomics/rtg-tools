@@ -86,7 +86,7 @@ public final class CgUtils {
   public static byte[] unPad(byte[] seq, boolean forward) {
     if (seq != null && seq.length == CG2_PADDED_LENGTH) {
       final int pos = forward ? CG2_PAD_POSITION : CG2_PAD_POSITION_REV;
-      assert seq[pos] == 0 || seq[pos] == 'N' || seq[pos] == FastaUtils.asciiToRawQuality('!');
+//      assert seq[pos] == 0 || seq[pos] == 'N' || seq[pos] == FastaUtils.asciiToRawQuality('!');
       final byte[] result = new byte[seq.length - 1];
       System.arraycopy(seq, 0, result, 0, pos);
       System.arraycopy(seq, pos + 1, result, pos, seq.length - pos - 1);
