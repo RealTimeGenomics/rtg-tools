@@ -53,49 +53,49 @@ public class ProteinFastaSymbolTable extends FastaSymbolTable {
       return Protein.STOP;
     }
     switch (code & ~32) {
-    case (int) 'A':
+    case 'A':
       return Protein.A;
-    case (int) 'C':
+    case 'C':
       return Protein.C;
-    case (int) 'D':
+    case 'D':
       return Protein.D;
-    case (int) 'E':
+    case 'E':
       return Protein.E;
-    case (int) 'F':
+    case 'F':
       return Protein.F;
-    case (int) 'G':
+    case 'G':
       return Protein.G;
-    case (int) 'H':
+    case 'H':
       return Protein.H;
-    case (int) 'I':
+    case 'I':
       return Protein.I;
-    case (int) 'K':
+    case 'K':
       return Protein.K;
-    case (int) 'L':
+    case 'L':
       return Protein.L;
-    case (int) 'M':
+    case 'M':
       return Protein.M;
-    case (int) 'N':
+    case 'N':
       return Protein.N;
-    case (int) 'P':
+    case 'P':
       return Protein.P;
-    case (int) 'Q':
+    case 'Q':
       return Protein.Q;
-    case (int) 'R':
+    case 'R':
       return Protein.R;
-    case (int) 'S':
+    case 'S':
       return Protein.S;
-    case (int) 'T':
+    case 'T':
       return Protein.T;
-    case (int) 'V':
+    case 'V':
       return Protein.V;
-    case (int) 'W':
+    case 'W':
       return Protein.W;
-    case (int) 'Y':
+    case 'Y':
       return Protein.Y;
-    case (int) 'X': //unknown residue
-    case (int) 'Z': //Z has 2 options
-    case (int) 'B': //B has 2 options
+    case 'X': //unknown residue
+    case 'Z': //Z has 2 options
+    case 'B': //B has 2 options
       return Protein.X;
     default:
       return null;

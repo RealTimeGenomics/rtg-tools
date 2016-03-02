@@ -47,16 +47,16 @@ public class DNAFastaSymbolTable extends FastaSymbolTable {
   @Override
   public final Residue scanResidue(int code) {
     switch (code & ~32) {
-    case (int) 'A':
+    case 'A':
       return DNA.A;
-    case (int) 'C':
+    case 'C':
       return DNA.C;
-    case (int) 'G':
+    case 'G':
       return DNA.G;
-    case (int) 'T':
-    case (int) 'U':
+    case 'T':
+    case 'U':
       return DNA.T;
-    case (int) 'N':
+    case 'N':
       return DNA.N;
     default:
     }
