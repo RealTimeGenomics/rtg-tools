@@ -80,7 +80,7 @@ public interface ExtensibleIndex extends CommonIndex {
 
   /**
    * Gets the value at the specified position.
-   * Sign bits are preserved across <code>setsigned</code> and <code>getSigned</code> calls.
+   * Sign bits are preserved across <code>setSigned</code> and <code>getSigned</code> calls.
    * This is not true of set and get calls where the low order bit pattern is preserved.
    * @param offset the position in this index
    * @return the value as a long, regardless of the underlying type
@@ -94,7 +94,7 @@ public interface ExtensibleIndex extends CommonIndex {
    * must have bit positions (n+1)..64 (inclusive, counting from 1) all 0.
    * If it is negative then it must have positions (n+1)..64 (inclusive, counting from 1) all 1.
    * This ensures that information is not lost.
-   * Sign bits are preserved across <code>setsigned</code> and <code>getSigned</code> calls.
+   * Sign bits are preserved across <code>setSigned</code> and <code>getSigned</code> calls.
    * This is not true of set and get calls where the low order bit pattern is preserved.
    *
    * @param offset the position in this index
