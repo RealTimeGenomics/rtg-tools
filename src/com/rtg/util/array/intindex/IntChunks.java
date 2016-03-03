@@ -74,7 +74,6 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
   public IntChunks(final int numberChunks, final long length, final int chunkBits) {
     super(length);
     assert chunkBits > 0 && chunkBits <= 30;
-    System.err.println("Chunk bits: " + chunkBits);
     mChunkBits = chunkBits;
     mChunkSize = 1 << mChunkBits;
     mChunkMask = mChunkSize - 1;
