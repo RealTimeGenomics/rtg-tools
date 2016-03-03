@@ -97,13 +97,13 @@ public class SequencesWriter {
     }
     FileUtils.ensureOutputDirectory(mOutputDir);
     mSizeLimit = sizeLimit;
-    mNamesToExclude = namesToExclude == null ? new ArrayList<String>() : namesToExclude;
+    mNamesToExclude = namesToExclude == null ? new ArrayList<>() : namesToExclude;
     mCompressed = compressed;
     if (trimQualityThreshold != null) {
-      if (System.getProperty("gillette-window-size") != null) {
-        final int windowSize = Integer.parseInt(System.getProperty("gillette-window-size"));
+      if (System.getProperty("quality-window-size") != null) {
+        final int windowSize = Integer.parseInt(System.getProperty("quality-window-size"));
         mReadTrimmer = new DefaultReadTrimmer(windowSize, trimQualityThreshold);
-        Diagnostic.userLog("Performing trimming with Gillette, threshold " + trimQualityThreshold + " window size " + windowSize);
+        Diagnostic.userLog("Performing trimming with quality threshold " + trimQualityThreshold + " window size " + windowSize);
       } else {
         mReadTrimmer = new BestSumReadTrimmer(trimQualityThreshold);
         Diagnostic.userLog("Performing trimming with BestSum, threshold " + trimQualityThreshold);
