@@ -502,7 +502,7 @@ public final class SamUtils {
   public static boolean looksLikeSam(File zippedSam) throws IOException {
     final boolean result;
     try (Reader fr = new InputStreamReader(FileUtils.createGzipInputStream(zippedSam, false))) {
-      result = fr.read() == (int) '@';
+      result = fr.read() == '@';
     }
     return result;
   }

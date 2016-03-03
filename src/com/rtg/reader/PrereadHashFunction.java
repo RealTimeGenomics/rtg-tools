@@ -128,7 +128,7 @@ public final class PrereadHashFunction {
    */
   public void irvineHash(byte[] buff, int offset, int length) {
     for (int i = offset; i < offset + length; i++) {
-      irvineHash((int) buff[i]);
+      irvineHash(buff[i]);
     }
   }
 

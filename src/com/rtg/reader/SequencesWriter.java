@@ -102,7 +102,7 @@ public class SequencesWriter {
     if (trimQualityThreshold != null) {
       if (System.getProperty("gillette-window-size") != null) {
         final int windowSize = Integer.parseInt(System.getProperty("gillette-window-size"));
-        mReadTrimmer = new GilletteReadTrimmer(windowSize, trimQualityThreshold);
+        mReadTrimmer = new DefaultReadTrimmer(windowSize, trimQualityThreshold);
         Diagnostic.userLog("Performing trimming with Gillette, threshold " + trimQualityThreshold + " window size " + windowSize);
       } else {
         mReadTrimmer = new BestSumReadTrimmer(trimQualityThreshold);
