@@ -40,6 +40,8 @@ import com.rtg.util.PseudoEnum;
  */
 public final class MachineType implements PseudoEnum {
 
+  public static final boolean CG_TRIM = true; //Boolean.valueOf(System.getProperty("cg-trim", "true"));
+
   private static int sSequenceNumber = -1;
 
   /** The platform type for Illumina, regardless of whether it is paired or single end */
@@ -160,5 +162,13 @@ public final class MachineType implements PseudoEnum {
    */
   public static MachineType[] values() {
     return HELPER.values();
+  }
+
+  public boolean cgTrimOuterBases() {
+    return this == COMPLETE_GENOMICS && CG_TRIM;
+  }
+
+  public boolean isCg() {
+    return this == COMPLETE_GENOMICS || this == COMPLETE_GENOMICS_2;
   }
 }

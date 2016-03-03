@@ -106,6 +106,9 @@ public final class SamUtils {
   /** Mismatching positions attribute name */
   public static final String ATTRIBUTE_MISMATCH_POSITIONS = "MD";
 
+  /** Mismatching positions attribute name */
+  public static final String ATTRIBUTE_READ_GROUP = ReadGroupUtils.RG_ATTRIBUTE;
+
 
   // Deprecated in current Sam spec, retained for backwards compatibility
 
@@ -142,8 +145,9 @@ public final class SamUtils {
   /**
    * This SAM attribute stores just the extra quality bytes for the part of
    * the CG overlap region that was omitted from the flattened read.
+   * Usually paired with a super cigar.
    */
-  public static final String CG_OVERLAP_QUALITY = "XQ";
+  public static final String CG_SUPER_CIGAR_OVERLAP_QUALITY = "XQ";
 
   /** This SAM attribute stores the alignment score of the mate. */
   public static final String ATTRIBUTE_MATE_ALIGNMENT_SCORE = "XM";
