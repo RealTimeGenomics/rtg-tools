@@ -74,6 +74,7 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
   public IntChunks(final int numberChunks, final long length, final int chunkBits) {
     super(length);
     assert chunkBits > 0 && chunkBits <= 30;
+    System.err.println("Chunk bits: " + chunkBits);
     mChunkBits = chunkBits;
     mChunkSize = 1 << mChunkBits;
     mChunkMask = mChunkSize - 1;
@@ -224,6 +225,9 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
   public int getInt(final long index) {
     final int chunk = (int) (index >> mChunkBits);
     final int offset = (int) (index & mChunkMask);
+    assert index >= 0 : index + " " + mChunkBits + " " + Long.toBinaryString(mChunkMask) + " " + chunk + " " + offset;
+    assert chunk >= 0 : index + " " + mChunkBits + " " + Long.toBinaryString(mChunkMask) + " " + chunk + " " + offset;
+    assert offset >= 0 : index + " " + mChunkBits + " " + Long.toBinaryString(mChunkMask) + " " + chunk + " " + offset;
     return mArray[chunk][offset];
   }
 
