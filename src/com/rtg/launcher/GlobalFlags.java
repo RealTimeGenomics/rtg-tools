@@ -76,8 +76,6 @@ public final class GlobalFlags {
   public static final String EDIT_DIST_HEURISTIC_ALIGNERS_FLAG = "com.rtg.alignment.EditDistanceFactory.heuristic-aligners";
   /** Only use the Gotoh aligner (disable all others) */
   public static final String EDIT_DIST_GOTOH_ONLY_FLAG = "com.rtg.alignment.EditDistanceFactory.gotoh-only";
-  /** Only use the <code>SingleIndelEditDistance</code> aligner (disable all others) */
-  public static final String EDIT_DIST_SINGLE_INDEL_ONLY_FLAG = "com.rtg.alignment.EditDistanceFactory.single-indel-only";
   /** Only use the <code>SingleIndelSeededEditDistance</code> aligner (disable all others) */
   public static final String EDIT_DIST_SINGLE_INDEL_SEEDED_ONLY_FLAG = "com.rtg.alignment.EditDistanceFactory.single-indel-seeded-only";
 
@@ -126,15 +124,6 @@ public final class GlobalFlags {
 
   /** Variant caller min depth for call-at-N triggering */
   public static final String CALLER_N_MIN_DEPTH = "com.rtg.variant.n-min-depth";
-
-  /** Expected frequency of the variant allele (default 0.5). */
-  public static final String CALLER_EXPECTED_ALLELE_FREQUENCY = "com.rtg.variant.base.Model.allele-frequency";
-
-  /** Method for computing the allele balance correction factor */
-  public static final String ALLELE_BALANCE_FACTOR = "com.rtg.variant.base.Model.allele-balance-factor";
-
-  /** Prior for random hypothesis when using random hypotheses. */
-  public static final String ENTROPY_RANDOM_PRIOR_FLAG = "com.rtg.variant.bayes.EntropyRandom.random-prior";
 
   /** Minimum phred base quality to consider a piece of evidence. */
   public static final String MIN_BASE_QUALITY = "com.rtg.variant.bayes.Model.min-bq";
@@ -192,7 +181,6 @@ public final class GlobalFlags {
     registerFlag(EDIT_DIST_LOGGING_AMOUNT_FLAG, Integer.class, 0);
     registerFlag(EDIT_DIST_HEURISTIC_ALIGNERS_FLAG, Boolean.class, true);
     registerFlag(EDIT_DIST_GOTOH_ONLY_FLAG);
-    registerFlag(EDIT_DIST_SINGLE_INDEL_ONLY_FLAG);
     registerFlag(EDIT_DIST_SINGLE_INDEL_SEEDED_ONLY_FLAG);
     registerFlag(EDIT_DIST_INDEL_TABLE_FLAG, String.class, "");
     registerFlag(EDIT_DIST_LOG_AS_HISTOGRAM_FLAG);
@@ -219,11 +207,8 @@ public final class GlobalFlags {
 
     // Misc calling
     registerFlag(CALLER_N_MIN_DEPTH, Integer.class, 5);
-    registerFlag(CALLER_EXPECTED_ALLELE_FREQUENCY, Double.class, 0.5);
-    registerFlag(ALLELE_BALANCE_FACTOR, AlleleBalanceFactor.class, AlleleBalanceFactor.NONE);
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
     registerFlag(FAMILY_CALLER_SORTED_HYPOTHESES, Boolean.class, true);
-    registerFlag(ENTROPY_RANDOM_PRIOR_FLAG, Double.class, 0.0);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
