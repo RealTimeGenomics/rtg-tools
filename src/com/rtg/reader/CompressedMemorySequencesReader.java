@@ -193,7 +193,6 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     if (mEnd > indexFile.getNumberSequences()) {
       throw new IllegalArgumentException("End sequence is greater than number of sequences in SDF");
     }
-    logSDF("NA");
     final StringBuilder sb = new StringBuilder("CompressedMemorySequencesReader from non SDF source");
     this.infoString(sb);
     Diagnostic.developerLog(sb.toString());
@@ -237,7 +236,6 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
       checksum.reset();
     }
     mPositions.set(counts.length, pos);
-    logSDF(mIndex.getSdfId().toString());
     mFullNamesRequested = false;
     final StringBuilder sb = new StringBuilder(LS + "CompressedMemorySequencesReader-tests");
     this.infoString(sb);
@@ -288,10 +286,9 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
         final int speedMB = (int) (dataSize * 1000.0 / (stoptime - starttime));
         if (loadNames && mIndex.hasNames()) {
           loadNames();
+          loadNameSuffixes(loadFullNames, mIndex.hasSequenceNameSuffixes());
         }
-        loadNameSuffixes(loadFullNames, mIndex.hasSequenceNameSuffixes());
-        logSDF(mIndex.getSdfId().toString());
-        final StringBuilder sb = new StringBuilder("CompressedMemorySequencesReader " + speedMB + " MB/sec, time " + timetaken + " sec");
+        final StringBuilder sb = new StringBuilder("CompressedMemorySequencesReader " + speedMB + " MB/sec, time " + timetaken + " sec" + LS);
         this.infoString(sb);
         Diagnostic.developerLog(sb.toString());
       } catch (final ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
@@ -300,10 +297,6 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     } catch (final NegativeArraySizeException e) {
       throw new CorruptSdfException();
     }
-  }
-
-  private void logSDF(String sdfID) {
-    Diagnostic.userLog("Referenced SDF-ID: " + sdfID + " Type: " + type() + " Sequences: " + numberSequences() + " Residues: " + lengthBetween(0, numberSequences()) + " Max-Length: " + maxLength() + " Min-Length: " + minLength());
   }
 
   @Override
@@ -478,7 +471,6 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   }
 
   void infoString(final StringBuilder sb) {
-    sb.append(LS);
     sb.append("Memory Usage\tbytes\tlength").append(LS);
     long totalBytes = 0;
     sb.append("\t\t").append(StringUtils.commas(mSeqData.bytes())).append("\t").append(StringUtils.commas(mSeqData.length())).append("\tSeqData").append(LS);
@@ -490,9 +482,13 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
       sb.append("\t\t").append(StringUtils.commas(mNames.bytes())).append("\t").append(StringUtils.commas(mNames.length())).append("\tNames").append(LS);
       totalBytes +=  mNames.bytes();
     }
+    if (mNameSuffixes != null) {
+      sb.append("\t\t").append(StringUtils.commas(mNameSuffixes.bytes())).append("\t").append(StringUtils.commas(mNameSuffixes.length())).append("\tSuffixes").append(LS);
+      totalBytes +=  mNameSuffixes.bytes();
+    }
     sb.append("\t\t").append(StringUtils.commas(mPositions.bytes())).append("\t").append(StringUtils.commas(mPositions.length())).append("\tPositions").append(LS);
     totalBytes +=  mPositions.bytes();
-    sb.append("\t\t").append(StringUtils.commas(totalBytes)).append("\t\tTotal").append(LS);
+    sb.append("\t\t").append(StringUtils.commas(totalBytes)).append("\t\tTotal bytes").append(LS);
   }
 
   private long infoQuality(StringBuilder sb) {

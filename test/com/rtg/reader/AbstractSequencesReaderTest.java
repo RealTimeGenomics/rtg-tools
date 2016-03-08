@@ -72,6 +72,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   @Override
   public void tearDown() throws Exception {
     FileHelper.deleteAll(mDir);
+    Diagnostic.setLogStream();
     mDir = null;
   }
 

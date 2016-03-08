@@ -29,9 +29,12 @@
  */
 package com.rtg.reader;
 
+import static com.rtg.util.StringUtils.LS;
+
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
 
@@ -73,8 +76,12 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
     mDirectory = directory;
     if (loadNames && mIndexFile.hasNames()) {
       loadNames();
+      loadNameSuffixes(loadFullNames, mIndexFile.hasSequenceNameSuffixes());
     }
-    loadNameSuffixes(loadFullNames, mIndexFile.hasSequenceNameSuffixes());
+    final StringBuilder sb = new StringBuilder("CMSR2 statistics");
+    sb.append(LS);
+    this.infoString(sb);
+    Diagnostic.userLog(sb.toString());
   }
 
   //copy constructor
@@ -223,4 +230,20 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   void initQuality() throws IOException {
     mData.initQuality();
   }
+
+  void infoString(final StringBuilder sb) {
+    sb.append("Memory Usage: ").append(mNumberSequences).append(" sequences").append(LS);
+    long totalBytes = mData.infoString(sb);
+    if (mNames != null) {
+      sb.append("\t\t").append(StringUtils.commas(mNames.bytes())).append("\t").append(StringUtils.commas(mNames.length())).append("\tNames").append(LS);
+      totalBytes +=  mNames.bytes();
+    }
+    if (mNameSuffixes != null) {
+      sb.append("\t\t").append(StringUtils.commas(mNameSuffixes.bytes())).append("\t").append(StringUtils.commas(mNameSuffixes.length())).append("\tSuffixes").append(LS);
+      totalBytes +=  mNameSuffixes.bytes();
+    }
+    sb.append("\t\t").append(StringUtils.commas(totalBytes)).append("\t\tTotal bytes").append(LS);
+  }
+
+
 }

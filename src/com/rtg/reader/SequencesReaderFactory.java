@@ -57,7 +57,7 @@ public final class SequencesReaderFactory {
   public static synchronized AnnotatedSequencesReader createDefaultSequencesReader(final File dir, LongRange region) throws IOException {
     try {
       final DefaultSequencesReader r = new DefaultSequencesReader(dir, region);
-      r.logSDF();
+      logSDF(r);
       return r;
     } catch (final FileNotFoundException e) {
       // Slightly better I/O reporting than the default provided by AbstractCli
@@ -111,7 +111,9 @@ public final class SequencesReaderFactory {
     if (dir == null) {
       return null;
     }
-    return CompressedMemorySequencesReader.createSequencesReader(dir, loadNames, loadFullNames, region);
+    final SequencesReader r = CompressedMemorySequencesReader.createSequencesReader(dir, loadNames, loadFullNames, region);
+    logSDF(r);
+    return r;
   }
 
   /**
@@ -208,4 +210,11 @@ public final class SequencesReaderFactory {
     }
     return new LongRange(start, end);
   }
+
+  private static void logSDF(SequencesReader r) {
+    final String sdfID = r.index().getSdfId().toString();
+    Diagnostic.userLog("Referenced SDF-ID: " + sdfID + " Type: " + r.type() + " Sequences: " + r.numberSequences() + " Max-Length: " + r.maxLength() + " Min-Length: " + r.minLength() + " Arm: " + r.getArm());
+  }
+
+
 }

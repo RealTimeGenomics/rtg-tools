@@ -162,7 +162,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
       "Memory Usage\tbytes\tlength",
 //      "24\t69\tSeqData",    TODO: uncomment this after long read FastScorer done.
       "3\t3\tSeqChecksums",
-      "66\t3\tNames",
+      "114\t3\tNames",
       "32\t4\tPositions"
     );
     assertEquals(mDir, msr.path());

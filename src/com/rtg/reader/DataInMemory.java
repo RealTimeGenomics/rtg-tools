@@ -29,6 +29,8 @@
  */
 package com.rtg.reader;
 
+import static com.rtg.util.StringUtils.LS;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -37,8 +39,10 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
 import com.rtg.mode.SequenceType;
+import com.rtg.util.StringUtils;
 import com.rtg.util.bytecompression.BitwiseByteArray;
 import com.rtg.util.bytecompression.CompressedByteArray;
+import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Helper for <code>CompressedMemorySequencesReader2</code> does most of the heavy lifting.
@@ -266,7 +270,75 @@ public final class DataInMemory {
     return new DataInMemory(mPointers, mSequenceChecksums, mQualityChecksums, mSequenceData, mQualLoader);
   }
 
-    /**
+  private static long bytes(int[][] arr) {
+    if (arr == null) {
+      return 0;
+    }
+    long b = 0;
+    for (int[] p : arr) {
+      b += p.length;
+    }
+    return 8L * arr.length + 4 * b;
+  }
+
+  private static long bytes(byte[][] arr) {
+    if (arr == null) {
+      return 0;
+    }
+    long b = 0;
+    for (byte[] p : arr) {
+      b += p.length;
+    }
+    return 8L * arr.length + b;
+  }
+
+  long infoString(StringBuilder sb) {
+    long totalBytes = 0;
+
+    final long pBytes = bytes(mPointers);
+    totalBytes += pBytes;
+    sb.append("\t\t").append(StringUtils.commas(pBytes)).append("\t\t").append("Pointers").append(LS);
+
+    final long fBytes = mFileNoLookup.bytes();
+    totalBytes += fBytes;
+    sb.append("\t\t").append(StringUtils.commas(fBytes)).append("\t\t").append("FileLookup").append(LS);
+
+    long sBytes = 0;
+    for (BitwiseByteArray b : mSequenceData) {
+      sBytes += b.bytes();
+    }
+    totalBytes += sBytes;
+    sb.append("\t\t").append(StringUtils.commas(sBytes)).append("\t\t").append("SequenceData").append(LS);
+
+    final long scBytes = bytes(mSequenceChecksums);
+    totalBytes += scBytes;
+    sb.append("\t\t").append(StringUtils.commas(scBytes)).append("\t\t").append("SequenceChecksums").append(LS);
+
+    totalBytes += infoQuality(sb, mQualityData);
+
+    if (mQualityChecksums != null) {
+      final long qcBytes = bytes(mQualityChecksums);
+      sb.append("\t\t").append(StringUtils.commas(qcBytes)).append("\t\t").append("QualityChecksums").append(LS);
+      totalBytes += qcBytes;
+    }
+
+    return totalBytes;
+  }
+
+  private static long infoQuality(StringBuilder sb, CompressedByteArray[] qualityData) {
+    long totalBytes = 0;
+    if (qualityData != null) {
+      long qualBytes = 0;
+      for (CompressedByteArray b : qualityData) {
+        qualBytes += b.bytes();
+      }
+      totalBytes += qualBytes;
+      sb.append("\t\t").append(StringUtils.commas(qualBytes)).append("\t\t").append("\tQualityData").append(LS);
+    }
+    return totalBytes;
+  }
+
+  /**
    * create data in memory
    * @param directory directory of SDF
    * @param index index file
@@ -450,6 +522,13 @@ public final class DataInMemory {
           fileStart = fileEnd;
         }
         mQualityData = ret;
+
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Memory Usage\tbytes").append(LS);
+        final long totalBytes = infoQuality(sb, mQualityData);
+        sb.append("\t\t").append(StringUtils.commas(totalBytes)).append("\t\tTotal bytes").append(LS);
+        Diagnostic.userLog("Loaded quality data" + LS + sb.toString());
+
       }
       return mQualityData;
     }

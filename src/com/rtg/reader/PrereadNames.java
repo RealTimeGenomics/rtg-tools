@@ -283,7 +283,7 @@ public class PrereadNames implements PrereadNamesInterface {
         poiLength += poi.length;
       }
     }
-    return length + poiLength * 4;
+    return (mNames.size() + mPointers.size()) * 8L + length + poiLength * 4;
   }
 
   @Override

@@ -146,7 +146,7 @@ public class AlternatingSequencesWriter extends SequencesWriter {
   public CompressedMemorySequencesReader[] processSequencesInMemoryPaired(File sourceFile, boolean includeQuality, SimplePrereadNames names, SimplePrereadNames suffixes, LongRange region) throws IOException {
     final CompressedMemorySequencesWriter sdfWriterLeft = new CompressedMemorySequencesWriter(sourceFile, mPrereadType, mDataSource.hasQualityData() && includeQuality, names, suffixes, true, mDataSource.type(), region);
     final RightSimplePrereadNames rNames = names == null ? null : new RightSimplePrereadNames(names);
-    final RightSimplePrereadNames rSuffixes = names == null ? null : new RightSimplePrereadNames(suffixes);
+    final RightSimplePrereadNames rSuffixes = suffixes == null ? null : new RightSimplePrereadNames(suffixes);
     final CompressedMemorySequencesWriter sdfWriterRight = new CompressedMemorySequencesWriter(sourceFile, mPrereadType, mDataSource.hasQualityData() && includeQuality, rNames, rSuffixes, true, mDataSource.type(), region);
     processSequences(sdfWriterLeft, sdfWriterRight, region);
     return new CompressedMemorySequencesReader[] {sdfWriterLeft.getReader(), sdfWriterRight.getReader()};

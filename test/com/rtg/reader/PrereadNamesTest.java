@@ -201,7 +201,7 @@ public class PrereadNamesTest extends TestCase {
     assertEquals("523456", names.name(0));
     assertEquals("623456", names.name(1));
     assertEquals("723456789012", names.name(2));
-    assertEquals(7 + 7 + 13 + 5 * 4, names.bytes());
+    assertEquals(79, names.bytes());
   }
 
   public void testFullLoad() throws IOException {

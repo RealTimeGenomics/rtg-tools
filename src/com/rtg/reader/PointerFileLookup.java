@@ -79,6 +79,13 @@ public abstract class PointerFileLookup {
     }
   }
 
+  /**
+   * @return size of object in bytes
+   */
+  public long bytes() {
+    return mStartSeqs.length * 4;
+  }
+
   private static class SimplePointerFileLookup extends PointerFileLookup {
     private final int mTilt;
     SimplePointerFileLookup(int tilt, int[][] pointers) {
@@ -89,6 +96,11 @@ public abstract class PointerFileLookup {
     @Override
     public int lookup(int sequenceId) {
       return sequenceId < mTilt ? 0 : 1;
+    }
+
+    @Override
+    public long bytes() {
+      return super.bytes() + 4;
     }
   }
 
@@ -122,6 +134,11 @@ public abstract class PointerFileLookup {
         //    = -(i + 2)
         return -(i + 2);
       }
+    }
+
+    @Override
+    public long bytes() {
+      return super.bytes() + mLookup.length * 4;
     }
   }
 }
