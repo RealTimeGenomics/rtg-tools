@@ -174,10 +174,6 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
     return 31;
   }
 
-  /**
-   * @see com.rtg.util.integrity.Integrity#integrity()
-   * @return true
-   */
   @Override
   public boolean integrity() {
     assert mMask == (int) Math.pow(2, mBits) - 1;
@@ -188,10 +184,6 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
     return true;
   }
 
-  /**
-   * @see com.rtg.util.integrity.Integrity#integrity()
-   * @return true
-   */
   @Override
   public boolean globalIntegrity() {
     return integrity();

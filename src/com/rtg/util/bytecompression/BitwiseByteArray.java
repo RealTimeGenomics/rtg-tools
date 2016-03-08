@@ -137,10 +137,6 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     return ((size + BITS_PER_LONG - 1) / BITS_PER_LONG) * mBits;
   }
 
-  /**
-   * @see com.rtg.util.integrity.Integrity#integrity()
-   * @return true
-   */
   @Override
   public boolean integrity() {
     Exam.assertTrue(0 <= mSize);
@@ -155,10 +151,6 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     return true;
   }
 
-  /**
-   * @see com.rtg.util.integrity.Integrity#integrity()
-   * @return true
-   */
   @Override
   public boolean globalIntegrity() {
     return integrity();
