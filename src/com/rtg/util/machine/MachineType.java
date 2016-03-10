@@ -40,6 +40,7 @@ import com.rtg.util.PseudoEnum;
  */
 public final class MachineType implements PseudoEnum {
 
+  /** Is the CG outer bases trimming enabled */
   public static final boolean CG_TRIM = true; //Boolean.valueOf(System.getProperty("cg-trim", "true"));
 
   private static int sSequenceNumber = -1;
@@ -164,11 +165,17 @@ public final class MachineType implements PseudoEnum {
     return HELPER.values();
   }
 
+  /**
+   * @return true if the outer base trimming should be applied on reads from this machine
+   */
   public boolean cgTrimOuterBases() {
     return this == COMPLETE_GENOMICS && CG_TRIM;
   }
 
-  public boolean isCg() {
+  /**
+   * @return true if this is one of the CG machine types
+   */
+  public boolean isCG() {
     return this == COMPLETE_GENOMICS || this == COMPLETE_GENOMICS_2;
   }
 }

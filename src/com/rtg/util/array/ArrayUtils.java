@@ -243,12 +243,4 @@ public final class ArrayUtils {
     return true;
   }
 
-  public static byte[] reverse(byte[] expandedRead, int from, int to) {
-    final int length = to - from;
-    byte[] reverse = new byte[length];
-    for (int i = length - 1, j = from; i >= 0 && j < to; i--, j++) {
-      reverse[i] = expandedRead[j + from];
-    }
-    return reverse;
-  }
 }
