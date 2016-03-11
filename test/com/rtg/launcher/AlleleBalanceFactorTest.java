@@ -35,7 +35,6 @@ import com.rtg.util.TestUtils;
 import junit.framework.TestCase;
 
 /**
- * @author kurt
  */
 public class AlleleBalanceFactorTest extends TestCase {
   public void test() {

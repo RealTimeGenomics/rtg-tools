@@ -32,7 +32,6 @@ package com.rtg.launcher;
 
 /**
  * Different ways of computing an allele balance correction
- * @author kurt
  */
 public enum AlleleBalanceFactor {
   /** Don't adjust for allele balance */

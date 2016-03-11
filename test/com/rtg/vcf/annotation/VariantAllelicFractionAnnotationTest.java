@@ -36,7 +36,6 @@ import com.rtg.vcf.header.VcfHeader;
 import junit.framework.TestCase;
 
 /**
- * @author kurt
  */
 public class VariantAllelicFractionAnnotationTest extends TestCase {
 
