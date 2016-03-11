@@ -4,6 +4,32 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
+RTG Core 3.6.2 (2016-03-10)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* map: mapping very large numbers of reads in a single chunk or with
+  low step size settings could exceed some internal datastructures,
+  giving unpredictable results. An explicit check for these conditions
+  has been added.
+
+* map: Reduction in peak memory use when mapping paired-end data.
+
+* vcfeval: Better error handling for variants which have triploid or
+  higher GT (ploidy higher than 2 is not supported).
+
+* extract: Extracting multiple regions from SAM/BAM across different
+  chromosomes could cause an exception.
+
+* rocplot: Improved error handling for yet more ways in which
+  attempting to open a GUI from a headless server can fail.
+
+* rocplot: (GUI) Minor improvement to crosshair handling.
+
+
+Previous releases
+=================
 
 RTG Core 3.6.1 (2016-01-25)
 ---------------------------
@@ -37,10 +63,6 @@ This release primarily includes bugfixes and minor improvements:
   machine where a graphics environment is unavailable.
 
 * rocplot: (GUI) Update frame title when graph title changes.
-
-
-Previous releases
-=================
 
 RTG Core 3.6 (2015-12-07)
 -------------------------
