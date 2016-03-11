@@ -33,7 +33,6 @@ package com.rtg.util.intervals;
 import junit.framework.TestCase;
 
 /**
- * @author Dave Ware
  */
 public class MergedIntervalsTest extends TestCase {
 
