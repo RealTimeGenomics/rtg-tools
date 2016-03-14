@@ -58,57 +58,6 @@ public final class DnaUtils {
   private DnaUtils() { }
 
   /**
-   * Convert a number into a string of nucleotide codes.
-   * This is handy for displaying hash function bits.
-   * @param x number to be displayed
-   * @param len number of bits and codes to display.
-   * @return string giving bit decomposition of x.
-   */
-  public static String toCodes(final long x, final int len) {
-    if (len <= 0 || len > 32) {
-      throw new IllegalArgumentException("length out of range=" + len);
-    }
-    final StringBuilder sb = new StringBuilder();
-    final int left = 64 - 2 * len;
-    long t = x << left;
-    long u = x << (left + len);
-    for (int i = 0; i < len; i++) {
-      final int code = (t < 0 ? 2 : 0) + (u < 0 ? 1 : 0);
-      sb.append(new String[] {"A", "C", "G", "T"}[code]);
-      t = t << 1;
-      u = u << 1;
-    }
-    assert u == 0;
-    return sb.toString();
-  }
-
-  /**
-   * Convert a number into a string of nucleotide codes.
-   * This is handy for displaying hash function bits.
-   * @param v0 first set of bits.
-   * @param v1 second set of bits.
-   * @param len number of bits and codes to display.
-   * @return string giving bit decomposition of x.
-   */
-  public static String toCodes(final long v0, final long v1, final int len) {
-    if (len <= 0 || len > 64) {
-      throw new IllegalArgumentException("length out of range=" + len);
-    }
-    final StringBuilder sb = new StringBuilder();
-    final int left = 64 - len;
-    long t = v0 << left;
-    long u = v1 << left;
-    for (int i = 0; i < len; i++) {
-      final int code = (t < 0 ? 2 : 0) + (u < 0 ? 1 : 0);
-      sb.append(new String[] {"A", "C", "G", "T"}[code]);
-      t = t << 1;
-      u = u << 1;
-    }
-    assert u == 0;
-    return sb.toString();
-  }
-
-  /**
    * Take reverse complement of a string.
    * @param seq to be reverse complemented.
    * @return the reversed sequence.

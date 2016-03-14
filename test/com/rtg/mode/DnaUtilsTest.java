@@ -31,8 +31,6 @@ package com.rtg.mode;
 
 import java.util.Arrays;
 
-import com.rtg.util.Utils;
-
 import junit.framework.TestCase;
 
 /**
@@ -40,42 +38,6 @@ import junit.framework.TestCase;
  *
  */
 public class DnaUtilsTest extends TestCase {
-
-  public void testToCodes01() {
-    assertEquals("AAA", DnaUtils.toCodes(Utils.fromBits(""), Utils.fromBits(""), 3));
-    assertEquals("TGC", DnaUtils.toCodes(Utils.fromBits("110"), Utils.fromBits("101"), 3));
-    assertEquals("AT", DnaUtils.toCodes(Utils.fromBits("101"), Utils.fromBits("101"), 2));
-    assertEquals("T", DnaUtils.toCodes(Utils.fromBits("101"), Utils.fromBits("101"), 1));
-    assertEquals("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATAT", DnaUtils.toCodes(Utils.fromBits("101"), Utils.fromBits("101"), 64));
-    try {
-      DnaUtils.toCodes(0, 0);
-    } catch (final RuntimeException e) {
-      assertEquals("length out of range=0", e.getMessage());
-    }
-    try {
-      DnaUtils.toCodes(0, 65);
-    } catch (final RuntimeException e) {
-      assertEquals("length out of range=65", e.getMessage());
-    }
-  }
-
-  public void testToCodes() {
-    assertEquals("AAA", DnaUtils.toCodes(Utils.fromBits(""), 3));
-    assertEquals("CAC", DnaUtils.toCodes(Utils.fromBits("101"), 3));
-    assertEquals("AT", DnaUtils.toCodes(Utils.fromBits("101"), 2));
-    assertEquals("G", DnaUtils.toCodes(Utils.fromBits("110"), 1));
-    assertEquals("AAAAAAAAAAAAAAAAAAAAAAAAAAAAACAC", DnaUtils.toCodes(Utils.fromBits("101"), 32));
-    try {
-      DnaUtils.toCodes(0, 0);
-    } catch (final RuntimeException e) {
-      assertEquals("length out of range=0", e.getMessage());
-    }
-    try {
-      DnaUtils.toCodes(0, 33);
-    } catch (final RuntimeException e) {
-      assertEquals("length out of range=33", e.getMessage());
-    }
-  }
 
   public void testReverseComplement() {
     assertEquals("", DnaUtils.reverseComplement(""));
