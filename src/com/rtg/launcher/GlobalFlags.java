@@ -131,6 +131,9 @@ public final class GlobalFlags {
   /** Print the details of complex evidence into the developer log. */
   public static final String COMPLEX_EVIDENCE_DETAILS = "com.rtg.variant.complex.complex-evidence-details";
 
+  /** Minimum count required in a calibration covariate set before it will be used */
+  public static final String QUALITY_CALIBRATION_MIN_EVIDENCE = "com.rtg.variant.quality-calibration-min-evidence";
+
   //Assembler
   /** If more than this many hits are seen at a position, skip them all. */
   public static final String ASSEMBLER_MAX_HITS_PER_START_POS_FLAG = "com.rtg.assembler.maxhits";
@@ -210,6 +213,7 @@ public final class GlobalFlags {
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
     registerFlag(FAMILY_CALLER_SORTED_HYPOTHESES, Boolean.class, true);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
+    registerFlag(QUALITY_CALIBRATION_MIN_EVIDENCE, Integer.class, 1000);
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
     // when there are lots of missing values.
