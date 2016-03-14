@@ -108,7 +108,7 @@ public final class FormatCli extends LoggedCli {
   private static final String XDEDUP_SECONDARY = "Xdedup-secondary-alignments";
 
   static class BadFormatCombinationException extends IllegalArgumentException {
-    public BadFormatCombinationException(String string) {
+    BadFormatCombinationException(String string) {
       super(string);
     }
   }

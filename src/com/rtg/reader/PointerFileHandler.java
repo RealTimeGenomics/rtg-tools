@@ -61,7 +61,7 @@ abstract class PointerFileHandler {
   protected byte mChecksum;
   protected byte mQualityChecksum;
 
-  public PointerFileHandler(long baseSize, long checksumSize) {
+  PointerFileHandler(long baseSize, long checksumSize) {
     mEntrySize = baseSize + checksumSize;
     mChecksumSize = checksumSize;
   }
@@ -199,7 +199,7 @@ abstract class PointerFileHandler {
 
   private static class OriginalPointerHandler extends PointerFileHandler {
 
-    public OriginalPointerHandler() {
+    OriginalPointerHandler() {
       super(4, 0);
     }
 
@@ -239,7 +239,7 @@ abstract class PointerFileHandler {
   private static class PointerAndChecksumHandler extends PointerFileHandler {
     private final boolean mHasQuality;
     private final byte[] mBuf;
-    public PointerAndChecksumHandler(IndexFile index) {
+    PointerAndChecksumHandler(IndexFile index) {
       super(4L, index.hasQuality() ? 2 : 1);
       mHasQuality = index.hasQuality();
       mBuf = new byte[(int) mChecksumSize];

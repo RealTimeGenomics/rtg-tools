@@ -32,7 +32,7 @@ package com.rtg.util.cli;
 /**
  */
 class FlagCountException extends IllegalArgumentException {
-  public FlagCountException(final String message) {
+  FlagCountException(final String message) {
     super(message);
   }
 }

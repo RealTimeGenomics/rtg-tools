@@ -121,7 +121,7 @@ public class HttpUsageLoggingClientTest extends TestCase {
   private static class MyDiagnosticListener implements DiagnosticListener {
     final String[][] mWarningMsgs;
     int mMsgNo = 0;
-    public MyDiagnosticListener(String[][] expected) {
+    MyDiagnosticListener(String[][] expected) {
       mWarningMsgs = expected;
     }
     @Override
@@ -143,7 +143,7 @@ public class HttpUsageLoggingClientTest extends TestCase {
     final String mHost;
     final int mNumFailures;
     int mTries = 0;
-    public MyHttpUsageLoggingClient(String host, boolean required, int numFailures) {
+    MyHttpUsageLoggingClient(String host, boolean required, int numFailures) {
       super(host, UsageConfigurationTest.createSimpleConfiguration(null, null, null, null, null), required);
       mHost = host;
       mNumFailures = numFailures;

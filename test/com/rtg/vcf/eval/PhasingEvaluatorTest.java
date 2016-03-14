@@ -72,7 +72,7 @@ public class PhasingEvaluatorTest extends TestCase {
     StringBuilder mBaselineVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
     StringBuilder mCallsVcf = new StringBuilder(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n");
     final VcfHeader mHeader;
-    public MockVariantSet(List<String> base, List<String> calls) {
+    MockVariantSet(List<String> base, List<String> calls) {
       mMap = new EnumMap<>(VariantSetType.class);
       mMap.put(VariantSetType.BASELINE, makeVariantList(base, mBaselineVcf));
       mMap.put(VariantSetType.CALLS, makeVariantList(calls, mCallsVcf));

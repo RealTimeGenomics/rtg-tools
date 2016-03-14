@@ -77,7 +77,7 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
     private int mCurrent = 1;
     private int mAdj;
 
-    public TestRaf(final File file, final String mode, final int maxDiff) throws IOException {
+    TestRaf(final File file, final String mode, final int maxDiff) throws IOException {
       super(file, mode);
       mMaxDiff = maxDiff;
     }

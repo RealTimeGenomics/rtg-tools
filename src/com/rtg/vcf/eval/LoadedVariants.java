@@ -47,7 +47,7 @@ class LoadedVariants {
    * @param variants the variants that were loaded
    * @param skipped a count of the number of variants skipped during loading
    */
-  public LoadedVariants(List<Variant> variants, int skipped) {
+  LoadedVariants(List<Variant> variants, int skipped) {
     mVariants = variants;
     mSkippedDuringLoading = skipped;
   }

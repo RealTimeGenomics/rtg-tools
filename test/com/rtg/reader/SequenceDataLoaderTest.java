@@ -72,7 +72,7 @@ public class SequenceDataLoaderTest extends TestCase {
   private static class TestDataFileIndex extends DataFileIndex {
 
     private final long[] mIndex;
-    public TestDataFileIndex(long[] index) {
+    TestDataFileIndex(long[] index) {
       mIndex = index;
     }
 

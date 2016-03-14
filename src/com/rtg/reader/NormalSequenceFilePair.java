@@ -56,7 +56,7 @@ class NormalSequenceFilePair implements SequenceFilePair {
   private final int mPointerEntrySize;
 
 
-  public NormalSequenceFilePair(OutputStream seqData, OutputStream qualData, DataOutputStream pointers, boolean quality, long limit, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
+  NormalSequenceFilePair(OutputStream seqData, OutputStream qualData, DataOutputStream pointers, boolean quality, long limit, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
     if (limit > Integer.MAX_VALUE) {
       try {
         try {
@@ -92,7 +92,7 @@ class NormalSequenceFilePair implements SequenceFilePair {
    * @param checksumQual checksum tracker for quality data
    * @throws IOException if an IO error occurs
    */
-  public NormalSequenceFilePair(File dir, int fileNum, boolean quality, final long limit, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
+  NormalSequenceFilePair(File dir, int fileNum, boolean quality, final long limit, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
     this(FileUtils.createOutputStream(SdfFileUtils.sequenceDataFile(dir, fileNum), false),
           quality ? FileUtils.createOutputStream(SdfFileUtils.qualityDataFile(dir, fileNum), false) : null,
           new DataOutputStream(FileUtils.createOutputStream(SdfFileUtils.sequencePointerFile(dir, fileNum), false)),

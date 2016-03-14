@@ -98,7 +98,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
     } else {
       final String sync;
       String weight = null;
-      double w;
+      final double w;
       final byte s = mCv.getStatus();
       switch (s) {
         case VariantId.STATUS_SKIPPED:

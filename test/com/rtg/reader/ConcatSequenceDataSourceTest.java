@@ -119,7 +119,7 @@ public class ConcatSequenceDataSourceTest extends TestCase {
     long mMinLength = Long.MAX_VALUE;
     long mMaxLength = Long.MIN_VALUE;
 
-    public ArraySequenceDataSource(byte[][] data, byte[][] quality, String[] labels, SequenceType type) {
+    ArraySequenceDataSource(byte[][] data, byte[][] quality, String[] labels, SequenceType type) {
       mData = Arrays.copyOf(data, data.length);
       mQuality = quality == null ? null : Arrays.copyOf(quality, quality.length);
       mLabels = Arrays.copyOf(labels, labels.length);

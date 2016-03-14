@@ -228,7 +228,7 @@ public class AlternatingSequencesReaderTest extends TestCase {
   private static class FakeReader extends MockSequencesReader {
     private final int mReadLength;
 
-    public FakeReader(SequenceType sequenceType, long numberSquences, long length, int readLength) {
+    FakeReader(SequenceType sequenceType, long numberSquences, long length, int readLength) {
       super(sequenceType, numberSquences, length);
       mReadLength = readLength;
     }

@@ -38,7 +38,7 @@ class FlushLocus {
   int mStart;
   int mEnd;
 
-  public FlushLocus(int start, int end) {
+  FlushLocus(int start, int end) {
     mStart = start;
     mEnd = end;
   }

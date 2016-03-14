@@ -42,7 +42,7 @@ import junit.framework.TestCase;
 public class VcfFormatStringAnnotatorTest extends TestCase {
 
   private static final class DummyDerivedAnnotation extends AbstractDerivedFormatAnnotation {
-    public DummyDerivedAnnotation() {
+    DummyDerivedAnnotation() {
       super("DUMMY", "DUMMY-DESC", AnnotationDataType.STRING);
     }
     @Override

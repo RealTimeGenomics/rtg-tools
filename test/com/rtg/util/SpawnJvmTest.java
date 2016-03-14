@@ -224,7 +224,7 @@ public final class SpawnJvmTest extends TestCase {
     private final String mStdErr;
     private int mRetCode;
 
-    public ProcessOutput(final String input, final int maxMem, final String className, final String... args) throws IOException {
+    ProcessOutput(final String input, final int maxMem, final String className, final String... args) throws IOException {
       final Process p = SpawnJvm.spawn(maxMem * 1024L * 1024L, className, args);
       try {
         if (input != null) {

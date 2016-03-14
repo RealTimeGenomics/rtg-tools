@@ -168,7 +168,7 @@ class RocLinePanel extends JPanel {
   private static class CheckBoxListener implements ItemListener {
     private final RocLinePanel mPanel;
 
-    public CheckBoxListener(RocLinePanel panel) {
+    CheckBoxListener(RocLinePanel panel) {
       mPanel = panel;
     }
     @Override

@@ -43,7 +43,7 @@ public class VcfInfoIntegerAnnotatorTest extends TestCase {
 
   private static final class DummyDerivedAnnotation extends AbstractDerivedAnnotation {
 
-    public DummyDerivedAnnotation() {
+    DummyDerivedAnnotation() {
       super("DUMMY", "DUMMY-DESC", AnnotationDataType.INTEGER);
     }
 

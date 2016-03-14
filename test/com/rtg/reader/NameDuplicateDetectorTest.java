@@ -47,7 +47,7 @@ public class NameDuplicateDetectorTest extends TestCase {
 
   class ArrayDummyNameReader extends DummySequencesReader {
     private final String[] mNames;
-    public ArrayDummyNameReader(String[] names) {
+    ArrayDummyNameReader(String[] names) {
       mNames = names;
     }
     @Override
@@ -86,7 +86,7 @@ public class NameDuplicateDetectorTest extends TestCase {
   }
 
   class NoSortingDuplicateDetector extends NameDuplicateDetector {
-    public NoSortingDuplicateDetector(int size) {
+    NoSortingDuplicateDetector(int size) {
       super(size);
     }
     @Override

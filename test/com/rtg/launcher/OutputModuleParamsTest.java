@@ -65,7 +65,7 @@ public class OutputModuleParamsTest extends TestCase {
       }
     }
 
-    public MockOutputModuleParams(MockOutputModuleParamsBuilder builder) {
+    MockOutputModuleParams(MockOutputModuleParamsBuilder builder) {
       super(builder);
     }
   }

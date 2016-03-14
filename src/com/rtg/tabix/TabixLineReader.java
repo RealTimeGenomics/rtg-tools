@@ -126,7 +126,7 @@ public class TabixLineReader implements LineReader {
     private final int mBeg;
     private final int mEnd;
     private String mCurrent = null;
-    public SingleRestrictionLineReader(File input, TabixIndexReader tir) throws IOException {
+    SingleRestrictionLineReader(File input, TabixIndexReader tir) throws IOException {
       mSequence = null;
       mBeg = -1;
       mEnd = -1;
@@ -134,7 +134,7 @@ public class TabixLineReader implements LineReader {
       mBCPositionReader = tir.getOptions().mFormat == TabixIndexer.TabixOptions.FORMAT_VCF ? new VcfPositionReader(bclr, tir.getOptions().mSkip) : new GenericPositionReader(bclr, tir.getOptions());
       mRange = new VirtualOffsets(0, 0xFFFFFFFFFFFFFFFFL, null);
     }
-    public SingleRestrictionLineReader(File input, TabixIndexReader tir, RegionRestriction region) throws IOException {
+    SingleRestrictionLineReader(File input, TabixIndexReader tir, RegionRestriction region) throws IOException {
       if (region == null) {
         throw new NullPointerException();
       }
@@ -211,7 +211,7 @@ public class TabixLineReader implements LineReader {
     private int mNextAlignmentStart;
     private int mNextTemplateId;
 
-    public MultiRestrictionLineReader(File input, TabixIndexReader tir, ReferenceRanges<String> ranges) throws IOException {
+    MultiRestrictionLineReader(File input, TabixIndexReader tir, ReferenceRanges<String> ranges) throws IOException {
       if (ranges == null) {
         throw new NullPointerException();
       }

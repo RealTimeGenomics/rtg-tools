@@ -244,7 +244,7 @@ public class ParamsCliTest extends TestCase {
     private boolean mRan;
     private final File mDir;
 
-    public TestParamsCli(boolean throwException, boolean notalkback, File dir) {
+    TestParamsCli(boolean throwException, boolean notalkback, File dir) {
       mThrowException = throwException;
       mNoTalkback = notalkback;
       mDir = dir;

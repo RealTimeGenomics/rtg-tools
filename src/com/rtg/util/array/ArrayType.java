@@ -49,7 +49,7 @@ public abstract class ArrayType {
     /**
      * @param bits number of bits to be stored for each value.
      */
-    public ArrayTypeBits(final int bits) {
+    ArrayTypeBits(final int bits) {
       super("Bits:" + BitIndex.roundUpBits(bits));
       mBits = BitIndex.roundUpBits(bits);
     }

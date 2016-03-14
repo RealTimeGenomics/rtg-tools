@@ -58,7 +58,7 @@ public final class Path implements Comparable<Path> {
     private final double mCalledTPCount;
     private final double mBaselineTPCount;
 
-    public SyncPoint(int pos, int calledCounts, int baselineCounts) {
+    SyncPoint(int pos, int calledCounts, int baselineCounts) {
       mPos = pos;
       mCalledTPCount = calledCounts;
       mBaselineTPCount = baselineCounts;

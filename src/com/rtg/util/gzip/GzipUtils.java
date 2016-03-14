@@ -119,7 +119,7 @@ public final class GzipUtils {
 
   static class FakeBlockingInputStream extends ByteArrayInputStream {
 
-    public FakeBlockingInputStream(byte[] input) {
+    FakeBlockingInputStream(byte[] input) {
       super(input);
     }
 

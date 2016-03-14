@@ -81,7 +81,7 @@ public final class SimpleThreadPool {
     private final String mSubName;
     private final boolean mLogLifecycleEvents;
 
-    public QueueThread(final String name, final String subname, boolean logJobLifeCycle) {
+    QueueThread(final String name, final String subname, boolean logJobLifeCycle) {
       super(name);
       mSubName = subname;
       mLogLifecycleEvents = logJobLifeCycle;

@@ -50,7 +50,7 @@ public final class SimpleArchive {
     final int mNameSize;
     final long mFileSize;
 
-    public FileHeader(int nameSize, long fileSize) {
+    FileHeader(int nameSize, long fileSize) {
       this.mNameSize = nameSize;
       this.mFileSize = fileSize;
     }

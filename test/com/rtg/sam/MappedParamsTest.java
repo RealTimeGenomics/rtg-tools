@@ -66,7 +66,7 @@ public class MappedParamsTest extends TestCase {
       }
     }
 
-    public MockMappedParams(MockMappedParamsBuilder builder) {
+    MockMappedParams(MockMappedParamsBuilder builder) {
       super(builder);
     }
   }

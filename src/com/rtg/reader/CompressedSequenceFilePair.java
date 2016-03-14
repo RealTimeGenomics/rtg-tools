@@ -55,7 +55,7 @@ class CompressedSequenceFilePair extends NormalSequenceFilePair {
    * @param checksumQual checksum tracker for quality data
    * @throws IOException if an IO error occurs
    */
-  public CompressedSequenceFilePair(File dir, int fileNum, boolean quality, final long limit, final int seqValues, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
+  CompressedSequenceFilePair(File dir, int fileNum, boolean quality, final long limit, final int seqValues, CRC32 checksumSeq, CRC32 checksumQual) throws IOException {
     super(new FileBitwiseOutputStream(SdfFileUtils.sequenceDataFile(dir, fileNum), CompressedByteArray.minBits(seqValues)),
           quality ? new FileCompressedOutputStream(SdfFileUtils.qualityDataFile(dir, fileNum), SdfWriter.MAX_QUALITY_VALUE) : null,
           new DataOutputStream(FileUtils.createOutputStream(SdfFileUtils.sequencePointerFile(dir, fileNum), false)),

@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class DummyDerivedFormatAnnotationTest extends TestCase {
 
   private static final class DummyDerivedFormatAnnotation extends AbstractDerivedFormatAnnotation {
-    public DummyDerivedFormatAnnotation() {
+    DummyDerivedFormatAnnotation() {
       super("DUMMY", "DUMMY-DESC", AnnotationDataType.STRING);
     }
     @Override

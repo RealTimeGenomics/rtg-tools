@@ -83,7 +83,7 @@ public abstract class DataFileIndex {
     private final long mTotal;
     private final int mNumberEntries;
 
-    public DataFileIndexVersion2(File dataIndexFile) throws IOException {
+    DataFileIndexVersion2(File dataIndexFile) throws IOException {
       if (dataIndexFile.exists()) {
         try (RandomAccessFile indexRAF = new RandomAccessFile(dataIndexFile, "r")) {
           //TODO handle longer indexs
@@ -142,7 +142,7 @@ public abstract class DataFileIndex {
     private final long mTotal;
     private final String mDataFilePrefix;
 
-    public DataFileIndexVersion1(File dataIndexFile, String dataFilePrefix) throws IOException {
+    DataFileIndexVersion1(File dataIndexFile, String dataFilePrefix) throws IOException {
       mDataFilePrefix = dataFilePrefix;
       mDir = dataIndexFile.getParentFile();
       if (dataIndexFile.exists()) {

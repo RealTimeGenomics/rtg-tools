@@ -889,7 +889,7 @@ public final class FileUtils {
     private final OutputStream mOut1;
     private final OutputStream mOut2;
 
-    public TeeOutputStream(OutputStream out1, OutputStream out2) {
+    TeeOutputStream(OutputStream out1, OutputStream out2) {
       mOut1 = out1;
       mOut2 = out2;
     }

@@ -85,7 +85,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
 
 
   private final class MyMemorySequencesReader extends CompressedMemorySequencesReader {
-    public MyMemorySequencesReader(final byte[][] data, final String[] labels, final long[] counts,
+    MyMemorySequencesReader(final byte[][] data, final String[] labels, final long[] counts,
         final int min, final int max, final SequenceType type) {
       super(data, labels, counts, min, max, type);
       final ArrayPrereadNames arr = new ArrayPrereadNames(new String[]{"someFile"});

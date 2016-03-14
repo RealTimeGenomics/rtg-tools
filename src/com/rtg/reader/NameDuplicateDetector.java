@@ -49,7 +49,7 @@ public class NameDuplicateDetector {
 
   private static class NullDetector extends NameDuplicateDetector {
 
-    public NullDetector() {
+    NullDetector() {
       super(0);
     }
 

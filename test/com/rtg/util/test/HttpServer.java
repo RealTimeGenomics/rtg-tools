@@ -69,7 +69,7 @@ public class HttpServer {
   private class Server extends Thread {
     private final ServerSocket mSocket;
     private boolean mDone = false;
-    public Server(final ServerSocket s) {
+    Server(final ServerSocket s) {
       mSocket = s;
     }
 

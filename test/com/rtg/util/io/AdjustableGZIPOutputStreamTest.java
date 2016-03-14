@@ -46,7 +46,7 @@ public class AdjustableGZIPOutputStreamTest extends TestCase {
 
   private class DummyOutputStream extends AdjustableGZIPOutputStream {
 
-    public DummyOutputStream(OutputStream out) throws IOException {
+    DummyOutputStream(OutputStream out) throws IOException {
       super(out);
     }
 

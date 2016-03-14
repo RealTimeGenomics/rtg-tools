@@ -86,7 +86,7 @@ class RocLinesPanel extends Box {
   private class MoveActionListener implements ActionListener {
     private final RocLinePanel mPanel;
 
-    public MoveActionListener(RocLinePanel panel) {
+    MoveActionListener(RocLinePanel panel) {
       mPanel = panel;
     }
 

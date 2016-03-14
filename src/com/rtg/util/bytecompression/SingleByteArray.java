@@ -37,7 +37,7 @@ import java.io.InputStream;
 final class SingleByteArray extends ByteArray {
   private final byte[] mData;
 
-  public SingleByteArray(final int size) {
+  SingleByteArray(final int size) {
     mData = new byte[size];
   }
 

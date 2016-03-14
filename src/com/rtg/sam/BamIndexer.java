@@ -211,7 +211,7 @@ public final class BamIndexer {
 
   private static class BamPositionReader implements BlockCompressedPositionReader {
     private final BamReader mReader;
-    public BamPositionReader(BamReader reader) {
+    BamPositionReader(BamReader reader) {
       mReader = reader;
     }
 

@@ -339,7 +339,7 @@ public class FileUtilsTest extends TestCase {
 
   private static class NonSkippingStream extends InputStream {
     private final InputStream mStream;
-    public NonSkippingStream(InputStream stream) {
+    NonSkippingStream(InputStream stream) {
       mStream = stream;
     }
 

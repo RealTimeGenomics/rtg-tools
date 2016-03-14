@@ -48,7 +48,7 @@ public class FlagTest extends TestCase {
     private final int mOrdinal;
     private final String mName;
 
-    public DummyEnum(final int ordinal, final String name) {
+    DummyEnum(final int ordinal, final String name) {
       mOrdinal = ordinal;
       mName = name;
     }

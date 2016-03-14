@@ -171,7 +171,7 @@ public class NanoRegression {
 
     private final File mRepositoryDir;
 
-    public FileRegressionStore(Class<?> testClass, File rootDir) {
+    FileRegressionStore(Class<?> testClass, File rootDir) {
       if (!(rootDir.exists() && rootDir.isDirectory())) {
         throw new RuntimeException("Repository root directory " + rootDir + " does not exist");
       }
@@ -211,7 +211,7 @@ public class NanoRegression {
     private final ClassLoader mLoader;
     private final String mResourcePrefix;
 
-    public ClasspathRegressionStore(Class<?> testClass) {
+    ClasspathRegressionStore(Class<?> testClass) {
       mLoader = testClass.getClassLoader();
       final String packageName = getPackageName(testClass);
       mResourcePrefix = packageName.replace(".", "/") + "/resources";
@@ -239,7 +239,7 @@ public class NanoRegression {
 
     private final RegressionStore[] mDelegates;
 
-    public UnionRegressionStore(RegressionStore[] delegates) {
+    UnionRegressionStore(RegressionStore[] delegates) {
       mDelegates = delegates;
     }
 
@@ -281,7 +281,7 @@ public class NanoRegression {
     private final String mActual;
     private final String mMessage;
 
-    public RegressionFailure(String id, String actual, String message) {
+    RegressionFailure(String id, String actual, String message) {
       mId = id;
       mActual = actual;
       mMessage = message;

@@ -46,7 +46,7 @@ public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
   public static final Protein X = new XProtein(0, "X", "Xaa", "Any amino acid");
 
   private static class XProtein extends Protein {
-    public XProtein(final int ordinal, final String ename,  final String sname, final String name) {
+    XProtein(final int ordinal, final String ename,  final String sname, final String name) {
       super(ordinal, ename, sname, name);
     }
     @Override
@@ -59,7 +59,7 @@ public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
   public static final Protein STOP = new STOPProtein(1, "STOP", "***", "Translated stop codon");
 
   private static class STOPProtein extends Protein {
-    public STOPProtein(final int ordinal, final String ename, final String sname, final String name) {
+    STOPProtein(final int ordinal, final String ename, final String sname, final String name) {
       super(ordinal, ename, sname, name);
     }
     @Override

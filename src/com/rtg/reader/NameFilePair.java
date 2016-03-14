@@ -55,7 +55,7 @@ class NameFilePair {
    * @param limit Max file size in bytes (currently ignored)
    * @throws IOException When IO errors occur
    */
-  public NameFilePair(final File names, final File pointers, final long limit) throws IOException {
+  NameFilePair(final File names, final File pointers, final long limit) throws IOException {
     mNameData = new BufferedOutputStreamFix(new FileOutputStream(names), FileUtils.BUFFERED_STREAM_SIZE);
     mPointers = new DataOutputStream(new BufferedOutputStreamFix(new FileOutputStream(pointers), FileUtils.BUFFERED_STREAM_SIZE));
     mLimit = limit;

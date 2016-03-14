@@ -56,10 +56,10 @@ public class ModuleParamsTest extends TestCase {
 
   private static final class MockModuleParams extends ModuleParams {
 
-    public MockModuleParams(MockModuleParamsBuilder builder) {
+    MockModuleParams(MockModuleParamsBuilder builder) {
       super(builder);
     }
-    public MockModuleParams(final CFlags flags) {
+    MockModuleParams(final CFlags flags) {
       super(flags.getName());
     }
     @Override

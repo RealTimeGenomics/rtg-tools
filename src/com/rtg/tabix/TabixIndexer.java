@@ -461,7 +461,7 @@ public final class TabixIndexer {
      * @param skip number of lines to skip at beginning.
      * @param positionStyle true for <code>BED</code> style (0-based half-closed half-open), false for <code>GFF</code> style (1-based closed).
      */
-    public TabixOptions(int format, int seqCol, int startCol, int endCol, char meta, int skip, boolean positionStyle) {
+    TabixOptions(int format, int seqCol, int startCol, int endCol, char meta, int skip, boolean positionStyle) {
       mFormat = format | (positionStyle ? 0x10000 : 0);
       mSeqCol = seqCol;
       mStartCol = startCol;
@@ -479,7 +479,7 @@ public final class TabixIndexer {
      * @param meta character indicating non data line in input.
      * @param skip number of lines to skip at beginning.
      */
-    public TabixOptions(int format, int seqCol, int startCol, int endCol, int meta, int skip) {
+    TabixOptions(int format, int seqCol, int startCol, int endCol, int meta, int skip) {
       mFormat = format;
       mSeqCol = seqCol;
       mStartCol = startCol;
@@ -560,7 +560,7 @@ public final class TabixIndexer {
 
   static class BedIndexerFactory extends IndexerFactory {
 
-    public BedIndexerFactory(int skip) {
+    BedIndexerFactory(int skip) {
       super(skip);
     }
 
@@ -576,7 +576,7 @@ public final class TabixIndexer {
   }
 
   static class TsvIndexerFactory extends IndexerFactory {
-    public TsvIndexerFactory() {
+    TsvIndexerFactory() {
       super(0);
     }
     @Override
@@ -625,7 +625,7 @@ public final class TabixIndexer {
   }
 
   static class AlleleCountsIndexerFactory extends IndexerFactory {
-    public AlleleCountsIndexerFactory() {
+    AlleleCountsIndexerFactory() {
       super(0);
     }
     @Override
@@ -672,7 +672,7 @@ public final class TabixIndexer {
     private InputStream mDataStream;
     private OutputStream mIndexStream;
 
-    public FileIndexerInputHandler(File dataFile, File indexFile) {
+    FileIndexerInputHandler(File dataFile, File indexFile) {
       this.mDataFile = dataFile;
       this.mOutputIndexFile = indexFile;
     }
@@ -729,7 +729,7 @@ public final class TabixIndexer {
     private final OutputStream mIndexStream;
     private boolean mPrelim;
 
-    public StreamIndexerInputHandler(InputStream inData, OutputStream outIndex) {
+    StreamIndexerInputHandler(InputStream inData, OutputStream outIndex) {
       this.mDataStream = inData;
       this.mIndexStream = outIndex;
     }

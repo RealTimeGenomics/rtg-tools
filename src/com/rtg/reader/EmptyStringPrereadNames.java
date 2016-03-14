@@ -37,7 +37,7 @@ import java.io.OutputStream;
 class EmptyStringPrereadNames implements PrereadNamesInterface {
   private final long mLength;
 
-  public EmptyStringPrereadNames(long length) {
+  EmptyStringPrereadNames(long length) {
     this.mLength = length;
   }
 

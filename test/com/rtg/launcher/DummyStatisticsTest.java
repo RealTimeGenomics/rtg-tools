@@ -51,7 +51,7 @@ public class DummyStatisticsTest extends TestCase {
     /**
      * @param outputDirectory The base output directory to generate statistics and reports in. May be null if no statistics or reports are to be generated.
      */
-    public DummyStatistics(File outputDirectory) {
+    DummyStatistics(File outputDirectory) {
       super(outputDirectory);
     }
 

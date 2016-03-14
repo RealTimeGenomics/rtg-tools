@@ -50,7 +50,7 @@ class RollingIndex {
   private long mDataSize;
   private final File mFile;
 
-  public RollingIndex(final File file) {
+  RollingIndex(final File file) {
     mCurrent = 0;
     mFile = file;
   }

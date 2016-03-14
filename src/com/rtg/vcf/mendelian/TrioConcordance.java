@@ -53,7 +53,7 @@ class TrioConcordance {
   private int mTrioConsistent = 0;
   private int mTrioInconsistent = 0;
 
-  public TrioConcordance(String child, String father, String mother) {
+  TrioConcordance(String child, String father, String mother) {
     mChild = child;
     mFather = father;
     mMother = mother;

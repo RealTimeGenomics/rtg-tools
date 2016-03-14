@@ -232,7 +232,7 @@ public class VcfMerge extends AbstractCli {
     VcfPositionZipper(RegionRestriction rr, File... vcfFiles) throws IOException {
       this(rr, null, null, vcfFiles);
     }
-    public VcfPositionZipper(RegionRestriction rr, String[] extraHeaderLines, Set<String> forceMerge, File... vcfFiles) throws IOException {
+    VcfPositionZipper(RegionRestriction rr, String[] extraHeaderLines, Set<String> forceMerge, File... vcfFiles) throws IOException {
       mFiles = vcfFiles;
       mReaders = new VcfReader[mFiles.length];
       mHeaders = new VcfHeader[mFiles.length];

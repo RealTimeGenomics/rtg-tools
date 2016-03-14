@@ -94,7 +94,7 @@ public class DataFileOpenerFactory {
   }
   private static class BitwiseOpener implements DataFileOpener {
     private final int mBits;
-    public BitwiseOpener(int bits) {
+    BitwiseOpener(int bits) {
       mBits = bits;
     }
     @Override
@@ -109,7 +109,7 @@ public class DataFileOpenerFactory {
 
   private static class CompressedOpener implements DataFileOpener {
     private final int mRange;
-    public CompressedOpener(int range) {
+    CompressedOpener(int range) {
       mRange = range;
     }
     @Override

@@ -77,7 +77,7 @@ public class LoggedCliTest extends AbstractCliTest {
     private final int mCode;
     private final boolean mThrow;
 
-    public FakeCli(File dir, int code, boolean throwException) {
+    FakeCli(File dir, int code, boolean throwException) {
       mDir = dir;
       mCode = code;
       mThrow = throwException;

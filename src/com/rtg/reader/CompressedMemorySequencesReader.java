@@ -544,7 +544,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     private final DataFileOpenerFactory mOpenerFactory;
     private final PointerFileHandler mHandler;
 
-    public QualityLoader(DataFileOpenerFactory fact, PointerFileHandler handler, ByteArray qualityChecksums) {
+    QualityLoader(DataFileOpenerFactory fact, PointerFileHandler handler, ByteArray qualityChecksums) {
       mOpenerFactory = fact;
       mHandler = handler;
       mQualityChecksums = qualityChecksums;

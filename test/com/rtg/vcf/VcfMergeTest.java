@@ -134,7 +134,7 @@ public class VcfMergeTest extends AbstractCliTest {
     private final String[][] mAlts;
     private final String[][] mSamples;
 
-    public ZipperCallbackTester(int[] positions, String[] templates, String[][] alts, String[][] samples) {
+    ZipperCallbackTester(int[] positions, String[] templates, String[][] alts, String[][] samples) {
       mPositions = positions;
       mTemplates = templates;
       mAlts = alts;
