@@ -133,6 +133,7 @@ public final class GlobalFlags {
 
   /** Minimum count required in a calibration covariate set before it will be used */
   public static final String QUALITY_CALIBRATION_MIN_EVIDENCE = "com.rtg.variant.quality-calibration-min-evidence";
+  public static final String QUALITY_CALIBRATION_COVARIATE_INTERSECTION = "com.rtg.variant.quality-calibration-covariate-intersection";
 
   //Assembler
   /** If more than this many hits are seen at a position, skip them all. */
@@ -213,7 +214,8 @@ public final class GlobalFlags {
     registerFlag(FAMILY_CALLER_FALLBACK_FLAG, Boolean.class, false);
     registerFlag(FAMILY_CALLER_SORTED_HYPOTHESES, Boolean.class, true);
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
-    registerFlag(QUALITY_CALIBRATION_MIN_EVIDENCE, Integer.class, 1000);
+    registerFlag(QUALITY_CALIBRATION_MIN_EVIDENCE, Integer.class, 10);
+    registerFlag(QUALITY_CALIBRATION_COVARIATE_INTERSECTION, Boolean.class, false);
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
     // when there are lots of missing values.
