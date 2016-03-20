@@ -63,6 +63,17 @@ public class StringUtilsTest extends TestCase {
     assertEquals("-9,223,372,036,854,775,808", StringUtils.commas(Long.MIN_VALUE));
   }
 
+  public void testTrim() {
+    assertEquals("", StringUtils.trimSpaces(""));
+    assertEquals("", StringUtils.trimSpaces(" "));
+    assertEquals("a", StringUtils.trimSpaces("a"));
+    assertEquals("a", StringUtils.trimSpaces(" a"));
+    assertEquals("a", StringUtils.trimSpaces("a "));
+    assertEquals("a b", StringUtils.trimSpaces("a b"));
+    assertEquals("a b", StringUtils.trimSpaces(" a b "));
+    assertEquals("a b" + (char) 27, StringUtils.trimSpaces(" a b" + (char) 27 + " "));
+  }
+
   public void test() {
     final int length = LS.length();
     assertTrue(length == 1 || length == 2);

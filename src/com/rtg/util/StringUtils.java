@@ -621,4 +621,25 @@ public final class StringUtils {
     return new StringBuilder(str).reverse().toString();
   }
 
+  /**
+   * Remove leading and trailing spaces from a string. This preserves other characters that may be
+   * regarded as whitespace (e.g. ESC)
+   * @param in the string to trim
+   * @return the trimmed string.
+   */
+  public static String trimSpaces(String in) {
+    if (in.indexOf(' ') == -1) {
+      return in;
+    }
+    final char[] c = in.toCharArray();
+    int start = 0;
+    while (start < c.length && c[start] == ' ') {
+      start++;
+    }
+    int end = c.length;
+    while (end > start && c[end - 1] == ' ') {
+      end--;
+    }
+    return new String(c, start, end - start);
+  }
 }
