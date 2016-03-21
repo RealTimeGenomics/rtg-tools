@@ -133,6 +133,7 @@ public final class GlobalFlags {
 
   /** Minimum count required in a calibration covariate set before it will be used */
   public static final String QUALITY_CALIBRATION_MIN_EVIDENCE = "com.rtg.variant.quality-calibration-min-evidence";
+  /** Use covariate intersection calibration method */
   public static final String QUALITY_CALIBRATION_COVARIATE_INTERSECTION = "com.rtg.variant.quality-calibration-covariate-intersection";
 
   //Assembler
