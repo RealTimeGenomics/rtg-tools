@@ -152,6 +152,33 @@ public class ReferenceRegionsTest extends TestCase {
     assertFalse(regions.enclosed("alligator", 10));
   }
 
+  private static final String EXPECTED_INTERSECT_1 = ""
+    + String.format("%s\t%d\t%d%n", "monkey", 20, 50)
+    + String.format("%s\t%d\t%d%n", "monkey", 100, 200);
+
+   private static final String EXPECTED_INTERSECT_2 = ""
+    + String.format("%s\t%d\t%d%n", "monkey", 20, 25)
+    + String.format("%s\t%d\t%d%n", "monkey", 30, 40)
+     + String.format("%s\t%d\t%d%n", "monkey", 45, 50);
+
+  public void testIntersect() throws IOException {
+    final String bed = (""
+      + "monkey 20 50 foo" + LS
+      + "monkey 100 200 bar" + LS
+    ).replaceAll(" ", "\t");
+
+    final BedReader reader = new BedReader(new BufferedReader(new StringReader(bed)));
+    final ReferenceRegions regions = ReferenceRegions.regions(reader);
+    regions.intersect(regions);
+    assertEquals(EXPECTED_INTERSECT_1, regions.toString());
+    final ReferenceRegions other = new ReferenceRegions();
+    other.add("monkey", 15, 25);
+    other.add("monkey", 30, 40);
+    other.add("monkey", 45, 55);
+    regions.intersect(other);
+    assertEquals(EXPECTED_INTERSECT_2, regions.toString());
+  }
+
   public void testEmpty() {
     final ReferenceRegions regions = new ReferenceRegions();
     regions.add("monkey", 60, 80);

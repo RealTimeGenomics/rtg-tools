@@ -31,12 +31,15 @@
 package com.rtg.util.intervals;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.rtg.bed.BedRecord;
+import com.rtg.bed.BedWriter;
 import com.rtg.util.io.IOIterator;
 
 /**
@@ -87,6 +90,26 @@ public class ReferenceRegions {
       mSequences.put(name, regions);
     }
     return regions;
+  }
+
+  /**
+   * Modifies this instance to be the intersection of this and provided regions
+   * @param regions regions to intersect with
+   */
+  public void intersect(ReferenceRegions regions) {
+    for (String seq : sequences()) {
+      int outStart = 0;
+      final MergedIntervals theirs = regions.mSequences.get(seq);
+      final MergedIntervals ours = mSequences.get(seq);
+      if (theirs != null) {
+        for (Map.Entry<Integer, Integer> interval : theirs.mIntervals.entrySet()) {
+          final int outEnd = interval.getKey();
+          ours.subtract(outStart, outEnd);
+          outStart = interval.getValue();
+        }
+        ours.subtract(outStart, Integer.MAX_VALUE);
+      }
+    }
   }
 
   /**
@@ -219,4 +242,30 @@ public class ReferenceRegions {
     return map;
   }
 
+  /**
+   * Writes regions out to bed
+   * Note: this method closes the Writer that is wrapped around the stream
+   * @param stream destination for bed
+   * @throws IOException if an IO error occurs
+   */
+  public void toBed(OutputStream stream) throws IOException {
+    try (BedWriter bw = new BedWriter(stream)) {
+      for (Map.Entry<String, MergedIntervals> seq : mSequences.entrySet()) {
+        for (Map.Entry<Integer, Integer> entry : seq.getValue().mIntervals.entrySet()) {
+          bw.write(new BedRecord(seq.getKey(), entry.getKey(), entry.getValue()));
+        }
+      }
+    }
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    for (String s : sequences()) {
+      for (Map.Entry<Integer, Integer> entry : mSequences.get(s).mIntervals.entrySet()) {
+        sb.append(String.format("%s\t%d\t%d%n", s, entry.getKey(), entry.getValue()));
+      }
+    }
+    return sb.toString();
+  }
 }
