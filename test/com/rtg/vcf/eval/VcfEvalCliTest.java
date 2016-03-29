@@ -135,6 +135,12 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
     check("vcfeval_small_tricky3", true, false, false, "--vcf-score-field", "QUAL", "-T", "1", "--sample", "dummy,sample1", "--squash-ploidy", "--ref-overlap");
   }
 
+  public void testNanoTricky4() throws IOException, UnindexableDataException {
+    // Has an insert and delete that cancel, but they are placed on either side of a snp.
+    // Ideally should just choose the snp as baseline TP, but vcfeval currently includes all three variants.
+    endToEnd("vcfeval_small_tricky4", new String[] {"tp.vcf", "tp-baseline.vcf"}, false, "--vcf-score-field", "QUAL", "-T", "1");
+  }
+
   public void testObeyPhasing() throws IOException, UnindexableDataException {
     endToEnd("obeyphasing/obeyphasing", new String[] {"tp.vcf"}, false, "--Xobey-phase=true");
   }
