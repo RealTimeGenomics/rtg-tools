@@ -128,8 +128,11 @@ public final class GlobalFlags {
   /** Minimum phred base quality to consider a piece of evidence. */
   public static final String MIN_BASE_QUALITY = "com.rtg.variant.bayes.Model.min-bq";
 
-  /** Print the details of complex evidence into the developer log. */
+  /** Print the details of complex evidence into screen. */
   public static final String COMPLEX_EVIDENCE_DETAILS = "com.rtg.variant.complex.complex-evidence-details";
+
+  /** Print the details of complex hypotheses into screen. */
+  public static final String COMPLEX_HYPOTHESIS_DETAILS = "com.rtg.variant.complex.complex-hypothesis-details";
 
   /** Minimum count required in a calibration covariate set before it will be used */
   public static final String QUALITY_CALIBRATION_MIN_EVIDENCE = "com.rtg.variant.quality-calibration-min-evidence";
@@ -208,6 +211,7 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_LIMIT, Integer.class, 3);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
     registerFlag(COMPLEX_EVIDENCE_DETAILS);
+    registerFlag(COMPLEX_HYPOTHESIS_DETAILS);
     registerFlag(COMPLEX_CALLER_UNROLL_CG_FLAG, Boolean.class, true);
 
     // Misc calling
