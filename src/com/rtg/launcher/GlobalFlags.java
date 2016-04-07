@@ -139,6 +139,9 @@ public final class GlobalFlags {
   /** Use covariate intersection calibration method */
   public static final String QUALITY_CALIBRATION_COVARIATE_INTERSECTION = "com.rtg.variant.quality-calibration-covariate-intersection";
 
+  /** Use Dirichlet rather than multinomial allele balance calculation. */
+  public static final String DIRICHLET_ALLELE_BALANCE = "com.rtg.variant.bayes.multisample.cancer.dirichlet";
+
   //Assembler
   /** If more than this many hits are seen at a position, skip them all. */
   public static final String ASSEMBLER_MAX_HITS_PER_START_POS_FLAG = "com.rtg.assembler.maxhits";
@@ -221,6 +224,7 @@ public final class GlobalFlags {
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
     registerFlag(QUALITY_CALIBRATION_MIN_EVIDENCE, Integer.class, 10);
     registerFlag(QUALITY_CALIBRATION_COVARIATE_INTERSECTION, Boolean.class, false);
+    registerFlag(DIRICHLET_ALLELE_BALANCE, Boolean.class, false);
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
     // when there are lots of missing values.
