@@ -134,6 +134,12 @@ public final class GlobalFlags {
   /** Print the details of complex hypotheses into screen. */
   public static final String COMPLEX_HYPOTHESIS_DETAILS = "com.rtg.variant.complex.complex-hypothesis-details";
 
+  /** Use new method for computing complex hypothesis priors */
+  public static final String COMPLEX_HYPOTHESIS_NEW_PRIORS = "com.rtg.variant.complex.complex-hypothesis-new-priors";
+
+  /** Adjust complex diploid priors using genome priors and other empirical tweaks */
+  public static final String COMPLEX_HYPOTHESIS_ADJUST_PRIORS = "com.rtg.variant.complex.complex-hypothesis-adjust-priors";
+
   /** Minimum count required in a calibration covariate set before it will be used */
   public static final String QUALITY_CALIBRATION_MIN_EVIDENCE = "com.rtg.variant.quality-calibration-min-evidence";
   /** Use covariate intersection calibration method */
@@ -215,6 +221,8 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
     registerFlag(COMPLEX_EVIDENCE_DETAILS);
     registerFlag(COMPLEX_HYPOTHESIS_DETAILS);
+    registerFlag(COMPLEX_HYPOTHESIS_NEW_PRIORS, Boolean.class, false);
+    registerFlag(COMPLEX_HYPOTHESIS_ADJUST_PRIORS, Boolean.class, true);
     registerFlag(COMPLEX_CALLER_UNROLL_CG_FLAG, Boolean.class, true);
 
     // Misc calling
