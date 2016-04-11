@@ -50,7 +50,7 @@ public enum RocFilter {
     }
 
     @Override
-    String fileName() {
+    public String fileName() {
       return "weighted_roc.tsv";
     }
   },
@@ -145,7 +145,8 @@ public enum RocFilter {
     }
   };
 
-  static final String ROC_EXT = "_roc.tsv";
+  /** The filename extension used for all ROC files */
+  public static final String ROC_EXT = "_roc.tsv";
 
   private final String mBaseFilename;
 
@@ -180,7 +181,7 @@ public enum RocFilter {
    * Get the name of the default output file for this filter
    * @return the output file name
    */
-  String fileName() {
+  public String fileName() {
     if (mBaseFilename != null) {
       return mBaseFilename + ROC_EXT;
     } else {

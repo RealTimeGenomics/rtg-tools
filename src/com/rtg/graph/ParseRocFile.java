@@ -61,6 +61,7 @@ public final class ParseRocFile {
     final ArrayList<String> scores = new ArrayList<>();
 
     String line = null;
+    String scoreName = null;
     try (BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
       String prevScore = null;
       float prevX = 0.0f;
@@ -71,6 +72,11 @@ public final class ParseRocFile {
           if (line.contains("#total")) {
             final String[] parts = line.split("\\s");
             totalVariants = Integer.parseInt(parts[parts.length - 1]);
+          } else if (line.contains("#score field:")) {
+            final String[] parts = line.split("\\s");
+            if (parts.length >= 3) {
+              scoreName = parts[2];
+            }
           }
           continue;
         }
@@ -105,6 +111,8 @@ public final class ParseRocFile {
       throw new NoTalkbackSlimException("Malformed line: " + line + " in \"" + shortName + "\"");
     }
     progressBarDelegate.addFile(lines);
-    return new DataBundle(shortName, points.toArray(new Point2D[points.size()]), scores.toArray(new String[scores.size()]), totalVariants);
+    final DataBundle dataBundle = new DataBundle(shortName, points.toArray(new Point2D[points.size()]), scores.toArray(new String[scores.size()]), totalVariants);
+    dataBundle.setScoreName(scoreName);
+    return dataBundle;
   }
 }

@@ -96,6 +96,7 @@ import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
+import com.rtg.vcf.eval.RocFilter;
 
 /**
  * Starts a new Swing window for displaying {@code Graph2D}s in. The window has
@@ -360,7 +361,7 @@ public class RocPlot {
         final File f = mFileChooser.getSelectedFile();
         if (f != null) {
           try {
-            loadFile(f, f.getCanonicalFile().getParentFile().getName(), true);
+            loadFile(f, null, true);
             updateProgress();
             showCurrentGraph();
           } catch (final IOException | NoTalkbackSlimException e1) {
@@ -609,7 +610,30 @@ public class RocPlot {
 
   private void loadFile(final File f, final String name, boolean showProgress) throws IOException {
     mFileChooserParent = f.getParentFile();
-    final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), name, showProgress);
+    final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getCanonicalPath(), showProgress);
+    if (name != null && name.trim().length() == 0) {
+      data.setTitle(name);
+    } else {
+      final StringBuilder autoname = new StringBuilder();
+      autoname.append(f.getCanonicalFile().getParentFile().getName());
+
+      final String path = f.getCanonicalFile().getName();
+      final int rocIdx = path.indexOf(RocFilter.ROC_EXT);
+      if (rocIdx != -1 && !path.startsWith(RocFilter.ALL.fileName())) {
+        if (autoname.length() > 0) {
+          autoname.append(' ');
+        }
+        autoname.append(path.substring(0, rocIdx));
+      }
+
+      if (data.getScoreName() != null) {
+        if (autoname.length() > 0) {
+          autoname.append(' ');
+        }
+        autoname.append(data.getScoreName());
+      }
+      data.setTitle(autoname.toString());
+    }
     addLine(f.getAbsolutePath(), data);
   }
 

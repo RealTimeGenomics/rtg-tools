@@ -230,9 +230,11 @@ public class RocPlotCli extends AbstractCli {
       outWriter.newLine();
     }
     for (int i = 0; i < fileList.size(); i++) {
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_DATA + (i + 1) + "\" value=\"" + fileList.get(i) + "\">");
+      final File file = fileList.get(i);
+      outWriter.write("      <param name=\"" + RocApplet.PARAM_DATA + (i + 1) + "\" value=\"" + file + "\">");
       outWriter.newLine();
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_NAME + (i + 1) + "\" value=\"" + nameList.get(i) + "\">");
+      final String name = nameList.get(i) != null ? nameList.get(i) : defaultNameFromFile(file);
+      outWriter.write("      <param name=\"" + RocApplet.PARAM_NAME + (i + 1) + "\" value=\"" + name + "\">");
       outWriter.newLine();
     }
     outWriter.write("    </applet>");
@@ -269,7 +271,7 @@ public class RocPlotCli extends AbstractCli {
     if (split.length > 1 && split[1].length() > 0) {
       name = split[1];
     } else {
-      name = defaultNameFromFile(file);
+      name = null;
     }
     return new Pair<>(file, name);
   }
@@ -291,7 +293,7 @@ public class RocPlotCli extends AbstractCli {
     for (final Object o : fileFlag.getValues()) {
       final File file = (File) o;
       fileList.add(file);
-      nameList.add(defaultNameFromFile(file));
+      nameList.add(null);
     }
     assert fileList.size() == nameList.size();
   }

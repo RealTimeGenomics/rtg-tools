@@ -53,6 +53,7 @@ final class DataBundle {
   private Point2D[] mRangedPoints = null;
   private String[] mRangedScores = null;
   private TextPoint2D[] mRangedPosPoints = null;
+  private String mScoreName;
 
   DataBundle(String title, Point2D[] points, String[] labels, int totalVariants) {
     mPoints = points;
@@ -181,5 +182,13 @@ final class DataBundle {
 
   public String getTitle() {
     return mTitle;
+  }
+
+  public void setScoreName(String scoreName) {
+    mScoreName = scoreName;
+  }
+
+  public String getScoreName() {
+    return mScoreName;
   }
 }
