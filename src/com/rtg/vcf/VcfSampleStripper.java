@@ -63,7 +63,7 @@ public class VcfSampleStripper implements VcfAnnotator {
    * @param sampleList the list of sample names
    * @param keep true to keep values in the list, false to remove them
    */
-  VcfSampleStripper(Set<String> sampleList, boolean keep) {
+  public VcfSampleStripper(Set<String> sampleList, boolean keep) {
     mRemoveAll = false;
     mKeepMode = keep;
     mSamples = sampleList;
