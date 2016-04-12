@@ -361,7 +361,7 @@ public class RocPlot {
         final File f = mFileChooser.getSelectedFile();
         if (f != null) {
           try {
-            loadFile(f, null, true);
+            loadFile(f, "", true);
             updateProgress();
             showCurrentGraph();
           } catch (final IOException | NoTalkbackSlimException e1) {
@@ -611,7 +611,7 @@ public class RocPlot {
   private void loadFile(final File f, final String name, boolean showProgress) throws IOException {
     mFileChooserParent = f.getParentFile();
     final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getCanonicalPath(), showProgress);
-    if (name != null && name.trim().length() == 0) {
+    if (name.length() > 0) {
       data.setTitle(name);
     } else {
       final StringBuilder autoname = new StringBuilder();
@@ -737,6 +737,7 @@ public class RocPlot {
         }
       }
     });
+    System.err.println("nameList = " + nameList);
     rp.loadData(fileList, nameList, true);
     SwingUtilities.invokeAndWait(new Runnable() {
       @Override
