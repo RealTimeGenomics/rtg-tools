@@ -221,7 +221,7 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
     registerFlag(COMPLEX_EVIDENCE_DETAILS);
     registerFlag(COMPLEX_HYPOTHESIS_DETAILS);
-    registerFlag(COMPLEX_HYPOTHESIS_NEW_PRIORS, Boolean.class, false);
+    registerFlag(COMPLEX_HYPOTHESIS_NEW_PRIORS, Boolean.class, true);
     registerFlag(COMPLEX_HYPOTHESIS_ADJUST_PRIORS, Boolean.class, true);
     registerFlag(COMPLEX_CALLER_UNROLL_CG_FLAG, Boolean.class, true);
 
