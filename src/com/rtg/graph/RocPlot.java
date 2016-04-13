@@ -737,7 +737,6 @@ public class RocPlot {
         }
       }
     });
-    System.err.println("nameList = " + nameList);
     rp.loadData(fileList, nameList, true);
     SwingUtilities.invokeAndWait(new Runnable() {
       @Override
