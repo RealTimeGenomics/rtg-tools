@@ -69,7 +69,7 @@ public class PedFileParserTest extends TestCase {
 
   public void testToString() throws IOException {
     final GenomeRelationships ped = makeTestPed();
-    mNano.check("pednormal", PedFileParser.toString(ped), true);
+    mNano.check("pednormal", PedFileParser.toString(ped, "with an extra header comment"), true);
   }
 
   public void testFile() throws IOException {

@@ -209,12 +209,21 @@ public final class PedFileParser {
    * all information in the GenomeRelationships, such as extra properties of alternate
    * relationship types.
    * @param pedigree to format as PED
+   * @param commentLines any additional lines to include as comments in the PED header
    * @return the pedigree in a big old string
    */
-  public static String toString(GenomeRelationships pedigree) {
+  public static String toString(GenomeRelationships pedigree, String... commentLines) {
     final StringBuilder sb = new StringBuilder();
-    sb.append("# PED format pedigree").append(StringUtils.LS);
-    sb.append("# fam-id\tind-id\tpat-id\tmat-id\tsex\tphen").append(StringUtils.LS);
+    sb.append("#PED format pedigree").append(StringUtils.LS);
+    sb.append("#").append(StringUtils.LS);
+    for (String comment : commentLines) {
+      sb.append("#").append(comment).append(StringUtils.LS);
+    }
+    sb.append("#fam-id/ind-id/pat-id/mat-id: 0=unknown").append(StringUtils.LS);
+    sb.append("#sex: 1=male; 2=female; 0=unknown").append(StringUtils.LS);
+    sb.append("#phenotype: -9=missing, 0=missing; 1=unaffected; 2=affected").append(StringUtils.LS);
+    sb.append("#").append(StringUtils.LS);
+    sb.append("#fam-id\tind-id\tpat-id\tmat-id\tsex\tphen").append(StringUtils.LS);
     for (final String genome : pedigree.genomes()) {
       final Properties p = pedigree.getProperties(genome);
       sb.append(p.getProperty(FAMILY_ID_PROPERTY, UNKNOWN)).append("\t");
