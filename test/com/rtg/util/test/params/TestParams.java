@@ -80,6 +80,7 @@ public final class TestParams {
   private final Class<?> mBuilder;
   private final Set<String> mExcludeParams;
   private final Set<String> mExcludeBuilder;
+  private final Set<String> mExcludeTypeCheck;
 
   private final StringBuilder mErr = new StringBuilder();
 
@@ -98,6 +99,7 @@ public final class TestParams {
     mErr.append("Builder class ").append(builder.getCanonicalName()).append(StringUtils.LS);
     mExcludeBuilder = new HashSet<>(EXCLUDE_METHODS_BUILDER);
     mExcludeParams = new HashSet<>(EXCLUDE_METHODS_PARAMS);
+    mExcludeTypeCheck = new HashSet<>();
   }
 
   /**
@@ -107,6 +109,16 @@ public final class TestParams {
    */
   public TestParams excludeParams(String method) {
     mExcludeParams.add(method);
+    return this;
+  }
+
+  /**
+   * Add a param that doesn't have the same type in builder
+   * @param field the method name
+   * @return this object, for convenience
+   */
+  public TestParams excludeTypeCheck(String field) {
+    mExcludeTypeCheck.add(field);
     return this;
   }
 
@@ -160,8 +172,10 @@ public final class TestParams {
         error(fieldClass.equals(methodReturnClass), "Params: " + fieldName + " return type of method:" + methodReturnClass.getCanonicalName() + " does not equal type of field:" + fieldClass.getCanonicalName());
       }
       if (containsBuilderField) {
-        final Class<?> fieldBuilderClass = fieldsBuilder.get(fieldName);
-        error(fieldClass.equals(fieldBuilderClass), "Both: " + fieldName + " type of params field:" + fieldClass.getCanonicalName() + " does not equal type of builder field:" + fieldBuilderClass.getCanonicalName());
+        if (!mExcludeTypeCheck.contains(fieldName)) {
+          final Class<?> fieldBuilderClass = fieldsBuilder.get(fieldName);
+          error(fieldClass.equals(fieldBuilderClass), "Both: " + fieldName + " type of params field:" + fieldClass.getCanonicalName() + " does not equal type of builder field:" + fieldBuilderClass.getCanonicalName());
+        }
       }
     }
     for (final String fieldName : fieldBuilderSet) {
