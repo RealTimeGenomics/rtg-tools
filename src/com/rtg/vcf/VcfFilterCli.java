@@ -111,6 +111,7 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String MAX_POSTERIOR_SCORE = "Xmax-posterior-score";
 
   private static final String EXPR_FLAG = "Xexpr";
+  private static final String JS_FLAG = "Xjs";
 
 
   private final VcfFilterTask mVcfFilterTask = new VcfFilterTask();
@@ -194,6 +195,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
     final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "format field expression (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "Arbitrary javascript for determining whether to keep record").setCategory(FILTERING);
 
     mFlags.setValidator(new VcfFilterValidator());
   }
@@ -430,11 +432,9 @@ public final class VcfFilterCli extends AbstractCli {
         mVcfFilterTask.mCheckingSample = true;
       }
     }
-
     mVcfFilterTask.mRemoveOverlapping = mFlags.isSet(REMOVE_OVERLAPPING);
     mVcfFilterTask.mRemoveAllSameAsRef = mFlags.isSet(REMOVE_ALL_SAME_AS_REF);
     mVcfFilterTask.mDensityWindow = mFlags.isSet(DENSITY_WINDOW) ? (Integer) mFlags.getValue(DENSITY_WINDOW) : null;
-
     if (mFlags.isSet(KEEP_FILTER)) {
       for (final Object tag : mFlags.getValues(KEEP_FILTER)) {
         mVcfFilterTask.mKeepFilters.add((String) tag);
@@ -488,7 +488,10 @@ public final class VcfFilterCli extends AbstractCli {
         mVcfFilterTask.mFilters.add(new ExpressionSampleFilter(mVcfFilterTask.mVcfFilterStatistics, e));
       }
     }
-
+    if (mFlags.isSet(JS_FLAG)) {
+      final String expr = (String) mFlags.getValue(JS_FLAG);
+      mVcfFilterTask.mFilters.add(new ScriptedVcfFilter(expr));
+    }
     final File in = (File) mFlags.getValue(INPUT);
     final File out = (File) mFlags.getValue(OUTPUT);
     final boolean gzip = !mFlags.isSet(NO_GZIP);

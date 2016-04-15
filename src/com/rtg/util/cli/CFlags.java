@@ -604,9 +604,9 @@ public final class CFlags {
   }
 
   private void setFlag(final Flag flag, final String strValue) {
-    if (strValue != null && strValue.contains("\n")) {
-      throw new IllegalArgumentException("Value cannot contain new line characters.");
-    }
+//    if (strValue != null && strValue.contains("\n")) {
+//      throw new IllegalArgumentException("Value cannot contain new line characters.");
+//    }
     mReceivedFlags.add(flag.setValue(strValue));
   }
 
