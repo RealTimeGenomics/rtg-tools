@@ -78,7 +78,7 @@ public final class CommandLine {
    * @return the command line as a single string.
    */
   public static String getCommandLine() {
-    return sCommandLine;
+    return sCommandLine != null ? sCommandLine.replaceAll("\n|\r\n", "\\\\n") : null;
   }
 
   /**
