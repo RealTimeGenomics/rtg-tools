@@ -70,6 +70,7 @@
     <fileset dir="${tools.src.dir}">
       <include name="com/**/*.properties"/>
       <include name="com/rtg/report/resources/*"/>
+      <include name="com/rtg/vcf/resources/*"/>
       <include name="com/rtg/mode/BLOSUM45" />
       <include name="com/rtg/mode/BLOSUM62" />
       <include name="com/rtg/mode/BLOSUM80" />

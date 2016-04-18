@@ -104,6 +104,7 @@ class VcfFilterTask {
       if (filter instanceof VcfSampleFilter) {
         ((VcfSampleFilter) filter).setSamples(mSampleIndexes, mSampleFailed);
       }
+      filter.setHeader(header);
     }
     header.addRunInfo();
     if (mFailFilterName != null) {

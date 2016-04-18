@@ -29,11 +29,14 @@
  */
 package com.rtg.vcf;
 
+import java.io.InputStreamReader;
+
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.rtg.util.Resources;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -53,9 +56,9 @@ public class ScriptedVcfFilter implements VcfFilter {
     final ScriptEngineManager manager = new ScriptEngineManager();
     mEngine = manager.getEngineByName("nashorn");
     try {
-      mEngine.eval("function acceptRecord(rec) {" + mScript + "}");
+      mEngine.eval("function acceptRecord(record, script) { rec = record; return eval(script);}");
     } catch (ScriptException e) {
-      throw new NoTalkbackSlimException("Could not evaluate the content of script: '" + mScript + "'");
+      throw new NoTalkbackSlimException("Could not evaluate the content of script: '" + mScript + "' | " + e.getMessage());
     }
   }
 
@@ -63,9 +66,9 @@ public class ScriptedVcfFilter implements VcfFilter {
   public boolean accept(VcfRecord record) {
     final Invocable iv = (Invocable) mEngine;
     try {
-      return Boolean.valueOf(iv.invokeFunction("acceptRecord", record).toString());
+      return Boolean.valueOf(iv.invokeFunction("acceptRecord", record, mScript).toString());
     } catch (ScriptException | NoSuchMethodException e) {
-      throw new NoTalkbackSlimException("Could not evaluate script on record: " + record);
+      throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + " |" + e.getMessage());
     }
   }
 
@@ -73,5 +76,10 @@ public class ScriptedVcfFilter implements VcfFilter {
   public void setHeader(VcfHeader header) {
     mHeader = header;
     mEngine.put("header", mHeader);
+    try {
+      mEngine.eval(new InputStreamReader(Resources.getResourceAsStream("com/rtg/vcf/resources/vcf_filter_preamble.js")));
+    } catch (ScriptException e) {
+      throw new NoTalkbackSlimException("Could not evaluate the content of preamble." + e.getMessage());
+    }
   }
 }
