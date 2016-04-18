@@ -295,6 +295,7 @@ public class VariantStatistics extends AbstractStatistics {
 
     final HashSet<Integer> altAlleles = new HashSet<>();
     final ArrayList<String> denovo = rec.getFormatAndSample().get(VcfUtils.FORMAT_DENOVO);
+    final ArrayList<String> somaticstatus = rec.getFormatAndSample().get(VcfUtils.FORMAT_SOMATIC_STATUS);
     for (int i = 0; i < sampleNames.size(); i++) {
       final String sampleName = sampleNames.get(i);
       if (mOnlySample == null || mOnlySample.contains(sampleName)) {
@@ -305,6 +306,9 @@ public class VariantStatistics extends AbstractStatistics {
           continue;
         }
         final PerSampleVariantStatistics sampleStats = ensurePerSampleStats(sampleName);
+        if ((somaticstatus != null) && "2".equals(somaticstatus.get(i))) {
+          sampleStats.mSomatic++;
+        }
         if ((denovo != null) && "Y".equals(denovo.get(i))) {
           sampleStats.mDeNovo++;
         }

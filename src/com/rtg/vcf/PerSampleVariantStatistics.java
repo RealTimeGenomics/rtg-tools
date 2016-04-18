@@ -56,6 +56,7 @@ public class PerSampleVariantStatistics {
   protected long mHaploid = 0;
   protected long mDeNovo = 0;
   protected long mPhased = 0;
+  protected long mSomatic = 0;
 
   protected long mTotalSnps = 0;
   protected long mTransitions = 0;
@@ -151,6 +152,8 @@ public class PerSampleVariantStatistics {
     names.add("Missing Genotype");
     values.add(mMissingGenotype > 0 ? Long.toString(mMissingGenotype) : null);
     final long totalNonMissingGenotypes = mTotalSnps + mTotalMnps + mTotalInsertions + mTotalDeletions + mTotalIndels + mTotalUnchanged;
+    names.add("Somatic Genotypes");
+    values.add(mSomatic > 0 ? Long.toString(mSomatic) : null);
     names.add("De Novo Genotypes");
     values.add(mDeNovo > 0 ? Long.toString(mDeNovo) : null);
     names.add("Phased Genotypes");

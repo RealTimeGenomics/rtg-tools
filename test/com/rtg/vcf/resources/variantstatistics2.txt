@@ -31,6 +31,8 @@ Insertions                   : 0
 Deletions                    : 4
 Indels                       : 0
 Same as reference            : 3
+Somatic Genotypes            : 1
+De Novo Genotypes            : 1
 SNP Transitions/Transversions: 1.00 (1/1)
 Total Haploid                : 1
 Haploid SNPs                 : 1

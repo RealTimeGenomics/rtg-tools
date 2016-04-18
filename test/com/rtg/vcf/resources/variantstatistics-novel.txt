@@ -27,6 +27,8 @@ Insertions                   : 0
 Deletions                    : 4
 Indels                       : 0
 Same as reference            : 1
+Somatic Genotypes            : 1
+De Novo Genotypes            : 1
 SNP Transitions/Transversions: - (0/0)
 Total Het/Hom ratio          : - (4/0)
 SNP Het/Hom ratio            : - (0/0)
