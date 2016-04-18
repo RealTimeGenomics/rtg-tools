@@ -40,9 +40,18 @@ import com.rtg.vcf.VcfUtils;
  */
 public interface VariantFactory {
 
-  String ALL_FACTORY = "all";
+  /** Name used to select the sample variants factory */
   String SAMPLE_FACTORY = "sample";
 
+  /** Name used to select the all-alts factory */
+  String ALL_FACTORY = "all";
+
+  /**
+   * Resolve the name of the variant factory to use, incorporating flag override if present.
+   * @param type which variant set this factory is for
+   * @param sampleName the user specified sample name, which may be the special value "ALT" to select the all-alts factory.
+   * @return the name of the variant factory to use, either <code>SAMPLE_FACTORY</code> or <code>ALL_FACTORY</code>
+   */
   static String getFactoryName(VariantSetType type, String sampleName) {
     final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
     if (customFactory.length() > 0) {
@@ -53,7 +62,7 @@ public interface VariantFactory {
         return f.length == 1 ? f[0] : f[1];
       }
     } else {
-      return "ALT".equals(sampleName)? ALL_FACTORY : SAMPLE_FACTORY;
+      return "ALT".equals(sampleName) ? ALL_FACTORY : SAMPLE_FACTORY;
     }
   }
 
