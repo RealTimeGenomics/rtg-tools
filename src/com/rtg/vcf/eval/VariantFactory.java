@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
+import com.rtg.launcher.GlobalFlags;
+import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -37,6 +39,23 @@ import com.rtg.vcf.VcfUtils;
  * Creates variants for evaluation from VCF records.
  */
 public interface VariantFactory {
+
+  String ALL_FACTORY = "all";
+  String SAMPLE_FACTORY = "sample";
+
+  static String getFactoryName(VariantSetType type, String sampleName) {
+    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
+    if (customFactory.length() > 0) {
+      final String[] f = StringUtils.split(customFactory, ',');
+      if (type == VariantSetType.BASELINE) {
+        return f[0];
+      } else {
+        return f.length == 1 ? f[0] : f[1];
+      }
+    } else {
+      return "ALT".equals(sampleName)? ALL_FACTORY : SAMPLE_FACTORY;
+    }
+  }
 
   /**
    * Construct a Variant by inspecting a <code>VcfRecord</code> object.

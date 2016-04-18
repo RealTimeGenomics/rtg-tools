@@ -164,11 +164,11 @@ class TabixVcfRecordSet implements VariantSet {
 
   static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
     final boolean explicitHalf = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
-    final String f = VcfEvalTask.getFactoryName(type);
+    final String f = VariantFactory.getFactoryName(type, sampleName);
     switch (f) {
-      case "sample":
+      case VariantFactory.SAMPLE_FACTORY:
         return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitHalf);
-      case "all":
+      case VariantFactory.ALL_FACTORY:
         return new VariantFactory.AllAlts(relaxedRef, explicitHalf);
       default:
         throw new RuntimeException("Could not determine variant factory for " + f);

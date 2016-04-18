@@ -52,7 +52,6 @@ import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
-import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
@@ -118,12 +117,14 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       throw new IllegalStateException("Cannot run two-pass with squash-ploidy set");
     }
     final boolean obeyPhase = params.obeyPhase();
+    final String bvf = VariantFactory.getFactoryName(VariantSetType.BASELINE, params.baselineSample());
+    final String cvf = VariantFactory.getFactoryName(VariantSetType.CALLS, params.callsSample());
     if (params.twoPass()) {
       o = new ArrayList<>();
-      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, false, obeyPhase), getOrientor(VariantSetType.CALLS, false, obeyPhase)));
-      o.add(new Pair<>(getOrientor(VariantSetType.BASELINE, true, obeyPhase), getOrientor(VariantSetType.CALLS, true, obeyPhase)));
+      o.add(new Pair<>(getOrientor(bvf, false, obeyPhase), getOrientor(cvf, false, obeyPhase)));
+      o.add(new Pair<>(getOrientor(bvf, true, obeyPhase), getOrientor(cvf, true, obeyPhase)));
     } else {
-      o = Collections.singletonList(new Pair<>(getOrientor(VariantSetType.BASELINE, params.squashPloidy(), obeyPhase), getOrientor(VariantSetType.CALLS, params.squashPloidy(), obeyPhase)));
+      o = Collections.singletonList(new Pair<>(getOrientor(bvf, params.squashPloidy(), obeyPhase), getOrientor(cvf, params.squashPloidy(), obeyPhase)));
     }
     try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
@@ -173,29 +174,14 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   }
 
 
-  static String getFactoryName(VariantSetType type) {
-    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
-    if (customFactory.length() > 0) {
-      final String[] f = StringUtils.split(customFactory, ',');
-      if (type == VariantSetType.BASELINE) {
-        return f[0];
-      } else {
-        return f.length == 1 ? f[0] : f[1];
-      }
-    } else {
-      return "sample";
-    }
-  }
-
-  static Orientor getOrientor(VariantSetType type, boolean squashPloidy, boolean obeyPhase) {
-    final String f = getFactoryName(type);
-    switch (f) {
-      case "sample":
+  static Orientor getOrientor(String variantFactoryName, boolean squashPloidy, boolean obeyPhase) {
+    switch (variantFactoryName) {
+      case VariantFactory.SAMPLE_FACTORY:
         return squashPloidy ? Orientor.SQUASH_GT : obeyPhase ? Orientor.PHASED : Orientor.UNPHASED;
-      case "all":
+      case VariantFactory.ALL_FACTORY:
         return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
       default:
-        throw new RuntimeException("Could not determine orientor for " + f);
+        throw new RuntimeException("Could not determine orientor for " + variantFactoryName);
     }
   }
 

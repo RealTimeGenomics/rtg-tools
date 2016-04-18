@@ -126,7 +126,7 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
   public void testNanoTricky2() throws IOException, UnindexableDataException {
     // Default of maximizing the sum of baseline and calls variants leaves one out. New path preference includes them all.
     check("vcfeval_small_tricky2", true, false, true, "--vcf-score-field", "QUAL", "-T", "1", "--ref-overlap",
-      "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample"
+      "--sample", "ALT,sample"
     );
   }
 
