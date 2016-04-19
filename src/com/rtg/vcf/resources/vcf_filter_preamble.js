@@ -145,8 +145,3 @@ var props = {
     FILTER: {get: filter},
 };
 Object.defineProperties(this, props);
-
-function acceptRecord(record, script) {
-    rec = record;
-    return eval(script);
-}

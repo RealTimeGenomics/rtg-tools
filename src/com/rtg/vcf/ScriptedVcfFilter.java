@@ -31,7 +31,8 @@ package com.rtg.vcf;
 
 import java.io.InputStreamReader;
 
-import javax.script.Invocable;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -46,6 +47,7 @@ import com.rtg.vcf.header.VcfHeader;
 public class ScriptedVcfFilter implements VcfFilter {
   private final String mScript;
   private final ScriptEngine mEngine;
+  private final CompiledScript mCompile;
   private VcfHeader mHeader;
 
   /**
@@ -54,15 +56,24 @@ public class ScriptedVcfFilter implements VcfFilter {
   public ScriptedVcfFilter(String expression) {
     mScript = expression;
     final ScriptEngineManager manager = new ScriptEngineManager();
-    mEngine = manager.getEngineByName("nashorn");
+    try {
+      mEngine = manager.getEngineByName("js");
+      if (mEngine == null || !(mEngine instanceof Compilable)) {
+        throw new NoTalkbackSlimException("No compatible javascript engine available");
+      }
+      final Compilable compileable = (Compilable) mEngine;
+      mCompile = compileable.compile(expression);
+    } catch (ScriptException e) {
+      throw new NoTalkbackSlimException("Could not evaluate the provided expression" + e.getMessage());
+    }
   }
 
   @Override
   public boolean accept(VcfRecord record) {
-    final Invocable iv = (Invocable) mEngine;
     try {
-      return Boolean.valueOf(iv.invokeFunction("acceptRecord", record, mScript).toString());
-    } catch (ScriptException | NoSuchMethodException e) {
+      mEngine.put("rec", record);
+      return Boolean.valueOf(mCompile.eval().toString());
+    } catch (ScriptException e) {
       throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + " |" + e.getMessage());
     }
   }
