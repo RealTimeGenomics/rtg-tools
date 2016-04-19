@@ -44,6 +44,20 @@ var sample = function (name) {
     return s;
 };
 
+function stringFieldFunction(field) {
+    return function () {
+        var index = sampleLookup[this];
+        return rec.getFormatAndSample().get(field).get(index);
+    }
+}
+
+var stringProps = {};
+for (i = 0; i < formatFields.size(); i++) {
+    var field = formatFields.get(i).getId();
+    stringProps[field] = {get: stringFieldFunction(field)};
+}
+Object.defineProperties(String.prototype, stringProps);
+
 // Declare globally accessible objects for the sample names. If the name is javascript safe then
 // that sample will be accessible by it's raw name without needing to explicitly call sample()
 for (i = 0; i < sampleNames.size(); i++) {

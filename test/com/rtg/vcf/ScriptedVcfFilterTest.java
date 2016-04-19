@@ -107,7 +107,10 @@ public class ScriptedVcfFilterTest extends TestCase {
     record.addFormatAndSample("GT", "0/1");
     record.addFormatAndSample("GT", "1/1");
     assertTrue(getScriptedVcfFilter("BOB.GT == '0/1'", header).accept(record));
+    // Via sample function
     assertTrue(getScriptedVcfFilter("sample('FRANK-2').GT == '1/1'", header).accept(record));
+    // Via string prototype
+    assertTrue(getScriptedVcfFilter("'FRANK-2'.GT == '1/1'", header).accept(record));
   }
 
   public void testMissing() {
@@ -158,4 +161,9 @@ public class ScriptedVcfFilterTest extends TestCase {
     assertTrue(getScriptedVcfFilter("INFO.IN == 'FOO'").accept(record));
   }
 
+  public void testStringFilter() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addFormatAndSample("GT", "0/1");
+    assertTrue(getScriptedVcfFilter("'BOB'.GT == '0/1'").accept(record));
+  }
 }
