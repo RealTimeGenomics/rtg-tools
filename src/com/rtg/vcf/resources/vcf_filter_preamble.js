@@ -23,7 +23,8 @@ function listToArray(list) {
 var formatFields = header.getFormatLines();
 function fieldFunction(field, sampleIndex) {
       return function () {
-        return rec.getFormatAndSample().get(field).get(sampleIndex);
+        var fields = rec.getFormatAndSample().get(field);
+        return fields == null ? "." : fields.get(sampleIndex);
       }
 }
 
@@ -56,7 +57,7 @@ function infoFunction(field) {
   return function () {
     var infoList = rec.getInfo().get(field);
     if (infoList == null) {
-      return null;
+      return ".";
     }
     var info = [];
     for (i = 0; i < infoList.size(); i++) {

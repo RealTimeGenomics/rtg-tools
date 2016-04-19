@@ -57,8 +57,12 @@ public class ScriptedVcfFilterTest extends TestCase {
   }
 
   private ScriptedVcfFilter getScriptedVcfFilter(String expression) {
+    return getScriptedVcfFilter(expression, getVcfHeader());
+  }
+
+  private ScriptedVcfFilter getScriptedVcfFilter(String expression, VcfHeader header) {
     final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression);
-    scriptedVcfFilter.setHeader(getVcfHeader());
+    scriptedVcfFilter.setHeader(header);
     return scriptedVcfFilter;
   }
 
@@ -70,6 +74,7 @@ public class ScriptedVcfFilterTest extends TestCase {
 
   public void testPreambleAlts() {
     final VcfRecord record = new VcfRecord("blah", 1, "A");
+    record.setNumberOfSamples(1);
     record.addAltCall("G");
     record.addAltCall("T");
     assertTrue(getScriptedVcfFilter("ALT.indexOf('T') > -1").accept(record));
@@ -79,9 +84,31 @@ public class ScriptedVcfFilterTest extends TestCase {
 
   public void testSampleFormats() {
     final VcfRecord record = new VcfRecord("blah", 1, "A");
+    record.addAltCall("G");
+    record.setNumberOfSamples(1);
     record.addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("BOB.GT == '0/1'").accept(record));
     assertFalse(getScriptedVcfFilter("BOB.GT == '1/0'").accept(record));
+    assertFalse(getScriptedVcfFilter("FRANK.GT == '1/0'").accept(record));
+  }
+
+  public void testWeirdSampleFormats() {
+    final VcfHeader header = getVcfHeader();
+    header.addSampleName("FRANK-2");
+    final VcfRecord record = new VcfRecord("blah", 1, "A");
+    record.addAltCall("G");
+    record.setNumberOfSamples(2);
+    record.addFormatAndSample("GT", "0/1");
+    record.addFormatAndSample("GT", "1/1");
+    assertTrue(getScriptedVcfFilter("BOB.GT == '0/1'", header).accept(record));
+    assertTrue(getScriptedVcfFilter("sample('FRANK-2').GT == '1/1'", header).accept(record));
+  }
+
+  public void testMissing() {
+    final VcfRecord record = new VcfRecord("blah", 1, "A");
+    record.addAltCall("G");
+    assertFalse(getScriptedVcfFilter("BOB.GT == '0/1'").accept(record));
+    assertTrue(getScriptedVcfFilter("BOB.GT == '.'").accept(record));
   }
 
   public void testChrom() {
