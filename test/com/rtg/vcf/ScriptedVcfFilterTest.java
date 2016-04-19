@@ -30,6 +30,7 @@
 
 package com.rtg.vcf;
 
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -89,7 +90,12 @@ public class ScriptedVcfFilterTest extends TestCase {
     record.addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("BOB.GT == '0/1'").accept(record));
     assertFalse(getScriptedVcfFilter("BOB.GT == '1/0'").accept(record));
-    assertFalse(getScriptedVcfFilter("FRANK.GT == '1/0'").accept(record));
+    try {
+      getScriptedVcfFilter("FRANK.GT == '1/0'").accept(record);
+      fail();
+    } catch (NoTalkbackSlimException e) {
+      // Expected
+    }
   }
 
   public void testWeirdSampleFormats() {
