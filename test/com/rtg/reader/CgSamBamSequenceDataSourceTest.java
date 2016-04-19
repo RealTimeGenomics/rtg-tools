@@ -44,7 +44,6 @@ import com.rtg.util.test.FileHelper;
 public class CgSamBamSequenceDataSourceTest extends AbstractNanoTest {
 
   public void testSdf2CgVersion2() throws Exception {
-    System.err.println(this.getClass().getClassLoader().getResource("rtg-license.txt"));
     try (final TestDirectory tempDir = new TestDirectory("sdf2cg")) {
       final File sdf = new File(tempDir, "sdf");
       final File sample = new File(tempDir, "sample.sam.gz");
