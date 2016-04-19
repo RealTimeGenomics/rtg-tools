@@ -45,7 +45,6 @@ import com.rtg.vcf.header.VcfHeader;
  * Filter than runs supplied Javascript to determine if record should be accepted
  */
 public class ScriptedVcfFilter implements VcfFilter {
-  private final String mScript;
   private final ScriptEngine mEngine;
   private final CompiledScript mCompile;
   private VcfHeader mHeader;
@@ -54,7 +53,6 @@ public class ScriptedVcfFilter implements VcfFilter {
    * @param expression script to run to determine if record should be accepted
    */
   public ScriptedVcfFilter(String expression) {
-    mScript = expression;
     final ScriptEngineManager manager = new ScriptEngineManager();
     try {
       mEngine = manager.getEngineByName("js");
