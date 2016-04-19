@@ -74,12 +74,14 @@ public class ReferenceGenome {
   public static final String REFERENCE_DEFAULT_HAPLOID = "#Default haploid\nversion 0\neither\tdef\thaploid\tlinear\n";
 
   /**
-   * Default fall-back method enumeration
+   * Possible values that may be used to override reference file based ploidy
    */
-  public enum DefaultFallback {
-    /** Use diploid default reference */
+  public enum ReferencePloidy {
+    /** Use whatever ploidy is specified by the reference text, or fall back to diploid if none */
+    AUTO,
+    /** Use reference genome with diploid ploidy */
     DIPLOID,
-    /** Use haploid default reference */
+    /** Use reference genome with haploid ploidy */
     HAPLOID
   }
 
@@ -102,31 +104,27 @@ public class ReferenceGenome {
    *
    * @param genome SDF containing sequences and reference specification file.
    * @param sex for this instance.
-   * @param fallback create a default ReferenceGenome of the given type when no reference file is present, if null and there is no reference an error will be thrown
+   * @param fallback if set, create a default ReferenceGenome of the given type
    * @throws IOException when actual I/O error or problems in file definition.
    */
-  public ReferenceGenome(final SequencesReader genome, final Sex sex, DefaultFallback fallback) throws IOException {
+  public ReferenceGenome(final SequencesReader genome, final Sex sex, ReferencePloidy fallback) throws IOException {
     try (BufferedReader r = getReferenceReader(genome, fallback)) {
       parse(ReaderUtils.getSequenceLengthMap(genome), r, sex);
     }
   }
 
-  private static BufferedReader getReferenceReader(SequencesReader genome, DefaultFallback fallback) throws IOException {
+  private static BufferedReader getReferenceReader(SequencesReader genome, ReferencePloidy fallback) throws IOException {
     final BufferedReader r;
     final File ref = new File(genome.path(), REFERENCE_FILE);
-    if (ref.exists()) {
+    if (fallback == ReferencePloidy.DIPLOID) {
+      r = new BufferedReader(new StringReader(REFERENCE_DEFAULT_DIPLOID));
+    } else if (fallback == ReferencePloidy.HAPLOID) {
+      r = new BufferedReader(new StringReader(REFERENCE_DEFAULT_HAPLOID));
+    } else if (ref.exists()) {
       final InputStreamReader isr = new InputStreamReader(new BufferedInputStream(new FileInputStream(ref)));
       r = new BufferedReader(isr);
-    } else if (fallback == DefaultFallback.DIPLOID) {
-      r = new BufferedReader(new StringReader(REFERENCE_DEFAULT_DIPLOID));
-    } else if (fallback == DefaultFallback.HAPLOID) {
-      r = new BufferedReader(new StringReader(REFERENCE_DEFAULT_HAPLOID));
     } else {
-      if (genome.path() != null) {
-        throw new IOException("No reference file contained in: " + genome.path().getPath());
-      } else {
-        throw new IOException("No reference file found");
-      }
+      r = new BufferedReader(new StringReader(REFERENCE_DEFAULT_DIPLOID));
     }
     return r;
   }

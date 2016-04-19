@@ -40,7 +40,7 @@ import java.io.IOException;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
-import com.rtg.reference.ReferenceGenome.DefaultFallback;
+import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.util.io.TestDirectory;
@@ -57,7 +57,7 @@ public class SexMemoTest extends TestCase {
     Diagnostic.setLogStream();
     try (final TestDirectory genomeDir = new TestDirectory("sexmemo")) {
       try (SequencesReader reader = ReaderTestUtils.getReaderDNA(">t\nacgt", genomeDir, null)) {
-        final SexMemo sx = new SexMemo(reader, DefaultFallback.DIPLOID);
+        final SexMemo sx = new SexMemo(reader, ReferencePloidy.DIPLOID);
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.EITHER, "t"));
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
@@ -71,7 +71,7 @@ public class SexMemoTest extends TestCase {
     Diagnostic.setLogStream();
     try (final TestDirectory genomeDir = new TestDirectory("sexmemo")) {
       try (SequencesReader reader = ReaderTestUtils.getReaderDNA(">t\nacgt", genomeDir, null)) {
-        final SexMemo sx = new SexMemo(reader, DefaultFallback.HAPLOID);
+        final SexMemo sx = new SexMemo(reader, ReferencePloidy.HAPLOID);
         assertEquals(Ploidy.HAPLOID, sx.getEffectivePloidy(Sex.EITHER, "t"));
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.HAPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
@@ -86,7 +86,7 @@ public class SexMemoTest extends TestCase {
     try (final TestDirectory tempDir = new TestDirectory("sexmemo")) {
       final File genomeDir = ReaderTestUtils.getDNADir(">t\nacgt", tempDir, false, true, true);
       try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(genomeDir)) {
-        final SexMemo sx = new SexMemo(reader, DefaultFallback.HAPLOID);
+        final SexMemo sx = new SexMemo(reader, ReferencePloidy.AUTO);
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.EITHER, "t"));
         assertEquals(Ploidy.NONE, sx.getEffectivePloidy(Sex.EITHER, "unknown"));
         assertEquals(Ploidy.DIPLOID, sx.getEffectivePloidy(Sex.MALE, "t"));
@@ -113,7 +113,7 @@ public class SexMemoTest extends TestCase {
             + LS).getBytes());
       }
       try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(genomeDir)) {
-        final SexMemo sx = new SexMemo(reader, DefaultFallback.HAPLOID);
+        final SexMemo sx = new SexMemo(reader, ReferencePloidy.AUTO);
 
         assertEquals(Ploidy.DIPLOID, sx.getRealPloidy(Sex.EITHER, "s1"));
         assertEquals(Ploidy.NONE, sx.getRealPloidy(Sex.EITHER, "unknown"));

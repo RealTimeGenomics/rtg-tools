@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.rtg.reader.SequencesReader;
-import com.rtg.reference.ReferenceGenome.DefaultFallback;
+import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.util.Pair;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -67,10 +67,10 @@ public class SexMemo {
    * Remember information from command line and reference file to enable ploidy of a sequence to be determined given the
    * sex of a sample.
    * @param reader sequences reader
-   * @param ploidy default ploidy
+   * @param ploidy default ploidy behaviour
    * @throws IOException whenever.
    */
-  public SexMemo(final SequencesReader reader, final DefaultFallback ploidy) throws IOException {
+  public SexMemo(final SequencesReader reader, final ReferencePloidy ploidy) throws IOException {
     final Sex[] sexValues = Sex.values();
     mReferences = new ReferenceGenome[sexValues.length];
     mParMap = new MyFrickenMap[sexValues.length];

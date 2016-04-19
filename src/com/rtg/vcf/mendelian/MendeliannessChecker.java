@@ -45,7 +45,7 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
-import com.rtg.reference.ReferenceGenome.DefaultFallback;
+import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.reference.SexMemo;
 import com.rtg.relation.Family;
 import com.rtg.relation.GenomeRelationships;
@@ -136,7 +136,7 @@ CommonFlags.initNoGzip(mFlags);
   private SexMemo getSexMemo() throws IOException {
     final SexMemo sexMemo;
     try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG))) {
-      sexMemo = new SexMemo(reader, DefaultFallback.DIPLOID);
+      sexMemo = new SexMemo(reader, ReferencePloidy.AUTO);
     }
     return sexMemo;
   }

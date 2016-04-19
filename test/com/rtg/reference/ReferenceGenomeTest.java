@@ -46,7 +46,7 @@ import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
-import com.rtg.reference.ReferenceGenome.DefaultFallback;
+import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
@@ -155,7 +155,7 @@ public class ReferenceGenomeTest extends TestCase {
         } catch (IOException e) {
           assertEquals("No reference file contained in: " + dir.getPath(), e.getMessage());
         }
-        ReferenceGenome rg = new ReferenceGenome(sr, Sex.EITHER, DefaultFallback.DIPLOID);
+        ReferenceGenome rg = new ReferenceGenome(sr, Sex.EITHER, ReferencePloidy.DIPLOID);
         final String[] rgStrings = new String[3];
         final StringBuilder rgString = new StringBuilder();
         Iterator<ReferenceSequence> it = rg.sequences().iterator();
@@ -168,7 +168,7 @@ public class ReferenceGenomeTest extends TestCase {
         assertEquals(rgString.toString(), rg.toString());
         assertFalse(it.hasNext());
 
-        rg = new ReferenceGenome(sr, Sex.EITHER, DefaultFallback.HAPLOID);
+        rg = new ReferenceGenome(sr, Sex.EITHER, ReferencePloidy.HAPLOID);
         rgString.setLength(0);
         it = rg.sequences().iterator();
         for (int i = 0; i < 3; i++) {
