@@ -64,7 +64,7 @@ public class VariantStatistics extends AbstractStatistics {
 
   protected long mTotalFiltered = 0;
   protected long mTotalNoGenotype = 0;
-  protected long mTotalVariants = 0; // Does not include filtered or no-call records.
+  protected long mTotalPassed = 0; // Does not include filtered or no-call records.
 
   protected long mComplexCalled = 0;
 
@@ -135,6 +135,18 @@ public class VariantStatistics extends AbstractStatistics {
     return sb.toString();
   }
 
+  public long getTotalPassed() {
+    return mTotalPassed;
+  }
+
+  public long getTotalFiltered() {
+    return mTotalFiltered;
+  }
+
+  public long getExcessCoverage() {
+    return mExcessCoverage;
+  }
+
   public void setExcessiveCoverageCount(final long excessCoverage) {
     mExcessCoverage = excessCoverage;
   }
@@ -190,7 +202,7 @@ public class VariantStatistics extends AbstractStatistics {
       values.add(Long.toString(mNoHypotheses));
     }
     names.add("Passed Filters");
-    values.add(Long.toString(mTotalVariants));
+    values.add(Long.toString(mTotalPassed));
     if (mTotalNoGenotype > 0) {
       names.add("No Genotypes");
       values.add(Long.toString(mTotalNoGenotype));
@@ -280,7 +292,7 @@ public class VariantStatistics extends AbstractStatistics {
       mTotalFiltered++;
       return;
     }
-    mTotalVariants++;
+    mTotalPassed++;
     final ArrayList<String> gts = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
     if (gts == null) {
       mTotalNoGenotype++;
