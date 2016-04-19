@@ -55,11 +55,6 @@ public class ScriptedVcfFilter implements VcfFilter {
     mScript = expression;
     final ScriptEngineManager manager = new ScriptEngineManager();
     mEngine = manager.getEngineByName("nashorn");
-    try {
-      mEngine.eval("function acceptRecord(record, script) { rec = record; return eval(script);}");
-    } catch (ScriptException e) {
-      throw new NoTalkbackSlimException("Could not evaluate the content of script: '" + mScript + "' | " + e.getMessage());
-    }
   }
 
   @Override

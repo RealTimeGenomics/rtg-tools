@@ -76,47 +76,62 @@ for (i = 0; i < infoFields.size(); i++) {
 /**
  * Fetch the pos from the current record
  */
-function POS() {
+function pos() {
   return rec.getOneBasedStart();
 }
 
 /**
  * Fetch the CHROM from the current record
  */
-function CHROM() {
+function chrom() {
   return rec.getSequenceName();
 }
 
 /**
  * Fetch the REF from the current record
  */
-function REF() {
+function ref() {
   return rec.getRefCall();
 }
 /**
  * Fetch the Alts as an array
  */
-function ALTS() {
+function alt() {
     return listToArray(rec.getAltCalls());
 }
 
 /**
  * Fetch the QUAL from the current record
  */
-function QUAL() {
+function qual() {
     return rec.getQuality();
 }
 
 /**
  * Fetch the FILTER from the current record
  */
-function FILTER() {
+function filter() {
     return listToArray(rec.getFilters());
 }
 
 /**
  * Fetch the ID from the current record
  */
-function ID() {
+function id() {
     return rec.getId();
+}
+var props = {
+    CHROM: {get: chrom},
+    POS: {get: pos},
+    ID: {get: id},
+    REF: {get: ref},
+    ALT: {get: alt},
+    QUAL: {get: qual},
+    FILTER: {get: filter},
+};
+Object.defineProperties(this, props);
+
+function acceptRecord(record, script) {
+    rec = record;
+    return eval(script);
 }

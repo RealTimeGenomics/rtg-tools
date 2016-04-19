@@ -63,9 +63,7 @@ public class ScriptedVcfFilterTest extends TestCase {
   }
 
   public void testPreambleRef() {
-    final ScriptedVcfFilter filter = getScriptedVcfFilter("REF() == 'A'");
-    final VcfHeader header = getVcfHeader();
-    filter.setHeader(header);
+    final ScriptedVcfFilter filter = getScriptedVcfFilter("REF == 'A'");
     assertTrue(filter.accept(new VcfRecord("blah", 1, "A")));
     assertFalse(filter.accept(new VcfRecord("blah", 1, "C")));
   }
@@ -74,9 +72,9 @@ public class ScriptedVcfFilterTest extends TestCase {
     final VcfRecord record = new VcfRecord("blah", 1, "A");
     record.addAltCall("G");
     record.addAltCall("T");
-    assertTrue(getScriptedVcfFilter("ALTS().indexOf('T') > -1").accept(record));
-    assertFalse(getScriptedVcfFilter("ALTS().indexOf('C') > -1").accept(record));
-    assertTrue(getScriptedVcfFilter("ALTS().length == 2").accept(record));
+    assertTrue(getScriptedVcfFilter("ALT.indexOf('T') > -1").accept(record));
+    assertFalse(getScriptedVcfFilter("ALT.indexOf('C') > -1").accept(record));
+    assertTrue(getScriptedVcfFilter("ALT.length == 2").accept(record));
   }
 
   public void testSampleFormats() {
@@ -89,35 +87,35 @@ public class ScriptedVcfFilterTest extends TestCase {
   public void testChrom() {
     // Pos is one based
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    assertFalse(getScriptedVcfFilter("CHROM() == 'chrom'").accept(record));
-    assertTrue(getScriptedVcfFilter("CHROM() == 'blah'").accept(record));
+    assertFalse(getScriptedVcfFilter("CHROM == 'chrom'").accept(record));
+    assertTrue(getScriptedVcfFilter("CHROM == 'blah'").accept(record));
   }
   public void testPos() {
     // Pos is one based
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    assertFalse(getScriptedVcfFilter("POS() == 0").accept(record));
-    assertTrue(getScriptedVcfFilter("POS() == 1").accept(record));
-    assertFalse(getScriptedVcfFilter("POS() == 2").accept(record));
+    assertFalse(getScriptedVcfFilter("POS == 0").accept(record));
+    assertTrue(getScriptedVcfFilter("POS == 1").accept(record));
+    assertFalse(getScriptedVcfFilter("POS == 2").accept(record));
   }
 
   public void testQual() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setQuality("100");
-    assertFalse(getScriptedVcfFilter("QUAL() == 10").accept(record));
-    assertTrue(getScriptedVcfFilter("QUAL() == 100").accept(record));
+    assertFalse(getScriptedVcfFilter("QUAL == 10").accept(record));
+    assertTrue(getScriptedVcfFilter("QUAL == 100").accept(record));
   }
   public void testId() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setId("VAR1");
-    assertFalse(getScriptedVcfFilter("ID() == 'VAR2'").accept(record));
-    assertTrue(getScriptedVcfFilter("ID() == 'VAR1'").accept(record));
+    assertFalse(getScriptedVcfFilter("ID == 'VAR2'").accept(record));
+    assertTrue(getScriptedVcfFilter("ID == 'VAR1'").accept(record));
   }
 
   public void testFilter() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addFilter("FAIL");
-    assertFalse(getScriptedVcfFilter("FILTER().indexOf('PASS') > -1").accept(record));
-    assertTrue(getScriptedVcfFilter("FILTER().indexOf('FAIL') > -1").accept(record));
+    assertFalse(getScriptedVcfFilter("FILTER.indexOf('PASS') > -1").accept(record));
+    assertTrue(getScriptedVcfFilter("FILTER.indexOf('FAIL') > -1").accept(record));
   }
 
   public void testInfo() {
