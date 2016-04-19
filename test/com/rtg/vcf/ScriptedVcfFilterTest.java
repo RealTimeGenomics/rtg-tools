@@ -166,4 +166,14 @@ public class ScriptedVcfFilterTest extends TestCase {
     record.addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("'BOB'.GT == '0/1'").accept(record));
   }
+
+  public void testComplexExpression() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.setNumberOfSamples(1);
+    record.addInfo("IN", "FOO");
+    record.addFormatAndSample("GT", "0/1");
+    // Check multiple js expressions variable assignment etc
+    assertTrue(getScriptedVcfFilter("gt = 'BOB'.GT; foo = INFO.IN == 'FOO'; foo && REF == 'A' && gt == '0/1'").accept(record));
+    assertFalse(getScriptedVcfFilter("gt = 'BOB'.GT; foo = INFO.IN == 'FOO'; !foo && REF == 'A' && gt == '0/1'").accept(record));
+  }
 }
