@@ -160,6 +160,10 @@ public class ScriptedVcfFilterTest extends TestCase {
     assertFalse(getScriptedVcfFilter("INFO.IN == 'BAR'").accept(record));
     assertTrue(getScriptedVcfFilter("INFO.IN == 'FOO'").accept(record));
   }
+  public void testMissingInfo() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    assertTrue(getScriptedVcfFilter("INFO.IN == '.'").accept(record));
+  }
 
   public void testStringFilter() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
