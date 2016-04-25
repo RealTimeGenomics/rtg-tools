@@ -279,7 +279,7 @@ public class CommandLineFiles {
     }
     return true;
   }
-  
+
   /**
    * Log an error in file validation.
    * @param type the type of error detected
@@ -319,7 +319,8 @@ public class CommandLineFiles {
     }
 
     if (mListFileFlag != null && flags.isSet(mListFileFlag)) {
-      try (BufferedReader br = new BufferedReader(new FileReader((File) flags.getValue(mListFileFlag)))) {
+      final File listFile = (File) flags.getValue(mListFileFlag);
+      try (BufferedReader br = new BufferedReader(new FileReader(listFile))) {
         for (String line = br.readLine(); line != null; line = br.readLine()) {
           line = line.trim();
           if ((line.length() > 0) && !line.startsWith("#")) {
@@ -337,6 +338,26 @@ public class CommandLineFiles {
 
     if (mErrorCount > 0) {
       throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "There were " + mErrorCount + " invalid input file paths");
+    }
+    return files;
+  }
+
+  /**
+   * Just read a list of files into a collection
+   * @param listFile file containing list of files
+   * @return the list of files
+   * @throws IOException if an IO error occurs
+   */
+  public static Collection<File> getFileList(File listFile) throws IOException {
+    final List<File> files = new ArrayList<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(listFile))) {
+      for (String line = br.readLine(); line != null; line = br.readLine()) {
+        line = line.trim();
+        if ((line.length() > 0) && !line.startsWith("#")) {
+          final File f = new File(line);
+          files.add(f);
+        }
+      }
     }
     return files;
   }
