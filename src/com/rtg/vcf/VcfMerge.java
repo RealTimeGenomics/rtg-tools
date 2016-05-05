@@ -61,7 +61,6 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.gzip.GzipUtils;
 import com.rtg.util.intervals.RegionRestriction;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
@@ -118,7 +117,7 @@ public class VcfMerge extends AbstractCli {
     public boolean isValid(final CFlags flags) {
       final File o = (File) flags.getValue(OUTPUT_FLAG);
       if (!CommonFlags.isStdio(o)) {
-        final File output = FileUtils.getZippedFileName(!flags.isSet(CommonFlags.NO_GZIP), o);
+        final File output = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), o);
         if (output.exists()) {
           flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
           return false;
@@ -186,7 +185,7 @@ public class VcfMerge extends AbstractCli {
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 
     final boolean stdout = CommonFlags.isStdio(outFile);
-    final File vcfFile = stdout ? null : FileUtils.getZippedFileName(gzip, outFile);
+    final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
     try (VcfWriter w = new VcfWriter(header, vcfFile, output, gzip, index)) {
       final ZipperCallback callback = new ZipperCallback() {
         @Override

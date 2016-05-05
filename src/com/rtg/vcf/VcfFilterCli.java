@@ -499,7 +499,7 @@ public final class VcfFilterCli extends AbstractCli {
     final boolean stdout = CommonFlags.isStdio(out);
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
-      final File vcfFile = stdout ? null : FileUtils.getZippedFileName(gzip, out);
+      final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, out);
       try (VcfWriter w = new VcfWriter(r.getHeader(), vcfFile, output, gzip, index)) {
         mVcfFilterTask.filterVcf(r, w);
       }

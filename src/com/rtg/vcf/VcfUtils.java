@@ -500,7 +500,7 @@ public final class VcfUtils {
    * @return true if the GT is heterozygous
    */
   public static boolean isHeterozygous(int[] gt) {
-    return gt.length != 1 && gt[0] != gt[1];
+    return gt.length == 2 && gt[0] != gt[1];
   }
 
   /**

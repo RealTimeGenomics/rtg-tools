@@ -48,7 +48,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.annotation.DerivedAnnotations;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -132,7 +131,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
       }
       final File o = (File) flags.getValue(CommonFlags.OUTPUT_FLAG);
       if (!CommonFlags.isStdio(o)) {
-        final File output = FileUtils.getZippedFileName(!flags.isSet(CommonFlags.NO_GZIP), o);
+        final File output = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), o);
         if (output.exists()) {
           flags.setParseMessage("The file \"" + output.getPath() + "\" already exists. Please remove it first or choose a different file");
           return false;
@@ -207,7 +206,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
         annotator.updateHeader(header);
       }
       header.addRunInfo();
-      final File vcfFile = stdout ? null : FileUtils.getZippedFileName(gzip, output);
+      final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
       try (VcfWriter writer = new VcfWriter(header, vcfFile, out, gzip, index)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();

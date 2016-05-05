@@ -71,7 +71,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
   public void testValidator() throws IOException {
     final File temp = FileUtils.createTempDir("validator", "test");
     try {
-      final File fake = new File(temp, "fake.txt");
+      final File fake = new File(temp, "fake.vcf");
       assertTrue(fake.createNewFile());
       TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", "blahInput").replaceAll("\\s+", " "), "Given file \"blahInput\" does not exist.");
       TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", temp.getPath()).replaceAll("\\s+", " "), "Given file \"" + temp.getPath() + "\" is a directory.");

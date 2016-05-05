@@ -51,7 +51,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.IdField;
@@ -152,7 +151,7 @@ public class VcfSubset extends AbstractCli {
       }
       final File o = (File) flags.getValue(OUTPUT);
       if (!CommonFlags.isStdio(o)) {
-        final File output = FileUtils.getZippedFileName(!flags.isSet(NO_GZIP), o);
+        final File output = VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), o);
         if (output.exists()) {
           flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
           return false;
@@ -257,7 +256,7 @@ public class VcfSubset extends AbstractCli {
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
-    final File vcfFile = stdout ? null : FileUtils.getZippedFileName(gzip, output);
+    final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
     try (final VcfReader reader = VcfReader.openVcfReader(input)) {
       final VcfHeader header = reader.getHeader();
 

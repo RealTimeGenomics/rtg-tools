@@ -124,7 +124,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
     try {
       final File in = new File(main, "input");
       FileUtils.stringToFile(INPUT1, in);
-      final File out = new File(main, "out");
+      final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-Z", "-p", "5.0");
 
@@ -153,7 +153,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
     try (final TestDirectory main = new TestDirectory()) {
       final File in = new File(main, "input");
       FileUtils.stringToFile(INPUT3, in);
-      final File out = new File(main, "out");
+      final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-d", "9", "-Z");
 
@@ -169,7 +169,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
     try (final TestDirectory main = new TestDirectory()) {
       final File in = new File(main, "input");
       FileUtils.stringToFile(INPUT3, in);
-      final File out = new File(main, "out");
+      final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-c", "9", "-Z");
 
@@ -193,7 +193,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
     try (final TestDirectory main = new TestDirectory()) {
       final File in = new File(main, "input");
       FileUtils.stringToFile(INPUT4, in);
-      final File out = new File(main, "out");
+      final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-d", "9", "-Z");
 
@@ -329,7 +329,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final String snps = FileUtils.streamToString(stream);
         FileUtils.stringToFile(snps, in);
       }
-      final File out = new File(dir, "out");
+      final File out = new File(dir, "out.vcf");
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-Z", "-d", "4", "-D", "6", "-p", "0.49", "-P", "1.21");
 
       final String o = FileUtils.fileToString(out);
@@ -360,7 +360,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final String snps = FileUtils.streamToString(stream);
         FileUtils.stringToFile(snps, in);
       }
-      final File out = new File(dir, "out");
+      final File out = new File(dir, "out.vcf");
       final String[] args = {
           "-i", in.getPath(), "-o", out.getPath(), "-Z",
       };
@@ -386,7 +386,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final String snps = FileUtils.streamToString(stream);
         FileUtils.stringToFile(snps, in);
       }
-      final File out = new File(dir, "out");
+      final File out = new File(dir, "out.vcf");
       final String[] args = {
         "-i", in.getPath(), "-o", out.getPath(), "-Z",
       };

@@ -120,8 +120,8 @@ public class VcfSubsetTest extends AbstractCliTest {
     try (TestDirectory main = new TestDirectory()) {
       final File in = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(main, "vcf.vcf.gz"));
       final File foo = new File(main, "foo");
-      final File out = new File(main, "out.gz");
-      final File out2 = new File(main, "out.txt");
+      final File out = new File(main, "out.vcf.gz");
+      final File out2 = new File(main, "out.vcf");
       String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), "Given file ", " does not exist.");
 
@@ -129,7 +129,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
 
       assertTrue(out.createNewFile());
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "out").getPath());
+      err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "out.vcf").getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out.getPath() + "\" already exists");
 
       assertTrue(out2.createNewFile());
