@@ -68,6 +68,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   static final String MODE_ANNOTATE = "annotate";
   static final String MODE_COMBINE = "combine";
   static final String MODE_SPLIT = "split";
+  static final String MODE_PHASE_TRANSFER = "phase-transfer";
   static final String MODE_RECODE = "recode";
   static final String MODE_ALLELES = "alleles";
 
@@ -157,6 +158,12 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
           throw new UnsupportedOperationException();
         }
         processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
+        break;
+      case MODE_PHASE_TRANSFER:
+        if (params.squashPloidy() || params.twoPass()) {
+          throw new UnsupportedOperationException();
+        }
+        processor = new PhaseTransferEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_ANNOTATE:
         processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());

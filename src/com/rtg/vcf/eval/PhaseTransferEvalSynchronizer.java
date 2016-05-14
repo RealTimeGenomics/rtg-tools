@@ -27,7 +27,6 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf.eval;
 
 import java.io.File;
@@ -36,17 +35,21 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfWriter;
-import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
- * Outputs <code>baseline.vcf</code> and <code>calls.vcf</code>, each as original VCF records with additional status annotations.
+ * Updates the GT value of any matched called variant records according to the phase used
+ * during matching. The assumption is that the baseline has been fully phased, and this permits
+ * transferring that phase information to an annotated call set.
  */
-class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
+public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
 
-  private final VcfWriter mBase;
-  protected final VcfWriter mCalls;
+  private static final String FORMAT_ORIGINAL_GT = "OGT";
+  private static final String INFO_PHASE = "PHASE";
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -62,69 +65,29 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  AnnotatingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
-                             String callsSampleName, RocSortValueExtractor extractor,
-                             File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+  PhaseTransferEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, String callsSampleName, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
-    final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final VcfHeader bh = variants.baseLineHeader().copy();
-    CombinedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);
-    mBase = new VcfWriter(bh, new File(outdir, "baseline.vcf" + zipExt), null, zip, true);
-    final VcfHeader ch = variants.calledHeader().copy();
-    CombinedEvalSynchronizer.addInfoHeaders(ch, VariantSetType.CALLS);
-    mCalls = new VcfWriter(ch, new File(outdir, "calls.vcf" + zipExt), null, zip, true);
-  }
-
-  @Override
-  protected void handleUnknownBaseline() throws IOException {
-    setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<String, String>()));
-    mBase.write(mBrv);
-  }
-
-  @Override
-  protected void handleUnknownCall() throws IOException {
-    setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<String, String>()));
-    mCalls.write(mCrv);
-  }
-
-  @Override
-  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
-    if (unknownBaseline) {
-      setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<String, String>()));
-      mBase.write(mBrv);
-      mBrv = null;
-    }
-    if (unknownCall) {
-      setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<String, String>()));
-      mCalls.write(mCrv);
-      mCrv = null;
-    }
-  }
-
-  @Override
-  protected void handleKnownBaseline() throws IOException {
-    setNewInfoFields(mBrv, updateForBaseline(false, new LinkedHashMap<String, String>()));
-    mBase.write(mBrv);
+    mCalls.getHeader().ensureContains(new InfoField(INFO_PHASE, MetaType.CHARACTER, VcfNumber.ONE, "Phase of match, A = matched in same phase, B = matched in opposite phase"));
+    mCalls.getHeader().ensureContains(new FormatField(FORMAT_ORIGINAL_GT, MetaType.STRING, VcfNumber.ONE, "Original pre-phasing genotype value"));
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
     setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<String, String>()));
-    mCalls.write(mCrv);
-  }
-
-  @Override
-  protected void handleKnownBoth() throws IOException {
-    // Just deal with the call side first, and let the baseline call take care of itself
-    handleKnownCall();
-  }
-
-  @Override
-  @SuppressWarnings("try")
-  public void close() throws IOException {
-    try (VcfWriter ignored = mBase;
-         VcfWriter ignored2 = mCalls) {
-      // done for nice closing side effects
+    if (VariantId.STATUS_GT_MATCH == mCv.getStatus()) {
+      assert mCv != null;
+      assert mCv instanceof OrientedVariant;
+      final OrientedVariant ov = (OrientedVariant) mCv;
+      final String ogt = mCrv.getSampleString(mCallSampleNo, VcfUtils.FORMAT_GENOTYPE);
+      final int[] gtArr = VcfUtils.splitGt(ogt);
+      if (gtArr.length == 2 && !ov.isAlleleA()) {
+        final int t = gtArr[0]; gtArr[0] = gtArr[1]; gtArr[1] = t;
+      }
+      final String ngt = VcfUtils.joinGt(true, gtArr);
+      mCrv.setFormatAndSample(FORMAT_ORIGINAL_GT, ogt, mCallSampleNo);
+      mCrv.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, ngt, mCallSampleNo);
+      mCrv.addInfo(INFO_PHASE, ov.isAlleleA() ? "A" : "B");
     }
+    mCalls.write(mCrv);
   }
 }
