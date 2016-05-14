@@ -75,7 +75,6 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
   protected void handleKnownCall() throws IOException {
     setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<String, String>()));
     if (VariantId.STATUS_GT_MATCH == mCv.getStatus()) {
-      assert mCv != null;
       assert mCv instanceof OrientedVariant;
       final OrientedVariant ov = (OrientedVariant) mCv;
       final String ogt = mCrv.getSampleString(mCallSampleNo, VcfUtils.FORMAT_GENOTYPE);
