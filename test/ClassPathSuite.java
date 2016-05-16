@@ -62,7 +62,7 @@ public class ClassPathSuite extends TestSuite {
     System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
     for (Class<?> c : testClasses) {
       //System.err.println("Adding tests from: " + c.getSimpleName());
-      addTestSuite(c);
+      addTestSuite((Class<? extends TestCase>) c);
     }
   }
 

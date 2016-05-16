@@ -29,6 +29,7 @@
  */
 
 import junit.framework.Test;
+import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
@@ -51,11 +52,12 @@ public class AllTests extends TestSuite {
     return new ClassPathSuite();
   }
 
+  @SuppressWarnings("unchecked")
   public static void main(final String[] args) throws ClassNotFoundException {
     if (args.length > 0) {
       final TestSuite t = new TestSuite();
       for (final String arg : args) {
-        t.addTestSuite(ClassLoader.getSystemClassLoader().loadClass(arg));
+        t.addTestSuite((Class<? extends TestCase>) ClassLoader.getSystemClassLoader().loadClass(arg));
       }
       junit.textui.TestRunner.run(t);
     } else {
