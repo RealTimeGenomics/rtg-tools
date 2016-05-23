@@ -232,7 +232,7 @@ public final class GlobalFlags {
     registerFlag(MIN_BASE_QUALITY, Integer.class, 0);
     registerFlag(QUALITY_CALIBRATION_MIN_EVIDENCE, Integer.class, 10);
     registerFlag(QUALITY_CALIBRATION_COVARIATE_INTERSECTION, Boolean.class, false);
-    registerFlag(DIRICHLET_ALLELE_BALANCE, Boolean.class, true);
+    registerFlag(DIRICHLET_ALLELE_BALANCE, String.class, "dirichlet");
 
     // AVR, training on missing instances increases time and experience indicates is a bad idea
     // when there are lots of missing values.
