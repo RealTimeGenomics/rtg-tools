@@ -72,6 +72,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   static final String MODE_RECODE = "recode";
   static final String MODE_ALLELES = "alleles";
   static final String MODE_GA4GH = "ga4gh";
+  static final String MODE_ROC_ONLY = "roc-only";
 
   protected VcfEvalTask(VcfEvalParams params, OutputStream reportStream, NoStatistics stats) {
     super(params, reportStream, stats, null);
@@ -177,6 +178,9 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         break;
       case MODE_GA4GH:
         processor = new Ga4ghEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed());
+        break;
+      case MODE_ROC_ONLY:
+        processor = new RocOnlyEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);

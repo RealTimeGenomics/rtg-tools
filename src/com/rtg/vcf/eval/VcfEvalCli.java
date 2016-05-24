@@ -127,7 +127,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional('f', SORT_FIELD, String.class, "STRING", "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO=<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, "STRING", "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     final Flag modeFlag = flags.registerOptional('m', OUTPUT_MODE, String.class, "STRING", "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
-    modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH});
+    modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
     flags.registerOptional('R', ROC_SUBSET, RocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
 
     flags.registerOptional(MAX_LENGTH, Integer.class, "INT", "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
@@ -291,8 +291,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.twoPass(false); // Makes no sense
     } else if (mFlags.isSet(TWO_PASS)) {
       builder.twoPass((Boolean) mFlags.getValue(TWO_PASS)); // Explicit override
-    } else if (mode.equals(VcfEvalTask.MODE_ANNOTATE) || mode.equals(VcfEvalTask.MODE_COMBINE) || mode.equals(VcfEvalTask.MODE_GA4GH)) {
-      builder.twoPass(true); // Default the number of passes depending on output mode
+    } else if (!mode.equals(VcfEvalTask.MODE_SPLIT)) {
+      builder.twoPass(true); // Default to two passes except for split mode (backward compability)
     }
     return builder.create();
   }
