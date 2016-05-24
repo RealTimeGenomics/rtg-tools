@@ -1,0 +1,15 @@
+##fileformat=VCFv4.1
+##contig=<ID=1,length=100>
+##INFO=<ID=BS,Number=.,Type=Integer,Description="Benchmarking superlocus ID for these variants.">
+##INFO=<ID=CALL_WEIGHT,Number=1,Type=Float,Description="Call weight (equivalent number of truth variants). When unspecified, assume 1.0">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=BD,Number=1,Type=String,Description="Decision for call (TP/FP/FN/N)">
+##FORMAT=<ID=BK,Number=1,Type=String,Description="Sub-type for decision (match/mismatch type)">
+##FORMAT=<ID=BI,Number=1,Type=String,Description="Additional comparison information">
+##FORMAT=<ID=QQ,Number=1,Type=Float,Description="Variant quality for ROC creation.">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	TRUTH	QUERY
+1	68	.	A	AT	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
+1	69	.	T	TA	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
+1	70	.	A	T,TT	.	.	BS=69	GT:BD:BK	2|2:FN	1|1:TP:gm
+1	83	.	AAT	A	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
+1	85	.	T	A	.	.	BS=69	GT:BD:BK	.:N	1|1:TP:gm
