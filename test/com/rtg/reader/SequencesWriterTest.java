@@ -58,7 +58,7 @@ import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import junit.framework.TestCase;
 
 /**

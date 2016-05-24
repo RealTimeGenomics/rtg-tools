@@ -36,7 +36,7 @@ import java.io.StringReader;
 import com.reeltwo.spelling.Spelling;
 import com.rtg.util.StringUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Separate class to keep Sharpen happy.

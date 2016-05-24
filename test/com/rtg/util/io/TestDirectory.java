@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Class to make it easier to create temp folder to unit tests.

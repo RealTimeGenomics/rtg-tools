@@ -429,7 +429,7 @@
 
   <property name="test.jvm.args" value="" />
   <property name="junit.jar" value="${tools.test.lib.dir}/junit.jar"/>
-  <property name="junit.runner" value="junit.textui.TestRunner" />
+  <property name="junit.runner" value="org.junit.runner.JUnitCore" />
 
   <target name="runtest" depends="compile-src,compile-test" description="Run a unit test class. -Dtest.class=xxx">
     <fail unless="test.class" message="test.class property must be set"/>
@@ -456,6 +456,29 @@
     <antcall target="runtest">
       <param name="test.class" value="AllTests"/>
     </antcall>
+  </target>
+
+  <target name="test" depends="compile-test"
+          description="Run all unit testsfalse. Invoke with -Dtest.class={some class} to run a single test class">
+    <delete dir="${build.dir}/test-reports" defaultexcludes="no"/>
+    <mkdir dir="${build.dir}/test-reports"/>
+    <junit failureproperty="test.failure" fork="yes" forkmode="once" filtertrace="on">
+      <test name="${test.class}" if="test.class" todir="${build.dir}/test-reports"/>
+      <classpath>
+        <pathelement path="${junit.jar}"/>
+        <resources refid="runtime.test.classpath" />
+      </classpath>
+      <batchtest unless="test.class" todir="${build.dir}/test-reports">
+        <fileset dir="${build.test}" includes="**/*Test.class" excludes="**/Abstract*Test.class"/>
+      </batchtest>
+      <formatter type="brief" usefile="false"/>
+      <formatter type="xml" usefile="true"/>
+    </junit>
+    <junitreport todir="${build.dir}/test-reports">
+      <fileset dir="${build.dir}/test-reports" includes="*.xml"/>
+      <report format="frames" styledir="${tools.test.lib.dir}" todir="${build.dir}/test-reports-html"/>
+      <report format="frames" styledir="${tools.test.lib.dir}/summary" todir="${build.dir}/test-reports-summary"/>
+    </junitreport>
   </target>
 
 </project>

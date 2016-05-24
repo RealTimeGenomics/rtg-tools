@@ -49,7 +49,7 @@ import com.rtg.util.integrity.Exam.ExamException;
 import com.rtg.util.integrity.IntegralAbstract;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Utilities useful when doing testing.

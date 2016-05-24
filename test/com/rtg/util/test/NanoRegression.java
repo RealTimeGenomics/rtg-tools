@@ -39,7 +39,7 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Support class for writing nano-regression tests for running within

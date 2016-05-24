@@ -35,7 +35,7 @@ import java.util.Locale;
 
 import com.rtg.util.TestUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Test a <code>CFlags</code> object for various metrics used in SLIM.

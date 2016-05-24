@@ -34,7 +34,7 @@ import com.rtg.util.diagnostic.DiagnosticEvent;
 import com.rtg.util.diagnostic.DiagnosticListener;
 import com.rtg.util.diagnostic.ErrorEvent;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * Make it easy to test Diagnostic messages.

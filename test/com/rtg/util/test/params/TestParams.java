@@ -43,7 +43,7 @@ import java.util.Set;
 
 import com.rtg.util.StringUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  */
