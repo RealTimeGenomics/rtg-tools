@@ -53,6 +53,12 @@ public class DnaUtilsTest extends TestCase {
     assertEquals(exp, s);
   }
 
+  public void testEncodeArrayCopy() {
+    final String exp = "AGTGCCGCGATCGTAGACAGTNNTCAGT";
+    assertEquals(exp, DnaUtils.bytesToSequenceIncCG(DnaUtils.encodeArrayCopy(exp.getBytes())));
+    assertEquals(exp.substring(4, 10), DnaUtils.bytesToSequenceIncCG(DnaUtils.encodeArrayCopy(exp.getBytes(), 4, 6)));
+  }
+
   public void testByteRevCo() {
     final byte[] src = {'A', 'C', 'C', 'T', 'G', 'G', 'A'};
     final byte[] dest = new byte[src.length];

@@ -186,30 +186,42 @@ public final class DnaUtils {
    * @return the encoded array (which will be the same array as <code>a</code>)
    */
   public static byte[] encodeArray(final byte[] a, final int length) {
+    return encodeArray(a, a, 0, length);
+  }
+
+  /**
+   * Transform a human-readable DNA sequence into internal 0..4 bytes.
+   * @param a Eg. {'a','c','g','t','n'} will become {1,2,3,4,0}.
+   * @param dest array transformed sequence will be written into
+   * @param start start position in source array to transform from
+   * @param length length to convert
+   * @return the encoded array (which will be the same array as <code>dest</code>)
+   */
+  public static byte[] encodeArray(final byte[] a, final byte[] dest, final int start, final int length) {
     for (int k = 0; k < length; k++) {
-      switch (a[k]) {
-      case (byte) 'a':
-      case (byte) 'A':
-        a[k] = 1;
-        break;
-      case (byte) 'c':
-      case (byte) 'C':
-        a[k] = 2;
-        break;
-      case (byte) 'g':
-      case (byte) 'G':
-        a[k] = 3;
-        break;
-      case (byte) 't':
-      case (byte) 'T':
-        a[k] = 4;
-        break;
-      default:
-        a[k] = 0;
-        break;
+      switch (a[k + start]) {
+        case (byte) 'a':
+        case (byte) 'A':
+          dest[k] = 1;
+          break;
+        case (byte) 'c':
+        case (byte) 'C':
+          dest[k] = 2;
+          break;
+        case (byte) 'g':
+        case (byte) 'G':
+          dest[k] = 3;
+          break;
+        case (byte) 't':
+        case (byte) 'T':
+          dest[k] = 4;
+          break;
+        default:
+          dest[k] = 0;
+          break;
       }
     }
-    return a;
+    return dest;
   }
 
   /**
@@ -251,6 +263,26 @@ public final class DnaUtils {
    */
   public static byte[] encodeArray(final byte[] a) {
     return encodeArray(a, a.length);
+  }
+
+  /**
+   * Transform a human-readable DNA sequence into internal 0..4 bytes without modifying original.
+   * @param a Eg. {'a','c','g','t','n'} will become {1,2,3,4,0}.
+   * @return the encoded array which will be a new array of length <code>a.length</code>
+   */
+  public static byte[] encodeArrayCopy(final byte[] a) {
+    return encodeArray(a, new byte[a.length], 0, a.length);
+  }
+
+  /**
+   * Transform a human-readable DNA sequence into internal 0..4 bytes without modifying original.
+   * @param a Eg. {'a','c','g','t','n'} will become {1,2,3,4,0}.
+   * @param start start position in <code>a</code> to transform from
+   * @param length number of bases to transform
+   * @return the encoded array which will be a new array of length <code>length</code>
+   */
+  public static byte[] encodeArrayCopy(final byte[] a, int start, int length) {
+    return encodeArray(a, new byte[length], start, length);
   }
 
 }
