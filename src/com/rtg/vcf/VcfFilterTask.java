@@ -127,8 +127,12 @@ class VcfFilterTask {
           mSampleIndexes[i] = i;
         }
       } else if (mSampleNames.size() == 0) {
-        mSampleIndexes = new int[1];
-        mSampleIndexes[0] = VcfUtils.getSampleIndexOrDie(header, null, "input");
+        if (header.getNumberOfSamples() > 0) {
+          mSampleIndexes = new int[1];
+          mSampleIndexes[0] = VcfUtils.getSampleIndexOrDie(header, null, "input");
+        } else {
+          mSampleIndexes = new int[0];
+        }
       } else {
         mSampleIndexes = new int[mSampleNames.size()];
         int i = 0;
