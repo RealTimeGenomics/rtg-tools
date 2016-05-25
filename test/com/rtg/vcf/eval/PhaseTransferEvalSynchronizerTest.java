@@ -38,6 +38,7 @@ public class PhaseTransferEvalSynchronizerTest extends AbstractVcfEvalTest {
 
   public void testPhaseTransfer() throws IOException, UnindexableDataException {
     endToEnd("vcfeval_phase_transfer", false, "--ref-overlap",
+      "--Xobey-phase=true",
       "--XXcom.rtg.vcf.eval.custom-path-processor=phase-transfer");
   }
 
