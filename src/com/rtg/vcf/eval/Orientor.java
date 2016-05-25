@@ -72,14 +72,16 @@ public interface Orientor {
   };
 
   /**
-   * Produces orientations corresponding to the possible diploid phasings from the
-   * GT-derived variant, obeying global phasing if present.
-   * Path finding will require matching both alleles.
+   * Orientor that obeys global phasing if present in the GT-derived variant.
    */
-  Orientor PHASED = new Orientor() {
+  final class PhasedOrientor implements Orientor {
+    final boolean mInvert;
+    PhasedOrientor(boolean invert) {
+      mInvert = invert;
+    }
     @Override
     public String toString() {
-      return "phase-obeying";
+      return "phase-" + (mInvert ? "inverting" : "obeying");
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
@@ -87,7 +89,9 @@ public interface Orientor {
       if (gv.alleleA() != gv.alleleB()) {
         if (variant.isPhased()) {
           return new OrientedVariant[]{
-            new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
+            mInvert
+              ? new OrientedVariant(variant, false, gv.alleleB(), gv.alleleA())
+              : new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
           };
         } else {
           // If the variant is heterozygous we need both phases
@@ -103,7 +107,21 @@ public interface Orientor {
         };
       }
     }
-  };
+  }
+
+  /**
+   * Produces orientations corresponding to the possible diploid phasings from the
+   * GT-derived variant, obeying global phasing if present.
+   * Path finding will require matching both alleles.
+   */
+  Orientor PHASED = new PhasedOrientor(false);
+
+  /**
+   * Produces orientations corresponding to the possible diploid phasings from the
+   * GT-derived variant, obeying but inverting global phasing if present.
+   * Path finding will require matching both alleles.
+   */
+  Orientor PHASE_INVERTED = new PhasedOrientor(true);
 
   /**
    * Produces orientations corresponding to the possible haploid ALTs from the GT-derived variant.

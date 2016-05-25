@@ -108,6 +108,13 @@ public class OrientorTest extends TestCase {
     assertEquals(2, pos[0].alleleId());
     assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
 
+    pos = Orientor.PHASE_INVERTED.orientations(variant);
+    assertEquals(1, pos.length);
+    assertFalse(pos[0].isAlleleA());
+    assertTrue(pos[0].isHeterozygous());
+    assertEquals(1, pos[0].alleleId());
+    assertEquals("chr:23-24 (*:A^:<24-24>AAAv)", pos[0].toString());
+
     variant = fact.variant(VariantTest.createRecord(SNP_LINE7), 0);
     pos = Orientor.PHASED.orientations(variant);
     assertEquals(1, pos.length);
@@ -116,6 +123,15 @@ public class OrientorTest extends TestCase {
     assertEquals(-1, pos[0].alleleId());
     assertEquals(2, pos[0].other().alleleId());
     assertEquals("chr:24-24 (.^:*:*:AAAv)", pos[0].toString());
+
+    pos = Orientor.PHASE_INVERTED.orientations(variant);
+    assertEquals(1, pos.length);
+    assertFalse(pos[0].isAlleleA());
+    assertTrue(pos[0].isHeterozygous());
+    assertEquals(2, pos[0].alleleId());
+    assertEquals(-1, pos[0].other().alleleId());
+    assertEquals("chr:24-24 (.v:*:*:AAA^)", pos[0].toString());
+
   }
 
   public void testSquashAlts() throws Exception {

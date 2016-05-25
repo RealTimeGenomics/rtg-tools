@@ -71,7 +71,8 @@ public final class VcfEvalParams extends OutputModuleParams {
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
     private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
-    private boolean mObeyPhase = false;
+    private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
+    private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
 
     @Override
     protected VcfEvalParamsBuilder self() {
@@ -263,12 +264,22 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
-     * Obey global phasing if present in the input VCF
-     * @param obeyPhase true to obey phasing is present
+     * Set the Orientor to use for the baseline during diploid GT comparisons.
+     * @param orientor the Orientor to use
      * @return this builder
      */
-    public VcfEvalParamsBuilder obeyPhase(boolean obeyPhase) {
-      mObeyPhase = obeyPhase;
+    public VcfEvalParamsBuilder baselinePhaseOrientor(Orientor orientor) {
+      mBaselinePhaseOrientor = orientor;
+      return this;
+    }
+
+    /**
+     * Set the Orientor to use for the calls during diploid GT comparisons.
+     * @param orientor the Orientor to use
+     * @return this builder
+     */
+    public VcfEvalParamsBuilder callsPhaseOrientor(Orientor orientor) {
+      mCallsPhaseOrientor = orientor;
       return this;
     }
 
@@ -300,7 +311,8 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final int mMaxLength;
   private final EnumSet<RocFilter> mRocFilters;
   private final boolean mOutputSlopeFiles;
-  private final boolean mObeyPhase;
+  private final Orientor mBaselinePhaseOrientor;
+  private final Orientor mCallsPhaseOrientor;
 
 
   /**
@@ -326,7 +338,8 @@ public final class VcfEvalParams extends OutputModuleParams {
     mMaxLength = builder.mMaxLength;
     mRocFilters = builder.mRocFilters;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
-    mObeyPhase = builder.mObeyPhase;
+    mBaselinePhaseOrientor = builder.mBaselinePhaseOrientor;
+    mCallsPhaseOrientor = builder.mCallsPhaseOrientor;
   }
 
   /**
@@ -459,10 +472,17 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
-   * @return if true obey global phasing if present in the input VCF
+   * @return the Orientor to use for the baseline during diploid GT comparisons.
    */
-  public boolean obeyPhase() {
-    return mObeyPhase;
+  public Orientor baselinePhaseOrientor() {
+    return mBaselinePhaseOrientor;
+  }
+
+  /**
+   * @return the Orientor to use for the calls during diploid GT comparisons.
+   */
+  public Orientor callsPhaseOrientor() {
+    return mCallsPhaseOrientor;
   }
 
   /**

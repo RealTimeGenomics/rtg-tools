@@ -134,7 +134,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
     flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
-    flags.registerOptional(OBEY_PHASE, Boolean.class, "BOOL", "obey global phasing if present in the input VCF", false).setCategory(FILTERING);
+    flags.registerOptional(OBEY_PHASE, String.class, "STRING", "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
 
     CommonFlags.initThreadsFlag(flags);
     CommonFlags.initNoGzip(flags);
@@ -196,27 +196,38 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
         return false;
       }
       if (flags.isSet(SAMPLE)) {
-        final String sample = (String) flags.getValue(SAMPLE);
-        if (sample.length() == 0) {
-          flags.setParseMessage("Supplied sample name cannot be empty");
+        if (validatePairedFlag(flags, (String) flags.getValue(SAMPLE), "sample name")) {
           return false;
         }
-        final String[] samples = StringUtils.split(sample, ',');
-        if (samples.length > 2) {
-          flags.setParseMessage("Invalid sample name specification " + sample + ". At most 1 comma is permitted");
-          return false;
-        }
-        if (samples[0].length() == 0) {
-          flags.setParseMessage("Invalid sample name specification " + sample + ". Supplied baseline sample name cannot be empty");
-          return false;
-        }
-        final String callsSample = samples.length == 2 ? samples[1] : samples[0];
-        if (callsSample.length() == 0) {
-          flags.setParseMessage("Invalid sample name specification " + sample + ". Supplied calls sample name cannot be empty");
+      }
+      if (flags.isSet(OBEY_PHASE)) {
+        if (validatePairedFlag(flags, (String) flags.getValue(OBEY_PHASE), "phase type")) {
           return false;
         }
       }
       return true;
+    }
+
+    private boolean validatePairedFlag(CFlags flags, String flagValue, String label) {
+      if (flagValue.length() == 0) {
+        flags.setParseMessage("Supplied " + label + " cannot be empty");
+        return true;
+      }
+      final String[] split = StringUtils.split(flagValue, ',');
+      if (split.length > 2) {
+        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". At most 1 comma is permitted");
+        return true;
+      }
+      if (split[0].length() == 0) {
+        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". Supplied baseline " + label + " cannot be empty");
+        return true;
+      }
+      final String callsValue = split.length == 2 ? split[1] : split[0];
+      if (callsValue.length() == 0) {
+        flags.setParseMessage("Invalid sample name specification " + flagValue + ". Supplied calls " + label + " cannot be empty");
+        return true;
+      }
+      return false;
     }
   }
 
@@ -232,6 +243,29 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       throw new NoTalkbackSlimException(vcfFile + " is not in bgzip format");
     } else if (!index.exists()) {
       throw new NoTalkbackSlimException("Index not found for file: " + index.getPath() + " expected index called: " + index.getPath());
+    }
+  }
+
+  private static String[] splitPairedSpec(String flagValue) {
+    final String[] split = StringUtils.split(flagValue, ',');
+    if (split.length == 2) {
+      return split;
+    } else {
+      return new String[] {split[0], split[0]};
+    }
+  }
+
+  // Map from name to the subset of Orientors that are relevant to phased GT comparisons
+  private static Orientor phaseTypeToOrientor(String name) {
+    switch (name) {
+      case "true":
+        return Orientor.PHASED;
+      case "invert":
+        return Orientor.PHASE_INVERTED;
+      case "false":
+        return Orientor.UNPHASED;
+      default:
+        throw new NoTalkbackSlimException("Unrecognized phase type:" + name);
     }
   }
 
@@ -256,10 +290,14 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.bedRegionsFile((File) mFlags.getValue(CommonFlags.BED_REGIONS_FLAG));
     }
     if (mFlags.isSet(SAMPLE)) {
-      final String sample = (String) mFlags.getValue(SAMPLE);
-      final String[] samples = StringUtils.split(sample, ',');
+      final String[] samples = splitPairedSpec((String) mFlags.getValue(SAMPLE));
       builder.baselineSample(samples[0]);
-      builder.callsSample(samples.length == 2 ? samples[1] : samples[0]);
+      builder.callsSample(samples[1]);
+    }
+    if (mFlags.isSet(OBEY_PHASE)) {
+      final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
+      builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
+      builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
     }
     final EnumSet<RocFilter> rocFilters;
     if (!mFlags.isSet(ROC_SUBSET)) {
@@ -283,7 +321,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
     builder.refOverlap(mFlags.isSet(REF_OVERLAP));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));
-    builder.obeyPhase((Boolean) mFlags.getValue(OBEY_PHASE));
     builder.numberThreads(CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG)));
     final String mode = ((String) mFlags.getValue(OUTPUT_MODE)).toLowerCase(Locale.ROOT);
     builder.outputMode(mode);
