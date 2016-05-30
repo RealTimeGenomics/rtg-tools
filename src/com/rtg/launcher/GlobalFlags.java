@@ -128,6 +128,12 @@ public final class GlobalFlags {
   /** Minimum phred base quality to consider a piece of evidence. */
   public static final String MIN_BASE_QUALITY = "com.rtg.variant.bayes.Model.min-bq";
 
+  /** Dump the non SNP signals that are used for triggering complex calls */
+  public static final String DUMP_COMPLEX_TRIGGER_SIGNALS = "com.rtg.variant.dump-complex-trigger-signals";
+
+  /** Use soft clips to trigger complex calling */
+  public static final String SOFT_CLIP_COMPLEX_TRIGGER = "com.rtg.variant.soft-clip-complex-trigger";
+
   /** Print the details of complex evidence into screen. */
   public static final String COMPLEX_EVIDENCE_DETAILS = "com.rtg.variant.complex.complex-evidence-details";
 
@@ -219,6 +225,8 @@ public final class GlobalFlags {
     registerFlag(COMPLEX_REGION_INDEL_EXTENSION);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_LIMIT, Integer.class, 3);
     registerFlag(COMPLEX_REGION_SIMPLE_REPEAT_IMPL, String.class, "default");
+    registerFlag(DUMP_COMPLEX_TRIGGER_SIGNALS, Boolean.class, false);
+    registerFlag(SOFT_CLIP_COMPLEX_TRIGGER, Boolean.class, false);
     registerFlag(COMPLEX_EVIDENCE_DETAILS);
     registerFlag(COMPLEX_HYPOTHESIS_DETAILS);
     registerFlag(COMPLEX_HYPOTHESIS_NEW_PRIORS, Boolean.class, true);
