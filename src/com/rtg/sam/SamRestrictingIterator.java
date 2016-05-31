@@ -32,6 +32,7 @@ package com.rtg.sam;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.rtg.util.intervals.Interval;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 
@@ -48,9 +49,9 @@ public class SamRestrictingIterator implements CloseableIterator<SAMRecord> {
 
   private int mTemplate = -1;
   private int mEndTemplate = -1;
-  private List<RangeList.RangeData<String>> mSeqRegions = null;
+  private List<? extends Interval> mSeqRegions = null;
   private int mCurrentRegionIdx = -1;
-  private RangeList.RangeData<String> mCurrentRegion = null;
+  private Interval mCurrentRegion = null;
 
   private SAMRecord mNextRecord;
 

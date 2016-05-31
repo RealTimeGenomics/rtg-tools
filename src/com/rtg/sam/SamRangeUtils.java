@@ -40,6 +40,7 @@ import com.rtg.bed.BedRecord;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.Interval;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.RangeList;
@@ -216,8 +217,8 @@ public final class SamRangeUtils {
       if (r.getSequenceLength() > 0) {
         final RangeList<T> rs = rangeMap.get(seq);
         if (rs != null) {
-          final List<RangeList.RangeData<T>> ranges = rs.getRangeList();
-          final RangeList.RangeData<T> last = ranges.get(ranges.size() - 1);
+          final List<? extends Interval> ranges = rs.getRangeList();
+          final Interval last = ranges.get(ranges.size() - 1);
           if (last.getEnd() >  r.getSequenceLength()) {
             throw new NoTalkbackSlimException("Specified sequence range (" + r.getSequenceName() + ":" + last.toString() + ") is outside the length of the sequence (" + r.getSequenceLength() + ")");
           }

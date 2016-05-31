@@ -79,7 +79,7 @@ public class ReferenceRegions {
   /**
    * @return the names of all sequences referenced by these regions
    */
-  public Collection<String> sequences() {
+  public Collection<String> sequenceNames() {
     return mSequences.keySet();
   }
 
@@ -97,7 +97,7 @@ public class ReferenceRegions {
    * @param regions regions to intersect with
    */
   public void intersect(ReferenceRegions regions) {
-    for (String seq : sequences()) {
+    for (String seq : sequenceNames()) {
       int outStart = 0;
       final MergedIntervals theirs = regions.mSequences.get(seq);
       final MergedIntervals ours = mSequences.get(seq);
@@ -261,7 +261,7 @@ public class ReferenceRegions {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for (String s : sequences()) {
+    for (String s : sequenceNames()) {
       for (Map.Entry<Integer, Integer> entry : mSequences.get(s).mIntervals.entrySet()) {
         sb.append(String.format("%s\t%d\t%d%n", s, entry.getKey(), entry.getValue()));
       }

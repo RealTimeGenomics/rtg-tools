@@ -33,12 +33,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.Interval;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
@@ -110,7 +111,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
       }
       try (InputStream is = openIndexFile()) {
         // TODO this could be further optimized so it doesn't have to re-open for each one, but will require processing the ranges sequences in index id order and with careful skipping between index sections
-        getFilePointers(ranges, seqName, is, mBinPositions[seqId], (int) (mLinearIndexPositions[seqId] - mBinPositions[seqId]), offsets);
+        getFilePointers(seqName, ranges.get(seqName).getRangeList(), is, mBinPositions[seqId], (int) (mLinearIndexPositions[seqId] - mBinPositions[seqId]), offsets);
       }
     }
     offsets.sort();
@@ -121,15 +122,15 @@ public abstract class AbstractIndexReader implements LocusIndex {
   /**
    * Retrieve the file pointers associated with region specified on a specific chromosome
    *
-   * @param ranges stores all the ranges we care about
    * @param seqName the chromosome name to extract pointers for
+   * @param intervals the list of intervals on the chromosome
    * @param indexStream stream containing index
    * @param binsPosition position of start of bins in index
    * @param binsSize of bins
    * @param results storage space for offset information
    * @throws java.io.IOException if an IO exception occurs
    */
-  public static void getFilePointers(ReferenceRanges<String> ranges, String seqName, InputStream indexStream, long binsPosition, int binsSize, VirtualOffsets results) throws IOException {
+  public static void getFilePointers(String seqName, List<? extends Interval> intervals, InputStream indexStream, long binsPosition, int binsSize, VirtualOffsets results) throws IOException {
 
     //seek to sequence
     FileUtils.skip(indexStream, binsPosition);
@@ -172,8 +173,8 @@ public abstract class AbstractIndexReader implements LocusIndex {
     }
 
     // Do queries
-    for (RangeList.RangeData<String> range : ranges.get(seqName).getRangeList()) {
-      final SequenceNameLocus region = new SequenceNameLocusSimple(seqName, range.getStart(), range.getEnd());
+    for (Interval interval : intervals) {
+      final SequenceNameLocus region = new SequenceNameLocusSimple(seqName, interval.getStart(), interval.getEnd());
 
       final int beg = (region.getStart() <= -1 || region.getStart() == Integer.MIN_VALUE) ? 0 : region.getStart();
       final int end = (region.getEnd() <= -1 || region.getEnd() == Integer.MAX_VALUE) ? MAX_COORD : region.getEnd();
