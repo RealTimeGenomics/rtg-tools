@@ -57,8 +57,7 @@ public class ClassPathSuite extends TestSuite {
     if (SHUFFLE_TESTS != null) { // Run test classes in random order to help detect any stray inter-test dependencies
       shuffle(testClasses);
     }
-    final String packagePrefix1 = null;
-    System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix1 + "\"");
+    System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
     for (Class<?> c : testClasses) {
       //System.err.println("Adding tests from: " + c.getSimpleName());
       addTestSuite(c);
