@@ -46,6 +46,7 @@ public class ClassPathScanner {
   private static final String CLASSPATH = System.getProperty("java.class.path");
   private static final String CLASS_EXT = ".class";
   private static final String JAR_EXT = ".jar";
+  private static final char ZIP_FILE_SEPARATOR = '/'; //zip files don't use platform dependent character
 
   private final String mPackage;
 
@@ -91,12 +92,12 @@ public class ClassPathScanner {
     return testClasses;
   }
 
-  private static String getClassName(String fileName, String classPathRoot) {
+  private static String getClassName(String fileName, String classPathRoot, char separatorChar) {
     String className = fileName.substring(classPathRoot.length());
-    if (className.charAt(0) == File.separatorChar) {
+    if (className.charAt(0) == separatorChar) {
       className = className.substring(1);
     }
-    return className.substring(0, className.length() - CLASS_EXT.length()).replace(File.separatorChar, '.');
+    return className.substring(0, className.length() - CLASS_EXT.length()).replace(separatorChar, '.');
   }
 
   private void scanDirectory(List<Class<?>> classes, ClassAcceptor acceptor, File root, File cur) {
@@ -107,7 +108,7 @@ public class ClassPathScanner {
           scanDirectory(classes, acceptor, root, each);
         } else {
           if (each.getName().endsWith(CLASS_EXT)) {
-            final String className = getClassName(each.getPath(), root.getPath());
+            final String className = getClassName(each.getPath(), root.getPath(), File.separatorChar);
             checkClass(classes, acceptor, className);
           }
         }
@@ -134,7 +135,7 @@ public class ClassPathScanner {
       ZipEntry each;
       while ((each = zin.getNextEntry()) != null) {
         if (each.getName().endsWith(CLASS_EXT)) {
-          final String className = getClassName(each.getName(), "");
+          final String className = getClassName(each.getName(), "", ZIP_FILE_SEPARATOR);
           checkClass(classes, acceptor, className);
         }
         zin.closeEntry();
