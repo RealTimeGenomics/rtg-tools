@@ -37,7 +37,8 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.Utils;
 
 /**
@@ -46,7 +47,7 @@ import com.rtg.util.Utils;
  */
 public final class RocSlope {
 
-  private static final boolean ALT_SLOPE = GlobalFlags.isSet(GlobalFlags.VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
+  private static final boolean ALT_SLOPE = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
 
   /**
    * Calculate the slope along an roc curve

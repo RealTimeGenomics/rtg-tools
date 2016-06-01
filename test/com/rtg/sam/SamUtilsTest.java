@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.reader.ReaderLongMock;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SequencesReader;

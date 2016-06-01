@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.License;
 import com.rtg.util.SpawnJvm;
 import com.rtg.util.StringUtils;

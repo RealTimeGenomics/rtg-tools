@@ -40,7 +40,7 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.diagnostic.Diagnostic;

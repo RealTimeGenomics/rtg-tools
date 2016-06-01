@@ -28,35 +28,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rtg;
+package com.rtg.util;
 
-import java.io.IOException;
-
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.util.cli.CommandLine;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.Talkback;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-/**
- * Provides a nice set up and tear down implementation that removes side effects from a few globals we have.
- */
-public abstract class AbstractTest extends TestCase {
+public class ClassPathScannerTest extends TestCase {
 
-  @Override
-  public void setUp() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    CommandLine.clearCommandArgs();
-    Diagnostic.setLogStream();
+  public void test() {
+    final List<Class<?>> list = new ClassPathScanner(ClassPathScannerTest.class.getPackage().getName()).getClasses(clazz -> clazz.getName().equals(ClassPathScannerTest.class.getName()));
+    assertEquals(1, list.size());
+    assertEquals(ClassPathScannerTest.class, list.get(0));
   }
-
-  @Override
-  public void tearDown() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    CommandLine.clearCommandArgs();
-    Diagnostic.setLogStream();
-    Talkback.setModuleName(null);
-  }
-
 }

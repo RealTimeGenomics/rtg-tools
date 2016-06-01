@@ -34,7 +34,8 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.diagnostic.Diagnostic;
 
@@ -46,8 +47,8 @@ public final class PathFinder {
 
   private static final boolean TRACE = false;
 
-  private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
-  private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(GlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
+  private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
+  private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
 
   private final byte[] mTemplate;
   private final String mTemplateName;
@@ -87,7 +88,7 @@ public final class PathFinder {
   }
 
   static PathPreference getPathPreference() {
-    final String mode = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
+    final String mode = GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
     Diagnostic.developerLog("Path finder maximisation: " + mode);
     final PathPreference maximiseMode;
     switch (mode) {

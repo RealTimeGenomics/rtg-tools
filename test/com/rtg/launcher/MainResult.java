@@ -31,6 +31,7 @@ package com.rtg.launcher;
 
 import java.io.ByteArrayOutputStream;
 
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.Utils;
 import com.rtg.util.cli.CommandLine;
 import com.rtg.util.io.MemoryPrintStream;

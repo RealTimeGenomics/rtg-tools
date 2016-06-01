@@ -41,9 +41,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.ParamsTask;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.PrereadNamesInterface;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SdfUtils;
@@ -144,7 +145,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {
     final File outdir = params.directory();
     final EvalSynchronizer processor;
-    final String outputMode = GlobalFlags.isSet(GlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
+    final String outputMode = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
     final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
     switch (outputMode) {
       case MODE_ALLELES:

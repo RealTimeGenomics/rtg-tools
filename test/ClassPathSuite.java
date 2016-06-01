@@ -28,18 +28,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import com.rtg.util.PortableRandom;
+import com.rtg.util.ClassPathScanner;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -52,23 +46,19 @@ public class ClassPathSuite extends TestSuite {
 
   private static final String SHUFFLE_TESTS = System.getProperty("junit.shuffle.tests");
   private static final String PACKAGE_PREFIX = System.getProperty("junit.package.prefix", "com.rtg");
-  private static final String CLASSPATH = System.getProperty("java.class.path");
-  private static final String CLASS_EXT = ".class";
-  private static final String JAR_EXT = ".jar";
-
-  private String mPackagePrefix = null;
 
   ClassPathSuite() {
     this(PACKAGE_PREFIX);
   }
 
   ClassPathSuite(String packagePrefix) {
-    mPackagePrefix = packagePrefix;
-    final Class<?>[] testClasses = getTestClasses();
+    final ClassPathScanner scanner = new ClassPathScanner(packagePrefix);
+    final List<Class<?>> testClasses = scanner.getClasses(clazz -> clazz.getName().endsWith("Test") && isTestClass(clazz));
     if (SHUFFLE_TESTS != null) { // Run test classes in random order to help detect any stray inter-test dependencies
       shuffle(testClasses);
     }
-    System.err.println("Found " + testClasses.length + " test classes with package prefix \"" + mPackagePrefix + "\"");
+    final String packagePrefix1 = null;
+    System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix1 + "\"");
     for (Class<?> c : testClasses) {
       //System.err.println("Adding tests from: " + c.getSimpleName());
       addTestSuite(c);
@@ -80,87 +70,13 @@ public class ClassPathSuite extends TestSuite {
    * @param arr a non-null array
    * @param <T> the type of array elements.
    */
-  public static <T> void shuffle(T[] arr) {
+  private static <T> void shuffle(List<T> arr) {
     final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.parseLong(SHUFFLE_TESTS));
     System.err.println("Shuffling tests with seed: " + r.getSeed());
-    for (int i = 0; i < arr.length; i++) {
-      final int z = r.nextInt(arr.length - i);
-      final T t = arr[i + z];
-      arr[i + z] = arr[i];
-      arr[i] = t;
+    for (int i = 0; i < arr.size(); i++) {
+      final int z = r.nextInt(arr.size() - i);
+      Collections.swap(arr, i + z, i);
     }
-  }
-
-  private Class<?>[] getTestClasses() {
-    final List<Class<?>> testClasses = new LinkedList<>();
-
-    for (String each : CLASSPATH.split(File.pathSeparator)) {
-      final File root = new File(each);
-      if (root.isDirectory()) {
-        scanDirectory(testClasses, root, root);
-      } else if (root.getName().endsWith(JAR_EXT)) {
-        scanZipFile(testClasses, root);
-      }
-    }
-    final Class<?>[] result = testClasses.toArray(new Class<?>[testClasses.size()]);
-    // Make the order deterministic
-    Arrays.sort(result, new Comparator<Class<?>>() {
-      @Override
-      public int compare(Class<?> o1, Class<?> o2) {
-        return o1.getName().compareTo(o2.getName());
-      }
-    });
-    return result;
-  }
-
-  private void scanDirectory(List<Class<?>> classes, File root, File cur) {
-    final File[] files = cur.listFiles();
-    if (files != null) {
-      for (File each : files) {
-        if (each.isDirectory()) {
-          scanDirectory(classes, root, each);
-        } else {
-          if (each.getName().endsWith(CLASS_EXT)) {
-            addIfTest(classes, getClassName(each.getPath(), root.getPath()));
-          }
-        }
-      }
-    }
-  }
-
-  private void scanZipFile(List<Class<?>> classes, File zipname) {
-    try (ZipInputStream zin = new ZipInputStream(new FileInputStream(zipname))) {
-      ZipEntry each;
-      while ((each = zin.getNextEntry()) != null) {
-        if (each.getName().endsWith(CLASS_EXT)) {
-          addIfTest(classes, getClassName(each.getName(), ""));
-        }
-        zin.closeEntry();
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private void addIfTest(List<Class<?>> classes, String className) {
-    if (className.endsWith("Test") && className.startsWith(mPackagePrefix)) {
-      try {
-        final Class<?> clazz = Class.forName(className);
-        if (isTestClass(clazz)) {
-          classes.add(clazz);
-        }
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException(e);
-      }
-    }
-  }
-
-  private static String getClassName(String fileName, String classPathRoot) {
-    String className = fileName.substring(classPathRoot.length());
-    if (className.charAt(0) == File.separatorChar) {
-      className = className.substring(1);
-    }
-    return className.substring(0, className.length() - CLASS_EXT.length()).replace(File.separatorChar, '.');
   }
 
   private static boolean isTestClass(Class<?> clazz) {

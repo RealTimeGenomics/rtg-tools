@@ -27,12 +27,15 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.launcher;
+
+package com.rtg.launcher.globals;
 
 import java.io.File;
+import java.util.List;
 
 import com.rtg.reader.FormatCli;
 import com.rtg.util.cli.CFlags;
+import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
@@ -48,8 +51,15 @@ public class GlobalFlagsTest extends TestCase {
   static final String TEST_FLAG = "test-flag";
   static final Integer TEST_DEFAULT = 20;
 
-  static {
-    GlobalFlags.registerFlag(TEST_FLAG, Integer.class, TEST_DEFAULT);
+  static class TestGlobalFlags extends GlobalFlagsInitializer {
+    TestGlobalFlags(List<Flag> flags) {
+      super(flags);
+    }
+
+    @Override
+    public void registerFlags() {
+      registerFlag(TEST_FLAG, Integer.class, TEST_DEFAULT);
+    }
   }
 
   private CFlags mFlags = null;

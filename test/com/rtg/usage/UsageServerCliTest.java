@@ -38,7 +38,7 @@ import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.MD5Utils;

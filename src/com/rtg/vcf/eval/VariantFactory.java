@@ -29,7 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
@@ -53,7 +54,7 @@ public interface VariantFactory {
    * @return the name of the variant factory to use, either <code>SAMPLE_FACTORY</code> or <code>ALL_FACTORY</code>
    */
   static String getFactoryName(VariantSetType type, String sampleName) {
-    final String customFactory = GlobalFlags.getStringValue(GlobalFlags.VCFEVAL_VARIANT_FACTORY);
+    final String customFactory = GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_VARIANT_FACTORY);
     if (customFactory.length() > 0) {
       final String[] f = StringUtils.split(customFactory, ',');
       if (type == VariantSetType.BASELINE) {

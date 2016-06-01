@@ -29,7 +29,7 @@
  */
 package com.rtg;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
 import com.rtg.util.License;

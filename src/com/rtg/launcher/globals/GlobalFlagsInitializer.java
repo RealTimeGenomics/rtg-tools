@@ -27,36 +27,40 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.rtg.launcher.globals;
 
-package com.rtg;
+import static com.rtg.launcher.globals.GlobalFlags.CATEGORY;
 
-import java.io.IOException;
+import java.util.List;
 
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.util.cli.CommandLine;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.Talkback;
-
-import junit.framework.TestCase;
+import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.util.cli.Flag;
 
 /**
- * Provides a nice set up and tear down implementation that removes side effects from a few globals we have.
+ * Base class for registering a bundle of experimental flags
  */
-public abstract class AbstractTest extends TestCase {
+@TestClass("com.rtg.launcher.globals.GlobalFlagsTest")
+public abstract class GlobalFlagsInitializer {
 
-  @Override
-  public void setUp() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    CommandLine.clearCommandArgs();
-    Diagnostic.setLogStream();
+  private final List<Flag> mFlags;
+
+  GlobalFlagsInitializer(List<Flag> flags) {
+    mFlags = flags;
   }
 
-  @Override
-  public void tearDown() throws IOException {
-    GlobalFlags.resetAccessedStatus();
-    CommandLine.clearCommandArgs();
-    Diagnostic.setLogStream();
-    Talkback.setModuleName(null);
+  /**
+   * Called to register the flags for this bundle. Should contain one or more {@link #registerFlag(String)}.
+   */
+  public abstract void registerFlags();
+
+  protected void registerFlag(String name) {
+    registerFlag(name, null, null);
   }
 
+  protected <T> void registerFlag(String name, Class<T> type, T def) {
+    if (type != null && def == null) {
+      throw new IllegalArgumentException("Default value must be non-null for experimental flags with a type");
+    }
+    mFlags.add(new Flag(null, "XX" + name, "", 0, 1, type, type == null ? "" : type.getSimpleName(), def, CATEGORY));
+  }
 }

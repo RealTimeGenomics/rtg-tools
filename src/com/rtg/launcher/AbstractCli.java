@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.usage.UsageLogging;
 import com.rtg.usage.UsageMetric;
 import com.rtg.util.Constants;

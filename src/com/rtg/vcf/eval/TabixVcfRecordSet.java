@@ -48,7 +48,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
 import com.rtg.launcher.CommonFlags;
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Pair;
@@ -163,7 +164,7 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
-    final boolean explicitHalf = GlobalFlags.getBooleanValue(GlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
+    final boolean explicitHalf = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
     final String f = VariantFactory.getFactoryName(type, sampleName);
     switch (f) {
       case VariantFactory.SAMPLE_FACTORY:

@@ -32,7 +32,8 @@ package com.rtg.sam;
 import java.io.File;
 import java.io.IOException;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.integrity.Exam;
 import com.rtg.util.integrity.Integrity;
 
@@ -49,7 +50,7 @@ public final class SamFileAndRecord extends SkipInvalidRecordsIterator implement
   private final String mPath;
 
   // work around to allow user to force file loading when sam header is malformed
-  private static final boolean IGNORE_HEADER_SORTORDER = GlobalFlags.isSet(GlobalFlags.SAM_IGNORE_SORT_ORDER_FLAG);
+  private static final boolean IGNORE_HEADER_SORTORDER = GlobalFlags.isSet(ToolsGlobalFlags.SAM_IGNORE_SORT_ORDER_FLAG);
 
   protected SamFileAndRecord(String path, int id, RecordIterator<SAMRecord> adaptor) throws IOException {
     super(path, adaptor, false);

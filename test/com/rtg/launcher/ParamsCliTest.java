@@ -37,6 +37,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.Params;

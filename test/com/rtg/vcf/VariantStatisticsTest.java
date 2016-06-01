@@ -33,7 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.rtg.launcher.GlobalFlags;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.MainResult;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
