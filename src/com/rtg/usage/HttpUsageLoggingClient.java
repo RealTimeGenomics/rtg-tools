@@ -49,7 +49,7 @@ import com.rtg.util.io.IOUtils;
 import com.rtg.util.io.MemoryPrintStream;
 
 /**
- * Client for talking to <code>http</code> based usage tracking server
+ * Client for talking to <code>http</code> based usage logging server
  */
 @TestClass(value = {"com.rtg.usage.UsageServerTest", "com.rtg.usage.HttpUsageLoggingClientTest"})
 public class HttpUsageLoggingClient implements UsageLoggingClient {
@@ -59,27 +59,17 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
   private final String mHost;
   private final UsageConfiguration mUsageConfiguration;
   private final boolean mRequireUsage;
+  private boolean mStartSent = false;
 
   /**
    * @param host <code>url</code> for posting usage to
-   * @param conf the usage tracking configuration (for user and host name logging options)
+   * @param conf the usage configuration (for user and host name logging options)
    * @param requireUsage true if a failed message should be treated as an error
    */
   public HttpUsageLoggingClient(String host, UsageConfiguration conf, boolean requireUsage) {
     mHost = host;
     mUsageConfiguration = conf;
     mRequireUsage = requireUsage;
-  }
-
-  @Override
-  public void recordEnd(long metric, String module, UUID runId, boolean success) {
-    final HashMap<String, String> values = new HashMap<>();
-    values.put(UsageServer.RUN_ID, runId.toString());
-    values.put(UsageServer.MODULE, module);
-    values.put(UsageServer.TYPE, success ? "Success" : "Fail");
-    values.put(UsageServer.METRIC, Long.toString(metric));
-    setCommon(values);
-    sendMessage(values);
   }
 
   @Override
@@ -90,7 +80,20 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
     values.put(UsageServer.MODULE, module);
     //values.put(UsageServer.METRIC, "N/A");
     setCommon(values);
-    sendMessage(values);
+    mStartSent = sendMessage(values);
+  }
+
+  @Override
+  public void recordEnd(long metric, String module, UUID runId, boolean success) {
+    if (mStartSent) {
+      final HashMap<String, String> values = new HashMap<>();
+      values.put(UsageServer.RUN_ID, runId.toString());
+      values.put(UsageServer.MODULE, module);
+      values.put(UsageServer.TYPE, success ? "Success" : "Fail");
+      values.put(UsageServer.METRIC, Long.toString(metric));
+      setCommon(values);
+      sendMessage(values);
+    }
   }
 
   private void setCommon(Map<String, String> map) {
@@ -115,7 +118,7 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
     return DEFAULT_RETRY_WAIT;
   }
 
-  private void sendMessage(Map<String, String> values) {
+  private boolean sendMessage(Map<String, String> values) {
     boolean success = false;
     String failureMessage = "";
     for (int t = 0; t < NUM_TRIES && !success; t++) {
@@ -126,7 +129,7 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
           if (mRequireUsage) {
             throw new NoTalkbackSlimException("Failed to send usage information. Aborting.");
           } else {
-            return;
+            return success;
           }
         }
         //Diagnostic.warning("Retrying... (Attempt " + (t + 1) + " of " + NUM_TRIES + ")");
@@ -184,10 +187,13 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
     }
     if (!success) {
       Diagnostic.warning(failureMessage);
-      Diagnostic.warning("(Gave up after " + NUM_TRIES + " attempts)");
       if (mRequireUsage) {
+        Diagnostic.warning("(Gave up after " + NUM_TRIES + " attempts)");
         throw new NoTalkbackSlimException("Failed to send usage information. Aborting.");
+      } else {
+        Diagnostic.warning("(Gave up after " + NUM_TRIES + " attempts. If this persists, you may wish to disable usage logging in the RTG installation configuration)");
       }
     }
+    return success;
   }
 }

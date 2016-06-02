@@ -108,6 +108,7 @@ public class HttpUsageLoggingClientTest extends TestCase {
         System.setProperty("user.name", new String(newname));
         final MyHttpUsageLoggingClient client = new MyHttpUsageLoggingClient("http://localhost:1000/", false, 3);
         client.recordBeginning("test mod", UUID.randomUUID());
+        client.recordEnd(12345, "test mod", UUID.randomUUID(), true);
         assertEquals(3, client.mTries);
         assertEquals(2, dl.mMsgNo);
       } finally {
