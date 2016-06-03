@@ -193,9 +193,9 @@ public final class VcfFilterCli extends AbstractCli {
     // Xflags
     mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, "float", "minimum allowed posterior score").setCategory(FILTERING);
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
-    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "format field expression (e.g. GQ>0.5)").setCategory(FILTERING);
+    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "Arbitrary javascript for determining whether to keep record").setCategory(FILTERING);
+    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "Arbitrary javascript for determining whether to keep record. May be either an expression or a file name").setCategory(FILTERING);
 
     mFlags.setValidator(new VcfFilterValidator());
   }
@@ -489,8 +489,15 @@ public final class VcfFilterCli extends AbstractCli {
       }
     }
     if (mFlags.isSet(JS_FLAG)) {
-      final String expr = (String) mFlags.getValue(JS_FLAG);
-      mVcfFilterTask.mFilters.add(new ScriptedVcfFilter(expr));
+      final String jsFlag = (String) mFlags.getValue(JS_FLAG);
+      final File jsFile = new File(jsFlag);
+      final String jsExpr;
+      if (jsFile.exists()) {
+        jsExpr = FileUtils.fileToString(jsFile);
+      } else {
+        jsExpr = jsFlag;
+      }
+      mVcfFilterTask.mFilters.add(new ScriptedVcfFilter(jsExpr));
     }
     final File in = (File) mFlags.getValue(INPUT);
     final File out = (File) mFlags.getValue(OUTPUT);
