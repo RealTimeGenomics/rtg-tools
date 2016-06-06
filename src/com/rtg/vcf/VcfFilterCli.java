@@ -38,6 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.stream.Collectors;
 
 import com.rtg.bed.BedUtils;
 import com.rtg.launcher.AbstractCli;
@@ -359,11 +360,8 @@ public final class VcfFilterCli extends AbstractCli {
   }
 
   private void process(final OutputStream output) throws IOException {
-
     if (mFlags.isSet(SAMPLE)) {
-      for (Object o : mFlags.getValues(SAMPLE)) {
-        mVcfFilterTask.mSampleNames.add((String) o);
-      }
+      mVcfFilterTask.mSampleNames.addAll(mFlags.getValues(SAMPLE).stream().map(o -> (String) o).collect(Collectors.toList()));
     }
 
     mVcfFilterTask.mResetFailedSampleGts = mFlags.isSet(CLEAR_FAILED_SAMPLES);
@@ -427,33 +425,21 @@ public final class VcfFilterCli extends AbstractCli {
     for (final String flag : sampleFlags) {
       mVcfFilterTask.mCheckingSample |= mFlags.isSet(flag);
     }
-    for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
-      if (!((String) expr).startsWith("INFO.")) {
-        mVcfFilterTask.mCheckingSample = true;
-      }
-    }
+    mFlags.getValues(EXPR_FLAG).stream().filter(expr -> !((String) expr).startsWith("INFO.")).forEach(expr -> mVcfFilterTask.mCheckingSample = true);
     mVcfFilterTask.mRemoveOverlapping = mFlags.isSet(REMOVE_OVERLAPPING);
     mVcfFilterTask.mRemoveAllSameAsRef = mFlags.isSet(REMOVE_ALL_SAME_AS_REF);
     mVcfFilterTask.mDensityWindow = mFlags.isSet(DENSITY_WINDOW) ? (Integer) mFlags.getValue(DENSITY_WINDOW) : null;
     if (mFlags.isSet(KEEP_FILTER)) {
-      for (final Object tag : mFlags.getValues(KEEP_FILTER)) {
-        mVcfFilterTask.mKeepFilters.add((String) tag);
-      }
+      mVcfFilterTask.mKeepFilters.addAll(mFlags.getValues(KEEP_FILTER).stream().map(tag -> (String) tag).collect(Collectors.toList()));
     }
     if (mFlags.isSet(REMOVE_FILTER)) {
-      for (final Object tag : mFlags.getValues(REMOVE_FILTER)) {
-        mVcfFilterTask.mRemoveFilters.add((String) tag);
-      }
+      mVcfFilterTask.mRemoveFilters.addAll(mFlags.getValues(REMOVE_FILTER).stream().map(tag -> (String) tag).collect(Collectors.toList()));
     }
     if (mFlags.isSet(KEEP_INFO)) {
-      for (final Object tag : mFlags.getValues(KEEP_INFO)) {
-        mVcfFilterTask.mKeepInfos.add((String) tag);
-      }
+      mVcfFilterTask.mKeepInfos.addAll(mFlags.getValues(KEEP_INFO).stream().map(tag -> (String) tag).collect(Collectors.toList()));
     }
     if (mFlags.isSet(REMOVE_INFO)) {
-      for (final Object tag : mFlags.getValues(REMOVE_INFO)) {
-        mVcfFilterTask.mRemoveInfos.add((String) tag);
-      }
+      mVcfFilterTask.mRemoveInfos.addAll(mFlags.getValues(REMOVE_INFO).stream().map(tag -> (String) tag).collect(Collectors.toList()));
     }
     if (mFlags.isSet(INCLUDE_BED)) {
       mVcfFilterTask.mIncludeBed = BedUtils.regions((File) mFlags.getValue(INCLUDE_BED));
@@ -491,13 +477,7 @@ public final class VcfFilterCli extends AbstractCli {
     if (mFlags.isSet(JS_FLAG)) {
       final String jsFlag = (String) mFlags.getValue(JS_FLAG);
       final File jsFile = new File(jsFlag);
-      final String jsExpr;
-      if (jsFile.exists()) {
-        jsExpr = FileUtils.fileToString(jsFile);
-      } else {
-        jsExpr = jsFlag;
-      }
-      mVcfFilterTask.mFilters.add(new ScriptedVcfFilter(jsExpr));
+      mVcfFilterTask.mFilters.add(new ScriptedVcfFilter(jsFile.exists() ? FileUtils.fileToString(jsFile) : jsFlag));
     }
     final File in = (File) mFlags.getValue(INPUT);
     final File out = (File) mFlags.getValue(OUTPUT);
