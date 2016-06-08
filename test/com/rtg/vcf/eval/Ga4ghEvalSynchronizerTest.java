@@ -41,7 +41,7 @@ public class Ga4ghEvalSynchronizerTest extends AbstractVcfEvalTest {
   }
 
   public void testCombined2() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_ga4gh2", false, "--sample", "sample1,sample2", "--ref-overlap", "--output-mode", "ga4gh", "--squash-ploidy");
+    endToEnd("vcfeval_ga4gh2", false, "--sample", "sample1,sample2", "--ref-overlap", "--output-mode", "ga4gh", "--squash-ploidy", "--all-records");
   }
 
   public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

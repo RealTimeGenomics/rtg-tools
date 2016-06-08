@@ -77,8 +77,14 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String OUTPUT_FILE_NAME = "output.vcf";
   private static final String SAMPLE_TRUTH = "TRUTH";
   private static final String SAMPLE_QUERY = "QUERY";
-  private static final int TRUTH = 0;
-  private static final int QUERY = 1;
+
+  // Order of sample columns in the output VCF
+  private static final int TRUTH_SAMPLE_INDEX = 0;
+  private static final int QUERY_SAMPLE_INDEX = 1;
+
+  // Record order during merging (first has field priority)
+  private static final int QUERY_MERGE_INDEX = 0;
+  private static final int TRUTH_MERGE_INDEX = 1;
 
   private final VcfWriter mVcfOut;
   private final VcfHeader mOutHeader;
@@ -116,6 +122,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();
     mOutHeader.addContigFields(variants.baseLineHeader());
+    variants.calledHeader().getFilterLines().forEach(mOutHeader::addFilterField);
     mOutHeader.addInfoField(new InfoField(INFO_SUPERLOCUS_ID, MetaType.INTEGER, VcfNumber.DOT, "Benchmarking superlocus ID for these variants."));
     mOutHeader.addInfoField(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of truth variants). When unspecified, assume 1.0"));
     mOutHeader.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
@@ -126,12 +133,12 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutHeader.addSampleName(SAMPLE_TRUTH);
     mOutHeader.addSampleName(SAMPLE_QUERY);
 
-    mInHeaders[TRUTH] = variants.baseLineHeader().copy();
-    mInHeaders[TRUTH].removeAllSamples();
-    mInHeaders[TRUTH].addSampleName(SAMPLE_TRUTH);
-    mInHeaders[QUERY] = variants.calledHeader().copy();
-    mInHeaders[QUERY].removeAllSamples();
-    mInHeaders[QUERY].addSampleName(SAMPLE_QUERY);
+    mInHeaders[TRUTH_MERGE_INDEX] = variants.baseLineHeader().copy();
+    mInHeaders[TRUTH_MERGE_INDEX].removeAllSamples();
+    mInHeaders[TRUTH_MERGE_INDEX].addSampleName(SAMPLE_TRUTH);
+    mInHeaders[QUERY_MERGE_INDEX] = variants.calledHeader().copy();
+    mInHeaders[QUERY_MERGE_INDEX].removeAllSamples();
+    mInHeaders[QUERY_MERGE_INDEX].addSampleName(SAMPLE_QUERY);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mVcfOut = new VcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), null, zip, true);
@@ -139,25 +146,25 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   @Override
   protected void handleUnknownBaseline() throws IOException {
-    final VcfRecord rec = makeSimpleRecord(mBrv, mBaselineSampleNo, TRUTH);
+    final VcfRecord rec = makeSimpleRecord(mBrv, mBaselineSampleNo, TRUTH_SAMPLE_INDEX, false);
     writeRecord(updateForBaseline(true, rec));
   }
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    final VcfRecord rec = makeSimpleRecord(mBrv, mBaselineSampleNo, TRUTH);
+    final VcfRecord rec = makeSimpleRecord(mBrv, mBaselineSampleNo, TRUTH_SAMPLE_INDEX, false);
     writeRecord(updateForBaseline(false, rec));
   }
 
   @Override
   protected void handleUnknownCall() throws IOException {
-    final VcfRecord rec = makeSimpleRecord(mCrv, mCallSampleNo, QUERY);
+    final VcfRecord rec = makeSimpleRecord(mCrv, mCallSampleNo, QUERY_SAMPLE_INDEX, true);
     writeRecord(updateForCall(true, rec));
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
-    final VcfRecord rec = makeSimpleRecord(mCrv, mCallSampleNo, QUERY);
+    final VcfRecord rec = makeSimpleRecord(mCrv, mCallSampleNo, QUERY_SAMPLE_INDEX, true);
     writeRecord(updateForCall(false, rec));
   }
 
@@ -188,16 +195,17 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   }
 
   private VcfRecord makeCombinedRecord() {
-    mInRecs[TRUTH] = makeSimpleRecord(mBrv, mBaselineSampleNo, -1);
-    mInRecs[QUERY] = makeSimpleRecord(mCrv, mCallSampleNo, -1);
+    mInRecs[TRUTH_MERGE_INDEX] = makeSimpleRecord(mBrv, mBaselineSampleNo, -1, false);
+    mInRecs[QUERY_MERGE_INDEX] = makeSimpleRecord(mCrv, mCallSampleNo, -1, true);
     return VcfRecord.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false); // Takes care of updating ALTs and GTs.
   }
 
   // Produce a (minimal) record with sample in correct location for easier merging / output
-  private VcfRecord makeSimpleRecord(VcfRecord inRec, int sampleIndex, int destPos) {
+  private VcfRecord makeSimpleRecord(VcfRecord inRec, int sampleIndex, int destPos, boolean preserveFilters) {
     final VcfRecord outRec = new VcfRecord(inRec.getSequenceName(), inRec.getStart(), inRec.getRefCall());
-    for (String alt : inRec.getAltCalls()) {
-      outRec.addAltCall(alt);
+    inRec.getAltCalls().forEach(outRec::addAltCall);
+    if (preserveFilters) {
+      inRec.getFilters().forEach(outRec::addFilter);
     }
     final String gtStr = VcfUtils.getValidGtStr(inRec, sampleIndex);
     if (destPos == -1) {
@@ -221,35 +229,35 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   protected VcfRecord updateForCall(boolean unknown, VcfRecord outRec) {
     if (unknown) {
-      outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY);
+      outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
     } else {
       final String sync;
       final byte s = mCv.getStatus();
       switch (s) {
         case VariantId.STATUS_SKIPPED:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY);
-          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, QUERY);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, QUERY_SAMPLE_INDEX);
           sync = null;
           break;
         case VariantId.STATUS_GT_MATCH:
           setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
           sync = Integer.toString(mCSyncStart + 1);
           break;
         case VariantId.STATUS_ALLELE_MATCH:
           setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, QUERY);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, QUERY_SAMPLE_INDEX);
           if (isMultiAllelicCall(((OrientedVariant) mCv).variant())) {
-            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY);
+            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY_SAMPLE_INDEX);
           }
           sync = Integer.toString(mCSyncStart2 + 1);
           break;
         case VariantId.STATUS_NO_MATCH:
           setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, QUERY);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, QUERY_SAMPLE_INDEX);
           sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
           break;
         default:
@@ -273,31 +281,31 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   protected VcfRecord updateForBaseline(boolean unknown, VcfRecord outRec) {
     if (unknown) {
-      outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH);
+      outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
     } else {
       final String sync;
       switch (mBv.getStatus()) {
         case VariantId.STATUS_SKIPPED:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH);
-          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, TRUTH);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, TRUTH_SAMPLE_INDEX);
           sync = null;
           break;
         case VariantId.STATUS_GT_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
           sync = Integer.toString(mBSyncStart + 1);
           break;
         case VariantId.STATUS_ALLELE_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, TRUTH);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, TRUTH_SAMPLE_INDEX);
           if (isMultiAllelicCall(((OrientedVariant) mBv).variant())) {
-            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, TRUTH);
+            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, TRUTH_SAMPLE_INDEX);
           }
           sync = Integer.toString(mBSyncStart2 + 1);
           break;
         case VariantId.STATUS_NO_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, TRUTH);
+          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
+          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, TRUTH_SAMPLE_INDEX);
           sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
           break;
         default:
@@ -311,7 +319,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private void setRocScore(VcfRecord outRec) {
     final double score = mRocExtractor.getSortValue(mCrv, mCallSampleNo);
     if (!Double.isNaN(score)) {
-      outRec.setFormatAndSample(FORMAT_ROC_SCORE,  "" + score, QUERY);
+      outRec.setFormatAndSample(FORMAT_ROC_SCORE,  "" + score, QUERY_SAMPLE_INDEX);
     }
   }
 

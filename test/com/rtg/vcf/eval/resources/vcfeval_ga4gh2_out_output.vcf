@@ -8,8 +8,8 @@
 ##FORMAT=<ID=BI,Number=1,Type=String,Description="Additional comparison information">
 ##FORMAT=<ID=QQ,Number=1,Type=Float,Description="Variant quality for ROC creation.">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	TRUTH	QUERY
-1	68	.	A	AT	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
-1	69	.	T	TA	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
-1	70	.	A	T,TT	.	.	BS=69	GT:BD:BK	2|2:FN	1|1:TP:gm
+1	68	.	A	AT	.	PASS	BS=69	GT:BD:BK	1|1:TP:gm	.:N
+1	69	.	T	TA	.	F1	BS=69	GT:BD:BK	1|1:TP:gm	.:N
+1	70	.	A	T,TT	.	F1;F2	BS=69	GT:BD:BK	2|2:FN	1|1:TP:gm
 1	83	.	AAT	A	.	.	BS=69	GT:BD:BK	1|1:TP:gm	.:N
 1	85	.	T	A	.	.	BS=69	GT:BD:BK	.:N	1|1:TP:gm
