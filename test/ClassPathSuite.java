@@ -32,8 +32,9 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
-import com.rtg.util.PortableRandom;
 import com.rtg.util.ClassPathScanner;
+import com.rtg.util.PortableRandom;
+import com.rtg.util.diagnostic.Diagnostic;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -52,6 +53,7 @@ public class ClassPathSuite extends TestSuite {
   }
 
   ClassPathSuite(String packagePrefix) {
+    Diagnostic.setLogStream();
     final ClassPathScanner scanner = new ClassPathScanner(packagePrefix);
     final List<Class<?>> testClasses = scanner.getClasses(clazz -> clazz.getName().endsWith("Test") && isTestClass(clazz));
     if (SHUFFLE_TESTS != null) { // Run test classes in random order to help detect any stray inter-test dependencies
