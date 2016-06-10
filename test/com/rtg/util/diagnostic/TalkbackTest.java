@@ -76,26 +76,29 @@ public class TalkbackTest extends TestCase {
         System.setErr(mps.printStream());
         try {
           final File logFile = new File(tmpDir, "log");
-          Diagnostic.setLogStream(new LogFile(logFile));
-          final Map<String, String> got = new HashMap<>();
-          final HttpServer h = createHttpServer(got, null);
-          h.start();
-          Talkback.setTalkbackURL("http://localhost:" + h.getPort() + "/talkback");
-          try {
-            assertTrue(Talkback.postTalkback(new RuntimeException(), true));
-          } finally {
-            h.stop();
+          try (LogFile logStream = new LogFile(logFile)) {
+            Diagnostic.setLogStream(logStream);
+            final Map<String, String> got = new HashMap<>();
+            final HttpServer h = createHttpServer(got, null);
+            h.start();
+            Talkback.setTalkbackURL("http://localhost:" + h.getPort() + "/talkback");
+            try {
+              assertTrue(Talkback.postTalkback(new RuntimeException(), true));
+            } finally {
+              h.stop();
+            }
+            assertTrue("expiry not in " + got.toString(), got.containsKey("expiry"));
+            assertTrue("machine not in " + got.toString(), got.containsKey("machine"));
+            assertTrue("subject not in " + got.toString(), got.containsKey("subject"));
+            assertTrue("user not in " + got.toString(), got.containsKey("user"));
+            assertTrue("not developer user in " + got.toString(), "1".equals(got.get("d")));
+            TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "Talkback successfully sent.");
+            assertEquals(2, mps.toString().split(StringUtils.LS).length);
           }
-          assertTrue("expiry not in " + got.toString(), got.containsKey("expiry"));
-          assertTrue("machine not in " + got.toString(), got.containsKey("machine"));
-          assertTrue("subject not in " + got.toString(), got.containsKey("subject"));
-          assertTrue("user not in " + got.toString(), got.containsKey("user"));
-          assertTrue("not developer user in " + got.toString(), "1".equals(got.get("d")));
-          TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "Talkback successfully sent.");
-          assertEquals(2, mps.toString().split(StringUtils.LS).length);
         } finally {
           System.setErr(olderr);
         }
+        Diagnostic.setLogStream();
       }
     } else {
       System.err.println("WARNING: No key, talkback posting not tested");

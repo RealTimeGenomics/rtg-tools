@@ -75,7 +75,7 @@ public final class IndexUtils {
       } else {
         mvFile = f;
       }
-      if (!outFile.renameTo(mvFile)) {
+      if ((!mvFile.exists() || mvFile.delete()) && !outFile.renameTo(mvFile)) {
         Diagnostic.warning("failed to rename temporary file: " + outFile.getPath() + " to: " + mvFile.getPath());
       }
     }

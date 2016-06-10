@@ -75,7 +75,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     h.removeAllSamples();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
     mAlleles = new VcfWriter(h, new File(output, "alleles.vcf" + zipExt), null, zip, true); // Contains new population alleles (old + new sample alleles)
-    mAuxiliary = new VcfWriter(h, new File(output, "aux.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
+    mAuxiliary = new VcfWriter(h, new File(output, "auxiliary.vcf" + zipExt), null, zip, true); // Contains sample calls that were matched (i.e. redundant alleles)
   }
 
   protected void resetRecordFields(VcfRecord rec) {
