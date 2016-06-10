@@ -646,8 +646,8 @@ public class Flag implements Comparable<Flag> {
         }
       }
     }
-    if (allowCsv) {
-      ret.append(" or as a comma separated list");
+    if (ret.length() > 0 && allowCsv) {
+      ret.append(", or as a comma separated list");
     }
     return ret.toString();
   }
