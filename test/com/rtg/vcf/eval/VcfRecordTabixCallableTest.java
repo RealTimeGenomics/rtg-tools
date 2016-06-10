@@ -34,6 +34,7 @@ import java.util.List;
 
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfUtils;
@@ -53,12 +54,21 @@ public class VcfRecordTabixCallableTest extends TestCase {
       final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
       ranges.put("simulatedSequence2", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence2")));
       ranges.put("simulatedSequence13", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence13")));
+      final ReferenceRegions highConf = new ReferenceRegions();
+      highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
+
       final VariantFactory fact = TabixVcfRecordSet.getVariantFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null, false);
-      final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100);
+      final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), highConf, "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100);
       List<Variant> set = runner.call().mVariants;
+      for (Variant v : set) {
+        assertTrue(v.hasStatus(VariantId.STATUS_LOW_CONF));
+      }
       assertEquals(2, set.size());
-      final VcfRecordTabixCallable runner2 = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence2"), "simulatedSequence2", -1, VariantSetType.BASELINE, fact, true, 100);
+      final VcfRecordTabixCallable runner2 = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence2"), highConf, "simulatedSequence2", -1, VariantSetType.BASELINE, fact, true, 100);
       set = runner2.call().mVariants;
+      for (Variant v : set) {
+        assertFalse(v.hasStatus(VariantId.STATUS_LOW_CONF));
+      }
       assertEquals(4, set.size());
       assertEquals(215, set.get(0).getStart());
     }

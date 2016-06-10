@@ -57,11 +57,13 @@ public final class Path implements Comparable<Path> {
     private final int mPos;
     private final double mCalledTPCount;
     private final double mBaselineTPCount;
+    private final double mBaselineTPHighConf;
 
-    SyncPoint(int pos, int calledCounts, int baselineCounts) {
+    SyncPoint(int pos, int calledCount, int baselineCount, int baselineHighConfCount) {
       mPos = pos;
-      mCalledTPCount = calledCounts;
-      mBaselineTPCount = baselineCounts;
+      mCalledTPCount = calledCount;
+      mBaselineTPCount = baselineCount;
+      mBaselineTPHighConf = baselineHighConfCount;
     }
 
     int getPos() {
@@ -300,9 +302,13 @@ public final class Path implements Comparable<Path> {
     int callPos = 0;
     for (int loc : syncpoints) {
       int baseLineCount = 0;
+      int baseLineHighConf = 0;
       int calledCount = 0;
       while (basePos < baseLine.size() && baseLine.get(basePos).getStart() <= loc) {
         baseLineCount++;
+        if (!baseLine.get(basePos).hasStatus(VariantId.STATUS_LOW_CONF)) {
+          baseLineHighConf++;
+        }
         basePos++;
       }
 
@@ -310,7 +316,7 @@ public final class Path implements Comparable<Path> {
         calledCount++;
         callPos++;
       }
-      list.add(new SyncPoint(loc, calledCount, baseLineCount));
+      list.add(new SyncPoint(loc, calledCount, baseLineCount, baseLineHighConf));
     }
     return list;
   }
@@ -348,12 +354,14 @@ public final class Path implements Comparable<Path> {
         syncpoint = syncIterator.next();
       }
       if (syncpoint.mBaselineTPCount == 0) {
+        // May rarely happen if there are self-cancelling calls
         Diagnostic.developerLog("Best path called variant was assigned weight of 0 due to no baseline TP within sync region "
             + v.getSequenceName() + ":" + (syncStart + 1) + "-" + (syncpoint.mPos + 1) + "\n"
             + "Bumped variant:  " + v);
         v.setWeight(0);
       } else {
-        v.setWeight(syncpoint.mBaselineTPCount / syncpoint.mCalledTPCount);
+        // TPHighConf count could still be 0 if the only TP are outside high conf regions
+        v.setWeight(syncpoint.mBaselineTPHighConf / syncpoint.mCalledTPCount);
       }
     }
   }

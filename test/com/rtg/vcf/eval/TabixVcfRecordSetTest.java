@@ -51,6 +51,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -87,7 +88,9 @@ public class TabixVcfRecordSetTest extends TestCase {
       for (int seq = 1; seq < 32; seq++) {
         ranges.put("simulatedSequence" + seq, new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
       }
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, names, null, null, true, false, 100);
+      final ReferenceRegions highConf = new ReferenceRegions();
+      highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
+      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100);
 
       final Set<String> expected = new HashSet<>();
       for (int seq = 1; seq < 32; seq++) {
@@ -101,6 +104,12 @@ public class TabixVcfRecordSetTest extends TestCase {
         final String currentName = current.getA();
         assertTrue("unexpected sequence <" + currentName + ">", expected.contains(currentName));
         expected.remove(currentName);
+        for (Variant v : current.getB().get(VariantSetType.BASELINE)) {
+          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_LOW_CONF));
+        }
+        for (Variant v : current.getB().get(VariantSetType.CALLS)) {
+          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_LOW_CONF));
+        }
         if (currentName.equals("simulatedSequence19")) {
           assertEquals(1, current.getB().get(VariantSetType.CALLS).size());
           assertEquals(6, current.getB().get(VariantSetType.BASELINE).size());

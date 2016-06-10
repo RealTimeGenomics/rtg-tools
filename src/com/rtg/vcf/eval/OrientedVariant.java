@@ -45,7 +45,6 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
   private final int mOtherAlleleId;
 
   private double mWeight;
-  private byte mStatus;
 
   /**
    * Create a homozygous variant
@@ -202,16 +201,16 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
 
   @Override
   public void setStatus(byte status) {
-    mStatus = status;
+    mVariant.setStatus(status);
   }
 
   @Override
-  public byte getStatus() {
-    return mStatus;
+  public boolean hasStatus(byte status) {
+    return mVariant.hasStatus(status);
   }
 
   /**
-   * @param weight  set the weight
+   * @param weight set the weight
    */
   public void setWeight(double weight) {
     mWeight = weight;

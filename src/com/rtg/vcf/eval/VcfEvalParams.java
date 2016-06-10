@@ -70,6 +70,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
+    private File mHighConfRegionsFile = null;
     private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
     private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
     private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
@@ -254,12 +255,22 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
-     * Set the bed file to use which specifies regions
-     * @param bedRegionsFile the bed file which specifies regions
+     * Set the bed file to use which specifies regions from which variants will be loaded
+     * @param bedFile the bed file which specifies regions
      * @return this builder
      */
-    public VcfEvalParamsBuilder bedRegionsFile(File bedRegionsFile) {
-      mBedRegionsFile = bedRegionsFile;
+    public VcfEvalParamsBuilder bedRegionsFile(File bedFile) {
+      mBedRegionsFile = bedFile;
+      return this;
+    }
+
+    /**
+     * Set the bed file to use which specifies high confidence regions
+     * @param bedFile the bed file which specifies regions
+     * @return this builder
+     */
+    public VcfEvalParamsBuilder highConfRegionsFile(File bedFile) {
+      mHighConfRegionsFile = bedFile;
       return this;
     }
 
@@ -298,6 +309,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final File mTemplateFile;
   private final RegionRestriction mRestriction;
   private final File mBedRegionsFile;
+  private final File mHighConfRegionsFile;
   private final String mScoreField;
   private final String mOutputMode;
   private final RocSortOrder mSortOrder;
@@ -325,6 +337,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mTemplateFile = builder.mTemplateFile;
     mRestriction = builder.mRestriction;
     mBedRegionsFile = builder.mBedRegionsFile;
+    mHighConfRegionsFile = builder.mHighConfRegionsFile;
     mSortOrder = builder.mSortOrder;
     mScoreField = builder.mScoreField;
     mOutputMode = builder.mOutputMode;
@@ -375,10 +388,17 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
-   * @return a bed file containing the regions to process, or null for no bed region based filtering.
+   * @return a bed file containing the regions to load variants from, or null for no bed region based filtering.
    */
   public File bedRegionsFile() {
     return mBedRegionsFile;
+  }
+
+  /**
+   * @return a bed file containing the high-confidence evaluation regions, or null for no high-confidence region evaluation.
+   */
+  public File highConfRegionsFile() {
+    return mHighConfRegionsFile;
   }
 
   /**

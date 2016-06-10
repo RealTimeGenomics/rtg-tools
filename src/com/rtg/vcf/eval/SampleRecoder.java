@@ -105,7 +105,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       // Good, evidence that we are recoding to new representation when needed
       mCrv.addInfo("STATUS", "C-TP-BDiff");
       mAuxiliary.write(mCrv);
-    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) {
+    } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // We don't have a baseline record at this position -- during allele accumulation this record was determined to be redundant / equivalent to other variants.
       // We have a good indication that it should have been possible to simplify this if the region were not too hard
       mCrv.addInfo("STATUS", "C-TooHard-BDiff");
@@ -132,7 +132,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
       normalize(mBrv, 0);
       mSampleVcf.write(mBrv);
-    } else if (mBv.getStatus() == VariantId.STATUS_SKIPPED) {
+    } else if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // Expected sometimes, do nothing here (a relevant call will already have been output if needed during processBoth using its allele representation).
       mBrv.addInfo("STATUS", "B-TooHard");
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.MISSING_FIELD);
@@ -176,10 +176,10 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       // Normal scenario where sample matches population alleles directly
       // Elsewhere we'll output the baseline version, but make a note here.
       // We expect many of these, probably fine to silently drop, but interesting to see the status
-      final String status = (mBv instanceof OrientedVariant) ? "C-TP-BSame" : (mBv.getStatus() == VariantId.STATUS_SKIPPED) ? "C-TP-BSkipped" : "C-TP-BSwitched";
+      final String status = (mBv instanceof OrientedVariant) ? "C-TP-BSame" : (mBv.hasStatus(VariantId.STATUS_SKIPPED)) ? "C-TP-BSkipped" : "C-TP-BSwitched";
       mCrv.addInfo("STATUS", status);
       mAuxiliary.write(mCrv);
-    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) {
+    } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // Happens in TooHard regions.
       // Output the original representation
       mCrv.addInfo("STATUS", "C-TooHard");

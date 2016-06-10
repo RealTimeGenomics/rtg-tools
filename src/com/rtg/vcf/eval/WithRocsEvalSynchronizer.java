@@ -113,16 +113,16 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     mCorrectPhasings += correctPhasings;
   }
 
-  protected void addToROCContainer(double weight, byte status) {
+  protected void addToROCContainer(double tpWeight, double fpWeight, boolean alleleMatch) {
     if (mDefaultRoc != null) {
-      if (status == VariantId.STATUS_ALLELE_MATCH) { // Consider these FP for GT ROCs
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0);
+      if (alleleMatch) { // Consider these FP for GT ROCs
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, fpWeight, tpWeight);
       } else {
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, weight);
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight);
       }
     }
     if (mAlleleRoc != null) {
-      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, weight);
+      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight);
     }
   }
 

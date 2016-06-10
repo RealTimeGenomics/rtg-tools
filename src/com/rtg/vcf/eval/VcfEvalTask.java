@@ -41,9 +41,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.bed.BedReader;
 import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.ParamsTask;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.PrereadNamesInterface;
 import com.rtg.reader.SdfId;
@@ -57,6 +58,9 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.intervals.SequenceNameLocus;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -98,7 +102,16 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
       final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
-      final VariantSet variants = getVariants(params, templateSequences, ranges);
+      final ReferenceRegions highConf;
+      if (params.highConfRegionsFile() != null) {
+        highConf = new ReferenceRegions();
+        try (IOIterator<? extends SequenceNameLocus> r = BedReader.openBedReader(null, params.highConfRegionsFile(), 0)) {
+          highConf.add(r);
+        }
+      } else {
+        highConf = null;
+      }
+      final VariantSet variants = getVariants(params, templateSequences, ranges, highConf);
 
       evaluateCalls(params, ranges, templateSequences, variants);
     }
@@ -206,10 +219,11 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
    * @param params the parameters
    * @param templateSequences template sequences
    * @param ranges controls which regions the variants will be loaded from
+   * @param highConf optional high-confidence regions
    * @return a VariantSet for the provided files
    * @throws IOException if IO is broken
    */
-  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences, ReferenceRanges<String> ranges) throws IOException {
+  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences, ReferenceRanges<String> ranges, ReferenceRegions highConf) throws IOException {
     final File calls = params.callsFile();
     final File baseline = params.baselineFile();
     final String baselineSample = params.baselineSample();
@@ -220,7 +234,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 
-    return new TabixVcfRecordSet(baseline, calls, ranges, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
+    return new TabixVcfRecordSet(baseline, calls, ranges, highConf, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
   }
 
   static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {

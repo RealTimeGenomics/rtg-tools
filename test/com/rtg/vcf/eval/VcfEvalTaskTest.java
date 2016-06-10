@@ -436,7 +436,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final VcfEvalParams params = VcfEvalParams.builder().callsFile(input).baseLineFile(input).create();
       try {
         final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, 32, 27);
-        VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader));
+        VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader), null);
         fail("Expected detection of no sequence name overlap");
       } catch (NoTalkbackSlimException e) {
         // Expected
@@ -449,7 +449,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
         lengths[seq - 1] = 1000;
       }
       final MockArraySequencesReader templateReader = new MockArraySequencesReader(SequenceType.DNA, lengths, names);
-      assertTrue(VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader)) instanceof TabixVcfRecordSet);
+      assertTrue(VcfEvalTask.getVariants(params, templateReader, VcfEvalTask.getReferenceRanges(params, templateReader), null) instanceof TabixVcfRecordSet);
     }
   }
 

@@ -129,7 +129,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
       mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
       mAuxiliary.write(mCrv);
-    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) { // Too-hard, output this variant with just the used alleles
+    } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too-hard, output this variant with just the used alleles
       final GtIdVariant v = (GtIdVariant) mCv;
       writeNonRedundant(v, "C-TooHard=" + mCv.toString());
     } else { // Excluded (novel or self-inconsistent)
@@ -143,7 +143,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
   protected void handleKnownBaseline() throws IOException {
     final String status = (mBv instanceof OrientedVariant)
       ? "B-TP=" + mBv.toString()
-      : (mBv.getStatus() == VariantId.STATUS_SKIPPED) ? "B-TooHard" : "B-FN";
+      : (mBv.hasStatus(VariantId.STATUS_SKIPPED)) ? "B-TooHard" : "B-FN";
     mBrv.addInfo("STATUS", status);
     mAlleles.write(mBrv);
   }
@@ -153,7 +153,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     if (mCv instanceof OrientedVariant) {
       mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
       mAuxiliary.write(mCrv);
-    } else if (mCv.getStatus() == VariantId.STATUS_SKIPPED) { // Too hard, merge records into b, adding any new ALT from c, flush c
+    } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too hard, merge records into b, adding any new ALT from c, flush c
       final GtIdVariant ov = (GtIdVariant) mCv;
       mergeIntoBaseline(ov, "C-TooHard");
     } else { // Excluded, merge records into b, adding any new ALT from c, flush c

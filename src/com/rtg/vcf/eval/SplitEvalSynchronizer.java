@@ -112,49 +112,42 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   @Override
   protected void handleKnownCall() throws IOException {
-    final byte s = mCv.getStatus();
-    switch (s) {
-      case VariantId.STATUS_SKIPPED:
-        break;
-      case VariantId.STATUS_GT_MATCH:
+    if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+      final double tpWeight = ((OrientedVariant) mCv).getWeight();
+      if (tpWeight > 0) {
         mCallTruePositives++;
         mTpCalls.write(mCrv);
-        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
-        break;
-      case VariantId.STATUS_ALLELE_MATCH:
+        addToROCContainer(tpWeight, 0, false);
+      }
+    } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+      final double tpWeight = ((OrientedVariant) mCv).getWeight();
+      if (tpWeight > 0) {
         mFalsePositivesCommonAllele++;
         (mFpCa != null ? mFpCa : mFp).write(mCrv);
-        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
-        break;
-      case VariantId.STATUS_NO_MATCH:
+        addToROCContainer(tpWeight, 0, true);
+      }
+    } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+      if (!mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
         mFalsePositives++;
         mFp.write(mCrv);
-        addToROCContainer(0, s);
-        break;
-      default:
-        throw new RuntimeException("Unhandled variant status: " + mCv.getStatus());
+        addToROCContainer(0, 1, false);
+      }
     }
   }
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    switch (mBv.getStatus()) {
-      case VariantId.STATUS_SKIPPED:
-        break;
-      case VariantId.STATUS_GT_MATCH:
+    if (!mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         mBaselineTruePositives++;
         mTpBase.write(mBrv);
-        break;
-      case VariantId.STATUS_ALLELE_MATCH:
+      } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
         mFalseNegativesCommonAllele++;
         (mFnCa != null ? mFnCa : mFn).write(mBrv);
-        break;
-      case VariantId.STATUS_NO_MATCH:
+      } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
         mFalseNegatives++;
         mFn.write(mBrv);
-        break;
-      default:
-        throw new RuntimeException("Unhandled variant status: " + mBv.getStatus());
+      }
     }
   }
 

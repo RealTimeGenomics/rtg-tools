@@ -74,6 +74,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String REF_OVERLAP = "ref-overlap";
   private static final String OUTPUT_MODE = "output-mode";
+  private static final String HIGH_CONF_FLAG = "Xhigh-confidence-regions";
 
   private static final String ROC_SUBSET = "Xroc-subset";
   private static final String SLOPE_FILES = "Xslope-files";
@@ -118,6 +119,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
     flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length").setCategory(INPUT_OUTPUT);
     flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+
+    flags.registerOptional('H', HIGH_CONF_FLAG, File.class, "File", "if set, evaluation will consider the regions in the supplied BED file as high-confidence").setCategory(INPUT_OUTPUT);
 
     flags.registerOptional(SAMPLE, String.class, "STRING", "the name of the sample to select. Use <baseline_sample>,<calls_sample> to select different sample names for baseline and calls. (Required when using multi-sample VCF files)").setCategory(FILTERING);
     flags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
@@ -288,6 +291,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     }
     if (mFlags.isSet(CommonFlags.BED_REGIONS_FLAG)) {
       builder.bedRegionsFile((File) mFlags.getValue(CommonFlags.BED_REGIONS_FLAG));
+    }
+    if (mFlags.isSet(HIGH_CONF_FLAG)) {
+      builder.highConfRegionsFile((File) mFlags.getValue(HIGH_CONF_FLAG));
     }
     if (mFlags.isSet(SAMPLE)) {
       final String[] samples = splitPairedSpec((String) mFlags.getValue(SAMPLE));

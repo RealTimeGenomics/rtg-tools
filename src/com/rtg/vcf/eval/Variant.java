@@ -102,12 +102,12 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
 
   @Override
   public void setStatus(byte status) {
-    mStatus = status;
+    mStatus |= status;
   }
 
   @Override
-  public byte getStatus() {
-    return mStatus;
+  public boolean hasStatus(byte status) {
+    return (mStatus & status) != 0;
   }
 
   @Override

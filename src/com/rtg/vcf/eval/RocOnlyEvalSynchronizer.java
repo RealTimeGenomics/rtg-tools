@@ -84,43 +84,36 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   @Override
   protected void handleKnownCall() throws IOException {
-    final byte s = mCv.getStatus();
-    switch (s) {
-      case VariantId.STATUS_SKIPPED:
-        break;
-      case VariantId.STATUS_GT_MATCH:
+    if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+      final double tpWeight = ((OrientedVariant) mCv).getWeight();
+      if (tpWeight > 0) {
         mCallTruePositives++;
-        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
-        break;
-      case VariantId.STATUS_ALLELE_MATCH:
+        addToROCContainer(tpWeight, 0, false);
+      }
+    } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+      final double tpWeight = ((OrientedVariant) mCv).getWeight();
+      if (tpWeight > 0) {
         mFalsePositivesCommonAllele++;
-        addToROCContainer(((OrientedVariant) mCv).getWeight(), s);
-        break;
-      case VariantId.STATUS_NO_MATCH:
+        addToROCContainer(tpWeight, 0, true);
+      }
+    } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+      if (!mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
         mFalsePositives++;
-        addToROCContainer(0, s);
-        break;
-      default:
-        throw new RuntimeException("Unhandled variant status: " + mCv.getStatus());
+        addToROCContainer(0, 1, false);
+      }
     }
   }
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    switch (mBv.getStatus()) {
-      case VariantId.STATUS_SKIPPED:
-        break;
-      case VariantId.STATUS_GT_MATCH:
+    if (!mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         mBaselineTruePositives++;
-        break;
-      case VariantId.STATUS_ALLELE_MATCH:
+      } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
         mFalseNegativesCommonAllele++;
-        break;
-      case VariantId.STATUS_NO_MATCH:
+      } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
         mFalseNegatives++;
-        break;
-      default:
-        throw new RuntimeException("Unhandled variant status: " + mBv.getStatus());
+      }
     }
   }
 

@@ -52,6 +52,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
   static final String INFO_CALL = "CALL";
   static final String INFO_SYNCPOS = "SYNC";
   static final String INFO_CALL_WEIGHT = "CALL_WEIGHT";
+  static final String STATUS_NON_CONF = "NON_CONF";
   static final String STATUS_IGNORED = "IGN";
   static final String STATUS_HARD = "HARD";
   static final String STATUS_TP = "TP";
@@ -99,40 +100,45 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       final String sync;
       String weight = null;
       final double w;
-      final byte s = mCv.getStatus();
-      switch (s) {
-        case VariantId.STATUS_SKIPPED:
-          status = STATUS_HARD;
-          sync = null;
-          break;
-        case VariantId.STATUS_GT_MATCH:
+      if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
+        status = STATUS_HARD;
+        sync = null;
+      } else if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+        w = ((OrientedVariant) mCv).getWeight();
+        if (w > 0) {
           mCallTruePositives++;
-          w = ((OrientedVariant) mCv).getWeight();
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
-          addToROCContainer(w, s);
+          addToROCContainer(w, 0, false);
           status = STATUS_TP;
-          sync = Integer.toString(mCSyncStart + 1);
-          break;
-        case VariantId.STATUS_ALLELE_MATCH:
+        } else {
+          status = STATUS_NON_CONF;
+        }
+        sync = Integer.toString(mCSyncStart + 1);
+      } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+        w = ((OrientedVariant) mCv).getWeight();
+        if (w > 0) {
           mFalsePositivesCommonAllele++;
-          w = ((OrientedVariant) mCv).getWeight();
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
-          addToROCContainer(w, s);
+          addToROCContainer(w, 0, true);
           status = STATUS_FP_CA;
-          sync = Integer.toString(mCSyncStart2 + 1);
-          break;
-        case VariantId.STATUS_NO_MATCH:
-          mFalsePositives++;
-          addToROCContainer(0, s);
-          status = STATUS_FP;
-          sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
-          break;
-        default:
-          throw new RuntimeException("Unhandled variant status during postprocessing: " + mCv.getStatus() + " cv:" + mCv);
+        } else {
+          status = STATUS_NON_CONF;
+        }
+        sync = Integer.toString(mCSyncStart2 + 1);
+      } else if (mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+        status = STATUS_NON_CONF;
+        sync = null;
+      } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        mFalsePositives++;
+        addToROCContainer(0, 1, false);
+        status = STATUS_FP;
+        sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
+      } else {
+        throw new RuntimeException("Unhandle variant status during postprocessing: " + mCv);
       }
       if (sync != null) {
         final String oldSync = newInfo.get(INFO_SYNCPOS);
@@ -152,28 +158,26 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       status = STATUS_IGNORED;
     } else {
       final String sync;
-      switch (mBv.getStatus()) {
-        case VariantId.STATUS_SKIPPED:
-          status = STATUS_HARD;
-          sync = null;
-          break;
-        case VariantId.STATUS_GT_MATCH:
-          mBaselineTruePositives++;
-          status = STATUS_TP;
-          sync = Integer.toString(mBSyncStart + 1);
-          break;
-        case VariantId.STATUS_ALLELE_MATCH:
-          mFalseNegativesCommonAllele++;
-          status = STATUS_FN_CA;
-          sync = Integer.toString(mBSyncStart2 + 1);
-          break;
-        case VariantId.STATUS_NO_MATCH:
-          mFalseNegatives++;
-          status = STATUS_FN;
-          sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
-          break;
-        default:
-          throw new RuntimeException("Unhandled variant status during postprocessing: " + mBv.getStatus() + " bv:" + mBv);
+      if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
+        status = STATUS_HARD;
+        sync = null;
+      } else if (mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+        status = STATUS_NON_CONF;
+        sync = null;
+      } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+        mBaselineTruePositives++;
+        status = STATUS_TP;
+        sync = Integer.toString(mBSyncStart + 1);
+      } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+        mFalseNegativesCommonAllele++;
+        status = STATUS_FN_CA;
+        sync = Integer.toString(mBSyncStart2 + 1);
+      } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        mFalseNegatives++;
+        status = STATUS_FN;
+        sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
+      } else {
+        throw new RuntimeException("Unhandle variant status during postprocessing: " + mBv);
       }
       if (sync != null) {
         final String oldSync = newInfo.get(INFO_SYNCPOS);

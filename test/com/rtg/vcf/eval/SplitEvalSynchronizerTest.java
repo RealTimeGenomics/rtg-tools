@@ -121,6 +121,7 @@ public class SplitEvalSynchronizerTest extends TestCase {
   public static OrientedVariant createOrientedVariant(Variant variant, boolean isAlleleA) {
     final OrientedVariant v = OrientedVariantTest.createOrientedVariant(variant, isAlleleA);
     v.setStatus(VariantId.STATUS_GT_MATCH);
+    v.setWeight(1.0);
     return v;
   }
   public static Variant createVariant(VcfRecord rec, int id) {

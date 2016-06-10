@@ -132,9 +132,10 @@ public class RocContainer {
    * add single result to ROC
    * @param rec the VCF record to incorporate into the ROC curves
    * @param sampleId the index of the sample column to use for score extraction
-   * @param weight weight of the call, 0.0 indicates a false positive with weight of 1
+   * @param tpWeight true positive weight of the call.
+   * @param fpWeight false positive weight of the call.
    */
-  public void addRocLine(VcfRecord rec, int sampleId, double weight) {
+  public void addRocLine(VcfRecord rec, int sampleId, double tpWeight, double fpWeight) {
     double score = Double.NaN;
     try {
       score = mRocExtractor.getSortValue(rec, sampleId);
@@ -146,8 +147,7 @@ public class RocContainer {
       final int[] gt = VcfUtils.getValidGt(rec, sampleId);
       for (final RocFilter filter : filters()) {
         if (filter.accept(rec, gt)) {
-          final int fpweight = weight > 0.0 ? 0 : 1;
-          addRocLine(score, weight, fpweight, filter);
+          addRocLine(score, tpWeight, fpWeight, filter);
         }
       }
     }

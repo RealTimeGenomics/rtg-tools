@@ -71,6 +71,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String FORMAT_EXTRA = "BI";
   private static final String EXTRA_MULTI = "multi";
   private static final String EXTRA_TOO_HARD = "too-hard";
+  private static final String EXTRA_NON_CONF = "non-confident";
 
   private static final String FORMAT_ROC_SCORE = "QQ";
 
@@ -232,36 +233,34 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
       outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
     } else {
       final String sync;
-      final byte s = mCv.getStatus();
-      switch (s) {
-        case VariantId.STATUS_SKIPPED:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, QUERY_SAMPLE_INDEX);
-          sync = null;
-          break;
-        case VariantId.STATUS_GT_MATCH:
-          setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
-          sync = Integer.toString(mCSyncStart + 1);
-          break;
-        case VariantId.STATUS_ALLELE_MATCH:
-          setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, QUERY_SAMPLE_INDEX);
-          if (isMultiAllelicCall(((OrientedVariant) mCv).variant())) {
-            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY_SAMPLE_INDEX);
-          }
-          sync = Integer.toString(mCSyncStart2 + 1);
-          break;
-        case VariantId.STATUS_NO_MATCH:
-          setRocScore(outRec);
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, QUERY_SAMPLE_INDEX);
-          sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
-          break;
-        default:
-          throw new RuntimeException("Unhandled variant status during postprocessing: " + mCv.getStatus() + " cv:" + mCv);
+      if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, QUERY_SAMPLE_INDEX);
+        sync = null;
+      } else if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+        setRocScore(outRec);
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+        sync = Integer.toString(mCSyncStart + 1);
+      } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+        setRocScore(outRec);
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, QUERY_SAMPLE_INDEX);
+        if (isMultiAllelicCall(((OrientedVariant) mCv).variant())) {
+          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY_SAMPLE_INDEX);
+        }
+        sync = Integer.toString(mCSyncStart2 + 1);
+      } else if (mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_NON_CONF, QUERY_SAMPLE_INDEX);
+        sync = null;
+      } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        setRocScore(outRec);
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FP, QUERY_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, QUERY_SAMPLE_INDEX);
+        sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
+      } else {
+        throw new RuntimeException("Unhandle variant status during postprocessing: " + mCv);
       }
       setSyncId(outRec, sync); // XXX, when there is already a (different) sync ID, we should instead output two separate VCF records
     }
@@ -284,32 +283,31 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
       outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
     } else {
       final String sync;
-      switch (mBv.getStatus()) {
-        case VariantId.STATUS_SKIPPED:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, TRUTH_SAMPLE_INDEX);
-          sync = null;
-          break;
-        case VariantId.STATUS_GT_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
-          sync = Integer.toString(mBSyncStart + 1);
-          break;
-        case VariantId.STATUS_ALLELE_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, TRUTH_SAMPLE_INDEX);
-          if (isMultiAllelicCall(((OrientedVariant) mBv).variant())) {
-            outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, TRUTH_SAMPLE_INDEX);
-          }
-          sync = Integer.toString(mBSyncStart2 + 1);
-          break;
-        case VariantId.STATUS_NO_MATCH:
-          outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
-          outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, TRUTH_SAMPLE_INDEX);
-          sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
-          break;
-        default:
-          throw new RuntimeException("Unhandled variant status during postprocessing: " + mBv.getStatus() + " bv:" + mBv);
+      if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, TRUTH_SAMPLE_INDEX);
+        sync = null;
+      } else if (mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_NON_CONF, TRUTH_SAMPLE_INDEX);
+        sync = null;
+      } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+        sync = Integer.toString(mBSyncStart + 1);
+      } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_ALLELE_MATCH, TRUTH_SAMPLE_INDEX);
+        if (isMultiAllelicCall(((OrientedVariant) mBv).variant())) {
+          outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, TRUTH_SAMPLE_INDEX);
+        }
+        sync = Integer.toString(mBSyncStart2 + 1);
+      } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_MISMATCH, TRUTH_SAMPLE_INDEX);
+        sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
+      } else {
+        throw new RuntimeException("Unhandled variant status during postprocessing: " + mBv);
       }
       setSyncId(outRec, sync); // XXX, when there is already a (different) sync ID, we should instead output two separate VCF records
     }
