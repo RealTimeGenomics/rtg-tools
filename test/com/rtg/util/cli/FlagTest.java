@@ -103,17 +103,17 @@ public class FlagTest extends TestCase {
   }
 
   public void testMinMax() {
-    assertEquals("", Flag.minMaxUsage(0, 1)); //this will be dealt with by the normal optional usage
-    assertEquals("", Flag.minMaxUsage(1, 1)); //this will be dealt with by the normal required usage
-    assertEquals("May be specified up to 2 times", Flag.minMaxUsage(0, 2));
-    assertEquals("May be specified up to 3 times", Flag.minMaxUsage(0, 3));
-    assertEquals("May be specified 0 or more times", Flag.minMaxUsage(0, Integer.MAX_VALUE));
-    assertEquals("Must be specified 1 or 2 times", Flag.minMaxUsage(1, 2));
-    assertEquals("Must be specified 1 to 3 times", Flag.minMaxUsage(1, 3));
-    assertEquals("Must be specified 1 or more times", Flag.minMaxUsage(1, Integer.MAX_VALUE));
-    assertEquals("Must be specified 2 times", Flag.minMaxUsage(2, 2));
-    assertEquals("Must be specified 2 or 3 times", Flag.minMaxUsage(2, 3));
-    assertEquals("Must be specified 2 to 4 times", Flag.minMaxUsage(2, 4));
-    assertEquals("Must be specified 2 or more times", Flag.minMaxUsage(2, Integer.MAX_VALUE));
+    assertEquals("", Flag.minMaxUsage(0, 1, false)); //this will be dealt with by the normal optional usage
+    assertEquals("", Flag.minMaxUsage(1, 1, false)); //this will be dealt with by the normal required usage
+    assertEquals("May be specified up to 2 times", Flag.minMaxUsage(0, 2, false));
+    assertEquals("May be specified up to 3 times or as a comma separated list", Flag.minMaxUsage(0, 3, true));
+    assertEquals("May be specified 0 or more times", Flag.minMaxUsage(0, Integer.MAX_VALUE, false));
+    assertEquals("Must be specified 1 or 2 times", Flag.minMaxUsage(1, 2, false));
+    assertEquals("Must be specified 1 to 3 times", Flag.minMaxUsage(1, 3, false));
+    assertEquals("Must be specified 1 or more times", Flag.minMaxUsage(1, Integer.MAX_VALUE, false));
+    assertEquals("Must be specified 2 times", Flag.minMaxUsage(2, 2, false));
+    assertEquals("Must be specified 2 or 3 times", Flag.minMaxUsage(2, 3, false));
+    assertEquals("Must be specified 2 to 4 times", Flag.minMaxUsage(2, 4, false));
+    assertEquals("Must be specified 2 or more times", Flag.minMaxUsage(2, Integer.MAX_VALUE, false));
   }
 }

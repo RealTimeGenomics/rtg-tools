@@ -474,7 +474,7 @@ public class Flag implements Comparable<Flag> {
    * @param max the maximum
    */
   public void setPsuedoMinMaxRangeString(final int min, final int max) {
-    final String str = minMaxUsage(min, max);
+    final String str = minMaxUsage(min, max, mRangeList);
     if (str.length() == 0) {
       mPsuedoMinMaxString = null;
     } else {
@@ -623,7 +623,7 @@ public class Flag implements Comparable<Flag> {
     return sb.toString();
   }
 
-  static String minMaxUsage(int min, int max) {
+  static String minMaxUsage(int min, int max, boolean allowCsv) {
     final StringBuilder ret = new StringBuilder();
     if (min >= 1 && max > 1) {
       if (max == Integer.MAX_VALUE) {
@@ -645,6 +645,9 @@ public class Flag implements Comparable<Flag> {
           }
         }
       }
+    }
+    if (allowCsv) {
+      ret.append(" or as a comma separated list");
     }
     return ret.toString();
   }
@@ -682,7 +685,7 @@ public class Flag implements Comparable<Flag> {
     if (mPsuedoMinMaxString != null) {
       minMaxUsage = mPsuedoMinMaxString;
     } else {
-      minMaxUsage = minMaxUsage(getMinCount(), getMaxCount());
+      minMaxUsage = minMaxUsage(getMinCount(), getMaxCount(), mRangeList);
     }
     if (minMaxUsage.length() > 0) {
       description.append(". ").append(minMaxUsage);
@@ -766,13 +769,12 @@ public class Flag implements Comparable<Flag> {
   }
 
   /**
-   * When set to true, this flag can take a comma-separated list of range values
+   * When enabled, this flag can take a comma-separated list of range values
    * and produce an list of those values
-   * @param rangeList true if flag should represent a list of the range values, false otherwise.
    * @return this flag, so calls can be chained.
    */
-  public Flag setRangeList(final boolean rangeList) {
-    mRangeList = rangeList;
+  public Flag enableCsv() {
+    mRangeList = true;
     return this;
   }
 

@@ -45,7 +45,6 @@ import java.util.Set;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -108,23 +107,23 @@ public class VcfSubset extends AbstractCli {
     CommonFlags.initIndexFlags(mFlags);
 
     // Contents of FILTER
-    mFlags.registerOptional(REMOVE_FILTER, String.class, "STRING", "remove the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(KEEP_FILTER, String.class, "STRING", "keep the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(REMOVE_FILTER, String.class, "STRING", "remove the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_FILTER, String.class, "STRING", "keep the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_FILTERS, "remove all FILTER tags").setCategory(FILTERING);
 
     // Contents of INFO
-    mFlags.registerOptional(REMOVE_INFO, String.class, "STRING", "remove the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(KEEP_INFO, String.class, "STRING", "keep the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(REMOVE_INFO, String.class, "STRING", "remove the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_INFO, String.class, "STRING", "keep the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_INFOS, "remove all INFO tags").setCategory(FILTERING);
 
     // Contents of SAMPLE
-    mFlags.registerOptional(REMOVE_SAMPLE, String.class, "STRING", "remove the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(KEEP_SAMPLE, String.class, "STRING", "keep the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(REMOVE_SAMPLE, String.class, "STRING", "remove the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_SAMPLE, String.class, "STRING", "keep the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_SAMPLES, "remove all samples").setCategory(FILTERING);
 
     // Contents of FORMAT
-    mFlags.registerOptional(REMOVE_FORMAT, String.class, "STRING", "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(KEEP_FORMAT, String.class, "STRING", "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(REMOVE_FORMAT, String.class, "STRING", "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_FORMAT, String.class, "STRING", "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Contents of QUAL
     mFlags.registerOptional(REMOVE_QUAL, "remove the QUAL field").setCategory(FILTERING);
@@ -214,7 +213,7 @@ public class VcfSubset extends AbstractCli {
 
           final Set<String> infosset = new LinkedHashSet<>();
           for (final Object anInfoslist : infoslist) {
-            Collections.addAll(infosset, StringUtils.split((String) anInfoslist, ','));
+            Collections.addAll(infosset, (String) anInfoslist);
           }
 
           if (checkHeader) {

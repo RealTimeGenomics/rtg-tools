@@ -99,7 +99,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
       derivedRange.add(derived.toString());
     }
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
-    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(derivedRange).setRangeList(true).setCategory(REPORTING);
+    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(derivedRange).enableCsv().setCategory(REPORTING);
     mFlags.setValidator(new SnpAnnotatorValidator());
   }
 
