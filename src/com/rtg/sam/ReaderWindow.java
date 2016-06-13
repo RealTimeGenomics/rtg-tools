@@ -71,4 +71,9 @@ public interface ReaderWindow<R extends ReaderRecord<R>> {
    */
   void flush(int start, int end) throws IOException;
 
+  /**
+   * Returns the start of the earliest chuck that has not had a flush request.
+   * @return position of minimum chunk with work outstanding.
+   */
+  int flushedTo();
 }
