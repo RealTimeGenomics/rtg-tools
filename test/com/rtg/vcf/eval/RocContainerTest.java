@@ -46,6 +46,10 @@ public class RocContainerTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory("roc")) {
       final RocContainer roc = new RocContainer(new RocSortValueExtractor() {
         @Override
+        boolean requiresSample() {
+          return false;
+        }
+        @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
           return 0;
         }

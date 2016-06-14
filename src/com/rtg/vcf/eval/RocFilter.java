@@ -53,6 +53,10 @@ public enum RocFilter {
     public String fileName() {
       return "weighted_roc.tsv";
     }
+    @Override
+    boolean requiresGt() {
+      return false;
+    }
   },
   /** all homozygous **/
   HOM("homozygous") {
@@ -108,12 +112,20 @@ public enum RocFilter {
     boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec);
     }
+    @Override
+    boolean requiresGt() {
+      return false;
+    }
   },
   /** all RTG simple (non complex) calls **/
   NON_XRX {
     @Override
     boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec);
+    }
+    @Override
+    boolean requiresGt() {
+      return false;
     }
   },
   /** homozygous complex calls **/
@@ -156,6 +168,13 @@ public enum RocFilter {
 
   RocFilter(String baseFilename) {
     mBaseFilename = baseFilename;
+  }
+
+  /**
+   * @return true if the filter requires access to a GT value
+   */
+  boolean requiresGt() {
+    return true;
   }
 
   /**

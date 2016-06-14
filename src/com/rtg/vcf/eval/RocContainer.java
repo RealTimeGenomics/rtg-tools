@@ -67,6 +67,7 @@ public class RocContainer {
   private int mNoScoreVariants = 0;
   private final RocSortValueExtractor mRocExtractor;
   private final String mFilePrefix;
+  private boolean mRequiresGt = false;
 
   /**
    * Constructor
@@ -110,6 +111,7 @@ public class RocContainer {
    */
   public void addFilter(RocFilter filter) {
     mRocs.put(filter, new TreeMap<Double, RocPoint>(mComparator));
+    mRequiresGt |= filter.requiresGt();
   }
 
   /**
@@ -144,7 +146,7 @@ public class RocContainer {
     if (Double.isNaN(score) || Double.isInfinite(score)) {
       mNoScoreVariants++;
     } else {
-      final int[] gt = VcfUtils.getValidGt(rec, sampleId);
+      final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
       for (final RocFilter filter : filters()) {
         if (filter.accept(rec, gt)) {
           addRocLine(score, tpWeight, fpWeight, filter);

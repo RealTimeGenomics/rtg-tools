@@ -51,6 +51,10 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
+        boolean requiresSample() {
+          return false;
+        }
+        @Override
         RocSortOrder getSortOrder() {
           return order;
         }
@@ -79,6 +83,10 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
+        boolean requiresSample() {
+          return false;
+        }
+        @Override
         RocSortOrder getSortOrder() {
           return order;
         }
@@ -102,6 +110,10 @@ public enum RocScoreField {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
+        @Override
+        boolean requiresSample() {
+          return true;
+        }
         @Override
         RocSortOrder getSortOrder() {
           return order;
@@ -134,6 +146,10 @@ public enum RocScoreField {
       }
       final AbstractDerivedAnnotation anno = derived.getAnnotation();
       return new RocSortValueExtractor() {
+        @Override
+        boolean requiresSample() {
+          return true;
+        }
         @Override
         RocSortOrder getSortOrder() {
           return order;

@@ -39,12 +39,20 @@ import com.rtg.vcf.VcfRecord;
 @TestClass("com.rtg.vcf.eval.RocScoreFieldTest")
 public abstract class RocSortValueExtractor {
 
+  abstract boolean requiresSample();
+
   abstract double getSortValue(VcfRecord rec, int sampleNo);
 
   abstract RocSortOrder getSortOrder();
 
   /** Dummy null extractor for testing purposes */
   public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {
+
+    @Override
+    boolean requiresSample() {
+      return false;
+    }
+
     @Override
     double getSortValue(VcfRecord rec, int sampleNo) {
       return 0;

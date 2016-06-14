@@ -33,9 +33,11 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -83,22 +85,36 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges);
 
     int callSampleNo;
+    EnumSet<RocFilter> filters;
     try {
       callSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
+      filters = rocFilters;
     } catch (NoTalkbackSlimException e) {
+      filters = EnumSet.copyOf(rocFilters);
+      if (extractor.requiresSample()) {
+        Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
+      } else {
+        filters.removeIf(RocFilter::requiresGt);
+        if (filters.size() != rocFilters.size()) {
+          final EnumSet<RocFilter> excluded = EnumSet.noneOf(RocFilter.class);
+          excluded.addAll(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
+          Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
+        }
+      }
       callSampleNo = -1;
     }
     mCallSampleNo = callSampleNo;
-    if (mCallSampleNo >= 0) {
+    if (mCallSampleNo >= 0 || !extractor.requiresSample()) {
       mDefaultRoc = new RocContainer(extractor);
-      mDefaultRoc.addFilters(rocFilters);
+      mDefaultRoc.addFilters(filters);
+      if (dualRocs) {
+        mAlleleRoc = new RocContainer(extractor, "allele_");
+        mAlleleRoc.addFilters(filters);
+      } else {
+        mAlleleRoc = null;
+      }
     } else {
       mDefaultRoc = null;
-    }
-    if (mCallSampleNo >= 0 && dualRocs) {
-      mAlleleRoc = new RocContainer(extractor, "allele_");
-      mAlleleRoc.addFilters(rocFilters);
-    } else {
       mAlleleRoc = null;
     }
     mZip = zip;
