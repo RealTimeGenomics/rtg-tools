@@ -202,7 +202,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.setValidator(new VcfFilterValidator());
   }
 
-  @TestClass("com.rtg.vcf.vcfFilterCliValidatorTest")
+  @TestClass("com.rtg.vcf.VcfFilterCliValidatorTest")
   private static class VcfFilterValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
