@@ -90,6 +90,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   private boolean mLastWasInconsistent = false;
 
   private long mTotalRecords;
+  private long mNoGtRecords;
   private long mStrangeChildPloidyRecords;
   private long mNonRefFamilyRecords;
   private long mBadMendelianRecords;
@@ -376,6 +377,9 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
 
   private void checkHeader() {
+    if (!mHeader.getFormatLines().stream().anyMatch((FormatField t ) -> t.getId().equals(VcfUtils.FORMAT_GENOTYPE))) {
+      throw new NoTalkbackSlimException("Supplied VCF does not contain GT FORMAT fields");
+    }
     for (Family f : mFamilies) {
       checkSampleOk(f.getFather(), "father");
       checkSampleOk(f.getMother(), "mother");
@@ -403,6 +407,9 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     if (!mTemplateName.equals(rec.getSequenceName())) {
       mTemplateName = rec.getSequenceName();
       updateExpectedAlleleCounts(mSexMemo, mTemplateName);
+    }
+    if (!rec.getFormatAndSample().containsKey(VcfUtils.FORMAT_GENOTYPE)) {
+      throw new NoTalkbackSlimException("Record does not contain GT field: " + rec.toString());
     }
     mTotalRecords++;
     mLastWasInconsistent = hasBadCallPloidy(rec) | hasBadMendelianness(rec);
