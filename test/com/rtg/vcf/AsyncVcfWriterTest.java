@@ -27,60 +27,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf;
 
-import java.io.IOException;
+import java.io.OutputStream;
 
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.vcf.header.VcfHeader;
 
-import htsjdk.samtools.util.AbstractAsyncWriter;
-import htsjdk.samtools.util.RuntimeIOException;
-
 /**
- * Adaptor that allows asynchronous writing of our VcfRecord objects.
  */
-public class AsyncVcfWriter extends AbstractAsyncWriter<VcfRecord> implements VcfWriter {
-
-  private static final int BUFFER_SIZE = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCF_ASYNC_BUFFER_SIZE);
-
-  private final VcfWriter mWriter;
-
-  /**
-   * Constructor
-   * @param w the inner VcfWriter
-   */
-  public AsyncVcfWriter(VcfWriter w) {
-    super(BUFFER_SIZE);
-    mWriter = w;
-  }
+public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
 
   @Override
-  public VcfHeader getHeader() {
-    return mWriter.getHeader();
+  protected VcfWriter getVcfWriter(VcfHeader head, OutputStream out) {
+    return new AsyncVcfWriter(new DefaultVcfWriter(head, out));
   }
 
-  @Override
-  protected String getThreadNamePrefix() {
-    return "VcfWriter";
-  }
-
-  @Override
-  protected void synchronouslyWrite(VcfRecord record) {
-    try {
-      mWriter.write(record);
-    } catch (IOException e) {
-      throw new RuntimeIOException(e);
-    }
-  }
-
-  @Override
-  protected void synchronouslyClose() {
-    try {
-      mWriter.close();
-    } catch (IOException e) {
-      throw new RuntimeIOException(e);
-    }
-  }
 }

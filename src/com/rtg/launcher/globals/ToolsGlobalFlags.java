@@ -42,6 +42,10 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
   /** Allow SAM file loading when sam header is not coordinate sorted */
   public static final String SAM_IGNORE_SORT_ORDER_FLAG = "com.rtg.sam.ignore-header-sortorder";
+
+  /** When writing VCFs asynchronously, the maximum number of records to buffer (per VCF) */
+  public static final String VCF_ASYNC_BUFFER_SIZE = "com.rtg.vcf.async-buffer-size";
+
   /** Output the best path found along with the haplotypes */
   public static final String VCFEVAL_DUMP_BEST_PATH = "com.rtg.vcf.eval.dump-path";
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
@@ -67,6 +71,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   @Override
   public void registerFlags() {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
+
+    registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
 
     registerFlag(VCFEVAL_DUMP_BEST_PATH);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");

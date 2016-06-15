@@ -30,75 +30,18 @@
 
 package com.rtg.vcf;
 
-import static com.rtg.util.StringUtils.TAB;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.OutputStream;
 
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class VcfWriterTest extends TestCase {
+public class DefaultVcfWriterTest extends AbstractVcfWriterTest {
 
-  private static final String LS = "\n"; // Not platform specific
-
-  public VcfWriterTest(String name) {
-    super(name);
-  }
-
-  public void test() throws IOException {
-    final VcfHeader head = new VcfHeader();
-    head.setVersionValue(VcfHeader.VERSION_VALUE);
-    head.addMetaInformationLine("##test1212121")
-    .addMetaInformationLine("##test12");
-    head.addSampleName("sample1")
-    .addSampleName("sample2");
-
-    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
-    rec.setId(".")
-    .setQuality("12.8")
-    .addAltCall("c")
-    .addAltCall("t")
-    .addFilter("TEST1")
-    .addFilter("TEST2")
-    .addInfo("DP", "23")
-    .addInfo("TEST", "45,46,47,48")
-    .setNumberOfSamples(2)
-    .addFormatAndSample("GT", "0/0")
-    .addFormatAndSample("GT", "0/1")
-    .addFormatAndSample("GQ", "100")
-    .addFormatAndSample("GQ", "95")
-    ;
-
-    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    final VcfWriter w = new DefaultVcfWriter(head, bos);
-    w.write(rec);
-    w.write(rec);
-
-    final String line = ""
-      + "chr1" + TAB
-      + "1210" + TAB
-      + "." + TAB
-      + "a" + TAB
-      + "c,t" + TAB
-      + "12.8" + TAB
-      + "TEST1;TEST2" + TAB
-      + "DP=23;TEST=45,46,47,48" + TAB
-      + "GT:GQ" + TAB
-      + "0/0:100" + TAB
-      + "0/1:95" + LS;
-    final String exp = "##fileformat=VCFv4.1" + LS
-      + "##test1212121" + LS
-      + "##test12" + LS
-      + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB + "INFO" + TAB + "FORMAT" + TAB + "sample1" + TAB + "sample2" + LS
-      + line
-      + line;
-
-    assertEquals(exp, bos.toString());
-    assertEquals(w.getHeader(), head);
+  @Override
+  protected VcfWriter getVcfWriter(VcfHeader head, OutputStream out) {
+    return new DefaultVcfWriter(head, out);
   }
 
   public void testErrors() {
