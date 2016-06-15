@@ -40,6 +40,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.stream.Collectors;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.bed.BedUtils;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
@@ -201,6 +202,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.setValidator(new VcfFilterValidator());
   }
 
+  @TestClass("com.rtg.vcf.vcfFilterCliValidatorTest")
   private static class VcfFilterValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
