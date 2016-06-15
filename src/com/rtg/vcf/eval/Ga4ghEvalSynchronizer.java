@@ -142,7 +142,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mInHeaders[QUERY_MERGE_INDEX].addSampleName(SAMPLE_QUERY);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mVcfOut = new VcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), null, zip, true);
+    mVcfOut = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip);
   }
 
   @Override

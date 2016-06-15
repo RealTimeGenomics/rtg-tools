@@ -186,7 +186,7 @@ public class VcfMerge extends AbstractCli {
 
     final boolean stdout = CommonFlags.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
-    try (VcfWriter w = new VcfWriter(header, vcfFile, output, gzip, index)) {
+    try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, output, gzip, index))) {
       final ZipperCallback callback = new ZipperCallback() {
         @Override
         public void vcfAtPosition(VcfRecord[] records, VcfHeader[] headers) throws IOException {

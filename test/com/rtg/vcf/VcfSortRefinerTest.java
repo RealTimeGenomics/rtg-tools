@@ -55,7 +55,7 @@ public class VcfSortRefinerTest extends AbstractNanoTest {
       FileHelper.stringToGzFile(mNano.loadReference(id + ".vcf"), in);
       final File out = new File(td, "out.vcf");
       try (final VcfSortRefiner t = new VcfSortRefiner(VcfReader.openVcfReader(in))) {
-        try (final VcfWriter w = new VcfWriter(t.getHeader(), out, null, false, false)) {
+        try (final VcfWriter w = new DefaultVcfWriter(t.getHeader(), out, null, false, false)) {
           while (t.hasNext()) {
             w.write(t.next());
           }

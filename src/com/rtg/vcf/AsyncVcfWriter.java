@@ -27,39 +27,56 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.tabix;
+package com.rtg.vcf;
 
-import java.io.File;
 import java.io.IOException;
 
-import com.rtg.util.io.TestDirectory;
-import com.rtg.vcf.DefaultVcfWriter;
-import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
+import htsjdk.samtools.util.AbstractAsyncWriter;
+import htsjdk.samtools.util.RuntimeIOException;
 
 /**
+ * Adaptor that allows asynchronous writing of our VcfRecord objects.
  */
-public class IndexingStreamCreatorTest extends TestCase {
+public class AsyncVcfWriter extends AbstractAsyncWriter<VcfRecord> implements VcfWriter {
 
-  public void testIt() throws IOException {
-    try (TestDirectory dir = new TestDirectory("isct")) {
-      final File vcfFile = new File(dir, "thingy.vcf.gz");
-      final VcfHeader header = new VcfHeader();
-      header.addCommonHeader();
-      header.addSampleName("sample");
-      try (IndexingStreamCreator streamHandler = new IndexingStreamCreator(vcfFile, System.out, true, new TabixIndexer.VcfIndexerFactory(), true)) {
-        try (VcfWriter writer = new DefaultVcfWriter(header, streamHandler.createStreamsAndStartThreads())) {
-          final VcfRecord rec = new VcfRecord("seq", 100, "A");
-          rec.addAltCall("T");
-          rec.setNumberOfSamples(1);
-          rec.addFormatAndSample("GT", "1/0");
-          writer.write(rec);
-        }
-      }
-      assertTrue(new File(dir, "thingy.vcf.gz.tbi").exists());
+  private final VcfWriter mWriter;
+
+  /**
+   * Constructor
+   * @param w the inner VcfWriter
+   */
+  public AsyncVcfWriter(VcfWriter w) {
+    super(500);
+    mWriter = w;
+  }
+
+  @Override
+  public VcfHeader getHeader() {
+    return mWriter.getHeader();
+  }
+
+  @Override
+  protected String getThreadNamePrefix() {
+    return "VcfWriter";
+  }
+
+  @Override
+  protected void synchronouslyWrite(VcfRecord record) {
+    try {
+      mWriter.write(record);
+    } catch (IOException e) {
+      throw new RuntimeIOException(e);
+    }
+  }
+
+  @Override
+  protected void synchronouslyClose() {
+    try {
+      mWriter.close();
+    } catch (IOException e) {
+      throw new RuntimeIOException(e);
     }
   }
 }

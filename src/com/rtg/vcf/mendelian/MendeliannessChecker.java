@@ -52,7 +52,9 @@ import com.rtg.relation.GenomeRelationships;
 import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.io.FileUtils;
+import com.rtg.vcf.AsyncVcfWriter;
 import com.rtg.vcf.ChildPhasingVcfAnnotator;
+import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -195,9 +197,9 @@ CommonFlags.initNoGzip(mFlags);
     }
 
     int skippedRecords = 0;
-    try (VcfWriter outputVcf = outputVcfFile != null ? new VcfWriter(header2, outputVcfFile, null, gzip, index) : null) {
-      try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? new VcfWriter(header2, inconsistentVcfFile, null, gzip, index) : null) {
-        try (VcfWriter consistentVcf = consistentVcfFile != null ? new VcfWriter(header, consistentVcfFile, null, gzip, index) : null) {
+    try (VcfWriter outputVcf = outputVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, outputVcfFile, null, gzip, index)) : null) {
+      try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, inconsistentVcfFile, null, gzip, index)) : null) {
+        try (VcfWriter consistentVcf = consistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header, consistentVcfFile, null, gzip, index)) : null) {
           try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile, gzip, false)) : null) {
             while (vr.hasNext()) {
               final VcfRecord rec = vr.next();

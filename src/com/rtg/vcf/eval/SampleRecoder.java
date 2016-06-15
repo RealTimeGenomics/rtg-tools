@@ -80,8 +80,8 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       h.getSampleNames().clear();
       h.addSampleName(sampleName == null ? "SAMPLE" : sampleName);
     }
-    mSampleVcf = new VcfWriter(h, new File(output, "sample.vcf" + zipExt), null, zip, true); // Primary output containing new representation of sample using population alleles
-    mAuxiliary = new VcfWriter(h, new File(output, "auxiliary.vcf" + zipExt), null, zip, true);
+    mSampleVcf = makeVcfWriter(h, new File(output, "sample.vcf" + zipExt), zip); // Primary output containing new representation of sample using population alleles
+    mAuxiliary = makeVcfWriter(h, new File(output, "auxiliary.vcf" + zipExt), zip);
   }
 
   @Override

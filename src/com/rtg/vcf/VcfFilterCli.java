@@ -487,7 +487,7 @@ public final class VcfFilterCli extends AbstractCli {
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-      try (VcfWriter w = new VcfWriter(r.getHeader(), vcfFile, output, gzip, index)) {
+      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), vcfFile, output, gzip, index))) {
         mVcfFilterTask.filterVcf(r, w);
       }
       if (!stdout) {

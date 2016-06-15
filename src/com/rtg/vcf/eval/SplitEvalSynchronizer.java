@@ -76,13 +76,13 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
                         File outdir, boolean zip, boolean slope, boolean twoPass, EnumSet<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mTpCalls = new VcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), null, zip, true);
-    mTpBase = new VcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), null, zip, true);
-    mFp = new VcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), null, zip, true);
-    mFn = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), null, zip, true);
+    mTpCalls = makeVcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), zip);
+    mTpBase = makeVcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), zip);
+    mFp = makeVcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), zip);
+    mFn = makeVcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), zip);
     if (twoPass) {
-      mFpCa = new VcfWriter(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt), null, zip, true);
-      mFnCa = new VcfWriter(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt), null, zip, true);
+      mFpCa = makeVcfWriter(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt), zip);
+      mFnCa = makeVcfWriter(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt), zip);
     } else {
       mFpCa = null;
       mFnCa = null;

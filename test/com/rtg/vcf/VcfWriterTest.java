@@ -74,7 +74,7 @@ public class VcfWriterTest extends TestCase {
     ;
 
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    final VcfWriter w = new VcfWriter(head, bos);
+    final VcfWriter w = new DefaultVcfWriter(head, bos);
     w.write(rec);
     w.write(rec);
 
@@ -103,13 +103,13 @@ public class VcfWriterTest extends TestCase {
 
   public void testErrors() {
     try {
-      new VcfWriter(null, new ByteArrayOutputStream());
+      new DefaultVcfWriter(null, new ByteArrayOutputStream());
     } catch (NullPointerException ex) {
       assertEquals("header cannot be null", ex.getMessage());
     }
 
     try {
-      new VcfWriter(new VcfHeader(), null);
+      new DefaultVcfWriter(new VcfHeader(), null);
     } catch (NullPointerException ex) {
       assertEquals("output stream cannot be null", ex.getMessage());
     }

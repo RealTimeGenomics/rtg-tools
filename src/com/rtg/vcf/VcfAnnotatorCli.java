@@ -207,7 +207,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
       }
       header.addRunInfo();
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (VcfWriter writer = new VcfWriter(header, vcfFile, out, gzip, index)) {
+      try (VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {

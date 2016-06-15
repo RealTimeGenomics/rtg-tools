@@ -99,7 +99,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mInHeaders[1] = variants.calledHeader().copy();
     mInHeaders[1].removeAllSamples();
     mInHeaders[1].addSampleName(SAMPLE_CALLS);
-    mVcfOut = new VcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), null, zip, true);
+    mVcfOut = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip);
   }
 
   @Override
