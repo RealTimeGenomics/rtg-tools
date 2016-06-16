@@ -58,48 +58,57 @@ public class VcfFilterCliTest extends AbstractCliTest {
   protected AbstractCli getCli() {
     return new VcfFilterCli();
   }
-//
-//  @Override
-//  public void setUp() {
-//    GlobalFlags.resetAccessedStatus();
-//  }
 
   public void testFlags() {
     checkHelp("rtg vcffilter", "Filters VCF records based on various criteria."
-        , "-i,", "--input=FILE", "VCF file containing variants"
-        , "-o,", "--output=FILE", "output VCF file"
-        , "-w,", "--density-window=INT", "window within which multiple variants are discarded"
-        , "-q,", "--min-quality=FLOAT", "minimum allowed quality"
-        , "-Q,", "--max-quality=FLOAT", "maximum allowed quality"
-        , "-g,", "--min-genotype-quality=FLOAT", "minimum allowed genotype quality"
-        , "-G,", "--max-genotype-quality=FLOAT", "maximum allowed genotype quality"
-        , "-c,", "--min-combined-read-depth=INT", "minimum allowed combined read depth"
-        , "-C,", "--max-combined-read-depth=INT", "maximum allowed combined read depth"
-        , "-d,", "--min-read-depth=INT", "minimum allowed sample read depth"
-        , "-D,", "--max-read-depth=INT", "maximum allowed sample read depth"
-        , "-A,", "--max-ambiguity-ratio=FLOAT", "maximum allowed ambiguity ratio"
-        , "-k,", "--keep-filter=STRING", "only keep variants with this FILTER tag"
-        , "-K,", "--keep-info=STRING", "only keep variants with this INFO tag"
-        , "-r,", "--remove-filter=STRING", "remove variants with this FILTER tag"
-        , "-R,", "--remove-info=STRING", "remove variants with this INFO tag"
-        , "--include-bed=FILE", "only keep variants within the regions in this BED file"
-        , "--exclude-bed=FILE", "discard all variants within the regions in this BED file"
-        , "--include-vcf=FILE", "only keep variants that overlap with the ones in this file"
-        , "--exclude-vcf=FILE", "discard all variants that overlap with the ones in this file"
-        , "--clear-failed-samples", "instead of removing failed records set the sample GT fields to missing"
-        , "--fail=STRING", "instead of removing failed records set their filter field to the provided value"
-        , "--remove-all-same-as-ref", "remove where all samples are same as reference"
-        , "--remove-same-as-ref", "remove where sample is same as reference"
-        , "--snps-only", "if set, will output simple SNPs only"
-        , "--non-snps-only", "if set, will output MNPs and INDELs only"
-        , "-Z,", "--no-gzip", "do not gzip the output"
-        , "--no-index", "do not produce indexes for output files"
-        );
+      , "-i,", "--input=FILE", "VCF file containing variants"
+      , "-o,", "--output=FILE", "output VCF file"
+      , "-w,", "--density-window=INT", "window within which multiple variants are discarded"
+      , "-q,", "--min-quality=FLOAT", "minimum allowed quality"
+      , "-Q,", "--max-quality=FLOAT", "maximum allowed quality"
+      , "-g,", "--min-genotype-quality=FLOAT", "minimum allowed genotype quality"
+      , "-G,", "--max-genotype-quality=FLOAT", "maximum allowed genotype quality"
+      , "-c,", "--min-combined-read-depth=INT", "minimum allowed combined read depth"
+      , "-C,", "--max-combined-read-depth=INT", "maximum allowed combined read depth"
+      , "-d,", "--min-read-depth=INT", "minimum allowed sample read depth"
+      , "-D,", "--max-read-depth=INT", "maximum allowed sample read depth"
+      , "-A,", "--max-ambiguity-ratio=FLOAT", "maximum allowed ambiguity ratio"
+      , "-k,", "--keep-filter=STRING", "only keep variants with this FILTER tag"
+      , "-K,", "--keep-info=STRING", "only keep variants with this INFO tag"
+      , "-r,", "--remove-filter=STRING", "remove variants with this FILTER tag"
+      , "-R,", "--remove-info=STRING", "remove variants with this INFO tag"
+      , "--include-bed=FILE", "only keep variants within the regions in this BED file"
+      , "--exclude-bed=FILE", "discard all variants within the regions in this BED file"
+      , "--include-vcf=FILE", "only keep variants that overlap with the ones in this file"
+      , "--exclude-vcf=FILE", "discard all variants that overlap with the ones in this file"
+      , "--clear-failed-samples", "instead of removing failed records set the sample GT fields to missing"
+      , "--fail=STRING", "instead of removing failed records set their filter field to the provided value"
+      , "--remove-all-same-as-ref", "remove where all samples are same as reference"
+      , "--remove-same-as-ref", "remove where sample is same as reference"
+      , "--snps-only", "if set, will output simple SNPs only"
+      , "--non-snps-only", "if set, will output MNPs and INDELs only"
+      , "-Z,", "--no-gzip", "do not gzip the output"
+      , "--no-index", "do not produce indexes for output files"
+      , "--all-samples", "apply sample-specific criteria"
+      , "--bed-regions", "only read VCF records that overlap"
+      , "--region", "within the specified range"
+      , "--sample", "to the named sample"
+      , "--max-avr-score", "maximum allowed AVR score"
+      , "--min-avr-score", "minimum allowed AVR score"
+      , "--max-denovo-score", "maximum de novo score"
+      , "--min-denovo-score", "minimum de novo score"
+      , "--remove-hom", "remove where sample is homozygous"
+      , "--remove-overlapping", "remove records that overlap"
+    );
+  }
 
+  public void testExtendedHelp() {
     checkExtendedHelp("rtg vcffilter"
-        , "-p,", "--Xmin-posterior-score=FLOAT", "minimum allowed posterior score"
-        , "-P,", "--Xmax-posterior-score=FLOAT", "maximum allowed posterior score"
-        );
+      , "-p,", "--Xmin-posterior-score=FLOAT", "minimum allowed posterior score"
+      , "-P,", "--Xmax-posterior-score=FLOAT", "maximum allowed posterior score"
+      , "--Xexpr", "this sample expression is true"
+      , "--Xjs", "arbitrary javascript"
+    );
   }
 
   private static final String INPUT1 = ""
@@ -636,7 +645,6 @@ public class VcfFilterCliTest extends AbstractCliTest {
   public void testNoGt() throws Exception {
     runResourceTestError(new String[] {"--remove-same-as-ref"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt");
     runResourceTestError(new String[] {"--remove-all-same-as-ref"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt");
-
     runResourceTestError(new String[] {"--min-genotype-quality", "50", "--clear-failed-samples"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp2.txt");
   }
 }

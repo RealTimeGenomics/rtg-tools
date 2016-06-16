@@ -117,6 +117,17 @@ public final class VcfFilterCli extends AbstractCli {
 
 
   private final VcfFilterTask mVcfFilterTask = new VcfFilterTask();
+  private static final String[] SAMPLE_FLAGS = new String[]{
+    REMOVE_HOM,
+    REMOVE_SAME_AS_REF,
+    SNPS_ONLY, NON_SNPS_ONLY,
+    MIN_DEPTH, MAX_DEPTH,
+    MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY,
+    MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE,
+    MAX_AMBIGUITY_RATIO,
+    MIN_AVR_SCORE, MAX_AVR_SCORE,
+    MIN_DENOVO_SCORE, MAX_DENOVO_SCORE,
+  };
 
   @Override
   public String moduleName() {
@@ -197,7 +208,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
     final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "Arbitrary javascript for determining whether to keep record. May be either an expression or a file name").setCategory(FILTERING);
+    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "arbitrary javascript for determining whether to keep record. May be either an expression or a file name").setCategory(FILTERING);
 
     mFlags.setValidator(new VcfFilterValidator());
   }
@@ -344,10 +355,7 @@ public final class VcfFilterCli extends AbstractCli {
     }
 
     static String getDoubleString(final double val) {
-      if (val >= Double.MAX_VALUE) {
-        return "Infinity";
-      }
-      return String.valueOf(val);
+      return val >= Double.MAX_VALUE ? "Infinity" : String.valueOf(val);
     }
   }
 
@@ -412,19 +420,8 @@ public final class VcfFilterCli extends AbstractCli {
           mFlags.isSet(MAX_DENOVO_SCORE) ? (Double) mFlags.getValue(MAX_DENOVO_SCORE) : Double.MAX_VALUE));
     }
 
-    final String[] sampleFlags = {
-      REMOVE_HOM,
-      REMOVE_SAME_AS_REF,
-      SNPS_ONLY, NON_SNPS_ONLY,
-      MIN_DEPTH, MAX_DEPTH,
-      MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY,
-      MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE,
-      MAX_AMBIGUITY_RATIO,
-      MIN_AVR_SCORE, MAX_AVR_SCORE,
-      MIN_DENOVO_SCORE, MAX_DENOVO_SCORE,
-    };
     mVcfFilterTask.mCheckingSample = false;
-    for (final String flag : sampleFlags) {
+    for (final String flag : SAMPLE_FLAGS) {
       mVcfFilterTask.mCheckingSample |= mFlags.isSet(flag);
     }
     mFlags.getValues(EXPR_FLAG).stream().filter(expr -> !((String) expr).startsWith("INFO.")).forEach(expr -> mVcfFilterTask.mCheckingSample = true);
