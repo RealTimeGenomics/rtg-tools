@@ -28,25 +28,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.Test;
 
 import com.rtg.util.ClassPathScanner;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.diagnostic.Diagnostic;
 
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Discover all unit tests within class path, optionally matching a package prefix
  */
-public class ClassPathSuite extends TestSuite {
+public class ClassPathSuite {
 
-  private static final String SHUFFLE_TESTS = System.getProperty("junit.shuffle.tests");
+  private static final String SHUFFLE_TESTS = System.getProperty("junit.shuffle.tests", "true");
   private static final String PACKAGE_PREFIX = System.getProperty("junit.package.prefix", "com.rtg");
+  final List<Class<?>> mTestClasses;
 
   ClassPathSuite() {
     this(PACKAGE_PREFIX);
@@ -60,10 +62,11 @@ public class ClassPathSuite extends TestSuite {
       shuffle(testClasses);
     }
     System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
-    for (Class<?> c : testClasses) {
-      //System.err.println("Adding tests from: " + c.getSimpleName());
-      addTestSuite((Class<? extends TestCase>) c);
-    }
+    shuffle(testClasses);
+    mTestClasses = testClasses;
+  }
+  public List<Class<?>> getTestClasses() {
+    return mTestClasses;
   }
 
   /**
@@ -84,18 +87,18 @@ public class ClassPathSuite extends TestSuite {
     if (isAbstractClass(clazz)) {
       return false;
     }
-    return TestCase.class.isAssignableFrom(clazz);
+    if (TestCase.class.isAssignableFrom(clazz)) {
+      return true;
+    }
+    for (Method method : clazz.getMethods()) {
+      if (method.isAnnotationPresent(Test.class)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static boolean isAbstractClass(Class<?> clazz) {
     return (clazz.getModifiers() & Modifier.ABSTRACT) != 0;
   }
-
-  /**
-   * @return a test suite containing all tests found on the classpath matching the prefix set via java property
-   */
-  public static Test suite() {
-    return new ClassPathSuite();
-  }
-
 }
