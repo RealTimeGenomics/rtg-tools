@@ -65,7 +65,8 @@ public class ClassPathSuite {
     shuffle(testClasses);
     mTestClasses = testClasses;
   }
-  public List<Class<?>> getTestClasses() {
+
+  List<Class<?>> getTestClasses() {
     return mTestClasses;
   }
 
