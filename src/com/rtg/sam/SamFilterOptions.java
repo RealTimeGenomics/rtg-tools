@@ -29,6 +29,7 @@
  */
 package com.rtg.sam;
 
+import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
 
 import java.io.File;
@@ -221,7 +222,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag registerRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", RESTRICTION_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
   }
 
   /**
@@ -231,7 +232,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag registerBedRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "FILE", "BED file containing regions to process").setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "FILE", "if set, only read SAM records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
   }
 
 
