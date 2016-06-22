@@ -846,7 +846,7 @@ public final class CFlags {
     for (final String flag : flags) {
       final Flag aFlag = getFlag(flag);
       if ((aFlag == null) || !aFlag.isSet()) {
-        setParseMessage("The flag --" + flag + " is required");
+        setParseMessage("The flag " + LONG_FLAG_PREFIX + flag + " is required");
         return false;
       }
     }
@@ -870,10 +870,10 @@ public final class CFlags {
         if (!isset) {
           isset = true;
         } else {
-          setParseMessage("Cannot set both " + sb.toString() + " and --" + flag);
+          setParseMessage("Cannot set both " + sb.toString() + " and " + LONG_FLAG_PREFIX + flag);
           return false;
         }
-        sb.append("--").append(flag);
+        sb.append(LONG_FLAG_PREFIX).append(flag);
       }
     }
     return true;
@@ -903,7 +903,7 @@ public final class CFlags {
       if (sb.length() > 0) {
         sb.append(" or ");
       }
-      sb.append("--").append(flag);
+      sb.append(LONG_FLAG_PREFIX).append(flag);
     }
     if (isset && !toomany) {
       return true;
@@ -932,7 +932,7 @@ public final class CFlags {
       if (sb.length() > 0) {
         sb.append(" or ");
       }
-      sb.append("--").append(flag);
+      sb.append(LONG_FLAG_PREFIX).append(flag);
     }
     setParseMessage("At least one " + sb.toString() + " must be set");
     return false;
@@ -947,7 +947,7 @@ public final class CFlags {
    */
   public boolean checkIff(String flag1, String flag2) {
     if (isSet(flag1) != isSet(flag2)) {
-      setParseMessage("Flags --" + flag1 + " and --" + flag2 + " must be set together");
+      setParseMessage("Flags " + LONG_FLAG_PREFIX + flag1 + " and " + LONG_FLAG_PREFIX + flag2 + " must be set together");
       return false;
     }
     return true;
@@ -962,7 +962,7 @@ public final class CFlags {
    */
   public boolean checkNand(String flag1, String flag2) {
     if (isSet(flag1) && isSet(flag2)) {
-      setParseMessage("Only one of --" + flag1 + " or --" + flag2 + " can be set");
+      setParseMessage("Only one of " + LONG_FLAG_PREFIX + flag1 + " or " + LONG_FLAG_PREFIX + flag2 + " can be set");
       return false;
     }
     return true;
@@ -977,7 +977,51 @@ public final class CFlags {
     for (final String flag : flags) {
       final Flag aFlag = getFlag(flag);
       if ((aFlag != null) && aFlag.isSet()) {
-        setParseMessage("The flag --" + flag + " is not permitted for this set of arguments");
+        setParseMessage("The flag " + LONG_FLAG_PREFIX + flag + " is not permitted for this set of arguments");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks an integer flag has a value between two values
+   * @param flagName the flag name to check
+   * @param lowValue the low value
+   * @param lowInclusive true if the low value itself is permitted
+   * @param highValue the high value
+   * @param highInclusive true if the high value itself is permitted
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkInRange(String flagName, int lowValue, boolean lowInclusive, int highValue, boolean highInclusive) {
+    if (isSet(flagName)) {
+      final int value = (Integer) getValue(flagName);
+      if ((value < lowValue) || (value <= lowValue && !lowInclusive)
+        || (value > highValue) || (value >= highValue && !highInclusive)) {
+        final String range = (lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")");
+        setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range " + range);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Checks a double flag has a value between two values
+   * @param flagName the flag name to check
+   * @param lowValue the low value
+   * @param lowInclusive true if the low value itself is permitted
+   * @param highValue the high value
+   * @param highInclusive true if the high value itself is permitted
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkInRange(String flagName, double lowValue, boolean lowInclusive, double highValue, boolean highInclusive) {
+    if (isSet(flagName)) {
+      final double value = (Double) getValue(flagName);
+      if ((value < lowValue) || (value <= lowValue && !lowInclusive)
+        || (value > highValue) || (value >= highValue && !highInclusive)) {
+        final String range = (lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")");
+        setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range " + range);
         return false;
       }
     }

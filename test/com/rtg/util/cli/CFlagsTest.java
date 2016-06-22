@@ -473,6 +473,34 @@ public class CFlagsTest extends TestCase {
     assertEquals("", mFlags.getParseMessage());
   }
 
+  public void testNumericRangeChecks() {
+    mFlags.registerOptional("a", Integer.class, "int", "therex");
+    mFlags.registerOptional("b", Double.class, "float", "therex");
+    mFlags.setFlags("--a", "2", "--b", "2");
+    assertTrue(mFlags.checkInRange("a", 2, true, 4, true));
+    assertFalse(mFlags.checkInRange("a", 2, false, 4, true));
+    assertTrue(mFlags.getParseMessage().contains("(2, 4]"));
+    assertFalse(mFlags.checkInRange("a", 3, true, 4, true));
+    assertTrue(mFlags.getParseMessage().contains("[3, 4]"));
+    assertTrue(mFlags.checkInRange("a", 0, true, 2, true));
+    assertFalse(mFlags.checkInRange("a", 0, true, 2, false));
+    assertTrue(mFlags.getParseMessage().contains("[0, 2)"));
+    assertFalse(mFlags.checkInRange("a", 0, true, 1, true));
+    assertTrue(mFlags.getParseMessage().contains("[0, 1]"));
+
+    assertTrue(mFlags.checkInRange("b", 2.0, true, 4.0, true));
+    assertFalse(mFlags.checkInRange("b", 2.0, false, 4.0, true));
+    assertTrue(mFlags.getParseMessage().contains("(2.0, 4.0]"));
+    assertFalse(mFlags.checkInRange("b", 3.0, true, 4.0, true));
+    assertTrue(mFlags.getParseMessage().contains("[3.0, 4.0]"));
+    assertTrue(mFlags.checkInRange("b", 0.0, true, 2.0, true));
+    assertFalse(mFlags.checkInRange("b", 0.0, true, 2.0, false));
+    assertTrue(mFlags.getParseMessage().contains("[0.0, 2.0)"));
+    assertFalse(mFlags.checkInRange("b", 0.0, true, 1.0, true));
+    assertTrue(mFlags.getParseMessage().contains("[0.0, 1.0]"));
+
+  }
+
   public void testCrossFlagChecks() {
     mFlags.registerOptional("a", "therex");
     mFlags.registerOptional("b", "therex");
