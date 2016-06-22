@@ -783,12 +783,45 @@ public final class FileUtils {
    * @return the filename extension, or empty string if none.
    */
   public static String getExtension(String fileName) {
+    return getExtension(new File(fileName));
+  }
+
+  /**
+   * Get the extension of the file
+   * @param file the file
+   * @return the extension including the '.' character
+   */
+  public static String getExtension(File file) {
     String extension = "";
-    final int i = fileName.lastIndexOf('.');
+    final String fileFilename = file.getName();
+    final int i = fileFilename.lastIndexOf('.');
     if (i > 0) {
-      extension = fileName.substring(i);
+      extension = fileFilename.substring(i);
     }
     return extension;
+  }
+
+  /**
+   * Remove the last extension from a filename
+   * @param filename the filename to check
+   * @return the filename without the last extension
+   */
+  public static String removeExtension(String filename) {
+    return removeExtension(new File(filename)).getPath();
+  }
+
+  /**
+   * Remove the last extension from a file's filename
+   * @param file the file to check
+   * @return file with last extension removed from filename
+   */
+  public static File removeExtension(File file) {
+    final String fileFilename = file.getName();
+    final int beginIndex = fileFilename.lastIndexOf('.');
+    if (beginIndex > 0) {
+      return new File(file.getParentFile(), fileFilename.substring(0, beginIndex));
+    }
+    return file;
   }
 
   /**

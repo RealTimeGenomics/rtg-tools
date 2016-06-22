@@ -492,4 +492,19 @@ public class FileUtilsTest extends TestCase {
       assertTrue(fstr.endsWith("</div></body></html>"));
     }
   }
+
+  public void testExtension() {
+    assertEquals(".flubber", FileUtils.getExtension("foo.boo.rah.flubber"));
+    assertEquals(".flubber", FileUtils.getExtension("foo.boo/rah.flubber"));
+    assertEquals("", FileUtils.getExtension("dshafdjsjasdfh"));
+    assertEquals(".flubber", FileUtils.getExtension(new File("foo.boo/rah.flubber")));
+    assertEquals("", FileUtils.getExtension(new File("foo.boo/rah_flubber")));
+    assertEquals("foo.boo.rah", FileUtils.removeExtension("foo.boo.rah.flubber"));
+    assertEquals("foo.boo/rah", FileUtils.removeExtension("foo.boo/rah.flubber"));
+    assertEquals("asdhfjdask", FileUtils.removeExtension("asdhfjdask"));
+    assertEquals(new File("foo.boo", "rah"), FileUtils.removeExtension(new File("foo.boo/rah.flubber")));
+    assertEquals(new File("foo.boo", "rah_flubber"), FileUtils.removeExtension(new File("foo.boo/rah_flubber")));
+
+    assertEquals("", FileUtils.getExtension("foo.moooloo/arah"));
+  }
 }
