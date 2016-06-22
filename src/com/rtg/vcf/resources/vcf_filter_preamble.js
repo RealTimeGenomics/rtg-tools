@@ -1,6 +1,11 @@
 // Global variable to hold the current record
 var rec;
 
+var VcfUtils = Java.type("com.rtg.vcf.VcfUtils");
+var FilterField = Java.type("com.rtg.vcf.header.FilterField");
+var InfoField = Java.type("com.rtg.vcf.header.InfoField");
+var FormatField = Java.type("com.rtg.vcf.header.FormatField");
+
 (function (global) {
     function listToArray(list) {
         if (list == null) {
