@@ -52,7 +52,8 @@ var rec;
     function stringFieldFunction(field) {
         return function () {
             var index = sampleLookup[this];
-            return rec.getFormatAndSample().get(field).get(index);
+            var fields = rec.getFormatAndSample().get(field);
+            return fields == null ? "." : fields.get(index);
         }
     }
 
