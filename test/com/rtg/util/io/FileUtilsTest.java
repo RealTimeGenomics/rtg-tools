@@ -500,7 +500,7 @@ public class FileUtilsTest extends TestCase {
     assertEquals(".flubber", FileUtils.getExtension(new File("foo.boo/rah.flubber")));
     assertEquals("", FileUtils.getExtension(new File("foo.boo/rah_flubber")));
     assertEquals("foo.boo.rah", FileUtils.removeExtension("foo.boo.rah.flubber"));
-    assertEquals("foo.boo/rah", FileUtils.removeExtension("foo.boo/rah.flubber"));
+    assertEquals("foo.boo" + File.separator + "rah", FileUtils.removeExtension("foo.boo" + File.separator + "rah.flubber"));
     assertEquals("asdhfjdask", FileUtils.removeExtension("asdhfjdask"));
     assertEquals(new File("foo.boo", "rah"), FileUtils.removeExtension(new File("foo.boo/rah.flubber")));
     assertEquals(new File("foo.boo", "rah_flubber"), FileUtils.removeExtension(new File("foo.boo/rah_flubber")));
