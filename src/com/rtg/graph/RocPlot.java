@@ -611,6 +611,11 @@ public class RocPlot {
   private void loadFile(final File f, final String name, boolean showProgress) throws IOException {
     mFileChooserParent = f.getParentFile();
     final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getCanonicalPath(), showProgress);
+    setBundleTitle(data, f, name);
+    addLine(f.getAbsolutePath(), data);
+  }
+
+  static void setBundleTitle(DataBundle data, File f, String name) throws IOException {
     if (name.length() > 0) {
       data.setTitle(name);
     } else {
@@ -634,7 +639,6 @@ public class RocPlot {
       }
       data.setTitle(autoname.toString());
     }
-    addLine(f.getAbsolutePath(), data);
   }
 
   private void addLine(String path, DataBundle dataBundle) {

@@ -52,7 +52,10 @@ public final class RocPlotPng {
   static void rocPngImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
     for (int i = 0; i < fileList.size(); i++) {
-      final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(fileList.get(i), false), nameList.get(i), false);
+      final File f = fileList.get(i);
+      final String name = nameList.get(i);
+      final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getCanonicalPath(), false);
+      RocPlot.setBundleTitle(db, f, name);
       data.put(db.getTitle(), db);
     }
     final ImageWriter iw = new ImageWriter(new GraphicsRenderer());
