@@ -30,6 +30,9 @@
 
 package com.rtg.vcf;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FilterOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
 import com.rtg.vcf.header.VcfHeader;
@@ -41,6 +44,50 @@ public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
   @Override
   protected VcfWriter getVcfWriter(VcfHeader head, OutputStream out) {
     return new AsyncVcfWriter(new DefaultVcfWriter(head, out));
+  }
+
+
+  public void testBrokenPipe() throws IOException {
+    final VcfHeader head = new VcfHeader();
+    head.setVersionValue(VcfHeader.VERSION_VALUE);
+    head.addMetaInformationLine("##test1212121");
+    head.addSampleName("sample1").addSampleName("sample2");
+
+    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
+    rec.setId(".")
+    .setQuality("12.8")
+    .addAltCall("c")
+    .addFilter("TEST1")
+    .addInfo("DP", "23")
+    .setNumberOfSamples(2)
+    .addFormatAndSample("GT", "0/0")
+    .addFormatAndSample("GT", "0/1")
+    .addFormatAndSample("GQ", "100")
+    .addFormatAndSample("GQ", "95")
+    ;
+
+    final int limit = 500;
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    final FilterOutputStream fos = new FilterOutputStream(bos) {
+      @Override
+      public void write(int b) throws IOException {
+        if (bos.size() > limit) {
+          throw new IOException("Broken pipe");
+        }
+        super.write(b);
+      }
+    };
+
+    try {
+      try (final VcfWriter w = getVcfWriter(head, fos)) {
+        for (int i = 0; i < 10000; i++) {
+          w.write(rec);
+        }
+      }
+      fail();
+    } catch (Exception e) {
+      assertFalse(e.getMessage().contains("Self-suppression"));
+    }
   }
 
 }
