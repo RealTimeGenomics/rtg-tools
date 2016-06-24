@@ -170,12 +170,12 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(NON_SNPS_ONLY, "if set, will output MNPs and INDELs only").setCategory(FILTERING);
 
     // Contents of FILTER
-    mFlags.registerOptional('r', REMOVE_FILTER, String.class, "STRING", "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional('k', KEEP_FILTER, String.class, "STRING", "only keep variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional('r', REMOVE_FILTER, String.class, "STRING", "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('k', KEEP_FILTER, String.class, "STRING", "only keep variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Contents of INFO
-    mFlags.registerOptional('R', REMOVE_INFO, String.class, "STRING", "remove variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional('K', KEEP_INFO, String.class, "STRING", "only keep variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional('R', REMOVE_INFO, String.class, "STRING", "remove variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('K', KEEP_INFO, String.class, "STRING", "only keep variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Which FORMAT columns do we look at
     mFlags.registerOptional(SAMPLE, String.class, "STRING", "apply sample-specific criteria to the named sample contained in the input VCF").setCategory(INPUT_OUTPUT).setMaxCount(Integer.MAX_VALUE);
