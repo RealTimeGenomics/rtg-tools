@@ -55,7 +55,9 @@ public enum VariantType {
   /** Structural variant break end */
   SV_BREAKEND(false, true, false),
   /** Structural variant symbolic value */
-  SV_SYMBOLIC(false, true, false);
+  SV_SYMBOLIC(false, true, false),
+  /** Structural variant missing allele */
+  SV_MISSING(false, true, false);
 
   private final boolean mIsIndelType;
   private final boolean mIsSvType;
@@ -107,6 +109,8 @@ public enum VariantType {
     if (allele.length() > 0) {
       if (allele.charAt(0) == '<') {
         return VariantType.SV_SYMBOLIC;
+      } else if (allele.charAt(0) == '*' && allele.length() == 1) {
+        return VariantType.SV_MISSING;
       } else {
         for (int i = 0; i < allele.length(); i++) {
           final char c = allele.charAt(i);
@@ -155,7 +159,7 @@ public enum VariantType {
   public static VariantType getType(String refAllele, String altAllele) {
     if (refAllele.equals(altAllele)) {
       return VariantType.UNCHANGED;
-    } else if (refAllele.length() == 1 && altAllele.length() == 1) {
+    } else if (refAllele.length() == 1 && altAllele.length() == 1 && altAllele.charAt(0) != '*') {
       return VariantType.SNP;
     }
     final VariantType svType = getSymbolicAlleleType(altAllele);

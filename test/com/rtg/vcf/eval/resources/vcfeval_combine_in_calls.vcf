@@ -9,6 +9,7 @@
 1	6	.	A	T	.	.	.	GT	0|1
 1	11	.	T	A	.	.	.	GT	0|1
 1	13	.	A	T	.	.	.	GT	0|1
+14	5	.	A	T,*	410	PASS	.	GT	2|2
 14	18	.	AA	TTTT,TTTTT	410	PASS	.	GT	2|1
 18	2	.	GACGC	G	12711	PASS	.	GT	1/1
 18	3	.	AC	TG	37499	PASS	.	GT	.
