@@ -37,6 +37,14 @@ public class SequenceNameLocusSimple extends Range implements SequenceNameLocus 
   protected final String mSequence;
 
   /**
+   * Construct from existing locus
+   * @param other the other locus
+   */
+  public SequenceNameLocusSimple(SequenceNameLocus other) {
+    this(other.getSequenceName(), other.getStart(), other.getEnd());
+  }
+
+  /**
    * @param sequence reference sequence name
    * @param start position on reference sequence (0 based)
    * @param end position on reference sequence (0 based, exclusive)
@@ -102,7 +110,7 @@ public class SequenceNameLocusSimple extends Range implements SequenceNameLocus 
 
   @Override
   public String toString() {
-    return getSequenceName() + ":" + (getStart() + 1) + "-" + getEnd(); // This representation (end is 1 based inclusive) is for consistency with RegionRestriction
+    return getSequenceName() + ":" + super.toString(); // This representation (end is 1 based inclusive) is for consistency with RegionRestriction
   }
 
 }

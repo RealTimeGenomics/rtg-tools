@@ -104,18 +104,20 @@ public class VcfRecord implements SequenceNameLocus {
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
   public static VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    String newRefCall = records[0].mRefCall;
+    final String refCall = records[0].getRefCall();
+    final int pos = records[0].getStart();
     final int length = records[0].getLength();
     final Set<String> uniqueIds = new LinkedHashSet<>();
     for (final VcfRecord vcf : records) {
-      assert vcf.getLength() == length;
-      if (newRefCall.length() != vcf.mRefCall.length()) { // TODO: Handle gVCF merging
-        newRefCall = vcf.mRefCall;
+      if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
+        throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
+      } else if (!refCall.equals(vcf.getRefCall())) {
+        throw new IllegalArgumentException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on reference bases. (" + refCall + " != " + vcf.getRefCall() + ")");
       }
       final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
       Collections.addAll(uniqueIds, ids);
     }
-    final VcfRecord merged = new VcfRecord(records[0].mSequence, records[0].mStart, newRefCall);
+    final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), records[0].getRefCall());
 
     final StringBuilder idsb = new StringBuilder();
     int z = 0;
@@ -132,29 +134,21 @@ public class VcfRecord implements SequenceNameLocus {
     for (int i = 0; i < records.length; i++) {
       final VcfRecord vcf = records[i];
       gtMap[i] = new int[vcf.mAltCalls.size() + 1];
-      final String refCall = merged.getRefCall();
-      final int lengthDiff = merged.getRefCall().length() - vcf.getRefCall().length();
       for (int j = 0; j < vcf.mAltCalls.size(); j++) {
-        final String oldAlt = vcf.mAltCalls.get(j);
-        final String newCall;
-        if (VariantType.getSymbolicAlleleType(oldAlt) == null) {
-          newCall = oldAlt;
+        final String alt = vcf.mAltCalls.get(j);
+        if (alt.equals(refCall)) {
+          gtMap[i][j + 1] = 0;
+          altsChanged = true;
         } else {
-          newCall = oldAlt + refCall.substring(refCall.length() - lengthDiff);
-        }
-        if (!newCall.equals(refCall)) {
-          int altIndex = merged.mAltCalls.indexOf(newCall);
+          int altIndex = merged.mAltCalls.indexOf(alt);
           if (altIndex == -1) {
             altIndex = merged.mAltCalls.size();
-            merged.mAltCalls.add(newCall);
+            merged.mAltCalls.add(alt);
           }
           gtMap[i][j + 1] = altIndex + 1;
           if (j != altIndex) {
             altsChanged = true;
           }
-        } else {
-          gtMap[i][j + 1] = 0;
-          altsChanged = true;
         }
       }
       if (vcf.mAltCalls.size() != merged.mAltCalls.size()) {
