@@ -60,13 +60,13 @@ public class VcfRecord implements SequenceNameLocus {
   /** The character used to delimit subfields within FORMAT and SAMPLE fields */
   public static final String FORMAT_AND_SAMPLE_SEPARATOR = ":";
   /** The character used to delimit subfields within FILTER and INFO fields */
-  public static final String FILTER_AND_INFO_SEPARATOR = ";";
+  public static final String ID_FILTER_AND_INFO_SEPARATOR = ";";
   /** The character used to delimit ALT alleles and multi-valued subfield values */
   public static final String ALT_CALL_INFO_SEPARATOR = ",";
 
   private String mSequence;
   private int mStart = -1;
-  private String mId;
+  private String mId; // These are stored in VCF representation (users may need to perform splitting)
   private String mRefCall;
   private final List<String> mAltCalls;
   private String mQual;
@@ -181,7 +181,7 @@ public class VcfRecord implements SequenceNameLocus {
           }
           sampleDone = true;
           for (final String key : records[i].getFormats()) {
-            ArrayList<String> field = merged.getFormatAndSample().get(key);
+            ArrayList<String> field = merged.getFormat(key);
             if (field == null) {
               field = new ArrayList<>();
               merged.mFormatAndSample.put(key, field);
@@ -190,7 +190,7 @@ public class VcfRecord implements SequenceNameLocus {
               field.add(MISSING);
             }
             if (key.equals(VcfUtils.FORMAT_GENOTYPE)) {
-              final String gtStr = records[i].getFormatAndSample().get(key).get(sampleIndex);
+              final String gtStr = records[i].getFormat(key).get(sampleIndex);
               final int[] splitGt = VcfUtils.splitGt(gtStr);
               for (int gti = 0; gti < splitGt.length; gti++) {
                 if (splitGt[gti] != -1) {
@@ -208,14 +208,14 @@ public class VcfRecord implements SequenceNameLocus {
               }
               field.set(destSampleIndex, sb.toString());
             } else {
-              field.set(destSampleIndex, records[i].getFormatAndSample().get(key).get(sampleIndex));
+              field.set(destSampleIndex, records[i].getFormat(key).get(sampleIndex));
             }
           }
         }
       }
     }
     for (final String key : merged.getFormats()) {
-      final ArrayList<String> field = merged.getFormatAndSample().get(key);
+      final ArrayList<String> field = merged.getFormat(key);
       while (field.size() < destHeader.getNumberOfSamples()) {
         field.add(MISSING);
       }
@@ -348,7 +348,7 @@ public class VcfRecord implements SequenceNameLocus {
     } else {
       final StringBuilder ids = new StringBuilder(id[0]);
       for (int i = 1; i < id.length; i++) {
-        ids.append(";").append(id[i]);
+        ids.append(ID_FILTER_AND_INFO_SEPARATOR).append(id[i]);
       }
       mId = ids.toString();
     }
@@ -423,6 +423,18 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * @return true if the record has failed filters
+   */
+  public boolean isFiltered() {
+    for (final String f : getFilters()) {
+      if (!(VcfUtils.FILTER_PASS.equals(f) || VcfRecord.MISSING.equals(f))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * @return list of filters (should be treated as read-only).
    */
   public List<String> getFilters() {
@@ -435,9 +447,8 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addFilter(String filter) {
-    // AVR acts on VCF records so we don't know at construction time if this has failed AVR score threshold
     // VCF spec says the field is either PASS or semicolon separated list of failures. So if a filter is
-    // added it should make sense to remove the PASS.
+    // added it should make sense to remove any PASS.
     mFilters.remove(VcfUtils.FILTER_PASS);
     mFilters.add(filter);
     return this;
@@ -507,10 +518,36 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * @return a set of the genotype keywords
+   * @return a set of the format ids used in this record
    */
   public Set<String> getFormats() {
     return mFormatAndSample.keySet();
+  }
+
+  /**
+   * Returns true if the record contains the specified format field
+   * @param key format value
+   * @return true if the format field is contained in this record
+   */
+  public boolean hasFormat(String key) {
+    return mFormatAndSample.containsKey(key);
+  }
+
+  /**
+   * Remove the specified format field from this record
+   * @param key format value
+   */
+  public void removeFormat(String key) {
+    mFormatAndSample.remove(key);
+  }
+
+  /**
+   * Gets the sample format values for a specified format
+   * @param key format value to be retrieved
+   * @return the sample values for this format field
+   */
+  public ArrayList<String> getFormat(String key) {
+    return mFormatAndSample.get(key);
   }
 
   /**
@@ -568,17 +605,12 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
-   * Resets all format values to the missing value for the given sample
-   * @param sampleIndex the index to reset
+   * Removes all samples from the record and clears format information
    * @return this, for call chaining
    */
-  public VcfRecord resetSample(int sampleIndex) {
-    assert sampleIndex < mNumSamples : "Invalid sample index: " + sampleIndex;
-    for (List<String> vals : mFormatAndSample.values()) {
-      if (sampleIndex < vals.size()) {
-        vals.set(sampleIndex, MISSING);
-      }
-    }
+  public VcfRecord removeSamples() {
+    mNumSamples = 0;
+    mFormatAndSample.clear();
     return this;
   }
 
@@ -678,7 +710,7 @@ public class VcfRecord implements SequenceNameLocus {
         sb.append("=")
         .append(StringUtils.implode(values, ALT_CALL_INFO_SEPARATOR));
       }
-      sb.append(FILTER_AND_INFO_SEPARATOR);
+      sb.append(ID_FILTER_AND_INFO_SEPARATOR);
     }
     if (sb.length() == 0) {
       return MISSING;
@@ -715,7 +747,7 @@ public class VcfRecord implements SequenceNameLocus {
     if (filter.size() == 0) {
       return MISSING;
     }
-    return StringUtils.implode(filter, FILTER_AND_INFO_SEPARATOR);
+    return StringUtils.implode(filter, ID_FILTER_AND_INFO_SEPARATOR);
   }
 
   /**
@@ -762,15 +794,4 @@ public class VcfRecord implements SequenceNameLocus {
     return null;
   }
 
-  /**
-   * @return true if the record has failed filters
-   */
-  public boolean isFiltered() {
-    for (final String f : getFilters()) {
-      if (!(VcfUtils.FILTER_PASS.equals(f) || VcfRecord.MISSING.equals(f))) {
-        return true;
-      }
-    }
-    return false;
-  }
 }

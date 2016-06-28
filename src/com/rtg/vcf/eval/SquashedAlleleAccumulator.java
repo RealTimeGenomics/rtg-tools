@@ -79,8 +79,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     rec.setQuality(null);
     rec.getFilters().clear();
     rec.getInfo().clear();
-    rec.getFormatAndSample().clear();
-    rec.setNumberOfSamples(0);
+    rec.removeSamples();
   }
 
   @Override
@@ -144,7 +143,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
       final String alt = alts.get(remaining - 1);
       alts.clear();
       alts.add(alt);
-      mCrv.getFormatAndSample().clear();
+      mCrv.removeSamples();
       mCrv.setNumberOfSamples(1);
       mCrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1");
     }
@@ -156,8 +155,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     mCrv.addInfo("STATUS", status);
     mAlternate.write(mCrv); // Write as-is to the alternate
     // Prepare for usual incorporation
-    mCrv.getFormatAndSample().clear();
-    mCrv.setNumberOfSamples(0);
+    mCrv.removeSamples();
     mCrv.setInfo("STATUS");
     super.writeNonRedundant(v, status);
   }

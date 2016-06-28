@@ -73,7 +73,7 @@ public class ChildPhasingVcfAnnotator implements VcfAnnotator {
   @Override
   public void annotate(VcfRecord rec) {
     // Phase the calls
-    final List<String> calls = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> calls = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     final String[] phased = new String[calls.size()];
     for (Family f : mFamilies) { // The families should have at least two members with generated calls, but there may be other members missing
       final Integer fatherIndex = mHeader.getSampleIndex(f.getFather());
@@ -103,7 +103,8 @@ public class ChildPhasingVcfAnnotator implements VcfAnnotator {
       newCalls.add(phased[i]);
     }
     // Plug phased calls into the record
-    rec.getFormatAndSample().put(VcfUtils.FORMAT_GENOTYPE, newCalls);
+    calls.clear();
+    calls.addAll(newCalls);
   }
 
   /**

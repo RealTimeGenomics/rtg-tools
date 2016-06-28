@@ -84,8 +84,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     rec.setQuality(null);
     rec.getFilters().clear();
     rec.getInfo().clear();
-    rec.getFormatAndSample().clear();
-    rec.setNumberOfSamples(0);
+    rec.removeSamples();
   }
 
   @Override

@@ -194,7 +194,7 @@ class VcfFilterTask {
 
   // and all GT of selected samples when a non-sample specific filter is triggered
   void resetSampleGts(VcfRecord record) {
-    final List<String> sampleGts = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (sampleGts == null) {
       throw new NoTalkbackSlimException("Record does not contain " + VcfUtils.FORMAT_GENOTYPE + " field:\n" + record.toString());
     }
@@ -360,7 +360,7 @@ class VcfFilterTask {
   boolean allSameAsRef(VcfRecord record) {
     if (mRemoveAllSameAsRef) {
       for (int sampleIndex = 0; sampleIndex < record.getNumberOfSamples(); sampleIndex++) {
-        final ArrayList<String> sampleGts = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+        final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
         if (sampleGts == null) {
           throw new NoTalkbackSlimException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());
         }
@@ -380,7 +380,7 @@ class VcfFilterTask {
     if (!mSnpsOnly && !mNonSnpsOnly && !mRemoveSameAsRef && !mRemoveHom) {
       return true;
     }
-    final ArrayList<String> sampleGts = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (sampleGts == null) {
       throw new NoTalkbackSlimException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());
     }

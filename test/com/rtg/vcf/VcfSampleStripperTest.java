@@ -29,10 +29,9 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.SampleField;
@@ -88,19 +87,17 @@ public class VcfSampleStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> formatAndSample = rec.getFormatAndSample();
-    assertNotNull(formatAndSample);
-    assertEquals(2, formatAndSample.size()); //gt, gq
-    assertNotNull(formatAndSample.get("GT"));
-    assertEquals(2, formatAndSample.get("GT").size());
-    assertNotNull(formatAndSample.get("GQ"));
-    assertEquals(2, formatAndSample.get("GQ").size());
+    assertEquals(2, rec.getFormats().size()); //gt, gq
+    assertNotNull(rec.getFormat("GT"));
+    assertEquals(2, rec.getFormat("GT").size());
+    assertNotNull(rec.getFormat("GQ"));
+    assertEquals(2, rec.getFormat("GQ").size());
     assertEquals(2, rec.getNumberOfSamples());
 
-    assertTrue(formatAndSample.get("GT").get(0).equals("0/1"));
-    assertTrue(formatAndSample.get("GT").get(1).equals("1/1"));
-    assertTrue(formatAndSample.get("GQ").get(0).equals("95"));
-    assertTrue(formatAndSample.get("GQ").get(1).equals("2"));
+    assertTrue(rec.getFormat("GT").get(0).equals("0/1"));
+    assertTrue(rec.getFormat("GT").get(1).equals("1/1"));
+    assertTrue(rec.getFormat("GQ").get(0).equals("95"));
+    assertTrue(rec.getFormat("GQ").get(1).equals("2"));
 
     final List<SampleField> headersamples = header.getSampleLines();
 
@@ -131,17 +128,15 @@ public class VcfSampleStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> formatAndSample = rec.getFormatAndSample();
-    assertNotNull(formatAndSample);
-    assertEquals(2, formatAndSample.size()); //gt, gq
-    assertNotNull(formatAndSample.get("GT"));
-    assertEquals(1, formatAndSample.get("GT").size());
-    assertNotNull(formatAndSample.get("GQ"));
-    assertEquals(1, formatAndSample.get("GQ").size());
+    assertEquals(2, rec.getFormats().size()); //gt, gq
+    assertNotNull(rec.getFormat("GT"));
+    assertEquals(1, rec.getFormat("GT").size());
+    assertNotNull(rec.getFormat("GQ"));
+    assertEquals(1, rec.getFormat("GQ").size());
     assertEquals(1, rec.getNumberOfSamples());
 
-    assertTrue(formatAndSample.get("GT").get(0).equals("1/1"));
-    assertTrue(formatAndSample.get("GQ").get(0).equals("2"));
+    assertTrue(rec.getFormat("GT").get(0).equals("1/1"));
+    assertTrue(rec.getFormat("GQ").get(0).equals("2"));
 
     final List<SampleField> headersamples = header.getSampleLines();
 
@@ -163,7 +158,7 @@ public class VcfSampleStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> filterlist = rec.getFormatAndSample();
+    final Set<String> filterlist = rec.getFormats();
     assertNotNull(filterlist);
     assertEquals(0, filterlist.size());
     assertEquals(0, rec.getNumberOfSamples());

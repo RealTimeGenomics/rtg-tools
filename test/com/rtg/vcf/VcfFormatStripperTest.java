@@ -29,10 +29,8 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.rtg.vcf.header.FormatField;
@@ -89,11 +87,9 @@ public class VcfFormatStripperTest extends TestCase {
     assertEquals(1, formatlist.size());
     assertTrue(formatlist.contains("GT"));
 
-    final Map<String, ArrayList<String>> formatMap = rec.getFormatAndSample();
-    assertNotNull(formatMap);
-    assertEquals(1, formatMap.size());
+    assertEquals(1, rec.getFormats().size());
 
-    assertTrue(formatMap.containsKey("GT"));
+    assertTrue(rec.hasFormat("GT"));
 
     final VcfHeader header = createTestHeader();
     ann.updateHeader(header);
@@ -122,12 +118,10 @@ public class VcfFormatStripperTest extends TestCase {
     assertTrue(formatset.contains("GT"));
     assertTrue(formatset.contains("GQ"));
 
-    final Map<String, ArrayList<String>> formatMap = rec.getFormatAndSample();
-    assertNotNull(formatMap);
-    assertEquals(2, formatMap.size());
+    assertEquals(2, rec.getFormats().size());
 
-    assertTrue(formatMap.containsKey("GT"));
-    assertTrue(formatMap.containsKey("GQ"));
+    assertTrue(rec.hasFormat("GT"));
+    assertTrue(rec.hasFormat("GQ"));
 
     final VcfHeader header = createTestHeader();
     ann.updateHeader(header);

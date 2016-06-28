@@ -84,7 +84,7 @@ public class VcfFormatStripper implements VcfAnnotator {
         it.remove();
       }
     }
-    if (rec.getFormatAndSample().size() == 0) {
+    if (rec.getFormats().size() == 0) {
       mKeepRecord = false;
     }
   }

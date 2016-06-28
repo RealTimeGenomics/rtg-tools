@@ -181,7 +181,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     rec.getFilters().clear();
     rec.getInfo().clear();
     final String gtStr = VcfUtils.getValidGtStr(rec, sampleIndex);
-    rec.getFormatAndSample().clear();
+    rec.removeSamples();
     if (destPos == -1) {
       rec.setNumberOfSamples(1);
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, gtStr);

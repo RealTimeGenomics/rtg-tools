@@ -54,7 +54,7 @@ public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDe
 
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
-    final List<String> gtList = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> gtList = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (gtList == null) {
       return null;
     }

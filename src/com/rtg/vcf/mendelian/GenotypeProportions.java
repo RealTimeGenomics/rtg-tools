@@ -183,7 +183,7 @@ public final class GenotypeProportions {
     try (VcfReader vcfR = VcfReader.openVcfReader(f)) {
       while (vcfR.hasNext()) {
         final VcfRecord rec = vcfR.next();
-        final ArrayList<String> sampleGts = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+        final ArrayList<String> sampleGts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }

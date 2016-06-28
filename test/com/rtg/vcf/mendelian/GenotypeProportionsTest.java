@@ -81,7 +81,7 @@ public class GenotypeProportionsTest extends TestCase {
     try (VcfReader r = new VcfReader(new BufferedReader(new StringReader(mNano.loadReference(vcfResource))))) {
       while (r.hasNext()) {
         final VcfRecord rec = r.next();
-        final ArrayList<String> sampleGts = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+        final ArrayList<String> sampleGts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }

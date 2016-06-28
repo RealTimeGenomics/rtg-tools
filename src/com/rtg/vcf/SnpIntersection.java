@@ -332,7 +332,7 @@ CommonFlags.initNoGzip(flags);
 
   private String vcfRecordToPrediction(VcfRecord rec) {
     final StringBuilder sb = new StringBuilder();
-    final String[] preds = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0).split("[/|]");
+    final String[] preds = rec.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0).split("[/|]");
     for (int i = 0; i < preds.length; i++) {
       final int pred = ".".equals(preds[i]) ? 0 : Integer.parseInt(preds[i]);
       if (i > 0) {

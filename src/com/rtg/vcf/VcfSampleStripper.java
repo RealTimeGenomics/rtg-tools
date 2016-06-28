@@ -32,7 +32,6 @@ package com.rtg.vcf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -103,8 +102,7 @@ public class VcfSampleStripper implements VcfAnnotator {
   @Override
   public void annotate(VcfRecord rec) {
     if (mRemoveAll) {
-      rec.getFormatAndSample().clear();
-      rec.setNumberOfSamples(0);
+      rec.removeSamples();
       return;
     } else if (mSamples == null || mSamples.size() == 0) {
       return;
@@ -116,19 +114,21 @@ public class VcfSampleStripper implements VcfAnnotator {
 
     int newNumSamples = rec.getNumberOfSamples();
     boolean first = true;
-    for (Map.Entry<String, ArrayList<String>> formatValue : rec.getFormatAndSample().entrySet()) {
+    for (String id : rec.getFormats()) {
+      final ArrayList<String> formatValues = rec.getFormat(id);
       //remove each sample from each format
       for (int j = mSampleIdsToRemove.length - 1; j >= 0; j--) { //backwards to avoid changing index values as we remove items
-        formatValue.getValue().remove(mSampleIdsToRemove[j]);
+        formatValues.remove(mSampleIdsToRemove[j]);
       }
       if (first) {
-        newNumSamples = formatValue.getValue().size();
+        newNumSamples = formatValues.size();
         first = false;
       }
     }
-    rec.setNumberOfSamples(newNumSamples);
     if (newNumSamples == 0) {
-      rec.getFormatAndSample().clear();
+      rec.removeSamples();
+    } else {
+      rec.setNumberOfSamples(newNumSamples);
     }
   }
 }

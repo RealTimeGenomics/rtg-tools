@@ -128,6 +128,10 @@ public final class VcfUtils {
   /** VCF FORMAT field used to indicate de novo score. */
   public static final String FORMAT_DENOVO_SCORE = "DNP";
 
+  /** Filter status field. */
+  public static final String FORMAT_FILTER = "FT";
+
+
   private static int alleleId(char c) {
     if (c == VcfUtils.MISSING_VALUE) {
       return -1;
@@ -392,9 +396,9 @@ public final class VcfUtils {
    * @return the value converted into a double, or {@code Double.NaN} if missing
    */
   public static double getDoubleFormatFieldFromRecord(VcfRecord rec, int sample, String field) {
-    final Map<String, ArrayList<String>> formatPerSample = rec.getFormatAndSample();
-    if (formatPerSample.containsKey(field)) {
-      final String fieldVal = formatPerSample.get(field).get(sample);
+    final ArrayList<String> format = rec.getFormat(field);
+    if (format != null) {
+      final String fieldVal = format.get(sample);
       try {
         if (fieldVal.equals(VcfRecord.MISSING)) {
           return Double.NaN;
@@ -539,7 +543,7 @@ public final class VcfUtils {
    * @throws NoTalkbackSlimException if the record does not contain GT values, or the sample is invalid.
    */
   public static String getValidGtStr(VcfRecord rec, int sample) {
-    final ArrayList<String> gtList = rec.getFormatAndSample().get(FORMAT_GENOTYPE);
+    final ArrayList<String> gtList = rec.getFormat(FORMAT_GENOTYPE);
     if (gtList == null) {
       throw new NoTalkbackSlimException("VCF record does not contain GT field, record: " + rec.toString());
     }
@@ -561,7 +565,7 @@ public final class VcfUtils {
     if (sampleId >= rec.getNumberOfSamples()) {
       throw new IllegalArgumentException("Record did not contain enough samples: " + rec.toString());
     }
-    if (!rec.getFormatAndSample().containsKey(FORMAT_GENOTYPE)) {
+    if (!rec.hasFormat(FORMAT_GENOTYPE)) {
       return false;
     }
     final int[] gtArr = getValidGt(rec, sampleId);

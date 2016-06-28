@@ -69,9 +69,9 @@ public class VcfFormatDoubleAnnotatorTest extends TestCase {
     rec.setNumberOfSamples(2);
     ann.annotate(rec);
     ann.annotate(rec); // Test that doing a second time doesn't break it / add extra
-    assertEquals(2, rec.getFormatAndSample().get("DUMMY").size());
-    assertEquals("0.000", rec.getFormatAndSample().get("DUMMY").get(0));
-    assertEquals("1.001", rec.getFormatAndSample().get("DUMMY").get(1));
+    assertEquals(2, rec.getFormat("DUMMY").size());
+    assertEquals("0.000", rec.getFormat("DUMMY").get(0));
+    assertEquals("1.001", rec.getFormat("DUMMY").get(1));
     assertEquals("seq\t1\t.\tA\t.\t.\t.\t.\tDUMMY\t0.000\t1.001", rec.toString());
   }
 }

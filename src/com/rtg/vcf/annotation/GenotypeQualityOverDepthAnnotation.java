@@ -50,8 +50,8 @@ public class GenotypeQualityOverDepthAnnotation extends AbstractDerivedFormatAnn
 
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
-    final List<String> dps = record.getFormatAndSample().get(VcfUtils.FORMAT_SAMPLE_DEPTH);
-    final List<String> gqs = record.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE_QUALITY);
+    final List<String> dps = record.getFormat(VcfUtils.FORMAT_SAMPLE_DEPTH);
+    final List<String> gqs = record.getFormat(VcfUtils.FORMAT_GENOTYPE_QUALITY);
     if (dps != null && gqs != null && dps.size() > sampleNumber && dps.size() == gqs.size()) {
       final String dpVal = dps.get(sampleNumber);
       final String gqVal = gqs.get(sampleNumber);

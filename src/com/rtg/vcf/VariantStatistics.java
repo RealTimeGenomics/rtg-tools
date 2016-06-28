@@ -293,7 +293,7 @@ public class VariantStatistics extends AbstractStatistics {
       return;
     }
     mTotalPassed++;
-    final ArrayList<String> gts = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final ArrayList<String> gts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (gts == null) {
       mTotalNoGenotype++;
       return;
@@ -306,8 +306,8 @@ public class VariantStatistics extends AbstractStatistics {
     final String ref = alleles[0];
 
     final HashSet<Integer> altAlleles = new HashSet<>();
-    final ArrayList<String> denovo = rec.getFormatAndSample().get(VcfUtils.FORMAT_DENOVO);
-    final ArrayList<String> somaticstatus = rec.getFormatAndSample().get(VcfUtils.FORMAT_SOMATIC_STATUS);
+    final ArrayList<String> denovo = rec.getFormat(VcfUtils.FORMAT_DENOVO);
+    final ArrayList<String> somaticstatus = rec.getFormat(VcfUtils.FORMAT_SOMATIC_STATUS);
     for (int i = 0; i < sampleNames.size(); i++) {
       final String sampleName = sampleNames.get(i);
       if (mOnlySample == null || mOnlySample.contains(sampleName)) {

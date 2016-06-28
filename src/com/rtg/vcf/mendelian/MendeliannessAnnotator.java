@@ -242,7 +242,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
   // Returns true if any of the calls have unexpected call ploidy
   private boolean hasBadCallPloidy(VcfRecord rec) {
-    final List<String> calls = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> calls = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (mSampleToSex.length != calls.size()) {
       throw new NoTalkbackSlimException("Number of samples in VCF record is inconsistent with previous records: " + rec.toString());
     }
@@ -287,7 +287,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
   // Returns true if any of the testable trio genotypes has bad mendelianness
   private boolean hasBadMendelianness(VcfRecord rec) {
-    final List<String> calls = rec.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> calls = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     boolean nonMendelian = false;
     boolean nonRef = false;
     boolean strangePloidy = false;
@@ -408,7 +408,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       mTemplateName = rec.getSequenceName();
       updateExpectedAlleleCounts(mSexMemo, mTemplateName);
     }
-    if (!rec.getFormatAndSample().containsKey(VcfUtils.FORMAT_GENOTYPE)) {
+    if (!rec.hasFormat(VcfUtils.FORMAT_GENOTYPE)) {
       throw new NoTalkbackSlimException("Record does not contain GT field: " + rec.toString());
     }
     mTotalRecords++;

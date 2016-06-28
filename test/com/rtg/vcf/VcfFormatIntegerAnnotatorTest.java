@@ -70,9 +70,9 @@ public class VcfFormatIntegerAnnotatorTest extends TestCase {
     rec.setNumberOfSamples(2);
     ann.annotate(rec);
     ann.annotate(rec); // Test that doing a second time doesn't break it / add extra
-    assertEquals(2, rec.getFormatAndSample().get("DUMMY").size());
-    assertEquals("0", rec.getFormatAndSample().get("DUMMY").get(0));
-    assertEquals("17", rec.getFormatAndSample().get("DUMMY").get(1));
+    assertEquals(2, rec.getFormat("DUMMY").size());
+    assertEquals("0", rec.getFormat("DUMMY").get(0));
+    assertEquals("17", rec.getFormat("DUMMY").get(1));
     assertEquals("seq\t1\t.\tA\t.\t.\t.\t.\tDUMMY\t0\t17", rec.toString());
   }
 }

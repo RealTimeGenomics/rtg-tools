@@ -157,8 +157,8 @@ public class VcfReaderTest extends TestCase {
     assertEquals("yy", rec.getInfo().get("X").iterator().next());
     assertEquals("7", rec.getInfo().get("DP").iterator().next());
 
-    assertEquals(2, rec.getFormatAndSample().size());
-    assertEquals(Collections.singletonList("0|0"), rec.getFormatAndSample().get("GT"));
-    assertEquals(Collections.singletonList("7"), rec.getFormatAndSample().get("GQ"));
+    assertEquals(2, rec.getFormats().size());
+    assertEquals(Collections.singletonList("0|0"), rec.getFormat("GT"));
+    assertEquals(Collections.singletonList("7"), rec.getFormat("GQ"));
   }
 }

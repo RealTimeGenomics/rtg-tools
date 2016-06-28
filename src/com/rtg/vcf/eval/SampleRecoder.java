@@ -126,10 +126,9 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     if (mBv instanceof OrientedVariant) {
       // Normal status if the sample contains this variant
       // Add the appropriate GT and output the record
-      final OrientedVariant ov = (OrientedVariant) mBv;
-      mBrv.getFormatAndSample().clear();
-      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
+      final OrientedVariant ov = (OrientedVariant) mBv;
+      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       normalize(mBrv, 0);
       mSampleVcf.write(mBrv);
     } else if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
@@ -165,7 +164,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     Arrays.sort(gt);
     rec.getAltCalls().clear();
     rec.getAltCalls().addAll(newAlts);
-    rec.getFormatAndSample().clear();
+    rec.removeSamples();
     rec.setNumberOfSamples(1);
     rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, gt));
   }

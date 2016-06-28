@@ -63,7 +63,7 @@ public class QualOverDepthAnnotation extends AbstractDerivedAnnotation {
           return Double.parseDouble(squal) / dp;
         }
       } else {
-        final List<String> dps = record.getFormatAndSample().get(VcfUtils.FORMAT_SAMPLE_DEPTH);
+        final List<String> dps = record.getFormat(VcfUtils.FORMAT_SAMPLE_DEPTH);
         if (dps != null && dps.size() != 0) {
           // get dp from sum of DP in samples, as DP may not exist in INFO for single sample VCF
           int dp = 0;

@@ -99,10 +99,10 @@ public class VcfRecordTest extends TestCase {
     assertEquals("46", iter.next());
     assertEquals("47", iter.next());
     assertEquals("48", iter.next());
-    assertEquals("0/0", rec.getFormatAndSample().get("GT").get(0));
-    assertEquals("0/1", rec.getFormatAndSample().get("GT").get(1));
-    assertEquals("100", rec.getFormatAndSample().get("GQ").get(0));
-    assertEquals("95", rec.getFormatAndSample().get("GQ").get(1));
+    assertEquals("0/0", rec.getFormat("GT").get(0));
+    assertEquals("0/1", rec.getFormat("GT").get(1));
+    assertEquals("100", rec.getFormat("GQ").get(0));
+    assertEquals("95", rec.getFormat("GQ").get(1));
     final String line = ""
       + "chr1" + TAB
       + "1210" + TAB
@@ -168,9 +168,9 @@ public class VcfRecordTest extends TestCase {
     assertEquals(2, merged.getAltCalls().size());
     assertEquals("C", merged.getAltCalls().get(0));
     assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(2, merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("0/2", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(1));
+    assertEquals(2, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
+    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
+    assertEquals("0/2", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
 
     r1 = createRecord("chr1", 50, "A", 0, 1, "C");
     r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
@@ -183,9 +183,9 @@ public class VcfRecordTest extends TestCase {
     assertEquals(2, merged.getAltCalls().size());
     assertEquals("C", merged.getAltCalls().get(0));
     assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(2, merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("2/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(1));
+    assertEquals(2, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
+    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
+    assertEquals("2/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
 
     // Outputs separate records due to different REF
     r1 = createRecord("chr1", 50, "A", 0, 1, "C");
@@ -223,10 +223,10 @@ public class VcfRecordTest extends TestCase {
     assertEquals(50, merged.getOneBasedStart());
     assertEquals(1, merged.getAltCalls().size());
     assertEquals("C", merged.getAltCalls().get(0));
-    assertEquals(3, merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals(".", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals(".", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(2));
+    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
+    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
+    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
+    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
 
     //test merge handling with multiple refs, some mergeable, some not
     final VcfHeader h3 = new VcfHeader();
@@ -243,20 +243,20 @@ public class VcfRecordTest extends TestCase {
     assertEquals(2, merged.getAltCalls().size());
     assertEquals("C", merged.getAltCalls().get(0));
     assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(3, merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("2/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals(".", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(2));
+    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
+    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
+    assertEquals("2/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
+    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
     merged = mergedArr[1];
     assertEquals("chr1", merged.getSequenceName());
     assertEquals("AC", merged.getRefCall());
     assertEquals(50, merged.getOneBasedStart());
     assertEquals(1, merged.getAltCalls().size());
     assertEquals("AG", merged.getAltCalls().get(0));
-    assertEquals(3, merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals(".", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals(".", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals("0/1", merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(2));
+    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
+    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
+    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
+    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
 
   }
 
@@ -282,8 +282,8 @@ public class VcfRecordTest extends TestCase {
     r2.addFormatAndSample(unmergeable.getId(), "2.0,3.0");
     VcfRecord[] mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, true);
     assertEquals(2, mergedArr.length);
-    assertTrue(mergedArr[0].getFormatAndSample().containsKey(unmergeable.getId()));
-    assertTrue(mergedArr[1].getFormatAndSample().containsKey(unmergeable.getId()));
+    assertTrue(mergedArr[0].hasFormat(unmergeable.getId()));
+    assertTrue(mergedArr[1].hasFormat(unmergeable.getId()));
 
     // Alts have different alleles
     r1 = createRecord("chr1", 50, "A", 0, 1, "C");
@@ -292,13 +292,13 @@ public class VcfRecordTest extends TestCase {
     r2.addFormatAndSample(unmergeable.getId(), "2.0,3.0");
     mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, true);
     assertEquals(2, mergedArr.length);
-    assertTrue(mergedArr[0].getFormatAndSample().containsKey(unmergeable.getId()));
-    assertTrue(mergedArr[1].getFormatAndSample().containsKey(unmergeable.getId()));
+    assertTrue(mergedArr[0].hasFormat(unmergeable.getId()));
+    assertTrue(mergedArr[1].hasFormat(unmergeable.getId()));
 
     // Alts have different alleles, but allow merge by dropping the FORMAT fields
     mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, false);
     assertEquals(1, mergedArr.length);
-    assertFalse(mergedArr[0].getFormatAndSample().containsKey(unmergeable.getId()));
+    assertFalse(mergedArr[0].hasFormat(unmergeable.getId()));
   }
 
   private void checkRecord(VcfRecord merged, VcfRecord exp, String[] genotype) {
@@ -317,7 +317,7 @@ public class VcfRecordTest extends TestCase {
       assertEquals(altCalls[i], merged.getAltCalls().get(i));
     }
     for (int i = 0; i < gts.length; i++) {
-      assertEquals(gts[i], merged.getFormatAndSample().get(VcfUtils.FORMAT_GENOTYPE).get(i));
+      assertEquals(gts[i], merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(i));
     }
   }
 
@@ -402,15 +402,15 @@ public class VcfRecordTest extends TestCase {
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(3);
     rec.padFormatAndSample("PAD");
-    assertNull(rec.getFormatAndSample().get("PAD"));
+    assertNull(rec.getFormat("PAD"));
     rec.setFormatAndSample("PAD", "DAP", 1);
     rec.padFormatAndSample("PAD");
-    assertEquals(3, rec.getFormatAndSample().get("PAD").size());
-    assertEquals(".", rec.getFormatAndSample().get("PAD").get(0));
-    assertEquals("DAP", rec.getFormatAndSample().get("PAD").get(1));
-    assertEquals(".", rec.getFormatAndSample().get("PAD").get(2));
+    assertEquals(3, rec.getFormat("PAD").size());
+    assertEquals(".", rec.getFormat("PAD").get(0));
+    assertEquals("DAP", rec.getFormat("PAD").get(1));
+    assertEquals(".", rec.getFormat("PAD").get(2));
     rec.setFormatAndSample("PAD", "DAPDAP", 1);
-    assertEquals("DAPDAP", rec.getFormatAndSample().get("PAD").get(1));
+    assertEquals("DAPDAP", rec.getFormat("PAD").get(1));
     rec.setInfo("INF", "VAL1", "VAL2");
     assertEquals(2, rec.getInfo().get("INF").size());
     assertEquals("VAL1", rec.getInfo().get("INF").get(0));
