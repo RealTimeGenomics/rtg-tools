@@ -50,8 +50,8 @@ public class BestSumReadTrimmer implements ReadTrimmer {
 
   @Override
   public int getTrimPosition(byte[] qualities, int length) {
-    if (qualities.length == 0) {
-      return 0;
+    if (qualities == null || qualities.length == 0) {
+      return length;
     }
     int bestPos = length > qualities.length ? qualities.length : length;
     if (length > 0 && qualities[length - 1] < mQualityThreshold) {

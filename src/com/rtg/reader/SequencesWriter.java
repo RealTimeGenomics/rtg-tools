@@ -109,7 +109,7 @@ public class SequencesWriter {
         Diagnostic.userLog("Performing trimming with BestSum, threshold " + trimQualityThreshold);
       }
     } else {
-      mReadTrimmer = null;
+      mReadTrimmer = new NullReadTrimmer();
     }
   }
 
@@ -131,7 +131,7 @@ public class SequencesWriter {
     mSizeLimit = 0;
     mNamesToExclude = namesToExclude == null ? new ArrayList<String>() : namesToExclude;
     mCompressed = compressed;
-    mReadTrimmer = null;
+    mReadTrimmer = new NullReadTrimmer();
   }
 
   /**
@@ -174,7 +174,7 @@ public class SequencesWriter {
       }
     }
 
-    final int length = mReadTrimmer != null && mDataSource.hasQualityData() ? mReadTrimmer.getTrimPosition(mDataSource.qualityData(), mDataSource.currentLength()) : mDataSource.currentLength();
+    final int length = mReadTrimmer.getTrimPosition(mDataSource.qualityData(), mDataSource.currentLength());
     mExcludedResiduesCount += mDataSource.currentLength() - length;
     sdfWriter.startSequence(label);
     sdfWriter.write(mDataSource.sequenceData(), mDataSource.qualityData(), length);  //may write 0 length

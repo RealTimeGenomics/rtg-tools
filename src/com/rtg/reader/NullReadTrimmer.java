@@ -31,47 +31,12 @@
 package com.rtg.reader;
 
 /**
- * Clips sequences based on average quality in a sliding window.
- *
+ * Implementation for when no trimming is to be carried out.
  */
-public class DefaultReadTrimmer implements ReadTrimmer {
-
-  private final int mWindowSize;
-  private final int mQualityThreshold;
-
-  /**
-   * Construct a read trimmer
-   * @param windowSize size of the window to look over
-   * @param qualityThreshold the threshold the window must average higher than
-   */
-  public DefaultReadTrimmer(int windowSize, int qualityThreshold) {
-    mWindowSize = windowSize;
-    mQualityThreshold = qualityThreshold;
-  }
+public class NullReadTrimmer implements ReadTrimmer {
 
   @Override
   public int getTrimPosition(byte[] qualities, int length) {
-    if (qualities == null || qualities.length == 0) {
-      return length;
-    }
-    final int[] quals = new int[mWindowSize];
-    int cutoffIndex = length;
-    double sum = 0.0;
-    for (int i = 0; i < cutoffIndex; i++) {
-      if (i >= quals.length) {
-        if (sum / quals.length < mQualityThreshold) {
-          cutoffIndex = i;
-        }
-      }
-      final int i2 = i % quals.length;
-      sum -= quals[i2];
-      quals[i2] = (int) qualities[i];
-      sum += quals[i2];
-    }
-    if (cutoffIndex > mWindowSize) {
-      return cutoffIndex;
-    }
-    return 0;
+    return length;
   }
-
 }
