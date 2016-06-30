@@ -507,4 +507,14 @@ public class FileUtilsTest extends TestCase {
 
     assertEquals("", FileUtils.getExtension("foo.moooloo/arah"));
   }
+
+  public void testBaseFile() {
+    assertEquals(new BaseFile(new File("foo.bar"), ".bang", true), FileUtils.getBaseFile(new File("foo.bar.bang"), true, ".bang"));
+    assertEquals(new BaseFile(new File("foo.bar"), ".bang", true), FileUtils.getBaseFile(new File("foo.bar.bang"), true, ".bong", ".bang"));
+    assertEquals(new BaseFile(new File("foo.bar.bang"), ".bong", true), FileUtils.getBaseFile(new File("foo.bar.bang"), true, ".bong", ".ban"));
+    assertEquals(new BaseFile(new File("foo.bar"), ".bang", true), FileUtils.getBaseFile(new File("foo.bar.bang.gz"), true, ".bang"));
+    assertEquals(new BaseFile(new File("foo.bar"), ".bang", true), FileUtils.getBaseFile(new File("foo.bar.bang.gz"), true, ".bong", ".bang"));
+    assertEquals(new BaseFile(new File("foo.bar.bang"), ".bong", true), FileUtils.getBaseFile(new File("foo.bar.bang.gz"), true, ".bong", ".ban"));
+    assertEquals(new BaseFile(new File("foo.bar"), ".bang", false), FileUtils.getBaseFile(new File("foo.bar.bang.gz"), false, ".bang"));
+  }
 }

@@ -30,10 +30,18 @@
 package com.rtg.reader;
 
 
+import java.io.File;
+import java.util.Arrays;
+
+import com.rtg.util.io.BaseFile;
+import com.rtg.util.io.FileUtils;
+
 /**
  * Utility functions for manipulating FASTA/FASTQ encoded data, e.g. between binary and ascii phred.
  */
 public final class FastaUtils {
+
+  private static final String[] EXTS = {".fasta", ".fa"};
 
   /** ASCII PHRED highest allowed value */
   public static final int PHRED_UPPER_LIMIT_CHAR = '~';
@@ -41,6 +49,13 @@ public final class FastaUtils {
   public static final int PHRED_LOWER_LIMIT_CHAR = '!';
 
   private FastaUtils() {
+  }
+
+  /**
+   * @return array of extensions that we recognize for FASTA files
+   */
+  public static String[] extensions() {
+    return Arrays.copyOf(EXTS, EXTS.length);
   }
 
   // Convert between raw and ascii phred quality values
@@ -170,6 +185,16 @@ public final class FastaUtils {
       result[i] = asciiToRawQuality((char) qualities[i]);
     }
     return result;
+  }
+
+  /**
+   * Takes a file and returns a FASTA base file, removing any gzip extension and storing a FASTQ extension if found
+   * @param file the source file
+   * @param gzip whether output is intended to be gzipped
+   * @return the base file
+   */
+  public static BaseFile baseFile(File file, boolean gzip) {
+    return FileUtils.getBaseFile(file, gzip, EXTS);
   }
 
 }

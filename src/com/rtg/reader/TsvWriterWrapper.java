@@ -30,17 +30,13 @@
 
 package com.rtg.reader;
 
-import static com.rtg.launcher.CommonFlags.STDIO_NAME;
-
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.launcher.CommonFlags;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.BaseFile;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
 
@@ -93,18 +89,8 @@ public class TsvWriterWrapper implements WriterWrapper {
         throw new NoTalkbackSlimException("Input data doesn't look like a recognized Complete Genomics read structure");
     }
 
-    // Strip any existing GZ or FASTA like suffix from the file name, but remember the primary type
-    String output = baseOutput.toString();
-    if (FileUtils.isGzipFilename(output)) {
-      output = output.substring(0, output.length() - FileUtils.GZ_SUFFIX.length());
-    }
-    String ext = FileUtils.getExtension(output);
-    if (Arrays.asList(extensions).contains(ext.toLowerCase(Locale.getDefault()))) {
-      output = output.substring(0, output.lastIndexOf('.'));
-    } else {
-      ext = extensions[0];
-    }
-    mOutput = FastaWriterWrapper.getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + ext), gzip);
+    final BaseFile baseFile = FileUtils.getBaseFile(baseOutput, gzip, extensions);
+    mOutput = FastaWriterWrapper.getStream(baseFile, "");
     mOutput.append("#GENERATED_BY\tsdf2cg\n");
     mOutput.append("#TYPE\tREADS\n");
     mOutput.append("#READ_TYPE\t").append(readType).append("\n");

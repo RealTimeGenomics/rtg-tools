@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
 
@@ -916,6 +917,33 @@ public final class FileUtils {
       outStream = new GzipAsynchOutputStream(outStream, terminate);
     }
     return outStream;
+  }
+
+  /**
+   * Returns a base file given a filename. This is used to determine what part of a user supplied filename are unique
+   * and which are merely associated with its file type. A gzip extension (<code>.gz</code>) will always be removed from the base file.
+   * @param file user supplied filename
+   * @param gzip whether the file will be gzipped
+   * @param exts extensions that are recognized for the format we are writing out. The first entry will be used as the
+   * base file extension if none of these are detected on <code>file</code>. Extensions should include their "." character
+   * @return the base file
+   */
+  public static BaseFile getBaseFile(File file, boolean gzip, String... exts) {
+    File baseOutFile = file;
+    if (isGzipFilename(baseOutFile)) { //remove gzip extension if present, we will put this back on if gzipping
+      baseOutFile = removeExtension(baseOutFile);
+    }
+    String extension = getExtension(baseOutFile);
+    if (exts.length > 0) {
+      if (Arrays.asList(exts).contains(extension.toLowerCase(Locale.getDefault()))) {
+        baseOutFile = removeExtension(baseOutFile); //remove extension if present, we will place back on with other suffixes
+      } else {
+        extension = exts[0];
+      }
+    } else {
+      extension = "";
+    }
+    return new BaseFile(baseOutFile, extension, gzip);
   }
 
   private static class TeeOutputStream extends OutputStream {

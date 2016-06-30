@@ -29,18 +29,15 @@
  */
 package com.rtg.reader;
 
-import static com.rtg.launcher.CommonFlags.STDIO_NAME;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.Locale;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.BaseFile;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
 
@@ -50,7 +47,6 @@ import com.rtg.util.io.LineWriter;
 @TestClass("com.rtg.reader.Sdf2FastaTest")
 public class FastaWriterWrapper implements WriterWrapper {
 
-  private static final String[] EXTS = {".fasta", ".fa"};
 
   private final boolean mIsPaired;
   private final SdfReaderWrapper mReader;
@@ -75,7 +71,7 @@ public class FastaWriterWrapper implements WriterWrapper {
    * @throws IOException if there is a problem constructing the writer.
    */
   public FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired) throws IOException {
-    this(baseOutput, reader, lineLength, rename, gzip, interleavePaired, EXTS);
+    this(baseOutput, reader, lineLength, rename, gzip, interleavePaired, FastaUtils.extensions());
   }
 
   protected FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired, String[] extensions) throws IOException {
@@ -92,42 +88,33 @@ public class FastaWriterWrapper implements WriterWrapper {
     mLineLength = lineLength;
     mRename = rename;
 
-    // Strip any existing GZ or FASTA like suffix from the file name, but remember the primary type
-    String output = baseOutput.toString();
-    if (FileUtils.isGzipFilename(output)) {
-      output = output.substring(0, output.length() - FileUtils.GZ_SUFFIX.length());
-    }
-    String ext = FileUtils.getExtension(output);
-    if (Arrays.asList(extensions).contains(ext.toLowerCase(Locale.getDefault()))) {
-      output = output.substring(0, output.lastIndexOf('.'));
-    } else {
-      ext = extensions[0];
-    }
+
+    final BaseFile baseFile = FileUtils.getBaseFile(baseOutput, gzip, extensions);
 
     if (mIsPaired) {
       mSingle = null;
       if (interleavePaired) {
-        mLeft = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + ext), gzip);
+        mLeft = getStream(baseFile, "");
         mRight = mLeft;
       } else {
-        if (CommonFlags.isStdio(output)) {
+        if (CommonFlags.isStdio(baseOutput)) {
           throw new NoTalkbackSlimException("Sending non-interleaved paired-end data to stdout is not supported.");
         }
-        mLeft = getStream(output + "_1" + ext, gzip);
-        mRight = getStream(output + "_2" + ext, gzip);
+        mLeft = getStream(baseFile, "_1");
+        mRight = getStream(baseFile, "_2");
       }
     } else {
       mLeft = null;
       mRight = null;
-      mSingle = getStream(CommonFlags.isStdio(output) ? STDIO_NAME : (output + ext), gzip);
+      mSingle = getStream(baseFile, "");
     }
   }
 
-  static LineWriter getStream(final String name, boolean gzip) throws IOException {
-    if (CommonFlags.isStdio(name)) {
+  static LineWriter getStream(final BaseFile baseFile, String fileSuffix) throws IOException {
+    if (CommonFlags.isStdio(baseFile.getBaseFile())) {
       return new LineWriter(new OutputStreamWriter(FileUtils.getStdoutAsOutputStream()));
     }
-    return new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(gzip ? new File(name + FileUtils.GZ_SUFFIX) : new File(name), gzip)));
+    return new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseFile.suffixedFile(fileSuffix), baseFile.isGzip())));
   }
 
   @Override
