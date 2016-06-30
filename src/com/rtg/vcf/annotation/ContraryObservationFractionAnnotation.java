@@ -67,7 +67,7 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     mHeader = header;
     mSampleToAntecedents = new ArrayList<>(header.getNumberOfSamples());
     for (int k = 0; k < header.getNumberOfSamples(); k++) {
-      mSampleToAntecedents.add(new ArrayList<Integer>());
+      mSampleToAntecedents.add(new ArrayList<>());
     }
     final List<PedigreeField> pedigreeLines = mHeader.getPedigreeLines();
     for (final PedigreeField pedLine : pedigreeLines) {
