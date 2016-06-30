@@ -77,7 +77,17 @@ public class BaseFile {
    * @return the fully named file
    */
   public File suffixedFile(String suffix) {
-    return new File(mBaseFile.getParentFile(), mBaseFile.getName() + suffix + mExtension + (mGzip ? FileUtils.GZ_SUFFIX : ""));
+    return suffixedFile(suffix, mGzip);
+  }
+
+  /**
+   * Apply suffix to base file and add all relevant extensions
+   * @param suffix suffix for base file
+   * @param gzip true to add a gzip suffix, false to not
+   * @return the fully named file
+   */
+  public File suffixedFile(String suffix, boolean gzip) {
+    return new File(mBaseFile.getParentFile(), mBaseFile.getName() + suffix + mExtension + (gzip ? FileUtils.GZ_SUFFIX : ""));
   }
 
   @Override

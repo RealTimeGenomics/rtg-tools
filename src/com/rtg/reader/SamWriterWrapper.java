@@ -30,13 +30,10 @@
 
 package com.rtg.reader;
 
-import static com.rtg.launcher.CommonFlags.STDIO_NAME;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.Locale;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.CommonFlags;
@@ -47,6 +44,7 @@ import com.rtg.sam.SamCommandHelper;
 import com.rtg.sam.SamUtils;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.BaseFile;
 import com.rtg.util.io.FileUtils;
 
 import htsjdk.samtools.SAMFileHeader;
@@ -92,18 +90,7 @@ public class SamWriterWrapper implements WriterWrapper {
       throw new NoTalkbackSlimException(ErrorType.SEQUENCE_LENGTH_ERROR);
     }
 
-    // Strip any existing GZ suffix from the file name, but remember the primary type
-    String output = baseOutput.toString();
-    if (FileUtils.isGzipFilename(output)) {
-      output = output.substring(0, output.length() - FileUtils.GZ_SUFFIX.length());
-    }
-    String ext = FileUtils.getExtension(output);
-    if (Arrays.asList(extensions).contains(ext.toLowerCase(Locale.getDefault()))) {
-      output = output.substring(0, output.lastIndexOf('.'));
-    } else {
-      ext = extensions[0]; // Default if no recognized extension
-    }
-
+    final BaseFile baseFile = FileUtils.getBaseFile(baseOutput, gzip, extensions);
 
     final SAMFileHeader header = new SAMFileHeader();
     header.setSortOrder(SAMFileHeader.SortOrder.unsorted);
@@ -133,14 +120,13 @@ public class SamWriterWrapper implements WriterWrapper {
 
     SamUtils.addProgramRecord(header);
 
-    final boolean bam = !CommonFlags.isStdio(output) && ext.endsWith(SamUtils.BAM_SUFFIX);
+    final boolean bam = !CommonFlags.isStdio(baseOutput) && baseFile.getExtension().endsWith(SamUtils.BAM_SUFFIX);
 
-    final String name = CommonFlags.isStdio(output) ? STDIO_NAME : (output + ext);
     final OutputStream os;
-    if (CommonFlags.isStdio(name)) {
+    if (CommonFlags.isStdio(baseOutput)) {
       os = FileUtils.getStdoutAsOutputStream();
     } else {
-      os = FileUtils.createOutputStream(gzip && !bam ? new File(name + FileUtils.GZ_SUFFIX) : new File(name), gzip && !bam);
+      os = FileUtils.createOutputStream(baseFile.suffixedFile("", gzip && !bam), gzip && !bam);
     }
 
     final SAMFileWriterFactory fact = new SAMFileWriterFactory();
