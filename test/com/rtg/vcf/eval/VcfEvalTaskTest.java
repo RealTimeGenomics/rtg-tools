@@ -270,13 +270,15 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     final String roc = FileUtils.fileToString(out);
     //System.err.println("ROC\n" + roc);
     final String[] homoLines = roc.split(StringUtils.LS);
+    int line = 0;
     if (checktotal) {
-      assertEquals("#total baseline variants: " + (tpCount + fnCount), homoLines[0]);
+      assertEquals("#total baseline variants: " + (tpCount + fnCount), homoLines[line++]);
     } else {
-      assertTrue(homoLines[0].startsWith("#total baseline variants: "));
+      assertTrue(homoLines[line++].startsWith("#total baseline variants: "));
     }
-    assertTrue(homoLines[1].startsWith("#score field: "));
-    assertTrue(homoLines[2].startsWith("#score\t"));
+    assertTrue(homoLines[line++].startsWith("#total call variants: "));
+    assertTrue(homoLines[line++].startsWith("#score field: "));
+    assertTrue(homoLines[line].startsWith("#score\t"));
     mNano.check(label, roc);
   }
 

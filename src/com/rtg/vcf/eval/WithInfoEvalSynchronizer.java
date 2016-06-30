@@ -110,7 +110,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
-          addToROCContainer(w, 0, false);
+          addToROCContainer(w, 0, 1, false);
           status = STATUS_TP;
         } else {
           status = STATUS_NON_CONF;
@@ -123,7 +123,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
-          addToROCContainer(w, 0, true);
+          addToROCContainer(w, 0, 1, true);
           status = STATUS_FP_CA;
         } else {
           status = STATUS_NON_CONF;
@@ -134,7 +134,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
         mFalsePositives++;
-        addToROCContainer(0, 1, false);
+        addToROCContainer(0, 1, 0, false);
         status = STATUS_FP;
         sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
       } else {

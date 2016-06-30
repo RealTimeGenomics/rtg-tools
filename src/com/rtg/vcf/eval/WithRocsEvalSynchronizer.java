@@ -129,16 +129,16 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     mCorrectPhasings += correctPhasings;
   }
 
-  protected void addToROCContainer(double tpWeight, double fpWeight, boolean alleleMatch) {
+  protected void addToROCContainer(double tpWeight, double fpWeight, double tpqWeight, boolean alleleMatch) {
     if (mDefaultRoc != null) {
       if (alleleMatch) { // Consider these FP for GT ROCs
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, fpWeight, tpWeight);
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, fpWeight, tpWeight, 0); // XXXLen 0 vs ???
       } else {
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight);
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
       }
     }
     if (mAlleleRoc != null) {
-      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight);
+      mAlleleRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
     }
   }
 
@@ -164,15 +164,16 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     writePhasingInfo();
     if (mAlleleRoc != null) {
       final int alleleTp = mBaselineTruePositives + mFalseNegativesCommonAllele;
-      mAlleleRoc.writeRocs(mOutDir, alleleTp, mFalsePositives, mFalseNegatives, mZip, mSlope);
+      final int alleleTpq = mCallTruePositives + mFalsePositivesCommonAllele;
+      mAlleleRoc.writeRocs(mOutDir, alleleTp, mFalsePositives, mFalseNegatives, alleleTpq, mZip, mSlope);
       // Do we want the allele-level summary too?
       //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
     }
     if (mDefaultRoc != null) {
       final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
       final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
-      mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mZip, mSlope);
-      mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFp, strictFn);
+      mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mCallTruePositives, mZip, mSlope);
+      mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFn, mCallTruePositives, strictFp);
     }
   }
 

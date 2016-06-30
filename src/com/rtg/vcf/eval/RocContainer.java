@@ -68,6 +68,8 @@ public class RocContainer {
   private final RocSortValueExtractor mRocExtractor;
   private final String mFilePrefix;
   private boolean mRequiresGt = false;
+  private RocPoint mBest = null;
+  private double mBestFMeasure = 0;
 
   /**
    * Constructor
@@ -134,10 +136,11 @@ public class RocContainer {
    * add single result to ROC
    * @param rec the VCF record to incorporate into the ROC curves
    * @param sampleId the index of the sample column to use for score extraction
-   * @param tpWeight true positive weight of the call.
+   * @param tpWeight true positive weight of the call (baseline weighting).
    * @param fpWeight false positive weight of the call.
+   * @param tpRaw true positive weight of the call (unweighted).
    */
-  public void addRocLine(VcfRecord rec, int sampleId, double tpWeight, double fpWeight) {
+  public void addRocLine(VcfRecord rec, int sampleId, double tpWeight, double fpWeight, double tpRaw) {
     double score = Double.NaN;
     try {
       score = mRocExtractor.getSortValue(rec, sampleId);
@@ -146,10 +149,11 @@ public class RocContainer {
     if (Double.isNaN(score) || Double.isInfinite(score)) {
       mNoScoreVariants++;
     } else {
+      final RocPoint point = new RocPoint(score, tpWeight, fpWeight, tpRaw);
       final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
       for (final RocFilter filter : filters()) {
         if (filter.accept(rec, gt)) {
-          addRocLine(score, tpWeight, fpWeight, filter);
+          addRocLine(point, filter);
         }
       }
     }
@@ -157,67 +161,53 @@ public class RocContainer {
 
   /**
    * add single result to ROC
-   * @param sortValue normally the posterior score
-   * @param tpweight amount to increment the true positive by
-   * @param fpweight amount to increment the false positive by
+   * @param point the ROC point
    * @param filter specifies which roc line the point will be added to
    */
-  void addRocLine(double sortValue, double tpweight, double fpweight, RocFilter filter) {
-    final RocPoint point = new RocPoint(sortValue, tpweight, fpweight);
+  void addRocLine(RocPoint point, RocFilter filter) {
     final SortedMap<Double, RocPoint> points = mRocs.get(filter);
-    final RocPoint old = points.put(sortValue, point);
-    if (old != null) {
-      point.mTp += old.mTp;
-      point.mFp += old.mFp;
+    if (points.containsKey(point.mThreshold)) {
+      points.get(point.mThreshold).add(point);
+    } else {
+      points.put(point.mThreshold, new RocPoint(point));
     }
-  }
-
-  private static final String HEADER = "#total baseline variants: ";
-  private static final String HEADER2 = "#score true_positives false_positives".replaceAll(" ", "\t");
-  private static final String HEADER3 = " false_negatives precision sensitivity f_measure".replaceAll(" ", "\t");
-  private void rocHeader(LineWriter out, int totalVariants, boolean extraMetrics) throws IOException {
-    out.writeln(HEADER + totalVariants);
-    if (mFieldLabel != null) {
-      out.writeln("#score field: " + mFieldLabel);
-    }
-    out.write(HEADER2);
-    if (extraMetrics) {
-      out.write(HEADER3);
-    }
-    out.newLine();
   }
 
   /**
-   * output ROC data to files
+   * Output ROC data to files. While scanning ROC data also keeps a record to the point with highest f-Measure.
    * @param outDir directory into which ROC files are written
    * @param truePositives total number of baseline true positives
    * @param falsePositives total number of false positives
    * @param falseNegatives total number of false negatives
+   * @param truePositivesRaw total number of call true positives
    * @param zip whether output should be compressed
    * @param slope if true, write ROC slope file
    * @throws IOException if an IO error occurs
    */
-  public void writeRocs(File outDir, int truePositives, int falsePositives, int falseNegatives, boolean zip, boolean slope) throws IOException {
+  public void writeRocs(File outDir, int truePositives, int falsePositives, int falseNegatives, int truePositivesRaw, boolean zip, boolean slope) throws IOException {
     Diagnostic.developerLog("Writing ROC");
+    mBestFMeasure = 0;
+    mBest = null;
+    final RocPoint unfiltered = new RocPoint(Double.NaN, truePositives, falsePositives, truePositivesRaw);
     final int totalBaselineVariants = truePositives + falseNegatives;
+    final int totalCallVariants = truePositivesRaw + falsePositives;
     for (Map.Entry<RocFilter, SortedMap<Double, RocPoint>> entry : mRocs.entrySet()) {
       final RocFilter filter = entry.getKey();
       final SortedMap<Double, RocPoint> points = entry.getValue();
       final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, mFilePrefix + filter.fileName()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
-        double tp = 0.0;
-        double fp = 0.0;
+        final RocPoint current = new RocPoint();
         final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
-        rocHeader(os, totalBaselineVariants, extraMetrics);
+        rocHeader(os, totalBaselineVariants, totalCallVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
-          final RocPoint p = me.getValue();
-          tp += p.mTp;
-          fp += p.mFp;
-          final String score = Utils.realFormat(me.getKey(), 3);
-          writeRocLine(os, score, totalBaselineVariants, tp, fp, extraMetrics);
+          final RocPoint point = me.getValue();
+          current.add(point);
+          current.mThreshold = point.mThreshold;
+          final String score = Utils.realFormat(point.mThreshold, 3);
+          writeRocLine(os, score, totalBaselineVariants, current, extraMetrics, filter == RocFilter.ALL);
         }
-        if (extraMetrics && (Math.abs(tp - truePositives) > 0.001 || Math.abs(fp - falsePositives) > 0.001)) {
-          writeRocLine(os, "None", totalBaselineVariants, truePositives, falsePositives, extraMetrics);
+        if (extraMetrics && (Math.abs(current.mTp - unfiltered.mTp) > 0.001 || Math.abs(current.mFp - unfiltered.mFp) > 0.001)) {
+          writeRocLine(os, "None", totalBaselineVariants, unfiltered, extraMetrics, false);
         }
       }
       if (slope) {
@@ -226,23 +216,40 @@ public class RocContainer {
     }
   }
 
-  void missingScoreWarning() {
-    if (getNumberOfIgnoredVariants() > 0) {
-      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
+  private void rocHeader(LineWriter out, int totalBaselineVariants, int totalCallVariants, boolean extraMetrics) throws IOException {
+    out.writeln("#total baseline variants: " + totalBaselineVariants);
+    out.writeln("#total call variants: " + totalCallVariants);
+    if (mFieldLabel != null) {
+      out.writeln("#score field: " + mFieldLabel);
     }
+    out.write("#score true_positives_baseline false_positives true_positives_call".replaceAll(" ", "\t"));
+    if (extraMetrics) {
+      out.write(" false_negatives precision sensitivity f_measure".replaceAll(" ", "\t"));
+    }
+    out.newLine();
   }
 
-  private void writeRocLine(LineWriter os, String score, int totalPositives, double truePositives, double falsePositives, boolean extraMetrics) throws IOException {
-    os.write(score + "\t" + Utils.realFormat(truePositives, 2) + "\t" + Utils.realFormat(falsePositives, 2));
+  private void writeRocLine(LineWriter os, String score, int totalPositives, RocPoint point, boolean extraMetrics, boolean updateBest) throws IOException {
+    final double truePositives = point.mTp;
+    final double falsePositives = point.mFp;
+    final double truePositivesRaw = point.mTpRaw;
+    os.write(score
+      + "\t" + Utils.realFormat(truePositives, 2)
+      + "\t" + Utils.realFormat(falsePositives, 2)
+      + "\t" + Utils.realFormat(truePositivesRaw, 2));
     if (extraMetrics) {
       final double fn = totalPositives - truePositives;
-      final double precision = ContingencyTable.precision(truePositives, falsePositives);
+      final double precision = ContingencyTable.precision(truePositivesRaw, falsePositives);
       final double recall = ContingencyTable.recall(truePositives, fn);
       final double fMeasure = ContingencyTable.fMeasure(precision, recall);
       os.write("\t" + Utils.realFormat(fn, 2)
         + "\t" + Utils.realFormat(precision, 4)
         + "\t" + Utils.realFormat(recall, 4)
         + "\t" + Utils.realFormat(fMeasure, 4));
+      if (updateBest && (mBest == null || fMeasure >= mBestFMeasure)) {
+        mBestFMeasure = fMeasure;
+        mBest = new RocPoint(point);
+      }
     }
     os.newLine();
   }
@@ -257,22 +264,28 @@ public class RocContainer {
     }
   }
 
-  void writeSummary(File outDir, int truePositives, int falsePositives, int falseNegatives) throws IOException {
+  void missingScoreWarning() {
+    if (getNumberOfIgnoredVariants() > 0) {
+      Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
+    }
+  }
+
+  void writeSummary(File outDir, int truePositives, int falseNegatives, int truePositivesRaw, int falsePositives) throws IOException {
     final File summaryFile = new File(outDir, mFilePrefix + CommonFlags.SUMMARY_FILE);
     final String summary;
     final int totalPositives = truePositives + falseNegatives;
     if (totalPositives > 0) {
       final TextTable table = new TextTable();
-      table.addRow("Threshold", "True-pos", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
+      table.addRow("Threshold", "True-pos-baseline", "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
       table.addSeparator();
 
-      final RocPoint best = bestFMeasure(totalPositives);
+      final RocPoint best = mBest;
       if (best == null) {
         Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SORT_FIELD);
       } else {
-        addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, best.mFp, totalPositives - best.mTp);
+        addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, totalPositives - best.mTp, best.mTpRaw, best.mFp);
       }
-      addRow(table, "None", truePositives, falsePositives, falseNegatives);
+      addRow(table, "None", truePositives, falseNegatives, truePositivesRaw, falsePositives);
       summary = table.toString();
     } else {
       summary = "0 total baseline variants, no summary statistics available" + StringUtils.LS;
@@ -283,12 +296,13 @@ public class RocContainer {
     }
   }
 
-  private static void addRow(final TextTable table, String threshold, double truePositive, double falsePositive, double falseNegative) {
-    final double precision = ContingencyTable.precision(truePositive, falsePositive);
+  private static void addRow(final TextTable table, String threshold, double truePositive, double falseNegative, double truePositiveRaw, double falsePositive) {
+    final double precision = ContingencyTable.precision(truePositiveRaw, falsePositive);
     final double recall = ContingencyTable.recall(truePositive, falseNegative);
     final double fMeasure = ContingencyTable.fMeasure(precision, recall);
     table.addRow(threshold,
       Long.toString(MathUtils.round(truePositive)),
+      Long.toString(MathUtils.round(truePositiveRaw)),
       Long.toString(MathUtils.round(falsePositive)),
       Long.toString(MathUtils.round(falseNegative)),
       Utils.realFormat(precision, 4),
@@ -296,40 +310,29 @@ public class RocContainer {
       Utils.realFormat(fMeasure, 4));
   }
 
-  // Find the threshold entry (from the ALL filter) that maximises f-measure, as an (arbitrary but) fair comparison point
-  RocPoint bestFMeasure(int totalBaselineVariants) {
-    final SortedMap<Double, RocPoint> points = mRocs.get(RocFilter.ALL);
-    if (points != null) {
-      double tp = 0.0;
-      double fp = 0.0;
-      double best = -1;
-      RocPoint bestPoint = null;
-      for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
-        final RocPoint p = me.getValue();
-        tp += p.mTp;
-        fp += p.mFp;
-        final double precision = ContingencyTable.precision(tp, fp);
-        final double recall = ContingencyTable.recall(tp, totalBaselineVariants - tp);
-        final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-        if (fMeasure >= best) {
-          best = fMeasure;
-          bestPoint = new RocPoint(p.mThreshold, tp, fp);
-        }
-      }
-      return bestPoint;
-    }
-    return null;
-  }
 
-  private static final class RocPoint {
+  static final class RocPoint {
     double mThreshold;
     double mTp;
+    double mTpRaw;
     double mFp;
 
-    private RocPoint(double threshold, double tp, double fp) {
+    RocPoint() {
+      this(Double.NaN, 0, 0, 0);
+    }
+    RocPoint(RocPoint other) {
+      this(other.mThreshold, other.mTp, other.mFp, other.mTpRaw);
+    }
+    RocPoint(double threshold, double tp, double fp, double tpraw) {
       mThreshold = threshold;
       mTp = tp;
       mFp = fp;
+      mTpRaw = tpraw;
+    }
+    void add(RocPoint p) {
+      mTp += p.mTp;
+      mFp += p.mFp;
+      mTpRaw += p.mTpRaw;
     }
   }
 

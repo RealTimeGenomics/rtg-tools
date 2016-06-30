@@ -1,6 +1,7 @@
 #total baseline variants: 7
+#total call variants: 7
 #score field: GQ (FORMAT)
-#score	true_positives	false_positives
-90.000	0.00	1.00
-30.004	2.00	1.00
-20.043	3.00	1.00
+#score	true_positives_baseline	false_positives	true_positives_call
+90.000	0.00	1.00	0.00
+30.004	2.00	1.00	1.00
+20.043	3.00	1.00	2.00

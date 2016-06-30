@@ -88,18 +88,18 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
       final double tpWeight = ((OrientedVariant) mCv).getWeight();
       if (tpWeight > 0) {
         mCallTruePositives++;
-        addToROCContainer(tpWeight, 0, false);
+        addToROCContainer(tpWeight, 0, 1, false);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
       final double tpWeight = ((OrientedVariant) mCv).getWeight();
       if (tpWeight > 0) {
         mFalsePositivesCommonAllele++;
-        addToROCContainer(tpWeight, 0, true);
+        addToROCContainer(tpWeight, 0, 1, true);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
       if (!mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
         mFalsePositives++;
-        addToROCContainer(0, 1, false);
+        addToROCContainer(0, 1, 0, false);
       }
     }
   }

@@ -1,3 +1,4 @@
 #total baseline variants: 7
+#total call variants: 7
 #score field: GQ (FORMAT)
-#score	true_positives	false_positives
+#score	true_positives_baseline	false_positives	true_positives_call
