@@ -162,7 +162,7 @@ public class VcfUtilsTest extends TestCase {
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test.vcf")).getName());
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf")).getName());
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test.vcf.gz")).getName());
-    assertEquals("test.vcf.gz.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf.gz")).getName());
+    assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf.gz")).getName());
   }
 
   public void testGetAnnotator() {

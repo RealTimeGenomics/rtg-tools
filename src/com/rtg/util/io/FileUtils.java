@@ -946,6 +946,17 @@ public final class FileUtils {
     return new BaseFile(baseOutFile, extension, gzip);
   }
 
+  /**
+   * Takes a user supplied file name and makes sure it has appropriate extensions
+   * @param userSuppliedFile filename the user supplied
+   * @param gzip if file is to be gzipped
+   * @param exts acceptable extensions (including the <code>.</code>) for target output file type
+   * @return the final output file name
+   */
+  public static File getOutputFileName(File userSuppliedFile, boolean gzip, String... exts) {
+    return getBaseFile(userSuppliedFile, gzip, exts).suffixedFile("");
+  }
+
   private static class TeeOutputStream extends OutputStream {
     private final OutputStream mOut1;
     private final OutputStream mOut2;

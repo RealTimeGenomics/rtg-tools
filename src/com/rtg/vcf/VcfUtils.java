@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import com.rtg.tabix.TabixIndexer;
@@ -256,9 +255,7 @@ public final class VcfUtils {
    * @return the appropriately adjusted file
    */
   public static File getZippedVcfFileName(final boolean gzip, final File file) {
-    final String name = file.getName().toLowerCase(Locale.getDefault());
-    final File vcfFile = name.endsWith(VCF_SUFFIX) || gzip && name.endsWith(VCF_SUFFIX + FileUtils.GZ_SUFFIX) ? file : new File(file.getPath() + VCF_SUFFIX);
-    return FileUtils.getZippedFileName(gzip, vcfFile);
+    return FileUtils.getOutputFileName(file, gzip, VCF_SUFFIX);
   }
 
   /**
