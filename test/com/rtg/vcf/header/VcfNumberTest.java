@@ -64,6 +64,12 @@ public class VcfNumberTest extends TestCase {
     assertEquals(VcfNumberType.REF_ALTS, a6.getNumberType());
     assertEquals(-1, a6.getNumber());
 
+    try {
+      new VcfNumber("-1");
+      fail();
+    } catch (IllegalArgumentException e) {
+      // Expected
+    }
     assertTrue(a.equals(a));
     assertTrue(a2.equals(a2));
     assertTrue(a3.equals(a3));
@@ -72,7 +78,6 @@ public class VcfNumberTest extends TestCase {
     assertTrue(a6.equals(a6));
     assertFalse(a4.equals(a5));
     assertFalse(a.equals(a5));
-    assertFalse(a.equals(new VcfNumber("-1")));
     assertTrue(a4.equals(new VcfNumber("13")));
     assertTrue(a5.equals(new VcfNumber("0")));
   }
@@ -84,7 +89,6 @@ public class VcfNumberTest extends TestCase {
                                                 new VcfNumber[] {new VcfNumber("."), new VcfNumber(".")},
                                                 new VcfNumber[] {new VcfNumber("13"), new VcfNumber("13")},
                                                 new VcfNumber[] {new VcfNumber("0"), new VcfNumber("0")},
-                                                new VcfNumber[] {new VcfNumber("-1"), new VcfNumber("-1")},
     });
   }
 }

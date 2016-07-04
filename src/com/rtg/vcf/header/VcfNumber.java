@@ -72,7 +72,14 @@ public class VcfNumber {
         break;
       default:
         mType = VcfNumberType.INTEGER;
-        mNumber = Integer.parseInt(number);
+        try {
+          mNumber = Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Invalid VCF number specification: " + number);
+        }
+        if (mNumber < 0) {
+          throw new IllegalArgumentException("Invalid VCF number specification: " + number);
+        }
         break;
     }
   }

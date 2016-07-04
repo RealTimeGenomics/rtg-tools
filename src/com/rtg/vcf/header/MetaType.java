@@ -71,6 +71,9 @@ public enum MetaType {
    * @return corresponding instance
    */
   public static MetaType parseValue(String val) {
+    if (!PARSE_MAP.containsKey(val)) {
+      throw new IllegalArgumentException("Invalid VCF header field type: '" + val + "'. Must be one of " + PARSE_MAP.keySet().toString());
+    }
     return PARSE_MAP.get(val);
   }
 

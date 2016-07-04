@@ -42,6 +42,15 @@ public class MetaTypeTest extends TestCase {
     TestUtils.testEnum(MetaType.class, "[Integer, Float, Flag, Character, String]");
   }
 
+  public void testParse() {
+    try {
+      MetaType.parseValue("foo");
+    } catch (IllegalArgumentException e) {
+      // Expected
+      //System.err.println(e.getMessage());
+    }
+  }
+
   public void testSuperSet() {
     assertTrue(MetaType.FLOAT.isSuperSet(MetaType.INTEGER));
     assertFalse(MetaType.FLOAT.isSuperSet(MetaType.CHARACTER));
