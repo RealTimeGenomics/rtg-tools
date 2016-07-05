@@ -30,6 +30,9 @@
 
 package com.rtg.vcf;
 
+import java.util.Arrays;
+import java.util.Collections;
+
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -179,5 +182,35 @@ public class ScriptedVcfFilterTest extends TestCase {
     // Check multiple js expressions variable assignment etc
     assertTrue(getScriptedVcfFilter("gt = 'BOB'.GT; foo = INFO.IN == 'FOO'; foo && REF == 'A' && gt == '0/1'").accept(record));
     assertFalse(getScriptedVcfFilter("gt = 'BOB'.GT; foo = INFO.IN == 'FOO'; !foo && REF == 'A' && gt == '0/1'").accept(record));
+  }
+
+  public void testUpdateFormat() {
+      final VcfRecord record = new VcfRecord("blah", 1, "A");
+      record.addAltCall("G");
+      record.setNumberOfSamples(1);
+      record.addFormatAndSample("GT", "0/1");
+      assertTrue(getScriptedVcfFilter("BOB.GT = '0/0'; true").accept(record));
+      assertEquals("0/0", record.getFormatAndSample().get("GT").get(0));
+  }
+  public void testUpdateFormatViaString() {
+    final VcfRecord record = new VcfRecord("blah", 1, "A");
+    record.addAltCall("G");
+    record.setNumberOfSamples(1);
+    record.addFormatAndSample("GT", "0/1");
+    assertTrue(getScriptedVcfFilter("'BOB'.GT = '0/0'; true").accept(record));
+    assertEquals("0/0", record.getFormatAndSample().get("GT").get(0));
+  }
+
+  public void testUpdateInfo() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN", "FOO");
+    assertTrue(getScriptedVcfFilter("INFO.IN = ['BAZ', 'BANG']; true").accept(record));
+    assertEquals(Arrays.asList("BAZ", "BANG"), record.getInfo().get("IN"));
+  }
+  public void testUpdateInfoSingle() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN", "FOO");
+    assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ'; true").accept(record));
+    assertEquals(Collections.singletonList("BAZ"), record.getInfo().get("IN"));
   }
 }

@@ -32,10 +32,18 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     /**
      * Return a function that will extract the specified format field from the sample column with the given index
      */
-    function fieldFunction(field, sampleIndex) {
+    function fieldGet(field, sampleIndex) {
         return function () {
             var fields = rec.getFormatAndSample().get(field);
             return fields == null ? "." : fields.get(sampleIndex);
+        }
+    }
+    /**
+     * Return a function that will set the specified format field on the sample column with the given index
+     */
+    function fieldSet(field, sampleIndex) {
+        return function (value) {
+            rec.setFormatAndSample(field, value, sampleIndex);
         }
     }
 
@@ -49,35 +57,62 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         var sampleIndex = sampleLookup[name];
         var s = {};
         formatIds.forEach(function (fieldName) {
-            Object.defineProperty(s, fieldName, {get: fieldFunction(fieldName, sampleIndex)});
+            Object.defineProperty(s, fieldName, {get: fieldGet(fieldName, sampleIndex), set: fieldSet(fieldName, sampleIndex)});
         });
         return s;
     }
 
-    function stringFieldFunction(field) {
+    function stringGetFunction(field) {
         return function () {
             var index = sampleLookup[this];
             var fields = rec.getFormatAndSample().get(field);
             return fields == null ? "." : fields.get(index);
         }
     }
+    
+    function stringSetFunction(field) {
+        return function (value) {
+            var index = sampleLookup[this];
+            rec.setFormatAndSample(field, value, index);
+        }
+    }
 
+    /**
+     * Add get/set to string prototype to allow treating them as sample references
+     */
     var stringProps = {};
     formatIds.forEach(function (field) {
-        stringProps[field] = {get: stringFieldFunction(field)};
+        stringProps[field] = {get: stringGetFunction(field), set: stringSetFunction(field)};
     });
     Object.defineProperties(String.prototype, stringProps);
 
     /**
      * Returns a function which will fetch the info field with the given name from the current record
      */
-    function infoFunction(field) {
+    function infoGet(field) {
         return function () {
             var infoList = listToArray(rec.getInfo().get(field));
             if (infoList == null) {
                 return ".";
             }
             return infoList;
+        }
+    }
+    /**
+     * Returns a function which will fetch the info field with the given name from the current record
+     */
+    function infoSet(field) {
+        return function (values) {
+            var ArrayList = Java.type("java.util.ArrayList");
+            var list = new ArrayList();
+            if (Array.isArray(values)) {
+                values.forEach(function (val) {
+                    list.add(val);
+                });
+            } else {
+                list.add(values);
+            }
+            rec.getInfo().put(field, list);
         }
     }
 
@@ -87,7 +122,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     });
     var INFO = {};
     infoIds.forEach(function(id) {
-        Object.defineProperty(INFO, id, {get: infoFunction(id)});
+        Object.defineProperty(INFO, id, {get: infoGet(id), set: infoSet(id)});
     });
     /**
      * Fetch the pos from the current record
@@ -156,5 +191,6 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     sampleNames.forEach(function (name) {
         global[name] = sample(name);
     });
+    global.samples = sampleNames;
 
 })(this);
