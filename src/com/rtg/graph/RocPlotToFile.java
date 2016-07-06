@@ -29,7 +29,10 @@
  */
 package com.rtg.graph;
 
+import static com.rtg.graph.RocPlotToFile.FileType.SVG;
+
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -43,13 +46,18 @@ import com.rtg.util.io.FileUtils;
 
 /**
  */
-public final class RocPlotPng {
+public final class RocPlotToFile {
 
-  private RocPlotPng() {
+  private RocPlotToFile() {
 
   }
+  public enum FileType {
+    SVG,
+    PNG
+    ;
+  }
 
-  static void rocPngImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile) throws IOException {
+  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, FileType type) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
     for (int i = 0; i < fileList.size(); i++) {
       final File f = fileList.get(i);
@@ -63,7 +71,11 @@ public final class RocPlotPng {
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
     final Graph2D graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
-    iw.toPNG(pngFile, graph, 800, 600, null);
+    if (type == SVG) {
+      iw.toSVG(new FileOutputStream(pngFile), graph, 800, 600, null);
+    } else {
+      iw.toPNG(pngFile, graph, 800, 600, null);
+    }
   }
 
   private static class NullProgressDelegate implements ProgressDelegate {

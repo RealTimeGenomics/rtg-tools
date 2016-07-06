@@ -29,6 +29,8 @@
  */
 package com.rtg.graph;
 
+import static com.rtg.graph.RocPlotToFile.FileType.PNG;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +46,7 @@ import junit.framework.TestCase;
 
 /**
  */
-public class RocPlotPngTest extends TestCase {
+public class RocPlotToFileTest extends TestCase {
 
   private static final String ROC = ""
           + "#total baseline variants: 3092754" + StringUtils.LS
@@ -61,7 +63,7 @@ public class RocPlotPngTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
       final File png = new File(dir, "PNG.png");
-      RocPlotPng.rocPngImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png);
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG);
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
