@@ -29,6 +29,8 @@
  */
 package com.rtg.graph;
 
+import static com.rtg.graph.RocPlotToFile.FileType.PNG;
+import static com.rtg.graph.RocPlotToFile.FileType.SVG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
@@ -64,6 +66,7 @@ public class RocPlotCli extends AbstractCli {
   private static final String APPLET_FLAG = "Xapplet";
   private static final String HIDE_SIDEPANE_FLAG = "hide-sidepane";
   private static final String PNG_FLAG = "png";
+  private static final String SVG_FLAG = "svg";
   static final String TITLE_FLAG = "title";
   static final String SCORES_FLAG = "scores";
   static final String LINE_WIDTH_FLAG = "line-width";
@@ -71,6 +74,7 @@ public class RocPlotCli extends AbstractCli {
 
 
   static final String PNG_EXTENSION = ".png";
+  static final String SVG_EXTENSION = ".svg";
 
   private static final String HTML_PREAMBLE = ""
       + "<html>\n"
@@ -108,7 +112,7 @@ public class RocPlotCli extends AbstractCli {
         }
       }
       if (flags.isSet(PNG_FLAG)) {
-        final File pngFile = getPngFilename((File) flags.getValue(PNG_FLAG));
+        final File pngFile = getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION);
         if (pngFile.isDirectory()) {
           flags.error("Path: " + pngFile.getPath() + " is a directory");
           return false;
@@ -139,6 +143,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the sidepane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class , "INT", "sets the plot line width", 2).setCategory(REPORTING);
     flags.registerOptional(PNG_FLAG, File.class , "FILE", "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
+    flags.registerOptional(SVG_FLAG, File.class , "FILE", "if set, output a SVG image to the given file").setCategory(INPUT_OUTPUT);
     final Flag curveFlag = flags.registerOptional(CURVE_FLAG, String.class, "STRING", "ROC data file with title optionally specified (path[=title])").setCategory(INPUT_OUTPUT);
     curveFlag.setMinCount(0);
     curveFlag.setMaxCount(Integer.MAX_VALUE);
@@ -175,9 +180,10 @@ public class RocPlotCli extends AbstractCli {
     try {
       if (mFlags.isSet(HTML_FLAG) || mFlags.isSet(APPLET_FLAG)) {
         rocApplet(fileList, nameList, outWriter, mFlags.isSet(HTML_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.getValue(TITLE_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG));
-      } else if (mFlags.isSet(PNG_FLAG))    { // Just output a PNG image
+      } else if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
         System.setProperty("java.awt.headless", "true");
-        RocPlotPng.rocPngImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), getPngFilename((File) mFlags.getValue(PNG_FLAG)));
+        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG);
+        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG);
       } else {   //Create and set up as a stand alone app.
         if (isReallyHeadless()) {
           Diagnostic.error("No graphics environment is available to open the rocplot GUI");
@@ -204,6 +210,13 @@ public class RocPlotCli extends AbstractCli {
       outWriter.flush();
     }
     return 0;
+  }
+
+  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.FileType svg) throws IOException {
+    if (mFlags.isSet(flagName)) {
+      File file = getFile((File) mFlags.getValue(flagName), fileExtension);
+      RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg);
+    }
   }
 
   private static void rocApplet(ArrayList<File> fileList, ArrayList<String> nameList, BufferedWriter outWriter, boolean html, boolean scores, Object title, boolean hideSidepane, Integer lineWidthSetting) throws IOException {
@@ -277,8 +290,8 @@ public class RocPlotCli extends AbstractCli {
   }
 
 
-  static File getPngFilename(File pngFile) {
-    if (!pngFile.getName().endsWith(PNG_EXTENSION)) {
+  static File getFile(File pngFile, String extension) {
+    if (!pngFile.getName().endsWith(extension)) {
       return new File(pngFile.getParent(), pngFile.getName() + PNG_EXTENSION);
     }
     return pngFile;

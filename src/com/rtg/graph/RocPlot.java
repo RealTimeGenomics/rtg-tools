@@ -32,7 +32,6 @@ package com.rtg.graph;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -89,8 +88,7 @@ import com.reeltwo.plot.Plot2D;
 import com.reeltwo.plot.Point2D;
 import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.renderer.Mapping;
-import com.reeltwo.plot.ui.PlotPanel;
-import com.reeltwo.plot.ui.ZoomPlotPanel;
+import com.reeltwo.plot.ui.InnerZoomPlot;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
@@ -120,7 +118,6 @@ public class RocPlot {
 
   private final JPanel mMainPanel;
   /** panel showing plot */
-  private final PlotPanel mPlotPanel;
   private final RocZoomPlotPanel mZoomPP;
   /** a progress bar */
   private final JProgressBar mProgressBar;
@@ -172,10 +169,9 @@ public class RocPlot {
   /** Creates a new swing plot. */
   RocPlot() {
     mMainPanel = new JPanel();
-    mPlotPanel = new PlotPanel(true);
-    mPlotPanel.setColors(PALETTE);
-    mZoomPP = new RocZoomPlotPanel(mPlotPanel, mMainPanel);
+    mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
+    mZoomPP.setColors(PALETTE);
     mProgressBar = new JProgressBar(-1, -1);
     mProgressBar.setVisible(true);
     mProgressBar.setStringPainted(true);
@@ -223,7 +219,7 @@ public class RocPlot {
   private void configureUI() {
     mMainPanel.setLayout(new BorderLayout());
     final JPanel pane = new JPanel(new BorderLayout());
-    pane.add(mPlotPanel, BorderLayout.CENTER);
+    pane.add(mZoomPP, BorderLayout.CENTER);
     final JPanel rightPanel = new JPanel(new GridBagLayout());
     mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, rightPanel);
     mSplitPane.setContinuousLayout(true);
@@ -236,16 +232,16 @@ public class RocPlot {
     mPopup.setLightWeightPopupEnabled(false);
     mPopup.add(mZoomPP.getZoomOutAction());
     mPopup.addSeparator();
-    mPopup.add(mPlotPanel.getPrintAction());
-    mPopup.add(mPlotPanel.getSaveImageAction());
-    mPopup.add(mPlotPanel.getSnapShotAction());
+    mPopup.add(mZoomPP.getPrintAction());
+    mPopup.add(mZoomPP.getSaveImageAction());
+    mPopup.add(mZoomPP.getSnapShotAction());
     mPopup.addSeparator();
 
-    mPlotPanel.addMouseListener(new PopupListener());
+    mZoomPP.addMouseListener(new PopupListener());
 
-    mPlotPanel.setBackground(Color.WHITE);
-    mPlotPanel.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
-    mPlotPanel.setGraphShadowWidth(4);
+    mZoomPP.setBackground(Color.WHITE);
+    mZoomPP.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
+    mZoomPP.setGraphShadowWidth(4);
 
     final GridBagConstraints c = new GridBagConstraints();
     c.insets = new Insets(2, 2, 2, 2);
@@ -396,23 +392,21 @@ public class RocPlot {
 
   // Adds the notion of painting a current crosshair position
   @JumbleIgnore
-  private static class RocZoomPlotPanel extends ZoomPlotPanel {
-    private final PlotPanel mPlotPanel;
+  private static class RocZoomPlotPanel extends InnerZoomPlot {
     private Point mCrosshair; // In TP / FP coordinates.
-    RocZoomPlotPanel(PlotPanel plotPanel, Container container) {
-      super(plotPanel, container);
-      mPlotPanel = plotPanel;
+    RocZoomPlotPanel() {
+      super();
     }
     @Override
     public void paint(Graphics g) {
       super.paint(g);
-      final Mapping[] mapping = mPlotPanel.getMapping();
+      final Mapping[] mapping = getMapping();
       if (mapping != null && mapping.length > 1 && mCrosshair != null) {
         Point p = new Point((int) mapping[0].worldToScreen(mCrosshair.x), (int) mapping[1].worldToScreen(mCrosshair.y));
         final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
           && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
         if (inView) {
-          p = SwingUtilities.convertPoint(mPlotPanel, p, this);
+          p = SwingUtilities.convertPoint(this, p, this);
           g.setColor(Color.BLACK);
           final int size = 9;
           g.drawLine(p.x - size, p.y - size, p.x + size, p.y + size);
@@ -585,7 +579,7 @@ public class RocPlot {
    * Returns the zooming part of the plot panel
    * @return zoom plot panel
    */
-  public ZoomPlotPanel getZoomPlotPanel() {
+  public InnerZoomPlot getZoomPlotPanel() {
     return mZoomPP;
   }
 
@@ -655,8 +649,8 @@ public class RocPlot {
     @Override
     public void mouseClicked(MouseEvent e) {
       final Point p = e.getPoint();
-      final Mapping[] mapping = mPlotPanel.getMapping();
-      final int maxVariants = ((RocGraph2D) mPlotPanel.getGraph()).getMaxVariants();
+      final Mapping[] mapping = mZoomPP.getMapping();
+      final int maxVariants = ((RocGraph2D) mZoomPP.getGraph()).getMaxVariants();
       if (mapping != null && mapping.length > 1) {
         final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
           && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
@@ -715,8 +709,8 @@ public class RocPlot {
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
-    frame.setGlassPane(rp.mZoomPP);
-    frame.getGlassPane().setVisible(true);
+//    frame.setGlassPane(rp.mZoomPP);
+//    frame.getGlassPane().setVisible(true);
     final CountDownLatch lock = new CountDownLatch(1);
     rp.mPopup.add(new AbstractAction("Exit", null) {
       @Override
