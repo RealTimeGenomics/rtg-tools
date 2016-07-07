@@ -29,7 +29,7 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.FileType.PNG;
+import static com.rtg.graph.RocPlotToFile.ImageFormat.PNG;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -29,7 +29,7 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.FileType.SVG;
+import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -51,13 +51,18 @@ public final class RocPlotToFile {
   private RocPlotToFile() {
 
   }
-  public enum FileType {
+
+  /**
+   * Supported image formats.
+   */
+  public enum ImageFormat {
+    /** SVG file type Scalable vector graphics */
     SVG,
+    /** Portable network graphics */
     PNG
-    ;
   }
 
-  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, FileType type) throws IOException {
+  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
     for (int i = 0; i < fileList.size(); i++) {
       final File f = fileList.get(i);
@@ -72,7 +77,9 @@ public final class RocPlotToFile {
 
     final Graph2D graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
     if (type == SVG) {
-      iw.toSVG(new FileOutputStream(pngFile), graph, 800, 600, null);
+      try (final FileOutputStream os = new FileOutputStream(pngFile)) {
+        iw.toSVG(os, graph, 800, 600, null);
+      }
     } else {
       iw.toPNG(pngFile, graph, 800, 600, null);
     }

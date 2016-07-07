@@ -29,8 +29,8 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.FileType.PNG;
-import static com.rtg.graph.RocPlotToFile.FileType.SVG;
+import static com.rtg.graph.RocPlotToFile.ImageFormat.PNG;
+import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
@@ -113,12 +113,16 @@ public class RocPlotCli extends AbstractCli {
       }
       if (flags.isSet(PNG_FLAG)) {
         final File pngFile = getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION);
-        if (checkFile(flags, pngFile)) return false;
+        if (checkFile(flags, pngFile)) {
+          return false;
+        }
       }
 
       if (flags.isSet(SVG_FLAG)) {
         final File svgFile = getFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION);
-        if (checkFile(flags, svgFile)) return false;
+        if (checkFile(flags, svgFile)) {
+          return false;
+        }
       }
       if (!CommonFlags.validateFlagBetweenValues(flags, LINE_WIDTH_FLAG, RocPlot.LINE_WIDTH_MIN, RocPlot.LINE_WIDTH_MAX)) {
         return false;
@@ -222,9 +226,9 @@ public class RocPlotCli extends AbstractCli {
     return 0;
   }
 
-  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.FileType svg) throws IOException {
+  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat svg) throws IOException {
     if (mFlags.isSet(flagName)) {
-      File file = getFile((File) mFlags.getValue(flagName), fileExtension);
+      final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
       RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg);
     }
   }
