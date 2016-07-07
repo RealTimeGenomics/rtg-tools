@@ -113,18 +113,28 @@ public class RocPlotCli extends AbstractCli {
       }
       if (flags.isSet(PNG_FLAG)) {
         final File pngFile = getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION);
-        if (pngFile.isDirectory()) {
-          flags.error("Path: " + pngFile.getPath() + " is a directory");
-          return false;
-        } else if (pngFile.exists()) {
-          flags.error("File: "  + pngFile.getPath() + " already exists");
-          return false;
-        }
+        if (checkFile(flags, pngFile)) return false;
+      }
+
+      if (flags.isSet(SVG_FLAG)) {
+        final File svgFile = getFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION);
+        if (checkFile(flags, svgFile)) return false;
       }
       if (!CommonFlags.validateFlagBetweenValues(flags, LINE_WIDTH_FLAG, RocPlot.LINE_WIDTH_MIN, RocPlot.LINE_WIDTH_MAX)) {
         return false;
       }
       return true;
+    }
+
+    private boolean checkFile(CFlags flags, File file) {
+      if (file.isDirectory()) {
+        flags.error("Path: " + file.getPath() + " is a directory");
+        return true;
+      } else if (file.exists()) {
+        flags.error("File: "  + file.getPath() + " already exists");
+        return true;
+      }
+      return false;
     }
   }
   @Override
