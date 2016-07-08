@@ -402,7 +402,7 @@ public final class VcfUtils {
         }
         return Double.parseDouble(fieldVal);
       } catch (NumberFormatException ex) {
-        throw new NoTalkbackSlimException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
+        throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return Double.NaN;
@@ -425,7 +425,7 @@ public final class VcfUtils {
         }
         return Double.parseDouble(fieldVal);
       } catch (NumberFormatException ex) {
-        throw new NoTalkbackSlimException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
+        throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return Double.NaN;
@@ -527,7 +527,7 @@ public final class VcfUtils {
   public static int[] getValidGt(VcfRecord rec, int sample) {
     final int[] gtArr = splitGt(getValidGtStr(rec, sample));
     if (!isValidGt(rec, gtArr)) {
-      throw new NoTalkbackSlimException("VCF record GT contains allele ID out of range, record: " + rec.toString());
+      throw new VcfFormatException("VCF record GT contains allele ID out of range, record: " + rec.toString());
     }
     return gtArr;
   }
@@ -542,10 +542,10 @@ public final class VcfUtils {
   public static String getValidGtStr(VcfRecord rec, int sample) {
     final ArrayList<String> gtList = rec.getFormat(FORMAT_GENOTYPE);
     if (gtList == null) {
-      throw new NoTalkbackSlimException("VCF record does not contain GT field, record: " + rec.toString());
+      throw new VcfFormatException("VCF record does not contain GT field, record: " + rec.toString());
     }
     if (sample >= gtList.size()) {
-      throw new NoTalkbackSlimException("Invalid sample number " + sample + ", record: " + rec.toString());
+      throw new VcfFormatException("Invalid sample number " + sample + ", record: " + rec.toString());
     }
     return gtList.get(sample);
   }
@@ -560,7 +560,7 @@ public final class VcfUtils {
    */
   public static boolean hasDefinedVariantGt(VcfRecord rec, int sampleId) {
     if (sampleId >= rec.getNumberOfSamples()) {
-      throw new IllegalArgumentException("Record did not contain enough samples: " + rec.toString());
+      throw new VcfFormatException("Record did not contain enough samples: " + rec.toString());
     }
     if (!rec.hasFormat(FORMAT_GENOTYPE)) {
       return false;

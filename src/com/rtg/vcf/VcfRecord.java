@@ -112,7 +112,7 @@ public class VcfRecord implements SequenceNameLocus {
       if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
         throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
       } else if (!refCall.equals(vcf.getRefCall())) {
-        throw new IllegalArgumentException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on reference bases. (" + refCall + " != " + vcf.getRefCall() + ")");
+        throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
       }
       final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
       Collections.addAll(uniqueIds, ids);
@@ -195,7 +195,7 @@ public class VcfRecord implements SequenceNameLocus {
               for (int gti = 0; gti < splitGt.length; gti++) {
                 if (splitGt[gti] != -1) {
                   if (splitGt[gti] >= gtMap[i].length) {
-                    throw new IllegalArgumentException("Invalid GT " + gtStr + " in input record: " + records[i]);
+                    throw new VcfFormatException("Invalid GT " + gtStr + " in input record: " + records[i]);
                   }
                   splitGt[gti] = gtMap[i][splitGt[gti]];
                 }
@@ -380,7 +380,7 @@ public class VcfRecord implements SequenceNameLocus {
    */
   public VcfRecord addAltCall(String altCall) {
     if (MISSING.equals(altCall)) {
-      throw new IllegalArgumentException("Attempt to add missing value '.' as explicit ALT allele");
+      throw new VcfFormatException("Attempt to add missing value '.' as explicit ALT allele");
     } else {
       mAltCalls.add(altCall);
     }
@@ -401,7 +401,7 @@ public class VcfRecord implements SequenceNameLocus {
    */
   public String getAllele(int allele) {
     if (allele > mAltCalls.size()) {
-      throw new IllegalArgumentException("Invalid allele number " + allele);
+      throw new VcfFormatException("Invalid allele number " + allele);
     }
     return allele == -1 ? null : allele == 0 ? getRefCall() : mAltCalls.get(allele - 1);
   }

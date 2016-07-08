@@ -49,8 +49,8 @@ import junit.framework.TestCase;
  */
 public class VcfReaderTest extends TestCase {
 
-  public void testEmpty() {
-    checkIoException("", "file format");
+  public void testEmpty() throws IOException {
+    checkVcfFormatException("", "file format");
   }
 
   static final String[] BAD_HDR = {
@@ -75,12 +75,12 @@ public class VcfReaderTest extends TestCase {
     }
   }
 
-  protected void checkIoException(String header, String... contains) {
+  protected void checkVcfFormatException(String header, String... contains) throws IOException {
     final Reader in = new StringReader(header);
     try {
       new VcfReader(new BufferedReader(in)).hasNext();
-      fail("IOException expected from .vcf file: " + header);
-    } catch (final IOException ex) {
+      fail("VcfFormatException expected from .vcf file: " + header);
+    } catch (final VcfFormatException ex) {
       TestUtils.containsAll(ex.getMessage(), contains);
     }
   }
@@ -92,10 +92,10 @@ public class VcfReaderTest extends TestCase {
     "chr1   123    foo  G    A    29    PASS    NS=3;DP=7    GT:GQ   0|0:34",    // HEADER0 says should not be any samples
   };
 
-  public void testBadRecords() {
+  public void testBadRecords() throws IOException {
     for (final String recText : BAD_RECORD) {
       final String badrec = recText.replaceAll("  *", TAB);
-      checkIoException(HEADER0 + badrec + LS, "Invalid VCF record");
+      checkVcfFormatException(HEADER0 + badrec + LS, "Invalid VCF record");
     }
   }
 

@@ -27,36 +27,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.vcf.header;
+package com.rtg.vcf;
 
-import com.rtg.util.TestUtils;
-import com.rtg.vcf.VcfFormatException;
-
-import junit.framework.TestCase;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
- * Test class
+ * Malformed data was encountered in a VCF file.
  */
-public class MetaTypeTest extends TestCase {
+public class VcfFormatException extends NoTalkbackSlimException {
 
-  public void testSomeMethod() {
-    TestUtils.testEnum(MetaType.class, "[Integer, Float, Flag, Character, String]");
-  }
-
-  public void testParse() {
-    try {
-      MetaType.parseValue("foo");
-    } catch (VcfFormatException e) {
-      // Expected
-      //System.err.println(e.getMessage());
-    }
-  }
-
-  public void testSuperSet() {
-    assertTrue(MetaType.FLOAT.isSuperSet(MetaType.INTEGER));
-    assertFalse(MetaType.FLOAT.isSuperSet(MetaType.CHARACTER));
-    for (final MetaType mt : MetaType.values()) {
-      assertTrue(mt.isSuperSet(mt));
-    }
+  /**
+   * Constructor
+   * @param message explains why the VCF file was invalid
+   */
+  public VcfFormatException(String message) {
+    super(message);
   }
 }

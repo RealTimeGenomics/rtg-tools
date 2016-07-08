@@ -31,6 +31,8 @@ package com.rtg.vcf.header;
 
 import java.util.HashMap;
 
+import com.rtg.vcf.VcfFormatException;
+
 /**
  * Encapsulate type in <code>VCF</code> meta lines
  */
@@ -72,7 +74,7 @@ public enum MetaType {
    */
   public static MetaType parseValue(String val) {
     if (!PARSE_MAP.containsKey(val)) {
-      throw new IllegalArgumentException("Invalid VCF header field type: '" + val + "'. Must be one of " + PARSE_MAP.keySet().toString());
+      throw new VcfFormatException("Invalid VCF header field type: '" + val + "'. Must be one of " + PARSE_MAP.keySet().toString());
     }
     return PARSE_MAP.get(val);
   }

@@ -203,7 +203,7 @@ public class VcfMerge extends AbstractCli {
       while (posZip.hasNextPosition()) {
         posZip.nextPosition(callback);
       }
-    } catch (final IllegalArgumentException iae) {
+    } catch (final VcfFormatException iae) {
       throw new NoTalkbackSlimException("Problem in VCF: " + iae.getMessage());
     }
     if (!stdout) {

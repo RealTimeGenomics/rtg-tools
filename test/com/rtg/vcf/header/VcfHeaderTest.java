@@ -36,6 +36,7 @@ import java.util.HashSet;
 
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.vcf.VcfFormatException;
 
 import junit.framework.TestCase;
 
@@ -112,42 +113,42 @@ public class VcfHeaderTest extends TestCase {
     try {
       head.addMetaInformationLine("##contig=<ID=xbox,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
     head.addMetaInformationLine("##FILTER=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##FILTER=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
     head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
     head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
     head.addMetaInformationLine("##ALT=<ID=xbox,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##ALT=<ID=xbox,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
     head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the sequel to the 360\">");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // expected
     }
   }

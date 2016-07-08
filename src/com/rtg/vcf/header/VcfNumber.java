@@ -30,6 +30,7 @@
 package com.rtg.vcf.header;
 
 import com.rtg.util.Utils;
+import com.rtg.vcf.VcfFormatException;
 
 /**
  * Encapsulate value of number field from <code>VCF</code> meta information lines
@@ -75,10 +76,10 @@ public class VcfNumber {
         try {
           mNumber = Integer.parseInt(number);
         } catch (NumberFormatException e) {
-          throw new IllegalArgumentException("Invalid VCF number specification: " + number);
+          throw new VcfFormatException("Invalid VCF number specification: " + number);
         }
         if (mNumber < 0) {
-          throw new IllegalArgumentException("Invalid VCF number specification: " + number);
+          throw new VcfFormatException("Invalid VCF number specification: " + number);
         }
         break;
     }

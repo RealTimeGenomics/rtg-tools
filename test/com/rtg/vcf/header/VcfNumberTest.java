@@ -30,6 +30,7 @@
 package com.rtg.vcf.header;
 
 import com.rtg.util.TestUtils;
+import com.rtg.vcf.VcfFormatException;
 
 import junit.framework.TestCase;
 
@@ -67,7 +68,7 @@ public class VcfNumberTest extends TestCase {
     try {
       new VcfNumber("-1");
       fail();
-    } catch (IllegalArgumentException e) {
+    } catch (VcfFormatException e) {
       // Expected
     }
     assertTrue(a.equals(a));

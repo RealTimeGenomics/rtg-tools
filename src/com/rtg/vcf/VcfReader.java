@@ -158,21 +158,16 @@ public class VcfReader implements IOIterator<VcfRecord> {
     final VcfHeader header = new VcfHeader();
     String line;
     while ((line = in.readLine()) != null) {
-      try {
-        if (line.startsWith("##")) {
-          header.addMetaInformationLine(line);
-        } else if (line.startsWith("#")) {
-          //should always be last header line
-          header.addColumnHeaderLine(line);
-          break;
-        }
-      } catch (final IllegalArgumentException e) {
-        //illegal argument here means badly formed header
-        throw new IOException(e.getMessage(), e);
+      if (line.startsWith("##")) {
+        header.addMetaInformationLine(line);
+      } else if (line.startsWith("#")) {
+        //should always be last header line
+        header.addColumnHeaderLine(line);
+        break;
       }
     }
     if (header.getVersionLine() == null) {
-      throw new IOException("No file format line found");
+      throw new VcfFormatException("No file format line found");
     }
     return header;
   }
@@ -185,9 +180,15 @@ public class VcfReader implements IOIterator<VcfRecord> {
   public static VcfRecord vcfLineToRecord(String line) {
     final String[] field = StringUtils.split(line, '\t');
     if (field.length < 8) {
-      throw new IllegalArgumentException("Expected at least 8 fields");
+      throw new VcfFormatException("Expected at least 8 fields");
     }
-    final VcfRecord rec = new VcfRecord(StringUtils.deepCopy(field[CHROM_FIELD]), Integer.parseInt(field[POS_FIELD]) - 1, StringUtils.deepCopy(field[REF_FIELD]));
+    final int pos;
+    try {
+      pos = Integer.parseInt(field[POS_FIELD]) - 1;
+    } catch (NumberFormatException e) {
+      throw new VcfFormatException(e.getMessage());
+    }
+    final VcfRecord rec = new VcfRecord(StringUtils.deepCopy(field[CHROM_FIELD]), pos, StringUtils.deepCopy(field[REF_FIELD]));
     rec.setId(StringUtils.deepCopy(field[ID_FIELD]));
     if (!VcfRecord.MISSING.equals(field[ALT_FIELD])) {
       final String[] altSplit = StringUtils.split(field[ALT_FIELD], ',');
@@ -220,14 +221,14 @@ public class VcfReader implements IOIterator<VcfRecord> {
     // now parse each sample field.
     if (field.length > 8) {
       if (field.length == 9) {
-        throw new IllegalArgumentException("Format field exists without sample fields");
+        throw new VcfFormatException("Format field exists without sample fields");
       }
       final String[] genotypes = StringUtils.split(field[8], ':');
       rec.setNumberOfSamples(field.length - 9);
       for (int sample = 9; sample < field.length; sample++) {
         final String[] svalues = StringUtils.split(field[sample], ':');
         if (svalues.length > genotypes.length) {
-          throw new IllegalArgumentException("Column " + (sample + 1) + " does not have the same number of values as specified in the format column. Field=" + field[sample]);
+          throw new VcfFormatException("Column " + (sample + 1) + " does not have the same number of values as specified in the format column. Field=" + field[sample]);
         }
         for (int i = 0; i < svalues.length; i++) {
           rec.addFormatAndSample(genotypes[i], svalues[i]);
@@ -285,11 +286,10 @@ public class VcfReader implements IOIterator<VcfRecord> {
     try {
       mCurrent = vcfLineToRecord(line);
       if (mCurrent.getNumberOfSamples() != mNumSamples) {
-        throw new IOException("Invalid VCF record. Expected " + mNumSamples + " samples, but there were " + mCurrent.getNumberOfSamples() + " on line:" + line);
+        throw new VcfFormatException("Expected " + mNumSamples + " samples, but there were " + mCurrent.getNumberOfSamples());
       }
-    } catch (final IllegalArgumentException e) {
-      //illegal argument == badly formed record
-      throw new IOException("Invalid VCF record. " + e.getMessage() + " on line:" + line, e);
+    } catch (final VcfFormatException e) {
+      throw new VcfFormatException("Invalid VCF record. " + e.getMessage() + " on line:" + line); // Add context information
     }
     return true;
   }
