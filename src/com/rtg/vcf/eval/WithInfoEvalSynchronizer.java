@@ -129,7 +129,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
           status = STATUS_NON_CONF;
         }
         sync = Integer.toString(mCSyncStart2 + 1);
-      } else if (mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      } else if (mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         status = STATUS_NON_CONF;
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
@@ -161,7 +161,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
         status = STATUS_HARD;
         sync = null;
-      } else if (mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      } else if (mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         status = STATUS_NON_CONF;
         sync = null;
       } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {

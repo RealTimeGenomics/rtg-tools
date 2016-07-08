@@ -306,7 +306,7 @@ public final class Path implements Comparable<Path> {
       int calledCount = 0;
       while (basePos < baseLine.size() && baseLine.get(basePos).getStart() <= loc) {
         baseLineCount++;
-        if (!baseLine.get(basePos).hasStatus(VariantId.STATUS_LOW_CONF)) {
+        if (!baseLine.get(basePos).hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
           baseLineHighConf++;
         }
         basePos++;

@@ -70,7 +70,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
-    private File mHighConfRegionsFile = null;
+    private File mEvalRegionsFile = null;
     private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
     private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
     private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
@@ -265,12 +265,12 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
-     * Set the bed file to use which specifies high confidence regions
+     * Set the bed file to use which specifies regions for transborder matches
      * @param bedFile the bed file which specifies regions
      * @return this builder
      */
-    public VcfEvalParamsBuilder highConfRegionsFile(File bedFile) {
-      mHighConfRegionsFile = bedFile;
+    public VcfEvalParamsBuilder evalRegionsFile(File bedFile) {
+      mEvalRegionsFile = bedFile;
       return this;
     }
 
@@ -309,7 +309,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final File mTemplateFile;
   private final RegionRestriction mRestriction;
   private final File mBedRegionsFile;
-  private final File mHighConfRegionsFile;
+  private final File mEvalRegionsFile;
   private final String mScoreField;
   private final String mOutputMode;
   private final RocSortOrder mSortOrder;
@@ -337,7 +337,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mTemplateFile = builder.mTemplateFile;
     mRestriction = builder.mRestriction;
     mBedRegionsFile = builder.mBedRegionsFile;
-    mHighConfRegionsFile = builder.mHighConfRegionsFile;
+    mEvalRegionsFile = builder.mEvalRegionsFile;
     mSortOrder = builder.mSortOrder;
     mScoreField = builder.mScoreField;
     mOutputMode = builder.mOutputMode;
@@ -395,10 +395,10 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
-   * @return a bed file containing the high-confidence evaluation regions, or null for no high-confidence region evaluation.
+   * @return a bed file containing the evaluation regions, or null for no transborder region evaluation.
    */
-  public File highConfRegionsFile() {
-    return mHighConfRegionsFile;
+  public File evalRegionsFile() {
+    return mEvalRegionsFile;
   }
 
   /**

@@ -127,7 +127,7 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
         addToROCContainer(tpWeight, 0, 1, true);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
-      if (!mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      if (!mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         mFalsePositives++;
         mFp.write(mCrv);
         addToROCContainer(0, 1, 0, false);
@@ -137,7 +137,7 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    if (!mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+    if (!mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
       if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         mBaselineTruePositives++;
         mTpBase.write(mBrv);

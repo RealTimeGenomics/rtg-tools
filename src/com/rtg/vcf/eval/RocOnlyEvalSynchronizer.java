@@ -97,7 +97,7 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
         addToROCContainer(tpWeight, 0, 1, true);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
-      if (!mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      if (!mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         mFalsePositives++;
         addToROCContainer(0, 1, 0, false);
       }
@@ -106,7 +106,7 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    if (!mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+    if (!mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
       if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         mBaselineTruePositives++;
       } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {

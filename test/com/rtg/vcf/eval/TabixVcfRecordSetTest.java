@@ -105,10 +105,10 @@ public class TabixVcfRecordSetTest extends TestCase {
         assertTrue("unexpected sequence <" + currentName + ">", expected.contains(currentName));
         expected.remove(currentName);
         for (Variant v : current.getB().get(VariantSetType.BASELINE)) {
-          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_LOW_CONF));
+          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
         }
         for (Variant v : current.getB().get(VariantSetType.CALLS)) {
-          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_LOW_CONF));
+          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
         }
         if (currentName.equals("simulatedSequence19")) {
           assertEquals(1, current.getB().get(VariantSetType.CALLS).size());

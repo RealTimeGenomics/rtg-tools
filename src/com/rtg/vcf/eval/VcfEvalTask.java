@@ -102,16 +102,16 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
       final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
-      final ReferenceRegions highConf;
-      if (params.highConfRegionsFile() != null) {
-        highConf = new ReferenceRegions();
-        try (IOIterator<? extends SequenceNameLocus> r = BedReader.openBedReader(null, params.highConfRegionsFile(), 0)) {
-          highConf.add(r);
+      final ReferenceRegions evalRegions;
+      if (params.evalRegionsFile() != null) {
+        evalRegions = new ReferenceRegions();
+        try (IOIterator<? extends SequenceNameLocus> r = BedReader.openBedReader(null, params.evalRegionsFile(), 0)) {
+          evalRegions.add(r);
         }
       } else {
-        highConf = null;
+        evalRegions = null;
       }
-      final VariantSet variants = getVariants(params, templateSequences, ranges, highConf);
+      final VariantSet variants = getVariants(params, templateSequences, ranges, evalRegions);
 
       evaluateCalls(params, ranges, templateSequences, variants);
     }
@@ -219,11 +219,11 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
    * @param params the parameters
    * @param templateSequences template sequences
    * @param ranges controls which regions the variants will be loaded from
-   * @param highConf optional high-confidence regions
+   * @param evalRegions optional evaluation regions
    * @return a VariantSet for the provided files
    * @throws IOException if IO is broken
    */
-  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences, ReferenceRanges<String> ranges, ReferenceRegions highConf) throws IOException {
+  static VariantSet getVariants(VcfEvalParams params, SequencesReader templateSequences, ReferenceRanges<String> ranges, ReferenceRegions evalRegions) throws IOException {
     final File calls = params.callsFile();
     final File baseline = params.baselineFile();
     final String baselineSample = params.baselineSample();
@@ -234,7 +234,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 
-    return new TabixVcfRecordSet(baseline, calls, ranges, highConf, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
+    return new TabixVcfRecordSet(baseline, calls, ranges, evalRegions, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
   }
 
   static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {

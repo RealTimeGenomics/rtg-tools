@@ -44,8 +44,8 @@ public interface VariantId extends SequenceNameLocus {
   byte STATUS_ALLELE_MATCH = 0b100;
   /** Variant was excluded */
   byte STATUS_NO_MATCH = 0b1000;
-  /** Variant was outside high-confidence regions */
-  byte STATUS_LOW_CONF = 0b10000;
+  /** Variant was outside eval regions */
+  byte STATUS_OUTSIDE_EVAL = 0b10000;
 
   /** @return the ID assigned to this variant */
   int getId();

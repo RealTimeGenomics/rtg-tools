@@ -250,7 +250,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
           outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_MULTI, QUERY_SAMPLE_INDEX);
         }
         sync = Integer.toString(mCSyncStart2 + 1);
-      } else if (mCv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      } else if (mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, QUERY_SAMPLE_INDEX);
         outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_NON_CONF, QUERY_SAMPLE_INDEX);
         sync = null;
@@ -287,7 +287,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
         outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_TOO_HARD, TRUTH_SAMPLE_INDEX);
         sync = null;
-      } else if (mBv.hasStatus(VariantId.STATUS_LOW_CONF)) {
+      } else if (mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_OTHER, TRUTH_SAMPLE_INDEX);
         outRec.setFormatAndSample(FORMAT_EXTRA, EXTRA_NON_CONF, TRUTH_SAMPLE_INDEX);
         sync = null;

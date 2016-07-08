@@ -49,20 +49,20 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
 
   private final File mInput;
   private final ReferenceRanges<String> mRanges;
-  private final ReferenceRegions mHighConf;
+  private final ReferenceRegions mEvalRegions;
   private final int mTemplateLength;
   private final VariantSetType mType;
   private final VariantFactory mFactory;
   private final boolean mPassOnly;
   private final int mMaxLength;
 
-  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions highConf, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength) {
+  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength) {
     if (!ranges.containsSequence(templateName)) {
       throw new IllegalArgumentException("Ranges supplied do not contain reference sequence " + templateName);
     }
     mInput = file;
     mRanges = ranges;
-    mHighConf = highConf;
+    mEvalRegions = evalRegions;
     mFactory = factory;
     mTemplateLength = templateLength;
     mType = type;
@@ -107,8 +107,8 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           if (v == null) { // Just wasn't variant according to the factory
             continue;
           }
-          if (mHighConf != null && !mHighConf.overlapped(v)) {
-            v.setStatus(VariantId.STATUS_LOW_CONF);
+          if (mEvalRegions != null && !mEvalRegions.overlapped(v)) {
+            v.setStatus(VariantId.STATUS_OUTSIDE_EVAL);
           }
           list.add(v);
         } catch (SkippedVariantException e) {
