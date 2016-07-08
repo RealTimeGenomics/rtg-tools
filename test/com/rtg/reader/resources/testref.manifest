@@ -1,6 +1,0 @@
-REF-MANIFEST
-CHECKS:	NAME	LENGTH
-REF-TXT:	com/rtg/reader/resources/testref-reference.txt
-SEQ:	abcd	57
-SEQ:	moo	60
-SEQ:	lalala	53

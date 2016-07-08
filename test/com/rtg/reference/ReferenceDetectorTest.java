@@ -28,11 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rtg.reader;
+package com.rtg.reference;
 
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.reader.AnnotatedSequencesReader;
+import com.rtg.reader.ReaderTestUtils;
+import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.Resources;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
@@ -45,18 +48,18 @@ import junit.framework.TestCase;
  */
 public class ReferenceDetectorTest extends TestCase {
 
-
   public void test() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final String dna = FileHelper.resourceToString("com/rtg/reader/resources/testref.fasta");
+      final String dna = FileHelper.resourceToString("com/rtg/reference/resources/testref.fasta");
       final File sdfDir = ReaderTestUtils.getDNADir(dna, new File(dir, "sdf"));
-      final ReferenceDetector detector = ReferenceDetector.loadManifest(Resources.getResourceAsStream("com/rtg/reader/resources/testref.manifest"));
-      final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(sdfDir);
-      assertTrue(detector.checkReference(reader));
-      detector.installReferenceConfiguration(reader);
-      final File refTxt = new File(sdfDir, "reference.txt");
-      assertTrue(refTxt.exists());
-      TestUtils.assertResourceEquals("com/rtg/reader/resources/testref-reference.txt", FileHelper.fileToString(refTxt));
+      final ReferenceDetector detector = ReferenceDetector.loadManifest(Resources.getResourceAsStream("com/rtg/reference/resources/testref.manifest"));
+      try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(sdfDir)) {
+        assertTrue(detector.checkReference(reader));
+        detector.installReferenceConfiguration(reader);
+        final File refTxt = new File(sdfDir, "reference.txt");
+        assertTrue(refTxt.exists());
+        TestUtils.assertResourceEquals("com/rtg/reference/resources/testref-reference.txt", FileHelper.fileToString(refTxt));
+      }
     }
   }
 }

@@ -27,28 +27,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
 
-import java.io.BufferedReader;
+package com.rtg.reference;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import com.rtg.reference.ReferenceGenome;
+import com.rtg.reader.ReaderUtils;
+import com.rtg.reader.SequencesReader;
+import com.rtg.util.GeneralParser;
 import com.rtg.util.Resources;
-import com.rtg.util.StringUtils;
 import com.rtg.util.io.FileUtils;
 
 /**
  * format:
  * <code>
  * REF-MANIFEST
+ * DESC: Some text to describe installed reference.txt file
  * CHECKS:\tNAME\t[checkType1]\t[checkType2]\t...
  * REF-TXT: [resourcePath]
  * SEQ:\t[seqName]\t[checkVal1]\t[checkVal2]\t...
@@ -58,20 +60,21 @@ import com.rtg.util.io.FileUtils;
  */
 public final class ReferenceDetector {
 
-  private static final String MAGIC_LINE = "REF-MANIFEST";
-  private static final String CHECK_MAGIC = "CHECKS:";
-  private static final String NAME_MAGIC = "NAME";
-  private static final String REF_TXT_MAGIC = "REF-TXT:";
-  private static final String SEQ_MAGIC = "SEQ:";
+  private static final String CHECK_MAGIC = "checks";
+  private static final String DESC_MAGIC = "desc";
+  private static final String NAME_MAGIC = "name";
+  private static final String SOURCE_MAGIC = "source";
 
   private final List<CheckType> mChecks;
+  private final String mDesc;
   private final String mRefTxt;
   private final List<CheckValues> mValues;
 
-  private ReferenceDetector(List<CheckType> checks, String refTxt, List<CheckValues> values) {
+  private ReferenceDetector(List<CheckType> checks, String refTxt, List<CheckValues> values, String desc) {
     mChecks = checks;
     mRefTxt = refTxt;
     mValues = values;
+    mDesc = desc;
   }
 
   private abstract static class CheckType {
@@ -162,6 +165,14 @@ public final class ReferenceDetector {
   }
 
   /**
+   * Description supplied by manifest
+   * @return the description
+   */
+  public String getDesc() {
+    return mDesc;
+  }
+
+  /**
    * Installs linked reference configuration into SDF
    * @param sr the SDF to install to
    * @throws IOException if an IO error occurs
@@ -175,28 +186,21 @@ public final class ReferenceDetector {
     if (refTxt.exists()) {
       throw new IOException(refTxt + " already exists");
     }
-    try (OutputStream stream = FileUtils.createOutputStream(refTxt)) {
-      final InputStream refTxtStream = Resources.getResourceAsStream(mRefTxt);
-      FileUtils.streamToStream(refTxtStream, stream, 4096);
+    try (OutputStream stream = FileUtils.createOutputStream(refTxt);
+        InputStream refTxtStream = Resources.getResourceAsStream(mRefTxt)) {
+        FileUtils.streamToStream(refTxtStream, stream, 4096);
     }
   }
 
-  private static List<CheckType> loadCheckTypes(String checksLine) {
-    if (checksLine != null) {
-      final String[] split = StringUtils.split(checksLine, '\t');
-      if (split.length < 1 && !CHECK_MAGIC.equals(split[0])) {
-        throw new IllegalArgumentException("Invalid CHECKS line in reference manifest");
-      }
-      if (split.length < 2 && !NAME_MAGIC.equals(split[1])) {
-        throw new IllegalArgumentException("Invalid CHECKS line, " + NAME_MAGIC + " must be first check type");
-      }
-      final List<CheckType> ret = new ArrayList<>();
-      for (int i = 2; i < split.length; i++) {
-        ret.add(CheckTypes.valueOf(split[i]).type());
-      }
-      return ret;
+  private static List<CheckType> loadCheckTypes(String... checks) {
+    if (checks.length < 1 && !NAME_MAGIC.equals(checks[0])) {
+      throw new IllegalArgumentException("Invalid CHECKS line, " + NAME_MAGIC + " must be first check type");
     }
-    throw new NullPointerException("Expected CHECKS line in reference manifest");
+    final List<CheckType> ret = new ArrayList<>();
+    for (int i = 1; i < checks.length; i++) {
+      ret.add(CheckTypes.valueOf(checks[i].toUpperCase(Locale.getDefault())).type());
+    }
+    return ret;
   }
 
   /**
@@ -206,39 +210,63 @@ public final class ReferenceDetector {
    * @throws IOException if an IO error occurs
    */
   public static ReferenceDetector loadManifest(InputStream referenceManifest) throws IOException {
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(referenceManifest))) {
-      final String magicLine = reader.readLine();
-      if (!MAGIC_LINE.equals(magicLine)) {
-        throw new IOException("Invalid reference manifest");
+    try (final ReferenceManifestParser parser = new ReferenceManifestParser(referenceManifest)) {
+      parser.parse();
+      return parser.getReferenceDetector();
+    }
+  }
+
+  private static class ReferenceManifestParser extends GeneralParser {
+    private List<CheckType> mCheckTypes = null;
+    private String mSource;
+    private final List<CheckValues> mValues;
+    private String mDesc;
+    private boolean mHeaderDone;
+
+    ReferenceManifestParser(InputStream stream) {
+      super(stream);
+      mValues = new ArrayList<>();
+    }
+
+    public ReferenceDetector getReferenceDetector() {
+      return new ReferenceDetector(mCheckTypes, mSource, mValues, mDesc);
+    }
+
+    @Override
+    protected void parseAtLine(String key, String... elements) {
+      switch (key) {
+        case CHECK_MAGIC:
+          mCheckTypes = loadCheckTypes(elements);
+          break;
+        case SOURCE_MAGIC:
+          mSource = getSingleValue(key, elements);
+          break;
+        case DESC_MAGIC:
+          mDesc = getSingleValue(key, elements);
+          break;
+        default:
+          throw new IllegalArgumentException("Unexpected line: @" + key);
       }
-      final String checkTypesLine = reader.readLine();
-      final List<CheckType> checkTypes;
-      try {
-        checkTypes = loadCheckTypes(checkTypesLine);
-      } catch (IllegalArgumentException | NullPointerException e) {
-        throw new IOException(e.getMessage());
+      if (mCheckTypes != null && mSource != null && mDesc != null) {
+        mHeaderDone = true;
       }
-      final String refTxtLine = reader.readLine();
-      if (refTxtLine == null) {
-        throw new IOException("Unexpected end of reference manifest");
+    }
+
+    @Override
+    protected void parseRegularLine(String... elements) {
+      if (!mHeaderDone) {
+        throw new IllegalArgumentException("@" + CHECK_MAGIC + ", @" + SOURCE_MAGIC + " and @" + DESC_MAGIC + " are required before table data");
       }
-      final String[] refTxtSplit = StringUtils.split(refTxtLine, '\t');
-      if (refTxtSplit.length != 2 || !REF_TXT_MAGIC.equals(refTxtSplit[0])) {
-        throw new IOException("Illegal " + REF_TXT_MAGIC + " line: '" + refTxtLine + "'");
+
+      if (elements.length < mCheckTypes.size() + 1) {
+        throw new IllegalArgumentException("Expected " + (mCheckTypes.size() + 1) + " columns for table data");
       }
-      final String refTxt = refTxtSplit[1];
-      final List<CheckValues> seqCheckValues = new ArrayList<>();
-      String seqLine;
-      while ((seqLine = reader.readLine()) != null) {
-        final String[] seqLineSplit = StringUtils.split(seqLine, '\t');
-        //magic, seqName, otherChecks
-        if (seqLineSplit.length != checkTypes.size() + 2 || !SEQ_MAGIC.equals(seqLineSplit[0])) {
-          throw new IOException("Invalid reference manifest line: '" + seqLine + "'");
-        }
-        final CheckValues v = new CheckValues(seqLineSplit[1], Arrays.copyOfRange(seqLineSplit, 2, seqLineSplit.length));
-        seqCheckValues.add(v);
-      }
-      return new ReferenceDetector(checkTypes, refTxt, seqCheckValues);
+      final String name = elements[0];
+      mValues.add(new CheckValues(name, Arrays.copyOfRange(elements, 1, elements.length)));
+    }
+
+    @Override
+    protected void parseHashLine(String comment) {
     }
   }
 }
