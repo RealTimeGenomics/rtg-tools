@@ -29,11 +29,13 @@
  */
 package com.rtg.vcf;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
  * Malformed data was encountered in a VCF file.
  */
+@TestClass("com.rtg.vcf.VcfReaderTest")
 public class VcfFormatException extends NoTalkbackSlimException {
 
   /**
