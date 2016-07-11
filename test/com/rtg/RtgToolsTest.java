@@ -36,15 +36,15 @@ import junit.framework.TestCase;
 
 /**
  */
-public class ToolsEntryTest extends TestCase {
+public class RtgToolsTest extends TestCase {
 
   public void test() {
-    assertTrue(new ToolsEntry().getSlimModule("HELP") instanceof Command);
+    assertTrue(new RtgTools().getSlimModule("HELP") instanceof Command);
   }
 
   public void test2() {
     final MemoryPrintStream mps = new MemoryPrintStream();
-    new ToolsEntry().help(null, mps.outputStream(), mps.printStream());
+    new RtgTools().help(null, mps.outputStream(), mps.printStream());
     final String out = mps.toString();
     TestUtils.containsAll(out, "format", "index", "bgzip");
     assertFalse(out.contains("map"));

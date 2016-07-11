@@ -32,13 +32,13 @@ package com.rtg;
 /**
  * Entry point for RTG tools
  */
-public final class ToolsEntry extends AbstractCliEntry {
+public final class RtgTools extends AbstractCliEntry {
 
   /**
    * @param args command line arguments
    */
   public static void main(String[] args) {
-    new ToolsEntry().mainImpl(args);
+    new RtgTools().mainImpl(args);
   }
 
   @Override

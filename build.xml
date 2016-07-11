@@ -27,7 +27,7 @@
   <property name="product" value="RTG Tools" />
   <property name="product.version" value="3.6.2-dev" />
   <property name="resources" value="tools" />
-  <property name="main.class" value="com.rtg.ToolsEntry" />
+  <property name="main.class" value="com.rtg.RtgTools" />
 
   <property name="regression.update" value=""/> <!-- Empty means don't update nano-regression results -->
 
@@ -279,7 +279,7 @@
   </macrodef>
 
   <target name="rtg-tools.jar" depends="compile-src,set-rtg-build-version,set-rtg-build-product" description="Tools jar.">
-    <rtg-jar main="com.rtg.ToolsEntry" file="${build.dir}/rtg-tools.jar" refid="jar-src"/>
+    <rtg-jar main="com.rtg.RtgTools" file="${build.dir}/rtg-tools.jar" refid="jar-src"/>
   </target>
 
   <target name="rtg-all.jar" depends="compile,set-rtg-build-version,set-rtg-build-product" description="Create jar including tests.">
