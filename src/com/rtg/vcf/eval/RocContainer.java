@@ -46,10 +46,12 @@ import java.util.TreeMap;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.ContingencyTable;
+import com.rtg.util.Environment;
 import com.rtg.util.MathUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TextTable;
 import com.rtg.util.Utils;
+import com.rtg.util.cli.CommandLine;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
@@ -217,6 +219,10 @@ public class RocContainer {
   }
 
   private void rocHeader(LineWriter out, int totalBaselineVariants, int totalCallVariants, boolean extraMetrics) throws IOException {
+    out.writeln("#Version " + Environment.getVersion() + ", ROC output 1.1");
+    if (CommandLine.getCommandLine() != null) {
+      out.writeln("#CL " + CommandLine.getCommandLine());
+    }
     out.writeln("#total baseline variants: " + totalBaselineVariants);
     out.writeln("#total call variants: " + totalCallVariants);
     if (mFieldLabel != null) {

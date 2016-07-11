@@ -50,6 +50,16 @@ import com.rtg.vcf.VcfUtils;
 
 public abstract class AbstractVcfEvalTest extends AbstractCliTest {
 
+  /**
+   * Takes a ROC string and strips out header fields that typically change from run to run.
+   * @param inString the full input string
+   * @return the sanitized string
+   */
+  static String sanitizeHeader(String inString) {
+    return inString.replaceAll("#CL .*\n", "")
+      .replaceAll("#Version .*\n", "");
+  }
+
   @Override
   protected AbstractCli getCli() {
     return new VcfEvalCli();
@@ -84,7 +94,7 @@ public abstract class AbstractVcfEvalTest extends AbstractCliTest {
       for (String fileName : filesToCheck) {
         final File file = new File(output, fileName);
         final String content = FileUtils.fileToString(file);
-        mNano.check(id + "_out_" + fileName, VcfUtils.isVcfExtension(file) ? TestUtils.sanitizeVcfHeader(content) : content);
+        mNano.check(id + "_out_" + fileName, VcfUtils.isVcfExtension(file) ? TestUtils.sanitizeVcfHeader(content) : sanitizeHeader(content));
       }
 
       if (extracheck != null) {

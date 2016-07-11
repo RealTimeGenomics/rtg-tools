@@ -618,7 +618,7 @@ public class PathTest extends AbstractNanoTest {
       final VcfEvalParams mep = new VcfEvalParams.VcfEvalParamsBuilder().templateFile(template).baseLineFile(muts).callsFile(calls).outputParams(op).useAllRecords(true).create();
       VcfEvalTask.evaluateCalls(mep);
 
-      final String weightedroc = FileUtils.fileToString(new File(output, "weighted_roc.tsv"));
+      final String weightedroc = AbstractVcfEvalTest.sanitizeHeader(FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
       mNano.check("path-noinfite-roc.tsv", weightedroc);
     }
   }

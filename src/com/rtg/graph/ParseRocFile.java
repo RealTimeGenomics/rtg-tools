@@ -66,13 +66,26 @@ public final class ParseRocFile {
       String prevScore = null;
       float prevX = 0.0f;
       float prevY = 0.0f;
+      final int scoreCol = 0;
+      final int tpCol = 1;
+      final int fpCol = 2;
       String score = String.format("%.3g", 0.0f);
       while ((line = br.readLine()) != null) {
         if (line.startsWith("#")) {
-          if (line.contains("#total")) {
+          if (line.startsWith("#total")) {
             final String[] parts = line.split("\\s");
-            totalVariants = Integer.parseInt(parts[parts.length - 1]);
-          } else if (line.contains("#score field:")) {
+            if (parts.length > 3) {
+              switch (parts[1]) {
+                case "baseline":
+                  totalVariants = Integer.parseInt(parts[parts.length - 1]);
+                  break;
+                default:
+                  break;
+              }
+            } else {
+              totalVariants = Integer.parseInt(parts[parts.length - 1]);
+            }
+          } else if (line.startsWith("#score field:")) {
             final String[] parts = line.split("\\s");
             if (parts.length >= 3) {
               scoreName = parts[2];
@@ -84,10 +97,10 @@ public final class ParseRocFile {
         if (linearr.length < 3) {
           throw new NoTalkbackSlimException("Malformed line: " + line + " in \"" + shortName + "\"");
         }
-        final float x = Float.parseFloat(linearr[2]); // False positives
-        final float y = Float.parseFloat(linearr[1]); // True positives
+        final float x = Float.parseFloat(linearr[fpCol]); // False positives
+        final float y = Float.parseFloat(linearr[tpCol]); // True positives
         try {
-          final float numeric = Float.parseFloat(linearr[0]); // Score
+          final float numeric = Float.parseFloat(linearr[scoreCol]); // Score
           score = String.format("%.3g", numeric);
         } catch (final NumberFormatException e) {
           score = linearr[0];

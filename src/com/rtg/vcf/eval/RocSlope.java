@@ -39,7 +39,9 @@ import java.util.ArrayList;
 
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
+import com.rtg.util.Environment;
 import com.rtg.util.Utils;
+import com.rtg.util.cli.CommandLine;
 
 /**
  * Class converts <code>ROC</code> files and calculates slope
@@ -65,6 +67,10 @@ public final class RocSlope {
    * @throws IOException some of the time
    */
   private RocSlope(InputStream in, PrintStream out) throws IOException {
+    out.println("#Version " + Environment.getVersion() + ", ROC-slope output 1.1");
+    if (CommandLine.getCommandLine() != null) {
+      out.println("#CL " + CommandLine.getCommandLine());
+    }
     out.println("#posterior\tslope\tlog-slope");
     try (BufferedReader r = new BufferedReader(new InputStreamReader(in))) {
       String s;

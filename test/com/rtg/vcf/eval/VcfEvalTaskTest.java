@@ -267,7 +267,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   }
 
   private void checkRocResults(String label, final File out, boolean checktotal, final int tpCount, final int fnCount) throws IOException {
-    final String roc = FileUtils.fileToString(out);
+    final String roc = AbstractVcfEvalTest.sanitizeHeader(FileUtils.fileToString(out));
     //System.err.println("ROC\n" + roc);
     final String[] homoLines = roc.split(StringUtils.LS);
     int line = 0;

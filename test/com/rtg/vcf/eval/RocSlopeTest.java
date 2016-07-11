@@ -37,20 +37,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import junit.framework.TestCase;
+import com.rtg.launcher.AbstractNanoTest;
 
 /**
  */
-public class RocSlopeTest extends TestCase {
-
-  private static final String HEADER = "#posterior slope log-slope";
+public class RocSlopeTest extends AbstractNanoTest {
 
   private static final String ROC0 = (""
       + "10 1.0 1 seq1 1" + LS
-      + "").replaceAll(" ", "\t");
-  private static final String EXPECTED0 = (""
-      + HEADER + LS
-      + "10.00 1.00 0.000" + LS
       + "").replaceAll(" ", "\t");
 
   public void test0() throws IOException {
@@ -58,7 +52,7 @@ public class RocSlopeTest extends TestCase {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC0.getBytes()), ps);
     }
-    assertEquals(EXPECTED0, baos.toString());
+    mNano.check("roc-slope-0.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
   }
 
   private static final String ROC1 = ("#ignore me I'm a header" + LS
@@ -70,18 +64,13 @@ public class RocSlopeTest extends TestCase {
       + "8 4.0 1 seq1 1" + LS
       + "7 5.0 1 seq1 1" + LS
       + "").replaceAll(" ", "\t");
-  private static final String EXPECTED1 = (""
-      + HEADER + LS
-      + "9.00 2.00 0.301" + LS
-      + "7.00 2.00 0.301" + LS
-      + "").replaceAll(" ", "\t");
 
   public void test1() throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC1.getBytes()), ps);
     }
-    assertEquals(EXPECTED1, baos.toString());
+    mNano.check("roc-slope-1.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
   }
 
   private static final String ROC2 = ("#ignore me I'm a header" + LS
@@ -98,20 +87,13 @@ public class RocSlopeTest extends TestCase {
       + "3 10.0 4 seq1 1" + LS
       + "2 10.0 5 seq1 1" + LS
       + "").replaceAll(" ", "\t");
-  private static final String EXPECTED2 = (""
-      + HEADER + LS
-      + "9.00 2.50 0.398" + LS
-      + "5.00 2.50 0.398" + LS
-      + "5.00 1.00 0.000" + LS
-      + "3.00 1.00 0.000" + LS
-      + "").replaceAll(" ", "\t");
 
   public void test2() throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC2.getBytes()), ps);
     }
-    assertEquals(EXPECTED2, baos.toString());
+    mNano.check("roc-slope-2.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
   }
 
   private static final String ROC3 = ("#ignore me I'm a header" + LS
@@ -123,22 +105,13 @@ public class RocSlopeTest extends TestCase {
       + "5 5.0 3 seq1 1" + LS
       + "4 6.0 3 seq1 1" + LS
       + "").replaceAll(" ", "\t");
-  private static final String EXPECTED3 = (""
-      + HEADER + LS
-      + "10.00 3.00 0.477" + LS
-      + "8.00 3.00 0.477" + LS
-      + "8.00 2.00 0.301" + LS
-      + "6.00 2.00 0.301" + LS
-      + "6.00 1.00 0.000" + LS
-      + "4.00 1.00 0.000" + LS
-      + "").replaceAll(" ", "\t");
 
   public void test3() throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC3.getBytes()), ps);
     }
-    assertEquals(EXPECTED3, baos.toString());
+    mNano.check("roc-slope-3.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
   }
 
   private static final String ROC3_A = ("#ignore me I'm a header" + LS
@@ -152,7 +125,7 @@ public class RocSlopeTest extends TestCase {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC3_A.getBytes()), ps);
     }
-    assertEquals(EXPECTED3, baos.toString());
+    mNano.check("roc-slope-3a.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
   }
 
 }
