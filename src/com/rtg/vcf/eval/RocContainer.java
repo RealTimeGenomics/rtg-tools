@@ -62,7 +62,12 @@ import com.rtg.vcf.VcfUtils;
  */
 public class RocContainer {
 
+  private static final int SCORE_DP = 3; // Decimal points for score field
+  private static final int COUNT_DP = 2; // Decimal points for weighted variant counts
+  private static final int METRICS_DP = 4; // Decimal points for metrics such as precision/recall
+
   private static final String SLOPE_EXT = "_slope.tsv";
+
   private final String mFieldLabel;
   private final Map<RocFilter, SortedMap<Double, RocPoint>> mRocs = new HashMap<>();
   private final Comparator<Double> mComparator;
@@ -114,7 +119,7 @@ public class RocContainer {
    * @param filter filtered curve to generate
    */
   public void addFilter(RocFilter filter) {
-    mRocs.put(filter, new TreeMap<Double, RocPoint>(mComparator));
+    mRocs.put(filter, new TreeMap<>(mComparator));
     mRequiresGt |= filter.requiresGt();
   }
 
@@ -198,17 +203,24 @@ public class RocContainer {
       final SortedMap<Double, RocPoint> points = entry.getValue();
       final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, mFilePrefix + filter.fileName()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
-        final RocPoint current = new RocPoint();
+        final RocPoint cumulative = new RocPoint();
+        String prevScore = null;
         final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
         rocHeader(os, totalBaselineVariants, totalCallVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
           final RocPoint point = me.getValue();
-          current.add(point);
-          current.mThreshold = point.mThreshold;
-          final String score = Utils.realFormat(point.mThreshold, 3);
-          writeRocLine(os, score, totalBaselineVariants, current, extraMetrics, filter == RocFilter.ALL);
+          final String score = Utils.realFormat(point.mThreshold, SCORE_DP);
+          if (prevScore != null && score.compareTo(prevScore) != 0) {
+            writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
+          }
+          prevScore = score;
+          cumulative.add(point);
+          cumulative.mThreshold = point.mThreshold;
         }
-        if (extraMetrics && (Math.abs(current.mTp - unfiltered.mTp) > 0.001 || Math.abs(current.mFp - unfiltered.mFp) > 0.001)) {
+        if (prevScore != null) {
+          writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
+        }
+        if (extraMetrics && (Math.abs(cumulative.mTp - unfiltered.mTp) > 0.001 || Math.abs(cumulative.mFp - unfiltered.mFp) > 0.001)) {
           writeRocLine(os, "None", totalBaselineVariants, unfiltered, extraMetrics, false);
         }
       }
@@ -240,18 +252,18 @@ public class RocContainer {
     final double falsePositives = point.mFp;
     final double truePositivesRaw = point.mTpRaw;
     os.write(score
-      + "\t" + Utils.realFormat(truePositives, 2)
-      + "\t" + Utils.realFormat(falsePositives, 2)
-      + "\t" + Utils.realFormat(truePositivesRaw, 2));
+      + "\t" + Utils.realFormat(truePositives, COUNT_DP)
+      + "\t" + Utils.realFormat(falsePositives, COUNT_DP)
+      + "\t" + Utils.realFormat(truePositivesRaw, COUNT_DP));
     if (extraMetrics) {
       final double fn = totalPositives - truePositives;
       final double precision = ContingencyTable.precision(truePositivesRaw, falsePositives);
       final double recall = ContingencyTable.recall(truePositives, fn);
       final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-      os.write("\t" + Utils.realFormat(fn, 2)
-        + "\t" + Utils.realFormat(precision, 4)
-        + "\t" + Utils.realFormat(recall, 4)
-        + "\t" + Utils.realFormat(fMeasure, 4));
+      os.write("\t" + Utils.realFormat(fn, COUNT_DP)
+        + "\t" + Utils.realFormat(precision, METRICS_DP)
+        + "\t" + Utils.realFormat(recall, METRICS_DP)
+        + "\t" + Utils.realFormat(fMeasure, METRICS_DP));
       if (updateBest && (mBest == null || fMeasure >= mBestFMeasure)) {
         mBestFMeasure = fMeasure;
         mBest = new RocPoint(point);
@@ -289,7 +301,7 @@ public class RocContainer {
       if (best == null) {
         Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SORT_FIELD);
       } else {
-        addRow(table, Utils.realFormat(best.mThreshold, 3), best.mTp, totalPositives - best.mTp, best.mTpRaw, best.mFp);
+        addRow(table, Utils.realFormat(best.mThreshold, SCORE_DP), best.mTp, totalPositives - best.mTp, best.mTpRaw, best.mFp);
       }
       addRow(table, "None", truePositives, falseNegatives, truePositivesRaw, falsePositives);
       summary = table.toString();
@@ -311,9 +323,9 @@ public class RocContainer {
       Long.toString(MathUtils.round(truePositiveRaw)),
       Long.toString(MathUtils.round(falsePositive)),
       Long.toString(MathUtils.round(falseNegative)),
-      Utils.realFormat(precision, 4),
-      Utils.realFormat(recall, 4),
-      Utils.realFormat(fMeasure, 4));
+      Utils.realFormat(precision, METRICS_DP),
+      Utils.realFormat(recall, METRICS_DP),
+      Utils.realFormat(fMeasure, METRICS_DP));
   }
 
 
