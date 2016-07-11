@@ -696,8 +696,13 @@ public class RocPlot {
   }
 
 
-  void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth) throws InterruptedException, InvocationTargetException, IOException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth) throws InterruptedException, InvocationTargetException, IOException {
     final JFrame frame = new JFrame();
+    final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
+    if (icon != null) {
+      frame.setIconImage(icon.getImage());
+    }
+
     final RocPlot rp = new RocPlot() {
       @Override
       public void setTitle(final String title) {

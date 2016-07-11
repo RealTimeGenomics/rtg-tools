@@ -204,8 +204,7 @@ public class RocPlotCli extends AbstractCli {
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        final RocPlot rp = new RocPlot();
-        rp.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime
