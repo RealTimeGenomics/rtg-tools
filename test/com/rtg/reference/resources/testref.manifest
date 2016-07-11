@@ -1,4 +1,4 @@
-#RTG moo, ref-manifest v2.0
+#ref-manifest v2.0
 @desc	test manifest for testref.fasta
 @source	com/rtg/reference/resources/testref-reference.txt
 @checks	name	length
