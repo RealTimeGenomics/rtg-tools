@@ -42,7 +42,7 @@ import com.rtg.util.io.FileUtils;
 
 /**
  */
-@TestClass("com.rtg.ToolsEntryTest")
+@TestClass("com.rtg.RtgToolsTest")
 public abstract class AbstractCliEntry {
 
   /**
