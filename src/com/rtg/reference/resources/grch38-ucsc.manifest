@@ -1,7 +1,7 @@
 #ref-manifest v2.0
-@desc	Generated from /rtgshare/data/human/ref/GRCh38/GRCh38_full.sdf
-@source	com/rtg/reference/resources/reference/grch38-hgrc.txt
-@checks	NAME	LENGTH
+@desc	Human GRCh38 with UCSC naming
+@source	com/rtg/reference/resources/grch38-ucsc.txt
+@checks	name	length
 chr1	248956422
 chr2	242193529
 chr3	198295559

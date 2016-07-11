@@ -52,6 +52,8 @@ import com.rtg.launcher.LoggedCli;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.ProteinFastaSymbolTable;
 import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
+import com.rtg.reference.ReferenceDetector;
+import com.rtg.reference.ReferenceManifest;
 import com.rtg.sam.DefaultSamFilter;
 import com.rtg.sam.DuplicateSamFilter;
 import com.rtg.sam.SamBamConstants;
@@ -461,6 +463,17 @@ public final class FormatCli extends LoggedCli {
       final Counts outputCounts = new Counts(writer.getNumberOfSequences(), writer.getTotalLength(), writer.getMaxLength(), writer.getMinLength());
       mNumSequences = mInputFormat.isPairedSam() ? writer.getNumberOfSequences() / 2 : writer.getNumberOfSequences();
       writeStats(files.toArray(new File[files.size()]), mInputFormat.isPairedSam(), inputCounts, outputCounts, writer.getSdfId(), ds.getDusted());
+      if (ReaderUtils.isSDF(mOutDir) && !ReaderUtils.isPairedEndDirectory(mOutDir)) {
+        try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(mOutDir)) {
+          for (ReferenceDetector referenceDetector : ReferenceManifest.getReferenceDetectors()) {
+            if (referenceDetector.checkReference(reader)) {
+              mOut.println("Detected: '" + referenceDetector.getDesc() + "', installing reference.txt");
+              referenceDetector.installReferenceConfiguration(reader);
+              break;
+            }
+          }
+        }
+      }
     }
 
     /**

@@ -148,20 +148,23 @@ public final class ReferenceDetector {
    * @throws IOException if an IO error occurs
    */
   public boolean checkReference(SequencesReader sr) throws IOException {
-    final Map<String, Long> sequenceNameMap = ReaderUtils.getSequenceNameMap(sr);
-    for (CheckValues cv : mValues) {
-      if (!sequenceNameMap.containsKey(cv.getSequenceName())) {
-        return false;
-      }
-      final long sequenceId = sequenceNameMap.get(cv.getSequenceName());
-      for (int i = 0; i < mChecks.size(); i++) {
-        final CheckType check = mChecks.get(i);
-        if (!check.checkValue(sr, sequenceId, cv.getValue(i))) {
+    if (sr.hasNames()) {
+      final Map<String, Long> sequenceNameMap = ReaderUtils.getSequenceNameMap(sr);
+      for (CheckValues cv : mValues) {
+        if (!sequenceNameMap.containsKey(cv.getSequenceName())) {
           return false;
         }
+        final long sequenceId = sequenceNameMap.get(cv.getSequenceName());
+        for (int i = 0; i < mChecks.size(); i++) {
+          final CheckType check = mChecks.get(i);
+          if (!check.checkValue(sr, sequenceId, cv.getValue(i))) {
+            return false;
+          }
+        }
       }
+      return true;
     }
-    return true;
+    return false;
   }
 
   /**

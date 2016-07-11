@@ -1,7 +1,7 @@
 #ref-manifest v2.0
-@desc	Generated from /rtgshare/data/human/ref/1000g_v37_phase2/sdf
-@source	com/rtg/reference/resources/reference/grch37-hgrc.txt
-@checks	NAME	LENGTH
+@desc	Human GRCh37 with HGRC naming
+@source	com/rtg/reference/resources/grch37-hgrc.txt
+@checks	name	length
 1	249250621
 2	243199373
 3	198022430
