@@ -41,6 +41,7 @@ import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SdfId;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
+import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.io.FileUtils;
@@ -56,8 +57,8 @@ public abstract class AbstractVcfEvalTest extends AbstractCliTest {
    * @return the sanitized string
    */
   static String sanitizeHeader(String inString) {
-    return inString.replaceAll("#CL .*\n", "")
-      .replaceAll("#Version .*\n", "");
+    return inString.replaceAll("#CL .*" + StringUtils.LS, "")
+      .replaceAll("#Version .*" + StringUtils.LS, "");
   }
 
   @Override
