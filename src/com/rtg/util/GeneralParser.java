@@ -41,7 +41,7 @@ import com.reeltwo.jumble.annotations.TestClass;
 /**
  * General parser for text files with:
  * -ignore lines beginning with #
- * -detect lines beginning with @someKey and pass forward this info
+ * -detect lines beginning with <code>@someKey</code> and pass forward this info
  * -treat file as tab separated
  */
 @TestClass("com.rtg.reference.ReferenceDetectorTest")
