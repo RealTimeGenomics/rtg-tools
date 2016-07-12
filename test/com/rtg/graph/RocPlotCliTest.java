@@ -34,7 +34,6 @@ import java.io.IOException;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
-import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 
 /**
@@ -58,22 +57,9 @@ public class RocPlotCliTest extends AbstractCliTest {
       assertTrue(png.createNewFile());
       checkHandleFlagsErr(f.getPath(), "--png", png.getPath());
 
-      final String html = checkMainInitOk("--curve", f.getPath() + "=Monkey", "--Xhtml");
-      TestUtils.containsAll(html,
-              String.format("<param name=\"data1\" value=\"%s\">", f.getPath()),
-              String.format("<param name=\"name1\" value=\"%s\">", "Monkey")
-      );
       final File f2 = new File(dir, "oink");
       assertTrue(f2.createNewFile());
       checkHandleFlagsOut("--curve", f.getPath() + "=Monkey", f2.getPath());
-
-      final String html2 = checkMainInitOk("--curve", f.getPath() + "=Monkey", f2.getPath(), "--Xapplet");
-      TestUtils.containsAll(html2,
-              String.format("<param name=\"data1\" value=\"%s\">", f.getPath()),
-              String.format("<param name=\"name1\" value=\"%s\">", "Monkey"),
-              String.format("<param name=\"data2\" value=\"%s\">", f2.getPath()),
-              String.format("<param name=\"name2\" value=\"%s\">", f2.getParentFile().getName())
-      );
     }
   }
 }
