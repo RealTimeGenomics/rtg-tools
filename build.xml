@@ -286,31 +286,6 @@
     <rtg-jar main="AllTests" file="${build.dir}/rtg-all.jar" refid="jar-test"/>
   </target>
 
-  <target name="ROC.jar" depends="compile-src" description="Make ROC applet jar.">
-    <jar destfile="${build.dir}/ROC.jar" duplicate="fail">
-      <manifest>
-        <attribute name="Implementation-Title" value="RTG"/>
-        <attribute name="Implementation-Vendor" value="Real Time Genomics"/>
-        <attribute name="Class-Path" value="."/>
-      </manifest>
-      <fileset dir="${build.src}">
-        <include name="com/rtg/util/*.class"/>
-        <include name="com/rtg/util/io/**/*.class"/>
-        <include name="com/rtg/util/gzip/**/*.class"/>
-        <include name="com/rtg/util/diagnostic/**/*.class"/>
-        <include name="com/rtg/graph/*.class"/>
-        <include name="com/rtg/graph/**/*.png"/>
-      </fileset>
-      <fileset dir="${tools.src.dir}">
-        <include name="com/rtg/util/diagnostic/*.properties"/>
-      </fileset>
-      <zipfileset src="${tools.src.lib.dir}/RPlot.jar" excludes="META-INF/**"/>
-      <zipfileset src="${tools.src.lib.dir}/gzipfix.jar">
-        <include name="com/rtg/util/gzip/WorkingGzipInputStream.class" />
-      </zipfileset>
-    </jar>
-  </target>
-
   <target name="javadoc" depends="compile-src" description="Build javadocs">
     <javadoc sourcepath="${src.path}" destdir="${build.dir}/javadocs" source="1.8"
              Author="true" Version="true" Package="true"

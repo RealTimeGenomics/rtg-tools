@@ -62,8 +62,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 /**
  */
 public class RocPlotCli extends AbstractCli {
-  private static final String HTML_FLAG = "Xhtml";
-  private static final String APPLET_FLAG = "Xapplet";
+
   private static final String HIDE_SIDEPANE_FLAG = "hide-sidepane";
   private static final String PNG_FLAG = "png";
   private static final String SVG_FLAG = "svg";
@@ -75,19 +74,6 @@ public class RocPlotCli extends AbstractCli {
 
   static final String PNG_EXTENSION = ".png";
   static final String SVG_EXTENSION = ".svg";
-
-  private static final String HTML_PREAMBLE = ""
-      + "<html>\n"
-      + "  <head>\n"
-      + "    <link rel=\"stylesheet\" type=\"text/css\" href=\"global.css\"/>\n"
-      + "  </head>\n"
-      + "  <body>\n"
-      + "  <div>";
-  private static final String HTML_POSTAMBLE = ""
-      + "  </div>\n"
-      + "  </body>\n"
-      + "</html>";
-
 
   private static class FlagValidator implements Validator {
     @Override
@@ -150,8 +136,6 @@ public class RocPlotCli extends AbstractCli {
     CommonFlagCategories.setCategories(flags);
     flags.setDescription("Plot ROC curves from vcfeval ROC data files, either to an image, or an interactive GUI.");
     flags.registerExtendedHelp();
-    flags.registerOptional(HTML_FLAG, "if set, output text for an HTML page that would display the ROC using an applet").setCategory(REPORTING);
-    flags.registerOptional(APPLET_FLAG, "if set, output text for an HTML applet tag").setCategory(REPORTING);
     flags.registerOptional('t', TITLE_FLAG, String.class, "STRING", "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the sidepane from the GUI on startup").setCategory(REPORTING);
@@ -192,9 +176,7 @@ public class RocPlotCli extends AbstractCli {
 
     final BufferedWriter outWriter = new BufferedWriter(new OutputStreamWriter(out));
     try {
-      if (mFlags.isSet(HTML_FLAG) || mFlags.isSet(APPLET_FLAG)) {
-        rocApplet(fileList, nameList, outWriter, mFlags.isSet(HTML_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.getValue(TITLE_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG));
-      } else if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
+      if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
         System.setProperty("java.awt.headless", "true");
         createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG);
         createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG);
@@ -230,54 +212,6 @@ public class RocPlotCli extends AbstractCli {
       final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
       RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg);
     }
-  }
-
-  private static void rocApplet(ArrayList<File> fileList, ArrayList<String> nameList, BufferedWriter outWriter, boolean html, boolean scores, Object title, boolean hideSidepane, Integer lineWidthSetting) throws IOException {
-    if (html) {
-      outWriter.write(HTML_PREAMBLE);
-      outWriter.newLine();
-    }
-    outWriter.write("    <applet width=\"100%\" height=\"100%\" code=\"com.rtg.graph.RocApplet\" archive=\"/ROC.jar\">");
-    outWriter.newLine();
-    if (title != null) {
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_TITLE + "\" value=\"" + title + "\">");
-      outWriter.newLine();
-    }
-    if (scores) {
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_SCORES + "\" value=\"true\">");
-      outWriter.newLine();
-    }
-    if (hideSidepane) {
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_SIDEPANE + "\" value=\"true\">");
-      outWriter.newLine();
-    }
-    if (lineWidthSetting != null) {
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_LINEWIDTH + "\" value=\"" + lineWidthSetting + "\">");
-      outWriter.newLine();
-    }
-    for (int i = 0; i < fileList.size(); i++) {
-      final File file = fileList.get(i);
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_DATA + (i + 1) + "\" value=\"" + file + "\">");
-      outWriter.newLine();
-      final String name = nameList.get(i).length() > 0 ? nameList.get(i) : defaultNameFromFile(file);
-      outWriter.write("      <param name=\"" + RocApplet.PARAM_NAME + (i + 1) + "\" value=\"" + name + "\">");
-      outWriter.newLine();
-    }
-    outWriter.write("    </applet>");
-    outWriter.newLine();
-    if (html) {
-      outWriter.write(HTML_POSTAMBLE);
-      outWriter.newLine();
-    }
-  }
-
-  /**
-   * Extracts the directory name of a file. This is sometimes used as a default name when displaying tracks etc
-   * @param file the file
-   * @return the directory name
-   */
-  static String defaultNameFromFile(File file) {
-    return file.getParentFile() != null ? file.getParentFile().getName() : file.getPath();
   }
 
   static List<Pair<File, String>> parseNamedFileStrings(List<Object> curveStrings) {
