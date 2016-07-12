@@ -43,8 +43,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -78,8 +76,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.reeltwo.plot.Graph2D;
@@ -137,7 +133,7 @@ public class RocPlot {
   private final JLabel mStatusLabel;
 
   // Graph data and state
-  final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<String, DataBundle>());
+  final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<>());
   boolean mShowScores = true;
   int mLineWidth = 2;
 
@@ -274,42 +270,28 @@ public class RocPlot {
     rightPanel.add(new JLabel("Line Width", JLabel.CENTER), c);
     mLineWidthSlider.setSnapToTicks(true);
     mLineWidthSlider.setValue(mLineWidth);
-    mLineWidthSlider.addChangeListener(new ChangeListener() {
-      @Override
-      public void stateChanged(ChangeEvent e) {
-        mLineWidth = mLineWidthSlider.getValue();
-        showCurrentGraph();
-      }
+    mLineWidthSlider.addChangeListener(e -> {
+      mLineWidth = mLineWidthSlider.getValue();
+      showCurrentGraph();
     });
     rightPanel.add(mLineWidthSlider, c);
 
-    mScoreCB.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        mShowScores = mScoreCB.isSelected();
-        showCurrentGraph();
-      }
+    mScoreCB.addItemListener(e -> {
+      mShowScores = mScoreCB.isSelected();
+      showCurrentGraph();
     });
     mScoreCB.setAlignmentX(0);
     rightPanel.add(mScoreCB, c);
 
-    mSelectAllCB.addItemListener(new ItemListener() {
-      @Override
-      public void itemStateChanged(ItemEvent e) {
-        for (final Component component : mRocLinesPanel.getComponents()) {
-          final RocLinePanel cp = (RocLinePanel) component;
-          cp.setSelected(mSelectAllCB.isSelected());
-        }
+    mSelectAllCB.addItemListener(e -> {
+      for (final Component component : mRocLinesPanel.getComponents()) {
+        final RocLinePanel cp = (RocLinePanel) component;
+        cp.setSelected(mSelectAllCB.isSelected());
       }
     });
     mSelectAllCB.setSelected(true);
     mOpenButton.addActionListener(new LoadFileListener());
-    mCommandButton.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.out.println("Equivalent rocplot command:\n" + getCommand() + "\n");
-      }
-    });
+    mCommandButton.addActionListener(e -> System.out.println("Equivalent rocplot command:\n" + getCommand() + "\n"));
 
     final JPanel namePanel = new JPanel(new GridBagLayout());
     c.fill = GridBagConstraints.NONE;           c.anchor = GridBagConstraints.LINE_START;
@@ -353,7 +335,7 @@ public class RocPlot {
       if (prefs.getInt(CHOOSER_WIDTH, -1) != -1 && prefs.getInt(CHOOSER_HEIGHT, -1) != -1) {
         mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
       }
-      if (mFileChooser.showOpenDialog(mMainPanel) == JFileChooser.APPROVE_OPTION) {
+      if (mFileChooser.showOpenDialog(mMainPanel.getTopLevelAncestor()) == JFileChooser.APPROVE_OPTION) {
         final File f = mFileChooser.getSelectedFile();
         if (f != null) {
           try {
@@ -361,7 +343,7 @@ public class RocPlot {
             updateProgress();
             showCurrentGraph();
           } catch (final IOException | NoTalkbackSlimException e1) {
-            JOptionPane.showMessageDialog(mMainPanel,
+            JOptionPane.showMessageDialog(mMainPanel.getTopLevelAncestor(),
               "Could not open file: " + f.getPath() + "\n"
                 + (e1.getMessage().length() > 100 ? e1.getMessage().substring(0, 100) + "..." : e1.getMessage()),
               "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
@@ -467,14 +449,11 @@ public class RocPlot {
   }
 
   void showCurrentGraph() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        final Graph2D graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
-        maintainZoomMax(graph);
-        graph.addPlot(invisibleGraph());
-        mZoomPP.setGraph(graph, true);
-      }
+    SwingUtilities.invokeLater(() -> {
+      final Graph2D graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+      maintainZoomMax(graph);
+      graph.addPlot(invisibleGraph());
+      mZoomPP.setGraph(graph, true);
     });
   }
 
@@ -496,22 +475,14 @@ public class RocPlot {
     mProgressBarDelegate.done();
   }
 
-  public ProgressBarDelegate getProgressBarDelegate() {
-    return mProgressBarDelegate;
-  }
-
-
   /**
    * Set the title of the plot
    * @param title plot title
    */
   public void setTitle(final String title) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        mIconLabel.setText(title);
-        mTitleEntry.setText(title);
-      }
+    SwingUtilities.invokeLater(() -> {
+      mIconLabel.setText(title);
+      mTitleEntry.setText(title);
     });
   }
 
@@ -521,28 +492,7 @@ public class RocPlot {
    */
   public void showScores(boolean flag) {
     mShowScores = flag;
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        mScoreCB.setSelected(mShowScores);
-      }
-    });
-  }
-
-  /**
-   * Set whether to show the open file button
-   * @param flag show open file button
-   */
-  public void showOpenButton(boolean flag) {
-    mOpenButton.setVisible(flag);
-  }
-
-  /**
-   * Set whether to show the command dump button
-   * @param flag show command dump button
-   */
-  public void showCommandButton(boolean flag) {
-    mCommandButton.setVisible(flag);
+    SwingUtilities.invokeLater(() -> mScoreCB.setSelected(mShowScores));
   }
 
   /**
@@ -551,12 +501,7 @@ public class RocPlot {
    */
   public void setLineWidth(int width) {
     mLineWidth = width < LINE_WIDTH_MIN ? LINE_WIDTH_MIN : width > LINE_WIDTH_MAX ? LINE_WIDTH_MAX : width;
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        mLineWidthSlider.setValue(mLineWidth);
-      }
-    });
+    SwingUtilities.invokeLater(() -> mLineWidthSlider.setValue(mLineWidth));
   }
 
   /**
@@ -565,22 +510,6 @@ public class RocPlot {
    */
   public void setSplitPaneDividerLocation(double loc) {
     mSplitPane.setDividerLocation(loc);
-  }
-
-  /**
-   * Returns the main application panel
-   * @return main panel
-   */
-  public JPanel getMainPanel() {
-    return mMainPanel;
-  }
-
-  /**
-   * Returns the zooming part of the plot panel
-   * @return zoom plot panel
-   */
-  public InnerZoomPlot getZoomPlotPanel() {
-    return mZoomPP;
   }
 
   /**
@@ -727,26 +656,18 @@ public class RocPlot {
     });
     rp.showScores(scores);
     rp.setTitle(title == null ? "ROC" : title);
-    SwingUtilities.invokeAndWait(new Runnable() {
-      @Override
-      public void run() {
-        frame.pack();
-        frame.setSize(1024, 768);
-        frame.setLocation(50, 50);
-        frame.setVisible(true);
-        rp.showCurrentGraph();
-        if (hideSidePanel) {
-          rp.setSplitPaneDividerLocation(1.0);
-        }
+    SwingUtilities.invokeAndWait(() -> {
+      frame.pack();
+      frame.setSize(1024, 768);
+      frame.setLocation(50, 50);
+      frame.setVisible(true);
+      rp.showCurrentGraph();
+      if (hideSidePanel) {
+        rp.setSplitPaneDividerLocation(1.0);
       }
     });
     rp.loadData(fileList, nameList, true);
-    SwingUtilities.invokeAndWait(new Runnable() {
-      @Override
-      public void run() {
-        rp.mZoomPP.setGraph(new RocGraph2D(rp.mRocLinesPanel.plotOrder(), rp.mLineWidth, rp.mShowScores, rp.mData, rp.mTitleEntry.getText()), false);
-      }
-    });
+    SwingUtilities.invokeAndWait(() -> rp.mZoomPP.setGraph(new RocGraph2D(rp.mRocLinesPanel.plotOrder(), rp.mLineWidth, rp.mShowScores, rp.mData, rp.mTitleEntry.getText()), false));
     lock.await();
   }
 }
