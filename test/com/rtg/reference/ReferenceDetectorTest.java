@@ -33,24 +33,22 @@ package com.rtg.reference;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.reader.AnnotatedSequencesReader;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.Resources;
-import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-
-import junit.framework.TestCase;
 
 /**
  *
  */
-public class ReferenceDetectorTest extends TestCase {
+public class ReferenceDetectorTest extends AbstractNanoTest {
 
   public void test() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final String dna = FileHelper.resourceToString("com/rtg/reference/resources/testref.fasta");
+      final String dna = mNano.loadReference("testref.fasta");
       final File sdfDir = ReaderTestUtils.getDNADir(dna, new File(dir, "sdf"));
       final ReferenceDetector detector = ReferenceDetector.loadManifest(Resources.getResourceAsStream("com/rtg/reference/resources/testref.manifest"));
       try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(sdfDir)) {
@@ -58,7 +56,7 @@ public class ReferenceDetectorTest extends TestCase {
         detector.installReferenceConfiguration(reader);
         final File refTxt = new File(sdfDir, "reference.txt");
         assertTrue(refTxt.exists());
-        TestUtils.assertResourceEquals("com/rtg/reference/resources/testref-reference.txt", FileHelper.fileToString(refTxt));
+        mNano.check("testref-reference.txt", FileHelper.fileToString(refTxt), false);
       }
     }
   }
