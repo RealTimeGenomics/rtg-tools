@@ -174,7 +174,11 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     return (int) mSequenceManager.getDataLength();
   }
 
-
+  @Override
+  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+    mSequenceManager.seek(sequenceIndex + mStart);
+    return mSequenceManager.sequenceChecksum();
+  }
 
   private String readStringInternal(LabelStreamManager manager) throws IOException {
     final SeekableStream data = manager.getData();

@@ -100,24 +100,38 @@ public final class ReferenceDetector {
     protected boolean checkValue(SequencesReader reader, long seqId, String checkValue) throws IOException {
       return reader.length(seqId) == Long.parseLong(checkValue);
     }
-
   }
 
-  private enum CheckTypes {
-    LENGTH {
-      @Override
-      CheckType type() {
-        return CheckLength.SINGLETON;
-      }
-    },
-    CRC32 {
-      @Override
-      CheckType type() {
-        return null;
-      }
-    };
+  private static final class CheckChecksum extends CheckType {
 
-    abstract CheckType type();
+    private CheckChecksum() { }
+    private static final CheckChecksum SINGLETON = new CheckChecksum();
+
+    @Override
+    protected String typeName() {
+      return "CRC32";
+    }
+
+    @Override
+    protected boolean checkValue(SequencesReader reader, long seqId, String checkValue) throws IOException {
+      return reader.sequenceDataChecksum(seqId) == Byte.parseByte(checkValue);
+    }
+  }
+
+
+
+  private static CheckType getCheckType(ReferenceManifest.CheckTypes type) {
+    switch (type) {
+      case NAME:
+        //Name is required to look up the sequence in the first place, so it is checked as a side-effect of that
+        throw new IllegalArgumentException("Name is special case");
+      case LENGTH:
+        return CheckLength.SINGLETON;
+      case CRC32:
+        return CheckChecksum.SINGLETON;
+      default:
+        throw new IllegalArgumentException("Unrecognized check type");
+    }
   }
 
   private static class CheckValues {
@@ -201,7 +215,7 @@ public final class ReferenceDetector {
     }
     final List<CheckType> ret = new ArrayList<>();
     for (int i = 1; i < checks.length; i++) {
-      ret.add(CheckTypes.valueOf(checks[i].toUpperCase(Locale.getDefault())).type());
+      ret.add(getCheckType(ReferenceManifest.CheckTypes.valueOf(checks[i].toUpperCase(Locale.getDefault()))));
     }
     return ret;
   }

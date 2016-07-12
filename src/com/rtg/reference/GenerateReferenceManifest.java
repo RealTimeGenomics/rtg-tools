@@ -59,7 +59,8 @@ public class GenerateReferenceManifest extends AbstractCli {
 
   private static final ReferenceManifest.CheckTypes[] CHECKS = {
     ReferenceManifest.CheckTypes.NAME,
-    ReferenceManifest.CheckTypes.LENGTH
+    ReferenceManifest.CheckTypes.LENGTH,
+    ReferenceManifest.CheckTypes.CRC32
   };
 
   private interface GetCheckValue {
@@ -69,6 +70,7 @@ public class GenerateReferenceManifest extends AbstractCli {
   private static GetCheckValue checkValueFactory(ReferenceManifest.CheckTypes type) {
     switch (type) {
       case NAME:
+        //name is required to look up the sequence, so it is found from there
         throw new IllegalArgumentException("Special case, shouldn't be used here");
       case LENGTH:
         return new GetCheckValue() {
@@ -78,7 +80,12 @@ public class GenerateReferenceManifest extends AbstractCli {
           }
         };
       case CRC32:
-        throw new UnsupportedOperationException("Not implemented yet");
+        return new GetCheckValue() {
+          @Override
+          public String getValue(SequencesReader reader, long seqId) throws IOException {
+            return Byte.toString(reader.sequenceDataChecksum(seqId));
+          }
+        };
       default:
         throw new RuntimeException("Unregcognized value");
     }

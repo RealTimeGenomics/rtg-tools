@@ -96,6 +96,12 @@ public abstract class DummySequencesReader implements SequencesReader {
   public int length(long sequenceIndex) {
     return 0;
   }
+
+  @Override
+  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+    return 0;
+  }
+
   @Override
   public long lengthBetween(long start, long end) {
     return 0;

@@ -144,6 +144,7 @@ public class MockSequencesReader extends DummySequencesReader {
     }
     return 0;
   }
+
   @Override
   public String name(long index) {
     return "seq" + index;

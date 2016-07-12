@@ -178,6 +178,12 @@ public class AlternatingSequencesReader implements SequencesReader {
   public int length(long sequenceIndex) throws IOException {
     return select(sequenceIndex).length(sequenceIndex / 2);
   }
+
+  @Override
+  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+    return select(sequenceIndex).sequenceDataChecksum(sequenceIndex / 2);
+  }
+
   @Override
   public String name(long sequenceIndex) throws IOException {
     return select(sequenceIndex).name(sequenceIndex / 2);

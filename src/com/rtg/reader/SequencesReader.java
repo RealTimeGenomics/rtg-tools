@@ -202,6 +202,14 @@ public interface SequencesReader extends AutoCloseable {
   int length(long sequenceIndex) throws IOException;
 
   /**
+   * Returns the checksum associated with the requested sequence
+   * @param sequenceIndex index of sequence
+   * @return first byte of CRC32 checksum produced from sequence data
+   * @throws IOException if an IO error occurs
+   */
+  byte sequenceDataChecksum(long sequenceIndex) throws IOException;
+
+  /**
    * Get the name of the specified sequence.
    * Will never be null and will always be 1 or more characters in length.
    * The set of characters that can occur in the name will be restricted to the

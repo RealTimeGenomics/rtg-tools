@@ -116,6 +116,15 @@ public final class DataInMemory {
   }
 
   /**
+   * @param seqId sequence id
+   * @return the checksum for given sequence
+   */
+  public byte sequenceChecksum(int seqId) {
+    seq(seqId);
+    return mSequenceChecksums[mStartFileNo][mStartIndex];
+  }
+
+  /**
    * Read sequence data
    * @param seq the sequence id
    * @param dest the destination array for data

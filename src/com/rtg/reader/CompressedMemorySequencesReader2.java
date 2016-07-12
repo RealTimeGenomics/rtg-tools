@@ -149,6 +149,11 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
+  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+    return mData.sequenceChecksum((int) sequenceIndex);
+  }
+
+  @Override
   public String name(long sequenceIndex) {
     return mNames.name(sequenceIndex);
   }
