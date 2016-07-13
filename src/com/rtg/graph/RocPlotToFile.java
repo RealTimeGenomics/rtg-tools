@@ -67,7 +67,7 @@ public final class RocPlotToFile {
     for (int i = 0; i < fileList.size(); i++) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
-      final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getCanonicalPath(), false);
+      final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), false);
       RocPlot.setBundleTitle(db, f, name);
       data.put(db.getTitle(), db);
     }

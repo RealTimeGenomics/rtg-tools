@@ -137,8 +137,10 @@ public class RocPlot {
   boolean mShowScores = true;
   int mLineWidth = 2;
 
-  private float mMaxXHi = -1.0f;
-  private float mMaxYHi = -1.0f;
+  private float mMaxX = Float.NaN;
+  private float mMaxY = Float.NaN;
+  private float mMinX = Float.NaN;
+  private float mMinY = Float.NaN;
 
   private final JScrollPane mScrollPane;
 
@@ -185,7 +187,7 @@ public class RocPlot {
     mTitleEntry = new JTextField("ROC");
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
     mOpenButton = new JButton("Open...");
-    mOpenButton.setToolTipText("Add a new ROC curve from a file");
+    mOpenButton.setToolTipText("Add a new curve from a file");
     mCommandButton = new JButton("Cmd");
     mCommandButton.setToolTipText("Send the equivalent rocplot command-line to the terminal");
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
@@ -401,7 +403,6 @@ public class RocPlot {
     }
   }
 
-  // Adds the notion of the baseline total number of variants, for calculating sensitivity
   @JumbleIgnore
   static class RocGraph2D extends Graph2D {
     private final int mMaxVariants;
@@ -443,6 +444,7 @@ public class RocPlot {
       mMaxVariants = maxVariants;
     }
 
+    // Total number of variants for calculating sensitivity at crosshair location
     public int getMaxVariants() {
       return mMaxVariants;
     }
@@ -451,8 +453,12 @@ public class RocPlot {
   void showCurrentGraph() {
     SwingUtilities.invokeLater(() -> {
       final Graph2D graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
-      maintainZoomMax(graph);
-      graph.addPlot(invisibleGraph());
+      if (graph.getPlots().length > 0) {
+        maintainZoomBounds(graph);
+      }
+      if (!Float.isNaN(mMaxX)) {
+        graph.addPlot(invisibleGraph());
+      }
       mZoomPP.setGraph(graph, true);
     });
   }
@@ -460,15 +466,24 @@ public class RocPlot {
   private Plot2D invisibleGraph() {
     // Invisible graph to maintain graph size when no lines are shown
     final PointPlot2D plot = new PointPlot2D();
-    plot.setData(Arrays.asList(new Point2D(0, 0), new Point2D(mMaxXHi, mMaxYHi)));
+    plot.setData(Arrays.asList(new Point2D(mMinX, mMinY), new Point2D(mMaxX, mMaxY)));
     plot.setLines(false);
     plot.setPoints(false);
     return plot;
   }
 
-  private void maintainZoomMax(Graph2D graph) {
-    mMaxXHi = Math.max(mMaxXHi, graph.getHi(Graph2D.X, Graph2D.ONE));
-    mMaxYHi = Math.max(mMaxYHi, graph.getHi(Graph2D.Y, Graph2D.ONE));
+  private void maintainZoomBounds(Graph2D graph) {
+    if (Float.isNaN(mMaxX)) {
+      mMaxX = graph.getHi(Graph2D.X, Graph2D.ONE);
+      mMaxY = graph.getHi(Graph2D.Y, Graph2D.ONE);
+      mMinX = graph.getLo(Graph2D.X, Graph2D.ONE);
+      mMinY = graph.getLo(Graph2D.Y, Graph2D.ONE);
+    } else {
+      mMaxX = Math.max(mMaxX, graph.getHi(Graph2D.X, Graph2D.ONE));
+      mMaxY = Math.max(mMaxY, graph.getHi(Graph2D.Y, Graph2D.ONE));
+      mMinX = Math.min(mMinX, graph.getLo(Graph2D.X, Graph2D.ONE));
+      mMinY = Math.min(mMinY, graph.getLo(Graph2D.Y, Graph2D.ONE));
+    }
   }
 
   void updateProgress() {
@@ -533,7 +548,7 @@ public class RocPlot {
 
   private void loadFile(final File f, final String name, boolean showProgress) throws IOException {
     mFileChooserParent = f.getParentFile();
-    final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getCanonicalPath(), showProgress);
+    final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getAbsolutePath(), showProgress);
     setBundleTitle(data, f, name);
     addLine(f.getAbsolutePath(), data);
   }
@@ -543,15 +558,15 @@ public class RocPlot {
       data.setTitle(name);
     } else {
       final StringBuilder autoname = new StringBuilder();
-      autoname.append(f.getCanonicalFile().getParentFile().getName());
+      autoname.append(f.getAbsoluteFile().getParentFile().getName());
 
-      final String path = f.getCanonicalFile().getName();
-      final int rocIdx = path.indexOf(RocFilter.ROC_EXT);
-      if (rocIdx != -1 && !path.startsWith(RocFilter.ALL.fileName())) {
+      final String fname = f.getName();
+      final int rocIdx = fname.indexOf(RocFilter.ROC_EXT);
+      if (rocIdx != -1 && !fname.startsWith(RocFilter.ALL.fileName())) {
         if (autoname.length() > 0) {
           autoname.append(' ');
         }
-        autoname.append(path.substring(0, rocIdx));
+        autoname.append(fname.substring(0, rocIdx));
       }
 
       if (data.getScoreName() != null) {
