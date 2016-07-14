@@ -30,6 +30,8 @@
 package com.rtg.vcf;
 
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
@@ -38,52 +40,128 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.rtg.util.Resources;
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.VcfHeader;
+
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 /**
  * Filter than runs supplied Javascript to determine if record should be accepted
  */
 public class ScriptedVcfFilter implements VcfFilter {
+  /** Name of the end function */
+  public static final String END = "end";
+  /** Name of the record function */
+  private static final String RECORD = "record";
+
   private final ScriptEngine mEngine;
-  private final CompiledScript mCompile;
-  private VcfHeader mHeader;
+  private final CompiledScript mCompiledExpression;
+  private final List<CompiledScript> mBeginnings = new ArrayList<>();
+  private ScriptObjectMirror mRecordFunction;
+
 
   /**
    * @param expression script to run to determine if record should be accepted
+   * @param beginnings initialisation scripts to run at start of processing
    */
-  public ScriptedVcfFilter(String expression) {
+  public ScriptedVcfFilter(String expression, List<String> beginnings) {
     final ScriptEngineManager manager = new ScriptEngineManager();
-    try {
-      mEngine = manager.getEngineByName("js");
-      if (mEngine == null || !(mEngine instanceof Compilable)) {
-        throw new NoTalkbackSlimException("No compatible javascript engine available");
+    mEngine = manager.getEngineByName("js");
+    if (mEngine == null || !(mEngine instanceof Compilable)) {
+      throw new NoTalkbackSlimException("No compatible javascript engine available");
+    }
+    final Compilable compileable = (Compilable) mEngine;
+    if (expression == null) {
+      mCompiledExpression = null;
+    } else {
+      try {
+        mCompiledExpression = compileable.compile(expression);
+      } catch (ScriptException e) {
+        throw new NoTalkbackSlimException("Could not evaluate the provided expression" + StringUtils.LS + e.getMessage());
       }
-      final Compilable compileable = (Compilable) mEngine;
-      mCompile = compileable.compile(expression);
-    } catch (ScriptException e) {
-      throw new NoTalkbackSlimException("Could not evaluate the provided expression" + e.getMessage());
+    }
+    for (String beginning : beginnings) {
+      try {
+        mBeginnings.add(compileable.compile(beginning));
+      } catch (ScriptException e) {
+        throw new NoTalkbackSlimException("Could not evaluate the beginning expression" + StringUtils.LS + e.getMessage());
+      }
     }
   }
 
   @Override
   public boolean accept(VcfRecord record) {
+    if (mCompiledExpression == null && mRecordFunction == null) {
+      return true;
+    }
+    mEngine.put("rec", record);
+    return invokeRecordFunction(record) && invokeExpression(record);
+  }
+
+  private Boolean invokeExpression(VcfRecord record) {
+    if (mCompiledExpression == null) {
+      return true;
+    }
     try {
-      mEngine.put("rec", record);
-      return Boolean.valueOf(mCompile.eval().toString());
+      final Object eval = mCompiledExpression.eval();
+        return eval == null || Boolean.valueOf(eval.toString());
     } catch (ScriptException e) {
-      throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + " |" + e.getMessage());
+      throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + e.getMessage());
+    }
+  }
+
+  private boolean invokeRecordFunction(VcfRecord record) {
+    if (mRecordFunction == null) {
+      return true;
+    }
+    try {
+      final Object o = mRecordFunction.call(null);
+      return o == null || Boolean.valueOf(o.toString());
+    } catch (RuntimeException e) {
+      throw new NoTalkbackSlimException("Can't evaluate record function against : " + record + StringUtils.LS + e.getMessage());
     }
   }
 
   @Override
   public void setHeader(VcfHeader header) {
-    mHeader = header;
-    mEngine.put("header", mHeader);
+    mEngine.put("header", header);
     try {
       mEngine.eval(new InputStreamReader(Resources.getResourceAsStream("com/rtg/vcf/resources/vcf_filter_preamble.js")));
     } catch (ScriptException e) {
-      throw new NoTalkbackSlimException("Could not evaluate the content of preamble." + e.getMessage());
+      throw new NoTalkbackSlimException("Error evaluating preamble" + StringUtils.LS + e.getMessage());
+    }
+    for (CompiledScript begin : mBeginnings) {
+      try {
+        begin.eval();
+      } catch (ScriptException e) {
+        throw new NoTalkbackSlimException("Error running begin script" + StringUtils.LS + e.getMessage());
+      }
+    }
+    mRecordFunction = getFunction(RECORD);
+  }
+
+  private ScriptObjectMirror getFunction(String functionName) {
+    final Object function = mEngine.get(functionName);
+    if (function == null || !(function instanceof ScriptObjectMirror)) {
+      return null;
+    }
+    final ScriptObjectMirror mirror = (ScriptObjectMirror) function;
+    return mirror.isFunction() ? mirror : null;
+  }
+
+  /**
+   * Invoke at the end of processing to run the ending scripts
+   */
+  public void end() {
+    final ScriptObjectMirror end = getFunction(END);
+    if (end != null) {
+      try {
+        end.call(null);
+      } catch (RuntimeException e) {
+        throw new NoTalkbackSlimException("Can't evaluate end function: " + StringUtils.LS + e.getMessage());
+      }
     }
   }
+
 }

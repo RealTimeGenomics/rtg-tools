@@ -65,7 +65,7 @@ public class ScriptedVcfFilterTest extends TestCase {
   }
 
   private ScriptedVcfFilter getScriptedVcfFilter(String expression, VcfHeader header) {
-    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression);
+    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Collections.emptyList());
     scriptedVcfFilter.setHeader(header);
     return scriptedVcfFilter;
   }
