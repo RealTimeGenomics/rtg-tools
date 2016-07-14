@@ -45,7 +45,18 @@ public final class ReferenceManifest {
 
   private ReferenceManifest() { }
 
-  private static final String MANIFEST_LIST = "com/rtg/reference/resources/manifest.list";
+  private static final String RESOURCE_PATH = "com/rtg/reference/resources";
+
+  private static final String MANIFEST_LIST = RESOURCE_PATH + "/manifest.list";
+
+  private static final String NAME_PATH = RESOURCE_PATH + "/namelookup";
+
+  private static final String NAME_NUMBERS_LIST = NAME_PATH + "/numbers.list";
+
+  private static final String NAME_SEX_LIST = NAME_PATH + "/sex.list";
+
+  /** Number of sequences an SDF can have before it is excluded from manifest checking */
+  public static final int MAX_SEQUENCE_NAMES = 200000;
 
   /**
    * Types of checks that may be in a reference manifest
@@ -65,15 +76,38 @@ public final class ReferenceManifest {
    * @throws IOException if an IO error occurs
    */
   public static List<ReferenceDetector> getReferenceDetectors() throws IOException {
+    return getReferenceDetectors(RESOURCE_PATH, MANIFEST_LIST);
+  }
+
+  /**
+   * Get the list of chromosome name reference manifest detectors
+   * @return a list of reference detectors
+   * @throws IOException if an IO error occurs
+   */
+  public static List<ReferenceDetector> getChromosomeNumberDetectors() throws IOException {
+    return getReferenceDetectors(NAME_PATH, NAME_NUMBERS_LIST);
+  }
+
+  /**
+   * Get the list of chromosome sex reference manifest detectors
+   * @return a list of reference detectors
+   * @throws IOException if an IO error occurs
+   */
+  public static List<ReferenceDetector> getChromosomeSexDetectors() throws IOException {
+    return getReferenceDetectors(NAME_PATH, NAME_SEX_LIST);
+  }
+
+  private static List<ReferenceDetector> getReferenceDetectors(String path, String list) throws IOException {
     final List<ReferenceDetector> ret = new ArrayList<>();
-    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Resources.getResourceAsStream(MANIFEST_LIST)))) {
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(Resources.getResourceAsStream(list)))) {
       String line;
       while ((line = reader.readLine()) != null) {
-        try (InputStream stream = Resources.getResourceAsStream("com/rtg/reference/resources/" + line)) {
+        try (InputStream stream = Resources.getResourceAsStream(path + "/" + line)) {
           ret.add(ReferenceDetector.loadManifest(stream));
         }
       }
     }
     return ret;
   }
+
 }

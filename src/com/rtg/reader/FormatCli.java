@@ -44,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -463,13 +464,39 @@ public final class FormatCli extends LoggedCli {
       final Counts outputCounts = new Counts(writer.getNumberOfSequences(), writer.getTotalLength(), writer.getMaxLength(), writer.getMinLength());
       mNumSequences = mInputFormat.isPairedSam() ? writer.getNumberOfSequences() / 2 : writer.getNumberOfSequences();
       writeStats(files.toArray(new File[files.size()]), mInputFormat.isPairedSam(), inputCounts, outputCounts, writer.getSdfId(), ds.getDusted());
+      checkAndInstallReferenceDescription();
+    }
+
+    private void checkAndInstallReferenceDescription() throws IOException {
       if (ReaderUtils.isSDF(mOutDir) && !ReaderUtils.isPairedEndDirectory(mOutDir)) {
         try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(mOutDir)) {
-          for (ReferenceDetector referenceDetector : ReferenceManifest.getReferenceDetectors()) {
-            if (referenceDetector.checkReference(reader)) {
-              mOut.println("Detected: '" + referenceDetector.getDesc() + "', installing reference.txt");
-              referenceDetector.installReferenceConfiguration(reader);
-              break;
+          final Map<String, Long> sequenceNameMap = ReferenceDetector.getSequenceNameMap(reader);
+          if (sequenceNameMap != null) {
+            boolean installed = false;
+            for (ReferenceDetector referenceDetector : ReferenceManifest.getReferenceDetectors()) {
+              if (referenceDetector.checkReference(reader, sequenceNameMap)) {
+                Diagnostic.info("Detected: '" + referenceDetector.getDesc() + "', installing reference.txt");
+                referenceDetector.installReferenceConfiguration(reader);
+                installed = true;
+                break;
+              }
+            }
+            if (!installed) {
+              boolean numbers = false;
+              for (ReferenceDetector detector : ReferenceManifest.getChromosomeNumberDetectors()) {
+                if (detector.checkReference(reader, sequenceNameMap)) {
+                  numbers = true;
+                }
+              }
+              boolean sex = false;
+              for (ReferenceDetector detector : ReferenceManifest.getChromosomeSexDetectors()) {
+                if (detector.checkReference(reader, sequenceNameMap)) {
+                  sex = true;
+                }
+              }
+              if (numbers && sex) {
+                Diagnostic.info("This looks like a genome reference, you can enable sex-aware processing by installing a reference.txt containing chromosome metadata.  See the user manual for more information.");
+              }
             }
           }
         }

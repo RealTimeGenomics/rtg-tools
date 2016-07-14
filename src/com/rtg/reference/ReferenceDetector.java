@@ -156,27 +156,51 @@ public final class ReferenceDetector {
   }
 
   /**
+   * Returns a map of sequence names to ID's if appropriate, null otherwise
+   * @param reader reader to acquire names from
+   * @return the map, or null if names are unavailable or there are too many sequences
+   * @throws IOException if an IO error occurs
+   */
+  public static Map<String, Long> getSequenceNameMap(SequencesReader reader) throws IOException {
+    if (reader.hasNames() && reader.numberSequences() <= ReferenceManifest.MAX_SEQUENCE_NAMES) {
+      return ReaderUtils.getSequenceNameMap(reader);
+    }
+    return null;
+  }
+
+  /**
+   * Checks whether given sequences reader matches criteria from loaded manifest
+   * @param sr sequences to check
+   * @param sequenceNameMap map of sequence names to ID's for <code>sr</code>
+   * @return true if sequences match
+   * @throws IOException if an IO error occurs
+   */
+  public boolean checkReference(SequencesReader sr, Map<String, Long> sequenceNameMap) throws IOException {
+    for (CheckValues cv : mValues) {
+      if (!sequenceNameMap.containsKey(cv.getSequenceName())) {
+        return false;
+      }
+      final long sequenceId = sequenceNameMap.get(cv.getSequenceName());
+      for (int i = 0; i < mChecks.size(); i++) {
+        final CheckType check = mChecks.get(i);
+        if (!check.checkValue(sr, sequenceId, cv.getValue(i))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
    * Checks whether given sequences reader matches criteria from loaded manifest
    * @param sr sequences to check
    * @return true if sequences match
    * @throws IOException if an IO error occurs
    */
   public boolean checkReference(SequencesReader sr) throws IOException {
-    if (sr.hasNames()) {
-      final Map<String, Long> sequenceNameMap = ReaderUtils.getSequenceNameMap(sr);
-      for (CheckValues cv : mValues) {
-        if (!sequenceNameMap.containsKey(cv.getSequenceName())) {
-          return false;
-        }
-        final long sequenceId = sequenceNameMap.get(cv.getSequenceName());
-        for (int i = 0; i < mChecks.size(); i++) {
-          final CheckType check = mChecks.get(i);
-          if (!check.checkValue(sr, sequenceId, cv.getValue(i))) {
-            return false;
-          }
-        }
-      }
-      return true;
+    final Map<String, Long> sequenceNameMap = getSequenceNameMap(sr);
+    if (sequenceNameMap != null) {
+      return checkReference(sr, sequenceNameMap);
     }
     return false;
   }
