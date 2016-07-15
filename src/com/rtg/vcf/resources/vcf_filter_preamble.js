@@ -193,4 +193,18 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     });
     global.samples = sampleNames;
 
+    global.ensureFormatHeader = function (format) {
+        var formatField = new FormatField(format);
+        header.ensureContains(formatField);
+        var id = formatField.getId();
+        var stringProps = {};
+        stringProps[id] = {get: stringGetFunction(id), set: stringSetFunction(id)};
+        Object.defineProperties(String.prototype, stringProps);
+    };
+    global.ensureInfoHeader = function (info) {
+        var infoField = new InfoField(info);
+        header.ensureContains(infoField);
+        var id = infoField.getId();
+        Object.defineProperty(global.INFO, id, {get: infoGet(id), set: infoSet(id)});
+    };
 })(this);
