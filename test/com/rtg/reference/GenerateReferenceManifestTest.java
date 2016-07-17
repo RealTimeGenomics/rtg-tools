@@ -51,7 +51,7 @@ public class GenerateReferenceManifestTest extends TestCase {
       final String dna = FileHelper.resourceToString("com/rtg/reference/resources/testref.fasta");
       final File sdfDir = ReaderTestUtils.getDNADir(dna, new File(dir, "sdf"));
       final StringWriter writer = new StringWriter();
-      GenerateReferenceManifest.generateManifest(sdfDir, "com/rtg/reference/resources/testref-reference.txt", writer);
+      GenerateReferenceManifest.generateManifest(sdfDir, "com/rtg/reference/resources/testref-reference.txt", writer, null);
       final String exp = StringUtils.grepMinusV(FileHelper.resourceToString("com/rtg/reference/resources/testref.manifest"), "@desc");
       final String actual = StringUtils.grepMinusV(writer.toString(), "@desc");
       assertEquals(exp, actual);

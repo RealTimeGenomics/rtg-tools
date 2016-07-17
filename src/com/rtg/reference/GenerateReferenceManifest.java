@@ -59,9 +59,9 @@ public class GenerateReferenceManifest extends AbstractCli {
 
   private static final ReferenceManifest.CheckTypes[] CHECKS = {
     ReferenceManifest.CheckTypes.NAME,
-    ReferenceManifest.CheckTypes.LENGTH,
-    ReferenceManifest.CheckTypes.CRC32
+    ReferenceManifest.CheckTypes.LENGTH
   };
+  private static final String DESCRIPTION_FLAG = "description";
 
   private interface GetCheckValue {
     String getValue(SequencesReader reader, long seqId) throws IOException;
@@ -96,16 +96,18 @@ public class GenerateReferenceManifest extends AbstractCli {
    * @param sdfDir directory of reference SDF
    * @param refTxtResource resource path to reference description file
    * @param writer writer to write output reference manifest
+   * @param description description for the manifest
    * @throws IOException if an IO error occurs
    */
-  public static void generateManifest(File sdfDir, String refTxtResource, Writer writer) throws IOException {
+  public static void generateManifest(File sdfDir, String refTxtResource, Writer writer, String description) throws IOException {
+    final String descUse = description != null ? description : ("Generated from " + sdfDir);
     try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(sdfDir)) {
       if (reader.hasNames() && reader.numberSequences() <= ReferenceManifest.MAX_SEQUENCE_NAMES) {
         try (InputStreamReader refReader = new InputStreamReader(Resources.getResourceAsStream(refTxtResource))) {
           final Map<String, Long> names = ReaderUtils.getSequenceNameMap(reader);
           final ReferenceGenome ref = new ReferenceGenome(reader, refReader, Sex.MALE);
           writer.write("#ref-manifest v2.0\n");
-          writer.write("@desc\tGenerated from " + sdfDir + "\n");
+          writer.write("@desc\t" + descUse + "\n");
           writer.write("@source\t" + refTxtResource + "\n");
           writer.write("@checks\t" + Arrays.stream(CHECKS).map(t -> t.name().toLowerCase(Locale.getDefault())).collect(Collectors.joining("\t")) + "\n");
           final GetCheckValue[] getters = new GetCheckValue[CHECKS.length - 1];
@@ -138,6 +140,7 @@ public class GenerateReferenceManifest extends AbstractCli {
     flags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "Reference to generate manifest for").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerRequired(String.class, CommonFlags.STRING, "Resource name of reference description").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.FILE, "Output file name or - for standard out").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerOptional('d', DESCRIPTION_FLAG, String.class, "STRING", "description for manifest");
   }
 
   private static Writer getFileWriter(File out) throws IOException {
@@ -151,7 +154,7 @@ public class GenerateReferenceManifest extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final File outFile = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
     try (Writer writer = getFileWriter(outFile)) {
-      generateManifest((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG), (String) mFlags.getAnonymousValue(0), writer);
+      generateManifest((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG), (String) mFlags.getAnonymousValue(0), writer, (String) mFlags.getValue(DESCRIPTION_FLAG));
     }
     return 0;
   }
