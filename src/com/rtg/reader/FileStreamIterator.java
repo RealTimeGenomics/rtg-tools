@@ -38,7 +38,6 @@ import java.util.List;
 
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
-import com.rtg.util.diagnostic.InformationType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 
@@ -81,7 +80,7 @@ class FileStreamIterator implements Iterator<InputStream> {
         if (mMaxCount == 1) {
           Diagnostic.info("Processing " + mProcessLabel + "\"" + mNextFile.toString() + "\"");
         } else {
-          Diagnostic.info(InformationType.PROCESSING_ITEM_N_OF_N, true, mProcessLabel, mNextFile.toString(), Integer.toString(mCounter), Integer.toString(mMaxCount));
+          Diagnostic.progress(String.format("Processing \"%s\" (%d of %d)", mNextFile.toString(), mCounter, mMaxCount));
         }
       } catch (final FileNotFoundException fnfe) {
         throw new NoTalkbackSlimException("The file: \"" + mNextFile.getPath() + "\" either could not be found or could not be opened. The underlying error message is: \"" + fnfe.getMessage() + "\"");
