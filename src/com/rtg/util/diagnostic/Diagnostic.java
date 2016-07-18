@@ -259,17 +259,6 @@ public final class Diagnostic {
   }
 
   /**
-   * Deal with an <code>IOException</code>
-   * @param e the exception that is causing all the fuss.
-   * @param directory original directory where the file is being read from.
-   * @return an exception which will usually be thrown by a caller.
-   */
-  public static SlimException ioReadException(final IOException e, final String directory) {
-    //TODO attempt to diagnose the IOException
-    return new NoTalkbackSlimException(ErrorType.READING_ERROR, directory);
-  }
-
-  /**
    * Set the stream to which logging messages are sent to null.  This is permissible,
    * but unadvisable, as setting it to null causes all
    * logging information to be discarded.   By default to logging stream
