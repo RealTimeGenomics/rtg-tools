@@ -28,54 +28,16 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.internal.RealSystem;
-import org.junit.internal.TextListener;
-import org.junit.runner.JUnitCore;
-import org.junit.runner.Result;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 import org.junit.runners.model.InitializationError;
 
 /**
- * Test suite for running all tests. Run from the command
- * line with:
- * <pre>
  *
- * java AllTests
- *
- * or
- *
- * java -Djunit.package.prefix=com.rtg.util.io AllTests (to run all tests under com.rtg.util)
- *
- * </pre>
  */
-public class AllTests {
-  @SuppressWarnings("unchecked")
-  public static void main(final String[] args) throws ClassNotFoundException, InitializationError {
-    final JUnitCore jUnitCore = new JUnitCore();
-    jUnitCore.addListener(new TextListener(new RealSystem()));
-    List<Result> results = new ArrayList<>();
-    if (args.length > 0) {
-      for (final String arg : args) {
-        final Class<?> klass = ClassLoader.getSystemClassLoader().loadClass(arg);
-        System.err.println(klass.getName());
-        results.add(jUnitCore.run(klass));
-      }
-    } else {
-      final Class<?>[] classes = getClasses();
-      results.add(jUnitCore.run(classes));
-    }
-    for (Result result : results) {
-      if (!result.wasSuccessful()) {
-        System.exit(1);
-      }
-    }
+@RunWith(AllTests.class)
+public class AllTests extends Suite {
+  public AllTests(Class<?> klass) throws InitializationError {
+    super(klass, RtgTestEntry.getClasses());
   }
-
-  public static Class<?>[] getClasses() {
-    final List<Class<?>> testClasses = new ClassPathSuite().getTestClasses();
-    return testClasses.toArray(new Class<?>[testClasses.size()]);
-  }
-
 }

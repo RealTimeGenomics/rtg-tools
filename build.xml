@@ -284,7 +284,7 @@
   </target>
 
   <target name="rtg-all.jar" depends="compile,set-rtg-build-version,set-rtg-build-product" description="Create jar including tests.">
-    <rtg-jar main="AllTests" file="${build.dir}/rtg-all.jar" refid="jar-test"/>
+    <rtg-jar main="RtgTestEntry" file="${build.dir}/rtg-all.jar" refid="jar-test"/>
   </target>
 
   <target name="javadoc" depends="compile-src" description="Build javadocs">
