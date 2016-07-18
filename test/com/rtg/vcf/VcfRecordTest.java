@@ -32,36 +32,15 @@ package com.rtg.vcf;
 
 import static com.rtg.util.StringUtils.TAB;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
-import com.rtg.util.StringUtils;
-import com.rtg.vcf.header.FormatField;
-import com.rtg.vcf.header.MetaType;
-import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfHeaderMerge;
-import com.rtg.vcf.header.VcfNumber;
 
 import junit.framework.TestCase;
 
 /**
  */
 public class VcfRecordTest extends TestCase {
-
-  private static final String VCF_RECORD_FORMAT = "%1$s\t%2$d\t.\t%3$s\t%4$s\t.\tPASS\t.\tGT:E1:E2\t%5$d/%6$d:.:.";
-
-  private static VcfRecord createRecord(String chrom, int pos, String ref, int gt1, int gt2, String... alts) {
-    final String altsStr = StringUtils.implode(alts, ",", false);
-    return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT, chrom, pos, ref, altsStr, gt1, gt2));
-  }
-
-  private static final String VCF_RECORD_FORMAT_MISSING = "%1$s\t%2$d\t.\t%3$s\t.\t.\tPASS\t.\tGT:E1:E2\t.";
-
-  private static VcfRecord createRecord(String chrom, int pos, String ref) {
-    return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT_MISSING, chrom, pos, ref));
-  }
 
   public VcfRecordTest(String name) {
     super(name);
@@ -149,167 +128,15 @@ public class VcfRecordTest extends TestCase {
     }
   }
 
-  public void testMerge() {
-    final VcfHeader h1 = new VcfHeader();
-    h1.addSampleName("sample1");
-    final VcfHeader h2 = new VcfHeader();
-    h2.addSampleName("sample2");
-    final VcfHeader mh = new VcfHeader();
-    mh.addSampleName("sample1");
-    mh.addSampleName("sample2");
-    VcfRecord r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    VcfRecord r2 = createRecord("chr1", 50, "A", 0, 1, "G");
-    VcfRecord[] mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(1, mergedArr.length);
-    VcfRecord merged = mergedArr[0];
-    assertEquals("chr1", merged.getSequenceName());
-    assertEquals("A", merged.getRefCall());
-    assertEquals(50, merged.getOneBasedStart());
-    assertEquals(2, merged.getAltCalls().size());
-    assertEquals("C", merged.getAltCalls().get(0));
-    assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(2, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("0/2", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
-
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(1, mergedArr.length);
-    merged = mergedArr[0];
-    assertEquals("chr1", merged.getSequenceName());
-    assertEquals("A", merged.getRefCall());
-    assertEquals(50, merged.getOneBasedStart());
-    assertEquals(2, merged.getAltCalls().size());
-    assertEquals("C", merged.getAltCalls().get(0));
-    assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(2, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("2/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
-
-    // Outputs separate records due to different REF
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "AC", 1, 2, "GG", "CG");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    checkRecord(mergedArr[0], r1, new String[] {"0/1", "."});
-    checkRecord(mergedArr[1], r2, new String[] {".", "1/2"});
-
-    // Outputs separate records due to different REF
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "AC", 1, 1, "AC"); //this tests the repair of a buggy case
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    checkRecord(mergedArr[0], r1, new String[] {"0/1", "."});
-    checkRecord(mergedArr[1], r2, new String[0], new String[] {".", "0/0"});
-
-    //test blank filling
-    mh.addSampleName("sample3");
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "AC", 1, 1, "AC");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    checkRecord(mergedArr[0], r1, new String[] {"0/1", "."});
-    checkRecord(mergedArr[1], r2, new String[0], new String[] {".", "0/0"});
-
-    //test reading of GT containing missing values
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "A");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(1, mergedArr.length);
-    merged = mergedArr[0];
-    assertEquals("chr1", merged.getSequenceName());
-    assertEquals("A", merged.getRefCall());
-    assertEquals(50, merged.getOneBasedStart());
-    assertEquals(1, merged.getAltCalls().size());
-    assertEquals("C", merged.getAltCalls().get(0));
-    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
-
-    //test merge handling with multiple refs, some mergeable, some not
-    final VcfHeader h3 = new VcfHeader();
-    h3.addSampleName("sample3");
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
-    final VcfRecord r3 = createRecord("chr1", 50, "AC", 0, 1, "AG");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2, r3}, new VcfHeader[] {h1, h2, h3}, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    merged = mergedArr[0];
-    assertEquals("chr1", merged.getSequenceName());
-    assertEquals("A", merged.getRefCall());
-    assertEquals(50, merged.getOneBasedStart());
-    assertEquals(2, merged.getAltCalls().size());
-    assertEquals("C", merged.getAltCalls().get(0));
-    assertEquals("G", merged.getAltCalls().get(1));
-    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals("2/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
-    merged = mergedArr[1];
-    assertEquals("chr1", merged.getSequenceName());
-    assertEquals("AC", merged.getRefCall());
-    assertEquals(50, merged.getOneBasedStart());
-    assertEquals(1, merged.getAltCalls().size());
-    assertEquals("AG", merged.getAltCalls().get(0));
-    assertEquals(3, merged.getFormat(VcfUtils.FORMAT_GENOTYPE).size());
-    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0));
-    assertEquals(".", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(1));
-    assertEquals("0/1", merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(2));
-
-  }
-
-  // Test behaviour in presence of unmergeable FORMAT fields
-  public void testUnmergeableHandling() {
-    final FormatField unmergeable = new FormatField("Unmergeable", MetaType.FLOAT, VcfNumber.ALTS, "Some number per alt");
-    final VcfHeader h1 = new VcfHeader();
-    h1.addCommonHeader();
-    h1.addSampleName("sample1");
-    h1.addFormatField(unmergeable);
-    final VcfHeader h2 = new VcfHeader();
-    h2.addCommonHeader();
-    h2.addSampleName("sample2");
-    h2.addFormatField(unmergeable);
-    final VcfHeader mh = VcfHeaderMerge.mergeHeaders(h1, h2, null);
-    final Set<String> hardSet = VcfMerge.alleleBasedFormats(mh);
-    assertTrue(hardSet.contains(unmergeable.getId()));
-
-    // Alts have same set, but the ordering is different
-    VcfRecord r1 = createRecord("chr1", 50, "A", 0, 1, "C", "G");
-    r1.addFormatAndSample(unmergeable.getId(), "1.0");
-    VcfRecord r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
-    r2.addFormatAndSample(unmergeable.getId(), "2.0,3.0");
-    VcfRecord[] mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, true);
-    assertEquals(2, mergedArr.length);
-    assertTrue(mergedArr[0].hasFormat(unmergeable.getId()));
-    assertTrue(mergedArr[1].hasFormat(unmergeable.getId()));
-
-    // Alts have different alleles
-    r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-    r1.addFormatAndSample(unmergeable.getId(), "1.0");
-    r2 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
-    r2.addFormatAndSample(unmergeable.getId(), "2.0,3.0");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, true);
-    assertEquals(2, mergedArr.length);
-    assertTrue(mergedArr[0].hasFormat(unmergeable.getId()));
-    assertTrue(mergedArr[1].hasFormat(unmergeable.getId()));
-
-    // Alts have different alleles, but allow merge by dropping the FORMAT fields
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, new VcfHeader[] {h1, h2}, mh, hardSet, false);
-    assertEquals(1, mergedArr.length);
-    assertFalse(mergedArr[0].hasFormat(unmergeable.getId()));
-  }
-
-  private void checkRecord(VcfRecord merged, VcfRecord exp, String[] genotype) {
+  static void checkRecord(VcfRecord merged, VcfRecord exp, String[] genotype) {
     final List<String> altCalls = exp.getAltCalls();
     checkRecord(merged, exp.getSequenceName(), exp.getRefCall(), exp.getOneBasedStart(), altCalls.toArray(new String[altCalls.size()]), genotype);
   }
-  private void checkRecord(VcfRecord merged, VcfRecord exp, String[] altCalls, String[] genotype) {
+  static void checkRecord(VcfRecord merged, VcfRecord exp, String[] altCalls, String[] genotype) {
     checkRecord(merged, exp.getSequenceName(), exp.getRefCall(), exp.getOneBasedStart(), altCalls, genotype);
   }
 
-  private void checkRecord(VcfRecord merged, String chr, String refCall, int pos, String[] altCalls, String[] gts) {
+  private static void checkRecord(VcfRecord merged, String chr, String refCall, int pos, String[] altCalls, String[] gts) {
     assertEquals(chr, merged.getSequenceName());
     assertEquals(refCall, merged.getRefCall());
     assertEquals(pos, merged.getOneBasedStart());
@@ -319,83 +146,6 @@ public class VcfRecordTest extends TestCase {
     for (int i = 0; i < gts.length; i++) {
       assertEquals(gts[i], merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(i));
     }
-  }
-
-  public void testIdMerge() {
-    final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
-    rec.setId("b;c")
-    .setQuality("12.8")
-    .addAltCall("c")
-    .addAltCall("t")
-    .addFilter("TEST1")
-    .addFilter("TEST2")
-    .addInfo("DP", "23")
-    .addInfo("TEST", "45", "46", "47", "48")
-    .addFormatAndSample("GT", "0/0")
-    .addFormatAndSample("GQ", "100")
-    ;
-    final VcfRecord rec2 = new VcfRecord("chr1", 1209, "a");
-    rec2.setId("a")
-    .setQuality("12.8")
-    .addAltCall("c")
-    .addAltCall("t")
-    .addFilter("TEST1")
-    .addFilter("TEST2")
-    .addInfo("DP", "23")
-    .addInfo("TEST", "45", "46", "47", "48")
-    .addFormatAndSample("GT", "0/1")
-    .addFormatAndSample("GQ", "95")
-    ;
-    final VcfHeader h1 = new VcfHeader();
-    h1.addSampleName("sample1");
-    final VcfRecord[] recs = {rec, rec2};
-    final VcfRecord[] mergedArr = VcfRecord.mergeRecords(recs, new VcfHeader[] {h1, h1}, h1, VcfMerge.alleleBasedFormats(h1), true);
-    assertEquals(1, mergedArr.length);
-    final VcfRecord merged = mergedArr[0];
-    assertEquals("b;c;a", merged.getId());
-  }
-
-  public void testMergeFormat() {
-    //Testing the merging of records with FORMAT fields with a number equal to genotype or alternate allele count
-    final VcfHeader h1 = new VcfHeader();
-    h1.addSampleName("sample1");
-    h1.addFormatField("ZZ", MetaType.INTEGER, new VcfNumber("A"), "Number on Alt Allele");
-    h1.addFormatField("ZX", MetaType.INTEGER, new VcfNumber("G"), "Number on Genotype");
-    final VcfHeader h2 = new VcfHeader();
-    h2.addSampleName("sample2");
-    h2.addFormatField("ZZ", MetaType.INTEGER, new VcfNumber("A"), "Number on Alt Allele");
-    h2.addFormatField("ZX", MetaType.INTEGER, new VcfNumber("G"), "Number on Genotype");
-    final VcfHeader[] heads = {h1, h2};
-    final VcfHeader mh = new VcfHeader();
-    mh.addSampleName("sample1");
-    mh.addSampleName("sample2");
-    mh.addFormatField("ZZ", MetaType.INTEGER, new VcfNumber("A"), "Number on Alt Allele");
-    mh.addFormatField("ZX", MetaType.INTEGER, new VcfNumber("G"), "Number on Genotype");
-
-    VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2");
-    VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
-    VcfRecord[] mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(1, mergedArr.length);
-    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ:ZX\t1/2:1,2\t1/2:.:3,4,5", mergedArr[0].toString());
-
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2\t.", mergedArr[0].toString());
-    assertEquals("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t.\t1/2:3,4,5", mergedArr[1].toString());
-
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT:ZZ\t1/1:3");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2\t.", mergedArr[0].toString());
-    assertEquals("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT:ZZ\t.\t1/1:3", mergedArr[1].toString());
-
-    r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tGGG\tAAA\t.\tPASS\t.\tGT:ZX\t0/1:1,2,3");
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tGGG\tCCC\t.\tPASS\t.\tGT:ZX\t0/1:4,5,6");
-    mergedArr = VcfRecord.mergeRecords(new VcfRecord[] {r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
-    assertEquals(2, mergedArr.length);
-    assertEquals("chr1\t100\t.\tGGG\tAAA\t.\tPASS\t.\tGT:ZX\t0/1:1,2,3\t.", mergedArr[0].toString());
-    assertEquals("chr1\t100\t.\tGGG\tCCC\t.\tPASS\t.\tGT:ZX\t.\t0/1:4,5,6", mergedArr[1].toString());
   }
 
   public void testSetMethods() {
@@ -421,12 +171,13 @@ public class VcfRecordTest extends TestCase {
     assertEquals("VAL2", rec.getInfo().get("INF").get(1));
     assertEquals("VAL1", rec.getInfo().get("INF").get(2));
   }
+
   public void testFilterHackery() {
     // Test that if a filter is added then PASS is removed
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addFilter("PASS");
-    assertEquals(Arrays.asList("PASS"), rec.getFilters());
+    assertEquals(Collections.singletonList("PASS"), rec.getFilters());
     rec.addFilter("a1.0");
-    assertEquals(Arrays.asList("a1.0"), rec.getFilters());
+    assertEquals(Collections.singletonList("a1.0"), rec.getFilters());
   }
 }

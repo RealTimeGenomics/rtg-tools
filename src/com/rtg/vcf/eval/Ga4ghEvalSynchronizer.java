@@ -39,6 +39,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfAltCleaner;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfRecordMerger;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.FormatField;
@@ -91,6 +92,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private final VcfHeader mOutHeader;
   private final VcfAltCleaner mAltCleaner = new VcfAltCleaner();
   private final RocSortValueExtractor mRocExtractor;
+  private final VcfRecordMerger mMerger = new VcfRecordMerger();
 
   // Helpers for merging records at same position
   private final VcfHeader[] mInHeaders = new VcfHeader[2];
@@ -198,7 +200,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private VcfRecord makeCombinedRecord() {
     mInRecs[TRUTH_MERGE_INDEX] = makeSimpleRecord(mBrv, mBaselineSampleNo, -1, false);
     mInRecs[QUERY_MERGE_INDEX] = makeSimpleRecord(mCrv, mCallSampleNo, -1, true);
-    return VcfRecord.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false); // Takes care of updating ALTs and GTs.
+    return mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false); // Takes care of updating ALTs and GTs.
   }
 
   // Produce a (minimal) record with sample in correct location for easier merging / output
@@ -226,6 +228,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     try (VcfWriter ignored = mVcfOut) {
       // done for nice closing side effects
     }
+    mMerger.close();
   }
 
   protected VcfRecord updateForCall(boolean unknown, VcfRecord outRec) {

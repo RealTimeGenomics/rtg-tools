@@ -42,6 +42,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfAltCleaner;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfRecordMerger;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.header.MetaType;
@@ -62,6 +63,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   private final VcfRecord[] mInRecs = new VcfRecord[2];
   private final VcfHeader[] mInHeaders = new VcfHeader[2];
   private final VcfAltCleaner mAltCleaner = new VcfAltCleaner();
+  private final VcfRecordMerger mMerger = new VcfRecordMerger();
   protected final int mBaselineSampleNo;
 
   /**
@@ -104,22 +106,22 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   @Override
   protected void handleUnknownBaseline() throws IOException {
-    writeBaseline(updateForBaseline(true, new LinkedHashMap<String, String>()));
+    writeBaseline(updateForBaseline(true, new LinkedHashMap<>()));
   }
 
   @Override
   protected void handleUnknownCall() throws IOException {
-    writeCall(updateForCall(true, new LinkedHashMap<String, String>()));
+    writeCall(updateForCall(true, new LinkedHashMap<>()));
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
-    writeCall(updateForCall(false, new LinkedHashMap<String, String>()));
+    writeCall(updateForCall(false, new LinkedHashMap<>()));
   }
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    writeBaseline(updateForBaseline(false, new LinkedHashMap<String, String>()));
+    writeBaseline(updateForBaseline(false, new LinkedHashMap<>()));
   }
 
   @Override
@@ -169,7 +171,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     resetRecordFields(mCrv, mCallSampleNo, -1);
     mInRecs[0] = mBrv;
     mInRecs[1] = mCrv;
-    final VcfRecord rec = VcfRecord.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false);
+    final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false);
     setNewInfoFields(rec, newInfo);
     mAltCleaner.annotate(rec);
     mVcfOut.write(rec);
@@ -198,5 +200,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     try (VcfWriter ignored = mVcfOut) {
       // done for nice closing side effects
     }
+    mMerger.close();
   }
 }

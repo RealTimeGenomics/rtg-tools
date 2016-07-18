@@ -36,18 +36,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.rtg.util.MultiMap;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
-import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Class to hold a single VCF record
@@ -63,8 +59,6 @@ public class VcfRecord implements SequenceNameLocus {
   public static final String ID_FILTER_AND_INFO_SEPARATOR = ";";
   /** The character used to delimit ALT alleles and multi-valued subfield values */
   public static final String ALT_CALL_INFO_SEPARATOR = ",";
-  /** Maximum number of duplicate warnings to explicitly print. */
-  public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
 
   private String mSequence;
   private int mStart = -1;
@@ -89,211 +83,6 @@ public class VcfRecord implements SequenceNameLocus {
    *  <code>"GQ"</code> maps to <code>["48","49"]</code>.
    */
   private final Map<String, ArrayList<String>> mFormatAndSample;
-
-  private static long sMultipleRecordsForSampleCount = 0;
-
-  /**
-   * Return the count of the total number of duplicate warnings since the last reset.
-   * @return duplicate count
-   */
-  public static long getMultipleRecordsForSampleCount() {
-    return sMultipleRecordsForSampleCount;
-  }
-
-  /**
-   * Reset the could of duplicate warnings.
-   */
-  public static void resetMultipleRecordsForSampleCount() {
-    sMultipleRecordsForSampleCount = 0;
-  }
-
-  /**
-   * Merges multiple VCF records into one VCF record
-   *
-   * May refuse to merge (by returning NULL) if there are problems merging
-   * the records. In particular where the input records do not have the same
-   * set of ALTs and where the records also use any FORMAT type contained
-   * in <code>unmergeableFormatFields</code>.
-   *
-   * @param records the VCF records to be merged
-   * @param headers the headers for each of the VCF records to be merged
-   * @param destHeader the header for the resulting VCF record
-   * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
-   * @param dropUnmergeable if true, any non-mergeable FORMAT fields will be dropped, allowing merge to proceed.
-   * @return the merged VCF record, or NULL if there are problems with merging them
-   */
-  public static VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    final String refCall = records[0].getRefCall();
-    final int pos = records[0].getStart();
-    final int length = records[0].getLength();
-    final Set<String> uniqueIds = new LinkedHashSet<>();
-    for (final VcfRecord vcf : records) {
-      if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
-        throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
-      } else if (!refCall.equals(vcf.getRefCall())) {
-        throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
-      }
-      final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
-      Collections.addAll(uniqueIds, ids);
-    }
-    final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), records[0].getRefCall());
-
-    final StringBuilder idsb = new StringBuilder();
-    int z = 0;
-    for (final String id : uniqueIds) {
-      if (z > 0) {
-        idsb.append(VcfUtils.VALUE_SEPARATOR);
-      }
-      idsb.append(id);
-      z++;
-    }
-    merged.mId = idsb.toString();
-    boolean altsChanged = false;
-    final int[][] gtMap = new int[records.length][];
-    for (int i = 0; i < records.length; i++) {
-      final VcfRecord vcf = records[i];
-      gtMap[i] = new int[vcf.mAltCalls.size() + 1];
-      for (int j = 0; j < vcf.mAltCalls.size(); j++) {
-        final String alt = vcf.mAltCalls.get(j);
-        if (alt.equals(refCall)) {
-          gtMap[i][j + 1] = 0;
-          altsChanged = true;
-        } else {
-          int altIndex = merged.mAltCalls.indexOf(alt);
-          if (altIndex == -1) {
-            altIndex = merged.mAltCalls.size();
-            merged.mAltCalls.add(alt);
-          }
-          gtMap[i][j + 1] = altIndex + 1;
-          if (j != altIndex) {
-            altsChanged = true;
-          }
-        }
-      }
-      if (vcf.mAltCalls.size() != merged.mAltCalls.size()) {
-        altsChanged = true;
-      }
-    }
-    merged.mQual = records[0].mQual;
-    merged.mFilters.addAll(records[0].mFilters);
-    merged.mNumSamples = destHeader.getNumberOfSamples();
-    for (final Map.Entry<String, ArrayList<String>> entry : records[0].mInfo.entrySet()) {
-      ArrayList<String> val = merged.mInfo.get(entry.getKey());
-      if (val == null) {
-        val = new ArrayList<>();
-        merged.mInfo.put(entry.getKey(), val);
-      }
-      for (final String s : entry.getValue()) {
-        val.add(s);
-      }
-    }
-
-    final List<String> names = destHeader.getSampleNames();
-    for (int destSampleIndex = 0; destSampleIndex < names.size(); destSampleIndex++) {
-      boolean sampleDone = false;
-      for (int i = 0; i < headers.length; i++) {
-        final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
-        if (sampleIndex > -1) {
-          if (sampleDone) {
-            if (++sMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
-              Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
-            }
-            continue;
-          }
-          sampleDone = true;
-          for (final String key : records[i].getFormats()) {
-            ArrayList<String> field = merged.getFormat(key);
-            if (field == null) {
-              field = new ArrayList<>();
-              merged.mFormatAndSample.put(key, field);
-            }
-            while (field.size() <= destSampleIndex) {
-              field.add(MISSING);
-            }
-            if (key.equals(VcfUtils.FORMAT_GENOTYPE)) {
-              final String gtStr = records[i].getFormat(key).get(sampleIndex);
-              final int[] splitGt = VcfUtils.splitGt(gtStr);
-              for (int gti = 0; gti < splitGt.length; gti++) {
-                if (splitGt[gti] != -1) {
-                  if (splitGt[gti] >= gtMap[i].length) {
-                    throw new VcfFormatException("Invalid GT " + gtStr + " in input record: " + records[i]);
-                  }
-                  splitGt[gti] = gtMap[i][splitGt[gti]];
-                }
-              }
-              final char sep = gtStr.indexOf(VcfUtils.PHASED_SEPARATOR) != -1 ? VcfUtils.PHASED_SEPARATOR : VcfUtils.UNPHASED_SEPARATOR;
-              final StringBuilder sb = new StringBuilder();
-              sb.append(splitGt[0] == -1 ? MISSING : splitGt[0]);
-              for (int gti = 1; gti < splitGt.length; gti++) {
-                sb.append(sep).append(splitGt[gti] == -1 ? MISSING : splitGt[gti]);
-              }
-              field.set(destSampleIndex, sb.toString());
-            } else {
-              field.set(destSampleIndex, records[i].getFormat(key).get(sampleIndex));
-            }
-          }
-        }
-      }
-    }
-    for (final String key : merged.getFormats()) {
-      final ArrayList<String> field = merged.getFormat(key);
-      while (field.size() < destHeader.getNumberOfSamples()) {
-        field.add(MISSING);
-      }
-    }
-    if (altsChanged) {
-      final Set<String> formats = merged.getFormats();
-      for (String field : unmergeableFormatFields) {
-        if (formats.contains(field)) {
-          if (dropUnmergeable) {
-            merged.getFormatAndSample().remove(field);
-          } else {
-            return null;
-          }
-        }
-      }
-    }
-    return merged;
-  }
-
-  /**
-   * Perform merge operation on a set of records with the same start position, batching up into separate merge operations for each reference span.
-   * @param records the records to merge
-   * @param headers the VcfHeader corresponding to each record
-   * @param destHeader the VcfHeader of of the destination VCF
-   * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
-   * @param preserveFormats if true, any non-mergeable FORMAT fields will be kept (resulting non-merged records), otherwise dropped, allowing merge to proceed.
-   * @return the merged records
-   */
-  static VcfRecord[] mergeRecords(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean preserveFormats) {
-    assert records.length == headers.length;
-    final MultiMap<Integer, VcfRecord> recordSets = new MultiMap<>(true);
-    final MultiMap<Integer, VcfHeader> headerSets = new MultiMap<>(true);
-    for (int i = 0; i < records.length; i++) {
-      recordSets.put(records[i].getLength(), records[i]);
-      headerSets.put(records[i].getLength(), headers[i]);
-    }
-    final ArrayList<VcfRecord> ret = new ArrayList<>();
-    for (Integer key : recordSets.keySet()) {
-      final Collection<VcfRecord> recs = recordSets.get(key);
-      final Collection<VcfHeader> heads = headerSets.get(key);
-      final VcfRecord[] recsArray = recs.toArray(new VcfRecord[recs.size()]);
-      final VcfHeader[] headsArray = heads.toArray(new VcfHeader[heads.size()]);
-      final VcfRecord merged = mergeRecordsWithSameRef(recsArray, headsArray, destHeader, unmergeableFormatFields, !preserveFormats);
-      if (merged != null) {
-        ret.add(merged);
-      } else {
-        final VcfRecord[] recHolder = new VcfRecord[1];
-        final VcfHeader[] headHolder = new VcfHeader[1];
-        for (int i = 0; i < recsArray.length; i++) {
-          recHolder[0] = recsArray[i];
-          headHolder[0] = headsArray[i];
-          ret.add(mergeRecordsWithSameRef(recHolder, headHolder, destHeader, unmergeableFormatFields, !preserveFormats));
-        }
-      }
-    }
-    return ret.toArray(new VcfRecord[ret.size()]);
-  }
 
   /**
    * Construct a new standard (non gVCF) VcfRecord
