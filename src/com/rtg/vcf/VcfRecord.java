@@ -63,6 +63,8 @@ public class VcfRecord implements SequenceNameLocus {
   public static final String ID_FILTER_AND_INFO_SEPARATOR = ";";
   /** The character used to delimit ALT alleles and multi-valued subfield values */
   public static final String ALT_CALL_INFO_SEPARATOR = ",";
+  /** Maximum number of duplicate warnings to explicitly print. */
+  public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
 
   private String mSequence;
   private int mStart = -1;
@@ -87,6 +89,23 @@ public class VcfRecord implements SequenceNameLocus {
    *  <code>"GQ"</code> maps to <code>["48","49"]</code>.
    */
   private final Map<String, ArrayList<String>> mFormatAndSample;
+
+  private static long sMultipleRecordsForSampleCount = 0;
+
+  /**
+   * Return the count of the total number of duplicate warnings since the last reset.
+   * @return duplicate count
+   */
+  public static long getMultipleRecordsForSampleCount() {
+    return sMultipleRecordsForSampleCount;
+  }
+
+  /**
+   * Reset the could of duplicate warnings.
+   */
+  public static void resetMultipleRecordsForSampleCount() {
+    sMultipleRecordsForSampleCount = 0;
+  }
 
   /**
    * Merges multiple VCF records into one VCF record
@@ -176,7 +195,9 @@ public class VcfRecord implements SequenceNameLocus {
         final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
         if (sampleIndex > -1) {
           if (sampleDone) {
-            Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
+            if (++sMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
+              Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
+            }
             continue;
           }
           sampleDone = true;

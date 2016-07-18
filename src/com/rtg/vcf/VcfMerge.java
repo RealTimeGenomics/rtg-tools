@@ -186,18 +186,16 @@ public class VcfMerge extends AbstractCli {
 
     final boolean stdout = CommonFlags.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
+    VcfRecord.resetMultipleRecordsForSampleCount();
     try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, output, gzip, index))) {
-      final ZipperCallback callback = new ZipperCallback() {
-        @Override
-        public void vcfAtPosition(VcfRecord[] records, VcfHeader[] headers) throws IOException {
-          assert records.length > 0;
-          final VcfRecord[] mergedArr = VcfRecord.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
-          for (VcfRecord merged : mergedArr) {
-            if (stats != null) {
-              stats.tallyVariant(header, merged);
-            }
-            w.write(merged);
+      final ZipperCallback callback = (records, headers) -> {
+        assert records.length > 0;
+        final VcfRecord[] mergedArr = VcfRecord.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
+        for (VcfRecord merged : mergedArr) {
+          if (stats != null) {
+            stats.tallyVariant(header, merged);
           }
+          w.write(merged);
         }
       };
       while (posZip.hasNextPosition()) {
@@ -205,6 +203,10 @@ public class VcfMerge extends AbstractCli {
       }
     } catch (final VcfFormatException iae) {
       throw new NoTalkbackSlimException("Problem in VCF: " + iae.getMessage());
+    }
+    final long dupWarnings = VcfRecord.getMultipleRecordsForSampleCount();
+    if (dupWarnings > VcfRecord.DUPLICATE_WARNINGS_TO_PRINT) {
+      Diagnostic.warning("A total of " + dupWarnings + " loci had multiple records for a sample.");
     }
     if (!stdout) {
       if (stats != null) {
