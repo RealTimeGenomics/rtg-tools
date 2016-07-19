@@ -62,7 +62,6 @@ public class ClassPathSuite {
       shuffle(testClasses);
     }
     System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
-    shuffle(testClasses);
     mTestClasses = testClasses;
   }
 
