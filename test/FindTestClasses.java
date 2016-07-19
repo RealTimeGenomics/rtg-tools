@@ -36,13 +36,16 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
 
 /**
+ * Util main class for locating the test class for a list of targets
+ * Inspects the class for jumble TestClass annotations or relys on class naming conventions if that is missing
  */
-public class FindTestClasses {
-  private FindTestClasses () {}
+public final class FindTestClasses {
+  private FindTestClasses() { }
 
   /**
    * Returns a comma separated list of test classes that correspond to the classes specified on the command line
-   * @param args
+   * @param args list of classes to match with tests
+   * @throws ClassNotFoundException if the provided class names can't be loaded
    */
   public static void main(String[] args) throws ClassNotFoundException {
     final List<String> testClasses = new ArrayList<>();

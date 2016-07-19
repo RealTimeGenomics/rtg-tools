@@ -35,14 +35,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.internal.RealSystem;
 import org.junit.internal.TextListener;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
-import org.junit.runners.model.InitializationError;
+
+import com.rtg.util.StringUtils;
 
 /**
  * Test suite for running all tests. Run from the command
@@ -57,13 +58,18 @@ import org.junit.runners.model.InitializationError;
  *
  * </pre>
  */
-public class RtgTestEntry {
+public final class RtgTestEntry {
 
   private static final boolean COLLECT_TIMINGS = Boolean.valueOf(System.getProperty("junit.timing", "false"));
+  private static final boolean PRINT_NAMES = Boolean.valueOf(System.getProperty("junit.printNames", "false"));
+  private static final boolean PRINT_FAILURES = Boolean.valueOf(System.getProperty("junit.printFailures", "false"));
   private static final int TESTS_PER_ROW = 120;
   private static final long LONG_TEST_THRESHOLD = 200;
   private static final int TIMING_WIDTH = 120;
 
+  /**
+   * Collects timing of all the run tests.
+   */
   private static class TimingListener extends RunListener {
     private final Map<String, Long> mTimings = new HashMap<>();
     private long mStart;
@@ -72,10 +78,6 @@ public class RtgTestEntry {
     public void testStarted(Description description) throws Exception {
       mStart = System.currentTimeMillis();
       mTestName = testName(description);
-    }
-
-    private String testName(Description description) {
-      return description.getClassName() + "." + description.getMethodName();
     }
 
     @Override
@@ -88,30 +90,61 @@ public class RtgTestEntry {
       }
     }
 
-    static String timingFormatter(String name, long time, int width) {
-      return name + StringUtils.leftPad(String.valueOf(time), Math.max(0, width - name.length()));
-    }
 
+    /**
+     *
+     * @param threshold minimum time threshold
+     * @return Map of test names to timing for all tests that took longer than threshold
+     */
     Map<String, Long> getTimings(long threshold) {
       final LinkedHashMap<String, Long> map = new LinkedHashMap<>();
       final List<Map.Entry<String, Long>> sorted = new ArrayList<>();
       sorted.addAll(mTimings.entrySet().stream().filter(e -> e.getValue() > threshold).collect(Collectors.toCollection(ArrayList::new)));
-      sorted.sort((a, b) -> a.getValue() > b.getValue() ? -1 : a.getValue().equals(b.getValue()) ? 0 : 1 );
+      sorted.sort((a, b) -> a.getValue() > b.getValue() ? -1 : a.getValue().equals(b.getValue()) ? 0 : 1);
       sorted.forEach(e -> map.put(e.getKey(), e.getValue()));
       return map;
     }
   }
 
+  private static String testName(Description description) {
+    return description.getClassName() + "." + description.getMethodName();
+  }
+
+
+  /** Private util class constructor */
+  private RtgTestEntry() { }
+
+  /**
+   * Test runner entry point
+   * @param args list of test classes to run
+   * @throws ClassNotFoundException can't load the specified classes
+   */
   @SuppressWarnings("unchecked")
-  public static void main(final String[] args) throws ClassNotFoundException, InitializationError {
+  public static void main(final String[] args) throws ClassNotFoundException {
     final JUnitCore jUnitCore = new JUnitCore();
     jUnitCore.addListener(new TextListener(new RealSystem()));
     final TimingListener timing;
     if (COLLECT_TIMINGS) {
-      timing =new TimingListener();
+      timing = new TimingListener();
       jUnitCore.addListener(timing);
     } else {
       timing = null;
+    }
+    if (PRINT_FAILURES) {
+      jUnitCore.addListener(new RunListener() {
+        @Override
+        public void testFailure(Failure failure) throws Exception {
+          System.out.println(com.rtg.util.StringUtils.LS + "FAILING TEST: " + testName(failure.getDescription()));
+        }
+      });
+    }
+    if (PRINT_NAMES) {
+      jUnitCore.addListener(new RunListener() {
+        @Override
+        public void testStarted(Description description) throws Exception {
+          System.out.println(testName(description));
+        }
+      });
     }
     jUnitCore.addListener(new RunListener() {
       int mTestCount = 0;
@@ -127,7 +160,6 @@ public class RtgTestEntry {
     if (args.length > 0) {
       for (final String arg : args) {
         final Class<?> klass = ClassLoader.getSystemClassLoader().loadClass(arg);
-        System.err.println(klass.getName());
         results.add(jUnitCore.run(klass));
       }
     } else {
@@ -140,7 +172,7 @@ public class RtgTestEntry {
         System.out.println();
         System.out.println("Long tests");
         for (Map.Entry<String, Long> entry : timings.entrySet()) {
-          System.out.println(TimingListener.timingFormatter(entry.getKey(), entry.getValue(), TIMING_WIDTH));
+          System.out.println(formatTimeRow(entry.getKey(), entry.getValue(), TIMING_WIDTH));
         }
       }
     }
@@ -152,6 +184,21 @@ public class RtgTestEntry {
     }
   }
 
+  /**
+   * Simple formatting of a test timing row.
+   * Will print wider if the test name doesn't fit
+   * @param name test name
+   * @param time time the test took
+   * @param width character width for the table.
+   * @return left aligned test name and right aligned time within {@code width} characters (if it fits)
+   */
+  static String formatTimeRow(String name, long time, int width) {
+    return name + StringUtils.padLeft(String.valueOf(time), Math.max(0, width - name.length()));
+  }
+
+  /**
+   * @return an array of all the test classes in the classpath
+   */
   public static Class<?>[] getClasses() {
     final List<Class<?>> testClasses = new ClassPathSuite().getTestClasses();
     return testClasses.toArray(new Class<?>[testClasses.size()]);

@@ -430,7 +430,7 @@
 
   <property name="test.jvm.args" value="" />
   <property name="junit.jar" value="${tools.test.lib.dir}/junit.jar"/>
-  <property name="junit.runner" value="org.junit.runner.JUnitCore" />
+  <property name="junit.runner" value="RtgTestEntry" />
 
   <target name="runtest" depends="compile-src,compile-test" description="Run a unit test class. -Dtest.class=xxx">
     <fail unless="test.class" message="test.class property must be set"/>
