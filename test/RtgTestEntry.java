@@ -101,7 +101,9 @@ public final class RtgTestEntry {
       final List<Map.Entry<String, Long>> sorted = new ArrayList<>();
       sorted.addAll(mTimings.entrySet().stream().filter(e -> e.getValue() > threshold).collect(Collectors.toCollection(ArrayList::new)));
       sorted.sort((a, b) -> a.getValue() > b.getValue() ? -1 : a.getValue().equals(b.getValue()) ? 0 : 1);
-      sorted.forEach(e -> map.put(e.getKey(), e.getValue()));
+      for (Map.Entry<String, Long> entry : sorted) {
+        map.put(entry.getKey(), entry.getValue());
+      }
       return map;
     }
   }

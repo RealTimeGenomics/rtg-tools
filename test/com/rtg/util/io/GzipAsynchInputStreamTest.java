@@ -51,9 +51,9 @@ public class GzipAsynchInputStreamTest extends AsynchInputStreamTest {
     return new GzipAsynchInputStream(file);
   }
 
+  @SuppressWarnings("try")
   public void testNullFile() throws IOException {
-    try {
-      new GzipAsynchInputStream((File) null);
+    try (InputStream ignored = new GzipAsynchInputStream((File) null)) {
       fail("null file exception expected");
     } catch (final IllegalArgumentException e) {
       assertEquals("File cannot be null", e.getMessage());
