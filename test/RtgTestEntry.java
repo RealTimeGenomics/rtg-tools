@@ -28,6 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -63,9 +65,11 @@ public final class RtgTestEntry {
   private static final boolean COLLECT_TIMINGS = Boolean.valueOf(System.getProperty("junit.timing", "false"));
   private static final boolean PRINT_NAMES = Boolean.valueOf(System.getProperty("junit.printNames", "false"));
   private static final boolean PRINT_FAILURES = Boolean.valueOf(System.getProperty("junit.printFailures", "false"));
+  private static final boolean CAPTURE_OUTPUT = Boolean.valueOf(System.getProperty("junit.captureOutput", "true"));
   private static final int TESTS_PER_ROW = 120;
   private static final long LONG_TEST_THRESHOLD = 200;
   private static final int TIMING_WIDTH = 120;
+  public static final String LINE = "-------------";
 
   /**
    * Collects timing of all the run tests.
@@ -108,8 +112,81 @@ public final class RtgTestEntry {
     }
   }
 
+  /**
+   * Captures stdout/stderr of tests
+   */
+  private static class OutputListener extends RunListener {
+    private PrintStream mOriginalOut;
+    private PrintStream mOriginalError;
+    PrintStream mOutStream;
+    PrintStream mErrorStream;
+    private ByteArrayOutputStream mOut;
+    private ByteArrayOutputStream mErr;
+
+    @Override
+    public void testStarted(Description description) throws Exception {
+      mOriginalOut = System.out;
+      mOriginalError = System.err;
+      mOut = new ByteArrayOutputStream();
+      mOutStream = new PrintStream(mOut);
+      mErr = new ByteArrayOutputStream();
+      mErrorStream = new PrintStream(mErr);
+      System.setOut(mOutStream);
+      System.setErr(mErrorStream);
+    }
+
+    @Override
+    public void testFinished(Description description) throws Exception {
+      final String name = testName(description);
+      mOutStream.flush();
+      mOutStream.close();
+      mErrorStream.flush();
+      mErrorStream.close();
+      System.setOut(mOriginalOut);
+      System.setErr(mOriginalError);
+      if (mOut.toString().length() > 0) {
+        System.out.println();
+        System.out.println(LINE + "STDOUT for: " + name + LINE);
+        System.out.println(mOut.toString());
+        System.out.println(LINE + LINE + LINE);
+      }
+      if (mErr.toString().length() > 0) {
+        System.out.println();
+        System.out.println(LINE + "STDERR for: " + name + LINE);
+        System.out.println(mErr.toString());
+        System.out.println(LINE + LINE + LINE);
+      }
+    }
+  }
+
   private static String testName(Description description) {
     return description.getClassName() + "." + description.getMethodName();
+  }
+
+  private static class FailureListener extends RunListener {
+    private PrintStream mOut = System.out;
+    @Override
+    public void testFailure(Failure failure) throws Exception {
+      mOut.println(com.rtg.util.StringUtils.LS + "FAILING TEST: " + testName(failure.getDescription()));
+    }
+  }
+  private static class NameListener extends RunListener {
+    private PrintStream mOut = System.out;
+    @Override
+    public void testStarted(Description description) throws Exception {
+      System.out.println(testName(description));
+    }
+  }
+  private static class NewLineListener extends RunListener {
+    private PrintStream mOut = System.out;
+    int mTestCount = 0;
+    @Override
+    public void testFinished(Description description) throws Exception {
+      mTestCount++;
+      if (mTestCount % TESTS_PER_ROW == 0) {
+        System.out.println();
+      }
+    }
   }
 
 
@@ -124,6 +201,9 @@ public final class RtgTestEntry {
   @SuppressWarnings("unchecked")
   public static void main(final String[] args) throws ClassNotFoundException {
     final JUnitCore jUnitCore = new JUnitCore();
+    if (CAPTURE_OUTPUT) {
+      jUnitCore.addListener(new OutputListener());
+    }
     jUnitCore.addListener(new TextListener(new RealSystem()));
     final TimingListener timing;
     if (COLLECT_TIMINGS) {
@@ -133,31 +213,12 @@ public final class RtgTestEntry {
       timing = null;
     }
     if (PRINT_FAILURES) {
-      jUnitCore.addListener(new RunListener() {
-        @Override
-        public void testFailure(Failure failure) throws Exception {
-          System.out.println(com.rtg.util.StringUtils.LS + "FAILING TEST: " + testName(failure.getDescription()));
-        }
-      });
+      jUnitCore.addListener(new FailureListener());
     }
     if (PRINT_NAMES) {
-      jUnitCore.addListener(new RunListener() {
-        @Override
-        public void testStarted(Description description) throws Exception {
-          System.out.println(testName(description));
-        }
-      });
+      jUnitCore.addListener(new NameListener());
     }
-    jUnitCore.addListener(new RunListener() {
-      int mTestCount = 0;
-      @Override
-      public void testFinished(Description description) throws Exception {
-        mTestCount++;
-        if (mTestCount % TESTS_PER_ROW == 0) {
-          System.out.println();
-        }
-      }
-    });
+    jUnitCore.addListener(new NewLineListener());
     final List<Result> results = new ArrayList<>();
     if (args.length > 0) {
       for (final String arg : args) {
