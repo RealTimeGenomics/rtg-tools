@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.util.StringUtils;
 
 /**
  * Util main class for locating the test class for a list of targets
@@ -51,16 +50,28 @@ public final class FindTestClasses {
     final List<String> testClasses = new ArrayList<>();
     for (String className : args) {
       final Class<?> aClass = FindTestClasses.class.getClassLoader().loadClass(className);
-      final TestClass[] annotationsByType = aClass.getAnnotationsByType(TestClass.class);
-      if (annotationsByType.length == 0) {
+      testClasses.addAll(annotatedTestClasses(aClass));
+      if (testClasses.size() == 0) {
         testClasses.add(defaultTestClass(aClass));
+      }
+    }
+    System.out.println(String.join(",", testClasses));
+  }
+
+  private static List<String> annotatedTestClasses(Class<?> clazz) {
+    final List<String> testClasses = new ArrayList<>();
+    final TestClass[] annotationsByType = clazz.getAnnotationsByType(TestClass.class);
+    if (annotationsByType.length == 0) {
+      final Class<?> enclosing = clazz.getEnclosingClass();
+      if (enclosing != null) {
+        return annotatedTestClasses(enclosing);
+      }
       } else {
         for (TestClass testClass : annotationsByType) {
           Collections.addAll(testClasses, testClass.value());
         }
       }
-    }
-    System.out.println(StringUtils.join(",", testClasses));
+    return testClasses;
   }
 
   /**
