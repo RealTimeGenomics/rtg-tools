@@ -73,6 +73,6 @@ public final class FindTestClasses {
     while (outer.getEnclosingClass() != null) {
       outer = outer.getEnclosingClass();
     }
-    return outer.getName().replaceAll("Abstract", "Dummy") + "Test";
+    return outer.getName().replaceAll("^Abstract", "Dummy") + "Test";
   }
 }
