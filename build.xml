@@ -458,39 +458,4 @@
       <param name="test.class" value="AllTests"/>
     </antcall>
   </target>
-
-  <target name="test" depends="compile-test"
-          description="Run all unit testsfalse. Invoke with -Dtest.class={some class} to run a single test class">
-    <delete dir="${build.dir}/test-reports" defaultexcludes="no"/>
-    <mkdir dir="${build.dir}/test-reports"/>
-    <property name="regression.root" refid="test.path" />
-    <junit failureproperty="test.failure" fork="yes" forkmode="once" filtertrace="on">
-      <jvmarg value="-server" />
-      <jvmarg value="-ea" />
-      <jvmarg value="-Djava.awt.headless=true" />
-      <jvmarg value="-Drtg.developer=true" />
-      <jvmarg value="-Djunit.printFailures=true" />
-      <jvmarg value="-Dregression.root=${regression.root}" />
-      <jvmarg value="-Dregression.update=${regression.update}" />
-      <jvmarg value="-javaagent:${buildtools.dir}/handlechecker.jar" />
-      <jvmarg line="${test.jvm.args}" />
-      <classpath>
-        <pathelement path="${junit.jar}"/>
-        <resources refid="runtime.test.classpath" />
-      </classpath>
-      <test name="${test.class}" if="test.class" todir="${build.dir}/test-reports"/>
-      <batchtest unless="test.class" todir="${build.dir}/test-reports">
-        <fileset dir="${build.test}" includes="**/*Test.class" excludes="**/Abstract*Test.class"/>
-      </batchtest>
-      <formatter classname="org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter" usefile="false" unless="test.class"/>
-      <formatter type="plain" usefile="false" if="test.class"/>
-      <formatter type="xml" usefile="true"/>
-    </junit>
-    <junitreport todir="${build.dir}/test-reports">
-      <fileset dir="${build.dir}/test-reports" includes="*.xml"/>
-      <report format="frames" styledir="${tools.test.lib.dir}" todir="${build.dir}/test-reports-html"/>
-      <report format="frames" styledir="${tools.test.lib.dir}/summary" todir="${build.dir}/test-reports-summary"/>
-    </junitreport>
-  </target>
-
 </project>
