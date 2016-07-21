@@ -79,11 +79,11 @@ public final class FindTestClasses {
    * @param aClass a target class
    * @return the default test class name
    */
-  private static String defaultTestClass(Class<?> aClass) {
+  static String defaultTestClass(Class<?> aClass) {
     Class<?> outer = aClass;
     while (outer.getEnclosingClass() != null) {
       outer = outer.getEnclosingClass();
     }
-    return outer.getName().replaceAll("^Abstract", "Dummy") + "Test";
+    return outer.getPackage().getName() + "." + outer.getSimpleName().replaceAll("^Abstract", "Dummy") + "Test";
   }
 }
