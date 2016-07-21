@@ -64,7 +64,9 @@ public enum DerivedAnnotations {
   /** Zygosity */
   ZY(new ZygosityAnnotation()),
   /** Ploidy */
-  PD(new PloidyAnnotation());
+  PD(new PloidyAnnotation()),
+  /** Difference in mean quality between called alleles */
+  MEANQAD(new MeanQualityDifferenceAnnotation());
 
   private final transient AbstractDerivedAnnotation mAnnotation;
 

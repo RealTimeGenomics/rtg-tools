@@ -30,28 +30,36 @@
 
 package com.rtg.vcf.annotation;
 
-import com.rtg.util.TestUtils;
+import com.rtg.vcf.VcfRecord;
 
 import junit.framework.TestCase;
 
 /**
+ *
  */
-public class DerivedAnnotationsTest extends TestCase {
+public class MeanQualityDifferenceAnnotationTest extends TestCase {
 
-  public void testEnum() {
-    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, COC, COF, VAF, ZY, PD, MEANQAD]");
-    assertTrue(DerivedAnnotations.IC.getAnnotation() instanceof InbreedingCoefficientAnnotation);
-    assertTrue(DerivedAnnotations.EP.getAnnotation() instanceof EquilibriumProbabilityAnnotation);
-    assertTrue(DerivedAnnotations.LAL.getAnnotation() instanceof LongestAlleleAnnotation);
-    assertTrue(DerivedAnnotations.QD.getAnnotation() instanceof QualOverDepthAnnotation);
-    assertTrue(DerivedAnnotations.NAA.getAnnotation() instanceof NumberOfAltAllelesAnnotation);
-    assertTrue(DerivedAnnotations.AC.getAnnotation() instanceof AlleleCountInGenotypesAnnotation);
-    assertTrue(DerivedAnnotations.AN.getAnnotation() instanceof NumberAllelesInGenotypesAnnotation);
-    assertTrue(DerivedAnnotations.GQD.getAnnotation() instanceof GenotypeQualityOverDepthAnnotation);
-    assertTrue(DerivedAnnotations.COC.getAnnotation() instanceof ContraryObservationCountAnnotation);
-    assertTrue(DerivedAnnotations.COF.getAnnotation() instanceof ContraryObservationFractionAnnotation);
-    assertTrue(DerivedAnnotations.ZY.getAnnotation() instanceof ZygosityAnnotation);
-    assertTrue(DerivedAnnotations.PD.getAnnotation() instanceof PloidyAnnotation);
+  public void test() {
+    check("0/0", "1,1", "60,60", null);
+    check("1/1", "1,1", "60,60", null);
+    check("0/1", "0,1", "60,60", null);
+    check("0/1", "1,0", "60,60", null);
+    check("./1", "1,1", "60,60", null);
+    check("1/.", "1,1", "60,60", null);
+    check("0/1", "1,1", "60,60", 0.0);
+    check("0/1", "1,1", "70,60", 10.0);
+    check("0/1", "1,2", "70,60", 40.0);
+    check("0/2", "1,0,2", "70,50,60", 40.0);
+    check("1/2", "1,1,2", "70,50,60", 20.0);
+    check("1/2", "1,1,2", "70,20,60", 10.0);
+    check("2/1", "1,1,2", "70,20,60", 10.0);
   }
 
+  public void check(String gt, String ad, String aq, Double expQad) {
+    final VcfRecord rec = new VcfRecord("seq", 0, "A");
+    rec.addFormatAndSample("GT", gt);
+    rec.addFormatAndSample("AD", ad);
+    rec.addFormatAndSample("AQ", aq);
+    assertEquals(expQad, new MeanQualityDifferenceAnnotation().getValue(rec, 0));
+  }
 }

@@ -127,6 +127,9 @@ public final class VcfUtils {
   /** VCF FORMAT field used to indicate de novo score. */
   public static final String FORMAT_DENOVO_SCORE = "DNP";
 
+  /** VCF FORMAT field for allelic quality */
+  public static final String FORMAT_ALLELE_QUALITY = "AQ";
+
   /** Filter status field. */
   public static final String FORMAT_FILTER = "FT";
 
