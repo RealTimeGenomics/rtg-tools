@@ -35,11 +35,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import org.junit.Assert;
+
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
-
-import org.junit.Assert;
 
 /**
  * Support class for writing nano-regression tests for running within
