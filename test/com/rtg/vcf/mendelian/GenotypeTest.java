@@ -31,6 +31,8 @@ package com.rtg.vcf.mendelian;
 
 import java.io.IOException;
 
+import com.rtg.util.TestUtils;
+
 import junit.framework.TestCase;
 
 /**
@@ -58,5 +60,11 @@ public class GenotypeTest extends TestCase {
     assertFalse(gt.contains(0));
     assertFalse(gt.contains(1));
     assertTrue(gt.contains(2));
+  }
+
+  public void testComparator() {
+    final Genotype[] ordered = {new Genotype("0"), new Genotype("0/0"), new Genotype("0/1"), new Genotype("1"), new Genotype("1/1")};
+    TestUtils.testOrder(Genotype.GENOTYPE_COMPARATOR, ordered, false);
+
   }
 }

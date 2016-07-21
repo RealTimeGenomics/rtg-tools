@@ -127,7 +127,7 @@ public abstract class OutputModuleParams extends ModuleParams {
 
   @Override
   public String toString() {
-    return mOutputParams.toString() + LS;
+    return mOutputParams + LS;
   }
 
 }
