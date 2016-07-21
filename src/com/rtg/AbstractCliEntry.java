@@ -42,7 +42,7 @@ import com.rtg.util.io.FileUtils;
 
 /**
  */
-@TestClass("com.rtg.RtgToolsTest")
+@TestClass({"com.rtg.RtgToolsTest", "com.rtg.DummyCliEntryTest"})
 public abstract class AbstractCliEntry {
 
   /**
@@ -50,56 +50,13 @@ public abstract class AbstractCliEntry {
    * @param args first argument is module to run, rest depend on the module.
    */
   public void mainImpl(final String[] args) {
-    final Object[] o = findXlog(args);
-    final String xLogURL = (String) o[0];
-    final String[] a = (String[]) o[1];
     try {
       final OutputStream out = FileUtils.getStdoutAsOutputStream();
       final int returnValue;
-      try {
-        returnValue = intMain(a, out, System.err);
-      } finally {
-        if (xLogURL != null) {
-          Talkback.postLog(xLogURL);
-        }
-      }
+      returnValue = intMain(args, out, System.err);
       System.exit(returnValue);
     } catch (final RuntimeException ex) {
       System.exit(1);
-    }
-  }
-
-  static Object[] findXlog(final String[] args) {
-    int pos = -1;
-    for (int i = 0; i < args.length; i++) {
-      if (args[i].equals("--Xlog") || args[i].startsWith("--Xlog=")) {
-        pos = i;
-        break;
-      }
-      if ("--".equals(args[i])) {
-        break;
-      }
-    }
-    if (pos == -1) {
-      final Object[] ret = new Object[2];
-      ret[1] = args;
-      return ret;
-    }
-
-    if (args[pos].startsWith("--Xlog=")) {
-      final String[] a = new String[args.length - 1];
-      System.arraycopy(args, 0, a, 0, pos);
-      System.arraycopy(args, pos + 1, a, pos, args.length - pos - 1);
-      return new Object[] {args[pos].substring(7), a};
-    } else {
-      if (pos == args.length - 1) {
-        System.err.println("Expected URL after --Xlog");
-        throw new RuntimeException();
-      }
-      final String[] a = new String[args.length - 2];
-      System.arraycopy(args, 0, a, 0, pos);
-      System.arraycopy(args, pos + 2, a, pos, args.length - pos - 2);
-      return new Object[] {args[pos + 1], a};
     }
   }
 

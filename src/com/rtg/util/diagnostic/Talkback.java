@@ -47,7 +47,6 @@ import java.util.regex.Pattern;
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
 import com.rtg.util.License;
-import com.rtg.util.PortableRandom;
 import com.rtg.util.Utils;
 import com.rtg.util.cli.CommandLine;
 import com.rtg.util.io.FileUtils;
@@ -61,8 +60,6 @@ public final class Talkback {
   //private constructor as this is a utility class
   private Talkback() {
   }
-
-  private static final PortableRandom RANDOM = new PortableRandom();
 
   private static String sTalkbackURL;
   private static boolean sTalkback;
@@ -259,23 +256,6 @@ public final class Talkback {
         + "&subject=" + urlEscape(fullsubject)
         + "&d=" + (License.isDeveloper() ? "1" : "0");
     return doPost(url, "application/x-www-form-urlencoded", postData, timeout);
-  }
-
-  /**
-   * Sends the log to the server.
-   *
-   * @param url the URL to log to
-   * @return true if posted ok, false if an error occurred on the log page or a timeout
-   */
-  public static boolean postLog(final String url) {
-    try {
-      final String boundary = "---------------------------" + RANDOM.nextDouble();
-      final String log = getLogContents();
-
-      return doPost(url, "multipart/form-data; boundary=" + boundary, "--" + boundary + "\n" + "Content-Disposition: form-data; name=\"logfile\"; filename=\"log.txt\"\n" + "Content-Type: text/plain\n" + "Content-Transfer-Encoding: 8bit\n" + "\n" + log + "\n" + "--" + boundary + "--\n", 5000);
-    } catch (final IOException e) {
-      return false;
-    }
   }
 
   /**

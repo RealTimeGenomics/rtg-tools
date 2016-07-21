@@ -27,27 +27,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg;
 
-import com.rtg.util.TestUtils;
-import com.rtg.util.io.MemoryPrintStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+import com.rtg.launcher.MockCli;
+import com.rtg.util.io.TestDirectory;
 
 import junit.framework.TestCase;
 
 /**
  */
-public class RtgToolsTest extends TestCase {
+public class DummyCliEntryTest extends TestCase {
+  private static final class MockCliEntry extends AbstractCliEntry {
+    final File mOutput;
 
-  public void test() {
-    assertTrue(new RtgTools().getSlimModule("HELP") instanceof Command);
+    private MockCliEntry(File output) {
+      mOutput = output;
+    }
+
+    @Override
+    protected Command getSlimModule(String arg) {
+      return new Command(new MockCli(new File(mOutput, "dir")) {
+        @Override
+        public String description() {
+          return "Mocking";
+        }
+
+        @Override
+        protected int mainExec(OutputStream out, PrintStream err) throws IOException {
+          return 0;
+        }
+      }, CommandCategory.ASSEMBLY, ReleaseLevel.ALPHA);
+    }
   }
 
-  public void test2() {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    assertEquals(1, new RtgTools().help(null, mps.outputStream(), mps.printStream()));
-    final String out = mps.toString();
-    TestUtils.containsAll(out, "format", "index", "bgzip");
-    assertFalse(out.contains("map"));
-    assertFalse(out.contains("family"));
+  public void test() throws IOException {
+    try (TestDirectory t = new TestDirectory()) {
+      final ByteArrayOutputStream err = new ByteArrayOutputStream();
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      try (PrintStream print = new PrintStream(err)) {
+        final int main = new MockCliEntry(t).intMain(new String[]{"--help"}, out, print);
+        print.flush();
+        assertEquals("", err.toString());
+        assertEquals(err.toString(), 0, main);
+        assertEquals("", out.toString());
+      }
+    }
   }
+
 }
