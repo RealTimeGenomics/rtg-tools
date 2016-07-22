@@ -69,7 +69,7 @@ public final class RtgTestEntry {
   private static final int TESTS_PER_ROW = 120;
   private static final long LONG_TEST_THRESHOLD = 200;
   private static final int TIMING_WIDTH = 120;
-  public static final String LINE = "-------------";
+  private static final String LINE = "-------------";
 
   /**
    * Collects timing of all the run tests.
