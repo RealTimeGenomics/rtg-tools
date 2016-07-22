@@ -164,27 +164,27 @@ public final class RtgTestEntry {
   }
 
   private static class FailureListener extends RunListener {
-    private PrintStream mOut = System.out;
+    private final PrintStream mOut = System.out;
     @Override
     public void testFailure(Failure failure) throws Exception {
       mOut.println(com.rtg.util.StringUtils.LS + "FAILING TEST: " + testName(failure.getDescription()));
     }
   }
   private static class NameListener extends RunListener {
-    private PrintStream mOut = System.out;
+    private final PrintStream mOut = System.out;
     @Override
     public void testStarted(Description description) throws Exception {
-      System.out.println(testName(description));
+      mOut.println(testName(description));
     }
   }
   private static class NewLineListener extends RunListener {
-    private PrintStream mOut = System.out;
+    private final PrintStream mOut = System.out;
     int mTestCount = 0;
     @Override
     public void testFinished(Description description) throws Exception {
       mTestCount++;
       if (mTestCount % TESTS_PER_ROW == 0) {
-        System.out.println();
+        mOut.println();
       }
     }
   }
@@ -255,7 +255,7 @@ public final class RtgTestEntry {
    * @param width character width for the table.
    * @return left aligned test name and right aligned time within {@code width} characters (if it fits)
    */
-  static String formatTimeRow(String name, long time, int width) {
+  private static String formatTimeRow(String name, long time, int width) {
     return name + StringUtils.padLeft(String.valueOf(time), Math.max(0, width - name.length()));
   }
 
