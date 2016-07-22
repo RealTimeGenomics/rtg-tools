@@ -37,6 +37,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import com.rtg.launcher.MockCli;
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.io.TestDirectory;
 
 import junit.framework.TestCase;
@@ -72,6 +73,7 @@ public class DummyCliEntryTest extends TestCase {
       final ByteArrayOutputStream err = new ByteArrayOutputStream();
       final ByteArrayOutputStream out = new ByteArrayOutputStream();
       try (PrintStream print = new PrintStream(err)) {
+        GlobalFlags.resetAccessedStatus();
         final int main = new MockCliEntry(t).intMain(new String[]{"--help"}, out, print);
         print.flush();
         assertEquals("", err.toString());
