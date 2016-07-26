@@ -99,6 +99,8 @@ public class VcfFilterCliTest extends AbstractCliTest {
       , "--min-denovo-score", "minimum de novo score"
       , "--remove-hom", "remove where sample is homozygous"
       , "--remove-overlapping", "remove records that overlap"
+      , "-e", "--keep-expr", "records for which this expression evaluates to true will be retained"
+      , "-j", "--javascript", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name"
     );
   }
 
@@ -107,7 +109,6 @@ public class VcfFilterCliTest extends AbstractCliTest {
       , "-p,", "--Xmin-posterior-score=FLOAT", "minimum allowed posterior score"
       , "-P,", "--Xmax-posterior-score=FLOAT", "maximum allowed posterior score"
       , "--Xexpr", "this sample expression is true"
-      , "--Xjs", "arbitrary javascript"
     );
   }
 

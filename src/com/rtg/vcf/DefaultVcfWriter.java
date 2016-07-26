@@ -68,6 +68,20 @@ public class DefaultVcfWriter implements VcfWriter {
     mOut = mIndexer.createStreamsAndStartThreads();
     mHeader = header;
   }
+  /**
+   * Creates a new VCF writer, using on-the-fly indexing, and can optionally skip writing the header
+   * @param header header for the file
+   * @param outputFile the output file to be written to
+   * @param stdout the output stream of stdout (will only be used if output file is null)
+   * @param compress true if the output should be gzip compressed (also true if bam is true)
+   * @param createIndexIfPossible true if an index should be created
+   * @param writeHeader true if the header should be written
+   * @throws java.io.IOException if there is a problem during writing.
+   */
+  public DefaultVcfWriter(VcfHeader header, File outputFile, OutputStream stdout, boolean compress, boolean createIndexIfPossible, boolean writeHeader) throws IOException {
+    this(header, outputFile, stdout, compress, createIndexIfPossible);
+    mHeaderWritten = !writeHeader;
+  }
 
   /**
    * create a new VCF writer

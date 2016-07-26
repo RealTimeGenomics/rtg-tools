@@ -116,10 +116,9 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String MAX_POSTERIOR_SCORE = "Xmax-posterior-score";
 
   private static final String EXPR_FLAG = "Xexpr";
-  private static final String JS_FLAG = "Xjs";
-  private static final String JS_FUNCTIONS = "Xjs-functions";
-  private static final String JS_BEGIN = "Xjs-begin";
-  private static final String JS_END = "Xjs-end";
+  private static final String KEEP_EXPRESSION_FLAG = "keep-expr";
+  private static final String JS_BEGIN_FLAG = "javascript";
+  private static final String NO_HEADER = "no-header";
 
 
   private final VcfFilterTask mVcfFilterTask = new VcfFilterTask();
@@ -214,10 +213,11 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
     final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(JS_FLAG, String.class, "STRING", "arbitrary javascript for determining whether to keep record. May be either an expression or a file name").setCategory(FILTERING);
-    final Flag begin = mFlags.registerOptional(JS_BEGIN, String.class, "STRING", "arbitrary javascript initialisers for determining whether to keep record. May be either an expression or a file name");
+    mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, "STRING", "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
+    final Flag begin = mFlags.registerOptional('j', JS_BEGIN_FLAG, String.class, "STRING", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
     begin.setCategory(FILTERING);
     begin.setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(INPUT_OUTPUT);
     mFlags.setValidator(new VcfFilterValidator());
   }
 
@@ -493,7 +493,7 @@ public final class VcfFilterCli extends AbstractCli {
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), vcfFile, output, gzip, index))) {
+      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), vcfFile, output, gzip, index, !mFlags.isSet(NO_HEADER)))) {
         mVcfFilterTask.filterVcf(r, w);
       }
       if (!stdout) {
@@ -504,9 +504,9 @@ public final class VcfFilterCli extends AbstractCli {
   }
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags) throws IOException {
-    final String expressionString = fileOrString(flags, JS_FLAG);
+    final String expressionString = fileOrString(flags, KEEP_EXPRESSION_FLAG);
     final List<String> beginnings = new ArrayList<>();
-    for (Object begin : flags.getValues(JS_BEGIN)) {
+    for (Object begin : flags.getValues(JS_BEGIN_FLAG)) {
       beginnings.add(fileIfExists((String) begin));
     }
     if (expressionString != null || beginnings.size() > 0) {

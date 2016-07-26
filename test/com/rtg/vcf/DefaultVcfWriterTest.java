@@ -31,9 +31,14 @@
 package com.rtg.vcf;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 
+import com.rtg.util.StringUtils;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  */
@@ -55,6 +60,19 @@ public class DefaultVcfWriterTest extends AbstractVcfWriterTest {
       new DefaultVcfWriter(new VcfHeader(), null);
     } catch (NullPointerException ex) {
       assertEquals("output stream cannot be null", ex.getMessage());
+    }
+  }
+
+  public void testNoHeader() throws IOException {
+    try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      final VcfHeader header = new VcfHeader();
+      header.addInfoField(new InfoField("YO", MetaType.CHARACTER, VcfNumber.ONE, "testing"));
+      try (final DefaultVcfWriter defaultVcfWriter = new DefaultVcfWriter(header, null, out, false, false, false)) {
+        final VcfRecord vcfRecord = new VcfRecord("foo", 2, "A");
+        defaultVcfWriter.write(vcfRecord);
+      }
+      out.flush();
+      assertEquals("foo\t3\t.\tA\t.\t.\t.\t." + StringUtils.LS, out.toString());
     }
   }
 }
