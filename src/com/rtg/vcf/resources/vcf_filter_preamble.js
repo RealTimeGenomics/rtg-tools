@@ -29,39 +29,12 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     var formatIds = listToArray(header.getFormatLines()).map(function (field) {
         return field.getId()
     });
-    /**
-     * Return a function that will extract the specified format field from the sample column with the given index
-     */
-    function fieldGet(field, sampleIndex) {
-        return function () {
-            var fields = rec.getFormatAndSample().get(field);
-            return fields == null ? "." : fields.get(sampleIndex);
-        }
-    }
-    /**
-     * Return a function that will set the specified format field on the sample column with the given index
-     */
-    function fieldSet(field, sampleIndex) {
-        return function (value) {
-            rec.setFormatAndSample(field, value, sampleIndex);
-        }
-    }
 
     /**
-     * Returns an object corresponding to a particular sample.
-     * The object will have properties defined which correspond to the format fields for that sample.
-     * This object is not specific to the current record, it's properties will dynamically
-     * fetch from the current record
+     * String prototype function for fetching a format field from a sample
+     * @param field format field
+     * @returns {Function} that extracts a format field
      */
-    function sample(name) {
-        var sampleIndex = sampleLookup[name];
-        var s = {};
-        formatIds.forEach(function (fieldName) {
-            Object.defineProperty(s, fieldName, {get: fieldGet(fieldName, sampleIndex), set: fieldSet(fieldName, sampleIndex)});
-        });
-        return s;
-    }
-
     function stringGetFunction(field) {
         return function () {
             var index = sampleLookup[this];
@@ -69,7 +42,12 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             return fields == null ? "." : fields.get(index);
         }
     }
-    
+
+    /**
+     * String prototype function for setting a format field in a sample
+     * @param field format field
+     * @returns {Function} that sets a format field
+     */
     function stringSetFunction(field) {
         return function (value) {
             var index = sampleLookup[this];
@@ -84,6 +62,8 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     formatIds.forEach(function (field) {
         stringProps[field] = {get: stringGetFunction(field), set: stringSetFunction(field)};
     });
+    // Note that Object.defineProperty doesn't seem to work here... bug defineProperties does
+    // No idea why.
     Object.defineProperties(String.prototype, stringProps);
 
     /**
@@ -183,13 +163,12 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         FILTER: {get: filter},
     };
     // Expose an API on the global scope
-    global.sample = sample;
     global.INFO = INFO;
     Object.defineProperties(global, props);
     // Declare globally accessible objects for the sample names. If the name is javascript safe then
     // that sample will be accessible by it's raw name without needing to explicitly call sample()
     sampleNames.forEach(function (name) {
-        global[name] = sample(name);
+        global[name] = name;
     });
     global.samples = sampleNames;
 
