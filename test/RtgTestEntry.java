@@ -28,7 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +68,6 @@ public final class RtgTestEntry {
   private static final int TESTS_PER_ROW = 120;
   private static final long LONG_TEST_THRESHOLD = 200;
   private static final int TIMING_WIDTH = 120;
-  private static final String LINE = "-------------";
 
   /**
    * Collects timing of all the run tests.
@@ -112,54 +110,7 @@ public final class RtgTestEntry {
     }
   }
 
-  /**
-   * Captures stdout/stderr of tests
-   */
-  private static class OutputListener extends RunListener {
-    private PrintStream mOriginalOut;
-    private PrintStream mOriginalError;
-    PrintStream mOutStream;
-    PrintStream mErrorStream;
-    private ByteArrayOutputStream mOut;
-    private ByteArrayOutputStream mErr;
-
-    @Override
-    public void testStarted(Description description) throws Exception {
-      mOriginalOut = System.out;
-      mOriginalError = System.err;
-      mOut = new ByteArrayOutputStream();
-      mOutStream = new PrintStream(mOut);
-      mErr = new ByteArrayOutputStream();
-      mErrorStream = new PrintStream(mErr);
-      System.setOut(mOutStream);
-      System.setErr(mErrorStream);
-    }
-
-    @Override
-    public void testFinished(Description description) throws Exception {
-      final String name = testName(description);
-      mOutStream.flush();
-      mOutStream.close();
-      mErrorStream.flush();
-      mErrorStream.close();
-      System.setOut(mOriginalOut);
-      System.setErr(mOriginalError);
-      if (mOut.toString().length() > 0) {
-        System.out.println();
-        System.out.println(LINE + "STDOUT for: " + name + LINE);
-        System.out.println(mOut.toString());
-        System.out.println(LINE + LINE + LINE);
-      }
-      if (mErr.toString().length() > 0) {
-        System.out.println();
-        System.out.println(LINE + "STDERR for: " + name + LINE);
-        System.out.println(mErr.toString());
-        System.out.println(LINE + LINE + LINE);
-      }
-    }
-  }
-
-  private static String testName(Description description) {
+  static String testName(Description description) {
     return description.getClassName() + "." + description.getMethodName();
   }
 

@@ -61,7 +61,7 @@ public class ClassPathSuite {
     if (SHUFFLE_TESTS != null) { // Run test classes in random order to help detect any stray inter-test dependencies
       shuffle(testClasses);
     }
-    System.err.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
+    System.out.println("Found " + testClasses.size() + " test classes with package prefix \"" + packagePrefix + "\"");
     mTestClasses = testClasses;
   }
 
@@ -76,7 +76,7 @@ public class ClassPathSuite {
    */
   private static <T> void shuffle(List<T> arr) {
     final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.parseLong(SHUFFLE_TESTS));
-    System.err.println("Shuffling tests with seed: " + r.getSeed());
+    System.out.println("Shuffling tests with seed: " + r.getSeed());
     for (int i = 0; i < arr.size(); i++) {
       final int z = r.nextInt(arr.size() - i);
       Collections.swap(arr, i + z, i);
