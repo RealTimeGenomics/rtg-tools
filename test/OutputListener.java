@@ -45,8 +45,8 @@ class OutputListener extends RunListener {
   private static final String LINE = "-------------";
   private PrintStream mOriginalOut;
   private PrintStream mOriginalError;
-  private LateOutputStream mOut;
-  private LateOutputStream mErr;
+  private LateOutputStream mOut = null;
+  private LateOutputStream mErr = null;
 
   /**
    * An output stream that will hang around and redirect any output that occurs after it has been closed to a dedicated
@@ -108,8 +108,12 @@ class OutputListener extends RunListener {
   @Override
   public void testFinished(Description description) throws Exception {
     final String name = RtgTestEntry.testName(description);
-    mOut.close();
-    mErr.close();
+    if (mOut != null) {
+      mOut.close();
+    }
+    if (mErr != null) {
+      mErr.close();
+    }
     System.setOut(mOriginalOut);
     System.setErr(mOriginalError);
     writeCollectedOutput(name, "STDOUT", mOut.getOut());
