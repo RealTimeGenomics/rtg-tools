@@ -46,12 +46,6 @@ import junit.framework.TestCase;
  */
 public class ScriptedVcfFilterTest extends TestCase {
 
-  public void test() {
-    final ScriptedVcfFilter filter = getScriptedVcfFilter("rec.getRefCall() == 'A'");
-    assertTrue(filter.accept(new VcfRecord("blah", 1, "A")));
-    assertFalse(filter.accept(new VcfRecord("blah", 1, "C")));
-  }
-
   private VcfHeader getVcfHeader() {
     final VcfHeader vcfHeader = new VcfHeader();
     vcfHeader.addSampleName("BOB");
@@ -110,8 +104,6 @@ public class ScriptedVcfFilterTest extends TestCase {
     record.addFormatAndSample("GT", "0/1");
     record.addFormatAndSample("GT", "1/1");
     assertTrue(getScriptedVcfFilter("BOB.GT == '0/1'", header).accept(record));
-    // Via sample function
-    assertTrue(getScriptedVcfFilter("sample('FRANK-2').GT == '1/1'", header).accept(record));
     // Via string prototype
     assertTrue(getScriptedVcfFilter("'FRANK-2'.GT == '1/1'", header).accept(record));
   }

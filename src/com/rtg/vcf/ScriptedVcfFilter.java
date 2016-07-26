@@ -54,6 +54,8 @@ public class ScriptedVcfFilter implements VcfFilter {
   public static final String END = "end";
   /** Name of the record function */
   private static final String RECORD = "record";
+  public static final String RECORD_VARIABLE = "RTG_VCF_RECORD";
+  public static final String HEADER_VARIABLE = "RTG_VCF_HEADER";
 
   private final ScriptEngine mEngine;
   private final CompiledScript mCompiledExpression;
@@ -95,7 +97,7 @@ public class ScriptedVcfFilter implements VcfFilter {
     if (mCompiledExpression == null && mRecordFunction == null) {
       return true;
     }
-    mEngine.put("rec", record);
+    mEngine.put(RECORD_VARIABLE, record);
     return invokeRecordFunction(record) && invokeExpression(record);
   }
 
@@ -105,7 +107,10 @@ public class ScriptedVcfFilter implements VcfFilter {
     }
     try {
       final Object eval = mCompiledExpression.eval();
-        return eval == null || Boolean.valueOf(eval.toString());
+      if (eval == null || !(eval instanceof Boolean)) {
+        throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + "The expression did not evaluate to a boolean value.");
+      }
+      return eval == null || Boolean.valueOf(eval.toString());
     } catch (ScriptException e) {
       throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + e.getMessage());
     }
@@ -117,7 +122,13 @@ public class ScriptedVcfFilter implements VcfFilter {
     }
     try {
       final Object o = mRecordFunction.call(null);
-      return o == null || Boolean.valueOf(o.toString());
+      if (o == null) {
+        return true;
+      }
+      if (!(o instanceof Boolean)) {
+        throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + "The return value of the record funciton was not a boolean.");
+      }
+      return (Boolean) o;
     } catch (RuntimeException e) {
       throw new NoTalkbackSlimException("Can't evaluate record function against : " + record + StringUtils.LS + e.getMessage());
     }
@@ -125,7 +136,7 @@ public class ScriptedVcfFilter implements VcfFilter {
 
   @Override
   public void setHeader(VcfHeader header) {
-    mEngine.put("header", header);
+    mEngine.put(HEADER_VARIABLE, header);
     try {
       mEngine.eval(new InputStreamReader(Resources.getResourceAsStream("com/rtg/vcf/resources/vcf_filter_preamble.js")));
     } catch (ScriptException e) {

@@ -19,14 +19,14 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     }
     
     // First we need to know the sample names
-    var sampleNames = listToArray(header.getSampleNames());
+    var sampleNames = listToArray(RTG_VCF_HEADER.getSampleNames());
     var sampleLookup = {};
     sampleNames.forEach(function (name, index) {
         sampleLookup[name] = index;
     });
 
     /** List of format IDs */
-    var formatIds = listToArray(header.getFormatLines()).map(function (field) {
+    var formatIds = listToArray(RTG_VCF_HEADER.getFormatLines()).map(function (field) {
         return field.getId()
     });
 
@@ -38,7 +38,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     function stringGetFunction(field) {
         return function () {
             var index = sampleLookup[this];
-            var fields = rec.getFormatAndSample().get(field);
+            var fields = RTG_VCF_RECORD.getFormatAndSample().get(field);
             return fields == null ? "." : fields.get(index);
         }
     }
@@ -51,7 +51,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     function stringSetFunction(field) {
         return function (value) {
             var index = sampleLookup[this];
-            rec.setFormatAndSample(field, value, index);
+            RTG_VCF_RECORD.setFormatAndSample(field, value, index);
         }
     }
 
@@ -71,7 +71,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      */
     function infoGet(field) {
         return function () {
-            var infoList = listToArray(rec.getInfo().get(field));
+            var infoList = listToArray(RTG_VCF_RECORD.getInfo().get(field));
             if (infoList == null) {
                 return ".";
             }
@@ -92,12 +92,12 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             } else {
                 list.add(values);
             }
-            rec.getInfo().put(field, list);
+            RTG_VCF_RECORD.getInfo().put(field, list);
         }
     }
 
-// Map declared info fields to the INFO object
-    var infoIds = listToArray(header.getInfoLines()).map(function (info) {
+    // Map declared info fields to the INFO object
+    var infoIds = listToArray(RTG_VCF_HEADER.getInfoLines()).map(function (info) {
         return info.getId()
     });
     var INFO = {};
@@ -108,49 +108,49 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      * Fetch the pos from the current record
      */
     function pos() {
-        return rec.getOneBasedStart();
+        return RTG_VCF_RECORD.getOneBasedStart();
     }
 
     /**
      * Fetch the CHROM from the current record
      */
     function chrom() {
-        return rec.getSequenceName();
+        return RTG_VCF_RECORD.getSequenceName();
     }
 
     /**
      * Fetch the REF from the current record
      */
     function ref() {
-        return rec.getRefCall();
+        return RTG_VCF_RECORD.getRefCall();
     }
 
     /**
      * Fetch the Alts as an array
      */
     function alt() {
-        return listToArray(rec.getAltCalls());
+        return listToArray(RTG_VCF_RECORD.getAltCalls());
     }
 
     /**
      * Fetch the QUAL from the current record
      */
     function qual() {
-        return rec.getQuality();
+        return RTG_VCF_RECORD.getQuality();
     }
 
     /**
      * Fetch the FILTER from the current record
      */
     function filter() {
-        return listToArray(rec.getFilters());
+        return listToArray(RTG_VCF_RECORD.getFilters());
     }
 
     /**
      * Fetch the ID from the current record
      */
     function id() {
-        return rec.getId();
+        return RTG_VCF_RECORD.getId();
     }
 
     var props = {
@@ -170,11 +170,11 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     sampleNames.forEach(function (name) {
         global[name] = name;
     });
-    global.samples = sampleNames;
+    global.SAMPLES = sampleNames;
 
     global.ensureFormatHeader = function (format) {
         var formatField = new FormatField(format);
-        header.ensureContains(formatField);
+        RTG_VCF_HEADER.ensureContains(formatField);
         var id = formatField.getId();
         var stringProps = {};
         stringProps[id] = {get: stringGetFunction(id), set: stringSetFunction(id)};
@@ -182,7 +182,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     };
     global.ensureInfoHeader = function (info) {
         var infoField = new InfoField(info);
-        header.ensureContains(infoField);
+        RTG_VCF_HEADER.ensureContains(infoField);
         var id = infoField.getId();
         Object.defineProperty(global.INFO, id, {get: infoGet(id), set: infoSet(id)});
     };
