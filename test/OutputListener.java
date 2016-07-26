@@ -110,14 +110,14 @@ class OutputListener extends RunListener {
     final String name = RtgTestEntry.testName(description);
     if (mOut != null) {
       mOut.close();
+      System.setOut(mOriginalOut);
+      writeCollectedOutput(name, "STDOUT", mOut.getOut());
     }
     if (mErr != null) {
       mErr.close();
+      System.setErr(mOriginalError);
+      writeCollectedOutput(name, "STDERR", mErr.getOut());
     }
-    System.setOut(mOriginalOut);
-    System.setErr(mOriginalError);
-    writeCollectedOutput(name, "STDOUT", mOut.getOut());
-    writeCollectedOutput(name, "STDERR", mErr.getOut());
   }
 
   private static void writeCollectedOutput(String testName, String outputName, ByteArrayOutputStream out) {
