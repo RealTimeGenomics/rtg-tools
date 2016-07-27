@@ -45,6 +45,7 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.VcfHeader;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.internal.runtime.Undefined;
 
 /**
  * Filter than runs supplied Javascript to determine if record should be accepted
@@ -54,8 +55,8 @@ public class ScriptedVcfFilter implements VcfFilter {
   public static final String END = "end";
   /** Name of the record function */
   private static final String RECORD = "record";
-  public static final String RECORD_VARIABLE = "RTG_VCF_RECORD";
-  public static final String HEADER_VARIABLE = "RTG_VCF_HEADER";
+  private static final String RECORD_VARIABLE = "RTG_VCF_RECORD";
+  private static final String HEADER_VARIABLE = "RTG_VCF_HEADER";
 
   private final ScriptEngine mEngine;
   private final CompiledScript mCompiledExpression;
@@ -110,7 +111,7 @@ public class ScriptedVcfFilter implements VcfFilter {
       if (eval == null || !(eval instanceof Boolean)) {
         throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + "The expression did not evaluate to a boolean value.");
       }
-      return eval == null || Boolean.valueOf(eval.toString());
+      return Boolean.valueOf(eval.toString());
     } catch (ScriptException e) {
       throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + e.getMessage());
     }
@@ -122,11 +123,11 @@ public class ScriptedVcfFilter implements VcfFilter {
     }
     try {
       final Object o = mRecordFunction.call(null);
-      if (o == null) {
+      if (o instanceof Undefined) {
         return true;
       }
       if (!(o instanceof Boolean)) {
-        throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + "The return value of the record funciton was not a boolean.");
+        throw new NoTalkbackSlimException("Could not evaluate script on record: " + record + StringUtils.LS + "The return value of the record function was not a boolean.");
       }
       return (Boolean) o;
     } catch (RuntimeException e) {
