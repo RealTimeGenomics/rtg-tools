@@ -282,14 +282,6 @@ class VcfFilterTask {
     if (allSameAsRef(record)) {
       return false;
     }
-    for (final VcfFilter filter : mFilters) {
-      if (!filter.accept(record)) {
-        if (!(filter instanceof VcfSampleFilter)) {
-          mNonSampleSpecificFailed = true;
-        }
-        return false;
-      }
-    }
     // Sample specific
     if (mCheckingSample) {
       boolean acceptGt = true;
@@ -316,6 +308,14 @@ class VcfFilterTask {
       mVcfFilterStatistics.increment(Stat.INCLUDE_BED_COUNT);
       mNonSampleSpecificFailed = true;
       return false;
+    }
+    for (final VcfFilter filter : mFilters) {
+      if (!filter.accept(record)) {
+        if (!(filter instanceof VcfSampleFilter)) {
+          mNonSampleSpecificFailed = true;
+        }
+        return false;
+      }
     }
     return true;
   }
