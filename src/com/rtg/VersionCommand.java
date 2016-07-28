@@ -55,9 +55,10 @@ public final class VersionCommand {
   static final String CONTACT_STR = "Contact:";
 
   static final String RAM_STR = "RAM:";
+  static final String CPU_STR = "CPU:";
   static final String JAVA_VERSION_STR = "JVM:";
 
-  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2014";
+  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2016";
 
   static final String CITE_STR = "Citation:" + LS
     + "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
@@ -128,6 +129,10 @@ public final class VersionCommand {
     + "(" + percentageAllocated + "%)";
   }
 
+  static String getCpuString() {
+    return "Defaulting to " + Environment.defaultThreads() + " of " + Environment.getAvailableProcessors() + " available processors (" + (100 * Environment.defaultThreads() / Environment.getAvailableProcessors()) + "%)";
+  }
+
   static String getJavaVersion() {
     final String version = System.getProperty("java.version");
     final String vm = System.getProperty("java.vm.name");
@@ -157,6 +162,7 @@ public final class VersionCommand {
     sb.append(VERSION_STR + " ").append(Environment.getCoreVersion()).append(LS);
     if (License.checkLicense()) {
       sb.append(RAM_STR).append(" ").append(getRamString()).append(LS);
+      sb.append(CPU_STR).append(" ").append(getCpuString()).append(LS);
       sb.append(JAVA_VERSION_STR).append(" ").append(getJavaVersion()).append(LS);
     }
     sb.append(LicenseCommand.getLicenseSummary());

@@ -211,7 +211,7 @@ public final class Environment {
       return getAvailableProcessors();
     }
     try {
-      return Integer.parseInt(s);
+      return Math.max(1, Integer.parseInt(s));
     } catch (NumberFormatException e) {
       throw new NoTalkbackSlimException("the system configuration for default number of threads is invalid: " + s);
     }
