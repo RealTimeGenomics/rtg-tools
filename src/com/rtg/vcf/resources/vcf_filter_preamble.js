@@ -51,7 +51,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     function stringSetFunction(field) {
         return function (value) {
             var index = sampleLookup[this];
-            RTG_VCF_RECORD.setFormatAndSample(field, value, index);
+            RTG_VCF_RECORD.setFormatAndSample(field, value.toString(), index);
         }
     }
 
@@ -87,10 +87,10 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             var list = new ArrayList();
             if (Array.isArray(values)) {
                 values.forEach(function (val) {
-                    list.add(val);
+                    list.add(val.toString());
                 });
             } else {
-                list.add(values);
+                list.add(values.toString());
             }
             RTG_VCF_RECORD.getInfo().put(field, list);
         }
