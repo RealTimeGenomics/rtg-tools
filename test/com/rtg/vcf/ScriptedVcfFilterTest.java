@@ -225,12 +225,29 @@ public class ScriptedVcfFilterTest {
   }
 
   @Test
+  public void testUpdateInfoNumerics() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN", "FOO");
+    assertTrue(getScriptedVcfFilter("INFO.IN = [12, -99]; true").accept(record));
+    assertEquals(Arrays.asList("12", "-99"), record.getInfo().get("IN"));
+  }
+
+  @Test
   public void testUpdateInfoSingle() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ'; true").accept(record));
     assertEquals(Collections.singletonList("BAZ"), record.getInfo().get("IN"));
   }
+
+  @Test
+  public void testUpdateInfoSingleNumeric() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN", "FOO");
+    assertTrue(getScriptedVcfFilter("INFO.IN = -99; true").accept(record));
+    assertEquals(Collections.singletonList("-99"), record.getInfo().get("IN"));
+  }
+
   @Test
   public void testRecordFunctionNoReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
@@ -259,5 +276,12 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addInfo("IN", "FOO");
     assertFalse(getScriptedVcfFilter(null, "function record() {return false;}").accept(record));
+  }
+
+  @Test
+  public void testMultipleBegins() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN", "FOO");
+    assertTrue(getScriptedVcfFilter(null, "var expected = 'A'", "function record() {return REF == expected;}").accept(record));
   }
 }
