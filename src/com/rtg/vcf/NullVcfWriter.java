@@ -30,48 +30,35 @@
 
 package com.rtg.vcf;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import com.rtg.vcf.header.InfoField;
-import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
+ * VCF writer that doesn't write anywhere
  */
-public class DefaultVcfWriterTest extends AbstractVcfWriterTest {
+class NullVcfWriter implements VcfWriter {
+  private final VcfHeader mHeader;
+
+  /**
+   * Simple constructor
+   * @param header the header to return when {@code getHeader} is called
+   */
+  NullVcfWriter(VcfHeader header) {
+    mHeader = header;
+  }
 
   @Override
-  protected VcfWriter getVcfWriter(VcfHeader head, OutputStream out) {
-    return new DefaultVcfWriter(head, out);
+  public VcfHeader getHeader() {
+    return mHeader;
   }
 
-  public void testErrors() {
-    try {
-      new DefaultVcfWriter(null, new ByteArrayOutputStream());
-    } catch (NullPointerException ex) {
-      assertEquals("header cannot be null", ex.getMessage());
-    }
-
-    try {
-      new DefaultVcfWriter(new VcfHeader(), null);
-    } catch (NullPointerException ex) {
-      assertEquals("output stream cannot be null", ex.getMessage());
-    }
+  @Override
+  public void write(VcfRecord record) throws IOException {
   }
 
-  public void testNoHeader() throws IOException {
-    try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      final VcfHeader header = new VcfHeader();
-      header.addInfoField(new InfoField("YO", MetaType.CHARACTER, VcfNumber.ONE, "testing"));
-      try (final DefaultVcfWriter defaultVcfWriter = new DefaultVcfWriter(header, null, out, false, false, false)) {
-        final VcfRecord vcfRecord = new VcfRecord("foo", 2, "A");
-        defaultVcfWriter.write(vcfRecord);
-      }
-      out.flush();
-      assertEquals("foo\t3\t.\tA\t.\t.\t.\t.\n", out.toString());
-    }
+  @Override
+  public void close() throws IOException {
+    // NOP
   }
 }

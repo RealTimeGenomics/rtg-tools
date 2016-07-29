@@ -42,6 +42,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.rtg.util.NullStreamUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -70,7 +71,7 @@ public class ScriptedVcfFilterTest {
   }
 
   private ScriptedVcfFilter getScriptedVcfFilter(String expression, VcfHeader header, String... begin) {
-    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin));
+    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin), NullStreamUtils.getNullOutputStream());
     scriptedVcfFilter.setHeader(header);
     return scriptedVcfFilter;
   }

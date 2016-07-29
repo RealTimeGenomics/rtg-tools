@@ -30,6 +30,8 @@
 package com.rtg.vcf;
 
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,10 +69,12 @@ public class ScriptedVcfFilter implements VcfFilter {
   /**
    * @param expression script to run to determine if record should be accepted
    * @param beginnings initialisation scripts to run at start of processing
+   * @param output output stream for the JavaScript print method
    */
-  public ScriptedVcfFilter(String expression, List<String> beginnings) {
+  public ScriptedVcfFilter(String expression, List<String> beginnings, OutputStream output) {
     final ScriptEngineManager manager = new ScriptEngineManager();
     mEngine = manager.getEngineByName("js");
+    mEngine.getContext().setWriter(new OutputStreamWriter(output));
     if (mEngine == null || !(mEngine instanceof Compilable)) {
       throw new NoTalkbackSlimException("No compatible javascript engine available");
     }

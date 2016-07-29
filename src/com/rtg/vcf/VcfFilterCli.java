@@ -117,7 +117,7 @@ public final class VcfFilterCli extends AbstractCli {
 
   private static final String EXPR_FLAG = "Xexpr";
   private static final String KEEP_EXPRESSION_FLAG = "keep-expr";
-  private static final String JS_BEGIN_FLAG = "javascript";
+  private static final String JAVASCRIPT_FLAG = "javascript";
   private static final String NO_HEADER = "no-header";
 
 
@@ -150,8 +150,8 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered.");
     CommonFlagCategories.setCategories(mFlags);
 
-    mFlags.registerRequired('i', INPUT, File.class, "file", "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    final Flag input = mFlags.registerOptional('i', INPUT, File.class, "file", "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    final Flag output = mFlags.registerOptional('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
 
@@ -214,10 +214,12 @@ public final class VcfFilterCli extends AbstractCli {
     final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, "STRING", "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
-    final Flag begin = mFlags.registerOptional('j', JS_BEGIN_FLAG, String.class, "STRING", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
-    begin.setCategory(FILTERING);
-    begin.setMaxCount(Integer.MAX_VALUE);
+    final Flag javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, "STRING", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
+    javascript.setCategory(FILTERING);
+    javascript.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(INPUT_OUTPUT);
+    mFlags.addRequiredSet(input, output);
+    mFlags.addRequiredSet(input, javascript);
     mFlags.setValidator(new VcfFilterValidator());
   }
 
@@ -225,6 +227,9 @@ public final class VcfFilterCli extends AbstractCli {
   private static class VcfFilterValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
+      if (!flags.checkOr(OUTPUT, JAVASCRIPT_FLAG)) {
+        return false;
+      }
       final File input = (File) flags.getValue(INPUT);
       if (!CommonFlags.isStdio(input)) {
         if (!input.exists()) {
@@ -236,12 +241,14 @@ public final class VcfFilterCli extends AbstractCli {
           return false;
         }
       }
-      final File o = (File) flags.getValue(OUTPUT);
-      if (!CommonFlags.isStdio(o)) {
-        final File output = FileUtils.getZippedFileName(!flags.isSet(NO_GZIP), o);
-        if (output.exists()) {
-          flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
-          return false;
+      if (flags.isSet(OUTPUT)) {
+        final File o = (File) flags.getValue(OUTPUT);
+        if (!CommonFlags.isStdio(o)) {
+          final File output = FileUtils.getZippedFileName(!flags.isSet(NO_GZIP), o);
+          if (output.exists()) {
+            flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
+            return false;
+          }
         }
       }
       if ((flags.isSet(MIN_GENOTYPE_QUALITY) || flags.isSet(MAX_GENOTYPE_QUALITY)) && (flags.isSet(MIN_POSTERIOR_SCORE) || flags.isSet(MAX_POSTERIOR_SCORE))) {
@@ -482,35 +489,43 @@ public final class VcfFilterCli extends AbstractCli {
       }
     }
 
-    final Optional<ScriptedVcfFilter> scriptFilter = buildScriptFilter(mFlags);
+    final Optional<ScriptedVcfFilter> scriptFilter = buildScriptFilter(mFlags, output);
     scriptFilter.ifPresent(mVcfFilterTask.mFilters::add);
 
     final File in = (File) mFlags.getValue(INPUT);
     final File out = (File) mFlags.getValue(OUTPUT);
-    final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
-    final boolean stdout = CommonFlags.isStdio(out);
+    final boolean stdout = out != null && CommonFlags.isStdio(out);
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
-      final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), vcfFile, output, gzip, index, !mFlags.isSet(NO_HEADER)))) {
+      try (VcfWriter w = getVcfWriter(output, out, r)) {
         mVcfFilterTask.filterVcf(r, w);
       }
-      if (!stdout) {
+      if (!stdout && out != null) {
         mVcfFilterTask.printStatistics(output);
       }
       scriptFilter.ifPresent(ScriptedVcfFilter::end);
     }
   }
 
-  private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags) throws IOException {
+  private VcfWriter getVcfWriter(OutputStream output, File out, VcfReader r) throws IOException {
+    if (out == null) {
+      return new NullVcfWriter(r.getHeader());
+    }
+    final boolean gzip = !mFlags.isSet(NO_GZIP);
+    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
+    final boolean writeHeader = !mFlags.isSet(NO_HEADER);
+    final File outputFile = CommonFlags.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
+    return new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), outputFile, output, gzip, index, writeHeader));
+  }
+
+  private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {
     final String expressionString = fileOrString(flags, KEEP_EXPRESSION_FLAG);
     final List<String> beginnings = new ArrayList<>();
-    for (Object begin : flags.getValues(JS_BEGIN_FLAG)) {
+    for (Object begin : flags.getValues(JAVASCRIPT_FLAG)) {
       beginnings.add(fileIfExists((String) begin));
     }
     if (expressionString != null || beginnings.size() > 0) {
-      final ScriptedVcfFilter filter = new ScriptedVcfFilter(expressionString, beginnings);
+      final ScriptedVcfFilter filter = new ScriptedVcfFilter(expressionString, beginnings, output);
       return Optional.of(filter);
     }
     return Optional.empty();
