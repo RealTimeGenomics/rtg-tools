@@ -74,10 +74,10 @@ public class ScriptedVcfFilter implements VcfFilter {
   public ScriptedVcfFilter(String expression, List<String> beginnings, OutputStream output) {
     final ScriptEngineManager manager = new ScriptEngineManager();
     mEngine = manager.getEngineByName("js");
-    mEngine.getContext().setWriter(new OutputStreamWriter(output));
     if (mEngine == null || !(mEngine instanceof Compilable)) {
       throw new NoTalkbackSlimException("No compatible javascript engine available");
     }
+    mEngine.getContext().setWriter(new OutputStreamWriter(output));
     final Compilable compileable = (Compilable) mEngine;
     if (expression == null) {
       mCompiledExpression = null;

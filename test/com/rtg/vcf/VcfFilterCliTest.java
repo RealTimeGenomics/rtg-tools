@@ -649,7 +649,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final String expected = Stream.of(41367, 41379, 41993, 44376, 44808, 45027, 45199, 45403, 45418, 45777, 45793,
           45921, 46168, 46244, 46375, 57063, 57076, 57473, 82069, 82299,
           82518, 83161, 83182, 83183, 84324, 84414, 84449)
-          .map(Object::toString).collect(Collectors.joining("\n")) + "\n";
+          .map(Object::toString).collect(Collectors.joining(StringUtils.LS)) + StringUtils.LS;
         assertEquals(expected, output.out());
       }
     }
