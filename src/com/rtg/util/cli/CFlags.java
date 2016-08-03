@@ -640,12 +640,35 @@ public final class CFlags {
   public boolean setFlags(final String... args) {
     reset();
     mArguments = args.clone();
-    final List<String> remaining = new ArrayList<>();
     boolean success = true;
+
+    // Quickly scan args to see if it looks like they tried to ask for help,
+    // even if it's in a position where a flag value was expected
+    boolean checkHelp = getFlag(HELP_FLAG) != null;
+    boolean checkExHelp = getFlag(EXTENDED_HELP_FLAG) != null;
+    boolean checkExexHelp = getFlag(EXPERIMENTAL_HELP_FLAG) != null;
+    for (final String arg : args) {
+      if (checkHelp && ((LONG_FLAG_PREFIX + HELP_FLAG).equals(arg) || (SHORT_FLAG_PREFIX + "h").equals(arg))) {
+        setFlag(getFlag(HELP_FLAG), null);
+        checkHelp = false;
+      }
+      if (checkExHelp && (LONG_FLAG_PREFIX + EXTENDED_HELP_FLAG).equals(arg)) {
+        setFlag(getFlag(EXTENDED_HELP_FLAG), null);
+        checkExHelp = false;
+      }
+      if (checkExexHelp && (LONG_FLAG_PREFIX + EXPERIMENTAL_HELP_FLAG).equals(arg)) {
+        setFlag(getFlag(EXPERIMENTAL_HELP_FLAG), null);
+        checkExexHelp = false;
+      }
+    }
+    if (isSet(HELP_FLAG) || isSet(EXTENDED_HELP_FLAG) || isSet(EXPERIMENTAL_HELP_FLAG)) {
+      success = false;
+    }
+
+    final List<String> remaining = new ArrayList<>();
     int anonymousCount = 0;
-    int i = 0;
     boolean restAnonymous = false;
-    for (; i < args.length && success; i++) {
+    for (int i = 0; i < args.length && success; i++) {
       final String nameArg = args[i];
       Flag flag = null;
       String value = null;
@@ -704,27 +727,7 @@ public final class CFlags {
         remaining.add(args[i]);
       }
     }
-    if (!success) {
-      final boolean checkHelp = getFlag(HELP_FLAG) != null && !isSet(HELP_FLAG);
-      final boolean checkExHelp = getFlag(EXTENDED_HELP_FLAG) != null && !isSet(EXTENDED_HELP_FLAG);
-      final boolean checkExexHelp = getFlag(EXPERIMENTAL_HELP_FLAG) != null && !isSet(EXPERIMENTAL_HELP_FLAG);
-      // Quickly scan args to see if it looks like they tried to ask for help,
-      // even if it's in a position where a flag value was expected
-      for (i = 0; i < args.length; i++) {
-        if (checkHelp && ((LONG_FLAG_PREFIX + HELP_FLAG).equals(args[i]) || (SHORT_FLAG_PREFIX + "h").equals(args[i]))) {
-          setFlag(getFlag(HELP_FLAG), null);
-        }
-        if (checkExHelp && (LONG_FLAG_PREFIX + EXTENDED_HELP_FLAG).equals(args[i])) {
-          setFlag(getFlag(EXTENDED_HELP_FLAG), null);
-        }
-        if (checkExexHelp && (LONG_FLAG_PREFIX + EXPERIMENTAL_HELP_FLAG).equals(args[i])) {
-          setFlag(getFlag(EXPERIMENTAL_HELP_FLAG), null);
-        }
-      }
-    }
-    if (isSet(HELP_FLAG) || isSet(EXTENDED_HELP_FLAG) || isSet(EXPERIMENTAL_HELP_FLAG)) {
-      success = false;
-    }
+
     if (success && !remaining.isEmpty()) {
       setRemainingParseMessage(remaining);
       success = false;

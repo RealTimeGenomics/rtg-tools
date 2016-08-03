@@ -117,8 +117,7 @@ public class CFlagsTest extends TestCase {
         "Sends output to a file instead of the screen.", "default");
     mFlags
         .setDescription("For help on interactive use or script commands, type 'help' at program startup.");
-    String[] args = {"--q", "--in", "a" };
-    if (!mFlags.setFlags(args)) {
+    if (!mFlags.setFlags("--q", "--in", "a")) {
       fail("Shouldn't fail");
     }
     assertTrue(mFlags.isSet("q"));
@@ -130,8 +129,11 @@ public class CFlagsTest extends TestCase {
     assertEquals(Boolean.FALSE, mFlags.getValue("log"));
     assertEquals(Boolean.TRUE, mFlags.getValue("q"));
 
-    args = new String[] {"--q", "--in" };
-    if (mFlags.setFlags(args)) {
+    if (mFlags.setFlags("--q", "--in")) {
+      fail("Should have failed.");
+    }
+
+    if (mFlags.setFlags("--in", "--help")) {
       fail("Should have failed.");
     }
   }
@@ -439,8 +441,9 @@ public class CFlagsTest extends TestCase {
     assertFalse(mFlags.setFlags("--zz", "h", "t", "k"));
     assertEquals("Unexpected arguments \"t\" \"k\"", mFlags.getParseMessage());
 
-    assertFalse(mFlags.setFlags("--uu", "-h"));
-    assertFalse(mFlags.setFlags("--zz", "-h"));
+    assertFalse(mFlags.setFlags("--uu", "--zz", "h"));
+    assertEquals("Unknown flag --uu", mFlags.getParseMessage());
+    assertFalse(mFlags.setFlags("--zz", "h"));
     assertEquals("You must provide a value for -j HIZ", mFlags.getParseMessage());
     try {
       mFlags.setFlags("--zz", null);
