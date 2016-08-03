@@ -32,12 +32,14 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.Map;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
@@ -81,14 +83,33 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
   }
 
+  @Override
+  protected final void resetBaselineRecordFields(VcfRecord rec) {
+    resetOurAnnotations(rec);
+  }
+
+  @Override
+  protected final void resetCallRecordFields(VcfRecord rec) {
+    resetOurAnnotations(rec);
+  }
+
+  // Remove any pre-existing annotations for VCFs that have already been through vcfeval
+  private void resetOurAnnotations(VcfRecord rec) {
+    final Map<String, ArrayList<String>> info = rec.getInfo();
+    info.remove(INFO_SYNCPOS);
+    info.remove(INFO_BASE);
+    info.remove(INFO_CALL);
+    info.remove(INFO_CALL_WEIGHT);
+  }
+
   static void addInfoHeaders(VcfHeader header, VariantSetType type) {
-    header.addInfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.");
+    header.ensureContains(new InfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed."));
     if (type == null || type == VariantSetType.BASELINE) {
-      header.addInfoField(INFO_BASE, MetaType.STRING, VcfNumber.ONE, "Baseline genotype status");
+      header.ensureContains(new InfoField(INFO_BASE, MetaType.STRING, VcfNumber.ONE, "Baseline genotype status"));
     }
     if (type == null || type == VariantSetType.CALLS) {
-      header.addInfoField(INFO_CALL, MetaType.STRING, VcfNumber.ONE, "Call genotype status");
-      header.addInfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, VcfNumber.ONE, "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0");
+      header.ensureContains(new InfoField(INFO_CALL, MetaType.STRING, VcfNumber.ONE, "Call genotype status"));
+      header.ensureContains(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, VcfNumber.ONE, "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0"));
     }
   }
 
