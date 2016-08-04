@@ -68,6 +68,15 @@ public class RangeList<T> {
     }
 
     /**
+     * Constuctor
+     * @param range an existing range range.
+     * @param metas the meta-data to store.
+     */
+    public RangeData(Interval range, List<T> metas) {
+      this(range.getStart(), range.getEnd(), metas);
+    }
+
+    /**
      * Constructor.
      * @param start the start of the range (0-based inclusive).
      * @param end the end of the range (0-based exclusive).
@@ -88,7 +97,7 @@ public class RangeList<T> {
      * @param end the end of the range (0-based exclusive).
      * @param metas the list of meta-data to store.
      */
-    private RangeData(int start, int end, List<T> metas) {
+    public RangeData(int start, int end, List<T> metas) {
       super(start, end);
       if (end < start) {
         throw new NoTalkbackSlimException("Invalid range : [" + start + "," + end + ") ");
