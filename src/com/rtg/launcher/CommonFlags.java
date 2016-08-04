@@ -55,6 +55,7 @@ import com.rtg.util.intervals.RegionRestriction;
  */
 public final class CommonFlags {
 
+
   private CommonFlags() { }
 
   /** output filter flag */
@@ -81,6 +82,8 @@ public final class CommonFlags {
   public static final String TEMPLATE_FLAG = "template";
   /** reads flag */
   public static final String READS_FLAG = "input";
+  /** Name of the input file */
+  public static final String INPUT_FLAG = "input";
   /** Name of the output file. */
   public static final String OUTPUT_FLAG = "output";
   /** threads flag */
