@@ -56,7 +56,7 @@ public class NoTalkbackSlimException extends SlimException {
    * returned to the user via the diagnostics system.
    * A stack trace will not be logged.
    *
-   * @param t ignored
+   * @param t cause of this exception
    * @param type error type
    * @param args parameters of the error type
    */
@@ -74,6 +74,7 @@ public class NoTalkbackSlimException extends SlimException {
 
   /**
    * Report program failure to user
+   * @param t cause of this exception
    * @param message message for error
    */
   public NoTalkbackSlimException(Throwable t, String message) {
