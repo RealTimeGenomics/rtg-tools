@@ -71,4 +71,12 @@ public class NoTalkbackSlimException extends SlimException {
   public NoTalkbackSlimException(String message) {
     this(null, ErrorType.INFO_ERROR, message);
   }
+
+  /**
+   * Report program failure to user
+   * @param message message for error
+   */
+  public NoTalkbackSlimException(Throwable t, String message) {
+    this(t, ErrorType.INFO_ERROR, message);
+  }
 }
