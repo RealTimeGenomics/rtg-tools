@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,6 +76,7 @@ import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
+import htsjdk.samtools.SAMTextHeaderCodec;
 import htsjdk.samtools.SamInputResource;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
@@ -945,5 +947,16 @@ public final class SamUtils {
     } catch (final RuntimeIOException e) {
       throw (IOException) e.getCause();
     }
+  }
+
+  /**
+   * Converts a SAM header to text form
+   * @param header the header
+   * @return the text
+   */
+  public static String getHeaderAsString(SAMFileHeader header) {
+    final StringWriter writer = new StringWriter();
+    new SAMTextHeaderCodec().encode(writer, header);
+    return writer.toString();
   }
 }
