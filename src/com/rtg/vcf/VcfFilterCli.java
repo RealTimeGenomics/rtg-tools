@@ -33,6 +33,7 @@ import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 import java.io.IOException;
@@ -217,7 +218,7 @@ public final class VcfFilterCli extends AbstractCli {
     final Flag javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, "STRING", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
     javascript.setCategory(FILTERING);
     javascript.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     mFlags.addRequiredSet(input, output);
     mFlags.addRequiredSet(input, javascript);
     mFlags.setValidator(new VcfFilterValidator());

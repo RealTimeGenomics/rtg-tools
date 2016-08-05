@@ -32,6 +32,7 @@ package com.rtg.vcf;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,6 +66,7 @@ public class VcfSubset extends AbstractCli {
   private static final String MODULE_NAME = "vcfsubset";
   private static final String INPUT = "input";
   private static final String OUTPUT = "output";
+  private static final String NO_HEADER = "no-header";
 
   private static final String REMOVE_INFO = "remove-info";
   private static final String KEEP_INFO = "keep-info";
@@ -105,6 +107,7 @@ public class VcfSubset extends AbstractCli {
     mFlags.registerRequired('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
+    mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
 
     // Contents of FILTER
     mFlags.registerOptional(REMOVE_FILTER, String.class, "STRING", "remove the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
@@ -251,6 +254,7 @@ public class VcfSubset extends AbstractCli {
     final File output = (File) mFlags.getValue(OUTPUT);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
+    final boolean writeHeader = !mFlags.isSet(NO_HEADER);
     final boolean stdout = CommonFlags.isStdio(output);
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
@@ -352,7 +356,7 @@ public class VcfSubset extends AbstractCli {
         formatStripper.updateHeader(header);
       }
       header.addRunInfo();
-      try (final VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {
+      try (final VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index, writeHeader))) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
