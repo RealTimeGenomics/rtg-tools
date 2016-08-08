@@ -67,7 +67,7 @@ public class DataBundleTest extends TestCase {
     final DataBundle db = new DataBundle("Monkey", points.toArray(new Point2D[points.size()]), labels, 300);
     db.setScoreRange(0.0f, 1.0f);
     final PointPlot2D scorePoints = db.getScorePoints(1, 1);
-    final String[] exp = {"100", "90.0", "81.0", "71.0", "62.0", "52.0", "43.0", "33.0", "24.0", "14.0", "5.00", "None"};
+    final String[] exp = {"100", "90.0", "80.0", "70.0", "60.0", "50.0", "40.0", "30.0", "20.0", "10.0", "None"};
     final Datum2D[] data = scorePoints.getData();
     for (int i = 0; i < data.length; i++) {
       final Datum2D d = data[i];

@@ -36,6 +36,7 @@ import com.reeltwo.plot.Point2D;
 import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.TextPlot2D;
 import com.reeltwo.plot.TextPoint2D;
+import com.rtg.util.ContingencyTable;
 
 /**
  * Holds counts.
@@ -46,6 +47,8 @@ final class DataBundle {
   private final Point2D[] mPoints;
   private final String[] mScores;
 
+  private final Point2D[] mPrecisionRecall;
+
   private String mTitle;
   private final int mTotalVariants;
   private boolean mShow;
@@ -53,6 +56,8 @@ final class DataBundle {
   private Point2D[] mRangedPoints = null;
   private String[] mRangedScores = null;
   private TextPoint2D[] mRangedPosPoints = null;
+  private TextPoint2D[] mRangedPrecisionRecallPosPoints = null;
+  private Point2D[] mRangedPrecisionRecall;
   private String mScoreName;
 
   DataBundle(String title, Point2D[] points, String[] labels, int totalVariants) {
@@ -61,6 +66,13 @@ final class DataBundle {
     mTitle = title;
     mTotalVariants = totalVariants;
     mShow = true;
+    mPrecisionRecall = new Point2D[points.length - 1];
+    for (int i = 0; i < mPrecisionRecall.length; i++) {
+      final Point2D point = points[i + 1];
+      final float x = (float) (ContingencyTable.recall(point.getY(), mTotalVariants - point.getY()) * 100.0);
+      final float y = (float) (ContingencyTable.precision(point.getY(), point.getX()) * 100.0);
+      mPrecisionRecall[i] = new Point2D(x, y);
+    }
 
     resetRange();
   }
@@ -83,13 +95,18 @@ final class DataBundle {
 
     final ArrayList<String> scores = new ArrayList<>();
     final ArrayList<Point2D> points = new ArrayList<>();
+    final ArrayList<Point2D> precisionRecallPoints = new ArrayList<>();
 
     for (int i = smin; i < smax; i++) {
       scores.add(mScores[i]);
       points.add(mPoints[i]);
     }
+    for (int i = smin; i < Math.min(smax, mPrecisionRecall.length - 1); i++) {
+      precisionRecallPoints.add(mPrecisionRecall[i]);
+    }
 
     mRangedPoints = points.toArray(new Point2D[points.size()]);
+    mRangedPrecisionRecall = precisionRecallPoints.toArray(new Point2D[precisionRecallPoints.size()]);
     mRangedScores = new String[scores.size()];
     for (int i = 0; i < scores.size(); i++) {
       mRangedScores[i] = scores.get(i);
@@ -101,58 +118,76 @@ final class DataBundle {
   void resetRange() {
     mRangedPoints = mPoints;
     mRangedScores = mScores;
+    mRangedPrecisionRecall = mPrecisionRecall;
     updateLabels();
   }
 
   private void updateLabels() {
-    final ArrayList<Integer> counts = new ArrayList<>();
-    float px = 0;
-    float py = 0;
-    if (mRangedPoints.length != 0) {
-      px = mRangedPoints[0].getX();
-      py = mRangedPoints[0].getY();
-    }
-    int countTotal = 0;
-    for (Point2D p : mRangedPoints) {
-      final int c = (int) (p.getX() - px + p.getY() - py);
-      counts.add(c);
-      countTotal += c;
-      px = p.getX();
-      py = p.getY();
-    }
+    mRangedPosPoints = updateLabels(mRangedPoints, mRangedScores);
+    mRangedPrecisionRecallPosPoints = updateLabels(mRangedPrecisionRecall, mRangedScores);
+  }
+    private TextPoint2D[] updateLabels(Point2D[] rangedPoints, String[] rangedScores) {
+      final ArrayList<Integer> counts = new ArrayList<>();
+      float px = 0;
+      float py = 0;
+      if (rangedPoints.length != 0) {
+        px = rangedPoints[0].getX();
+        py = rangedPoints[0].getY();
+      }
+      int countTotal = 0;
+      for (Point2D p : rangedPoints) {
+        final int c = (int) (p.getX() - px + p.getY() - py);
+        counts.add(c);
+        countTotal += c;
+        px = p.getX();
+        py = p.getY();
+      }
 
-    final ArrayList<TextPoint2D> posPoints = new ArrayList<>();
-    // set up score labels - make TOTAL_LABELS per line
-    if (countTotal != 0) {
-      final int step = countTotal / TOTAL_LABELS;
-      Point2D p = mRangedPoints[0];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[0]));
-      if (step != 0) {
-        int c = 0;
-        for (int i = 0; i < counts.size(); i++) {
-          for (int j = 0; j < counts.get(i); j++) {
-            c++;
-            if (c != 0 && c % step == 0) {
-              p = mRangedPoints[i];
-              posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[i]));
+      final ArrayList<TextPoint2D> posPoints = new ArrayList<>();
+      // set up score labels - make TOTAL_LABELS per line
+      if (countTotal != 0) {
+        final double step = countTotal / (double) TOTAL_LABELS;
+        double next = step;
+        Point2D p = rangedPoints[0];
+        posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[0]));
+        if (step != 0) {
+          int c = 0;
+          for (int i = 0; i < counts.size(); i++) {
+            for (int j = 0; j < counts.get(i); j++) {
+              c++;
+              if (c >= next && posPoints.size() <= TOTAL_LABELS - 1) {
+                while (c >= next) {
+                  next += step;
+                }
+                p = rangedPoints[i];
+                posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[i]));
+              }
             }
           }
         }
+        final int end = rangedScores.length - 1;
+        p = rangedPoints[Math.min(end, rangedPoints.length - 1)];
+        posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[end]));
       }
-      final int end = mRangedScores.length - 1;
-      p = mRangedPoints[end];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), mRangedScores[end]));
+      return posPoints.toArray(new TextPoint2D[posPoints.size()]);
     }
-    mRangedPosPoints = posPoints.toArray(new TextPoint2D[posPoints.size()]);
-  }
 
   TextPoint2D getMaxRangedPoint() {
     return mRangedPosPoints.length == 0 ? null : mRangedPosPoints[mRangedPosPoints.length - 1];
   }
 
   PointPlot2D getPlot(int lineWidth, int colour) {
+    final PointPlot2D lplot = makePlot(lineWidth, colour, mRangedPoints);
+    return lplot;
+  }
+
+  PointPlot2D getPrecisionRecallPlot(int lineWidth, int colour) {
+    return makePlot(lineWidth, colour, mRangedPrecisionRecall);
+  }
+
+  private PointPlot2D makePlot(int lineWidth, int colour, Point2D[] rangedPrecisionRecall) {
     final PointPlot2D lplot = new PointPlot2D();
-    lplot.setData(mRangedPoints);
+    lplot.setData(rangedPrecisionRecall);
     lplot.setPoints(false);
     lplot.setLines(true);
     lplot.setLineWidth(lineWidth);
@@ -162,18 +197,34 @@ final class DataBundle {
   }
 
   TextPlot2D getScoreLabels() {
+    return makeScoreLabels(mRangedPosPoints);
+  }
+
+  TextPlot2D getPrecisionRecallScoreLabels() {
+    return makeScoreLabels(mRangedPrecisionRecallPosPoints);
+  }
+
+  private TextPlot2D makeScoreLabels(Point2D[] rangedPrecisionRecall) {
     final TextPlot2D tplot = new TextPlot2D();
-    tplot.setData(mRangedPosPoints);
+    tplot.setData(rangedPrecisionRecall);
     return tplot;
   }
 
   PointPlot2D getScorePoints(int lineWidth, int colour) {
+    return makeScorePoints(lineWidth, colour, mRangedPosPoints);
+  }
+
+  private PointPlot2D makeScorePoints(int lineWidth, int colour, TextPoint2D[] rangedPosPoints) {
     final PointPlot2D pplot = new PointPlot2D();
-    pplot.setData(mRangedPosPoints);
+    pplot.setData(rangedPosPoints);
     pplot.setPoints(true);
     pplot.setColor(colour);
     pplot.setLineWidth(lineWidth);
     return pplot;
+  }
+
+  PointPlot2D getPrecisionRecallScorePoints(int lineWidth, int colour) {
+    return makeScorePoints(lineWidth, colour, mRangedPrecisionRecallPosPoints);
   }
 
   int getTotalVariants() {

@@ -63,6 +63,7 @@ import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -78,6 +79,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
+import com.reeltwo.plot.Axis;
 import com.reeltwo.plot.Graph2D;
 import com.reeltwo.plot.KeyPosition;
 import com.reeltwo.plot.Plot2D;
@@ -109,6 +111,8 @@ public class RocPlot {
   // File chooser stored user-preference keys
   private static final String CHOOSER_WIDTH = "chooser-width";
   private static final String CHOOSER_HEIGHT = "chooser-height";
+  private static final String ROC_PLOT = "ROC Plot";
+  private static final String PRECISION_RECALL = "Precision/Recall";
 
   private final ProgressBarDelegate mProgressBarDelegate;
 
@@ -129,6 +133,7 @@ public class RocPlot {
   private final JButton mOpenButton;
   private final JButton mCommandButton;
   private final JTextField mTitleEntry;
+  private final JComboBox<String> mGraphType;
   private JSplitPane mSplitPane;
   private final JLabel mStatusLabel;
 
@@ -198,6 +203,7 @@ public class RocPlot {
     mIconLabel.setFont(new Font("Arial", Font.BOLD, 24));
     mIconLabel.setHorizontalAlignment(JLabel.LEFT);
     mIconLabel.setIconTextGap(50);
+    mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_RECALL});
     configureUI();
   }
 
@@ -268,6 +274,13 @@ public class RocPlot {
       }
     });
     rightPanel.add(mTitleEntry, c);
+    rightPanel.add(mGraphType, c);
+    mGraphType.addItemListener(e -> {
+      showCurrentGraph();
+      SwingUtilities.invokeLater(() -> {
+        mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
+      });
+    });
 
     rightPanel.add(new JLabel("Line Width", JLabel.CENTER), c);
     mLineWidthSlider.setSnapToTicks(true);
@@ -377,7 +390,7 @@ public class RocPlot {
   // Adds the notion of painting a current crosshair position
   @JumbleIgnore
   private static class RocZoomPlotPanel extends InnerZoomPlot {
-    private Point mCrosshair; // In TP / FP coordinates.
+    private Point2D mCrosshair; // In TP / FP coordinates.
     RocZoomPlotPanel() {
       super();
     }
@@ -386,7 +399,7 @@ public class RocPlot {
       super.paint(g);
       final Mapping[] mapping = getMapping();
       if (mapping != null && mapping.length > 1 && mCrosshair != null) {
-        Point p = new Point((int) mapping[0].worldToScreen(mCrosshair.x), (int) mapping[1].worldToScreen(mCrosshair.y));
+        Point p = new Point((int) mapping[0].worldToScreen(mCrosshair.getX()), (int) mapping[1].worldToScreen(mCrosshair.getY()));
         final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
           && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
         if (inView) {
@@ -398,8 +411,37 @@ public class RocPlot {
         }
       }
     }
-    void setCrossHair(Point p) {
+    void setCrossHair(Point2D p) {
       mCrosshair = p;
+    }
+  }
+
+  @JumbleIgnore
+  private static class PrecisionRecallGraph2D extends Graph2D {
+    PrecisionRecallGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
+      setKeyVerticalPosition(KeyPosition.BOTTOM);
+      setKeyHorizontalPosition(KeyPosition.RIGHT);
+      setGrid(true);
+      setLabel(Graph2D.X, "Recall");
+      setLabel(Graph2D.Y, "Precision");
+      setTitle(title);
+
+      float yLow = 100;
+      for (int i = 0; i < lineOrdering.size(); i++) {
+        final DataBundle db = data.get(lineOrdering.get(i));
+        if (db.show()) {
+          final PointPlot2D plot = db.getPrecisionRecallPlot(lineWidth, i);
+          addPlot(plot);
+          if (showScores) {
+            addPlot(db.getPrecisionRecallScorePoints(lineWidth, i));
+            addPlot(db.getPrecisionRecallScoreLabels());
+          }
+          yLow = Math.min(yLow, plot.getLo(Axis.Y));
+        }
+      }
+      setRange(Graph2D.X, 0, 100);
+      setRange(Graph2D.Y, Math.max(0, yLow), 100);
+      setTitle(title);
     }
   }
 
@@ -418,7 +460,8 @@ public class RocPlot {
       for (int i = 0; i < lineOrdering.size(); i++) {
         final DataBundle db = data.get(lineOrdering.get(i));
         if (db.show()) {
-          addPlot(db.getPlot(lineWidth, i));
+          final PointPlot2D plot = db.getPlot(lineWidth, i);
+          addPlot(plot);
           if (showScores) {
             addPlot(db.getScorePoints(lineWidth, i));
             addPlot(db.getScoreLabels());
@@ -452,7 +495,12 @@ public class RocPlot {
 
   void showCurrentGraph() {
     SwingUtilities.invokeLater(() -> {
-      final Graph2D graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+      final Graph2D graph;
+      if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
+        graph = new PrecisionRecallGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+      } else {
+        graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+      }
       if (graph.getPlots().length > 0) {
         maintainZoomBounds(graph);
       }
@@ -594,19 +642,38 @@ public class RocPlot {
     public void mouseClicked(MouseEvent e) {
       final Point p = e.getPoint();
       final Mapping[] mapping = mZoomPP.getMapping();
-      final int maxVariants = ((RocGraph2D) mZoomPP.getGraph()).getMaxVariants();
-      if (mapping != null && mapping.length > 1) {
-        final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
-          && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
-        final float fp = mapping[0].screenToWorld((float) p.getX());
-        final float tp = mapping[1].screenToWorld((float) p.getY());
-        if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
-          mProgressBar.setString(getMetricString(tp, fp, maxVariants));
-          mZoomPP.setCrossHair(new Point((int) fp, (int) tp));
-        } else {
-          mZoomPP.setCrossHair(null);
-          mProgressBar.setString("");
+      final Graph2D zoomedGraph = mZoomPP.getGraph();
+      if (zoomedGraph instanceof RocGraph2D) {
+        final RocGraph2D graph = (RocGraph2D) zoomedGraph;
+        final int maxVariants = graph.getMaxVariants();
+        if (mapping != null && mapping.length > 1) {
+          final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
+            && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
+          final float fp = mapping[0].screenToWorld((float) p.getX());
+          final float tp = mapping[1].screenToWorld((float) p.getY());
+          if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
+            mProgressBar.setString(getMetricString(tp, fp, maxVariants));
+            mZoomPP.setCrossHair(new Point2D(fp, tp));
+          } else {
+            mZoomPP.setCrossHair(null);
+            mProgressBar.setString("");
+          }
         }
+      } else if (zoomedGraph instanceof PrecisionRecallGraph2D) {
+        if (mapping != null && mapping.length > 1) {
+          final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
+            && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
+          final float fp = mapping[0].screenToWorld((float) p.getX());
+          final float tp = mapping[1].screenToWorld((float) p.getY());
+          if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
+//            mProgressBar.setString(getMetricString(tp, fp, maxVariants));
+            mZoomPP.setCrossHair(new Point2D(fp, tp));
+          } else {
+            mZoomPP.setCrossHair(null);
+            mProgressBar.setString("");
+          }
+        }
+
       }
     }
 
