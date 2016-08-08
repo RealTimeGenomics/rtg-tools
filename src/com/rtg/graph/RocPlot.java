@@ -169,8 +169,11 @@ public class RocPlot {
     new Color(0xB0B0B0),
   };
 
-  /** Creates a new swing plot. */
-  RocPlot() {
+  /**
+   * Creates a new swing plot.
+   * @param precisionRecall true defaults to precision recall graph
+   */
+  RocPlot(boolean precisionRecall) {
     mMainPanel = new JPanel();
     mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
@@ -204,6 +207,7 @@ public class RocPlot {
     mIconLabel.setHorizontalAlignment(JLabel.LEFT);
     mIconLabel.setIconTextGap(50);
     mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_RECALL});
+    mGraphType.setSelectedItem(precisionRecall ? PRECISION_RECALL : ROC_PLOT);
     configureUI();
   }
 
@@ -278,6 +282,12 @@ public class RocPlot {
     mGraphType.addItemListener(e -> {
       showCurrentGraph();
       SwingUtilities.invokeLater(() -> {
+        final String text = mTitleEntry.getText();
+        if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
+          mTitleEntry.setText(text.replaceAll("ROC", "Precision/Recall"));
+        } else {
+          mTitleEntry.setText(text.replaceAll("Precision/Recall", "ROC"));
+        }
         mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
       });
     });
@@ -384,6 +394,9 @@ public class RocPlot {
         sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
       }
     }
+    if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
+      sb.append(" --").append(RocPlotCli.PRECISION_RECALL_FLAG);
+    }
     return sb.toString();
   }
 
@@ -417,7 +430,7 @@ public class RocPlot {
   }
 
   @JumbleIgnore
-  private static class PrecisionRecallGraph2D extends Graph2D {
+  static class PrecisionRecallGraph2D extends Graph2D {
     PrecisionRecallGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
@@ -707,14 +720,14 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth) throws InterruptedException, InvocationTargetException, IOException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall) throws InterruptedException, InvocationTargetException, IOException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot() {
+    final RocPlot rp = new RocPlot(precisionRecall) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);
@@ -737,7 +750,7 @@ public class RocPlot {
       }
     });
     rp.showScores(scores);
-    rp.setTitle(title == null ? "ROC" : title);
+    rp.setTitle(title != null ? title : precisionRecall ? "Precision/Recall" : "ROC");
     SwingUtilities.invokeAndWait(() -> {
       frame.pack();
       frame.setSize(1024, 768);
@@ -749,7 +762,7 @@ public class RocPlot {
       }
     });
     rp.loadData(fileList, nameList, true);
-    SwingUtilities.invokeAndWait(() -> rp.mZoomPP.setGraph(new RocGraph2D(rp.mRocLinesPanel.plotOrder(), rp.mLineWidth, rp.mShowScores, rp.mData, rp.mTitleEntry.getText()), false));
+    SwingUtilities.invokeAndWait(rp::showCurrentGraph);
     lock.await();
   }
 }

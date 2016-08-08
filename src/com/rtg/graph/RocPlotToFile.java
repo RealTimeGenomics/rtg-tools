@@ -62,7 +62,7 @@ public final class RocPlotToFile {
     PNG
   }
 
-  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type) throws IOException {
+  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type, boolean precisionRecall) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
     for (int i = 0; i < fileList.size(); i++) {
       final File f = fileList.get(i);
@@ -75,7 +75,12 @@ public final class RocPlotToFile {
 
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
-    final Graph2D graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
+    final Graph2D graph;
+    if (precisionRecall) {
+      graph = new RocPlot.PrecisionRecallGraph2D(paths, lineWidth, scores, data, title != null ? title : "Precision/Recall");
+    } else {
+      graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
+    }
     if (type == SVG) {
       try (final FileOutputStream os = new FileOutputStream(pngFile)) {
         iw.toSVG(os, graph, 800, 600, null);

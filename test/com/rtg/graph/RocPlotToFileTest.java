@@ -63,7 +63,7 @@ public class RocPlotToFileTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
       final File png = new File(dir, "PNG.png");
-      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG);
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG, false);
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
