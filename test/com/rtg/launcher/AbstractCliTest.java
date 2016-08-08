@@ -71,6 +71,15 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
     assertEquals("rtg", mCli.applicationName());
   }
 
+  public void testDescription() {
+    final String description = mCli.description();
+    if (description != null) {
+      assertTrue(description.length() > 1);
+      // Check it starts with lowercase (except acronyms), for consistency with what we have
+      assertTrue(Character.isLowerCase(description.charAt(0)) || Character.isUpperCase(description.charAt(1)));
+    }
+  }
+
   /**
    * Checks the help output of the CLI class for consistency and that
    * it contains the specified strings.
