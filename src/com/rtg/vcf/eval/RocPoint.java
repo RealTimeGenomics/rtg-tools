@@ -42,7 +42,7 @@ public final class RocPoint {
   /**
    * Construct a point with all 0.0
    */
-  public RocPoint() {
+  RocPoint() {
     this(Double.NaN, 0, 0, 0);
   }
 
@@ -50,7 +50,7 @@ public final class RocPoint {
    * Construct a new point from an existing one
    * @param other the point to copy
    */
-  public RocPoint(RocPoint other) {
+  RocPoint(RocPoint other) {
     this(other.mThreshold, other.mTruePositives, other.mFalsePositives, other.mRawTruePositives);
   }
 
@@ -87,16 +87,5 @@ public final class RocPoint {
 
   public double getFalsePositives() {
     return mFalsePositives;
-  }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("RocPoint{");
-    sb.append("mThreshold=").append(mThreshold);
-    sb.append(", mTruePositives=").append(mTruePositives);
-    sb.append(", mRawTruePositives=").append(mRawTruePositives);
-    sb.append(", mFalsePositives=").append(mFalsePositives);
-    sb.append('}');
-    return sb.toString();
   }
 }
