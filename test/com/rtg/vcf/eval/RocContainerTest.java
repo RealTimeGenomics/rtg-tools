@@ -65,13 +65,13 @@ public class RocContainerTest extends TestCase {
       roc.addFilter(RocFilter.ALL);
       //EnumSet<RocFilter> v = EnumSet.of(RocFilter.ALL);
       final RocFilter v = RocFilter.ALL;
-      roc.addRocLine(new RocContainer.RocPoint(0.1, 1.0, 0.0, 1.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.1, 0.0, 1.0, 0.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.2, 0.0, 1.0, 0.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.1, 0.5, 0.0, 1.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.2, 1.5, 0.0, 1.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.1, 0.5, 0.0, 1.0), v);
-      roc.addRocLine(new RocContainer.RocPoint(0.3, 1.5, 0.0, 1.0), v);
+      roc.addRocLine(new RocPoint(0.1, 1.0, 0.0, 1.0), v);
+      roc.addRocLine(new RocPoint(0.1, 0.0, 1.0, 0.0), v);
+      roc.addRocLine(new RocPoint(0.2, 0.0, 1.0, 0.0), v);
+      roc.addRocLine(new RocPoint(0.1, 0.5, 0.0, 1.0), v);
+      roc.addRocLine(new RocPoint(0.2, 1.5, 0.0, 1.0), v);
+      roc.addRocLine(new RocPoint(0.1, 0.5, 0.0, 1.0), v);
+      roc.addRocLine(new RocPoint(0.3, 1.5, 0.0, 1.0), v);
       roc.writeRocs(dir, 5, 0, 0, 5, true, false); // XXXLen try with more baseline TP
       final File allFile = new File(dir, "weighted_roc.tsv.gz");
       final String all = FileHelper.gzFileToString(allFile);

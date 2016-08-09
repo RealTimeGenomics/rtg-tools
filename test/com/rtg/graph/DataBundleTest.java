@@ -33,9 +33,9 @@ import java.util.ArrayList;
 
 import com.reeltwo.plot.Datum2D;
 import com.reeltwo.plot.Graph2D;
-import com.reeltwo.plot.Point2D;
 import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.TextPoint2D;
+import com.rtg.vcf.eval.RocPoint;
 
 import junit.framework.TestCase;
 
@@ -43,7 +43,7 @@ import junit.framework.TestCase;
  */
 public class DataBundleTest extends TestCase {
   public void test() {
-    final Point2D[] points = {new Point2D(4.0f, 5.0f), new Point2D(100.0f, 200.0f)};
+    final RocPoint[] points = {new RocPoint(0, 5.0f, 4.0f, 0), new RocPoint(0, 200.0f, 100.0f, 0)};
     final String[] scores = {"5.0", "9.0"};
     final DataBundle db = new DataBundle("Monkey", points, scores, 300);
     assertEquals(300, db.getTotalVariants());
@@ -56,15 +56,15 @@ public class DataBundleTest extends TestCase {
   }
 
   public void testScoreLabels() {
-    final ArrayList<Point2D> points = new ArrayList<>();
+    final ArrayList<RocPoint> points = new ArrayList<>();
     final ArrayList<String> scores = new ArrayList<>();
     for (int i = 0; i < 100; i++) {
-      points.add(new Point2D(i, i));
+      points.add(new RocPoint(0, i, i, 0));
       scores.add(String.format("%.3g", (float) (100 - i)));
     }
     final String[] labels = scores.toArray(new String[scores.size()]);
     labels[labels.length - 1] = "None";
-    final DataBundle db = new DataBundle("Monkey", points.toArray(new Point2D[points.size()]), labels, 300);
+    final DataBundle db = new DataBundle("Monkey", points.toArray(new RocPoint[points.size()]), labels, 300);
     db.setScoreRange(0.0f, 1.0f);
     final PointPlot2D scorePoints = db.getScorePoints(1, 1);
     final String[] exp = {"100", "90.0", "80.0", "70.0", "60.0", "50.0", "40.0", "30.0", "20.0", "10.0", "None"};

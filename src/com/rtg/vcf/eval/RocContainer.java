@@ -29,6 +29,15 @@
  */
 package com.rtg.vcf.eval;
 
+import static com.rtg.vcf.eval.RocContainer.RocColumns.FALSE_NEGATIVES;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.FALSE_POSITIVES;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.F_MEASURE;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.PRECISION;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.SCORE;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.SENSITIVITY;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.TRUE_POSITIVES_BASELINE;
+import static com.rtg.vcf.eval.RocContainer.RocColumns.TRUE_POSITIVES_CALL;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,10 +45,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -61,6 +72,30 @@ import com.rtg.vcf.VcfUtils;
 /**
  */
 public class RocContainer {
+
+  /**
+   * List of ROC file column headings
+   */
+  public static class RocColumns {
+    /** Header for the score column */
+    public static final String SCORE = "score";
+    /** Header for the true positives when there is only one column */
+    public static final String TRUE_POSITIVES = "true_positives";
+    /** Header for the true positives counted in baseline space */
+    public static final String TRUE_POSITIVES_BASELINE = "true_positives_baseline";
+    /** Header for the false positives */
+    public static final String FALSE_POSITIVES = "false_positives";
+    /** Header for the true positives counted in call space */
+    public static final String TRUE_POSITIVES_CALL = "true_positives_call";
+    /** Header for the false negative column */
+    public static final String FALSE_NEGATIVES = "false_negatives";
+    /** Header for the precision column */
+    public static final String PRECISION = "precision";
+    /** Header for the sensitivity column */
+    public static final String SENSITIVITY = "sensitivity";
+    /** Header for the F measure column */
+    public static final String F_MEASURE = "f_measure";
+  }
 
   private static final int SCORE_DP = 3; // Decimal points for score field
   private static final int COUNT_DP = 2; // Decimal points for weighted variant counts
@@ -220,7 +255,7 @@ public class RocContainer {
         if (prevScore != null) {
           writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
         }
-        if (extraMetrics && (Math.abs(cumulative.mTp - unfiltered.mTp) > 0.001 || Math.abs(cumulative.mFp - unfiltered.mFp) > 0.001)) {
+        if (extraMetrics && (Math.abs(cumulative.mTruePositives - unfiltered.mTruePositives) > 0.001 || Math.abs(cumulative.mFalsePositives - unfiltered.mFalsePositives) > 0.001)) {
           writeRocLine(os, "None", totalBaselineVariants, unfiltered, extraMetrics, false);
         }
       }
@@ -240,17 +275,20 @@ public class RocContainer {
     if (mFieldLabel != null) {
       out.writeln("#score field: " + mFieldLabel);
     }
-    out.write("#score true_positives_baseline false_positives true_positives_call".replaceAll(" ", "\t"));
+    final List<String> baseRocColumns = Arrays.asList(SCORE, TRUE_POSITIVES_BASELINE, FALSE_POSITIVES, TRUE_POSITIVES_CALL);
+    out.write("#" + String.join("\t", baseRocColumns));
+
     if (extraMetrics) {
-      out.write(" false_negatives precision sensitivity f_measure".replaceAll(" ", "\t"));
+      final List<String> extraRocColumns = Arrays.asList(FALSE_NEGATIVES, PRECISION, SENSITIVITY, F_MEASURE);
+      out.write("\t" + String.join("\t", extraRocColumns));
     }
     out.newLine();
   }
 
   private void writeRocLine(LineWriter os, String score, int totalPositives, RocPoint point, boolean extraMetrics, boolean updateBest) throws IOException {
-    final double truePositives = point.mTp;
-    final double falsePositives = point.mFp;
-    final double truePositivesRaw = point.mTpRaw;
+    final double truePositives = point.mTruePositives;
+    final double falsePositives = point.mFalsePositives;
+    final double truePositivesRaw = point.mRawTruePositives;
     os.write(score
       + "\t" + Utils.realFormat(truePositives, COUNT_DP)
       + "\t" + Utils.realFormat(falsePositives, COUNT_DP)
@@ -301,7 +339,7 @@ public class RocContainer {
       if (best == null) {
         Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SORT_FIELD);
       } else {
-        addRow(table, Utils.realFormat(best.mThreshold, SCORE_DP), best.mTp, totalPositives - best.mTp, best.mTpRaw, best.mFp);
+        addRow(table, Utils.realFormat(best.mThreshold, SCORE_DP), best.mTruePositives, totalPositives - best.mTruePositives, best.mRawTruePositives, best.mFalsePositives);
       }
       addRow(table, "None", truePositives, falseNegatives, truePositivesRaw, falsePositives);
       summary = table.toString();
@@ -328,31 +366,6 @@ public class RocContainer {
       Utils.realFormat(fMeasure, METRICS_DP));
   }
 
-
-  static final class RocPoint {
-    double mThreshold;
-    double mTp;
-    double mTpRaw;
-    double mFp;
-
-    RocPoint() {
-      this(Double.NaN, 0, 0, 0);
-    }
-    RocPoint(RocPoint other) {
-      this(other.mThreshold, other.mTp, other.mFp, other.mTpRaw);
-    }
-    RocPoint(double threshold, double tp, double fp, double tpraw) {
-      mThreshold = threshold;
-      mTp = tp;
-      mFp = fp;
-      mTpRaw = tpraw;
-    }
-    void add(RocPoint p) {
-      mTp += p.mTp;
-      mFp += p.mFp;
-      mTpRaw += p.mTpRaw;
-    }
-  }
 
   private static class DescendingDoubleComparator implements Comparator<Double>, Serializable {
     @Override
