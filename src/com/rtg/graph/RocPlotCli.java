@@ -70,7 +70,7 @@ public class RocPlotCli extends AbstractCli {
   static final String SCORES_FLAG = "scores";
   static final String LINE_WIDTH_FLAG = "line-width";
   static final String CURVE_FLAG = "curve";
-  static final String PRECISION_RECALL_FLAG = "precision-recall";
+  static final String PRECISION_SENSITIVITY_FLAG = "precision-sensitivity";
 
 
   static final String PNG_EXTENSION = ".png";
@@ -139,7 +139,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerExtendedHelp();
     flags.registerOptional('t', TITLE_FLAG, String.class, "STRING", "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
-    flags.registerOptional(PRECISION_RECALL_FLAG, "if set, use precision/recall mode").setCategory(REPORTING);
+    flags.registerOptional(PRECISION_SENSITIVITY_FLAG, "if set, use precision/sensitivity mode").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the sidepane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class , "INT", "sets the plot line width", 2).setCategory(REPORTING);
     flags.registerOptional(PNG_FLAG, File.class , "FILE", "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
@@ -180,15 +180,15 @@ public class RocPlotCli extends AbstractCli {
     try {
       if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
         System.setProperty("java.awt.headless", "true");
-        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG, mFlags.isSet(PRECISION_RECALL_FLAG));
-        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG, mFlags.isSet(PRECISION_RECALL_FLAG));
+        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG, mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
+        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG, mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
       } else {   //Create and set up as a stand alone app.
         if (isReallyHeadless()) {
           Diagnostic.error("No graphics environment is available to open the rocplot GUI");
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_RECALL_FLAG));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime

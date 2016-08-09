@@ -55,6 +55,7 @@ final class DataBundle {
 
   private String mTitle;
   private final int mTotalVariants;
+  private final float mMinPrecision;
   private boolean mShow;
 
   private Point2D[] mRangedPoints = null;
@@ -75,6 +76,7 @@ final class DataBundle {
     mShow = true;
     mPrecisionRecall = new Point2D[points.length - 1];
     final boolean hasRaw = Arrays.stream(points).anyMatch(x -> x.getRawTruePositives() > 0);
+    float minPrecision = 100;
     for (int i = 0; i < mPrecisionRecall.length; i++) {
       final RocPoint point = points[i + 1];
       final double truePositives = point.getTruePositives();
@@ -82,7 +84,9 @@ final class DataBundle {
       final float x = (float) (ContingencyTable.recall(truePositives, mTotalVariants - truePositives) * 100.0);
       final float y = (float) (ContingencyTable.precision(rawTp, point.getFalsePositives()) * 100.0);
       mPrecisionRecall[i] = new Point2D(x, y);
+      minPrecision = Math.min(minPrecision, y);
     }
+    mMinPrecision = minPrecision;
 
     resetRange();
   }
@@ -240,6 +244,10 @@ final class DataBundle {
 
   int getTotalVariants() {
     return mTotalVariants;
+  }
+
+  float getMinPrecision() {
+    return mMinPrecision;
   }
 
   public String getTitle() {

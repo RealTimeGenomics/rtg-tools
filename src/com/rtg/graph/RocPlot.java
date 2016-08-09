@@ -79,7 +79,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
-import com.reeltwo.plot.Axis;
 import com.reeltwo.plot.Graph2D;
 import com.reeltwo.plot.KeyPosition;
 import com.reeltwo.plot.Plot2D;
@@ -112,7 +111,12 @@ public class RocPlot {
   private static final String CHOOSER_WIDTH = "chooser-width";
   private static final String CHOOSER_HEIGHT = "chooser-height";
   private static final String ROC_PLOT = "ROC Plot";
-  private static final String PRECISION_RECALL = "Precision/Recall";
+
+  private static final String PRECISION = "Precision";
+  private static final String SENSITIVITY = "Sensitivity";
+  private static final String PRECISION_SENSITIVITY = PRECISION + "/" + SENSITIVITY;
+
+  private static final String ROC = "ROC";
 
   private final ProgressBarDelegate mProgressBarDelegate;
 
@@ -206,8 +210,8 @@ public class RocPlot {
     mIconLabel.setFont(new Font("Arial", Font.BOLD, 24));
     mIconLabel.setHorizontalAlignment(JLabel.LEFT);
     mIconLabel.setIconTextGap(50);
-    mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_RECALL});
-    mGraphType.setSelectedItem(precisionRecall ? PRECISION_RECALL : ROC_PLOT);
+    mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_SENSITIVITY});
+    mGraphType.setSelectedItem(precisionRecall ? PRECISION_SENSITIVITY : ROC_PLOT);
     configureUI();
   }
 
@@ -283,11 +287,16 @@ public class RocPlot {
       showCurrentGraph();
       SwingUtilities.invokeLater(() -> {
         final String text = mTitleEntry.getText();
-        if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
-          mTitleEntry.setText(text.replaceAll("ROC", "Precision/Recall"));
+        if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
+          if (text.equals(ROC)) {
+            mTitleEntry.setText(PRECISION_SENSITIVITY);
+          }
         } else {
-          mTitleEntry.setText(text.replaceAll("Precision/Recall", "ROC"));
+          if (text.equals(PRECISION_SENSITIVITY)) {
+            mTitleEntry.setText(ROC);
+          }
         }
+        mZoomPP.setCrossHair(null);
         mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
       });
     });
@@ -394,8 +403,8 @@ public class RocPlot {
         sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
       }
     }
-    if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
-      sb.append(" --").append(RocPlotCli.PRECISION_RECALL_FLAG);
+    if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
+      sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
     }
     return sb.toString();
   }
@@ -435,8 +444,8 @@ public class RocPlot {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
       setGrid(true);
-      setLabel(Graph2D.X, "Recall");
-      setLabel(Graph2D.Y, "Precision");
+      setLabel(Graph2D.X, SENSITIVITY);
+      setLabel(Graph2D.Y, PRECISION);
       setTitle(title);
 
       float yLow = 100;
@@ -449,7 +458,7 @@ public class RocPlot {
             addPlot(db.getPrecisionRecallScorePoints(lineWidth, i));
             addPlot(db.getPrecisionRecallScoreLabels());
           }
-          yLow = Math.min(yLow, plot.getLo(Axis.Y));
+          yLow = Math.min(yLow, db.getMinPrecision());
         }
       }
       setRange(Graph2D.X, 0, 100);
@@ -501,7 +510,7 @@ public class RocPlot {
     }
 
     // Total number of variants for calculating sensitivity at crosshair location
-    public int getMaxVariants() {
+    int getMaxVariants() {
       return mMaxVariants;
     }
   }
@@ -509,7 +518,7 @@ public class RocPlot {
   void showCurrentGraph() {
     SwingUtilities.invokeLater(() -> {
       final Graph2D graph;
-      if (mGraphType.getSelectedItem().equals(PRECISION_RECALL)) {
+      if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
         graph = new PrecisionRecallGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
       } else {
         graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
@@ -676,14 +685,14 @@ public class RocPlot {
         if (mapping != null && mapping.length > 1) {
           final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
             && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
-          final float fp = mapping[0].screenToWorld((float) p.getX());
-          final float tp = mapping[1].screenToWorld((float) p.getY());
-          if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
-//            mProgressBar.setString(getMetricString(tp, fp, maxVariants));
-            mZoomPP.setCrossHair(new Point2D(fp, tp));
+          final float recall = mapping[0].screenToWorld((float) p.getX());
+          final float precision = mapping[1].screenToWorld((float) p.getY());
+          if (inView && recall >= 0 && precision >= 0 && (recall + precision > 0)) {
+            mZoomPP.setCrossHair(new Point2D(recall, precision));
+            mProgressBar.setString(getPrecisionRecallString(precision, recall));
           } else {
             mZoomPP.setCrossHair(null);
-            mProgressBar.setString("");
+            mProgressBar.setString(getPrecisionRecallString(precision, recall));
           }
         }
 
@@ -719,6 +728,13 @@ public class RocPlot {
     return message;
   }
 
+  private static String getPrecisionRecallString(double precision, double recall) {
+    String message = String.format("Precision=%.2f%%", precision);
+    final double fMeasure = ContingencyTable.fMeasure(precision, recall);
+    message += String.format(" Sensitivity=%.2f%% F-measure=%.2f%%", recall, fMeasure);
+    return message;
+  }
+
 
   static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall) throws InterruptedException, InvocationTargetException, IOException {
     final JFrame frame = new JFrame();
@@ -750,7 +766,7 @@ public class RocPlot {
       }
     });
     rp.showScores(scores);
-    rp.setTitle(title != null ? title : precisionRecall ? "Precision/Recall" : "ROC");
+    rp.setTitle(title != null ? title : precisionRecall ? PRECISION_SENSITIVITY : ROC);
     SwingUtilities.invokeAndWait(() -> {
       frame.pack();
       frame.setSize(1024, 768);
