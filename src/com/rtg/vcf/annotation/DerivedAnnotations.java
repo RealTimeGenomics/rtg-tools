@@ -66,7 +66,10 @@ public enum DerivedAnnotations {
   /** Ploidy */
   PD(new PloidyAnnotation()),
   /** Difference in mean quality between called alleles */
-  MEANQAD(new MeanQualityDifferenceAnnotation());
+  MEANQAD(new MeanQualityDifferenceAnnotation()),
+  /** Difference in mean quality between called alleles */
+  QA(new AltAlleleQualityAnnotation())
+  ;
 
   private final transient AbstractDerivedAnnotation mAnnotation;
 

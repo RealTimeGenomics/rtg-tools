@@ -130,6 +130,9 @@ public final class VcfUtils {
   /** VCF FORMAT field for allelic quality */
   public static final String FORMAT_ALLELE_QUALITY = "AQ";
 
+  /** VCF FORMAT field for variant allele */
+  public static final String FORMAT_VARIANT_ALLELE = "VA";
+
   /** Filter status field. */
   public static final String FORMAT_FILTER = "FT";
 
