@@ -221,7 +221,7 @@ public class ScriptedVcfFilterTest {
   public void testUpdateInfo() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addInfo("IN", "FOO");
-    assertTrue(getScriptedVcfFilter("INFO.IN = ['BAZ', 'BANG']; true").accept(record));
+    assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ,BANG'; true").accept(record));
     assertEquals(Arrays.asList("BAZ", "BANG"), record.getInfo().get("IN"));
   }
 
@@ -229,7 +229,7 @@ public class ScriptedVcfFilterTest {
   public void testUpdateInfoNumerics() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addInfo("IN", "FOO");
-    assertTrue(getScriptedVcfFilter("INFO.IN = [12, -99]; true").accept(record));
+    assertTrue(getScriptedVcfFilter("INFO.IN = '12,-99'; true").accept(record));
     assertEquals(Arrays.asList("12", "-99"), record.getInfo().get("IN"));
   }
 

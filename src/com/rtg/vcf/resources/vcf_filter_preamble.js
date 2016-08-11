@@ -75,22 +75,21 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             if (infoList == null) {
                 return ".";
             }
-            return infoList;
+            return infoList.join(",");
         }
     }
     /**
      * Returns a function which will fetch the info field with the given name from the current record
      */
     function infoSet(field) {
-        return function (values) {
+        return function (value) {
+            var values = value.toString().split(',');
             var ArrayList = Java.type("java.util.ArrayList");
             var list = new ArrayList();
             if (Array.isArray(values)) {
                 values.forEach(function (val) {
                     list.add(val.toString());
                 });
-            } else {
-                list.add(values.toString());
             }
             RTG_VCF_RECORD.getInfo().put(field, list);
         }
