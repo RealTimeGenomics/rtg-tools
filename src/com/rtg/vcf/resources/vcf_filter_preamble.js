@@ -162,6 +162,9 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         FILTER: {get: filter},
     };
     // Expose an API on the global scope
+    global.has = function (thing) {
+        return typeof thing != "undefined" && thing != ".";
+    }
     global.INFO = INFO;
     Object.defineProperties(global, props);
     // Declare globally accessible objects for the sample names. If the name is javascript safe then
