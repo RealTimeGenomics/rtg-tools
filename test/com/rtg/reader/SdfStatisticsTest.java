@@ -71,7 +71,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
         , "-q,", "--quality", "display mean of quality"
         , "-n,", "--unknowns", "display info about unknown bases (Ns)"
         , "--taxonomy", "display information about taxonomy"
-        , "--sex=SEX", "display reference sequence list for the given sex, if defined (Must be one of [male, female, either]). May be specified 0 or more times"
+        , "--sex=SEX", "display reference sequence list for the given sex, if defined. Allowed values are [male, female, either]"
         );
   }
 

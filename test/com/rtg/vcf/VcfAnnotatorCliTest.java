@@ -64,7 +64,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
         , "--no-index", "do not produce indexes for output files"
         );
     checkExtendedHelp("rtg vcfannotate"
-        , "--Xderived-annotations=STRING", "derived fields to add to VCF file (Must be one or more of " + Arrays.toString(DerivedAnnotations.values()) + " in a comma separated list)"
+        , "--Xderived-annotations=STRING", "derived fields to add to VCF file. Allowed values are " + Arrays.toString(DerivedAnnotations.values())
         );
   }
 

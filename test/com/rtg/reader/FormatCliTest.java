@@ -72,8 +72,8 @@ public class FormatCliTest extends AbstractCliTest {
   public void testHelp() {
     checkHelp("rtg format"
         , "Converts the contents of sequence data files (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format."
-        , "-f,", "--format=FORMAT", "format of input (Must be one of [fasta, fastq"
-        , "-q,", "--quality-format=FORMAT", "format of quality data for fastq files (use sanger for Illumina 1.8+) (Must be one of [sanger, solexa, illumina])"
+        , "-f,", "--format=FORMAT", "format of input. Allowed values are [fasta, fastq"
+        , "-q,", "--quality-format=FORMAT", "format of quality data for fastq files (use sanger for Illumina 1.8+). Allowed values are [sanger, solexa, illumina]"
         , "--input-list-file=FILE", "file containing a list of input read files (1 per line)"
         , "-l,", "--left=FILE", "left input file for FASTA/FASTQ paired end data"
         , "-o,", "--output=SDF", "name of output SDF"

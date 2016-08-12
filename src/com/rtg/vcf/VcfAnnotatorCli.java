@@ -89,8 +89,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(BED_IDS_FLAG, File.class, "file", "add variant IDs from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(BED_INFO_FLAG, File.class, "file", "add INFO annotations from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(VCF_IDS_FLAG, File.class, "file", "add variant IDs from VCF file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(INFO_ID_FLAG, String.class, "string", "the INFO ID for BED INFO annotations", "ANN").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional(INFO_DESCR_FLAG, String.class, "string", "if the BED INFO field is not already declared, use this description in the header", "Annotation").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(INFO_ID_FLAG, String.class, "string", "the INFO ID for BED INFO annotations", "ANN").setCategory(REPORTING);
+    mFlags.registerOptional(INFO_DESCR_FLAG, String.class, "string", "if the BED INFO field is not already declared, use this description in the header", "Annotation").setCategory(REPORTING);
     mFlags.registerOptional(RELABEL_FLAG, File.class, "file", "relabel samples according to \"old-name new-name\" pairs in specified file").setCategory(REPORTING);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
@@ -99,7 +99,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
       derivedRange.add(derived.toString());
     }
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
-    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(derivedRange).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(derivedRange).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.setValidator(new SnpAnnotatorValidator());
   }
 

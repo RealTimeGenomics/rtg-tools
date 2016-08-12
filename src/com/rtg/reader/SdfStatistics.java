@@ -125,7 +125,7 @@ public final class SdfStatistics extends AbstractCli {
       flags.registerOptional('p', POSITIONS_FLAG, "only display info about unknown bases (Ns) by read position").setCategory(REPORTING);
 
       flags.registerOptional('q', QS_FLAG, "display mean of quality").setCategory(REPORTING);
-      flags.registerOptional(SEX_FLAG, Sex.class, "sex", "display reference sequence list for the given sex, if defined").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
+      flags.registerOptional(SEX_FLAG, Sex.class, "sex", "display reference sequence list for the given sex, if defined").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE).enableCsv();
       flags.registerOptional(TAXONOMY_FLAG, "display information about taxonomy").setCategory(REPORTING);
 
       flags.registerOptional(NAMES_AND_LENGTHS_FLAG, "print out the name and length of each sequence. (Not recommended for read sets)").setCategory(REPORTING);

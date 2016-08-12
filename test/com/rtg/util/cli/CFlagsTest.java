@@ -640,7 +640,7 @@ public class CFlagsTest extends TestCase {
 
     final String str = mFlags.getUsageString();
 
-    assertTrue(str, str.toLowerCase(Locale.getDefault()).contains("must be one of [one, two, three]"));
+    assertTrue(str, str.toLowerCase(Locale.getDefault()).contains("allowed values are [one, two, three]"));
   }
 
   public void testEnum2() {

@@ -675,11 +675,7 @@ public class Flag implements Comparable<Flag> {
 
     final List<String> range = getParameterRange();
     if (range != null) {
-      if (mRangeList) {
-        description.append(" (Must be one or more of ").append(Arrays.toString(range.toArray())).append(" in a comma separated list)");
-      } else {
-        description.append(" (Must be one of ").append(Arrays.toString(range.toArray())).append(")");
-      }
+      description.append(". Allowed values are ").append(Arrays.toString(range.toArray()));
     }
     final String minMaxUsage;
     if (mPsuedoMinMaxString != null) {
