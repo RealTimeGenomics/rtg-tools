@@ -156,7 +156,7 @@ public class RocPlot {
   private final JFileChooser mFileChooser = new JFileChooser();
   private File mFileChooserParent = null;
 
-  private static final Color[] PALETTE = {
+  static final Color[] PALETTE = {
     new Color(0xFF4030),
     new Color(0x30F030),
     new Color(0x3030FF),

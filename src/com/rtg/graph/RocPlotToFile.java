@@ -71,7 +71,9 @@ public final class RocPlotToFile {
       RocPlot.setBundleTitle(db, f, name);
       data.put(db.getTitle(), db);
     }
-    final ImageWriter iw = new ImageWriter(new GraphicsRenderer());
+    final GraphicsRenderer gr = new GraphicsRenderer();
+    gr.setColors(RocPlot.PALETTE);
+    final ImageWriter iw = new ImageWriter(gr);
 
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
