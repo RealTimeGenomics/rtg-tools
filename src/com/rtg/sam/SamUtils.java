@@ -170,6 +170,8 @@ public final class SamUtils {
   public static final String ATTRIBUTE_BWA_NUM_BEST_HITS = "X0";
 
 
+  /** Value used in SAM to indicate absence of a CIGAR. */
+  public static final String NO_CIGAR = "*";
   /** CIGAR value for SAME */
   public static final char CIGAR_SAME = '=';
   /** CIGAR value for MISMATCH */
@@ -186,6 +188,8 @@ public final class SamUtils {
   public static final char CIGAR_SOFT_CLIP = 'S';
   /** CIGAR value for HARD CLIP */
   public static final char CIGAR_HARD_CLIP = 'H';
+  /** CIGAR value for PADDING */
+  public static final char CIGAR_PADDING = 'P';
   /** Pseudo-CIGAR value for unmapped */
   public static final char CIGAR_UNMAPPED = 'u';
 
