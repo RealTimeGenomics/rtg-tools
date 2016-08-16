@@ -42,7 +42,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.rtg.util.NullStreamUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -71,7 +70,7 @@ public class ScriptedVcfFilterTest {
   }
 
   private ScriptedVcfFilter getScriptedVcfFilter(String expression, VcfHeader header, String... begin) {
-    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin), NullStreamUtils.getNullOutputStream());
+    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin), System.err);
     scriptedVcfFilter.setHeader(header);
     return scriptedVcfFilter;
   }
@@ -142,6 +141,20 @@ public class ScriptedVcfFilterTest {
     assertFalse(getScriptedVcfFilter("POS == 0").accept(record));
     assertTrue(getScriptedVcfFilter("POS == 1").accept(record));
     assertFalse(getScriptedVcfFilter("POS == 2").accept(record));
+  }
+  @Test
+  public void testOrder() {
+    VcfHeader header = getVcfHeader();
+    header.addFormatField("DP", MetaType.INTEGER, VcfNumber.ONE, "FOO");
+    final ScriptedVcfFilter filter = getScriptedVcfFilter("SAMPLES[0].DP >= 10", header, "function record() {SAMPLES[0].DP *= 4; return true;}");
+    final VcfRecord recordA = new VcfRecord("blah", 2, "A");
+    recordA.setNumberOfSamples(1);
+    recordA.addFormatAndSample("DP", "10");
+    final VcfRecord recordB = new VcfRecord("blah", 4, "A");
+    recordB.setNumberOfSamples(1);
+    recordB.addFormatAndSample("DP", "9");
+    assertTrue(filter.accept(recordA));
+    assertFalse(filter.accept(recordB));
   }
 
   @Test
