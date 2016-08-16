@@ -103,7 +103,7 @@ public class ScriptedVcfFilter implements VcfFilter {
       return true;
     }
     mEngine.put(RECORD_VARIABLE, record);
-    return invokeRecordFunction(record) && invokeExpression(record);
+    return invokeExpression(record) && invokeRecordFunction(record);
   }
 
   private Boolean invokeExpression(VcfRecord record) {
