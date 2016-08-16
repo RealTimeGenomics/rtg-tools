@@ -86,32 +86,6 @@ GOTO :no
 :start
 IF /I "%PROCESSOR_ARCHITECTURE%" NEQ "AMD64" GOTO :no64bit
 
-REM   Following checks for supported OS
-REM   Windows XP 64 bit and Windows Server 2003
-ver | FIND "5.2" > nul
-IF %ERRORLEVEL% EQU 0 GOTO :os_ok
-
-REM   Windows Vista and Windows Sever 2008 
-ver | FIND "6.0" > nul
-IF %ERRORLEVEL% EQU 0 GOTO :os_ok
-
-REM   Windows 7 and Windows Sever 2008 R2 
-ver | FIND "6.1" > nul
-IF %ERRORLEVEL% EQU 0 GOTO :os_ok
-
-REM   Windows 8 and Windows Sever 2012
-ver | FIND "6.2" > nul
-IF %ERRORLEVEL% EQU 0 GOTO :os_ok
-
-REM   Windows 8.1 and Windows Sever 2012 R2 
-ver | FIND "6.3" > nul
-IF %ERRORLEVEL% EQU 0 GOTO :os_ok
-
-REM   We have checked for all tested versions of Windows   
-echo This is not a supported version of windows, please contact support@realtimegenomics.com for more information
-GOTO :no
-
-:os_ok
 
 SET ACCEPTED_NAME="%~dp0%.license_accepted"
 
