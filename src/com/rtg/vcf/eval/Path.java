@@ -131,10 +131,10 @@ public final class Path implements Comparable<Path> {
     if (mCalledPath.getPosition() != mBaselinePath.getPosition()) {
       return false;
     }
-    if (mCalledPath.getPosition() < mCalledPath.getVariantEndPosition()) {
+    if (mCalledPath.getPosition() < mCalledPath.getIncludedVariantEndPosition()) {
       return false;
     }
-    if (mBaselinePath.getPosition() < mBaselinePath.getVariantEndPosition()) {
+    if (mBaselinePath.getPosition() < mBaselinePath.getIncludedVariantEndPosition()) {
       return false;
     }
     if (!mCalledPath.isOnTemplate()) {

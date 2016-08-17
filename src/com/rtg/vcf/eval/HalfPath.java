@@ -240,6 +240,14 @@ public final class HalfPath implements Comparable<HalfPath> {
   }
 
   /**
+   * Get variant end position of last variant included.
+   * @return Returns the variant end position.
+   */
+  public int getIncludedVariantEndPosition() {
+    return mIncludedVariantEndPosition;
+  }
+
+  /**
    * Get variant end position of last variant added (included or excluded).
    * @return Returns the variant end position.
    */
