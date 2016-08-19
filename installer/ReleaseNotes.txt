@@ -4,6 +4,228 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
+RTG Core 3.7 (2016-08-19)
+-------------------------
+
+Major features of this release:
+
+* Improvements to mapping speed when aligning targeted sequencing
+  data. This feature makes use of a per-reference hash blacklist which
+  is constructed once per reference genome and can yield significant
+  speed improvement.  In addition, several changes were made to reduce
+  peak memory use during mapping.
+
+* Variant callers now allow the optional inclusion of expected
+  germline allele balance terms in the Bayesian model.  In a
+  genome-wide scale, this generally results in a reduction in
+  false-positive calls, although sensitivity may be reduced for
+  variants which do not follow allele balance expectations, such as
+  mosaic de novo variants.
+
+* Several improvements to the somatic caller. These include the
+  ability to enable output of germline variants (due to the joint
+  calling, accuracy of calling germline variants during somatic
+  calling is typically higher than separately calling germline
+  variants from the normal sample alone). The somatic caller now has
+  the ability to explicitly model the expected somatic allelic
+  fraction, for use in cases where the tumor heterogeneity is expected
+  to be low. Additional options allow the output of records at sites
+  exceeding user-specified thresholds for non-reference evidence.
+
+* Several improvements to the variant comparison tools.  vcfeval now
+  includes the ability to evaluate matches across confident-region
+  boundaries according to GA4GH recommended practise.  vcfeval can be
+  used to compare against "sample-free" VCFs such as
+  ExAC/COSMIC/dbSNP, and the runtime has also been significantly
+  improved.  In addition, the rocplot command can now produce
+  precision-sensitivity graphs, and can output SVG as a more
+  publication-ready format.
+
+Detailed changes are listed below by area.  For more information on
+new features, see the RTG Operations Manual.
+
+## Basic Formatting and Mapping
+
+* format: Automatically installs reference genome configuration
+  information when a recognized reference genome is being formatted to
+  SDF. Also outputs a reminder for those cases where it looks like a
+  reference genome is being formatted but which is not one of the
+  recognized genomes.
+
+* sdf2cg: New command to allow the export of Complete Genomics data
+  that has been formatted as SDF to Complete Genomics TSV read format.
+
+* map/cgmap: TLEN was not being correctly computed in the presence of
+  soft clipping and back steps. This has now been corrected.
+
+* map/cgmap: Several reductions in peak memory use during mapping.
+
+* map: Significant speed improvement when mapping highly targeted
+  sequencing data, using the mechanism of a repetitive hash blacklist.
+  This is enabled via the new flag --reference-blacklist. A separate
+  tool is used for one-off blacklist construction.
+
+* hashdist: New command that can be used to analyse the uniqueness of
+  k-mers contained within a reference sequence and to produce a
+  reference hash blacklist.
+
+* calibrate: New flag --exclude-bed and --exclude-vcf can be used to
+  exclude sites of known genomic variation during the computation of
+  calibration data. It is not currently possible to specify this
+  information to the automatic calibration that is carried out during
+  mapping, this will be added in a future release.
+
+### Variant Calling
+
+* snp/family/population/somatic: These callers expect calling to be
+  carried out on alignments that have had calibration information
+  computed. They now requires the explicit use of the --no-calibration
+  flag in order to proceed anyway.
+
+* snp/family/population/somatic: These commands now output a warning
+  if too many "excessive coverage" situations are encountered, as this
+  usually signifies that the user has incorrectly calibrated their
+  mappings or has failed to supply an appropriate coverage parameter
+  to the caller. In addition, these commands output a warning if it
+  appears that calibration has not been computed from correct regions
+  for targeted data.
+
+* snp/family/population/somatic: New flag --min-base-quality which
+  allows explicit ignoring of base calls which do not meet the
+  specified minimum phred quality score. These bases will be treated
+  the same as an N and will not contribute to allele counts.  The
+  default is to consider all bases.
+
+* family/population/somatic: The semantics of --max-coverage has
+  changed from being the total coverage across all samples, to being
+  the average per-sample coverage.  This flag is typically only used
+  when running without calibration, and this change makes the default
+  behaviour more scalable with varying numbers of samples.
+
+* snp: An explicitly specified --ploidy flag now overrides the ploidy
+  obtained from reference genome configuration (if present).
+  Previously the ploidy specified in the reference genome would take
+  precedence.
+
+* snp/family/population/somatic: Fixed an incorrect (and sometimes
+  non-deterministic) computation of the PUR FORMAT annotation. This
+  does not affect primary calling but could result in changes in AVR
+  score.
+
+* snp/family/population/somatic: Updated the Bayesian model to include
+  a term for the expected allele balance. This is disabled by default,
+  and can be enabled with the new flag --enable-allelic-fraction. This
+  option gives improved precision for regular germline calling, but
+  sensitivity to mosaic variants or those within CNV regions may be
+  reduced.
+
+* snp/somatic: The new flags --min-variant-allelic-depth and
+  --min-variant-allelic-fraction can be used to enable output at sites
+  where these thresholds are met, even if the caller would not
+  otherwise make a call. Note that this does not act as a filter to
+  prevent the caller from output at sites where these thresholds are
+  not met.
+
+* somatic: New flag --include-germline which instructs the somatic
+  caller to also output variants which have been identified as
+  germline variants.
+
+* somatic: New flag --enable-somatic-allelic-fraction which instructs
+  the Bayesian model to include a term for the expected somatic
+  allelic fraction in the calling.  This flag is most appropriate when
+  tumor heterogeneity is low.
+
+### Variant Processing and Analysis
+
+* vcfsubset/vcffilter: New flag --no-header which omits the output of
+  the VCF header.
+
+* vcffilter: New option --keep-expr to allow filtering records based
+  on simple JavaScript expressions with natural VCF field access. For
+  example 'NA12878.DP > NA12892.DP' to select records from a trio
+  call-set where the depth of NA12878 is greater than that of her
+  mother. See the user manual for more information and examples.
+
+* vcffilter: New option --javascript to allow advanced filtering and
+  other processing of the VCF file using powerful JavaScript
+  filters. These scripts can contain initial setup, per-record
+  actions, and end functions. See the user manual for more information
+  and examples.
+
+* vcfeval: Specifying a sample name of ALT for either the baseline or
+  call sample name instructs vcfeval to match against all possible
+  non-ref diploid (or haploid if using --squash-ploidy) genotypes
+  possible from the declared ALTs. This permits matching against a VCF
+  that contains no sample column, for example to find hits against a
+  sample-free VCF such as ExAC or COSMIC.
+
+* vcfeval: New flag --evaluation-regions, which adds support for
+  matching across high-confidence/false-positive regions such as those
+  supplied with GIAB or Illumina Platinum Genomes truth sets according
+  to GA4GH recommendations. In summary, only matches against baseline
+  variants within these regions count as true positives and only
+  non-matched call variants made within these regions count as false
+  positives.
+
+* vcfeval: Now outputs additional true positive statistics for the
+  unweighted calls, so you can see the simple count of true positives
+  in call representation.  When computing precision, this uses the
+  unweighted call count in the denominator, to reduce representation
+  bias in the precision.
+
+* vcfeval: Significant speed increase (often 2x speed up for typical
+  WGS comparisons).
+
+* vcfeval: New output mode 'roc-only' which skips the output of VCF
+  files and only produces the ROC data files and summary metrics. This
+  reduces run-time and the size of the output directories when doing
+  many runs.
+
+* rocplot: Added the ability to plot precision-sensitivity graphs via
+  the new flag --precision-sensitivity.  In the interactive GUI the
+  graph type can also be changed on the fly via a dropdown chooser.
+
+* rocplot: Added the ability to output images in SVG format, both in
+  non-interactive mode via the new flag --svg, and when saving images
+  from the interactive GUI.
+
+* rocplot: Improved the default labelling of curves by including the
+  score field if available.
+
+* rocplot: The curve palette size has been increased in order to allow
+  easier differentiation when more than 8 curves are being displayed
+  at once.
+
+* rocplot: (GUI) Fixed an annoying bug that could occur when trying to
+  edit the title of the plot or of the curves. Several other minor GUI
+  improvements have been made, such as the ability to use the
+  mouse-wheel to scroll large lists of curves.
+
+### Other
+
+* aview: Now defaults to showing base colors in the terminal. Use
+  --no-base-colors to disable this.
+
+* aview: Better error handling for invalid SAM records.
+
+* aview: New flag --print-soft-clipped-bases to display soft-clipped
+  bases.
+
+* chrstats: New flag --output-pedigree that can be used to create a
+  default pedigree file based on the mappings of multiple samples,
+  using inferred sample sex where possible.
+
+* many: In several cases where a flag could be specified multiple
+  times, it is now possible to supply a comma separated list of
+  values. These are indicated in the output of --help.
+
+* many: Most utility commands which write VCF files now do so
+  asynchronously, often resulting in significant speed improvements.
+
+
+Previous releases
+=================
+
 RTG Core 3.6.2 (2016-03-10)
 ---------------------------
 
@@ -27,9 +249,6 @@ This release primarily includes bugfixes and minor improvements:
 
 * rocplot: (GUI) Minor improvement to crosshair handling.
 
-
-Previous releases
-=================
 
 RTG Core 3.6.1 (2016-01-25)
 ---------------------------
