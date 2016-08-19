@@ -54,7 +54,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
   static final String INFO_CALL = "CALL";
   static final String INFO_SYNCPOS = "SYNC";
   static final String INFO_CALL_WEIGHT = "CALL_WEIGHT";
-  static final String STATUS_NON_CONF = "NON_CONF";
+  static final String STATUS_OUTSIDE = "OUT";
   static final String STATUS_IGNORED = "IGN";
   static final String STATUS_HARD = "HARD";
   static final String STATUS_TP = "TP";
@@ -134,7 +134,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
           addToROCContainer(w, 0, 1, false);
           status = STATUS_TP;
         } else {
-          status = STATUS_NON_CONF;
+          status = STATUS_OUTSIDE;
         }
         sync = Integer.toString(mCSyncStart + 1);
       } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
@@ -147,11 +147,11 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
           addToROCContainer(w, 0, 1, true);
           status = STATUS_FP_CA;
         } else {
-          status = STATUS_NON_CONF;
+          status = STATUS_OUTSIDE;
         }
         sync = Integer.toString(mCSyncStart2 + 1);
       } else if (mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
-        status = STATUS_NON_CONF;
+        status = STATUS_OUTSIDE;
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
         mFalsePositives++;
@@ -183,7 +183,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         status = STATUS_HARD;
         sync = null;
       } else if (mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
-        status = STATUS_NON_CONF;
+        status = STATUS_OUTSIDE;
         sync = null;
       } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         mBaselineTruePositives++;

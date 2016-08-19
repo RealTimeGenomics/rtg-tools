@@ -57,13 +57,13 @@ public final class Path implements Comparable<Path> {
     private final int mPos;
     private final double mCalledTPCount;
     private final double mBaselineTPCount;
-    private final double mBaselineTPHighConf;
+    private final double mBaselineTPInside;
 
-    SyncPoint(int pos, int calledCount, int baselineCount, int baselineHighConfCount) {
+    SyncPoint(int pos, int calledCount, int baselineCount, int baselineInsideCount) {
       mPos = pos;
       mCalledTPCount = calledCount;
       mBaselineTPCount = baselineCount;
-      mBaselineTPHighConf = baselineHighConfCount;
+      mBaselineTPInside = baselineInsideCount;
     }
 
     int getPos() {
@@ -302,12 +302,12 @@ public final class Path implements Comparable<Path> {
     int callPos = 0;
     for (int loc : syncpoints) {
       int baseLineCount = 0;
-      int baseLineHighConf = 0;
+      int baseLineInside = 0;
       int calledCount = 0;
       while (basePos < baseLine.size() && baseLine.get(basePos).getStart() <= loc) {
         baseLineCount++;
         if (!baseLine.get(basePos).hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
-          baseLineHighConf++;
+          baseLineInside++;
         }
         basePos++;
       }
@@ -316,7 +316,7 @@ public final class Path implements Comparable<Path> {
         calledCount++;
         callPos++;
       }
-      list.add(new SyncPoint(loc, calledCount, baseLineCount, baseLineHighConf));
+      list.add(new SyncPoint(loc, calledCount, baseLineCount, baseLineInside));
     }
     return list;
   }
@@ -360,8 +360,8 @@ public final class Path implements Comparable<Path> {
             + "Bumped variant:  " + v);
         v.setWeight(0);
       } else {
-        // TPHighConf count could still be 0 if the only TP are outside high conf regions
-        v.setWeight(syncpoint.mBaselineTPHighConf / syncpoint.mCalledTPCount);
+        // Inside count could still be 0 if the only TP are outside evaluation regions
+        v.setWeight(syncpoint.mBaselineTPInside / syncpoint.mCalledTPCount);
       }
     }
   }
