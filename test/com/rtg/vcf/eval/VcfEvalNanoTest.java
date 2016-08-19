@@ -94,6 +94,12 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     check("vcfeval_too_complex_end", false, false, true);
   }
 
+  public void testNanoAllMatches() throws IOException, UnindexableDataException {
+    // This contains a few variants that should be flagged
+    // One example is tricky, in that it is normally discarded before reaching a sync point
+    endToEnd("vcfeval_all_matches", new String[] {"output.vcf"}, true, "--output-mode=combine", "--sample=BASELINE,CALLS", "--all-records", "--ref-overlap", "--Xtwo-pass=false", "--XXcom.rtg.vcf.eval.flag-alternates=true");
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");
