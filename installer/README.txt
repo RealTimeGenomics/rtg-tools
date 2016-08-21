@@ -22,7 +22,7 @@ No-JRE:
   The no-JRE distribution does not include a Java Runtime Environment
   and instead uses the system-installed Java.  Ensure that at the
   command line you can enter 'java -version' and that this command
-  reports a java version of 1.7 or higher before proceeding with the
+  reports a java version of 1.8 or higher before proceeding with the
   steps below. This may require setting your PATH environment variable
   to include the location of an appropriate version of java.
 
@@ -30,8 +30,8 @@ Linux/MacOS X:
 
   Unzip the RTG distribution to the desired location.
 
-  If your RTG distribution requires a license file (rtg-license.txt),
-  copy the license file from Real Time Genomics into the RTG
+  If your RTG installation requires a license file (rtg-license.txt),
+  copy the license file provided by Real Time Genomics into the RTG
   distribution directory.
 
   In a terminal, cd to the installation directory and test for success

@@ -4,7 +4,7 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
-RTG Core 3.7 (2016-08-19)
+RTG Core 3.7 (2016-08-25)
 -------------------------
 
 Major features of this release:
@@ -22,15 +22,17 @@ Major features of this release:
   variants which do not follow allele balance expectations, such as
   mosaic de novo variants.
 
-* Several improvements to the somatic caller. These include the
-  ability to enable output of germline variants (due to the joint
-  calling, accuracy of calling germline variants during somatic
-  calling is typically higher than separately calling germline
-  variants from the normal sample alone). The somatic caller now has
-  the ability to explicitly model the expected somatic allelic
-  fraction, for use in cases where the tumor heterogeneity is expected
-  to be low. Additional options allow the output of records at sites
-  exceeding user-specified thresholds for non-reference evidence.
+* Several improvements to the somatic caller. These include the ability
+  to enable output of germline variants (due to the joint calling,
+  accuracy of calling germline variants during somatic calling is
+  typically higher than separately calling germline variants from the
+  normal sample alone). The somatic caller now has the ability to
+  explicitly model the expected somatic allelic fraction, for use in
+  cases where the tumor heterogeneity is expected to be low. Additional
+  options allow the output of records at sites exceeding user-specified
+  thresholds for non-reference evidence. We have also included an AVR
+  model specifically built for somatic calling which provides more
+  accurate scoring than the regular germline AVR models.
 
 * Several improvements to the variant comparison tools.  vcfeval now
   includes the ability to evaluate matches across confident-region
@@ -40,6 +42,10 @@ Major features of this release:
   improved.  In addition, the rocplot command can now produce
   precision-sensitivity graphs, and can output SVG as a more
   publication-ready format.
+
+Note: RTG now requires Java 8, so for those using the "nojre" RTG
+download or who are building from source, make sure you have Java 8
+installed.
 
 Detailed changes are listed below by area.  For more information on
 new features, see the RTG Operations Manual.
@@ -63,7 +69,7 @@ new features, see the RTG Operations Manual.
 * map: Significant speed improvement when mapping highly targeted
   sequencing data, using the mechanism of a repetitive hash blacklist.
   This is enabled via the new flag --reference-blacklist. A separate
-  tool is used for one-off blacklist construction.
+  tool 'hashdist' is used for this one-off blacklist construction.
 
 * hashdist: New command that can be used to analyse the uniqueness of
   k-mers contained within a reference sequence and to produce a
@@ -135,6 +141,11 @@ new features, see the RTG Operations Manual.
   allelic fraction in the calling.  This flag is most appropriate when
   tumor heterogeneity is low.
 
+* somatic: A new pre-built AVR model is provided for somatic calling
+  which provides better scoring for somatic variants than the regular
+  AVR models. This new model, "illumina-somatic.avr" is selected by
+  default by the somatic caller.
+
 ### Variant Processing and Analysis
 
 * vcfsubset/vcffilter: New flag --no-header which omits the output of
@@ -181,6 +192,10 @@ new features, see the RTG Operations Manual.
   reduces run-time and the size of the output directories when doing
   many runs.
 
+* vcfeval: Command line score field specification permits INFO.<name>
+  form, for consistency with JavaScript expression notation, although
+  the old form of INFO=<name> is still supported.
+
 * rocplot: Added the ability to plot precision-sensitivity graphs via
   the new flag --precision-sensitivity.  In the interactive GUI the
   graph type can also be changed on the fly via a dropdown chooser.
@@ -221,6 +236,11 @@ new features, see the RTG Operations Manual.
 
 * many: Most utility commands which write VCF files now do so
   asynchronously, often resulting in significant speed improvements.
+
+* all: The distribution now includes an HTML version of the operations
+  manual in addition to the PDF version.
+
+* all: The minimum Java requirement for RTG is now Java 8.
 
 
 Previous releases
