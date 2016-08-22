@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
 
-import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
@@ -274,63 +273,6 @@ public class CommonFlagsTest extends TestCase {
       assertTrue(mps.toString().contains("You have specified too many sequences, please specify a range of less than " + Integer.MAX_VALUE));
     } finally {
       Diagnostic.setLogStream();
-    }
-  }
-
-  public void testNoSuchAvrModel() {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    try {
-      final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), mps.printStream());
-      flags.registerOptional(CommonFlags.AVR_MODEL_FILE_FLAG, File.class, "File", "AVR");
-      flags.setFlags("--avr-model", "no-such-model-avr");
-      try {
-        CommonFlags.getAvrModel(flags, false);
-        fail();
-      } catch (final InvalidParamsException e) {
-        // expected
-      }
-    } finally {
-      Diagnostic.setLogStream();
-    }
-  }
-
-  public void testAvrModelDirFailures() throws Exception {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    try (TestDirectory tmpDir = new TestDirectory()) {
-      try {
-        final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), mps.printStream());
-        final String oldAvrModels = System.getProperty(CommonFlags.ENVIRONMENT_MODELS_DIR);
-        try {
-          final File f = new File(tmpDir, "blah");
-          try {
-            System.setProperty(CommonFlags.ENVIRONMENT_MODELS_DIR, f.getPath());
-            CommonFlags.getAvrModel(flags, false);
-            fail();
-          } catch (final InvalidParamsException e) {
-            assertFalse(f.exists());
-            assertEquals("The AVR models directory cannot be found or is not a directory: " + f.getPath(), e.getMessage());
-          }
-          assertTrue(f.createNewFile());
-          try {
-            System.setProperty(CommonFlags.ENVIRONMENT_MODELS_DIR, f.getPath());
-            CommonFlags.getAvrModel(flags, false);
-            fail();
-          } catch (final InvalidParamsException e) {
-            assertTrue(f.exists());
-            assertEquals("The AVR models directory cannot be found or is not a directory: " + f.getPath(), e.getMessage());
-          }
-        } finally {
-          if (oldAvrModels == null) {
-            System.clearProperty(CommonFlags.ENVIRONMENT_MODELS_DIR);
-          } else {
-            System.setProperty(CommonFlags.ENVIRONMENT_MODELS_DIR, oldAvrModels);
-          }
-        }
-      } finally {
-        Diagnostic.setLogStream();
-      }
     }
   }
 
