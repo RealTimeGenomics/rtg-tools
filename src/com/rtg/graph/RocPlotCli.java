@@ -139,7 +139,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerExtendedHelp();
     flags.registerOptional('t', TITLE_FLAG, String.class, "STRING", "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
-    flags.registerOptional(PRECISION_SENSITIVITY_FLAG, "if set, use precision/sensitivity mode").setCategory(REPORTING);
+    flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the sidepane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class , "INT", "sets the plot line width", 2).setCategory(REPORTING);
     flags.registerOptional(PNG_FLAG, File.class , "FILE", "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
