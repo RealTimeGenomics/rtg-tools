@@ -46,6 +46,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.rtg.util.RstTable;
 import com.rtg.util.StringUtils;
 
 /**
@@ -81,6 +82,8 @@ import com.rtg.util.StringUtils;
  *
  */
 public final class CFlags {
+
+  private static final String TABLE_USAGE = "cflags.table";
 
   static final String LS = System.lineSeparator();
 
@@ -1193,19 +1196,15 @@ public final class CFlags {
   }
 
   private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
-    int longestUsageLength = 0;
+    if (Boolean.getBoolean(TABLE_USAGE)) {
+      wb.setWrapWidth(0);
+      wb.append(getTableUsage(level));
+      return;
+    }
     // Get longest string lengths for use below in pretty-printing.
     //final int[] counts = new int[mCategories.length];
-    for (Flag flag : mRegisteredFlags) {
-      //counts[getCategoryLocation(flag.getCategory())]++;
-      if (!displayFlag(flag, level)) {
-        continue;
-      }
-      final String usageStr = flag.getFlagUsage();
-      if (usageStr.length() > longestUsageLength) {
-        longestUsageLength = usageStr.length();
-      }
-    }
+    final int longestUsageLength = getUsageLength(level);
+
     // We do all the required flags first
     for (final String mCategorie : mCategories) {
       final List<Flag> flags = getFlagFromType(mCategorie);
@@ -1226,6 +1225,72 @@ public final class CFlags {
         }
       }
     }
+  }
+
+  private String getTableUsage(Flag.Level level) {
+    final int usageLength = getUsageLength(level);
+
+    //layout:
+    //+--------+-----------------+--------------------+
+    //| Category                                      |
+    //+========+=================+====================+
+    //| ``-x`` | ``--usage=VAL`` | longer description |
+    //+--------+-----------------+--------------------+
+    final StringBuilder sb = new StringBuilder();
+    for (final String category : mCategories) {
+      final int descriptionLength = getUsageDescriptionLength(level, category);
+
+      if (usageLength > 0 && descriptionLength > 0) {
+        final RstTable table = new RstTable(1, category.length(), 6, usageLength + 4, descriptionLength);
+        table.addHeading(category);
+
+        final List<Flag> flags = getFlagFromType(category);
+        for (Flag flag : flags) {
+          if (displayFlag(flag, level)) {
+            final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
+            table.addRow(
+              shortFlag,
+              "``" + flag.getFlagUsage() + "``",
+              flag.getUsageDescription()
+            );
+          }
+        }
+        sb.append(StringUtils.LS);
+        sb.append(table.getText());
+      }
+    }
+    return sb.toString();
+  }
+
+  private int getUsageLength(Flag.Level level) {
+    int longestUsageLength = 0;
+    // Get longest string lengths for use below in pretty-printing.
+    //final int[] counts = new int[mCategories.length];
+    for (Flag flag : mRegisteredFlags) {
+      //counts[getCategoryLocation(flag.getCategory())]++;
+      if (!displayFlag(flag, level)) {
+        continue;
+      }
+      final String usageStr = flag.getFlagUsage();
+      if (usageStr.length() > longestUsageLength) {
+        longestUsageLength = usageStr.length();
+      }
+    }
+    return longestUsageLength;
+  }
+
+  private int getUsageDescriptionLength(Flag.Level level, String category) {
+    final List<Flag> flags = getFlagFromType(category);
+    int usageLength = 0;
+    for (Flag flag : flags) {
+      if (displayFlag(flag, level)) {
+        final String usageDescription = flag.getUsageDescription();
+        if (usageDescription.length() > usageLength) {
+          usageLength = usageDescription.length();
+        }
+      }
+    }
+    return usageLength;
   }
 
   static boolean displayFlag(Flag flag, Flag.Level level) {

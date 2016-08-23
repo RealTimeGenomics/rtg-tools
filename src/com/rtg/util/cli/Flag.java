@@ -671,6 +671,17 @@ public class Flag implements Comparable<Flag> {
     }
     wb.append(" ");
 
+    final String description = getUsageDescription();
+
+    wb.wrapText(description);
+    wb.append(CFlags.LS);
+  }
+
+  /**
+   * The description including default values and bounds/limits
+   * @return description string
+   */
+  public String getUsageDescription() {
     final StringBuilder description = new StringBuilder(getDescription());
 
     final List<String> range = getParameterRange();
@@ -699,9 +710,7 @@ public class Flag implements Comparable<Flag> {
       }
       description.append(" (Default is ").append(defs).append(")");
     }
-
-    wb.wrapText(description.toString());
-    wb.append(CFlags.LS);
+    return description.toString();
   }
 
   private static String autoDescription(final Class<?> type) {
