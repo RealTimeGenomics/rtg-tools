@@ -230,11 +230,13 @@ public final class SdfStatistics extends AbstractCli {
         out.append(StringUtils.LS);
       }
       out.append("Sequence names     : ");
-      if (reader.hasNames()) {
-        out.append("yes");
-      } else {
-        out.append("no");
-      }
+      out.append(reader.hasNames() ? "yes" : "no");
+      out.append(StringUtils.LS);
+      out.append("Sex metadata       : ");
+      out.append(ReferenceGenome.hasReferenceFile(reader) ? "yes" : "no");
+      out.append(StringUtils.LS);
+      out.append("Taxonomy metadata  : ");
+      out.append(TaxonomyUtils.hasTaxonomyInfo(reader) ? "yes" : "no");
       out.append(StringUtils.LS);
       final long[] counts = reader.residueCounts();
       long sum = 0;
@@ -252,11 +254,7 @@ public final class SdfStatistics extends AbstractCli {
         printQualityHistogram(reader, out);
       }
       out.append("Residue qualities  : ");
-      if (reader.hasQualityData() && reader.hasHistogram()) {
-        out.append("yes");
-      } else {
-        out.append("no");
-      }
+      out.append(reader.hasQualityData() && reader.hasHistogram() ? "yes" : "no");
       out.append(StringUtils.LS);
       if (nStats) {
         printNBlocks(reader, out);

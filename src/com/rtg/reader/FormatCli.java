@@ -498,7 +498,7 @@ public final class FormatCli extends LoggedCli {
               }
               if (numbers && sex) {
                 Diagnostic.info("");
-                Diagnostic.info("This looks like a genome reference, you can enable sex-aware processing by installing a reference.txt containing chromosome metadata.  See the user manual for more information.");
+                Diagnostic.info("This looks like a genome reference, but is not recognized. You should enable sex-aware processing by manually installing an appropriate reference.txt containing chromosome metadata.  See the user manual for more information.");
                 Diagnostic.info("");
               }
             }
