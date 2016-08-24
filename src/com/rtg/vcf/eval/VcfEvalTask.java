@@ -54,6 +54,7 @@ import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
@@ -254,15 +255,15 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final RocScoreField fieldType;
     final String fieldName;
     if (scoreField != null) {
-      if (scoreField.contains("=")) {
-        final int pIndex = scoreField.indexOf('=');
-        final String fieldTypeName = scoreField.substring(0, pIndex).toUpperCase(Locale.getDefault());
+      final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
+      if (splitScore.length > 1) {
+        final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());
         try {
           fieldType = RocScoreField.valueOf(fieldTypeName);
         } catch (IllegalArgumentException e) {
           throw new NoTalkbackSlimException("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
         }
-        fieldName = scoreField.substring(pIndex + 1);
+        fieldName = splitScore[1];
       } else if (scoreField.equals(VcfUtils.QUAL)) {
         fieldType = RocScoreField.QUAL;
         fieldName = "UNUSED";
