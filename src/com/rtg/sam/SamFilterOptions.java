@@ -213,7 +213,7 @@ public final class SamFilterOptions {
     return flags.registerOptional(KEEP_DUPLICATES_FLAG, KEEP_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
-  private static final String RESTRICTION_DESC = "if set, only process SAM records within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length";
+  private static final String RESTRICTION_DESC = "if set, only process SAM records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length";
 
   /**
    * Register flag for restricting records to be processed.

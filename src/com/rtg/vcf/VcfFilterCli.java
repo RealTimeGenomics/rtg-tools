@@ -156,7 +156,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
 
-    mFlags.registerOptional(RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
     // What to apply to, what to do with the results of filtering

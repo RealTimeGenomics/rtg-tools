@@ -118,7 +118,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
         , "-i,", "input-first=FILE", "first file"
         , "-I,", "input-second=FILE", "second file"
         , "-o,", "output=DIR", "output directory"
-        , "--region=STRING", "if set, only process the SNPs within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length"
+        , "--region=STRING", "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length"
         , "-Z,", "no-gzip", "do not gzip the output"
         , "-c,", "compare-alts", "do a basic comparison on ALT calls in addition to position"
         );

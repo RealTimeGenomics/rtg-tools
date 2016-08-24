@@ -117,7 +117,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerRequired('c', CALLS, File.class, "file", "VCF file containing called variants").setCategory(INPUT_OUTPUT);
     flags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, "SDF", "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
 
-    flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length").setCategory(INPUT_OUTPUT);
+    flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
     flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
     flags.registerOptional('e', EVAL_REGIONS_FLAG, File.class, "File", "if set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set high-confidence regions or other regions of interest where region boundary effects should be minimized").setCategory(INPUT_OUTPUT);

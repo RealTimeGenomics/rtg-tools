@@ -116,7 +116,7 @@ CommonFlags.initNoGzip(flags);
     final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, "STRING", "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
-    flags.registerOptional(REGION_FLAG, String.class, "STRING", "if set, only process the SNPs within the specified range. The format is one of <template_name>, <template_name>:start-end or <template_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    flags.registerOptional(REGION_FLAG, String.class, "STRING", "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     flags.setDescription("Produces intersection information between two SNP files.");
     flags.setValidator(new SnpIntersectionFlagValidator());
   }
