@@ -221,6 +221,28 @@ public class TextTable {
     }
   }
 
+  /**
+   * Output the table as basic tab separated
+   * @return the <code>TSV</code> representation
+   */
+  public String getAsTsv() {
+    final StringBuilder sb = new StringBuilder();
+    for (ArrayList<String> row : mTableContents) {
+      if (row != SEPARATOR) {
+        boolean first = true;
+        for (String column : row) {
+          if (!first) {
+            sb.append("\t");
+          }
+          first = false;
+          sb.append(column);
+        }
+        sb.append(StringUtils.LS);
+      }
+    }
+    return sb.toString();
+  }
+
 
   @Override
   public String toString() {

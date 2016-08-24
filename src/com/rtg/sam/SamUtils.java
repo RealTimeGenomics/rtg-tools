@@ -31,6 +31,7 @@ package com.rtg.sam;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -71,6 +72,8 @@ import htsjdk.samtools.Cigar;
 import htsjdk.samtools.CigarElement;
 import htsjdk.samtools.CigarOperator;
 import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMFileWriter;
+import htsjdk.samtools.SAMFileWriterFactory;
 import htsjdk.samtools.SAMProgramRecord;
 import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
@@ -962,5 +965,23 @@ public final class SamUtils {
     final StringWriter writer = new StringWriter();
     new SAMTextHeaderCodec().encode(writer, header);
     return writer.toString();
+  }
+
+  /**
+   * Converts a BAM file to string, useful for tests
+   * @param bamFile the BAM file
+   * @return string representation of BAM file
+   * @throws IOException if an IO error occurs
+   */
+  public static String bamToString(File bamFile) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (final SamReader reader = makeSamReader(bamFile)) {
+      try (SAMFileWriter writer = new SAMFileWriterFactory().makeSAMWriter(reader.getFileHeader(), true, baos)) {
+        for (SAMRecord r : reader) {
+          writer.addAlignment(r);
+        }
+      }
+    }
+    return baos.toString();
   }
 }

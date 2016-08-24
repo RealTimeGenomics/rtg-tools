@@ -920,6 +920,16 @@ public final class FileUtils {
   }
 
   /**
+   * Create a stream that writes same output to two streams
+   * @param first one of the streams
+   * @param second the other of the streams
+   * @return a new stream that forwards its output to given streams
+   */
+  public static OutputStream createTeedOutputStream(OutputStream first, OutputStream second) {
+    return new TeeOutputStream(first, second);
+  }
+
+  /**
    * Returns a base file given a filename. This is used to determine what part of a user supplied filename are unique
    * and which are merely associated with its file type. A gzip extension (<code>.gz</code>) will always be removed from the base file.
    * @param file user supplied filename
