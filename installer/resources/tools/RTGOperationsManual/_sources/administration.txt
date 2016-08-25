@@ -1,0 +1,250 @@
+Administration & Capacity Planning
+===================================
+
+Advanced installation configuration
+------------------------------------
+
+RTG software can be shared by a group of users by installing on a
+centrally available file directory or shared drive. Assignment of
+execution privileges can be determined by the administrator, independent
+of the software license file. For commercial users, the software license
+prepared by Real Time Genomics (``rtg-license.txt``) need only be included
+in the same directory as the executable (``RTG.jar``) and the run-time
+scripts (``rtg`` or ``rtg.bat``).
+
+During installation on Unix systems, a configuration file named
+``rtg.cfg`` is created in the installation directory. By editing this
+configuration file, one may alter further configuration variables
+appropriate to the specific deployment requirements of the organization.
+On Windows systems, these variables are set in the ``rtg.bat`` file in the
+installation directory. These configuration variables include:
+
+.. tabularcolumns:: |l|L|
+
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Variable                   | Description                                                                                                                                                                                                                |
++============================+============================================================================================================================================================================================================================+
+| ``RTG_MEM``                | Specify the maximum memory for Java run-time execution. Use a G suffix for gigabytes, e.g.: ``RTG_MEM=48G``. The default memory allocation is 90% of system memory.                                                        |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_JAVA``               | Specify the path to Java (default assumes current path).                                                                                                                                                                   |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_JAR``                | Indicate the path to the ``RTG.jar`` executable (default assumes current path).                                                                                                                                            |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_JAVA_OPTS``          | Provide any additional Java JVM options.                                                                                                                                                                                   |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_DEFAULT_THREADS``    | By default any RTG module with a ``--threads`` parameter will automatically use the number of cores as the number of threads. This setting makes the specified number the default for the ``--threads`` parameter instead. |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_PROXY``              | Specify the http proxy server for TalkBack exception management (default is no http proxy).                                                                                                                                |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_TALKBACK``           | Send log files for crash-severity exception conditions (default is true, set to false to disable).                                                                                                                         |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_USAGE``              | If set to true, enable simple usage logging.                                                                                                                                                                               |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_USAGE_DIR``          | Destination directory when performing single-user file-based usage logging.                                                                                                                                                |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_USAGE_HOST``         | Server URL when performing server-based logging.                                                                                                                                                                           |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_USAGE_OPTIONAL``     | May contain a comma-separated list of the names of optional fields to include in usage logging (when enabled). Any of ``username``, ``hostname`` and ``commandline`` may be set here.                                      |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_REFERENCES_DIR``     | Specifies an alternate directory containing metagenomic pipeline reference datasets.                                                                                                                                       |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ``RTG_MODELS_DIR``         | Specifies an alternate directory containing AVR models.                                                                                                                                                                    |
++----------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+Run-time performance optimization
+---------------------------------
+
+**CPU** — Multi-core operation finishes jobs faster by processing
+multiple application threads in parallel. By default RTG uses all
+available cores of a multi-processor server node. With a command line
+parameter setting, RTG operation can be limited to a specified number of
+cores if desired.
+
+**Memory** — Adding more memory can improve performance where very high
+read coverage is desired. RTG creates and uses indexes to speed up
+genomic data processing. The more RAM you have, the more reads you can
+process in memory in a run. We use 48 GB as a rule of thumb for
+processing human data. However, a smaller number of reads can be
+processed in as little as 2 GB.
+
+**Disk Capacity** — Disk requirements are highly dependent on the size of the
+underlying data sets, the amount of information needed to hold quality
+scores, and the number of runs needed to investigate the impact of
+varying levels of sensitivity. Though all data is handled and stored in
+compressed form by default, a realistic minimum disk size for handling human
+data is 1 TB. As a rule of thumb, for every 2 GB of input read data
+expect to add 1 GB of index data and 1 GB of output files per run.
+Additionally, leave another 2 GB free for temporary storage during
+processing.
+
+Alternate configurations
+------------------------
+
+**Demonstration system** — For training, testing, demonstrating,
+processing and otherwise working with smaller genomes, RTG works just
+fine on a newer laptop system with an Intel processor. For example,
+product testing in support of this documentation was executed on a
+MacBook PC (Intel Core 2 Duo processor, 2.1 GHz clock speed, 1
+processor, 2 cores, 3MB L2 Cache, 4 GB RAM, 290 GB 5400 RPM Serial-ATA
+disk)
+
+**Clustered system** — The comparison of genomic variation on a large
+scale demands extensive processing capability. Assuming standard CPU
+hardware as described above, scale up to meet your institutional or
+major product needs by adding more rack-mounted boards and blades into
+rack servers in your data center. To estimate the number of cores
+required, first estimate the number of jobs to be run, noting size and
+sensitivity requirements. Then apply the appropriate benchmark figures
+for different size jobs run with varying sensitivity, dividing the
+number of reads to be processed by the reads/second/core.
+
+Exception management - TalkBack and log file
+--------------------------------------------
+
+Many RTG commands generate a log file with each run that is saved to the
+results output directory. The contents of the file contain lists of job
+parameters, system configuration, and run-time information.
+
+In the case of internal exceptions, additional information is recorded
+in the log file specific to the problem encountered. Fatal exceptions
+are trapped and notification is sent to Real Time Genomics with a copy
+of the log file. This mechanism is called TalkBack and uses an embedded
+URL to which RTG sends the report.
+
+The following sample log displays the software version information,
+parameter list, and run-time progress.
+
+.. code-block:: text
+
+	2009-09-05 21:38:10 RTG version = v2.0b build 20013 (2009-10-03)
+	2009-09-05 21:38:10 java.runtime.name = Java(TM) SE Runtime Environment
+	2009-09-05 21:38:10 java.runtime.version = 1.6.0_07-b06-153
+	2009-09-05 21:38:10 os.arch = x86_64
+	2009-09-05 21:38:10 os.freememory = 1792544768
+	2009-09-05 21:38:10 os.name = Mac OS X
+	2009-09-05 21:38:10 os.totalmemory = 4294967296
+	2009-09-05 21:38:10 os.version = 10.5.8
+	2009-09-05 21:38:10 Command line arguments: [-a, 1, -b, 0, -w, 16, -f, topn, -n, 5, -P, -o, pflow, -i, pfreads, -t, pftemplate]
+	2009-09-05 21:38:10 NgsParams threshold=20 threads=2
+	2009-09-05 21:39:59  Index[0] memory performance
+
+TalkBack may be disabled by adding ``RTG_TALK_BACK=false`` to the
+``rtg.cfg`` configuration file (Unix) or the ``rtg.bat`` file (Window) as
+described in :ref:`Advanced installation configuration`.
+
+Usage logging
+--------------
+
+RTG has the ability to record simple command usage information for
+submission to Real Time Genomics. The first time RTG is run (typically
+during installation), the user will be asked whether to enable usage
+logging. This information may be required for customers with a
+pay-per-use license. Other customers may choose to send this information
+to give Real Time Genomics feedback on which commands and features are
+commonly used or to locally log RTG command use for their own analysis.
+
+A usage record contains the following fields:
+
+-  Time and date
+-  License serial number
+-  Unique ID for the run
+-  Version of RTG software
+-  RTG command name, without parameters (e.g. map)
+-  Status (Started / Failed / Succeeded)
+-  A command-specific field (e.g. number of reads)
+
+For example:
+
+.. code-block:: text
+
+  2013-02-11 11:38:38007   4f6c2eca-0bfc-4267-be70-b7baa85ebf66    RTG Core v2.7 build d74f45d (2013-02-04)   format  Start   N/A
+
+No confidential information is included in these records. It is possible
+to add extra fields, such as the user name running the command, host
+name of the machine running the command, and full command-line
+parameters, however as these fields may contain confidential
+information, they must be explicitly enabled as described in :ref:`Advanced
+installation configuration`.
+
+When RTG is first installed, you will be asked whether to enable user
+logging. Usage logging can also be manually enabled by editing the
+``rtg.cfg`` file (or ``rtg.bat`` file on Windows) and setting
+``RTG_USAGE=true``. If the ``RTG_USAGE_DIR`` and ``RTG_USAGE_HOST``
+settings are empty, the default behavior is to directly submit usage
+records to an RTG hosted server via HTTPS. This feature requires the
+machine running RTG to have access to the Internet.
+
+For cases where the machines running RTG do not have access to the
+Internet, there are two alternatives for collecting usage information.
+
+Single-user, single machine
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Usage information can be recorded directly to a text file. To enable
+this option, edit the ``rtg.cfg`` file (or ``rtg.bat`` file on Windows),
+and set the ``RTG_USAGE_DIR`` to the name of a directory where the user
+has write permissions. For example:
+
+.. code-block:: text
+
+  RTG_USAGE=true
+  RTG_USAGE_DIR=/opt/rtg-usage
+
+Within this directory, the RTG usage information will be written to a
+text file named after the date of the current month, in the form
+``YYYY-MM.txt``. A new file will be created each month. This text file can
+be manually sent to Real Time Genomics when requested.
+
+Multi-user or multiple machines
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In this case, a local server can be started to collect usage information
+from compute nodes and recorded to local files for later manual
+submission. To configure this method of collecting usage information,
+edit the ``rtg.cfg`` file (or ``rtg.bat`` file on Windows), and set the
+``RTG_USAGE_DIR`` to the name of a directory where the local server will
+store usage logs, and ``RTG_USAGE_HOST`` to a URL consisting of the name
+of the local machine that will run the server and the network port on
+which the server will listen. For example if the server will be run on a
+machine named ``gridhost.mylan.net``, listening on port ``9090``, writing
+usage information into the directory ``/opt/rtg-usage/``, set:
+
+.. code-block:: text
+
+  RTG_USAGE=true
+  RTG_USAGE_DIR=/opt/rtg-usage
+  RTG_USAGE_HOST=http://gridhost.mylan.net:9090/
+
+On the machine ``gridhost``, run the command:
+
+$ rtg usageserver
+
+Which will start the local usage server listening. Now when RTG commands
+are run on other nodes or as other users, they will submit usage records
+to this sever for collation.
+
+Within the usage directory, the RTG usage information will be written to
+a text file named after the date of the current month, in the form
+``YYYY-MM.txt``. A new file will be created each month. This text file can
+be manually sent to Real Time Genomics when requested.
+
+Advanced configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+
+If you wish to augment usage information with any of the optional
+fields, edit the ``rtg.cfg`` file (or ``rtg.bat`` file on Windows) and set
+the ``RTG_USAGE_OPTIONAL`` to a comma separated list containing any of
+the following:
+
+-  ``username`` - adds the username of the user running the RTG command.
+-  ``hostname`` - adds the machine name running the RTG command.
+-  ``commandline`` - adds the command line, including parameters, of the
+   RTG command (this field will be truncated if the length exceeds 1000
+   characters).
+
+For example:
+
+.. code-block:: text
+
+  RTG_USAGE_OPTIONAL=username,hostname,commandline
+

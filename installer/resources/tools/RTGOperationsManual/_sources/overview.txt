@@ -1,0 +1,206 @@
+Overview
+========
+
+This chapter introduces the features, operational options, and
+installation requirements of the data analysis software from `Real Time
+Genomics <http://realtimegenomics.com>`_.
+
+Introduction
+------------
+
+RTG software enables the development of fast, efficient software
+pipelines for deep genomic analysis. RTG is built on innovative search
+technologies and new algorithms designed for processing high volumes of
+high-throughput sequencing data from different sequencing technology
+platforms. The RTG sequence search and alignment functions enable read
+mapping and protein searches with a unique combination of sensitivity
+and speed.
+
+.. only:: tools
+
+  .. include:: overview_tools_intro.inc.rst
+
+.. only:: core
+
+  .. include:: overview_core_intro.inc.rst
+
+RTG software description
+------------------------
+
+RTG software is delivered as a single executable with multiple commands
+executed through a command line interface (CLI). Commands are delivered
+in product packages, and for commercial users each command can be
+independently enabled through a license key.
+
+Usage:
+
+.. code-block:: text
+
+  rtg COMMAND [OPTIONS] <REQUIRED>
+
+.. only:: core
+
+  .. include:: overview_core_intro2.inc.rst
+
+.. seealso::
+  For detailed information about RTG command syntax and
+  usage of individual commands, refer to :ref:`RTG Command Reference`.
+
+.. comment
+
+
+.. only:: core
+
+  .. include:: overview_core_descriptions.inc.rst
+
+
+Installation and deployment
+---------------------------
+
+RTG is a self-contained tool that sets minimal expectations on the
+environment in which it is placed. It comes with the application
+components it needs to execute completely, yet performance can be
+enhanced with some simple modifications to the deployment configuration.
+This section provides guidelines for installing and creating an optimal
+configuration, starting from a typical recommended system.
+
+RTG software pipeline runs in a wide range of computing environments
+from dual-core processor laptops to compute clusters with racks of dual
+processor quad core server nodes. However, internal human genome
+analysis benchmarks suggest the use of six server nodes of the
+configuration shown in below.
+
+Table : Recommended system requirements
+
++-----------+------------------------------------+
+| Processor | Intel Core i7-2600                 |
++-----------+------------------------------------+
+| Memory    | 48 GB RAM DDR3                     |
++-----------+------------------------------------+
+| Disk      | 5 TB, 7200 RPM (prefer SAS disk)   |
++-----------+------------------------------------+
+
+RTG Software can be run as a Java JAR file, but platform specific
+wrapper scripts are supplied to provide improved pipeline ergonomics.
+Instructions for a quick start installation are provided here.
+
+For further information about setting up per-machine configuration
+files, please see the ``README.txt`` contained in the distribution zip
+file (a copy is also included in this manual's appendix).
+
+Quick start instructions
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+These instructions are intended for an individual to install and operate
+the RTG software without the need to establish root / administrator
+privileges.
+
+RTG software is delivered in a compressed zip file, such as:
+``rtg-core-3.3.zip``. Unzip this file to begin installation.
+
+Linux and Windows distributions include a Java Virtual Machine (JVM)
+version 1.8 that has undergone quality assurance testing. RTG may be
+used on other operating systems for which a JVM version 1.8 or higher is
+available, such as MacOS X or Solaris, by using the 'no-jre'
+distribution.
+
+RTG for Java is delivered as a Java application accessed via executable
+wrapper script (``rtg`` on UNIX systems, ``rtg.bat`` on Windows) that allows
+a user to customize initial memory allocation and other configuration
+options. It is recommended that these wrapper scripts be used rather
+than directly executing the Java JAR.
+
+Here are platform-specific instructions for RTG deployment.
+
+Linux/MacOS X:
+
+-  Unzip the RTG distribution to the desired location.
+-  If your installation requires a license file (``rtg-license.txt``),
+   copy the license file provided by Real Time Genomics into the RTG
+   distribution directory.
+- In a terminal, cd to the installation directory and test for success
+   by entering ``./rtg version``
+-  On MacOS X, depending on your operating system version and
+   configuration regarding unsigned applications, you may encounter the
+   error message:
+
+   .. code-block:: text
+
+     -bash: rtg: /usr/bin/env: bad interpreter: Operation not permitted
+
+   If this occurs, you must clear the OS X quarantine attribute with the
+   command:
+
+   .. code-block:: text
+
+     $ xattr -d com.apple.quarantine rtg
+
+-  The first time rtg is executed you will be prompted with some
+   questions to customize your installation. Follow the prompts.
+-  Enter ``./rtg help`` for a list of rtg commands. Help for any
+   individual command is available using the ``--help`` flag, e.g.:
+   ``./rtg format --help``
+-  By default, RTG software scripts establish a memory space of 90% of
+   the available RAM - this is automatically calculated. One may
+   override this limit in the ``rtg.cfg`` settings file or on a per-run
+   basis by supplying ``RTG_MEM`` as an environment variable or as the
+   first program argument, e.g.: ``./rtg RTG_MEM=48g map``
+-  [OPTIONAL] If you will be running RTG on multiple machines and would
+   like to customize settings on a per-machine basis, copy ``rtg.cfg`` to
+   ``/etc/rtg.cfg``, editing per-machine settings appropriately (requires
+   root privileges).  An alternative that does not require root
+   privileges is to copy ``rtg.cfg`` to ``rtg.HOSTNAME.cfg``, editing
+   per-machine settings appropriately, where HOSTNAME is the short host
+   name output by the command ``hostname -s``
+
+Windows:
+
+-  Unzip the RTG distribution to the desired location.
+-  If your installation requires a license, copy the license file
+   provided by Real Time Genomics (``rtg-license.txt``) into the RTG
+   distribution directory.
+-  Test for success by entering ``rtg version`` at the command line. The
+   first time RTG is executed you will be prompted with some questions
+   to customize your installation. Follow the prompts.
+-  Enter ``rtg help`` for a list of rtg commands. Help for any
+   individual command is available using the ``--help`` flag, e.g.:
+   ``./rtg format --help``
+-  By default, RTG software scripts establish a memory space of 90% of
+   the available RAM - this is automatically calculated. One may
+   override this limit by setting the ``RTG_MEM`` variable in the
+   ``rtg.bat`` script or as an environment variable.
+
+License Management
+~~~~~~~~~~~~~~~~~~
+
+Commercial distributions of RTG products require the presence of a valid
+license key file for operation.
+
+The license key file must be located in the same directory as the RTG
+executable. The license enables the execution of a particular command
+set for the purchased product(s) and features.
+
+A license key allows flexible use of the RTG package on any node or CPU
+core.
+
+To view the current license features at the command prompt, enter:
+
+.. code-block:: text
+
+  $ rtg license
+
+.. seealso:: For more data center deployment and instructions for
+  editing scripts, see :ref:`Administration & capacity planning`.
+
+Technical assistance and support
+--------------------------------
+
+For assistance with any technical or conceptual issue that may arise
+during use of the RTG product, contact Real Time Genomics Technical
+Support via email at support@realtimegenomics.com
+
+In addition, a discussion group is available at:
+https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users
+
+A low-traffic announcements-only group is available at:
+https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-announce
