@@ -62,10 +62,11 @@ public final class SamOutput implements Closeable {
    * @param stdio output stream to use if filename is "-" (standard out)
    * @param header header for output SAM/BAM file
    * @param gzipIfPossible whether we should attempt to compress output file
+   * @param presorted if input if in correct sort order
    * @return wrapper containing writer and other relevant things
    * @throws IOException if an IO Error occurs
    */
-  public static SamOutput getSamOutput(File filename, OutputStream stdio, SAMFileHeader header, boolean gzipIfPossible) throws IOException {
+  public static SamOutput getSamOutput(File filename, OutputStream stdio, SAMFileHeader header, boolean gzipIfPossible, boolean presorted) throws IOException {
     final SamBamBaseFile baseFile = SamBamBaseFile.getBaseFile(filename, gzipIfPossible);
     final File outputFile;
     final OutputStream outputStream;
@@ -88,10 +89,11 @@ public final class SamOutput implements Closeable {
       final OutputStream samOutputstream = streamCreator.createStreamsAndStartThreads(header.getSequenceDictionary().size(), true, true);
       try {
         final SAMFileWriter writer;
+        final File dir = filename.getAbsoluteFile().getParentFile();
         if (bam) {
-          writer = new SAMFileWriterFactory().makeBAMWriter(header, true, samOutputstream);
+          writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, samOutputstream);
         } else {
-          writer = new SAMFileWriterFactory().makeSAMWriter(header, true, samOutputstream);
+          writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream);
         }
         return new SamOutput(outputFile, streamCreator, writer);
       } catch (Throwable t) {
