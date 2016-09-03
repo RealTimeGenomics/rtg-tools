@@ -1,6 +1,6 @@
 # RTG Tools
 
-Copyright (c) 2014 Real Time Genomics Ltd
+Copyright (c) 2016 Real Time Genomics Ltd
 
 This software is provided under the Simplified BSD License. See
 [LICENSE.txt](LICENSE.txt)
