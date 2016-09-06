@@ -108,7 +108,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--remove-samples", "--keep-info", "AN", "--keep-info", "AC", "--keep-filter", "YEA", "-Z");
+      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--remove-ids", "--remove-qual", "--remove-samples", "--keep-info", "AN", "--keep-info", "AC", "--keep-filter", "YEA", "-Z");
 
       final String content = FileHelper.fileToString(out);
       final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");

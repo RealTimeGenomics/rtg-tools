@@ -85,6 +85,8 @@ public class VcfSubset extends AbstractCli {
 
   private static final String REMOVE_QUAL = "remove-qual";
 
+  private static final String REMOVE_ID = "remove-ids";
+
   private static final String REMOVE_UNUSED_ALTS = "Xremove-unused-alts";
 
   @Override
@@ -131,8 +133,11 @@ public class VcfSubset extends AbstractCli {
     // Contents of QUAL
     mFlags.registerOptional(REMOVE_QUAL, "remove the QUAL field").setCategory(FILTERING);
 
+    // Contents of ID
+    mFlags.registerOptional(REMOVE_ID, "remove the contents of the ID field").setCategory(FILTERING);
+
     // Contents of ALT
-    mFlags.registerOptional(REMOVE_UNUSED_ALTS, "remove unused ALT alleles").setCategory(FILTERING);
+    mFlags.registerOptional(REMOVE_UNUSED_ALTS, "remove unused ALT alleles. Only GT is updated accordingly, other INFO/FORMAT fields are unaltered").setCategory(FILTERING);
 
     mFlags.setValidator(new VcfSubsetValidator());
   }
@@ -346,6 +351,9 @@ public class VcfSubset extends AbstractCli {
       }
       if (mFlags.isSet(REMOVE_QUAL)) {
         annotators.add(new VcfQualCleaner());
+      }
+      if (mFlags.isSet(REMOVE_ID)) {
+        annotators.add(new VcfIdCleaner());
       }
 
       int skippedRecords = 0;
