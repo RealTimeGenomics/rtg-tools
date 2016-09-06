@@ -147,7 +147,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   static final String SAM_REC_BAD3A = ""
     + "badread3a" + TAB + "16" + TAB + "gi0";
   static final String SAM_REC_BAD4 = ""
-    + "badread4" + TAB + "-9" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0\n";
+    + "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0\n";
   static final String SAM_REC_BAD6 = ""
     + "badread6" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "xxx" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0\n";
   static final String SAM_REC_BAD7 = ""
@@ -209,6 +209,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
         TestUtils.containsAll(str, msgs);
         assertEquals(numValid, num);
       } catch (final NoTalkbackSlimException e) {
+        e.printStackTrace(System.err);
         fail();
       }
     } catch (final NoTalkbackSlimException e) {
@@ -341,7 +342,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
 
   public void testBad2First5() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD4, 0, "SAM record is invalid in file ",
-      "badread4" + TAB + "-9" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0",
+      "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0",
       "[ERROR: Read name badread4, Not primary alignment flag should not be set for unmapped read., ERROR: Read name badread4, Supplementary alignment flag should not be set for unmapped read., ERROR: Read name badread4, MAPQ should be 0 for unmapped read.]",
       "At data line 1"); //"Line: badread4", "MRNM not specified but flags indicate mate mapped;");
   }
@@ -364,7 +365,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   }
 
   public void testBad2First9() throws IOException {
-    checkUgly(SAM_HEAD10 + SAM_REC_BAD9, 0, "Non-numeric value in FLAG column");
+    checkUgly(SAM_HEAD10 + SAM_REC_BAD9, 0, "Unknown flag character");
   }
 
   public void testBad2First10() {
@@ -385,7 +386,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
     checkBadNoError(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_BAD8, 1, 2); //, "Line: badread8", "length(QUAL) != length(SEQ)");
 
     checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_BAD3A, 1, "Line: badread3a", "Error parsing text SAM file. Not enough fields;",  "Line 5");
-    checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_BAD9, 1, "Non-numeric value in FLAG column");
+    checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_BAD9, 1, "Unknown flag character");
   }
 
   public void testBad2Third() throws IOException {
@@ -400,7 +401,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
     checkBadNoError(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_OK11 + SAM_REC_BAD8, 2, 3); //, "Line: badread8", "length(QUAL) != length(SEQ)");
 
     checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_OK11 + SAM_REC_BAD3A, 2, "Line: badread3a", "Error parsing text SAM file. Not enough fields;", "Line 6");
-    checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_OK11 + SAM_REC_BAD9, 2, "Non-numeric value in FLAG column");
+    checkBad(SAM_HEAD10 + SAM_REC_OK10 + SAM_REC_OK11 + SAM_REC_BAD9, 2, "Unknown flag character");
   }
 
 }
