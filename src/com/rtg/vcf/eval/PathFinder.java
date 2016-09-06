@@ -222,7 +222,7 @@ public final class PathFinder {
     varIndex--;
     Diagnostic.developerLog("Skipped to maxPos: " + maxPos + ". Variant index " + path.getVariantIndex() + " -> " + varIndex);
     path.setVariantIndex(varIndex);
-    path.moveForward(maxPos);
+    path.moveForward(Math.min(maxPos, mTemplate.length - 1));
   }
 
 

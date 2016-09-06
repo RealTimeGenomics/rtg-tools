@@ -157,6 +157,10 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
     check("vcfeval_too_complex", false, false, true);
   }
 
+  public void testNanoTooComplexAtEnd() throws IOException, UnindexableDataException {
+    check("vcfeval_too_complex_end", false, false, true);
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

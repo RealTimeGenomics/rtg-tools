@@ -1,0 +1,34 @@
+##fileformat=VCFv4.1
+##contig=<ID=11,length=10000>
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878
+11	1881	.	A	AT,ATTT,ATT	.	.	.	GT	0/1
+11	3532	.	G	GC	.	.	.	GT	1/1
+11	3796	.	ACACAC	A,AAC,AACAC	.	.	.	GT	0/1
+11	3798	.	ACAC	A	.	.	.	GT	0/1
+11	3800	.	AC	A	.	.	.	GT	0/1
+11	3801	.	CA	C	.	.	.	GT	0/1
+11	3802	.	AC	A	.	.	.	GT	0/1
+11	3803	.	CA	C	.	.	.	GT	0/1
+11	3804	.	AC	A	.	.	.	GT	0/1
+11	3805	.	CA	C	.	.	.	GT	0/1
+11	3806	.	AC	A	.	.	.	GT	0/1
+11	3807	.	CA	C	.	.	.	GT	0/1
+11	3808	.	AC	A	.	.	.	GT	0/1
+11	3809	.	CA	C	.	.	.	GT	0/1
+11	3810	.	AC	A	.	.	.	GT	0/1
+11	3811	.	CA	C	.	.	.	GT	0/1
+11	3812	.	AC	A	.	.	.	GT	0/1
+11	3813	.	CA	C	.	.	.	GT	0/1
+11	3814	.	AC	A	.	.	.	GT	0/1
+11	3815	.	CA	C	.	.	.	GT	0/1
+11	3816	.	AC	A	.	.	.	GT	0/1
+11	3817	.	CA	C	.	.	.	GT	0/1
+11	3818	.	AC	A	.	.	.	GT	0/1
+11	3819	.	CA	C	.	.	.	GT	0/1
+11	3820	.	AC	A	.	.	.	GT	0/1
+11	3821	.	CA	C	.	.	.	GT	0/1
+11	3822	.	ACACACACACAC	A	.	.	.	GT	0/1
+11	3830	.	ACAC	A	.	.	.	GT	0/1
+11	3831	.	CACAA	C	.	.	.	GT	0/1
+11	3835	.	A	CCCCC	.	.	.	GT	0/1
