@@ -488,6 +488,25 @@ public final class FileUtils {
 
   /**
    * Creates a <code>BufferedInputStream</code> for a file,
+   * utilizing a <code>GZIPInputStream</code>.
+   *
+   * @param is the input stream
+   * @param async if true, the input will be asynchronous (not to be used with picard)
+   * @return an <code>BufferedInputStream</code> value
+   * @throws IOException if an error occurs.
+   */
+  public static BufferedInputStream createGzipInputStream(InputStream is, boolean async) throws IOException {
+    final InputStream inStream;
+    if (async) {
+      inStream = new GzipAsynchInputStream(is);
+    } else {
+      inStream = GzipUtils.createGzipInputStream(new BufferedInputStream(is));
+    }
+    return new BufferedInputStream(inStream);
+  }
+
+  /**
+   * Creates a <code>BufferedInputStream</code> for a file,
    * utilizing a <code>CBZip2InputStream</code>.
    *
    * @param file the input <code>File</code>

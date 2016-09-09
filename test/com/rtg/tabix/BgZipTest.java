@@ -30,9 +30,13 @@
 package com.rtg.tabix;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
@@ -119,6 +123,25 @@ public class BgZipTest extends AbstractCliTest {
     }
 
   }
+
+  public void testStdIn() throws IOException {
+    final String data = "blah";
+    try (TestDirectory dir = new TestDirectory()) {
+      final File gzFile = FileHelper.stringToGzFile(data, new File(dir, "gzippedFile.gz"));
+      final InputStream beforeIn = System.in;
+      try {
+        try (InputStream newIn = new FileInputStream(gzFile)) {
+          System.setIn(newIn);
+          final MainResult res = MainResult.run(new BgZip(), "-d", "-");
+          assertEquals(0, res.rc());
+          assertEquals(data, res.out());
+        }
+      } finally {
+        System.setIn(beforeIn);
+      }
+    }
+  }
+
 
   @Override
   protected AbstractCli getCli() {

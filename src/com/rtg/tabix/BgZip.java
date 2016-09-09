@@ -107,7 +107,15 @@ public class BgZip extends AbstractCli {
   }
 
   private static String getOutputFilename(File inputFile, boolean decompress) {
-    return decompress ? inputFile.getPath().substring(0, inputFile.getPath().length() - 3) : inputFile.getPath() + FileUtils.GZ_SUFFIX;
+    if (decompress) {
+      if (FileUtils.isGzipFilename(inputFile)) {
+        return FileUtils.removeExtension(inputFile).getPath();
+      } else {
+        return null;
+      }
+    } else {
+      return inputFile.getPath() + FileUtils.GZ_SUFFIX;
+    }
   }
 
   @Override
@@ -143,13 +151,20 @@ public class BgZip extends AbstractCli {
         throw new NoTalkbackSlimException("Input file not in GZIP format");
       }
     }
-    return stdin ? System.in : mFlags.isSet(DECOMPRESS_FLAG) ? FileUtils.createGzipInputStream(f, true) : new FileInputStream(f);
+    if (mFlags.isSet(DECOMPRESS_FLAG)) {
+      return stdin ? FileUtils.createGzipInputStream(System.in, true) : FileUtils.createGzipInputStream(f, true);
+    } else {
+      return stdin ? System.in : new FileInputStream(f);
+    }
   }
 
   private OutputStream getOutputStream(OutputStream out, File f, boolean stdout) throws FileNotFoundException {
     final OutputStream os;
     final String outputFilename = getOutputFilename(f, mFlags.isSet(DECOMPRESS_FLAG));
     if (!stdout && !mFlags.isSet(FORCE_FLAG)) { //if we aren't forcibly overwriting files
+      if (outputFilename == null) {
+        throw new NoTalkbackSlimException("unrecognized gzip extension on file: " + f.getPath() + " -- aborting");
+      }
       final File outfile = new File(outputFilename);
       if (outfile.exists()) {
         throw new NoTalkbackSlimException("Output file \"" + outfile.getPath() + "\" already exists.");
