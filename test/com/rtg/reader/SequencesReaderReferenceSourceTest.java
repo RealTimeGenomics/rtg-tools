@@ -44,15 +44,16 @@ public class SequencesReaderReferenceSourceTest extends AbstractTest {
   public void test() throws IOException {
     try (TestDirectory templ = new TestDirectory()) {
       ReaderTestUtils.getDNADir(">seq1\nactg\n>seq2\ngtca", templ);
-      final SequencesReader r = SequencesReaderFactory.createDefaultSequencesReader(templ);
-      final SequencesReaderReferenceSource sr = r.referenceSource();
-      assertNull(sr.getReferenceBases(new SAMSequenceRecord("foo", 1), false));
-      final byte[] s1 = sr.getReferenceBases(new SAMSequenceRecord("seq1", 1), false);
-      assertNotNull(s1);
-      assertEquals("ACTG", new String(s1));
-      final byte[] s2 = sr.getReferenceBases(new SAMSequenceRecord("seq2", 1), false);
-      assertNotNull(s2);
-      assertEquals("GTCA", new String(s2));
+      try (final SequencesReader r = SequencesReaderFactory.createDefaultSequencesReader(templ)) {
+        final SequencesReaderReferenceSource sr = r.referenceSource();
+        assertNull(sr.getReferenceBases(new SAMSequenceRecord("foo", 1), false));
+        final byte[] s1 = sr.getReferenceBases(new SAMSequenceRecord("seq1", 1), false);
+        assertNotNull(s1);
+        assertEquals("ACTG", new String(s1));
+        final byte[] s2 = sr.getReferenceBases(new SAMSequenceRecord("seq2", 1), false);
+        assertNotNull(s2);
+        assertEquals("GTCA", new String(s2));
+      }
     }
   }
 }
