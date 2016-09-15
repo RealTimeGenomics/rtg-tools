@@ -34,6 +34,9 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
+
 /**
  * An override of the standard <code>GZIPOutputStream</code> so that
  * we can get access to the deflation compression level.
@@ -46,7 +49,7 @@ public class AdjustableGZIPOutputStream extends GZIPOutputStream {
   public static final int DEFAULT_GZIP_BUFFER_SIZE = 64 * 1024;
 
   /** Benchmarking shows that 2 gives best CPU to compression tradeoff */
-  public static final int DEFAULT_GZIP_LEVEL = 2;
+  public static final int DEFAULT_GZIP_LEVEL = GlobalFlags.getIntegerValue(ToolsGlobalFlags.GZIP_LEVEL);
 
 
   /**
