@@ -38,12 +38,14 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.IndexingStreamCreator;
 import com.rtg.tabix.TabixIndexer;
+import com.rtg.util.io.AdjustableGZIPOutputStream;
 import com.rtg.util.io.FileUtils;
 
 import htsjdk.samtools.CRAMFileWriter;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
+import htsjdk.samtools.util.BlockCompressedOutputStream;
 
 /**
  * Handles managing the various things we want when outputting SAM or BAM with indexing
@@ -107,9 +109,12 @@ public final class SamOutput implements Closeable {
       compress = type != SamBamBaseFile.SamFormat.SAM || baseFile.isGzip();
     }
     if (type == SamBamBaseFile.SamFormat.CRAM) {
+      if (!writeHeader || !terminateBlockGzip) {
+        throw new UnsupportedOperationException("Piecewise CRAM output is not supported");
+      }
       final OutputStream indexOut = indexIfPossible ? FileUtils.createOutputStream(BamIndexer.indexFileName(outputFile)) : null;
       try {
-        final SAMFileWriter writer = new CRAMFileWriter(FileUtils.createOutputStream(outputFile), indexOut, reference == null ? SamUtils.NO_CRAM_REFERENCE_SOURCE : reference.referenceSource(), header, outputFile.getName());
+        final SAMFileWriter writer = new CRAMFileWriter(FileUtils.createOutputStream(outputFile), indexOut, presorted, reference == null ? SamUtils.NO_CRAM_REFERENCE_SOURCE : reference.referenceSource(), header, outputFile.getName());
         return new SamOutput(outputFile, indexOut, writer);
       } catch (Throwable t) {
         indexOut.close();
@@ -125,10 +130,10 @@ public final class SamOutput implements Closeable {
           final File dir = filename.getAbsoluteFile().getParentFile();
           switch (type) {
             case BAM:
-              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, samOutputstream);
+              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, new BlockCompressedOutputStream(samOutputstream, null, AdjustableGZIPOutputStream.DEFAULT_GZIP_LEVEL, terminateBlockGzip), writeHeader, false /* ignored */, true);
               break;
             case SAM:
-              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream);
+              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream, writeHeader);
               break;
             default:
               throw new UnsupportedOperationException();
