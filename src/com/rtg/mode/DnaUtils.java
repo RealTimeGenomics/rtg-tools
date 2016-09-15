@@ -216,9 +216,12 @@ public final class DnaUtils {
         case (byte) 'T':
           dest[k] = 4;
           break;
-        default:
+        case (byte) 'n':
+        case (byte) 'N':
           dest[k] = 0;
           break;
+        default:
+          throw new IllegalArgumentException(Character.valueOf((char) a[k + start]).toString());
       }
     }
     return dest;
