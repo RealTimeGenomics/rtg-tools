@@ -37,24 +37,24 @@ import junit.framework.TestCase;
 public class SamBamBaseFileTest extends TestCase {
 
   public void testGetBaseFile() {
-    assertEquals(new SamBamBaseFile(new File("foo.bar.bang"), ".bam", false, true), SamBamBaseFile.getBaseFile(new File("foo.bar.bang"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar.bang"), ".bam", false, true), SamBamBaseFile.getBaseFile(new File("foo.bar.bang.gz"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", true, false), SamBamBaseFile.getBaseFile(new File("foo.bar.sam"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", true, false), SamBamBaseFile.getBaseFile(new File("foo.bar.sam.gz"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", false, false), SamBamBaseFile.getBaseFile(new File("foo.bar.sam.gz"), false));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, true), SamBamBaseFile.getBaseFile(new File("foo.bar.bam"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, true), SamBamBaseFile.getBaseFile(new File("foo.bar.bam.gz"), true));
-    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, true), SamBamBaseFile.getBaseFile(new File("foo.bar.bam.gz"), false));
+    assertEquals(new SamBamBaseFile(new File("foo.bar.bang"), ".bam", false, SamBamBaseFile.SamFormat.BAM), SamBamBaseFile.getBaseFile(new File("foo.bar.bang"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar.bang"), ".bam", false, SamBamBaseFile.SamFormat.BAM), SamBamBaseFile.getBaseFile(new File("foo.bar.bang.gz"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", true, SamBamBaseFile.SamFormat.SAM), SamBamBaseFile.getBaseFile(new File("foo.bar.sam"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", true, SamBamBaseFile.SamFormat.SAM), SamBamBaseFile.getBaseFile(new File("foo.bar.sam.gz"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".sam", false, SamBamBaseFile.SamFormat.SAM), SamBamBaseFile.getBaseFile(new File("foo.bar.sam.gz"), false));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, SamBamBaseFile.SamFormat.BAM), SamBamBaseFile.getBaseFile(new File("foo.bar.bam"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, SamBamBaseFile.SamFormat.BAM), SamBamBaseFile.getBaseFile(new File("foo.bar.bam.gz"), true));
+    assertEquals(new SamBamBaseFile(new File("foo.bar"), ".bam", false, SamBamBaseFile.SamFormat.BAM), SamBamBaseFile.getBaseFile(new File("foo.bar.bam.gz"), false));
   }
 
   public void test() {
-    final SamBamBaseFile file1 = new SamBamBaseFile(new File("filename"), ".bam", false, true);
+    final SamBamBaseFile file1 = new SamBamBaseFile(new File("filename"), ".bam", false, SamBamBaseFile.SamFormat.BAM);
     assertEquals(new File("filename"), file1.getBaseFile());
     assertEquals(".bam", file1.getExtension());
     assertFalse(file1.isGzip());
     assertEquals(new File("filename.bam"), file1.suffixedFile(""));
     assertEquals(new File("filename_suffix.bam"), file1.suffixedFile("_suffix"));
-    final SamBamBaseFile file2 = new SamBamBaseFile(new File("filename"), ".sam", true, false);
+    final SamBamBaseFile file2 = new SamBamBaseFile(new File("filename"), ".sam", true, SamBamBaseFile.SamFormat.SAM);
     assertEquals(new File("filename.sam.gz"), file2.suffixedFile(""));
     assertEquals(new File("filename_suffix.sam.gz"), file2.suffixedFile("_suffix"));
   }

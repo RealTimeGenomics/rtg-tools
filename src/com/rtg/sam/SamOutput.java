@@ -35,9 +35,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import com.rtg.launcher.CommonFlags;
+import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.IndexingStreamCreator;
 import com.rtg.tabix.TabixIndexer;
+import com.rtg.util.io.FileUtils;
 
+import htsjdk.samtools.CRAMFileWriter;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriter;
 import htsjdk.samtools.SAMFileWriterFactory;
@@ -47,13 +50,29 @@ import htsjdk.samtools.SAMFileWriterFactory;
  */
 public final class SamOutput implements Closeable {
   private final File mOutFile;
-  private final IndexingStreamCreator mStreamCreator;
+  private final Closeable mStreamCreator;
   private final SAMFileWriter mWriter;
 
-  private SamOutput(File outFile, IndexingStreamCreator streamCreator, SAMFileWriter writer) {
+  private SamOutput(File outFile, Closeable streamCreator, SAMFileWriter writer) {
     mOutFile = outFile;
     mStreamCreator = streamCreator;
     mWriter = writer;
+  }
+
+  /**
+   * Creates a SAM or BAM writer as appropriate and generates an index for this output if possible. Also writes to standard output if filename is "-".
+   * This method does not support CRAM output.
+   * @param filename filename given by user
+   * @param stdio output stream to use if filename is "-" (standard out)
+   * @param header header for output SAM/BAM file
+   * @param gzipIfPossible whether we should attempt to compress output file
+   * @param presorted if input if in correct sort order
+   * @param reference the reference used to resolve CRAM, or null if no CRAM support is required
+   * @return wrapper containing writer and other relevant things
+   * @throws IOException if an IO Error occurs
+   */
+  public static SamOutput getSamOutput(File filename, OutputStream stdio, SAMFileHeader header, boolean gzipIfPossible, boolean presorted, SequencesReader reference) throws IOException {
+    return getSamOutput(filename, stdio, header, gzipIfPossible, presorted, true, true, true, reference);
   }
 
   /**
@@ -63,53 +82,73 @@ public final class SamOutput implements Closeable {
    * @param header header for output SAM/BAM file
    * @param gzipIfPossible whether we should attempt to compress output file
    * @param presorted if input if in correct sort order
+   * @param writeHeader true if the header should be written, false otherwise
+   * @param terminateBlockGzip true if the output stream should contain a termination block (may be false if doing indexing of chunks)
+   * @param indexIfPossible true if the output should be indexed if possible
+   * @param reference the reference used to resolve CRAM, or null if no CRAM support is required
    * @return wrapper containing writer and other relevant things
    * @throws IOException if an IO Error occurs
    */
-  public static SamOutput getSamOutput(File filename, OutputStream stdio, SAMFileHeader header, boolean gzipIfPossible, boolean presorted) throws IOException {
+  public static SamOutput getSamOutput(File filename, OutputStream stdio, SAMFileHeader header, boolean gzipIfPossible, boolean presorted, boolean writeHeader, boolean terminateBlockGzip, boolean indexIfPossible, SequencesReader reference) throws IOException {
     final SamBamBaseFile baseFile = SamBamBaseFile.getBaseFile(filename, gzipIfPossible);
     final File outputFile;
     final OutputStream outputStream;
-    final boolean bam;
+    final SamBamBaseFile.SamFormat type;
     final boolean compress;
-    if (CommonFlags.isStdio(filename)) {
+    if (CommonFlags.isStdio(filename)) { // Use uncompressed SAM for stdout
       outputFile = null;
       outputStream = stdio;
-      bam = false;
+      type = SamBamBaseFile.SamFormat.SAM;
       compress = false;
     } else {
       outputFile = baseFile.suffixedFile("");
       outputStream = null;
-      bam = baseFile.isBam();
-      compress = bam || baseFile.isGzip();
+      type = baseFile.format();
+      compress = type != SamBamBaseFile.SamFormat.SAM || baseFile.isGzip();
     }
-    final TabixIndexer.IndexerFactory indexerFactory = bam ? null : new TabixIndexer.SamIndexerFactory();
-    final IndexingStreamCreator streamCreator = new IndexingStreamCreator(outputFile, outputStream, compress, indexerFactory, true);
-    try {
-      final OutputStream samOutputstream = streamCreator.createStreamsAndStartThreads(header.getSequenceDictionary().size(), true, true);
+    if (type == SamBamBaseFile.SamFormat.CRAM) {
+      final OutputStream indexOut = indexIfPossible ? FileUtils.createOutputStream(BamIndexer.indexFileName(outputFile)) : null;
       try {
-        final SAMFileWriter writer;
-        final File dir = filename.getAbsoluteFile().getParentFile();
-        if (bam) {
-          writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, samOutputstream);
-        } else {
-          writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream);
-        }
-        return new SamOutput(outputFile, streamCreator, writer);
+        final SAMFileWriter writer = new CRAMFileWriter(FileUtils.createOutputStream(outputFile), indexOut, reference == null ? SamUtils.NO_CRAM_REFERENCE_SOURCE : reference.referenceSource(), header, outputFile.getName());
+        return new SamOutput(outputFile, indexOut, writer);
       } catch (Throwable t) {
-        samOutputstream.close();
+        indexOut.close();
         throw t;
       }
-    } catch (Throwable t) {
-      streamCreator.close();
-      throw t;
+    } else {
+      final TabixIndexer.IndexerFactory indexerFactory = type == SamBamBaseFile.SamFormat.SAM ? new TabixIndexer.SamIndexerFactory() : null;
+      final IndexingStreamCreator streamCreator = new IndexingStreamCreator(outputFile, outputStream, compress, indexerFactory, indexIfPossible);
+      try {
+        final OutputStream samOutputstream = streamCreator.createStreamsAndStartThreads(header.getSequenceDictionary().size(), writeHeader, terminateBlockGzip);
+        try {
+          final SAMFileWriter writer;
+          final File dir = filename.getAbsoluteFile().getParentFile();
+          switch (type) {
+            case BAM:
+              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, samOutputstream);
+              break;
+            case SAM:
+              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream);
+              break;
+            default:
+              throw new UnsupportedOperationException();
+          }
+          return new SamOutput(outputFile, streamCreator, writer);
+        } catch (Throwable t) {
+          samOutputstream.close();
+          throw t;
+        }
+      } catch (Throwable t) {
+        streamCreator.close();
+        throw t;
+      }
     }
   }
 
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
-    try (IndexingStreamCreator ignored = mStreamCreator;
+    try (Closeable ignored = mStreamCreator;
          SAMFileWriter ignored2 = mWriter
     ) {
 
@@ -118,10 +157,6 @@ public final class SamOutput implements Closeable {
 
   public File getOutFile() {
     return mOutFile;
-  }
-
-  public IndexingStreamCreator getStreamCreator() {
-    return mStreamCreator;
   }
 
   public SAMFileWriter getWriter() {

@@ -30,6 +30,7 @@
 package com.rtg.sam;
 
 import java.io.File;
+import java.util.Locale;
 
 import com.rtg.util.io.BaseFile;
 import com.rtg.util.io.FileUtils;
@@ -40,20 +41,22 @@ import com.rtg.util.io.FileUtils;
  */
 public class SamBamBaseFile extends BaseFile {
 
-  private static final String[] SAM_BAM_EXTS = {SamUtils.BAM_SUFFIX, SamUtils.SAM_SUFFIX};
+  enum SamFormat { SAM, BAM, CRAM }
 
-  private final boolean mBam;
+  private static final String[] SAM_BAM_EXTS = {SamUtils.BAM_SUFFIX, SamUtils.SAM_SUFFIX, SamUtils.CRAM_SUFFIX};
+
+  private final SamFormat mFormat;
 
   /**
    * This is non private solely for testing purposes. Please use {@link #getBaseFile(File, boolean)} instead
    * @param baseFile the base file name
    * @param extension the extension
-   * @param gzip whether file should be compressed
-   * @param bam if output file is bam
+   * @param gzip whether file should have a gzip extension
+   * @param format output file type
    */
-  SamBamBaseFile(File baseFile, String extension, boolean gzip, boolean bam) {
+  SamBamBaseFile(File baseFile, String extension, boolean gzip, SamFormat format) {
     super(baseFile, extension, gzip);
-    mBam = bam;
+    mFormat = format;
   }
 
   /**
@@ -64,18 +67,29 @@ public class SamBamBaseFile extends BaseFile {
    */
   public static SamBamBaseFile getBaseFile(File file, boolean gzip) {
     final BaseFile initial = FileUtils.getBaseFile(file, gzip, SAM_BAM_EXTS);
-    if (initial.getExtension().equalsIgnoreCase(SamUtils.BAM_SUFFIX)) {
-      return new SamBamBaseFile(initial.getBaseFile(), initial.getExtension(), false, true);
-    } else {
-      return new SamBamBaseFile(initial.getBaseFile(), initial.getExtension(), gzip, false);
+    switch (initial.getExtension().toLowerCase(Locale.ROOT)) {
+      case SamUtils.CRAM_SUFFIX:
+        return new SamBamBaseFile(initial.getBaseFile(), initial.getExtension(), false, SamFormat.CRAM);
+      case SamUtils.SAM_SUFFIX:
+        return new SamBamBaseFile(initial.getBaseFile(), initial.getExtension(), gzip, SamFormat.SAM);
+      //case SamUtils.BAM_SUFFIX:
+      default:
+        return new SamBamBaseFile(initial.getBaseFile(), initial.getExtension(), false, SamFormat.BAM);
     }
+  }
+
+  /**
+   * @return the primary output format type
+   */
+  SamFormat format() {
+    return mFormat;
   }
 
   /**
    * @return true for BAM, false for SAM
    */
   public boolean isBam() {
-    return mBam;
+    return mFormat == SamFormat.BAM;
   }
 
   /**
@@ -97,7 +111,7 @@ public class SamBamBaseFile extends BaseFile {
       return false;
     }
     final SamBamBaseFile that = (SamBamBaseFile) o;
-    if (mBam != that.mBam) {
+    if (mFormat != that.mFormat) {
       return false;
     }
     return true;
@@ -106,7 +120,7 @@ public class SamBamBaseFile extends BaseFile {
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + (mBam ? 1 : 0);
+    result = 31 * result + mFormat.ordinal();
     return result;
   }
 }

@@ -62,28 +62,28 @@ public class SamOutputTest extends AbstractNanoTest {
     rec.setCigarString("4=");
     try (TestDirectory dir = new TestDirectory()) {
       final MemoryPrintStream mps = new MemoryPrintStream();
-      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo"), mps.outputStream(), header, true, true)) {
+      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo"), mps.outputStream(), header, true, true, null)) {
         out.getWriter().addAlignment(rec);
       }
       mNano.check("samoutput_expected_1.sam", MainResult.run(new ExtractCli(), "--header", new File(dir, "foo.bam").getPath(), "seq:500000+1").out());
       assertTrue(new File(dir, "foo.bam.bai").exists());
       assertEquals("", mps.toString());
 
-      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo.sam"), mps.outputStream(), header, true, true)) {
+      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo.sam"), mps.outputStream(), header, true, true, null)) {
         out.getWriter().addAlignment(rec);
       }
       mNano.check("samoutput_expected_1.sam", MainResult.run(new ExtractCli(), "--header", new File(dir, "foo.sam.gz").getPath(), "seq:500000+1").out());
       assertTrue(new File(dir, "foo.sam.gz.tbi").exists());
       assertEquals("", mps.toString());
 
-      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo.sam"), mps.outputStream(), header, false, true)) {
+      try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo.sam"), mps.outputStream(), header, false, true, null)) {
         out.getWriter().addAlignment(rec);
       }
       mNano.check("samoutput_expected_1.sam", FileHelper.fileToString(new File(dir, "foo.sam")));
       assertFalse(new File(dir, "foo.sam.tbi").exists());
       assertEquals("", mps.toString());
 
-      try (SamOutput out = SamOutput.getSamOutput(new File("-"), mps.outputStream(), header, true, true)) {
+      try (SamOutput out = SamOutput.getSamOutput(new File("-"), mps.outputStream(), header, true, true, null)) {
         out.getWriter().addAlignment(rec);
       }
       mNano.check("samoutput_expected_1.sam", mps.toString());

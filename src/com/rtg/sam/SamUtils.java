@@ -217,10 +217,13 @@ public final class SamUtils {
   /** The filename extension used for BAM files */
   public static final String BAM_SUFFIX = ".bam";
 
+  /** The filename extension used for CRAM files */
+  public static final String CRAM_SUFFIX = ".cram";
+
   /** The filename extension used for BAM index files */
   public static final String BAI_SUFFIX = BamIndexer.BAM_INDEX_EXTENSION;
 
-  private static final CRAMReferenceSource NO_CRAM_REFERENCE_SOURCE = (sequenceRecord, tryNameVariants) -> {
+  static final CRAMReferenceSource NO_CRAM_REFERENCE_SOURCE = (sequenceRecord, tryNameVariants) -> {
     throw new NoTalkbackSlimException("Either no reference SDF was specified, or this command does not currently support CRAM input");
   };
 
