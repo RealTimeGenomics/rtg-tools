@@ -151,7 +151,7 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered.");
     CommonFlagCategories.setCategories(mFlags);
 
-    final Flag input = mFlags.registerOptional('i', INPUT, File.class, "file", "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    final Flag input = mFlags.registerRequired('i', INPUT, File.class, "file", "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     final Flag output = mFlags.registerOptional('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
