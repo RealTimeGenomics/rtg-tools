@@ -281,4 +281,8 @@ public class VcfMergeTest extends AbstractCliTest {
   public void testFlags() {
     checkMainInitBadFlags("-f", "-F");
   }
+
+  public void testMixNoSample() throws Exception {
+    checkMerge("mix-nosample", "vcfmerge-mix-nosample-1.vcf", "vcfmerge-mix-nosample-2.vcf");
+  }
 }

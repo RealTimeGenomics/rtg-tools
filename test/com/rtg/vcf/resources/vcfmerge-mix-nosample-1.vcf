@@ -1,0 +1,9 @@
+##fileformat=VCFv4.1
+##reference=file:///seq/references/Homo_sapiens_assembly19/v1/Homo_sapiens_assembly19.fasta
+##contig=<ID=1,length=249250621>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	13372	.	G	C	608.91	PASS	.
+1	13417	.	C	CGAGA	258189.04	PASS	.
+1	13494	.	A	G	18163.42	PASS	.
+1	13504	.	G	A	6229.58	PASS	.
+1	13539	.	G	C	658.19	PASS	.

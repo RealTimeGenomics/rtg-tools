@@ -51,6 +51,22 @@ public class VcfRecordMerger implements AutoCloseable {
   /** Maximum number of duplicate warnings to explicitly print. */
   public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
   private long mMultipleRecordsForSampleCount = 0;
+  private final String mDefaultFormat;
+
+  /**
+   * Constructor
+   */
+  public VcfRecordMerger() {
+    this(VcfUtils.FORMAT_GENOTYPE);
+  }
+
+  /**
+   * Constructor
+   * @param defaultFormat the ID of the FORMAT field to fall back to when merging sample-free VCFs with those containing samples
+   */
+  public VcfRecordMerger(String defaultFormat) {
+    mDefaultFormat = defaultFormat;
+  }
 
   /**
    * Merges multiple VCF records into one VCF record
@@ -181,6 +197,9 @@ public class VcfRecordMerger implements AutoCloseable {
           }
         }
       }
+    }
+    if (names.size() > 0 && merged.getFormats().size() == 0) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
+      merged.addFormat(mDefaultFormat);
     }
     for (final String key : merged.getFormats()) {
       final ArrayList<String> field = merged.getFormat(key);

@@ -475,7 +475,7 @@ public class VcfRecord implements SequenceNameLocus {
     sb.append(TAB);
     sb.append(getPrintableInfo(getInfo()));
     if (countNumberOfSamples(mFormatAndSample) != mNumSamples) {
-      throw new IllegalStateException("Number of samples (" + mNumSamples + ") disagrees with contents of VCF record (" + countNumberOfSamples(mFormatAndSample) + ")");
+      throw new IllegalStateException("Number of samples (" + mNumSamples + ") disagrees with contents of VCF record (" + countNumberOfSamples(mFormatAndSample) + ") at: " + getSequenceName() + ":" + getOneBasedStart());
     }
     if (mNumSamples > 0) {
       sb.append(TAB);
