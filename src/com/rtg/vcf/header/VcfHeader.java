@@ -410,6 +410,20 @@ public class VcfHeader {
   }
 
   /**
+   * Gets the FormatField corresponding to an ID
+   * @param id the ID to retrieve
+   * @return the corresponding format field, or null if no field with that ID exists
+   */
+  public FormatField getFormatField(String id) {
+    for (FormatField f : mFormatLines) {
+      if (f.getId().equals(id)) {
+        return f;
+      }
+    }
+    return null;
+  }
+
+  /**
    * @param line meta information line
    * @return this, for call chaining
    */
