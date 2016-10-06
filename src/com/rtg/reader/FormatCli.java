@@ -136,7 +136,8 @@ public final class FormatCli extends LoggedCli {
   public static final String NO_NAMES = "no-names";
   private static final String COMPRESS_FLAG = "Xcompress";
   private static final String DISABLE_DUPLICATE_DETECTOR = "allow-duplicate-names";
-  private static final String READ_TRIM_FLAG = "trim-threshold";
+  private static final String TRIM_THRESHOLD_FLAG = "trim-threshold";
+  private static final String TRIM_END_FLAG = "trim-end-bases";
   private static final String SELECT_READ_GROUP = "select-read-group";
 
   @Override
@@ -167,7 +168,8 @@ public final class FormatCli extends LoggedCli {
       mFlags.registerOptional(SELECT_READ_GROUP, String.class, "String", "when formatting from SAM/BAM input, only include reads with this read group ID").setCategory(FILTERING);
       mFlags.registerOptional('p', PROTEIN_FLAG, RESOURCE.getString("PROTEIN_DESC")).setCategory(INPUT_OUTPUT);
       mFlags.registerOptional(DUST_FLAG, RESOURCE.getString("DUST_DESC")).setCategory(FILTERING);
-      mFlags.registerOptional(READ_TRIM_FLAG, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold").setCategory(FILTERING);
+      mFlags.registerOptional(TRIM_THRESHOLD_FLAG, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold").setCategory(FILTERING);
+      mFlags.registerOptional(TRIM_END_FLAG, Integer.class, CommonFlags.INT, "trim the specified number of bases from read ends").setCategory(FILTERING);
 
       final Flag inputListFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of input read files (1 per line)").setCategory(INPUT_OUTPUT);
 
@@ -397,8 +399,8 @@ public final class FormatCli extends LoggedCli {
       mDedupSecondary = dedupSecondary;
     }
 
-    void setReadTrimQualityThreshold(Integer threshold) {
-      mReadTrimmer = threshold == null ? new NullReadTrimmer() : new BestSumReadTrimmer(threshold);
+    void setReadTrimmer(ReadTrimmer trimmer) {
+      mReadTrimmer = trimmer;
     }
 
     private void formattingMessage(boolean paired) {
@@ -733,13 +735,21 @@ public final class FormatCli extends LoggedCli {
           final PrereadExecutor pre = new PrereadExecutor(mFlags.isSet(PROTEIN_FLAG), mFlags.isSet(DUST_FLAG), inputformat, outputDir, ps, namesToExclude,
             useQuality, useNames, (Boolean) mFlags.getValue(COMPRESS_FLAG), (Boolean) mFlags.getValue(XMAPPED_SAM),
             selectReadGroup, samReadGroupRecord, mFlags.isSet(XDEDUP_SECONDARY));
-          if (mFlags.isSet(READ_TRIM_FLAG)) {
+          final ArrayList<ReadTrimmer> trimmers = new ArrayList<>();
+          if (mFlags.isSet(TRIM_THRESHOLD_FLAG)) {
             if (inputformat == InputFormat.FASTA) {
               throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Input must contain qualities to perform quality-based read trimming.");
             }
-            pre.setReadTrimQualityThreshold((Integer) mFlags.getValue(READ_TRIM_FLAG));
+            trimmers.add(new BestSumReadTrimmer((Integer) mFlags.getValue(TRIM_THRESHOLD_FLAG)));
           }
-
+          if (mFlags.isSet(TRIM_END_FLAG)) {
+            trimmers.add(new LastBasesReadTrimmer((Integer) mFlags.getValue(TRIM_END_FLAG)));
+          }
+          if (trimmers.size() == 1) {
+            pre.setReadTrimmer(trimmers.get(0));
+          } else if (trimmers.size() > 1) {
+            pre.setReadTrimmer(new MinReadTrimmer(trimmers.toArray(new ReadTrimmer[0])));
+          }
           if (files.size() == 0) {
             final File left = (File) mFlags.getValue(LEFT_FILE_FLAG);
             final File right = (File) mFlags.getValue(RIGHT_FILE_FLAG);
