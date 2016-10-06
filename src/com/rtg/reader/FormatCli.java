@@ -360,7 +360,7 @@ public final class FormatCli extends LoggedCli {
     private final boolean mMappedSam;
     private final String mSamReadGroup;
     private final SAMReadGroupRecord mReadGroupRecord;
-    private Integer mReadTrimQualityThreshold = null;
+    private ReadTrimmer mReadTrimmer = new NullReadTrimmer();
     private long mNumSequences = 0;
     private final boolean mDedupSecondary;
 
@@ -398,7 +398,7 @@ public final class FormatCli extends LoggedCli {
     }
 
     void setReadTrimQualityThreshold(Integer threshold) {
-      mReadTrimQualityThreshold = threshold;
+      mReadTrimmer = threshold == null ? new NullReadTrimmer() : new BestSumReadTrimmer(threshold);
     }
 
     private void formattingMessage(boolean paired) {
@@ -446,16 +446,17 @@ public final class FormatCli extends LoggedCli {
         }
         ds = new FastaSequenceDataSource(files, new ProteinFastaSymbolTable(), true, null);
         ds.setDusting(mDusting);
-        writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed, mReadTrimQualityThreshold);
+        writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
       } else {
         ds = getDnaDataSource(files, mInputFormat, null, mMappedSam, false, mSamReadGroup, mDedupSecondary);
         ds.setDusting(mDusting);
         if (mInputFormat.isPairedSam()) {
-          writer = new AlternatingSequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed, mReadTrimQualityThreshold);
+          writer = new AlternatingSequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
         } else {
-          writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed, mReadTrimQualityThreshold);
+          writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
         }
       }
+      writer.setReadTrimmer(mReadTrimmer);
       writer.setReadGroup(mReadGroupRecord == null ? null : mReadGroupRecord.toString());
       // perform the actual work
       writer.processSequences(mIncludeQuality, mIncludeNames);
@@ -527,8 +528,8 @@ public final class FormatCli extends LoggedCli {
 
       final SimpleThreadPool pool = new SimpleThreadPool(2, "paired-end prereader", true);
       pool.enableBasicProgress(2);
-      final SequenceProcessor leftSequenceProc = new SequenceProcessor(leftds, prereadType, PrereadArm.LEFT, new File(mOutDir, "left"), sdfId, mNamesToExclude, mCompressed, mReadTrimQualityThreshold);
-      final SequenceProcessor rightSequenceProc = new SequenceProcessor(rightds, prereadType, PrereadArm.RIGHT, new File(mOutDir, "right"), sdfId, mNamesToExclude, mCompressed, mReadTrimQualityThreshold);
+      final SequenceProcessor leftSequenceProc = new SequenceProcessor(leftds, prereadType, PrereadArm.LEFT, new File(mOutDir, "left"), sdfId, mNamesToExclude, mCompressed, mReadTrimmer);
+      final SequenceProcessor rightSequenceProc = new SequenceProcessor(rightds, prereadType, PrereadArm.RIGHT, new File(mOutDir, "right"), sdfId, mNamesToExclude, mCompressed, mReadTrimmer);
       leftSequenceProc.setIncludeNames(mIncludeNames);
       rightSequenceProc.setIncludeNames(mIncludeNames);
       leftSequenceProc.setIncludeQuality(mIncludeQuality);
@@ -636,8 +637,9 @@ public final class FormatCli extends LoggedCli {
       private boolean mIncludeQuality;
       private boolean mIncludeNames;
 
-      SequenceProcessor(SequenceDataSource datasource, PrereadType prereadType, PrereadArm arm, File outDir, SdfId sdfId, Collection<String> namesToExclude, boolean compressed, Integer readTrimQualityThreshold) {
-        mWriter = new SequencesWriter(datasource, outDir, Constants.MAX_FILE_SIZE, namesToExclude, prereadType, compressed, readTrimQualityThreshold);
+      SequenceProcessor(SequenceDataSource datasource, PrereadType prereadType, PrereadArm arm, File outDir, SdfId sdfId, Collection<String> namesToExclude, boolean compressed, ReadTrimmer trimmer) {
+        mWriter = new SequencesWriter(datasource, outDir, Constants.MAX_FILE_SIZE, namesToExclude, prereadType, compressed);
+        mWriter.setReadTrimmer(trimmer);
         mWriter.setPrereadArm(arm);
         mWriter.setSdfId(sdfId);
       }

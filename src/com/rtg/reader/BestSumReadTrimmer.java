@@ -36,7 +36,7 @@ package com.rtg.reader;
  * <code>argmax_x{\sum_{i=x+1}^l(INT-q_i)}</code> if <code>q_l&lt;INT</code> where l is the original read length.
  *
  */
-public class BestSumReadTrimmer implements ReadTrimmer {
+public final class BestSumReadTrimmer implements ReadTrimmer {
 
   private final int mQualityThreshold;
 
@@ -46,6 +46,11 @@ public class BestSumReadTrimmer implements ReadTrimmer {
    */
   public BestSumReadTrimmer(int qualityThreshold) {
     mQualityThreshold = qualityThreshold;
+  }
+
+  @Override
+  public String toString() {
+    return "BestSum(threshold=" + mQualityThreshold + ")";
   }
 
   @Override

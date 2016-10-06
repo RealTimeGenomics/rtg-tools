@@ -75,7 +75,7 @@ public class SequencesWriter {
   long mNumberOfSequences = 0;
   final boolean mCompressed;
 
-  final ReadTrimmer mReadTrimmer;
+  ReadTrimmer mReadTrimmer = new NullReadTrimmer();
 
   /**
    * Creates a writer for processing sequences from provided data source.
@@ -84,10 +84,9 @@ public class SequencesWriter {
    * @param sizeLimit Maximum size for output files
    * @param namesToExclude Names to be excluded from written result (may be null)
    * @param type preread type
-   * @param trimQualityThreshold quality threshold to trim reads after, or null for no trimming
    * @param compressed whether <code>SDF</code> should be compressed
    */
-  public SequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, Collection<String> namesToExclude, PrereadType type, boolean compressed, Integer trimQualityThreshold) {
+  public SequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, Collection<String> namesToExclude, PrereadType type, boolean compressed) {
     mDataSource = source;
     mOutputDir = outputDir;
     mPrereadType = type;
@@ -99,18 +98,8 @@ public class SequencesWriter {
     mSizeLimit = sizeLimit;
     mNamesToExclude = namesToExclude == null ? new ArrayList<>() : namesToExclude;
     mCompressed = compressed;
-    if (trimQualityThreshold != null) {
-      if (System.getProperty("quality-window-size") != null) {
-        final int windowSize = Integer.parseInt(System.getProperty("quality-window-size"));
-        mReadTrimmer = new DefaultReadTrimmer(windowSize, trimQualityThreshold);
-        Diagnostic.userLog("Performing trimming with quality threshold " + trimQualityThreshold + " window size " + windowSize);
-      } else {
-        mReadTrimmer = new BestSumReadTrimmer(trimQualityThreshold);
-        Diagnostic.userLog("Performing trimming with BestSum, threshold " + trimQualityThreshold);
-      }
-    } else {
-      mReadTrimmer = new NullReadTrimmer();
-    }
+
+    // new BestSumReadTrimmer(trimQualityThreshold);
   }
 
   /**
@@ -131,7 +120,6 @@ public class SequencesWriter {
     mSizeLimit = 0;
     mNamesToExclude = namesToExclude == null ? new ArrayList<String>() : namesToExclude;
     mCompressed = compressed;
-    mReadTrimmer = new NullReadTrimmer();
   }
 
   /**
@@ -143,7 +131,16 @@ public class SequencesWriter {
    * @param compressed whether <code>SDF</code> should be compressed
    */
   public SequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, PrereadType type, boolean compressed) {
-    this(source, outputDir, sizeLimit, null, type, compressed, null);
+    this(source, outputDir, sizeLimit, null, type, compressed);
+  }
+
+  /**
+   * Sets the trimmer to apply to sequences during formatting
+   * @param trimmer the read trimmer to apply
+   */
+  public void setReadTrimmer(ReadTrimmer trimmer) {
+    mReadTrimmer = trimmer;
+    Diagnostic.userLog("Performing trimming with " + trimmer);
   }
 
   /**
@@ -341,7 +338,7 @@ public class SequencesWriter {
   public static void main(String[] args) throws Exception {
     final long start = System.currentTimeMillis();
     final SequenceDataSource leftds = new FastaSequenceDataSource(Collections.singletonList(new File(args[0])), new DNAFastaSymbolTable(), true, null);
-    final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<String>(), PrereadType.UNKNOWN, true, null);
+    final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<String>(), PrereadType.UNKNOWN, true);
     // perform the actual work
     writer.processSequences();
     System.err.println("time " + ((System.currentTimeMillis() - start) / 1000) + "s");

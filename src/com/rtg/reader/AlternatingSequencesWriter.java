@@ -51,25 +51,12 @@ public class AlternatingSequencesWriter extends SequencesWriter {
    * @param source Source of sequences
    * @param outputDir Destination of output files
    * @param sizeLimit Maximum size for output files
-   * @param type preread type
-   * @param compressed whether <code>SDF</code> should be compressed
-   * @param trimQualityThreshold quality threshold to trim reads after, or null for no trimming
-   */
-  public AlternatingSequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, PrereadType type, boolean compressed, Integer trimQualityThreshold) {
-    super(source, outputDir, sizeLimit, null, type, compressed, trimQualityThreshold);
-  }
-  /**
-   * Creates an alternating writer for processing sequences from provided data source.
-   * @param source Source of sequences
-   * @param outputDir Destination of output files
-   * @param sizeLimit Maximum size for output files
    * @param namesToExclude Names to be excluded from written result (may be null)
    * @param type preread type
    * @param compressed whether <code>SDF</code> should be compressed
-   * @param trimQualityThreshold quality threshold to trim reads after, or null for no trimming
    */
-  public AlternatingSequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, final Collection<String> namesToExclude, PrereadType type, boolean compressed, Integer trimQualityThreshold) {
-    super(source, outputDir, sizeLimit, namesToExclude, type, compressed, trimQualityThreshold);
+  public AlternatingSequencesWriter(SequenceDataSource source, File outputDir, long sizeLimit, final Collection<String> namesToExclude, PrereadType type, boolean compressed) {
+    super(source, outputDir, sizeLimit, namesToExclude, type, compressed);
   }
 
   /**

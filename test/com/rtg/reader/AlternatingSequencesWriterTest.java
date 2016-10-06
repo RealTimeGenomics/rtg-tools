@@ -56,7 +56,7 @@ public class AlternatingSequencesWriterTest extends TestCase {
       final File reads = new File(tempDir, "reads");
       FileHelper.resourceToFile("com/rtg/reader/resources/sample.tsv", reads);
 
-      final AlternatingSequencesWriter asw = new AlternatingSequencesWriter(new TsvSequenceDataSource(reads, 5), tempDir, 1000, PrereadType.CG, false, null);
+      final AlternatingSequencesWriter asw = new AlternatingSequencesWriter(new TsvSequenceDataSource(reads, 5), tempDir, 1000, null, PrereadType.CG, false);
 
       asw.processSequences(true, false);
       assertEquals(10, asw.mMaxLength);

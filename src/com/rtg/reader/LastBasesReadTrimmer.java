@@ -31,17 +31,27 @@
 package com.rtg.reader;
 
 /**
- * Implementation for when no trimming is to be carried out.
+ * Always removes the specified number of bases from the read end.
  */
-public final class NullReadTrimmer implements ReadTrimmer {
+public final class LastBasesReadTrimmer implements ReadTrimmer {
+
+  private final int mNumBases;
+
+  /**
+   * Constructor
+   * @param numBases the number of bases to remove
+   */
+  public LastBasesReadTrimmer(int numBases) {
+    mNumBases = numBases;
+  }
 
   @Override
   public String toString() {
-    return "no trimming";
+    return "Last(bases=" + mNumBases + ")";
   }
 
   @Override
   public int getTrimPosition(byte[] qualities, int length) {
-    return length;
+    return Math.max(0, length - mNumBases);
   }
 }

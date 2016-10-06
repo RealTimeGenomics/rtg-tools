@@ -34,7 +34,7 @@ package com.rtg.reader;
  * Clips sequences based on average quality in a sliding window.
  *
  */
-public class DefaultReadTrimmer implements ReadTrimmer {
+public final class DefaultReadTrimmer implements ReadTrimmer {
 
   private final int mWindowSize;
   private final int mQualityThreshold;
@@ -47,6 +47,11 @@ public class DefaultReadTrimmer implements ReadTrimmer {
   public DefaultReadTrimmer(int windowSize, int qualityThreshold) {
     mWindowSize = windowSize;
     mQualityThreshold = qualityThreshold;
+  }
+
+  @Override
+  public String toString() {
+    return "Default(threshold=" + mQualityThreshold + ", window=" + mWindowSize +")";
   }
 
   @Override

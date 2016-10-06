@@ -40,6 +40,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.junit.Assert;
+
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.Protein;
@@ -58,7 +60,6 @@ import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.test.FileHelper;
 
-import org.junit.Assert;
 import junit.framework.TestCase;
 
 /**
@@ -540,7 +541,7 @@ public class SequencesWriterTest extends TestCase {
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
     final ArrayList<String> sup = new ArrayList<>();
     sup.add("baddog");
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 1024, sup, PrereadType.UNKNOWN, false, null);
+    final SequencesWriter sw = new SequencesWriter(ds, mDir, 1024, sup, PrereadType.UNKNOWN, false);
     assertEquals(0, sw.getNumberOfExcludedSequences());
     sw.processSequences();
 
@@ -813,7 +814,8 @@ public class SequencesWriterTest extends TestCase {
                       + "@hobos-r us\naccccaccccacaaacccaa\n"
                       + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false, 50);
+    final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false);
+    sw.setReadTrimmer(new BestSumReadTrimmer(50));
     final SequencesReader sr = sw.processSequencesInMemory(null, true, null, null, LongRange.NONE);
 
     assertEquals(3, sr.numberSequences());
@@ -830,7 +832,8 @@ public class SequencesWriterTest extends TestCase {
         + ">hobos-r us"
         + "\naccccaccccacaaacccaa\n"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false, 50);
+    final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false);
+    sw.setReadTrimmer(new BestSumReadTrimmer(50));
     final File proxy = new File("proxy");
     final SequencesReader sr = sw.processSequencesInMemory(proxy, true, null, null, LongRange.NONE);
 

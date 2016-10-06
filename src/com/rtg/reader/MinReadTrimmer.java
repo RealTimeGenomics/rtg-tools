@@ -30,18 +30,35 @@
 
 package com.rtg.reader;
 
+import java.util.Arrays;
+
 /**
- * Implementation for when no trimming is to be carried out.
+ * Clips sequences to the minimum end position suggested by delegate trimmers.
  */
-public final class NullReadTrimmer implements ReadTrimmer {
+public final class MinReadTrimmer implements ReadTrimmer {
+
+  private final ReadTrimmer[] mTrimmers;
+
+  /**
+   * Construct a read trimmer
+   * @param trimmers the delegate trimmers to iterate through
+   */
+  public MinReadTrimmer(ReadTrimmer... trimmers) {
+    mTrimmers = trimmers;
+  }
 
   @Override
   public String toString() {
-    return "no trimming";
+    return "Min(trimmers=" + Arrays.toString(mTrimmers) + ")";
   }
 
   @Override
   public int getTrimPosition(byte[] qualities, int length) {
-    return length;
+    int pos = length;
+    for (ReadTrimmer t : mTrimmers) {
+      pos = Math.min(pos, t.getTrimPosition(qualities, length));
+    }
+    return pos;
   }
+
 }
