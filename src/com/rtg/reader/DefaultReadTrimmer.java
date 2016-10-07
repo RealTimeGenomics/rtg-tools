@@ -51,7 +51,7 @@ public final class DefaultReadTrimmer implements ReadTrimmer {
 
   @Override
   public String toString() {
-    return "Default(threshold=" + mQualityThreshold + ", window=" + mWindowSize +")";
+    return "Default(threshold=" + mQualityThreshold + ", window=" + mWindowSize + ")";
   }
 
   @Override
