@@ -611,6 +611,7 @@ public class RocPlot {
       final String name = names.get(i);
       loadFile(f, name, showProgress);
     }
+    SwingUtilities.invokeLater(() -> mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
     if (showProgress) {
       updateProgress();
     }
