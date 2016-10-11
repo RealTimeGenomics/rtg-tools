@@ -54,7 +54,7 @@ public final class CommandLine {
    */
   public static void setCommandArgs(String... args) {
     sCommandArgs = Arrays.copyOf(args, args.length);
-    sCommandLine = StringUtils.implode(args, " ", true);
+    sCommandLine = StringUtils.join(" ", args, true);
   }
 
   /**

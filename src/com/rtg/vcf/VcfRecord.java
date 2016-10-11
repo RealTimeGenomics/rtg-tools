@@ -492,7 +492,7 @@ public class VcfRecord implements SequenceNameLocus {
     if (altCalls.size() == 0) {
       return MISSING;
     }
-    return StringUtils.implode(altCalls, ALT_CALL_INFO_SEPARATOR);
+    return StringUtils.join(ALT_CALL_INFO_SEPARATOR, altCalls);
   }
 
   private static int countNumberOfSamples(Map<String, ArrayList<String>> formatAndSample) {
@@ -518,7 +518,7 @@ public class VcfRecord implements SequenceNameLocus {
       final Collection<String> values = e.getValue();
       if (values != null && values.size() > 0) {
         sb.append("=")
-        .append(StringUtils.implode(values, ALT_CALL_INFO_SEPARATOR));
+        .append(StringUtils.join(ALT_CALL_INFO_SEPARATOR, values));
       }
       sb.append(ID_FILTER_AND_INFO_SEPARATOR);
     }
@@ -550,14 +550,14 @@ public class VcfRecord implements SequenceNameLocus {
     if (formatAndSample.size() == 0) {
       return MISSING;
     }
-    return StringUtils.implode(formatAndSample.keySet(), FORMAT_AND_SAMPLE_SEPARATOR);
+    return StringUtils.join(FORMAT_AND_SAMPLE_SEPARATOR, formatAndSample.keySet());
   }
 
   private static String getFilter(List<String> filter) {
     if (filter.size() == 0) {
       return MISSING;
     }
-    return StringUtils.implode(filter, ID_FILTER_AND_INFO_SEPARATOR);
+    return StringUtils.join(ID_FILTER_AND_INFO_SEPARATOR, filter);
   }
 
   /**

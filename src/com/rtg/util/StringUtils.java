@@ -275,13 +275,13 @@ public final class StringUtils {
 
 
   /**
-   * Implodes a string array into a String.
-   * @param array the array to implode
+   * Joins a string array into a String.
    * @param delim the delimiter to insert between values
+   * @param array the array to join
    * @param quoteStringsWithSpaces whether to surround strings that contain spaces with quotes or not
-   * @return the imploded string
+   * @return the string elements joined by the delimiter
    */
-  public static String implode(final String[] array, final String delim, final boolean quoteStringsWithSpaces) {
+  public static String join(final String delim, final String[] array, final boolean quoteStringsWithSpaces) {
     final StringBuilder sb = new StringBuilder();
     for (int i = 0; i < array.length; i++) {
       if (i != 0 && delim != null) {
@@ -293,34 +293,42 @@ public final class StringUtils {
   }
 
   /**
-   * Implodes a string array into a String.
-   * @param array the array to implode
+   * Joins a string array into a String.
    * @param delim the delimiter to insert between values
-   * @return the imploded string
+   * @param array the array to join
+   * @return the string elements joined by the delimiter
    */
-  public static String implode(final String[] array, final String delim) {
-    return implode(array, delim, false);
+  public static String join(final String delim, final String[] array) {
+    return join(delim, array, false);
   }
 
   /**
-   * Implodes a collection of strings into a String.
-   * @param strings the collection to implode
-   * @param delim the delimiter to insert between values
-   * @param quoteStringsWithSpaces whether to surround strings that contain spaces with quotes or not
-   * @return the imploded string
+   * Produces a string that consists of the <code>toString</code> of each element in collection with the glue string separating each item
+   * @param <T> type of object to join
+   * @param delim the string that will be inserted between elements of items
+   * @param items the elements to join into a string
+   * @return a string containing all elements of items separated by glue
    */
-  public static String implode(final Collection<String> strings, final String delim, final boolean quoteStringsWithSpaces) {
-    return implode(strings.toArray(new String[strings.size()]), delim, quoteStringsWithSpaces);
+  public static <T> String join(char delim, Collection<T> items) {
+    return join("" + delim, items);
   }
 
   /**
-   * Implodes a collection of strings into a String.
-   * @param strings the collection to implode
-   * @param delim the delimiter to insert between values
-   * @return the imploded string
+   * Produces a string that consists of the <code>toString</code> of each element in collection with the glue string separating each item
+   * @param <T> type of object to join
+   * @param delim the string that will be inserted between elements of items
+   * @param items the elements to join into a string
+   * @return a string containing all elements of items separated by glue
    */
-  public static String implode(final Collection<String> strings, final String delim) {
-    return implode(strings, delim, false);
+  public static <T> String join(String delim, Collection<T> items) {
+    final StringBuilder sb = new StringBuilder();
+    String join = "";
+    for (final T item : items) {
+      sb.append(join);
+      join = delim;
+      sb.append(item.toString());
+    }
+    return sb.toString();
   }
 
   /**
@@ -420,23 +428,6 @@ public final class StringUtils {
     return grepInner(val, pattern, true);
   }
 
-  /**
-   * Produces a string that consists of the <code>toString</code> of each element in collection with the glue string separating each item
-   * @param <T> type of object to join
-   * @param glue the string that will be inserted between elements of items
-   * @param items the elements to join into a string
-   * @return a string containing all elements of items separated by glue
-   */
-  public static <T> String join(String glue, Collection<T> items) {
-    final StringBuilder sb = new StringBuilder();
-    String join = "";
-    for (final T item : items) {
-      sb.append(join);
-      join = glue;
-      sb.append(item.toString());
-    }
-    return sb.toString();
-  }
 
 
   private static boolean equalsLeft(final String a, final String b, int pos, final int rightOffset) {

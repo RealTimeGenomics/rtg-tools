@@ -51,7 +51,7 @@ public class VcfRecordMergerTest extends TestCase {
   private static final String VCF_RECORD_FORMAT_MISSING = "%1$s\t%2$d\t.\t%3$s\t.\t.\tPASS\t.\tGT:E1:E2\t.";
 
   static VcfRecord createRecord(String chrom, int pos, String ref, int gt1, int gt2, String... alts) {
-    final String altsStr = StringUtils.implode(alts, ",", false);
+    final String altsStr = StringUtils.join(",", alts, false);
     return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT, chrom, pos, ref, altsStr, gt1, gt2));
   }
 

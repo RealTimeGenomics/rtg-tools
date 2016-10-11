@@ -159,21 +159,19 @@ public class StringUtilsTest extends TestCase {
     assertEquals("\"\\uFFFF\"", StringUtils.display("\uFFFF"));
   }
 
-  public void testImplode() {
-    assertEquals("-b blah -f wow omg", StringUtils.implode(new String[] {"-b", "blah", "-f", "wow omg"}, " ", false));
-    assertEquals("-b blah -f \"wow omg\"", StringUtils.implode(new String[] {"-b", "blah", "-f", "wow omg"}, " ", true));
-    assertEquals("-b blah -f wow omg", StringUtils.implode(new String[] {"-b", "blah", "-f", "wow omg"}, " "));
+  public void testJoin3() {
+    assertEquals("-b blah -f wow omg", StringUtils.join(" ", new String[] {"-b", "blah", "-f", "wow omg"}, false));
+    assertEquals("-b blah -f \"wow omg\"", StringUtils.join(" ", new String[] {"-b", "blah", "-f", "wow omg"}, true));
+    assertEquals("-b blah -f wow omg", StringUtils.join(" ", new String[] {"-b", "blah", "-f", "wow omg"}));
   }
 
-  public void testImplode2() {
+  public void testJoin2() {
     final ArrayList<String> collection = new ArrayList<>();
     collection.add("-b");
     collection.add("blah");
     collection.add("-f");
     collection.add("wow omg");
-    assertEquals("-b blah -f wow omg", StringUtils.implode(collection, " ", false));
-    assertEquals("-b blah -f \"wow omg\"", StringUtils.implode(collection, " ", true));
-    assertEquals("-b blah -f wow omg", StringUtils.implode(collection, " "));
+    assertEquals("-b blah -f wow omg", StringUtils.join(" ", collection));
   }
 
   public void testSplit() {

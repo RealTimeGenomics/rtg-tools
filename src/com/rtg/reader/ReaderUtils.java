@@ -216,7 +216,7 @@ public final class ReaderUtils {
     final Map<String, Long> nameMap = getSequenceNameMap(reader);
     missingChromosomes.addAll(regions.sequenceNames().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList()));
     if (missingChromosomes.size() > 0) {
-      throw new InvalidParamsException("The following sequences specified in the regions list are not present in the template: " + StringUtils.implode(missingChromosomes, ", "));
+      throw new InvalidParamsException("The following sequences specified in the regions list are not present in the template: " + StringUtils.join(", ", missingChromosomes));
     }
   }
 }
