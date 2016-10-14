@@ -515,6 +515,26 @@ public final class SamUtils {
     }
   }
 
+  private static final SamReader.Type[] SUPPORTED_TYPES = {SamReader.Type.SAM_TYPE, SamReader.Type.BAM_TYPE, SamReader.Type.CRAM_TYPE };
+
+  /**
+   * Guess the supported SAM file type based on extension.
+   * @param file the file to check
+   * @return the type, or null if the type is not supported
+   */
+  public static SamReader.Type getSamType(final File file) {
+    for (SamReader.Type t : SUPPORTED_TYPES) {
+      if (file.getName().endsWith(t.fileExtension())) {
+        return t;
+      }
+    }
+    // We also handle tabixed block-compressed SAM files.
+    if (file.getName().endsWith(SamReader.Type.SAM_TYPE.fileExtension() + FileUtils.GZ_SUFFIX)) {
+      return SamReader.Type.SAM_TYPE;
+    }
+    return null;
+  }
+
   /**
    * @param zippedSam zipped file to check
    * @return true if it starts with a <code>SAM</code> header (i.e. first character is @)
@@ -922,7 +942,7 @@ public final class SamUtils {
    * @param stream the stream to read from. Must already be performing decompression if required.
    * @param reference the SequencesReader to be used as the reference (required for CRAM files).
    * @param headerOverride the pre-determined SAM header
-   * @param assumeType the type of input to assume.   @return the SamReader
+   * @param assumeType the type of input to assume.
    * @return the SamReader
    * @throws IOException if an I/O problem occurs opening the file
    */

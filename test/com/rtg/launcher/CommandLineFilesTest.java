@@ -60,8 +60,8 @@ public class CommandLineFilesTest extends TestCase {
   @Override
   public void setUp() throws IOException {
     mDir = FileUtils.createTempDir("CommandLineFilesTest", "tmpDir");
-    mOne = new File(mDir, "one");
-    mTwo = new File(mDir, "two");
+    mOne = new File(mDir, "one.sam.gz");
+    mTwo = new File(mDir, "two.sam.gz");
     mLog = new MemoryPrintStream();
     Diagnostic.setLogStream(mLog.printStream());
   }
@@ -223,7 +223,7 @@ public class CommandLineFilesTest extends TestCase {
     final File f = new File(mDir, "test" + SamUtils.BAM_SUFFIX);
     makeFile(f);
     final String[] args = {f.getPath()};
-    checkInvalid(cmf2, "The file \"" + f.getPath() + "\" does not have a valid index", 1, getFlags(args));
+    checkInvalid(cmf2, "The file \"" + f.getPath() + "\" does not have a \".bai\" index", 1, getFlags(args));
     File f2 = new File(mDir, "test" + SamUtils.BAI_SUFFIX);
 //    System.err.println(f.getPath());
 //    System.err.println(f2.getPath());

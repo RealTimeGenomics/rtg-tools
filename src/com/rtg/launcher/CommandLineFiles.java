@@ -37,14 +37,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
+import com.rtg.sam.BamIndexer;
 import com.rtg.sam.SamUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+
+import htsjdk.samtools.SamReader;
 
 /**
  * Class for extracting a list of files from a CFlags object following the conventions we tend to use.
@@ -187,22 +189,25 @@ public class CommandLineFiles {
   public static final FileConstraint VARIANT_INPUT = new FileConstraint() {
     @Override
     public boolean validate(File f, CommandLineFiles files) {
-      if (f.getName().toLowerCase(Locale.getDefault()).endsWith(CommonFlags.RECALIBRATE_EXTENSION)) {
+      if (f.getName().endsWith(CommonFlags.RECALIBRATE_EXTENSION)) {
         return true;
       }
-      if (f.getName().toLowerCase(Locale.getDefault()).endsWith(SamUtils.BAM_SUFFIX)) {
-        final File bamIndexA = new File(f.getPath() + SamUtils.BAI_SUFFIX);
-        final File bamIndexB = new File(f.getPath().substring(0, f.getPath().length() - SamUtils.BAM_SUFFIX.length()) + SamUtils.BAI_SUFFIX);
-        if (!bamIndexA.exists() && !bamIndexB.exists()) {
-          files.error(ErrorType.INFO_ERROR, "The file \"" + f.getPath() + "\" does not have a valid index");
+      final SamReader.Type t = SamUtils.getSamType(f);
+      if (t == SamReader.Type.BAM_TYPE
+        /*|| t == SamReader.Type.CRAM_TYPE*/) {
+        if (!BamIndexer.indexFileName(f).exists() && !BamIndexer.secondaryIndexFileName(f).exists()) {
+          files.error(ErrorType.INFO_ERROR, "The file \"" + f.getPath() + "\" does not have a \".bai\" index");
           return false;
         }
-      } else {
+      } else if (t == SamReader.Type.SAM_TYPE) {
         final File tabix = new File(f.getPath() + TabixIndexer.TABIX_EXTENSION);
         if (!tabix.exists()) {
           files.error(ErrorType.INFO_ERROR, "The file \"" + f.getPath() + "\" does not have a tabix index");
           return false;
         }
+      } else {
+        files.error(ErrorType.INFO_ERROR, "The file \"" + f.getPath() + "\" is not supported for indexed retrieval");
+        return false;
       }
       return true;
     }

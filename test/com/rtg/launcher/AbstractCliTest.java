@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.StringWriter;
 
+import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.TestCFlags;
@@ -110,6 +111,7 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
     Diagnostic.setLogStream(ps);
     final StringWriter err = new StringWriter();
     try {
+      GlobalFlags.resetAccessedStatus();
       assertFalse(mCli.handleFlags(args, TestUtils.getNullPrintStream(), err));
       assertNotNull(mCli.mFlags);
       ps.flush();
@@ -129,6 +131,7 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
   protected String checkHandleFlagsOut(String... args) {
     final StringWriter writer = new StringWriter();
     final MemoryPrintStream err = new MemoryPrintStream();
+    GlobalFlags.resetAccessedStatus();
     final boolean val = mCli.handleFlags(args, writer, err.printStream());
     assertTrue(err.toString(), val);
     return writer.toString();
@@ -139,6 +142,7 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
    * @param args command line arguments.
    */
   protected void checkHandleFlags(String... args) {
+    GlobalFlags.resetAccessedStatus();
     mCli.handleFlags(args, TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
   }
 

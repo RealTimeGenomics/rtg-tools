@@ -29,7 +29,6 @@
  */
 package com.rtg.sam;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -44,6 +43,7 @@ import com.rtg.util.io.ClosedFileInputStream;
 
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMRecord;
+import htsjdk.samtools.SAMRecordIterator;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.CloseableIterator;
@@ -57,7 +57,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   private static final boolean MULTI_CHUNKS = true;
 
   private final File mFile;
-  private final boolean mIsBam;
+  private final SamReader.Type mType;
   private final ReferenceRanges<String> mRegions;
   private final SequencesReader mReference;
   private final CloseableIterator<SAMRecord> mIterator;
@@ -74,7 +74,8 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   public SamClosedFileReader(File file, ReferenceRanges<String> regions, SequencesReader reference, SAMFileHeader header) throws IOException {
     super(header);
     SamUtils.logRunId(header);
-    mIsBam = SamUtils.isBAMFile(file);
+    final SamReader.Type t = SamUtils.getSamType(file);
+    mType = t == null ? SamReader.Type.SAM_TYPE : t; // Treat unknown (e.g. piped or /dev/fd63) as SAM
     mFile = file;
     mStream = new ClosedFileInputStream(mFile);
     mReference = reference;
@@ -101,10 +102,6 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   }
 
 
-  private CloseableIterator<SAMRecord> primaryIterator(BlockCompressedInputStream bcis) throws IOException {
-    return SamUtils.makeSamReader(bcis, mReference, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
-  }
-
   /**
    * Creates a closed file input stream backed {@link SAMRecord} iterator over the given region.
    * @return the iterator
@@ -114,35 +111,38 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
 
     // Handle easy case of no restriction
     if (mRegions == null || mRegions.allAvailable()) {
-      if (!mIsBam) {
+      if (mType == SamReader.Type.SAM_TYPE) {
         return SamUtils.makeSamReader(mStream, mReference, mHeader).iterator(); // htsjdk will decide whether decompression is required
       } else {
-        return primaryIterator(new BlockCompressedInputStream(mStream));
+        // Currently the above makeSamReader doesn't support header override.
+        // Needed when merging map intermediate files which have a minimal header in order to work with large metagenomic references
+        return SamUtils.makeSamReader(new BlockCompressedInputStream(mStream), mReference, mHeader, mType).iterator();
       }
     }
 
     final LocusIndex index;
-    if (mIsBam) {
+    if (mType == SamReader.Type.SAM_TYPE) {
+      final File indexFileName = TabixIndexer.indexFileName(mFile);
+      if (!TabixIndexer.isBlockCompressed(mFile) || !indexFileName.exists()) {
+        throw new NoTalkbackSlimException("File " + mFile.getPath() + " is not tabix indexed");
+      }
+      index = new TabixIndexReader(indexFileName);
+    } else if (mType == SamReader.Type.BAM_TYPE) {
       File indexFileName = BamIndexer.indexFileName(mFile);
       if (!indexFileName.exists()) {
         indexFileName = BamIndexer.secondaryIndexFileName(mFile);
         if (!indexFileName.exists()) {
-          throw new NoTalkbackSlimException("File " + mFile.getPath() + " is not indexed");
+          throw new NoTalkbackSlimException("File " + mFile.getPath() + " is not indexed for " + mType.fileExtension());
         }
       }
       index = new BamIndexReader(indexFileName, mHeader.getSequenceDictionary());
     } else {
-      final File indexFileName = TabixIndexer.indexFileName(mFile);
-      if (!TabixIndexer.isBlockCompressed(mFile) || !indexFileName.exists()) {
-        throw new NoTalkbackSlimException("File " + mFile.getPath() + " is not indexed");
-      }
-      index = new TabixIndexReader(indexFileName);
+      throw new NoTalkbackSlimException("Indexed extraction from " + mType.fileExtension() + " " + mFile.getPath());
     }
 
     final VirtualOffsets filePointers = index.getFilePointers(mRegions);
-
     if (filePointers == null) {
-      return SamUtils.makeSamReader(new ByteArrayInputStream(new byte[0]), mReference, mHeader, SamReader.Type.SAM_TYPE).iterator();
+      return new EmptySAMRecordIterator();
     }
 
     //Diagnostic.developerLog("Using virtual offsets for file: " + mFile.toString() + "\t" + filePointers);
@@ -153,11 +153,32 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
      */
     final BlockCompressedInputStream cfis = new BlockCompressedInputStream(mStream);
     if (MULTI_CHUNKS) {
-      return new SamMultiRestrictingIterator(cfis, filePointers, mReference, mHeader, mIsBam, mFile.toString());
+      return new SamMultiRestrictingIterator(cfis, filePointers, mReference, mHeader, mType, mFile.toString());
     } else {
       // This should be correct but will read all data from start of first region through to end of last region
       cfis.seek(filePointers.start(0));
-      return new SamRestrictingIterator(primaryIterator(cfis), mRegions);
+      return new SamRestrictingIterator(SamUtils.makeSamReader(cfis, mReference, mHeader, mType).iterator(), mRegions);
+    }
+  }
+
+  private static class EmptySAMRecordIterator implements SAMRecordIterator {
+    @Override
+    public SAMRecordIterator assertSorted(SAMFileHeader.SortOrder sortOrder) {
+      return this;
+    }
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public boolean hasNext() {
+      return false;
+    }
+
+    @Override
+    public SAMRecord next() {
+      return null;
     }
   }
 }

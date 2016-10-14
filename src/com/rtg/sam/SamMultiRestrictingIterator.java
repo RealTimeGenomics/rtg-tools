@@ -56,7 +56,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
   private final VirtualOffsets mOffsets;
   private final SAMFileHeader mHeader;
   private final SequencesReader mReference;
-  private final boolean mIsBam;
+  private final SamReader.Type mType;
   private final String mLabel;
 
   private int mCurrentOffset = 0;
@@ -69,12 +69,12 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
   private int mDoubleFetched = 0;
   private SAMRecord mNextRecord;
 
-  SamMultiRestrictingIterator(BlockCompressedInputStream stream, VirtualOffsets offsets, SequencesReader reference, SAMFileHeader header, boolean isBam, String label) throws IOException {
+  SamMultiRestrictingIterator(BlockCompressedInputStream stream, VirtualOffsets offsets, SequencesReader reference, SAMFileHeader header, SamReader.Type type, String label) throws IOException {
     mStream = stream;
     mOffsets = offsets;
     mHeader = header;
     mReference = reference;
-    mIsBam = isBam;
+    mType = type;
     mLabel = label;
 
     mCurrentIt = null;
@@ -171,8 +171,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
         // Don't the current iterator here as it will axe off the underlying block compressed input stream, oddly only for SAM, not BAM
         clearBuffered();
         mStream.seek(mOffsets.start(mCurrentOffset));
-        // Warning: Confusing constructors being used here - the true is only used to force a different constructor
-        mCurrentIt = SamUtils.makeSamReader(mStream, mReference, mHeader, mIsBam ? SamReader.Type.BAM_TYPE : SamReader.Type.SAM_TYPE).iterator();
+        mCurrentIt = SamUtils.makeSamReader(mStream, mReference, mHeader, mType).iterator();
 
         //} else {
         //  Diagnostic.developerLog("After region " + mCurrentRegion + ", re-using existing reader for region " + mOffsets.region(mCurrentOffset));
