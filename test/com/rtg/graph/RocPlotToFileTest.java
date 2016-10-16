@@ -30,6 +30,7 @@
 package com.rtg.graph;
 
 import static com.rtg.graph.RocPlotToFile.ImageFormat.PNG;
+import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -38,15 +39,14 @@ import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.StringUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class RocPlotToFileTest extends TestCase {
+public class RocPlotToFileTest extends AbstractNanoTest {
 
   private static final String ROC = ""
           + "#total baseline variants: 3092754" + StringUtils.LS
@@ -59,7 +59,7 @@ public class RocPlotToFileTest extends TestCase {
           + "0.333\t2071000.000\t1646920" + StringUtils.LS
           + "0.200\t2995295.000\t1864591" + StringUtils.LS;
 
-  public void test() throws IOException {
+  public void testPng() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
       final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
       final File png = new File(dir, "PNG.png");
@@ -67,6 +67,30 @@ public class RocPlotToFileTest extends TestCase {
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
+    }
+  }
+
+  public void testSvg() throws IOException {
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
+      final File svg = new File(dir, "example.svg");
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
+      mNano.check("example.svg", FileUtils.fileToString(svg));
+    }
+  }
+
+  private static final String ROC_NO_TOTAL = ""
+    + "#total baseline variants: 0" + StringUtils.LS
+    + "#score\ttrue_positives\tfalse_positives" + StringUtils.LS
+    + "3.300\t0.000\t15" + StringUtils.LS
+    + "2.261\t0.000\t137" + StringUtils.LS;
+
+  public void testNoTotal() throws IOException {
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File roc = FileUtils.stringToFile(ROC_NO_TOTAL, new File(dir, "roc.tsv"));
+      final File svg = new File(dir, "example.svg");
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
+      mNano.check("example-no-total.svg", FileUtils.fileToString(svg));
     }
   }
 }
