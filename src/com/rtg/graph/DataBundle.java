@@ -74,7 +74,7 @@ final class DataBundle {
     mTitle = title;
     mTotalVariants = totalVariants;
     mShow = true;
-    mPrecisionRecall = new Point2D[points.length - 1];
+    mPrecisionRecall = new Point2D[totalVariants > 0 ? points.length - 1 : 0];
     final boolean hasRaw = Arrays.stream(points).anyMatch(x -> x.getRawTruePositives() > 0);
     float minPrecision = 100;
     for (int i = 0; i < mPrecisionRecall.length; i++) {
