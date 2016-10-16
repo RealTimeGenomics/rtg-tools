@@ -111,12 +111,12 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
 
     // Handle easy case of no restriction
     if (mRegions == null || mRegions.allAvailable()) {
-      if (mType == SamReader.Type.SAM_TYPE) {
-        return SamUtils.makeSamReader(mStream, mReference, mHeader).iterator(); // htsjdk will decide whether decompression is required
-      } else {
-        // Currently the above makeSamReader doesn't support header override.
+      if (mType == SamReader.Type.BAM_TYPE) {
+        // Currently the below makeSamReader doesn't support header override.
         // Needed when merging map intermediate files which have a minimal header in order to work with large metagenomic references
         return SamUtils.makeSamReader(new BlockCompressedInputStream(mStream), mReference, mHeader, mType).iterator();
+      } else {
+        return SamUtils.makeSamReader(mStream, mReference, mHeader).iterator(); // htsjdk will decide whether decompression is required
       }
     }
 
