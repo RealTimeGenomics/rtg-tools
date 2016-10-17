@@ -4,6 +4,42 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
+RTG Core 3.7.1 (2016-10-18)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* map/cgmap: Addresses a pathological case where a particular paired-end
+  read pair plus reference sequence could run for a disproportionately
+  long time in highly repetitive regions.
+
+* vcfeval: Fixes a rare exception that could occur when a "too-hard"
+  region occurs right at the end of a reference sequence.
+
+* rocplot: Fixes an exception that would occur when trying to plot the
+  result of evaluating a call set (containing variants) against a
+  baseline containing no variants.
+
+* rocplot: (gui) When loading several files on startup, sometimes the
+  initial view would not be fully zoomed out.  We now ensure that the
+  plot is zoomed out after the initial files are loaded.
+
+* vcffilter: Fixes a regression in command line flag validation that
+  would cause a talkback exception if no input file was supplied rather
+  than presenting an appropriate message.
+
+* vcfmerge: Fixes an exception that could occur when merging a mixture
+  of regular VCFs containing sample columns with sites-only VCFs.
+
+* bgzip: Fixes an exception that could occur when decompressing from
+  stdin.
+
+* Minor documentation fixes.
+
+
+Previous releases
+=================
+
 RTG Core 3.7 (2016-08-25)
 -------------------------
 
@@ -242,9 +278,6 @@ new features, see the RTG Operations Manual.
 
 * all: The minimum Java requirement for RTG is now Java 8.
 
-
-Previous releases
-=================
 
 RTG Core 3.6.2 (2016-03-10)
 ---------------------------
