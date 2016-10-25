@@ -39,14 +39,15 @@ import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
-import com.rtg.launcher.AbstractNanoTest;
+import com.rtg.AbstractTest;
 import com.rtg.util.StringUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 
 /**
  */
-public class RocPlotToFileTest extends AbstractNanoTest {
+public class RocPlotToFileTest extends AbstractTest {
 
   private static final String ROC = ""
           + "#total baseline variants: 3092754" + StringUtils.LS
@@ -70,12 +71,27 @@ public class RocPlotToFileTest extends AbstractNanoTest {
     }
   }
 
+  private void checkSvg(final File svg, final int lines, final String... expected) throws IOException {
+    final String s = FileUtils.fileToString(svg);
+    assertEquals(lines, TestUtils.splitLines(s).length);
+    TestUtils.containsAll(s, expected);
+  }
+
   public void testSvg() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
       final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
-      mNano.check("example.svg", FileUtils.fileToString(svg));
+      checkSvg(svg, 113,
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
+        "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
+        "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
+        "True Positives",
+        "False Positives",
+        ">%<",
+        "a title (baseline total = 3092754)",
+        "</svg>"
+      );
     }
   }
 
@@ -90,7 +106,15 @@ public class RocPlotToFileTest extends AbstractNanoTest {
       final File roc = FileUtils.stringToFile(ROC_NO_TOTAL, new File(dir, "roc.tsv"));
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
-      mNano.check("example-no-total.svg", FileUtils.fileToString(svg));
+      checkSvg(svg, 107,
+        "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
+        "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
+        "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
+        "True Positives",
+        "False Positives",
+        "a title<",
+        "</svg>"
+      );
     }
   }
 }
