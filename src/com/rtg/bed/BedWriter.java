@@ -75,7 +75,7 @@ public class BedWriter implements Closeable {
    * @param line the comment line
    * @throws java.io.IOException if error
    */
-  protected void writeComment(String line) throws IOException {
+  public void writeComment(String line) throws IOException {
     mOut.write(COMMENT_CHAR);
     writeLine(line);
   }
