@@ -42,14 +42,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.junit.Assert;
+
 import com.rtg.mode.DNA;
 import com.rtg.mode.Protein;
 import com.rtg.mode.TranslatedFrame;
 import com.rtg.util.integrity.Exam.ExamException;
 import com.rtg.util.integrity.IntegralAbstract;
 import com.rtg.util.test.FileHelper;
-
-import org.junit.Assert;
 
 /**
  * Utilities useful when doing testing.
@@ -717,8 +717,7 @@ public final class TestUtils {
         return "" + (i + 1) + "c" + (i + 1) + StringUtils.LS
           + "< " + erecs[i].trim() + StringUtils.LS
           + "---" + StringUtils.LS
-          + "> " + arecs[i].trim() + StringUtils.LS + StringUtils.LS
-          + cat(arecs);
+          + "> " + arecs[i].trim() + StringUtils.LS + StringUtils.LS;
      }
     }
     if (i < erecs.length) {

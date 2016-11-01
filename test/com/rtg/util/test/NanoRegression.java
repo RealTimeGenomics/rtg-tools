@@ -278,17 +278,23 @@ public class NanoRegression {
   private static class RegressionFailure {
 
     private final String mId;
+    private final String mExpected;
     private final String mActual;
     private final String mMessage;
 
-    RegressionFailure(String id, String actual, String message) {
+    RegressionFailure(String id, String expected, String actual, String message) {
       mId = id;
+      mExpected = expected;
       mActual = actual;
       mMessage = message;
     }
 
     public String id() {
       return mId;
+    }
+
+    public String expected() {
+      return mExpected;
     }
 
     public String actual() {
@@ -307,12 +313,18 @@ public class NanoRegression {
   // If this is set to a regexp that matches the current class name, then updates will be enabled
   private static final String PROP_UPDATE = "regression.update";
 
+  // If this is set to true, use old method of failure reporting
+  private static final String PROP_OLD_REPORTING = "regression.old.reporting";
+
 
   // Name of the test class
   private final String mName;
 
   // Provide access to reference results
   private final RegressionStore mRepository;
+
+  // If set, use non-IDE-friendly comparison reporting
+  private final boolean mOldReporting;
 
   // If true, results updating has been enabled
   private final boolean mUpdateEnabled;
@@ -339,6 +351,8 @@ public class NanoRegression {
    */
   public NanoRegression(Class<?> testClass, boolean updateEnabled) {
     mName = testClass.getName();
+
+    mOldReporting = Boolean.getBoolean(PROP_OLD_REPORTING);
 
     if (updateEnabled) {
       mUpdateEnabled = true;
@@ -407,10 +421,6 @@ public class NanoRegression {
     mRepository.updateReference(id, reference);
   }
 
-  private boolean updateEnabled() {
-    return mUpdateEnabled;
-  }
-
   /**
    * Compares the given results against reference results associated
    * with the specified identifier. If there is a comparison failure,
@@ -447,19 +457,22 @@ public class NanoRegression {
       if (convert) {
         expected = StringUtils.convertLineEndings(expected);
       }
-//      Assert.assertEquals(expected, actual);
       final String result = TestUtils.compareLines(expected.split("\n"), actual.split("\n"));
       if (result != null) {
-        System.err.println("Expected:<");
-        System.err.println(expected);
-        System.err.println(">");
-        System.err.println("Actual:<");
-        System.err.println(actual);
-        System.err.println(">");
-        mFailures.add(new RegressionFailure(id, actual, result));
+        if (mOldReporting) {
+          System.err.println("Expected:<");
+          System.err.println(expected);
+          System.err.println(">");
+          System.err.println("Actual:<");
+          System.err.println(actual);
+          System.err.println(">");
+        } else {
+          System.err.println(mName + ":" + id + StringUtils.LS + result);
+        }
+        mFailures.add(new RegressionFailure(id, expected, actual, result));
       }
     } else {
-      mFailures.add(new RegressionFailure(id, actual, "No reference results available."));
+      mFailures.add(new RegressionFailure(id, "No reference results available", actual, "No reference results available."));
     }
   }
 
@@ -472,7 +485,7 @@ public class NanoRegression {
    */
   public void finish() throws IOException {
     if (mFailures.size() > 0) {
-      if (updateEnabled()) {
+      if (mUpdateEnabled) {
         for (final RegressionFailure failure : mFailures) {
           System.err.println("Updating reference: " + failure.id());
           mRepository.updateReference(failure.id(), failure.actual());
@@ -480,18 +493,36 @@ public class NanoRegression {
         System.err.println("Regression " + mName + " updated results for " + mFailures.size() + " checks");
       } else {
         // Dump the failures and fail out
-        Assert.fail("Regression " + mName + " failed " + mFailures.size() + " checks" + StringUtils.LS + getFailureString());
+        if (mOldReporting) {
+          Assert.fail("Regression " + mName + " failed " + mFailures.size() + " checks" + StringUtils.LS + getFailureString());
+        } else {
+          assertFailure();
+        }
       }
       mFailures.clear();
     }
   }
 
-  /**
-   * @return a failure string
-   */
-  @SuppressWarnings("StringBufferMayBeStringBuilder")
-  public String getFailureString() {
-    final StringBuffer sb = new StringBuffer();
+  private void assertFailure() {
+    final StringBuilder sbExp = new StringBuilder();
+    final StringBuilder sbAct = new StringBuilder();
+    for (final RegressionFailure failure : mFailures) {
+      appendContent(sbExp, failure.id(), failure.expected());
+      appendContent(sbAct, failure.id(), failure.actual());
+    }
+    Assert.assertEquals(sbExp.toString(), sbAct.toString());
+    Assert.fail("Check test " + mName + ": initial comparison failed but final assertEquals passed!");
+  }
+
+  private void appendContent(StringBuilder sb, String id, String content) {
+    sb.append("---").append(StringUtils.LS)
+      .append("--- ").append(mName).append(":").append(id).append(StringUtils.LS)
+      .append("---").append(StringUtils.LS)
+      .append(content);
+  }
+
+  private String getFailureString() {
+    final StringBuilder sb = new StringBuilder();
     for (final RegressionFailure failure : mFailures) {
       sb.append("Failed: ").append(mName).append(":").append(failure.id()).append(StringUtils.LS).append(failure.message());
     }
