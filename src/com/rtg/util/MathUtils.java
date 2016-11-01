@@ -37,7 +37,10 @@ public final class MathUtils {
 
   /** The natural logarithm of 10 */
   public static final double LOG_10 = Math.log(10.0);
-  private static final double LOG10_E = Math.log10(Math.E);
+  /** The natural logarithm of 2 */
+  public static final double LOG_2 = Math.log(2);
+  /** The natural logarithm of e */
+  public static final double LOG10_E = Math.log10(Math.E);
 
   private MathUtils() { //prevent instantiation
   }
@@ -102,7 +105,6 @@ public final class MathUtils {
 
   private static final int EXPONENT_OFFSET = 52;
   private static final int EXPONENT_BIAS = 1023;
-  private static final double LN2 = Math.log(2);
 
   private static final int BITS = 16;
   private static final double DIV = 1L << BITS;
@@ -291,7 +293,7 @@ public final class MathUtils {
     final long lg = (t >>> EXPONENT_OFFSET) - EXPONENT_BIAS;
     final int mantissa = (int) (t >> (EXPONENT_OFFSET - BITS));
     final double mlg = LOG_TABLE[mantissa & MASK];
-    return mlg + lg * LN2;
+    return mlg + lg * LOG_2;
   }
 
   /**
