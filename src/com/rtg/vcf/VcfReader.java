@@ -122,7 +122,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
       vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
     } else {
       if (stdin) {
-        throw new IOException("Cannot apply region restrictions when reading from stdin");
+        throw new IOException("Cannot apply region restrictions when reading VCF from stdin");
       }
       vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), VcfUtils.getHeader(f));
     }
@@ -143,7 +143,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
       vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
     } else {
       if (stdin) {
-        throw new IOException("Cannot apply region restriction when reading from stdin");
+        throw new IOException("Cannot apply region restriction when reading VCF from stdin");
       }
       vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), VcfUtils.getHeader(f));
     }
@@ -167,7 +167,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
       }
     }
     if (header.getVersionLine() == null) {
-      throw new VcfFormatException("No file format line found");
+      throw new VcfFormatException("No VCF file format version header line found");
     }
     return header;
   }

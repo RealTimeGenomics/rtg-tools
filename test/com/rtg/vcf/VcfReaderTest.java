@@ -50,7 +50,7 @@ import junit.framework.TestCase;
 public class VcfReaderTest extends TestCase {
 
   public void testEmpty() throws IOException {
-    checkVcfFormatException("", "file format");
+    checkVcfFormatException("", "VCF file format version header line");
   }
 
   static final String[] BAD_HDR = {

@@ -102,7 +102,7 @@ public class BedReader implements IOIterator<BedRecord> {
     final BedReader bedr;
     if (region != null) {
       if (stdin) {
-        throw new IOException("Cannot apply region restriction when reading from stdin");
+        throw new IOException("Cannot apply region restriction when reading BED from stdin");
       }
       bedr = new BedReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), f, minAnnotations);
     } else {

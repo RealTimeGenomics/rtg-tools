@@ -446,7 +446,7 @@ public class VcfHeader {
       } else {
         if (isVersionLine(line)) {
           if (mVersionLine != null) {
-            throw new VcfFormatException("More than one version line found");
+            throw new VcfFormatException("More than one VCF version line found");
           }
           mVersionLine = line;
         } else {
@@ -454,7 +454,7 @@ public class VcfHeader {
         }
       }
     } else {
-      throw new VcfFormatException("Not a meta information line: " + line);
+      throw new VcfFormatException("Not a VCF meta information line: " + line);
     }
     return this;
   }
@@ -470,7 +470,7 @@ public class VcfHeader {
     } else if (line.startsWith("#")) {
       return addColumnHeaderLine(line);
     } else {
-      throw new VcfFormatException("Not a header line: " + line);
+      throw new VcfFormatException("Not a VCF header line: " + line);
     }
   }
 
