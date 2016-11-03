@@ -59,8 +59,8 @@ public class BedWriterTest extends TestCase {
       final File bedFile = new File(testDir, "test.bed");
       try (BedWriter writer = new BedWriter(new FileOutputStream(bedFile))) {
         writer.writeComment(" COMMENT");
-        writer.writeLine("track adsfasdf");
-        writer.writeLine("browser adsfasdf");
+        writer.writeln("track adsfasdf");
+        writer.writeln("browser adsfasdf");
         writer.write(new BedRecord("chr1", 2, 80, "annotation"));
         writer.write(new BedRecord("chr2", 3, 40, "annotation1", "annotation2"));
         writer.write(new BedRecord("chr3", 7, 90, "annotation", "annotation3"));

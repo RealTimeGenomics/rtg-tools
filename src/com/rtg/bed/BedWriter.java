@@ -67,7 +67,7 @@ public class BedWriter implements Closeable {
    * @throws java.io.IOException if error
    */
   public void write(BedRecord record) throws IOException {
-    writeLine(record.toString());
+    writeln(record.toString());
   }
 
   /**
@@ -77,7 +77,7 @@ public class BedWriter implements Closeable {
    */
   public void writeComment(String line) throws IOException {
     mOut.write(COMMENT_CHAR);
-    writeLine(line);
+    writeln(line);
   }
 
   /**
@@ -85,7 +85,7 @@ public class BedWriter implements Closeable {
    * @param line the line to output
    * @throws java.io.IOException if error
    */
-  protected void writeLine(String line) throws IOException {
+  public void writeln(String line) throws IOException {
     mOut.write(line.getBytes());
     ByteUtils.writeLn(mOut);
   }
