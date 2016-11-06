@@ -126,14 +126,14 @@ public final class SamOutput implements Closeable {
       try {
         final OutputStream samOutputstream = streamCreator.createStreamsAndStartThreads(header.getSequenceDictionary().size(), writeHeader, terminateBlockGzip);
         try {
+          final SAMFileWriterFactory fact = new SAMFileWriterFactory().setTempDirectory(filename.getAbsoluteFile().getParentFile()).setUseAsyncIo(true);
           final SAMFileWriter writer;
-          final File dir = filename.getAbsoluteFile().getParentFile();
           switch (type) {
             case BAM:
-              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeBAMWriter(header, presorted, new BlockCompressedOutputStream(samOutputstream, null, AdjustableGZIPOutputStream.DEFAULT_GZIP_LEVEL, terminateBlockGzip), writeHeader, false /* ignored */, true);
+              writer = fact.makeBAMWriter(header, presorted, new BlockCompressedOutputStream(samOutputstream, null, AdjustableGZIPOutputStream.DEFAULT_GZIP_LEVEL, terminateBlockGzip), writeHeader, false /* ignored */, true);
               break;
             case SAM:
-              writer = new SAMFileWriterFactory().setTempDirectory(dir).makeSAMWriter(header, presorted, samOutputstream, writeHeader);
+              writer = fact.makeSAMWriter(header, presorted, samOutputstream, writeHeader);
               break;
             default:
               throw new UnsupportedOperationException();
