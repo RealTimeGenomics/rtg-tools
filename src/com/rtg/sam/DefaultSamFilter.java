@@ -38,6 +38,11 @@ import htsjdk.samtools.SAMRecord;
  */
 public class DefaultSamFilter implements SamFilter {
 
+  // Number of bits used for quantizing subsampling fraction
+  private static final int SUBSAMPLE_RESOLUTION = 16;
+  private static final int SUBSAMPLE_MAX = 1 << SUBSAMPLE_RESOLUTION;
+  private static final int SUBSAMPLE_MASK = SUBSAMPLE_MAX-1;
+
   private final SamFilterParams mFilterParams;
 
   /**
@@ -100,9 +105,23 @@ public class DefaultSamFilter implements SamFilter {
         return false;
       }
     }
+
+    if (params.subsampleFraction() != null) {
+      // Subsample using hash of read name, ensures pairs are kept together
+      return (internalHash(rec.getReadName(), params.subsampleSeed()) & SUBSAMPLE_MASK) < params.subsampleFraction() * SUBSAMPLE_MAX;
+    }
+
     return true;
   }
 
+  private static long internalHash(final String data, final long seed) {
+    long hash = 13L;
+    final char[] charArray = data.toCharArray();
+    for (final char c : charArray) {
+      hash = hash * 31L + c;
+    }
+    return hash + seed;
+  }
 
   @Override
   public boolean acceptRecord(final SAMRecord rec) {

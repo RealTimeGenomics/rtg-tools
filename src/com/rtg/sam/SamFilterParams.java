@@ -33,6 +33,7 @@ import java.io.File;
 
 import com.rtg.util.IntegerOrPercentage;
 import com.rtg.util.InvalidParamsException;
+import com.rtg.util.PortableRandom;
 
 /**
  * Parameters for selection of SAM records.
@@ -63,6 +64,8 @@ public class SamFilterParams {
     protected int mRequireUnsetFlags = 0;
     protected int mRequireSetFlags = 0;
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
+    public Double mSubsampleFraction = null;
+    public long mSubsampleSeed = 42;
 
     protected SamRegionRestriction mRestriction = null;
     protected File mBedRegionsFile = null;
@@ -74,6 +77,26 @@ public class SamFilterParams {
      */
     public SamFilterParamsBuilder minMapQ(final int val) {
       mMinMapQ = val;
+      return this;
+    }
+
+    /**
+     * Set the proportion of alignments to retain during subsampling.
+     * @param fraction the proportion of alignments to retain (or null to disable subsampling)
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder subsampleFraction(final Double fraction) {
+      mSubsampleFraction = fraction;
+      return this;
+    }
+
+    /**
+     * Set the seed/salt used during subsampling.
+     * @param seed the seed
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder subsampleSeed(final long seed) {
+      mSubsampleSeed = new PortableRandom(seed).nextLong(); // Add some PRNG variability to the user-supplied seed.
       return this;
     }
 
@@ -256,6 +279,9 @@ public class SamFilterParams {
   private final boolean mExcludeUnplaced;
   private final boolean mFindAndRemoveDuplicates; //detected version
   private final boolean mExcludeVariantInvalid;
+  private final Double mSubsampleFraction;
+  private final long mSubsampleSeed;
+
 
   private final SamRegionRestriction mRestriction;
   private final File mBedRegionsFile;
@@ -265,6 +291,8 @@ public class SamFilterParams {
    */
   public SamFilterParams(SamFilterParamsBuilder builder) {
     mMinMapQ = builder.mMinMapQ;
+    mSubsampleFraction = builder.mSubsampleFraction;
+    mSubsampleSeed = builder.mSubsampleSeed;
     mMaxAlignmentCount = builder.mMaxAlignmentCount;
     mMaxASMatedValue = builder.mMaxASMatedValue;
     mMaxASUnmatedValue = builder.mMaxASUnmatedValue;
@@ -297,6 +325,23 @@ public class SamFilterParams {
 
     mFindAndRemoveDuplicates = builder.mFindAndRemoveDuplicates;
   }
+
+  /**
+   * Gets the proportion of alignments that should be retained after downsampling.
+   * Null indicates no downsampling should be performed.
+   * @return the fraction of alignments to retain. E.g. 0.33 will downsample alignments to retain 1/3
+   */
+  public Double subsampleFraction() {
+    return mSubsampleFraction;
+  }
+
+  /**
+   * @return the seed used during subsampling (actually a salt)
+   */
+  public long subsampleSeed() {
+    return mSubsampleSeed;
+  }
+
 
   /**
    * Mated SAM records having alignment score over this value will be filtered.
@@ -433,6 +478,7 @@ public class SamFilterParams {
       + " excludeVariantInvalid=" + excludeVariantInvalid()
       + " requireSetFlags=" + requireSetFlags()
       + " requireUnsetFlags=" + requireUnsetFlags()
+      + (subsampleFraction() == null ? "" : " subsampleFraction=" + subsampleFraction() + " subsampleSeed=" + subsampleSeed())
       + " regionTemplate=" + restrictionTemplate();
   }
 

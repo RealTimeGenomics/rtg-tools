@@ -69,6 +69,22 @@ public final class SamFilterOptions {
       return flags.registerOptional(MAX_HITS_FLAG, Integer.class, "int", HITS_DESC).setCategory(SENSITIVITY_TUNING);
     }
   }
+  
+  /** Flag name for enabling subsampling records. */
+  public static final String SUBSAMPLE_FLAG = "subsample-fraction";
+
+  /** Flag name for specifying the seed when subsampling. */
+  public static final String SUBSAMPLE_SEED_FLAG = "seed";
+
+  /**
+   * Register flags for subsampling
+   *
+   * @param flags flags to add into
+   */
+  public static void registerSubsampleFlags(final CFlags flags) {
+    flags.registerOptional(SUBSAMPLE_FLAG, Double.class, "FLOAT", "if set, subsample SAM records to retain this fraction of reads").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, "INT", "seed used during subsampling").setCategory(SENSITIVITY_TUNING);
+  }
 
   /** Flag name for filter on <code>MAPQ</code> field of SAM record. */
   public static final String MIN_MAPQ_FLAG = "min-mapq";
@@ -264,6 +280,13 @@ public final class SamFilterOptions {
         return false;
       }
     }
+    if (flags.isSet(SUBSAMPLE_FLAG)) {
+      final double fraction = (Double) flags.getValue(SUBSAMPLE_FLAG);
+      if (fraction < 0 || fraction > 1.0) {
+        flags.setParseMessage("--" + SUBSAMPLE_FLAG + " must be between 0 and 1.0");
+        return false;
+      }
+    }
     if (flags.isSet(MIN_MAPQ_FLAG)) {
       final int minMapQ = (Integer) flags.getValue(MIN_MAPQ_FLAG);
       if (minMapQ < 1) {
@@ -321,6 +344,12 @@ public final class SamFilterOptions {
     }
     if (flags.isSet(MIN_MAPQ_FLAG)) {
       builder.minMapQ((Integer) flags.getValue(MIN_MAPQ_FLAG));
+    }
+    if (flags.isSet(SUBSAMPLE_FLAG)) {
+      builder.subsampleFraction((Double) flags.getValue(SUBSAMPLE_FLAG));
+    }
+    if (flags.isSet(SUBSAMPLE_SEED_FLAG)) {
+      builder.subsampleSeed((Integer) flags.getValue(SUBSAMPLE_SEED_FLAG));
     }
     if (flags.isSet(MAX_AS_MATED_FLAG)) {
       final IntegerOrPercentage matedAS = (IntegerOrPercentage) flags.getValue(MAX_AS_MATED_FLAG);
