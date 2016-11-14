@@ -51,7 +51,7 @@ public class FormatField implements IdField<FormatField> {
    */
   public FormatField(String line) {
     final HashMap<String, String> temp = VcfHeader.parseMetaLine(line, FORMAT_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID", "Type", "Number", "Description");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID", "Type", "Number", "Description");
     mId = temp.get("ID");
     mType = MetaType.parseValue(temp.get("Type"));
     mNumber = new VcfNumber(temp.get("Number"));

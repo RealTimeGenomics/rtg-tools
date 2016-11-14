@@ -49,7 +49,7 @@ public class AltField implements IdField<AltField> {
    */
   public AltField(String line) {
     final HashMap<String, String> temp = VcfHeader.parseMetaLine(line, ALT_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID", "Description");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID", "Description");
     mId = temp.get("ID");
     mDescription = temp.get("Description");
   }

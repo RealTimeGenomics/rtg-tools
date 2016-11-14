@@ -158,12 +158,16 @@ public class VcfReader implements IOIterator<VcfRecord> {
     final VcfHeader header = new VcfHeader();
     String line;
     while ((line = in.readLine()) != null) {
-      if (line.startsWith("##")) {
-        header.addMetaInformationLine(line);
-      } else if (line.startsWith("#")) {
-        //should always be last header line
-        header.addColumnHeaderLine(line);
-        break;
+      try {
+        if (line.startsWith("##")) {
+          header.addMetaInformationLine(line);
+        } else if (line.startsWith("#")) {
+          //should always be last header line
+          header.addColumnHeaderLine(line);
+          break;
+        }
+      } catch (final VcfFormatException e) {
+        throw new VcfFormatException("Invalid VCF header. " + e.getMessage() + " on line:" + line); // Add context information
       }
     }
     if (header.getVersionLine() == null) {

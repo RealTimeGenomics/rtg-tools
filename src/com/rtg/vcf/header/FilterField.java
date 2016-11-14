@@ -49,7 +49,7 @@ public class FilterField implements IdField<FilterField> {
    */
   public FilterField(String line) {
     final HashMap<String, String> temp = VcfHeader.parseMetaLine(line, FILTER_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID", "Description");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID", "Description");
     mId = temp.get("ID");
     mDescription = temp.get("Description");
   }

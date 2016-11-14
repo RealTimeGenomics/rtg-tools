@@ -91,7 +91,8 @@ public class VcfReaderTest extends TestCase {
       + "##contig=<ID=foo,length=abcde>" + LS
       + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB
       + "INFO" + LS,
-      "Non-integer contig length" );
+      "Invalid VCF header", "on line:",
+      "Non-integer contig length");
   }
 
   static final String[] BAD_RECORD = {

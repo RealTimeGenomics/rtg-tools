@@ -55,7 +55,7 @@ public class SampleField implements IdField<SampleField> {
    */
   public SampleField(String line) {
     final HashMap<String, String> temp = VcfHeader.parseMetaLine(line, SAMPLE_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID");
     mId = temp.get("ID");
     mGenomes = temp.get("Genomes");
     mMixture = temp.get("Mixture");

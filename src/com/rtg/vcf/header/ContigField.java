@@ -53,7 +53,7 @@ public class ContigField implements IdField<ContigField> {
    */
   public ContigField(String line) {
     final LinkedHashMap<String, String> temp = VcfHeader.parseMetaLine(line, CONTIG_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID");
     mId = temp.get("ID");
     temp.remove("ID");
     if (temp.containsKey("length")) {

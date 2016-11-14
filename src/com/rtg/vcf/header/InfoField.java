@@ -50,7 +50,7 @@ public class InfoField implements IdField<InfoField> {
    */
   public InfoField(String line) {
     final HashMap<String, String> temp = VcfHeader.parseMetaLine(line, INFO_LINE_PATTERN);
-    VcfHeader.checkRequiredMetaKeys(temp, line, "ID", "Type", "Number", "Description");
+    VcfHeader.checkRequiredMetaKeys(temp, "ID", "Type", "Number", "Description");
     mId = temp.get("ID");
     mType = MetaType.parseValue(temp.get("Type"));
     mNumber = new VcfNumber(temp.get("Number"));

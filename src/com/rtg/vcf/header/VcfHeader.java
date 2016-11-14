@@ -375,7 +375,6 @@ public class VcfHeader {
     }
     final String[] split = mVersionLine.split("=", 2);
     if (split.length < 2) {
-      //unpossible
       throw new VcfFormatException("VCF version line does not contain a value");
     }
     return split[1];
@@ -454,7 +453,7 @@ public class VcfHeader {
         }
       }
     } else {
-      throw new VcfFormatException("Not a VCF meta information line: " + line);
+      throw new VcfFormatException("Not a VCF meta information line");
     }
     return this;
   }
@@ -470,7 +469,7 @@ public class VcfHeader {
     } else if (line.startsWith("#")) {
       return addColumnHeaderLine(line);
     } else {
-      throw new VcfFormatException("Not a VCF header line: " + line);
+      throw new VcfFormatException("Unrecognized VCF header line");
     }
   }
 
@@ -483,10 +482,10 @@ public class VcfHeader {
   public VcfHeader addColumnHeaderLine(String line) {
     final String[] split = line.split("\t");
     if (split.length < 8) {
-      throw new VcfFormatException("VCF header line missing required columns");
+      throw new VcfFormatException("VCF column header line missing required columns");
     }
     if (split.length == 9) {
-     throw new VcfFormatException("VCF header line contains format field but no sample fields");
+     throw new VcfFormatException("VCF column header line contains format column but no sample columns");
     }
     for (int i = 0; i < 8; i++) {
       if (!split[i].equals(HEADER_COLUMNS[i])) {
@@ -774,7 +773,7 @@ public class VcfHeader {
   static LinkedHashMap<String, String> parseMetaLine(String line, Pattern linePattern) {
     final Matcher m = linePattern.matcher(line.trim());
     if (!m.matches()) {
-      throw new VcfFormatException("Could not parse VCF header line: " + line);
+      throw new VcfFormatException("Could not parse VCF header line");
     }
     final LinkedHashMap<String, String> ret = new LinkedHashMap<>(4);
     //        V----------------------------------V
@@ -795,7 +794,7 @@ public class VcfHeader {
           final String key = keyValMatcher.group(1).trim();
           ret.put(key, keyValMatcher.group(2).trim());
         } else {
-          throw new VcfFormatException("Could not parse VCF header line: " + line);
+          throw new VcfFormatException("Could not parse VCF header line");
         }
       }
       inner = inner.substring(keyValMatcher.end());
@@ -803,10 +802,10 @@ public class VcfHeader {
     return ret;
   }
 
-  static void checkRequiredMetaKeys(Map<String, String> provided, String line, String... required) {
+  static void checkRequiredMetaKeys(Map<String, String> provided, String... required) {
     for (String key : required) {
       if (!provided.containsKey(key)) {
-        throw new VcfFormatException("VCF header missing " + key + " declaration on line: " + line);
+        throw new VcfFormatException("VCF header missing " + key + " declaration");
       }
     }
   }
