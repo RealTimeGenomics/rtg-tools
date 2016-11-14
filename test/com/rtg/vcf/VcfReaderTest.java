@@ -85,6 +85,15 @@ public class VcfReaderTest extends TestCase {
     }
   }
 
+  public void testContigLength() throws IOException {
+    checkVcfFormatException(""
+      + "##fileformat=VCFv4.1" + LS
+      + "##contig=<ID=foo,length=abcde>" + LS
+      + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB
+      + "INFO" + LS,
+      "Non-integer contig length" );
+  }
+
   static final String[] BAD_RECORD = {
     "chr1   123    .    G    A    29    PASS",                                   // Missing INFO column
     "chr1   .      .    G    A    29    PASS    DP=7",                           // Missing INFO column

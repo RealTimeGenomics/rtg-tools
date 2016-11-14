@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
+import com.rtg.vcf.VcfFormatException;
 
 /**
  *
@@ -56,7 +57,11 @@ public class ContigField implements IdField<ContigField> {
     mId = temp.get("ID");
     temp.remove("ID");
     if (temp.containsKey("length")) {
-      mLength = Integer.valueOf(temp.get("length"));
+      try {
+        mLength = Integer.valueOf(temp.get("length"));
+      } catch (NumberFormatException e) {
+        throw new VcfFormatException("Non-integer contig length \"" + temp.get("length") + "\"");
+      }
       temp.remove("length");
     } else {
       mLength = null;
