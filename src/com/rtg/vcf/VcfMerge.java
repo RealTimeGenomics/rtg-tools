@@ -77,6 +77,7 @@ public class VcfMerge extends AbstractCli {
   private static final String FORCE_MERGE = "force-merge";
   private static final String FORCE_MERGE_ALL = "force-merge-all";
   private static final String PRESERVE_FORMATS = "preserve-formats";
+  private static final String NON_PADDING_AWARE = "Xnon-padding-aware";
   private static final String STATS_FLAG = "stats";
 
   @Override
@@ -109,6 +110,7 @@ public class VcfMerge extends AbstractCli {
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
+    mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
     mFlags.setValidator(new VcfMergeValidator());
   }
 
@@ -160,27 +162,16 @@ public class VcfMerge extends AbstractCli {
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final VariantStatistics stats = mFlags.isSet(STATS_FLAG) ? new VariantStatistics(null) : null;
     final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
-    mergeVcfFiles(out, outFile, gzip, index, stats, extraHeaderLines.toArray(new String[extraHeaderLines.size()]), forceMerge, preserveFormats, inputs.toArray(new File[inputs.size()]));
-    return 0;
-  }
-
-  static Set<String> alleleBasedFormats(VcfHeader destHeader) {
-    final Set<String> alleleBasedFormats = new HashSet<>(); // This is the set of format fields that we cannot merge if ALTs change
-    for (FormatField field : destHeader.getFormatLines()) {
-      final VcfNumberType numberType = field.getNumber().getNumberType();
-      if (numberType == VcfNumberType.GENOTYPES
-          || numberType == VcfNumberType.ALTS
-          || numberType == VcfNumberType.REF_ALTS
-          || (numberType == VcfNumberType.UNKNOWN && "AD".equals(field.getId()))) { // AD (and potentially other VcfNumberType.UNKNOWN too) cannot be merged as it has one value per ref+alts
-        alleleBasedFormats.add(field.getId());
+    final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
+    final VcfPositionZipper posZip = new VcfPositionZipper(null, forceMerge, inputs.toArray(new File[inputs.size()]));
+    final VcfHeader header = posZip.getHeader();
+    for (final String extraLine : extraHeaderLines) {
+      try {
+        header.addMetaInformationLine(extraLine);
+      } catch (final IllegalArgumentException e) {
+        throw new NoTalkbackSlimException("Invalid extra header line: " + extraLine);
       }
     }
-    return alleleBasedFormats;
-  }
-
-  static void mergeVcfFiles(OutputStream output, File outFile, boolean gzip, boolean index, final VariantStatistics stats, String[] extraHeaderLines, Set<String> forceMerge, final boolean preserveFormats, File... inputs) throws IOException {
-    final VcfPositionZipper posZip = new VcfPositionZipper(null, extraHeaderLines, forceMerge, inputs);
-    final VcfHeader header = posZip.getHeader();
     header.addRunInfo();
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 
@@ -191,8 +182,8 @@ public class VcfMerge extends AbstractCli {
 
     final boolean stdout = CommonFlags.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
-    try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat)) {
-      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, output, gzip, index))) {
+    try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
+      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {
         final ZipperCallback callback = (records, headers) -> {
           assert records.length > 0;
           final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
@@ -212,9 +203,24 @@ public class VcfMerge extends AbstractCli {
     }
     if (!stdout) {
       if (stats != null) {
-        stats.printStatistics(output);
+        stats.printStatistics(out);
       }
     }
+    return 0;
+  }
+
+  static Set<String> alleleBasedFormats(VcfHeader destHeader) {
+    final Set<String> alleleBasedFormats = new HashSet<>(); // This is the set of format fields that we cannot merge if ALTs change
+    for (FormatField field : destHeader.getFormatLines()) {
+      final VcfNumberType numberType = field.getNumber().getNumberType();
+      if (numberType == VcfNumberType.GENOTYPES
+          || numberType == VcfNumberType.ALTS
+          || numberType == VcfNumberType.REF_ALTS
+          || (numberType == VcfNumberType.UNKNOWN && "AD".equals(field.getId()))) { // AD (and potentially other VcfNumberType.UNKNOWN too) cannot be merged as it has one value per ref+alts
+        alleleBasedFormats.add(field.getId());
+      }
+    }
+    return alleleBasedFormats;
   }
 
   /**
@@ -233,9 +239,9 @@ public class VcfMerge extends AbstractCli {
     private final Set<Integer> mCurrentRecords = new HashSet<>();
 
     VcfPositionZipper(RegionRestriction rr, File... vcfFiles) throws IOException {
-      this(rr, null, null, vcfFiles);
+      this(rr, null, vcfFiles);
     }
-    VcfPositionZipper(RegionRestriction rr, String[] extraHeaderLines, Set<String> forceMerge, File... vcfFiles) throws IOException {
+    VcfPositionZipper(RegionRestriction rr, Set<String> forceMerge, File... vcfFiles) throws IOException {
       mFiles = vcfFiles;
       mReaders = new VcfReader[mFiles.length];
       mHeaders = new VcfHeader[mFiles.length];
@@ -288,15 +294,6 @@ public class VcfMerge extends AbstractCli {
         }
       } else {
         mRegions = new RegionRestriction[] {rr};
-      }
-      if (extraHeaderLines != null) {
-        for (final String extraLine : extraHeaderLines) {
-          try {
-            mMergedHeader.addMetaInformationLine(extraLine);
-          } catch (final IllegalArgumentException e) {
-            throw new NoTalkbackSlimException("Invalid extra header line: " + extraLine);
-          }
-        }
       }
       populateNext();
     }

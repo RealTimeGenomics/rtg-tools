@@ -174,10 +174,11 @@ public class VcfMergeTest extends AbstractCliTest {
       final File f3 = BgzipFileHelper.bytesToBgzipFile(string3.getBytes(), new File(dir, "file3.vcf.gz"));
       new TabixIndexer(f3, TabixIndexer.indexFileName(f3)).saveVcfIndex();
       final File output = new File(dir, "out.vcf");
-      VcfMerge.mergeVcfFiles(null, output, false, false, null, new String[]{}, null, false, f1, f2, f3);
-      String actual = FileUtils.fileToString(output);
-      actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
-      mNano.check("vcfmerge_testSamePosDiffRef.vcf", actual, false);
+      checkMainInit("-Z", "-o", output.getPath(), "--Xnon-padding-aware", f1.getPath(), f2.getPath(), f3.getPath());
+      mNano.check("vcfmerge_testSamePosDiffRef.vcf", StringUtils.grepMinusV(FileUtils.fileToString(output), "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n"), false);
+      final File output2 = new File(dir, "out2.vcf");
+      checkMainInit("-Z", "-o", output2.getPath(), f1.getPath(), f2.getPath(), f3.getPath());
+      mNano.check("vcfmerge_testSamePosDiffRef_pa.vcf", StringUtils.grepMinusV(FileUtils.fileToString(output2), "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n"), false);
     }
   }
 
@@ -196,9 +197,9 @@ public class VcfMergeTest extends AbstractCliTest {
       final File f3 = BgzipFileHelper.bytesToBgzipFile(string3.getBytes(), new File(dir, "file3.vcf.gz"));
       new TabixIndexer(f3, TabixIndexer.indexFileName(f3)).saveVcfIndex();
       final File output = new File(dir, "out.vcf.gz");
-      VcfMerge.mergeVcfFiles(null, output, true, true, null, new String[]{}, null, false, f2, f3);
+      checkMainInit("-o", output.getPath(), f2.getPath(), f3.getPath());
       final File output2 = new File(dir, "out2.vcf");
-      VcfMerge.mergeVcfFiles(null, output2, false, false, null, new String[]{}, null, false, f1, output);
+      checkMainInit("-Z", "-o", output2.getPath(), f1.getPath(), output.getPath());
       String actual = FileUtils.fileToString(output2);
       actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
       mNano.check("vcfmerge_testSamePos.vcf", actual, false);
@@ -212,7 +213,7 @@ public class VcfMergeTest extends AbstractCliTest {
       final File f1 = BgzipFileHelper.bytesToBgzipFile(FileHelper.resourceToString("com/rtg/vcf/resources/" + resourcea).getBytes(), new File(dir, "fileA.vcf.gz"));
       new TabixIndexer(f1, TabixIndexer.indexFileName(f1)).saveVcfIndex();
       final File output = new File(dir, "out.vcf");
-      VcfMerge.mergeVcfFiles(null, output, false, false, null, new String[]{"##extraline=foo", "##extraline2=bar" }, null, false, f1);
+      checkMainInitOk("-Z", "-o", output.getPath(), "-a", "##extraline=foo", "-a", "##extraline2=bar", f1.getPath());
       String actual = FileUtils.fileToString(output);
       actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
       mNano.check("vcfmerge_testSingle.vcf", actual, false);

@@ -52,20 +52,23 @@ public class VcfRecordMerger implements AutoCloseable {
   public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
   private long mMultipleRecordsForSampleCount = 0;
   private final String mDefaultFormat;
+  private final boolean mPaddingAware;
 
   /**
    * Constructor
    */
   public VcfRecordMerger() {
-    this(VcfUtils.FORMAT_GENOTYPE);
+    this(VcfUtils.FORMAT_GENOTYPE, true);
   }
 
   /**
    * Constructor
    * @param defaultFormat the ID of the FORMAT field to fall back to when merging sample-free VCFs with those containing samples
+   * @param paddingAware if true, do not merge records containing padding bases with those without padding bases, to avoid semantic pollution
    */
-  public VcfRecordMerger(String defaultFormat) {
+  public VcfRecordMerger(String defaultFormat, boolean paddingAware) {
     mDefaultFormat = defaultFormat;
+    mPaddingAware = paddingAware;
   }
 
   /**
@@ -236,8 +239,9 @@ public class VcfRecordMerger implements AutoCloseable {
     final MultiMap<Integer, VcfRecord> recordSets = new MultiMap<>(true);
     final MultiMap<Integer, VcfHeader> headerSets = new MultiMap<>(true);
     for (int i = 0; i < records.length; i++) {
-      recordSets.put(records[i].getLength(), records[i]);
-      headerSets.put(records[i].getLength(), headers[i]);
+      final int key = mPaddingAware && VcfUtils.hasRedundantFirstNucleotide(records[i]) ? -records[i].getLength() : records[i].getLength();
+      recordSets.put(key, records[i]);
+      headerSets.put(key, headers[i]);
     }
     final ArrayList<VcfRecord> ret = new ArrayList<>();
     for (Integer key : recordSets.keySet()) {
