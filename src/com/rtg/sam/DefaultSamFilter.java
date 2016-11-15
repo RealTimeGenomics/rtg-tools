@@ -41,7 +41,7 @@ public class DefaultSamFilter implements SamFilter {
   // Number of bits used for quantizing subsampling fraction
   private static final int SUBSAMPLE_RESOLUTION = 16;
   private static final int SUBSAMPLE_MAX = 1 << SUBSAMPLE_RESOLUTION;
-  private static final int SUBSAMPLE_MASK = SUBSAMPLE_MAX-1;
+  private static final int SUBSAMPLE_MASK = SUBSAMPLE_MAX - 1;
 
   private final SamFilterParams mFilterParams;
 

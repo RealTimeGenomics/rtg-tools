@@ -64,8 +64,8 @@ public class SamFilterParams {
     protected int mRequireUnsetFlags = 0;
     protected int mRequireSetFlags = 0;
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
-    public Double mSubsampleFraction = null;
-    public long mSubsampleSeed = 42;
+    protected Double mSubsampleFraction = null;
+    protected long mSubsampleSeed = 42;
 
     protected SamRegionRestriction mRestriction = null;
     protected File mBedRegionsFile = null;
@@ -327,9 +327,9 @@ public class SamFilterParams {
   }
 
   /**
-   * Gets the proportion of alignments that should be retained after downsampling.
-   * Null indicates no downsampling should be performed.
-   * @return the fraction of alignments to retain. E.g. 0.33 will downsample alignments to retain 1/3
+   * Gets the proportion of alignments that should be retained after subsampling.
+   * Null indicates no subsampling should be performed.
+   * @return the fraction of alignments to retain. E.g. 0.33 will subsample alignments to retain 1/3
    */
   public Double subsampleFraction() {
     return mSubsampleFraction;
