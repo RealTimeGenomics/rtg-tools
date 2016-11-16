@@ -190,15 +190,20 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
     assert originalAlleles.length == originalAd.length && originalAlleles.length == derivedAlleles.length && originalAlleles.length == derivedAd.length;
     final double invOriginalAdSum = 1.0 / oSum;
     final double invDerivedAdSum = 1.0 / dSum;
-    int contraryCount = 0;
-    double contraryFraction = 0.0;
+    int derivedContraryCount = 0;
+    double derivedContraryFraction = 0.0;
+    int origContraryCount = 0;
+    double origContraryFraction = 0.0;
     for (int k = 0; k < originalAlleles.length; k++) {
-      if (originalAlleles[k] ^ derivedAlleles[k]) {
-        contraryCount += originalAlleles[k] ? derivedAd[k] : originalAd[k];
-        contraryFraction += originalAlleles[k] ? derivedAd[k] * invDerivedAdSum : originalAd[k] * invOriginalAdSum;
+      if (originalAlleles[k] && !derivedAlleles[k]) {
+        derivedContraryCount += derivedAd[k];
+        derivedContraryFraction += derivedAd[k] * invDerivedAdSum;
+      } else if (!originalAlleles[k] && derivedAlleles[k]) {
+        origContraryCount += originalAd[k];
+        origContraryFraction += originalAd[k] * invOriginalAdSum;
       }
     }
-    return getValue(contraryFraction, contraryCount);
+    return getValue(origContraryFraction + derivedContraryFraction, origContraryCount + derivedContraryCount);
   }
 
   @Override
