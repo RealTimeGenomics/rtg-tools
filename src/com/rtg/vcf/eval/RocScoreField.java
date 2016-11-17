@@ -39,6 +39,7 @@ import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
 import com.rtg.vcf.annotation.DerivedAnnotations;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -46,7 +47,7 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public enum RocScoreField {
 
-  /** use <code>QUAL</code> VCF field to sort */
+  /** Use <code>QUAL</code> VCF field to sort */
   QUAL {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
@@ -78,7 +79,7 @@ public enum RocScoreField {
       };
     }
   },
-  /** use VCF info field to provide sort value */
+  /** Use a VCF info field to provide sort value */
   INFO {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
@@ -106,7 +107,7 @@ public enum RocScoreField {
       };
     }
   },
-  /** use VCF format field to provide sort value */
+  /** Use a VCF format field to provide sort value */
   FORMAT {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
@@ -134,7 +135,7 @@ public enum RocScoreField {
       };
     }
   },
-  /** use derived field to provide sort value */
+  /** Use derived annotation to provide sort value computed on the fly */
   DERIVED {
     @Override
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
@@ -146,38 +147,68 @@ public enum RocScoreField {
         throw new NoTalkbackSlimException("Unrecognized derived annotation \"" + field + "\", must be one of " + Arrays.toString(DerivedAnnotations.values()));
       }
       final AbstractDerivedAnnotation<?> anno = derived.getAnnotation();
-      return new RocSortValueExtractor() {
-        @Override
-        boolean requiresSample() {
-          return true;
-        }
-        @Override
-        RocSortOrder getSortOrder() {
-          return order;
-        }
-        @Override
-        void setHeader(VcfHeader header) {
-          anno.checkHeader(header);
-        }
-        @Override
-        double getSortValue(VcfRecord rec, int sampleNo) {
-          final Double val = (Double) anno.getValue(rec, sampleNo);
-          if (val == null) {
-            return Double.NaN;
+      if (anno.getField().getType() == MetaType.INTEGER) {
+        return new DerivedRocSortValueExtractor(order, anno) {
+          @Override
+          double getSortValue(VcfRecord rec, int sampleNo) {
+            final Integer val = (Integer) mAnno.getValue(rec, sampleNo);
+            if (val == null) {
+              return Double.NaN;
+            }
+            return val;
           }
-          if (MathUtils.approxEquals(val, 0, 0.00000001)) {
-            return 0;
+        };
+      } else if (anno.getField().getType() == MetaType.FLOAT) {
+        return new DerivedRocSortValueExtractor(order, anno) {
+          @Override
+          double getSortValue(VcfRecord rec, int sampleNo) {
+            final Double val = (Double) mAnno.getValue(rec, sampleNo);
+            if (val == null) {
+              return Double.NaN;
+            }
+            if (MathUtils.approxEquals(val, 0, 0.00000001)) {
+              return 0;
+            }
+            return val;
           }
-          return val;
-        }
-        @Override
-        public String toString() {
-          return fieldName + " (derived)";
-        }
-      };
+        };
+      } else {
+        throw new NoTalkbackSlimException("Cannot use derived annotation \"" + field + "\", must be numeric");
+      }
     }
   };
 
   abstract RocSortValueExtractor getExtractor(String fieldName, RocSortOrder order);
 
+  private abstract static class DerivedRocSortValueExtractor extends RocSortValueExtractor {
+    private final RocSortOrder mOrder;
+    protected final AbstractDerivedAnnotation<?> mAnno;
+    private final String mFieldName;
+
+    DerivedRocSortValueExtractor(RocSortOrder order, AbstractDerivedAnnotation<?> anno) {
+      mOrder = order;
+      mAnno = anno;
+      mFieldName = anno.getField().getId();
+    }
+
+    @Override
+    boolean requiresSample() {
+      return true;
+    }
+
+    @Override
+    RocSortOrder getSortOrder() {
+      return mOrder;
+    }
+
+    @Override
+    void setHeader(VcfHeader header) {
+      mAnno.checkHeader(header);
+    }
+
+    @Override
+    public String toString() {
+      return mFieldName + " (derived)";
+    }
+  }
 }
