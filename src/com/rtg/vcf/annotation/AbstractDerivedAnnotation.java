@@ -35,44 +35,35 @@ import java.util.Set;
 
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.TypedField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Abstract class to use when implementing a derived annotation.
  */
-public abstract class AbstractDerivedAnnotation implements VcfAnnotation {
+public abstract class AbstractDerivedAnnotation<T extends TypedField<T>> implements VcfAnnotation<T> {
 
-  private final String mName;
-  private final String mDescription;
-  private final AnnotationDataType mType;
+  private final T mField;
 
   /**
-   * @param name the attribute name
-   * @param description the attribute description
-   * @param type the attribute type
+   * @param field the attribute declaration
    */
-  public AbstractDerivedAnnotation(String name, String description, AnnotationDataType type) {
-    mName = name;
-    mDescription = description;
-    mType = type;
+  public AbstractDerivedAnnotation(T field) {
+    mField = field;
+  }
+
+  @Override
+  public T getField() {
+    return mField;
   }
 
   @Override
   public String getName() {
-    return mName;
+    return mField.getId();
   }
 
-  @Override
-  public AnnotationDataType getType() {
-    return mType;
-  }
-
-  /**
-   * Get the VCF header description for the annotation.
-   * @return the description of the annotation.
-   */
-  public String getDescription() {
-    return mDescription;
+  String getDescription() {
+    return mField.getDescription();
   }
 
   protected String checkHeader(VcfHeader header, String[] infoFields, String[] formatFields) {
@@ -104,7 +95,7 @@ public abstract class AbstractDerivedAnnotation implements VcfAnnotation {
     }
     final StringBuilder sb = new StringBuilder();
     if (missingInfos.length() > 0 || missingFormats.length() > 0) {
-      sb.append("Derived annotation ").append(mName).append(" missing required fields in VCF header");
+      sb.append("Derived annotation ").append(getName()).append(" missing required fields in VCF header");
       if (missingInfos.length() > 0) {
         sb.append(" (INFO fields:").append(missingInfos.toString()).append(')');
       }

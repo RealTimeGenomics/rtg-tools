@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -44,7 +45,7 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
     final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
     assertEquals("COC", an.getName());
     assertEquals("Contrary observation count", an.getDescription());
-    assertEquals(AnnotationDataType.INTEGER, an.getType());
+    assertEquals(MetaType.INTEGER, an.getField().getType());
     assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)", an.checkHeader(new VcfHeader()));
   }
 

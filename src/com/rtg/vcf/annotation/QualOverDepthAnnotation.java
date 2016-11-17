@@ -34,18 +34,21 @@ import java.util.List;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Derived attribute giving QUAL divided by DP.
  */
-public class QualOverDepthAnnotation extends AbstractDerivedAnnotation {
+public class QualOverDepthAnnotation extends AbstractDerivedInfoAnnotation {
 
   /**
    * Constructor.
    */
   public QualOverDepthAnnotation() {
-    super("QD", "QUAL / DP", AnnotationDataType.DOUBLE);
+    super(new InfoField("QD", MetaType.FLOAT, VcfNumber.ONE, "QUAL / DP"));
   }
 
   @Override

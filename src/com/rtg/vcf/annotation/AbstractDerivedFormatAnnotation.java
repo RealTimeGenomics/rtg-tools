@@ -30,17 +30,17 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.vcf.header.FormatField;
+
 /**
  */
-public abstract class AbstractDerivedFormatAnnotation extends AbstractDerivedAnnotation {
+public abstract class AbstractDerivedFormatAnnotation extends AbstractDerivedAnnotation<FormatField> {
 
   /**
-   * @param name the attribute name
-   * @param description the attribute description
-   * @param type the attribute type
+   * @param field the field declaration
    */
-  public AbstractDerivedFormatAnnotation(String name, String description, AnnotationDataType type) {
-    super(name, description, type);
+  public AbstractDerivedFormatAnnotation(FormatField field) {
+    super(field);
   }
 
 }

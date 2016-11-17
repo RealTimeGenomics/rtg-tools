@@ -47,7 +47,7 @@ public class ContraryObservationFractionAnnotationTest extends TestCase {
     final ContraryObservationFractionAnnotation an = new ContraryObservationFractionAnnotation();
     assertEquals("COF", an.getName());
     assertEquals("Contrary observation fraction", an.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, an.getType());
+    assertEquals(MetaType.FLOAT, an.getField().getType());
     assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)", an.checkHeader(new VcfHeader()));
   }
 

@@ -144,7 +144,7 @@ public enum RocScoreField {
       } catch (IllegalArgumentException e) {
         throw new NoTalkbackSlimException("Unrecognized derived annotation \"" + field + "\", must be one of " + Arrays.toString(DerivedAnnotations.values()));
       }
-      final AbstractDerivedAnnotation anno = derived.getAnnotation();
+      final AbstractDerivedAnnotation<?> anno = derived.getAnnotation(); // XXX we need to provide the ability to call ADA.checkHeader(), or some annotations won't work.
       return new RocSortValueExtractor() {
         @Override
         boolean requiresSample() {

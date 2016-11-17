@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class NumberOfAltAllelesAnnotationTest extends TestCase {
     final NumberOfAltAllelesAnnotation ann = new NumberOfAltAllelesAnnotation();
     assertEquals("NAA", ann.getName());
     assertEquals("Number of alternative alleles", ann.getDescription());
-    assertEquals(AnnotationDataType.INTEGER, ann.getType());
+    assertEquals(MetaType.INTEGER, ann.getField().getType());
   }
 
   public void test() {

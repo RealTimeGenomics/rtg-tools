@@ -31,10 +31,8 @@
 package com.rtg.vcf;
 
 import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
-import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
  */
@@ -47,14 +45,14 @@ public class VcfFormatIntegerAnnotator implements VcfAnnotator {
    * @param annotation the annotation to use.
    */
   public VcfFormatIntegerAnnotator(AbstractDerivedFormatAnnotation annotation) {
-    assert annotation != null && annotation.getType().getClassType() == Integer.class;
+    assert annotation != null && annotation.getField().getType() == MetaType.INTEGER;
     mAnnotation = annotation;
   }
 
   @Override
   public void updateHeader(VcfHeader header) {
     mAnnotation.checkHeader(header);
-    header.ensureContains(new FormatField(mAnnotation.getName(), MetaType.INTEGER, VcfNumber.ONE, mAnnotation.getDescription()));
+    header.ensureContains(mAnnotation.getField());
   }
 
   @Override

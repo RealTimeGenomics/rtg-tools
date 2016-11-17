@@ -37,7 +37,7 @@ import com.rtg.util.Utils;
 /**
  * Class to encapsulate information of a format meta information line in <code>VCF</code>
  */
-public class FormatField implements IdField<FormatField> {
+public class FormatField implements TypedField<FormatField> {
 
   private static final Pattern FORMAT_LINE_PATTERN = Pattern.compile("^##FORMAT=<(.+)>$");
 
@@ -72,15 +72,6 @@ public class FormatField implements IdField<FormatField> {
     mDescription = description;
   }
 
-
-  /**
-   * @return the ID field
-   */
-  @Override
-  public String getId() {
-    return mId;
-  }
-
   @Override
   public boolean equals(Object obj) {
     return mostlyEquals(obj) && mType == ((FormatField) obj).mType;
@@ -113,23 +104,22 @@ public class FormatField implements IdField<FormatField> {
     return null;
   }
 
-  /**
-   * @return number field
-   */
+  @Override
+  public String getId() {
+    return mId;
+  }
+
+  @Override
   public VcfNumber getNumber() {
     return mNumber;
   }
 
-  /**
-   * @return type field
-   */
+  @Override
   public MetaType getType() {
     return mType;
   }
 
-  /**
-   * @return description field
-   */
+  @Override
   public String getDescription() {
     return mDescription;
   }

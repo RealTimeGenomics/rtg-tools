@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class LongestAlleleAnnotationTest extends TestCase {
     final LongestAlleleAnnotation lalAnn = new LongestAlleleAnnotation();
     assertEquals("LAL", lalAnn.getName());
     assertEquals("Length of longest allele", lalAnn.getDescription());
-    assertEquals(AnnotationDataType.INTEGER, lalAnn.getType());
+    assertEquals(MetaType.INTEGER, lalAnn.getField().getType());
   }
 
   public void test() {

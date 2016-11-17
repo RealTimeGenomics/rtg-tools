@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class PloidyAnnotationTest extends TestCase {
     final PloidyAnnotation pdAnn = new PloidyAnnotation();
     assertEquals("PD", pdAnn.getName());
     assertEquals("Ploidy of sample. 'h'=>haploid, 'd'=>diploid", pdAnn.getDescription());
-    assertEquals(AnnotationDataType.STRING, pdAnn.getType());
+    assertEquals(MetaType.STRING, pdAnn.getField().getType());
   }
 
   public void test() {

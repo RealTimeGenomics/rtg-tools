@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class GenotypeQualityOverDepthAnnotationTest extends TestCase {
     final GenotypeQualityOverDepthAnnotation gqdAnn = new GenotypeQualityOverDepthAnnotation();
     assertEquals("GQD", gqdAnn.getName());
     assertEquals("GQ / DP for a single sample", gqdAnn.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, gqdAnn.getType());
+    assertEquals(MetaType.FLOAT, gqdAnn.getField().getType());
   }
 
   public void test() {

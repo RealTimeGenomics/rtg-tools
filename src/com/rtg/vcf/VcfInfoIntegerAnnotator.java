@@ -30,30 +30,28 @@
 
 package com.rtg.vcf;
 
-import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
-import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.annotation.AbstractDerivedInfoAnnotation;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
  */
 public class VcfInfoIntegerAnnotator implements VcfAnnotator {
 
-  final AbstractDerivedAnnotation mAnnotation;
+  final AbstractDerivedInfoAnnotation mAnnotation;
 
   /**
    * Create an INFO annotation that outputs an integer value.
    * @param annotation the annotation to use.
    */
-  public VcfInfoIntegerAnnotator(AbstractDerivedAnnotation annotation) {
-    assert annotation != null && annotation.getType().getClassType() == Integer.class;
+  public VcfInfoIntegerAnnotator(AbstractDerivedInfoAnnotation annotation) {
+    assert annotation != null && annotation.getField().getType() == MetaType.INTEGER;
     mAnnotation = annotation;
   }
 
   @Override
   public void updateHeader(VcfHeader header) {
-    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.INTEGER, VcfNumber.ONE, mAnnotation.getDescription()));
+    header.ensureContains(mAnnotation.getField());
   }
 
   @Override

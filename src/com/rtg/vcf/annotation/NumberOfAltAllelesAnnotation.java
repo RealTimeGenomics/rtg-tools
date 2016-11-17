@@ -31,18 +31,21 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Annotation that counts the number of alternative alleles in a VCF record.
  */
-public class NumberOfAltAllelesAnnotation extends AbstractDerivedAnnotation {
+public class NumberOfAltAllelesAnnotation extends AbstractDerivedInfoAnnotation {
 
   /**
    * Constructor.
    */
   public NumberOfAltAllelesAnnotation() {
-    super("NAA", "Number of alternative alleles", AnnotationDataType.INTEGER);
+    super(new InfoField("NAA", MetaType.INTEGER, VcfNumber.ONE, "Number of alternative alleles"));
   }
 
   @Override

@@ -30,10 +30,11 @@
 
 package com.rtg.vcf;
 
-import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
-import com.rtg.vcf.annotation.AnnotationDataType;
+import com.rtg.vcf.annotation.AbstractDerivedInfoAnnotation;
+import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 import com.rtg.vcf.header.VcfNumberType;
 
 import junit.framework.TestCase;
@@ -42,10 +43,10 @@ import junit.framework.TestCase;
  */
 public class VcfInfoPerAltIntegerAnnotatorTest extends TestCase {
 
-  private static final class DummyDerivedAnnotation extends AbstractDerivedAnnotation {
+  private static final class DummyDerivedAnnotation extends AbstractDerivedInfoAnnotation {
 
     DummyDerivedAnnotation() {
-      super("DUMMY", "DUMMY-DESC", AnnotationDataType.INTEGER);
+      super(new InfoField("DUMMY", MetaType.INTEGER, VcfNumber.ALTS, "DUMMY-DESC"));
     }
 
     @Override

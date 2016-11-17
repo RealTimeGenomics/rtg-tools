@@ -31,17 +31,15 @@
 package com.rtg.vcf;
 
 import com.rtg.util.Utils;
-import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
-import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.annotation.AbstractDerivedInfoAnnotation;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
  */
 public class VcfInfoDoubleAnnotator implements VcfAnnotator {
 
-  final AbstractDerivedAnnotation mAnnotation;
+  final AbstractDerivedInfoAnnotation mAnnotation;
   final int mDecimalPlaces;
 
   /**
@@ -49,7 +47,7 @@ public class VcfInfoDoubleAnnotator implements VcfAnnotator {
    * Uses a default of 3 for number of decimal places.
    * @param annotation the annotation to use.
    */
-  public VcfInfoDoubleAnnotator(AbstractDerivedAnnotation annotation) {
+  public VcfInfoDoubleAnnotator(AbstractDerivedInfoAnnotation annotation) {
     this(annotation, 3);
   }
 
@@ -58,15 +56,15 @@ public class VcfInfoDoubleAnnotator implements VcfAnnotator {
    * @param annotation the annotation to use.
    * @param decimalPlaces the number of decimal places to output.
    */
-  public VcfInfoDoubleAnnotator(AbstractDerivedAnnotation annotation, int decimalPlaces) {
-    assert annotation != null && annotation.getType().getClassType() == Double.class;
+  public VcfInfoDoubleAnnotator(AbstractDerivedInfoAnnotation annotation, int decimalPlaces) {
+    assert annotation != null && annotation.getField().getType() == MetaType.FLOAT;
     mAnnotation = annotation;
     mDecimalPlaces = decimalPlaces;
   }
 
   @Override
   public void updateHeader(VcfHeader header) {
-    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.FLOAT, VcfNumber.ONE, mAnnotation.getDescription()));
+    header.ensureContains(mAnnotation.getField());
   }
 
   @Override

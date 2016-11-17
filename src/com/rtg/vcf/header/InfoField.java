@@ -37,7 +37,7 @@ import com.rtg.util.Utils;
 /**
  * Class to encapsulate information of a info meta information line in <code>VCF</code>
  */
-public class InfoField implements IdField<InfoField> {
+public class InfoField implements TypedField<InfoField> {
   private static final Pattern INFO_LINE_PATTERN = Pattern.compile("^##INFO=<(.+)>$");
 
   private final String mId;
@@ -103,31 +103,22 @@ public class InfoField implements IdField<InfoField> {
     return Utils.pairHash(Utils.pairHash(Utils.pairHash(mId.hashCode(), mNumber.hashCode()), mType.ordinal()), mDescription.hashCode());
   }
 
-  /**
-   * @return ID field
-   */
   @Override
   public String getId() {
     return mId;
   }
 
-  /**
-   * @return number field
-   */
+  @Override
   public VcfNumber getNumber() {
     return mNumber;
   }
 
-  /**
-   * @return type field
-   */
+  @Override
   public MetaType getType() {
     return mType;
   }
 
-  /**
-   * @return description field
-   */
+  @Override
   public String getDescription() {
     return mDescription;
   }

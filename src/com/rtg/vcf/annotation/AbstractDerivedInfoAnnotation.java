@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,36 +30,17 @@
 
 package com.rtg.vcf.annotation;
 
-import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.InfoField;
-import com.rtg.vcf.header.MetaType;
-import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
- * Annotation for the length of the longest allele across all samples in VCF record.
  */
-public class LongestAlleleAnnotation extends AbstractDerivedInfoAnnotation {
+public abstract class AbstractDerivedInfoAnnotation extends AbstractDerivedAnnotation<InfoField> {
 
   /**
-   * Constructor
+   * @param field the field declaration
    */
-  public LongestAlleleAnnotation() {
-    super(new InfoField("LAL", MetaType.INTEGER, VcfNumber.ONE, "Length of longest allele"));
-  }
-
-  @Override
-  public Object getValue(VcfRecord record, int sampleNumber) {
-    int length = record.getRefCall().length();
-    for (final String allele : record.getAltCalls()) {
-      length = Math.max(length, allele.length());
-    }
-    return length;
-  }
-
-  @Override
-  public String checkHeader(VcfHeader header) {
-    return null; //Alleles column is not optional
+  public AbstractDerivedInfoAnnotation(InfoField field) {
+    super(field);
   }
 
 }

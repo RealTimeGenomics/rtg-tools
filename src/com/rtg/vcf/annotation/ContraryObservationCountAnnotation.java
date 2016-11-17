@@ -49,7 +49,7 @@ public class ContraryObservationCountAnnotation extends ContraryObservationFract
    * Construct a new contrary observation count format annotation.
    */
   public ContraryObservationCountAnnotation() {
-    super("COC", "Contrary observation count", AnnotationDataType.INTEGER);
+    super(COC_FIELD);
   }
 
   @Override

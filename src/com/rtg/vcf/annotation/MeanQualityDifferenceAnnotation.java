@@ -32,7 +32,10 @@ package com.rtg.vcf.annotation;
 import com.rtg.util.StringUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Calculates field for difference in mean quality for called alleles
@@ -43,7 +46,7 @@ public class MeanQualityDifferenceAnnotation extends AbstractDerivedFormatAnnota
    * constructor
    */
   public MeanQualityDifferenceAnnotation() {
-    super("MEANQAD", "Difference between the mean alt quality and mean reference quality", AnnotationDataType.DOUBLE);
+    super(new FormatField("MEANQAD", MetaType.FLOAT, VcfNumber.ONE, "Difference between the mean alt quality and mean reference quality"));
   }
 
   @Override

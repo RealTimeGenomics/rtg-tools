@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -43,7 +44,7 @@ public class VariantAllelicFractionAnnotationTest extends TestCase {
     final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
     assertEquals("VAF", annotation.getName());
     assertEquals("Variant Allelic Fraction", annotation.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, annotation.getType());
+    assertEquals(MetaType.FLOAT, annotation.getField().getType());
   }
 
   public void test() {

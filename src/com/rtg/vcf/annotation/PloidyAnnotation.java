@@ -34,7 +34,10 @@ import java.util.ArrayList;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Ploidy derived attribute
@@ -45,7 +48,7 @@ public class PloidyAnnotation extends AbstractDerivedFormatAnnotation {
    * Constructor
    */
   public PloidyAnnotation() {
-    super("PD", "Ploidy of sample. 'h'=>haploid, 'd'=>diploid", AnnotationDataType.STRING);
+    super(new FormatField("PD", MetaType.STRING /* MetaType.CHARACTER */, VcfNumber.ONE, "Ploidy of sample. 'h'=>haploid, 'd'=>diploid"));
   }
 
   @Override

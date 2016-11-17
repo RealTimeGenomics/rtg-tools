@@ -30,30 +30,29 @@
 
 package com.rtg.vcf;
 
-import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
-import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.annotation.AbstractDerivedInfoAnnotation;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
+import com.rtg.vcf.header.VcfNumberType;
 
 /**
  */
 public class VcfInfoPerAltIntegerAnnotator implements VcfAnnotator {
 
-  final AbstractDerivedAnnotation mAnnotation;
+  final AbstractDerivedInfoAnnotation mAnnotation;
 
   /**
    * Create an INFO annotation that outputs an integer value for each alt allele in the variant.
    * @param annotation the annotation to use.
    */
-  public VcfInfoPerAltIntegerAnnotator(AbstractDerivedAnnotation annotation) {
-    assert annotation != null && annotation.getType().getClassType() == Integer.class;
+  public VcfInfoPerAltIntegerAnnotator(AbstractDerivedInfoAnnotation annotation) {
+    assert annotation != null && annotation.getField().getType() == MetaType.INTEGER && annotation.getField().getNumber().getNumberType() == VcfNumberType.ALTS;
     mAnnotation = annotation;
   }
 
   @Override
   public void updateHeader(VcfHeader header) {
-    header.ensureContains(new InfoField(mAnnotation.getName(), MetaType.INTEGER, VcfNumber.ALTS, mAnnotation.getDescription()));
+    header.ensureContains(mAnnotation.getField());
   }
 
   @Override

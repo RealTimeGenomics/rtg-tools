@@ -35,21 +35,24 @@ import java.util.List;
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Common code for inbreeding coefficient and Hardy Weinberg equilibrium probability
  * @see <a href="http://en.wikipedia.org/wiki/Hardy-Weinberg_principle#Inbreeding_coefficient">Inbreeding coefficient</a>
  */
 @TestClass(value = {"com.rtg.vcf.annotation.InbreedingCoefficientAnnotationTest", "com.rtg.vcf.annotation.EquilibriumProbabilityAnnotationTest"})
-public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDerivedAnnotation {
+public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDerivedInfoAnnotation {
 
   /**
    * @param name the name for this annotation
    * @param description the description for this annotation
    */
   public AbstractInbreedingCoefficientAnnotation(String name, String description) {
-    super(name, description, AnnotationDataType.DOUBLE);
+    super(new InfoField(name, MetaType.FLOAT, VcfNumber.ONE, description));
   }
 
   @Override

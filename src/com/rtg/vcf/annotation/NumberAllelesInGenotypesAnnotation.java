@@ -34,19 +34,22 @@ import java.util.List;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Implementation of the AN info field as defined in the VCF specification.
  * Total number of alleles in called genotypes.
  */
-public class NumberAllelesInGenotypesAnnotation extends AbstractDerivedAnnotation {
+public class NumberAllelesInGenotypesAnnotation extends AbstractDerivedInfoAnnotation {
 
   /**
    * Constructor
    */
   public NumberAllelesInGenotypesAnnotation() {
-    super("AN", "Total number of alleles in called genotypes", AnnotationDataType.INTEGER);
+    super(new InfoField("AN", MetaType.INTEGER, VcfNumber.ONE, "Total number of alleles in called genotypes"));
   }
 
   @Override

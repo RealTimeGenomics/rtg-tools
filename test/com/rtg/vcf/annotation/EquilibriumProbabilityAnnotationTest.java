@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -43,7 +44,7 @@ public class EquilibriumProbabilityAnnotationTest extends TestCase {
     final EquilibriumProbabilityAnnotation epAnn = new EquilibriumProbabilityAnnotation();
     assertEquals("EP", epAnn.getName());
     assertEquals("Phred scaled probability that site is not in Hardy-Weinberg equilibrium", epAnn.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, epAnn.getType());
+    assertEquals(MetaType.FLOAT, epAnn.getField().getType());
     assertEquals("Derived annotation EP missing required fields in VCF header (FORMAT fields: GT)", epAnn.checkHeader(null));
   }
 

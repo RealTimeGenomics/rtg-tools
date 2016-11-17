@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
@@ -41,10 +42,10 @@ import junit.framework.TestCase;
  */
 public class DummyDerivedAnnotationTest extends TestCase {
 
-  private static final class DummyDerivedAnnotation extends AbstractDerivedAnnotation {
+  private static final class DummyDerivedAnnotation extends AbstractDerivedInfoAnnotation {
 
     DummyDerivedAnnotation() {
-      super("DUMMY", "DUMMY-DESC", AnnotationDataType.DOUBLE);
+      super(new InfoField("DUMMY", MetaType.FLOAT, VcfNumber.ONE, "DUMMY-DESC"));
     }
 
     @Override
@@ -59,14 +60,14 @@ public class DummyDerivedAnnotationTest extends TestCase {
   }
 
   public void testDerivedAnnotation() {
-    final AbstractDerivedAnnotation ann = new DummyDerivedAnnotation();
+    final DummyDerivedAnnotation ann = new DummyDerivedAnnotation();
     assertEquals("DUMMY", ann.getName());
     assertEquals("DUMMY-DESC", ann.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, ann.getType());
+    assertEquals(MetaType.FLOAT, ann.getField().getType());
   }
 
   public void testCheckHeader() {
-    final AbstractDerivedAnnotation ann = new DummyDerivedAnnotation();
+    final DummyDerivedAnnotation ann = new DummyDerivedAnnotation();
     assertEquals("Derived annotation DUMMY missing required fields in VCF header (INFO fields: II) (FORMAT fields: FF)", ann.checkHeader(null, new String[]{"II"}, new String[] {"FF"}));
     final VcfHeader header = new VcfHeader();
     header.addInfoField("II", MetaType.INTEGER, VcfNumber.ONE, "Info Field");

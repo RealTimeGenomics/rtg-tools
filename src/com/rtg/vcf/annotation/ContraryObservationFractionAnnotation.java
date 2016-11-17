@@ -51,15 +51,15 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
 
   protected final ContraryObservationCounter mCounter = new ContraryObservationCounter();
 
-  protected ContraryObservationFractionAnnotation(final String field, final String description, final AnnotationDataType type) {
-    super(field, description, type);
+  protected ContraryObservationFractionAnnotation(FormatField f) {
+    super(f);
   }
 
   /**
    * Construct a new contrary observation fraction format annotation.
    */
   public ContraryObservationFractionAnnotation() {
-    this("COF", "Contrary observation fraction", AnnotationDataType.DOUBLE);
+    super(COF_FIELD);
   }
 
   @Override

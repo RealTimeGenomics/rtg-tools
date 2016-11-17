@@ -34,7 +34,10 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.array.ArrayUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * The fraction of evidence that is supporting the somatic variant allele for this sample.
@@ -44,15 +47,11 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
   private static final String FORMAT_ADE = "ADE";
   private static final String FORMAT_VA = "VA";
 
-  protected VariantAllelicFractionAnnotation(final String field, final String description, final AnnotationDataType type) {
-    super(field, description, type);
-  }
-
   /**
    * Construct a new contrary observation fraction format annotation.
    */
   public VariantAllelicFractionAnnotation() {
-    this("VAF", "Variant Allelic Fraction", AnnotationDataType.DOUBLE);
+    super(new FormatField("VAF", MetaType.FLOAT, VcfNumber.ONE, "Variant Allelic Fraction"));
   }
 
   private double[] ad(final double[] res, final VcfRecord record, final int sample) {

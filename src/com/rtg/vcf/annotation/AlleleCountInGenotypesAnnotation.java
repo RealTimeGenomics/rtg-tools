@@ -34,19 +34,22 @@ import java.util.List;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Implementation of the VCF format specified AC field.
  * Allele count in genotypes, for each alternative allele, in the same order as listed.
  */
-public class AlleleCountInGenotypesAnnotation extends AbstractDerivedAnnotation {
+public class AlleleCountInGenotypesAnnotation extends AbstractDerivedInfoAnnotation {
 
   /**
    * Constructor
    */
   public AlleleCountInGenotypesAnnotation() {
-    super("AC", "Allele count in genotypes, for each alternative allele, in the same order as listed", AnnotationDataType.INTEGER);
+    super(new InfoField("AC", MetaType.INTEGER, VcfNumber.ALTS, "Allele count in genotypes, for each alternative allele, in the same order as listed"));
   }
 
   @Override

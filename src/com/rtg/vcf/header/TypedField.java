@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,39 +27,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.rtg.vcf.annotation;
-
-import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.header.InfoField;
-import com.rtg.vcf.header.MetaType;
-import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
+package com.rtg.vcf.header;
 
 /**
- * Annotation for the length of the longest allele across all samples in VCF record.
+ * Both info and format fields have the notion of typing.
  */
-public class LongestAlleleAnnotation extends AbstractDerivedInfoAnnotation {
+public interface TypedField<T extends TypedField<T>> extends IdField<T> {
 
   /**
-   * Constructor
+   * @return the field number type
    */
-  public LongestAlleleAnnotation() {
-    super(new InfoField("LAL", MetaType.INTEGER, VcfNumber.ONE, "Length of longest allele"));
-  }
+  VcfNumber getNumber();
 
-  @Override
-  public Object getValue(VcfRecord record, int sampleNumber) {
-    int length = record.getRefCall().length();
-    for (final String allele : record.getAltCalls()) {
-      length = Math.max(length, allele.length());
-    }
-    return length;
-  }
+  /**
+   * @return field type
+   */
+  MetaType getType();
 
-  @Override
-  public String checkHeader(VcfHeader header) {
-    return null; //Alleles column is not optional
-  }
-
+  /**
+   * @return field description
+   */
+  String getDescription();
 }

@@ -34,7 +34,10 @@ import java.util.List;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Derived attribute giving GQ divided by DP for a sample.
@@ -45,7 +48,7 @@ public class GenotypeQualityOverDepthAnnotation extends AbstractDerivedFormatAnn
    * Constructor.
    */
   public GenotypeQualityOverDepthAnnotation() {
-    super("GQD", "GQ / DP for a single sample", AnnotationDataType.DOUBLE);
+    super(new FormatField("GQD", MetaType.FLOAT, VcfNumber.ONE, "GQ / DP for a single sample"));
   }
 
   @Override

@@ -33,7 +33,10 @@ package com.rtg.vcf.annotation;
 import com.rtg.util.StringUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Calculates field for difference in mean quality for called alleles
@@ -44,7 +47,7 @@ public class AltAlleleQualityAnnotation extends AbstractDerivedFormatAnnotation 
    * constructor
    */
   public AltAlleleQualityAnnotation() {
-    super("QA", "Sum of quality of the alternate observations", AnnotationDataType.DOUBLE);
+    super(new FormatField("QA", MetaType.FLOAT, VcfNumber.ONE, "Sum of quality of the alternate observations"));
   }
 
   @Override

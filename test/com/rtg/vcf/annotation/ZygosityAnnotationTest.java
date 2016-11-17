@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class ZygosityAnnotationTest extends TestCase {
     final ZygosityAnnotation zyAnn = new ZygosityAnnotation();
     assertEquals("ZY", zyAnn.getName());
     assertEquals("Zygosity of sample. 'e'=>heterozygous, 'o'=>homozygous", zyAnn.getDescription());
-    assertEquals(AnnotationDataType.STRING, zyAnn.getType());
+    assertEquals(MetaType.STRING, zyAnn.getField().getType());
   }
 
   public void test() {

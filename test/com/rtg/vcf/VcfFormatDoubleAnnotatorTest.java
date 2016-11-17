@@ -31,9 +31,10 @@
 package com.rtg.vcf;
 
 import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
-import com.rtg.vcf.annotation.AnnotationDataType;
+import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 import junit.framework.TestCase;
 
@@ -43,7 +44,7 @@ public class VcfFormatDoubleAnnotatorTest extends TestCase {
 
   private static final class DummyDerivedAnnotation extends AbstractDerivedFormatAnnotation {
     DummyDerivedAnnotation() {
-      super("DUMMY", "DUMMY-DESC", AnnotationDataType.DOUBLE);
+      super(new FormatField("DUMMY", MetaType.FLOAT, VcfNumber.ONE, "DUMMY-DESC"));
     }
     @Override
     public Object getValue(VcfRecord record, int sampleNumber) {

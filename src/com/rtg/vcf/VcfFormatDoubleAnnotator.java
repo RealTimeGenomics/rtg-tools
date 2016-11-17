@@ -32,10 +32,8 @@ package com.rtg.vcf;
 
 import com.rtg.util.Utils;
 import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
-import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
  */
@@ -59,7 +57,7 @@ public class VcfFormatDoubleAnnotator implements VcfAnnotator {
    * @param decimalPlaces the number of decimal places to output.
    */
   public VcfFormatDoubleAnnotator(AbstractDerivedFormatAnnotation annotation, int decimalPlaces) {
-    assert annotation != null && annotation.getType().getClassType() == Double.class;
+    assert annotation != null && annotation.getField().getType() == MetaType.FLOAT;
     mAnnotation = annotation;
     mDecimalPlaces = decimalPlaces;
   }
@@ -67,7 +65,7 @@ public class VcfFormatDoubleAnnotator implements VcfAnnotator {
   @Override
   public void updateHeader(VcfHeader header) {
     mAnnotation.checkHeader(header);
-    header.ensureContains(new FormatField(mAnnotation.getName(), MetaType.FLOAT, VcfNumber.ONE, mAnnotation.getDescription()));
+    header.ensureContains(mAnnotation.getField());
   }
 
   @Override

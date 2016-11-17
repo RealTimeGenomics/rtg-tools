@@ -44,7 +44,7 @@ public class QualOverDepthAnnotationTest extends TestCase {
     final QualOverDepthAnnotation ann = new QualOverDepthAnnotation();
     assertEquals("QD", ann.getName());
     assertEquals("QUAL / DP", ann.getDescription());
-    assertEquals(AnnotationDataType.DOUBLE, ann.getType());
+    assertEquals(MetaType.FLOAT, ann.getField().getType());
   }
 
   public void test() {

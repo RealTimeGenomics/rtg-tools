@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.MetaType;
 
 import junit.framework.TestCase;
 
@@ -42,7 +43,7 @@ public class AlleleCountInGenotypesAnnotationTest extends TestCase {
     final AlleleCountInGenotypesAnnotation ann = new AlleleCountInGenotypesAnnotation();
     assertEquals("AC", ann.getName());
     assertEquals("Allele count in genotypes, for each alternative allele, in the same order as listed", ann.getDescription());
-    assertEquals(AnnotationDataType.INTEGER, ann.getType());
+    assertEquals(MetaType.INTEGER, ann.getField().getType());
   }
 
   public void test() {

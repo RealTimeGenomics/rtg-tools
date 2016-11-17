@@ -50,7 +50,7 @@ class ContraryObservationCounter {
     private final double mOriginalContraryFraction;
     private final double mDerivedContraryFraction;
 
-    public Counts(int originalContraryCount, int derivedContraryCount, double originalContraryFraction, double derivedContraryFraction) {
+    Counts(int originalContraryCount, int derivedContraryCount, double originalContraryFraction, double derivedContraryFraction) {
       mOriginalContraryCount = originalContraryCount;
       mDerivedContraryCount = derivedContraryCount;
       mOriginalContraryFraction = originalContraryFraction;

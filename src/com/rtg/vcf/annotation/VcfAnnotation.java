@@ -31,24 +31,25 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.TypedField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
  * VCF annotation specification and extraction interface.
  */
-public interface VcfAnnotation {
+public interface VcfAnnotation<T extends TypedField<T>> {
+
+  /**
+   * Gets the VCF header field where this annotation should be stored
+   * @return the header field
+   */
+  T getField();
 
   /**
    * Gets the name of the annotation.
    * @return name of annotation
    */
   String getName();
-
-  /**
-   * Returns the type of the annotation.
-   * @return annotation type.
-   */
-  AnnotationDataType getType();
 
   /**
    * Returns the value for an annotation from a given {@link VcfRecord}.
@@ -60,7 +61,7 @@ public interface VcfAnnotation {
   Object getValue(VcfRecord record, int sampleNumber);
 
   /**
-   * Insures any required annotations are declared in the given header.
+   * Ensures any required annotations are declared in the given header.
    * @param header a VCF header
    * @return null if all good, other wise an error message.
    */

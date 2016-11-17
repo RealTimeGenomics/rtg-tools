@@ -32,6 +32,8 @@ package com.rtg.vcf.annotation;
 
 import java.util.EnumSet;
 
+import com.rtg.vcf.header.MetaType;
+
 /**
  * Enumeration of the derived annotations.
  */
@@ -71,9 +73,9 @@ public enum DerivedAnnotations {
   QA(new AltAlleleQualityAnnotation())
   ;
 
-  private final transient AbstractDerivedAnnotation mAnnotation;
+  private final transient AbstractDerivedAnnotation<?> mAnnotation;
 
-  DerivedAnnotations(AbstractDerivedAnnotation annotation) {
+  DerivedAnnotations(AbstractDerivedAnnotation<?> annotation) {
     assert name().equals(annotation.getName());
     mAnnotation = annotation;
   }
@@ -82,7 +84,7 @@ public enum DerivedAnnotations {
    * Get the annotation associated with this enum value.
    * @return the annotation associated with this enum value.
    */
-  public AbstractDerivedAnnotation getAnnotation() {
+  public AbstractDerivedAnnotation<?> getAnnotation() {
     return mAnnotation;
   }
 
@@ -101,7 +103,8 @@ public enum DerivedAnnotations {
   public static EnumSet<DerivedAnnotations> singleValueNumericAnnotations() {
     final EnumSet<DerivedAnnotations> ret = EnumSet.noneOf(DerivedAnnotations.class);
     for (final DerivedAnnotations ann : singleValueAnnotations()) {
-      if (ann.getAnnotation().getType() == AnnotationDataType.INTEGER || ann.getAnnotation().getType() == AnnotationDataType.DOUBLE) {
+      final MetaType t = ann.getAnnotation().getField().getType();
+      if (t == MetaType.INTEGER || t == MetaType.FLOAT) {
         ret.add(ann);
       }
     }

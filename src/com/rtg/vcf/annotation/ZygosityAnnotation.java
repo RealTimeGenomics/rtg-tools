@@ -34,7 +34,10 @@ import java.util.ArrayList;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Derived annotation for zygosity of a record sample.
@@ -45,7 +48,7 @@ public class ZygosityAnnotation extends AbstractDerivedFormatAnnotation {
    * Constructor
    */
   public ZygosityAnnotation() {
-    super("ZY", "Zygosity of sample. 'e'=>heterozygous, 'o'=>homozygous", AnnotationDataType.STRING);
+    super(new FormatField("ZY", MetaType.STRING /* MetaType.CHARACTER*/, VcfNumber.ONE, "Zygosity of sample. 'e'=>heterozygous, 'o'=>homozygous"));
   }
 
   @Override
