@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Class template for value extractor.
@@ -44,6 +45,12 @@ public abstract class RocSortValueExtractor {
   abstract double getSortValue(VcfRecord rec, int sampleNo);
 
   abstract RocSortOrder getSortOrder();
+
+  /**
+   * Lets the extractor see the header in order to get any required information.
+   * @param header a VCF header
+   */
+  void setHeader(VcfHeader header) { }
 
   /** Dummy null extractor for testing purposes */
   public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {

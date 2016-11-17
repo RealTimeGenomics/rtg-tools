@@ -39,6 +39,7 @@ import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
 import com.rtg.vcf.annotation.DerivedAnnotations;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Enumeration of possible ROC score fields
@@ -144,7 +145,7 @@ public enum RocScoreField {
       } catch (IllegalArgumentException e) {
         throw new NoTalkbackSlimException("Unrecognized derived annotation \"" + field + "\", must be one of " + Arrays.toString(DerivedAnnotations.values()));
       }
-      final AbstractDerivedAnnotation<?> anno = derived.getAnnotation(); // XXX we need to provide the ability to call ADA.checkHeader(), or some annotations won't work.
+      final AbstractDerivedAnnotation<?> anno = derived.getAnnotation();
       return new RocSortValueExtractor() {
         @Override
         boolean requiresSample() {
@@ -153,6 +154,10 @@ public enum RocScoreField {
         @Override
         RocSortOrder getSortOrder() {
           return order;
+        }
+        @Override
+        void setHeader(VcfHeader header) {
+          anno.checkHeader(header);
         }
         @Override
         double getSortValue(VcfRecord rec, int sampleNo) {
