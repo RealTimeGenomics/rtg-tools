@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,42 +27,46 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.rtg.vcf.annotation;
 
-package com.rtg.vcf;
-
-import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
-import com.rtg.vcf.header.MetaType;
-import com.rtg.vcf.header.VcfHeader;
+import com.rtg.util.Utils;
+import com.rtg.vcf.header.TypedField;
 
 /**
+ * Simple single-value annotation formatters
  */
-public class VcfFormatIntegerAnnotator implements VcfAnnotator {
+class Formatter {
 
-  final AbstractDerivedFormatAnnotation mAnnotation;
+  static final Formatter DEFAULT = new Formatter();
+  static final Formatter DEFAULT_DOUBLE = new Formatter() {
+    @Override
+    String toString(Object val) {
+      return Utils.realFormat((Double) val, 3);
+    }
+  };
+
+  static Formatter getFormatter(TypedField<?> field) {
+    if (field.getNumber().getNumber() != 1) {
+      throw new IllegalArgumentException("Value formatting of multi-valued field " + field.getId() + " currently not supported.");
+    }
+    switch (field.getType()) {
+      case FLOAT:
+        return DEFAULT_DOUBLE;
+      case INTEGER:
+      case STRING:
+      case CHARACTER:
+        return DEFAULT;
+      default:
+        throw new IllegalArgumentException("Value formatting of type " + field.getType() + " not supported for field " + field.getId());
+    }
+  }
 
   /**
-   * Create an FORMAT annotation that outputs an integer value.
-   * @param annotation the annotation to use.
+   * Convert the supplied object to a string representation for VCF
+   * @param val the value to format
+   * @return the value as a String
    */
-  public VcfFormatIntegerAnnotator(AbstractDerivedFormatAnnotation annotation) {
-    assert annotation != null && annotation.getField().getType() == MetaType.INTEGER;
-    mAnnotation = annotation;
-  }
-
-  @Override
-  public void updateHeader(VcfHeader header) {
-    mAnnotation.checkHeader(header);
-    header.ensureContains(mAnnotation.getField());
-  }
-
-  @Override
-  public void annotate(VcfRecord rec) {
-    for (int i = 0; i < rec.getNumberOfSamples(); i++) {
-      final Integer val = (Integer) mAnnotation.getValue(rec, i);
-      if (val != null) {
-        rec.setFormatAndSample(mAnnotation.getName(), val.toString(), i);
-      }
-    }
-    rec.padFormatAndSample(mAnnotation.getName());
+  String toString(Object val) {
+    return val.toString();
   }
 }

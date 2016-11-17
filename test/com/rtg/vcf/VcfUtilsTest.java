@@ -35,7 +35,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.vcf.annotation.DerivedAnnotations;
 
 import junit.framework.TestCase;
 
@@ -163,25 +162,6 @@ public class VcfUtilsTest extends TestCase {
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf")).getName());
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test.vcf.gz")).getName());
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf.gz")).getName());
-  }
-
-  public void testGetAnnotator() {
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.IC) instanceof VcfInfoDoubleAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.EP) instanceof VcfInfoDoubleAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.LAL) instanceof VcfInfoIntegerAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.QD) instanceof VcfInfoDoubleAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.NAA) instanceof VcfInfoIntegerAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.AC) instanceof VcfInfoPerAltIntegerAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.AN) instanceof VcfInfoIntegerAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.GQD) instanceof VcfFormatDoubleAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.ZY) instanceof VcfFormatStringAnnotator);
-    assertTrue(VcfUtils.getAnnotator(DerivedAnnotations.PD) instanceof VcfFormatStringAnnotator);
-    try {
-      VcfUtils.getAnnotator(null);
-      fail("Worked with null annotation");
-    } catch (NullPointerException e) {
-      //expected
-    }
   }
 
 }

@@ -33,6 +33,7 @@ package com.rtg.vcf.annotation;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.TypedField;
@@ -41,7 +42,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Abstract class to use when implementing a derived annotation.
  */
-public abstract class AbstractDerivedAnnotation<T extends TypedField<T>> implements VcfAnnotation<T> {
+public abstract class AbstractDerivedAnnotation<T extends TypedField<T>> implements VcfAnnotation<T>, VcfAnnotator {
 
   private final T mField;
 

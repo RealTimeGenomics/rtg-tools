@@ -30,17 +30,45 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  */
 public abstract class AbstractDerivedInfoAnnotation extends AbstractDerivedAnnotation<InfoField> {
 
+  private final Formatter mFormatter;
+
   /**
+   * Constructor for simple single-valued annotations
    * @param field the field declaration
    */
-  public AbstractDerivedInfoAnnotation(InfoField field) {
+  protected AbstractDerivedInfoAnnotation(InfoField field) {
+    this(field, Formatter.getFormatter(field));
+  }
+
+  /**
+   * @param field the field declaration
+   * @param formatter to use (or null if the subclass will be doing its own formatting)
+   */
+  protected AbstractDerivedInfoAnnotation(InfoField field, Formatter formatter) {
     super(field);
+    mFormatter = formatter;
+  }
+
+  @Override
+  public void updateHeader(VcfHeader header) {
+    checkHeader(header);
+    header.ensureContains(getField());
+  }
+
+  @Override
+  public void annotate(VcfRecord rec) {
+    final Object val = getValue(rec, -1);
+    if (val != null) {
+      rec.setInfo(getName(), mFormatter.toString(val));
+    }
   }
 
 }

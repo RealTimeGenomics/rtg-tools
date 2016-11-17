@@ -43,11 +43,6 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
-import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
-import com.rtg.vcf.annotation.AbstractDerivedInfoAnnotation;
-import com.rtg.vcf.annotation.AlleleCountInGenotypesAnnotation;
-import com.rtg.vcf.annotation.DerivedAnnotations;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
@@ -575,42 +570,6 @@ public final class VcfUtils {
     final int[] gtArr = getValidGt(rec, sampleId);
     final VariantType type = VariantType.getType(rec, gtArr);
     return !type.isNonVariant() && !type.isSvType();
-  }
-
-  /**
-   * Get an appropriate VCF annotator for this derived annotation.
-   * @param derivedAnnotation the derived annotation to get an annotator for.
-   * @return the VCF annotator for this derived annotation.
-   */
-  public static VcfAnnotator getAnnotator(DerivedAnnotations derivedAnnotation) {
-    final AbstractDerivedAnnotation<?> annotation = derivedAnnotation.getAnnotation();
-    if (annotation instanceof AlleleCountInGenotypesAnnotation) {
-      return new VcfInfoPerAltIntegerAnnotator((AlleleCountInGenotypesAnnotation) annotation);
-    } else if (annotation instanceof AbstractDerivedFormatAnnotation) {
-      final AbstractDerivedFormatAnnotation formatAnnotation = (AbstractDerivedFormatAnnotation) annotation;
-      switch (formatAnnotation.getField().getType()) {
-        case FLOAT:
-          return new VcfFormatDoubleAnnotator(formatAnnotation);
-        case INTEGER:
-          return new VcfFormatIntegerAnnotator(formatAnnotation);
-        case STRING:
-          return new VcfFormatStringAnnotator(formatAnnotation);
-        default:
-          throw new IllegalArgumentException("Format annotation of type " + formatAnnotation.getField().getType() + " not currently supported");
-      }
-    } else if (annotation instanceof AbstractDerivedInfoAnnotation) {
-      final AbstractDerivedInfoAnnotation infoAnnotation = (AbstractDerivedInfoAnnotation) annotation;
-      switch (infoAnnotation.getField().getType()) {
-        case FLOAT:
-          return new VcfInfoDoubleAnnotator(infoAnnotation);
-        case INTEGER:
-          return new VcfInfoIntegerAnnotator(infoAnnotation);
-        default:
-          throw new IllegalArgumentException("Info annotation of type " + infoAnnotation.getField().getType() + " not currently supported");
-      }
-    } else {
-      throw new IllegalArgumentException("Annotation " + annotation.getField().getId() + " not currently supported");
-    }
   }
 
   /**

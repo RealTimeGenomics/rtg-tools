@@ -169,16 +169,17 @@ public final class VcfAnnotatorCli extends AbstractCli {
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
 
-    final EnumSet<DerivedAnnotations> annos = EnumSet.noneOf(DerivedAnnotations.class);
+    final EnumSet<DerivedAnnotations> derived = EnumSet.noneOf(DerivedAnnotations.class);
     if (mFlags.isSet(X_DERIVED_ANNOTATIONS_FLAG)) {
       for (final Object anno : mFlags.getValues(X_DERIVED_ANNOTATIONS_FLAG)) {
-        annos.add(DerivedAnnotations.valueOf(anno.toString().toUpperCase(Locale.getDefault())));
+        derived.add(DerivedAnnotations.valueOf(anno.toString().toUpperCase(Locale.getDefault())));
       }
     }
     if (mFlags.isSet(FILL_AN_AC_FLAG)) {
-      annos.add(DerivedAnnotations.AN);
-      annos.add(DerivedAnnotations.AC);
+      derived.add(DerivedAnnotations.AN);
+      derived.add(DerivedAnnotations.AC);
     }
+
     final List<VcfAnnotator> annotators = new ArrayList<>();
     if (mFlags.isSet(BED_INFO_FLAG)) {
       annotators.add(new BedVcfAnnotator((String) mFlags.getValue(INFO_ID_FLAG), (String) mFlags.getValue(INFO_DESCR_FLAG), getFiles(BED_INFO_FLAG)));
@@ -188,8 +189,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
     } else if (mFlags.isSet(VCF_IDS_FLAG)) {
       annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG)));
     }
-    for (DerivedAnnotations anno : annos) {
-      annotators.add(VcfUtils.getAnnotator(anno));
+    for (DerivedAnnotations anno : derived) {
+      annotators.add(anno.getAnnotation());
     }
     if (mFlags.isSet(RELABEL_FLAG)) {
       annotators.add(VcfSampleNameRelabeller.create((File) mFlags.getValue(RELABEL_FLAG)));

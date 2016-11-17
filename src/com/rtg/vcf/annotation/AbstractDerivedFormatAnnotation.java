@@ -30,17 +30,48 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  */
 public abstract class AbstractDerivedFormatAnnotation extends AbstractDerivedAnnotation<FormatField> {
 
+  private final Formatter mFormatter;
+
   /**
+   * Constructor for simple single-valued annotations
    * @param field the field declaration
    */
-  public AbstractDerivedFormatAnnotation(FormatField field) {
+  protected AbstractDerivedFormatAnnotation(FormatField field) {
+    this(field, Formatter.getFormatter(field));
+  }
+
+  /**
+   * @param field the field declaration
+   * @param formatter to use (or null if the subclass will be doing its own formatting)
+   */
+  protected AbstractDerivedFormatAnnotation(FormatField field, Formatter formatter) {
     super(field);
+    mFormatter = formatter;
+  }
+
+  @Override
+  public void updateHeader(VcfHeader header) {
+    checkHeader(header);
+    header.ensureContains(getField());
+  }
+
+  @Override
+  public void annotate(VcfRecord rec) {
+    for (int i = 0; i < rec.getNumberOfSamples(); i++) {
+      final Object val = getValue(rec, i);
+      if (val != null) {
+        rec.setFormatAndSample(getName(), mFormatter.toString(val), i);
+      }
+    }
+    rec.padFormatAndSample(getName());
   }
 
 }

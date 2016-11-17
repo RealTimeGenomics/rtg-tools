@@ -49,7 +49,7 @@ public class AlleleCountInGenotypesAnnotation extends AbstractDerivedInfoAnnotat
    * Constructor
    */
   public AlleleCountInGenotypesAnnotation() {
-    super(new InfoField("AC", MetaType.INTEGER, VcfNumber.ALTS, "Allele count in genotypes, for each alternative allele, in the same order as listed"));
+    super(new InfoField("AC", MetaType.INTEGER, VcfNumber.ALTS, "Allele count in genotypes, for each alternative allele, in the same order as listed"), null);
   }
 
   @Override
@@ -73,6 +73,18 @@ public class AlleleCountInGenotypesAnnotation extends AbstractDerivedInfoAnnotat
   @Override
   public String checkHeader(VcfHeader header) {
     return checkHeader(header, null, new String[]{VcfUtils.FORMAT_GENOTYPE});
+  }
+
+  @Override
+  public void annotate(VcfRecord rec) {
+    final int[] vals = (int[]) getValue(rec, -1);
+    if (vals != null) {
+      final String[] vcfVals = new String[vals.length];
+      for (int i = 0 ; i < vals.length; i++) {
+        vcfVals[i] = Integer.toString(vals[i]);
+      }
+      rec.setInfo(getName(), vcfVals);
+    }
   }
 
 }
