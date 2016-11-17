@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,57 +30,47 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.util.Utils;
+import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
-import com.rtg.vcf.header.FormatField;
-import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
- * The fraction of evidence that is considered contrary to the call made for this sample.
+ * The counts (and fraction) of evidence that is considered contrary to the call made for this sample.
  * For example, in a somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
  * value is the fraction of the somatic (1) allele in the normal sample.
  * These attributes are also applicable to de novo calls, where the evidence
  * of the parents for the de novo allele is considered contrary.
  * Usually a high <code>COF</code> value indicates an unreliable call.
  */
-public class ContraryObservationFractionAnnotation extends AbstractDerivedFormatAnnotation {
+public class ContraryObservationAnnotator implements VcfAnnotator {
 
-  static final FormatField COF_FIELD = new FormatField("COF", MetaType.FLOAT, VcfNumber.ONE, "Contrary observation fraction");
+  private static final String FORMAT_COF = ContraryObservationFractionAnnotation.COF_FIELD.getId();
+  private static final String FORMAT_COC = ContraryObservationCountAnnotation.COC_FIELD.getId();
 
   protected final ContraryObservationCounter mCounter = new ContraryObservationCounter();
 
-  protected ContraryObservationFractionAnnotation(final String field, final String description, final AnnotationDataType type) {
-    super(field, description, type);
-  }
-
-  /**
-   * Construct a new contrary observation fraction format annotation.
-   */
-  public ContraryObservationFractionAnnotation() {
-    this("COF", "Contrary observation fraction", AnnotationDataType.DOUBLE);
-  }
-
   @Override
-  public Object getValue(final VcfRecord record, final int sampleNumber) {
-    final ContraryObservationCounter.Counts counts = mCounter.getCounts(record, sampleNumber);
-    if (counts == null) {
-      return null;
-    }
-    return counts.getContraryFraction();
-  }
-
-  @Override
-  public String checkHeader(VcfHeader header) {
+  public void updateHeader(VcfHeader header) {
     mCounter.initSampleInfo(header);
-    // Need either SS (for somatic caller) or DN (for family caller)
-    final String somaticStatus = checkHeader(header, null, new String[]{VcfUtils.FORMAT_SOMATIC_STATUS});
-    final String denovoStatus = checkHeader(header, null, new String[]{VcfUtils.FORMAT_DENOVO});
-    if (somaticStatus != null && denovoStatus != null) {
-      return "Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)";
-    }
-    return checkHeader(header, null, new String[]{VcfUtils.FORMAT_ALLELIC_DEPTH, VcfUtils.FORMAT_GENOTYPE});
+    header.ensureContains(ContraryObservationCountAnnotation.COC_FIELD);
+    header.ensureContains(ContraryObservationFractionAnnotation.COF_FIELD);
   }
 
+  @Override
+  public void annotate(VcfRecord rec) {
+    for (int i = 0; i < rec.getNumberOfSamples(); i++) {
+      final ContraryObservationCounter.Counts counts = mCounter.getCounts(rec, i);
+      if (counts == null) {
+        continue;
+      }
+      rec.setFormatAndSample(FORMAT_COC, "" + counts.getContraryCount(), i);
+      final Double cof = counts.getContraryFraction();
+      if (cof != null) {
+        rec.setFormatAndSample(FORMAT_COF, Utils.realFormat(cof, 3), i);
+      }
+    }
+    rec.padFormatAndSample(FORMAT_COF);
+    rec.padFormatAndSample(FORMAT_COC);
+  }
 }

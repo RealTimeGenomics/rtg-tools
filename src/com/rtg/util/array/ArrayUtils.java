@@ -53,7 +53,21 @@ public final class ArrayUtils {
    * @param a array
    * @return sum
    */
-  public static long sum(final long[] a) {
+  public static double sum(final double... a) {
+    double s = 0;
+    for (final double v : a) {
+      s += v;
+    }
+    return s;
+  }
+
+  /**
+   * Sum an array of longs.
+   *
+   * @param a array
+   * @return sum
+   */
+  public static long sum(final long... a) {
     long sum = 0;
     for (final long x : a) {
       sum += x;
@@ -67,7 +81,7 @@ public final class ArrayUtils {
    * @param a array
    * @return sum
    */
-  public static long sum(final int[] a) {
+  public static long sum(final int... a) {
     long sum = 0;
     for (final int x : a) {
       sum += x;

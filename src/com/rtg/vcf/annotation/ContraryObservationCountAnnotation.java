@@ -30,6 +30,11 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfNumber;
+
 /**
  * The count of evidence that is considered contrary to the call made for this sample.
  * For example, in a <code>normal&ndash;cancer</code> somatic call of 0/0 -&gt; 1/0, the <code>COC</code>
@@ -37,6 +42,8 @@ package com.rtg.vcf.annotation;
  * <code>COC</code> value indicates an unreliable call.
  */
 public class ContraryObservationCountAnnotation extends ContraryObservationFractionAnnotation {
+
+  static final FormatField COC_FIELD = new FormatField("COC", MetaType.INTEGER, VcfNumber.ONE, "Contrary observation count");
 
   /**
    * Construct a new contrary observation count format annotation.
@@ -46,8 +53,12 @@ public class ContraryObservationCountAnnotation extends ContraryObservationFract
   }
 
   @Override
-  protected Object getValue(final double contraryFraction, final int contraryCount) {
-    return contraryCount;
+  public Object getValue(final VcfRecord record, final int sampleNumber) {
+    final ContraryObservationCounter.Counts counts = mCounter.getCounts(record, sampleNumber);
+    if (counts == null) {
+      return null;
+    }
+    return counts.getContraryCount();
   }
 
 }

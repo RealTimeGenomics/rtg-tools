@@ -31,6 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import com.rtg.util.StringUtils;
+import com.rtg.util.array.ArrayUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
@@ -69,14 +70,6 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
     return ad(new double[record.getAltCalls().size() + 1], record, sample);
   }
 
-  private double sum(final double... a) {
-    double s = 0;
-    for (final double v : a) {
-      s += v;
-    }
-    return s;
-  }
-
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
     final Integer va = record.getSampleInteger(sampleNumber, FORMAT_VA);
@@ -84,7 +77,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
       return null;
     }
     final double[] ad = ad(record, sampleNumber);
-    final double sum = sum(ad);
+    final double sum = ArrayUtils.sum(ad);
     if (sum == 0) {
       return null;
     }
