@@ -77,7 +77,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final Map<String, VcfAnnotator> ANNOTATORS = new TreeMap<>();
   static {
     for (DerivedAnnotations anno : DerivedAnnotations.values()) {
-      final VcfAnnotation annotator = anno.getAnnotation();
+      final VcfAnnotation<?> annotator = anno.getAnnotation();
       ANNOTATORS.put(annotator.getName(), annotator);
     }
     ANNOTATORS.put("CONT", new ContraryObservationAnnotator());
