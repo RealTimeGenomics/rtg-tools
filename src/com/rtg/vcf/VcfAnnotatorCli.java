@@ -39,16 +39,21 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
+import com.rtg.vcf.annotation.ContraryObservationAnnotator;
 import com.rtg.vcf.annotation.DerivedAnnotations;
+import com.rtg.vcf.annotation.VcfAnnotation;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -68,6 +73,15 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String RELABEL_FLAG = "relabel";
   private static final String X_DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
 
+  /** All known annotators with zero-arg constructors */
+  private static final Map<String, VcfAnnotator> ANNOTATORS = new TreeMap<>();
+  static {
+    for (DerivedAnnotations anno : DerivedAnnotations.values()) {
+      final VcfAnnotation annotator = anno.getAnnotation();
+      ANNOTATORS.put(annotator.getName(), annotator);
+    }
+    ANNOTATORS.put("CONT", new ContraryObservationAnnotator());
+  }
 
   @Override
   public String moduleName() {
@@ -94,12 +108,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(RELABEL_FLAG, File.class, "file", "relabel samples according to \"old-name new-name\" pairs in specified file").setCategory(REPORTING);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
-    final List<String> derivedRange = new ArrayList<>();
-    for (final DerivedAnnotations derived : DerivedAnnotations.values()) {
-      derivedRange.add(derived.toString());
-    }
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
-    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(derivedRange).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, "STRING", "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.setValidator(new SnpAnnotatorValidator());
   }
 
@@ -159,25 +169,19 @@ public final class VcfAnnotatorCli extends AbstractCli {
 
   private Collection<File> getFiles(String flag) {
     final Collection<Object> inputFiles = mFlags.getValues(flag);
-    final ArrayList<File> retFiles = new ArrayList<>();
-    for (final Object file : inputFiles) {
-      retFiles.add((File) file);
-    }
-    return retFiles;
+    return inputFiles.stream().map(file -> (File) file).collect(Collectors.toCollection(ArrayList::new));
   }
 
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
 
-    final EnumSet<DerivedAnnotations> derived = EnumSet.noneOf(DerivedAnnotations.class);
+    final Set<String> derived = new LinkedHashSet<>();
     if (mFlags.isSet(X_DERIVED_ANNOTATIONS_FLAG)) {
-      for (final Object anno : mFlags.getValues(X_DERIVED_ANNOTATIONS_FLAG)) {
-        derived.add(DerivedAnnotations.valueOf(anno.toString().toUpperCase(Locale.getDefault())));
-      }
+      derived.addAll(mFlags.getValues(X_DERIVED_ANNOTATIONS_FLAG).stream().map(Object::toString).collect(Collectors.toList()));
     }
-    if (mFlags.isSet(FILL_AN_AC_FLAG)) {
-      derived.add(DerivedAnnotations.AN);
-      derived.add(DerivedAnnotations.AC);
+    if (mFlags.isSet(FILL_AN_AC_FLAG)) { // Convenience flag
+      derived.add(DerivedAnnotations.AC.getAnnotation().getName());
+      derived.add(DerivedAnnotations.AN.getAnnotation().getName());
     }
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
@@ -189,9 +193,9 @@ public final class VcfAnnotatorCli extends AbstractCli {
     } else if (mFlags.isSet(VCF_IDS_FLAG)) {
       annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG)));
     }
-    for (DerivedAnnotations anno : derived) {
-      annotators.add(anno.getAnnotation());
-    }
+
+    annotators.addAll(derived.stream().map(ANNOTATORS::get).collect(Collectors.toList()));
+
     if (mFlags.isSet(RELABEL_FLAG)) {
       annotators.add(VcfSampleNameRelabeller.create((File) mFlags.getValue(RELABEL_FLAG)));
     }

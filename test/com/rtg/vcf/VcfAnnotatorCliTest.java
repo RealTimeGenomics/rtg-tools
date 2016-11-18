@@ -31,7 +31,6 @@ package com.rtg.vcf;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
@@ -40,7 +39,6 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.vcf.annotation.DerivedAnnotations;
 
 /**
  */
@@ -64,7 +62,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
         , "--no-index", "do not produce indexes for output files"
         );
     checkExtendedHelp("rtg vcfannotate"
-        , "--Xderived-annotations=STRING", "derived fields to add to VCF file. Allowed values are " + Arrays.toString(DerivedAnnotations.values())
+        , "--Xderived-annotations=STRING", "derived fields to add to VCF file. Allowed values are "
         );
   }
 

@@ -30,14 +30,15 @@
 
 package com.rtg.vcf.annotation;
 
+import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.TypedField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
- * VCF annotation specification and extraction interface.
+ * VCF annotation specification and extraction interface for single-field annotations.
  */
-public interface VcfAnnotation<T extends TypedField<T>> {
+public interface VcfAnnotation<T extends TypedField<T>> extends VcfAnnotator {
 
   /**
    * Gets the VCF header field where this annotation should be stored
