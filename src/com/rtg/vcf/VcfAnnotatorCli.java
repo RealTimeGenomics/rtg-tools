@@ -32,6 +32,7 @@ package com.rtg.vcf;
 
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,6 +72,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String INFO_DESCR_FLAG = "info-description";
   private static final String FILL_AN_AC_FLAG = "fill-an-ac";
   private static final String RELABEL_FLAG = "relabel";
+  private static final String NO_HEADER = "no-header";
   private static final String X_DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
 
   /** All known annotators with zero-arg constructors */
@@ -100,6 +102,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', INPUT_FLAG, File.class, "file", "VCF file containing variants to annotate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "file", "output VCF file name. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     mFlags.registerOptional(BED_IDS_FLAG, File.class, "file", "add variant IDs from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(BED_INFO_FLAG, File.class, "file", "add INFO annotations from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(VCF_IDS_FLAG, File.class, "file", "add variant IDs from VCF file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
@@ -204,6 +207,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     final File output = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
+    final boolean writeHeader = !mFlags.isSet(NO_HEADER);
     final boolean stdout = CommonFlags.isStdio(output);
     try (VcfReader reader = VcfReader.openVcfReader(inputFile)) {
       final VcfHeader header = reader.getHeader();
@@ -212,7 +216,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
       }
       header.addRunInfo();
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {
+      try (VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index, writeHeader))) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
