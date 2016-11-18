@@ -72,9 +72,8 @@ class ContraryObservationCounter {
     protected double getDerivedContraryFraction() {
       return mDerivedContraryFraction;
     }
-    protected Double getContraryFraction() {
-      final double contraryFraction = getOriginalContraryFraction() + getDerivedContraryFraction();
-      return (Double.isNaN(contraryFraction)) ? null : contraryFraction;
+    protected double getContraryFraction() {
+      return getOriginalContraryFraction() + getDerivedContraryFraction();
     }
     protected int getContraryCount() {
       return getOriginalContraryCount() + getDerivedContraryCount();

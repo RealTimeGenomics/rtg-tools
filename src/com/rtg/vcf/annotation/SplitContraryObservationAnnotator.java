@@ -30,27 +30,38 @@
 
 package com.rtg.vcf.annotation;
 
-import static com.rtg.vcf.annotation.ContraryObservationCountAnnotation.COC_FIELD;
-import static com.rtg.vcf.annotation.ContraryObservationFractionAnnotation.COF_FIELD;
-
 import com.rtg.util.Utils;
 import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
- * The counts (and fraction) of evidence that is considered contrary to the call made for this sample.
- * For example, in a somatic call of 0/0 -&gt; 1/0, the <code>COF</code>
+ * The counts (and fraction) of evidence that is considered contrary to the call made for this sample,
+ * separated by whether the observations are in the original vs derived genomes.
+ *
+ * For example, in a somatic call of 0/0 -&gt; 1/0, the <code>OCOF</code>
  * value is the fraction of the somatic (1) allele in the normal sample.
  * These attributes are also applicable to de novo calls, where the evidence
  * of the parents for the de novo allele is considered contrary.
- * Usually a high <code>COF</code> value indicates an unreliable call.
+ * Usually a high <code>OCOF</code> value indicates an unreliable call.
+ *
+ * Similarly for pure somatic calling, or family calling, the <code>DCOC</code> is the
+ * count of observations in the derived sample (tumor / child) which correspond to an
+ * original allele (normal / parent) which is not supposed to be present.
  */
-public class ContraryObservationAnnotator implements VcfAnnotator {
+public class SplitContraryObservationAnnotator implements VcfAnnotator {
+
+  private static final FormatField OCOC_FIELD = new FormatField("OCOC", MetaType.INTEGER, VcfNumber.ONE, "Contrary observations seen in original (as count)");
+  private static final FormatField OCOF_FIELD = new FormatField("OCOF", MetaType.FLOAT, VcfNumber.ONE, "Contrary observations seen in original (as fraction of total)");
+  private static final FormatField DCOC_FIELD = new FormatField("DCOC", MetaType.INTEGER, VcfNumber.ONE, "Contrary observations seen in derived (as count)");
+  private static final FormatField DCOF_FIELD = new FormatField("DCOF", MetaType.FLOAT, VcfNumber.ONE, "Contrary observations seen in derived (as fraction of total)");
 
   private static final FormatField[] ALL =  {
-    COC_FIELD, COF_FIELD,
+    OCOC_FIELD, OCOF_FIELD,
+    DCOC_FIELD, DCOF_FIELD,
   };
 
   protected final ContraryObservationCounter mCounter = new ContraryObservationCounter();
@@ -70,8 +81,10 @@ public class ContraryObservationAnnotator implements VcfAnnotator {
       if (counts == null) {
         continue;
       }
-      rec.setFormatAndSample(COC_FIELD.getId(), "" + counts.getContraryCount(), i);
-      rec.setFormatAndSample(COF_FIELD.getId(), Utils.realFormat(counts.getContraryFraction(), 3), i);
+      rec.setFormatAndSample(OCOC_FIELD.getId(), "" + counts.getOriginalContraryCount(), i);
+      rec.setFormatAndSample(DCOC_FIELD.getId(), "" + counts.getDerivedContraryCount(), i);
+      rec.setFormatAndSample(OCOF_FIELD.getId(), Utils.realFormat(counts.getOriginalContraryFraction(), 3), i);
+      rec.setFormatAndSample(DCOF_FIELD.getId(), Utils.realFormat(counts.getDerivedContraryFraction(), 3), i);
     }
     for (FormatField f : ALL) {
       rec.padFormatAndSample(f.getId());
