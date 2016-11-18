@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 
 /**
  */
-public class DummyDerivedAnnotationTest extends TestCase {
+public class DummyDerivedInfoAnnotationTest extends TestCase {
 
   private static final class DummyDerivedAnnotation extends AbstractDerivedInfoAnnotation {
 

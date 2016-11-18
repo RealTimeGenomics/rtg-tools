@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,28 +30,25 @@
 
 package com.rtg.vcf.annotation;
 
+import java.io.IOException;
+
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
-import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class ContraryObservationCountAnnotationTest extends TestCase {
+public class ContraryObservationAnnotatorTest extends AbstractNanoTest {
 
-  public void testName() {
-    final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
-    assertEquals("COC", an.getName());
-    assertEquals("Contrary observation count", an.getDescription());
-    assertEquals(MetaType.INTEGER, an.getField().getType());
-    assertEquals("Derived annotation COC missing required fields in VCF header (FORMAT fields: SS or DN)", an.checkHeader(new VcfHeader()));
-  }
+  public void testSomaticCase() throws IOException {
+    final ContraryObservationAnnotator an = new ContraryObservationAnnotator();
 
-  public void testSomaticCase() {
-    final ContraryObservationCountAnnotation an = new ContraryObservationCountAnnotation();
-    an.checkHeader(ContraryObservationCounterTest.makeHeaderSomatic());
+    final VcfHeader header = ContraryObservationCounterTest.makeHeaderSomatic();
+    an.updateHeader(header);
+    assertNotNull(header.getFormatField("COC"));
+    assertNotNull(header.getFormatField("COF"));
+
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
     rec.setNumberOfSamples(2);
@@ -61,8 +58,8 @@ public class ContraryObservationCountAnnotationTest extends TestCase {
     rec.addFormatAndSample(VcfUtils.FORMAT_SOMATIC_STATUS, "2");
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "9,1");
     rec.addFormatAndSample(VcfUtils.FORMAT_ALLELIC_DEPTH, "6,6");
-    assertNull(an.getValue(rec, 0));
-    assertEquals(1, an.getValue(rec, 1));
-    assertNull(an.getValue(rec, 2));
+
+    an.annotate(rec);
+    mNano.check("coc_cof_rec.vcf", rec.toString());
   }
 }

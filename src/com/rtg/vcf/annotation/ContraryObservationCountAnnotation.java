@@ -55,10 +55,7 @@ public class ContraryObservationCountAnnotation extends ContraryObservationFract
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
     final ContraryObservationCounter.Counts counts = mCounter.getCounts(record, sampleNumber);
-    if (counts == null) {
-      return null;
-    }
-    return counts.getContraryCount();
+    return (counts == null) ? null : counts.getContraryCount();
   }
 
 }

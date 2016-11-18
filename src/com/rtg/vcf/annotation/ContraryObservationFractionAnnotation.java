@@ -65,10 +65,7 @@ public class ContraryObservationFractionAnnotation extends AbstractDerivedFormat
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
     final ContraryObservationCounter.Counts counts = mCounter.getCounts(record, sampleNumber);
-    if (counts == null) {
-      return null;
-    }
-    return counts.getContraryFraction();
+    return (counts == null) ? null : counts.getContraryFraction();
   }
 
   @Override
