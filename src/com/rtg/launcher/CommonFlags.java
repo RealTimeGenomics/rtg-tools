@@ -99,6 +99,13 @@ public final class CommonFlags {
   public static final String RESTRICTION_FLAG = "region";
   /** Flag name for restricting operation to within regions contained in a BED file. */
   public static final String BED_REGIONS_FLAG = "bed-regions";
+  /**
+   * Flag to indicate that it is OK to take a less cautious approach
+   * to allow the command to proceed. For example, allow writing into
+   * existing directories, overwriting existing files, etc
+   */
+  public static final String FORCE = "Xforce";
+
 
   /** input sequence quality type flag */
   public static final String QUALITY_FLAG = "quality-format";
@@ -231,8 +238,22 @@ public final class CommonFlags {
    * @return true if valid, otherwise false
    */
   public static boolean validateOutputDirectory(final CFlags flags) {
-    final File outputDir = (File) flags.getValue(OUTPUT_FLAG);
-    return validateOutputDirectory(outputDir);
+    return validateOutputDirectory(flags, OUTPUT_FLAG);
+  }
+
+  /**
+   * Validate the output dir flags.
+   * @param flags the flags
+   * @param outputFlag the name of the flag used to specify the output directory
+   * @return true if valid, otherwise false
+   */
+  public static boolean validateOutputDirectory(CFlags flags, String outputFlag) {
+    final File directory = (File) flags.getValue(outputFlag);
+    if (directory.exists() && !flags.isSet(FORCE)) {
+      Diagnostic.error(ErrorType.DIRECTORY_EXISTS, directory.getPath());
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -299,6 +320,16 @@ public final class CommonFlags {
   }
 
   /**
+   * Initialize the flag that permits overwriting existing files/directories
+   * @param flags shared flags
+   */
+  public static void initForce(CFlags flags) {
+    if (flags.getFlag(FORCE) == null) {
+      flags.registerOptional(FORCE, "if set, allow overwriting existing output files/directories").setCategory(CommonFlagCategories.UTILITY);
+    }
+  }
+
+  /**
    *
    * @param flags shared flags
    */
@@ -312,6 +343,7 @@ public final class CommonFlags {
    */
   public static void initOutputDirFlag(CFlags flags) {
     flags.registerRequired('o', OUTPUT_FLAG, File.class, DIR, "directory for output").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    initForce(flags);
   }
 
   /**
@@ -460,21 +492,6 @@ public final class CommonFlags {
       files.addConstraint(CommandLineFiles.NOT_DIRECTORY); // REGULAR_FILE breaks bash-fu
     }
     return files.getFileList(flags);
-  }
-
-  /**
-   * Test if the supplied directory already exists.
-   * @param directory directory to test
-   * @return true if directory is valid, otherwise a false and calls
-   * <code>Diagnostic.error</code> with details of the reason it is invalid.
-   * @exception NullPointerException if <code>directory</code> is null.
-   */
-  public static boolean validateOutputDirectory(File directory) {
-    if (directory.exists()) {
-      Diagnostic.error(ErrorType.DIRECTORY_EXISTS, directory.getPath());
-      return false;
-    }
-    return true;
   }
 
   /**

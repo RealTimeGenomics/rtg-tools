@@ -68,7 +68,6 @@ public final class Cg2Sdf extends LoggedCli {
   static final String MODULE_NAME = "cg2sdf";
 
 
-  static final String OUTPUT_FLAG = "output";
   //static final String VERSION_1 = "Xversion1";
   static final String MAXIMUM_NS = "max-unknowns";
   static final String NO_QUALITY = "no-quality";
@@ -99,7 +98,7 @@ public final class Cg2Sdf extends LoggedCli {
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setCategory(INPUT_OUTPUT);
     final Flag list = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of Complete Genomics files (1 per line)").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.registerOptional(MAXIMUM_NS, Integer.class, "INT", "maximum number of Ns allowed in either side for a read", 5).setCategory(FILTERING);
     //
@@ -115,15 +114,14 @@ public final class Cg2Sdf extends LoggedCli {
 
   @Override
   protected File outputDirectory() {
-    return (File) mFlags.getValue(OUTPUT_FLAG);
+    return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
   }
 
   private static final Validator VALIDATOR = new Validator() {
     @Override
     public boolean isValid(final CFlags flags) {
 
-      final File output = (File) flags.getValue(OUTPUT_FLAG);
-      if (!CommonFlags.validateOutputDirectory(output)) {
+      if (!CommonFlags.validateOutputDirectory(flags)) {
         return false;
       }
 
@@ -253,7 +251,7 @@ public final class Cg2Sdf extends LoggedCli {
   protected int mainExec(OutputStream out, LogStream initLog) throws IOException {
     final PrintStream outStream = new PrintStream(out);
     try {
-      final File output = (File) mFlags.getValue(OUTPUT_FLAG);
+      final File output = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
       try (PrintStream summaryStream = new PrintStream(new FileOutputStream(new File(output, CommonFlags.SUMMARY_FILE)))) {
         final Collection<File> inputFiles = CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false);
         final Integer maximumNs = (Integer) mFlags.getValue(MAXIMUM_NS);

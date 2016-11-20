@@ -110,7 +110,7 @@ public final class SnpIntersection extends LoggedCli {
     CommonFlagCategories.setCategories(flags);
     flags.registerRequired('i', FIRST_INPUT_FILE, File.class, CommonFlags.FILE, "first file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerRequired('I', SECOND_INPUT_FILE, File.class, CommonFlags.FILE, "second file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.DIR, "output directory").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    CommonFlags.initOutputDirFlag(flags);
     flags.registerOptional('c', COMPARE_ALTS, "do a basic comparison on ALT calls in addition to position").setCategory(CommonFlagCategories.REPORTING);
 CommonFlags.initNoGzip(flags);
     final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, "STRING", "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);

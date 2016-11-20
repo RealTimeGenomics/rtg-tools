@@ -61,7 +61,6 @@ public final class SdfSplitter extends LoggedCli {
 
   private static final String MODULE_NAME = "sdfsplit";
 
-  private static final String OUTPUT_FLAG = "output";
   private static final String COUNT_FLAG = "num-sequences";
   private static final String ENABLE_MEMORY_READER = "in-memory";
   private static final String DISABLE_DUPLICATE_DETECTOR = "allow-duplicate-names";
@@ -87,7 +86,7 @@ public final class SdfSplitter extends LoggedCli {
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setCategory(INPUT_OUTPUT);
     final Flag listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of SDFs (1 per line)").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "DIR", "output base directory (must be empty if present)").setCategory(INPUT_OUTPUT);
+    CommonFlags.initOutputDirFlag(mFlags);
     mFlags.registerRequired('n', COUNT_FLAG, Integer.class, "INT", "number of reads per output").setCategory(UTILITY);
     mFlags.registerOptional(DISABLE_DUPLICATE_DETECTOR, "disable checking for duplicate sequence names").setCategory(UTILITY);
 
@@ -106,7 +105,7 @@ public final class SdfSplitter extends LoggedCli {
         return false;
       }
 
-      if (!CommonFlags.validateOutputDirectory((File) flags.getValue(OUTPUT_FLAG))) {
+      if (!CommonFlags.validateOutputDirectory(flags)) {
         return false;
       }
 
@@ -253,7 +252,7 @@ public final class SdfSplitter extends LoggedCli {
 
   @Override
   protected File outputDirectory() {
-    return (File) mFlags.getValue(OUTPUT_FLAG);
+    return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
   }
 
   @Override

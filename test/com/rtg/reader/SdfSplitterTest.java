@@ -264,7 +264,7 @@ public class SdfSplitterTest extends AbstractCliTest {
     checkHelp("sdfsplit [OPTION]... -n INT -o DIR",
               "[OPTION]... -n INT -o DIR -I FILE",
               "number of reads per output",
-              "output base directory",
+              "directory for output",
               "input SDF",
               "file containing a list of SDFs (1 per line)");
   }

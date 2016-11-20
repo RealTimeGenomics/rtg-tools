@@ -54,7 +54,6 @@ import com.rtg.util.diagnostic.WarningType;
 public class IndexerCli extends AbstractCli {
 
   private static final String INPUT_FORMAT = "format";
-  private static final String FORCE = "Xforce";
 
   /**
    * Supported formats for indexer
@@ -94,7 +93,7 @@ public class IndexerCli extends AbstractCli {
     flags.setDescription("Creates index files for block compressed TAB-delimited genome position files.");
     CommonFlagCategories.setCategories(flags);
     flags.setValidator(new IndexerValidator());
-    flags.registerOptional(FORCE, "If the file isn't block compressed then perform this step as well").setCategory(CommonFlagCategories.UTILITY);
+    flags.registerOptional(CommonFlags.FORCE, "If the file isn't block compressed then perform this step as well").setCategory(CommonFlagCategories.UTILITY);
     final Flag inFlag = flags.registerRequired(File.class, "FILE", "block compressed files containing data to be indexed");
     inFlag.setCategory(CommonFlagCategories.INPUT_OUTPUT);
     inFlag.setMinCount(0);
@@ -118,7 +117,7 @@ public class IndexerCli extends AbstractCli {
     int retCode = 0;
     final IndexFormat format = (IndexFormat) mFlags.getValue(INPUT_FORMAT);
     Collection<File> inputFiles = CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false);
-    if (mFlags.isSet(FORCE)) {
+    if (mFlags.isSet(CommonFlags.FORCE)) {
       inputFiles = IndexUtils.ensureBlockCompressed(inputFiles);
     }
     for (final File f : inputFiles) {

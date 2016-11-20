@@ -46,7 +46,7 @@ public class ErrorTypeTest extends TestCase {
       check(et);
     }
     TestUtils.testPseudoEnum(ErrorType.class, "[SLIM_ERROR, INFO_ERROR, FUTURE_VERSION_ERROR, BAD_FILE_CHUNK_SIZE,"
-        + " DIRECTORY_EXISTS, DIRECTORY_NOT_EXISTS, DIRECTORY_NOT_CREATED, DIRECTORY_NOT_EMPTY,"
+        + " DIRECTORY_EXISTS, DIRECTORY_NOT_EXISTS, DIRECTORY_NOT_CREATED,"
         + " NOT_A_DIRECTORY, INVALID_FILE_FORMAT, INVALID_MAX_FREQUENCY, EXPECTED_POSITIVE,"
         + " EXPECTED_NONNEGATIVE, DISK_SPACE, SEQUENCE_TOO_LONG, INVALID_LICENSE, FILE_EXISTS,"
         + " FILE_NOT_CREATED, READING_ERROR, UNABLE_TO_RECOGNIZE_ENVIRONMENT, WRITING_ERROR,"
@@ -73,7 +73,6 @@ public class ErrorTypeTest extends TestCase {
     assertEquals(1, ErrorType.DIRECTORY_EXISTS.getNumberOfParameters());
     assertEquals(1, ErrorType.DIRECTORY_NOT_CREATED.getNumberOfParameters());
     assertEquals(1, ErrorType.DIRECTORY_NOT_EXISTS.getNumberOfParameters());
-    assertEquals(1, ErrorType.DIRECTORY_NOT_EMPTY.getNumberOfParameters());
     assertEquals(1, ErrorType.INVALID_MAX_FREQUENCY.getNumberOfParameters());
     assertEquals(1, ErrorType.SEQUENCE_TOO_LONG.getNumberOfParameters());
     assertEquals(0, ErrorType.INVALID_LICENSE.getNumberOfParameters());

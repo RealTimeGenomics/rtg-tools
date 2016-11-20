@@ -85,7 +85,7 @@ public class Cg2SdfTest extends AbstractCliTest {
       final Iterator<Object> it = flags.getAnonymousValues(0).iterator();
       assertTrue(it.hasNext());
       assertEquals(in.getPath(), ((File) it.next()).getPath());
-      assertEquals(notexist.getPath(), ((File) flags.getValue(Cg2Sdf.OUTPUT_FLAG)).getPath());
+      assertEquals(notexist.getPath(), ((File) flags.getValue(CommonFlags.OUTPUT_FLAG)).getPath());
     }
   }
 

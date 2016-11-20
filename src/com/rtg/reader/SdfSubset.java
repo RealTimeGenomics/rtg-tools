@@ -56,13 +56,11 @@ import com.rtg.util.io.LogStream;
  */
 public final class SdfSubset extends LoggedCli {
 
-  static final String OUTPUT = "output";
-
   private static final Validator VALIDATOR = new Validator() {
 
     @Override
     public boolean isValid(CFlags flags) {
-      if (!CommonFlags.validateOutputDirectory((File) flags.getValue(OUTPUT))) {
+      if (!CommonFlags.validateOutputDirectory(flags)) {
         return false;
       }
       if (!flags.isSet(ID_FILE_FLAG) && !flags.getAnonymousFlag(0).isSet() && !(flags.isSet(START_SEQUENCE) || flags.isSet(END_SEQUENCE))) {
@@ -78,7 +76,7 @@ public final class SdfSubset extends LoggedCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Extracts a subset of sequences from one SDF and outputs them to another SDF.");
     Sdf2Fasta.registerExtractorFlags(mFlags);
-    mFlags.registerRequired('o', OUTPUT, File.class, "SDF", "output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.setValidator(VALIDATOR);
   }
@@ -95,14 +93,14 @@ public final class SdfSubset extends LoggedCli {
 
   @Override
   protected File outputDirectory() {
-    return (File) mFlags.getValue(OUTPUT);
+    return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
   }
 
 
   @Override
   protected int mainExec(OutputStream out, LogStream log) throws IOException {
     try (final SdfReaderWrapper reader = new SdfReaderWrapper((File) mFlags.getValue(INPUT), false, false)) {
-      try (final SdfWriterWrapper writer = new SdfWriterWrapper((File) mFlags.getValue(OUTPUT), reader, false)) {
+      try (final SdfWriterWrapper writer = new SdfWriterWrapper((File) mFlags.getValue(CommonFlags.OUTPUT_FLAG), reader, false)) {
         writer.copySourceTemplatesFile(reader);
 
         final WrapperFilter filter;

@@ -86,11 +86,6 @@ public final class ErrorType implements DiagnosticType, Serializable, PseudoEnum
   public static final ErrorType DIRECTORY_NOT_CREATED = new ErrorType(++sCounter, "DIRECTORY_NOT_CREATED", 1);
 
   /**
-   * Directory exists but is not empty. The parameter is the directory name.
-   */
-  public static final ErrorType DIRECTORY_NOT_EMPTY = new ErrorType(++sCounter, "DIRECTORY_NOT_EMPTY", 1);
-
-  /**
    * Specified name is not a directory. The parameter is the name.
    */
   public static final ErrorType NOT_A_DIRECTORY = new ErrorType(++sCounter, "NOT_A_DIRECTORY", 1);
@@ -490,7 +485,6 @@ public final class ErrorType implements DiagnosticType, Serializable, PseudoEnum
     DIRECTORY_EXISTS,
     DIRECTORY_NOT_EXISTS,
     DIRECTORY_NOT_CREATED,
-    DIRECTORY_NOT_EMPTY,
     NOT_A_DIRECTORY,
     INVALID_FILE_FORMAT,
     INVALID_MAX_FREQUENCY,

@@ -276,8 +276,7 @@ public final class FormatCli extends LoggedCli {
         return false;
       }
 
-      final File outputDir = (File) flags.getValue(CommonFlags.OUTPUT_FLAG);
-      if (!CommonFlags.validateOutputDirectory(outputDir)) {
+      if (!CommonFlags.validateOutputDirectory(flags)) {
         return false;
       }
       if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
