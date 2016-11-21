@@ -74,6 +74,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -200,7 +201,7 @@ public class RocPlot {
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
     mOpenButton = new JButton("Open...");
     mOpenButton.setToolTipText("Add a new curve from a file");
-    mCommandButton = new JButton("Cmd");
+    mCommandButton = new JButton("Cmd...");
     mCommandButton.setToolTipText("Send the equivalent rocplot command-line to the terminal");
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
     mIconLabel = new JLabel(icon);
@@ -325,7 +326,16 @@ public class RocPlot {
     });
     mSelectAllCB.setSelected(true);
     mOpenButton.addActionListener(new LoadFileListener());
-    mCommandButton.addActionListener(e -> System.out.println("Equivalent rocplot command:\n" + getCommand() + "\n"));
+    mCommandButton.addActionListener(e -> {
+      final String command = getCommand();
+      final JTextArea ta = new JTextArea(1 + command.length() / 120, 120);
+      ta.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+      ta.setText(command);
+      ta.setCaretPosition(0);
+      ta.setLineWrap(true);
+      ta.setEditable(false);
+      JOptionPane.showMessageDialog(mMainPanel, new JScrollPane(ta), "Equivalent rocplot command", JOptionPane.INFORMATION_MESSAGE);
+    });
 
     final JPanel namePanel = new JPanel(new GridBagLayout());
     c.fill = GridBagConstraints.NONE;           c.anchor = GridBagConstraints.LINE_START;
@@ -391,20 +401,20 @@ public class RocPlot {
   }
 
   private String getCommand() {
-    final StringBuilder sb = new StringBuilder("rtg rocplot ");
-    sb.append("--").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+    final StringBuilder sb = new StringBuilder("rtg rocplot");
+    sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
+    sb.append(" --").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
     if (mShowScores) {
       sb.append(" --").append(RocPlotCli.SCORES_FLAG);
     }
-    sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
+    if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
+      sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
+    }
     for (final Component component : mRocLinesPanel.getComponents()) {
       final RocLinePanel cp = (RocLinePanel) component;
       if (cp.isSelected()) {
         sb.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(cp.getPath() + "=" + cp.getLabel()));
       }
-    }
-    if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-      sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
     }
     return sb.toString();
   }
