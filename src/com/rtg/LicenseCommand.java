@@ -31,6 +31,8 @@ package com.rtg;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
@@ -89,15 +91,7 @@ public final class LicenseCommand extends Command {
     return sb.toString();
   }
 
-  private static String sModuleTypeName;
-
-  static void resetModuleTypeName() {
-    sModuleTypeName = null;
-  }
-
   private static void printLicense(final PrintStream out, CommandLookup info) {
-    resetModuleTypeName();
-
     out.println(getLicenseSummary());
 
     final String commandName = "Command name";
@@ -111,39 +105,42 @@ public final class LicenseCommand extends Command {
     out.print("\t" + padTo("Licensed?", 17));
     out.print(" Release Level");
     out.println();
-    out.println();
 
+    final HashSet<CommandCategory> categories = new LinkedHashSet<>();
     for (Command module : info.commands()) {
-      outputModule(module, longestUsageLength, out);
+      if (showModule(module)) {
+        categories.add(module.getCategory());
+      }
+    }
+
+    for (CommandCategory cat : categories) {
+      out.println();
+      out.println(cat.getLabel() + ":");
+      for (Command module : info.commands()) {
+        if (cat == module.getCategory() && showModule(module)) {
+          outputModule(module, longestUsageLength, out);
+        }
+      }
     }
   }
 
   static void outputModule(Command module, int longestUsageLength, PrintStream out) {
-    if (showModule(module)) {
-      if (sModuleTypeName == null || !sModuleTypeName.equals(module.getCategory().toString())) {
-        if (sModuleTypeName != null) {
-          out.println();
-        }
-        sModuleTypeName = module.getCategory().toString();
-        out.println(module.getCategory().getLabel() + ":");
-      }
-      out.print("\t" + module.getCommandName().toLowerCase(Locale.getDefault()));
-      for (int i = 0; i < longestUsageLength - module.getCommandName().length(); i++) {
-        out.print(" ");
-      }
-
-      out.print(" \t");
-      out.print(padTo(module.licenseStatus(), 17));
-
+    out.print("\t" + module.getCommandName().toLowerCase(Locale.getDefault()));
+    for (int i = 0; i < longestUsageLength - module.getCommandName().length(); i++) {
       out.print(" ");
-      if (module.getReleaseLevel() == ReleaseLevel.GA) {
-        out.print(module.getReleaseLevel());
-      } else {
-        out.print(module.getReleaseLevel().toString().toLowerCase(Locale.getDefault()));
-      }
-
-      out.println();
     }
+
+    out.print(" \t");
+    out.print(padTo(module.licenseStatus(), 17));
+
+    out.print(" ");
+    if (module.getReleaseLevel() == ReleaseLevel.GA) {
+      out.print(module.getReleaseLevel());
+    } else {
+      out.print(module.getReleaseLevel().toString().toLowerCase(Locale.getDefault()));
+    }
+
+    out.println();
   }
 
   static String padTo(String str, int length) {
