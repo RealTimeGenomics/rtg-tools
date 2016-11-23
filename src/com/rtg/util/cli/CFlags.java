@@ -1097,7 +1097,7 @@ public final class CFlags {
     if (!checkInRange(maxFlag, min, lowInclusive, max, highInclusive)) {
       return false;
     }
-    if (isSet(minFlag) && isSet(maxFlag) && (Integer) getValue(minFlag) > (Integer) getValue(maxFlag) ) {
+    if (isSet(minFlag) && isSet(maxFlag) && (Integer) getValue(minFlag) > (Integer) getValue(maxFlag)) {
       setParseMessage("The value for --" + minFlag + " cannot be greater than the value for --" + maxFlag);
       return false;
     }
@@ -1119,7 +1119,7 @@ public final class CFlags {
     if (!checkInRange(maxFlag, min, max)) {
       return false;
     }
-    if (isSet(minFlag) && isSet(maxFlag) && (Double) getValue(minFlag) > (Double) getValue(maxFlag) ) {
+    if (isSet(minFlag) && isSet(maxFlag) && (Double) getValue(minFlag) > (Double) getValue(maxFlag)) {
       setParseMessage("The value for --" + minFlag + " cannot be greater than the value for --" + maxFlag);
       return false;
     }
