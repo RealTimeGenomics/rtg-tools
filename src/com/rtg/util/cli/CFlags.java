@@ -1005,9 +1005,9 @@ public final class CFlags {
       if ((value < lowValue) || (value <= lowValue && !lowInclusive)
         || (value > highValue) || (value >= highValue && !highInclusive)) {
         if (highValue == Integer.MAX_VALUE) {
-          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? ">= " : "> ") + lowValue);
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? "at least " : "greater than ") + lowValue);
         } else if (lowValue == Integer.MIN_VALUE) {
-          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "<= " : "< ") + highValue);
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "at most " : "less than ") + highValue);
         } else {
           setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range "
             + ((lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")")));
@@ -1033,9 +1033,9 @@ public final class CFlags {
       if ((value < lowValue) || (value <= lowValue && !lowInclusive)
         || (value > highValue) || (value >= highValue && !highInclusive)) {
         if (highValue == Double.MAX_VALUE) {
-          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? ">= " : "> ") + lowValue);
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? "at least " : "greater than ") + lowValue);
         } else if (lowValue == -Double.MAX_VALUE) {
-          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "<= " : "< ") + highValue);
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "at most " : "less than ") + highValue);
         } else {
           setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range "
             + ((lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")")));

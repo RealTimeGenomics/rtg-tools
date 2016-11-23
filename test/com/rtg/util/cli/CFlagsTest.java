@@ -491,9 +491,9 @@ public class CFlagsTest extends TestCase {
     assertFalse(mFlags.checkInRange("a", 0, true, 1, true));
     assertTrue(mFlags.getParseMessage().contains("[0, 1]"));
     assertFalse(mFlags.checkInRange("a", 3, true, Integer.MAX_VALUE, true));
-    assertTrue(mFlags.getParseMessage().contains(">= 3"));
+    assertTrue(mFlags.getParseMessage().contains("at least 3"));
     assertFalse(mFlags.checkInRange("a", Integer.MIN_VALUE, true, 2, false));
-    assertTrue(mFlags.getParseMessage().contains("< 2"));
+    assertTrue(mFlags.getParseMessage().contains("less than 2"));
 
     assertTrue(mFlags.checkInRange("b", 2.0, true, 4.0, true));
     assertFalse(mFlags.checkInRange("b", 2.0, false, 4.0, true));
@@ -506,9 +506,9 @@ public class CFlagsTest extends TestCase {
     assertFalse(mFlags.checkInRange("b", 0.0, true, 1.0, true));
     assertTrue(mFlags.getParseMessage().contains("[0.0, 1.0]"));
     assertFalse(mFlags.checkInRange("b", 3.0, true, Double.MAX_VALUE, true));
-    assertTrue(mFlags.getParseMessage().contains(">= 3.0"));
+    assertTrue(mFlags.getParseMessage().contains("at least 3.0"));
     assertFalse(mFlags.checkInRange("b", -Double.MAX_VALUE, true, 2.0, false));
-    assertTrue(mFlags.getParseMessage().contains("< 2.0"));
+    assertTrue(mFlags.getParseMessage().contains("less than 2.0"));
 
   }
 
