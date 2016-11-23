@@ -50,7 +50,6 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import com.rtg.launcher.AbstractCli;
-import com.rtg.launcher.CommonFlags;
 import com.rtg.util.Pair;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
@@ -111,7 +110,7 @@ public class RocPlotCli extends AbstractCli {
           return false;
         }
       }
-      if (!CommonFlags.validateFlagBetweenValues(flags, LINE_WIDTH_FLAG, RocPlot.LINE_WIDTH_MIN, RocPlot.LINE_WIDTH_MAX)) {
+      if (!flags.checkInRange(LINE_WIDTH_FLAG, RocPlot.LINE_WIDTH_MIN, RocPlot.LINE_WIDTH_MAX)) {
         return false;
       }
       return true;

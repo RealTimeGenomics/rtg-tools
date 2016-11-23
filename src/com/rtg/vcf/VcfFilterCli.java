@@ -257,22 +257,22 @@ public final class VcfFilterCli extends AbstractCli {
         flags.setParseMessage("Use genotype-quality or posterior filters, not both.");
         return false;
       }
-      if (!isMinMaxValid(flags, MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY, 0.0, Double.MAX_VALUE, true)) {
+      if (!flags.checkMinMaxInRange(MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY, 0.0, Double.MAX_VALUE)) {
         return false;
       }
-      if (!isMinMaxValid(flags, MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE, 0.0, Double.MAX_VALUE, true)) {
+      if (!flags.checkMinMaxInRange(MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE, 0.0, Double.MAX_VALUE)) {
         return false;
       }
-      if (!isMinMaxValid(flags, MIN_QUALITY, MAX_QUALITY, 0.0, Double.MAX_VALUE, true)) {
+      if (!flags.checkMinMaxInRange(MIN_QUALITY, MAX_QUALITY, 0.0, Double.MAX_VALUE)) {
         return false;
       }
-      if (!isMinMaxValid(flags, null, MAX_AMBIGUITY_RATIO, 0.0, 1.0, true)) {
+      if (!flags.checkInRange(MAX_AMBIGUITY_RATIO, 0.0, 1.0)) {
         return false;
       }
-      if (!isMinMaxValid(flags, MIN_AVR_SCORE, MAX_AVR_SCORE, 0.0, Double.MAX_VALUE, true)) {
+      if (!flags.checkMinMaxInRange(MIN_AVR_SCORE, MAX_AVR_SCORE, 0.0, Double.MAX_VALUE)) {
         return false;
       }
-      if (!isMinMaxValid(flags, MIN_DENOVO_SCORE, MAX_DENOVO_SCORE, 0.0, Double.MAX_VALUE, true)) {
+      if (!flags.checkMinMaxInRange(MIN_DENOVO_SCORE, MAX_DENOVO_SCORE, 0.0, Double.MAX_VALUE)) {
         return false;
       }
       if (flags.isSet(MIN_DENOVO_SCORE) || flags.isSet(MAX_DENOVO_SCORE)) {
@@ -281,10 +281,10 @@ public final class VcfFilterCli extends AbstractCli {
           return false;
         }
       }
-      if (flags.isSet(DENSITY_WINDOW) && !CommonFlags.validateFlagBetweenValues(flags, DENSITY_WINDOW, 1, Integer.MAX_VALUE)) {
+      if (flags.isSet(DENSITY_WINDOW) && !flags.checkInRange(DENSITY_WINDOW, 1, Integer.MAX_VALUE)) {
         return false;
       }
-      if (!validateDepthFlags(flags, MIN_DEPTH, MAX_DEPTH) || !validateDepthFlags(flags, MIN_COMBINED_DEPTH, MAX_COMBINED_DEPTH)) {
+      if (!flags.checkMinMaxInRange(MIN_DEPTH, MAX_DEPTH, 0, Integer.MAX_VALUE) || !flags.checkMinMaxInRange(MIN_COMBINED_DEPTH, MAX_COMBINED_DEPTH, 0, Integer.MAX_VALUE)) {
         return false;
       }
       for (final String flag : new String[] {EXCLUDE_BED, EXCLUDE_VCF, INCLUDE_BED, INCLUDE_VCF}) {
@@ -313,25 +313,6 @@ public final class VcfFilterCli extends AbstractCli {
       return true;
     }
 
-    static boolean validateDepthFlags(CFlags flags, String minFlag, String maxFlag) {
-      int c = 0;
-      if (flags.isSet(minFlag)) {
-        c = (Integer) flags.getValue(minFlag);
-        if (c < 0) {
-          flags.setParseMessage("The specified flag \"--" + minFlag + "\" has invalid value \"" + c + "\". It should be greater than or equal to 0.");
-          return false;
-        }
-      }
-      if (flags.isSet(maxFlag)) {
-        final int maxc = (Integer) flags.getValue(maxFlag);
-        if (maxc < c) {
-          flags.setParseMessage("The specified flag \"--" + maxFlag + "\" has invalid value \"" + maxc + "\". It should be greater than or equal to " + c + ".");
-          return false;
-        }
-      }
-      return true;
-    }
-
     static boolean validateFile(CFlags flags, String flag) {
       if (flags.isSet(flag)) {
         final File file = (File) flags.getValue(flag);
@@ -347,32 +328,6 @@ public final class VcfFilterCli extends AbstractCli {
       return false;
     }
 
-    static boolean isMinMaxValid(final CFlags flags, final String minFlag, final String maxFlag, double min, double max, boolean maxInclusive) {
-      double minp = min;
-      if (minFlag != null && flags.isSet(minFlag)) {
-        minp = (Double) flags.getValue(minFlag);
-        if (minp < min || minp > max || (!maxInclusive && minp >= max)) {
-          flags.setParseMessage(getMinMaxMessage(minFlag, minp, min, max, maxInclusive));
-          return false;
-        }
-      }
-      if (flags.isSet(maxFlag)) {
-        final double maxp = (Double) flags.getValue(maxFlag);
-        if (maxp < minp || maxp > max || (!maxInclusive && (maxp >= max || minp >= maxp))) {
-          flags.setParseMessage(getMinMaxMessage(maxFlag, maxp, minp, max, maxInclusive));
-          return false;
-        }
-      }
-      return true;
-    }
-
-    static String getMinMaxMessage(final String flag, final double val, final double min, final double max, boolean maxInclusive) {
-      return "The specified flag \"--" + flag + "\" has invalid value \"" + val + "\". It should be greater than or equal to " + min + " and less than " + (maxInclusive && max != Double.MAX_VALUE ? "or equal to " : "") + getDoubleString(max) + ".";
-    }
-
-    static String getDoubleString(final double val) {
-      return val >= Double.MAX_VALUE ? "Infinity" : String.valueOf(val);
-    }
   }
 
   @Override

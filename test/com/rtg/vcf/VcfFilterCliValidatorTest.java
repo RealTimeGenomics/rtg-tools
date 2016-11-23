@@ -71,55 +71,46 @@ public class VcfFilterCliValidatorTest extends AbstractCliTest {
 
       assertTrue(out.delete());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-p", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--Xmin-posterior-score\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--Xmin-posterior-score must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-p", "1.0", "-P", "0.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--Xmax-posterior-score\" has invalid value \"" + 0.0 + "\". It should be greater than or equal to " + 1.0 + " and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--Xmin-posterior-score cannot be greater than the value for --Xmax-posterior-score");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-Q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--min-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
-
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-q", "1.0", "-Q", "0.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-quality\" has invalid value \"" + 0.0 + "\". It should be greater than or equal to " + 1.0 + " and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--min-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-Q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-G", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-genotype-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-genotype-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-g", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--min-genotype-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
-
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-g", "1.0", "-G", "0.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-genotype-quality\" has invalid value \"" + 0.0 + "\". It should be greater than or equal to " + 1.0 + " and less than Infinity.");
-
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-G", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-genotype-quality\" has invalid value \"" + -1.0 + "\". It should be greater than or equal to 0.0 and less than Infinity.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--min-genotype-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-d", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--min-read-depth\" has invalid value \"-1\". It should be greater than or equal to 0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--min-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-D", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-read-depth\" has invalid value \"-1\". It should be greater than or equal to 0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-c", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--min-combined-read-depth\" has invalid value \"-1\". It should be greater than or equal to 0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--min-combined-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-C", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-combined-read-depth\" has invalid value \"-1\". It should be greater than or equal to 0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-combined-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-A", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-ambiguity-ratio\" has invalid value \"-1.0\". It should be greater than or equal to 0.0 and less than or equal to 1.0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-A", "1.1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--max-ambiguity-ratio\" has invalid value \"1.1\". It should be greater than or equal to 0.0 and less than or equal to 1.0.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--density-window", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The specified flag \"--density-window\" has invalid value \"-1\". It should be greater than or equal to \"1\".");
+      TestUtils.containsAll(TestUtils.unwrap(err), "--density-window must be at least 1");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--min-genotype-quality",  "0" , "--Xmax-posterior-score", "10");
       TestUtils.containsAll(TestUtils.unwrap(err), "Use genotype-quality or posterior filters, not both.");

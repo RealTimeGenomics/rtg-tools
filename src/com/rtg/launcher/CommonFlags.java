@@ -278,48 +278,6 @@ public final class CommonFlags {
   }
 
   /**
-   * Validates an integer flag has a value between two values
-   * @param flags the flags
-   * @param flagName the flag name to check
-   * @param lowValue the low value (inclusive)
-   * @param highValue the high value (inclusive)
-   * @return true if the flag exists and is between the values, otherwise false.
-   */
-  public static boolean validateFlagBetweenValues(CFlags flags, String flagName, int lowValue, int highValue) {
-    final int value = (Integer) flags.getValue(flagName);
-    if (value < lowValue) {
-      Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + flagName, value + "", lowValue + "");
-      return false;
-    }
-    if (value > highValue) {
-      Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, "--" + flagName, value + "", highValue + "");
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Validates an float flag has a value between two values
-   * @param flags the flags
-   * @param flagName the flag name to check
-   * @param lowValue the low value (inclusive)
-   * @param highValue the high value (inclusive)
-   * @return true if the flag exists and is between the values, otherwise false.
-   */
-  public static boolean validateFlagBetweenValues(CFlags flags, String flagName, double lowValue, double highValue) {
-    final double value = (double) flags.getValue(flagName);
-    if (value < lowValue) {
-      Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + flagName, value + "", lowValue + "");
-      return false;
-    }
-    if (value > highValue) {
-      Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, "--" + flagName, value + "", highValue + "");
-      return false;
-    }
-    return true;
-  }
-
-  /**
    * Initialize the flag that permits overwriting existing files/directories
    * @param flags shared flags
    */

@@ -991,6 +991,17 @@ public final class CFlags {
   }
 
   /**
+   * Checks an integer flag has a value between two values, both ends inclusive
+   * @param flagName the flag name to check
+   * @param lowValue the low value, or Integer.MIN_VALUE if unbounded
+   * @param highValue the high value, or Integer.MAX_VALUE if unbounded
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkInRange(String flagName, int lowValue, int highValue) {
+    return checkInRange(flagName, lowValue, true, highValue, true);
+  }
+
+  /**
    * Checks an integer flag has a value between two values
    * @param flagName the flag name to check
    * @param lowValue the low value, or Integer.MIN_VALUE if unbounded
@@ -1019,6 +1030,17 @@ public final class CFlags {
   }
 
   /**
+   * Checks a double flag has a value between two values, both ends inclusive
+   * @param flagName the flag name to check
+   * @param lowValue the low value, or -Double.MAX_VALUE if unbounded
+   * @param highValue the high value, or Double.MAX_VALUE if unbounded
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkInRange(String flagName, double lowValue, double highValue) {
+    return checkInRange(flagName, lowValue, true, highValue, true);
+  }
+
+  /**
    * Checks a double flag has a value between two values.
    * @param flagName the flag name to check
    * @param lowValue the low value, or -Double.MAX_VALUE if unbounded
@@ -1042,6 +1064,64 @@ public final class CFlags {
         }
         return false;
       }
+    }
+    return true;
+  }
+
+  /**
+   * Checks min/max pair of integer flags has values between two values, both ends inclusive
+   * @param minFlag the flag name for the minimum value
+   * @param maxFlag the flag name for the minimum value
+   * @param min the low value, or -Double.MAX_VALUE if unbounded
+   * @param max the high value, or Double.MAX_VALUE if unbounded
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkMinMaxInRange(String minFlag, String maxFlag, int min, int max) {
+    return checkMinMaxInRange(minFlag, maxFlag, min, true, max, true);
+  }
+
+  /**
+   * Checks min/max pair of integer flags has values between two values, both ends inclusive
+   * @param minFlag the flag name for the minimum value
+   * @param maxFlag the flag name for the minimum value
+   * @param min the low value, or -Double.MAX_VALUE if unbounded
+   * @param lowInclusive true if the low value itself is permitted
+   * @param max the high value, or Double.MAX_VALUE if unbounded
+   * @param highInclusive true if the max value itself is permitted
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkMinMaxInRange(String minFlag, String maxFlag, int min, boolean lowInclusive, int max, boolean highInclusive) {
+    if (!checkInRange(minFlag, min, lowInclusive, max, highInclusive)) {
+      return false;
+    }
+    if (!checkInRange(maxFlag, min, lowInclusive, max, highInclusive)) {
+      return false;
+    }
+    if (isSet(minFlag) && isSet(maxFlag) && (Integer) getValue(minFlag) > (Integer) getValue(maxFlag) ) {
+      setParseMessage("The value for --" + minFlag + " cannot be greater than the value for --" + maxFlag);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks min/max pair of double flags has values between two values, both ends inclusive
+   * @param minFlag the flag name for the minimum value
+   * @param maxFlag the flag name for the minimum value
+   * @param min the low value, or -Double.MAX_VALUE if unbounded
+   * @param max the high value, or Double.MAX_VALUE if unbounded
+   * @return true if the flag exists and is between the values, otherwise false.
+   */
+  public boolean checkMinMaxInRange(String minFlag, String maxFlag, double min, double max) {
+    if (!checkInRange(minFlag, min, max)) {
+      return false;
+    }
+    if (!checkInRange(maxFlag, min, max)) {
+      return false;
+    }
+    if (isSet(minFlag) && isSet(maxFlag) && (Double) getValue(minFlag) > (Double) getValue(maxFlag) ) {
+      setParseMessage("The value for --" + minFlag + " cannot be greater than the value for --" + maxFlag);
+      return false;
     }
     return true;
   }
