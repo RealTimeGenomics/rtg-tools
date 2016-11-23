@@ -712,7 +712,7 @@ public final class CFlags {
           setParseMessage("Attempt to set flag " + nameArg + " too many times.");
           success = false;
         } catch (final IllegalArgumentException e) {
-          setParseMessage("Invalid value \"" + value + "\" for \"" + nameArg + "\". " + e.getMessage());
+          setParseMessage("Invalid value \"" + value + "\" for flag " + nameArg + ". " + e.getMessage());
           success = false;
         }
       } else if (anonymousCount < mAnonymousFlags.size()) {
@@ -993,9 +993,9 @@ public final class CFlags {
   /**
    * Checks an integer flag has a value between two values
    * @param flagName the flag name to check
-   * @param lowValue the low value
+   * @param lowValue the low value, or Integer.MIN_VALUE if unbounded
    * @param lowInclusive true if the low value itself is permitted
-   * @param highValue the high value
+   * @param highValue the high value, or Integer.MAX_VALUE if unbounded
    * @param highInclusive true if the high value itself is permitted
    * @return true if the flag exists and is between the values, otherwise false.
    */
@@ -1004,8 +1004,14 @@ public final class CFlags {
       final int value = (Integer) getValue(flagName);
       if ((value < lowValue) || (value <= lowValue && !lowInclusive)
         || (value > highValue) || (value >= highValue && !highInclusive)) {
-        final String range = (lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")");
-        setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range " + range);
+        if (highValue == Integer.MAX_VALUE) {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? ">= " : "> ") + lowValue);
+        } else if (lowValue == Integer.MIN_VALUE) {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "<= " : "< ") + highValue);
+        } else {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range "
+            + ((lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")")));
+        }
         return false;
       }
     }
@@ -1013,11 +1019,11 @@ public final class CFlags {
   }
 
   /**
-   * Checks a double flag has a value between two values
+   * Checks a double flag has a value between two values.
    * @param flagName the flag name to check
-   * @param lowValue the low value
+   * @param lowValue the low value, or -Double.MAX_VALUE if unbounded
    * @param lowInclusive true if the low value itself is permitted
-   * @param highValue the high value
+   * @param highValue the high value, or Double.MAX_VALUE if unbounded
    * @param highInclusive true if the high value itself is permitted
    * @return true if the flag exists and is between the values, otherwise false.
    */
@@ -1026,8 +1032,14 @@ public final class CFlags {
       final double value = (Double) getValue(flagName);
       if ((value < lowValue) || (value <= lowValue && !lowInclusive)
         || (value > highValue) || (value >= highValue && !highInclusive)) {
-        final String range = (lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")");
-        setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range " + range);
+        if (highValue == Double.MAX_VALUE) {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (lowInclusive ? ">= " : "> ") + lowValue);
+        } else if (lowValue == -Double.MAX_VALUE) {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be " + (highInclusive ? "<= " : "< ") + highValue);
+        } else {
+          setParseMessage("The value for " + LONG_FLAG_PREFIX + flagName + " must be in the range "
+            + ((lowInclusive ? "[" : "(") + lowValue + ", " + highValue + (highInclusive ? "]" : ")")));
+        }
         return false;
       }
     }

@@ -442,7 +442,7 @@ public class FormatCliTest extends AbstractCliTest {
            "-f", "embl"
       };
       final String err = checkHandleFlagsErr(args);
-      assertTrue(err, err.contains("Invalid value \"embl\" for \"-f\""));
+      assertTrue(err, err.contains("Invalid value \"embl\" for flag -f"));
     }
   }
 
@@ -480,7 +480,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(tempDir, "in");
       FileUtils.stringToFile("^", input);
       String err = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "solexa1.2", input.getPath());
-      assertTrue("error was: " + err, err.contains("Invalid value \"solexa1.2\" for \"-q\"."));
+      assertTrue("error was: " + err, err.contains("Invalid value \"solexa1.2\" for flag -q."));
 
       err = checkMainInitBadFlags("-o", outputDir.getPath(), "-f", "fastq", "-q", "illumina", input.getPath());
       assertTrue("error was: " + err, err.contains("Unrecognized symbols appeared before label symbol. Last sequence read was: \"<none>\""));

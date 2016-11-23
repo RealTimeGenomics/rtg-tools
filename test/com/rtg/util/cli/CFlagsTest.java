@@ -468,7 +468,7 @@ public class CFlagsTest extends TestCase {
     f.setParameterRange(m);
     mFlags.register(f);
     assertFalse(mFlags.setFlags("--xx", "v"));
-    assertEquals("Invalid value \"v\" for \"--xx\". Value supplied is not in the set of allowed values.",
+    assertEquals("Invalid value \"v\" for flag --xx. Value supplied is not in the set of allowed values.",
         mFlags.getParseMessage());
     assertTrue(mFlags.setFlags("--xx", "value"));
     assertEquals("", mFlags.getParseMessage());
@@ -490,6 +490,10 @@ public class CFlagsTest extends TestCase {
     assertTrue(mFlags.getParseMessage().contains("[0, 2)"));
     assertFalse(mFlags.checkInRange("a", 0, true, 1, true));
     assertTrue(mFlags.getParseMessage().contains("[0, 1]"));
+    assertFalse(mFlags.checkInRange("a", 3, true, Integer.MAX_VALUE, true));
+    assertTrue(mFlags.getParseMessage().contains(">= 3"));
+    assertFalse(mFlags.checkInRange("a", Integer.MIN_VALUE, true, 2, false));
+    assertTrue(mFlags.getParseMessage().contains("< 2"));
 
     assertTrue(mFlags.checkInRange("b", 2.0, true, 4.0, true));
     assertFalse(mFlags.checkInRange("b", 2.0, false, 4.0, true));
@@ -501,6 +505,10 @@ public class CFlagsTest extends TestCase {
     assertTrue(mFlags.getParseMessage().contains("[0.0, 2.0)"));
     assertFalse(mFlags.checkInRange("b", 0.0, true, 1.0, true));
     assertTrue(mFlags.getParseMessage().contains("[0.0, 1.0]"));
+    assertFalse(mFlags.checkInRange("b", 3.0, true, Double.MAX_VALUE, true));
+    assertTrue(mFlags.getParseMessage().contains(">= 3.0"));
+    assertFalse(mFlags.checkInRange("b", -Double.MAX_VALUE, true, 2.0, false));
+    assertTrue(mFlags.getParseMessage().contains("< 2.0"));
 
   }
 
