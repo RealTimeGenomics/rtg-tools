@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
 import com.rtg.tabix.TabixIndexer;
@@ -104,7 +103,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
    * @throws IOException if an IO Error occurs
    */
   public static VcfReader openVcfReader(File f) throws IOException {
-    final boolean stdin = CommonFlags.isStdio(f);
+    final boolean stdin = FileUtils.isStdio(f);
     return new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
   }
 
@@ -116,7 +115,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, ReferenceRanges<String> ranges) throws IOException {
-    final boolean stdin = CommonFlags.isStdio(f);
+    final boolean stdin = FileUtils.isStdio(f);
     final VcfReader vcfr;
     if (ranges == null || ranges.allAvailable()) {
       vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
@@ -137,7 +136,7 @@ public class VcfReader implements IOIterator<VcfRecord> {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, RegionRestriction region) throws IOException {
-    final boolean stdin = CommonFlags.isStdio(f);
+    final boolean stdin = FileUtils.isStdio(f);
     final VcfReader vcfr;
     if (region == null) {
       vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));

@@ -30,6 +30,10 @@
 package com.rtg.vcf;
 
 
+import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.NO_GZIP;
+import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
@@ -61,6 +65,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.gzip.GzipUtils;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
@@ -72,7 +77,6 @@ import com.rtg.vcf.header.VcfNumberType;
  */
 public class VcfMerge extends AbstractCli {
 
-  private static final String OUTPUT_FLAG = "output";
   private static final String ADD_HEADER_FLAG = "add-header";
   private static final String FORCE_MERGE = "force-merge";
   private static final String FORCE_MERGE_ALL = "force-merge-all";
@@ -93,22 +97,24 @@ public class VcfMerge extends AbstractCli {
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initNoGzip(mFlags);
+    CommonFlags.initIndexFlags(mFlags);
+    CommonFlags.initForce(mFlags);
+    mFlags.registerExtendedHelp();
     mFlags.setDescription("Merge a set of VCF files.");
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "FILE", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional('a', ADD_HEADER_FLAG, String.class, "STRING", "add the supplied text to the output VCF header")
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('a', ADD_HEADER_FLAG, String.class, STRING, "add the supplied text to the output VCF header")
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired(File.class, "FILE", "input VCF files to merge")
+    mFlags.registerRequired(File.class, FILE, "input VCF files to merge")
       .setMinCount(1)
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('F', FORCE_MERGE_ALL, "attempt merging of all non-matching header declarations").setCategory(UTILITY);
-    final Flag forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, "STRING", "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
+    final Flag forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(PRESERVE_FORMATS, "if set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
-    CommonFlags.initNoGzip(mFlags);
-    CommonFlags.initIndexFlags(mFlags);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
     mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
     mFlags.setValidator(new VcfMergeValidator());
@@ -117,13 +123,8 @@ public class VcfMerge extends AbstractCli {
   private static class VcfMergeValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      final File o = (File) flags.getValue(OUTPUT_FLAG);
-      if (!CommonFlags.isStdio(o)) {
-        final File output = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), o);
-        if (output.exists()) {
-          flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
-          return false;
-        }
+      if (!CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))) {
+        return false;
       }
       if (!flags.checkNand(FORCE_MERGE_ALL, FORCE_MERGE)) {
         return false;
@@ -158,7 +159,7 @@ public class VcfMerge extends AbstractCli {
         forceMerge.add((String) o);
       }
     }
-    final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
+    final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final VariantStatistics stats = mFlags.isSet(STATS_FLAG) ? new VariantStatistics(null) : null;
     final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
@@ -180,7 +181,7 @@ public class VcfMerge extends AbstractCli {
       defaultFormat = header.getFormatLines().get(0).getId();
     }
 
-    final boolean stdout = CommonFlags.isStdio(outFile);
+    final boolean stdout = FileUtils.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
     try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
       try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {

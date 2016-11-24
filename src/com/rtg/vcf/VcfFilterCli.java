@@ -29,7 +29,13 @@
  */
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.FLOAT;
+import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
+import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -65,10 +71,6 @@ import com.rtg.vcf.VcfFilterStatistics.Stat;
  */
 public final class VcfFilterCli extends AbstractCli {
 
-  // flags
-  private static final String MODULE_NAME = "vcffilter";
-  private static final String INPUT = "input";
-  private static final String OUTPUT = "output";
   private static final String RESTRICTION_FLAG = "region";
 
   // filter flags
@@ -137,7 +139,7 @@ public final class VcfFilterCli extends AbstractCli {
 
   @Override
   public String moduleName() {
-    return MODULE_NAME;
+    return "vcffilter";
   }
 
   @Override
@@ -151,24 +153,24 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered.");
     CommonFlagCategories.setCategories(mFlags);
 
-    final Flag input = mFlags.registerRequired('i', INPUT, File.class, "file", "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    final Flag output = mFlags.registerOptional('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    final Flag input = mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    final Flag output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
 
-    mFlags.registerOptional(RESTRICTION_FLAG, String.class, "string", "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
     // What to apply to, what to do with the results of filtering
-    mFlags.registerOptional(FAIL_FLAG, String.class, "STRING", "instead of removing failed records set their filter field to the provided value").setCategory(REPORTING);
+    mFlags.registerOptional(FAIL_FLAG, String.class, STRING, "instead of removing failed records set their filter field to the provided value").setCategory(REPORTING);
     mFlags.registerOptional(CLEAR_FAILED_SAMPLES, "instead of removing failed records set the sample GT fields to missing").setCategory(REPORTING);
 
     // Variant position
-    mFlags.registerOptional(INCLUDE_BED, File.class, "File", "only keep variants within the regions in this BED file").setCategory(FILTERING);
-    mFlags.registerOptional(EXCLUDE_BED, File.class, "File", "discard all variants within the regions in this BED file").setCategory(FILTERING);
-    mFlags.registerOptional(INCLUDE_VCF, File.class, "File", "only keep variants that overlap with the ones in this file").setCategory(FILTERING);
-    mFlags.registerOptional(EXCLUDE_VCF, File.class, "File", "discard all variants that overlap with the ones in this file").setCategory(FILTERING);
-    mFlags.registerOptional('w', DENSITY_WINDOW, Integer.class, "INT", "window within which multiple variants are discarded").setCategory(FILTERING);
+    mFlags.registerOptional(INCLUDE_BED, File.class, FILE, "only keep variants within the regions in this BED file").setCategory(FILTERING);
+    mFlags.registerOptional(EXCLUDE_BED, File.class, FILE, "discard all variants within the regions in this BED file").setCategory(FILTERING);
+    mFlags.registerOptional(INCLUDE_VCF, File.class, FILE, "only keep variants that overlap with the ones in this file").setCategory(FILTERING);
+    mFlags.registerOptional(EXCLUDE_VCF, File.class, FILE, "discard all variants that overlap with the ones in this file").setCategory(FILTERING);
+    mFlags.registerOptional('w', DENSITY_WINDOW, Integer.class, INT, "window within which multiple variants are discarded").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_OVERLAPPING, "remove records that overlap with previous records").setCategory(FILTERING);
 
     // REF/ALT contents
@@ -176,15 +178,15 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(NON_SNPS_ONLY, "if set, will output MNPs and INDELs only").setCategory(FILTERING);
 
     // Contents of FILTER
-    mFlags.registerOptional('r', REMOVE_FILTER, String.class, "STRING", "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional('k', KEEP_FILTER, String.class, "STRING", "only keep variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('r', REMOVE_FILTER, String.class, STRING, "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('k', KEEP_FILTER, String.class, STRING, "only keep variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Contents of INFO
-    mFlags.registerOptional('R', REMOVE_INFO, String.class, "STRING", "remove variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional('K', KEEP_INFO, String.class, "STRING", "only keep variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('R', REMOVE_INFO, String.class, STRING, "remove variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('K', KEEP_INFO, String.class, STRING, "only keep variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Which FORMAT columns do we look at
-    mFlags.registerOptional(SAMPLE, String.class, "STRING", "apply sample-specific criteria to the named sample contained in the input VCF").setCategory(INPUT_OUTPUT).setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional(SAMPLE, String.class, STRING, "apply sample-specific criteria to the named sample contained in the input VCF").setCategory(INPUT_OUTPUT).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(ALL_SAMPLES, "apply sample-specific criteria to all samples contained in the input VCF").setCategory(INPUT_OUTPUT);
 
     // FORMAT/GT
@@ -193,29 +195,29 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(REMOVE_ALL_SAME_AS_REF, "remove where all samples are same as reference").setCategory(FILTERING);
 
     // Other INFO fields
-    mFlags.registerOptional('c', MIN_COMBINED_DEPTH, Integer.class, "INT", "minimum allowed combined read depth").setCategory(FILTERING);
-    mFlags.registerOptional('C', MAX_COMBINED_DEPTH, Integer.class, "INT", "maximum allowed combined read depth").setCategory(FILTERING);
+    mFlags.registerOptional('c', MIN_COMBINED_DEPTH, Integer.class, INT, "minimum allowed combined read depth").setCategory(FILTERING);
+    mFlags.registerOptional('C', MAX_COMBINED_DEPTH, Integer.class, INT, "maximum allowed combined read depth").setCategory(FILTERING);
 
     // Other FORMAT fields
-    mFlags.registerOptional('d', MIN_DEPTH, Integer.class, "INT", "minimum allowed sample read depth").setCategory(FILTERING);
-    mFlags.registerOptional('D', MAX_DEPTH, Integer.class, "INT", "maximum allowed sample read depth").setCategory(FILTERING);
-    mFlags.registerOptional('g', MIN_GENOTYPE_QUALITY, Double.class, "float", "minimum allowed genotype quality").setCategory(FILTERING);
-    mFlags.registerOptional('G', MAX_GENOTYPE_QUALITY, Double.class, "float", "maximum allowed genotype quality").setCategory(FILTERING);
-    mFlags.registerOptional('q', MIN_QUALITY, Double.class, "float", "minimum allowed quality").setCategory(FILTERING);
-    mFlags.registerOptional('Q', MAX_QUALITY, Double.class, "float", "maximum allowed quality").setCategory(FILTERING);
-    mFlags.registerOptional('A', MAX_AMBIGUITY_RATIO, Double.class, "float", "maximum allowed ambiguity ratio").setCategory(FILTERING);
-    mFlags.registerOptional(MIN_AVR_SCORE, Double.class, "float", "minimum allowed AVR score").setCategory(FILTERING);
-    mFlags.registerOptional(MAX_AVR_SCORE, Double.class, "float", "maximum allowed AVR score").setCategory(FILTERING);
-    mFlags.registerOptional(MIN_DENOVO_SCORE, Double.class, "float", "minimum de novo score threshold").setCategory(FILTERING);
-    mFlags.registerOptional(MAX_DENOVO_SCORE, Double.class, "float", "maximum de novo score threshold").setCategory(FILTERING);
+    mFlags.registerOptional('d', MIN_DEPTH, Integer.class, INT, "minimum allowed sample read depth").setCategory(FILTERING);
+    mFlags.registerOptional('D', MAX_DEPTH, Integer.class, INT, "maximum allowed sample read depth").setCategory(FILTERING);
+    mFlags.registerOptional('g', MIN_GENOTYPE_QUALITY, Double.class, FLOAT, "minimum allowed genotype quality").setCategory(FILTERING);
+    mFlags.registerOptional('G', MAX_GENOTYPE_QUALITY, Double.class, FLOAT, "maximum allowed genotype quality").setCategory(FILTERING);
+    mFlags.registerOptional('q', MIN_QUALITY, Double.class, FLOAT, "minimum allowed quality").setCategory(FILTERING);
+    mFlags.registerOptional('Q', MAX_QUALITY, Double.class, FLOAT, "maximum allowed quality").setCategory(FILTERING);
+    mFlags.registerOptional('A', MAX_AMBIGUITY_RATIO, Double.class, FLOAT, "maximum allowed ambiguity ratio").setCategory(FILTERING);
+    mFlags.registerOptional(MIN_AVR_SCORE, Double.class, FLOAT, "minimum allowed AVR score").setCategory(FILTERING);
+    mFlags.registerOptional(MAX_AVR_SCORE, Double.class, FLOAT, "maximum allowed AVR score").setCategory(FILTERING);
+    mFlags.registerOptional(MIN_DENOVO_SCORE, Double.class, FLOAT, "minimum de novo score threshold").setCategory(FILTERING);
+    mFlags.registerOptional(MAX_DENOVO_SCORE, Double.class, FLOAT, "maximum de novo score threshold").setCategory(FILTERING);
 
     // Xflags
-    mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, "float", "minimum allowed posterior score").setCategory(FILTERING);
-    mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, "float", "maximum allowed posterior score").setCategory(FILTERING);
-    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, "STRING", "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
+    mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, FLOAT, "minimum allowed posterior score").setCategory(FILTERING);
+    mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, FLOAT, "maximum allowed posterior score").setCategory(FILTERING);
+    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, STRING, "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, "STRING", "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
-    final Flag javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, "STRING", "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
+    mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, STRING, "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
+    final Flag javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, STRING, "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
     javascript.setCategory(FILTERING);
     javascript.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
@@ -228,51 +230,34 @@ public final class VcfFilterCli extends AbstractCli {
   private static class VcfFilterValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      if (!flags.checkOr(OUTPUT, JAVASCRIPT_FLAG)) {
+      if (flags.isSet(OUTPUT_FLAG)) {
+        if (!CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))) {
+          return false;
+        }
+      }
+      if (!CommonFlags.validateInputFile(flags, INPUT_FLAG)
+        || !CommonFlags.validateInputFile(flags, EXCLUDE_BED, EXCLUDE_VCF, INCLUDE_BED, INCLUDE_VCF)
+        || !flags.checkOr(OUTPUT_FLAG, JAVASCRIPT_FLAG)
+        || !flags.checkMinMaxInRange(MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY, 0.0, Double.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE, 0.0, Double.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_QUALITY, MAX_QUALITY, 0.0, Double.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_AVR_SCORE, MAX_AVR_SCORE, 0.0, Double.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_DENOVO_SCORE, MAX_DENOVO_SCORE, 0.0, Double.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_DEPTH, MAX_DEPTH, 0, Integer.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_COMBINED_DEPTH, MAX_COMBINED_DEPTH, 0, Integer.MAX_VALUE)
+        || !flags.checkInRange(MAX_AMBIGUITY_RATIO, 0.0, 1.0)
+        || !flags.checkInRange(DENSITY_WINDOW, 1, Integer.MAX_VALUE)
+        || !CommonFlags.validateRegions(flags)
+        || !flags.checkNand(EXCLUDE_BED, EXCLUDE_VCF)
+        || !flags.checkNand(INCLUDE_BED, INCLUDE_VCF)
+        || !flags.checkNand(SNPS_ONLY, NON_SNPS_ONLY)
+        || !flags.checkNand(SAMPLE, ALL_SAMPLES)
+        || !flags.checkNand(FAIL_FLAG, CLEAR_FAILED_SAMPLES)) {
         return false;
-      }
-      final File input = (File) flags.getValue(INPUT);
-      if (!CommonFlags.isStdio(input)) {
-        if (!input.exists()) {
-          flags.setParseMessage("Given file \"" + input.getPath() + "\" does not exist.");
-          return false;
-        }
-        if (input.isDirectory()) {
-          flags.setParseMessage("Given file \"" + input.getPath() + "\" is a directory.");
-          return false;
-        }
-      }
-      if (flags.isSet(OUTPUT)) {
-        final File o = (File) flags.getValue(OUTPUT);
-        if (!CommonFlags.isStdio(o)) {
-          final File output = FileUtils.getZippedFileName(!flags.isSet(NO_GZIP), o);
-          if (output.exists()) {
-            flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
-            return false;
-          }
-        }
       }
       if ((flags.isSet(MIN_GENOTYPE_QUALITY) || flags.isSet(MAX_GENOTYPE_QUALITY)) && (flags.isSet(MIN_POSTERIOR_SCORE) || flags.isSet(MAX_POSTERIOR_SCORE))) {
         //Only possible if someone is monkeying with X-flags
         flags.setParseMessage("Use genotype-quality or posterior filters, not both.");
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_GENOTYPE_QUALITY, MAX_GENOTYPE_QUALITY, 0.0, Double.MAX_VALUE)) {
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_POSTERIOR_SCORE, MAX_POSTERIOR_SCORE, 0.0, Double.MAX_VALUE)) {
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_QUALITY, MAX_QUALITY, 0.0, Double.MAX_VALUE)) {
-        return false;
-      }
-      if (!flags.checkInRange(MAX_AMBIGUITY_RATIO, 0.0, 1.0)) {
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_AVR_SCORE, MAX_AVR_SCORE, 0.0, Double.MAX_VALUE)) {
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_DENOVO_SCORE, MAX_DENOVO_SCORE, 0.0, Double.MAX_VALUE)) {
         return false;
       }
       if (flags.isSet(MIN_DENOVO_SCORE) || flags.isSet(MAX_DENOVO_SCORE)) {
@@ -281,53 +266,8 @@ public final class VcfFilterCli extends AbstractCli {
           return false;
         }
       }
-      if (flags.isSet(DENSITY_WINDOW) && !flags.checkInRange(DENSITY_WINDOW, 1, Integer.MAX_VALUE)) {
-        return false;
-      }
-      if (!flags.checkMinMaxInRange(MIN_DEPTH, MAX_DEPTH, 0, Integer.MAX_VALUE) || !flags.checkMinMaxInRange(MIN_COMBINED_DEPTH, MAX_COMBINED_DEPTH, 0, Integer.MAX_VALUE)) {
-        return false;
-      }
-      for (final String flag : new String[] {EXCLUDE_BED, EXCLUDE_VCF, INCLUDE_BED, INCLUDE_VCF}) {
-        if (validateFile(flags, flag)) {
-          return false;
-        }
-      }
-      if (!CommonFlags.validateRegions(flags)) {
-        return false;
-      }
-      if (!flags.checkNand(EXCLUDE_BED, EXCLUDE_VCF)) {
-        return false;
-      }
-      if (!flags.checkNand(INCLUDE_BED, INCLUDE_VCF)) {
-        return false;
-      }
-      if (!flags.checkNand(SNPS_ONLY, NON_SNPS_ONLY)) {
-        return false;
-      }
-      if (!flags.checkNand(SAMPLE, ALL_SAMPLES)) {
-        return false;
-      }
-      if (!flags.checkNand(FAIL_FLAG, CLEAR_FAILED_SAMPLES)) {
-        return false;
-      }
       return true;
     }
-
-    static boolean validateFile(CFlags flags, String flag) {
-      if (flags.isSet(flag)) {
-        final File file = (File) flags.getValue(flag);
-        if (!file.exists()) {
-          flags.setParseMessage("The \"--" + flag + "\" file: \"" + file + "\" doesn't exist.");
-          return true;
-        }
-        if (file.isDirectory()) {
-          flags.setParseMessage("The \"--" + flag + "\" file: \"" + file + "\" is a directory.");
-          return true;
-        }
-      }
-      return false;
-    }
-
   }
 
   @Override
@@ -448,9 +388,9 @@ public final class VcfFilterCli extends AbstractCli {
     final Optional<ScriptedVcfFilter> scriptFilter = buildScriptFilter(mFlags, output);
     scriptFilter.ifPresent(mVcfFilterTask.mFilters::add);
 
-    final File in = (File) mFlags.getValue(INPUT);
-    final File out = (File) mFlags.getValue(OUTPUT);
-    final boolean stdout = out != null && CommonFlags.isStdio(out);
+    final File in = (File) mFlags.getValue(INPUT_FLAG);
+    final File out = (File) mFlags.getValue(OUTPUT_FLAG);
+    final boolean stdout = out != null && FileUtils.isStdio(out);
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
       try (VcfWriter w = getVcfWriter(output, out, r)) {
@@ -470,7 +410,7 @@ public final class VcfFilterCli extends AbstractCli {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final boolean writeHeader = !mFlags.isSet(NO_HEADER);
-    final File outputFile = CommonFlags.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
+    final File outputFile = FileUtils.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
     return new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), outputFile, output, gzip, index, writeHeader));
   }
 

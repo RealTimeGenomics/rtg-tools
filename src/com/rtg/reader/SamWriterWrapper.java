@@ -36,7 +36,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.launcher.CommonFlags;
 import com.rtg.mode.DnaUtils;
 import com.rtg.sam.ReadGroupUtils;
 import com.rtg.sam.SamBamConstants;
@@ -120,10 +119,10 @@ public class SamWriterWrapper implements WriterWrapper {
 
     SamUtils.addProgramRecord(header);
 
-    final boolean bam = !CommonFlags.isStdio(baseOutput) && baseFile.getExtension().endsWith(SamUtils.BAM_SUFFIX);
+    final boolean bam = !FileUtils.isStdio(baseOutput) && baseFile.getExtension().endsWith(SamUtils.BAM_SUFFIX);
 
     final OutputStream os;
-    if (CommonFlags.isStdio(baseOutput)) {
+    if (FileUtils.isStdio(baseOutput)) {
       os = FileUtils.getStdoutAsOutputStream();
     } else {
       os = FileUtils.createOutputStream(baseFile.suffixedFile("", gzip && !bam), gzip && !bam);

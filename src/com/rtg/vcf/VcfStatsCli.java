@@ -47,6 +47,7 @@ import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -97,7 +98,7 @@ public class VcfStatsCli extends AbstractCli {
       final List<Object> files = flags.getAnonymousValues(0);
       if (files.size() > 1) {
         for (Object file : files) {
-          if (CommonFlags.isStdio((File) file)) {
+          if (FileUtils.isStdio((File) file)) {
             flags.setParseMessage("Reading from standard in, not expecting other FILE arguments.");
             return false;
           }
@@ -112,7 +113,7 @@ public class VcfStatsCli extends AbstractCli {
     final List<File> inputs;
     final List<Object> files = mFlags.getAnonymousValues(0);
     // Kludge to let '-' as a single filename through the file checking to make std in possible
-    if (files.size() == 1 && CommonFlags.isStdio((File) files.get(0))) {
+    if (files.size() == 1 && FileUtils.isStdio((File) files.get(0))) {
       inputs = new ArrayList<>();
       inputs.add((File) files.get(0));
     } else {

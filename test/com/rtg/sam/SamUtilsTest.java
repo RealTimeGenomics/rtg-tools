@@ -406,7 +406,7 @@ public class SamUtilsTest extends TestCase {
     assertEquals("test.sam.gz", SamUtils.getZippedSamFileName(true, new File("test.sam")).getName());
     assertEquals("test.sam", SamUtils.getZippedSamFileName(false, new File("test.sam")).getName());
     assertEquals("test.sam.gz", SamUtils.getZippedSamFileName(true, new File("test.sam.gz")).getName());
-    assertEquals("test.sam.gz.sam", SamUtils.getZippedSamFileName(false, new File("test.sam.gz")).getName());
+    assertEquals("test.sam", SamUtils.getZippedSamFileName(false, new File("test.sam.gz")).getName());
   }
 
   public void testSamReadName() {

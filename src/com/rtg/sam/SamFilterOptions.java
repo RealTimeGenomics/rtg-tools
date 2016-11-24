@@ -39,7 +39,6 @@ import com.rtg.util.IntegerOrPercentage;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.ErrorType;
 
 /**
  * Constants and utility methods for command line flags for filtering SAM records.
@@ -273,38 +272,22 @@ public final class SamFilterOptions {
    * @return true if the provided flags are valid, false otherwise
    */
   public static boolean validateFilterFlags(final CFlags flags, boolean allowUnmappedOnly) {
-    if (flags.isSet(MAX_HITS_FLAG)) {
-      final int maxHits = (Integer) flags.getValue(MAX_HITS_FLAG);
-      if (maxHits < 1) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAX_HITS_FLAG, "" + maxHits, "1");
-        return false;
-      }
-    }
-    if (flags.isSet(SUBSAMPLE_FLAG)) {
-      final double fraction = (Double) flags.getValue(SUBSAMPLE_FLAG);
-      if (fraction < 0 || fraction > 1.0) {
-        flags.setParseMessage("--" + SUBSAMPLE_FLAG + " must be between 0 and 1.0");
-        return false;
-      }
-    }
-    if (flags.isSet(MIN_MAPQ_FLAG)) {
-      final int minMapQ = (Integer) flags.getValue(MIN_MAPQ_FLAG);
-      if (minMapQ < 1) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MIN_MAPQ_FLAG, "" + minMapQ, "1");
-        return false;
-      }
+    if (!flags.checkInRange(MAX_HITS_FLAG, 1, Integer.MAX_VALUE)
+      || !flags.checkInRange(SUBSAMPLE_FLAG, 0.0, 1.0)
+      || !flags.checkInRange(MIN_MAPQ_FLAG, 1, Integer.MAX_VALUE)) {
+      return false;
     }
     if (flags.isSet(MAX_AS_MATED_FLAG)) {
       final IntegerOrPercentage maxMated = (IntegerOrPercentage) flags.getValue(MAX_AS_MATED_FLAG);
       if (maxMated.getValue(100) < 0) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAX_AS_MATED_FLAG, "" + maxMated, "0");
+        flags.setParseMessage("The value for --" + MAX_AS_MATED_FLAG + " must be at least 0");
         return false;
       }
     }
     if (flags.isSet(MAX_AS_UNMATED_FLAG)) {
       final IntegerOrPercentage maxUnmated = (IntegerOrPercentage) flags.getValue(MAX_AS_UNMATED_FLAG);
       if (maxUnmated.getValue(100) < 0) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAX_AS_UNMATED_FLAG, "" + maxUnmated, "0");
+        flags.setParseMessage("The value for --" + MAX_AS_UNMATED_FLAG + " must be at least 0");
         return false;
       }
     }

@@ -47,7 +47,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -692,9 +691,7 @@ public final class SamUtils {
    * @return the appropriately adjusted file
    */
   public static File getZippedSamFileName(final boolean gzip, final File file) {
-    final String name = file.getName().toLowerCase(Locale.getDefault());
-    final File samfile = name.endsWith(SAM_SUFFIX) || gzip && name.endsWith(SAM_SUFFIX + FileUtils.GZ_SUFFIX) ? file : new File(file.getPath() + SAM_SUFFIX);
-    return FileUtils.getZippedFileName(gzip, samfile);
+    return FileUtils.getOutputFileName(file, gzip, SAM_SUFFIX);
   }
 
   /**

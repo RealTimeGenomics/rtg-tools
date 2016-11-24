@@ -29,7 +29,9 @@
  */
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
+import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
@@ -51,6 +53,7 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.IdField;
@@ -105,30 +108,31 @@ public class VcfSubset extends AbstractCli {
     mFlags.setDescription("Removes columnar data from VCF records.");
     CommonFlagCategories.setCategories(mFlags);
 
-    mFlags.registerRequired('i', INPUT, File.class, "file", "VCF file containing variants to manipulate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT, File.class, "file", "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT, File.class, FILE, "VCF file containing variants to manipulate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
+    CommonFlags.initForce(mFlags);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
 
     // Contents of FILTER
-    mFlags.registerOptional(REMOVE_FILTER, String.class, "STRING", "remove the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(KEEP_FILTER, String.class, "STRING", "keep the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(REMOVE_FILTER, String.class, STRING, "remove the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_FILTER, String.class, STRING, "keep the specified FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_FILTERS, "remove all FILTER tags").setCategory(FILTERING);
 
     // Contents of INFO
-    mFlags.registerOptional(REMOVE_INFO, String.class, "STRING", "remove the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(KEEP_INFO, String.class, "STRING", "keep the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(REMOVE_INFO, String.class, STRING, "remove the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_INFO, String.class, STRING, "keep the specified INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_INFOS, "remove all INFO tags").setCategory(FILTERING);
 
     // Contents of SAMPLE
-    mFlags.registerOptional(REMOVE_SAMPLE, String.class, "STRING", "remove the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(KEEP_SAMPLE, String.class, "STRING", "keep the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(REMOVE_SAMPLE, String.class, STRING, "remove the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_SAMPLE, String.class, STRING, "keep the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_SAMPLES, "remove all samples").setCategory(FILTERING);
 
     // Contents of FORMAT
-    mFlags.registerOptional(REMOVE_FORMAT, String.class, "STRING", "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(KEEP_FORMAT, String.class, "STRING", "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(REMOVE_FORMAT, String.class, STRING, "remove the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_FORMAT, String.class, STRING, "keep the specified FORMAT field").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Contents of QUAL
     mFlags.registerOptional(REMOVE_QUAL, "remove the QUAL field").setCategory(FILTERING);
@@ -145,45 +149,12 @@ public class VcfSubset extends AbstractCli {
   private static class VcfSubsetValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      final File input = (File) flags.getValue(INPUT);
-      if (!CommonFlags.isStdio(input)) {
-        if (!input.exists()) {
-          flags.setParseMessage("Given file \"" + input.getPath() + "\" does not exist.");
-          return false;
-        }
-        if (input.isDirectory()) {
-          flags.setParseMessage("Given file \"" + input.getPath() + "\" is a directory.");
-          return false;
-        }
-      }
-      final File o = (File) flags.getValue(OUTPUT);
-      if (!CommonFlags.isStdio(o)) {
-        final File output = VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), o);
-        if (output.exists()) {
-          flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
-          return false;
-        }
-      }
-
-      if (!checkPairNands(flags, REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)) {
-        return false;
-      }
-      if (!checkPairNands(flags, REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)) {
-        return false;
-      }
-      if (!checkPairNands(flags, REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)) {
-        return false;
-      }
-      if (!flags.checkNand(REMOVE_FORMAT, KEEP_FORMAT)) {
-        return false;
-      }
-
-      return true;
-    }
-
-    private boolean checkPairNands(CFlags flags, String flag1, String flag2, String flag3) {
-      if (flags.isSet(flag1) && flags.isSet(flag2) || flags.isSet(flag1) && flags.isSet(flag3) || flags.isSet(flag2) && flags.isSet(flag3)) {
-        flags.setParseMessage("Only one of --" + flag1 + ", --" + flag2 + ", or --" + flag3 + " can be set");
+      if (!CommonFlags.validateInputFile(flags, INPUT)
+        || !CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT)))
+        || !flags.checkAtMostOne(REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)
+        || !flags.checkAtMostOne(REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)
+        || !flags.checkAtMostOne(REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)
+        || !flags.checkNand(REMOVE_FORMAT, KEEP_FORMAT)) {
         return false;
       }
       return true;
@@ -260,7 +231,7 @@ public class VcfSubset extends AbstractCli {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final boolean writeHeader = !mFlags.isSet(NO_HEADER);
-    final boolean stdout = CommonFlags.isStdio(output);
+    final boolean stdout = FileUtils.isStdio(output);
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
 

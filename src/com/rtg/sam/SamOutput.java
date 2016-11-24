@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.IndexingStreamCreator;
 import com.rtg.tabix.TabixIndexer;
@@ -97,7 +96,7 @@ public final class SamOutput implements Closeable {
     final OutputStream outputStream;
     final SamBamBaseFile.SamFormat type;
     final boolean compress;
-    if (CommonFlags.isStdio(filename)) { // Use uncompressed SAM for stdout
+    if (FileUtils.isStdio(filename)) { // Use uncompressed SAM for stdout
       outputFile = null;
       outputStream = stdio;
       type = SamBamBaseFile.SamFormat.SAM;

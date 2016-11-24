@@ -866,9 +866,9 @@ public final class CFlags {
    */
   public boolean checkAtMostOne(String... flags) {
     if (flags.length < 2) {
-      throw new IllegalArgumentException("checkOneOrNone requires at least two parameters");
+      throw new IllegalArgumentException("checkAtMostOne requires at least two parameters");
     }
-    final StringBuilder sb = new StringBuilder();
+    String firstFlag = null;
     boolean isset = false;
     for (final String flag : flags) {
       final Flag aFlag = getFlag(flag);
@@ -876,10 +876,10 @@ public final class CFlags {
         if (!isset) {
           isset = true;
         } else {
-          setParseMessage("Cannot set both " + sb.toString() + " and " + LONG_FLAG_PREFIX + flag);
+          setParseMessage("Cannot set both " + firstFlag + " and " + LONG_FLAG_PREFIX + flag);
           return false;
         }
-        sb.append(LONG_FLAG_PREFIX).append(flag);
+        firstFlag = LONG_FLAG_PREFIX + flag;
       }
     }
     return true;
@@ -967,11 +967,7 @@ public final class CFlags {
    * @return true if passes.
    */
   public boolean checkNand(String flag1, String flag2) {
-    if (isSet(flag1) && isSet(flag2)) {
-      setParseMessage("Only one of " + LONG_FLAG_PREFIX + flag1 + " or " + LONG_FLAG_PREFIX + flag2 + " can be set");
-      return false;
-    }
-    return true;
+    return checkAtMostOne(flag1, flag2);
   }
 
   /**

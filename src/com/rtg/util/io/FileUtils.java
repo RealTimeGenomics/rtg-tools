@@ -96,6 +96,9 @@ public final class FileUtils {
    */
   public static final String BZ2_SUFFIX = ".bz2";
 
+  /** File name argument used to indicate read from stdin or write to stdout */
+  public static final String STDIO_NAME = "-";
+
   private FileUtils() {
   }
 
@@ -766,6 +769,24 @@ public final class FileUtils {
   }
 
   /**
+   * Returns true if the input file is the stdin/stdout indicator
+   * @param file to test
+   * @return true if the file indicates stdin/stdout should be used
+   */
+  public static boolean isStdio(File file) {
+    return isStdio(file.toString());
+  }
+
+  /**
+   * Returns true if the input file is the stdin/stdout indicator
+   * @param filename to test
+   * @return true if the file indicates stdin/stdout should be used
+   */
+  public static boolean isStdio(String filename) {
+    return STDIO_NAME.equals(filename);
+  }
+
+  /**
    * @param file file to check
    * @return true if has <code>BZIP2</code> file extension
    */
@@ -904,7 +925,9 @@ public final class FileUtils {
    * @return the appropriately adjusted file
    */
   public static File getZippedFileName(final boolean gzip, final File file) {
-    if (gzip == isGzipFilename(file)) {    // All is good
+    if (isStdio(file)) {    // All is good
+      return file;
+    } else if (gzip == isGzipFilename(file)) {    // All is good
       return file;
     } else if (gzip) {    // Need to add suffix
       return new File(file.getAbsolutePath() + GZ_SUFFIX);
@@ -976,14 +999,15 @@ public final class FileUtils {
   }
 
   /**
-   * Takes a user supplied file name and makes sure it has appropriate extensions
+   * Takes a user supplied file name and makes sure it has appropriate extensions.
+   * If the user supplied the filename corresponding to stdin/stdout, it will not be altered.
    * @param userSuppliedFile filename the user supplied
    * @param gzip if file is to be gzipped
    * @param exts acceptable extensions (including the <code>.</code>) for target output file type
    * @return the final output file name
    */
   public static File getOutputFileName(File userSuppliedFile, boolean gzip, String... exts) {
-    return getBaseFile(userSuppliedFile, gzip, exts).suffixedFile("");
+    return isStdio(userSuppliedFile) ? userSuppliedFile : getBaseFile(userSuppliedFile, gzip, exts).suffixedFile("");
   }
 
   private static class TeeOutputStream extends OutputStream {

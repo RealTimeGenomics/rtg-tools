@@ -29,6 +29,10 @@
  */
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.STRING;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,7 +57,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.Timer;
 import com.rtg.util.intervals.RegionRestriction;
@@ -108,15 +111,15 @@ public final class SnpIntersection extends LoggedCli {
 
   protected static void initFlags(CFlags flags) {
     CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('i', FIRST_INPUT_FILE, File.class, CommonFlags.FILE, "first file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerRequired('I', SECOND_INPUT_FILE, File.class, CommonFlags.FILE, "second file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerRequired('i', FIRST_INPUT_FILE, File.class, FILE, "first file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerRequired('I', SECOND_INPUT_FILE, File.class, FILE, "second file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     CommonFlags.initOutputDirFlag(flags);
     flags.registerOptional('c', COMPARE_ALTS, "do a basic comparison on ALT calls in addition to position").setCategory(CommonFlagCategories.REPORTING);
 CommonFlags.initNoGzip(flags);
-    final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, "STRING", "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
+    final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
-    flags.registerOptional(REGION_FLAG, String.class, "STRING", "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    flags.registerOptional(REGION_FLAG, String.class, STRING, "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     flags.setDescription("Produces intersection information between two SNP files.");
     flags.setValidator(new SnpIntersectionFlagValidator());
   }
@@ -124,10 +127,8 @@ CommonFlags.initNoGzip(flags);
   protected static final class SnpIntersectionFlagValidator implements Validator {
     @Override
     public boolean isValid(CFlags flags) {
-      if (!CommonFlags.validateOutputDirectory(flags)) {
-        return false;
-      }
-      if (!checkInputFile(flags, FIRST_INPUT_FILE) || !checkInputFile(flags, SECOND_INPUT_FILE)) {
+      if (!CommonFlags.validateOutputDirectory(flags)
+        || !CommonFlags.validateInputFile(flags, FIRST_INPUT_FILE, SECOND_INPUT_FILE)) {
         return false;
       }
       if (flags.isSet(REGION_FLAG)) {
@@ -167,28 +168,10 @@ CommonFlags.initNoGzip(flags);
     }
   }
 
-  protected static boolean checkInputFile(CFlags flags, String flag) {
-    final File file = (File) flags.getValue(flag);
-    if (!file.exists()) {
-      Diagnostic.error(ErrorType.INFO_ERROR, "The file \"" + file.getPath() + "\", specified for \"--" + flag + "\", does not exist.");
-      return false;
-    }
-    if (file.isDirectory()) {
-      Diagnostic.error(ErrorType.INFO_ERROR, "The file \"" + file.getPath() + "\", specified for \"--" + flag + "\", is a directory.");
-      return false;
-    }
-    return true;
-  }
-
-  @Override
-  protected int mainExec(OutputStream out, LogStream log) throws IOException {
-    process(out);
-    return 0;
-  }
 
   @Override
   protected File outputDirectory() {
-    return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
+    return (File) mFlags.getValue(OUTPUT_FLAG);
   }
 
   @Override
@@ -201,11 +184,12 @@ CommonFlags.initNoGzip(flags);
     return "simple position-based intersection of VCF files";
   }
 
-  private void process(final OutputStream out) throws IOException {
+  @Override
+  protected int mainExec(OutputStream out, LogStream log) throws IOException {
     final boolean compareAlts = mFlags.isSet(COMPARE_ALTS);
     final File first = (File) mFlags.getValue(FIRST_INPUT_FILE);
     final File second = (File) mFlags.getValue(SECOND_INPUT_FILE);
-    final File outputFile = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
+    final File outputFile = (File) mFlags.getValue(OUTPUT_FLAG);
     final RegionRestriction region = mFlags.isSet(REGION_FLAG) ? new RegionRestriction((String) mFlags.getValue(REGION_FLAG)) : null;
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
     final List<Object> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
@@ -328,6 +312,7 @@ CommonFlags.initNoGzip(flags);
     try (OutputStream summary = new BufferedOutputStreamFix(new FileOutputStream(output.file(CommonFlags.SUMMARY_FILE)))) {
       writeSummary(summary, sb.toString());
     }
+    return 0;
   }
 
   private String vcfRecordToPrediction(VcfRecord rec) {

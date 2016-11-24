@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.launcher.CommonFlags;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.BaseFile;
@@ -97,7 +96,7 @@ public class FastaWriterWrapper implements WriterWrapper {
         mLeft = getStream(baseFile, "");
         mRight = mLeft;
       } else {
-        if (CommonFlags.isStdio(baseOutput)) {
+        if (FileUtils.isStdio(baseOutput)) {
           throw new NoTalkbackSlimException("Sending non-interleaved paired-end data to stdout is not supported.");
         }
         mLeft = getStream(baseFile, "_1");
@@ -111,7 +110,7 @@ public class FastaWriterWrapper implements WriterWrapper {
   }
 
   static LineWriter getStream(final BaseFile baseFile, String fileSuffix) throws IOException {
-    if (CommonFlags.isStdio(baseFile.getBaseFile())) {
+    if (FileUtils.isStdio(baseFile.getBaseFile())) {
       return new LineWriter(new OutputStreamWriter(FileUtils.getStdoutAsOutputStream()));
     }
     return new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseFile.suffixedFile(fileSuffix), baseFile.isGzip())));

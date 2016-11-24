@@ -51,10 +51,10 @@ public class VcfFilterCliValidatorTest extends AbstractCliTest {
   public void testFlagValidator() throws IOException {
     try (final TestDirectory main = new TestDirectory("vcffiltercli")) {
       final File foo = new File(main, "foo");
-      final File out = new File(main, "out.gz");
-      final File out2 = new File(main, "out.txt");
+      final File out = new File(main, "out.vcf.gz");
+      final File out2 = new File(main, "out.vcf");
       String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Given file ", " does not exist.");
+      TestUtils.containsAll(TestUtils.unwrap(err), "The --input file ", " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
@@ -123,30 +123,30 @@ public class VcfFilterCliValidatorTest extends AbstractCliTest {
 
       final File bedFile = new File(main, "foo.bed");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The \"--include-bed\" file: \"" + bedFile + "\" doesn't exist");
+      TestUtils.containsAll(TestUtils.unwrap(err), "The --include-bed file \"" + bedFile + "\" does not exist");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The \"--exclude-bed\" file: \"" + bedFile + "\" doesn't exist");
+      TestUtils.containsAll(TestUtils.unwrap(err), "The --exclude-bed file \"" + bedFile + "\" does not exist");
 
       assertTrue(bedFile.mkdir());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-vcf", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The \"--include-vcf\" file: \"" + bedFile + "\" is a directory");
+      TestUtils.containsAll(TestUtils.unwrap(err), "The --include-vcf file \"" + bedFile + "\" is a directory");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-vcf", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The \"--exclude-vcf\" file: \"" + bedFile + "\" is a directory");
+      TestUtils.containsAll(TestUtils.unwrap(err), "The --exclude-vcf file \"" + bedFile + "\" is a directory");
 
       assertTrue(bedFile.delete() && bedFile.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-vcf", bedFile.toString(), "--include-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --include-bed or --include-vcf");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --include-bed and --include-vcf");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-vcf", bedFile.toString(), "--exclude-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --exclude-bed or --exclude-vcf");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --exclude-bed and --exclude-vcf");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--snps-only", "--non-snps-only");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --snps-only or --non-snps-only");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --snps-only and --non-snps-only");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--fail", "BLAH", "--clear-failed-samples");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --fail or --clear-failed-samples");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --fail and --clear-failed-samples");
 
     }
   }

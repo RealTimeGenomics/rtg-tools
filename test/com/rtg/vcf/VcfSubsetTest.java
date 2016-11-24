@@ -123,7 +123,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(main, "out.vcf.gz");
       final File out2 = new File(main, "out.vcf");
       String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Given file ", " does not exist.");
+      TestUtils.containsAll(TestUtils.unwrap(err), " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
       TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
@@ -137,28 +137,28 @@ public class VcfSubsetTest extends AbstractCliTest {
       TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out2.getPath() + "\" already exists");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-infos", "--remove-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-infos, --remove-info, or --keep-info can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-infos", "--keep-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-infos, --remove-info, or --keep-info can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-info", "feh", "--keep-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-infos, --remove-info, or --keep-info can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filters", "--remove-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-filters, --remove-filter, or --keep-filter can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filters", "--keep-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-filters, --remove-filter, or --keep-filter can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filter", "feh", "--keep-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-filters, --remove-filter, or --keep-filter can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-samples", "--remove-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-samples, --remove-sample, or --keep-sample can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-samples", "--keep-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-samples, --remove-sample, or --keep-sample can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-sample", "feh", "--keep-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-samples, --remove-sample, or --keep-sample can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-format", "feh", "--keep-format", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Only one of --remove-format or --keep-format can be set");
+      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
     }
   }
 

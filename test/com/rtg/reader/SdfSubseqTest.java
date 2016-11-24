@@ -116,10 +116,10 @@ public class SdfSubseqTest extends AbstractCliTest {
       TestUtils.containsAll(err, "The region value \"TEST:-5+6\" is malformed.");
 
       err = checkHandleFlagsErr("-i", normal.toString(), "TEST:1+1", "-f", "-q");
-      TestUtils.containsAll(err, "Only one of --fasta or --fastq");
+      TestUtils.containsAll(err, "Cannot set both --fasta and --fastq");
 
       err = checkHandleFlagsErr("-i", normal.toString(), "TEST:4+2", "--Xpreserve-coordinates", "--reverse-complement");
-      TestUtils.containsAll(err, "Only one of --Xpreserve-coordinates or --reverse-complement");
+      TestUtils.containsAll(err, "Cannot set both --Xpreserve-coordinates and --reverse-complement");
 
       err = checkHandleFlagsErr("-i", normal.toString(), "-I", "TEST:1+1");
       TestUtils.containsAll(err.replaceAll("\\s+", " "), "When --sequence-id is set the <sequence_name> of the region \"TEST:1+1\" must be an integer greater than or equal to 0.");

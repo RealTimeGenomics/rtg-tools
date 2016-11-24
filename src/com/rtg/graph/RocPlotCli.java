@@ -50,6 +50,7 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.Pair;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
@@ -79,34 +80,29 @@ public class RocPlotCli extends AbstractCli {
     @Override
     public boolean isValid(CFlags flags) {
       if (!(flags.getAnonymousValues(0).size() > 0 || flags.isSet(CURVE_FLAG))) {
-        flags.error("Must supply at least 1 ROC file");
+        flags.setParseMessage("Must supply at least 1 ROC file");
         return false;
       }
       if (flags.isSet(CURVE_FLAG)) {
         for (Pair<File, String> filepair : parseNamedFileStrings(flags.getValues(CURVE_FLAG))) {
-          if (!filepair.getA().exists()) {
-            flags.error("File: " + filepair.getA() + " does not exist");
+          if (!CommonFlags.validateInputFile(flags, filepair.getA())) {
             return false;
           }
         }
       }
       for (Object o : flags.getAnonymousValues(0)) {
-        final File f = (File) o;
-        if (!f.exists()) {
-          flags.error("File: " + f + " does not exist");
+        if (!CommonFlags.validateInputFile(flags, (File) o)) {
           return false;
         }
       }
       if (flags.isSet(PNG_FLAG)) {
-        final File pngFile = getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION);
-        if (checkFile(flags, pngFile)) {
+        if (!CommonFlags.validateOutputFile(flags, getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION))) {
           return false;
         }
       }
 
       if (flags.isSet(SVG_FLAG)) {
-        final File svgFile = getFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION);
-        if (checkFile(flags, svgFile)) {
+        if (!CommonFlags.validateOutputFile(flags, getFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION))) {
           return false;
         }
       }
@@ -115,18 +111,8 @@ public class RocPlotCli extends AbstractCli {
       }
       return true;
     }
-
-    private boolean checkFile(CFlags flags, File file) {
-      if (file.isDirectory()) {
-        flags.error("Path: " + file.getPath() + " is a directory");
-        return true;
-      } else if (file.exists()) {
-        flags.error("File: "  + file.getPath() + " already exists");
-        return true;
-      }
-      return false;
-    }
   }
+
   @Override
   protected void initFlags() {
     initFlags(mFlags);
@@ -136,6 +122,7 @@ public class RocPlotCli extends AbstractCli {
     CommonFlagCategories.setCategories(flags);
     flags.setDescription("Plot ROC curves from vcfeval ROC data files, either to an image, or an interactive GUI.");
     flags.registerExtendedHelp();
+    CommonFlags.initForce(flags);
     flags.registerOptional('t', TITLE_FLAG, String.class, "STRING", "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
     flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);

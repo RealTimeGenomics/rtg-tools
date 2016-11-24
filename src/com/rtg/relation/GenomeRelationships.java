@@ -45,7 +45,6 @@ import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.reference.Sex;
 import com.rtg.relation.Relationship.RelationshipFilter;
 import com.rtg.relation.Relationship.RelationshipType;
@@ -118,7 +117,7 @@ public class GenomeRelationships {
     } else if (pedFile.getName().endsWith(".ped")) {
       pedigree = PedFileParser.loadFile(pedFile);
     } else { // Guess based on content
-      pedigree = loadGenomeRelationships(new InputStreamReader(CommonFlags.isStdio(pedFile) ? System.in : FileUtils.createInputStream(pedFile, false)));
+      pedigree = loadGenomeRelationships(new InputStreamReader(FileUtils.isStdio(pedFile) ? System.in : FileUtils.createInputStream(pedFile, false)));
     }
     return pedigree;
   }

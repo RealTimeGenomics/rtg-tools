@@ -144,7 +144,7 @@ public class GenerateReferenceManifest extends AbstractCli {
   }
 
   private static Writer getFileWriter(File out) throws IOException {
-    if (CommonFlags.isStdio(out)) {
+    if (FileUtils.isStdio(out)) {
       return new OutputStreamWriter(FileUtils.getStdoutAsOutputStream());
     }
     return new FileWriter(out);

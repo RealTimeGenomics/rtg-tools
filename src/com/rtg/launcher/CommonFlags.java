@@ -46,6 +46,7 @@ import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.io.FileUtils;
 
 /**
  * Container for common flags
@@ -137,9 +138,6 @@ public final class CommonFlags {
   public static final String STRING = "STRING";
   /** FILE OR SDF */
   public static final String SDF_OR_FILE = "SDF|FILE";
-
-  /** File name argument used to indicate read from stdin or write to stdout */
-  public static final String STDIO_NAME = "-";
 
   /** Name of summary file. */
   public static final String SUMMARY_FILE = "summary.txt";
@@ -249,9 +247,74 @@ public final class CommonFlags {
    */
   public static boolean validateOutputDirectory(CFlags flags, String outputFlag) {
     final File directory = (File) flags.getValue(outputFlag);
-    if (directory.exists() && !flags.isSet(FORCE)) {
-      Diagnostic.error(ErrorType.DIRECTORY_EXISTS, directory.getPath());
-      return false;
+    if (directory.exists()) {
+      if (!flags.isSet(FORCE)) {
+        Diagnostic.error(ErrorType.DIRECTORY_EXISTS, directory.getPath());
+        return false;
+      } else if (!directory.isDirectory()) {
+        flags.setParseMessage("The directory \"" + directory + "\" already exists and is not a directory. Please remove it first or choose a different file");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Validate that an output file does not already exist.
+   * @param flags the flags
+   * @param output the output file. It is acceptable to pass stdin.
+   * @return true if valid, otherwise false
+   */
+  public static boolean validateOutputFile(CFlags flags, File output) {
+    if (!FileUtils.isStdio(output)) {
+      if (output.exists()) {
+        if (!flags.isSet(FORCE)) {
+          flags.setParseMessage("The file \"" + output + "\" already exists. Please remove it first or choose a different file");
+          return false;
+        } else if (output.isDirectory()) {
+          flags.setParseMessage("The file \"" + output + "\" already exists and is a directory. Please remove it first or choose a different file");
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Validate that an input file exists and is not a directory
+   * @param flags the flags
+   * @param inputFlags the input flag name. It is acceptable to pass stdin.
+   * @return true if valid, otherwise false
+   */
+  public static boolean validateInputFile(CFlags flags, String... inputFlags) {
+    for (String inputFlag : inputFlags) {
+      if (flags.isSet(inputFlag) && !validateInputFile(flags, (File) flags.getValue(inputFlag), "--" + inputFlag)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Validate that an input file exists and is not a directory
+   * @param flags the flags
+   * @param input the input file. It is acceptable to pass stdin.
+   * @return true if valid, otherwise false
+   */
+  public static boolean validateInputFile(CFlags flags, File input) {
+    return validateInputFile(flags, input, "given");
+  }
+
+  private static boolean validateInputFile(CFlags flags, File input, String label) {
+    if (!FileUtils.isStdio(input)) {
+      if (!input.exists()) {
+        flags.setParseMessage("The " + label + " file \"" + input.getPath() + "\" does not exist.");
+        return false;
+      }
+      if (input.isDirectory()) {
+        flags.setParseMessage("The " + label + " file \"" + input.getPath() + "\" is a directory.");
+        return false;
+      }
     }
     return true;
   }
@@ -355,24 +418,6 @@ public final class CommonFlags {
   }
 
   /**
-   * Returns true if the input file is the stdin/stdout indicator
-   * @param file to test
-   * @return true if the file indicates stdin/stdout should be used
-   */
-  public static boolean isStdio(File file) {
-    return isStdio(file.toString());
-  }
-
-  /**
-   * Returns true if the input file is the stdin/stdout indicator
-   * @param filename to test
-   * @return true if the file indicates stdin/stdout should be used
-   */
-  public static boolean isStdio(String filename) {
-    return STDIO_NAME.equals(filename);
-  }
-
-  /**
    * Check the file list and anonymous file input flags.
    * @param flags the flags to check
    * @param fileListFlag the flag name for the file list
@@ -458,7 +503,7 @@ public final class CommonFlags {
    * @return false if validation failed
    */
   public static boolean validateNotStdout(File outfile) {
-    if (isStdio(outfile)) {
+    if (FileUtils.isStdio(outfile)) {
       Diagnostic.error("This command does not support sending output to stdout");
       return false;
     }
@@ -537,7 +582,7 @@ public final class CommonFlags {
     if (flags.isSet(RESTRICTION_FLAG)) {
       final String region = (String) flags.getValue(RESTRICTION_FLAG);
       if (!RegionRestriction.validateRegion(region)) {
-        flags.setParseMessage("The value \"" + region + "\" for \"--" + RESTRICTION_FLAG + "\" is malformed.");
+        flags.setParseMessage("The value \"" + region + "\" for --" + RESTRICTION_FLAG + " is malformed.");
         return false;
       }
     }
@@ -553,4 +598,5 @@ public final class CommonFlags {
     }
     return true;
   }
+
 }

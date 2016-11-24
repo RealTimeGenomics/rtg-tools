@@ -123,7 +123,7 @@ public class BgZip extends AbstractCli {
 
     for (Object o : mFlags.getAnonymousValues(0)) {
       final File f = (File) o;
-      final boolean stdin = CommonFlags.isStdio(f);
+      final boolean stdin = FileUtils.isStdio(f);
       final boolean stdout = mFlags.isSet(STDOUT_FLAG) || stdin;
       try (final InputStream is = getInputStream(f, stdin)) {
         try (OutputStream os = getOutputStream(out, f, stdout)) {

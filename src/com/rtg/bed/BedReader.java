@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
 import com.rtg.tabix.TabixIndexer;
@@ -98,7 +97,7 @@ public class BedReader implements IOIterator<BedRecord> {
    * @throws IOException if an I/O error occurs
    */
   public static BedReader openBedReader(RegionRestriction region, File f, int minAnnotations) throws IOException {
-    final boolean stdin = CommonFlags.isStdio(f);
+    final boolean stdin = FileUtils.isStdio(f);
     final BedReader bedr;
     if (region != null) {
       if (stdin) {
