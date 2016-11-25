@@ -136,29 +136,10 @@ CommonFlags.initNoGzip(flags);
           flags.setParseMessage("The value \"" + region + "\" for \"--" + REGION_FLAG + "\" is not a well formed region.");
           return false;
         }
-        if (!validateBlockCompressed(flags, FIRST_INPUT_FILE)
-          || !validateBlockCompressed(flags, SECOND_INPUT_FILE)) {
+        if (!CommonFlags.validateTabixedInputFile(flags, FIRST_INPUT_FILE, SECOND_INPUT_FILE)) {
+          flags.setParseMessage(flags.getParseMessage() + ". Cannot use \"--" + REGION_FLAG + "\".");
           return false;
         }
-      }
-      return true;
-    }
-    private boolean validateBlockCompressed(CFlags flags, String flagName) {
-      final File file = (File) flags.getValue(flagName);
-      final String err = "\"" + file.getPath() + "\" is not in bgzip format. Cannot use \"--" + REGION_FLAG + "\".";
-      try {
-        if (!TabixIndexer.isBlockCompressed(file)) {
-          flags.setParseMessage(err);
-          return false;
-        }
-      } catch (IOException e) {
-        flags.setParseMessage(err);
-        return false;
-      }
-      final File index = TabixIndexer.indexFileName(file);
-      if (!index.exists()) {
-        flags.setParseMessage("Index not found for file: \"" + file.getPath() + "\" expected index called: \"" + index.getPath() + "\"");
-        return false;
       }
       return true;
     }

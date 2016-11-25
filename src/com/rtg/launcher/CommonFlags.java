@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.rtg.reference.ReferenceGenome;
+import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
 import com.rtg.util.cli.CFlags;
@@ -315,6 +316,42 @@ public final class CommonFlags {
         flags.setParseMessage("The " + label + " file \"" + input.getPath() + "\" is a directory.");
         return false;
       }
+    }
+    return true;
+  }
+
+  /**
+   * Validate that an input file exists and is not a directory, and is block-compressed with a tabix index
+   * @param flags the flags
+   * @param inputFlags the input flag name.
+   * @return true if valid, otherwise false
+   */
+  public static boolean validateTabixedInputFile(CFlags flags, String... inputFlags) {
+    for (String inputFlag : inputFlags) {
+      if (flags.isSet(inputFlag)) {
+        if (!validateInputFile(flags, inputFlag) || !validateTabixedInputFile(flags, (File) flags.getValue(inputFlag))) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean validateTabixedInputFile(CFlags flags, File file) {
+    final File index = TabixIndexer.indexFileName(file);
+    final boolean blockCompressed;
+    try {
+      blockCompressed = TabixIndexer.isBlockCompressed(file);
+    } catch (IOException e) {
+      flags.setParseMessage(file + " could not be read: " + e.getMessage());
+      return false;
+    }
+    if (!blockCompressed) {
+      flags.setParseMessage(file + " is not in bgzip format");
+      return false;
+    } else if (!index.exists()) {
+      flags.setParseMessage("Index not found for file " + index.getPath() + ", expected index called: " + index.getPath());
+      return false;
     }
     return true;
   }

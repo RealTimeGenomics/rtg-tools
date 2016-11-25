@@ -39,7 +39,6 @@ import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.header.VcfHeader;
@@ -60,10 +59,7 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
     );
   }
 
-  public void testValidator() throws IOException {
-    final VcfEvalCli.VcfEvalFlagsValidator v = new VcfEvalCli.VcfEvalFlagsValidator();
-    final CFlags flags =  new CFlags();
-    VcfEvalCli.initFlags(flags);
+  public void testValidator() throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcfevalcli")) {
       final File out = new File(dir, "out");
       final File calls = new File(dir, "calls");
@@ -75,23 +71,21 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
         , "-b", mutations.getPath()
         , "-t", template.getPath()
       };
-      flags.setValidator(null);
-      flags.setFlags(flagStrings);
-      assertFalse(v.isValid(flags));
-      TestUtils.containsAllUnwrapped(flags.getParseMessage(), "--baseline file", "does not exist");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr(flagStrings), "--baseline file", "does not exist");
 
       assertTrue(mutations.createNewFile());
-      assertFalse(v.isValid(flags));
-      TestUtils.containsAllUnwrapped(flags.getParseMessage(), "--calls file", "does not exist");
+      FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", mutations);
+      new TabixIndexer(mutations).saveVcfIndex();
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr(flagStrings), "--calls file", "does not exist");
 
-      assertTrue(calls.createNewFile());
-      assertFalse(v.isValid(flags));
-
+      FileHelper.stringToGzFile(VcfHeader.MINIMAL_HEADER + "\tSAMPLE\n", calls);
+      new TabixIndexer(calls).saveVcfIndex();
+      checkHandleFlagsErr(flagStrings);
       ReaderTestUtils.getDNADir(">t" + StringUtils.LS + "ACGT" + StringUtils.LS, template);
-      assertTrue(v.isValid(flags));
+      checkHandleFlags(flagStrings);
 
       assertTrue(out.mkdir());
-      assertFalse(v.isValid(flags));
+      checkHandleFlagsErr(flagStrings);
     }
   }
 

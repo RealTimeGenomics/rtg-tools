@@ -44,7 +44,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.OutputParams;
 import com.rtg.launcher.ParamsCli;
-import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
@@ -101,14 +100,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   @Override
   protected void initFlags() {
     initFlags(mFlags);
-    mFlags.setName(applicationName() + " " + moduleName());
   }
 
-  /**
-   * initialize a flags object
-   * @param flags the flags object to initialize
-   */
-  public static void initFlags(final CFlags flags) {
+  private static void initFlags(final CFlags flags) {
     CommonFlagCategories.setCategories(flags);
     flags.registerExtendedHelp();
     flags.setDescription("Evaluates called variants for genotype agreement with a baseline variant set irrespective of representational differences. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called variants not matched in the baseline), false negatives (baseline variants not matched in the call set), and true positives (variants that match between the baseline and calls).");
@@ -149,7 +143,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     @Override
     public boolean isValid(final CFlags flags) {
       return CommonFlags.validateOutputDirectory(flags)
-        && CommonFlags.validateInputFile(flags, BASELINE, CALLS)
+        && CommonFlags.validateTabixedInputFile(flags, BASELINE, CALLS)
         && CommonFlags.validateThreads(flags)
         && CommonFlags.validateTemplate(flags)
         && CommonFlags.validateRegions(flags)
@@ -220,15 +214,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     return new VcfEvalTask(params, out, new NoStatistics());
   }
 
-  private void checkTabix(File vcfFile) throws IOException {
-    final File index = TabixIndexer.indexFileName(vcfFile);
-    if (!TabixIndexer.isBlockCompressed(vcfFile)) {
-      throw new NoTalkbackSlimException(vcfFile + " is not in bgzip format");
-    } else if (!index.exists()) {
-      throw new NoTalkbackSlimException("Index not found for file: " + index.getPath() + " expected index called: " + index.getPath());
-    }
-  }
-
   private static String[] splitPairedSpec(String flagValue) {
     final String[] split = StringUtils.split(flagValue, ',');
     if (split.length == 2) {
@@ -260,8 +245,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.templateFile((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG));
     final File baseline = (File) mFlags.getValue(BASELINE);
     final File calls = (File) mFlags.getValue(CALLS);
-    checkTabix(baseline);
-    checkTabix(calls);
     builder.baseLineFile(baseline).callsFile(calls);
     builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
     builder.scoreField((String) mFlags.getValue(SORT_FIELD));
