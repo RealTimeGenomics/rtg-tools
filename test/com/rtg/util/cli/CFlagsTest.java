@@ -698,7 +698,7 @@ public class CFlagsTest extends TestCase {
       "Usage:  [OPTION]...",
       "Use them with caution",
       "Optional flags: ",
-      " --Xhelp print help on extended command-line flag usage",
+      " --Xhelp", "print help on extended command-line flag usage",
       " --Xoptional Test of --X options");
   }
 
