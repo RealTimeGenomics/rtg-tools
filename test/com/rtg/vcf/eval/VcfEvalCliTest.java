@@ -38,6 +38,7 @@ import com.rtg.reader.ReaderTestUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.StringUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -77,11 +78,11 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
       flags.setValidator(null);
       flags.setFlags(flagStrings);
       assertFalse(v.isValid(flags));
-      assertTrue(flags.getParseMessage().contains("baseline VCF file doesn't exist"));
+      TestUtils.containsAllUnwrapped(flags.getParseMessage(), "--baseline file", "does not exist");
 
       assertTrue(mutations.createNewFile());
       assertFalse(v.isValid(flags));
-      assertTrue(flags.getParseMessage().contains("calls VCF file doesn't exist"));
+      TestUtils.containsAllUnwrapped(flags.getParseMessage(), "--calls file", "does not exist");
 
       assertTrue(calls.createNewFile());
       assertFalse(v.isValid(flags));

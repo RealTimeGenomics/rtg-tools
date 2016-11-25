@@ -148,20 +148,20 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
     @Override
     public boolean isValid(final CFlags flags) {
-      if (!CommonFlags.validateOutputDirectory(flags)) {
-        return false;
-      }
+      return CommonFlags.validateOutputDirectory(flags)
+        && CommonFlags.validateInputFile(flags, BASELINE, CALLS)
+        && CommonFlags.validateThreads(flags)
+        && CommonFlags.validateTemplate(flags)
+        && CommonFlags.validateRegions(flags)
+        && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
+        && validateSortField(flags)
+        && validatePairedFlag(flags, OBEY_PHASE, "phase type")
+        && validatePairedFlag(flags, OBEY_PHASE, "phase type")
+        && validatePairedFlag(flags, SAMPLE, "sample name")
+        && validatePairedFlag(flags, OBEY_PHASE, "phase type");
+    }
 
-      final File generated = (File) flags.getValue(BASELINE);
-      if (!(generated.exists() && generated.isFile())) {
-        flags.setParseMessage("baseline VCF file doesn't exist");
-        return false;
-      }
-      final File detected = (File) flags.getValue(CALLS);
-      if (!(detected.exists() && detected.isFile())) {
-        flags.setParseMessage("calls VCF file doesn't exist");
-        return false;
-      }
+    private boolean validateSortField(CFlags flags) {
       if (flags.isSet(SORT_FIELD)) {
         final String field = (String) flags.getValue(SORT_FIELD);
         final int pIndex = field.indexOf('=');
@@ -186,51 +186,31 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
           }
         }
       }
-      if (!CommonFlags.validateThreads(flags)) {
-        return false;
-      }
-      if (!CommonFlags.validateTemplate(flags)) {
-        return false;
-      }
-      if (!CommonFlags.validateRegions(flags)) {
-        return false;
-      }
-      if (!flags.checkNand(SQUASH_PLOIDY, TWO_PASS)) {
-        return false;
-      }
-      if (flags.isSet(SAMPLE)) {
-        if (validatePairedFlag(flags, (String) flags.getValue(SAMPLE), "sample name")) {
+      return true;
+    }
+    private boolean validatePairedFlag(CFlags flags, String flag, String label) {
+      if (flags.isSet(flag)) {
+        final String flagValue = (String) flags.getValue(flag);
+        if (flagValue.length() == 0) {
+          flags.setParseMessage("Supplied " + label + " cannot be empty");
           return false;
         }
-      }
-      if (flags.isSet(OBEY_PHASE)) {
-        if (validatePairedFlag(flags, (String) flags.getValue(OBEY_PHASE), "phase type")) {
+        final String[] split = StringUtils.split(flagValue, ',');
+        if (split.length > 2) {
+          flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". At most 1 comma is permitted");
+          return false;
+        }
+        if (split[0].length() == 0) {
+          flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". Supplied baseline " + label + " cannot be empty");
+          return false;
+        }
+        final String callsValue = split.length == 2 ? split[1] : split[0];
+        if (callsValue.length() == 0) {
+          flags.setParseMessage("Invalid sample name specification " + flagValue + ". Supplied calls " + label + " cannot be empty");
           return false;
         }
       }
       return true;
-    }
-
-    private boolean validatePairedFlag(CFlags flags, String flagValue, String label) {
-      if (flagValue.length() == 0) {
-        flags.setParseMessage("Supplied " + label + " cannot be empty");
-        return true;
-      }
-      final String[] split = StringUtils.split(flagValue, ',');
-      if (split.length > 2) {
-        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". At most 1 comma is permitted");
-        return true;
-      }
-      if (split[0].length() == 0) {
-        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". Supplied baseline " + label + " cannot be empty");
-        return true;
-      }
-      final String callsValue = split.length == 2 ? split[1] : split[0];
-      if (callsValue.length() == 0) {
-        flags.setParseMessage("Invalid sample name specification " + flagValue + ". Supplied calls " + label + " cannot be empty");
-        return true;
-      }
-      return false;
     }
   }
 
