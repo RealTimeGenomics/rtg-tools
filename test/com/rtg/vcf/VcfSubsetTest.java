@@ -123,42 +123,42 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(main, "out.vcf.gz");
       final File out2 = new File(main, "out.vcf");
       String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), " does not exist.");
+      TestUtils.containsAllUnwrapped(err, " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
+      TestUtils.containsAllUnwrapped(err, main.getPath() + "\" is a directory");
 
       assertTrue(out.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "out.vcf").getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out.getPath() + "\" already exists");
+      TestUtils.containsAllUnwrapped(err, "The file \"" + out.getPath() + "\" already exists");
 
       assertTrue(out2.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out2.getPath(), "--no-gzip");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out2.getPath() + "\" already exists");
+      TestUtils.containsAllUnwrapped(err, "The file \"" + out2.getPath() + "\" already exists");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-infos", "--remove-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-infos", "--keep-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-info", "feh", "--keep-info", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filters", "--remove-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filters", "--keep-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-filter", "feh", "--keep-filter", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-samples", "--remove-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-samples", "--keep-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-sample", "feh", "--keep-sample", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "newout.gz").getPath(), "--remove-format", "feh", "--keep-format", "blah");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both");
     }
   }
 

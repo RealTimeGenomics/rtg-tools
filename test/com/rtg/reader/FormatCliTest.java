@@ -416,18 +416,12 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(dir, "in");
       FileUtils.stringToFile("", input);
       final File outDir = new File(dir, "out");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath()),
-          "No input files specified.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath()),
-          "Both left and right reads must be specified.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-r", input.getPath()),
-          "Both left and right reads must be specified.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath(), "-r", input.getPath(), "-p"),
-          "Cannot set protein flag when left and right files are specified.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath(), input.getPath()),
-          "Either specify individual input files or left and right files, not both.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outDir.getPath(), "-r", input.getPath(), input.getPath()),
-          "Either specify individual input files or left and right files, not both.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath()), "No input files specified.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath()), "Both left and right reads must be specified.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath(), "-r", input.getPath()), "Both left and right reads must be specified.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath(), "-r", input.getPath(), "-p"), "Cannot set protein flag when left and right files are specified.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath(), "-l", input.getPath(), input.getPath()), "Either specify individual input files or left and right files, not both.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outDir.getPath(), "-r", input.getPath(), input.getPath()), "Either specify individual input files or left and right files, not both.");
     }
   }
 
@@ -456,7 +450,7 @@ public class FormatCliTest extends AbstractCliTest {
          i.getPath(),
     };
     final String result = checkHandleFlagsErr(args);
-    assertTrue(result, result.replaceAll("\\s+", " ").contains("The directory \"" + que.getPath() + "\" already exists. Please remove it first or choose a different directory."));
+    TestUtils.containsAllUnwrapped(result, "The directory \"" + que.getPath() + "\" already exists. Please remove it first or choose a different directory.");
     FileHelper.deleteAll(que);
   }
 
@@ -470,7 +464,7 @@ public class FormatCliTest extends AbstractCliTest {
         que.getPath(),
       };
       final String result = checkHandleFlagsErr(args);
-      assertTrue(result, result.replaceAll("\\s+", " ").contains("The directory \"" + que.getPath() + "\" already exists. Please remove it first or choose a different directory."));
+      TestUtils.containsAllUnwrapped(result, "The directory \"" + que.getPath() + "\" already exists. Please remove it first or choose a different directory.");
     }
   }
 

@@ -40,11 +40,8 @@ import com.rtg.launcher.AbstractCliTest;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.cli.CFlags;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.SnpIntersection.LineHolder;
 
@@ -125,57 +122,32 @@ public final class SnpIntersectionTest extends AbstractCliTest {
   }
 
   public void testValidator() throws IOException {
-    final File tempDir = FileUtils.createTempDir("snpIntersectionValidator", "test");
-    try {
-      final MemoryPrintStream ps = new MemoryPrintStream();
-      Diagnostic.setLogStream(ps.printStream());
-      final CFlags flags = new CFlags("blah", ps.printStream(), ps.printStream());
-      SnpIntersection.initFlags(flags);
-      assertFalse(flags.setFlags("-o", tempDir.getPath(), "-i", "blah", "-I", "blah"));
-      ps.reset();
-      assertFalse(flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", "blah", "-I", "blah"));
-      assertTrue(ps.toString(), ps.toString().contains("\"blah\" does not exist."));
-      ps.reset();
+    try (final TestDirectory tempDir = new TestDirectory("snpIntersectionValidator")) {
+
+      checkHandleFlagsErr("-o", tempDir.getPath(), "-i", "blah", "-I", "blah");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", "blah", "-I", "blah"),
+        "\"blah\" does not exist.");
+
       final File input = new File(tempDir, "file");
       assertTrue(input.createNewFile());
-      assertFalse(flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", tempDir.getPath()));
-      assertTrue(ps.toString(), ps.toString().contains("\"" + tempDir.getPath() + "\" is a directory."));
-      ps.reset();
-      assertFalse(flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:0-10"));
-      assertTrue(ps.toString(), ps.toString().contains("The value \"chr1:0-10\" for \"--region\" is not a well formed region."));
-      try {
-        flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:1-10");
-        fail();
-      } catch (final NoTalkbackSlimException e) {
-        assertEquals("\"" + input.getPath() + "\" is not in bgzip format. Cannot use \"--region\".", e.getMessage());
-      }
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", tempDir.getPath()),
+        "is a directory.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:0-10"),
+        "The value \"chr1:0-10\" for \"--region\" is not a well formed region.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:1-10"),
+        "\"" + input.getPath() + "\" is not in bgzip format. Cannot use \"--region\".");
       final File bgzipInput = new File(tempDir, "file.gz");
       FileHelper.stringToGzFile("#Test String", bgzipInput);
-      try {
-        flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInput.getPath(), "-I", input.getPath(), "--region", "chr1:1-10");
-        fail();
-      } catch (final NoTalkbackSlimException e) {
-        assertEquals("\"" + input.getPath() + "\" is not in bgzip format. Cannot use \"--region\".", e.getMessage());
-      }
-      try {
-        flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInput.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10");
-        fail();
-      } catch (final NoTalkbackSlimException e) {
-        assertEquals("Index not found for file: \"" + bgzipInput.getPath() + "\" expected index called: \"" + bgzipInput.getPath() + ".tbi\"", e.getMessage());
-      }
       final File bgzipInputWithIndex = new File(tempDir, "file2.gz");
       FileHelper.stringToGzFile("#Test String", bgzipInputWithIndex);
       final File bgzipInputIndex = new File(tempDir, "file2.gz.tbi");
       assertTrue(bgzipInputIndex.createNewFile());
-      try {
-        flags.setFlags("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInputWithIndex.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10");
-        fail();
-      } catch (final NoTalkbackSlimException e) {
-        assertEquals("Index not found for file: \"" + bgzipInput.getPath() + "\" expected index called: \"" + bgzipInput.getPath() + ".tbi\"", e.getMessage());
-      }
-    } finally {
-      Diagnostic.setLogStream();
-      assertTrue(FileHelper.deleteAll(tempDir));
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInputWithIndex.getPath(), "-I", input.getPath(), "--region", "chr1:1-10"),
+        "\"" + input.getPath() + "\" is not in bgzip format. Cannot use \"--region\".");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInput.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10"),
+        "Index not found for file: \"" + bgzipInput.getPath() + "\" expected index called: \"" + bgzipInput.getPath() + ".tbi\"");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInputWithIndex.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10"),
+        "Index not found for file: \"" + bgzipInput.getPath() + "\" expected index called: \"" + bgzipInput.getPath() + ".tbi\"");
     }
   }
 

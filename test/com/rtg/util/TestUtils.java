@@ -408,7 +408,7 @@ public final class TestUtils {
       return;
     }
     final String msg =
-        "Expected: " + Arrays.toString(a) + " Actual:" + Arrays.toString(b);
+      "Expected: " + Arrays.toString(a) + " Actual:" + Arrays.toString(b);
     Assert.fail(msg);
   }
 
@@ -422,7 +422,7 @@ public final class TestUtils {
       return;
     }
     final String msg =
-        "Expected: " + Arrays.toString(a) + " Actual:" + Arrays.toString(b);
+      "Expected: " + Arrays.toString(a) + " Actual:" + Arrays.toString(b);
     Assert.fail(msg);
   }
 
@@ -496,10 +496,31 @@ public final class TestUtils {
    * @param subs all the items that should be in the string.
    */
   public static void containsAll(final String str, final String... subs) {
+    containsAll(false, str, subs);
+  }
+
+  /**
+   * Check that a number of strings are contained in str, which is unwrapped before checking. This method is
+   * appropriate for checking help error message output.
+   * @param str string to be checked.
+   * @param subs all the items that should be in the string.
+   */
+  public static void containsAllUnwrapped(final String str, final String... subs) {
+    containsAll(true, str, subs);
+  }
+
+  /**
+   * Check that a number of strings are contained in str.
+   * @param unwrap if true, the input string will be "unwrapped"
+   * @param str string to be checked.
+   * @param subs all the items that should be in the string.
+   */
+  private static void containsAll(boolean unwrap, final String str, final String... subs) {
     boolean ok = true;
     final StringBuilder sb = new StringBuilder();
+    final String unw = unwrap ? unwrap(str) : str;
     for (final String sub : subs) {
-      if (!str.contains(sub)) {
+      if (!unw.contains(sub)) {
         sb.append("'").append(sub).append("' was not contained in:").append(str).append(StringUtils.LS);
         ok = false;
       }
@@ -718,7 +739,7 @@ public final class TestUtils {
           + "< " + erecs[i].trim() + StringUtils.LS
           + "---" + StringUtils.LS
           + "> " + arecs[i].trim() + StringUtils.LS + StringUtils.LS;
-     }
+      }
     }
     if (i < erecs.length) {
       return "" + (i + 1) + "d" + (i + 1) + StringUtils.LS
@@ -771,7 +792,7 @@ public final class TestUtils {
       for (int i = 0; i < erecs.length; i++) {
         if (!arecs[i].trim().startsWith(erecs[i].trim())) {
           System.err.println("Line " + i + StringUtils.LS + ">Expected: " + erecs[i].trim()
-              + StringUtils.LS + ">actual  : " + arecs[i].trim());
+            + StringUtils.LS + ">actual  : " + arecs[i].trim());
           same = false;
           break;
         }

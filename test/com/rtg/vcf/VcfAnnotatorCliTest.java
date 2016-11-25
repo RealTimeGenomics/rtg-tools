@@ -71,14 +71,14 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
     try {
       final File fake = new File(temp, "fake.vcf");
       assertTrue(fake.createNewFile());
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", "blahInput").replaceAll("\\s+", " "), "file \"blahInput\" does not exist.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", temp.getPath()).replaceAll("\\s+", " "), "file \"" + temp.getPath() + "\" is a directory.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", fake.getPath()).replaceAll("\\s+", " "), "file \"blahBed\" does not exist.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", temp.getPath(), "-i", fake.getPath()).replaceAll("\\s+", " "), "file \"" + temp.getPath() + "\" is a directory.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", "blahBed", "-i", fake.getPath()).replaceAll("\\s+", " "), "file \"blahBed\" does not exist.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", temp.getPath(), "-i", fake.getPath()).replaceAll("\\s+", " "), "file \"" + temp.getPath() + "\" is a directory.");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", fake.getPath(), "--bed-info", fake.getPath(), "-i", fake.getPath(), "-Z").replaceAll("\\s+", " "), "The file \"" + fake.getPath() + "\" already exists. Please remove it first or choose a different file");
-      TestUtils.containsAll(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", fake.getPath(), "--vcf-ids", fake.getPath(), "-i", fake.getPath(), "-Z").replaceAll("\\s+", " "), "Cannot set both --bed-ids and --vcf-ids");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", "blahInput"), "file \"blahInput\" does not exist.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", temp.getPath()), "file \"" + temp.getPath() + "\" is a directory.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", fake.getPath()), "file \"blahBed\" does not exist.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", temp.getPath(), "-i", fake.getPath()), "file \"" + temp.getPath() + "\" is a directory.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", "blahBed", "-i", fake.getPath()), "file \"blahBed\" does not exist.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", temp.getPath(), "-i", fake.getPath()), "file \"" + temp.getPath() + "\" is a directory.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", fake.getPath(), "--bed-info", fake.getPath(), "-i", fake.getPath(), "-Z"), "The file \"" + fake.getPath() + "\" already exists. Please remove it first or choose a different file");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", fake.getPath(), "--vcf-ids", fake.getPath(), "-i", fake.getPath(), "-Z"), "Cannot set both --bed-ids and --vcf-ids");
       checkHandleFlagsOut("-o", "blahOutput", "-i", fake.getPath());
     } finally {
       FileHelper.deleteAll(temp);

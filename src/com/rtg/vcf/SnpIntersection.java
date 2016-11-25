@@ -57,7 +57,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.Timer;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.BufferedOutputStreamFix;
@@ -137,32 +136,29 @@ CommonFlags.initNoGzip(flags);
           flags.setParseMessage("The value \"" + region + "\" for \"--" + REGION_FLAG + "\" is not a well formed region.");
           return false;
         }
-        final File first = (File) flags.getValue(FIRST_INPUT_FILE);
-        final String errStringFirst = "\"" + first.getPath() + "\" is not in bgzip format. Cannot use \"--" + REGION_FLAG + "\".";
-        try {
-          if (!TabixIndexer.isBlockCompressed(first)) {
-            throw new NoTalkbackSlimException(errStringFirst);
-          }
-        } catch (IOException e) {
-          throw new NoTalkbackSlimException(errStringFirst);
+        if (!validateBlockCompressed(flags, FIRST_INPUT_FILE)
+          || !validateBlockCompressed(flags, SECOND_INPUT_FILE)) {
+          return false;
         }
-        final File second = (File) flags.getValue(SECOND_INPUT_FILE);
-        final String errStringSecond = "\"" + second.getPath() + "\" is not in bgzip format. Cannot use \"--" + REGION_FLAG + "\".";
-        try {
-          if (!TabixIndexer.isBlockCompressed(second)) {
-            throw new NoTalkbackSlimException(errStringSecond);
-          }
-        } catch (IOException e) {
-          throw new NoTalkbackSlimException(errStringSecond);
+      }
+      return true;
+    }
+    private boolean validateBlockCompressed(CFlags flags, String flagName) {
+      final File file = (File) flags.getValue(flagName);
+      final String err = "\"" + file.getPath() + "\" is not in bgzip format. Cannot use \"--" + REGION_FLAG + "\".";
+      try {
+        if (!TabixIndexer.isBlockCompressed(file)) {
+          flags.setParseMessage(err);
+          return false;
         }
-        final File indexFirst = TabixIndexer.indexFileName(first);
-        if (!indexFirst.exists()) {
-          throw new NoTalkbackSlimException("Index not found for file: \"" + first.getPath() + "\" expected index called: \"" + indexFirst.getPath() + "\"");
-        }
-        final File indexSecond = TabixIndexer.indexFileName(second);
-        if (!indexSecond.exists()) {
-          throw new NoTalkbackSlimException("Index not found for file: \"" + second.getPath() + "\" expected index called: \"" + indexSecond.getPath() + "\"");
-        }
+      } catch (IOException e) {
+        flags.setParseMessage(err);
+        return false;
+      }
+      final File index = TabixIndexer.indexFileName(file);
+      if (!index.exists()) {
+        flags.setParseMessage("Index not found for file: \"" + file.getPath() + "\" expected index called: \"" + index.getPath() + "\"");
+        return false;
       }
       return true;
     }

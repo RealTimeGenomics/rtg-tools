@@ -99,22 +99,16 @@ public class Cg2SdfTest extends AbstractCliTest {
     try (final TestDirectory dir = new TestDirectory("cg2sdf")) {
       final File in = new File(dir, "in");
       final File outdir = new File(dir, "out");
-      TestUtils.containsAll(checkHandleFlagsErr(in.getPath()),
-        "You must provide a value for -o SDF");
-      TestUtils.containsAll(checkHandleFlagsErr(in.getPath()),
-        ERROR_FOOTER);
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath()),
-        "No input files specified.");
+      TestUtils.containsAll(checkHandleFlagsErr(in.getPath()), ERROR_FOOTER);
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr(in.getPath()), "You must provide a value for -o SDF");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath()), "No input files specified.");
       assertTrue(in.createNewFile());
       assertTrue(outdir.mkdirs());
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath()),
-        "The directory",
-        "already exists. Please remove it first or choose a different directory.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath()), "The directory", "already exists. Please remove it first or choose a different directory.");
 
       assertTrue(FileHelper.deleteAll(outdir));
 
-      TestUtils.containsAll(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"),
-        "The specified flag \"--max-unknowns\" has invalid value \"-1\". It should be greater than or equal to \"0\".");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"), "The specified flag \"--max-unknowns\" has invalid value \"-1\". It should be greater than or equal to \"0\".");
 
       final String err = checkHandleFlagsErr("-o", outdir.getPath(), "-I", "x");
       TestUtils.containsAll(err,

@@ -163,7 +163,7 @@ public class DummyCliTest extends AbstractCliTest {
   }
 
   public void testHandleFlags() {
-    assertTrue(checkHandleFlagsErr("--foo").contains("Error: Expecting value for flag --foo"));
+    TestUtils.containsAllUnwrapped(checkHandleFlagsErr("--foo"), "Error: Expecting value for flag --foo");
     assertEquals("rtg module", getCFlags().getName());
   }
 }

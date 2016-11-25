@@ -54,99 +54,99 @@ public class VcfFilterCliValidatorTest extends AbstractCliTest {
       final File out = new File(main, "out.vcf.gz");
       final File out2 = new File(main, "out.vcf");
       String err = checkHandleFlagsErr("-i", foo.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The --input file ", " does not exist.");
+      TestUtils.containsAllUnwrapped(err, "The --input file ", " does not exist.");
 
       err = checkHandleFlagsErr("-i", main.getPath(), "-o", out.getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), main.getPath() + "\" is a directory");
+      TestUtils.containsAllUnwrapped(err, main.getPath() + "\" is a directory");
 
       final File in = new File(main, "input");
       FileUtils.stringToFile(VcfFilterCliTest.INPUT4, in);
       assertTrue(out.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", new File(main, "out").getPath());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out.getPath() + "\" already exists");
+      TestUtils.containsAllUnwrapped(err, "The file \"" + out.getPath() + "\" already exists");
 
       assertTrue(out2.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out2.getPath(), "--no-gzip");
-      TestUtils.containsAll(TestUtils.unwrap(err), "The file \"" + out2.getPath() + "\" already exists");
+      TestUtils.containsAllUnwrapped(err, "The file \"" + out2.getPath() + "\" already exists");
 
       assertTrue(out.delete());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-p", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--Xmin-posterior-score must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--Xmin-posterior-score must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-p", "1.0", "-P", "0.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--Xmin-posterior-score cannot be greater than the value for --Xmax-posterior-score");
+      TestUtils.containsAllUnwrapped(err, "--Xmin-posterior-score cannot be greater than the value for --Xmax-posterior-score");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-Q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-quality must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--max-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--min-quality must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--min-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-Q", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-quality must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--max-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-G", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-genotype-quality must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--max-genotype-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-g", "-1.0");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--min-genotype-quality must be at least 0.0");
+      TestUtils.containsAllUnwrapped(err, "--min-genotype-quality must be at least 0.0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-d", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--min-read-depth must be at least 0");
+      TestUtils.containsAllUnwrapped(err, "--min-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-D", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-read-depth must be at least 0");
+      TestUtils.containsAllUnwrapped(err, "--max-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-c", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--min-combined-read-depth must be at least 0");
+      TestUtils.containsAllUnwrapped(err, "--min-combined-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-C", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-combined-read-depth must be at least 0");
+      TestUtils.containsAllUnwrapped(err, "--max-combined-read-depth must be at least 0");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-A", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(err, "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "-A", "1.1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(err, "--max-ambiguity-ratio must be in the range [0.0, 1.0]");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--density-window", "-1");
-      TestUtils.containsAll(TestUtils.unwrap(err), "--density-window must be at least 1");
+      TestUtils.containsAllUnwrapped(err, "--density-window must be at least 1");
 
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--min-genotype-quality",  "0" , "--Xmax-posterior-score", "10");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Use genotype-quality or posterior filters, not both.");
+      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--min-genotype-quality", "0", "--Xmax-posterior-score", "10");
+      TestUtils.containsAllUnwrapped(err, "Use genotype-quality or posterior filters, not both.");
 
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--Xmin-posterior-score",  "0" , "--max-genotype-quality", "10");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Use genotype-quality or posterior filters, not both.");
+      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--Xmin-posterior-score", "0", "--max-genotype-quality", "10");
+      TestUtils.containsAllUnwrapped(err, "Use genotype-quality or posterior filters, not both.");
 
-      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--min-denovo-score",  "10", "--sample", "alice", "--sample", "bob");
-      TestUtils.containsAll(TestUtils.unwrap(err), "De Novo filtering requires a single sample to be specified");
+      err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--min-denovo-score", "10", "--sample", "alice", "--sample", "bob");
+      TestUtils.containsAllUnwrapped(err, "De Novo filtering requires a single sample to be specified");
 
       final File bedFile = new File(main, "foo.bed");
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The --include-bed file \"" + bedFile + "\" does not exist");
+      TestUtils.containsAllUnwrapped(err, "The --include-bed file \"" + bedFile + "\" does not exist");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The --exclude-bed file \"" + bedFile + "\" does not exist");
+      TestUtils.containsAllUnwrapped(err, "The --exclude-bed file \"" + bedFile + "\" does not exist");
 
       assertTrue(bedFile.mkdir());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-vcf", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The --include-vcf file \"" + bedFile + "\" is a directory");
+      TestUtils.containsAllUnwrapped(err, "The --include-vcf file \"" + bedFile + "\" is a directory");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-vcf", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "The --exclude-vcf file \"" + bedFile + "\" is a directory");
+      TestUtils.containsAllUnwrapped(err, "The --exclude-vcf file \"" + bedFile + "\" is a directory");
 
       assertTrue(bedFile.delete() && bedFile.createNewFile());
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--include-vcf", bedFile.toString(), "--include-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --include-bed and --include-vcf");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both --include-bed and --include-vcf");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--exclude-vcf", bedFile.toString(), "--exclude-bed", bedFile.toString());
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --exclude-bed and --exclude-vcf");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both --exclude-bed and --exclude-vcf");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--snps-only", "--non-snps-only");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --snps-only and --non-snps-only");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both --snps-only and --non-snps-only");
 
       err = checkHandleFlagsErr("-i", in.getPath(), "-o", out.getPath(), "--fail", "BLAH", "--clear-failed-samples");
-      TestUtils.containsAll(TestUtils.unwrap(err), "Cannot set both --fail and --clear-failed-samples");
+      TestUtils.containsAllUnwrapped(err, "Cannot set both --fail and --clear-failed-samples");
 
     }
   }

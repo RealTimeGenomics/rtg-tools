@@ -112,17 +112,13 @@ public class SdfSubseqTest extends AbstractCliTest {
       sw = new SequencesWriter(ds, normal, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
 
-      err = checkHandleFlagsErr("-i", normal.toString(), "TEST:-5+6");
-      TestUtils.containsAll(err, "The region value \"TEST:-5+6\" is malformed.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-i", normal.toString(), "TEST:-5+6"), "The region value \"TEST:-5+6\" is malformed.");
 
-      err = checkHandleFlagsErr("-i", normal.toString(), "TEST:1+1", "-f", "-q");
-      TestUtils.containsAll(err, "Cannot set both --fasta and --fastq");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-i", normal.toString(), "TEST:1+1", "-f", "-q"), "Cannot set both --fasta and --fastq");
 
-      err = checkHandleFlagsErr("-i", normal.toString(), "TEST:4+2", "--Xpreserve-coordinates", "--reverse-complement");
-      TestUtils.containsAll(err, "Cannot set both --Xpreserve-coordinates and --reverse-complement");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-i", normal.toString(), "TEST:4+2", "--Xpreserve-coordinates", "--reverse-complement"), "Cannot set both --Xpreserve-coordinates and --reverse-complement");
 
-      err = checkHandleFlagsErr("-i", normal.toString(), "-I", "TEST:1+1");
-      TestUtils.containsAll(err.replaceAll("\\s+", " "), "When --sequence-id is set the <sequence_name> of the region \"TEST:1+1\" must be an integer greater than or equal to 0.");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-i", normal.toString(), "-I", "TEST:1+1"), "When --sequence-id is set the <sequence_name> of the region \"TEST:1+1\" must be an integer greater than or equal to 0.");
 
       err = checkMainInitBadFlags("-i", normal.toString(), "TEST:1-60000");
       TestUtils.containsAll(err, "Supplied end position \"60000\" reads past sequence end");
@@ -247,7 +243,7 @@ public class SdfSubseqTest extends AbstractCliTest {
       final File readRightDir = new File(tempDir, "right");
       ReaderTestUtils.getReaderDNA(right, readRightDir, null).close();
 
-      assertTrue(checkHandleFlagsErr("-i", tempDir.getPath(), "1").contains("Paired-end SDF not supported"));
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-i", tempDir.getPath(), "1"), "Paired-end SDF not supported");
     } finally {
       FileHelper.deleteAll(tempDir);
     }
