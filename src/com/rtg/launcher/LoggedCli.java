@@ -110,11 +110,20 @@ public abstract class LoggedCli extends AbstractCli {
       try {
         final List<DiagnosticListener> listeners = initializeOtherListeners();
         try {
+          final File doneFile = new File(outputDir, "done");
+          if (doneFile.exists()) {
+            if (!doneFile.isFile()) {
+              throw new IOException("Status file \"" + doneFile.getPath() + "\" cannot be removed: not a file");
+            } else if (!doneFile.delete()) {
+              throw new IOException("Status file \"" + doneFile.getPath() + "\" could not be removed");
+            } else {
+              Diagnostic.userLog("Removing pre-existing status file: " + doneFile.getPath());
+            }
+          }
           final int ret = mainExec(out, outputLog);
           if (ret == 0) {
             successful = true;
             final String time = "Finished successfully in " + timeDifference(System.currentTimeMillis(), startTime) + " s.";
-            final File doneFile = new File(outputDir, "done");
             try (PrintStream done = new PrintStream(new FileOutputStream(doneFile))) {
               done.println(time);
             }
