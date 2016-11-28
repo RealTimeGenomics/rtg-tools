@@ -412,7 +412,7 @@ public final class VcfUtils {
   }
 
   /**
-   * If field contains multiple values will get a most the first value.
+   * If field contains multiple values will get the first value.
    * @param rec VCF record
    * @param field string ID of field to extract
    * @return the value converted into a double, or {@code Double.NaN} if missing
@@ -420,7 +420,7 @@ public final class VcfUtils {
   public static double getDoubleInfoFieldFromRecord(VcfRecord rec, String field) {
     final Map<String, ArrayList<String>> infoField = rec.getInfo();
     if (infoField.containsKey(field)) {
-      final String fieldVal = infoField.get(field).get(0); // TODO how to support multiple values
+      final String fieldVal = infoField.get(field).get(0);
       try {
         if (fieldVal.equals(VcfRecord.MISSING)) {
           return Double.NaN;
@@ -431,6 +431,29 @@ public final class VcfUtils {
       }
     } else {
       return Double.NaN;
+    }
+  }
+
+  /**
+   * If field contains multiple values will get the first value.
+   * @param rec VCF record
+   * @param field string ID of field to extract
+   * @return the value converted into a double, or {@code Double.NaN} if missing
+   */
+  public static Integer getIntegerInfoFieldFromRecord(VcfRecord rec, String field) {
+    final Map<String, ArrayList<String>> infoField = rec.getInfo();
+    if (infoField.containsKey(field)) {
+      final String fieldVal = infoField.get(field).get(0);
+      try {
+        if (fieldVal.equals(VcfRecord.MISSING)) {
+          return null;
+        }
+        return Integer.parseInt(fieldVal);
+      } catch (NumberFormatException ex) {
+        throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
+      }
+    } else {
+      return null;
     }
   }
 
