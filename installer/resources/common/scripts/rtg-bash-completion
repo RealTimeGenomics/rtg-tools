@@ -90,7 +90,7 @@ function _complete_rtg() {
                         enumfile=$cachedir/$cmd.$prev
                         if [ -f $enumfile ]; then
                             #echo "enum flag type $flagtype" >>~/.rtgcomp
-                            COMPREPLY=( $(compgen -W "$(cat $enumfile)" -- "${cur}") )
+                            COMPREPLY=( $(compgen -W "$(tr ' ' '\n' <$enumfile)" -- "${cur}") )
                         else
                             #echo "unknown flag type $flagtype" >>~/.rtgcomp
                             oifs="$IFS"
@@ -114,26 +114,27 @@ function _complete_rtg() {
 # retrieval.
 function _complete_rtghelp () {
     local rtg=$1
-    # echo "_complete_rtghelp $1 $2" >>~/.rtgcomp
-    shift
+    local cmd=$2
+    local help=$3
+    # echo "_complete_rtghelp $rtg $cmd $help" >>~/.rtgcomp
     local cachedir=$HOME/.rtg-completion
     [ -d $cachedir ] || mkdir $cachedir
-    local cache=$cachedir/$1.$2
+    local cache=$cachedir/$cmd.$help
     local lastcmd=$cachedir/lastcmd
-    [ -f $cache ] && [ -f $lastcmd ] && [ "$1" == "$(cat $lastcmd)" ] || { 
-        "$rtg" $1 $2 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' >$cache && \
-        <$cache tr -d ',' | awk --posix 'match($0,/(--[^=]+)=.*\(Must be one of \[([^]]+)\]/)
+    [ -f $cache ] && [ -f $lastcmd ] && [ "$cmd" == "$(cat $lastcmd)" ] || {
+        "$rtg" $cmd $help 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' >$cache && \
+        <$cache tr -d ',' | awk --posix 'match($0,/(--[^=]+)=.*Allowed values are \[([^]]+)\]/)
 {
   l=substr($0, RSTART, RLENGTH - 1);
   if (match(l,/(--[^=]+)=/)) {
     f=substr(l, RSTART, RLENGTH - 1)
-    if (match(l,/\(Must be one of \[([^]]+)/)) {
-      o=substr(l, RSTART+17, RLENGTH);
-      file="'$cachedir/$1.'"f; print o>file
+    if (match(l,/Allowed values are \[([^]]+)/)) {
+      o=substr(l, RSTART+20, RLENGTH);
+      file="'$cachedir/$cmd.'"f; print o>file
     }
   }
 }'
-        echo $1 >$lastcmd 
+        echo $cmd >$lastcmd
     }
     cat $cache
 }
