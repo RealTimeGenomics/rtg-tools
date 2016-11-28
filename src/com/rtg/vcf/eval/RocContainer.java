@@ -320,6 +320,9 @@ public class RocContainer {
     }
   }
 
+  /**
+   * Issue a warning if there were were variants that did not contain the score field.
+   */
   public void missingScoreWarning() {
     if (getNumberOfIgnoredVariants() > 0) {
       Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
