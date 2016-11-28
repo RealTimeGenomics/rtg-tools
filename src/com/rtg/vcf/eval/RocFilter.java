@@ -30,9 +30,7 @@
 
 package com.rtg.vcf.eval;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
@@ -168,39 +166,6 @@ public abstract class RocFilter {
       return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
   };
-
-
-  private static final RocFilter[] VALUES = {ALL, HOM, HET, SNP, NON_SNP, MNP, INDEL, XRX, NON_XRX, HOM_XRX, HOM_NON_XRX, HET_XRX, HET_NON_XRX};
-  private static final Map<String, RocFilter> VALUE_OF = new HashMap<>();
-  static {
-    for (final RocFilter r : values()) {
-      VALUE_OF.put(r.name(), r);
-    }
-  }
-
-  /**
-   * Generate array of all the possible singletons.
-   * These are in the same ordering as ordinal().
-   * @return array of all the possible singletons.
-   */
-  public static RocFilter[] values() {
-    return VALUES.clone();
-  }
-
-  /**
-   * Get the singleton with the specified value (aka name).
-   * @param str the name of a singleton.
-   * @return the singleton
-   * @throws IllegalArgumentException if str is not a valid name.
-   */
-  public static RocFilter valueOf(final String str) {
-    final RocFilter res = VALUE_OF.get(str);
-    if (res == null) {
-      throw new IllegalArgumentException(str);
-    }
-    return res;
-  }
-
 
 
   /** The filename extension used for all ROC files */
