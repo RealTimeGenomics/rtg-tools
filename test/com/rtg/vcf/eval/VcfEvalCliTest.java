@@ -108,7 +108,7 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
   }
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
-    check("vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL");
+    check("vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "all,snp,xrx");
   }
 
   public void testNanoTricky() throws IOException, UnindexableDataException {

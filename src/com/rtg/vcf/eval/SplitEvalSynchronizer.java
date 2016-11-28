@@ -32,7 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.Set;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -73,7 +73,7 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
    */
   SplitEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                         String callsSampleName, RocSortValueExtractor extractor,
-                        File outdir, boolean zip, boolean slope, boolean twoPass, EnumSet<RocFilter> rocFilters) throws IOException {
+                        File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mTpCalls = makeVcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), zip);

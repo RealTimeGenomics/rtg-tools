@@ -35,8 +35,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.rtg.launcher.AbstractNanoTest;
@@ -226,7 +227,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   private void checkRoc(String label, String template, String[] both, String[] calledOnly, String[] baselineOnly, boolean checktotal, boolean rtgStats) throws IOException, UnindexableDataException {
     try (TestDirectory tdir = new TestDirectory()) {
       createInput(tdir, both, calledOnly, baselineOnly);
-      final EnumSet<RocFilter> rocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
+      final Set<RocFilter> rocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
       if (rtgStats) {
         rocFilters.add(RocFilter.NON_XRX);
         rocFilters.add(RocFilter.XRX);

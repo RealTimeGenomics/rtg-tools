@@ -30,7 +30,9 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
@@ -39,13 +41,12 @@ import com.rtg.vcf.VcfUtils;
 /**
  * Interface defining ROC filters
  */
-public enum RocFilter {
-
+public abstract class RocFilter {
 
   /** accepts everything **/
-  ALL {
+  public static final RocFilter ALL = new RocFilter("ALL") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return true;
     }
 
@@ -54,126 +55,194 @@ public enum RocFilter {
       return "weighted_roc.tsv";
     }
     @Override
-    boolean requiresGt() {
+    public boolean requiresGt() {
       return false;
     }
-  },
+  };
+
   /** all homozygous **/
-  HOM("homozygous") {
+  public static final RocFilter HOM = new RocFilter("HOM", "homozygous") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHomozygousAlt(gt);
     }
-  },
+  };
+
   /** all heterozygous **/
-  HET("heterozygous") {
+  public static final RocFilter HET = new RocFilter("HET", "heterozygous") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHeterozygous(gt);
     }
-  },
+  };
+
   /** all SNPs **/
-  SNP {
+  public static final RocFilter SNP = new RocFilter("SNP") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
       return type == VariantType.SNP;
     }
-  },
+  };
+
   /** non-SNPs **/
-  NON_SNP {
+  public static final RocFilter NON_SNP = new RocFilter("NON_SNP") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
       return type != VariantType.SNP;
     }
-  },
+  };
+
   /** all MNPs (non-length changing) **/
-  MNP {
+  public static final RocFilter MNP = new RocFilter("MNP") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
       return type == VariantType.MNP;
     }
-  },
+  };
+
   /** all indels (length changing) **/
-  INDEL {
+  public static final RocFilter INDEL = new RocFilter("INDEL") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
       return type.isIndelType();
     }
-  },
+  };
 
   // RTG simple vs complex breakdowns
   /** all RTG complex calls **/
-  XRX {
+  public static final RocFilter XRX = new RocFilter("XRX") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec);
     }
     @Override
-    boolean requiresGt() {
+    public boolean requiresGt() {
       return false;
     }
-  },
+  };
+
   /** all RTG simple (non complex) calls **/
-  NON_XRX {
+  public static final RocFilter NON_XRX = new RocFilter("NON_XRX") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec);
     }
     @Override
-    boolean requiresGt() {
+    public boolean requiresGt() {
       return false;
     }
-  },
+  };
+
   /** homozygous complex calls **/
-  HOM_XRX("homozygous_xrx") {
+  public static final RocFilter HOM_XRX = new RocFilter("HOM_XRX", "homozygous_xrx") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
-  },
+  };
+
   /** homozygous simple (non complex) calls **/
-  HOM_NON_XRX("homozygous_non_xrx") {
+  public static final RocFilter HOM_NON_XRX = new RocFilter("HOM_NON_XRX", "homozygous_non_xrx") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
     }
-  },
+  };
+
   /** heterozygous complex calls **/
-  HET_XRX("heterozygous_xrx") {
+  public static final RocFilter HET_XRX = new RocFilter("HET_XRX", "heterozygous_xrx") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
-  },
+  };
+
   /** heterozygous simple (non complex) calls **/
-  HET_NON_XRX("heterozygous_non_xrx") {
+  public static final RocFilter HET_NON_XRX = new RocFilter("HET_NON_XRX", "heterozygous_non_xrx") {
     @Override
-    boolean accept(VcfRecord rec, int[] gt) {
+    public boolean accept(VcfRecord rec, int[] gt) {
       return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
     }
   };
 
+
+  private static final RocFilter[] VALUES = {ALL, HOM, HET, SNP, NON_SNP, MNP, INDEL, XRX, NON_XRX, HOM_XRX, HOM_NON_XRX, HET_XRX, HET_NON_XRX};
+  private static final Map<String, RocFilter> VALUE_OF = new HashMap<>();
+  static {
+    for (final RocFilter r : values()) {
+      VALUE_OF.put(r.name(), r);
+    }
+  }
+
+  /**
+   * Generate array of all the possible singletons.
+   * These are in the same ordering as ordinal().
+   * @return array of all the possible singletons.
+   */
+  public static RocFilter[] values() {
+    return VALUES.clone();
+  }
+
+  /**
+   * Get the singleton with the specified value (aka name).
+   * @param str the name of a singleton.
+   * @return the singleton
+   * @throws IllegalArgumentException if str is not a valid name.
+   */
+  public static RocFilter valueOf(final String str) {
+    final RocFilter res = VALUE_OF.get(str);
+    if (res == null) {
+      throw new IllegalArgumentException(str);
+    }
+    return res;
+  }
+
+
+
   /** The filename extension used for all ROC files */
   public static final String ROC_EXT = "_roc.tsv";
 
+  private final String mName;
   private final String mBaseFilename;
 
-  RocFilter() {
-    this(null);
+  /**
+   * Create a RocFilter with default output file name
+   * @param name the name of the filter
+   */
+  public RocFilter(String name) {
+    this(name, null);
   }
 
-  RocFilter(String baseFilename) {
+  /**
+   * Create a RocFilter with specified output file name
+   * @param name the name of the filter
+   * @param baseFilename the base filename used for ROC output files
+   */
+  public RocFilter(String name, String baseFilename) {
+    mName = name;
     mBaseFilename = baseFilename;
+  }
+
+  /**
+   * @return the name of the RocFilter
+   */
+  public String name() {
+    return mName;
+  }
+
+  @Override
+  public String toString() {
+    return name();
   }
 
   /**
    * @return true if the filter requires access to a GT value
    */
-  boolean requiresGt() {
+  public boolean requiresGt() {
     return true;
   }
 
@@ -183,7 +252,7 @@ public enum RocFilter {
    * @param sample sample number
    * @return if accepted returns true, false otherwise
    */
-  boolean accept(VcfRecord rec, int sample) {
+  public boolean accept(VcfRecord rec, int sample) {
     final int[] gt = VcfUtils.getValidGt(rec, sample);
     return accept(rec, gt);
   }
@@ -194,7 +263,7 @@ public enum RocFilter {
    * @param gt the split GT field of the sample
    * @return if accepted returns true, false otherwise
    */
-  abstract boolean accept(VcfRecord rec, int[] gt);
+  public abstract boolean accept(VcfRecord rec, int[] gt);
 
   /**
    * Get the name of the default output file for this filter

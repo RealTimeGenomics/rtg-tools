@@ -33,8 +33,8 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -79,7 +79,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
    */
   WithInfoEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
   }
 

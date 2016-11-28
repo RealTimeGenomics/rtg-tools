@@ -37,8 +37,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.NoStatistics;
@@ -268,11 +269,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
       builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
     }
-    final EnumSet<RocFilter> rocFilters;
+    final Set<RocFilter> rocFilters;
     if (!mFlags.isSet(ROC_SUBSET)) {
-      rocFilters = EnumSet.of(RocFilter.ALL, RocFilter.SNP, RocFilter.NON_SNP);
+      rocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.SNP, RocFilter.NON_SNP));
     } else {
-      rocFilters = EnumSet.noneOf(RocFilter.class);
+      rocFilters = new HashSet<>();
       for (Object o : mFlags.getValues(ROC_SUBSET)) {
         rocFilters.add((RocFilter) o);
       }

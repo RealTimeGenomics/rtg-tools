@@ -33,10 +33,10 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -84,7 +84,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   CombinedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String baselineSampleName, String callsSampleName,
                            RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";

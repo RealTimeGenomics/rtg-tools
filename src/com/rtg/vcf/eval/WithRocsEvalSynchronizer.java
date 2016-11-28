@@ -32,7 +32,8 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.reeltwo.jumble.annotations.TestClass;
@@ -81,22 +82,22 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    */
   WithRocsEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
 
     int callSampleNo;
-    EnumSet<RocFilter> filters;
+    Set<RocFilter> filters;
     try {
       callSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
       filters = rocFilters;
     } catch (NoTalkbackSlimException e) {
-      filters = EnumSet.copyOf(rocFilters);
+      filters = new HashSet<>(rocFilters);
       if (extractor.requiresSample()) {
         Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
       } else {
         filters.removeIf(RocFilter::requiresGt);
         if (filters.size() != rocFilters.size()) {
-          final EnumSet<RocFilter> excluded = EnumSet.noneOf(RocFilter.class);
+          final Set<RocFilter> excluded = new HashSet<>();
           excluded.addAll(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
           Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
         }

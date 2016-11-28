@@ -31,8 +31,8 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfUtils;
@@ -65,7 +65,7 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  PhaseTransferEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, String callsSampleName, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+  PhaseTransferEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, String callsSampleName, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     mCalls.getHeader().ensureContains(new InfoField(INFO_PHASE, MetaType.CHARACTER, VcfNumber.ONE, "Phase of match, A = matched in same phase, B = matched in opposite phase"));
     mCalls.getHeader().ensureContains(new FormatField(FORMAT_ORIGINAL_GT, MetaType.STRING, VcfNumber.ONE, "Original pre-phasing genotype value"));

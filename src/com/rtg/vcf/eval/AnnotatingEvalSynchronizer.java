@@ -32,8 +32,8 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
@@ -64,7 +64,7 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    */
   AnnotatingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                              String callsSampleName, RocSortValueExtractor extractor,
-                             File outdir, boolean zip, boolean slope, boolean dualRocs, EnumSet<RocFilter> rocFilters) throws IOException {
+                             File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baseLineHeader().copy();

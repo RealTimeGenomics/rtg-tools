@@ -30,7 +30,9 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
-import java.util.EnumSet;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.rtg.launcher.OutputModuleParams;
 import com.rtg.util.intervals.RegionRestriction;
@@ -71,7 +73,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
     private File mEvalRegionsFile = null;
-    private EnumSet<RocFilter> mRocFilters = EnumSet.of(RocFilter.ALL, RocFilter.HET, RocFilter.HOM);
+    private Set<RocFilter> mRocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
     private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
     private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
 
@@ -228,7 +230,7 @@ public final class VcfEvalParams extends OutputModuleParams {
      * @param filters the set of ROC outputs to produce
      * @return this builder, so calls can be chained
      */
-    public VcfEvalParamsBuilder rocFilters(EnumSet<RocFilter> filters) {
+    public VcfEvalParamsBuilder rocFilters(Set<RocFilter> filters) {
       mRocFilters = filters;
       return self();
     }
@@ -321,7 +323,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final boolean mSquashPloidy;
   private final boolean mRefOverlap;
   private final int mMaxLength;
-  private final EnumSet<RocFilter> mRocFilters;
+  private final Set<RocFilter> mRocFilters;
   private final boolean mOutputSlopeFiles;
   private final Orientor mBaselinePhaseOrientor;
   private final Orientor mCallsPhaseOrientor;
@@ -487,7 +489,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   /**
    * @return a set of the ROC outputs to produce
    */
-  public EnumSet<RocFilter> rocFilters() {
+  public Set<RocFilter> rocFilters() {
     return mRocFilters;
   }
 

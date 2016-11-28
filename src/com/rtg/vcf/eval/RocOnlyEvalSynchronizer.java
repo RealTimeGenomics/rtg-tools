@@ -32,7 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.EnumSet;
+import java.util.Set;
 
 import com.rtg.util.intervals.ReferenceRanges;
 
@@ -57,7 +57,7 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
    */
   RocOnlyEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                           String callsSampleName, RocSortValueExtractor extractor,
-                          File outdir, boolean zip, boolean slope, boolean twoPass, EnumSet<RocFilter> rocFilters) throws IOException {
+                          File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
   }
 
