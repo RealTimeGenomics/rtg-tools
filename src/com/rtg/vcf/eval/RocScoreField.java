@@ -53,15 +53,15 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
-        boolean requiresSample() {
+        public boolean requiresSample() {
           return false;
         }
         @Override
-        RocSortOrder getSortOrder() {
+        public RocSortOrder getSortOrder() {
           return order;
         }
         @Override
-        double getSortValue(VcfRecord rec, int sampleNo) {
+        public double getSortValue(VcfRecord rec, int sampleNo) {
           final String qualStr = rec.getQuality();
           if (VcfRecord.MISSING.equals(qualStr)) {
             return Double.NaN;
@@ -85,15 +85,15 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
-        boolean requiresSample() {
+        public boolean requiresSample() {
           return false;
         }
         @Override
-        RocSortOrder getSortOrder() {
+        public RocSortOrder getSortOrder() {
           return order;
         }
         @Override
-        double getSortValue(VcfRecord rec, int sampleNo) {
+        public double getSortValue(VcfRecord rec, int sampleNo) {
           final double val = VcfUtils.getDoubleInfoFieldFromRecord(rec, fieldName);
           if (MathUtils.approxEquals(val, 0, 0.00000001)) {
             return 0;
@@ -113,15 +113,15 @@ public enum RocScoreField {
     RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
       return new RocSortValueExtractor() {
         @Override
-        boolean requiresSample() {
+        public boolean requiresSample() {
           return true;
         }
         @Override
-        RocSortOrder getSortOrder() {
+        public RocSortOrder getSortOrder() {
           return order;
         }
         @Override
-        double getSortValue(VcfRecord rec, int sampleNo) {
+        public double getSortValue(VcfRecord rec, int sampleNo) {
           final double val = VcfUtils.getDoubleFormatFieldFromRecord(rec, sampleNo, fieldName);
           if (MathUtils.approxEquals(val, 0, 0.00000001)) {
             return 0;
@@ -150,7 +150,7 @@ public enum RocScoreField {
       if (anno.getField().getType() == MetaType.INTEGER) {
         return new DerivedRocSortValueExtractor(order, anno) {
           @Override
-          double getSortValue(VcfRecord rec, int sampleNo) {
+          public double getSortValue(VcfRecord rec, int sampleNo) {
             final Integer val = (Integer) mAnno.getValue(rec, sampleNo);
             if (val == null) {
               return Double.NaN;
@@ -161,7 +161,7 @@ public enum RocScoreField {
       } else if (anno.getField().getType() == MetaType.FLOAT) {
         return new DerivedRocSortValueExtractor(order, anno) {
           @Override
-          double getSortValue(VcfRecord rec, int sampleNo) {
+          public double getSortValue(VcfRecord rec, int sampleNo) {
             final Double val = (Double) mAnno.getValue(rec, sampleNo);
             if (val == null) {
               return Double.NaN;
@@ -192,12 +192,12 @@ public enum RocScoreField {
     }
 
     @Override
-    boolean requiresSample() {
+    public boolean requiresSample() {
       return true;
     }
 
     @Override
-    RocSortOrder getSortOrder() {
+    public RocSortOrder getSortOrder() {
       return mOrder;
     }
 

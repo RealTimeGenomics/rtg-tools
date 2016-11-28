@@ -30,8 +30,14 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -40,11 +46,56 @@ import com.rtg.vcf.header.VcfHeader;
 @TestClass("com.rtg.vcf.eval.RocScoreFieldTest")
 public abstract class RocSortValueExtractor {
 
-  abstract boolean requiresSample();
+  /**
+   * Creates an appropriate sort value extractor for the specified field
+   * @param scoreField the field to extract
+   * @param sortOrder the sort order
+   * @return the extractor
+   */
+  public static RocSortValueExtractor getRocSortValueExtractor(String scoreField, RocSortOrder sortOrder) {
+    final RocScoreField fieldType;
+    final String fieldName;
+    if (scoreField != null) {
+      final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
+      if (splitScore.length > 1) {
+        final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());
+        try {
+          fieldType = RocScoreField.valueOf(fieldTypeName);
+        } catch (IllegalArgumentException e) {
+          throw new NoTalkbackSlimException("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
+        }
+        fieldName = splitScore[1];
+      } else if (scoreField.equals(VcfUtils.QUAL)) {
+        fieldType = RocScoreField.QUAL;
+        fieldName = "UNUSED";
+      } else {
+        fieldType = RocScoreField.FORMAT;
+        fieldName = scoreField;
+      }
+    } else {
+      fieldType = RocScoreField.FORMAT;
+      fieldName = VcfUtils.FORMAT_GENOTYPE_QUALITY;
+    }
+    return fieldType.getExtractor(fieldName, sortOrder);
+  }
 
-  abstract double getSortValue(VcfRecord rec, int sampleNo);
+  /**
+   * @return true if the extractor requires a sample column
+   */
+  public abstract boolean requiresSample();
 
-  abstract RocSortOrder getSortOrder();
+  /**
+   * Gets the score value from a record
+   * @param rec the VCF record
+   * @param sampleNo the index of the sample of interest (or -1 for a sample-free record)
+   * @return the score value
+   */
+  public abstract double getSortValue(VcfRecord rec, int sampleNo);
+
+  /**
+   * @return the order in which the scores should be sorted such that "good" scores are first.
+   */
+  public abstract RocSortOrder getSortOrder();
 
   /**
    * Lets the extractor see the header in order to get any required information.
@@ -56,17 +107,17 @@ public abstract class RocSortValueExtractor {
   public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {
 
     @Override
-    boolean requiresSample() {
+    public boolean requiresSample() {
       return false;
     }
 
     @Override
-    double getSortValue(VcfRecord rec, int sampleNo) {
+    public double getSortValue(VcfRecord rec, int sampleNo) {
       return 0;
     }
 
     @Override
-    RocSortOrder getSortOrder() {
+    public RocSortOrder getSortOrder() {
       return RocSortOrder.ASCENDING;
     }
 

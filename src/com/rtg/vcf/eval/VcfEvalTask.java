@@ -34,11 +34,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import com.rtg.bed.BedReader;
@@ -54,7 +52,6 @@ import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
-import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
@@ -160,7 +157,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final File outdir = params.directory();
     final EvalSynchronizer processor;
     final String outputMode = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
-    final RocSortValueExtractor rocExtractor = getRocSortValueExtractor(params.scoreField(), params.sortOrder());
+    final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor(params.scoreField(), params.sortOrder());
     rocExtractor.setHeader(variants.calledHeader());
     switch (outputMode) {
       case MODE_ALLELES:
@@ -250,33 +247,6 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       ranges = SamRangeUtils.createFullReferenceRanges(templateSequences);
     }
     return ranges;
-  }
-
-  private static RocSortValueExtractor getRocSortValueExtractor(String scoreField, RocSortOrder sortOrder) {
-    final RocScoreField fieldType;
-    final String fieldName;
-    if (scoreField != null) {
-      final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
-      if (splitScore.length > 1) {
-        final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());
-        try {
-          fieldType = RocScoreField.valueOf(fieldTypeName);
-        } catch (IllegalArgumentException e) {
-          throw new NoTalkbackSlimException("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
-        }
-        fieldName = splitScore[1];
-      } else if (scoreField.equals(VcfUtils.QUAL)) {
-        fieldType = RocScoreField.QUAL;
-        fieldName = "UNUSED";
-      } else {
-        fieldType = RocScoreField.FORMAT;
-        fieldName = scoreField;
-      }
-    } else {
-      fieldType = RocScoreField.FORMAT;
-      fieldName = VcfUtils.FORMAT_GENOTYPE_QUALITY;
-    }
-    return fieldType.getExtractor(fieldName, sortOrder);
   }
 
   static void checkHeader(VcfHeader baseline, VcfHeader calls, SdfId referenceSdfId) throws IOException {

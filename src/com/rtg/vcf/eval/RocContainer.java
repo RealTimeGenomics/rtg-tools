@@ -320,13 +320,22 @@ public class RocContainer {
     }
   }
 
-  void missingScoreWarning() {
+  public void missingScoreWarning() {
     if (getNumberOfIgnoredVariants() > 0) {
       Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
     }
   }
 
-  void writeSummary(File outDir, int truePositives, int falseNegatives, int truePositivesRaw, int falsePositives) throws IOException {
+  /**
+   * Write the summary file for the ROC data
+   * @param outDir directory into which ROC files are written
+   * @param truePositives total number of baseline true positives
+   * @param falseNegatives total number of false negatives
+   * @param truePositivesRaw total number of call true positives
+   * @param falsePositives total number of false positives
+   * @throws IOException if an IO error occurs
+   */
+  public void writeSummary(File outDir, int truePositives, int falseNegatives, int truePositivesRaw, int falsePositives) throws IOException {
     final File summaryFile = new File(outDir, mFilePrefix + CommonFlags.SUMMARY_FILE);
     final String summary;
     final int totalPositives = truePositives + falseNegatives;
