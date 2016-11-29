@@ -63,7 +63,7 @@ public class TextTableTest extends TestCase {
     assertEquals("", table.toString());
     assertEquals(0, table.numRows());
 
-    table.addRow("depth", "breadth", "covered", "size", "non-N-depth", "non-N-breadth", "non-N-covered", "non-N-size", "name");
+    table.addHeaderRow("Depth", "Breadth", "Covered", "Size", "Non-N Depth", "Non-N Breadth", "Non-N Covered", "Non-N Size", "Name");
     table.addSeparator();
     table.addRow("0.0097", "0.0087", "2140198", "247249719", "0.0107", "0.0095", "2140198", "224999719", "chr1");
     table.addRow("0.0112", "0.0093", "1259191", "135374737", "0.0116", "0.0096", "1259191", "131624728", "chr10");
@@ -72,6 +72,7 @@ public class TextTableTest extends TestCase {
     assertEquals(6, table.numRows());
 
     mNano.check("tt-default.txt", table.toString());
+    mNano.check("tt-default.tsv", table.getAsTsv());
 
     table.setAlignment(TextTable.Align.LEFT, TextTable.Align.RIGHT, TextTable.Align.CENTER, TextTable.Align.LEFT, TextTable.Align.CENTER, TextTable.Align.RIGHT, TextTable.Align.LEFT);
     mNano.check("tt-mixed-alignments.txt", table.toString());

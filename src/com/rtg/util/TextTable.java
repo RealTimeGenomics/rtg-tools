@@ -31,6 +31,7 @@ package com.rtg.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 
 import com.rtg.util.array.ArrayUtils;
 import com.rtg.util.diagnostic.SlimException;
@@ -89,7 +90,10 @@ public class TextTable {
   private final int mInitialIndent;
   private final Align mDefaultAlignment;
   private final ArrayList<ArrayList<String>> mTableContents = new ArrayList<>();
+  private final BitSet mHeaderRows = new BitSet();
+  private String mHeaderTsvPrefix;
   private int[] mColumnWidths = null;
+
 
   private Align[] mAlignment = new Align[0];
 
@@ -110,6 +114,15 @@ public class TextTable {
     mTabWidth = tabWidth;
     mInitialIndent = initialIndent;
     mDefaultAlignment = defaultAlignment;
+    mHeaderTsvPrefix = "#";
+  }
+
+  /**
+   * Sets the prefix used for header rows when printing in TSV format
+   * @param prefix the prefix, or null for no prefix
+   */
+  public void setHeaderTsvPrefix(String prefix) {
+    mHeaderTsvPrefix = prefix;
   }
 
   /**
@@ -121,6 +134,16 @@ public class TextTable {
       throw new SlimException("Too many alignment values supplied for number of columns in table formatter");
     }
     mAlignment = Arrays.copyOf(alignment, alignment.length);
+  }
+
+  /**
+   * Add a row of entries to the table
+   * Each row must be the same length and contain no nulls
+   * @param cells the cells to add
+   */
+  public void addHeaderRow(String... cells) {
+    mHeaderRows.set(mTableContents.size());
+    addRow(cells);
   }
 
   /**
@@ -227,20 +250,29 @@ public class TextTable {
    */
   public String getAsTsv() {
     final StringBuilder sb = new StringBuilder();
-    for (ArrayList<String> row : mTableContents) {
+    for (int i = 0; i < mTableContents.size(); i++) {
+      final ArrayList<String> row = mTableContents.get(i);
       if (row != SEPARATOR) {
+        final boolean isHeader = mHeaderRows.get(i);
+        if (isHeader && mHeaderTsvPrefix != null) {
+          sb.append(mHeaderTsvPrefix);
+        }
         boolean first = true;
         for (String column : row) {
           if (!first) {
             sb.append("\t");
           }
           first = false;
-          sb.append(column);
+          sb.append(isHeader ? sanitizeHeaderCell(column) : column);
         }
         sb.append(StringUtils.LS);
       }
     }
     return sb.toString();
+  }
+
+  protected String sanitizeHeaderCell(String cell) {
+    return cell.replaceAll("\\s", "_");
   }
 
 
