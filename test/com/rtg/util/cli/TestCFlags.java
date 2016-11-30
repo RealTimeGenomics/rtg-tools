@@ -30,12 +30,14 @@
 package com.rtg.util.cli;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Locale;
-
-import com.rtg.util.TestUtils;
+import java.util.Set;
 
 import org.junit.Assert;
+
+import com.rtg.util.TestUtils;
 
 /**
  * Test a <code>CFlags</code> object for various metrics used in SLIM.
@@ -120,7 +122,7 @@ public final class TestCFlags {
   }
 
   /**
-   * Check various syntactic properties of a <code>CFlags</code> description.
+   * Check various syntactic properties of a <code>CFlags</code> description and flag configuration.
    *
    * @param flags the flags
    * @param contains strings required to be present
@@ -130,11 +132,14 @@ public final class TestCFlags {
     final StringBuilder problems = new StringBuilder();
     try {
       CheckSpelling.setSpelling(problems);
+      final Set<String> cats = flags.getCategories() == null ? null : new HashSet<>(Arrays.asList(flags.getCategories()));
       for (final Flag f : flags.getRequired()) {
         checkDescriptionConstraints(f);
+        checkFlagCategory(cats, f);
       }
       for (final Flag f : flags.getOptional()) {
         checkDescriptionConstraints(f);
+        checkFlagCategory(cats, f);
       }
       if (problems.length() > 0) {
         Assert.fail(problems.toString());
@@ -147,6 +152,13 @@ public final class TestCFlags {
     Assert.assertNotNull(usage);
     if (contains != null) {
       TestUtils.containsAll(usage, contains);
+    }
+  }
+
+  private static void checkFlagCategory(Set<String> categories, Flag f) {
+    if (categories != null) {
+      Assert.assertTrue("--" + f.getName() + " has no category set but flags requires categories.", f.getCategory().length() > 0);
+      Assert.assertTrue("--" + f.getName() + " has category " + f.getCategory() + " which is not within flag categories: " + categories, categories.contains(f.getCategory()));
     }
   }
 
