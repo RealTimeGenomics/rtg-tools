@@ -29,12 +29,14 @@
  */
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.BED_REGIONS_FLAG;
 import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
@@ -70,8 +72,6 @@ import com.rtg.vcf.VcfFilterStatistics.Stat;
  *
  */
 public final class VcfFilterCli extends AbstractCli {
-
-  private static final String RESTRICTION_FLAG = "region";
 
   // filter flags
   private static final String REMOVE_INFO = "remove-info";
@@ -160,7 +160,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlags.initForce(mFlags);
 
     mFlags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
     // What to apply to, what to do with the results of filtering
     mFlags.registerOptional(FAIL_FLAG, String.class, STRING, "instead of removing failed records set their filter field to the provided value").setCategory(REPORTING);
@@ -231,10 +231,8 @@ public final class VcfFilterCli extends AbstractCli {
   private static class VcfFilterValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      if (flags.isSet(OUTPUT_FLAG)) {
-        if (!CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))) {
-          return false;
-        }
+      if (flags.isSet(OUTPUT_FLAG) && !CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))) {
+        return false;
       }
       if (!CommonFlags.validateInputFile(flags, INPUT_FLAG)
         || !CommonFlags.validateInputFile(flags, EXCLUDE_BED, EXCLUDE_VCF, INCLUDE_BED, INCLUDE_VCF)
@@ -363,15 +361,15 @@ public final class VcfFilterCli extends AbstractCli {
       mVcfFilterTask.mExcludeBed = VcfUtils.regionsVcf((File) mFlags.getValue(EXCLUDE_VCF));
     }
     final RegionRestriction region;
-    if (mFlags.isSet(CommonFlags.RESTRICTION_FLAG)) {
+    if (mFlags.isSet(RESTRICTION_FLAG)) {
       region = new RegionRestriction((String) mFlags.getValue(RESTRICTION_FLAG));
     } else {
       region = null;
     }
     final ReferenceRanges<String> ranges;
-    if (mFlags.isSet(CommonFlags.BED_REGIONS_FLAG)) {
+    if (mFlags.isSet(BED_REGIONS_FLAG)) {
       Diagnostic.developerLog("Loading BED regions");
-      ranges = SamRangeUtils.createBedReferenceRanges((File) mFlags.getValue(CommonFlags.BED_REGIONS_FLAG));
+      ranges = SamRangeUtils.createBedReferenceRanges((File) mFlags.getValue(BED_REGIONS_FLAG));
     } else {
       ranges = null;
     }

@@ -616,6 +616,17 @@ public final class CommonFlags {
    * @return <code>true</code> if all okay <code>false</code> otherwise
    */
   public static boolean validateRegions(CFlags flags) {
+    return flags.checkNand(RESTRICTION_FLAG, BED_REGIONS_FLAG)
+      && validateRegion(flags)
+      && validateInputFile(flags, BED_REGIONS_FLAG);
+  }
+
+  /**
+   * Check that the region flags are appropriate, if set.
+   * @param flags the flags to check
+   * @return <code>true</code> if all okay <code>false</code> otherwise
+   */
+  public static boolean validateRegion(CFlags flags) {
     if (flags.isSet(RESTRICTION_FLAG)) {
       final String region = (String) flags.getValue(RESTRICTION_FLAG);
       if (!RegionRestriction.validateRegion(region)) {
@@ -623,17 +634,6 @@ public final class CommonFlags {
         return false;
       }
     }
-    if (flags.isSet(BED_REGIONS_FLAG)) {
-      final File bedRegionsFile = (File) flags.getFlag(BED_REGIONS_FLAG).getValue();
-      if (!bedRegionsFile.exists()) {
-        Diagnostic.error(ErrorType.FILE_NOT_FOUND, "The specified file, \"" + bedRegionsFile.getPath() + "\", does not exist.");
-        return false;
-      }
-    }
-    if (!flags.checkNand(RESTRICTION_FLAG, BED_REGIONS_FLAG)) {
-      return false;
-    }
     return true;
   }
-
 }

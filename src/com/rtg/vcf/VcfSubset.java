@@ -149,15 +149,12 @@ public class VcfSubset extends AbstractCli {
   private static class VcfSubsetValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      if (!CommonFlags.validateInputFile(flags, INPUT)
-        || !CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT)))
-        || !flags.checkAtMostOne(REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)
-        || !flags.checkAtMostOne(REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)
-        || !flags.checkAtMostOne(REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)
-        || !flags.checkNand(REMOVE_FORMAT, KEEP_FORMAT)) {
-        return false;
-      }
-      return true;
+      return CommonFlags.validateInputFile(flags, INPUT)
+        && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT)))
+        && flags.checkAtMostOne(REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)
+        && flags.checkAtMostOne(REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)
+        && flags.checkAtMostOne(REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)
+        && flags.checkNand(REMOVE_FORMAT, KEEP_FORMAT);
     }
   }
 

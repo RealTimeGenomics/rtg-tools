@@ -31,6 +31,7 @@ package com.rtg.vcf;
 
 import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 
 import java.io.BufferedWriter;
@@ -101,8 +102,6 @@ public final class SnpIntersection extends LoggedCli {
   private static final String FIRST_ONLY_OUT = "first-only.vcf";
   private static final String SECOND_ONLY_OUT = "second-only.vcf";
 
-  private static final String REGION_FLAG = "region";
-
   @Override
   protected void initFlags() {
     initFlags(mFlags);
@@ -118,7 +117,7 @@ CommonFlags.initNoGzip(flags);
     final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
-    flags.registerOptional(REGION_FLAG, String.class, STRING, "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    flags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     flags.setDescription("Produces intersection information between two SNP files.");
     flags.setValidator(new SnpIntersectionFlagValidator());
   }
@@ -127,17 +126,13 @@ CommonFlags.initNoGzip(flags);
     @Override
     public boolean isValid(CFlags flags) {
       if (!CommonFlags.validateOutputDirectory(flags)
-        || !CommonFlags.validateInputFile(flags, FIRST_INPUT_FILE, SECOND_INPUT_FILE)) {
+        || !CommonFlags.validateInputFile(flags, FIRST_INPUT_FILE, SECOND_INPUT_FILE)
+        || !CommonFlags.validateRegion(flags)) {
         return false;
       }
-      if (flags.isSet(REGION_FLAG)) {
-        final String region = (String) flags.getValue(REGION_FLAG);
-        if (!RegionRestriction.validateRegion(region)) {
-          flags.setParseMessage("The value \"" + region + "\" for \"--" + REGION_FLAG + "\" is not a well formed region.");
-          return false;
-        }
+      if (flags.isSet(RESTRICTION_FLAG)) {
         if (!CommonFlags.validateTabixedInputFile(flags, FIRST_INPUT_FILE, SECOND_INPUT_FILE)) {
-          flags.setParseMessage(flags.getParseMessage() + ". Cannot use \"--" + REGION_FLAG + "\".");
+          flags.setParseMessage(flags.getParseMessage() + ". Cannot use --" + RESTRICTION_FLAG + ".");
           return false;
         }
       }
@@ -167,7 +162,7 @@ CommonFlags.initNoGzip(flags);
     final File first = (File) mFlags.getValue(FIRST_INPUT_FILE);
     final File second = (File) mFlags.getValue(SECOND_INPUT_FILE);
     final File outputFile = (File) mFlags.getValue(OUTPUT_FLAG);
-    final RegionRestriction region = mFlags.isSet(REGION_FLAG) ? new RegionRestriction((String) mFlags.getValue(REGION_FLAG)) : null;
+    final RegionRestriction region = mFlags.isSet(RESTRICTION_FLAG) ? new RegionRestriction((String) mFlags.getValue(RESTRICTION_FLAG)) : null;
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
     final List<Object> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
     final HashSet<String> forceMerge = new HashSet<>();

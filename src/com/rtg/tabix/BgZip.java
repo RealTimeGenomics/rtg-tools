@@ -42,9 +42,7 @@ import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 
@@ -84,26 +82,10 @@ public class BgZip extends AbstractCli {
     mFlags.registerOptional(NO_TERMINATE_FLAG, "if set, do not add the block gzip termination block").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('l', LEVEL_FLAG, Integer.class, "INT", "the compression level to use, between 1 (least but fast) and 9 (highest but slow)", BlockCompressedOutputStream.getDefaultCompressionLevel()).setCategory(INPUT_OUTPUT);
 
-    mFlags.setValidator(new Validator() {
-      @Override
-      public boolean isValid(CFlags flags) {
-        if (flags.isSet(LEVEL_FLAG) && ((Integer) flags.getValue(LEVEL_FLAG) < 1) || ((Integer) flags.getValue(LEVEL_FLAG) > 9)) {
-          flags.setParseMessage("Compression level must be between 1 and 9");
-          return false;
-        }
-        if (!flags.checkNand(STDOUT_FLAG, FORCE_FLAG)) {
-          return false;
-        }
-        if (!flags.checkNand(DECOMPRESS_FLAG, NO_TERMINATE_FLAG)) {
-          return false;
-        }
-        if (!flags.checkNand(DECOMPRESS_FLAG, LEVEL_FLAG)) {
-          return false;
-        }
-        return true;
-      }
-    });
-
+    mFlags.setValidator(flags -> flags.checkInRange(LEVEL_FLAG, 1, 9)
+      && flags.checkNand(STDOUT_FLAG, FORCE_FLAG)
+      && flags.checkNand(DECOMPRESS_FLAG, NO_TERMINATE_FLAG)
+      && flags.checkNand(DECOMPRESS_FLAG, LEVEL_FLAG));
   }
 
   private static String getOutputFilename(File inputFile, boolean decompress) {

@@ -126,16 +126,12 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static class SnpAnnotatorValidator implements Validator {
     @Override
     public boolean isValid(CFlags flags) {
-      if (!CommonFlags.validateInputFile(flags, INPUT_FLAG)
-        || !CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
-        || !flags.checkNand(BED_IDS_FLAG, VCF_IDS_FLAG)
-        || !checkFileList(flags, BED_INFO_FLAG)
-        || !checkFileList(flags, BED_IDS_FLAG)
-        || !checkFileList(flags, VCF_IDS_FLAG)
-        ) {
-        return false;
-      }
-      return true;
+      return CommonFlags.validateInputFile(flags, INPUT_FLAG)
+        && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
+        && flags.checkNand(BED_IDS_FLAG, VCF_IDS_FLAG)
+        && checkFileList(flags, BED_INFO_FLAG)
+        && checkFileList(flags, BED_IDS_FLAG)
+        && checkFileList(flags, VCF_IDS_FLAG);
     }
 
     private boolean checkFileList(CFlags flags, String flag) {

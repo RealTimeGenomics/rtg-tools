@@ -133,9 +133,9 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", tempDir.getPath()),
         "is a directory.");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:0-10"),
-        "The value \"chr1:0-10\" for \"--region\" is not a well formed region.");
+        "The value \"chr1:0-10\" for --region is malformed.");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", input.getPath(), "-I", input.getPath(), "--region", "chr1:1-10"),
-        "is not in bgzip format. Cannot use \"--region\".");
+        "is not in bgzip format. Cannot use --region.");
       final File bgzipInput = new File(tempDir, "file.gz");
       FileHelper.stringToGzFile("#Test String", bgzipInput);
       final File bgzipInputWithIndex = new File(tempDir, "file2.gz");
@@ -143,7 +143,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       final File bgzipInputIndex = new File(tempDir, "file2.gz.tbi");
       assertTrue(bgzipInputIndex.createNewFile());
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInputWithIndex.getPath(), "-I", input.getPath(), "--region", "chr1:1-10"),
-        "is not in bgzip format. Cannot use \"--region\".");
+        "is not in bgzip format. Cannot use --region.");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInput.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10"),
         "Index not found for file", "expected index called", bgzipInput.getPath() + ".tbi");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", new File(tempDir.getPath(), "output").getPath(), "-i", bgzipInputWithIndex.getPath(), "-I", bgzipInput.getPath(), "--region", "chr1:1-10"),
