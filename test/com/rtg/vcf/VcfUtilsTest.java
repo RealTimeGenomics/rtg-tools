@@ -70,19 +70,19 @@ public class VcfUtilsTest extends TestCase {
     try {
       checkSplit(new int[] {}, VcfUtils.splitGt("|"));
       fail();
-    } catch (NumberFormatException e) {
+    } catch (VcfFormatException e) {
       // Expected
     }
     try {
       checkSplit(new int[] {}, VcfUtils.splitGt(""));
       fail();
-    } catch (NumberFormatException e) {
+    } catch (VcfFormatException e) {
       // Expected
     }
     try {
       checkSplit(new int[] {}, VcfUtils.splitGt("a"));
       fail();
-    } catch (NumberFormatException e) {
+    } catch (VcfFormatException e) {
       // Expected
     }
   }

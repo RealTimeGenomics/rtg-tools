@@ -312,7 +312,13 @@ public class VariantStatistics extends AbstractStatistics {
       final String sampleName = sampleNames.get(i);
       if (mOnlySample == null || mOnlySample.contains(sampleName)) {
         final String gtStr = gts.get(i);
-        final int[] splitGt = VcfUtils.splitGt(gtStr);
+        final int[] splitGt;
+        try {
+          splitGt = VcfUtils.splitGt(gtStr);
+        } catch (VcfFormatException e) {
+          Diagnostic.warning("VCF record GT is invalid, record: " + rec.toString());
+          continue;
+        }
         if (!VcfUtils.isValidGt(rec, splitGt)) {
           Diagnostic.warning("VCF record GT contains allele ID out of range, record: " + rec.toString());
           continue;

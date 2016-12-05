@@ -162,36 +162,40 @@ public final class VcfUtils {
    * @throws NumberFormatException if the subfield is malformed.
    */
   public static int[] splitGt(String gt) {
-    final int gtlen = gt.length();
-    if (gtlen == 1) { // Typical haploid call
-      return new int[] {alleleId(gt.charAt(0)) };
-    } else {
-      int[] result = new int[2]; // Initialize assuming the most common case, diploid, and resize if needed
-      int ploid = 0;
-      int allelestart = 0;
-      for (int i = 0; i < gtlen; i++) {
-        final char c = gt.charAt(i);
-        if (c == PHASED_SEPARATOR || c == UNPHASED_SEPARATOR) {
+    try {
+      final int gtlen = gt.length();
+      if (gtlen == 1) { // Typical haploid call
+        return new int[]{alleleId(gt.charAt(0))};
+      } else {
+        int[] result = new int[2]; // Initialize assuming the most common case, diploid, and resize if needed
+        int ploid = 0;
+        int allelestart = 0;
+        for (int i = 0; i < gtlen; i++) {
+          final char c = gt.charAt(i);
+          if (c == PHASED_SEPARATOR || c == UNPHASED_SEPARATOR) {
+            if (ploid == result.length) { // More than diploid call!
+              result = Arrays.copyOf(result, result.length + 1);
+            }
+            result[ploid++] = alleleId(gt, allelestart, i - allelestart);
+            allelestart = i + 1;
+          }
+        }
+        if (allelestart < gtlen) {
           if (ploid == result.length) { // More than diploid call!
             result = Arrays.copyOf(result, result.length + 1);
           }
-          result[ploid++] = alleleId(gt, allelestart, i - allelestart);
-          allelestart = i + 1;
+          result[ploid++] = alleleId(gt, allelestart, gtlen - allelestart);
         }
-      }
-      if (allelestart < gtlen) {
-        if (ploid == result.length) { // More than diploid call!
-          result = Arrays.copyOf(result, result.length + 1);
+        if (ploid < result.length) { // Can only happen if a haploid genotype with allele id > 9
+          result = Arrays.copyOf(result, ploid);
         }
-        result[ploid++] = alleleId(gt, allelestart, gtlen - allelestart);
+        if (ploid == 0) {
+          throw new NumberFormatException();
+        }
+        return result;
       }
-      if (ploid < result.length) { // Can only happen if a haploid genotype with allele id > 9
-        result = Arrays.copyOf(result, ploid);
-      }
-      if (ploid == 0) {
-        throw new NumberFormatException("Malformed GT '" + gt + "'"); // NFE is for consistency with the parseInt stuff
-      }
-      return result;
+    } catch (NumberFormatException e) {
+      throw new VcfFormatException("Malformed VCF GT value \"" + gt + "\"");
     }
   }
 
@@ -202,7 +206,6 @@ public final class VcfUtils {
    * @param phased if true, use the phased separator
    * @param gt a VCF genotype subfield (the <code>GT</code> value).
    * @return a new <code>int[]</code> containing one int per allele. Any missing values ('.') will be assigned index -1.
-   * @throws NumberFormatException if the subfield is malformed.
    */
   public static String joinGt(boolean phased, int... gt) {
     final char sep = phased ? PHASED_SEPARATOR : UNPHASED_SEPARATOR;
