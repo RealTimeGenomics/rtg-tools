@@ -43,13 +43,12 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Reads a <code>.vcf</code> input stream and converts it into VCF records.
  */
-public class VcfReader implements IOIterator<VcfRecord> {
+public class VcfReader implements VcfIterator {
 
   private static final int CHROM_FIELD = 0;
   private static final int POS_FIELD = 1;
