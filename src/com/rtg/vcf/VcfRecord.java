@@ -257,9 +257,13 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addFilter(String filter) {
-    // VCF spec says the field is either PASS or semicolon separated list of failures. So if a filter is
-    // added it should make sense to remove any PASS.
-    mFilters.remove(VcfUtils.FILTER_PASS);
+    // VCF spec says the field is either PASS or semicolon separated list of failures.
+    // So we may need to remove any existing PASS, or other filters, depending on what comes in.
+    if (VcfUtils.FILTER_PASS.equals(filter)) {
+      mFilters.clear();
+    } else {
+      mFilters.remove(VcfUtils.FILTER_PASS);
+    }
     mFilters.add(filter);
     return this;
   }
