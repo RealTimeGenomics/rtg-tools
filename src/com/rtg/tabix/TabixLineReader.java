@@ -270,7 +270,7 @@ public class TabixLineReader implements LineReader {
 
             if (alignmentStart <= mPreviousAlignmentStart) { // this record would have been already returned by an earlier region
               //Diagnostic.developerLog("Ignoring record from earlier block at " + mReader.getReferenceName() + ":" + (alignmentStart + 1));
-              mDoubleFetched++;
+              ++mDoubleFetched;
               if (mDoubleFetched % 100000 == 0) {
                 Diagnostic.developerLog("Many double-fetched records noticed at " + mReader.getReferenceName() + ":" + (alignmentStart + 1) + " in region " + mCurrentRegion + " (skipping through to " + mPreviousAlignmentStart + ")");
               }
@@ -316,7 +316,7 @@ public class TabixLineReader implements LineReader {
           mCurrentTemplate = newTemplate;
 
         }
-        mCurrentOffset++;
+        ++mCurrentOffset;
       } catch (IOException e) {
         throw new RuntimeIOException(e.getMessage(), e);
       }

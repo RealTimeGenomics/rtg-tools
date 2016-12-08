@@ -206,7 +206,7 @@ CommonFlags.initNoGzip(flags);
           writeHeader(sameWriter, combinedHeader);
           writeHeader(differentWriter, combinedHeader);
           while (secondReader.hasNext()) {
-            totalSecondCount++;
+            ++totalSecondCount;
             final VcfRecord vc = secondReader.next();
             vc.addInfo("SF", "1");
             final String key = vc.getSequenceName() + "_" + vc.getOneBasedStart();
@@ -219,17 +219,17 @@ CommonFlags.initNoGzip(flags);
                 vcFirst.addInfo("SF", "0");
                 if (!compareAlts || comparePredictions(vcfRecordToPrediction(vcFirst), vcfRecordToPrediction(vc))) {
                   //System.err.println("same " + key);
-                  sameCount++;
+                  ++sameCount;
                   write(sameWriter, vcFirst);
                   write(sameWriter, vc);
                 } else {
-                  differentCount++;
+                  ++differentCount;
                   write(differentWriter, vcFirst);
                   write(differentWriter, vc);
                 }
               }
             } else {
-              secondOnlyCount++;
+              ++secondOnlyCount;
               write(secondOnlyWriter, vc);
             }
           }
@@ -245,7 +245,7 @@ CommonFlags.initNoGzip(flags);
       Collections.sort(firstOnlyLines);
       for (LineHolder lh : firstOnlyLines) {
         if (!lh.mMatched) {
-          firstOnlyCount++;
+          ++firstOnlyCount;
           final VcfRecord rec = lh.mLine;
           rec.addInfo("SF", "0");
           write(firstOnlyWriter, lh.mLine);
@@ -295,7 +295,7 @@ CommonFlags.initNoGzip(flags);
   private String vcfRecordToPrediction(VcfRecord rec) {
     final StringBuilder sb = new StringBuilder();
     final String[] preds = rec.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0).split("[/|]");
-    for (int i = 0; i < preds.length; i++) {
+    for (int i = 0; i < preds.length; ++i) {
       final int pred = ".".equals(preds[i]) ? 0 : Integer.parseInt(preds[i]);
       if (i > 0) {
         sb.append(":");
@@ -314,7 +314,7 @@ CommonFlags.initNoGzip(flags);
     Diagnostic.progress("Start loading first file...");
 
     while (vorr.hasNext()) {
-      totalFirstCount++;
+      ++totalFirstCount;
       final VcfRecord vc = vorr.next();
       //map.put(l.getReference() + l.getLocation(), value)
       final String key = vc.getSequenceName() + "_" + vc.getOneBasedStart();

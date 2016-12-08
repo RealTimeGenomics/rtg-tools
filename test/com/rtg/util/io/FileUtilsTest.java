@@ -98,7 +98,7 @@ public class FileUtilsTest extends TestCase {
 
   public void testStreamToFile() throws Exception {
     final byte[] bytes = new byte[100];
-    for (int i = 0; i < bytes.length; i++) {
+    for (int i = 0; i < bytes.length; ++i) {
       bytes[i] = (byte) (i % 11 + 1);
     }
 
@@ -113,7 +113,7 @@ public class FileUtilsTest extends TestCase {
       try (FileInputStream fis = new FileInputStream(f)) {
         final byte[] res = IOUtils.readData(fis);
         assertEquals(bytes.length, res.length);
-        for (int i = 0; i < bytes.length; i++) {
+        for (int i = 0; i < bytes.length; ++i) {
           assertEquals("" + i, bytes[i], res[i]);
         }
       }
@@ -124,7 +124,7 @@ public class FileUtilsTest extends TestCase {
 
   public void testByteArrayToFile() throws Exception {
     final byte[] bytes = new byte[100];
-    for (int i = 0; i < bytes.length; i++) {
+    for (int i = 0; i < bytes.length; ++i) {
       bytes[i] = (byte) (i % 11 + 1);
     }
     File f = FileHelper.createTempFile();
@@ -139,7 +139,7 @@ public class FileUtilsTest extends TestCase {
       try (FileInputStream fis = new FileInputStream(f)) {
         final byte[] res = IOUtils.readData(fis);
         assertEquals(bytes.length, res.length);
-        for (int i = 0; i < bytes.length; i++) {
+        for (int i = 0; i < bytes.length; ++i) {
           assertEquals("" + i, bytes[i], res[i]);
         }
       }
@@ -231,7 +231,7 @@ public class FileUtilsTest extends TestCase {
 
   private void checkStreamToString(final String str) throws IOException {
     final byte[] ba = new byte[str.length()];
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
       ba[i] = (byte) str.charAt(i);
     }
     final InputStream instr = new ByteArrayInputStream(ba);
@@ -307,7 +307,7 @@ public class FileUtilsTest extends TestCase {
       final OutputStream outS = new GZIPOutputStream(new FileOutputStream(out));
       try {
         final byte[] buf = new byte[1024];
-        for (int i = 0; i < fourMb; i++) {
+        for (int i = 0; i < fourMb; ++i) {
           outS.write(buf);
         }
       } finally {
@@ -369,7 +369,7 @@ public class FileUtilsTest extends TestCase {
 
   public void testMassiveStreamSkip() throws IOException {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 1111; i++) {
+    for (int i = 0; i < 1111; ++i) {
       sb.append('Z');
     }
     sb.append("rest of string");
@@ -384,7 +384,7 @@ public class FileUtilsTest extends TestCase {
 
   public void testTooBigSkip() throws IOException {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; ++i) {
       sb.append('Z');
     }
     sb.append("rest of string");
@@ -401,7 +401,7 @@ public class FileUtilsTest extends TestCase {
   public void testSeek() throws IOException {
     final StringBuilder sb = new StringBuilder();
     final String expected = "rest of string";
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; ++i) {
       sb.append('Z');
     }
     sb.append(expected);
@@ -414,7 +414,7 @@ public class FileUtilsTest extends TestCase {
   public void testSeekEOF() throws IOException {
     final StringBuilder sb = new StringBuilder();
     final String expected = "rest of string";
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; ++i) {
       sb.append('Z');
     }
     sb.append(expected);
@@ -429,11 +429,11 @@ public class FileUtilsTest extends TestCase {
 
   public void testGetIntFromFile() throws IOException {
     try (DataOutputStream fos = new DataOutputStream(new FileOutputStream(mTmp))) {
-      for (int i = 0; i < 20; i++) {
+      for (int i = 0; i < 20; ++i) {
         fos.writeInt(i);
       }
     }
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 20; ++i) {
       assertEquals(i, FileUtils.getIntFromFile(mTmp, i));
     }
     try {

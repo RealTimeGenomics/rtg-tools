@@ -77,7 +77,7 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
 
   public File recode(TestDirectory dir, File template, File samples, File alleles) {
     final String[] mergeArgs = new String[6];
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; ++i) {
       final File output = new File(dir, "recode" + i);
       final MainResult res = MainResult.run(new VcfEvalCli(),
         "-o", output.getPath(), "--sample", "SAMPLE" + i,
@@ -101,7 +101,7 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
 
   public File accumulate(TestDirectory dir, File template, File samples, File initial) {
     File alleles = initial;
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; ++i) {
       final File output = new File(dir, "accum" + i);
       final MainResult res = MainResult.run(new VcfEvalCli(),
         "-o", output.getPath(), "--sample", "SAMPLE" + i,

@@ -131,7 +131,7 @@ public class HttpUsageLoggingClientTest extends TestCase {
         for (String msgBit : mWarningMsgs[mMsgNo]) {
           assertTrue("'" + msgBit + "' was not contained in: '" + event.getMessage() + "'", event.getMessage().contains(msgBit));
         }
-        mMsgNo++;
+        ++mMsgNo;
       }
     }
 

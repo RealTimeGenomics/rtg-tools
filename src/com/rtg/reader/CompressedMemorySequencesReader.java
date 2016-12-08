@@ -227,7 +227,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     mRegion = new LongRange(mStart, mEnd);
     long pos = 0;
     final CRC32 checksum = new CRC32();
-    for (int i = 0; i < counts.length; i++) {
+    for (int i = 0; i < counts.length; ++i) {
       mPositions.set(i, pos);
       mSeqData.set(pos, data[i], (int) counts[i]);
       pos += counts[i];
@@ -365,7 +365,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   @Override
   public int[] sequenceLengths(final long start, final long end) {
     final int[] a = new int[(int) (end - start)];
-    for (long i = start; i < end; i++) {
+    for (long i = start; i < end; ++i) {
       a[(int) (i - start)] = (int) (mPositions.get(i + 1) - mPositions.get(i));
     }
     return a;
@@ -411,7 +411,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   @Override
   public int read(final long sequenceIndex, final byte[] dataOut) {
     final int length = read(sequenceIndex, dataOut, 0, length(sequenceIndex));
-    mReadCount++;
+    ++mReadCount;
     // check every Nth (256) read for CRC corruption w.r.t. the original file.
     if ((mReadCount & 0xff) == 0) {
       checkChecksum(sequenceIndex, dataOut, length, mChecksums.get(sequenceIndex));
@@ -452,7 +452,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     mQualityData.get(dest, sequenceIndex, start, length);
 
     // check every Nth (256) read for CRC corruption w.r.t. the original file.
-    mQualityCount++;
+    ++mQualityCount;
     if ((mQualityCount & 0xff) == 0 && length > 0) {
       checkChecksum(sequenceIndex, dest, length, mQualityChecksums.get(sequenceIndex));
     }
@@ -510,7 +510,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   boolean checkChecksums() {
     final CRC32 checksum = new CRC32();
     final byte[] buffer = new byte[(int) maxLength()];
-    for (long i = 0; i < numberSequences(); i++) {
+    for (long i = 0; i < numberSequences(); ++i) {
       mSeqData.get(buffer, mPositions.get(i), length(i));
       checksum.reset();
       checksum.update(buffer, 0, length(i));

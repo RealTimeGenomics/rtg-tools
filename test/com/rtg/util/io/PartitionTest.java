@@ -49,7 +49,7 @@ public class PartitionTest extends TestCase {
       final ArrayList<File> list = new ArrayList<>();
       final File[] f = new File[10];
       final StringBuilder sb = new StringBuilder();
-      for (int k = 0; k < f.length; k++) {
+      for (int k = 0; k < f.length; ++k) {
         sb.append("X");
         f[k] = new File(main, String.valueOf(k));
         FileUtils.stringToFile(sb.toString(), f[k]);

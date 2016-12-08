@@ -48,7 +48,7 @@ public class ChildFamilyLookupTest extends TestCase {
       final int[] sampleIds = f.getSampleIds();
       assertNull(lookup.getFamily(sampleIds[Family.FATHER_INDEX]));
       assertNull(lookup.getFamily(sampleIds[Family.MOTHER_INDEX]));
-      for (int i = Family.FIRST_CHILD_INDEX; i < sampleIds.length; i++) {
+      for (int i = Family.FIRST_CHILD_INDEX; i < sampleIds.length; ++i) {
         assertEquals(f, lookup.getFamily(sampleIds[i]));
       }
     }

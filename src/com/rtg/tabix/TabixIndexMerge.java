@@ -62,7 +62,7 @@ public final class TabixIndexMerge {
     final SequenceIndex[][] indexesSquared = new SequenceIndex[files.size()][];
     final String[][] sequenceNames = new String[files.size()][];
     TabixHeader mergedHeader = null;
-    for (int i = 0; i < files.size(); i++) {
+    for (int i = 0; i < files.size(); ++i) {
       final File tbiFile = files.get(i);
       try (BlockCompressedInputStream bcis = new BlockCompressedInputStream(tbiFile)) {
         final TabixHeader th = TabixHeader.readHeader(bcis);
@@ -94,7 +94,7 @@ public final class TabixIndexMerge {
     assert indexesSquared.length > 0 && sequenceNames.length == indexesSquared.length;
     SequenceIndex[] mergeMaster = indexesSquared[0];
     String[] nameMaster = sequenceNames[0];
-    for (int i = 1; i < indexesSquared.length; i++) {
+    for (int i = 1; i < indexesSquared.length; ++i) {
       final String[] mergeName = collapseNames(nameMaster, sequenceNames[i]);
       mergeMaster = collapse(mergeMaster, indexesSquared[i], mergeName, nameMaster, sequenceNames[i]);
       nameMaster = mergeName;
@@ -117,13 +117,13 @@ public final class TabixIndexMerge {
         if (nextArrayIndex < nextNames.length && nextNames[nextArrayIndex].equals(currName)) {
           currIndex.addChunks(next[nextArrayIndex]);
           currIndex.addLinearIndex(next[nextArrayIndex]);
-          nextArrayIndex++;
+          ++nextArrayIndex;
         }
-        masterArrayIndex++;
+        ++masterArrayIndex;
       } else {
         assert nextArrayIndex < nextNames.length && nextNames[nextArrayIndex].equals(currName);
         currIndex = next[nextArrayIndex];
-        nextArrayIndex++;
+        ++nextArrayIndex;
       }
       ret.add(currIndex);
     }
@@ -161,7 +161,7 @@ public final class TabixIndexMerge {
     final byte[] buf = bufHelper.toByteArray();
     final ArrayList<SequenceIndex> indexes = new ArrayList<>();
     long pos = 0;
-    for (int seqNo = 0; seqNo < numberSequences; seqNo++) {
+    for (int seqNo = 0; seqNo < numberSequences; ++seqNo) {
       final SequenceIndex bi = new SequenceIndex();
       //if (!th.getSequenceNamesUnpacked()[seqNo].equals(seqName) && seqName != null) {
       //  indexes.add(bi);
@@ -170,11 +170,11 @@ public final class TabixIndexMerge {
       //seqName = th.getSequenceNamesUnpacked()[seqNo];
       final int numBins = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos);
       pos += 4;
-      for (int i = 0; i < numBins; i++) {
+      for (int i = 0; i < numBins; ++i) {
         final int binNo = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos);
         final int numChunks = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos + 4);
         pos += 8;
-        for (int j = 0; j < numChunks; j++) {
+        for (int j = 0; j < numChunks; ++j) {
           final long chunkBeg;
           final long chunkEnd;
           if (binNo == TabixIndexer.META_BIN && j == 1) {
@@ -191,7 +191,7 @@ public final class TabixIndexMerge {
       }
       final int numLinear = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos);
       pos += 4;
-      for (int chunkNo = 0; chunkNo < numLinear; chunkNo++) {
+      for (int chunkNo = 0; chunkNo < numLinear; ++chunkNo) {
         final long orgChunkOffset = ByteArrayIOUtils.bytesToLongLittleEndian(buf, (int) pos);
         final long chunkOffset = fixChunkPosition(orgChunkOffset, pointerAdjust);
         bi.setLinearIndex(chunkNo, chunkOffset, -1);

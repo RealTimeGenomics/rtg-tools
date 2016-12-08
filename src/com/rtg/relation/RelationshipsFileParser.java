@@ -106,7 +106,7 @@ public final class RelationshipsFileParser {
     final String genome = spaceSplit[1];
     ped.addGenome(genome);
     final Properties p = ped.getProperties(genome);
-    for (int i = 2; i < spaceSplit.length; i++) {
+    for (int i = 2; i < spaceSplit.length; ++i) {
       final String[] splitProp = spaceSplit[i].split("=", 2);
       p.setProperty(splitProp[0], splitProp[1]);
     }
@@ -128,7 +128,7 @@ public final class RelationshipsFileParser {
     ped.addGenome(genome2);
 
     final Relationship r = ped.addRelationship(t, genome1, genome2);
-    for (int i = 3; i < spaceSplit.length; i++) {
+    for (int i = 3; i < spaceSplit.length; ++i) {
       final String[] splitProp = spaceSplit[i].split("=", 2);
       r.setProperty(splitProp[0], splitProp[1]);
     }

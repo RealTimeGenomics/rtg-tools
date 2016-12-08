@@ -158,7 +158,7 @@ public class SdfSplitterTest extends AbstractCliTest {
       SdfSplitter.split(inDirs, outDir, 100, true, false, false);
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "000000"))) {
         assertEquals(EXPECTED_SEQUENCES.length, dsr.numberSequences());
-        for (int j = 0; j < EXPECTED_SEQUENCES.length; j++) {
+        for (int j = 0; j < EXPECTED_SEQUENCES.length; ++j) {
           assertEquals("j: " + j, EXPECTED_SEQUENCE_NAMES[j], dsr.name(j));
         }
       }
@@ -178,7 +178,7 @@ public class SdfSplitterTest extends AbstractCliTest {
       final ArrayList<File> inDirs = new ArrayList<>();
       inDirs.add(inDir);
       SdfSplitter.split(inDirs, outDir, 1, true, false, false);
-      for (int j = 0; j < EXPECTED_SEQUENCES.length; j++) {
+      for (int j = 0; j < EXPECTED_SEQUENCES.length; ++j) {
         final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "00000" + j));
         final SequencesIterator it = dsr.iterator();
         assertEquals("j: " + j, 1, dsr.numberSequences());
@@ -214,11 +214,11 @@ public class SdfSplitterTest extends AbstractCliTest {
       SdfSplitter.split(inDirs, outDir, 100, false, false, false);
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(new File(outDir, "000000"))) {
         final SequencesIterator it = dsr.iterator();
-        for (int j = 0; j < EXPECTED_SEQUENCES.length; j++) {
+        for (int j = 0; j < EXPECTED_SEQUENCES.length; ++j) {
           assertTrue("j: " + j, it.nextSequence());
           assertEquals("j: " + j, EXPECTED_SEQUENCE_NAMES[j], it.currentName());
         }
-        for (int j = 0; j < EXPECTED_SEQUENCES_2.length; j++) {
+        for (int j = 0; j < EXPECTED_SEQUENCES_2.length; ++j) {
           assertTrue("j2: " + j, it.nextSequence());
           assertEquals("j2: " + j, EXPECTED_SEQUENCE_NAMES_2[j], it.currentName());
         }

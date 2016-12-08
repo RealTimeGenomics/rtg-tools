@@ -170,7 +170,7 @@ public final class VcfUtils {
         int[] result = new int[2]; // Initialize assuming the most common case, diploid, and resize if needed
         int ploid = 0;
         int allelestart = 0;
-        for (int i = 0; i < gtlen; i++) {
+        for (int i = 0; i < gtlen; ++i) {
           final char c = gt.charAt(i);
           if (c == PHASED_SEPARATOR || c == UNPHASED_SEPARATOR) {
             if (ploid == result.length) { // More than diploid call!
@@ -294,7 +294,7 @@ public final class VcfUtils {
    */
   public static boolean isNonVariantGt(String gt) {
     final int gtlen = gt.length();
-    for (int i = 0; i < gtlen; i++) {
+    for (int i = 0; i < gtlen; ++i) {
       final char c = gt.charAt(i);
       switch (c) {
         case PHASED_SEPARATOR:
@@ -333,7 +333,7 @@ public final class VcfUtils {
    */
   public static boolean isNonMissingGt(String gt) {
     final int gtlen = gt.length();
-    for (int i = 0; i < gtlen; i++) {
+    for (int i = 0; i < gtlen; ++i) {
       final char c = gt.charAt(i);
       switch (c) {
         case PHASED_SEPARATOR:
@@ -639,7 +639,7 @@ public final class VcfUtils {
     final String[] alleles = new String[rec.getAltCalls().size() + 1];
     final List<String> alts = rec.getAltCalls();
     alleles[0] = prevNt ? rec.getRefCall().substring(1) : rec.getRefCall();
-    for (int i = 1; i < alleles.length; i++) {
+    for (int i = 1; i < alleles.length; ++i) {
       final String allele = alts.get(i - 1);
       alleles[i] = prevNt ? allele.substring(1) : allele;
     }

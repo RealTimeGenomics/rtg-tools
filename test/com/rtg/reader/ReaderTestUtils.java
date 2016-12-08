@@ -76,7 +76,7 @@ public final class ReaderTestUtils {
    */
   public static String fasta(String... sequences) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < sequences.length; i++) {
+    for (int i = 0; i < sequences.length; ++i) {
       sb.append(">").append(i).append(StringUtils.LS).append(sequences[i]).append(StringUtils.LS);
     }
     return sb.toString();

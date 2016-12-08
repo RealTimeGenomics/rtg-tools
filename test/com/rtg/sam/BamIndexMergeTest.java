@@ -68,7 +68,7 @@ public class BamIndexMergeTest extends TestCase {
     try {
       final ArrayList<File> files = new ArrayList<>();
       final ArrayList<Long> dataFileSizes = new ArrayList<>();
-      for (int i = 1; i <= 4; i++) {
+      for (int i = 1; i <= 4; ++i) {
         final String samFileName = String.format(BAM_FILES, i);
         final File bamFile = new File(dir, samFileName);
         final File baiFile = new File(dir, samFileName + ".bai");

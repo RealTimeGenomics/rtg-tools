@@ -77,7 +77,7 @@ public class TaxonNodeTest extends TestCase {
     final HashMap<Integer, TaxonNode> nodes = new HashMap<>();
     final TaxonNode root = new TaxonNode(1, "root", "root");
     nodes.put(1, root);
-    for (int i = 2; i <= 10; i++) {
+    for (int i = 2; i <= 10; ++i) {
       final TaxonNode node = new TaxonNode(i, "node" + i, "rank" + i);
       nodes.put(i, node);
       nodes.get((i - 2) / 3 + 1).addChild(node);
@@ -97,7 +97,7 @@ public class TaxonNodeTest extends TestCase {
         assertEquals(-1, tn.getParentId());
         assertNull(tn.getParent());
       }
-      i++;
+      ++i;
     }
 
     final TaxonNode node = nodes.get(10);

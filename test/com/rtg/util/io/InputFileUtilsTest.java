@@ -45,9 +45,9 @@ public class InputFileUtilsTest extends TestCase {
 
   public void testRemoveRedundantPaths() throws IOException {
     final List<File> files = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; ++i) {
       final File f = new File("file" + i + ".txt");
-      for (int j = 0; j <= i; j++) {
+      for (int j = 0; j <= i; ++j) {
         files.add(f);
       }
     }
@@ -55,7 +55,7 @@ public class InputFileUtilsTest extends TestCase {
     assertEquals(15, files.size());
     assertEquals(5, cleaned.size());
     final Iterator<File> it = cleaned.iterator();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; ++i) {
       final File f = it.next();
       assertEquals("file" + i + ".txt", f.getPath());
     }

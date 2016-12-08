@@ -140,7 +140,7 @@ public class FileBitwiseInputStream extends SeekableStream {
     final long whichLong = (offset >>> WHICH_LONG) * mBits;
     final int whichBit = (int) (offset & WITHIN_LONG);
     int result = 0;
-    for (int b = 0; b < mBits; b++) {
+    for (int b = 0; b < mBits; ++b) {
       //final long longValue = mData[b].get(whichLong);
       final long longValue = data(whichLong + b);
       result = (result << 1) | (int) ((longValue >> whichBit) & 1);
@@ -156,13 +156,13 @@ public class FileBitwiseInputStream extends SeekableStream {
       long bits0 = data(whichLong);
       long bits1 = data(whichLong + 1);
       long bits2 = data(whichLong + 2);
-      for (int pos = 0; pos < length; pos++) {
+      for (int pos = 0; pos < length; ++pos) {
         final long bit0 = (bits0 >>> whichBit) & 1;
         final long bit1 = (bits1 >>> whichBit) & 1;
         final long bit2 = (bits2 >>> whichBit) & 1;
         dest[pos + bOffset] = (byte) ((bit0 << 2) | (bit1 << 1) | bit2);
         // now move along to the next bit
-        whichBit++;
+        ++whichBit;
         if (whichBit == BITS_PER_LONG && pos < length - 1) {
           whichBit = 0;
           whichLong += mBits;
@@ -172,21 +172,21 @@ public class FileBitwiseInputStream extends SeekableStream {
         }
       }
     } else {
-      for (int b = 0; b < mBits; b++) {
+      for (int b = 0; b < mBits; ++b) {
         mBitBuffer[b] = data(whichLong + b);
       }
-      for (int pos = 0; pos < length; pos++) {
+      for (int pos = 0; pos < length; ++pos) {
         int value = 0;
-        for (int b = 0; b < mBits; b++) {
+        for (int b = 0; b < mBits; ++b) {
           value = (value << 1) | (int) ((mBitBuffer[b] >>> whichBit) & 1);
         }
         dest[pos + bOffset] = (byte) value;
         // now move along to the next bit
-        whichBit++;
+        ++whichBit;
         if (whichBit == BITS_PER_LONG && pos < length - 1) {
           whichBit = 0;
           whichLong += mBits;
-          for (int b = 0; b < mBits; b++) {
+          for (int b = 0; b < mBits; ++b) {
             mBitBuffer[b] = data(whichLong + b);
           }
         }

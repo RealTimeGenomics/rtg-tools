@@ -112,10 +112,10 @@ public class FileCompressedInputStream extends SeekableStream {
     // precalculate our lookup tables
     mValue = new byte[mPerBitfield][];
     /* Powers of <code>mRange</code>. */
-    for (int withinBitfield = 0; withinBitfield < mPerBitfield; withinBitfield++) {
+    for (int withinBitfield = 0; withinBitfield < mPerBitfield; ++withinBitfield) {
       mValue[withinBitfield] = new byte[mMask + 1];
       final int divisor = (int) Math.pow(range, withinBitfield);
-      for (int i = 0; i <= mMask; i++) {
+      for (int i = 0; i <= mMask; ++i) {
         mValue[withinBitfield][i] = (byte) (i / divisor % range);
       }
     }
@@ -182,22 +182,22 @@ public class FileCompressedInputStream extends SeekableStream {
     longValue = longValue >>> (whichBitfield * mBits);
     int bitField = (int) (longValue & mMask);
     int withinBitfield = (int) (offset % mPerLong) % mPerBitfield;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       // this line is a faster version of the following two, using a lookup table.
       dest[i + bOffset] = mValue[withinBitfield][bitField];
       // the slow version...
       //final int divisor = (int) Math.pow(mRange, withinBitfield);
       //dest[i] = (byte) (bitField / divisor % mRange);
-      withinBitfield++;
+      ++withinBitfield;
       if (withinBitfield == mPerBitfield) {
         // move along to next bitfield
         withinBitfield = 0;
-        whichBitfield++;
+        ++whichBitfield;
         longValue = longValue >>> mBits;
         bitField = (int) (longValue & mMask);
         if (whichBitfield == mNumBitfields) {
           whichBitfield = 0;
-          whichLong++;
+          ++whichLong;
           longValue = data(whichLong);
           bitField = (int) (longValue & mMask);
         }

@@ -50,7 +50,7 @@ public class WorkerThreadTest extends TestCase {
     final WorkerThread wt = new WorkerThread("testWorkerThread", signal);
     assertTrue(wt.isDaemon()); // sigh jumble
     wt.start();
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; ++i) {
       synchronized (signal) {
         wt.enqueueJob(run);
         while (wt.hasJob()) {

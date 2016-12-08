@@ -77,7 +77,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
 
   public void testEqualsBig() {
     final byte[] data = new byte[1000];
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       data[i] = (byte) (i & 7);
     }
     final BitwiseByteArray big1 = new BitwiseByteArray(data.length, 3, 20, false);
@@ -85,7 +85,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
     big1.set(0L, data, data.length);
     big2.set(0L, data, data.length);
 
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       assertEquals(data[i], big1.get(i));
       assertEquals(data[i], big2.get(i));
     }
@@ -104,12 +104,12 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
   public void testGrow() {
     final BitwiseByteArray bba = new BitwiseByteArray(0, 3, 5, true);
     final byte[] bs = new byte[1];
-    for (long i = 0; i < 1234; i++) {
+    for (long i = 0; i < 1234; ++i) {
       bs[0] = (byte) (i % 8);
       //System.err.println("tSetting: " + i + " : " + bs[0]);
       bba.set(i, bs, 1);
     }
-    for (long i = 0; i < 1234; i++) {
+    for (long i = 0; i < 1234; ++i) {
       assertEquals((byte) (i % 8), bba.get(i));
     }
   }
@@ -124,7 +124,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
     final int bits = 3;
     final String which = args.length < 1 ? "bitwise" : args[0];
     // do this several times, to warm up the hot-spot compiler.
-    for (int run = 0; run < 4; run++) {
+    for (int run = 0; run < 4; ++run) {
       final ByteArray array =
         "bitwise".equals(which) ? new BitwiseByteArray(length, bits)
         : "compressed".equals(which) ? new CompressedByteArray(length, 1 << (bits - 1))
@@ -133,7 +133,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
         System.out.println("============= run #" + run + "============= Speed testing " + array);
         long time0 = System.nanoTime();
         final byte[] tmp = new byte[35];
-        for (long pos = 0; pos < length - tmp.length; pos++) {
+        for (long pos = 0; pos < length - tmp.length; ++pos) {
           tmp[(int) (pos % tmp.length)] = (byte) ((pos + 3) % (1 << bits));
           if (pos % tmp.length == tmp.length - 1) {
             array.set(pos, tmp, tmp.length);
@@ -146,7 +146,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
 
         time0 = System.nanoTime();
         final int repeats = 10;
-        for (int trial = 0; trial < repeats * length / tmp.length; trial++) {
+        for (int trial = 0; trial < repeats * length / tmp.length; ++trial) {
           array.get(tmp, (trial * 10231L) % (length - tmp.length), tmp.length);
         }
         time1 = System.nanoTime();
@@ -158,7 +158,7 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
           final BitwiseByteArray barray = (BitwiseByteArray) array;
           time0 = System.nanoTime();
           long equal = 0L;
-          for (int trial = 0; trial < repeats * length / tmp.length; trial++) {
+          for (int trial = 0; trial < repeats * length / tmp.length; ++trial) {
             equal += barray.countEquals((trial * 10243L) % (length - tmp.length), tmp.length, barray, 0L);
           }
           time1 = System.nanoTime();

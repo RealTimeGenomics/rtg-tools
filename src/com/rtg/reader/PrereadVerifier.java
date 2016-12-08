@@ -224,7 +224,7 @@ public final class PrereadVerifier {
     long totalDone = 0;
     final long totalNumberOfSeq = reader.numberSequences();
     final long totalTides = reader.totalLength();
-    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; numberOfSeq++) {
+    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; ++numberOfSeq) {
       if (numberOfSeq >= totalNumberOfSeq) {
         return 0;
       }
@@ -272,7 +272,7 @@ public final class PrereadVerifier {
     final long totalNumberOfSeq = reader.numberSequences();
     final long totalTides = reader.totalLength();
     long totalDone = 0;
-    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; numberOfSeq++) {
+    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; ++numberOfSeq) {
       if (numberOfSeq >= totalNumberOfSeq) {
         return 0;
       }
@@ -304,7 +304,7 @@ public final class PrereadVerifier {
     final long totalNumberOfSeq = reader.numberSequences();
     final long totalTides = reader.totalLength();
     long totalDone = 0;
-    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; numberOfSeq++) {
+    for (long numberOfSeq = 0; numberOfSeq < totalNumberOfSeq; ++numberOfSeq) {
       if (numberOfSeq >= totalNumberOfSeq) {
         return 0;
       }
@@ -338,7 +338,7 @@ public final class PrereadVerifier {
     final SequencesIterator it = reader.iterator();
     it.seek(0);
     do {
-      numberOfSeq++;
+      ++numberOfSeq;
       if (numberOfSeq >= totalNumberOfSeq) {
         return 0;
       }
@@ -355,7 +355,7 @@ public final class PrereadVerifier {
     final SequencesIterator it = reader.iterator();
     it.seek(0);
     do {
-      numberOfSeq++;
+      ++numberOfSeq;
       if (numberOfSeq >= totalNumberOfSeq) {
         return 0;
       }

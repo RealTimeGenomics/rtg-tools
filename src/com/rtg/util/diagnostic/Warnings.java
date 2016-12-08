@@ -93,7 +93,7 @@ public final class Warnings {
      * @param msg to be included in the warning (appended to this objects warning).
      */
     public void warn(final String msg) {
-      mCount++;
+      ++mCount;
       if (mCount <= mLimit) {
         Diagnostic.warning(mMessage + " " + msg);
       } else {

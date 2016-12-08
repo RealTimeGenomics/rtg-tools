@@ -48,19 +48,19 @@ public class ArithByteCompressionTest extends AbstractByteCompressionTest {
     final int[] pointers = new int[strings.length + 1];
     pointers[0] = 0;
     int numBytes = 0;
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int length = strings[i].length();
       numBytes += length;
       pointers[i + 1] = numBytes;
     }
     final byte[] bytes = new byte[numBytes];
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int start = pointers[i];
-      for (int j = 0; j < strings[i].length(); j++) {
+      for (int j = 0; j < strings[i].length(); ++j) {
         bytes[start + j] = (byte) (strings[i].charAt(j) - '0');
       }
     }
-    for (int i = 0; i < pointers.length - 1; i++) {
+    for (int i = 0; i < pointers.length - 1; ++i) {
       final int length = pointers[i + 1] - pointers[i];
       cmp.add(bytes, pointers[i], length);
       cmp.integrity();
@@ -79,19 +79,19 @@ public class ArithByteCompressionTest extends AbstractByteCompressionTest {
     final int[] pointers = new int[strings.length + 1];
     pointers[0] = 0;
     int numBytes = 0;
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int length = strings[i].length();
       numBytes += length;
       pointers[i + 1] = numBytes;
     }
     final byte[] bytes = new byte[numBytes];
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int start = pointers[i];
-      for (int j = 0; j < strings[i].length(); j++) {
+      for (int j = 0; j < strings[i].length(); ++j) {
         bytes[start + j] = (byte) (strings[i].charAt(j) - '0');
       }
     }
-    for (int i = 0; i < pointers.length - 1; i++) {
+    for (int i = 0; i < pointers.length - 1; ++i) {
       final int length = pointers[i + 1] - pointers[i];
       cmp.add(bytes, pointers[i], length);
       cmp.integrity();

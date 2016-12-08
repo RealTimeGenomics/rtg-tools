@@ -169,7 +169,7 @@ public class TextTable {
       }
       cellList.add(cell);
       mColumnWidths[col] = Math.max(mColumnWidths[col], cell.length());
-      col++;
+      ++col;
     }
     mTableContents.add(cellList);
   }
@@ -197,7 +197,7 @@ public class TextTable {
   }
 
   private static void appendSpaces(StringBuilder sb, int number) {
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < number; ++i) {
       sb.append(' ');
     }
   }
@@ -205,7 +205,7 @@ public class TextTable {
   // Takes care to handle case of empty columns at end of table
   private long getTotalWidth() {
     long totalWidth =  ArrayUtils.sum(mColumnWidths) + mTabWidth * (mColumnWidths.length - 1L);
-    for (int j = mColumnWidths.length - 1; j >= 0 && mColumnWidths[j] == 0; j--) {
+    for (int j = mColumnWidths.length - 1; j >= 0 && mColumnWidths[j] == 0; --j) {
       totalWidth -= mTabWidth;
     }
     return totalWidth;
@@ -224,11 +224,11 @@ public class TextTable {
         final long totalWidth =  getTotalWidth();
         for (final ArrayList<String> row : mTableContents) {
           if (row == SEPARATOR) {
-            for (long j = 0; j < totalWidth; j++) {
+            for (long j = 0; j < totalWidth; ++j) {
               sb.append('-');
             }
           } else {
-            for (int j = 0; j < columns; j++) {
+            for (int j = 0; j < columns; ++j) {
               if (j == 0) {
                 appendSpaces(sb, mInitialIndent);
               } else {
@@ -250,7 +250,7 @@ public class TextTable {
    */
   public String getAsTsv() {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < mTableContents.size(); i++) {
+    for (int i = 0; i < mTableContents.size(); ++i) {
       final ArrayList<String> row = mTableContents.get(i);
       if (row != SEPARATOR) {
         final boolean isHeader = mHeaderRows.get(i);

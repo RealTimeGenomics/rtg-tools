@@ -163,7 +163,7 @@ public interface Orientor {
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final OrientedVariant[] pos = new OrientedVariant[variant.numAlleles() - 1];
-      for (int i = 0; i < pos.length; i++) {
+      for (int i = 0; i < pos.length; ++i) {
         pos[i] = new OrientedVariant(variant, i + 1);
       }
       return pos;
@@ -183,12 +183,12 @@ public interface Orientor {
     public OrientedVariant[] orientations(Variant variant) {
       final boolean explicitHalfCall = variant.allele(-1) != null;
       final ArrayList<OrientedVariant> pos = new ArrayList<>(variant.numAlleles() * variant.numAlleles() - 1);
-      for (int i = 1; i < variant.numAlleles(); i++) {
-        for (int j = -1; j < i; j++) {
+      for (int i = 1; i < variant.numAlleles(); ++i) {
+        for (int j = -1; j < i; ++j) {
           pos.add(new OrientedVariant(variant, true, i, j));
           pos.add(new OrientedVariant(variant, false, j, i));
           if (j == -1 && !explicitHalfCall) {
-            j++; // Jump from . to first allele, so skips will match as missing
+            ++j; // Jump from . to first allele, so skips will match as missing
           }
         }
         pos.add(new OrientedVariant(variant, true, i, i));

@@ -308,7 +308,7 @@ public class TranslatedFrameTest extends TestCase {
           sb.append(", ");
         }
         sb.append(s);
-        i++;
+        ++i;
       }
       sb.append(LS);
     }

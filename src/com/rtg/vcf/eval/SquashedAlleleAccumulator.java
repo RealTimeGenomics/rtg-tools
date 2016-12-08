@@ -123,9 +123,9 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     int remaining = -1;
     int numAlts = 0;
     if (v.numAlleles() > 2) {
-      for (int i = 1; i < v.numAlleles(); i++) {
+      for (int i = 1; i < v.numAlleles(); ++i) {
         if (v.allele(i) != null) {
-          numAlts++;
+          ++numAlts;
           if (i != ov.alleleId()) {
             if (remaining != -1) {
               throw new IllegalStateException("Cannot have two remaining ALT alleles");

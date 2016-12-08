@@ -60,7 +60,7 @@ class RollingIndex {
   }
 
   public void incrementCount() {
-    mCurrent++;
+    ++mCurrent;
   }
 
   public void incrementSize(long amount) {

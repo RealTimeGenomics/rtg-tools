@@ -351,7 +351,7 @@ public class BamReader extends SamBamReader {
     mSeqInfo = new ArrayList<>(num);
     mReferenceLengths = new int[num];
     mReferenceNames = new String[num];
-    for (int i = 0; i < mReferenceLengths.length; i++) {
+    for (int i = 0; i < mReferenceLengths.length; ++i) {
       readDataFully(mIOBuf, 0, 4, input);
       final int nameLen = ByteArrayIOUtils.bytesToIntLittleEndian(mIOBuf, 0);
       if (mIOBuf.length < nameLen) {
@@ -394,7 +394,7 @@ public class BamReader extends SamBamReader {
 
   private static String bytesToCigar(final byte[] buf, final int offset, final int length) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       final int c = ByteArrayIOUtils.bytesToIntLittleEndian(buf, offset + (i * 4));
       sb.append((c >> 4) & 0x0FFFFFFF);
       sb.append(CIGAR_CODES[c & 0xF]);
@@ -405,7 +405,7 @@ public class BamReader extends SamBamReader {
   private static String bytesToSeq(final byte[] buf, final int offset, final int length, final int readLen) {
     final StringBuilder sb = new StringBuilder();
     final int len = length * 2 == readLen ? length : length - 1;
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       final byte b = buf[offset + i];
       sb.append(BASE_CODES[(b & 0xFF) >> 4]);
       sb.append(BASE_CODES[b & 0xF]);
@@ -422,7 +422,7 @@ public class BamReader extends SamBamReader {
       return "*";
     }
     final byte[] qual = new byte[length];
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       qual[i] = (byte) ((byte) '!' + buf[offset + i]);
     }
     return new String(qual, 0, length);
@@ -446,7 +446,7 @@ public class BamReader extends SamBamReader {
           case 'A':
           case 'c':
           case 'C':
-            pos++;
+            ++pos;
             break;
           case 's':
           case 'S':
@@ -476,7 +476,7 @@ public class BamReader extends SamBamReader {
   private int findAttribute(final String tag) {
     final int tag1 = (int) tag.charAt(0); //I changed these from codePoints for .net, hopefully will be ok
     final int tag2 = (int) tag.charAt(1);
-    for (int i = 0; i < mAttributeOffsetsLength; i++) {
+    for (int i = 0; i < mAttributeOffsetsLength; ++i) {
       final int pos = mAttributeOffsets[i];
       if ((int) mCurrentAlignment[pos] == tag1 && (int) mCurrentAlignment[pos + 1] == tag2) {
         return pos;
@@ -488,7 +488,7 @@ public class BamReader extends SamBamReader {
   @Override
   public String[] getAttributeTags() {
     final String[] ret = new String[mAttributeOffsetsLength];
-    for (int i = 0; i < mAttributeOffsetsLength; i++) {
+    for (int i = 0; i < mAttributeOffsetsLength; ++i) {
       final int pos = mAttributeOffsets[i];
       ret[i] = new String(mCurrentAlignment, pos, 2);
     }

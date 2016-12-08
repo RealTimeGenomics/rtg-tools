@@ -92,20 +92,20 @@ public class MultiByteArrayTest extends TestCase {
       mba.set(offset, data, Math.min(data.length, (int) (mba.length() - offset)));
     }
     // check byte by byte
-    for (long i = mba.length() - 1; i >= 0; i--) {
+    for (long i = mba.length() - 1; i >= 0; --i) {
       assertEquals(data[(int) i % data.length], get1(mba, i));
     }
     // check the multi-getter.
-    for (int start = 0; start < 8; start++) {
+    for (int start = 0; start < 8; ++start) {
       final byte[] out = new byte[data.length];
       mba.get(out, start, data.length);
-      for (int i = 0; i < data.length; i++) {
+      for (int i = 0; i < data.length; ++i) {
         assertEquals(data[(i + start) % data.length], out[i]);
       }
     }
     // do a load longer than one segment.
     mba.load(new ByteArrayInputStream(data, 0, data.length), 3L, data.length);
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       assertEquals(data[i], get1(mba, 3L + i));
     }
     assertTrue(bis.toString().contains("MultiByteArray allocating 8 bytes (block 1 of 3)"));
@@ -131,7 +131,7 @@ public class MultiByteArrayTest extends TestCase {
                                    0, 0, 0, 0, 0,
                                    0, 0, 0, 3};
     assertEquals((long) exp.length, mb.length());
-    for (int i = 0; i < exp.length; i++) {
+    for (int i = 0; i < exp.length; ++i) {
       assertEquals(exp[i], mb.get(i));
     }
   }

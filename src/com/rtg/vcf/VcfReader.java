@@ -227,15 +227,15 @@ public class VcfReader implements VcfIterator {
       }
       final String[] genotypes = StringUtils.split(field[8], ':');
       rec.setNumberOfSamples(field.length - 9);
-      for (int sample = 9; sample < field.length; sample++) {
+      for (int sample = 9; sample < field.length; ++sample) {
         final String[] svalues = StringUtils.split(field[sample], ':');
         if (svalues.length > genotypes.length) {
           throw new VcfFormatException("Column " + (sample + 1) + " does not have the same number of values as specified in the format column. Field=" + field[sample]);
         }
-        for (int i = 0; i < svalues.length; i++) {
+        for (int i = 0; i < svalues.length; ++i) {
           rec.addFormatAndSample(genotypes[i], svalues[i]);
         }
-        for (int i = svalues.length; i < genotypes.length; i++) {
+        for (int i = svalues.length; i < genotypes.length; ++i) {
           rec.addFormatAndSample(genotypes[i], VcfRecord.MISSING);
         }
       }

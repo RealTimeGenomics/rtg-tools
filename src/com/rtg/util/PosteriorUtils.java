@@ -88,7 +88,7 @@ public final class PosteriorUtils {
   }
 
   //  public static void main(final String[] args) {
-  //    for (int i = 1580; i < 1620; i++) {
+  //    for (int i = 1580; i < 1620; ++i) {
   //      final double x = i / 10.0;
   //      final double y = Math.pow(10, x / 10.0);
   //      final boolean same = y + 1 == y;

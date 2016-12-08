@@ -157,7 +157,7 @@ public final class SimpleThreadPool {
   private void updateProgress() {
     if (mBasicProgress) {
       synchronized (mJobs) {
-        mTotalJobsFinished++;
+        ++mTotalJobsFinished;
         final String message = mThreadPoolName + ": " + mTotalJobsFinished + "/" + mTotalJobs + " Jobs Finished";
         Diagnostic.progress(message);
         Diagnostic.developerLog(message);

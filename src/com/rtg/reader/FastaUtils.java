@@ -85,7 +85,7 @@ public final class FastaUtils {
       return null;
     }
     final char[] result = new char[qualities.length];
-    for (int i = 0; i < qualities.length; i++) {
+    for (int i = 0; i < qualities.length; ++i) {
       result[i] = rawToAsciiQuality(qualities[i]);
     }
     return result;
@@ -123,7 +123,7 @@ public final class FastaUtils {
   public static String rawToAsciiString(byte[] quality, int offset, int length) {
     final StringBuilder b = new StringBuilder();
     final int end = offset + length;
-    for (int i = offset; i < end; i++) {
+    for (int i = offset; i < end; ++i) {
       b.append(rawToAsciiQuality(quality[i]));
     }
     return b.toString();
@@ -151,7 +151,7 @@ public final class FastaUtils {
       return null;
     }
     final byte[] result = new byte[length];
-    for (int j = offset, i = 0; i < result.length; i++, j++) {
+    for (int j = offset, i = 0; i < result.length; ++i, ++j) {
       result[i] = asciiToRawQuality(qualities.charAt(j));
     }
     return result;
@@ -166,7 +166,7 @@ public final class FastaUtils {
       return null;
     }
     final byte[] result = new byte[qualities.length];
-    for (int i = 0; i < qualities.length; i++) {
+    for (int i = 0; i < qualities.length; ++i) {
       result[i] = asciiToRawQuality(qualities[i]);
     }
     return result;
@@ -181,7 +181,7 @@ public final class FastaUtils {
       return null;
     }
     final byte[] result = new byte[qualities.length];
-    for (int i = 0; i < qualities.length; i++) {
+    for (int i = 0; i < qualities.length; ++i) {
       result[i] = asciiToRawQuality((char) qualities[i]);
     }
     return result;

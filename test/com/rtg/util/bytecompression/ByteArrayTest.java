@@ -68,7 +68,7 @@ public class ByteArrayTest extends TestCase {
     final ByteArray array = getByteArray(128, bits);
 
     final byte[] data = new byte[(int) array.length()];
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       final int value = (i + 3) % (1 << bits);
       assert value < 128;
       data[i] = (byte) value;
@@ -77,7 +77,7 @@ public class ByteArrayTest extends TestCase {
     array.set(0L, data, data.length);
     final byte[] tmp = new byte[data.length];
     array.get(tmp, 0L, data.length);
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       assertEquals("data[" + i + "]", data[i], tmp[i]);
       assertEquals("data[" + i + "]", data[i], array.get(i));
     }
@@ -91,7 +91,7 @@ public class ByteArrayTest extends TestCase {
   public void testGetSet() {
     final byte[] data = {1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 20, 18, 16, 14, 12, 10, 8, 6, 4, 2, 0};
 
-    for (int size = 1; size < data.length; size++) {
+    for (int size = 1; size < data.length; ++size) {
       final ByteArray array = getByteArray(100, 7);
       long offset = 1L;  // because our get goes one byte before offset.
       while (offset < array.length()) {
@@ -102,7 +102,7 @@ public class ByteArrayTest extends TestCase {
         final byte[] tmp = new byte[safeWrite + 1];
         array.get(tmp, offset - 1, safeWrite + 1);
         assertEquals("tmp[0]", offset == 1L ? (byte) 0 : data[size - 1], tmp[0]);
-        for (int i = 1; i <= safeWrite; i++) {
+        for (int i = 1; i <= safeWrite; ++i) {
           assertEquals("tmp[" + i + "]", data[i - 1], tmp[i]);
           assertEquals("tmp[" + i + "]", data[i - 1], array.get(offset + i - 1));
         }

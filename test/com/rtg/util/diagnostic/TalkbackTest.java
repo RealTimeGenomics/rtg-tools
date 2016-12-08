@@ -171,7 +171,7 @@ public class TalkbackTest extends TestCase {
         mps.reset();
 
         final StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 25000; i++) {
+        for (int i = 0; i < 25000; ++i) {
           sb.append("A");
         }
 

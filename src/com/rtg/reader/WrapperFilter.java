@@ -67,7 +67,7 @@ class WrapperFilter {
   protected void warnInvalidSequence(String seqid) {
     if (mWarnCount < 5) {
       Diagnostic.warning("Invalid sequence id " + seqid + ", must be from 0 to " + (mReader.numberSequences() - 1));
-      mWarnCount++;
+      ++mWarnCount;
       if (mWarnCount == 5) {
         Diagnostic.warning("(Only the first 5 messages shown.)");
       }
@@ -129,7 +129,7 @@ class WrapperFilter {
           throw new NumberFormatException("Invalid range: " + seqRange);
         }
         //System.out.println("Getting sequences from " + startIdx + " to " + endIdx);
-        for (long i = startIdx; i <= endIdx; i++) {
+        for (long i = startIdx; i <= endIdx; ++i) {
           transfer(i);
         }
       }
@@ -163,7 +163,7 @@ class WrapperFilter {
    */
   protected void transfer(LongRange range) throws IOException {
     final LongRange r = SequencesReaderFactory.resolveRange(range, mReader.numberSequences());
-    for (long seq = r.getStart(); seq < r.getEnd(); seq++) {
+    for (long seq = r.getStart(); seq < r.getEnd(); ++seq) {
       transfer(seq);
     }
   }

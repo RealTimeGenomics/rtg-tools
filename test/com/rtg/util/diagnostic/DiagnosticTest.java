@@ -58,7 +58,7 @@ public class DiagnosticTest extends TestCase {
   private int mCount = 0;
 
   private void bump() {
-    mCount++;
+    ++mCount;
   }
 
   public void testListener() {

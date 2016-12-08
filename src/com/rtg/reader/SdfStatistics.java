@@ -240,7 +240,7 @@ public final class SdfStatistics extends AbstractCli {
       out.append(StringUtils.LS);
       final long[] counts = reader.residueCounts();
       long sum = 0;
-      for (int i = 0 ; i < counts.length; i++) {
+      for (int i = 0 ; i < counts.length; ++i) {
         out.append((reader.type() == SequenceType.DNA) ? DNA.values()[i].toString() : Protein.values()[i].toString());
         out.append("                  : ");
         out.append(Long.toString(counts[i]));
@@ -273,7 +273,7 @@ public final class SdfStatistics extends AbstractCli {
     final SAMProgramRecord pg = new SAMProgramRecord(Constants.APPLICATION_NAME);
     pg.setProgramVersion(Environment.getVersion());
     final int[] lengths = reader.sequenceLengths(0, reader.numberSequences());
-    for (int i = 0; i < lengths.length; i++) {
+    for (int i = 0; i < lengths.length; ++i) {
       final SAMSequenceRecord record = new SAMSequenceRecord(reader.name(i), lengths[i]);
       header.addSequence(record);
     }
@@ -322,7 +322,7 @@ public final class SdfStatistics extends AbstractCli {
     final StringBuilder str = new StringBuilder();
     // find the last valid non-zero value
     int lastIndex = -1;
-    for (int i = histo.length - 1; i >= 0; i--) {
+    for (int i = histo.length - 1; i >= 0; --i) {
       if (histo[i] != 0) {
         lastIndex = i;
         break;
@@ -331,7 +331,7 @@ public final class SdfStatistics extends AbstractCli {
 
     final long addition = 1;
 
-    for (int i = 0; i <= lastIndex; i++) {
+    for (int i = 0; i <= lastIndex; ++i) {
       //if (histo[i] > 0) {
       final String number;
       if ((long) i == SdfWriter.MAX_HISTOGRAM) {
@@ -339,7 +339,7 @@ public final class SdfStatistics extends AbstractCli {
       } else {
         number = Long.toString((long) i + addition);
       }
-      for (int j = 0; j < 18 - number.length(); j++) {
+      for (int j = 0; j < 18 - number.length(); ++j) {
         str.append(" ");
       }
       str.append(number);
@@ -374,7 +374,7 @@ public final class SdfStatistics extends AbstractCli {
 
   static void printSequenceNameAndLength(SequencesReader sr, PrintStream out) throws IOException {
     out.println("Sequence lengths: ");
-    for (long seq = 0; seq < sr.numberSequences(); seq++) {
+    for (long seq = 0; seq < sr.numberSequences(); ++seq) {
       if (sr.hasNames()) {
         out.println(sr.name(seq) + "\t" + sr.length(seq));
       } else {
@@ -414,7 +414,7 @@ public final class SdfStatistics extends AbstractCli {
     final StringBuilder str = new StringBuilder();
     // find the last valid non-zero value
     int lastIndex = -1;
-    for (int i = histo.length - 1; i >= 0; i--) {
+    for (int i = histo.length - 1; i >= 0; --i) {
       if (histo[i] != 0) {
         lastIndex = i;
         break;
@@ -423,7 +423,7 @@ public final class SdfStatistics extends AbstractCli {
 
     final long addition = addOne ? 1 : 0;
 
-    for (int i = 0; i <= lastIndex; i++) {
+    for (int i = 0; i <= lastIndex; ++i) {
       //if (histo[i] > 0) {
       final String number;
       if ((long) i == SdfWriter.MAX_HISTOGRAM) {
@@ -431,7 +431,7 @@ public final class SdfStatistics extends AbstractCli {
       } else {
         number = Long.toString((long) i + addition);
       }
-      for (int j = 0; j < 18 - number.length(); j++) {
+      for (int j = 0; j < 18 - number.length(); ++j) {
         str.append(" ");
       }
       str.append(number);

@@ -181,7 +181,7 @@ public final class ReferenceDetector {
         return false;
       }
       final long sequenceId = sequenceNameMap.get(cv.getSequenceName());
-      for (int i = 0; i < mChecks.size(); i++) {
+      for (int i = 0; i < mChecks.size(); ++i) {
         final CheckType check = mChecks.get(i);
         if (!check.checkValue(sr, sequenceId, cv.getValue(i))) {
           return false;
@@ -238,7 +238,7 @@ public final class ReferenceDetector {
       throw new IllegalArgumentException("Invalid CHECKS line, " + NAME_MAGIC + " must be first check type");
     }
     final List<CheckType> ret = new ArrayList<>();
-    for (int i = 1; i < checks.length; i++) {
+    for (int i = 1; i < checks.length; ++i) {
       ret.add(getCheckType(ReferenceManifest.CheckTypes.valueOf(checks[i].toUpperCase(Locale.getDefault()))));
     }
     return ret;

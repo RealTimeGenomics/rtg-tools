@@ -67,9 +67,9 @@ public abstract class ScoringMatrix implements Serializable, Integrity {
 
   @Override
   public boolean integrity() {
-    for (int i = 0; i < mScores.length; i++) {
+    for (int i = 0; i < mScores.length; ++i) {
       Exam.assertEquals(mScores[i].length, mScores.length);
-      for (int j = 0; j < mScores[i].length; j++) {
+      for (int j = 0; j < mScores[i].length; ++j) {
         final int sc = mScores[i][j];
         Exam.assertTrue(-10 < sc && sc < 20);
         Exam.assertEquals(sc, mScores[j][i]);
@@ -103,7 +103,7 @@ public abstract class ScoringMatrix implements Serializable, Integrity {
         //get the ids for the columns
         final String[] splits = line.split("\\ +");
         colids = new int[splits.length];
-        for (int i = 1; i < splits.length; i++) {
+        for (int i = 1; i < splits.length; ++i) {
           final String x = splits[i];
           colids[i] = codeIndex(table, x);
         }
@@ -116,7 +116,7 @@ public abstract class ScoringMatrix implements Serializable, Integrity {
       final int row = codeIndex(table, splits[0]);
       if (row > -1) {
         //System.err.println("row=" + row);
-        for (int i = 1; i < splits.length; i++) {
+        for (int i = 1; i < splits.length; ++i) {
           final int col = colids[i];
           if (col == -1) {
             continue;

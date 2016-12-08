@@ -101,8 +101,8 @@ public final class IndexSorter {
     //System.err.println("start sort off:" + off + " length:" + len);
     // Insertion sort on smallest arrays
     if (len < 7) {
-      for (long i = off; i < len + off; i++) {
-        for (long j = i; j > off && x.get(j - 1) > x.get(j); j--) {
+      for (long i = off; i < len + off; ++i) {
+        for (long j = i; j > off && x.get(j - 1) > x.get(j); --j) {
           swapper.swap(j, j - 1);
         }
       }
@@ -143,13 +143,13 @@ public final class IndexSorter {
         if (x.get(b) == v) {
           swapper.swap(a++, b);
         }
-        b++;
+        ++b;
       }
       while (c >= b && x.get(c) >= v) {
         if (x.get(c) == v) {
           swapper.swap(c, d--);
         }
-        c--;
+        --c;
       }
       if (b > c) {
         break;
@@ -186,7 +186,7 @@ public final class IndexSorter {
    * @param n length
    */
   private static void vecswap(final Swapper s, final long aa, final long bb, final long n) {
-    for (long i = 0, a = aa, b = bb; i < n; i++, a++, b++) {
+    for (long i = 0, a = aa, b = bb; i < n; ++i, ++a, ++b) {
       s.swap(a, b);
     }
   }

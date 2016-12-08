@@ -66,7 +66,7 @@ public final class OutputBytes implements Output {
   }
 
   private void writtenBit() {
-    mBitsToGo--;
+    --mBitsToGo;
     if (mBitsToGo == 0) {
       flush();
     }

@@ -90,7 +90,7 @@ public class SamPositionReaderTest extends TestCase {
           spr.next();
           if (i >= ENTRIES[ref]) {
             i = 0;
-            ref++;
+            ++ref;
           }
           assertEquals(EXP_REF_NAME[ref], spr.getReferenceName());
           assertEquals(ref, spr.getReferenceId());
@@ -102,7 +102,7 @@ public class SamPositionReaderTest extends TestCase {
           assertTrue(spr.hasReference());
           assertTrue(spr.hasCoordinates());
           assertFalse(spr.isUnmapped());
-          i++;
+          ++i;
         }
       } finally {
         spr.close();

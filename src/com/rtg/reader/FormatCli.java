@@ -250,10 +250,10 @@ public final class FormatCli extends LoggedCli {
         }
         int nonFiles = 0;
         if (!validFile((File) flags.getValue(LEFT_FILE_FLAG))) {
-          nonFiles++;
+          ++nonFiles;
         }
         if (!validFile((File) flags.getValue(RIGHT_FILE_FLAG))) {
-          nonFiles++;
+          ++nonFiles;
         }
         if (nonFiles > 0) {
           throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "There were " + nonFiles + " invalid input file paths");

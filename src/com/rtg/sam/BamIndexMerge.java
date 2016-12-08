@@ -60,14 +60,14 @@ public final class BamIndexMerge {
     long pointerAdjust = 0;
     final SequenceIndex[][] indexesSquared = new SequenceIndex[files.size()][];
     final String[][] sequenceNames = new String[files.size()][];
-    for (int i = 0; i < files.size(); i++) {
+    for (int i = 0; i < files.size(); ++i) {
       final File baiFile = files.get(i);
       try (FileInputStream is = new FileInputStream(baiFile)) {
         final byte[] smallBuf = new byte[8];
         IOUtils.readFully(is, smallBuf, 0, 8);
         final int numSequences = ByteArrayIOUtils.bytesToIntLittleEndian(smallBuf, 4);
         sequenceNames[i] = new String[numSequences];
-        for (int j = 0; j < numSequences; j++) {
+        for (int j = 0; j < numSequences; ++j) {
           sequenceNames[i][j] = Integer.toString(j);
         }
 

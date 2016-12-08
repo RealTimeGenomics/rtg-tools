@@ -197,7 +197,7 @@ public class AsynchOutputStream extends OutputStream {
       }
     }
     mBuffer[mBufferCount] = (byte) b;
-    mBufferCount++;
+    ++mBufferCount;
   }
 
   /**

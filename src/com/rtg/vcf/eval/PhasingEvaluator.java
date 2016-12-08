@@ -94,7 +94,7 @@ public final class PhasingEvaluator {
       if (!groupInPhase(baselineSection)) {
         for (VariantSummary summary : callSection) {
           if (summary.isPhased()) {
-            unphaseable++;
+            ++unphaseable;
           }
         }
         baseIsPhased = false;
@@ -128,10 +128,10 @@ public final class PhasingEvaluator {
           //Continue phasing
           final boolean callTransition = currentCall.phase() != callPhase;
           if (currentCall.included() && !(callTransition == transition)) {
-            misPhasings++;
+            ++misPhasings;
             callPhase = currentCall.phase();
           } else if (currentCall.included()) {
-            correctPhasings++;
+            ++correctPhasings;
             callPhase = currentCall.phase();
           }
         }

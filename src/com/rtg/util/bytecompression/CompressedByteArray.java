@@ -133,11 +133,11 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
     // precalculate our lookup tables
     mValue = new byte[mPerBitfield][];
     mRangePowers = new int[mPerBitfield];
-    for (int withinBitfield = 0; withinBitfield < mPerBitfield; withinBitfield++) {
+    for (int withinBitfield = 0; withinBitfield < mPerBitfield; ++withinBitfield) {
       mRangePowers[withinBitfield] = (int) Math.pow(mRange, withinBitfield);
       mValue[withinBitfield] = new byte[mMask + 1];
       final int divisor = (int) Math.pow(mRange, withinBitfield);
-      for (int i = 0; i <= mMask; i++) {
+      for (int i = 0; i <= mMask; ++i) {
         mValue[withinBitfield][i] = (byte) (i / divisor % mRange);
       }
     }
@@ -169,7 +169,7 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
         return bits;
       }
       max = max << 1;
-      bits++;
+      ++bits;
     }
     return 31;
   }
@@ -178,7 +178,7 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
   public boolean integrity() {
     assert mMask == (int) Math.pow(2, mBits) - 1;
     Exam.assertEquals(mPerBitfield, mValue.length);
-    for (int i = 0; i < mPerBitfield; i++) {
+    for (int i = 0; i < mPerBitfield; ++i) {
       Exam.assertEquals(mRange, mValue[i].length);
     }
     return true;
@@ -228,22 +228,22 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
     longValue = longValue >>> (whichBitfield * mBits);
     int bitField = (int) (longValue & mMask);
     int withinBitfield = (int) (adjOffset % mPerLong) % mPerBitfield;
-    for (int i = destOffset; i < destOffset + length; i++) {
+    for (int i = destOffset; i < destOffset + length; ++i) {
       // this line is a faster version of the following two, using a lookup table.
       dest[i] = mValue[withinBitfield][bitField];
       // the slow version...
       //final int divisor = (int) Math.pow(mRange, withinBitfield);
       //dest[i] = (byte) (bitField / divisor % mRange);
-      withinBitfield++;
+      ++withinBitfield;
       if (withinBitfield == mPerBitfield) {
         // move along to next bitfield
         withinBitfield = 0;
-        whichBitfield++;
+        ++whichBitfield;
         longValue = longValue >>> mBits;
         bitField = (int) (longValue & mMask);
         if (whichBitfield == mNumBitfields) {
           whichBitfield = 0;
-          whichLong++;
+          ++whichLong;
           longValue = mData.get(whichLong);
           bitField = (int) (longValue & mMask);
         }
@@ -292,20 +292,20 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
     long longValue = mData.get(whichLong);
     int whichBitfield = (int) (offset % mPerLong) / mPerBitfield;
     int withinBitfield = (int) (offset % mPerLong) % mPerBitfield;
-    for (int i = bOffset; i < bOffset + length; i++) {
+    for (int i = bOffset; i < bOffset + length; ++i) {
       final int mult = mRangePowers[withinBitfield];
       // final int mult = (int) Math.pow(mRange, withinBitfield);
       final byte val = data[i];
       assert 0 <= val && val < mRange : "value: " + val + " i: " + i;
       longValue += (long) (val * mult) << (whichBitfield * mBits);
-      withinBitfield++;
+      ++withinBitfield;
       if (withinBitfield == mPerBitfield) {
         withinBitfield = 0;
-        whichBitfield++;
+        ++whichBitfield;
         if (whichBitfield == mNumBitfields) {
           mData.set(whichLong, longValue);
           whichBitfield = 0;
-          whichLong++;
+          ++whichLong;
           longValue = 0L;
         }
       }
@@ -360,7 +360,7 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
           final int size = buf.limit();
           final int numLongs = size / 8;
 
-          for (int i = 0; i < numLongs && startLong + i < totLongs; i++) {
+          for (int i = 0; i < numLongs && startLong + i < totLongs; ++i) {
             ret.mData.set(startLong + i, buf.getLong());
           }
           startLong += numLongs;
@@ -383,7 +383,7 @@ public final class CompressedByteArray extends ByteArray implements Integrity {
    */
   public void dumpCompressedValues(DataOutputStream dos, long values) throws IOException {
     final long whichLong = values / mPerLong + 1;
-    for (long i = 0; i < whichLong; i++) {
+    for (long i = 0; i < whichLong; ++i) {
       dos.writeLong(mData.get(i));
     }
   }

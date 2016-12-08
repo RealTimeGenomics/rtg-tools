@@ -68,13 +68,13 @@ public class PackedIndexTest extends AbstractCommonIndexTest {
   protected void check(final long range) {
     final PackedIndex index = new PackedIndex(100, range, BitIndex.IndexType.DEFAULT);
     assertTrue(index.globalIntegrity());
-    for (long i = 0; i < index.length(); i++) {
+    for (long i = 0; i < index.length(); ++i) {
       index.set(i, range - 1);
     }
     for (long i = index.length() - 1; i >= 0; i -= 3) {
       index.set(i, (int) (i % range));
     }
-    for (long i = 0; i < index.length(); i++) {
+    for (long i = 0; i < index.length(); ++i) {
       assertEquals("i=" + i, i % 3 == 0 ? i % range : range - 1, index.get(i));
     }
     assertEquals(100, index.length());
@@ -83,7 +83,7 @@ public class PackedIndexTest extends AbstractCommonIndexTest {
     // check that the minimum number of bits is used.
     int bits = 1;
     while (range > (1L << bits)) {
-      bits++;
+      ++bits;
     }
     assertTrue(bits < 64);
     assertEquals(bits, index.getBits());

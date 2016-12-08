@@ -61,7 +61,7 @@ class TaxidWrapperFilter extends WrapperFilter {
   protected void warnInvalidSequence(String seqid) {
     if (mWarnCount < 5) {
       Diagnostic.warning("No sequence data for taxonomy id " + seqid);
-      mWarnCount++;
+      ++mWarnCount;
       if (mWarnCount == 5) {
         Diagnostic.warning("(Only the first 5 messages shown.)");
       }

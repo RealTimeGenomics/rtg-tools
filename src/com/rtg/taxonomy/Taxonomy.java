@@ -285,7 +285,7 @@ public class Taxonomy {
       String line;
       int lineNumber = 0;
       while ((line = reader.readLine()) != null) {
-        lineNumber++;
+        ++lineNumber;
         if (lineNumber == 1) {
           // expect first line to have RTG taxomony version
           if (!line.contains("RTG taxonomy")) {

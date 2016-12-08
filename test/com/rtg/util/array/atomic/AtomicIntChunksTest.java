@@ -51,13 +51,13 @@ public class AtomicIntChunksTest extends TestCase {
   }
 
   private static void set(final int start, final AtomicIntChunks lc) {
-    for (int i = start; i < lc.length(); i++) {
+    for (int i = start; i < lc.length(); ++i) {
       lc.set(i, i + 1);
     }
   }
 
   private static void check(final AtomicIntChunks lc) {
-    for (int i = 0; i < lc.length(); i++) {
+    for (int i = 0; i < lc.length(); ++i) {
       assertEquals(i + 1, lc.get(i));
     }
   }

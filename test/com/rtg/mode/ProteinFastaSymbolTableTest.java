@@ -102,7 +102,7 @@ public class ProteinFastaSymbolTableTest extends TestCase {
     final ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
     final byte[] table = t.getAsciiToOrdinalTable();
     assertEquals(255, table.length);
-    for (int i = 0; i < 255; i++) {
+    for (int i = 0; i < 255; ++i) {
       final Residue r = t.scanResidue(i);
       if (r == null) {
         assertEquals((byte) 255, table[i]);
@@ -119,7 +119,7 @@ public class ProteinFastaSymbolTableTest extends TestCase {
     final ProteinFastaSymbolTable t = new ProteinFastaSymbolTable();
     final byte[] table = t.getOrdinalToAsciiTable();
     assertEquals(22, table.length);
-    for (int k = 0; k < table.length; k++) {
+    for (int k = 0; k < table.length; ++k) {
       assertEquals((byte) Protein.values()[k].toString().charAt(0), table[k]);
     }
   }

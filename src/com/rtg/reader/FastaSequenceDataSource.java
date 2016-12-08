@@ -254,12 +254,12 @@ public class FastaSequenceDataSource implements SequenceDataSource {
         setBufferLength(mBufferPosition);
         return;
       } else if (inputByte <= 32) {     //whitespace
-        mInputBufferPosition++;
+        ++mInputBufferPosition;
         readInputBuffer();
         continue;
       } else if (mDustSequence && Character.isLowerCase((char) inputByte)) {
         residueByte = (byte) unknownResidue.ordinal();
-        mDusted++;
+        ++mDusted;
       } else {
         residueByte = mFastaSymbolLookupTable[inputByte];
         if (residueByte == (byte) 255) {
@@ -267,7 +267,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
           if (mWarningCount < NUMBER_OF_TIDE_WARNINGS) {
             Diagnostic.warning(WarningType.BAD_TIDE, mCurrentSequenceName, Character.toString((char) inputByte), unknownResidue.toString());
           }
-          mWarningCount++;
+          ++mWarningCount;
           if (mWarningCount == NUMBER_OF_TIDE_WARNINGS) {
             Diagnostic.warning("Subsequent warnings of this type will not be shown.");
           }
@@ -278,8 +278,8 @@ public class FastaSequenceDataSource implements SequenceDataSource {
         ensureBuffer();
       }
       mBuffer[mBufferPosition] = residueByte;
-      mBufferPosition++;
-      mInputBufferPosition++;
+      ++mBufferPosition;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     setBufferLength(mBufferPosition);
@@ -307,7 +307,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
     while (mInputBufferLength > 0 && mInputBufferPosition < mInputBufferLength) {
       final byte b = mInputBuffer[mInputBufferPosition];
       if (b == '>') {
-        mInputBufferPosition++; //move one past the >
+        ++mInputBufferPosition; //move one past the >
         return readLabel();
       } else {
         if (b == '@') {
@@ -316,7 +316,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
           throw new NoTalkbackSlimException(ErrorType.BAD_FASTA_LABEL, name() != null ? name() : "<none>");
         }
       }
-      mInputBufferPosition++;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     final String filename = mSourceIt instanceof FileStreamIterator ? ((FileStreamIterator) mSourceIt).currentFile().getPath() : "<Not known>";
@@ -331,7 +331,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
       final byte b = mInputBuffer[mInputBufferPosition];
       if (b == '\r' || b == '\n') {
         mCurrentSequenceName = name.toString();
-        mInputBufferPosition++; //skip past the new line
+        ++mInputBufferPosition; //skip past the new line
         return true;
       }
       if (name.length() >= 1000 * 1000) {
@@ -339,7 +339,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
         Diagnostic.warning("Fasta sequence label is longer than 1,000,000 characters, this might affect the output file size.");
       }
       name.append((char) b);
-      mInputBufferPosition++;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     return false;

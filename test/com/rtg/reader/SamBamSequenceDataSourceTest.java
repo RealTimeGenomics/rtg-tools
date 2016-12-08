@@ -183,10 +183,10 @@ public class SamBamSequenceDataSourceTest extends TestCase {
       assertTrue(source.nextSequence());
       assertEquals(read[1].length(), source.currentLength());
       assertEquals(read[0], source.name());
-      for (int j = 0; j < read[1].length(); j++) {
+      for (int j = 0; j < read[1].length(); ++j) {
         assertEquals(DNA.valueOf(read[1].charAt(j)).ordinal(), source.sequenceData()[j]);
       }
-      for (int j = 0; j < read[2].length(); j++) {
+      for (int j = 0; j < read[2].length(); ++j) {
         assertEquals(read[2].charAt(j) - 33, source.qualityData()[j]);
       }
     }
@@ -206,20 +206,20 @@ public class SamBamSequenceDataSourceTest extends TestCase {
       assertTrue(source.nextSequence());
       assertEquals(read[1].length(), source.currentLength());
       assertEquals(read[0], source.name());
-      for (int j = 0; j < read[1].length(); j++) {
+      for (int j = 0; j < read[1].length(); ++j) {
         assertEquals(DNA.valueOf(read[1].charAt(j)).ordinal(), source.sequenceData()[j]);
       }
-      for (int j = 0; j < read[2].length(); j++) {
+      for (int j = 0; j < read[2].length(); ++j) {
         assertEquals(read[2].charAt(j) - 33, source.qualityData()[j]);
       }
 
       assertTrue(source.nextSequence());
       assertEquals(read[1].length(), source.currentLength());
       assertEquals(read[0], source.name());
-      for (int j = 0; j < read[1].length(); j++) {
+      for (int j = 0; j < read[1].length(); ++j) {
         assertEquals(DNA.complement((byte) DNA.valueOf(read[1].charAt(j)).ordinal()), source.sequenceData()[read[1].length() - j - 1]);
       }
-      for (int j = 0; j < read[2].length(); j++) {
+      for (int j = 0; j < read[2].length(); ++j) {
         assertEquals(read[2].charAt(j) - 33, source.qualityData()[j]);
       }
     }
@@ -234,7 +234,7 @@ public class SamBamSequenceDataSourceTest extends TestCase {
     sb.append(SAM_HEADER);
     sb.append(SECOND_READ_GROUP);
     final int numReads = 5;
-    for (int i = 0; i < READS.length; i++) {
+    for (int i = 0; i < READS.length; ++i) {
       sb.append(String.format(SAM_LINE_LEFT, SAM_NL, READS[i][0], READS[i][1], READS[i][2]));
       sb.append(String.format(SAM_LINE_RIGHT, SAM_NL, READS[i][0], DnaUtils.reverseComplement(READS[i][1]), READS[i][2]));
       if (i < numReads) {
@@ -255,7 +255,7 @@ public class SamBamSequenceDataSourceTest extends TestCase {
       final SamBamSequenceDataSource source = getSourceFromFiles(inputs, true, new SamBamSequenceDataSource.FilterReadGroups(readGroup));
       int recordCount = 0;
       while (source.nextSequence()) {
-        recordCount++;
+        ++recordCount;
       }
       assertEquals(numReads * 2, recordCount);
     }

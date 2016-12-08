@@ -136,7 +136,7 @@ public class MultiByteArray extends ByteArray {
       System.arraycopy(mData[block], blockpos, dest, destpos, amountToCopy);
       destpos += amountToCopy;
       remaining -= amountToCopy;
-      block++;
+      ++block;
       blockpos = 0;
     }
   }
@@ -165,7 +165,7 @@ public class MultiByteArray extends ByteArray {
       System.arraycopy(src, srcpos, mData[block], blockpos, amountToCopy);
       srcpos += amountToCopy;
       remaining -= amountToCopy;
-      block++;
+      ++block;
       blockpos = 0;
     }
   }
@@ -176,7 +176,7 @@ public class MultiByteArray extends ByteArray {
     int j = (int) (offset & mMask);
     while (read < count) {
       read += stream.read(mData[i], j, Math.min(mChunkSize - j, count - read));
-      i++;
+      ++i;
       j = 0;
     }
   }

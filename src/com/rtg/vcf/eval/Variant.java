@@ -114,7 +114,7 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
-    for (int i = 0; i < numAlleles(); i++) {
+    for (int i = 0; i < numAlleles(); ++i) {
       if (i > 0) {
         sb.append(":");
       }

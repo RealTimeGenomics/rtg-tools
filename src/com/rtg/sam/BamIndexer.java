@@ -104,7 +104,7 @@ public final class BamIndexer {
 
   private static SequenceIndexContainer createBamIndexInternal(BamReader input, int numReferences, boolean refLengths) throws IOException, UnindexableDataException {
     final SequenceIndex[] indexs = new SequenceIndex[numReferences];
-    for (int i = 0; i < indexs.length; i++) {
+    for (int i = 0; i < indexs.length; ++i) {
       indexs[i] = refLengths ? new SequenceIndex(input.referenceLength(i)) : new SequenceIndex();
     }
     final List<SequenceIndex> indexList = Arrays.asList(indexs);
@@ -195,7 +195,7 @@ public final class BamIndexer {
       }
       ByteArrayIOUtils.intToBytesLittleEndian(bai.getLinearSize(), buf, 0);
       output.write(buf, 0, 4);
-      for (int j = 0; j < bai.getLinearSize(); j++) {
+      for (int j = 0; j < bai.getLinearSize(); ++j) {
         ByteArrayIOUtils.longToBytesLittleEndian(bai.getLinearIndex(j), buf, 0);
         output.write(buf, 0, 8);
       }
@@ -263,7 +263,7 @@ public final class BamIndexer {
     @Override
     public List<String> getSequenceNames() {
       final ArrayList<String> ret = new ArrayList<>();
-      for (int i = 0; i < mReader.numReferences(); i++) {
+      for (int i = 0; i < mReader.numReferences(); ++i) {
         ret.add(mReader.referenceName(i));
       }
       return ret;

@@ -55,7 +55,7 @@ public class SpyHistogram {
    */
   public void increment(final int index) {
     if (index >= mHisto.length) {
-      mCount++;
+      ++mCount;
       return;
     }
     mHisto[index]++;

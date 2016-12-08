@@ -63,7 +63,7 @@ public class NumberAllelesInGenotypesAnnotation extends AbstractDerivedInfoAnnot
       final int[] gts = VcfUtils.splitGt(gtStr);
       for (final int gt : gts) {
         if (gt >= 0) {
-          count++;
+          ++count;
         }
       }
     }

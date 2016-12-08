@@ -120,12 +120,12 @@ public abstract class BedRangeLoader<T> {
     final int start = rec.getStart();
     int end = rec.getEnd();
     if (end == start) {
-      end++;
+      ++end;
       // warning - need to have a range of at least 1
       if (mExtendWarningCount < 10) {
         Diagnostic.warning("Zero length range, extending end by 1 : " + rec.toString());
       }
-      mExtendWarningCount++;
+      ++mExtendWarningCount;
     }
 
     return new RangeData<>(start, end, getMeta(rec));

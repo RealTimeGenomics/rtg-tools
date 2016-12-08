@@ -47,7 +47,7 @@ public final class StaticModel implements DetailedModel {
   StaticModel(final int[] counts) {
     mCounts = new int[counts.length + 1];
     int sofar = 0;
-    for (int i = 1; i <= counts.length; i++) {
+    for (int i = 1; i <= counts.length; ++i) {
       sofar += counts[i - 1] + 1;
       mCounts[i] = sofar;
     }

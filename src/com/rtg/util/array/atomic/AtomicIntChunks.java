@@ -86,7 +86,7 @@ public class AtomicIntChunks implements AtomicIndex {
     mArray = new AtomicIntegerArray[chunks];
     long left = mLength;
     long total = 0;
-    for (int i = 0; i < chunks; i++) {
+    for (int i = 0; i < chunks; ++i) {
       final int assignedLength = left <= mChunkSize ? (int) left :  mChunkSize;
       assert assignedLength > 0;
       mArray[i] =  new AtomicIntegerArray(assignedLength);

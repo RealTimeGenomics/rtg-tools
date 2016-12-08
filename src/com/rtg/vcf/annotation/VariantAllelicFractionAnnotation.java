@@ -58,7 +58,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
     final String ad = record.getSampleString(sample, FORMAT_ADE);
     if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
-      for (int k = 0; k < res.length; k++) {
+      for (int k = 0; k < res.length; ++k) {
         res[k] += Double.parseDouble(adSplit[k]);
       }
     }

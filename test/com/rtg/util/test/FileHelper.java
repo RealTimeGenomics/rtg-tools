@@ -197,7 +197,7 @@ public final class FileHelper {
       final char[] buffer = FileUtils.makeBuffer();
       final int eof = -1;
       for (int len = br.read(buffer); len > eof; len = br.read(buffer)) {
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; ++i) {
           sb.append(buffer[i]);
         }
       }

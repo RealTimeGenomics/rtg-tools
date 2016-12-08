@@ -66,7 +66,7 @@ public class VcfFilterStatisticsTest extends TestCase {
     assertEquals(expected2, stream.toString());
     stream.reset();
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 15; ++i) {
       for (VcfFilterStatistics.Stat s : Stat.values()) {
         if (s.ordinal() > i - 2) {
           stats.increment(s);

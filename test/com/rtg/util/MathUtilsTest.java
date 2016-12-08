@@ -93,7 +93,7 @@ public class MathUtilsTest extends TestCase {
         assertEquals((i + 1) + ":" + n, n + 1, MathUtils.ceilPowerOf2Bits(i + 1));
       }
       i = i << 1;
-      n++;
+      ++n;
     }
     assertEquals(Long.MIN_VALUE, i);
   }
@@ -122,11 +122,11 @@ public class MathUtilsTest extends TestCase {
   public void testLogBinomialP() {
     final double[]  pascal = new double[10];
     pascal[0] = 1.0;
-    for (int i = 0; i < pascal.length - 1; i++) {
-      for (int j = 0; j <= i; j++) {
+    for (int i = 0; i < pascal.length - 1; ++i) {
+      for (int j = 0; j <= i; ++j) {
         assertEquals(i + ":" + j, -Math.log(pascal[j]) + i * Math.log(2.0) , MathUtils.logBinomial(0.5, i, j), 1.0e-7);
       }
-      for (int j = i; j >= 0; j--) {
+      for (int j = i; j >= 0; --j) {
         pascal[j + 1] += pascal[j];
       }
     }
@@ -166,11 +166,11 @@ public class MathUtilsTest extends TestCase {
   public void testLogBinomial() {
     final double[]  pascal = new double[10];
     pascal[0] = 1.0;
-    for (int i = 0; i < pascal.length - 1; i++) {
-      for (int j = 0; j <= i; j++) {
+    for (int i = 0; i < pascal.length - 1; ++i) {
+      for (int j = 0; j <= i; ++j) {
         assertEquals(i + ":" + j, Math.log(pascal[j]), MathUtils.logBinomial(i, j), 1.0e-7);
       }
-      for (int j = i; j >= 0; j--) {
+      for (int j = i; j >= 0; --j) {
         pascal[j + 1] += pascal[j];
       }
     }
@@ -179,7 +179,7 @@ public class MathUtilsTest extends TestCase {
 
   public void testLogFactorial() {
     double f = 2.0;
-    for (int i = 2; i < 40; i++) {
+    for (int i = 2; i < 40; ++i) {
       final double lf = Math.log(f);
       final double error = (MathUtils.logFactorial(i) - lf) / lf;
       //System.err.println("i:" + i + " error:" + error);
@@ -214,7 +214,7 @@ public class MathUtilsTest extends TestCase {
   private void checkLnToNormalizedProb(final double[] logs, final double[] expProb) {
     assertEquals(expProb.length, logs.length);
     final double[] actual = MathUtils.lnToNormaliedProb(logs);
-    for (int i = 0; i < logs.length; i++) {
+    for (int i = 0; i < logs.length; ++i) {
       if (Double.isNaN(expProb[i])) {
         assertTrue(Double.isNaN(actual[i]));
       } else {
@@ -246,7 +246,7 @@ public class MathUtilsTest extends TestCase {
   public void testLog() {
     assertEquals(Double.NEGATIVE_INFINITY, MathUtils.log(0.0));
     double x = 1e-100;
-    for (int j = 0; j < 10000000; j++) {
+    for (int j = 0; j < 10000000; ++j) {
       assertTrue(Math.abs(Math.log(x) - MathUtils.log(x)) < 0.0001);
       x *= 1.00005;
     }
@@ -275,7 +275,7 @@ public class MathUtilsTest extends TestCase {
   }
 
   public void testLogExpPlus1() {
-    for (double x = -1234.0; x <= 1234.0; x++) {
+    for (double x = -1234.0; x <= 1234.0; ++x) {
       final double y = MathUtils.logExpPlus1(x);
       if (x > 10.0) {
         assertEquals(x, y);
@@ -288,7 +288,7 @@ public class MathUtilsTest extends TestCase {
   }
 
   public void testLogExpMinus1() {
-    for (double x = 0.0; x <= 1234.0; x++) {
+    for (double x = 0.0; x <= 1234.0; ++x) {
       final double y = MathUtils.logExpMinus1(x);
       if (x > 10.0) {
         assertEquals(x, y);

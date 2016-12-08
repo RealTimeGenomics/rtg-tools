@@ -74,11 +74,11 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
 
   private void initQualityTable(final FastQScoreType scoreType) {
     if (scoreType.equals(FastQScoreType.SOLEXA)) {
-      for (char c = (char) FastaUtils.PHRED_LOWER_LIMIT_CHAR; c <= FastaUtils.PHRED_UPPER_LIMIT_CHAR; c++) {
+      for (char c = (char) FastaUtils.PHRED_LOWER_LIMIT_CHAR; c <= FastaUtils.PHRED_UPPER_LIMIT_CHAR; ++c) {
         mQualityTable[c - FastaUtils.PHRED_LOWER_LIMIT_CHAR] = (byte) (10 * Math.log10(1 + Math.pow(10, (c - 64) / 10.0)) + 0.5);
       }
     } else {
-      for (int i = 0; i < mQualityTable.length; i++) {
+      for (int i = 0; i < mQualityTable.length; ++i) {
         mQualityTable[i] = (byte) i;
       }
     }
@@ -158,7 +158,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
       if (mSequenceLabelMistmatchCount < MAX_SEQUENCE_LABEL_MISMATCH_WARNINGS) {
         Diagnostic.warning(WarningType.SEQUENCE_LABEL_MISMATCH, sequenceLabel, name());
       }
-      mSequenceLabelMistmatchCount++;
+      ++mSequenceLabelMistmatchCount;
       if (mSequenceLabelMistmatchCount == MAX_SEQUENCE_LABEL_MISMATCH_WARNINGS) {
         Diagnostic.warning("Subsequent warnings of this type will not be shown.");
       }
@@ -181,7 +181,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
       } else if (ch == '\r' || ch == '\n') {
         return true;
       }
-      mInputBufferPosition++;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     return true;  //end of file is as good as a newline
@@ -199,8 +199,8 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
     while (mInputBufferLength > 0 &&  mInputBufferPosition < mInputBufferLength) {
       final byte b = mInputBuffer[mInputBufferPosition];
       if (b == labelChar) {
-        mInputBufferPosition++; //move one past the label pos
-        mSequenceCount++;
+        ++mInputBufferPosition; //move one past the label pos
+        ++mSequenceCount;
         return readLabel();
       } else {
         if (b == '>') {
@@ -209,7 +209,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
           throw new NoTalkbackSlimException(ErrorType.BAD_FASTA_LABEL, name() != null ? name() : "<none>");
         }
       }
-      mInputBufferPosition++;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     if (mSequenceCount == 0) {
@@ -262,9 +262,9 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
           ensureQualityBuffer();
         }
         mQualityBuffer[mQualityBufferPosition] = mQualityTable[qualityValue];
-        mQualityBufferPosition++;
+        ++mQualityBufferPosition;
       }
-      mInputBufferPosition++;
+      ++mInputBufferPosition;
       readInputBuffer();
     }
     if (mQualityBufferPosition != mBufferPosition) {

@@ -53,7 +53,7 @@ public class FileBitwiseOutputStreamTest extends TestCase {
     try {
       final PortableRandom pr = new PortableRandom(42);
       final byte[] b = new byte[1000000];
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         b[i] = (byte) pr.nextInt(5);
       }
       final BitwiseByteArray bwba = new BitwiseByteArray(b.length, 3);
@@ -76,7 +76,7 @@ public class FileBitwiseOutputStreamTest extends TestCase {
       final byte[] exp = fileToByteArray(f);
       final byte[] res = fileToByteArray(fo);
       assertEquals(exp.length, res.length);
-      for (int i = 0; i < exp.length; i++) {
+      for (int i = 0; i < exp.length; ++i) {
         assertEquals("i: " + i + " exp: " + exp[i] + " res: " + res[i], exp[i], res[i]);
       }
     } finally {
@@ -102,7 +102,7 @@ public class FileBitwiseOutputStreamTest extends TestCase {
     try {
       final PortableRandom pr = new PortableRandom(42);
       final byte[] b = new byte[1000000];
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         b[i] = (byte) pr.nextInt(5);
       }
       final File outF = new File(dir, "out");
@@ -121,7 +121,7 @@ public class FileBitwiseOutputStreamTest extends TestCase {
         }
       }
       assertEquals(b.length, res.length);
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         assertEquals("i: " + i + " exp: " + b[i] + " res: " + res[i], b[i], res[i]);
       }
     } finally {

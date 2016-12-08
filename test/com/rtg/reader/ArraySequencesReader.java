@@ -47,7 +47,7 @@ public class ArraySequencesReader extends DummySequencesReader {
 
   private static byte[][] convertStrings(String... data) {
     final byte[][] result = new byte[data.length][];
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       result[i] = DnaUtils.encodeString(data[i]);
     }
     return result;
@@ -61,13 +61,13 @@ public class ArraySequencesReader extends DummySequencesReader {
     mData = new byte[data.length][];
     mQuality = quality == null ? null : new byte[quality.length][];
     int tot = 0;
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       final byte[] element = data[i];
       mData[i] = element.clone();
       tot += element.length;
     }
     if (mQuality != null) {
-      for (int i = 0; i < quality.length; i++) {
+      for (int i = 0; i < quality.length; ++i) {
         mQuality[i] = quality[i].clone();
       }
     }
@@ -154,7 +154,7 @@ public class ArraySequencesReader extends DummySequencesReader {
   @Override
   public long lengthBetween(final long start, final long end) {
     long tot = 0;
-    for (int i = (int) start; i < end; i++) {
+    for (int i = (int) start; i < end; ++i) {
       tot += mData[i].length;
     }
     return tot;
@@ -163,7 +163,7 @@ public class ArraySequencesReader extends DummySequencesReader {
   @Override
   public int[] sequenceLengths(final long start, final long end) {
     final int[] lengths = new int[mData.length];
-    for (int i = 0; i < mData.length; i++) {
+    for (int i = 0; i < mData.length; ++i) {
       lengths[i] = mData[i].length;
     }
     return lengths;

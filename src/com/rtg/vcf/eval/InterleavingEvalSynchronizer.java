@@ -87,10 +87,10 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
     final int lim = syncPoints.size() - 1;
     int newId = sId;
     while (newId > 0 && syncPoints.get(newId) > vv) {
-      newId--;
+      --newId;
     }
     while (newId < lim && syncPoints.get(newId + 1) <= vv) {
-      newId++;
+      ++newId;
     }
     return newId;
   }
@@ -132,7 +132,7 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
         }
         if (mBrv == null && br.hasNext()) {
           mBrv = br.next();
-          mBid++;
+          ++mBid;
           resetBaselineRecordFields(mBrv);
         }
         if (mCv == null && cit.hasNext()) {
@@ -148,7 +148,7 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
         }
         if (mCrv == null && cr.hasNext()) {
           mCrv = cr.next();
-          mCid++;
+          ++mCid;
           resetCallRecordFields(mCrv);
         }
 

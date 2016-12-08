@@ -90,7 +90,7 @@ public class ConcatSequenceDataSource<T extends SequenceDataSource> implements S
       mMaxLength = Math.max(mMaxLength, mCurrent.getMaxLength());
       mCurrent.close();
       mCurrent = mIterator.next();
-      mNameIndex++;
+      ++mNameIndex;
       printFileNumber();
     }
     return true;

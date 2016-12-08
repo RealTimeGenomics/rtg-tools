@@ -66,7 +66,7 @@ public final class Partition {
     // Greedy algorithm - sort by file length, start with biggest, put in emptiest bin
     Arrays.sort(files, FILE_COMPARATOR);
     final ArrayList<List<File>> bins = new ArrayList<>();
-    for (int k = 0; k < binCount; k++) {
+    for (int k = 0; k < binCount; ++k) {
       bins.add(new ArrayList<File>());
     }
     final long[] usage = new long[binCount];
@@ -75,7 +75,7 @@ public final class Partition {
     for (final File f : files) {
       int b = 0;
       long u = usage[0];
-      for (int k = 1; k < binCount; k++) {
+      for (int k = 1; k < binCount; ++k) {
         if (usage[k] < u) { //this results in 0 length files all getting put into the first empty bin, which MAY result in further empty bins remaining empty.
 //        if (usage[k] <= u && bins.get(k).size() < bins.get(b).size()) { // <- as per above, this kind of thing would spread the empty files across empty bins.
           u = usage[k];

@@ -133,7 +133,7 @@ public final class RtgTestEntry {
     int mTestCount = 0;
     @Override
     public void testFinished(Description description) throws Exception {
-      mTestCount++;
+      ++mTestCount;
       if (mTestCount % TESTS_PER_ROW == 0) {
         mOut.println();
       }

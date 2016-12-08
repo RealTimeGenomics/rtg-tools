@@ -301,7 +301,7 @@ abstract class PointerFileHandler {
         final int entries = fileEnd - fileOffset;
         final byte[] buf = new byte[entries * (int) mEntrySize];
         IOUtils.readFully(fis, buf, 0, buf.length);
-        for (int i = 0; i < entries; i++) {
+        for (int i = 0; i < entries; ++i) {
           if (offset + i - 1 >= 0) {
             checksums.set(offset + i - 1, buf[i * (int) mEntrySize]);
             if (mHasQuality) {

@@ -91,7 +91,7 @@ public class CompressedMemorySequencesReader2Test extends CompressedMemorySequen
         mem.readQuality(i, actQual);
         assertTrue(Arrays.equals(expQual, actQual));
 
-        i++;
+        ++i;
       }
       final SequencesReader mem2 = mem.copy();
       final FastqSequenceDataSource fastq2 = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), FastqSequenceDataSource.FastQScoreType.PHRED);
@@ -106,7 +106,7 @@ public class CompressedMemorySequencesReader2Test extends CompressedMemorySequen
         final byte[] actQual = new byte[act.length];
         mem2.readQuality(i2, actQual);
         assertTrue(Arrays.equals(expQual, actQual));
-        i2++;
+        ++i2;
       }
     } finally {
       assertTrue(FileHelper.deleteAll(dir));
@@ -124,7 +124,7 @@ public class CompressedMemorySequencesReader2Test extends CompressedMemorySequen
       final CompressedMemorySequencesReader2 mem = new CompressedMemorySequencesReader2(dir, f, true, true, region);
       final CompressedMemorySequencesReader memold = new CompressedMemorySequencesReader(dir, f, 5, true, true, region);
 
-      for (int i = 0; i < memold.numberSequences(); i++) {
+      for (int i = 0; i < memold.numberSequences(); ++i) {
         final String oldname = memold.fullName(i);
         final String name = mem.fullName(i);
         assertEquals("i: " + i, oldname, name);

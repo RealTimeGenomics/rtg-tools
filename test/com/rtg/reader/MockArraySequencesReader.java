@@ -121,7 +121,7 @@ public class MockArraySequencesReader extends MockSequencesReader {
 
   @Override
   public int read(final long index, final byte[] out) {
-    for (int i = 0; i < out.length; i++) {
+    for (int i = 0; i < out.length; ++i) {
       out[i] = (byte) ((i % 4) + 1);
     }
     return out.length;

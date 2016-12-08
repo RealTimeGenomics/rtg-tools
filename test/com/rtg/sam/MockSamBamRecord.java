@@ -80,7 +80,7 @@ public class MockSamBamRecord implements SamBamRecord {
 
   @Override
   public int getFieldNumFromTag(String tag) {
-    for (int i = SamBamConstants.ATTRIBUTES_FIELD; i < mField.length; i++) {
+    for (int i = SamBamConstants.ATTRIBUTES_FIELD; i < mField.length; ++i) {
       if (mField[i] != null && mField[i].startsWith(tag)) {
         return i;
       }

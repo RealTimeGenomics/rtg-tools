@@ -63,7 +63,7 @@ public abstract class AbstractByteArrayRegression extends TestCase {
     long lastOffset = 0;
     for (long l = 0; l < elements;) {
       int i = 0;
-      for (; i < buffer.length && l < elements; i++, l++) {
+      for (; i < buffer.length && l < elements; ++i, ++l) {
         buffer[i] = value.nextValue();
       }
       byteArray.set(lastOffset, buffer, i);
@@ -78,7 +78,7 @@ public abstract class AbstractByteArrayRegression extends TestCase {
     for (long l = 0; l < elements;) {
       final int read = (int) Math.min(buffer.length, elements - l);
       byteArray.get(buffer, l, read);
-      for (int i = 0; i < read; i++, l++) {
+      for (int i = 0; i < read; ++i, ++l) {
         val = value.nextValue();
         assertEquals(val, buffer[i]);
       }

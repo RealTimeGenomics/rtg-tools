@@ -107,10 +107,10 @@ public class ParseRocFileTest extends TestCase {
     Diagnostic.setLogStream();
     try (final TestDirectory dir = new TestDirectory()) {
       final StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < 500; i++) {
+      for (int i = 0; i < 500; ++i) {
         sb.append("1.0\t5.0\t2").append(StringUtils.LS);
       }
-      for (int i = 0; i < 500; i++) {
+      for (int i = 0; i < 500; ++i) {
         sb.append("1.0\t7.0\t9").append(StringUtils.LS);
       }
 

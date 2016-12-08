@@ -89,10 +89,10 @@ public class DummyIndexTest extends TestCase {
   }
   public void testToString() {
     final AbstractIndex index = new IntArray(40);
-    for (int i = 5; i < 15; i++) {
+    for (int i = 5; i < 15; ++i) {
       index.set(i, i);
     }
-    for (int i = 35; i < 40; i++) {
+    for (int i = 35; i < 40; ++i) {
       index.set(i, i);
     }
 

@@ -157,7 +157,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
     final int[] binNumChunks = new int[numBins];
     final long[][] binChunkBounds = new long[numBins][];
     int binStart = 4;
-    for (int i = 0; i < numBins; i++) {
+    for (int i = 0; i < numBins; ++i) {
       //find out bin id and number of chunks
       binNum[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart);
       binIdIndex[binNum[i]] = i;
@@ -165,7 +165,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
       final int chunkStart = binStart + 8;
       final int chunkSize = numChunks * 16; //check for overflow
       final long[] chunkBounds = binChunkBounds[i] = new long[numChunks * 2];
-      for (int k = 0, j = 0; k < numChunks; k++) {
+      for (int k = 0, j = 0; k < numChunks; ++k) {
         chunkBounds[j++] = ByteArrayIOUtils.bytesToLongLittleEndian(binsBuf, chunkStart + k * 16);
         chunkBounds[j++] = ByteArrayIOUtils.bytesToLongLittleEndian(binsBuf, chunkStart + k * 16 + 8);
       }
@@ -187,13 +187,13 @@ public abstract class AbstractIndexReader implements LocusIndex {
       long begFilePointer = -1;
       long endFilePointer = -1;
 
-      for (int i = 0; i < numBinsForRegion; i++) {
+      for (int i = 0; i < numBinsForRegion; ++i) {
         final int binNo = bins[i];
         final int binIndex = binIdIndex[binNo];
         if (binIndex != -1) {
           final int numChunks = binNumChunks[binIndex];
           final long[] chunkBounds = binChunkBounds[binIndex];
-          for (int k = 0, j = 0; k < numChunks; k++) {
+          for (int k = 0, j = 0; k < numChunks; ++k) {
             final long chunkBeg = chunkBounds[j++];
             final long chunkEnd = chunkBounds[j++];
             //TODO optimize for bins 1 through 4680

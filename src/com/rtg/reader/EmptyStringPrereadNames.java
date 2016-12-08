@@ -54,7 +54,7 @@ class EmptyStringPrereadNames implements PrereadNamesInterface {
   @Override
   public long calcChecksum() {
     final PrereadHashFunction namef = new PrereadHashFunction();
-    for (int k = 0; k < length(); k++) {
+    for (int k = 0; k < length(); ++k) {
       namef.irvineHash("");
       namef.irvineHash(0);
     }

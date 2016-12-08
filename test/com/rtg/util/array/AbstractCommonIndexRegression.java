@@ -65,13 +65,13 @@ public abstract class AbstractCommonIndexRegression extends TestCase {
     final CommonIndex index = createIndex(elements);
     assertEquals(elements, index.length());
 
-    for (long l = 0; l < elements; l++) {
+    for (long l = 0; l < elements; ++l) {
       index.set(l, value.nextValue());
     }
 
     value.reset();
 
-    for (long l = 0; l < elements; l++) {
+    for (long l = 0; l < elements; ++l) {
       assertEquals(value.nextValue(), index.get(l));
     }
   }

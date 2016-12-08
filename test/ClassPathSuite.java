@@ -77,7 +77,7 @@ public class ClassPathSuite {
   private static <T> void shuffle(List<T> arr) {
     final PortableRandom r = Boolean.valueOf(SHUFFLE_TESTS) ? new PortableRandom() : new PortableRandom(Long.parseLong(SHUFFLE_TESTS));
     System.out.println("Shuffling tests with seed: " + r.getSeed());
-    for (int i = 0; i < arr.size(); i++) {
+    for (int i = 0; i < arr.size(); ++i) {
       final int z = r.nextInt(arr.size() - i);
       Collections.swap(arr, i + z, i);
     }

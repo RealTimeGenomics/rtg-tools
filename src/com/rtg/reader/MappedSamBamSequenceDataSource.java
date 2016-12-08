@@ -89,7 +89,7 @@ public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
               }
             }
             mRecordMap.put(rec.getReadName(), rec);
-            mDuplicates++;
+            ++mDuplicates;
             continue;
           }
 

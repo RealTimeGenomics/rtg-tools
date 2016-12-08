@@ -85,8 +85,8 @@ public final class QuickSort {
     //System.err.println("start sort off:" + off + " length:" + len);
     // Insertion sort on smallest arrays
     if (len < 7) {
-      for (long i = off; i < len + off; i++) {
-        for (long j = i; j > off && proxy.compare(j - 1, j) > 0; j--) {
+      for (long i = off; i < len + off; ++i) {
+        for (long j = i; j > off && proxy.compare(j - 1, j) > 0; --j) {
           proxy.swap(j, j - 1);
         }
       }
@@ -129,7 +129,7 @@ public final class QuickSort {
             m = a - 1;
           }
         }
-        b++;
+        ++b;
       }
       int ccompm;
       while (c >= b && (ccompm = proxy.compare(c, m)) >= 0) {
@@ -139,7 +139,7 @@ public final class QuickSort {
             m = d + 1;
           }
         }
-        c--;
+        --c;
       }
       if (b > c) {
         break;
@@ -173,7 +173,7 @@ public final class QuickSort {
    * @return true if sorted
    */
   public static boolean isSorted(SortProxy proxy) {
-    for (long i = 1; i < proxy.length(); i++) {
+    for (long i = 1; i < proxy.length(); ++i) {
       if (proxy.compare(i - 1, i) > 0) {
         return false;
       }
@@ -189,7 +189,7 @@ public final class QuickSort {
    * @param n length
    */
   private static void vecswap(final SortProxy s, final long aa, final long bb, final long n) {
-    for (long i = 0, a = aa, b = bb; i < n; i++, a++, b++) {
+    for (long i = 0, a = aa, b = bb; i < n; ++i, ++a, ++b) {
       s.swap(a, b);
     }
   }

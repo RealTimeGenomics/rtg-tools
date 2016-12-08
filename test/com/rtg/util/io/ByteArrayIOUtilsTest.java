@@ -65,14 +65,14 @@ public final class ByteArrayIOUtilsTest extends TestCase {
     final byte[] bytes = bos.toByteArray();
     final long[] result = ByteArrayIOUtils.convertToLongArray(bytes);
     assertEquals("length", TEST_ARRAY_LONG.length, result.length);
-    for (int i = 0; i < TEST_ARRAY_LONG.length; i++) {
+    for (int i = 0; i < TEST_ARRAY_LONG.length; ++i) {
       assertEquals("pos: " + i, TEST_ARRAY_LONG[i], result[i]);
     }
     final long[] result2 = new long[bytes.length / 8];
     final int l = ByteArrayIOUtils.convertToLongArray(bytes, result2);
     assertEquals(result2.length, l);
     assertEquals("length", TEST_ARRAY_LONG.length, result2.length);
-    for (int i = 0; i < TEST_ARRAY_LONG.length; i++) {
+    for (int i = 0; i < TEST_ARRAY_LONG.length; ++i) {
       assertEquals("pos: " + i, TEST_ARRAY_LONG[i], result2[i]);
     }
   }
@@ -87,14 +87,14 @@ public final class ByteArrayIOUtilsTest extends TestCase {
     final byte[] bytes = bos.toByteArray();
     final int[] result = ByteArrayIOUtils.convertToIntArray(bytes);
     assertEquals("length", TEST_ARRAY_INT.length, result.length);
-    for (int i = 0; i < TEST_ARRAY_INT.length; i++) {
+    for (int i = 0; i < TEST_ARRAY_INT.length; ++i) {
       assertEquals("pos: " + i, TEST_ARRAY_INT[i], result[i]);
     }
     final int[] result2 = new int[bytes.length / 4];
     final int l = ByteArrayIOUtils.convertToIntArray(bytes, result2);
     assertEquals(result2.length, l);
     assertEquals("length", TEST_ARRAY_INT.length, result2.length);
-    for (int i = 0; i < TEST_ARRAY_INT.length; i++) {
+    for (int i = 0; i < TEST_ARRAY_INT.length; ++i) {
       assertEquals("pos: " + i, TEST_ARRAY_INT[i], result2[i]);
     }
   }

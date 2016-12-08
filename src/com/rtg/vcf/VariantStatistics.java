@@ -223,7 +223,7 @@ public class VariantStatistics extends AbstractStatistics {
   }
   static void printCounts(List<String> names, List<String> values, StringBuilder out) {
     final int pad = Math.max(maxLabel(names) + 2, 31);
-    for (int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < names.size(); ++i) {
       final String name = names.get(i);
       final String value = values.get(i);
       if (value != null) {
@@ -239,7 +239,7 @@ public class VariantStatistics extends AbstractStatistics {
     printCounts(outputStatistics.getA(), outputStatistics.getB(), out);
     if (mShowAlleleCountHistograms) {
       String spaces = "Number of Alleles            : ";
-      for (int i = 0; i < mAltAlleleCounts.getLength(); i++) {
+      for (int i = 0; i < mAltAlleleCounts.getLength(); ++i) {
         if (mAltAlleleCounts.getValue(i) > 0) {
           out.append(spaces);
           spaces = "                               ";
@@ -289,17 +289,17 @@ public class VariantStatistics extends AbstractStatistics {
       }
     }
     if (rec.isFiltered()) {
-      mTotalFiltered++;
+      ++mTotalFiltered;
       return;
     }
-    mTotalPassed++;
+    ++mTotalPassed;
     final ArrayList<String> gts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (gts == null) {
-      mTotalNoGenotype++;
+      ++mTotalNoGenotype;
       return;
     }
     if (VcfUtils.isComplexScored(rec)) {
-      mComplexCalled++;
+      ++mComplexCalled;
     }
 
     final String[] alleles = VcfUtils.getAlleleStrings(rec);
@@ -308,7 +308,7 @@ public class VariantStatistics extends AbstractStatistics {
     final HashSet<Integer> altAlleles = new HashSet<>();
     final ArrayList<String> denovo = rec.getFormat(VcfUtils.FORMAT_DENOVO);
     final ArrayList<String> somaticstatus = rec.getFormat(VcfUtils.FORMAT_SOMATIC_STATUS);
-    for (int i = 0; i < sampleNames.size(); i++) {
+    for (int i = 0; i < sampleNames.size(); ++i) {
       final String sampleName = sampleNames.get(i);
       if (mOnlySample == null || mOnlySample.contains(sampleName)) {
         final String gtStr = gts.get(i);
@@ -474,10 +474,10 @@ public class VariantStatistics extends AbstractStatistics {
     int diffStart = 0;
     int diffEnd = ref.length() - 1;
     while (ref.charAt(diffStart) == pred.charAt(diffStart)) {
-      diffStart++;
+      ++diffStart;
     }
     while (ref.charAt(diffEnd) == pred.charAt(diffEnd)) {
-      diffEnd--;
+      --diffEnd;
     }
     return new Range(diffStart, diffEnd + 1);
   }
@@ -598,7 +598,7 @@ public class VariantStatistics extends AbstractStatistics {
       length = names.size();
     }
 
-    for (int i = length - 1; i >= 0; i--) {
+    for (int i = length - 1; i >= 0; --i) {
       boolean present = false;
       for (List<String> stats : values.values()) {
         if (stats.get(i) != null) {

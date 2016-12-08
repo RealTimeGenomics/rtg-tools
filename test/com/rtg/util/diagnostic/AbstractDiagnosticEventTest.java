@@ -57,7 +57,7 @@ public abstract class AbstractDiagnosticEventTest extends TestCase {
     final String methodName = "values";
     for (final DiagnosticType type : (DiagnosticType[]) getEnumClass().getMethod(methodName, new Class<?>[] {}).invoke(null)) {
       final String[] params = new String[type.getNumberOfParameters()];
-      for (int k = 0; k < params.length; k++) {
+      for (int k = 0; k < params.length; ++k) {
         params[k] = "XX" + k + "XX";
       }
       final String message = new DiagnosticEvent<>(type, params).getMessage();

@@ -113,7 +113,7 @@ public abstract class DNA implements Residue, PseudoEnum {
    */
   public static char[] valueChars() {
     final char[] chars = new char[VALUES.length];
-    for (int i = 0; i < VALUES.length; i++) {
+    for (int i = 0; i < VALUES.length; ++i) {
       chars[i] = VALUES[i].toString().charAt(0);
     }
     return chars;
@@ -136,7 +136,7 @@ public abstract class DNA implements Residue, PseudoEnum {
    * @param length number of bytes to complement
    */
   public static void complementInPlace(final byte[] codes, final int offset, final int length) {
-    for (int i = offset; i < offset + length; i++) {
+    for (int i = offset; i < offset + length; ++i) {
       codes[i] = COMPLEMENT[codes[i]];
     }
   }
@@ -148,7 +148,7 @@ public abstract class DNA implements Residue, PseudoEnum {
    * @param length number of bytes to complement
    */
   public static void reverseComplementInPlace(final byte[] codes, final int offset, final int length) {
-    for (int i = offset, j = offset + length - 1; i <= j; i++, j--) {
+    for (int i = offset, j = offset + length - 1; i <= j; ++i, --j) {
       final byte tmp = codes[j];
       codes[j] = COMPLEMENT[codes[i]];
       codes[i] = COMPLEMENT[tmp];
@@ -260,7 +260,7 @@ public abstract class DNA implements Residue, PseudoEnum {
    */
   public static byte[] stringDNAtoByte(final String dna) {
     final byte[] dnaBytes = new byte[dna.length()];
-    for (int i = 0; i < dna.length(); i++) {
+    for (int i = 0; i < dna.length(); ++i) {
       dnaBytes[i] = (byte) getDNA(dna.charAt(i));
     }
     return dnaBytes;
@@ -274,7 +274,7 @@ public abstract class DNA implements Residue, PseudoEnum {
    */
   public static byte[] byteDNAtoByte(final byte[] dna) {
     final byte[] dnaBytes = new byte[dna.length];
-    for (int i = 0; i < dna.length; i++) {
+    for (int i = 0; i < dna.length; ++i) {
       dnaBytes[i] = (byte) getDNA((char) dna[i]);
     }
     return dnaBytes;

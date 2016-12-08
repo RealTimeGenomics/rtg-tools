@@ -110,7 +110,7 @@ public class Histogram {
   public void addHistogram(String histStr) {
     if (histStr.length() > 0) {
       final String[] values = histStr.split("\t");
-      for (int i = values.length - 1; i >= 0; i--) {
+      for (int i = values.length - 1; i >= 0; --i) {
         final long val = Long.parseLong(values[i]);
         if (val > 0) {
           increment(i, val);
@@ -124,7 +124,7 @@ public class Histogram {
    * @param other the other histogram
    */
   public void addHistogram(Histogram other) {
-    for (int i = 0; i < other.getLength(); i++) {
+    for (int i = 0; i < other.getLength(); ++i) {
       increment(i, other.getValue(i));
     }
   }
@@ -136,10 +136,10 @@ public class Histogram {
   public double[] toDistribution() {
     final double[] ret = new double[getLength()];
     long tot = 0;
-    for (int i = 0; i < getLength(); i++) {
+    for (int i = 0; i < getLength(); ++i) {
       tot += getValue(i);
     }
-    for (int i = 0; i < getLength(); i++) {
+    for (int i = 0; i < getLength(); ++i) {
       ret[i] = (double) getValue(i) / tot;
     }
     return ret;

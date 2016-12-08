@@ -69,8 +69,8 @@ public final class ReverseComplementingReader extends AbstractSequencesReader {
       final byte b = x[l];
       x[l] = x[r];
       x[r] = b;
-      l++;
-      r--;
+      ++l;
+      --r;
     }
   }
 
@@ -192,8 +192,8 @@ public final class ReverseComplementingReader extends AbstractSequencesReader {
       final double b = av[l];
       av[l] = av[r];
       av[r] = b;
-      l++;
-      r--;
+      ++l;
+      --r;
     }
     return av;
   }

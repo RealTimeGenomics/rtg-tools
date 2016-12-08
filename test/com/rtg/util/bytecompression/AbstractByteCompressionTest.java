@@ -49,10 +49,10 @@ public abstract class AbstractByteCompressionTest extends TestCase {
     final Random randomCh = new Random(13 * seed + 101);
 
     final String[] strs = new String[number];
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < number; ++i) {
       final int length = randomLen.nextInt(maxLength);
       final StringBuilder sb = new StringBuilder();
-      for (int j = 0; j < length; j++) {
+      for (int j = 0; j < length; ++j) {
         final int ch = randomCh.nextInt(10);
         sb.append(ch);
       }
@@ -79,38 +79,38 @@ public abstract class AbstractByteCompressionTest extends TestCase {
     final int[] pointers = new int[strings.length + 1];
     pointers[0] = 0;
     int numBytes = 0;
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int length = strings[i].length();
       numBytes += length;
       pointers[i + 1] = numBytes;
     }
     final byte[] bytes = new byte[numBytes];
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       final int start = pointers[i];
-      for (int j = 0; j < strings[i].length(); j++) {
+      for (int j = 0; j < strings[i].length(); ++j) {
         bytes[start + j] = (byte) (strings[i].charAt(j) - '0');
       }
     }
-    for (int i = 0; i < pointers.length - 1; i++) {
+    for (int i = 0; i < pointers.length - 1; ++i) {
       cmp.add(bytes, pointers[i], pointers[i + 1] - pointers[i]);
     }
     final long totalBytes = cmp.bytes();
     cmp.freeze();
     assertTrue(totalBytes >= cmp.bytes());
-    for (int i = 0; i < pointers.length - 1; i++) {
+    for (int i = 0; i < pointers.length - 1; ++i) {
       final int start = pointers[i];
       final int length = pointers[i + 1] - start;
       final byte[] outBytes = new byte[length];
       cmp.get(outBytes, i, 0, length);
-      for (int j = 0; j < length; j++) {
+      for (int j = 0; j < length; ++j) {
         assertEquals(bytes[j + start], outBytes[j]);
       }
     }
     //System.err.println(cmp.toString());
-    for (int i = 0; i < pointers.length - 1; i++) {
+    for (int i = 0; i < pointers.length - 1; ++i) {
       final int start = pointers[i];
       final int length = pointers[i + 1] - start;
-      for (int j = 0; j < length; j++) {
+      for (int j = 0; j < length; ++j) {
         //System.err.println("i=" + i + " j=" + j);
         final byte[] outByte = new byte[1];
         cmp.get(outByte, i, j, 1);

@@ -78,7 +78,7 @@ public abstract class FastaSymbolTable {
   static byte[] getAsciiToOrdinalTable(FastaSymbolTable table) {
     final byte[] mapping = new byte[255];
     Residue r;
-    for (int i = 0; i < 255; i++) {
+    for (int i = 0; i < 255; ++i) {
       r = table.scanResidue(i);
       if (r == null) {
         mapping[i] = (byte) 255;
@@ -92,7 +92,7 @@ public abstract class FastaSymbolTable {
   // Creates map from internal byte code to ascii representation
   static byte[] getOrdinalToAsciiTable(Residue[] residues) {
     final byte[] mapping = new byte[residues.length];
-    for (int k = 0; k < mapping.length; k++) {
+    for (int k = 0; k < mapping.length; ++k) {
       mapping[k] = (byte) residues[k].toString().charAt(0);
     }
     return mapping;

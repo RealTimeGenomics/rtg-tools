@@ -62,7 +62,7 @@ public final class DefaultReadTrimmer implements ReadTrimmer {
     final int[] quals = new int[mWindowSize];
     int cutoffIndex = length;
     double sum = 0.0;
-    for (int i = 0; i < cutoffIndex; i++) {
+    for (int i = 0; i < cutoffIndex; ++i) {
       if (i >= quals.length) {
         if (sum / quals.length < mQualityThreshold) {
           cutoffIndex = i;

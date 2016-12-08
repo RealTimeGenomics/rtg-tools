@@ -45,7 +45,7 @@ public class Order0ModelBuilder implements ArithModelBuilder {
 
   @Override
   public void add(byte[] buffer, int offset, int length) {
-    for (int i = offset; i < offset + length; i++) {
+    for (int i = offset; i < offset + length; ++i) {
       mCounts[buffer[i]]++;
     }
   }

@@ -189,10 +189,10 @@ public final class Path implements Comparable<Path> {
   void include(boolean side, OrientedVariant var, int varIndex) {
     if (side) {
       mCalledPath.include(var, varIndex);
-      mCSinceSync++;
+      ++mCSinceSync;
     } else {
       mBaselinePath.include(var, varIndex);
-      mBSinceSync++;
+      ++mBSinceSync;
     }
   }
 
@@ -305,16 +305,16 @@ public final class Path implements Comparable<Path> {
       int baseLineInside = 0;
       int calledCount = 0;
       while (basePos < baseLine.size() && baseLine.get(basePos).getStart() <= loc) {
-        baseLineCount++;
+        ++baseLineCount;
         if (!baseLine.get(basePos).hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
-          baseLineInside++;
+          ++baseLineInside;
         }
-        basePos++;
+        ++basePos;
       }
 
       while (callPos < called.size() && called.get(callPos).getStart() <= loc) {
-        calledCount++;
-        callPos++;
+        ++calledCount;
+        ++callPos;
       }
       list.add(new SyncPoint(loc, calledCount, baseLineCount, baseLineInside));
     }

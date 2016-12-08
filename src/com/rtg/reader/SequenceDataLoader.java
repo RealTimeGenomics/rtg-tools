@@ -50,7 +50,7 @@ public final class SequenceDataLoader {
 
   static long loadData(ByteArray seqData, DataFileIndex seqIndex, long start, long end, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
     final ArrayList<File> dataFiles = new ArrayList<>();
-    for (int i = 0; i < seqIndex.numberEntries(); i++) {
+    for (int i = 0; i < seqIndex.numberEntries(); ++i) {
       dataFiles.add(SdfFileUtils.sequenceDataFile(dir, i));
     }
     return loadData(seqData, seqIndex, start, dir, positions, checksums, dataFiles, openFact.getSequenceOpener(), handler, checksumsLoaded);
@@ -58,7 +58,7 @@ public final class SequenceDataLoader {
 
   static long loadQuality(ByteArray qualData, DataFileIndex seqIndex, long start, long end, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
     final ArrayList<File> dataFiles = new ArrayList<>();
-    for (int i = 0; i < seqIndex.numberEntries(); i++) {
+    for (int i = 0; i < seqIndex.numberEntries(); ++i) {
       dataFiles.add(SdfFileUtils.qualityDataFile(dir, i));
     }
     return loadData(qualData, seqIndex, start, dir, positions, checksums, dataFiles, openFact.getQualityOpener(), handler, checksumsLoaded);
@@ -69,7 +69,7 @@ public final class SequenceDataLoader {
     long sequencesSoFar = 0;
     while (startFile < seqIndex.numberEntries() && sequencesSoFar + seqIndex.numberSequences(startFile) <= start) {
       sequencesSoFar += seqIndex.numberSequences(startFile);
-      startFile++;
+      ++startFile;
     }
     long dataOffset = 0;
     final CRC32 checksum = new CRC32();
@@ -77,7 +77,7 @@ public final class SequenceDataLoader {
     int i = startFile;
     final long totalLength = positions.get(positions.length() - 1);
     if (totalLength == 0) { //if we're asked for x sequences which comprise of no data, do a shortcircuit.
-      for (int j = 0; j < positions.length() - 1; j++) {
+      for (int j = 0; j < positions.length() - 1; ++j) {
         hf.irvineHash(0L);
       }
       return hf.getHash();
@@ -102,11 +102,11 @@ public final class SequenceDataLoader {
         currentSeq = loaded.getB();
       }
       dataOffset += dataRead;
-      i++;
+      ++i;
     }
     while (currentSeq < positions.length() - 1) {  //while there are more sequences to read (but no data to read!)
       hf.irvineHash(0L);
-      currentSeq++;
+      ++currentSeq;
     }
     return hf.getHash();
   }
@@ -126,7 +126,7 @@ public final class SequenceDataLoader {
       while (j < bytesRead) {
         if (positions.get(tmpCurrentSeq + 1) == positions.get(tmpCurrentSeq)) {
           hf.irvineHash(0L);
-          tmpCurrentSeq++;
+          ++tmpCurrentSeq;
           continue;
         }
         final int len = (int) (positions.get(tmpCurrentSeq + 1) - (memoryOffset + totalRead + j));
@@ -141,7 +141,7 @@ public final class SequenceDataLoader {
           } else {
             checksums.set(tmpCurrentSeq, (byte) checksum.getValue());
           }
-          tmpCurrentSeq++;
+          ++tmpCurrentSeq;
           checksum.reset();
         } else {
           hf.irvineHash(buffer, j, bytesRead - j);
@@ -159,7 +159,7 @@ public final class SequenceDataLoader {
     long sequencesSoFar = 0;
     while (startFile < seqIndex.numberEntries() && sequencesSoFar + seqIndex.numberSequences(startFile) <= start) {
       sequencesSoFar += seqIndex.numberSequences(startFile);
-      startFile++;
+      ++startFile;
     }
     final long numberOfSequences = end - start;
     long posOffset = 0;
@@ -177,7 +177,7 @@ public final class SequenceDataLoader {
       dataSize += seqIndex.dataSize(currentFile) ; //Bsd.sequenceDataFile(dir, currentFile).length();
       sequencesSoFar += read + sequenceOffset;
       sequenceOffset = 0;
-      currentFile++;
+      ++currentFile;
     }
     if (end == seqIndex.getTotalNumberSequences()) {
       final int fileNo = seqIndex.numberEntries() - 1;

@@ -447,7 +447,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
 
       final String[] names = new String[31];
       final int[] lengths = new int[31];
-      for (int seq = 1; seq < 32; seq++) {
+      for (int seq = 1; seq < 32; ++seq) {
         names[seq - 1] = "simulatedSequence" + seq;
         lengths[seq - 1] = 1000;
       }

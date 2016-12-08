@@ -52,7 +52,7 @@ public class BrLineReaderTest extends TestCase {
     try (BrLineReader br = new BrLineReader(new BufferedReader(new StringReader(EXPECTED)))) {
       int count = 0;
       while (br.readLine() != null) {
-        count++;
+        ++count;
       }
       assertEquals(3, count);
     }

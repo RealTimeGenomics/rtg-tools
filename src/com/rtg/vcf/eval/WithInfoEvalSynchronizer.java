@@ -127,7 +127,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       } else if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         w = ((OrientedVariant) mCv).getWeight();
         if (w > 0) {
-          mCallTruePositives++;
+          ++mCallTruePositives;
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
@@ -140,7 +140,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
         w = ((OrientedVariant) mCv).getWeight();
         if (w > 0) {
-          mFalsePositivesCommonAllele++;
+          ++mFalsePositivesCommonAllele;
           if (Math.abs(w - 1.0) > 0.001) {
             weight = String.format("%.3g", w);
           }
@@ -154,7 +154,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         status = STATUS_OUTSIDE;
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
-        mFalsePositives++;
+        ++mFalsePositives;
         addToROCContainer(0, 1, 0, false);
         status = STATUS_FP;
         sync = mCSyncStart2 > 0 ? Integer.toString(mCSyncStart2 + 1) : Integer.toString(mCSyncStart + 1);
@@ -186,15 +186,15 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         status = STATUS_OUTSIDE;
         sync = null;
       } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
-        mBaselineTruePositives++;
+        ++mBaselineTruePositives;
         status = STATUS_TP;
         sync = Integer.toString(mBSyncStart + 1);
       } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
-        mFalseNegativesCommonAllele++;
+        ++mFalseNegativesCommonAllele;
         status = STATUS_FN_CA;
         sync = Integer.toString(mBSyncStart2 + 1);
       } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
-        mFalseNegatives++;
+        ++mFalseNegatives;
         status = STATUS_FN;
         sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
       } else {

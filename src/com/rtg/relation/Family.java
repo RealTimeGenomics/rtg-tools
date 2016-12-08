@@ -241,7 +241,7 @@ public class Family {
     // Default IDs are assigned corresponding to FATHER_INDEX, MOTHER_INDEX, FIRST_CHILD_INDEX...
     // These may be reassigned if need be
     mSampleIds = new int[children.length + 2];
-    for (int i = 0; i < mSampleIds.length; i++) {
+    for (int i = 0; i < mSampleIds.length; ++i) {
       mSampleIds[i] = i;
     }
 
@@ -275,7 +275,7 @@ public class Family {
     for (final String child : mChildren) {
       mMembers[i] = child;
       mIsDiseased[i] = isDiseased(child);
-      i++;
+      ++i;
     }
   }
 
@@ -289,14 +289,14 @@ public class Family {
     mPedigree = new GenomeRelationships();
     mIsDiseased = new boolean[children.length + FIRST_CHILD_INDEX];
     mMembers = new String[children.length + FIRST_CHILD_INDEX];
-    for (int i = 0; i < children.length; i++) {
+    for (int i = 0; i < children.length; ++i) {
       mPedigree.addParentChild(father, children[i]);
       mPedigree.addParentChild(mother, children[i]);
       mChildren.add(children[i]);
       mMembers[FIRST_CHILD_INDEX + i] = children[i];
     }
     mSampleIds = new int[children.length + 2];
-    for (int i = 0; i < mSampleIds.length; i++) {
+    for (int i = 0; i < mSampleIds.length; ++i) {
       mSampleIds[i] = i;
     }
     mFather = father;
@@ -344,7 +344,7 @@ public class Family {
    * @param sampleIds a list containing the genome names. The index of the name within the list is the genome id.
    */
   public void setSampleIds(List<String> sampleIds) {
-    for (int i = 0; i < mMembers.length; i++) {
+    for (int i = 0; i < mMembers.length; ++i) {
       mSampleIds[i] = sampleIds.indexOf(mMembers[i]);
     }
   }
@@ -477,7 +477,7 @@ public class Family {
     int i = 0;
     for (String childName : getChildren()) {
         sb.append("Child ").append(i + 1).append(": ").append(childName).append(" sex: ").append(mPedigree.getSex(childName)).append(" id:").append(mSampleIds[FIRST_CHILD_INDEX + i]).append(StringUtils.LS);
-        i++;
+        ++i;
     }
     return sb.toString();
   }

@@ -60,7 +60,7 @@ public class ProteinTest extends TestCase {
     final String valueOfMethod = "valueOf";
     m = Protein.class.getMethod(valueOfMethod, String.class);
     // Check ordinal and valueOf
-    for (int i = 0; i < r.length; i++) {
+    for (int i = 0; i < r.length; ++i) {
       assertEquals(i, r[i].ordinal());
       if (r[i] != Protein.STOP) {
         assertEquals(r[i], m.invoke(null, r[i].toString()));

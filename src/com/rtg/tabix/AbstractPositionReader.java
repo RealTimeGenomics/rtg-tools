@@ -76,7 +76,7 @@ abstract class AbstractPositionReader implements BlockCompressedPositionReader {
     mMeta = meta;
     mSequenceNames = new HashMap<>();
     mNamesList = new ArrayList<>();
-    for (int i = 0; i < skip; i++) {
+    for (int i = 0; i < skip; ++i) {
       mReader.readLine();
     }
     populateNext();
@@ -241,7 +241,7 @@ abstract class AbstractPositionReader implements BlockCompressedPositionReader {
     while (mTabsUsed <= colNo + 1) {
       int pos = mTabs[mTabsUsed - 1] + 1;
       while (pos < mCurrentLine.length() && mCurrentLine.charAt(pos) != '\t') {
-        pos++;
+        ++pos;
       }
       mTabs[mTabsUsed++] = pos;
     }

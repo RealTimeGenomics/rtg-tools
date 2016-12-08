@@ -39,7 +39,7 @@ public class IndexSorterTest extends TestCase {
 
   private CommonIndex dynamic(final int[] x) {
     final CommonIndex a = com.rtg.util.array.intindex.IntCreate.createIndex(x.length);
-    for (int i = 0; i < x.length; i++) {
+    for (int i = 0; i < x.length; ++i) {
       a.set(i, x[i]);
     }
     return a;
@@ -50,7 +50,7 @@ public class IndexSorterTest extends TestCase {
   }
   private boolean equals(final CommonIndex a, final CommonIndex b) {
     assertEquals(a.length(), b.length());
-    for (long i = 0; i < a.length(); i++) {
+    for (long i = 0; i < a.length(); ++i) {
       if (a.get(i) != b.get(i)) {
         return false;
       }
@@ -163,18 +163,18 @@ public class IndexSorterTest extends TestCase {
 
   public void testSortAtRandomPairs() {
     final PortableRandom r = new PortableRandom();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; ++i) {
       final long l = r.nextInt(1000);
       final CommonIndex keys = com.rtg.util.array.intindex.IntCreate.createIndex(l);
             final CommonIndex pairs = com.rtg.util.array.intindex.IntCreate.createIndex(l);
       // init arrays to be the same
-      for (long j = 0; j < l; j++) {
+      for (long j = 0; j < l; ++j) {
         keys.set(j, r.nextInt(100));
         pairs.set(j, keys.get(j));
       }
       final int q = r.nextInt((int) keys.length() + 1);
       IndexSorter.sort(keys, pairs, q);
-      for (long j = 0; j < q - 1; j++) {
+      for (long j = 0; j < q - 1; ++j) {
         assertTrue(keys.get(j) <= keys.get(j + 1));
         assertTrue(keys.get(j) == pairs.get(j));
       }
@@ -183,12 +183,12 @@ public class IndexSorterTest extends TestCase {
 
   public void testSortAtRandomPairsWithLimitedAction() {
     final PortableRandom r = new PortableRandom();
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; ++i) {
       final long l = 3 + r.nextInt(500);
       final CommonIndex keys = com.rtg.util.array.intindex.IntCreate.createIndex(l);
             final CommonIndex pairs = com.rtg.util.array.intindex.IntCreate.createIndex(l);
       // init arrays to be the same
-      for (int j = 0; j < l; j++) {
+      for (int j = 0; j < l; ++j) {
         keys.set(j, r.nextInt(100));
         pairs.set(j, keys.get(j));
       }
@@ -196,7 +196,7 @@ public class IndexSorterTest extends TestCase {
       final int k2 = (int) keys.get(keys.length() - 2);
       final int k3 = (int) keys.get(keys.length() - 1);
       IndexSorter.sort(keys, pairs, keys.length() - 3);
-      for (int j = 0; j < keys.length() - 4; j++) {
+      for (int j = 0; j < keys.length() - 4; ++j) {
         assertTrue(keys.get(j) <= keys.get(j + 1));
         assertTrue(keys.get(j) == pairs.get(j));
       }

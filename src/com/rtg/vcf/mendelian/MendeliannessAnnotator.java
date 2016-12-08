@@ -149,10 +149,10 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
   private static int calledPloidy(final String vcfGenotype) {
     int c = 1;
-    for (int k = 1; k < vcfGenotype.length(); k++) {
+    for (int k = 1; k < vcfGenotype.length(); ++k) {
       final char v = vcfGenotype.charAt(k);
       if (v == VcfUtils.PHASED_SEPARATOR || v == VcfUtils.UNPHASED_SEPARATOR) {
-        c++;
+        ++c;
       }
     }
     return c;
@@ -188,7 +188,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
   private void updateExpectedAlleleCounts(final SexMemo sexMemo, String templateName) {
     // Update expected allele counts for each sample, depends on sex and reference.txt
-    for (int k = 0; k < mSampleToSex.length; k++) {
+    for (int k = 0; k < mSampleToSex.length; ++k) {
       if (mSampleToSex[k] != null) {
         mExpectedPloidy[k] = expectedPloidy(sexMemo.getEffectivePloidy(mSampleToSex[k], templateName));
         mParPloidy[k] = sexMemo.getParEffectivePloidy(mSampleToSex[k], templateName);
@@ -247,7 +247,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       throw new NoTalkbackSlimException("Number of samples in VCF record is inconsistent with previous records: " + rec.toString());
     }
     boolean badPloidy = false;
-    for (int k = 0; k < calls.size(); k++) {
+    for (int k = 0; k < calls.size(); ++k) {
       if (mSampleToSex[k] != null) {
         final String call = calls.get(k);
         if (VcfUtils.isNonMissingGt(call) || mStrictMissingPloidy) {
@@ -267,7 +267,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       }
     }
     if (badPloidy) {
-      mBadPloidyRecords++;
+      ++mBadPloidyRecords;
     }
     return badPloidy;
   }
@@ -335,13 +335,13 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     }
 
     if (nonRef) {
-      mNonRefFamilyRecords++;
+      ++mNonRefFamilyRecords;
     }
     if (strangePloidy) {
-      mStrangeChildPloidyRecords++;
+      ++mStrangeChildPloidyRecords;
     }
     if (nonMendelian) {
-      mBadMendelianRecords++;
+      ++mBadMendelianRecords;
     }
     return nonMendelian;
   }
@@ -411,7 +411,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     if (!rec.hasFormat(VcfUtils.FORMAT_GENOTYPE)) {
       throw new NoTalkbackSlimException("Record does not contain GT field: " + rec.toString());
     }
-    mTotalRecords++;
+    ++mTotalRecords;
     mLastWasInconsistent = hasBadCallPloidy(rec) | hasBadMendelianness(rec);
   }
 

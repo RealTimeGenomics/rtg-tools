@@ -56,7 +56,7 @@ public final class Utils {
   public static String toBitsSep(final long x) {
     final StringBuilder sb = new StringBuilder();
     long t = x;
-    for (int i = 0; i < Long.SIZE; i++) {
+    for (int i = 0; i < Long.SIZE; ++i) {
       if ((i & 7) == 0 && i > 0) {
         sb.append(":");
       }
@@ -75,7 +75,7 @@ public final class Utils {
   public static String toBitsSep(final int x) {
     final StringBuilder sb = new StringBuilder();
     int t = x;
-    for (int i = 0; i < Integer.SIZE; i++) {
+    for (int i = 0; i < Integer.SIZE; ++i) {
       if ((i & 7) == 0 && i > 0) {
         sb.append(":");
       }
@@ -93,7 +93,7 @@ public final class Utils {
    */
   public static String toBits(final long[] x) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < x.length; i++) {
+    for (int i = 0; i < x.length; ++i) {
       sb.append("[").append(i).append("]").append(toBits(x[i], 64)).append(" ");
     }
     return sb.toString();
@@ -108,7 +108,7 @@ public final class Utils {
     final StringBuilder sb = new StringBuilder();
     long t = x;
     boolean first = false;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; ++i) {
       if (t < 0) {
         sb.append("1");
         first = true;
@@ -136,7 +136,7 @@ public final class Utils {
     final StringBuilder sb = new StringBuilder();
     final int left = 64 - len;
     long t = x << left;
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       sb.append(t < 0 ? "1" : "0");
       t = t << 1;
     }
@@ -159,12 +159,12 @@ public final class Utils {
     }
     final int left = 64 - 2 * len;
     long t = x << left;
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       sb.append(t < 0 ? "1" : "0");
       t = t << 1;
     }
     sb.append(":");
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       sb.append(t < 0 ? "1" : "0");
       t = t << 1;
     }
@@ -181,16 +181,16 @@ public final class Utils {
   public static long fromBits(final String str) {
     long res = 0;
     int len = 0;
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
       final char c = str.charAt(i);
       switch(c) {
         case '0':
           res = res << 1;
-          len++;
+          ++len;
           break;
         case '1':
           res = (res << 1) + 1L;
-          len++;
+          ++len;
           break;
         case ':': //allows toBits to be read in again
         case ' ':
@@ -283,7 +283,7 @@ public final class Utils {
   public static int pairHashContinuous(int... vals) {
     assert vals.length > 1;
     int ret = pairHash(vals[0], vals[1]);
-    for (int i = 2; i < vals.length; i++) {
+    for (int i = 2; i < vals.length; ++i) {
       ret = pairHash(ret, vals[i]);
     }
     return ret;
@@ -300,7 +300,7 @@ public final class Utils {
     }
     final Object obj = objects[0];
     int hash = (obj == null ? 0 : objects[0].hashCode()) + 43;
-    for (int i = 1; i < objects.length; i++) {
+    for (int i = 1; i < objects.length; ++i) {
       final Object ob = objects[i];
       final int h = ob == null ? 0 : ob.hashCode();
       hash = pairHash(hash, h);
@@ -333,7 +333,7 @@ public final class Utils {
     } else if (a.length != b.length) {
       return false;
     }
-    for (int i = 0; i < a.length; i++) {
+    for (int i = 0; i < a.length; ++i) {
       final Object x = a[i];
       final Object y = b[i];
       if (x == null) {
@@ -408,7 +408,7 @@ public final class Utils {
    * @param a a non-null array of bytes.
    */
   public static void reverseInPlace(final byte[] a) {
-    for (int start = 0, end = a.length - 1; start < end; start++, end--) {
+    for (int start = 0, end = a.length - 1; start < end; ++start, --end) {
       final byte tmp = a[start];
       a[start] = a[end];
       a[end] = tmp;
@@ -430,7 +430,7 @@ public final class Utils {
     } else if (str.charAt(2) != '.') {
       return false;
     }
-    for (int i = 0; i < dp; i++) {
+    for (int i = 0; i < dp; ++i) {
       if (str.charAt(3 + i) != '0') {
         return false;
       }
@@ -501,7 +501,7 @@ public final class Utils {
     int x = POWERS_10.length - 1;
     //Find first non-zero digit
     while (POWERS_10[x] > t) {
-      x--;
+      --x;
     }
 
     //generate all digits - avoid division and %
@@ -510,10 +510,10 @@ public final class Utils {
       final int pwr = POWERS_10[x];
       while (pwr <= t) {
         t -= pwr;
-        d++;
+        ++d;
       }
       out.write('0' + d);
-      x--;
+      --x;
     }
     assert t == 0;
   }
@@ -569,7 +569,7 @@ public final class Utils {
     if (t == 0) {
       out.write('0');
       out.write('.');
-      for (int k = 0; k < dp; k++) {
+      for (int k = 0; k < dp; ++k) {
         out.write('0');
       }
       return;
@@ -578,7 +578,7 @@ public final class Utils {
     //Find first non-zero digit
     int x = POWERS_10.length - 1;
     while (POWERS_10[x] > t) {
-      x--;
+      --x;
     }
 
     if (x < dp) {
@@ -590,10 +590,10 @@ public final class Utils {
         final int pwr = POWERS_10[x];
         while (pwr <= t) {
           t -= pwr;
-          dig++;
+          ++dig;
         }
         out.write('0' + dig);
-        x--;
+        --x;
       }
     }
     out.write((byte) '.');
@@ -605,10 +605,10 @@ public final class Utils {
       final int pwr = POWERS_10[y];
       while (pwr <= t) {
         t -= pwr;
-        dig++;
+        ++dig;
       }
       out.write('0' + dig);
-      y--;
+      --y;
     }
     assert t == 0;
 
@@ -623,7 +623,7 @@ public final class Utils {
   public static String realFormat(final double[] x, final int dp) {
     final StringBuilder sb = new StringBuilder();
     sb.append("[");
-    for (int i = 0; i < x.length; i++) {
+    for (int i = 0; i < x.length; ++i) {
       if (i > 0) {
         sb.append(", ");
       }
@@ -644,7 +644,7 @@ public final class Utils {
    */
   public static void realWrite(final OutputStream out, final double[] x, final int dp) throws IOException {
     out.write((byte) '[');
-    for (int i = 0; i < x.length; i++) {
+    for (int i = 0; i < x.length; ++i) {
       if (i > 0) {
         out.write(COMMA_BYTES);
       }
@@ -662,7 +662,7 @@ public final class Utils {
   public static String realFormatArray(final double[] x) {
     final StringBuilder sb = new StringBuilder();
     sb.append("[");
-    for (int i = 0; i < x.length; i++) {
+    for (int i = 0; i < x.length; ++i) {
       if (i > 0) {
         sb.append(", ");
       }
@@ -690,7 +690,7 @@ public final class Utils {
       if (del < 0.0000001) {
         return dp;
       }
-      dp++;
+      ++dp;
       y = y * 10.0;
     }
   }

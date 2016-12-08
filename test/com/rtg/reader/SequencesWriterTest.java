@@ -250,7 +250,7 @@ public class SequencesWriterTest extends TestCase {
       //assertTrue(dsr.nextSequence());
       final String[] labels = {"1", "2", "3", "4", "5", "6", "7", "8"};
       final byte[][] expected = {{1}, {2}, {3}, {4}, {1}, {2}, {3}, {4}};
-      for (int i = 0; i < expected.length; i++) {
+      for (int i = 0; i < expected.length; ++i) {
         assertTrue(it.nextSequence());
         assertEquals(labels[i], it.currentName());
         checkEquals(it, expected[i]);
@@ -293,7 +293,7 @@ public class SequencesWriterTest extends TestCase {
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
       final long[] histogram = dsr.histogram();
       assertEquals(8, histogram[0]);
-      for (int i = 1; i < histogram.length; i++) {
+      for (int i = 1; i < histogram.length; ++i) {
         assertEquals(0, histogram[i]);
       }
     }
@@ -345,7 +345,7 @@ public class SequencesWriterTest extends TestCase {
       it.readCurrentQuality(q);
       assertTrue(Arrays.equals(new byte[]{'I' - 33, 'I' - 33, 'I' - 33, 'I' - 33, 'I' - 33, 'I' - 33}, q));
 
-      for (int i = 0; i < 6; i++) {
+      for (int i = 0; i < 6; ++i) {
         assertEquals(1.0E-4, dsr.positionQualityAverage()[i]);
       }
       assertEquals(0.0, dsr.positionQualityAverage()[7]);
@@ -473,7 +473,7 @@ public class SequencesWriterTest extends TestCase {
       assertEquals(32, it.currentLength());
       checkEquals(it, new byte[]{1, 2, 3, 4, 3, 4, 3, 4, 3, 4, 2, 4, 4, 1, 3, 3, 3, 2, 4, 2, 1, 2, 4, 3, 3, 4, 2, 1, 4, 3, 2, 1});
       byte[] qualExp = new byte[32];
-      for (int i = 0; i < 32; i++) {
+      for (int i = 0; i < 32; ++i) {
         final char c = "!!ASDFFSAFASHSKFSDIUR<<SA><>S<<<".charAt(i);
         qualExp[i] = (byte) (c - '!');
         if (qualExp[i] > 63) {
@@ -486,7 +486,7 @@ public class SequencesWriterTest extends TestCase {
       assertEquals(17, it.currentLength());
 
       qualExp = new byte[17];
-      for (int i = 0; i < 17; i++) {
+      for (int i = 0; i < 17; ++i) {
         final char c = "!ADSFG<<{()))[[[]".charAt(i);
         qualExp[i] = (byte) (c - '!');
         if (qualExp[i] > 63) {
@@ -499,7 +499,7 @@ public class SequencesWriterTest extends TestCase {
       assertEquals("hobos-r", it.currentName());
       assertEquals(20, it.currentLength());
       qualExp = new byte[20];
-      for (int i = 0; i < 20; i++) {
+      for (int i = 0; i < 20; ++i) {
         final char c = "ADSFAD[[<<<><<[[;;FS".charAt(i);
         qualExp[i] = (byte) (c - '!');
         if (qualExp[i] > 63) {

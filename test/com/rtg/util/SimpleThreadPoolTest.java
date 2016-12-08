@@ -76,7 +76,7 @@ public class SimpleThreadPoolTest extends TestCase {
   }
   static volatile int sTriedRunningAfterDead = 0;
   static void setTriedRunningAfterDead() {
-    sTriedRunningAfterDead++;
+    ++sTriedRunningAfterDead;
   }
 
   private static final RuntimeException EXCEPTION = new RuntimeException("my-aborting-job");
@@ -141,7 +141,7 @@ public class SimpleThreadPoolTest extends TestCase {
     final AtomicInteger atom = new AtomicInteger();
 
     atom.set(0);
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 5; ++i) {
       final IORunnable run = new RunIncrement(atom);
       pool.execute(run);
     }
@@ -178,7 +178,7 @@ public class SimpleThreadPoolTest extends TestCase {
       final AtomicInteger atom = new AtomicInteger();
 
       atom.set(0);
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 5; ++i) {
         final IORunnable run = new RunIncrement(atom);
         pool.execute(run);
       }
@@ -203,7 +203,7 @@ public class SimpleThreadPoolTest extends TestCase {
       final AtomicInteger atom = new AtomicInteger();
 
       atom.set(0);
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 5; ++i) {
         final IORunnable run = new RunIncrement(atom);
         pool.execute(run);
       }
@@ -237,7 +237,7 @@ public class SimpleThreadPoolTest extends TestCase {
       }
     };
     final SimpleThreadPool stp = new SimpleThreadPool(25, "Test", true);
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 100; ++i) {
       stp.execute(run);
     }
     stp.terminate();
@@ -245,7 +245,7 @@ public class SimpleThreadPoolTest extends TestCase {
   }
 
   public void testTerminate() throws IOException {
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; ++i) {
       final SimpleThreadPool blah = new SimpleThreadPool(1, "Test", true);
       blah.execute(new RunSlimError());
       try {
@@ -271,7 +271,7 @@ public class SimpleThreadPoolTest extends TestCase {
       };
       final SimpleThreadPool stp = new SimpleThreadPool(25, "Test", true);
       stp.enableBasicProgress(100);
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 100; ++i) {
         stp.execute(run);
       }
       stp.terminate();
@@ -279,11 +279,11 @@ public class SimpleThreadPoolTest extends TestCase {
       final File progressFile = new File(testDir, FileUtils.PROGRESS_SUFFIX);
       final String mps = FileHelper.fileToString(progressFile);
       assertTrue(mps, mps.contains("Test: Starting 100 Jobs"));
-      for (int i = 1; i <= 100; i++) {
+      for (int i = 1; i <= 100; ++i) {
         assertTrue(mps, mps.contains("Test: " + i + "/100 Jobs Finished"));
       }
       final SimpleThreadPool stp1 = new SimpleThreadPool(25, "Test2", true);
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 100; ++i) {
         stp1.execute(run);
       }
       stp1.terminate();
@@ -308,7 +308,7 @@ public class SimpleThreadPoolTest extends TestCase {
 
     }
     boolean done = false;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       final Thread t = threads[i];
       if (t.getName().equals("SimpleThreadPool-TestQueue-Queue")) {
         assertTrue(t.isDaemon());
@@ -353,7 +353,7 @@ public class SimpleThreadPoolTest extends TestCase {
 //    public void run() {
 //      final int numThreads = mNum + 4;
 //      final SimpleThreadPool innerThreadPool = new SimpleThreadPool(numThreads, "InnerThreadPool");
-//      for (int i = numThreads - 1; i >= 0; i--) {
+//      for (int i = numThreads - 1; i >= 0; --i) {
 //        innerThreadPool.execute(new ExceptionRunnable(mNum, i));
 //      }
 //      innerThreadPool.terminate();
@@ -364,7 +364,7 @@ public class SimpleThreadPoolTest extends TestCase {
 //    Diagnostic.setLogStream(System.err);
 //    final int numThreads = 8;
 //    final SimpleThreadPool outerThreadPool = new SimpleThreadPool(numThreads, "OuterThreadPool");
-//    for (int i = numThreads - 1; i >= 0; i--) {
+//    for (int i = numThreads - 1; i >= 0; --i) {
 //      outerThreadPool.execute(new InnerThreadRunnable(i));
 //    }
 //    outerThreadPool.terminate();

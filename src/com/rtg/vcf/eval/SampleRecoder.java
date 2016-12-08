@@ -156,7 +156,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       lastId = id;
     }
     Collections.sort(newAlts);
-    for (int i = 0; i < gt.length; i++) {
+    for (int i = 0; i < gt.length; ++i) {
       if (gt[i] > 0) {
         gt[i] = newAlts.indexOf(rec.getAllele(gt[i])) + 1;
       }
@@ -199,7 +199,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     // OK to just silently drop.
     mCrv.setInfo("STATUS", "C-NotInPath");
     mAuxiliary.write(mCrv);
-    mCalledNotInPath++;
+    ++mCalledNotInPath;
   }
 
   @Override

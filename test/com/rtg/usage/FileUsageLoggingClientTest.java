@@ -115,7 +115,7 @@ public class FileUsageLoggingClientTest extends TestCase {
     try (TestDirectory dir = new TestDirectory()) {
       final String testData = "oogabooga" + StringUtils.LS + "boogly oogly" + StringUtils.LS + "S=yyyysadfjkasdfk73251jk15sfad" + StringUtils.LS + "S=xxxxx1234gogog" + StringUtils.LS + "more stuff that is irrelevant" + StringUtils.LS + "even more" + StringUtils.LS;
       try (final RandomAccessFile raf = getRandomAccessFile(dir, testData)) {
-        for (int i = 1; i < 11; i++) {
+        for (int i = 1; i < 11; ++i) {
           final String result = FileUsageLoggingClient.getLastKey(raf, i);
           assertEquals("xxxxx1234gogog", result);
         }
@@ -278,10 +278,10 @@ public class FileUsageLoggingClientTest extends TestCase {
       final String expectedFilename = df.format(date) + ".usage";
       final Random r = new Random();
       try (final FileOutputStream fos = new FileOutputStream(new File(dir, expectedFilename))) {
-        for (int k = 0; k < 10; k++) {
+        for (int k = 0; k < 10; ++k) {
           fos.write('S');
           fos.write('=');
-          for (int c = 0; c < 500; c++) {
+          for (int c = 0; c < 500; ++c) {
             fos.write((char) r.nextInt(65536));
           }
         }
@@ -309,7 +309,7 @@ public class FileUsageLoggingClientTest extends TestCase {
       final File file = new File(dir, expectedFilename);
       final Random r = new Random();
       final TreeSet<UUID> notYetEnded = new TreeSet<>();
-      for (int k = 0; k < 200; k++) {
+      for (int k = 0; k < 200; ++k) {
         switch (r.nextInt(3)) {
           case 0:
             final UUID code = UUID.randomUUID();

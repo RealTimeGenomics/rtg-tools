@@ -80,7 +80,7 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
 
     mArray = new int[numberChunks][];
     long soFar = 0;
-    for (int i = 0; i < numberChunks && soFar < length; i++) {
+    for (int i = 0; i < numberChunks && soFar < length; ++i) {
       mArray[i] =  new int[mChunkSize];
       soFar += mChunkSize;
     }
@@ -113,7 +113,7 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
     mArray = new int[chunks][];
     long left = mLength;
     long total = 0;
-    for (int i = 0; i < chunks; i++) {
+    for (int i = 0; i < chunks; ++i) {
       final int assignedLength = left <= mChunkSize ? (int) left :  mChunkSize;
       assert assignedLength > 0;
       mArray[i] =  new int[assignedLength];
@@ -284,14 +284,14 @@ public final class IntChunks extends IntIndex implements ExtensibleIndex {
     Exam.assertTrue("" + mLength + ":" + mTotalLength, 0 <= mLength && mLength <= mTotalLength);
     final long il = mTotalLength == 0 ? 0 : ((mTotalLength - 1) >>> mChunkBits) + 1;
     long total = 0;
-    for (int i = 0; i < il; i++) {
+    for (int i = 0; i < il; ++i) {
       final int[] arr = mArray[i];
       Exam.assertNotNull(arr);
       Exam.assertTrue(mChunkSize >= arr.length);
       total += arr.length;
     }
     Exam.assertEquals(total, mTotalLength);
-    for (int i = (int) il; i < mArray.length; i++) {
+    for (int i = (int) il; i < mArray.length; ++i) {
       Exam.assertTrue(mArray[i] == null);
     }
     return true;

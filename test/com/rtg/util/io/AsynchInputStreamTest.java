@@ -60,7 +60,7 @@ public class AsynchInputStreamTest extends TestCase {
       try (AsynchInputStream input = getStream(file, EXAMPLE1)) {
         final byte[] buf = new byte[100];
         assertEquals(12, input.read(buf));
-        for (int i = 0; i < EXAMPLE1.length(); i++) {
+        for (int i = 0; i < EXAMPLE1.length(); ++i) {
           assertEquals(EXAMPLE1.charAt(i), (char) buf[i]);
         }
         final int exp = -1;

@@ -178,7 +178,7 @@ class ReferenceParse {
     if (split == null) {
       return null;
     }
-    mNonblankLines++;
+    ++mNonblankLines;
     if (split.length < 2) {
       return "Version line too short";
     }

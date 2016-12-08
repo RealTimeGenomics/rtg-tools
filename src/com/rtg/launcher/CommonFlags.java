@@ -509,7 +509,7 @@ public final class CommonFlags {
     int count = 0;
     for (final File f : files) {
       if (!f.getName().endsWith(RECALIBRATE_EXTENSION)) {
-        count++;
+        ++count;
       }
     }
     return count;

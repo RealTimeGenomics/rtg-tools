@@ -56,7 +56,7 @@ public class FileStreamIteratorTest extends TestCase {
     final int numFiles = 10;
     try {
       final ArrayList<File> files = new ArrayList<>();
-      for (int i = 0; i < numFiles; i++) {
+      for (int i = 0; i < numFiles; ++i) {
         files.add(new File(tempDir, String.valueOf(i)));
         if (files.get(i).createNewFile()) {
           FileUtils.appendToFile(files.get(i), String.valueOf(i));
@@ -70,7 +70,7 @@ public class FileStreamIteratorTest extends TestCase {
         //Expected
       }
       assertNull(iterator.currentFile());
-      for (int i = 0; i < numFiles; i++) {
+      for (int i = 0; i < numFiles; ++i) {
         final InputStream current = iterator.next();
         assertNotNull(current);
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(current))) {

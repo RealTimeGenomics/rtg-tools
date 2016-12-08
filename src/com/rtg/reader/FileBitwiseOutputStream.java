@@ -88,7 +88,7 @@ public class FileBitwiseOutputStream extends OutputStream {
   private void flushCurrent() throws IOException {
     final int toWrite = mBufferInUse - mBits; //can only be sure those mBits behind are ready to be written
     if (toWrite > 0) {
-      for (int i = 0; i < toWrite; i++) {
+      for (int i = 0; i < toWrite; ++i) {
         mStream.writeLong(mBuffer[i]);
       }
       final int newInUse = mBufferInUse - toWrite;
@@ -112,7 +112,7 @@ public class FileBitwiseOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     try (DataOutputStream out = mStream) {
-      for (int i = 0; i < mBufferInUse; i++) {
+      for (int i = 0; i < mBufferInUse; ++i) {
         out.writeLong(mBuffer[i]);
       }
       mBufferInUse = 0;
@@ -140,16 +140,16 @@ public class FileBitwiseOutputStream extends OutputStream {
   private void set(final long offset, final byte[] data, final int bOffset, final int length) throws IOException {
     long whichLong = (offset >>> WHICH_LONG) * mBits;
     int whichBit = (int) (offset & WITHIN_LONG);
-    for (int pos = bOffset; pos < bOffset + length; pos++) {
+    for (int pos = bOffset; pos < bOffset + length; ++pos) {
       int value = data[pos];
-      for (int b = mBits - 1; b >= 0; b--) {
+      for (int b = mBits - 1; b >= 0; --b) {
         //final long old = mData[b].get(whichLong);
         //mData[b].set(whichLong, old | ((value & 1L) << whichBit));
         dataBitwiseOrSet(whichLong + b, (value & 1L) << whichBit);
         value = value >>> 1;
       }
       // now move along to the next bit
-      whichBit++;
+      ++whichBit;
       if (whichBit == BITS_PER_LONG) {
         whichBit = 0;
         whichLong += mBits;

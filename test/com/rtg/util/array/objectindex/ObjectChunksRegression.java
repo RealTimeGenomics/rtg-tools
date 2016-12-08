@@ -58,13 +58,13 @@ public class ObjectChunksRegression extends TestCase {
     final ObjectChunks<Byte> index = new ObjectChunks<>(elements);
     assertEquals(elements, index.length());
 
-    for (long l = 0; l < elements; l++) {
+    for (long l = 0; l < elements; ++l) {
       index.set(l, value.nextValue());
     }
 
     value.reset();
 
-    for (long l = 0; l < elements; l++) {
+    for (long l = 0; l < elements; ++l) {
       assertEquals(Byte.valueOf(value.nextValue()), index.get(l));
     }
   }

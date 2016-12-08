@@ -107,7 +107,7 @@ public class SlimExceptionTest extends TestCase {
   private int mCount = 0;
 
   private void bump() {
-    mCount++;
+    ++mCount;
   }
 
   private void checkLog(final String t) {

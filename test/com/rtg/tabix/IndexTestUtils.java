@@ -92,10 +92,10 @@ public final class IndexTestUtils {
     ret.append("Sequence names: ");
     boolean first = true;
     int off = 0;
-    for (int i = 0; i < numRefs; i++) {
+    for (int i = 0; i < numRefs; ++i) {
       int newOff = off;
       while (newOff < names.length && names[newOff] != 0) {
-        newOff++;
+        ++newOff;
       }
       if (!first) {
         ret.append(", ");
@@ -137,20 +137,20 @@ public final class IndexTestUtils {
   private static String indicesToUniqueString(InputStream is, int numRefs) throws IOException {
     final StringBuilder ret = new StringBuilder();
     final byte[] buf = new byte[4096];
-    for (int i = 0; i < numRefs; i++) {
+    for (int i = 0; i < numRefs; ++i) {
       ret.append("refId: ").append(i).append(StringUtils.LS);
       readIOFully(is, buf, 4);
       final int numBins = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 0);
       ret.append("  numBins: ").append(numBins).append(StringUtils.LS);
       //final SortedMap<Integer, ArrayList<LongPair>> binSet = new TreeMap<>();
       final SortedMap<Integer, VirtualOffsets> binSet = new TreeMap<>();
-      for (int j = 0; j < numBins; j++) {
+      for (int j = 0; j < numBins; ++j) {
         readIOFully(is, buf, 8);
         final int bin = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 0);
         final int numChunks = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 4);
         final VirtualOffsets chunks = new VirtualOffsets();
         binSet.put(bin, chunks);
-        for (int k = 0; k < numChunks; k++) {
+        for (int k = 0; k < numChunks; ++k) {
           readIOFully(is, buf, 16);
           chunks.add(ByteArrayIOUtils.bytesToLongLittleEndian(buf, 0), ByteArrayIOUtils.bytesToLongLittleEndian(buf, 8), null);
         }
@@ -166,7 +166,7 @@ public final class IndexTestUtils {
           ret.append("    binSet: ");
         }
         ret.append(entry).append(", ");
-        cc++;
+        ++cc;
         if (cc == 10) {
           cc = 0;
         }
@@ -177,7 +177,7 @@ public final class IndexTestUtils {
       final int numIntervals = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 0);
       final long[] intervals = new long[numIntervals];
       ret.append("  numIntervals: ").append(numIntervals).append(StringUtils.LS);
-      for (int j = 0; j < numIntervals; j++) {
+      for (int j = 0; j < numIntervals; ++j) {
         readIOFully(is, buf, 8);
         final long off = ByteArrayIOUtils.bytesToLongLittleEndian(buf, 0);
         intervals[j] = off;
@@ -194,11 +194,11 @@ public final class IndexTestUtils {
           ret.append("    intervals ").append(index).append("-").append(index + 9).append(": ");
         }
         ret.append(VirtualOffsets.offsetToString(off)).append(", ");
-        cc++;
+        ++cc;
         if (cc == 10) {
           cc = 0;
         }
-        index++;
+        ++index;
       }
       ret.append(StringUtils.LS);
     }

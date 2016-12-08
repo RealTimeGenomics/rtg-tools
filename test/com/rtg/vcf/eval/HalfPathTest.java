@@ -84,7 +84,7 @@ public class HalfPathTest extends TestCase {
     while (!path.finished()) {
       assertEquals(expected[i], path.nextHaplotypeABase());
       path.step();
-      i++;
+      ++i;
     }
 
   }
@@ -112,7 +112,7 @@ public class HalfPathTest extends TestCase {
         //System.out.println(expectedMinus[i] + " " + path.nextMinusBase());
       }
       path.step();
-      i++;
+      ++i;
     }
     assertEquals(Math.max(expected.length, expectedMinus.length), i);
   }

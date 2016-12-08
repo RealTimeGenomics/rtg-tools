@@ -204,7 +204,7 @@ CommonFlags.initNoGzip(mFlags);
             while (vr.hasNext()) {
               final VcfRecord rec = vr.next();
               if (passOnly && rec.isFiltered()) {
-                skippedRecords++;
+                ++skippedRecords;
                 continue;
               }
 

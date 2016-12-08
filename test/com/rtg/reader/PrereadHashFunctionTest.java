@@ -48,7 +48,7 @@ public class PrereadHashFunctionTest extends TestCase {
 
   public void testInt() {
     final PrereadHashFunction prf = new PrereadHashFunction();
-    for (int i = 0 ; i < 1000; i++) {
+    for (int i = 0 ; i < 1000; ++i) {
       prf.irvineHash(i);
     }
     assertEquals(8815098401637430148L, prf.getHash());
@@ -56,7 +56,7 @@ public class PrereadHashFunctionTest extends TestCase {
 
   public void testLong() {
     final PrereadHashFunction prf = new PrereadHashFunction();
-    for (long l = 0 ; l < 1000; l++) {
+    for (long l = 0 ; l < 1000; ++l) {
       prf.irvineHash(l);
     }
     assertEquals(6022146393827695201L, prf.getHash());
@@ -336,7 +336,7 @@ public class PrereadHashFunctionTest extends TestCase {
 
   public void testHashes() {
     assertEquals(256, PrereadHashFunction.HASH_BLOCKS.length);
-    for (int i = 0; i < HASH.length; i++) {
+    for (int i = 0; i < HASH.length; ++i) {
       assertEquals(HASH[i], PrereadHashFunction.HASH_BLOCKS[i]);
     }
 

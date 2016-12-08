@@ -140,10 +140,10 @@ public class VcfRecordTest extends TestCase {
     assertEquals(chr, merged.getSequenceName());
     assertEquals(refCall, merged.getRefCall());
     assertEquals(pos, merged.getOneBasedStart());
-    for (int i = 0; i < altCalls.length; i++) {
+    for (int i = 0; i < altCalls.length; ++i) {
       assertEquals(altCalls[i], merged.getAltCalls().get(i));
     }
-    for (int i = 0; i < gts.length; i++) {
+    for (int i = 0; i < gts.length; ++i) {
       assertEquals(gts[i], merged.getFormat(VcfUtils.FORMAT_GENOTYPE).get(i));
     }
   }

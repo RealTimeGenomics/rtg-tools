@@ -73,7 +73,7 @@ public final class InputBytes extends IntegralAbstract implements Input {
     if (mEof) {
       return false;
     }
-    mBitsToGo--;
+    --mBitsToGo;
     final boolean res = (mByteBuffer & (1 << mBitsToGo)) != 0;
     fetchInput();
     return res;
@@ -86,7 +86,7 @@ public final class InputBytes extends IntegralAbstract implements Input {
       } else {
         mByteBuffer = mIn.getByte(mPosition);
         mBitsToGo = OutputBytes.BITS_PER_BYTE;
-        mPosition++;
+        ++mPosition;
       }
     }
   }

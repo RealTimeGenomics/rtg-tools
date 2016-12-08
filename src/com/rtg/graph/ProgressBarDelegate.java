@@ -68,7 +68,7 @@ public class ProgressBarDelegate implements ProgressDelegate {
 
   @Override
   public void addFile(int numberLines) {
-    mTotalFiles++;
+    ++mTotalFiles;
     mTotalLines += numberLines;
   }
 

@@ -346,7 +346,7 @@ public class VcfSubset extends AbstractCli {
             if (formatStripper.keepRecord()) {
               writer.write(rec);
             } else {
-              skippedRecords++;
+              ++skippedRecords;
             }
           } else {
             writer.write(rec);

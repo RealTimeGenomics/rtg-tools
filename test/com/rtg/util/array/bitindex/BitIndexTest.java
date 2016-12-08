@@ -77,13 +77,13 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     final BitIndex index = BitCreate.createIndex(100, bits);
     final int mask = (1 << bits) - 1;
     assertTrue(index.globalIntegrity());
-    for (long i = 0; i < index.length(); i++) {
+    for (long i = 0; i < index.length(); ++i) {
       index.set(i, mask);
     }
     for (long i = index.length() - 1; i >= 0; i -= 3) {
       index.set(i, (int) (i & mask));
     }
-    for (long i = 0; i < index.length(); i++) {
+    for (long i = 0; i < index.length(); ++i) {
       assertEquals("i=" + i, i % 3 == 0 ? i & mask : mask, index.get(i));
     }
     assertEquals(100, index.length());
@@ -128,13 +128,13 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     final BitIndex bi = new BitIndex(100, 3);
     int index = 0;
     while (index < 100) {
-      for (long i = -4; i < 4; i++) {
+      for (long i = -4; i < 4; ++i) {
         bi.setSigned(index++, i);
       }
     }
     index = 0;
     while (index < 100) {
-      for (long i = -4; i < 4; i++) {
+      for (long i = -4; i < 4; ++i) {
         assertEquals(i, bi.getSigned(index++));
       }
     }
@@ -152,7 +152,7 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     }
     index = 0;
     while (index < 1000) {
-      for (long i = 0; i < 8; i++) {
+      for (long i = 0; i < 8; ++i) {
         assertEquals(r[index], bi.get(index++));
       }
     }
@@ -161,11 +161,11 @@ public class BitIndexTest extends AbstractCommonIndexTest {
   public void testSimple() {
     final BitIndex bi = new BitIndex(10, 3);
     int index = 0;
-    for (long i = 0; i < 8; i++) {
+    for (long i = 0; i < 8; ++i) {
       bi.set(index++, i);
     }
     index = 0;
-    for (long i = 0; i < 8; i++) {
+    for (long i = 0; i < 8; ++i) {
       assertEquals(i, bi.get(index++));
     }
   }
@@ -175,14 +175,14 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     final BitIndex bi = new BitIndex(length, 4);
     assertEquals(length, bi.length());
     assertEquals(504, bi.bytes()); //Regression
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       bi.set(i, i & 15);
     }
     final int trim = 42;
     bi.trim(trim);
     assertEquals(trim, bi.length());
     assertEquals(24, bi.bytes()); //Regression
-    for (int i = 0; i < trim; i++) {
+    for (int i = 0; i < trim; ++i) {
       assertEquals(i & 15, bi.get(i));
     }
   }
@@ -192,7 +192,7 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     final BitIndex bi = new BitIndex(length, 4);
     assertEquals(length, bi.length());
     assertEquals(8, bi.bytes()); //Regression
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       bi.set(i, i & 15);
     }
 
@@ -200,10 +200,10 @@ public class BitIndexTest extends AbstractCommonIndexTest {
     bi.extendBy(extend - length);
     assertEquals(extend, bi.length());
     assertEquals(504, bi.bytes()); //Regression
-    for (int i = 0; i < extend; i++) {
+    for (int i = 0; i < extend; ++i) {
       bi.set(i, (i + 1) & 15);
     }
-    for (int i = 0; i < extend; i++) {
+    for (int i = 0; i < extend; ++i) {
       assertEquals((i + 1) & 15, bi.get(i));
     }
   }

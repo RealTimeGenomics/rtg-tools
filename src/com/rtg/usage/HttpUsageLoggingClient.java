@@ -121,7 +121,7 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
   private boolean sendMessage(Map<String, String> values) {
     boolean success = false;
     String failureMessage = "";
-    for (int t = 0; t < NUM_TRIES && !success; t++) {
+    for (int t = 0; t < NUM_TRIES && !success; ++t) {
       if (t > 0) {
         try {
           Thread.sleep(getRetryTimeInMillis());

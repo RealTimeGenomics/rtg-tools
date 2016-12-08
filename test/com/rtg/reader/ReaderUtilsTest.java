@@ -115,7 +115,7 @@ public class ReaderUtilsTest extends TestCase {
   private void checkNameMap(SequencesReader reader) throws IOException {
     final Map<String, Long> names = ReaderUtils.getSequenceNameMap(reader);
     assertEquals(10, names.size());
-    for (int i = 0; i < names.size(); i++) {
+    for (int i = 0; i < names.size(); ++i) {
       final String key = "seq" + i;
       assertTrue(names.containsKey(key));
       assertEquals(i, (long) names.get(key));

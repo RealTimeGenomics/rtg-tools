@@ -105,7 +105,7 @@ public final class HalfPath implements Comparable<HalfPath> {
     sb.append(' ');
     sb.append(replayAll(included, region));
 
-    for (int i = 0; i < included.size(); i++) {
+    for (int i = 0; i < included.size(); ++i) {
       included.set(i, included.get(i).other());
     }
     sb.append("|").append(replayAll(included, region));

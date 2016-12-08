@@ -112,7 +112,7 @@ public enum VariantType {
       } else if (allele.charAt(0) == '*' && allele.length() == 1) {
         return VariantType.SV_MISSING;
       } else {
-        for (int i = 0; i < allele.length(); i++) {
+        for (int i = 0; i < allele.length(); ++i) {
           final char c = allele.charAt(i);
           if ((c == '[') || (c == ']')) {
             return VariantType.SV_BREAKEND;
@@ -190,7 +190,7 @@ public enum VariantType {
     final int seq1Len = seq1.length();
     final int seq2Len = seq2.length();
     int left;
-    for (left = 0; left < seq1Len; left++) {
+    for (left = 0; left < seq1Len; ++left) {
       if (seq1.charAt(left) != seq2.charAt(left)) {
         break;
       }
@@ -199,7 +199,7 @@ public enum VariantType {
       return true;
     }
     int right;
-    for (right = 0; right < seq1Len; right++) {
+    for (right = 0; right < seq1Len; ++right) {
       if (seq1.charAt(seq1Len - right - 1) != seq2.charAt(seq2Len - right - 1)) {
         break;
       }

@@ -40,7 +40,7 @@ public class BasicLinkedListNodeTest extends TestCase {
 
   private BasicLinkedListNode<String> getList(String[] values) {
     BasicLinkedListNode<String> head = null;
-    for (int i = values.length - 1; i >= 0; i--) {
+    for (int i = values.length - 1; i >= 0; --i) {
       head = new BasicLinkedListNode<>(values[i], head);
     }
     return head;

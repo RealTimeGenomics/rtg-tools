@@ -64,7 +64,7 @@ public final class RocPlotToFile {
 
   static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type, boolean precisionRecall) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
-    for (int i = 0; i < fileList.size(); i++) {
+    for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
       final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), false);

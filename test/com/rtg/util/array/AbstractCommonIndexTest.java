@@ -39,7 +39,7 @@ public abstract class AbstractCommonIndexTest extends TestCase {
 
   protected final void checkSwap(final AbstractIndex index) {
     assertTrue(index.globalIntegrity());
-    for (long i = 0; i < index.length(); i++) {
+    for (long i = 0; i < index.length(); ++i) {
       assertEquals(0, index.get(i));
     }
     // test toString() when all zeroes

@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class BytesTest extends TestCase {
 
   private void write(OutputBytes ob, String str) {
-    for (int i = 0; i < str.length(); i++) {
+    for (int i = 0; i < str.length(); ++i) {
       ob.writeBit(str.charAt(i) == '1');
     }
   }
@@ -48,7 +48,7 @@ public class BytesTest extends TestCase {
   private String read(InputBytes ib, int bits) {
     ib.integrity();
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < bits; i++) {
+    for (int i = 0; i < bits; ++i) {
       sb.append(ib.readBit() ? "1" : "0");
     }
     assertFalse(ib.readBit());

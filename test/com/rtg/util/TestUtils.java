@@ -92,7 +92,7 @@ public final class TestUtils {
           nameMethod.setAccessible(true);
 
           // Check ordinal and valueOf
-          for (int i = 0; i < r.length; i++) {
+          for (int i = 0; i < r.length; ++i) {
             final int oi = (Integer) ordinal.invoke(r[i]);
             Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
             final String name = (String) nameMethod.invoke(r[i]);
@@ -142,7 +142,7 @@ public final class TestUtils {
           nameMethod.setAccessible(true);
 
           // Check ordinal and valueOf
-          for (int i = 0; i < r.length; i++) {
+          for (int i = 0; i < r.length; ++i) {
             final int oi = (Integer) ordinal.invoke(r[i]);
             Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
             final String name = (String) nameMethod.invoke(r[i]);
@@ -167,7 +167,7 @@ public final class TestUtils {
    * @param groups to be checked against each other.
    */
   public static void equalsTest(final Object[][] groups) {
-    for (int i = 0; i < groups.length; i++) {
+    for (int i = 0; i < groups.length; ++i) {
       final Object[] gi = groups[i];
 
       //Test nothing in this group equal to null
@@ -184,7 +184,7 @@ public final class TestUtils {
       }
 
       //test everything in this group not equal to things in other groups
-      for (int j = 0; j < groups.length; j++) {
+      for (int j = 0; j < groups.length; ++j) {
         if (j != i) {
           final Object[] gj = groups[j];
           for (Object aGi : gi) {
@@ -206,7 +206,7 @@ public final class TestUtils {
    * @param groups to be checked against each other.
    */
   public static void equalsHashTest(final Object[][] groups) {
-    for (int i = 0; i < groups.length; i++) {
+    for (int i = 0; i < groups.length; ++i) {
       final Object[] gi = groups[i];
 
       //Test nothing in this group equal to null
@@ -224,11 +224,11 @@ public final class TestUtils {
       }
 
       //test everything in this group not equal to things in other groups
-      for (int j = 0; j < groups.length; j++) {
+      for (int j = 0; j < groups.length; ++j) {
         if (j != i) {
           final Object[] gj = groups[j];
-          for (int k = 0; k < gi.length; k++) {
-            for (int l = 0; l < gj.length; l++) {
+          for (int k = 0; k < gi.length; ++k) {
+            for (int l = 0; l < gj.length; ++l) {
               Assert.assertFalse("Objects should not be equals(): i=" + i + " j=" + j + " k=" + k + " l=" + l + " g[i,k]=" + gi[k] + " g[j,l]=" + gj[l], gi[k].equals(gj[l]));
               //            strictly this next neednt be true - but highly likely to be if the job has been done well
               Assert.assertTrue(gi[k].toString() + " has same hashcode as " + gj[l].toString(), gi[k].hashCode() != gj[l].hashCode());
@@ -246,7 +246,7 @@ public final class TestUtils {
    * @param array being checked.
    */
   public static void equalsTest(final Object[] array) {
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       final Object objectI = array[i];
       if (objectI instanceof IntegralAbstract) {
         try {
@@ -256,14 +256,14 @@ public final class TestUtils {
         }
       }
     }
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       final Object objectI = array[i];
       Assert.assertEquals(objectI, objectI);
       Assert.assertFalse(objectI.equals(null));
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < i; ++j) {
         Assert.assertTrue(!array[j].equals(objectI));
       }
-      for (int j = i + 1; j < array.length; j++) {
+      for (int j = i + 1; j < array.length; ++j) {
         Assert.assertTrue(i + ":" + objectI + " == " + j + ":" + array[j], !array[j].equals(objectI));
       }
     }
@@ -276,7 +276,7 @@ public final class TestUtils {
    * @param array being checked.
    */
   public static void equalsHashTest(final Object[] array) {
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       final Object objectI = array[i];
       Assert.assertFalse(objectI.hashCode() == 0);
       if (objectI instanceof IntegralAbstract) {
@@ -287,15 +287,15 @@ public final class TestUtils {
         }
       }
     }
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       final Object objectI = array[i];
       Assert.assertEquals(objectI, objectI);
       Assert.assertFalse(objectI.equals(null));
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < i; ++j) {
         Assert.assertTrue(!array[j].equals(objectI));
         Assert.assertTrue(array[j].hashCode() != objectI.hashCode());
       }
-      for (int j = i + 1; j < array.length; j++) {
+      for (int j = i + 1; j < array.length; ++j) {
         Assert.assertTrue(i + ":" + objectI + " == " + j + ":" + array[j], !array[j].equals(objectI));
       }
     }
@@ -314,8 +314,8 @@ public final class TestUtils {
    * @param <T> type to compare.
    */
   public static <T> void testOrder(final Comparator<T> ator, final T[] compare, final boolean checkHash) {
-    for (int i = 0; i < compare.length; i++) {
-      for (int j = 0; j < i; j++) {
+    for (int i = 0; i < compare.length; ++i) {
+      for (int j = 0; j < i; ++j) {
         //System.err.println(i+":"+j);
         Assert.assertTrue(ator + ":" + compare[j] + ":" + compare[i], ator.compare(compare[j], compare[i]) < 0);
         Assert.assertFalse(compare[j].equals(compare[i]));
@@ -342,7 +342,7 @@ public final class TestUtils {
    * @param <T> the type being compared
    */
   public static <T extends Comparable<T>> void testOrder(final T[] array, final boolean checkHash) {
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       Assert.assertEquals(0, array[i].compareTo(array[i]));
       Assert.assertFalse(array[i].equals(null));
       try {
@@ -351,7 +351,7 @@ public final class TestUtils {
       } catch (final NullPointerException e) {
         // expected
       }
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < i; ++j) {
         Assert.assertTrue(array[j].compareTo(array[i]) < 0);
         Assert.assertTrue(array[i].compareTo(array[j]) > 0);
         Assert.assertFalse(array[j].equals(array[i]));
@@ -386,7 +386,7 @@ public final class TestUtils {
       if (aa.length != ba.length) {
         return false;
       }
-      for (int i = 0; i < aa.length; i++) {
+      for (int i = 0; i < aa.length; ++i) {
         if (!equals(aa[i], ba[i])) { //note recursive call
           return false;
         }
@@ -559,10 +559,10 @@ public final class TestUtils {
    * @param <T> Comparable type
    */
   public static <T extends Comparable<T>> void testOrder(final T[][] array, final boolean checkHash) {
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       TestUtils.testEquivalent("" + i, array[i]);
       Assert.assertFalse("Array element: " + i + " is null", array[i].equals(null));
-      for (int j = 0; j < i; j++) {
+      for (int j = 0; j < i; ++j) {
         TestUtils.testLess(j + ":" + i, array[j], array[i], checkHash);
       }
     }
@@ -579,12 +579,12 @@ public final class TestUtils {
       return;
     }
     final int hash = array[0].hashCode();
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       final String msg = message + ":" + i;
       final T ai = array[i];
       Assert.assertFalse(msg, ai.equals(null));
       Assert.assertEquals(msg, hash, ai.hashCode());
-      for (int j = 0; j < array.length; j++) {
+      for (int j = 0; j < array.length; ++j) {
         final String ms = msg + ":" + j;
         Assert.assertEquals(ms, 0, ai.compareTo(array[j]));
         Assert.assertTrue(ms, ai.equals(array[j]));
@@ -603,9 +603,9 @@ public final class TestUtils {
    * of hashCode it may be necessary to leave this false in some cases).
    */
   private static <T extends Comparable<T>> void testLess(final String msg, final T[] a, final T[] b, final boolean checkHash) {
-    for (int i = 0; i < a.length; i++) {
+    for (int i = 0; i < a.length; ++i) {
       final T ai = a[i];
-      for (int j = 0; j < b.length; j++) {
+      for (int j = 0; j < b.length; ++j) {
         final T bj = b[j];
         final String m = msg + ": " + i + ":" + j + " : " + ai + " : " + bj;
         Assert.assertTrue(m, ai.compareTo(bj) < 0);
@@ -676,7 +676,7 @@ public final class TestUtils {
   public static String unwrap(final String input) {
     final String[] lines = splitLines(input);
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < lines.length; i++) {
+    for (int i = 0; i < lines.length; ++i) {
       if (i > 0) {
         sb.append(" ");
       }
@@ -733,7 +733,7 @@ public final class TestUtils {
    */
   public static String compareLines(final String[] erecs, final String[] arecs) {
     int i = 0;
-    for (; i < erecs.length && i < arecs.length; i++) {
+    for (; i < erecs.length && i < arecs.length; ++i) {
       if (!erecs[i].trim().equals(arecs[i].trim())) {
         return "" + (i + 1) + "c" + (i + 1) + StringUtils.LS
           + "< " + erecs[i].trim() + StringUtils.LS
@@ -789,7 +789,7 @@ public final class TestUtils {
       System.err.println("Expected " + erecs.length + " actual " + arecs.length);
       same = false;
     } else {
-      for (int i = 0; i < erecs.length; i++) {
+      for (int i = 0; i < erecs.length; ++i) {
         if (!arecs[i].trim().startsWith(erecs[i].trim())) {
           System.err.println("Line " + i + StringUtils.LS + ">Expected: " + erecs[i].trim()
             + StringUtils.LS + ">actual  : " + arecs[i].trim());
@@ -867,7 +867,7 @@ public final class TestUtils {
    */
   public static String dnaToProtein(final String dna) {
     final byte[] dnaBytes = new byte[dna.length()];
-    for (int i = 0; i < dna.length(); i++) {
+    for (int i = 0; i < dna.length(); ++i) {
       final byte b;
       switch (dna.charAt(i)) {
         case 'a':

@@ -78,7 +78,7 @@ public class TabixIndexReader extends AbstractIndexReader {
       if (len < FIXED_HEADER_SIZE) {
         throw new EOFException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (index does not have a complete header)");
       }
-      for (int i = 0; i < TBI_MAGIC.length; i++) {
+      for (int i = 0; i < TBI_MAGIC.length; ++i) {
         if (TBI_MAGIC[i] != buf[i]) {
           throw new IOException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (index does not have a valid header)");
         }
@@ -103,23 +103,23 @@ public class TabixIndexReader extends AbstractIndexReader {
       mSequenceLookup = new HashMap<>();
       int seqNo = 0;
       int start = 0;
-      for (int i = 0; i < nameLength; i++) {
+      for (int i = 0; i < nameLength; ++i) {
         if (nameBuf[i] == 0) {
           mSequenceNames[seqNo] = new String(nameBuf, start, i - start);
           mSequenceLookup.put(mSequenceNames[seqNo], seqNo);
           start = i + 1;
-          seqNo++;
+          ++seqNo;
         }
       }
       seqNo = 0;
       mBinPositions = new long[numberReferences];
       mLinearIndexPositions = new long[numberReferences];
       long pos = FIXED_HEADER_SIZE + nameLength;
-      for (; seqNo < numberReferences; seqNo++) {
+      for (; seqNo < numberReferences; ++seqNo) {
         mBinPositions[seqNo] = pos;
         final int numBins = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos);
         pos += 4;
-        for (int i = 0; i < numBins; i++) {
+        for (int i = 0; i < numBins; ++i) {
           final int numChunks = ByteArrayIOUtils.bytesToIntLittleEndian(buf, (int) pos + 4);
           pos += 8;
           pos += numChunks * 16L;

@@ -88,10 +88,10 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
   protected static VcfRecord makeOneAlleleRecord(int aa) {
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.setNumberOfSamples(aa);
-    for (int i = 0; i < aa / 2; i++) {
+    for (int i = 0; i < aa / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     }
-    for (int i = aa / 2; i < aa; i++) {
+    for (int i = aa / 2; i < aa; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "./.");
     }
     return rec;
@@ -101,19 +101,19 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("C");
     rec.setNumberOfSamples(aa + ac + cc);
-    for (int i = 0; i < aa / 2; i++) {
+    for (int i = 0; i < aa / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     }
-    for (int i = aa / 2; i < aa; i++) {
+    for (int i = aa / 2; i < aa; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "./.");
     }
-    for (int i = 0; i < ac / 2; i++) {
+    for (int i = 0; i < ac / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     }
-    for (int i = ac / 2; i < ac; i++) {
+    for (int i = ac / 2; i < ac; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1/0");
     }
-    for (int i = 0; i < cc; i++) {
+    for (int i = 0; i < cc; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1/1");
     }
     return rec;
@@ -124,31 +124,31 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
     rec.addAltCall("C");
     rec.addAltCall("G");
     rec.setNumberOfSamples(aa + ac + ag + cc + cg + gg);
-    for (int i = 0; i < aa; i++) {
+    for (int i = 0; i < aa; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/0");
     }
-    for (int i = 0; i < ac / 2; i++) {
+    for (int i = 0; i < ac / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/1");
     }
-    for (int i = ac / 2; i < ac; i++) {
+    for (int i = ac / 2; i < ac; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1/0");
     }
-    for (int i = 0; i < ag / 2; i++) {
+    for (int i = 0; i < ag / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "0/2");
     }
-    for (int i = ag / 2; i < ag; i++) {
+    for (int i = ag / 2; i < ag; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "2/0");
     }
-    for (int i = 0; i < cc; i++) {
+    for (int i = 0; i < cc; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1/1");
     }
-    for (int i = 0; i < cg / 2; i++) {
+    for (int i = 0; i < cg / 2; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "1/2");
     }
-    for (int i = cg / 2; i < cg; i++) {
+    for (int i = cg / 2; i < cg; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "2/1");
     }
-    for (int i = 0; i < gg; i++) {
+    for (int i = 0; i < gg; ++i) {
       rec.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, "2/2");
     }
     return rec;

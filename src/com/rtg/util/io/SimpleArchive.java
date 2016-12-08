@@ -94,7 +94,7 @@ public final class SimpleArchive {
     input.readInt(); //version
     final byte[] buf = new byte[4096];
     final int numFiles = input.readInt();
-    for (int i = 0; i < numFiles; i++) {
+    for (int i = 0; i < numFiles; ++i) {
       final FileHeader header = new FileHeader(input.readInt(), input.readLong());
       final byte[] name = new byte[header.mNameSize];
       input.readFully(name);
@@ -161,7 +161,7 @@ public final class SimpleArchive {
     if (args[0].equals("c")) {
       final File archive = new File(args[1]);
       final File[] input = new File[args.length - 2];
-      for (int i = 0; i < input.length; i++) {
+      for (int i = 0; i < input.length; ++i) {
         input[i] = new File(args[i + 2]);
       }
       writeArchive(archive, input);

@@ -57,7 +57,7 @@ public abstract class AbstractIntIndexTest extends TestCase {
 
   public void testUnsigned() {
     final CommonIndex ix = create(1);
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 32; ++i) {
       final long v = 1L << i;
       ix.set(0, v);
       assertEquals(v, ix.get(0));
@@ -140,12 +140,12 @@ public abstract class AbstractIntIndexTest extends TestCase {
     final IntIndex a = create(length, 3);
     a.integrity();
     assertEquals(length, a.length());
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       assertEquals(0, a.getInt(i));
       final int j = i * 3;
       a.setInt(i, j);
     }
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       final int j = i * 3;
       assertEquals(j, a.getInt(i));
     }

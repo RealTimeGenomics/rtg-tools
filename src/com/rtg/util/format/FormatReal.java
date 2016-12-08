@@ -69,7 +69,7 @@ public class FormatReal {
     }
     mLength = 1 + in + iff;
     mPadding = new char[mLength];
-    for (int i = 0; i < mLength; i++) {
+    for (int i = 0; i < mLength; ++i) {
       mPadding[i] = ' ';
     }
     //fill with spaces
@@ -78,13 +78,13 @@ public class FormatReal {
     final StringBuilder formatneg = new StringBuilder();
     formatpos.append("#");
     formatneg.append("-");
-    for (int i = 2; i < in; i++) {
+    for (int i = 2; i < in; ++i) {
       formatpos.append("#");
       formatneg.append("#");
     }
     formatpos.append("0.");
     formatneg.append("0.");
-    for (int i = 0; i < iff; i++) {
+    for (int i = 0; i < iff; ++i) {
       formatpos.append("0");
       formatneg.append("0");
     }

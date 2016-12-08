@@ -78,7 +78,7 @@ public class VcfIdAnnotator implements VcfAnnotator {
             final int end = start + record.getRefCall().length();
             final RangeList.RangeData<String> range = new RangeData<>(start, end, ids[0]);
             annos.add(range);
-            for (int i = 1; i < ids.length; i++) {
+            for (int i = 1; i < ids.length; ++i) {
               range.addMeta(ids[i]);
             }
           }

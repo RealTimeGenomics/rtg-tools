@@ -109,7 +109,7 @@ public class RecordStats implements Runnable {
         }
         addColumnData();
 
-        count++;
+        ++count;
         if (count == REPEAT_HEADER) {
           count = 0;
         }

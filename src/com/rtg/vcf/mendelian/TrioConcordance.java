@@ -67,9 +67,9 @@ class TrioConcordance {
   // Increment the status of a three-way mendelian genotype test
   public void addTrioStatus(boolean nonMendelian) {
     if (nonMendelian) {
-      mTrioInconsistent++;
+      ++mTrioInconsistent;
     } else {
-      mTrioConsistent++;
+      ++mTrioConsistent;
     }
   }
 
@@ -133,7 +133,7 @@ class TrioConcordance {
       if (parent.length() != 2 || child.length() != 2 || parent.get(0) < 0 || child.get(0) < 0) {
         mCounts[IGNORED]++;
       } else {
-        mInformative++;
+        ++mInformative;
         if (parent.equals(child)) {
           mCounts[SAME]++;
         } else {

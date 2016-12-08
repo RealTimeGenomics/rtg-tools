@@ -159,7 +159,7 @@ public class ReferenceGenomeTest extends TestCase {
         final String[] rgStrings = new String[3];
         final StringBuilder rgString = new StringBuilder();
         Iterator<ReferenceSequence> it = rg.sequences().iterator();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; ++i) {
           rgStrings[i] = "s" + (i + 1) + " DIPLOID linear 4" + LS;
           rgString.append(rgStrings[i]);
           assertTrue(it.hasNext());
@@ -171,7 +171,7 @@ public class ReferenceGenomeTest extends TestCase {
         rg = new ReferenceGenome(sr, Sex.EITHER, ReferencePloidy.HAPLOID);
         rgString.setLength(0);
         it = rg.sequences().iterator();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; ++i) {
           rgStrings[i] = "s" + (i + 1) + " HAPLOID linear 4" + LS;
           rgString.append(rgStrings[i]);
           assertTrue(it.hasNext());

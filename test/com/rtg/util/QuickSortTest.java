@@ -44,7 +44,7 @@ public class QuickSortTest extends TestCase {
     final long seed = pr.getSeed();
     try {
       final int[] unsorted = new int[100000];
-      for (int i = 0; i < unsorted.length; i++) {
+      for (int i = 0; i < unsorted.length; ++i) {
         unsorted[i] = Math.abs(pr.nextInt());
       }
       final int[] unsorted2 = Arrays.copyOf(unsorted, unsorted.length);

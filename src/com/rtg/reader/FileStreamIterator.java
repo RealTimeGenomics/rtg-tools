@@ -74,7 +74,7 @@ class FileStreamIterator implements Iterator<InputStream> {
     }
     if (mIt.hasNext()) {
       mNextFile = mIt.next();
-      mCounter++;
+      ++mCounter;
       try {
         mNext = FileUtils.createInputStream(mNextFile, true);
         if (mMaxCount == 1) {

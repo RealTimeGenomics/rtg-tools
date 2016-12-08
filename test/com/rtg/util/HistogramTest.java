@@ -43,7 +43,7 @@ public class HistogramTest extends TestCase {
     hist.increment(3);
     assertEquals(4, hist.getLength());
     assertEquals("0\t0\t0\t1", hist.toString());
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; ++i) {
       assertEquals(0, hist.getValue(i));
     }
     assertEquals(1, hist.getValue(3));

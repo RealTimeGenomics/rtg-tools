@@ -131,8 +131,8 @@ public class AdjacencyTest extends TestCase {
     new Adjacency("chr2", 10, true),
     };
     // check all pairs
-    for (int i = 0; i < a.length; i++) {
-      for (int j = 0; j < a.length; j++) {
+    for (int i = 0; i < a.length; ++i) {
+      for (int j = 0; j < a.length; ++j) {
         final int expect = Integer.signum(i - j);
         assertEquals(expect, a[i].compareTo(a[j]));
         if (expect == 0) {

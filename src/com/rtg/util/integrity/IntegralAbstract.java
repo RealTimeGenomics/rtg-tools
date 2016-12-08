@@ -241,7 +241,7 @@ public abstract class IntegralAbstract implements Integrity {
     final int length = Array.getLength(fieldObj);
     sb.append(prefix).append("[").append(length).append("]");
     if (componentClass.isPrimitive()) {
-      for (int i = 0; i < length; i++) {
+      for (int i = 0; i < length; ++i) {
         if (i % 10 == 0) {
           sb.append(LS).append(prefix).append("[").append(i).append("] ");
         } else {
@@ -259,7 +259,7 @@ public abstract class IntegralAbstract implements Integrity {
         }
       }
     } else {
-      for (int i = 0; i < length; i++) {
+      for (int i = 0; i < length; ++i) {
         sb.append(LS).append(prefix).append("[").append(i).append("] ");
         final Object obj = Array.get(fieldObj, i);
         if (obj == null) {

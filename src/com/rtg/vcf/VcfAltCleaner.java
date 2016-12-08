@@ -59,7 +59,7 @@ public class VcfAltCleaner implements VcfAnnotator {
     final List<String> alts = rec.getAltCalls();
     final boolean[] used = new boolean[alts.size()];
     final int samples = rec.getNumberOfSamples();
-    for (int k = 0; k < samples; k++) {
+    for (int k = 0; k < samples; ++k) {
       final String gt = rec.getSampleString(k, VcfUtils.FORMAT_GENOTYPE);
       final int[] splitGt = VcfUtils.splitGt(gt);
       for (final int alleleCode : splitGt) {
@@ -75,16 +75,16 @@ public class VcfAltCleaner implements VcfAnnotator {
       final List<String> originalAlts = new ArrayList<>(alts);
       alts.clear(); // somewhat risky, but we are going to recode all the samples
       final int[] alleleCodeRemap = new int[used.length + 1]; // entry 0 is for the ref and remains as a 0
-      for (int k = 0, j = 0; k < used.length; k++) {
+      for (int k = 0, j = 0; k < used.length; ++k) {
         if (used[k]) {
           alleleCodeRemap[k + 1] = ++j;
           alts.add(originalAlts.get(k));
         }
       }
-      for (int k = 0; k < samples; k++) {
+      for (int k = 0; k < samples; ++k) {
         final String gt = rec.getSampleString(k, VcfUtils.FORMAT_GENOTYPE);
         final int[] splitGt = VcfUtils.splitGt(gt);
-        for (int j = 0; j < splitGt.length; j++) {
+        for (int j = 0; j < splitGt.length; ++j) {
           if (splitGt[j] > 0 && splitGt[j] < alleleCodeRemap.length) {
             splitGt[j] = alleleCodeRemap[splitGt[j]];
           }

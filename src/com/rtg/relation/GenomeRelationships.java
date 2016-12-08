@@ -541,7 +541,7 @@ public class GenomeRelationships {
         int matches = 0;
         for (Relationship rel : mPed.relationships(genome)) {
           if (rel.type() == mType && (mIsFirst ^ genome.equals(rel.second()))) {
-            matches++;
+            ++matches;
             if (matches == mNumRequired) {
               return true;
             }
@@ -676,15 +676,15 @@ public class GenomeRelationships {
 
     final HashSet<Integer> groupIds = new HashSet<>();
     // populate connections & minimize groups
-    for (int j = 0; j < genomes2.length; j++) {
+    for (int j = 0; j < genomes2.length; ++j) {
       int min = j + 1;
       final String g1 = genomes2[j];
-      for (int i = 0; i < genomes2.length; i++) {
+      for (int i = 0; i < genomes2.length; ++i) {
         final String g2 = genomes2[i];
         if (areRelated(g1, g2)) {
           connectionsMatrix[j * genomes2.length + i] = j + 1;  // set a default id
           // find any other connections and lower ids
-          for (int k = 0; k < j; k++) {
+          for (int k = 0; k < j; ++k) {
             final int value = connectionsMatrix[k * genomes2.length + i];
             if (value != 0 && value < min) {
               min = value;
@@ -693,7 +693,7 @@ public class GenomeRelationships {
         }
       }
       // assign lower ids to this row
-      for (int i = 0; i < genomes2.length; i++) {
+      for (int i = 0; i < genomes2.length; ++i) {
         if (connectionsMatrix[j * genomes2.length + i] != 0) {
           connectionsMatrix[j * genomes2.length + i] = min;
           groupIds.add(min);  // add to set of unique ids

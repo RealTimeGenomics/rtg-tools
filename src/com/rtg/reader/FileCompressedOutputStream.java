@@ -88,7 +88,7 @@ public class FileCompressedOutputStream extends OutputStream {
     mPerLong = mPerBitfield * mNumBitfields;
     // precalculate our lookup tables
     mRangePowers = new int[mPerBitfield];
-    for (int withinBitfield = 0; withinBitfield < mPerBitfield; withinBitfield++) {
+    for (int withinBitfield = 0; withinBitfield < mPerBitfield; ++withinBitfield) {
       mRangePowers[withinBitfield] = (int) Math.pow(mRange, withinBitfield);
     }
   }
@@ -100,7 +100,7 @@ public class FileCompressedOutputStream extends OutputStream {
   private void flushCurrent() throws IOException {
     final int toWrite = mBufferInUse - mBits; //can only be sure those 1 byte behind are ready to be written
     if (toWrite > 0) {
-      for (int i = 0; i < toWrite; i++) {
+      for (int i = 0; i < toWrite; ++i) {
         mStream.writeLong(mBuffer[i]);
       }
       final int newInUse = mBufferInUse - toWrite;
@@ -130,7 +130,7 @@ public class FileCompressedOutputStream extends OutputStream {
   @Override
   public void close() throws IOException {
     try (final DataOutputStream out = mStream) {
-      for (int i = 0; i < mBufferInUse; i++) {
+      for (int i = 0; i < mBufferInUse; ++i) {
         out.writeLong(mBuffer[i]);
       }
       out.writeLong(0L); //reader is slightly dumb
@@ -163,20 +163,20 @@ public class FileCompressedOutputStream extends OutputStream {
     long longValue = data(whichLong);
     int whichBitfield = (int) (offset % mPerLong) / mPerBitfield;
     int withinBitfield = (int) (offset % mPerLong) % mPerBitfield;
-    for (int i = bOffset; i < bOffset + length; i++) {
+    for (int i = bOffset; i < bOffset + length; ++i) {
       final int mult = mRangePowers[withinBitfield];
       // final int mult = (int) Math.pow(mRange, withinBitfield);
       final byte val = data[i];
       assert 0 <= val && val < mRange : "value: " + val + " i: " + i;
       longValue += (long) (val * mult) << (whichBitfield * mBits);
-      withinBitfield++;
+      ++withinBitfield;
       if (withinBitfield == mPerBitfield) {
         withinBitfield = 0;
-        whichBitfield++;
+        ++whichBitfield;
         if (whichBitfield == mNumBitfields) {
           dataSet(whichLong, longValue);
           whichBitfield = 0;
-          whichLong++;
+          ++whichLong;
           longValue = 0L;
         }
       }

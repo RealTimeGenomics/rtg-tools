@@ -124,12 +124,12 @@ public abstract class AbstractLongIndexTest extends TestCase {
     final LongIndex a = create(length, 3);
     a.integrity();
     assertEquals(length, a.length());
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       assertEquals(0, a.get(i));
       final long j = (long) (i * 3);
       a.set(i, j);
     }
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       final long j = (long) (i * 3);
       assertEquals(j, a.get(i));
     }

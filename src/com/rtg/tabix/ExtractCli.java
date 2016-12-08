@@ -146,7 +146,7 @@ public class ExtractCli extends AbstractCli {
       regions = new ReferenceRanges<>(true);
     } else {
       final RegionRestriction[] r = new RegionRestriction[rStrings.size()];
-      for (int i = 0; i < rStrings.size(); i++) {
+      for (int i = 0; i < rStrings.size(); ++i) {
         r[i] = new RegionRestriction((String) rStrings.get(i));
       }
       regions = SamRangeUtils.createExplicitReferenceRange(r);

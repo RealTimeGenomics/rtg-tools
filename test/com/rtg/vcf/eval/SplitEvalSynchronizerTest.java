@@ -69,7 +69,7 @@ public class SplitEvalSynchronizerTest extends TestCase {
       if (mSetId >= 3) {
         return null;
       }
-      mSetId++;
+      ++mSetId;
       final HashMap<VariantSetType, List<Variant>> result = new HashMap<>();
       final List<Variant> empty = Collections.emptyList();
       result.put(VariantSetType.CALLS, empty);

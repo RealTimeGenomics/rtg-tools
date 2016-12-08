@@ -46,7 +46,7 @@ public class StatusIntervalTest extends TestCase {
       // ok
     }
     final StatusInterval i = new StatusInterval(5, 10);
-    for (int k = 5; k < 10; k++) {
+    for (int k = 5; k < 10; ++k) {
       assertFalse(i.contains(k));
     }
     try {
@@ -61,11 +61,11 @@ public class StatusIntervalTest extends TestCase {
     }
     i.add(2, 3, FOO);
     i.add(7, 8, FOO);
-    for (int k = 5; k < 10; k++) {
+    for (int k = 5; k < 10; ++k) {
       assertTrue((k == 7) ^ !i.contains(k));
     }
     i.add(0, 100, FOO);
-    for (int k = 5; k < 10; k++) {
+    for (int k = 5; k < 10; ++k) {
       assertTrue(i.contains(k));
       assertTrue(i.get(k) == FOO);
     }

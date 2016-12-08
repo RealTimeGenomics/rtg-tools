@@ -157,7 +157,7 @@ public class VcfRecord implements SequenceNameLocus {
       mId = id[0];
     } else {
       final StringBuilder ids = new StringBuilder(id[0]);
-      for (int i = 1; i < id.length; i++) {
+      for (int i = 1; i < id.length; ++i) {
         ids.append(ID_FILTER_AND_INFO_SEPARATOR).append(id[i]);
       }
       mId = ids.toString();
@@ -484,7 +484,7 @@ public class VcfRecord implements SequenceNameLocus {
     if (mNumSamples > 0) {
       sb.append(TAB);
       sb.append(getFormat(getFormatAndSample()));
-      for (int i = 0; i < mNumSamples; i++) {
+      for (int i = 0; i < mNumSamples; ++i) {
         sb.append(TAB);
         sb.append(getSample(i, getFormatAndSample()));
       }

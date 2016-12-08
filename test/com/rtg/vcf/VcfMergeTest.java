@@ -101,7 +101,7 @@ public class VcfMergeTest extends AbstractCliTest {
         int count = 0;
         while (zipper.hasNextPosition()) {
           zipper.nextPosition(callback);
-          count++;
+          ++count;
         }
         assertEquals(positions.length, count);
       } finally {
@@ -117,7 +117,7 @@ public class VcfMergeTest extends AbstractCliTest {
         int count = 0;
         while (zipper.hasNextPosition()) {
           zipper.nextPosition(callback);
-          count++;
+          ++count;
         }
         assertEquals(2, count);
       } finally {
@@ -143,13 +143,13 @@ public class VcfMergeTest extends AbstractCliTest {
 
     @Override
     public void vcfAtPosition(VcfRecord[] records, VcfHeader[] headers) {
-      for (int i = 0; i < records.length; i++) {
+      for (int i = 0; i < records.length; ++i) {
         assertEquals("" + mI, mPositions[mI], records[i].getOneBasedStart());
         assertEquals(mTemplates[mI], records[i].getSequenceName());
         assertEquals(mAlts[mI][i], records[i].getAltCalls().get(0));
         assertTrue(headers[i].toString().contains(mSamples[mI][i]));
       }
-      mI++;
+      ++mI;
     }
   }
 

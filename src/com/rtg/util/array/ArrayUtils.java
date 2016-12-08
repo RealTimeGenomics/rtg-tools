@@ -170,7 +170,7 @@ public final class ArrayUtils {
    */
   public static byte[] asByteArray(final List<Byte> l) {
     final byte[] a = new byte[l.size()];
-    for (int i = 0; i < a.length; i++) {
+    for (int i = 0; i < a.length; ++i) {
       a[i] = l.get(i);
     }
     return a;
@@ -184,7 +184,7 @@ public final class ArrayUtils {
    */
   public static long[] asLongArray(final List<Long> l) {
     final long[] a = new long[l.size()];
-    for (int i = 0; i < a.length; i++) {
+    for (int i = 0; i < a.length; ++i) {
       a[i] = l.get(i);
     }
     return a;
@@ -198,7 +198,7 @@ public final class ArrayUtils {
   public static int[] parseIntArray(final String input) {
     final String[] strings = input.split(", *");
     final int[] values = new int[strings.length];
-    for (int i = 0; i < strings.length; i++) {
+    for (int i = 0; i < strings.length; ++i) {
       values[i] = Integer.parseInt(strings[i]);
     }
     return values;
@@ -216,7 +216,7 @@ public final class ArrayUtils {
     assert 0 <= start;
     assert start <= end;
     assert end <= arr1.length();
-    for (long ii = start; ii < end - 1; ii++) {
+    for (long ii = start; ii < end - 1; ++ii) {
       if (arr1.get(ii) > arr1.get(ii + 1)) {
         return false;
       }
@@ -233,7 +233,7 @@ public final class ArrayUtils {
    */
   public static boolean isSorted(final CommonIndex arr1, final long len) {
     assert len <= arr1.length();
-    for (long ii = 0; ii < len - 1; ii++) {
+    for (long ii = 0; ii < len - 1; ++ii) {
       if (arr1.get(ii) > arr1.get(ii + 1)) {
         return false;
       }
@@ -249,7 +249,7 @@ public final class ArrayUtils {
    */
   public static boolean isSortedStrict(final CommonIndex arr1, final long len) {
     assert len <= arr1.length();
-    for (long ii = 0; ii < len - 1; ii++) {
+    for (long ii = 0; ii < len - 1; ++ii) {
       if (arr1.get(ii) >= arr1.get(ii + 1)) {
         return false;
       }

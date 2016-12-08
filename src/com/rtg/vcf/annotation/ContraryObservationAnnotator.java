@@ -65,7 +65,7 @@ public class ContraryObservationAnnotator implements VcfAnnotator {
 
   @Override
   public void annotate(VcfRecord rec) {
-    for (int i = 0; i < rec.getNumberOfSamples(); i++) {
+    for (int i = 0; i < rec.getNumberOfSamples(); ++i) {
       final ContraryObservationCounter.Counts counts = mCounter.getCounts(rec, i);
       if (counts == null) {
         continue;

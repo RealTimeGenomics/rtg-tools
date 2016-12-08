@@ -48,7 +48,7 @@ public class ExpressionInfoFilter extends VcfInfoFilter {
     final String expr = expression.replace(" ", "");
     int k = 0;
     while (k < expr.length() && "!=<>".indexOf(expr.charAt(k)) == -1) {
-      k++;
+      ++k;
     }
     final int opStart = k;
     mField = expr.substring(0, opStart);
@@ -56,7 +56,7 @@ public class ExpressionInfoFilter extends VcfInfoFilter {
       throw new NoTalkbackSlimException("Could not parse field in: " + expression);
     }
     do {
-      k++;
+      ++k;
     } while (k < expr.length() && "!=<>".indexOf(expr.charAt(k)) >= 0);
     if (opStart >= expr.length()) {
       throw new NoTalkbackSlimException("No operator found in: " + expression);

@@ -56,7 +56,7 @@ public class TabixHeader {
     mSequenceNamesUnpacked = new String[mNumSequences];
     int seqNo = 0;
     int sp = 0;
-    for (int i = 0; i < mSequenceNames.length; i++) {
+    for (int i = 0; i < mSequenceNames.length; ++i) {
       if (mSequenceNames[i] == 0) {
         mSequenceNamesUnpacked[seqNo++] = new String(mSequenceNames, sp, i - sp);
         sp = i + 1;
@@ -86,7 +86,7 @@ public class TabixHeader {
     if (firstHeader.mNumSequences > 0 && nextHeader.mNumSequences > 0
             && firstHeader.mSequenceNamesUnpacked[firstHeader.mNumSequences - 1].equals(nextHeader.mSequenceNamesUnpacked[0])) {
       final byte[] secondNames = nextHeader.mSequenceNames;
-      for (int i = 0; i < secondNames.length; i++) {
+      for (int i = 0; i < secondNames.length; ++i) {
         if (secondNames[i] == 0) {
           startPos = i + 1;
           break;

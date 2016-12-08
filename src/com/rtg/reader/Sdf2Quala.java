@@ -181,7 +181,7 @@ public final class Sdf2Quala extends AbstractCli {
   }
 
   static void process(final SequencesReader read, final LineWriter seqWriter, LineWriter qualWriter, final boolean rename, final byte def) throws IOException {
-    for (long seq = 0; seq < read.numberSequences(); seq++) {
+    for (long seq = 0; seq < read.numberSequences(); ++seq) {
       final String sequenceName = rename || !read.hasNames() ? String.valueOf(seq) : read.fullName(seq);
       final String sequenceFastaName = ">" + sequenceName;
       seqWriter.writeln(sequenceFastaName);
@@ -197,7 +197,7 @@ public final class Sdf2Quala extends AbstractCli {
       }
 
       final StringBuilder sb = new StringBuilder();
-      for (int k = 0; k < quality.length; k++) {
+      for (int k = 0; k < quality.length; ++k) {
         if (k > 0) {
           sb.append(" ");
         }

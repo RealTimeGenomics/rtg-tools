@@ -44,7 +44,7 @@ public class NotRandomRandomTest extends TestCase {
   public void test() {
     final NotRandomRandom rand = new NotRandomRandom();
     double dd = 0.0;
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; ++i) {
       final double r = rand.nextDouble();
       assertTrue(r > dd - 0.00000000001 && r < dd + 0.00000000001);
       dd += 0.1;

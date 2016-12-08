@@ -50,7 +50,7 @@ public class SequenceStreamManagerTest extends DefaultSequencesReaderTest {
         SimpleArchive.unpackArchive(is, mDir);
         try (SequencesReader sr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
           final byte[] buff = new byte[(int) sr.maxLength()];
-          for (long seq = 0; seq < sr.numberSequences(); seq++) {
+          for (long seq = 0; seq < sr.numberSequences(); ++seq) {
             sr.read(seq, buff);
           }
         }
@@ -61,7 +61,7 @@ public class SequenceStreamManagerTest extends DefaultSequencesReaderTest {
       try (SequencesReader sr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
         final byte[] buff = new byte[(int) sr.maxLength()];
         try {
-          for (long seq = 0; seq < sr.numberSequences(); seq++) {
+          for (long seq = 0; seq < sr.numberSequences(); ++seq) {
             sr.read(seq, buff);
           }
           fail("should have dided horribly");

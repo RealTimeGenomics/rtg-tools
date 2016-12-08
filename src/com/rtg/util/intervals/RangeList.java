@@ -202,7 +202,7 @@ public class RangeList<T> {
       int i2 = 0;
       for (final Integer x : pivots) {
         pivots2[i2] = x;
-        i2++;
+        ++i2;
       }
       Arrays.sort(pivots2);
 
@@ -211,7 +211,7 @@ public class RangeList<T> {
       if (pivots2[0] != Integer.MIN_VALUE) {
         mRanges.add(new RangeData<T>(Integer.MIN_VALUE, pivots2[0]));
       }
-      for (int i = 1; i < pivots2.length; i++) {
+      for (int i = 1; i < pivots2.length; ++i) {
         mRanges.add(new RangeData<T>(pivots2[i - 1], pivots2[i]));
       }
       if (pivots2[pivots2.length - 1] != Integer.MAX_VALUE) {
@@ -224,7 +224,7 @@ public class RangeList<T> {
         while (index < mRanges.size() && mRanges.get(index).getEnd() <= range.getEnd()) {
           mRanges.get(index).addMeta(range.getMeta());
           mRanges.get(index).addOriginalRange(range);
-          index++;
+          ++index;
         }
       }
     }

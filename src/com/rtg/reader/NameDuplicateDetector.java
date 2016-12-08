@@ -92,7 +92,7 @@ public class NameDuplicateDetector {
     assert mCount < mHashes.length();
     mHashes.setInt(mCount, name.hashCode());
     mIndexIds.set(mCount, (((long) readerIndex) << 32) | (((long) seqId) & 0xFFFFFFFFL));
-    mCount++;
+    ++mCount;
   }
 
   static int sequenceId(long indexId) {
@@ -121,7 +121,7 @@ public class NameDuplicateDetector {
         sort();
         long currentHash = mHashes.get(0);
         final Set<String> names = new HashSet<>();
-        for (long i = 1; i < mHashes.length(); i++) {
+        for (long i = 1; i < mHashes.length(); ++i) {
           final long nextHash = mHashes.get(i);
           if (nextHash > currentHash) {
             currentHash = nextHash;
@@ -168,7 +168,7 @@ public class NameDuplicateDetector {
    */
   public boolean checkSequenceDuplicates(SequencesReader[] readers, File duplicatesOutputFile) throws IOException {
     final PrereadNamesInterface[] prereadNames = new PrereadNamesInterface[readers.length];
-    for (int i = 0; i < readers.length; i++) {
+    for (int i = 0; i < readers.length; ++i) {
       prereadNames[i] = readers[i] != null ? readers[i].names() : null;
     }
     return checkPrereadDuplicates(prereadNames, duplicatesOutputFile);
@@ -199,7 +199,7 @@ public class NameDuplicateDetector {
   public static boolean checkPrereadNames(PrereadNamesInterface prereadNames, File outputFile) throws IOException {
     final long numberSequences = prereadNames.length();
     final NameDuplicateDetector dupDetector = new NameDuplicateDetector(numberSequences);
-    for (long i = 0; i < numberSequences; i++) {
+    for (long i = 0; i < numberSequences; ++i) {
       dupDetector.addPair(prereadNames.name(i), (int) i, 0);
     }
     return dupDetector.checkPrereadDuplicates(new PrereadNamesInterface[] {prereadNames}, outputFile);

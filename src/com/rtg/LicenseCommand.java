@@ -99,7 +99,7 @@ public final class LicenseCommand extends Command {
     final int longestUsageLength = getLongestLengthModule(info.commands(), commandName);
     out.print("\t");
     out.print(commandName);
-    for (int i = -1; i < longestUsageLength - commandName.length(); i++) {
+    for (int i = -1; i < longestUsageLength - commandName.length(); ++i) {
       out.print(" ");
     }
     out.print("\t" + padTo("Licensed?", 17));
@@ -126,7 +126,7 @@ public final class LicenseCommand extends Command {
 
   static void outputModule(Command module, int longestUsageLength, PrintStream out) {
     out.print("\t" + module.getCommandName().toLowerCase(Locale.getDefault()));
-    for (int i = 0; i < longestUsageLength - module.getCommandName().length(); i++) {
+    for (int i = 0; i < longestUsageLength - module.getCommandName().length(); ++i) {
       out.print(" ");
     }
 
@@ -145,7 +145,7 @@ public final class LicenseCommand extends Command {
 
   static String padTo(String str, int length) {
     final StringBuilder sb = new StringBuilder(str);
-    for (int i = str.length(); i < length; i++) {
+    for (int i = str.length(); i < length; ++i) {
       sb.append(' ');
     }
     return sb.toString();

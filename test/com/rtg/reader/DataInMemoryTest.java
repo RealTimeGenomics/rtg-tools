@@ -97,8 +97,8 @@ public class DataInMemoryTest extends TestCase {
       assertEquals(35, mem.lengthBetween(3, 4));
       assertEquals(30, mem.lengthBetween(4, 5));
       assertEquals(58, mem.lengthBetween(1, 4));
-      for (int i = 0; i < LENGTHS.length; i++) {
-        for (int j = i + 1; j < LENGTHS.length; j++) {
+      for (int i = 0; i < LENGTHS.length; ++i) {
+        for (int j = i + 1; j < LENGTHS.length; ++j) {
           final int[] lengths = mem.sequenceLengths(i, j);
           assertTrue(Arrays.equals(Arrays.copyOfRange(LENGTHS, i, j), lengths));
         }
@@ -149,7 +149,7 @@ public class DataInMemoryTest extends TestCase {
         final int length = mem.readSequence(index, act, 0, act.length);
         assertEquals("index " + index + "\n" + exp.length + " " + length, exp.length, length);
         assertTrue("index " + index + " \nExp: " + Arrays.toString(exp) + " \nACT: " + Arrays.toString(act), Arrays.equals(exp, act));
-        index++;
+        ++index;
       }
     } finally {
       assertTrue(FileHelper.deleteAll(dir));
@@ -176,7 +176,7 @@ public class DataInMemoryTest extends TestCase {
         final byte[] actQual = new byte[act.length];
         mem.readQuality(i, actQual, 0, Integer.MAX_VALUE);
         assertTrue(Arrays.equals(expQual, actQual));
-        i++;
+        ++i;
       }
     } finally {
       assertTrue(FileHelper.deleteAll(dir));
@@ -211,7 +211,7 @@ public class DataInMemoryTest extends TestCase {
           mem.readQuality(i - iadj, actQual, 0, Integer.MAX_VALUE);
           assertTrue(Arrays.equals(expQual, actQual));
         } finally {
-          i++;
+          ++i;
         }
       }
     } finally {
@@ -225,7 +225,7 @@ public class DataInMemoryTest extends TestCase {
       final IndexFile f = new IndexFile(dir);
       final DataInMemory.PointerLoader foo = new DataInMemory.PointerLoader(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
       foo.loadPointers();
-      for (int i = 0; i < POINTERS.length; i++) {
+      for (int i = 0; i < POINTERS.length; ++i) {
         assertTrue("i: " + i + " EXP: " + Arrays.toString(POINTERS[i]) + " ACT: " + Arrays.toString(foo.mPointers[i]),  Arrays.equals(POINTERS[i], foo.mPointers[i]));
       }
     } finally {
@@ -241,7 +241,7 @@ public class DataInMemoryTest extends TestCase {
 
       final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 10);
       assertTrue(Arrays.equals(LENGTHS, mem.sequenceLengths(0, 5)));
-      for (int i = 0; i < LENGTHS.length; i++) {
+      for (int i = 0; i < LENGTHS.length; ++i) {
         assertEquals("i: "  + i, LENGTHS[i], mem.length(i));
       }
     } finally {

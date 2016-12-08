@@ -66,7 +66,7 @@ public final class ReportUtils {
 
   static String[] resourceArray(String... resources) {
     final String[] result = new String[resources.length];
-    for (int i = 0; i < resources.length; i++) {
+    for (int i = 0; i < resources.length; ++i) {
       final String r = resources[i];
       result[i] = TEMPLATE_DIR + "/" + r;
     }

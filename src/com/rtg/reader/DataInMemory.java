@@ -104,7 +104,7 @@ public final class DataInMemory {
         int fileNo = mStartFileNo + 1;
         while (fileNo < mPointers.length && mPointers[fileNo].length == 1) {
           tot += mPointers[fileNo][0];
-          fileNo++;
+          ++fileNo;
         }
         if (fileNo < mPointers.length) {
           tot += mPointers[fileNo][0];
@@ -143,7 +143,7 @@ public final class DataInMemory {
     int index = mStartIndex + 1;
     while (arrOffset >= mPointers[fileNo][index]) {
       arrOffset -= mPointers[fileNo][index];
-      fileNo++;
+      ++fileNo;
       index = 0;
     }
     int lengthToGet = Math.min(mPointers[fileNo][index] - arrOffset, length);
@@ -151,12 +151,12 @@ public final class DataInMemory {
     mSequenceData[fileNo].get(dest, arrOffset, 0, lengthToGet);
     destOffset += lengthToGet;
     if (destOffset < length && index == mPointers[fileNo].length - 1) {
-      fileNo++;
+      ++fileNo;
       while (destOffset < length && fileNo < mPointers.length && mPointers[fileNo].length == 1) {
         lengthToGet = Math.min(mPointers[fileNo][0], length - destOffset);
         mSequenceData[fileNo].get(dest, 0, destOffset, lengthToGet);
         destOffset += lengthToGet;
-        fileNo++;
+        ++fileNo;
       }
       if (destOffset < length && fileNo < mPointers.length) {
         lengthToGet = Math.min(mPointers[fileNo][0], length - destOffset);
@@ -188,7 +188,7 @@ public final class DataInMemory {
     int index = mStartIndex + 1;
     while (arrOffset >= mPointers[fileNo][index]) {
       arrOffset -= mPointers[fileNo][index];
-      fileNo++;
+      ++fileNo;
       index = 0;
     }
     int lengthToGet = Math.min(mPointers[fileNo][index] - arrOffset, length);
@@ -196,12 +196,12 @@ public final class DataInMemory {
     mQualityData[fileNo].get(dest, arrOffset, 0, lengthToGet);
     destOffset += lengthToGet;
     if (destOffset < length && index == mPointers[fileNo].length - 1) {
-      fileNo++;
+      ++fileNo;
       while (destOffset < length && fileNo < mPointers.length && mPointers[fileNo].length == 1) {
         lengthToGet = Math.min(mPointers[fileNo][0], length - destOffset);
         mQualityData[fileNo].get(dest, 0, destOffset, lengthToGet);
         destOffset += lengthToGet;
-        fileNo++;
+        ++fileNo;
       }
       if (destOffset < length && fileNo < mPointers.length) {
         lengthToGet = Math.min(mPointers[fileNo][0], length - destOffset);
@@ -224,7 +224,7 @@ public final class DataInMemory {
     final int startIndex = start - mFileNoLookup.startSeq(fileStart);
     final int endIndex = end - mFileNoLookup.startSeq(fileEnd);
     long retLength = -mPointers[fileStart][startIndex];
-    for (int i = fileStart; i < fileEnd; i++) {
+    for (int i = fileStart; i < fileEnd; ++i) {
       retLength += mPointers[i][mPointers[i].length - 1];
     }
     retLength += mPointers[fileEnd][endIndex];
@@ -243,12 +243,12 @@ public final class DataInMemory {
     final int[] ret = new int[end - start];
     int fileNo = fileStart;
     int pointerIndex = startIndex;
-    for (int retIndex = 0; retIndex < end - start; retIndex++) {
+    for (int retIndex = 0; retIndex < end - start; ++retIndex) {
       ret[retIndex] = -mPointers[fileNo][pointerIndex];
-      pointerIndex++;
+      ++pointerIndex;
       while (fileNo < mPointers.length && pointerIndex == mPointers[fileNo].length - 1) {
         ret[retIndex] += mPointers[fileNo][pointerIndex];
-        fileNo++;
+        ++fileNo;
         pointerIndex = 0;
       }
       if (fileNo < mPointers.length && pointerIndex < mPointers[fileNo].length) {
@@ -261,10 +261,10 @@ public final class DataInMemory {
   private static int numberEntries(DataFileIndex seqIndex, long start, long end) {
     int numberEntries = 0;
     long runningTotal = 0;
-    for (int i = 0; i < seqIndex.numberEntries(); i++) {
+    for (int i = 0; i < seqIndex.numberEntries(); ++i) {
       final long addSeqs = seqIndex.numberSequences(i);
       if (start < runningTotal + addSeqs && end >= runningTotal) {
-        numberEntries++;
+        ++numberEntries;
       }
       runningTotal += addSeqs;
     }
@@ -416,7 +416,7 @@ public final class DataInMemory {
       long fileStart = 0;
       long fileEnd = 0;
       int i = 0;
-      for (int fn = 0; fn < mSeqIndex.numberEntries(); fn++) {
+      for (int fn = 0; fn < mSeqIndex.numberEntries(); ++fn) {
         fileEnd += mSeqIndex.numberSequences(fn);
         if (mStart < fileEnd && mEnd >= fileStart) {
           int j = 0;
@@ -445,7 +445,7 @@ public final class DataInMemory {
                     }
                   }
                   mPointers[i][j] = buf.getInt();
-                  j++;
+                  ++j;
                   if (j >= mPointers[i].length) {
                     break chanread;
                   }
@@ -458,7 +458,7 @@ public final class DataInMemory {
               }
             }
           }
-          i++;
+          ++i;
         }
         fileStart = fileEnd;
       }
@@ -470,7 +470,7 @@ public final class DataInMemory {
         if (mPointers[0][0] > 0) {
           final int adj = mPointers[0][0];
           mFirstFilePointerAdj = adj;
-          for (int j = 0; j < mPointers[0].length; j++) {
+          for (int j = 0; j < mPointers[0].length; ++j) {
             mPointers[0][j] -= adj;
           }
         }
@@ -513,7 +513,7 @@ public final class DataInMemory {
         long fileStart = 0;
         long fileEnd = 0;
         int i = 0;
-        for (int fn = 0; fn < mDataFileIndex.numberEntries(); fn++) {
+        for (int fn = 0; fn < mDataFileIndex.numberEntries(); ++fn) {
           fileEnd += mDataFileIndex.numberSequences(fn);
           if (mStart < fileEnd && mEnd >= fileStart) {
             final int startVal;
@@ -526,7 +526,7 @@ public final class DataInMemory {
               endVal = mPointers[i][mPointers[i].length - 1] + mFirstFilePointerAdjust;
             }
             ret[i] = CompressedByteArray.loadCompressed(SdfFileUtils.qualityDataFile(mDir, fn), startVal, endVal, CompressedMemorySequencesReader.MAX_QUAL_VALUE);
-            i++;
+            ++i;
           }
           fileStart = fileEnd;
         }
@@ -556,7 +556,7 @@ public final class DataInMemory {
       long fileStart = 0;
       long fileEnd = 0;
       int i = 0;
-      for (int fn = 0; fn < mDataFileIndex.numberEntries(); fn++) {
+      for (int fn = 0; fn < mDataFileIndex.numberEntries(); ++fn) {
         fileEnd += mDataFileIndex.numberSequences(fn);
         if (mStart < fileEnd && mEnd >= fileStart) {
           final int startVal;
@@ -569,7 +569,7 @@ public final class DataInMemory {
               endVal = mPointers[i][mPointers[i].length - 1] + mFirstFilePointerAdjust;
             }
           mSequenceData[i] = BitwiseByteArray.loadBitwise(SdfFileUtils.sequenceDataFile(mDir, fn), startVal, endVal, range);
-          i++;
+          ++i;
         }
         fileStart = fileEnd;
       }

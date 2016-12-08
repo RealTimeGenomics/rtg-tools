@@ -87,18 +87,18 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
     if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
       final double tpWeight = ((OrientedVariant) mCv).getWeight();
       if (tpWeight > 0) {
-        mCallTruePositives++;
+        ++mCallTruePositives;
         addToROCContainer(tpWeight, 0, 1, false);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
       final double tpWeight = ((OrientedVariant) mCv).getWeight();
       if (tpWeight > 0) {
-        mFalsePositivesCommonAllele++;
+        ++mFalsePositivesCommonAllele;
         addToROCContainer(tpWeight, 0, 1, true);
       }
     } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
       if (!mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
-        mFalsePositives++;
+        ++mFalsePositives;
         addToROCContainer(0, 1, 0, false);
       }
     }
@@ -108,11 +108,11 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
   protected void handleKnownBaseline() throws IOException {
     if (!mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
       if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
-        mBaselineTruePositives++;
+        ++mBaselineTruePositives;
       } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
-        mFalseNegativesCommonAllele++;
+        ++mFalseNegativesCommonAllele;
       } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
-        mFalseNegatives++;
+        ++mFalseNegatives;
       }
     }
   }

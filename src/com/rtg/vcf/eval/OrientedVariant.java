@@ -119,7 +119,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
     }
     sb.append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
     final int firstAllele = (mAlleleId == -1 || mOtherAlleleId == -1) ? -1 : 0;
-    for (int i = firstAllele; i < mVariant.numAlleles(); i++) {
+    for (int i = firstAllele; i < mVariant.numAlleles(); ++i) {
       if (i > firstAllele) {
         sb.append(":");
       }

@@ -671,7 +671,7 @@ public final class CFlags {
     final List<String> remaining = new ArrayList<>();
     int anonymousCount = 0;
     boolean restAnonymous = false;
-    for (int i = 0; i < args.length && success; i++) {
+    for (int i = 0; i < args.length && success; ++i) {
       final String nameArg = args[i];
       Flag flag = null;
       String value = null;
@@ -720,7 +720,7 @@ public final class CFlags {
         try {
           setFlag(flag, args[i]);
           if (flag.getCount() == flag.getMaxCount()) {
-            anonymousCount++;
+            ++anonymousCount;
           }
         } catch (final IllegalArgumentException e) {
           setParseMessage("Invalid value \"" + args[i] + "\". " + e.getMessage());
@@ -1149,7 +1149,7 @@ public final class CFlags {
       if (!mRemainderHeaderString.equals("")) {
         ret.append(' ');
         final String[] splitRemainderHeaderString = mRemainderHeaderString.split(LS);
-        for (int i = 0; i < splitRemainderHeaderString.length; i++) {
+        for (int i = 0; i < splitRemainderHeaderString.length; ++i) {
           ret.wrapText(splitRemainderHeaderString[i]);
           if (i != splitRemainderHeaderString.length - 1) {
             ret.wrap();
@@ -1301,7 +1301,7 @@ public final class CFlags {
       while (flagItr.hasNext()) {
         final Flag flag = flagItr.next();
         if (displayFlag(flag, level)) {
-          flagsCount++;
+          ++flagsCount;
         }
       }
       if (flagsCount > 0) {
@@ -1433,7 +1433,7 @@ public final class CFlags {
     while (flagItr.hasNext()) {
       final Flag flag = flagItr.next();
       if (displayFlag(flag, level)) {
-        requiredCount++;
+        ++requiredCount;
       }
     }
     if (requiredCount > 0) {
@@ -1451,7 +1451,7 @@ public final class CFlags {
     while (flagItr.hasNext()) {
       final Flag flag = flagItr.next();
       if (displayFlag(flag, level)) {
-        optionalCount++;
+        ++optionalCount;
       }
     }
     if (optionalCount > 0) {

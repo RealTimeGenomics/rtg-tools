@@ -120,7 +120,7 @@ public class CommandLineFilesTest extends TestCase {
   public void testInputFileListManyInvalid() throws IOException {
     final File list = new File(mDir, "list");
     try (FileWriter fw = new FileWriter(list)) {
-      for (int i = 0; i < 50; i++) {
+      for (int i = 0; i < 50; ++i) {
         fw.write(new File(mDir, "no-such-file-" + i) + LS);
       }
     }

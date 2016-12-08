@@ -59,7 +59,7 @@ public class PhasingEvaluatorTest extends TestCase {
     int id = 0;
     for (String s : variants) {
       final String vartab = s.replaceAll(" ", "\t");
-      id++;
+      ++id;
       callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), id, 0));
       sb.append(vartab).append("\n");
     }

@@ -102,7 +102,7 @@ public class PerSampleVariantStatistics {
 
   PerSampleVariantStatistics() {
     mAlleleLengths = new Histogram[VariantType.values().length];
-    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; i++) {
+    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; ++i) {
       // i from SNP as we don't care about NO_CALL/UNCHANGED
       mAlleleLengths[i] = new Histogram();
     }
@@ -224,7 +224,7 @@ public class PerSampleVariantStatistics {
     sb.append("Variant Allele Lengths :").append(StringUtils.LS);
     //sb.append("bin\tSNP\tMNP\tInsert\tDelete\tIndel").append(StringUtils.LS);
     sb.append("length");
-    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; i++) {
+    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; ++i) {
       if (i <= VariantType.INDEL.ordinal() || mAlleleLengths[i].getLength() != 0) {
         sb.append("\t").append(VARIANT_TYPE_NAMES[i]);
       }
@@ -233,7 +233,7 @@ public class PerSampleVariantStatistics {
 
     int size = 0;
     final int[] lengths = new int[mAlleleLengths.length];
-    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; i++) {
+    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; ++i) {
       lengths[i] = mAlleleLengths[i].getLength();
       if (lengths[i] > size) {
         size = lengths[i];
@@ -247,10 +247,10 @@ public class PerSampleVariantStatistics {
       if (end - bin > 1) {
         sb.append("-").append(end - 1);
       }
-      for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; i++) {
+      for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; ++i) {
         if (i <= VariantType.INDEL.ordinal() || mAlleleLengths[i].getLength() != 0) {
           long sum = 0L;
-          for (int j = bin; j < end; j++) {
+          for (int j = bin; j < end; ++j) {
             if (j < lengths[i]) {
               sum += mAlleleLengths[i].getValue(j);
             }

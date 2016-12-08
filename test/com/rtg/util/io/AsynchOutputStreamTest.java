@@ -126,7 +126,7 @@ public class AsynchOutputStreamTest extends TestCase {
     final File file = File.createTempFile("test", "gzipasynch");
     try {
       try (GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024)) {
-        for (int i = 0; i < 1028; i++) {
+        for (int i = 0; i < 1028; ++i) {
           out.write((int) 'a');
         }
         out.flush();
@@ -166,7 +166,7 @@ public class AsynchOutputStreamTest extends TestCase {
         @Override
         public void write(int b) throws IOException {
           if (mNum > 0) {
-            mNum--;
+            --mNum;
           } else {
             throw new IOException("Expected");
           }

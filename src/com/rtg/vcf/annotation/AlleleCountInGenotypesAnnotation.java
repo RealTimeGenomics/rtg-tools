@@ -80,7 +80,7 @@ public class AlleleCountInGenotypesAnnotation extends AbstractDerivedInfoAnnotat
     final int[] vals = (int[]) getValue(rec, -1);
     if (vals != null) {
       final String[] vcfVals = new String[vals.length];
-      for (int i = 0 ; i < vals.length; i++) {
+      for (int i = 0 ; i < vals.length; ++i) {
         vcfVals[i] = Integer.toString(vals[i]);
       }
       rec.setInfo(getName(), vcfVals);

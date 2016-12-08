@@ -53,7 +53,7 @@ public class WrappedIntArray extends IntegralAbstract implements ImmutableIntArr
    */
   public WrappedIntArray(final long[] array) {
     mArray = new int[array.length];
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       mArray[i] = (int) array[i];
     }
   }
@@ -67,7 +67,7 @@ public class WrappedIntArray extends IntegralAbstract implements ImmutableIntArr
     assert left.length == right.length;
     final int size = left.length + right.length;
     mArray = new int[size];
-    for (int i = 0; i < left.length; i++) {
+    for (int i = 0; i < left.length; ++i) {
       final int j = i << 1;
       mArray[j] = left[i];
       mArray[j + 1] = right[i];

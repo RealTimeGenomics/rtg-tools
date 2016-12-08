@@ -63,7 +63,7 @@ public class SequenceModeTest extends TestCase {
   public final void testHashEquals() {
     TestUtils.equalsTest(SequenceMode.values());
     final SequenceMode[][] vg = new SequenceMode[SequenceMode.values().length][];
-    for (int i = 0; i < vg.length; i++) {
+    for (int i = 0; i < vg.length; ++i) {
       vg[i] = new SequenceMode[1];
     }
     for (final Object sm : SequenceMode.values()) {

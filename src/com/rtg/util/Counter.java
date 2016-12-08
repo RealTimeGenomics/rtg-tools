@@ -52,7 +52,7 @@ public class Counter {
    * Increment the counter.
    */
   public void increment() {
-    mCount++;
+    ++mCount;
   }
 
   /**

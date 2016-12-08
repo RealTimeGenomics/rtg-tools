@@ -216,7 +216,7 @@ public class VcfHeader {
    * @throws IOException if an IO error occurs whilst reading
    */
   public void addContigFields(SequencesReader reader) throws IOException {
-    for (long i = 0; i < reader.numberSequences(); i++) {
+    for (long i = 0; i < reader.numberSequences(); ++i) {
       addLine(META_STRING + "contig=<ID=\"" + reader.name(i) + "\",length=" + reader.length(i) + ">");
     }
   }
@@ -487,13 +487,13 @@ public class VcfHeader {
     if (split.length == 9) {
      throw new VcfFormatException("VCF column header line contains format column but no sample columns");
     }
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; ++i) {
       if (!split[i].equals(HEADER_COLUMNS[i])) {
         throw new VcfFormatException("Incorrect VCF header column " + (i + 1) + " expected \"" + HEADER_COLUMNS[i] + "\" was \"" + split[i] + "\"");
       }
     }
     if (split.length > 9) {
-      for (int i = 9; i < split.length; i++) {
+      for (int i = 9; i < split.length; ++i) {
         addSampleName(split[i]);
       }
     }
@@ -657,7 +657,7 @@ public class VcfHeader {
     }
     //now reindex the mNameToColumn thing.
     mNameToColumn.clear();
-    for (int i = 0; i < mSampleNames.size(); i++) {
+    for (int i = 0; i < mSampleNames.size(); ++i) {
       mNameToColumn.put(mSampleNames.get(i), i);
     }
     //and clear out any sample lines
@@ -704,7 +704,7 @@ public class VcfHeader {
       mSampleNames.set(index, newName);
       mNameToColumn.remove(originalName);
       mNameToColumn.put(newName, index);
-      for (int k = 0; k < mSampleLines.size(); k++) {
+      for (int k = 0; k < mSampleLines.size(); ++k) {
         final SampleField sample = mSampleLines.get(k);
         if (sample.getId().equals(originalName)) {
           mSampleLines.set(k, new SampleField(sample.toString().replaceFirst(originalName, newName)));
@@ -724,7 +724,7 @@ public class VcfHeader {
     final StringBuilder sb;
     if (getNumberOfSamples() > 0) {
       sb = new StringBuilder(HEADER_LINE);
-      for (int i = 0; i < getNumberOfSamples(); i++) {
+      for (int i = 0; i < getNumberOfSamples(); ++i) {
         sb.append(TAB).append(mSampleNames.get(i));
       }
     } else {

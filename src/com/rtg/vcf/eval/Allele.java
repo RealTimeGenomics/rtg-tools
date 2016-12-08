@@ -101,7 +101,7 @@ public class Allele extends SequenceNameLocusSimple {
   static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray, boolean trim, boolean explicitMissing) {
     final boolean removePaddingBase = !trim && VcfUtils.hasRedundantFirstNucleotide(rec);
     final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
-    for (int i = -1; i < alleles.length - 1; i++) {
+    for (int i = -1; i < alleles.length - 1; ++i) {
       if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
         alleles[i + 1] = getAllele(rec, i, trim, removePaddingBase, explicitMissing);
       }

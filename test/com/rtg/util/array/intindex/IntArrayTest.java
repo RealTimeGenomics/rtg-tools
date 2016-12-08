@@ -54,7 +54,7 @@ public class IntArrayTest extends AbstractIntIndexTest {
 
   public void testSerial() throws IOException {
     final IntArray la = new IntArray(10);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       la.set(i, i * 4 + 7);
     }
     final ByteArrayOutputStream out =  new ByteArrayOutputStream();
@@ -63,7 +63,7 @@ public class IntArrayTest extends AbstractIntIndexTest {
     final IntIndex index2 = IntCreate.loadIndex(new ObjectInputStream(in));
     assertTrue(index2 instanceof IntArray);
     assertEquals(la.length(), index2.length());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       assertEquals(la.get(i), index2.get(i));
     }
   }

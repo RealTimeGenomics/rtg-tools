@@ -105,7 +105,7 @@ public class Timer extends AbstractTimer implements Integrity {
     }
     mStart = System.nanoTime();
     mState = State.RUNNING;
-    mStartCount++;
+    ++mStartCount;
   }
 
   /**
@@ -140,7 +140,7 @@ public class Timer extends AbstractTimer implements Integrity {
       throw new IllegalStateException();
     }
     mTime += time;
-    mStartCount++;
+    ++mStartCount;
     mState = State.STOPPED;
   }
 

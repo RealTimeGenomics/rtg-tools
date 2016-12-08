@@ -52,7 +52,7 @@ public class FileCompressedOutputStreamTest extends TestCase {
     try {
       final PortableRandom pr = new PortableRandom(42);
       final byte[] b = new byte[1000000];
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         b[i] = (byte) pr.nextInt(CompressedMemorySequencesReader.MAX_QUAL_VALUE);
       }
       final CompressedByteArray bwba = new CompressedByteArray(b.length, CompressedMemorySequencesReader.MAX_QUAL_VALUE, false);
@@ -75,7 +75,7 @@ public class FileCompressedOutputStreamTest extends TestCase {
       final byte[] exp = FileBitwiseOutputStreamTest.fileToByteArray(f);
       final byte[] res = FileBitwiseOutputStreamTest.fileToByteArray(fo);
       assertEquals(exp.length, res.length);
-      for (int i = 0; i < exp.length; i++) {
+      for (int i = 0; i < exp.length; ++i) {
         assertEquals("i: " + i + " exp: " + exp[i] + " res: " + res[i], exp[i], res[i]);
       }
     } finally {
@@ -89,7 +89,7 @@ public class FileCompressedOutputStreamTest extends TestCase {
     try {
       final PortableRandom pr = new PortableRandom(42);
       final byte[] b = new byte[1000000];
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         b[i] = (byte) pr.nextInt(CompressedMemorySequencesReader.MAX_QUAL_VALUE);
       }
       final File outF = new File(dir, "out");
@@ -108,7 +108,7 @@ public class FileCompressedOutputStreamTest extends TestCase {
         }
       }
       assertEquals(b.length, res.length);
-      for (int i = 0; i < b.length; i++) {
+      for (int i = 0; i < b.length; ++i) {
         assertEquals("i: " + i + " exp: " + b[i] + " res: " + res[i], b[i], res[i]);
       }
     } finally {

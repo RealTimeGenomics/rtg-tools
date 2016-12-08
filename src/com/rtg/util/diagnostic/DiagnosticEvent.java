@@ -103,7 +103,7 @@ public class DiagnosticEvent<T extends DiagnosticType> {
 
       // Substitute parameters into value string
       final String[] params = getParams();
-      for (int k = 0; k < params.length; k++) {
+      for (int k = 0; k < params.length; ++k) {
         final int position = value.indexOf("%" + (k + 1));
         // In theory should always use all parameters, but just in case someone does
         // write an error message that does not use all the parameters, we make an

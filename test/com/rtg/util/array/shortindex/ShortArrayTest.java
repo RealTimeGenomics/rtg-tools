@@ -55,7 +55,7 @@ public class ShortArrayTest extends AbstractShortIndexTest {
 
   public void testSerial() throws IOException {
     final ShortArray la = new ShortArray(10);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       la.set(i, i * 4 + 7);
     }
     final ByteArrayOutputStream out =  new ByteArrayOutputStream();
@@ -64,7 +64,7 @@ public class ShortArrayTest extends AbstractShortIndexTest {
     final ShortIndex index2 = ShortCreate.loadIndex(new ObjectInputStream(in));
     assertTrue(index2 instanceof ShortArray);
     assertEquals(la.length(), index2.length());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       assertEquals(la.get(i), index2.get(i));
     }
   }

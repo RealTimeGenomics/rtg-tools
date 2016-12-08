@@ -126,12 +126,12 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
     if (half < mMinLength) {
       mMinLength = half;
     }
-    for (int k = 0, j = half; k < half; k++, j++) {
+    for (int k = 0, j = half; k < half; ++k, ++j) {
       if (Character.toLowerCase(s.charAt(k)) == 'n') {
-        ncountLeft++;
+        ++ncountLeft;
       }
       if (Character.toLowerCase(s.charAt(j)) == 'n') {
-        ncountRight++;
+        ++ncountRight;
       }
     }
     final boolean r = ncountLeft <= mMaximumNs && ncountRight <= mMaximumNs;
@@ -143,7 +143,7 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
         mMaximumNsCount = ncountRight;
       }
     } else {
-      mSkippedNReads++;
+      ++mSkippedNReads;
       mSkippedNResidues += size;
     }
     return r;
@@ -195,7 +195,7 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
 
           final byte[] readBytes = parts[READ_FIELD].getBytes();
           final byte[] qualityBytes = new byte[readBytes.length];
-          for (int i = 0; i < readBytes.length; i++) {
+          for (int i = 0; i < readBytes.length; ++i) {
             byte residueByte = mFastaSymbolLookupTable[readBytes[i]];
             if (residueByte == (byte) 255) { //unrecognized character, print warning, shove in unknown
               Diagnostic.warning(WarningType.BAD_TIDE, name(), Character.toString((char) readBytes[i]), CHAR_TO_RESIDUE.unknownResidue().toString());
@@ -210,7 +210,7 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
 
             CgUtils.unPad(qualityBytes, 0, mLeftQuality);
             CgUtils.unPad(qualityBytes, CgUtils.CG2_PADDED_LENGTH, mRightQuality);
-            mCurrentLength--;
+            --mCurrentLength;
           } else {
             System.arraycopy(readBytes, 0, mLeftRead, 0, mCurrentLength);
             System.arraycopy(readBytes, mCurrentLength, mRightRead, 0, mCurrentLength);
@@ -219,7 +219,7 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
             System.arraycopy(qualityBytes, mCurrentLength, mRightQuality, 0, mCurrentLength);
           }
 
-          mSeqNo++;
+          ++mSeqNo;
           return true;
         }
       }

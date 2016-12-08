@@ -173,11 +173,11 @@ public final class HelpCommand extends Command {
       sb.append("\t").append(module.getCommandName().toLowerCase(Locale.getDefault()));
       if (module.getCommandName().length() > longestUsageLength) {
         sb.append(StringUtils.LS).append("\t");
-        for (int i = 0; i < longestUsageLength; i++) {
+        for (int i = 0; i < longestUsageLength; ++i) {
           sb.append(" ");
         }
       } else {
-        for (int i = 0; i < longestUsageLength - module.getCommandName().length(); i++) {
+        for (int i = 0; i < longestUsageLength - module.getCommandName().length(); ++i) {
           sb.append(" ");
         }
       }
@@ -187,7 +187,7 @@ public final class HelpCommand extends Command {
     final WrappingStringBuilder wb = new WrappingStringBuilder();
     wb.setWrapWidth(width);
     final StringBuilder spaces = new StringBuilder();
-    for (int i = 0; i < longestUsageLength; i++) {
+    for (int i = 0; i < longestUsageLength; ++i) {
       spaces.append(" ");
     }
     wb.setWrapIndent("\t" + spaces.toString() + " \t");

@@ -121,7 +121,7 @@ public class MockReaderParams extends ReaderParams {
   public int[] lengths() throws IOException {
     final int n = (int) mReader.numberSequences();
     final int[] lengths = new int[n];
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
       lengths[i] = mReader.length(i);
     }
     return lengths;

@@ -123,7 +123,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
     final PrereadNamesInterface names = templateSequences.names();
     final Map<String, Long> nameMap = new HashMap<>();
-    for (long i = 0; i < names.length(); i++) {
+    for (long i = 0; i < names.length(); ++i) {
       nameMap.put(names.name(i), i);
     }
 
@@ -143,7 +143,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
-      for (int i = 0; i < templateSequences.numberSequences(); i++) {
+      for (int i = 0; i < templateSequences.numberSequences(); ++i) {
         threadPool.execute(new SequenceEvaluator(sync, nameMap, templateSequences, o));
       }
 
@@ -229,7 +229,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final String callsSample = params.callsSample();
 
     final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
-    for (long i = 0; i < templateSequences.names().length(); i++) {
+    for (long i = 0; i < templateSequences.names().length(); ++i) {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 

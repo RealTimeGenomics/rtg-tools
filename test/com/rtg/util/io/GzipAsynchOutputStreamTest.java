@@ -58,7 +58,7 @@ public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
     try {
       final GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
       try {
-        for (int i = 0; i < 1028; i++) {
+        for (int i = 0; i < 1028; ++i) {
           out.write((int) 'a');
         }
         out.flush();

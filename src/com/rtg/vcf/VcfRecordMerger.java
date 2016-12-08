@@ -109,17 +109,17 @@ public class VcfRecordMerger implements AutoCloseable {
         idsb.append(VcfUtils.VALUE_SEPARATOR);
       }
       idsb.append(id);
-      z++;
+      ++z;
     }
     merged.setId(idsb.toString());
     boolean altsChanged = false;
     final int[][] gtMap = new int[records.length][];
     final List<String> mergedAltCalls = merged.getAltCalls();
-    for (int i = 0; i < records.length; i++) {
+    for (int i = 0; i < records.length; ++i) {
       final VcfRecord vcf = records[i];
       final int numAlts = vcf.getAltCalls().size();
       gtMap[i] = new int[numAlts + 1];
-      for (int j = 0; j < numAlts; j++) {
+      for (int j = 0; j < numAlts; ++j) {
         final String alt = vcf.getAltCalls().get(j);
         if (alt.equals(refCall)) {
           gtMap[i][j + 1] = 0;
@@ -155,9 +155,9 @@ public class VcfRecordMerger implements AutoCloseable {
     }
 
     final List<String> names = destHeader.getSampleNames();
-    for (int destSampleIndex = 0; destSampleIndex < names.size(); destSampleIndex++) {
+    for (int destSampleIndex = 0; destSampleIndex < names.size(); ++destSampleIndex) {
       boolean sampleDone = false;
-      for (int i = 0; i < headers.length; i++) {
+      for (int i = 0; i < headers.length; ++i) {
         final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
         if (sampleIndex > -1) {
           if (sampleDone) {
@@ -179,7 +179,7 @@ public class VcfRecordMerger implements AutoCloseable {
             if (key.equals(VcfUtils.FORMAT_GENOTYPE)) {
               final String gtStr = records[i].getFormat(key).get(sampleIndex);
               final int[] splitGt = VcfUtils.splitGt(gtStr);
-              for (int gti = 0; gti < splitGt.length; gti++) {
+              for (int gti = 0; gti < splitGt.length; ++gti) {
                 if (splitGt[gti] != -1) {
                   if (splitGt[gti] >= gtMap[i].length) {
                     throw new VcfFormatException("Invalid GT " + gtStr + " in input record: " + records[i]);
@@ -190,7 +190,7 @@ public class VcfRecordMerger implements AutoCloseable {
               final char sep = gtStr.indexOf(VcfUtils.PHASED_SEPARATOR) != -1 ? VcfUtils.PHASED_SEPARATOR : VcfUtils.UNPHASED_SEPARATOR;
               final StringBuilder sb = new StringBuilder();
               sb.append(splitGt[0] == -1 ? VcfRecord.MISSING : splitGt[0]);
-              for (int gti = 1; gti < splitGt.length; gti++) {
+              for (int gti = 1; gti < splitGt.length; ++gti) {
                 sb.append(sep).append(splitGt[gti] == -1 ? VcfRecord.MISSING : splitGt[gti]);
               }
               field.set(destSampleIndex, sb.toString());
@@ -238,7 +238,7 @@ public class VcfRecordMerger implements AutoCloseable {
     assert records.length == headers.length;
     final MultiMap<Integer, VcfRecord> recordSets = new MultiMap<>(true);
     final MultiMap<Integer, VcfHeader> headerSets = new MultiMap<>(true);
-    for (int i = 0; i < records.length; i++) {
+    for (int i = 0; i < records.length; ++i) {
       final int key = mPaddingAware && VcfUtils.hasRedundantFirstNucleotide(records[i]) ? -records[i].getLength() : records[i].getLength();
       recordSets.put(key, records[i]);
       headerSets.put(key, headers[i]);
@@ -255,7 +255,7 @@ public class VcfRecordMerger implements AutoCloseable {
       } else {
         final VcfRecord[] recHolder = new VcfRecord[1];
         final VcfHeader[] headHolder = new VcfHeader[1];
-        for (int i = 0; i < recsArray.length; i++) {
+        for (int i = 0; i < recsArray.length; ++i) {
           recHolder[0] = recsArray[i];
           headHolder[0] = headsArray[i];
           ret.add(mergeRecordsWithSameRef(recHolder, headHolder, destHeader, unmergeableFormatFields, !preserveFormats));

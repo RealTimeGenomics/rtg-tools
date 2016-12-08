@@ -81,11 +81,11 @@ public class TabixVcfRecordSetTest extends TestCase {
       FileHelper.stringToGzFile(CALLS, out);
       new TabixIndexer(out).saveVcfIndex();
       final Collection<Pair<String, Integer>> names = new ArrayList<>();
-      for (int seq = 1; seq < 32; seq++) {
+      for (int seq = 1; seq < 32; ++seq) {
         names.add(new Pair<>("simulatedSequence" + seq, -1));
       }
       final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
-      for (int seq = 1; seq < 32; seq++) {
+      for (int seq = 1; seq < 32; ++seq) {
         ranges.put("simulatedSequence" + seq, new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
       }
       final ReferenceRegions highConf = new ReferenceRegions();
@@ -93,7 +93,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100);
 
       final Set<String> expected = new HashSet<>();
-      for (int seq = 1; seq < 32; seq++) {
+      for (int seq = 1; seq < 32; ++seq) {
         expected.add("simulatedSequence" + seq);
       }
       expected.remove("simulatedSequence12");

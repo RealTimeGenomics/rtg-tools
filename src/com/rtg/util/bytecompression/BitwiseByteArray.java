@@ -142,7 +142,7 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     Exam.assertTrue(0 <= mSize);
     Exam.assertTrue(0 < mBits);
     Exam.assertNotNull(mData);
-    for (int i = 0; i < mData.length; i++) {
+    for (int i = 0; i < mData.length; ++i) {
       Exam.assertNotNull("" + i, mData[i]);
     }
     //Assert.assertTrue(mData.length >= mBits * (mCapacity / BITS_PER_LONG));
@@ -165,7 +165,7 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     final int whichArr = (int) (whichLong / mMaxLongsPerArray);
     final int accessLong = (int) (whichLong - (long) whichArr * mMaxLongsPerArray);
     int result = 0;
-    for (int b = 0; b < mBits; b++) {
+    for (int b = 0; b < mBits; ++b) {
       //final long longValue = mData[b].get(whichLong);
       final long longValue = mData[whichArr][accessLong + b];
       result = (result << 1) | (int) ((longValue >> whichBit) & 1);
@@ -207,20 +207,20 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
       long bits0 = mData[whichArr][accessLong];
       long bits1 = mData[whichArr][accessLong + 1];
       long bits2 = mData[whichArr][accessLong + 2];
-      for (int pos = destOffset; pos < destOffset + length; pos++) {
+      for (int pos = destOffset; pos < destOffset + length; ++pos) {
         final long bit0 = (bits0 >>> whichBit) & 1;
         final long bit1 = (bits1 >>> whichBit) & 1;
         final long bit2 = (bits2 >>> whichBit) & 1;
         dest[pos] = (byte) ((bit0 << 2) | (bit1 << 1) | bit2);
         // now move along to the next bit
-        whichBit++;
+        ++whichBit;
         if (whichBit == BITS_PER_LONG && pos < destOffset + length - 1) {
           whichBit = 0;
           whichLong += mBits;
           accessLong += mBits;
           if (whichLong == nextSwitch) {
             accessLong = 0;
-            whichArr++;
+            ++whichArr;
             nextSwitch += mMaxLongsPerArray;
           }
           bits0 = mData[whichArr][accessLong];
@@ -229,23 +229,23 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
         }
       }
     } else {
-      for (int pos = destOffset; pos < destOffset + length; pos++) {
+      for (int pos = destOffset; pos < destOffset + length; ++pos) {
         int value = 0;
-        for (int b = 0; b < mBits; b++) {
+        for (int b = 0; b < mBits; ++b) {
           //final long bits = mData[b].get(whichLong);
           final long bits = mData[whichArr][accessLong + b];
           value = (value << 1) | (int) ((bits >>> whichBit) & 1);
         }
         dest[pos] = (byte) value;
         // now move along to the next bit
-        whichBit++;
+        ++whichBit;
         if (whichBit == BITS_PER_LONG) {
           whichBit = 0;
           whichLong += mBits;
           accessLong += mBits;
           if (whichLong == nextSwitch) {
             accessLong = 0;
-            whichArr++;
+            ++whichArr;
             nextSwitch += mMaxLongsPerArray;
           }
         }
@@ -279,7 +279,7 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     if (remaining != 0) {
       final int numArrays = (longs % mMaxLongsPerArray == 0) ? (int) (longs / mMaxLongsPerArray) : (int) (longs / mMaxLongsPerArray) + 1;
       mData = Arrays.copyOf(mData, numArrays);
-      i++;
+      ++i;
       while (remaining > 0) {
         final long cSize = Math.min(mMaxLongsPerArray, remaining);
         mData[i++] = new long[(int) cSize];
@@ -321,23 +321,23 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     int whichArr = (int) (whichLong / mMaxLongsPerArray);
     long nextSwitch = ((long) whichArr + 1) * mMaxLongsPerArray;
     int accessLong = (int) (whichLong - (long) whichArr * mMaxLongsPerArray);
-    for (int pos = bOffset; pos < bOffset + length; pos++) {
+    for (int pos = bOffset; pos < bOffset + length; ++pos) {
       int value = data[pos];
-      for (int b = mBits - 1; b >= 0; b--) {
+      for (int b = mBits - 1; b >= 0; --b) {
         //final long old = mData[b].get(whichLong);
         //mData[b].set(whichLong, old | ((value & 1L) << whichBit));
         mData[whichArr][accessLong + b] |= (value & 1L) << whichBit;
         value = value >> 1;
       }
       // now move along to the next bit
-      whichBit++;
+      ++whichBit;
       if (whichBit == BITS_PER_LONG) {
         whichBit = 0;
         whichLong += mBits;
         accessLong += mBits;
         if (whichLong == nextSwitch) {
           accessLong = 0;
-          whichArr++;
+          ++whichArr;
           nextSwitch += mMaxLongsPerArray;
         }
       }
@@ -402,7 +402,7 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
             //ByteArrayIOUtils.convertToLongArray(buf, sFrom, sTo, mData[dataArray], dFrom, dTo);
             numLongs -= dTo - dFrom;
             if (numLongs > 0) {
-              dataArray++;
+              ++dataArray;
               dFrom = 0;
               dTo = Math.min(ret.mData[dataArray].length, dFrom + numLongs);
             }
@@ -428,10 +428,10 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     int whichArr = 0;
     long nextSwitch = mMaxLongsPerArray;
     int accessLong = 0;
-    for (long i = 0; i < whichLong + mBits; i++) {
+    for (long i = 0; i < whichLong + mBits; ++i) {
       if (i == nextSwitch) {
         accessLong = 0;
-        whichArr++;
+        ++whichArr;
         nextSwitch += mMaxLongsPerArray;
       }
       dos.writeLong(mData[whichArr][accessLong++]);

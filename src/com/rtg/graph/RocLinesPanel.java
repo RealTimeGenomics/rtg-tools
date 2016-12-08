@@ -93,7 +93,7 @@ class RocLinesPanel extends Box {
     @Override
     public void actionPerformed(ActionEvent e) {
       final Component[] components = getComponents();
-      for (int i = 0; i < components.length; i++) {
+      for (int i = 0; i < components.length; ++i) {
         final RocLinePanel cp = (RocLinePanel) components[i];
 
         if (cp == mPanel) {

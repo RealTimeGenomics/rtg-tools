@@ -56,7 +56,7 @@ public class SourceTemplateReadWriterTest extends TestCase {
       assertTrue(templateFile.exists());
       resultArray = SourceTemplateReadWriter.readTemplateMap(temp);
       assertEquals(testArray.length, resultArray.length);
-      for (int i = 0; i < testArray.length; i++) {
+      for (int i = 0; i < testArray.length; ++i) {
         assertEquals(testArray[i], resultArray[i]);
       }
       assertTrue(templateFile.delete());

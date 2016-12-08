@@ -130,12 +130,12 @@ public abstract class AbstractShortIndexTest extends TestCase {
     final ShortIndex a = create(length, 3);
     a.integrity();
     assertEquals(length, a.length());
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       assertEquals(0, a.getShort(i));
       final short j = (short) (i * 3);
       a.setShort(i, j);
     }
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       final short j = (short) (i * 3);
       assertEquals(j, a.getShort(i));
     }

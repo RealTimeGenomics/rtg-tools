@@ -477,7 +477,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final byte[] b = ds.sequenceData();
     final byte[] q = ds.qualityData();
     assertEquals(15000, ds.currentLength());
-    for (int i = 0; i < 15000; i++) {
+    for (int i = 0; i < 15000; ++i) {
       assertEquals(DNA.T.ordinal(), b[i]);
       assertEquals('[' - '!', q[i]);
     }
@@ -524,7 +524,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     final String bad = "\"!@#$%^&*()_1234567890-={}[]vs\\|?/<,\"\"";
     final StringWriter wr = new StringWriter();
-    for (int i = 0; i < bad.length(); i++) {
+    for (int i = 0; i < bad.length(); ++i) {
       wr.append((char) (126 - i));
     }
     final String bed = wr.toString();
@@ -538,7 +538,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
     assertEquals(bad.length(), ds.currentLength());
-    for (int i = 0; i < bad.length(); i++) {
+    for (int i = 0; i < bad.length(); ++i) {
       assertEquals("" + i, DNA.N.ordinal(), b[i]);
     }
     assertTrue(!ds.nextSequence());
@@ -588,7 +588,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
         int j = 0;
         for (final DNA e : exp) {
           assertEquals(e.ordinal(), b[j]);
-          j++;
+          ++j;
         }
       }
       assertTrue(!ds.nextSequence());
@@ -642,7 +642,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
         {DNA.C, DNA.A, DNA.T, DNA.G},
         {DNA.T, DNA.T, DNA.T, DNA.T}};
     final String[] labels = {"test", "hobo", "more", "again"};
-    for (int i = 0; i < labels.length; i++) {
+    for (int i = 0; i < labels.length; ++i) {
       assertTrue(ds.nextSequence());
       assertEquals(labels[i], ds.name());
       final byte[] b = ds.sequenceData();
@@ -650,7 +650,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
       int j = 0;
       for (final DNA exp : allexpected[i]) {
         assertEquals(exp.ordinal(), b[j]);
-        j++;
+        ++j;
       }
     }
     assertTrue(!ds.nextSequence());
@@ -857,7 +857,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     final StringBuilder fqStr = new StringBuilder();
     final StringBuilder expectedWarnings = new StringBuilder();
-    for (int i = 0; i < numberOfMismatches; i++) {
+    for (int i = 0; i < numberOfMismatches; ++i) {
       fqStr.append("@seq").append(i).append(" extraBlah\n");
       fqStr.append("AGGGCCCCTTTTAGT\n");
       fqStr.append("+seq").append(i).append("\n");
@@ -879,7 +879,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
       int numSeq = 0;
       while (ds.nextSequence()) {
-        numSeq++;
+        ++numSeq;
       }
       assertEquals(numberOfMismatches, numSeq);
       assertEquals(expectedWarnings.toString(), dl.mWarnings.toString());

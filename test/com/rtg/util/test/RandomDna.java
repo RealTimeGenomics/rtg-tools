@@ -50,7 +50,7 @@ public final class RandomDna {
    */
   public static String random(final int len, final PortableRandom r) {
     final StringBuilder sb = new StringBuilder(len);
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       switch (r.nextInt(4)) {
       case 0:
         sb.append('A');

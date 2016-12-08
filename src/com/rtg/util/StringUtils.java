@@ -78,7 +78,7 @@ public final class StringUtils {
     //    final StringBuilder ret = new StringBuilder(input.length());
     //    char temp = '\0';
     //    int last = 0;
-    //    for (int i = 0; i < inChar.length; i++) {
+    //    for (int i = 0; i < inChar.length; ++i) {
     //      if (inChar[i] == '\n' || inChar[i] == '\r') {
     //        if (temp == '\0' || temp == inChar[i]) {
     //          ret.append(new String(inChar, last, i - last));
@@ -179,7 +179,7 @@ public final class StringUtils {
     if (!Character.isJavaIdentifierStart(str.charAt(0))) {
       return false;
     }
-    for (int i = 1; i < str.length(); i++) {
+    for (int i = 1; i < str.length(); ++i) {
       if (!Character.isJavaIdentifierPart(str.charAt(i))) {
         return false;
       }
@@ -196,7 +196,7 @@ public final class StringUtils {
    */
   public static String repeat(final String rep, final int n) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
       sb.append(rep);
     }
     return sb.toString();
@@ -212,7 +212,7 @@ public final class StringUtils {
   public static String display(final String arg) {
     final StringBuilder sb = new StringBuilder();
     sb.append("\"");
-    for (int i = 0; i < arg.length(); i++) {
+    for (int i = 0; i < arg.length(); ++i) {
       final Character c = arg.charAt(i);
       final String trans = REPLACE.get(c);
       if (trans != null) {
@@ -229,7 +229,7 @@ public final class StringUtils {
       sb.append("\\u");
       final String hexl = Integer.toHexString(c);
       final String hex = hexl.toUpperCase(Locale.getDefault());
-      for (int j = hex.length(); j < 4; j++) {
+      for (int j = hex.length(); j < 4; ++j) {
         sb.append("0");
       }
       sb.append(hex);
@@ -283,7 +283,7 @@ public final class StringUtils {
    */
   public static String join(final String delim, final String[] array, final boolean quoteStringsWithSpaces) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < array.length; i++) {
+    for (int i = 0; i < array.length; ++i) {
       if (i != 0 && delim != null) {
         sb.append(delim);
       }
@@ -369,7 +369,7 @@ public final class StringUtils {
       return s;
     }
     final StringBuilder b = new StringBuilder();
-    for (int i = 0; i < slen; i++) {
+    for (int i = 0; i < slen; ++i) {
       final char c = s.charAt(i);
       switch (c) {
         case '<':
@@ -460,8 +460,8 @@ public final class StringUtils {
     final String a = strings[0];
     int clip = -1;
     while (true) {
-      clip++;
-      for (int k = 1; k < strings.length; k++) {
+      ++clip;
+      for (int k = 1; k < strings.length; ++k) {
         if (strings[k] != null && !equalsLeft(a, strings[k], clip, rightOffset)) {
           return clip;
         }
@@ -482,8 +482,8 @@ public final class StringUtils {
     final String a = strings[0];
     int clip = -1;
     while (true) {
-      clip++;
-      for (int k = 1; k < strings.length; k++) {
+      ++clip;
+      for (int k = 1; k < strings.length; ++k) {
         if (strings[k] != null && !equalsRight(a, strings[k], clip, leftOffset)) {
           return clip;
         }
@@ -518,7 +518,7 @@ public final class StringUtils {
    */
   public static String removeBackslashEscapes(final String s) {
     final StringBuilder sb = new StringBuilder();
-    for (int k = 0; k < s.length(); k++) {
+    for (int k = 0; k < s.length(); ++k) {
       final char c = s.charAt(k);
       if (c == '\\') {
         if (++k == s.length()) {
@@ -625,11 +625,11 @@ public final class StringUtils {
     final char[] c = in.toCharArray();
     int start = 0;
     while (start < c.length && c[start] == ' ') {
-      start++;
+      ++start;
     }
     int end = c.length;
     while (end > start && c[end - 1] == ' ') {
-      end--;
+      --end;
     }
     return new String(c, start, end - start);
   }

@@ -154,7 +154,7 @@ public class HaplotypePlaybackTest extends TestCase {
       path.next();
       //System.err.println(path.nt() + " " + path.toString());
       assertEquals(expected[i], path.nt());
-      i++;
+      ++i;
     }
     assertEquals(expected.length, i);
   }
@@ -187,7 +187,7 @@ public class HaplotypePlaybackTest extends TestCase {
       path.next();
       //System.err.println(path.nt());
       assertEquals(expected[i], path.nt());
-      i++;
+      ++i;
     }
     assertEquals(first, path.currentVariant());
     //A -> G:T
@@ -202,7 +202,7 @@ public class HaplotypePlaybackTest extends TestCase {
       path.next();
       //System.err.println(path.nt());
       assertEquals(expected[i], path.nt());
-      i++;
+      ++i;
     }
     assertEquals(next, path.currentVariant());
 
@@ -210,7 +210,7 @@ public class HaplotypePlaybackTest extends TestCase {
       path.next();
       //System.err.println(path.nt());
       assertEquals(expected[i], path.nt());
-      i++;
+      ++i;
     }
     assertEquals(expected.length, i);
   }
@@ -287,7 +287,7 @@ public class HaplotypePlaybackTest extends TestCase {
     int i = -1;
     while (path.templatePosition() < 4) {
       path.next();
-      i++;
+      ++i;
       //System.err.println(path.nt());
       assertEquals("position: " + i, expected[i], path.nt());
       assertEquals(i, path.templatePosition());
@@ -296,7 +296,7 @@ public class HaplotypePlaybackTest extends TestCase {
     path.moveForward(i);
     while (path.hasNext()) {
       path.next();
-      i++;
+      ++i;
       assertEquals("position: " + i, expected[i], path.nt());
       assertEquals(i, path.templatePosition());
     }

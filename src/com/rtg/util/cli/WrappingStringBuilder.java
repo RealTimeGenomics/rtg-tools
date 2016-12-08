@@ -97,7 +97,7 @@ public class WrappingStringBuilder {
    */
   public void setWrapIndent(final int indent) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < indent; i++) {
+    for (int i = 0; i < indent; ++i) {
       sb.append(' ');
     }
     mPrefix = sb.toString();
@@ -125,7 +125,7 @@ public class WrappingStringBuilder {
    */
   public WrappingStringBuilder append(final String s) {
     final int end = s.length();
-    for (int i = 0; i < end; i++) {
+    for (int i = 0; i < end; ++i) {
       append(s.charAt(i));
     }
     return this;
@@ -138,7 +138,7 @@ public class WrappingStringBuilder {
    */
   private void appendTrimmed(final String s) {
     boolean skip = true;
-    for (int i = 0; i < s.length(); i++) {
+    for (int i = 0; i < s.length(); ++i) {
       final char c = s.charAt(i);
       if (c != ' ') {
         skip = false;
@@ -220,7 +220,7 @@ public class WrappingStringBuilder {
     int end = 0;
     while (end < s.length()) {
       boolean leader = true;
-      for (end = start; end < s.length(); end++) {
+      for (end = start; end < s.length(); ++end) {
         final char c = s.charAt(end);
         if (Character.isWhitespace(c)) {
           if (!leader) {

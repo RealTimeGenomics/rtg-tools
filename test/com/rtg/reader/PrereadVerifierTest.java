@@ -143,7 +143,7 @@ public class PrereadVerifierTest extends TestCase {
     final PortableRandom rnd = new PortableRandom();
     try {
       // int count = 0;
-      for (int k = 0; k < 20; k++) {
+      for (int k = 0; k < 20; ++k) {
         boolean failed = false;
         try {
           try {
@@ -229,7 +229,7 @@ public class PrereadVerifierTest extends TestCase {
     final StringBuilder failures = new StringBuilder();
     final PortableRandom rnd = new PortableRandom();
     try {
-      for (int k = 0; k < 10; k++) {
+      for (int k = 0; k < 10; ++k) {
         boolean failed = false;
         try {
           try {
@@ -253,7 +253,7 @@ public class PrereadVerifierTest extends TestCase {
 
           final int t = rnd.nextInt(targets.length);
           // System.out.println("Files");
-          // for (int i = 0; i < targets.length; i++) {
+          // for (int i = 0; i < targets.length; ++i) {
           //   System.out.println((i==t?"*":" ") + targets[i].getPath());
           // }
           final File target = targets[t];

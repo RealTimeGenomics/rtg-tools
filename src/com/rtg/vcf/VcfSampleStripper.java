@@ -88,7 +88,7 @@ public class VcfSampleStripper implements VcfAnnotator {
           throw new NoTalkbackSlimException("Could not find sample name: " + sample + " in VCF header");
         }
         mSampleIdsToRemove[i] = sampleId;
-        i++;
+        ++i;
       }
       Arrays.sort(mSampleIdsToRemove); //this so that when we come to remove from the format sample lists,
 
@@ -117,7 +117,7 @@ public class VcfSampleStripper implements VcfAnnotator {
     for (String id : rec.getFormats()) {
       final ArrayList<String> formatValues = rec.getFormat(id);
       //remove each sample from each format
-      for (int j = mSampleIdsToRemove.length - 1; j >= 0; j--) { //backwards to avoid changing index values as we remove items
+      for (int j = mSampleIdsToRemove.length - 1; j >= 0; --j) { //backwards to avoid changing index values as we remove items
         formatValues.remove(mSampleIdsToRemove[j]);
       }
       if (first) {

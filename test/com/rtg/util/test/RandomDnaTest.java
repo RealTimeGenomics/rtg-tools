@@ -45,19 +45,19 @@ public class RandomDnaTest extends TestCase {
     int c = 0;
     int g = 0;
     int t = 0;
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 10000; ++i) {
       switch (s.charAt(i)) {
       case 'A':
-        a++;
+        ++a;
         break;
       case 'C':
-        c++;
+        ++c;
         break;
       case 'G':
-        g++;
+        ++g;
         break;
       case 'T':
-        t++;
+        ++t;
         break;
       default:
         fail();

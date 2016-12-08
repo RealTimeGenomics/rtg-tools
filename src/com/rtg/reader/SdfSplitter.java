@@ -143,7 +143,7 @@ public final class SdfSplitter extends LoggedCli {
     type = reader.type();
     totalSequences = reader.numberSequences();
     reader.close();
-    for (int i = 1; i < inDirs.size(); i++) {
+    for (int i = 1; i < inDirs.size(); ++i) {
       final File dir = inDirs.get(i);
       try {
         reader = new SdfReaderWrapper(dir, false, isPaired);
@@ -184,16 +184,16 @@ public final class SdfSplitter extends LoggedCli {
           if (writer != null) {
             writer.setReader(reader);
           }
-          readerNumber++;
+          ++readerNumber;
         } catch (final FileNotFoundException e) {
           throw new NoTalkbackSlimException(ErrorType.FILE_NOT_FOUND, dir.toString());
         }
-        for (long seq = 0; seq < reader.numberSequences(); seq++) {
+        for (long seq = 0; seq < reader.numberSequences(); ++seq) {
           if (writer == null) {
             final String fname;
             fname = String.format("%06d", numOutputs);
             writer = new SdfWriterWrapper(new File(outDir, fname), reader, forceCompression);
-            numOutputs++;
+            ++numOutputs;
             if (inDirs.size() == 1) {
               writer.copySourceTemplatesFile(reader);
             }
@@ -221,7 +221,7 @@ public final class SdfSplitter extends LoggedCli {
               throw new NoTalkbackSlimException(ErrorType.FILE_NOT_FOUND, dir.toString());
             }
             readers[readerNumber] = readerWrappers[readerNumber].isPaired() ? readerWrappers[readerNumber].left() : readerWrappers[readerNumber].single();
-            readerNumber++;
+            ++readerNumber;
           }
           if (dupDetector.checkSequenceDuplicates(readers, new File(outDir.getPath(), "duplicate-names.txt"))) {
             Diagnostic.warning(WarningType.INFO_WARNING, "Duplicate Sequence Names in Input");

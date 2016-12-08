@@ -88,7 +88,7 @@ public class ChildPhasingVcfAnnotator implements VcfAnnotator {
       }
     }
     final ArrayList<String> newCalls = new ArrayList<>(calls.size());
-    for (int i = 0; i < calls.size(); i++) {
+    for (int i = 0; i < calls.size(); ++i) {
       if (phased[i] == null) { // All not-yet phased calls get copied through unaltered
         phased[i] = calls.get(i);
 

@@ -93,7 +93,7 @@ public class GzipAsynchInputStreamTest extends AsynchInputStreamTest {
             }
             //      // consume some time, to emulate processing the data
             //      byte[] dummy = {'A', 'B', 'C', 'D'};
-            //      for (long i = 0; i < size; i++) {
+            //      for (long i = 0; i < size; ++i) {
             //        dummy[(int) i & 0x3] ^= 0x01;
             //      }
             output.write(buf, 0, size);
@@ -128,9 +128,9 @@ public class GzipAsynchInputStreamTest extends AsynchInputStreamTest {
     final File file = File.createTempFile("test", "GzipAsynch.gz");
     // fill file with a larger amount of data.
     try (GZIPOutputStream out = new GZIPOutputStream(new FileOutputStream(file))) {
-      for (int i = 0; i < kbytes; i++) {
+      for (int i = 0; i < kbytes; ++i) {
         // generate a randomish line.
-        for (int pos = 0; pos < 1024; pos++) {
+        for (int pos = 0; pos < 1024; ++pos) {
           line[pos] = (byte) ('!' + (pos * (long) i) % 91);
         }
         line[1023] = (byte) '\n';
@@ -170,7 +170,7 @@ public class GzipAsynchInputStreamTest extends AsynchInputStreamTest {
         gzipOut.close();
       }
       final byte[] buf = new byte[2* 1024 * 1024];
-      for (int i = 0; i < 1000; i++) {
+      for (int i = 0; i < 1000; ++i) {
         GzipAsynchInputStream asyncIn = new GzipAsynchInputStream(tempFile);
         final long start = System.currentTimeMillis();
         try {

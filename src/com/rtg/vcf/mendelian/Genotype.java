@@ -107,7 +107,7 @@ class Genotype {
   static class GenotypeComparator implements Comparator<Genotype>, Serializable {
     @Override
     public int compare(Genotype a, Genotype b) {
-      for (int i = 0; i < a.mAlleles.length && i < b.mAlleles.length; i++) {
+      for (int i = 0; i < a.mAlleles.length && i < b.mAlleles.length; ++i) {
         if (a.mAlleles[i] < b.mAlleles[i]) {
           return -1;
         } else if (a.mAlleles[i] > b.mAlleles[i]) {

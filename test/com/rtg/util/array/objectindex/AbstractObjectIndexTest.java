@@ -132,12 +132,12 @@ public abstract class AbstractObjectIndexTest extends TestCase {
     final ObjectIndex<Integer> a = create(length, 3);
     a.integrity();
     assertEquals(length, a.length());
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       assertEquals(null, a.get(i));
       final int j = i * 3;
       a.set(i, j);
     }
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       final int j = i * 3;
       assertEquals(Integer.valueOf(j), a.get(i));
     }

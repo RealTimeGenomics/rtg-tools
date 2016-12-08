@@ -40,7 +40,7 @@ public class TrioConcordanceTest extends TestCase {
   public void testConcordance() throws IOException {
     final TrioConcordance tc = new TrioConcordance("child", "father", "mother");
 
-    for (int i = 0; i < 25; i++) {
+    for (int i = 0; i < 25; ++i) {
       tc.add(new Genotype("0/0"), new Genotype("0/0"), new Genotype("0/0"));
       tc.add(new Genotype("1/0"), new Genotype("0/1"), new Genotype("1/0"));
       tc.add(new Genotype("1/0"), new Genotype("0/1"), new Genotype("0/0"));

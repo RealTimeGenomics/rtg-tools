@@ -111,7 +111,7 @@ public final class TestCFlags {
       if (name.length() < 3) {
         Assert.fail("Long flag name is too short: --" + name);
       }
-      for (int k = 0; k < name.length(); k++) {
+      for (int k = 0; k < name.length(); ++k) {
         if (Character.isWhitespace(name.charAt(k))) {
           Assert.fail("Name of flag contains whitespace: --" + name);
         }

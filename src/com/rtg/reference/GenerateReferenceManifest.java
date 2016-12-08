@@ -111,14 +111,14 @@ public class GenerateReferenceManifest extends AbstractCli {
           writer.write("@source\t" + refTxtResource + "\n");
           writer.write("@checks\t" + Arrays.stream(CHECKS).map(t -> t.name().toLowerCase(Locale.getDefault())).collect(Collectors.joining("\t")) + "\n");
           final GetCheckValue[] getters = new GetCheckValue[CHECKS.length - 1];
-          for (int i = 0; i < CHECKS.length - 1; i++) {
+          for (int i = 0; i < CHECKS.length - 1; ++i) {
             getters[i] = checkValueFactory(CHECKS[i + 1]);
           }
           for (ReferenceSequence sequence : ref.sequences()) {
             if (sequence.isSpecified()) {
               final long seqId = names.get(sequence.name());
               writer.write(sequence.name());
-              for (int i = 0; i < getters.length; i++) {
+              for (int i = 0; i < getters.length; ++i) {
                 writer.write("\t");
                 writer.write(getters[i].getValue(reader, seqId));
               }

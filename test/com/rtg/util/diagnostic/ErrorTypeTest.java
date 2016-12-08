@@ -167,12 +167,12 @@ public class ErrorTypeTest extends TestCase {
   public void check(final ErrorType et) {
     final int nArgs = et.getNumberOfParameters();
     final String[] args = new String[nArgs];
-    for (int i = 0; i < nArgs; i++) {
+    for (int i = 0; i < nArgs; ++i) {
       args[i] = "xxxx" + i + "yyyy";
     }
     final ErrorEvent event = new ErrorEvent(et, args);
     final String msg = event.getMessage();
-    for (int i = 0; i < nArgs; i++) {
+    for (int i = 0; i < nArgs; ++i) {
       assertTrue(msg.contains(args[i]));
     }
   }

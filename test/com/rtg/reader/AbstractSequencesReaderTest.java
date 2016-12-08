@@ -287,7 +287,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
         DNA.C, DNA.A, DNA.C, DNA.T, DNA.G, DNA.G, DNA.T, DNA.C, DNA.A, DNA.T, DNA.G,
         DNA.C, DNA.A};
       assertEquals(expected.length, amount);
-      for (int i = 0; i < seqs.length; i++) {
+      for (int i = 0; i < seqs.length; ++i) {
         assertEquals(expected[i].ordinal(), seqs[i]);
       }
       assertTrue(Exam.integrity(dsr));
@@ -299,7 +299,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
       byte[] bytes = new byte[expected.length];
       it.readCurrent(bytes);
       DNA[] dnaValues = DNA.values();
-      for (int i = 0; i < bytes.length; i++) {
+      for (int i = 0; i < bytes.length; ++i) {
         assertEquals(expected[i], dnaValues[bytes[i]]);
       }
 
@@ -311,7 +311,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
       bytes = new byte[expected.length];
       it.readCurrent(bytes, 4, expected.length);
       dnaValues = DNA.values();
-      for (int i = 0; i < bytes.length; i++) {
+      for (int i = 0; i < bytes.length; ++i) {
         assertEquals(expected[i], dnaValues[bytes[i]]);
       }
 
@@ -384,13 +384,13 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
     //check rolling works
     final byte[] expQualBytes = new byte[60];
     final StringBuilder quals = new StringBuilder();
-    for (int i = 0; i < expQualBytes.length; i++) {
+    for (int i = 0; i < expQualBytes.length; ++i) {
       expQualBytes[i] = (byte) (60 - i);
       quals.append((char) (60 - i + '!'));
     }
     final byte[] expDnaBytes = new byte[60];
     final StringBuilder dnas = new StringBuilder();
-    for (int i = 0; i < expDnaBytes.length; i++) {
+    for (int i = 0; i < expDnaBytes.length; ++i) {
       expDnaBytes[i] = (byte) DNA.A.ordinal();
       dnas.append(DNA.A.toString());
     }
@@ -446,23 +446,23 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
       final DNA[] expected1 = getExpected1();
       final DNA[] expected2 = getExpected2();
       dsr.read(0, bigenough);
-      for (int i = 0; i < expected0.length; i++) {
+      for (int i = 0; i < expected0.length; ++i) {
         assertEquals(expected0[i].ordinal(), bigenough[i]);
       }
       dsr.read(1, bigenough);
-      for (int i = 0; i < expected1.length; i++) {
+      for (int i = 0; i < expected1.length; ++i) {
         assertEquals(expected1[i].ordinal(), bigenough[i]);
       }
       dsr.read(1, bigenough, 8, expected1.length - 8);
-      for (int i = 8; i < expected1.length; i++) {
+      for (int i = 8; i < expected1.length; ++i) {
         assertEquals(String.valueOf(i), expected1[i].ordinal(), bigenough[i - 8]);
       }
       dsr.read(2, bigenough);
-      for (int i = 0; i < expected2.length; i++) {
+      for (int i = 0; i < expected2.length; ++i) {
         assertEquals(expected2[i].ordinal(), bigenough[i]);
       }
       dsr.read(1, notbigenough);
-      for (int i = 0; i < expected1.length; i++) {
+      for (int i = 0; i < expected1.length; ++i) {
         assertEquals(expected1[i].ordinal(), notbigenough[i]);
       }
       try {

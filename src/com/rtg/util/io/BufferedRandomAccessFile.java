@@ -124,7 +124,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
     }
     //System.err.print(off + " " + len + " : " + leftover + " = " + mBufferEnd + " - " + mBufferPos);
     //System.err.println("\tRead");
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < len; ++i) {
       final int c = this.read();
       if (c != -1) {
         b[off + i] = (byte) c;

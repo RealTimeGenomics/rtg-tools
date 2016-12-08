@@ -64,7 +64,7 @@ public class BedReaderTest extends TestCase {
       final File bedFile = FileUtils.stringToFile(BED_CONTENTS, new File(tempDir, "test.bed"));
       try (BedReader reader = new BedReader(new BufferedReader(new FileReader(bedFile)))) {
         assertEquals(5, reader.getHeader().getHeaderLines().length);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; ++i) {
           assertEquals(lines[i], reader.getHeader().getHeaderLines()[i]);
         }
         assertTrue(reader.hasNext());

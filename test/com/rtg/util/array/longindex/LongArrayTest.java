@@ -64,7 +64,7 @@ public class LongArrayTest extends AbstractLongIndexTest {
 
   public void testSerial() throws IOException {
     final LongArray la = new LongArray(10);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       la.set(i, i * 4 + 7);
     }
     final ByteArrayOutputStream out =  new ByteArrayOutputStream();
@@ -73,7 +73,7 @@ public class LongArrayTest extends AbstractLongIndexTest {
     final LongIndex index2 = LongCreate.loadIndex(new ObjectInputStream(in));
     assertTrue(index2 instanceof LongArray);
     assertEquals(la.length(), index2.length());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       assertEquals(la.get(i), index2.get(i));
     }
   }

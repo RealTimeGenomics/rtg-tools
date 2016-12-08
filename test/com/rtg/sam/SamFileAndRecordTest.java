@@ -130,7 +130,7 @@ public class SamFileAndRecordTest extends SkipInvalidRecordsIteratorTest {
         int c = 0;
         while (it.hasNext()) {
           it.next();
-          c++;
+          ++c;
         }
         assertEquals(4, c);
       }

@@ -118,7 +118,7 @@ public class SamFilterIterator implements RecordIterator<SAMRecord> {
         pullNextRecord();
         if (mNextRecord != null) {
           if (!mSamFilter.acceptRecord(mNextRecord)) {
-            mFilteredRecords++;
+            ++mFilteredRecords;
             continue;
           }
           break;
@@ -137,7 +137,7 @@ public class SamFilterIterator implements RecordIterator<SAMRecord> {
     }
     final SAMRecord ret = mNextRecord;
     mNextRecord = null;
-    mValidCount++;
+    ++mValidCount;
     return ret;
   }
 

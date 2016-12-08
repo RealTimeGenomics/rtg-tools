@@ -80,7 +80,7 @@ public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
 
     try {
       try (final VcfWriter w = getVcfWriter(head, fos)) {
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 10000; ++i) {
           w.write(rec);
         }
       }

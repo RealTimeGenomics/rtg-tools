@@ -44,7 +44,7 @@ public class MockVariant extends Variant {
 
   static Allele[] toAlleles(String seq, int start, int end, byte[][] alleles) {
     final Allele[] result = new Allele[alleles.length];
-    for (int i = 0; i < result.length; i++) {
+    for (int i = 0; i < result.length; ++i) {
       result[i] = alleles[i] == null ? null : new Allele(seq, start, end, alleles[i]);
     }
     return result;
@@ -89,7 +89,7 @@ public class MockVariant extends Variant {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getStart() + 1).append(":").append(getEnd() + 1).append(" ");
-    for (int i = 0; i < numAlleles(); i++) {
+    for (int i = 0; i < numAlleles(); ++i) {
       if (i > 0) {
         sb.append(":");
       }

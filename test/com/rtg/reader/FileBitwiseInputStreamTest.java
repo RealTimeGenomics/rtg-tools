@@ -47,7 +47,7 @@ public class FileBitwiseInputStreamTest extends TestCase {
   public void testSomeMethod() throws IOException {
     final PortableRandom pr = new PortableRandom(42);
     final byte[] b = new byte[1000000];
-    for (int i = 0; i < b.length; i++) {
+    for (int i = 0; i < b.length; ++i) {
       b[i] = (byte) pr.nextInt(5);
     }
     final BitwiseByteArray bwba = new BitwiseByteArray(b.length, 3);
@@ -58,13 +58,13 @@ public class FileBitwiseInputStreamTest extends TestCase {
         bwba.dumpCompressedValues(dos, b.length);
       }
       try (FileBitwiseInputStream fbs = new FileBitwiseInputStream(f, 3, b.length, true)) {
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; ++i) {
           final int pos = pr.nextInt(b.length);
           fbs.seek(pos);
           assertEquals(bwba.get(pos), (byte) fbs.read());
         }
         fbs.seek(0);
-        for (int i = 0; i < b.length; i++) {
+        for (int i = 0; i < b.length; ++i) {
           assertEquals(bwba.get(i), (byte) fbs.read());
         }
         fbs.seek(0);
@@ -72,7 +72,7 @@ public class FileBitwiseInputStreamTest extends TestCase {
         int pos1 = 0;
         int len;
         while ((len = fbs.read(buf, 0, buf.length)) > 0) {
-          for (int i = 0; i < len; i++) {
+          for (int i = 0; i < len; ++i) {
             assertEquals(bwba.get(pos1 + i), buf[i]);
           }
           pos1 += len;

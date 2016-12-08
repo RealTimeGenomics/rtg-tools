@@ -79,7 +79,7 @@ public class IntegerRangeTest extends TestCase {
   //WARNING: dangerous for large ranges - override as necessary
   private void check(final IntegerRange ir) {
     ir.integrity();
-    for (int i = ir.low(); i < ir.high(); i++) {
+    for (int i = ir.low(); i < ir.high(); ++i) {
       if (ir.hasInvalid() && i == ir.invalid()) {
         check(ir, i);
       } else {

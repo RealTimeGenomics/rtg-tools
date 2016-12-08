@@ -53,7 +53,7 @@ public class FormatInteger {
   public static String toBits(final long x) {
     final StringBuilder sb = new StringBuilder();
     long t = x;
-    for (int i = 0; i < 64; i++) {
+    for (int i = 0; i < 64; ++i) {
       if ((i & 7) == 0 && i > 0) {
         sb.append(":");
       }
@@ -100,7 +100,7 @@ public class FormatInteger {
     mLength = in;
     mPadding = new char[mLength];
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < mLength; i++) {
+    for (int i = 0; i < mLength; ++i) {
       mPadding[i] = ' ';
       sb.append(" ");
     }

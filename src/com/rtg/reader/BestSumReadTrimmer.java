@@ -62,7 +62,7 @@ public final class BestSumReadTrimmer implements ReadTrimmer {
     if (length > 0 && qualities[length - 1] < mQualityThreshold) {
       int bestSum = 0;
       int sum = 0;
-      for (int i = length - 1; i >= 0; i--) {
+      for (int i = length - 1; i >= 0; --i) {
         sum += mQualityThreshold - qualities[i];
         if (sum >= bestSum) {
           bestSum = sum;

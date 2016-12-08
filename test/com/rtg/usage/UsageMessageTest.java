@@ -99,7 +99,7 @@ public class UsageMessageTest extends TestCase {
   public void testCommandLineTrim() {
     final String onePart = "a quick brown fox\n jumps over the lazy dog\t repeat many many times";
     final StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 50; ++i) {
       sb.append(onePart);
     }
     assertTrue(sb.length() > 1000);

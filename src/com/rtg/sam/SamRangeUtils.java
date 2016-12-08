@@ -141,7 +141,7 @@ public final class SamRangeUtils {
   public static ReferenceRanges<String> createFullReferenceRanges(SequencesReader sequencesReader) throws IOException {
     final ReferenceRanges<String> rangeMap = new ReferenceRanges<>(false);
     final Map<String, Integer> idMap = new HashMap<>();
-    for (int k = 0; k < sequencesReader.numberSequences(); k++) {
+    for (int k = 0; k < sequencesReader.numberSequences(); ++k) {
       final int rlen = sequencesReader.length(k);
       if (rlen > 0) {
         final String name = sequencesReader.names().name(k);

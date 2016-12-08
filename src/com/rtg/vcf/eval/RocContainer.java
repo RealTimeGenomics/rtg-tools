@@ -189,7 +189,7 @@ public class RocContainer {
     } catch (IndexOutOfBoundsException ignored) {
     }
     if (Double.isNaN(score) || Double.isInfinite(score)) {
-      mNoScoreVariants++;
+      ++mNoScoreVariants;
     } else {
       final RocPoint point = new RocPoint(score, tpWeight, fpWeight, tpRaw);
       final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;

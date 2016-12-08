@@ -54,7 +54,7 @@ public class PrereadNames implements PrereadNamesInterface {
     long namesSoFar = 0;
     while (startFile < nameIndex.numberEntries() && namesSoFar + nameIndex.numberSequences(startFile) <= start) {
       namesSoFar += nameIndex.numberSequences(startFile);
-      startFile++;
+      ++startFile;
     }
     int k = startFile;
     File source;
@@ -88,7 +88,7 @@ public class PrereadNames implements PrereadNamesInterface {
         namesSoFar += length - 1;
         pointersList.add(pointers);
       }
-      k++;
+      ++k;
     }
     return firstPointer;
   }
@@ -117,7 +117,7 @@ public class PrereadNames implements PrereadNamesInterface {
     int count = 0;
     for (i = 0; i < pointerBytes.length - remaining; i += 4) {
       res[i / 4] = ByteArrayIOUtils.bytesToIntBigEndian(pointerBytes, i) - pointerOffset;
-      count++;
+      ++count;
     }
     return count;
   }
@@ -180,10 +180,10 @@ public class PrereadNames implements PrereadNamesInterface {
  @Override
   public long calcChecksum() {
     final PrereadHashFunction namef = new PrereadHashFunction();
-    for (int k = 0; k < mNames.size(); k++) {
+    for (int k = 0; k < mNames.size(); ++k) {
       final byte[] names = mNames.get(k);
       final int[] pointers = mPointers.get(k);
-      for (int iid = 0; iid < pointers.length - 1; iid++) {
+      for (int iid = 0; iid < pointers.length - 1; ++iid) {
         final int start = pointers[iid];
         // -1 below accounts for terminating nul byte
         final int end = pointers[iid + 1] - 1;
@@ -226,7 +226,7 @@ public class PrereadNames implements PrereadNamesInterface {
     // -1 below accounts for terminating nul byte
     final int end = mPointers.get(k)[iid + 1] - 1;
     final byte[] raw = mNames.get(k);
-    for (int i = mPointers.get(k)[iid]; i < end; i++) {
+    for (int i = mPointers.get(k)[iid]; i < end; ++i) {
       a.append((char) raw[i]);
     }
   }
@@ -253,7 +253,7 @@ public class PrereadNames implements PrereadNamesInterface {
     long namesSoFar = 0;
     while (startFile < nameIndex.numberEntries() && namesSoFar + nameIndex.numberSequences(startFile) <= start) {
       namesSoFar += nameIndex.numberSequences(startFile);
-      startFile++;
+      ++startFile;
     }
     int k = startFile;
     for (int[] pointerArray : pointers) {
@@ -265,7 +265,7 @@ public class PrereadNames implements PrereadNamesInterface {
         final int length = pointerArray[pointerArray.length - 1];
         names.add(suckDataIn(bis, length));
       }
-      k++;
+      ++k;
     }
   }
 
@@ -307,7 +307,7 @@ public class PrereadNames implements PrereadNamesInterface {
    */
   public static void main(String[] args) throws IOException {
     final PrereadNames names = new PrereadNames(new File(args[0]), LongRange.NONE);
-    for (int i = 0; i < names.length(); i++) {
+    for (int i = 0; i < names.length(); ++i) {
       System.out.println(i + ": " + names.name(i));
     }
   }

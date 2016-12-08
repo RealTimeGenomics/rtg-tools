@@ -78,7 +78,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     try (VcfSortRefiner reader = new VcfSortRefiner(VcfReader.openVcfReader(mInput, mRanges))) {
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
-        id++;
+        ++id;
 
         if (mPassOnly && rec.isFiltered()) {
           continue;
@@ -91,14 +91,14 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
         }
         if (mMaxLength > -1 && length > mMaxLength) {
           Diagnostic.userLog("Variant allele in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " has length (" + length + ") exceeding maximum allele length (" + mMaxLength + "), skipping.");
-          skipped++;
+          ++skipped;
           continue;
         }
         
         // Skip variants which end outside the length of the template sequence
         if (mTemplateLength >= 0 && rec.getEnd() > mTemplateLength) {
           Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " ends outside the length of the reference sequence (" + mTemplateLength + ").");
-          skipped++;
+          ++skipped;
           continue;
         }
 
@@ -113,7 +113,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           list.add(v);
         } catch (SkippedVariantException e) {
           Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " was skipped: " + e.getMessage());
-          skipped++;
+          ++skipped;
         }
       }
     }

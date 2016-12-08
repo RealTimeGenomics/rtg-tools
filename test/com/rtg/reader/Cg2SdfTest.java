@@ -117,7 +117,7 @@ public class Cg2SdfTest extends AbstractCliTest {
   }
 
   private void resetCounts(int[] counts) {
-    for (int i = 0; i < counts.length; i++) {
+    for (int i = 0; i < counts.length; ++i) {
       counts[i] = 0;
     }
   }

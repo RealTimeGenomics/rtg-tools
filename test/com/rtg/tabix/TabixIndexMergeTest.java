@@ -70,7 +70,7 @@ public class TabixIndexMergeTest extends TestCase {
     try {
       final ArrayList<File> files = new ArrayList<>();
       final ArrayList<Long> dataFileSizes = new ArrayList<>();
-      for (int i = 1; i <= 4; i++) {
+      for (int i = 1; i <= 4; ++i) {
         final String samFileName = String.format(SAM_FILES, i);
         final File samFile = new File(dir, samFileName);
         final File tbiFile = new File(dir, samFileName + ".tbi");

@@ -71,7 +71,7 @@ public class TaxonomyTest extends TestCase {
   public Taxonomy makeTaxonomy() {
     final Taxonomy tax = new Taxonomy();
     tax.addNode(1, -1, "root", "root");
-    for (int i = 2; i <= 10; i++) {
+    for (int i = 2; i <= 10; ++i) {
       tax.addNode(i, (i - 2) / 3 + 1, "node" + i, "rank" + i);
     }
     assertEquals(10, tax.size());
@@ -103,7 +103,7 @@ public class TaxonomyTest extends TestCase {
         assertEquals(-1, tn.getParentId());
         assertNull(tn.getParent());
       }
-      i++;
+      ++i;
     }
     assertTrue(tax.isConsistent());
   }
@@ -170,7 +170,7 @@ public class TaxonomyTest extends TestCase {
       assertTrue(tax1.contains(1));
 
       final ArrayList<Integer> ids = new ArrayList<>();
-      for (int id = 156657; id <= 156666; id++) {
+      for (int id = 156657; id <= 156666; ++id) {
         ids.add(id);
         assertTrue(tax1.contains(id));
       }
@@ -206,7 +206,7 @@ public class TaxonomyTest extends TestCase {
     tax.addNode(1, -1, "root", "root");
     assertTrue(tax.isConsistent());
 
-    for (int i = 10; i >= 3; i--) {
+    for (int i = 10; i >= 3; --i) {
       final int parId = (i - 2) / 3 + 1;
       tax.addNode(i, parId, "node" + i, "rank" + i);
       assertFalse("i:" + i, tax.isConsistent());
@@ -230,7 +230,7 @@ public class TaxonomyTest extends TestCase {
         assertEquals(-1, tn.getParentId());
         assertNull(tn.getParent());
       }
-      i++;
+      ++i;
     }
     assertTrue(tax.isConsistent());
 

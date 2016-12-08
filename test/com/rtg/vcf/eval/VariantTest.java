@@ -230,7 +230,7 @@ public class VariantTest extends TestCase {
   private void checkArray(byte[] a, byte[] b) {
     final String fail = "expected <" + Arrays.toString(a) + "> but was :<" + Arrays.toString(b) + ">";
     assertEquals(fail, a.length, b.length);
-    for (int i = 0; i < a.length; i++) {
+    for (int i = 0; i < a.length; ++i) {
       assertEquals(fail, a[i], b[i]);
     }
   }

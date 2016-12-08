@@ -71,7 +71,7 @@ public class GenericPositionReaderTest extends TestCase {
         assertEquals("simulatedSequence1", gpr.getReferenceName());
         assertEquals(pos[i], gpr.getStartPosition());
         assertEquals(len[i], gpr.getLengthOnReference());
-        i++;
+        ++i;
       }
       assertEquals(2, i);
     }

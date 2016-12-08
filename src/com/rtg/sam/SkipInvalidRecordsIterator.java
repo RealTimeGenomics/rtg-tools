@@ -135,7 +135,7 @@ public class SkipInvalidRecordsIterator extends AbstractSamRecordIterator {
   }
 
   private void maybeWarn(Throwable t) {
-    mNumInvalidRecords++;
+    ++mNumInvalidRecords;
     if (!mSilent && mNumInvalidRecords <= NUM_RECORDS_TO_WARN) {
       Diagnostic.warning(WarningType.SAM_BAD_FORMAT_WARNING, mPath, LS + t.getMessage() + " at data line " + mRecordCount);
     }
@@ -143,7 +143,7 @@ public class SkipInvalidRecordsIterator extends AbstractSamRecordIterator {
 
   private void nextRecord() {
     while (mWrapped.hasNext()) {
-      mRecordCount++;
+      ++mRecordCount;
       try {
         final SAMRecord current = mWrapped.next();
         if (current != null) {
@@ -153,7 +153,7 @@ public class SkipInvalidRecordsIterator extends AbstractSamRecordIterator {
             return;
           } else {
             // invalid records but we continue
-            mNumInvalidRecords++;
+            ++mNumInvalidRecords;
             if (!mSilent && mNumInvalidRecords <= NUM_RECORDS_TO_WARN) {
 
               final List<SAMValidationError> valid = current.isValid();

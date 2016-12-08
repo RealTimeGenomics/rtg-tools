@@ -96,7 +96,7 @@ public class SimplePrereadNames implements PrereadNamesInterface {
   @Override
   public long calcChecksum() {
     final PrereadHashFunction namef = new PrereadHashFunction();
-    for (long k = 0; k < length(); k++) {
+    for (long k = 0; k < length(); ++k) {
       final byte[] name = getNameBytes(k);
       namef.irvineHash(name);
       namef.irvineHash(name.length);

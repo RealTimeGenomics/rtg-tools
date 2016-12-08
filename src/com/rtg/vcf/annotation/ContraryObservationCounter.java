@@ -87,7 +87,7 @@ class ContraryObservationCounter {
   void initSampleInfo(final VcfHeader header) {
     mHeader = header;
     mSampleToAntecedents = new ArrayList<>(header.getNumberOfSamples());
-    for (int k = 0; k < header.getNumberOfSamples(); k++) {
+    for (int k = 0; k < header.getNumberOfSamples(); ++k) {
       mSampleToAntecedents.add(new ArrayList<>());
     }
     final List<PedigreeField> pedigreeLines = mHeader.getPedigreeLines();
@@ -124,7 +124,7 @@ class ContraryObservationCounter {
     final String ad = record.getSampleString(sample, VcfUtils.FORMAT_ALLELIC_DEPTH);
     if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
-      for (int k = 0; k < res.length; k++) {
+      for (int k = 0; k < res.length; ++k) {
         res[k] += Integer.parseInt(adSplit[k]);
       }
     }
@@ -203,7 +203,7 @@ class ContraryObservationCounter {
     double derivedContraryFraction = 0.0;
     int origContraryCount = 0;
     double origContraryFraction = 0.0;
-    for (int k = 0; k < originalAlleles.length; k++) {
+    for (int k = 0; k < originalAlleles.length; ++k) {
       if (originalAlleles[k] && !derivedAlleles[k]) {
         derivedContraryCount += derivedAd[k];
         derivedContraryFraction += derivedAd[k] * invDerivedAdSum;

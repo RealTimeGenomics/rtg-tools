@@ -236,7 +236,7 @@ public class FastaSequenceDataSourceTest extends TestCase {
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
     assertEquals(bad.length(), ds.currentLength());
-    for (int i = 0; i < bad.length(); i++) {
+    for (int i = 0; i < bad.length(); ++i) {
       assertEquals("" + i, DNA.N.ordinal(), b[i]);
     }
     assertFalse(ds.nextSequence());
@@ -288,13 +288,13 @@ public class FastaSequenceDataSourceTest extends TestCase {
 
     byte[] b = ds.sequenceData();
     assertEquals(expected.length, ds.currentLength());
-    for (int i = 0; i < expected.length; i++) {
+    for (int i = 0; i < expected.length; ++i) {
       assertEquals(expected[i].ordinal(), b[i]);
     }
     assertTrue(ds.nextSequence());
     b = ds.sequenceData();
     assertEquals(expected2.length, ds.currentLength());
-    for (int i = 0; i < expected2.length; i++) {
+    for (int i = 0; i < expected2.length; ++i) {
       assertEquals(expected2[i].ordinal(), b[i]);
     }
     assertFalse(ds.nextSequence());
@@ -331,12 +331,12 @@ public class FastaSequenceDataSourceTest extends TestCase {
       assertEquals(Protein.values().length + 1, ds.currentLength());
       int i = 0;
       int j = 0;
-      for (; i < Protein.values().length; i++) {
+      for (; i < Protein.values().length; ++i) {
         if (Protein.values()[i].equals(Protein.STOP)) {
           continue;
         }
         assertEquals(Protein.values()[i].ordinal(), b[j]);
-        j++;
+        ++j;
       }
       assertEquals(Protein.X.ordinal(), b[i + 1]);
       assertEquals(Protein.X.ordinal(), b[i + 2]);
@@ -420,7 +420,7 @@ public class FastaSequenceDataSourceTest extends TestCase {
         {DNA.C, DNA.A, DNA.T, DNA.G},
         {DNA.T, DNA.T, DNA.T, DNA.T}};
     final String[] labels = {"test", "hobo", "more", "again"};
-    for (int i = 0; i < labels.length; i++) {
+    for (int i = 0; i < labels.length; ++i) {
       assertTrue(ds.nextSequence());
       assertEquals(labels[i], ds.name());
       final byte[] b = ds.sequenceData();

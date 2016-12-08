@@ -68,7 +68,7 @@ public class AdjustableGZIPOutputStreamTest extends TestCase {
     // now check that levels 1..3 of compression give decreasing sizes.
     long size = contents.length();
     long size2 = 0;
-    for (int level = 1; level <= 3; level++) {
+    for (int level = 1; level <= 3; ++level) {
       final long compressedSize = compress(contents, level);
       //System.out.println("level " + level + " compresses to " + compressedSize + " bytes");
       assertTrue(compressedSize < size);
@@ -105,7 +105,7 @@ public class AdjustableGZIPOutputStreamTest extends TestCase {
 
     // now check that decompressing gives the original contents
     final InputStream in = new WorkingGzipInputStream(new ByteArrayInputStream(bytes));
-    for (int i = 0; i < contents.length(); i++) {
+    for (int i = 0; i < contents.length(); ++i) {
       assertEquals(contents.charAt(i), in.read());
     }
     assertEquals(-1, in.read());
@@ -117,7 +117,7 @@ public class AdjustableGZIPOutputStreamTest extends TestCase {
         "a", "medium", "level", "of", "randomness!"};
     final StringBuilder builder = new StringBuilder();
     final PortableRandom ran = new PortableRandom(42);
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 1000; ++i) {
       final String word = words[ran.nextInt(words.length)];
       builder.append(word);
     }

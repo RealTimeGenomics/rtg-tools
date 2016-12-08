@@ -177,7 +177,7 @@ public class BlockCompressedLineReader implements LineReader {
           mLineFilePointer = mFilePointer;
           mFilePointer = mPos == mBufferUsed ? mStream.getFilePointer() : mBufferFilePointer + mPos;
           //return successful
-          mLineNumber++;
+          ++mLineNumber;
           return ret;
         }
       }

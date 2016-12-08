@@ -328,7 +328,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     long retLength = 0;
     int startFileNo = -1;
     int endFileNo = -1;
-    for (int i = 0; i < numSequences.length; i++) {
+    for (int i = 0; i < numSequences.length; ++i) {
       if (i > 0) {
         numSequences[i] = numSequences[i - 1] + dataIndex.numberSequences(i);
       } else {
@@ -398,7 +398,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     final long[] numSequences = new long[dataIndex.numberEntries()]; //mSequenceManager.sequenceIndex();
     int startFileNo = -1;
     int endFileNo = -1;
-    for (int i = 0; i < numSequences.length; i++) {
+    for (int i = 0; i < numSequences.length; ++i) {
       if (i > 0) {
         numSequences[i] = numSequences[i - 1] + dataIndex.numberSequences(i);
       } else {
@@ -419,7 +419,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     final long startLower = startFileNo == 0 ? 0 : numSequences[startFileNo - 1];
     final long endLower = endFileNo < 1 ? 0 : numSequences[endFileNo - 1];
     int seqNo = 0;
-    for (int i = startFileNo; (endFileNo == -1 || i <= endFileNo) && i < numSequences.length; i++) {
+    for (int i = startFileNo; (endFileNo == -1 || i <= endFileNo) && i < numSequences.length; ++i) {
       try (RandomAccessFile raf = new RandomAccessFile(SdfFileUtils.sequencePointerFile(mDirectory, i), "r")) {
         final long pos;
         if (i == startFileNo) {
@@ -491,19 +491,19 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
       final int mod = length % entrySize;
       final int effLength = mod == 0 ? length : length - mod;
       int seqLimit = seqNo;
-      for (int i = 0; i < effLength / entrySize; i++) {
+      for (int i = 0; i < effLength / entrySize; ++i) {
         lengths[seqLimit++] = ByteArrayIOUtils.bytesToIntBigEndian(buffer, i * entrySize + (entrySize - 4));
       }
       //final int seqLimit = ByteArrayIOUtils.convertToIntInLongArray(buffer, 0, effLength, lengths, seqNo, lengths.length) + seqNo;
       if (seqNo == 0 && seqLimit > 0) {
         seqNo = 1;
       }
-      for (; seqNo < seqLimit; seqNo++) {
+      for (; seqNo < seqLimit; ++seqNo) {
         lengths[seqNo - 1] = lengths[seqNo] - lengths[seqNo - 1];
       }
       //adjust buffer if we didn't read multiple of 4 bytes
       bufStart = 0;
-      for (int j = effLength; j < length; j++, bufStart++) {
+      for (int j = effLength; j < length; ++j, ++bufStart) {
         buffer[bufStart] = buffer[j];
       }
     }

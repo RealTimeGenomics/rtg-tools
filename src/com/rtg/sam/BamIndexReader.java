@@ -65,7 +65,7 @@ public class BamIndexReader extends AbstractIndexReader {
       if (len != FIXED_HEADER_SIZE) {
         throw new EOFException("File: " + indexFile.getPath() + " is not a valid BAM index. (index does not have a complete header)");
       }
-      for (int i = 0; i < BAI_MAGIC.length; i++) {
+      for (int i = 0; i < BAI_MAGIC.length; ++i) {
         if (BAI_MAGIC[i] != buf[i]) {
           throw new IOException("File: " + indexFile.getPath() + " is not a valid BAI index. (index does not have a valid header)");
         }
@@ -77,7 +77,7 @@ public class BamIndexReader extends AbstractIndexReader {
 
       mSequenceNames = new String[numRefs];
       mSequenceLookup = new HashMap<>();
-      for (int i = 0; i < dict.size(); i++) {
+      for (int i = 0; i < dict.size(); ++i) {
         mSequenceNames[i] = dict.getSequence(i).getSequenceName();
         mSequenceLookup.put(mSequenceNames[i], i);
       }
@@ -86,12 +86,12 @@ public class BamIndexReader extends AbstractIndexReader {
       mLinearIndexPositions = new long[numRefs];
       long pos = FIXED_HEADER_SIZE;
       final byte[] bBuf = new byte[8];
-      for (; seqNo < numRefs; seqNo++) {
+      for (; seqNo < numRefs; ++seqNo) {
         mBinPositions[seqNo] = pos;
         IOUtils.readFully(is, bBuf, 0, 4);
         pos += 4;
         final int numBins = ByteArrayIOUtils.bytesToIntLittleEndian(bBuf, 0);
-        for (int i = 0; i < numBins; i++) {
+        for (int i = 0; i < numBins; ++i) {
           IOUtils.readFully(is, bBuf, 0, 8);
           pos += 8;
           final int numChunks = ByteArrayIOUtils.bytesToIntLittleEndian(bBuf, 4);

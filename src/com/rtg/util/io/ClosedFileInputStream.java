@@ -154,7 +154,7 @@ public final class ClosedFileInputStream extends htsjdk.samtools.seekablestream.
     if (mBufferPos == mBufferInUse) {
       fillBuffer();
     }
-    mFilePointer++;
+    ++mFilePointer;
     return mBuffer[mBufferPos++] & 0xff;
   }
 
@@ -163,7 +163,7 @@ public final class ClosedFileInputStream extends htsjdk.samtools.seekablestream.
     mBufferInUse = 0;
     try (RandomAccessFile raf = new RandomAccessFile(mFile, "r")) {
       raf.seek(mFilePointer);
-      mDiskSeeksDone++;
+      ++mDiskSeeksDone;
       int len;
       while (mBufferInUse != mBuffer.length && (len = raf.read(mBuffer, mBufferInUse, mBuffer.length - mBufferInUse)) != -1) {
         mBufferInUse += len;

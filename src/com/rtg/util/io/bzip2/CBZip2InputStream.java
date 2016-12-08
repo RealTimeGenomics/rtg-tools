@@ -77,7 +77,7 @@ public class CBZip2InputStream extends InputStream {
 
         int nInUseShadow = 0;
 
-        for (int i = 0; i < 256; i++) {
+        for (int i = 0; i < 256; ++i) {
           if (inUse[i]) {
             seqToUnseq[nInUseShadow++] = (byte) i;
           }
@@ -469,8 +469,8 @@ public class CBZip2InputStream extends InputStream {
                                              final int minLen,
                                              final int maxLen,
                                              final int alphaSize) {
-        for (int i = minLen, pp = 0; i <= maxLen; i++) {
-            for (int j = 0; j < alphaSize; j++) {
+        for (int i = minLen, pp = 0; i <= maxLen; ++i) {
+            for (int j = 0; j < alphaSize; ++j) {
                 if (length[j] == i) {
                     perm[pp++] = j;
                 }
@@ -482,16 +482,16 @@ public class CBZip2InputStream extends InputStream {
             limit[i] = 0;
         }
 
-        for (int i = 0; i < alphaSize; i++) {
+        for (int i = 0; i < alphaSize; ++i) {
             base[length[i] + 1]++;
         }
 
-        for (int i = 1, b = base[0]; i < MAX_CODE_LEN; i++) {
+        for (int i = 1, b = base[0]; i < MAX_CODE_LEN; ++i) {
             b += base[i];
             base[i] = b;
         }
 
-        for (int i = minLen, vec = 0, b = base[i]; i <= maxLen; i++) {
+        for (int i = minLen, vec = 0, b = base[i]; i <= maxLen; ++i) {
             final int nb = base[i + 1];
             vec += nb - b;
             b = nb;
@@ -499,7 +499,7 @@ public class CBZip2InputStream extends InputStream {
             vec <<= 1;
         }
 
-        for (int i = minLen + 1; i <= maxLen; i++) {
+        for (int i = minLen + 1; i <= maxLen; ++i) {
             base[i] = ((limit[i - 1] + 1) << 1) - base[i];
         }
     }
@@ -514,7 +514,7 @@ public class CBZip2InputStream extends InputStream {
         int inUse16 = 0;
 
         /* Receive the mapping table */
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; ++i) {
             if (bsGetBit()) {
                 inUse16 |= 1 << i;
             }
@@ -524,10 +524,10 @@ public class CBZip2InputStream extends InputStream {
             inUse[i] = false;
         }
 
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < 16; ++i) {
             if ((inUse16 & (1 << i)) != 0) {
                 final int i16 = i << 4;
-                for (int j = 0; j < 16; j++) {
+                for (int j = 0; j < 16; ++j) {
                     if (bsGetBit()) {
                         inUse[i16 + j] = true;
                     }
@@ -542,10 +542,10 @@ public class CBZip2InputStream extends InputStream {
         final int nGroups = bsR(3);
         final int nSelectors = bsR(15);
 
-        for (int i = 0; i < nSelectors; i++) {
+        for (int i = 0; i < nSelectors; ++i) {
             int j = 0;
             while (bsGetBit()) {
-                j++;
+                ++j;
             }
             selectorMtf[i] = (byte) j;
         }
@@ -555,13 +555,13 @@ public class CBZip2InputStream extends InputStream {
             pos[v] = (byte) v;
         }
 
-        for (int i = 0; i < nSelectors; i++) {
+        for (int i = 0; i < nSelectors; ++i) {
             int v = selectorMtf[i] & 0xff;
             final byte tmp = pos[v];
             while (v > 0) {
                 // nearly all times v is zero, 4 in most other cases
                 pos[v] = pos[v - 1];
-                v--;
+                --v;
             }
             pos[0] = tmp;
             selector[i] = tmp;
@@ -570,10 +570,10 @@ public class CBZip2InputStream extends InputStream {
         final char[][] len  = dataShadow.mTemp_charArray2d;
 
         /* Now the coding tables */
-        for (int t = 0; t < nGroups; t++) {
+        for (int t = 0; t < nGroups; ++t) {
             int curr = bsR(5);
             final char[] lenT = len[t];
-            for (int i = 0; i < alphaSize; i++) {
+            for (int i = 0; i < alphaSize; ++i) {
                 while (bsGetBit()) {
                     curr += bsGetBit() ? -1 : 1;
                 }
@@ -597,7 +597,7 @@ public class CBZip2InputStream extends InputStream {
         final int[][] base  = dataShadow.mBase;
         final int[][] perm  = dataShadow.mPerm;
 
-        for (int t = 0; t < nGroups; t++) {
+        for (int t = 0; t < nGroups; ++t) {
             int minLen = 32;
             int maxLen = 0;
             final char[] lenT = len[t];
@@ -678,7 +678,7 @@ public class CBZip2InputStream extends InputStream {
                         permZt     = perm[zt];
                         minLensZt  = minLens[zt];
                     } else {
-                        groupPos--;
+                        --groupPos;
                     }
 
                     int zn = minLensZt;
@@ -699,7 +699,7 @@ public class CBZip2InputStream extends InputStream {
                     bsLiveShadow -= zn;
 
                     while (zvec > limitZt[zn]) {
-                        zn++;
+                        ++zn;
                         while (bsLiveShadow < 1) {
                             final int thech = inShadow.read();
                             if (thech >= 0) {
@@ -710,7 +710,7 @@ public class CBZip2InputStream extends InputStream {
                                 throw new IOException("unexpected end of stream");
                             }
                         }
-                        bsLiveShadow--;
+                        --bsLiveShadow;
                         zvec = (zvec << 1) | ((bsBuffShadow >> bsLiveShadow) & 1);
                     }
                     nextSym = permZt[zvec - baseZt[zn]];
@@ -758,7 +758,7 @@ public class CBZip2InputStream extends InputStream {
                     permZt     = perm[zt];
                     minLensZt  = minLens[zt];
                 } else {
-                    groupPos--;
+                    --groupPos;
                 }
 
                 int zn = minLensZt;
@@ -779,7 +779,7 @@ public class CBZip2InputStream extends InputStream {
                 bsLiveShadow -= zn;
 
                 while (zvec > limitZt[zn]) {
-                    zn++;
+                    ++zn;
                     while (bsLiveShadow < 1) {
                         final int thech = inShadow.read();
                         if (thech >= 0) {
@@ -790,7 +790,7 @@ public class CBZip2InputStream extends InputStream {
                             throw new IOException("unexpected end of stream");
                         }
                     }
-                    bsLiveShadow--;
+                    --bsLiveShadow;
                     zvec = (zvec << 1) | ((bsBuffShadow >> bsLiveShadow) & 1);
                 }
                 nextSym = permZt[zvec - baseZt[zn]];
@@ -814,7 +814,7 @@ public class CBZip2InputStream extends InputStream {
         int bsBuffShadow = this.mBsBuff;
 
         while (zvec > limitZt[zn]) {
-            zn++;
+            ++zn;
             while (bsLiveShadow < 1) {
                 final int thech = inShadow.read();
 
@@ -826,7 +826,7 @@ public class CBZip2InputStream extends InputStream {
                     throw new IOException("unexpected end of stream");
                 }
             }
-            bsLiveShadow--;
+            --bsLiveShadow;
             zvec = (zvec << 1) | ((bsBuffShadow >> bsLiveShadow) & 1);
         }
 
@@ -847,12 +847,12 @@ public class CBZip2InputStream extends InputStream {
         cftab[0] = 0;
         System.arraycopy(this.mData.mUnzftab, 0, cftab, 1, 256);
 
-        for (int i = 1, c = cftab[0]; i <= 256; i++) {
+        for (int i = 1, c = cftab[0]; i <= 256; ++i) {
             c += cftab[i];
             cftab[i] = c;
         }
         final int lastShadow = this.mLast;
-        for (int i = 0; i <= lastShadow; i++) {
+        for (int i = 0; i <= lastShadow; ++i) {
             tt[cftab[ll8[i] & 0xff]++] = i;
         }
 

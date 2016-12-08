@@ -217,9 +217,9 @@ public final class PathFinder {
   private void skipVariantsTo(HalfPath path, Variant[] variants, int maxPos) {
     int varIndex = path.getVariantIndex();
     while (varIndex < variants.length && (varIndex == -1 || variants[varIndex].getStart() < maxPos)) {
-      varIndex++;
+      ++varIndex;
     }
-    varIndex--;
+    --varIndex;
     Diagnostic.developerLog("Skipped to maxPos: " + maxPos + ". Variant index " + path.getVariantIndex() + " -> " + varIndex);
     path.setVariantIndex(varIndex);
     path.moveForward(Math.min(maxPos, mTemplate.length - 1));

@@ -105,7 +105,7 @@ public class SequenceIndex {
   void setLinearIndex(final int chunk, final long virtualOffset, int minBin) {
     if (chunk > minBin) {
       if (mPreviousChunk != -1) {
-        for (int i = mPreviousChunk + 1; i < chunk; i++) {
+        for (int i = mPreviousChunk + 1; i < chunk; ++i) {
           setLinearIndexInternal(i, mPreviousOffset);
         }
       }
@@ -134,7 +134,7 @@ public class SequenceIndex {
   }
 
   void addLinearIndex(SequenceIndex other) {
-    for (int i = 0; i < other.mLinearSize; i++) {
+    for (int i = 0; i < other.mLinearSize; ++i) {
       setLinearIndex(i, other.mLinearIndex[i], -1);
     }
   }

@@ -118,7 +118,7 @@ public final class RocSlope {
           }
         }
       }
-      for (int i = 1; i < stack.size(); i++) {
+      for (int i = 1; i < stack.size(); ++i) {
         final Container c1 = stack.get(i);
         final double slope = c1.slope();
         final double posterior = c1.mFirstPosterior;
@@ -133,7 +133,7 @@ public final class RocSlope {
         }
       }
       //       out.println();
-      //       for (int i = 1; i < stack.size(); i++) {
+      //       for (int i = 1; i < stack.size(); ++i) {
       //         final Container c1 = stack.get(i);
       //         out.println(Utils.realFormat(c1.mLastPosterior, 2) + "\t" + Utils.realFormat(c1.slope(), 2));
       //       }

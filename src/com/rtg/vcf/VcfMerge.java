@@ -250,7 +250,7 @@ public class VcfMerge extends AbstractCli {
       VcfHeader current = null;
       int numSamples = 0;
       boolean warnNumSamples = true;
-      for (int i = 0; i < mFiles.length; i++) {
+      for (int i = 0; i < mFiles.length; ++i) {
         final File file = mFiles[i];
         try (VcfReader vr = new VcfReader(new BufferedReader(new InputStreamReader(GzipUtils.createGzipInputStream(new FileInputStream(file)))))) {
           mHeaders[i] = vr.getHeader();
@@ -273,7 +273,7 @@ public class VcfMerge extends AbstractCli {
           chroms.add(cf.getId());
         }
       }
-      for (int i = 0; i < vcfFiles.length; i++) {
+      for (int i = 0; i < vcfFiles.length; ++i) {
         final File vcfFile = vcfFiles[i];
         final File index = TabixIndexer.indexFileName(vcfFile);
         if (!TabixIndexer.isBlockCompressed(vcfFile)) {
@@ -318,7 +318,7 @@ public class VcfMerge extends AbstractCli {
       while (!recordActive && mCurrentRegion < mRegions.length) {
         int minPos = Integer.MAX_VALUE;
 
-        for (int i = 0; i < mReaders.length; i++) {
+        for (int i = 0; i < mReaders.length; ++i) {
           if (mReaders[i] == null) {
             mReaders[i] = new VcfReader(new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mHeaders[i]);
           }
@@ -335,8 +335,8 @@ public class VcfMerge extends AbstractCli {
           }
         }
         if (!recordActive) {
-          mCurrentRegion++;
-          for (int i = 0; i < mReaders.length; i++) {
+          ++mCurrentRegion;
+          for (int i = 0; i < mReaders.length; ++i) {
             if (mReaders[i] != null) {
               mReaders[i].close();
             }

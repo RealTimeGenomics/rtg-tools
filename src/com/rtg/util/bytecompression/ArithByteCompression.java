@@ -89,7 +89,7 @@ public class ArithByteCompression extends IntegralAbstract implements ByteCompre
     } else {
       mInitial.add(buffer, offset, length);
       mBuilder.add(buffer, offset, length);
-      mCountBlocks++;
+      ++mCountBlocks;
       mCount += length;
       if (mCount >= mInitialCount) {
         pack();
@@ -103,7 +103,7 @@ public class ArithByteCompression extends IntegralAbstract implements ByteCompre
     mBuilder = null;
     mPointers.append(mEncoder.endBlock());
     byte[] buf = new byte[0];
-    for (int i = 0; i < mCountBlocks; i++) {
+    for (int i = 0; i < mCountBlocks; ++i) {
       final int length = mInitial.length(i);
       if (buf.length < length) {
         buf = new byte[length];
@@ -115,7 +115,7 @@ public class ArithByteCompression extends IntegralAbstract implements ByteCompre
   }
 
   private void addComp(byte[] buffer, int offset, int length) {
-    for (int j = offset; j < offset + length; j++) {
+    for (int j = offset; j < offset + length; ++j) {
       mModel.encode(mEncoder, buffer[j]);
     }
     mPointers.append(mEncoder.endBlock());
@@ -128,7 +128,7 @@ public class ArithByteCompression extends IntegralAbstract implements ByteCompre
     } else {
       final InputBytes ib = new InputBytes(mBytes, mPointers.get(index), mPointers.get(index + 1));
       final ArithDecoder de = new ArithDecoder(ib);
-      for (int j = 0; j < offset + length; j++) {
+      for (int j = 0; j < offset + length; ++j) {
         final int sym = mModel.decode(de);
         if (j >= offset) {
           buffer[j - offset] = (byte) sym;

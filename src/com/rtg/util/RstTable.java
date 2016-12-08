@@ -103,7 +103,7 @@ public class RstTable {
     if (text.length != mWidths.length) {
       throw new IllegalArgumentException("Expected " + mWidths.length + " columns, got " + text.length);
     }
-    for (int i = 0; i < text.length; i++) {
+    for (int i = 0; i < text.length; ++i) {
       if (text[i].length() > mWidths[i]) {
         System.err.println("Arrays.toString(mWidths) = " + Arrays.toString(mWidths));
         System.err.println("Arrays.toString(text) = " + Arrays.toString(text));

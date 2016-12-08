@@ -69,7 +69,7 @@ public class IOUtilsTest extends TestCase {
 
   private void checkBytes(final byte[] s, final byte[] bres) {
     assertEquals(s.length, bres.length);
-    for (int i = 0; i < s.length; i++) {
+    for (int i = 0; i < s.length; ++i) {
       assertEquals(s[i], bres[i]);
     }
   }

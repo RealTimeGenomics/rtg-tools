@@ -216,7 +216,7 @@ public class Flag implements Comparable<Flag> {
         final Object[] ret = (Object[]) m.invoke(null);
         final String[] res = new String[ret.length];
 
-        for (int i = 0; i < ret.length; i++) {
+        for (int i = 0; i < ret.length; ++i) {
           res[i] = ret[i].toString().toLowerCase(Locale.getDefault()); // List enums as lowercase by default
         }
         return res;
@@ -666,7 +666,7 @@ public class Flag implements Comparable<Flag> {
 
     final String usageStr = getFlagUsage();
     wb.append(getFlagUsage());
-    for (int i = 0; i < longestUsageLength - usageStr.length(); i++) {
+    for (int i = 0; i < longestUsageLength - usageStr.length(); ++i) {
       wb.append(" ");
     }
     wb.append(" ");

@@ -116,7 +116,7 @@ public final class MultiFamilyOrdering {
             final String lookupName = genNextFamily.getFather() + " " + genNextFamily.getMother();
             parentPairToFamily.put(lookupName, genNextFamily);
             int count = parentPairCounts.get(lookupName);
-            count++;
+            ++count;
             parentPairCounts.put(lookupName, count);
           }
         }
@@ -143,7 +143,7 @@ public final class MultiFamilyOrdering {
           for (Family genNextFamily : genNextFamilies) {
             final String lookupName = genNextFamily.getFather() + " " + genNextFamily.getMother();
             int count = parentPairCounts.get(lookupName);
-            count--;
+            --count;
             if (count == 0) {
               zeroAncestors.add(genNextFamily);
               parentPairCounts.remove(lookupName);

@@ -165,7 +165,7 @@ public class SequencesWriter {
     //filtering, not related to format of data
     for (final String s : mNamesToExclude) {
       if (label.contains(s)) {
-        mExcludedSequencesCount++;
+        ++mExcludedSequencesCount;
         mExcludedResiduesCount += mDataSource.currentLength();
         return;
       }

@@ -45,7 +45,7 @@ public abstract class PointerFileLookup {
   private PointerFileLookup(int[][] pointers) {
     mStartSeqs = new int[pointers.length];
     int startSeq = 0;
-    for (int i = 0; i < mStartSeqs.length; i++) {
+    for (int i = 0; i < mStartSeqs.length; ++i) {
       mStartSeqs[i] = startSeq;
       startSeq += pointers[i].length - 1;
     }
@@ -111,7 +111,7 @@ public abstract class PointerFileLookup {
       super(pointers);
       mLookup = new int[pointers.length];
       int tot = 0;
-      for (int i = 0; i < pointers.length; i++) {
+      for (int i = 0; i < pointers.length; ++i) {
         mLookup[i] = tot;
         tot += pointers[i].length - 1;
       }
@@ -122,7 +122,7 @@ public abstract class PointerFileLookup {
       int i = Arrays.binarySearch(mLookup, sequenceId);
       if (i >= 0) {
         while (i < mLookup.length && mLookup[i] == sequenceId) {
-          i++;
+          ++i;
         }
         return i - 1;
       } else {

@@ -123,7 +123,7 @@ class VcfFilterTask {
       mSampleFailed = new boolean[header.getNumberOfSamples()];
       if (mAllSamples) {
         mSampleIndexes = new int[header.getNumberOfSamples()];
-        for (int i = 0; i < mSampleIndexes.length; i++) {
+        for (int i = 0; i < mSampleIndexes.length; ++i) {
           mSampleIndexes[i] = i;
         }
       } else if (mSampleNames.size() == 0) {
@@ -359,7 +359,7 @@ class VcfFilterTask {
 
   boolean allSameAsRef(VcfRecord record) {
     if (mRemoveAllSameAsRef) {
-      for (int sampleIndex = 0; sampleIndex < record.getNumberOfSamples(); sampleIndex++) {
+      for (int sampleIndex = 0; sampleIndex < record.getNumberOfSamples(); ++sampleIndex) {
         final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
         if (sampleGts == null) {
           throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());

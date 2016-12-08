@@ -176,7 +176,7 @@ public abstract class VcfSampleFilter extends AbstractVcfFilter {
       if (isDenovo(record, sampleIndex)) {
         if (withinScoreCriteria(record, sampleIndex)) {
           boolean result = true;
-          for (int i = 0; i < record.getNumberOfSamples(); i++) {
+          for (int i = 0; i < record.getNumberOfSamples(); ++i) {
             if (i != sampleIndex
               && isDenovo(record, i)
               && withinScoreCriteria(record, i)) {

@@ -90,9 +90,9 @@ public class ArithTest extends TestCase {
     final Random randi = new Random(seedi);
     final Random randj = new Random(seedj);
     final int[][] ra = new int[blocks][];
-    for (int i = 0; i < ra.length; i++) {
+    for (int i = 0; i < ra.length; ++i) {
       ra[i] = new int[randi.nextInt(50)];
-      for (int j = 0; j < ra[i].length; j++) {
+      for (int j = 0; j < ra[i].length; ++j) {
         ra[i][j] = randj.nextInt(range);
       }
     }
@@ -101,22 +101,22 @@ public class ArithTest extends TestCase {
     final ArithEncoder en = new ArithEncoder(new OutputBytes(bc));
     final long[] positions = new long[ra.length + 1];
     positions[0] = en.endBlock();
-    for (int i = 0; i < ra.length; i++) {
-      for (int j = 0; j < ra[i].length; j++) {
+    for (int i = 0; i < ra.length; ++i) {
+      for (int j = 0; j < ra[i].length; ++j) {
         am.encode(en, ra[i][j]);
       }
       positions[i + 1] = en.endBlock();
     }
-    //    for (int i = 0; i < ra.length; i++) {
+    //    for (int i = 0; i < ra.length; ++i) {
     //      System.err.println("[" + i + "] " + positions[i] + "  " + ra[i].length);
     //    }
     //    System.err.println("[" + ra.length + "] " + positions[ra.length]);
 
     en.close();
-    for (int i = 0; i < ra.length; i++) {
+    for (int i = 0; i < ra.length; ++i) {
       final InputBytes ib = new InputBytes(bc, positions[i], positions[i + 1]);
       final ArithDecoder de = new ArithDecoder(ib);
-      for (int j = 0; j < ra[i].length; j++) {
+      for (int j = 0; j < ra[i].length; ++j) {
         final int sym = am.decode(de);
         assertEquals("i=" + i + " j=" + j, ra[i][j], sym);
       }

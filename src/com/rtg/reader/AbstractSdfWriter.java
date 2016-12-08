@@ -60,12 +60,12 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
   private static final int MAX_ALLOW_CHAR = 126;
   private static final int MAX_WARNINGS = 10;
   static {
-    for (int k = 0; k < ERROR.length; k++) {
+    for (int k = 0; k < ERROR.length; ++k) {
       ERROR[k] = Math.pow(10, -0.1 * k);
     }
     ALLOWED_NAME_START = new boolean[MAX_ALLOW_CHAR + 1];
     ALLOWED_NAME_REST = new boolean[MAX_ALLOW_CHAR + 1];
-    for (char c = '!'; c < '~'; c++) {
+    for (char c = '!'; c < '~'; ++c) {
       ALLOWED_NAME_START[c] = true;
       ALLOWED_NAME_REST[c] = true;
     }
@@ -240,7 +240,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
     indexFile.setComment(mComment);
     indexFile.setSamReadGroup(mReadGroup);
     final double[] posAverages = new double[MAX_HISTOGRAM];
-    for (int i = 0; i < MAX_HISTOGRAM; i++) {
+    for (int i = 0; i < MAX_HISTOGRAM; ++i) {
       if (mPositionCounts[i] > 0) {
         posAverages[i] = mQSAveragePerPos[i] / mPositionCounts[i];
       }
@@ -254,7 +254,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
   }
 
   protected void clipQuality(byte[] qs, int length) {
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       if (qs[i] > CLIPPED_QUALITY_VALUE) {
         qs[i] = CLIPPED_QUALITY_VALUE;
       }
@@ -278,7 +278,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
     static boolean fixSequenceName(final String name, final StringBuilder newName) {
       boolean ret = true;
       final char[] thename = name.toCharArray();
-      for (int i = 0; i < thename.length; i++) {
+      for (int i = 0; i < thename.length; ++i) {
         final char c = thename[i];
         if (c > MAX_ALLOW_CHAR || (i == 0 && !ALLOWED_NAME_START[c]) || !ALLOWED_NAME_REST[c]) {
           newName.append('X');
@@ -304,13 +304,13 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
         if (mNoNameCount < MAX_WARNINGS) {
           Diagnostic.warning(WarningType.NO_NAME, label);
         }
-        mNoNameCount++;
+        ++mNoNameCount;
         if (mNoNameCount == MAX_WARNINGS) {
           Diagnostic.warning("Subsequent warnings of this type will not be shown.");
         }
       }
 
-      for (int k = 0; k < label.length(); k++) {
+      for (int k = 0; k < label.length(); ++k) {
         if (Character.isWhitespace(label.charAt(k))) {
           suffix = label.substring(k);
           label = label.substring(0, k);
@@ -327,7 +327,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
         if (mSequenceLabelTooLong < MAX_WARNINGS) {
           Diagnostic.warning(WarningType.SEQUENCE_LABEL_TOO_LONG, label);
         }
-        mSequenceLabelTooLong++;
+        ++mSequenceLabelTooLong;
         if (mSequenceLabelTooLong == MAX_WARNINGS) {
           Diagnostic.warning("Subsequent warnings of this type will not be shown.");
         }
@@ -406,7 +406,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
     if (mNoSequenceData < MAX_WARNINGS) {
       Diagnostic.warning(WarningType.NO_SEQUENCE, label == null ? null : label.toString());
     }
-    mNoSequenceData++;
+    ++mNoSequenceData;
     if (mNoSequenceData == MAX_WARNINGS) {
       Diagnostic.warning("Subsequent warnings of this type will not be shown.");
     }
@@ -444,7 +444,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
   protected void updateCountStatistics(byte[] rs, byte[] qs, int length) {
     byte r;
     int q;
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       r = rs[i];
       mResidueCounts[r]++;
       //update count for histogram for N's, for protein will keep track of X and STOP
@@ -458,11 +458,11 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
 
         // compute numblocks
         if (!mPrevWasN) {
-          mNBlocks++;
+          ++mNBlocks;
         }
         mPrevWasN = true;
-        mCurrentNBlockLength++;
-        mCurrentNCount++;
+        ++mCurrentNBlockLength;
+        ++mCurrentNCount;
       } else {
         if (mCurrentNBlockLength > mNLongestBlock) {
           mNLongestBlock = mCurrentNBlockLength;
@@ -483,7 +483,7 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
           mPositionCounts[(int) mCurrentSeqPosition]++;
         }
       }
-      mCurrentSeqPosition++;
+      ++mCurrentSeqPosition;
     }
   }
 

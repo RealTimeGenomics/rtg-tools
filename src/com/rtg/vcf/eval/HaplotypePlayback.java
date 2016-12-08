@@ -160,13 +160,13 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
       throw new NoSuchElementException("Attempt to fetch nucleotide past the end of the template");
     }
     if (isOnTemplate()) {
-      mTemplatePosition++;
+      ++mTemplatePosition;
       if (mNextVariant != null && mNextVariant.allele().getStart() == mTemplatePosition) { // Position to consume the variant
         mPositionInVariant = 0;
       }
     } else {
       assert mPositionInVariant != INVALID;
-      mPositionInVariant++;
+      ++mPositionInVariant;
     }
     assert mNextVariant != null || mPositionInVariant == INVALID;
     if (mNextVariant != null) {

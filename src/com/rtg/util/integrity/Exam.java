@@ -321,7 +321,7 @@ public final class Exam {
    * @throws AssertionError if the assertion failed
    */
   public static boolean assertSorted(final double[] a) {
-    for (int i = 1; i < a.length; i++) {
+    for (int i = 1; i < a.length; ++i) {
       Exam.assertTrue("Not sorted:" + Arrays.toString(a), a[i - 1] < a[i]);
     }
     return true;
@@ -334,7 +334,7 @@ public final class Exam {
    * @throws AssertionError if the assertion failed
    */
   public static boolean assertDescending(final double[] a) {
-    for (int i = 1; i < a.length; i++) {
+    for (int i = 1; i < a.length; ++i) {
       Exam.assertTrue("Not descending:" + Arrays.toString(a), a[i - 1] >= a[i]);
     }
     return true;

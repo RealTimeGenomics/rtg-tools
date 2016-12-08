@@ -47,7 +47,7 @@ public final class PrereadHashFunction {
   static {
     HASH_BLOCKS = new long[256];
     final Random r = new Random(1L); // use same seed for deterministic behavior
-    for (int i = 0; i < 256; i++) {
+    for (int i = 0; i < 256; ++i) {
       HASH_BLOCKS[i] = r.nextLong();
     }
   }
@@ -84,7 +84,7 @@ public final class PrereadHashFunction {
    */
   public void irvineHash(final long in0) {
     long in = in0;
-    for (int k = 0; k < 8; k++) {
+    for (int k = 0; k < 8; ++k) {
       irvineHash((int) (in & 0xFF));
       in = in >>> 8;
     }
@@ -127,7 +127,7 @@ public final class PrereadHashFunction {
    * @param length number of entries in the array to hash
    */
   public void irvineHash(byte[] buff, int offset, int length) {
-    for (int i = offset; i < offset + length; i++) {
+    for (int i = offset; i < offset + length; ++i) {
       irvineHash(buff[i]);
     }
   }
@@ -139,7 +139,7 @@ public final class PrereadHashFunction {
    * @param s string to hash
    */
   public void irvineHash(final String s) {
-      for (int i = 0; i < s.length(); i++) {
+      for (int i = 0; i < s.length(); ++i) {
         irvineHash(s.charAt(i));
       }
   }

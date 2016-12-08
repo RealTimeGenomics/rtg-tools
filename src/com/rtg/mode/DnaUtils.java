@@ -64,7 +64,7 @@ public final class DnaUtils {
    */
   public static String reverseComplement(final String seq) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = seq.length() - 1; i >= 0; i--) {
+    for (int i = seq.length() - 1; i >= 0; --i) {
       final char c = seq.charAt(i);
       switch (c) {
       case 'a':
@@ -141,7 +141,7 @@ public final class DnaUtils {
    */
   public static String bytesToSequenceIncCG(final byte[] seq, final int start, final int length) {
     final StringBuilder sb = new StringBuilder();
-    for (int i = start; i < start + length; i++) {
+    for (int i = start; i < start + length; ++i) {
       if (i < 0 || i >= seq.length) {
         sb.append('N');
       } else if (seq[i] != 5) { //allow for CG spacer, but strip it
@@ -198,7 +198,7 @@ public final class DnaUtils {
    * @return the encoded array (which will be the same array as <code>dest</code>)
    */
   public static byte[] encodeArray(final byte[] a, final byte[] dest, final int start, final int length) {
-    for (int k = 0; k < length; k++) {
+    for (int k = 0; k < length; ++k) {
       switch (a[k + start]) {
         case (byte) 'a':
         case (byte) 'A':
@@ -234,7 +234,7 @@ public final class DnaUtils {
    * @param length length to convert
    */
   public static void reverseComplement(byte[] src, byte[] dest, int length) {
-    for (int k = 0; k < length; k++) {
+    for (int k = 0; k < length; ++k) {
       switch (src[k]) {
       case (byte) 'a':
       case (byte) 'A':

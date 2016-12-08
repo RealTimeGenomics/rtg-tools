@@ -72,7 +72,7 @@ public class SimplePrereadNamesTest extends TestCase {
       final File queryDir = ReaderTestUtils.getDNADir(PrereadNamesTest.SEQ_DNA_A2, new File(dir, "q"));
       final PrereadNames names = new PrereadNames(queryDir, LongRange.NONE);
       final SimplePrereadNames sprn = new SimplePrereadNames();
-      for (long i = 0; i < names.length(); i++) {
+      for (long i = 0; i < names.length(); ++i) {
         sprn.setName(i, names.name(i));
       }
       assertEquals(names.calcChecksum(), sprn.calcChecksum());

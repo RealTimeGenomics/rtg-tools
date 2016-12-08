@@ -459,7 +459,7 @@ public class RocPlot {
       setTitle(title);
 
       float yLow = 100;
-      for (int i = 0; i < lineOrdering.size(); i++) {
+      for (int i = 0; i < lineOrdering.size(); ++i) {
         final DataBundle db = data.get(lineOrdering.get(i));
         if (db.show()) {
           final PointPlot2D plot = db.getPrecisionRecallPlot(lineWidth, i);
@@ -489,7 +489,7 @@ public class RocPlot {
       setTitle(title);
 
       int maxVariants = -1;
-      for (int i = 0; i < lineOrdering.size(); i++) {
+      for (int i = 0; i < lineOrdering.size(); ++i) {
         final DataBundle db = data.get(lineOrdering.get(i));
         if (db.show()) {
           final PointPlot2D plot = db.getPlot(lineWidth, i);
@@ -616,7 +616,7 @@ public class RocPlot {
   }
 
   private void loadData(ArrayList<File> files, ArrayList<String> names, boolean showProgress) throws IOException {
-    for (int i = 0; i < files.size(); i++) {
+    for (int i = 0; i < files.size(); ++i) {
       final File f = files.get(i);
       final String name = names.get(i);
       loadFile(f, name, showProgress);

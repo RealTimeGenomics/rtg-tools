@@ -163,7 +163,7 @@ public class SdfWriter extends AbstractSdfWriter {
   private void rollSequence() throws IOException {
     closeCurrentSequenceFilePair();
     mCurrentSeq = seqFilePair(mRollSeqNum, mSizeLimit);
-    mRollSeqNum++;
+    ++mRollSeqNum;
   }
 
   private void openSeqIndex() {
@@ -194,7 +194,7 @@ public class SdfWriter extends AbstractSdfWriter {
     mCurrentName = new NameFilePair(new File(mOutputDir, SdfFileUtils.LABEL_DATA_FILENAME + mRollLabelNum),
         new File(mOutputDir, SdfFileUtils.LABEL_POINTER_FILENAME + mRollLabelNum),
         mSizeLimit);
-    mRollLabelNum++;
+    ++mRollLabelNum;
   }
 
   private void rollLabelSuffix() throws IOException {
@@ -202,7 +202,7 @@ public class SdfWriter extends AbstractSdfWriter {
     mCurrentNameSuffix = new NameFilePair(new File(mOutputDir, SdfFileUtils.LABEL_SUFFIX_DATA_FILENAME + mRollLabelSuffixNum),
         new File(mOutputDir, SdfFileUtils.LABEL_SUFFIX_POINTER_FILENAME + mRollLabelSuffixNum),
         mSizeLimit);
-    mRollLabelSuffixNum++;
+    ++mRollLabelSuffixNum;
 
   }
 
@@ -311,7 +311,7 @@ public class SdfWriter extends AbstractSdfWriter {
       result = false;
     }
     if (result) {
-      mNumberOfSequences++;
+      ++mNumberOfSequences;
     }
     return result;
   }
@@ -404,7 +404,7 @@ public class SdfWriter extends AbstractSdfWriter {
 
   private void removeSuffixFiles() throws IOException {
     final DataFileIndex dfi = DataFileIndex.loadLabelSuffixDataFileIndex(mIndexFile.dataIndexVersion(), mOutputDir);
-    for (int i = 0; i < dfi.numberEntries(); i++) {
+    for (int i = 0; i < dfi.numberEntries(); ++i) {
       final File data = SdfFileUtils.labelSuffixDataFile(mOutputDir, i);
       deleteRedundantFile(data);
       final File pointer = SdfFileUtils.labelSuffixPointerFile(mOutputDir, i);

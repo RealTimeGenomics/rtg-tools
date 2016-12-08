@@ -142,7 +142,7 @@ public final class ReaderUtils {
    */
   public static Map<String, Long> getSequenceNameMap(final SequencesReader sequences) throws IOException {
     final Map<String, Long> map = new LinkedHashMap<>((int) sequences.numberSequences());
-    for (long i = 0; i < sequences.numberSequences(); i++) {
+    for (long i = 0; i < sequences.numberSequences(); ++i) {
       map.put(sequences.name(i), i);
     }
     return map;
@@ -156,7 +156,7 @@ public final class ReaderUtils {
    */
   public static Map<String, Long> getSequenceNameMap(final PrereadNamesInterface names) throws IOException {
     final Map<String, Long> map = new LinkedHashMap<>((int) names.length());
-    for (long i = 0; i < names.length(); i++) {
+    for (long i = 0; i < names.length(); ++i) {
       map.put(names.name(i), i);
     }
     return map;
@@ -184,7 +184,7 @@ public final class ReaderUtils {
   public static Map<String, Integer> getSequenceLengthMap(final SequencesReader genome) throws IOException {
     final Map<String, Integer> names = new LinkedHashMap<>();
     final long numberSequences = genome.numberSequences();
-    for (long l = 0; l < numberSequences; l++) {
+    for (long l = 0; l < numberSequences; ++l) {
       names.put(genome.name(l), genome.length(l));
     }
     return names;
@@ -198,7 +198,7 @@ public final class ReaderUtils {
    */
   public static ReferenceRegions fullReferenceRegions(SequencesReader sequencesReader) throws IOException {
     final ReferenceRegions regions = new ReferenceRegions();
-    for (int k = 0; k < sequencesReader.numberSequences(); k++) {
+    for (int k = 0; k < sequencesReader.numberSequences(); ++k) {
       regions.add(sequencesReader.names().name(k), 0, sequencesReader.length(k));
     }
     return regions;

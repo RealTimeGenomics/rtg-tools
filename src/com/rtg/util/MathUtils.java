@@ -115,7 +115,7 @@ public final class MathUtils {
   private static final double[] LOG_F = new double[31];
   static {
     double f = 1.0;
-    for (int i = 0; i < LOG_F.length; i++) {
+    for (int i = 0; i < LOG_F.length; ++i) {
       LOG_F[i] = Math.log(f);
       f = f * (i + 1);
     }
@@ -123,7 +123,7 @@ public final class MathUtils {
     // The rounding below is heuristic and not strictly necessary
     // to get an approximate result.  By making the rounding 0
     // for entry 0, ensure log(1)=0.
-    for (int k = 0; k < 1 << BITS; k++) {
+    for (int k = 0; k < 1 << BITS; ++k) {
       final double round = (k & 1) == 0 ? 0 : 0.5;
       LOG_TABLE[k] = Math.log(1 + (k + round) / DIV);
     }
@@ -182,7 +182,7 @@ public final class MathUtils {
     while (i <= x) {
       assert i > 0;
       assert n >= 0;
-      n++;
+      ++n;
       i = i << 1;
     }
     assert 1L << n == i;
@@ -202,7 +202,7 @@ public final class MathUtils {
     }
     s = 1 / s;
     final double[] p = new double[a.length];
-    for (int k = 0; k < a.length; k++) {
+    for (int k = 0; k < a.length; ++k) {
       p[k] = s * a[k];
     }
     return p;
@@ -221,7 +221,7 @@ public final class MathUtils {
     }
     s = 1 / s;
     final double[] p = new double[a.length];
-    for (int k = 0; k < a.length; k++) {
+    for (int k = 0; k < a.length; ++k) {
       p[k] = s * a[k];
     }
     return p;
@@ -238,8 +238,8 @@ public final class MathUtils {
    */
   public static double[] deconvolve(final double[] p, final double rate) {
     final double[] r = Arrays.copyOf(p, p.length);
-    for (int k = 0; k < p.length; k++) {
-      for (int j = 0; j < p.length; j++) {
+    for (int k = 0; k < p.length; ++k) {
+      for (int j = 0; j < p.length; ++j) {
         if (k + j < p.length) {
           r[k + j] -= rate * p[k] * p[j];
         }
@@ -251,7 +251,7 @@ public final class MathUtils {
       sum += q;
     }
     sum = 1 / sum;
-    for (int k = 0; k < r.length; k++) {
+    for (int k = 0; k < r.length; ++k) {
       r[k] *= sum;
     }
     return r;
@@ -271,7 +271,7 @@ public final class MathUtils {
     }
     final double[] r = new double[n];
     double v = 1.0;
-    for (int k = 0; k < n; k++, v *= p) {
+    for (int k = 0; k < n; ++k, v *= p) {
       r[k] = v;
     }
     return renormalize(r);
@@ -355,18 +355,18 @@ public final class MathUtils {
   public static double[] lnToNormaliedProb(final double[] logs) {
     final double[] prob = new double[logs.length];
     double max = logs[0];
-    for (int i = 1; i < logs.length; i++) {
+    for (int i = 1; i < logs.length; ++i) {
       if (max < logs[i]) {
         max = logs[i];
       }
     }
     double sum = 0.0;
-    for (int i = 0; i < logs.length; i++) {
+    for (int i = 0; i < logs.length; ++i) {
       final double v = Math.exp(logs[i] - max);
       prob[i] = v;
       sum += v;
     }
-    for (int i = 0; i < logs.length; i++) {
+    for (int i = 0; i < logs.length; ++i) {
       prob[i] = prob[i] / sum;
     }
     return prob;

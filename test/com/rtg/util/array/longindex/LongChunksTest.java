@@ -123,25 +123,25 @@ public class LongChunksTest extends AbstractLongIndexTest {
   }
 
   private void set(final int start, final LongChunks lc) {
-    for (int i = start; i < lc.length(); i++) {
+    for (int i = start; i < lc.length(); ++i) {
       lc.set(i, i + 1);
     }
   }
 
   private void check(final LongChunks lc) {
-    for (int i = 0; i < lc.length(); i++) {
+    for (int i = 0; i < lc.length(); ++i) {
       assertEquals(i + 1, lc.get(i));
     }
   }
 
   private void setSigned(final int start, final LongChunks lc) {
-    for (int i = start; i < lc.length(); i++) {
+    for (int i = start; i < lc.length(); ++i) {
       lc.setSigned(i, -(i + 1) + 10);
     }
   }
 
   private void checkSigned(final LongChunks lc) {
-    for (int i = 0; i < lc.length(); i++) {
+    for (int i = 0; i < lc.length(); ++i) {
       assertEquals(-(i + 1) + 10, lc.getSigned(i));
     }
   }
@@ -237,14 +237,14 @@ public class LongChunksTest extends AbstractLongIndexTest {
 
   private void checkTrim(final int initLength, final int trimLength) {
     final LongChunks ic = new LongChunks(initLength, 3);
-    for (int i = 0; i < initLength; i++) {
+    for (int i = 0; i < initLength; ++i) {
       ic.set(i, i + 1);
     }
     ic.integrity();
     ic.trim(trimLength);
     ic.integrity();
     assertEquals(trimLength, ic.length());
-    for (int i = 0; i < trimLength; i++) {
+    for (int i = 0; i < trimLength; ++i) {
       assertEquals(i + 1, ic.get(i));
     }
     try {
@@ -286,7 +286,7 @@ public class LongChunksTest extends AbstractLongIndexTest {
 
   public void testSerial() throws IOException {
     final LongChunks la = new LongChunks(10);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       la.set(i, i * 4 + 7);
     }
     final ByteArrayOutputStream out =  new ByteArrayOutputStream();
@@ -295,7 +295,7 @@ public class LongChunksTest extends AbstractLongIndexTest {
     final LongIndex index2 = LongCreate.loadIndex(new ObjectInputStream(in));
     assertTrue(index2 instanceof LongChunks);
     assertEquals(la.length(), index2.length());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       assertEquals(la.get(i), index2.get(i));
     }
   }

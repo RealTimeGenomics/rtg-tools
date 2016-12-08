@@ -85,7 +85,7 @@ public final class ShortChunks extends ShortIndex implements ExtensibleIndex {
     final int chunks = (int) ch;
     mArray = new short[chunks][];
     long left = mLength;
-    for (int i = 0; i < chunks; i++) {
+    for (int i = 0; i < chunks; ++i) {
       final int assignedLength = left <= mChunkSize ? (int) left :  mChunkSize;
       assert assignedLength > 0;
       mArray[i] =  new short[assignedLength];
@@ -258,7 +258,7 @@ public final class ShortChunks extends ShortIndex implements ExtensibleIndex {
     Exam.assertTrue("" + mLength + ":" + mTotalLength, 0 <= mLength && mLength <= mTotalLength);
     final long il = mTotalLength >>> mChunkBits;
     final long ml = il << mChunkBits;
-    for (int i = 0; i < il; i++) {
+    for (int i = 0; i < il; ++i) {
       final short[] arr = mArray[i];
       Exam.assertNotNull(arr);
       Exam.assertEquals(mChunkSize, arr.length);
@@ -268,7 +268,7 @@ public final class ShortChunks extends ShortIndex implements ExtensibleIndex {
     } else {
       Exam.assertEquals(mTotalLength - ml, mArray[(int) il].length);
     }
-    for (int i = (int) il + 1; i < mArray.length; i++) {
+    for (int i = (int) il + 1; i < mArray.length; ++i) {
       Exam.assertTrue(mArray[i] == null);
     }
     return true;

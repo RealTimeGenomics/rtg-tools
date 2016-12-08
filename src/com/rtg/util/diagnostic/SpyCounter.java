@@ -49,7 +49,7 @@ public class SpyCounter {
    * Increment the counter.
    */
   public void increment() {
-    mCount++;
+    ++mCount;
   }
 
   @Override

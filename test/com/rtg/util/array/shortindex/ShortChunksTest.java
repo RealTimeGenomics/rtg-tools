@@ -91,25 +91,25 @@ public class ShortChunksTest extends AbstractShortIndexTest {
   }
 
   private void set(final int start, final ShortChunks bc) {
-    for (int i = start; i < bc.length(); i++) {
+    for (int i = start; i < bc.length(); ++i) {
       bc.setSigned(i, -128 + (i + 1) % 255);
     }
   }
 
   private void check(final ShortChunks bc) {
-    for (int i = 0; i < bc.length(); i++) {
+    for (int i = 0; i < bc.length(); ++i) {
       assertEquals(-128 + (i + 1) % 255, bc.getSigned(i));
     }
   }
 
   private void setSigned(final int start, final ShortChunks lc) {
-    for (int i = start; i < lc.length(); i++) {
+    for (int i = start; i < lc.length(); ++i) {
       lc.setSigned(i, -(i + 1) + 10);
     }
   }
 
   private void checkSigned(final ShortChunks lc) {
-    for (int i = 0; i < lc.length(); i++) {
+    for (int i = 0; i < lc.length(); ++i) {
       assertEquals(-(i + 1) + 10, lc.getSigned(i));
     }
   }
@@ -160,14 +160,14 @@ public class ShortChunksTest extends AbstractShortIndexTest {
 
   private void checkTrim(final int initLength, final int trimLength) {
     final ShortChunks ic = new ShortChunks(initLength, 3);
-    for (int i = 0; i < initLength; i++) {
+    for (int i = 0; i < initLength; ++i) {
       ic.set(i, i + 1);
     }
     ic.integrity();
     ic.trim(trimLength);
     ic.integrity();
     assertEquals(trimLength, ic.length());
-    for (int i = 0; i < trimLength; i++) {
+    for (int i = 0; i < trimLength; ++i) {
       assertEquals(i + 1, ic.get(i));
     }
     try {
@@ -228,7 +228,7 @@ public class ShortChunksTest extends AbstractShortIndexTest {
 
   public void testSerial() throws IOException {
     final ShortChunks la = new ShortChunks(10);
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       la.set(i, i * 4 + 7);
     }
     final ByteArrayOutputStream out =  new ByteArrayOutputStream();
@@ -237,7 +237,7 @@ public class ShortChunksTest extends AbstractShortIndexTest {
     final ShortIndex index2 = ShortCreate.loadIndex(new ObjectInputStream(in));
     assertTrue(index2 instanceof ShortChunks);
     assertEquals(la.length(), index2.length());
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 10; ++i) {
       assertEquals(la.get(i), index2.get(i));
     }
   }

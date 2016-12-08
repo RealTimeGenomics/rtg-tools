@@ -113,7 +113,7 @@ public abstract class ParamsCli<P extends Params> extends LoggedCli {
     for (final Object obj : values) {
       final File samFile = (File) obj;
       if (!samFile.exists()) {
-        filesNotFoundCount++;
+        ++filesNotFoundCount;
         if (filesNotFoundCount <= 5) {
           Diagnostic.error(ErrorType.FILE_NOT_FOUND, samFile.getPath());
         }

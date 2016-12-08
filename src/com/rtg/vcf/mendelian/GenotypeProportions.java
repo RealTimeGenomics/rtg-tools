@@ -153,7 +153,7 @@ public final class GenotypeProportions {
         } else if (alleleCountA > alleleCountB) {
           return -1;
         }
-        for (int i = 0; i < a.mParents.length && i < b.mParents.length; i++) {
+        for (int i = 0; i < a.mParents.length && i < b.mParents.length; ++i) {
           if (Genotype.GENOTYPE_COMPARATOR.compare(a.mParents[i], b.mParents[i]) < 0) {
             return -1;
           } else if (Genotype.GENOTYPE_COMPARATOR.compare(a.mParents[i], b.mParents[i]) > 0) {

@@ -57,13 +57,13 @@ public class GzipUtilsTest extends TestCase {
     final ByteArrayOutputStream joinedBaos = new ByteArrayOutputStream();
 
     GZIPOutputStream out = new GZIPOutputStream(firstBaos);
-    for (byte i = 0; i < 10; i++) {
+    for (byte i = 0; i < 10; ++i) {
       out.write(i);
     }
     out.flush();
     out.close();
     out = new GZIPOutputStream(secondBaos);
-    for (byte i = 10; i < 20; i++) {
+    for (byte i = 10; i < 20; ++i) {
       out.write(i);
     }
     out.flush();
@@ -76,7 +76,7 @@ public class GzipUtilsTest extends TestCase {
 
     final InputStream in = GzipUtils.createGzipInputStream(new ByteArrayInputStream(joinedBaos.toByteArray()));
     try {
-      for (byte i = 0; i < 20; i++) {
+      for (byte i = 0; i < 20; ++i) {
         assertEquals(i, in.read());
       }
       assertEquals(-1, in.read());
@@ -94,7 +94,7 @@ public class GzipUtilsTest extends TestCase {
       while ((num = in2.read(b, 0, 3)) > 0) {
 
         count += num;
-        for (int j = 0; j < num; j++, i++) {
+        for (int j = 0; j < num; ++j, ++i) {
           assertEquals(i, b[j]);
         }
       }
@@ -145,7 +145,7 @@ public class GzipUtilsTest extends TestCase {
   }
 
   public void testShouldOverrideGzip1() throws IOException {
-    for (int i = 1; i < GzipUtils.GZIP_FILE.length; i++) {
+    for (int i = 1; i < GzipUtils.GZIP_FILE.length; ++i) {
       final ByteArrayInputStream javaDevelopersAreStupid = new GzipUtils.FakeBlockingInputStream(GzipUtils.GZIP_FILE);
       final byte[] input = IOUtils.readData(GzipUtils.createGzipInputStream(new BufferedInputStream(javaDevelopersAreStupid, i)));
       assertEquals("i: " + i, new String(GzipUtils.EXPECTED_UNZIPPED), new String(input));

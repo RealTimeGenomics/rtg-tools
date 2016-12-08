@@ -131,12 +131,12 @@ public abstract class AbstractByteIndexTest extends TestCase {
     final ByteIndex a = create(length, 3);
     a.integrity();
     assertEquals(length, a.length());
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       assertEquals(0, a.getByte(i));
       final byte j = (byte) (i * 3);
       a.setByte(i, j);
     }
-    for (int i = 0; i < a.length(); i++) {
+    for (int i = 0; i < a.length(); ++i) {
       final short j = (byte) (i * 3);
       assertEquals(j, a.getByte(i));
     }

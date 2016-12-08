@@ -189,7 +189,7 @@ public class ConcurrentByteQueueTest extends TestCase {
       final Thread[] thread = new Thread[mSequence.length];
       long bits = delays;
       final long mask = (2L << mSteps) - 1;
-      for (int i = 0; i < thread.length; i++) {
+      for (int i = 0; i < thread.length; ++i) {
         mSequence[i].setId();
         mSequence[i].setDelays(bits & mask);
         mSequence[i].println("Thread " + (i + 1) + ", " + Long.toBinaryString(bits & mask));
@@ -201,7 +201,7 @@ public class ConcurrentByteQueueTest extends TestCase {
         aThread.start();
       }
       // wait for all threads to finish.
-      for (int i = 0; i < thread.length; i++) {
+      for (int i = 0; i < thread.length; ++i) {
         try {
           thread[i].join();
         } catch (InterruptedException e) {
@@ -260,13 +260,13 @@ public class ConcurrentByteQueueTest extends TestCase {
 
     final PortableRandom rand = new PortableRandom(42);
     final ConcurrentTester tester = new ConcurrentTester(reader, writer);
-    for (int run = 0; run < 4; run++) {
+    for (int run = 0; run < 4; ++run) {
       //System.err.println("===== run " + run + " =====");
       Arrays.fill(out, (byte) 0);
       tester.run(rand.nextLong());
       assertFalse(readWasNotPositive[0]);
       // now check that the correct contents have been transferred.
-      for (int i = 0; i < out.length; i++) {
+      for (int i = 0; i < out.length; ++i) {
         assertEquals("i=" + i, DATA[i], out[i]);
       }
     }

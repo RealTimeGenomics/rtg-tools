@@ -57,7 +57,7 @@ public class SquashedAlleleAccumulatorTest extends AlleleAccumulatorTest {
       "--XXcom.rtg.vcf.eval.maximize=calls-min-base"
     };
     File alleles = initial;
-    for (int i = 1; i < 5; i++) {
+    for (int i = 1; i < 5; ++i) {
       final File output = new File(dir, "accum-a-" + i);
       final MainResult res = MainResult.run(new VcfEvalCli(), Utils.append(commonArgs,
         "-o", output.getPath(), "--sample", "SAMPLE" + i, "-b", alleles.getPath(), "-c", samples.getPath()));

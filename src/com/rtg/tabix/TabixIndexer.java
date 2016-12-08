@@ -155,7 +155,7 @@ public final class TabixIndexer {
       String line;
       while ((line = bcli.readLine()) != null) {
         if (BED_SKIP_LINES.matcher(line).matches()) {
-          skip++;
+          ++skip;
         } else {
           break;
         }
@@ -228,7 +228,7 @@ public final class TabixIndexer {
       }
       final boolean unmapped = input.isUnmapped();
       if (unmapped) {
-        totalUnmapped++;
+        ++totalUnmapped;
       }
       if (!unmapped || input.hasReference()) {
         final int refId = input.getReferenceId();
@@ -257,9 +257,9 @@ public final class TabixIndexer {
           minBin = -1;
         }
         if (unmapped) {
-          refUnmapped++;
+          ++refUnmapped;
         } else {
-          refMapped++;
+          ++refMapped;
         }
       } else {
         if (lastRefId >= 0) {
@@ -314,7 +314,7 @@ public final class TabixIndexer {
   private static int setLinearIndex(final SequenceIndex index, final int begin, final int len, final long virtualOffset, int minBin) {
     final int b = begin >> LINEAR_SHIFT;
     final int e = (begin + len - 1) >> LINEAR_SHIFT;
-    for (int i = b; i <= e; i++) {
+    for (int i = b; i <= e; ++i) {
       index.setLinearIndex(i, virtualOffset, minBin);
     }
     return e;
@@ -339,9 +339,9 @@ public final class TabixIndexer {
             currentChunk.mChunkEnd = tempChunk.mChunkEnd;
             list.remove(j);
           } else {
-            current++;
+            ++current;
             currentChunk = list.get(current);
-            j++;
+            ++j;
           }
         }
       }
@@ -410,7 +410,7 @@ public final class TabixIndexer {
       }
       ByteArrayIOUtils.intToBytesLittleEndian(bai.getLinearSize(), buf, 0);
       output.write(buf, 0, 4);
-      for (int j = 0; j < bai.getLinearSize(); j++) {
+      for (int j = 0; j < bai.getLinearSize(); ++j) {
         ByteArrayIOUtils.longToBytesLittleEndian(bai.getLinearIndex(j), buf, 0);
         output.write(buf, 0, 8);
       }

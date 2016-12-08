@@ -69,7 +69,7 @@ public class TsvSequenceDataSourceTest extends TestCase {
     assertEquals(expected.length(), ds.currentLength());
     final DNAFastaSymbolTable t = new DNAFastaSymbolTable();
     final byte[] b = ds.sequenceData();
-    for (int i = 0; i < expected.length(); i++) {
+    for (int i = 0; i < expected.length(); ++i) {
       assertEquals(t.scanResidue(expected.charAt(i)).ordinal(), b[i]);
     }
   }
@@ -78,7 +78,7 @@ public class TsvSequenceDataSourceTest extends TestCase {
     assertEquals(expected.length(), ds.currentLength());
     final byte[] q = ds.qualityData();
     assertNotNull(q);
-    for (int i = 0; i < expected.length(); i++) {
+    for (int i = 0; i < expected.length(); ++i) {
       assertEquals(expected.charAt(i) - '!', q[i]);
     }
   }

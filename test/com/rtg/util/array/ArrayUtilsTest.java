@@ -60,7 +60,7 @@ public class ArrayUtilsTest extends TestCase {
   public void testParse() {
     int[] output = ArrayUtils.parseIntArray("1,2,3,4");
     assertEquals(4, output.length);
-    for (int i = 0; i < output.length; i++) {
+    for (int i = 0; i < output.length; ++i) {
       assertEquals(i + 1, output[i]);
     }
     output = ArrayUtils.parseIntArray("1");
@@ -123,7 +123,7 @@ public class ArrayUtilsTest extends TestCase {
       }
       final long[] saved = ArrayUtils.readLongArray(longArray);
       assertEquals(numbers.length, saved.length);
-      for (int i = 0; i < numbers.length; i++) {
+      for (int i = 0; i < numbers.length; ++i) {
         assertEquals(numbers[i], saved[i]);
       }
     } finally {
@@ -143,7 +143,7 @@ public class ArrayUtilsTest extends TestCase {
       final LongIndex saved = LongCreate.createIndex(numbers.length);
       final int size = ArrayUtils.readInts(intArray, saved, 0, 1);
       assertEquals(numbers.length, size);
-      for (int i = 0; i < numbers.length; i++) {
+      for (int i = 0; i < numbers.length; ++i) {
         assertEquals((long) numbers[i] + 1L, saved.get(i));
       }
     } finally {
@@ -162,7 +162,7 @@ public class ArrayUtilsTest extends TestCase {
       final LongIndex saved = LongCreate.createIndex(numbers.length - 2);
       final int size = ArrayUtils.readInts(intArray, 1, 6, saved, 0, 1);
       assertEquals(numbers.length - 2, size);
-      for (int i = 1; i < numbers.length - 1; i++) {
+      for (int i = 1; i < numbers.length - 1; ++i) {
         assertEquals((long) numbers[i] + 1L, saved.get(i - 1));
       }
     } finally {
@@ -173,7 +173,7 @@ public class ArrayUtilsTest extends TestCase {
   public void testReverseArrayInPlace() {
     final byte[] test = {1, 2, 3, 4, 5, 6, 7, 8, 9};
     Utils.reverseInPlace(test);
-    for (int i = 0; i < test.length; i++) {
+    for (int i = 0; i < test.length; ++i) {
       assertEquals(9 - i, test[i]);
     }
   }

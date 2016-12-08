@@ -120,7 +120,7 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
    */
   private static int stringToInt(final String s, final int start, final int end) {
     int t = 0;
-    for (int k = start; k < end; k++) {
+    for (int k = start; k < end; ++k) {
       t *= 10;
       t += s.charAt(k) - '0';
     }
@@ -129,7 +129,7 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
 
   private static int nextCigarPos(String cigar, int start) {
     final int end = cigar.length();
-    for (int k = start; k < end; k++) {
+    for (int k = start; k < end; ++k) {
       switch (cigar.charAt(k)) {
         case 'S':
         case 'G':

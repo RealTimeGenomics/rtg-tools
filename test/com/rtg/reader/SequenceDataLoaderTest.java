@@ -186,7 +186,7 @@ public class SequenceDataLoaderTest extends TestCase {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA(POSITIONS_FASTA_2, mDir, new SdfId(1L), 20);
     reader.close();
     final int[] results = {16, 16, 20, 20, 12, 6};
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
       final LongIndex index = LongCreate.createIndex(2);
       //long[] seqIndex = {2, 1, 1, 1, 1};
       //final long[] seqIndex = ArrayUtils.readLongArray(Bsd.sequenceIndexFile(mDir));
@@ -274,7 +274,7 @@ public class SequenceDataLoaderTest extends TestCase {
   }
 
   private void checkQualityRange(ByteArray data, int start, int end, char value) {
-    for (int i = start; i < end; i++) {
+    for (int i = start; i < end; ++i) {
       final byte qual = data.get(i);
       assertEquals(value - 33, qual);
     }
@@ -295,7 +295,7 @@ public class SequenceDataLoaderTest extends TestCase {
     SequenceDataLoader.loadData(seqData, seqIndex, 3, 5, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
 
-    for (int i = 0; i < seqData.length(); i++) {
+    for (int i = 0; i < seqData.length(); ++i) {
       assertEquals(i % 4 + 1, seqData.get(i));
     }
   }
@@ -319,7 +319,7 @@ public class SequenceDataLoaderTest extends TestCase {
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
     SequenceDataLoader.loadData(seqData, new TestDataFileIndex(seqIndex), 1, 2, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
-    for (int i = 0; i < seqData.length(); i++) {
+    for (int i = 0; i < seqData.length(); ++i) {
       assertEquals(i % 4 + 1, seqData.get(i));
     }
   }

@@ -88,7 +88,7 @@ public class PathTest extends AbstractNanoTest {
     int excludeCount = 0;
     for (final OrientedVariant v : side) {
       if (v.isAlleleA()) {
-        includeCount++;
+        ++includeCount;
         //System.err.println("include: " + v);
         boolean found = false;
         for (final OrientedVariant ov : included) {
@@ -99,7 +99,7 @@ public class PathTest extends AbstractNanoTest {
         }
         assertTrue("the variant <" + v + "> wasn't included", found);
       } else {
-        excludeCount++;
+        ++excludeCount;
         //System.err.println("exclude: " + v);
         assertTrue("the variant <" + v.variant() + "> wasn't excluded", excluded.contains(v.variant()));
       }
@@ -509,7 +509,7 @@ public class PathTest extends AbstractNanoTest {
 
   static void check(List<OrientedVariant> v, double[] weights) {
     assertEquals(weights.length, v.size());
-    for (int i = 0; i < v.size(); i++) {
+    for (int i = 0; i < v.size(); ++i) {
       assertEquals(i + " : " + v.toString(), weights[i], v.get(i).getWeight(), 0.0001);
     }
   }

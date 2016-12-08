@@ -155,7 +155,7 @@ abstract class AbstractStreamManager {
   protected void loadNext() {
     final long value;
     value = mIndex.numberSequences(mIndexPos++);
-    mIndexedSequenceFileNumber++;
+    ++mIndexedSequenceFileNumber;
     mCurrentLower = mCurrentUpper;
     mCurrentUpper += value;
   }

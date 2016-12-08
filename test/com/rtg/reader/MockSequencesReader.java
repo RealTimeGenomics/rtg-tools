@@ -162,7 +162,7 @@ public class MockSequencesReader extends DummySequencesReader {
   @Override
   public long lengthBetween(final long start, final long end) {
     long tot = 0;
-    for (long i = start; i < end; i++) {
+    for (long i = start; i < end; ++i) {
       tot += mLengths[(int) i];
     }
     return tot;

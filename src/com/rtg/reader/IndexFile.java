@@ -227,7 +227,7 @@ public class IndexFile implements Integrity {
     }
     mResidueCount = new long[totalResidue];
     long count = 0;
-    for (int i = 0; i < totalResidue; i++) {
+    for (int i = 0; i < totalResidue; ++i) {
       mResidueCount[i] = indexStream.readLong();
       headerHash.irvineHash(mResidueCount[i]);
       count += mResidueCount[i];
@@ -257,13 +257,13 @@ public class IndexFile implements Integrity {
       headerHash.irvineHash(mLongestNBlock);
       //read N histogram
       mNHistogram = new long[SdfWriter.MAX_HISTOGRAM];
-      for (int i = 0; i < mNHistogram.length; i++) {
+      for (int i = 0; i < mNHistogram.length; ++i) {
         mNHistogram[i] = indexStream.readLong();
         headerHash.irvineHash(mNHistogram[i]);
       }
       //read Pos histogram
       mPosHistogram = new long[SdfWriter.MAX_HISTOGRAM];
-      for (int i = 0; i < mPosHistogram.length; i++) {
+      for (int i = 0; i < mPosHistogram.length; ++i) {
         mPosHistogram[i] = indexStream.readLong();
         headerHash.irvineHash(mPosHistogram[i]);
       }
@@ -273,7 +273,7 @@ public class IndexFile implements Integrity {
       //headerHash.irvineHash(String.valueOf(mGlobalQSAverage));
 
       mPositionAverageHistogram = new double[SdfWriter.MAX_HISTOGRAM];
-      for (int i = 0; i < mPositionAverageHistogram.length; i++) {
+      for (int i = 0; i < mPositionAverageHistogram.length; ++i) {
         mPositionAverageHistogram[i] = indexStream.readDouble();
         compatDoubleHash(headerHash, mVersion, mPositionAverageHistogram[i]);
         //headerHash.irvineHash(String.valueOf(mPositionAverageHistogram[i]));

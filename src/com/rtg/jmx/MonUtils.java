@@ -62,7 +62,7 @@ public final class MonUtils {
   }
   static void padRight(Appendable out, String str, int width, char pchar) throws IOException {
     out.append(str);
-    for (int i = str.length(); i < width; i++) {
+    for (int i = str.length(); i < width; ++i) {
       out.append(pchar);
     }
   }
@@ -71,7 +71,7 @@ public final class MonUtils {
     pad(out, str, width, ' ');
   }
   static void pad(Appendable out, String str, int width, char pchar) throws IOException {
-    for (int i = str.length(); i < width; i++) {
+    for (int i = str.length(); i < width; ++i) {
         out.append(pchar);
     }
     out.append(str);

@@ -588,7 +588,7 @@ public final class FileUtils {
       final char[] buffer = FileUtils.makeBuffer();
       final int eof = -1;
       for (int len = br.read(buffer); len > eof; len = br.read(buffer)) {
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; ++i) {
           sb.append(buffer[i]);
         }
       }
@@ -620,7 +620,7 @@ public final class FileUtils {
     int len = stream.read(b);
     final int eof = -1;
     while (len != eof) {
-      for (int i = 0; i < len; i++) {
+      for (int i = 0; i < len; ++i) {
         out.append((char) b[i]); //this does not do careful conversion but good enough for testing use.
       }
       len = stream.read(b);

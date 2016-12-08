@@ -71,7 +71,7 @@ public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDe
       if (gts.length == 2) {
         diploid = true;
         if (gts[0] != gts[1]) {
-          hetCount++;
+          ++hetCount;
         }
         for (int gt : gts) {
           if (gt < 0) {
@@ -79,7 +79,7 @@ public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDe
           }
           alleleFreqCount[gt]++;
         }
-        total++;
+        ++total;
       }
     }
     if (!diploid) {
@@ -91,12 +91,12 @@ public abstract class AbstractInbreedingCoefficientAnnotation extends AbstractDe
   protected double getExpectedHetProb(int total, int... haploidAlleleCount) {
     final int numAlleles = haploidAlleleCount.length;
     final double[] alleleFreqs = new double[numAlleles];
-    for (int i = 0; i < numAlleles; i++) {
+    for (int i = 0; i < numAlleles; ++i) {
       alleleFreqs[i] = haploidAlleleCount[i] / (2.0 * total);
     }
     double expectedHetProb = 0;
-    for (int i = 0; i < numAlleles; i++) {
-      for (int j = i + 1; j < numAlleles; j++) {
+    for (int i = 0; i < numAlleles; ++i) {
+      for (int j = i + 1; j < numAlleles; ++j) {
         expectedHetProb += 2 * alleleFreqs[i] * alleleFreqs[j];
       }
     }

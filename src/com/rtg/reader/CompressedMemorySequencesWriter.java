@@ -220,7 +220,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
         updateChecksums();
       }
       updateStatistics(mCurrentLength);
-      mCurrentId++;
+      ++mCurrentId;
       return true;
     } else {
       return false;

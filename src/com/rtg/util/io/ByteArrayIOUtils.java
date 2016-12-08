@@ -98,7 +98,7 @@ public final class ByteArrayIOUtils {
 
   private static int convertToLongArrayInternal(final byte[] src, final int sFrom, final int sTo, final long[] dest, final int dFrom) {
     int i, j;
-    for (i = dFrom, j = sFrom; j < sTo; i++, j += 8) {
+    for (i = dFrom, j = sFrom; j < sTo; ++i, j += 8) {
       dest[i] = ((long) src[j] << 56)
                 + ((long) (src[j + 1] & 0xFF) << 48)
                 + ((long) (src[j + 2] & 0xFF) << 40)
@@ -159,7 +159,7 @@ public final class ByteArrayIOUtils {
 
   private static int convertToIntArrayInternal(final byte[] vals, final int sFrom, final int sTo, final int[] dest, final int start) {
     int i, j;
-    for (i = start, j = sFrom; j < sTo; i++, j += 4) {
+    for (i = start, j = sFrom; j < sTo; ++i, j += 4) {
       dest[i] = (vals[j] << 24)
                 + ((vals[j + 1] & 0xFF) << 16)
                 + ((vals[j + 2] & 0xFF) << 8)
@@ -190,7 +190,7 @@ public final class ByteArrayIOUtils {
 
   private static int convertToIntInLongArrayInternal(final byte[] vals, final int sFrom, final int sTo, final long[] dest, final int start) {
     int i, j;
-    for (i = start, j = sFrom; j < sTo; i++, j += 4) {
+    for (i = start, j = sFrom; j < sTo; ++i, j += 4) {
       dest[i] = (vals[j] << 24)
                 + ((vals[j + 1] & 0xFF) << 16)
                 + ((vals[j + 2] & 0xFF) << 8)
@@ -302,7 +302,7 @@ public final class ByteArrayIOUtils {
 
   private static int convertToLongArrayLittleEndianInternal(final byte[] src, final int sFrom, final int sTo, final long[] dest, final int dFrom) {
     int i, j;
-    for (i = dFrom, j = sFrom; j < sTo; i++, j += 8) {
+    for (i = dFrom, j = sFrom; j < sTo; ++i, j += 8) {
       dest[i] = ((long) src[j + 7] << 56)
                 + ((long) (src[j + 6] & 0xFF) << 48)
                 + ((long) (src[j + 5] & 0xFF) << 40)

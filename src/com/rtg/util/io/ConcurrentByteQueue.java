@@ -90,7 +90,7 @@ public class ConcurrentByteQueue implements Integrity {
 //            + "CBQ Reader was full notifies: " + mReadWasFullNotify);
     mClosed = true;
     notifyAll();
-//    for (int i = 0; i < mReadHist.length; i++) {
+//    for (int i = 0; i < mReadHist.length; ++i) {
 //      Diagnostic.developerLog("CBQ hist: " + (i * 1000) + " read " + mReadHist[i] + " write " + mWriteHist[i]);
 //    }
   }

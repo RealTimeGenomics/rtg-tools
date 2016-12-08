@@ -76,7 +76,7 @@ public class ObjectChunks<A> extends ObjectIndex<A> {
     final int chunks = (int) ch;
     mArray = new Object[chunks][];
     long left = mLength;
-    for (int i = 0; i < chunks; i++) {
+    for (int i = 0; i < chunks; ++i) {
       final int assignedLength = left <= mChunkSize ? (int) left :  mChunkSize;
       if (assignedLength == 0) {
         throw new RuntimeException("zero assigned length");

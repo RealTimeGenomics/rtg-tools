@@ -128,7 +128,7 @@ public class FastaWriterWrapper implements WriterWrapper {
 
   protected void writeSequence(SequencesReader reader, long seqId, LineWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
     final int length = reader.read(seqId, dataBuffer);
-    for (int i = 0; i < length; i++) {
+    for (int i = 0; i < length; ++i) {
       dataBuffer[i] = mCodeToBytes[dataBuffer[i]];
     }
     final String name = !mRename && mHasNames ? reader.fullName(seqId) : ("" + seqId);

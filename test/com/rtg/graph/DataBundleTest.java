@@ -58,7 +58,7 @@ public class DataBundleTest extends TestCase {
   public void testScoreLabels() {
     final ArrayList<RocPoint> points = new ArrayList<>();
     final ArrayList<String> scores = new ArrayList<>();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 100; ++i) {
       points.add(new RocPoint(0, i, i, 0));
       scores.add(String.format("%.3g", (float) (100 - i)));
     }
@@ -69,7 +69,7 @@ public class DataBundleTest extends TestCase {
     final PointPlot2D scorePoints = db.getScorePoints(1, 1);
     final String[] exp = {"100", "90.0", "80.0", "70.0", "60.0", "50.0", "40.0", "30.0", "20.0", "10.0", "None"};
     final Datum2D[] data = scorePoints.getData();
-    for (int i = 0; i < data.length; i++) {
+    for (int i = 0; i < data.length; ++i) {
       final Datum2D d = data[i];
       assertTrue(d instanceof TextPoint2D);
       final TextPoint2D p = (TextPoint2D) d;

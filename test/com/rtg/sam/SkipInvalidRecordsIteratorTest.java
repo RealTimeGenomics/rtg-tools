@@ -202,7 +202,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
       try (SkipInvalidRecordsIterator sfr = new SkipInvalidRecordsIterator(sam)) {
         while (sfr.hasNext()) {
           sfr.next();
-          num++;
+          ++num;
         }
         final String str = out.toString();
         //System.err.println(str);
@@ -239,7 +239,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
           if (!rec.getIsValid()) {
             fail();
           }
-          num++;
+          ++num;
         }
         assertEquals(numValid, num);
         assertEquals(numValid, sfr.getOutputRecordsCount());
@@ -275,7 +275,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
       try {
         while (sfr.hasNext()) {
           sfr.next();
-          num++;
+          ++num;
         }
         fail("Expected Errors not thrown");
       } catch (final NoTalkbackSlimException e) {

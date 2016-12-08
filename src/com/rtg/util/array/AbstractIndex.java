@@ -92,7 +92,7 @@ public abstract class AbstractIndex extends IntegralAbstract implements CommonIn
   void toString(final StringBuilder sbLong, final long start, final long end) {
     final long e = end > length() ? length() : end;
     boolean allZero = true;
-    for (long i = start; i < e; i++) {
+    for (long i = start; i < e; ++i) {
       if (get(i) != 0L) {
         allZero = false;
         break;
@@ -105,7 +105,7 @@ public abstract class AbstractIndex extends IntegralAbstract implements CommonIn
     sbLong.append(start);
     sbLong.append("] ");
 
-    for (long i = start; i < e; i++) {
+    for (long i = start; i < e; ++i) {
       formatValue().format(sbLong, get(i));
       if (i != (e - 1)) {
         sbLong.append(", ");
@@ -127,7 +127,7 @@ public abstract class AbstractIndex extends IntegralAbstract implements CommonIn
     sbLong.append(start);
     sbLong.append("] ");
 
-    for (long i = start; i < end; i++) {
+    for (long i = start; i < end; ++i) {
       sbLong.append("  ");
       sbLong.append(FormatInteger.toBits(get(i)));
     }

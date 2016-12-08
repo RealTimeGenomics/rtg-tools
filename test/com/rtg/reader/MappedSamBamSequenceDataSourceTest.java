@@ -96,10 +96,10 @@ public class MappedSamBamSequenceDataSourceTest extends SamBamSequenceDataSource
       assertTrue(source.nextSequence());
       assertEquals(READS[4][1].length(), source.currentLength());
       assertEquals(READS[4][0], source.name());
-      for (int j = 0; j < READS[4][1].length(); j++) {
+      for (int j = 0; j < READS[4][1].length(); ++j) {
           assertEquals(DNA.valueOf(READS[4][1].charAt(READS[4][1].length() - 1 - j)).complement().ordinal(), source.sequenceData()[j]);
       }
-      for (int j = 0; j < READS[4][2].length(); j++) {
+      for (int j = 0; j < READS[4][2].length(); ++j) {
         assertEquals(READS[4][2].charAt(READS[4][2].length() - 1 - j) - 33, source.qualityData()[j]);
       }
       assertFalse(source.nextSequence());
@@ -113,7 +113,7 @@ public class MappedSamBamSequenceDataSourceTest extends SamBamSequenceDataSource
     final StringBuilder sb = new StringBuilder();
     sb.append(SAM_HEADER);
 
-    for (int i = 0; i < READS.length; i++) {
+    for (int i = 0; i < READS.length; ++i) {
       if (i % 2 == 0) {
         sb.append(String.format(SAM_LINE_LEFT, SAM_NL, READS[i][0], READS[i][1], READS[i][2]));
         sb.append(String.format(SAM_LINE_RIGHT, SAM_NL, READS[i][0], DnaUtils.reverseComplement(READS[i][1]), READS[i][2]));

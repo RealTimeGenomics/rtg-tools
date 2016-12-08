@@ -105,7 +105,7 @@ public class SamRestrictingIterator implements CloseableIterator<SAMRecord> {
 
       // Advance active region if need be
       while (mCurrentRegion.getEnd() <= alignmentStart && mCurrentRegionIdx < mSeqRegions.size() - 1) {
-        mCurrentRegionIdx++;
+        ++mCurrentRegionIdx;
         mCurrentRegion = mSeqRegions.get(mCurrentRegionIdx);
       }
 

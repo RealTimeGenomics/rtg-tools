@@ -115,7 +115,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
 
   private static byte[] setData(final File file) throws IOException {
     final byte[] contents = new byte[1024 * 1027];
-    for (int i = 0; i < contents.length; i++) {
+    for (int i = 0; i < contents.length; ++i) {
       contents[i] = (byte) (i % 256);
     }
     try (RandomAccessFile raf = new RandomAccessFile(file, "rw")) {
@@ -128,7 +128,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
     final byte[] contents = setData(mTmp);
 
     try (RandomAccessFile braf = new BufferedRandomAccessFile(mTmp, "r")) {
-      for (int i = 0; i < contents.length; i++) {
+      for (int i = 0; i < contents.length; ++i) {
         final int x = braf.read();
         assertEquals(contents[i], (byte) x);
         assertEquals(i + 1, braf.getFilePointer());
@@ -151,7 +151,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
         if (read == 0) {
           break;
         }
-        for (int i = 0; i < read; i++) {
+        for (int i = 0; i < read; ++i) {
           assertTrue(i + " : " + count + " : " + read, count + i < contents.length);
           assertEquals("buf[" + i + "]=" + buf[i] + " != contents[" + (count + i) + "]=" + contents[count + i], contents[count + i], buf[i]);
         }
@@ -169,7 +169,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
 
     try (RandomAccessFile braf = new BufferedRandomAccessFile(mTmp, "r")) {
       final PortableRandom rand = new PortableRandom(314159);
-      for (int i = 0; i < 100; i++) {
+      for (int i = 0; i < 100; ++i) {
         final int index = rand.nextInt(contents.length - 1000);
         braf.seek(index);
         assertEquals(index, braf.getFilePointer());
@@ -177,7 +177,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
         read = braf.read(buf, 0, buf.length);
         assertEquals(buf.length, read);
 
-        for (int j = 0; j < read; j++) {
+        for (int j = 0; j < read; ++j) {
           assertTrue(j + " : " + index + " : " + read, index + j < contents.length);
           assertEquals("buf[" + j + "]=" + buf[j] + " != contents[" + (index + j) + "]=" + contents[index + j], contents[index + j], buf[j]);
         }
@@ -222,7 +222,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       //assertEquals(0, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i], buf[i]);
       }
 
@@ -230,7 +230,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       //assertEquals(0, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i], buf[i]);
       }
 
@@ -238,7 +238,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       assertEquals(10, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i + 10], buf[i]);
       }
 
@@ -246,7 +246,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       //assertEquals(0, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i], buf[i]);
       }
 
@@ -254,7 +254,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       assertEquals(100000, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i + 100000], buf[i]);
       }
 
@@ -262,7 +262,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       assertEquals(100001, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i + 100001], buf[i]);
       }
 
@@ -270,7 +270,7 @@ public class BufferedRandomAccessFileTest extends TestCase {
       assertEquals(99999, braf.getFilePointer());
       read = braf.read(buf, 0, buf.length);
       assertEquals(buf.length, read);
-      for (int i = 0; i < buf.length; i++) {
+      for (int i = 0; i < buf.length; ++i) {
         assertEquals(contents[i + 99999], buf[i]);
       }
     }

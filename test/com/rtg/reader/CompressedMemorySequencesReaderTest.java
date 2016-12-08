@@ -230,9 +230,9 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     final Residue[] bases = {DNA.A, DNA.C, DNA.G, DNA.T};
     final SdfWriter writer = new SdfWriter(dir, sizeLimit, PrereadType.UNKNOWN, false, true, false, SequenceType.DNA);
     final byte[] buf = new byte[seqLength];
-    for (int i = 0; i < seqNum; i++) {
+    for (int i = 0; i < seqNum; ++i) {
       writer.startSequence("random " + i);
-      for (int j = 0; j < seqLength; j++) {
+      for (int j = 0; j < seqLength; ++j) {
         buf[j] = (byte) bases[rand.nextInt(4)].ordinal();
       }
       writer.write(buf, null, buf.length);
@@ -293,7 +293,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     final byte[] foo = new byte[6];
     cmsr.readQuality(0, foo, 4, 6);
     final String qual = "EFGHIJ";
-    for (int i = 0; i < foo.length; i++) {
+    for (int i = 0; i < foo.length; ++i) {
       assertEquals(qual.charAt(i) - '!', foo[i]);
     }
   }

@@ -218,16 +218,16 @@ public final class SdfSubseq extends AbstractCli {
     byte[] buff = new byte[length];
     reader.read(sequenceId, buff, start, length);
     if (reverseComplement) {
-      for (int i = length - 1; i >= 0; i--) {
+      for (int i = length - 1; i >= 0; --i) {
         out.write(mCodeToBytes[buff[i]]);
       }
     } else {
       if (mFlags.isSet(PRESERVE_FLAG)) {
-        for (int i = 0; i < start; i++) {
+        for (int i = 0; i < start; ++i) {
           out.write(mCodeToBytes[0]);
         }
       }
-      for (int i = 0; i < length; i++) {
+      for (int i = 0; i < length; ++i) {
         out.write(mCodeToBytes[buff[i]]);
       }
     }
@@ -239,16 +239,16 @@ public final class SdfSubseq extends AbstractCli {
       buff = new byte[length];
       reader.readQuality(sequenceId, buff, start, length);
       if (reverseComplement) {
-        for (int i = length - 1; i >= 0; i--) {
+        for (int i = length - 1; i >= 0; --i) {
           out.write(buff[i] + 33);
         }
       } else {
         if (mFlags.isSet(PRESERVE_FLAG)) {
-          for (int i = 0; i < start; i++) {
+          for (int i = 0; i < start; ++i) {
             out.write(33);
           }
         }
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; ++i) {
           out.write(buff[i] + 33);
         }
       }

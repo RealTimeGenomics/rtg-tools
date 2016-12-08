@@ -87,21 +87,21 @@ public class ByteChunksTest extends AbstractByteIndexTest {
   public void testArrayCopy() {
     final ByteChunks bc = new ByteChunks(32, 3);
     final byte[] bytes = new byte[32];
-    for (int i = 0; i < bytes.length; i++) {
+    for (int i = 0; i < bytes.length; ++i) {
       bytes[i] = (byte) i;
     }
     bc.copyBytes(bytes, 0, 0, bytes.length);
-    for (int i = 0; i < bytes.length; i++) {
+    for (int i = 0; i < bytes.length; ++i) {
       assertEquals(bytes[i], bc.getByte(i));
     }
     final byte[] out = new byte[32];
     bc.getBytes(out, 0, 0, 32);
-    for (int i = 0; i < out.length; i++) {
+    for (int i = 0; i < out.length; ++i) {
       assertEquals(i, out[i]);
     }
 
     bc.getBytes(out, 10, 5, 15);
-    for (int i = 0; i < out.length; i++) {
+    for (int i = 0; i < out.length; ++i) {
       if (i < 10 || i > 24) {
         assertEquals(i, out[i]);
       } else {
@@ -113,11 +113,11 @@ public class ByteChunksTest extends AbstractByteIndexTest {
   public void testArrayCopy2() {
     final ByteChunks bc = new ByteChunks(32, 3);
     final byte[] bytes = new byte[32];
-    for (int i = 0; i < bytes.length; i++) {
+    for (int i = 0; i < bytes.length; ++i) {
       bytes[i] = (byte) i;
     }
     bc.copyBytes(bytes, 20, 5, 12);
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 32; ++i) {
       if (i < 5 || i > 16) {
         assertEquals(0, bc.getByte(i));
       } else {
@@ -127,25 +127,25 @@ public class ByteChunksTest extends AbstractByteIndexTest {
   }
 
   private void set(final int start, final ByteChunks bc) {
-    for (int i = start; i < bc.length(); i++) {
+    for (int i = start; i < bc.length(); ++i) {
       bc.setSigned(i, -128 + (i + 1) % 255);
     }
   }
 
   private void check(final ByteChunks bc) {
-    for (int i = 0; i < bc.length(); i++) {
+    for (int i = 0; i < bc.length(); ++i) {
       assertEquals(-128 + (i + 1) % 255, bc.getSigned(i));
     }
   }
 
   private void setSigned(final int start, final ByteChunks lc) {
-    for (int i = start; i < lc.length(); i++) {
+    for (int i = start; i < lc.length(); ++i) {
       lc.setSigned(i, -(i + 1) + 10);
     }
   }
 
   private void checkSigned(final ByteChunks lc) {
-    for (int i = 0; i < lc.length(); i++) {
+    for (int i = 0; i < lc.length(); ++i) {
       assertEquals(-(i + 1) + 10, lc.getSigned(i));
     }
   }
@@ -243,14 +243,14 @@ public class ByteChunksTest extends AbstractByteIndexTest {
 
   private void checkTrim(final int initLength, final int trimLength) {
     final ByteChunks ic = new ByteChunks(initLength, 3);
-    for (int i = 0; i < initLength; i++) {
+    for (int i = 0; i < initLength; ++i) {
       ic.set(i, i + 1);
     }
     ic.integrity();
     ic.trim(trimLength);
     ic.integrity();
     assertEquals(trimLength, ic.length());
-    for (int i = 0; i < trimLength; i++) {
+    for (int i = 0; i < trimLength; ++i) {
       assertEquals(i + 1, ic.get(i));
     }
     try {

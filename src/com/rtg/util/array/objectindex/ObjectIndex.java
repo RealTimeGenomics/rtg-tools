@@ -147,7 +147,7 @@ public abstract class ObjectIndex<A> extends IntegralAbstract {
   public void toString(final StringBuilder sbInt, final long start, final long end) {
     final long e = end > length() ? length() : end;
     boolean allNull = true;
-    for (long i = start; i < e; i++) {
+    for (long i = start; i < e; ++i) {
       if (get(i) != null) {
         allNull = false;
         break;
@@ -160,7 +160,7 @@ public abstract class ObjectIndex<A> extends IntegralAbstract {
     FORMAT_INDEX.format(sbInt, start);
     sbInt.append("] ");
 
-    for (long i = start; i < e; i++) {
+    for (long i = start; i < e; ++i) {
       sbInt.append(get(i));
       if (i != (e - 1)) {
         sbInt.append(", ");

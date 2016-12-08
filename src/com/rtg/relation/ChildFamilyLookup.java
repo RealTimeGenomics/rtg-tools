@@ -44,7 +44,7 @@ public class ChildFamilyLookup {
     if (families != null) {
       for (Family f : families) {
         final int[] sampleIds = f.getSampleIds();
-        for (int i = Family.FIRST_CHILD_INDEX; i < sampleIds.length; i++) {
+        for (int i = Family.FIRST_CHILD_INDEX; i < sampleIds.length; ++i) {
           childToFamily[sampleIds[i]] = f;
         }
       }

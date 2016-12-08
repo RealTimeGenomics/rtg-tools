@@ -95,7 +95,7 @@ class SequencesReaderReferenceSource implements CRAMReferenceSource {
       final byte[] data = new byte[mReader.length(seqId)];
       mReader.read(seqId, data);
       // Convert from internal binary 0-4 encoding to the ASCII uppercase bases that htsjdk wants
-      for (int i = 0; i < data.length; i++) {
+      for (int i = 0; i < data.length; ++i) {
         data[i] = (byte) DnaUtils.getBase(data[i]);
       }
       mCache.put(record.getSequenceName(), new WeakReference<>(data));

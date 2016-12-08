@@ -101,14 +101,14 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
   protected void handleUnknownBaseline() throws IOException {
     mBrv.setInfo("STATUS", "B-NotInPath"); // Should never happen for us.
     mAlleles.write(mBrv);
-    mBaselineNotInPath++;
+    ++mBaselineNotInPath;
   }
 
   @Override
   protected void handleUnknownCall() throws IOException {
     mCrv.setInfo("STATUS", "C-NotInPath"); // Was skipped during loading, probably OK to just silently drop.
     mAuxiliary.write(mCrv);
-    mCalledNotInPath++;
+    ++mCalledNotInPath;
   }
 
   @Override

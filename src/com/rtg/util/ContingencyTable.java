@@ -77,8 +77,8 @@ public class ContingencyTable {
    * @param eval another evaluation
    */
   public void add(ContingencyTable eval) {
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 2; j++) {
+    for (int i = 0; i < 2; ++i) {
+      for (int j = 0; j < 2; ++j) {
         add(i, j, eval.mContingencyTable[i][j]);
       }
     }

@@ -135,7 +135,7 @@ public class ConcatSequenceDataSourceTest extends TestCase {
 
     @Override
     public boolean nextSequence() {
-      mSequenceIndex++;
+      ++mSequenceIndex;
       if (mSequenceIndex < mData.length) {
         mMinLength = Math.min(mMinLength, currentLength());
         mMaxLength = Math.max(mMaxLength, currentLength());

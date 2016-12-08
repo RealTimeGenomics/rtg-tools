@@ -313,8 +313,8 @@ public class UtilsTest extends TestCase {
 
   private void checkWriteReal(final double x) throws IOException {
     double y = x;
-    for (int i = 0; i < 12; i++) {
-      for (int dp = 0; dp < 11; dp++) {
+    for (int i = 0; i < 12; ++i) {
+      for (int dp = 0; dp < 11; ++dp) {
         checkWriteReal(y, dp);
       }
       y = 10.0 * y;

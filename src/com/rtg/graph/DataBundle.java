@@ -77,7 +77,7 @@ final class DataBundle {
     mPrecisionRecall = new Point2D[totalVariants > 0 ? points.length - 1 : 0];
     final boolean hasRaw = Arrays.stream(points).anyMatch(x -> x.getRawTruePositives() > 0);
     float minPrecision = 100;
-    for (int i = 0; i < mPrecisionRecall.length; i++) {
+    for (int i = 0; i < mPrecisionRecall.length; ++i) {
       final RocPoint point = points[i + 1];
       final double truePositives = point.getTruePositives();
       final float rawTp = (float) (hasRaw ? point.getRawTruePositives() : truePositives);
@@ -111,18 +111,18 @@ final class DataBundle {
     final ArrayList<Point2D> points = new ArrayList<>();
     final ArrayList<Point2D> precisionRecallPoints = new ArrayList<>();
 
-    for (int i = smin; i < smax; i++) {
+    for (int i = smin; i < smax; ++i) {
       scores.add(mScores[i]);
       points.add(mPoints[i]);
     }
-    for (int i = smin; i < Math.min(smax, mPrecisionRecall.length - 1); i++) {
+    for (int i = smin; i < Math.min(smax, mPrecisionRecall.length - 1); ++i) {
       precisionRecallPoints.add(mPrecisionRecall[i]);
     }
 
     mRangedPoints = points.toArray(new Point2D[points.size()]);
     mRangedPrecisionRecall = precisionRecallPoints.toArray(new Point2D[precisionRecallPoints.size()]);
     mRangedScores = new String[scores.size()];
-    for (int i = 0; i < scores.size(); i++) {
+    for (int i = 0; i < scores.size(); ++i) {
       mRangedScores[i] = scores.get(i);
     }
 
@@ -167,9 +167,9 @@ final class DataBundle {
       posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[0]));
       if (step > 0) {
         int c = 0;
-        for (int i = 0; i < counts.size(); i++) {
-          for (int j = 0; j < counts.get(i); j++) {
-            c++;
+        for (int i = 0; i < counts.size(); ++i) {
+          for (int j = 0; j < counts.get(i); ++j) {
+            ++c;
             if (c >= next && posPoints.size() <= TOTAL_LABELS - 1) {
               while (c >= next) {
                 next += step;

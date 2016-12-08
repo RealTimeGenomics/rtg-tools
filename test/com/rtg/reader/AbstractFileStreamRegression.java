@@ -72,7 +72,7 @@ public abstract class AbstractFileStreamRegression extends TestCase {
       try (OutputStream out = createOutputStream(temp, range)) {
         for (long l = 0; l < elements; ) {
           int i = 0;
-          for (; i < buffer.length && l < elements; i++, l++) {
+          for (; i < buffer.length && l < elements; ++i, ++l) {
             buffer[i] = value.nextValue();
           }
           out.write(buffer, 0, i);
@@ -88,7 +88,7 @@ public abstract class AbstractFileStreamRegression extends TestCase {
       try (InputStream in = createInputStream(temp, range, elements, false)) {
         for (long l = 0; l < elements; ) {
           final int read = in.read(buffer);
-          for (int i = 0; i < read; i++, l++) {
+          for (int i = 0; i < read; ++i, ++l) {
             assertEquals(value.nextValue(), buffer[i]);
           }
 //          if (l >= nextLabelOutput) {

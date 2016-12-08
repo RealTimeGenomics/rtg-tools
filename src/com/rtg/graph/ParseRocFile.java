@@ -149,7 +149,7 @@ public final class ParseRocFile {
         prevRawTp = Math.max(prevRawTp, rawTp);
         prevScore = score;
 
-        lines++;
+        ++lines;
         if (showProgress && lines % 100 == 0) {
           progressBarDelegate.setProgress(lines);
         }

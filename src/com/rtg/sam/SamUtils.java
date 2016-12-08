@@ -252,7 +252,7 @@ public final class SamUtils {
   public static void samCat(boolean inputIsGzipped, OutputStream destination, boolean deleteIntermediate, File... inputFiles) throws IOException {
     final byte[] buff = new byte[FileUtils.BUFFERED_STREAM_SIZE];
     final OneShotTimer timer = new OneShotTimer("samCat");
-    for (int i = 0; i < inputFiles.length; i++) {
+    for (int i = 0; i < inputFiles.length; ++i) {
       final long t0 = System.nanoTime();
       boolean dropHeader = i > 0;
       boolean scanNewLine = false;
@@ -264,7 +264,7 @@ public final class SamUtils {
           while ((len = input.read(buff)) > 0) {
             int currentPos = 0;
             if (dropHeader) {
-              for (; currentPos < len; currentPos++) {
+              for (; currentPos < len; ++currentPos) {
                 final char c = (char) buff[currentPos];
                 if (scanNewLine && c == '\n') {
                   scanNewLine = false;
@@ -493,14 +493,14 @@ public final class SamUtils {
           final String[] split = StringUtils.split(r.getId(), '-');
           int id = Integer.parseInt(split[1]);
           do {
-            id++;
+            ++id;
             idStr = split[0] + "-" + id;
           } while (idsUsed.contains(idStr));
         } else {
           int id = 1;
           idStr = r.getId() + "-" + id;
           while (idsUsed.contains(idStr)) {
-            id++;
+            ++id;
             idStr = r.getId() + "-" + id;
           }
         }
@@ -624,7 +624,7 @@ public final class SamUtils {
   public static int cigarRefLength(final String cigar) {
     int refLen = 0;
     int numStartPos = 0;
-    for (int i = 0; i < cigar.length(); i++) {
+    for (int i = 0; i < cigar.length(); ++i) {
       final char c = cigar.charAt(i);
       if (c < '0' || c > '9') {
         switch (c) {
@@ -635,7 +635,7 @@ public final class SamUtils {
           case '=':
           case 'X':
             int mult = 1;
-            for (int j = i - 1; j >= numStartPos; j--) {
+            for (int j = i - 1; j >= numStartPos; --j) {
               refLen += mult * (cigar.charAt(j) - '0');
               mult *= 10;
             }
@@ -658,7 +658,7 @@ public final class SamUtils {
   public static Cigar convertToLegacyCigar(Cigar cigar) {
     final Cigar cg = new Cigar();
     int count = 0;
-    for (int i = 0; i < cigar.numCigarElements(); i++) {
+    for (int i = 0; i < cigar.numCigarElements(); ++i) {
       final CigarElement ce = cigar.getCigarElement(i);
       if (ce.getOperator().equals(CigarOperator.EQ) || ce.getOperator().equals(CigarOperator.X)) {
         count += ce.getLength();
@@ -898,7 +898,7 @@ public final class SamUtils {
 
     final long numSequences = reference.numberSequences();
     final HashSet<String> refNames = new HashSet<>();
-    for (long i = 0; i < numSequences; i++) {
+    for (long i = 0; i < numSequences; ++i) {
       refNames.add(reference.name(i));
     }
     final SdfId samGuid = getReferenceGuid(uberHeader);
