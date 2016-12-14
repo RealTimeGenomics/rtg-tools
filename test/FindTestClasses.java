@@ -36,7 +36,7 @@ import com.reeltwo.jumble.annotations.TestClass;
 
 /**
  * Util main class for locating the test class for a list of targets
- * Inspects the class for jumble TestClass annotations or relys on class naming conventions if that is missing
+ * Inspects the class for jumble TestClass annotations or relies on class naming conventions if that is missing
  */
 public final class FindTestClasses {
   private FindTestClasses() { }
