@@ -29,6 +29,9 @@
  */
 package com.rtg.reader;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import com.rtg.mode.DnaUtils;
 
 /**
@@ -204,4 +207,36 @@ public class ArraySequencesReader extends DummySequencesReader {
     return length;
   }
 
+  @Override
+  public PrereadNamesInterface names() {
+    return new PrereadNamesInterface() {
+      @Override
+      public long length() {
+        return numberSequences();
+      }
+
+      @Override
+      public String name(long id) {
+        return ArraySequencesReader.this.name(id);
+      }
+
+      @Override
+      public long calcChecksum() {
+        return 0;
+      }
+
+      @Override
+      public long bytes() {
+        return 0;
+      }
+
+      @Override
+      public void writeName(Appendable a, long id) throws IOException {
+      }
+
+      @Override
+      public void writeName(OutputStream os, long id) throws IOException {
+      }
+    };
+  }
 }
