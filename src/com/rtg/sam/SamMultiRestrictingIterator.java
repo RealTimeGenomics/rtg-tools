@@ -118,8 +118,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
         final int refId = rec.getReferenceIndex();
 
         if (refId > mCurrentTemplate) { // current offset has exceeded region and block overlapped next template
-          setBuffered(rec);
-          advanceSubIterator();
+          recordPreviousAndAdvance(previousRecord, rec);
         } else {
 
           if (refId < mCurrentTemplate) { // Current block may occasionally return records from the previous template if the block overlaps
@@ -147,13 +146,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
           }
 
           if (alignmentStart >= mCurrentRegion.getEnd()) {  // past current region, advance the iterator and record the furtherest we got
-            if (previousRecord != null && previousRecord.getReferenceIndex() == mCurrentTemplate) {
-              mPreviousAlignmentStart = previousRecord.getAlignmentStart();
-            } else {
-              mPreviousAlignmentStart = Integer.MIN_VALUE;
-            }
-            setBuffered(rec);
-            advanceSubIterator();
+            recordPreviousAndAdvance(previousRecord, rec);
             continue;
           }
 
@@ -162,6 +155,16 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
         }
       }
     }
+  }
+
+  private void recordPreviousAndAdvance(SAMRecord previousRecord, SAMRecord rec) throws IOException {
+    if (previousRecord != null && previousRecord.getReferenceIndex() == mCurrentTemplate) {
+      mPreviousAlignmentStart = previousRecord.getAlignmentStart();
+    } else {
+      mPreviousAlignmentStart = Integer.MIN_VALUE;
+    }
+    setBuffered(rec);
+    advanceSubIterator();
   }
 
   protected void advanceSubIterator() throws IOException {
