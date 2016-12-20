@@ -39,6 +39,7 @@ import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.TabixLineReader;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.IOIterator;
@@ -89,9 +90,31 @@ public class BedReader implements IOIterator<BedRecord> {
   }
 
   /**
-   * Open a <code>bed</code> reader, optionally with a region restriction
+   * Open a <code>BED</code> reader, optionally with a region restriction
+   * @param f <code>BED</code> file, optionally gzipped. If f is '-', input will be read from System.in instead
+   * @param ranges regions to restrict to, null if whole file should be used
+   * @param minAnnotations minimum number of annotation columns needed in BED input
+   * @return the reader
+   * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
+   */
+  public static BedReader openBedReader(File f, ReferenceRanges<String> ranges, int minAnnotations) throws IOException {
+    final boolean stdin = FileUtils.isStdio(f);
+    final BedReader bedr;
+    if (ranges == null || ranges.allAvailable()) {
+      bedr = new BedReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
+    } else {
+      if (stdin) {
+        throw new IOException("Cannot apply region restrictions when reading BED from stdin");
+      }
+      bedr = new BedReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), f, minAnnotations);
+    }
+    return bedr;
+  }
+
+  /**
+   * Open a <code>BED</code> reader, optionally with a region restriction
    * @param region region to restrict to, null if whole file should be used
-   * @param f <code>BED</code> file, optionally gzipped
+   * @param f <code>BED</code> file, optionally gzipped. If f is '-', input will be read from System.in instead
    * @param minAnnotations minimum number of annotation columns needed in BED input
    * @return the reader
    * @throws IOException if an I/O error occurs

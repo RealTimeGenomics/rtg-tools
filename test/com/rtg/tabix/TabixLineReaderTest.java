@@ -34,7 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.rtg.bed.BedReader;
+import com.rtg.bed.BedRecord;
 import com.rtg.sam.SamRangeUtils;
+import com.rtg.sam.SamRegionRestriction;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -129,6 +132,29 @@ public class TabixLineReaderTest extends TestCase {
         );
       final String result = extractRecords(input, tabix, ranges);
       mNano.check("tlr-multi-region", result);
+    }
+  }
+
+  public void testRegionsAtEndOfSequence() throws IOException, UnindexableDataException {
+    // This test simulates an error that was occuring when you have two regions at the end of a sequence
+    // and the second to last region is overlapped by the final record in the sequence.
+    try (TestDirectory dir = new TestDirectory("TabixLineReader")) {
+      final File sam = FileHelper.resourceToFile("com/rtg/tabix/resources/multiRegionSequenceEnd.bed.gz", new File(dir, "tricky.bed.gz"));
+      final File index = new File(dir, "tricky.bed.gz.tbi");
+      new TabixIndexer(sam, index).saveBedIndex();
+      try (BedReader normalReader = BedReader.openBedReader(new RegionRestriction("chr7", 159334000, 159335001), sam, 0)) {
+        final SamRegionRestriction r1 = new SamRegionRestriction("chr7", 159334000, 159335000);
+        final SamRegionRestriction r2 = new SamRegionRestriction("chr7", 159335000, 159335001);
+        final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(r1, r2);
+        try (BedReader multiReader = BedReader.openBedReader(sam, ranges, 0)) {
+          while (normalReader.hasNext() && multiReader.hasNext()) {
+            final BedRecord a = normalReader.next();
+            final BedRecord b = multiReader.next();
+            assertEquals(a.toString(), b.toString());
+          }
+          assertEquals(normalReader.hasNext(), multiReader.hasNext());
+        }
+      }
     }
   }
 }
