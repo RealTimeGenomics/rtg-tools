@@ -251,8 +251,7 @@ public class TabixLineReader implements LineReader {
           }
 
           if (refId > mCurrentTemplate) { // current offset has exceeded region and block overlapped next template
-            mBuffered = true;
-            advanceSubIterator();
+            recordPreviousAndAdvance(previousStart, previousTemplateId);
           } else {
 
             if (refId < mCurrentTemplate) { // Current block may occasionally return records from the previous template if the block overlaps
@@ -278,13 +277,7 @@ public class TabixLineReader implements LineReader {
             }
 
             if (alignmentStart >= mCurrentRegion.getEnd()) {  // past current region, advance the iterator and record the furtherest we got
-              if (previousStart != Integer.MIN_VALUE && previousTemplateId == mCurrentTemplate) {
-                mPreviousAlignmentStart = previousStart;
-              } else {
-                mPreviousAlignmentStart = Integer.MIN_VALUE;
-              }
-              mBuffered = true;
-              advanceSubIterator();
+              recordPreviousAndAdvance(previousStart, previousTemplateId);
               continue;
             }
 
@@ -295,6 +288,16 @@ public class TabixLineReader implements LineReader {
           }
         }
       }
+    }
+
+    private void recordPreviousAndAdvance(int previousStart, int previousTemplateId) {
+      if (previousStart != Integer.MIN_VALUE && previousTemplateId == mCurrentTemplate) {
+        mPreviousAlignmentStart = previousStart;
+      } else {
+        mPreviousAlignmentStart = Integer.MIN_VALUE;
+      }
+      mBuffered = true;
+      advanceSubIterator();
     }
 
     protected void advanceSubIterator() {
