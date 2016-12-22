@@ -52,6 +52,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.Constants;
@@ -226,7 +228,10 @@ public final class SamUtils {
     throw new NoTalkbackSlimException("Either no reference SDF was specified, or this command does not currently support CRAM input");
   };
 
-//  private static final boolean IGNORE_HEADER_INCOMPATIBILITY = GlobalFlags.isSet(GlobalFlags.SAM_IGNORE_INCOMPATIBLE_HEADERS_FLAG);
+  private static final boolean LENIENT_SDF_MISMATCH = GlobalFlags.getBooleanValue(ToolsGlobalFlags.LENIENT_SDF_ID_MISMATCH_FLAG);
+
+  private static final String READS_SDF_ID_MISMATCH = "Current reads SDF-ID does not match SDF-ID of reads used during mapping.";
+  private static final String REFERENCE_SDF_ID_MISMATCH = "Current reference SDF-ID does not match SDF-ID of reference used during mapping.";
 
   private SamUtils() {
   }
@@ -395,9 +400,11 @@ public final class SamUtils {
   public static void checkReadsGuid(final SAMFileHeader header, final SdfId sdfId) {
     final SdfId myGuid = getReadsGuid(header);
     if (!myGuid.check(sdfId)) {
-      throw new NoTalkbackSlimException("SDF-ID of given SDF does not match SDF used during mapping.");
-    } else if (!myGuid.available()) {
-      Diagnostic.warning("No READ-SDF-ID found in SAM header, unable to verify read-id correctness.");
+      if (LENIENT_SDF_MISMATCH) {
+        Diagnostic.warning(READS_SDF_ID_MISMATCH);
+      } else {
+        throw new NoTalkbackSlimException(READS_SDF_ID_MISMATCH);
+      }
     }
   }
 
@@ -414,9 +421,11 @@ public final class SamUtils {
 
   private static void checkReferenceGuid(SdfId samGuid, SdfId referenceGuid) {
     if (!samGuid.check(referenceGuid)) {
-      throw new NoTalkbackSlimException("TEMPLATE-SDF-ID of given file does not match reference SDF-ID used during mapping.");
-    } else if (!samGuid.available()) {
-      Diagnostic.warning("No TEMPLATE-SDF-ID found in SAM header, unable to verify reference correctness.");
+      if (LENIENT_SDF_MISMATCH) {
+        Diagnostic.warning(REFERENCE_SDF_ID_MISMATCH);
+      } else {
+        throw new NoTalkbackSlimException(REFERENCE_SDF_ID_MISMATCH);
+      }
     }
   }
 
@@ -894,16 +903,12 @@ public final class SamUtils {
    * @throws NoTalkbackSlimException if SAM header sequence dictionaries mismatch, and in strict mode
    */
   public static void checkUberHeaderAgainstReference(SequencesReader reference, SAMFileHeader uberHeader, boolean strict) throws IOException, NoTalkbackSlimException {
-    final SdfId refId = reference.getSdfId();
+    checkReferenceGuid(uberHeader, reference.getSdfId());
 
     final long numSequences = reference.numberSequences();
     final HashSet<String> refNames = new HashSet<>();
     for (long i = 0; i < numSequences; ++i) {
       refNames.add(reference.name(i));
-    }
-    final SdfId samGuid = getReferenceGuid(uberHeader);
-    if (!samGuid.check(refId)) {
-      Diagnostic.warning("TEMPLATE-SDF-ID does not match reference SDF-ID.");
     }
 
     final StringBuilder sb = new StringBuilder();

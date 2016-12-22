@@ -217,11 +217,10 @@ public class SamUtilsTest extends TestCase {
       sf.addComment("READ-SDF-ID:" + Long.toHexString(123456));
       SamUtils.checkReadsGuid(sf, new SdfId(123456)); //this should work
 
-      try {
-        SamUtils.checkReadsGuid(sf, new SdfId(12));
-      } catch (final NoTalkbackSlimException ex) {
-        assertEquals("SDF-ID of given SDF does not match SDF used during mapping.", ex.getMessage());
-      }
+      final MemoryPrintStream mps = new MemoryPrintStream();
+      Diagnostic.setLogStream(mps.printStream());
+      SamUtils.checkReadsGuid(sf, new SdfId(12));
+      TestUtils.containsAll(mps.toString(), "Current reads SDF-ID does not match SDF-ID of reads used during mapping.");
 
       final SAMFileHeader sf2 = new SAMFileHeader();
       sf2.addComment("READ-SDF-ID:$$$$$$$");
@@ -232,21 +231,13 @@ public class SamUtilsTest extends TestCase {
         assertTrue(ex.getMessage(), ex.getMessage().contains("Malformed READ-SDF-ID: attribute from SAM header : '$$$$$$$'."));
       }
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      Diagnostic.setLogStream(mps.printStream());
-      final SAMFileHeader sf3 = new SAMFileHeader();
-      SamUtils.checkReadsGuid(sf3, new SdfId(123456));
-      assertTrue(mps.toString().contains("No READ-SDF-ID found in SAM header, unable to verify read-id correctness."));
-
       final SAMFileHeader sft = new SAMFileHeader();
       sft.addComment("TEMPLATE-SDF-ID:" + Long.toHexString(123456));
       SamUtils.checkReferenceGuid(sft, new SdfId(123456)); //this should work
 
-      try {
-        SamUtils.checkReferenceGuid(sft, new SdfId(12));
-      } catch (final NoTalkbackSlimException ex) {
-        assertEquals("TEMPLATE-SDF-ID of given file does not match reference SDF-ID used during mapping.", ex.getMessage());
-      }
+      mps.reset();
+      SamUtils.checkReferenceGuid(sft, new SdfId(12));
+      TestUtils.containsAll(mps.toString(), "Current reference SDF-ID does not match SDF-ID of reference used during mapping.");
 
       final SAMFileHeader sft2 = new SAMFileHeader();
       sft2.addComment("TEMPLATE-SDF-ID:$$$$$$$");
@@ -256,12 +247,6 @@ public class SamUtilsTest extends TestCase {
       } catch (final NoTalkbackSlimException ex) {
         assertTrue(ex.getMessage(), ex.getMessage().contains("Malformed TEMPLATE-SDF-ID: attribute from SAM header : '$$$$$$$'."));
       }
-
-      final MemoryPrintStream mpst = new MemoryPrintStream();
-      Diagnostic.setLogStream(mpst.printStream());
-      final SAMFileHeader sft3 = new SAMFileHeader();
-      SamUtils.checkReferenceGuid(sft3, new SdfId(123456));
-      assertTrue(mpst.toString().contains("No TEMPLATE-SDF-ID found in SAM header, unable to verify reference correctness."));
     } finally {
       Diagnostic.setLogStream();
     }

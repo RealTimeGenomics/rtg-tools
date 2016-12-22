@@ -43,6 +43,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** Allow SAM file loading when sam header is not coordinate sorted */
   public static final String SAM_IGNORE_SORT_ORDER_FLAG = "com.rtg.sam.ignore-header-sortorder";
 
+  /** Allow definite SDF-ID mismatches to be warning rather than exit */
+  public static final String LENIENT_SDF_ID_MISMATCH_FLAG = "com.rtg.sam.lenient-sdf-id";
+
   /** Level of gzip compression to use. */
   public static final String GZIP_LEVEL = "com.rtg.utils.gzip-level";
 
@@ -74,6 +77,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   @Override
   public void registerFlags() {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
+    registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, true);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
 
     registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
