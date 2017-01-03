@@ -79,9 +79,9 @@ public class Family {
    * Each child must share the same two parents.
    * @param pedigree the GenomeRelationships which describes the family
    * @return the identified family
-   * @throws IllegalArgumentException if the genome file doesn't describe a simple family
+   * @throws PedigreeException if the genome file doesn't describe a simple family
    */
-  public static Family getFamily(GenomeRelationships pedigree) {
+  public static Family getFamily(GenomeRelationships pedigree) throws PedigreeException {
     String firstParent = null;
     String secondParent = null;
     final String father;
@@ -93,7 +93,7 @@ public class Family {
         if (r.first().equals(name)) {
           if (!found) {
             if (firstParent != null) {
-              throw new IllegalArgumentException("There are more than two parents specified");
+              throw new PedigreeException("There are more than two parents specified");
             }
             firstParent = secondParent;
             secondParent = name;
@@ -105,7 +105,7 @@ public class Family {
       }
     }
     if (firstParent == null) {
-      throw new IllegalArgumentException("There are fewer than two parents specified");
+      throw new PedigreeException("There are fewer than two parents specified");
     }
     if ((pedigree.getSex(firstParent) == Sex.FEMALE) || (pedigree.getSex(secondParent) == Sex.MALE)) {
       mother = firstParent;
@@ -127,9 +127,9 @@ public class Family {
    * @param sloppy if true, allow families where the sex of both parents are unknown
    * @param samplesToKeep allow only these samples in returned families. null to keep everything.
    * @return a set containing all identified families
-   * @throws IllegalArgumentException if the genome file doesn't describe a simple family
+   * @throws PedigreeException if the genome file doesn't describe a simple family
    */
-  public static Set<Family> getFamilies(GenomeRelationships pedigree, boolean sloppy, Set<String> samplesToKeep) {
+  public static Set<Family> getFamilies(GenomeRelationships pedigree, boolean sloppy, Set<String> samplesToKeep) throws PedigreeException {
     final Relationship.SampleRelationshipFilter sampleFilter = samplesToKeep != null ? new Relationship.SampleRelationshipFilter(samplesToKeep) : null;
     final Map<Pair<String, String>, Set<String>> partials = new LinkedHashMap<>();
     for (final String child : pedigree.genomes()) {
@@ -227,14 +227,14 @@ public class Family {
    * @param father the name of the father
    * @param mother the name of the mother
    * @param children the names of the children
-   * @throws IllegalArgumentException if the pedigree and sample names do not form a simple family
+   * @throws PedigreeException if the pedigree and sample names do not form a simple family
    */
-  public Family(GenomeRelationships pedigree, String father, String mother, String... children) {
+  public Family(GenomeRelationships pedigree, String father, String mother, String... children) throws PedigreeException {
     mPedigree = pedigree;
     mFather = father;
     mMother = mother;
     if (father.equals(mother)) {
-      throw new IllegalArgumentException("Mother and father cannot be the same sample: '" + father + "'");
+      throw new PedigreeException("Mother and father cannot be the same sample: '" + father + "'");
     }
 
 
@@ -249,17 +249,17 @@ public class Family {
     for (final String c : children) {
       final Relationship[] rel = pedigree.relationships(c, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(c));
       if (rel.length != 2) {
-        throw new IllegalArgumentException("Child sample: '" + c + "' has " + rel.length + " parents");
+        throw new PedigreeException("Child sample: '" + c + "' has " + rel.length + " parents");
       }
       if (rel[0].first().equals(rel[1].first())) { // This can probably not occur due to querying collapsing duplicates
-        throw new IllegalArgumentException("Child sample: '" + c + "' had the same parent '" + rel[0].first() + "' specified twice");
+        throw new PedigreeException("Child sample: '" + c + "' had the same parent '" + rel[0].first() + "' specified twice");
       }
       if (c.equals(mother) || c.equals(father)) {
-        throw new IllegalArgumentException("The sample: '" + c + "' cannot be both a parent and a child in the family");
+        throw new PedigreeException("The sample: '" + c + "' cannot be both a parent and a child in the family");
       }
       for (String parent : new String[] {rel[0].first(), rel[1].first()}) {
         if (!(parent.equals(mother) || parent.equals(father))) {
-          throw new IllegalArgumentException("The sample: '" + c + "' had non-family parent '" + parent + "'");
+          throw new PedigreeException("The sample: '" + c + "' had non-family parent '" + parent + "'");
         }
       }
       mChildren.add(c);

@@ -49,8 +49,10 @@ import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.reference.SexMemo;
 import com.rtg.relation.Family;
 import com.rtg.relation.GenomeRelationships;
+import com.rtg.relation.PedigreeException;
 import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.AsyncVcfWriter;
 import com.rtg.vcf.ChildPhasingVcfAnnotator;
@@ -131,8 +133,11 @@ CommonFlags.initNoGzip(mFlags);
       // Get initial relationships from header samples, PEDIGREE and (if present) SAMPLE lines
       pedigree = VcfPedigreeParser.load(header);
     }
-
-    return Family.getFamilies(pedigree, true, new HashSet<>(header.getSampleNames())); // Sloppy as we check sex explicitly
+    try {
+      return Family.getFamilies(pedigree, true, new HashSet<>(header.getSampleNames())); // Sloppy as we check sex explicitly
+    } catch (PedigreeException e) {
+      throw new NoTalkbackSlimException(e.getMessage());
+    }
   }
 
   private SexMemo getSexMemo() throws IOException {

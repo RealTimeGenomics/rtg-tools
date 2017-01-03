@@ -109,89 +109,93 @@ public class PedStatsCli extends AbstractCli {
     final GenomeRelationships pedigree = GenomeRelationships.loadGenomeRelationships(pedFile);
 
     try (LineWriter w = new LineWriter(new OutputStreamWriter(out))) {
+      try {
 
-      if (mFlags.isSet(DOT_OUT)) {      // Output dotty stuff
-        w.writeln(pedigree.toGraphViz((String) mFlags.getValue(DOT_OUT)));
+        if (mFlags.isSet(DOT_OUT)) {      // Output dotty stuff
+          w.writeln(pedigree.toGraphViz((String) mFlags.getValue(DOT_OUT)));
 
-      } else if (mFlags.isSet(PRIMARY_IDS)) {
-        writeIds(w, pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)));
-      } else if (mFlags.isSet(MALE_IDS)) {
-        writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE)));
-      } else if (mFlags.isSet(FEMALE_IDS)) {
-        writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE)));
-      } else if (mFlags.isSet(MATERNAL_IDS)) {
-        final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
-          new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE));
-        writeIds(w, genomes);
-      } else if (mFlags.isSet(PATERNAL_IDS)) {
-        final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
-          new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE));
-        writeIds(w, genomes);
-      } else if (mFlags.isSet(FOUNDER_IDS)) {
-        final String[] genomes = pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false));
-        writeIds(w, genomes);
-      } else if (mFlags.isSet(FAMILIES_OUT)) { // Output list of families identified in the ped file:
-        final Set<Family> families = Family.getFamilies(pedigree, false, null);
-        for (final Family f : families) {
-          w.writeln(f.toString());
-        }
-
-      } else if (mFlags.isSet(DUMP)) {
-        w.writeln(pedigree.toString());
-
-      } else if (mFlags.isSet(ORDERING)) {      // ordering stuff
-        final List<Family> families;
-        try {
-          families = MultiFamilyOrdering.orderFamiliesAndSetMates(Family.getFamilies(pedigree, false, null));
-        } catch (PedigreeException e) {
-          throw new NoTalkbackSlimException(e.getMessage());
-        }
-        w.writeln("Families in processing order:");
-        for (final Family f : families) {
-          w.writeln(f.toString());
-        }
-        final Set<String> nonMonog = MultiFamilyOrdering.nonMonogamousSamples(families);
-        if (nonMonog.size() > 0) {
-          w.writeln("The following individuals are not monogamous:");
-          for (final String s : nonMonog) {
-            w.writeln(s);
+        } else if (mFlags.isSet(PRIMARY_IDS)) {
+          writeIds(w, pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)));
+        } else if (mFlags.isSet(MALE_IDS)) {
+          writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE)));
+        } else if (mFlags.isSet(FEMALE_IDS)) {
+          writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE)));
+        } else if (mFlags.isSet(MATERNAL_IDS)) {
+          final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
+            new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE));
+          writeIds(w, genomes);
+        } else if (mFlags.isSet(PATERNAL_IDS)) {
+          final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
+            new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE));
+          writeIds(w, genomes);
+        } else if (mFlags.isSet(FOUNDER_IDS)) {
+          final String[] genomes = pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false));
+          writeIds(w, genomes);
+        } else if (mFlags.isSet(FAMILIES_OUT)) { // Output list of families identified in the ped file:
+          final Set<Family> families = Family.getFamilies(pedigree, false, null);
+          for (final Family f : families) {
+            w.writeln(f.toString());
           }
-        } else {
-          w.writeln("Set of families is monogamous");
-        }
 
-      } else if (mFlags.isSet(FAMILY_FLAGS)) {
-        final Set<Family> families = Family.getFamilies(pedigree, false, null);
-        for (final Family f : families) {
-          String familycmd = "";
-          familycmd += "--father " + f.getFather();
-          familycmd += " --mother " + f.getMother();
-          for (final String child : f.getChildren()) {
-            if (pedigree.getSex(child) == Sex.MALE) {
-              familycmd += " --son " + child;
-            } else if (pedigree.getSex(child) == Sex.FEMALE) {
-              familycmd += " --daughter " + child;
-            } else {
-              System.err.println("Child has unknown sex: " + child);
+        } else if (mFlags.isSet(DUMP)) {
+          w.writeln(pedigree.toString());
+
+        } else if (mFlags.isSet(ORDERING)) {      // ordering stuff
+          final List<Family> families;
+          try {
+            families = MultiFamilyOrdering.orderFamiliesAndSetMates(Family.getFamilies(pedigree, false, null));
+          } catch (PedigreeException e) {
+            throw new NoTalkbackSlimException(e.getMessage());
+          }
+          w.writeln("Families in processing order:");
+          for (final Family f : families) {
+            w.writeln(f.toString());
+          }
+          final Set<String> nonMonog = MultiFamilyOrdering.nonMonogamousSamples(families);
+          if (nonMonog.size() > 0) {
+            w.writeln("The following individuals are not monogamous:");
+            for (final String s : nonMonog) {
+              w.writeln(s);
             }
+          } else {
+            w.writeln("Set of families is monogamous");
           }
-          w.writeln("rtg family " + familycmd);
+
+        } else if (mFlags.isSet(FAMILY_FLAGS)) {
+          final Set<Family> families = Family.getFamilies(pedigree, false, null);
+          for (final Family f : families) {
+            String familycmd = "";
+            familycmd += "--father " + f.getFather();
+            familycmd += " --mother " + f.getMother();
+            for (final String child : f.getChildren()) {
+              if (pedigree.getSex(child) == Sex.MALE) {
+                familycmd += " --son " + child;
+              } else if (pedigree.getSex(child) == Sex.FEMALE) {
+                familycmd += " --daughter " + child;
+              } else {
+                System.err.println("Child has unknown sex: " + child);
+              }
+            }
+            w.writeln("rtg family " + familycmd);
+          }
+        } else { // Output summary information
+          final TextTable table = new TextTable();
+          table.setAlignment(TextTable.Align.LEFT);
+          w.writeln("Pedigree file: " + pedFile.toString());
+          w.writeln();
+          table.addRow("Total samples:", "" + pedigree.genomes().length);
+          table.addRow("Primary samples:", "" + pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)).length);
+          table.addRow("Male samples:", "" + pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE)).length);
+          table.addRow("Female samples:", "" + pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE)).length);
+          table.addRow("Afflicted samples:", "" + pedigree.genomes(new GenomeRelationships.DiseasedGenomeFilter(pedigree)).length);
+          table.addRow("Founder samples:", "" + pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false)).length);
+          table.addRow("Parent-child relationships:", "" + pedigree.relationships(new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD)).length);
+          table.addRow("Other relationships:", "" + pedigree.relationships(new Relationship.NotFilter(new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD))).length);
+          table.addRow("Families:", "" + Family.getFamilies(pedigree, false, null).size());
+          w.writeln(table.toString());
         }
-      } else { // Output summary information
-        final TextTable table = new TextTable();
-        table.setAlignment(TextTable.Align.LEFT);
-        w.writeln("Pedigree file: " + pedFile.toString());
-        w.writeln();
-        table.addRow("Total samples:", "" + pedigree.genomes().length);
-        table.addRow("Primary samples:", "" + pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)).length);
-        table.addRow("Male samples:", "" + pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE)).length);
-        table.addRow("Female samples:", "" + pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE)).length);
-        table.addRow("Afflicted samples:", "" + pedigree.genomes(new GenomeRelationships.DiseasedGenomeFilter(pedigree)).length);
-        table.addRow("Founder samples:", "" + pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false)).length);
-        table.addRow("Parent-child relationships:", "" + pedigree.relationships(new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD)).length);
-        table.addRow("Other relationships:", "" + pedigree.relationships(new Relationship.NotFilter(new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD))).length);
-        table.addRow("Families:", "" + Family.getFamilies(pedigree, false, null).size());
-        w.writeln(table.toString());
+      } catch (PedigreeException e) {
+        throw new NoTalkbackSlimException(e.getMessage());
       }
     }
     return 0;

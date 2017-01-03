@@ -192,7 +192,12 @@ public final class VcfPedigreeParser {
       }
       if (gr.relationships(Relationship.RelationshipType.PARENT_CHILD).length > 0) {
         // Do nuclear families
-        final Set<Family> families = Family.getFamilies(gr, true, null); //sloppy parsing to support family disease caller that doesn't enforce parent sex
+        final Set<Family> families;
+        try {
+          families = Family.getFamilies(gr, true, null); //sloppy parsing to support family disease caller that doesn't enforce parent sex
+        } catch (PedigreeException e) {
+          throw new NoTalkbackSlimException(e.getMessage());
+        }
         for (final Family f : families) {
           for (final String child : f.getChildren()) {
             if (isOutputGenome(outputSamples, child) || isOutputGenome(outputSamples, f.getMother()) || isOutputGenome(outputSamples, f.getFather())) {

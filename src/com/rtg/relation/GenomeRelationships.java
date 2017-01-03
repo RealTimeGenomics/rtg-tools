@@ -52,6 +52,7 @@ import com.rtg.relation.Relationship.RelationshipTypeFilter;
 import com.rtg.relation.Relationship.SecondInRelationshipFilter;
 import com.rtg.util.MultiMap;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfUtils;
@@ -357,25 +358,29 @@ public class GenomeRelationships {
     final Map<String, String> nodeIds = new HashMap<>();
 
     // Output family specific stuff (i.e. node representing a marriage, with children coming off that)
-    for (final Family family : Family.getFamilies(this, false, null)) {
-      seenGenomes.add(family.getFather());
-      seenGenomes.add(family.getMother());
-      final String fatherId = nodeId(nodeIds, family.getFather());
-      final String motherId = nodeId(nodeIds, family.getMother());
-      final String marriageId = nodeId(nodeIds, "m" + family.getFather() + "x" + family.getMother());
-      sb.append("  {\n");
-      //sb.append("    rank = same;\n");
-      sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
-      sb.append("    ").append(motherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
-      sb.append("    ").append(marriageId).append(" [shape=diamond,style=filled,label=\"\",height=.1,width=.1];\n");
-      sb.append("  }\n");
-      for (final String child : family.getChildren()) {
-        sb.append("  ").append(marriageId).append(" -> ").append(nodeId(nodeIds, child)).append(" [];\n");
-        for (final Relationship r : relationships(child, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child))) {
-          seen.add(r);
-          seenGenomes.add(child);
+    try {
+      for (final Family family : Family.getFamilies(this, false, null)) {
+        seenGenomes.add(family.getFather());
+        seenGenomes.add(family.getMother());
+        final String fatherId = nodeId(nodeIds, family.getFather());
+        final String motherId = nodeId(nodeIds, family.getMother());
+        final String marriageId = nodeId(nodeIds, "m" + family.getFather() + "x" + family.getMother());
+        sb.append("  {\n");
+        //sb.append("    rank = same;\n");
+        sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
+        sb.append("    ").append(motherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
+        sb.append("    ").append(marriageId).append(" [shape=diamond,style=filled,label=\"\",height=.1,width=.1];\n");
+        sb.append("  }\n");
+        for (final String child : family.getChildren()) {
+          sb.append("  ").append(marriageId).append(" -> ").append(nodeId(nodeIds, child)).append(" [];\n");
+          for (final Relationship r : relationships(child, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child))) {
+            seen.add(r);
+            seenGenomes.add(child);
+          }
         }
       }
+    } catch (PedigreeException e) {
+      throw new NoTalkbackSlimException(e.getMessage());
     }
 
     // Output remaining relationships

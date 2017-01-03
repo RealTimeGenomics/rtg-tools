@@ -87,7 +87,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
       assertEquals("There are fewer than two parents specified", e.getMessage());
     }
@@ -102,7 +102,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
       assertEquals("Child sample: 'childb' has 1 parents", e.getMessage());
     }
@@ -117,7 +117,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
     }
   }
@@ -131,7 +131,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
     }
   }
@@ -146,7 +146,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
       assertEquals("Child sample: 'childa' has 1 parents", e.getMessage());
     }
@@ -162,7 +162,7 @@ public class FamilyTest extends TestCase {
     try {
       Family.getFamily(RelationshipsFileParser.load(new BufferedReader(new StringReader(input))));
       fail();
-    } catch (final IllegalArgumentException e) {
+    } catch (final PedigreeException e) {
       // Expected
       assertEquals("There are more than two parents specified", e.getMessage());
     }
@@ -182,7 +182,7 @@ public class FamilyTest extends TestCase {
     assertEquals("female", fam.getMother());
   }
 
-  public void testMultiFamily() {
+  public void testMultiFamily() throws PedigreeException {
     final GenomeRelationships pedigree = new GenomeRelationships();
     pedigree.addGenome("father", GenomeRelationships.SEX_MALE).setProperty(GenomeRelationships.DISEASE_PROPERTY, "true");
     pedigree.addGenome("mother", GenomeRelationships.SEX_FEMALE);
