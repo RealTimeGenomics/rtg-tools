@@ -85,17 +85,14 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
   }
 
   /**
-   * Read FASTQ sequences from given InputStreams. This constructor assumes all the
-   * input streams are open.
+   * Read FASTQ sequences from given InputStreams. Primarily used for testing
    * @param iss list of InputStreams
    * @param scoreType what type of quality score is represented
    */
   public FastqSequenceDataSource(List<InputStream> iss, final FastQScoreType scoreType) {
     super(iss, new DNAFastaSymbolTable());
     mScoreType = scoreType;
-    if (scoreType != null) {
-      initQualityTable(scoreType);
-    }
+    initQualityTable(scoreType);
   }
 
   /**
@@ -105,15 +102,12 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
    * of all previous streams is undefined.
    * @param files List of files
    * @param scoreType what type of quality score is represented
-   * @param file hack to overload constructor, should always be true
    * @param arm the arm that this source belongs to
    */
-  public FastqSequenceDataSource(List<File> files, final FastQScoreType scoreType, boolean file, PrereadArm arm) {
-    super(files, new DNAFastaSymbolTable(), file, arm);
+  public FastqSequenceDataSource(List<File> files, final FastQScoreType scoreType, PrereadArm arm) {
+    super(files, new DNAFastaSymbolTable(), arm);
     mScoreType = scoreType;
-    if (scoreType != null) {
-      initQualityTable(scoreType);
-    }
+    initQualityTable(scoreType);
   }
 
   /**

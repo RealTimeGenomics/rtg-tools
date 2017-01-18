@@ -94,7 +94,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
    * @return SamBamSequenceDataSource the sequence data source for the inputs
    */
   public static SamBamSequenceDataSource fromInputFiles(List<File> files, boolean paired, boolean flattenPaired, SamFilter filter) {
-    return new SamBamSequenceDataSource(new FileStreamIterator(files, null), paired, flattenPaired, filter);
+    return new SamBamSequenceDataSource(new FileStreamIterator(files), paired, flattenPaired, filter);
   }
 
   @Override

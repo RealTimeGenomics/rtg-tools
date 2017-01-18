@@ -697,7 +697,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
   }
 
   private void multipleFileTest(ArrayList<File> list) throws IOException {
-    try (FastqSequenceDataSource ds = new FastqSequenceDataSource(list, FastQScoreType.PHRED, true, null)) {
+    try (FastqSequenceDataSource ds = new FastqSequenceDataSource(list, FastQScoreType.PHRED, PrereadArm.UNKNOWN)) {
       assertTrue(ds.nextSequence());
       assertEquals("first", ds.name());
       byte[] b = ds.sequenceData();

@@ -461,7 +461,7 @@ public class FastaSequenceDataSourceTest extends TestCase {
       list.add(getFile("tt2", s2));
       final String s3 = ">third\nacgt";
       list.add(getFile("tt3", s3));
-      try (FastaSequenceDataSource fsds = new FastaSequenceDataSource(list, new DNAFastaSymbolTable(), true, null)) {
+      try (FastaSequenceDataSource fsds = new FastaSequenceDataSource(list, new DNAFastaSymbolTable(), PrereadArm.UNKNOWN)) {
         assertTrue(fsds.nextSequence());
         assertEquals("first", fsds.name());
         byte[] b = fsds.sequenceData();
@@ -510,7 +510,7 @@ public class FastaSequenceDataSourceTest extends TestCase {
       final String s3 = ">third\nacgt";
       final File f3 = getGZFile("tt3", s3);
       list.add(f3);
-      try (FastaSequenceDataSource ds = new FastaSequenceDataSource(list, new DNAFastaSymbolTable(), true, null)) {
+      try (FastaSequenceDataSource ds = new FastaSequenceDataSource(list, new DNAFastaSymbolTable(), PrereadArm.UNKNOWN)) {
         assertTrue(ds.nextSequence());
         byte[] b = ds.sequenceData();
         assertEquals(4, ds.currentLength());

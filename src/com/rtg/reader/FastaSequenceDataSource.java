@@ -88,8 +88,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
   public static final String FASTA_EXTENSION = ".fasta";
 
   /**
-   * Read FASTA sequences from given InputStreams. This constructor assumes all the
-   * input streams are open.
+   * Read FASTA sequences from given InputStreams. Primarily used for testing.
    * @param iss list of InputStreams
    * @param table Symbol table for type of input.
    */
@@ -103,18 +102,13 @@ public class FastaSequenceDataSource implements SequenceDataSource {
   }
 
   /**
-   * Read FASTA sequences from given stream. Assumes that the opening and closing of
-   * files is handled externally.  That is, when <code>next()</code> is called on
-   * the iterator it is assumed that the returned stream open, but that the status
-   * of all previous streams is undefined.
+   * Read FASTA sequences from given files.
    * @param files List of files
    * @param table Symbol table for type of input.
-   * @param file hack to overload constructor, should always be true
    * @param arm the arm that this source belongs to
    */
-  public FastaSequenceDataSource(List<File> files, FastaSymbolTable table, boolean file, PrereadArm arm) {
-    assert file;
-    if (files == null) {
+  public FastaSequenceDataSource(List<File> files, FastaSymbolTable table, PrereadArm arm) {
+    if (files == null || arm == null) {
       throw new NullPointerException();
     }
     mTable = table;

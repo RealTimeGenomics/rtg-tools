@@ -53,7 +53,7 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
    * @return SamBamSequenceDataSource the sequence data source for the inputs
    */
   public static CgSamBamSequenceDataSource fromInputFiles(List<File> files, boolean flattenPaired, SamFilter filter) {
-    return new CgSamBamSequenceDataSource(new FileStreamIterator(files, null), flattenPaired, filter);
+    return new CgSamBamSequenceDataSource(new FileStreamIterator(files), flattenPaired, filter);
   }
 
   private CgSamBamSequenceDataSource(FileStreamIterator inputs, boolean flattenPaired, SamFilter filter) {

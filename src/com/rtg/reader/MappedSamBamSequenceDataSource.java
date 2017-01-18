@@ -65,7 +65,7 @@ public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
    * @return SamBamSequenceDataSource the sequence data source for the inputs
    */
   public static MappedSamBamSequenceDataSource fromInputFiles(List<File> files, boolean paired, boolean flattenPaired, SamFilter filter) {
-    return new MappedSamBamSequenceDataSource(new FileStreamIterator(files, null), paired, flattenPaired, filter);
+    return new MappedSamBamSequenceDataSource(new FileStreamIterator(files), paired, flattenPaired, filter);
   }
 
   @Override

@@ -42,7 +42,7 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 
 /**
- * Iterates through <code>FileStreams</code>
+ * Iterates through a group of <code>File</code> producing an InputStream for each
  */
 class FileStreamIterator implements Iterator<InputStream> {
 
@@ -55,6 +55,10 @@ class FileStreamIterator implements Iterator<InputStream> {
 
   private File mNextFile;
   private File mLastFile;
+
+  FileStreamIterator(final List<File> files) {
+    this(files, PrereadArm.UNKNOWN);
+  }
 
   FileStreamIterator(final List<File> files, PrereadArm arm) {
     mIt = files.iterator();

@@ -303,13 +303,13 @@ public final class FormatCli extends LoggedCli {
    */
   public static SequenceDataSource getDnaDataSource(List<File> files, InputFormat format, PrereadArm arm, boolean mappedSam, boolean flattenPaired, String samReadGroup, boolean dedupSecondary) {
     if (format == InputFormat.FASTA) {
-      return new FastaSequenceDataSource(files, new DNAFastaSymbolTable(), true, arm);
+      return new FastaSequenceDataSource(files, new DNAFastaSymbolTable(), arm);
     } else if (format == InputFormat.FASTQ || format == InputFormat.FASTQ_CG) {
-      return new FastqSequenceDataSource(files, FastQScoreType.PHRED, true, arm);
+      return new FastqSequenceDataSource(files, FastQScoreType.PHRED, arm);
     } else if (format == InputFormat.SOLEXA) {
-      return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA, true, arm);
+      return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA, arm);
     } else if (format == InputFormat.SOLEXA1_3) {
-      return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA1_3, true, arm);
+      return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA1_3, arm);
     } else if (format.isSam()) {
       final List<SamFilter> filters = new ArrayList<>();
       int filterFlags = SamBamConstants.SAM_SUPPLEMENTARY_ALIGNMENT; // Always ignore supplementary alignments
@@ -453,11 +453,11 @@ public final class FormatCli extends LoggedCli {
         if (mInputFormat != InputFormat.FASTA) {
           throw new BadFormatCombinationException("Incompatible sequence type and file format. format=" + mInputFormat + " protein=" + mProtein);
         }
-        ds = new FastaSequenceDataSource(files, new ProteinFastaSymbolTable(), true, null);
+        ds = new FastaSequenceDataSource(files, new ProteinFastaSymbolTable(), PrereadArm.UNKNOWN);
         ds.setDusting(mDusting);
         writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
       } else {
-        ds = getDnaDataSource(files, mInputFormat, null, mMappedSam, false, mSamReadGroup, mDedupSecondary);
+        ds = getDnaDataSource(files, mInputFormat, PrereadArm.UNKNOWN, mMappedSam, false, mSamReadGroup, mDedupSecondary);
         ds.setDusting(mDusting);
         if (mInputFormat.isPairedSam()) {
           writer = new AlternatingSequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);

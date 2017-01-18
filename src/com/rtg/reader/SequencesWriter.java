@@ -340,7 +340,7 @@ public class SequencesWriter {
    */
   public static void main(String[] args) throws Exception {
     final long start = System.currentTimeMillis();
-    final SequenceDataSource leftds = new FastaSequenceDataSource(Collections.singletonList(new File(args[0])), new DNAFastaSymbolTable(), true, null);
+    final SequenceDataSource leftds = new FastaSequenceDataSource(Collections.singletonList(new File(args[0])), new DNAFastaSymbolTable(), PrereadArm.UNKNOWN);
     final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<String>(), PrereadType.UNKNOWN, true);
     // perform the actual work
     writer.processSequences();
