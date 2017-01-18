@@ -189,7 +189,12 @@ public abstract class AbstractCli {
         Diagnostic.setLogStream();
         break;
       case "err":
+      case "stderr":
         Diagnostic.setLogStream(System.err);
+        break;
+      case "out":
+      case "stdout":
+        Diagnostic.setLogStream(System.out);
         break;
       default:
         Diagnostic.setLogStream(new LogFile(new File(LOG_DEST)));
