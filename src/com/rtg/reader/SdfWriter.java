@@ -254,6 +254,13 @@ public class SdfWriter extends AbstractSdfWriter {
       mSeqIndex.incrementCount();
     }
 
+    if (mHasQuality) {
+      if (qs[0] == -1) {
+        throw new NoTalkbackSlimException(ErrorType.INVALID_QUALITY_LENGTH, mCurrentLabel == null ? Long.toString(mNumberOfSequences) : mCurrentLabel.toString());
+      }
+      clipQuality(qs, length);
+    }
+
     int bytesWritten = 0;
     int bytesToWrite;
     while (bytesWritten < length) {
@@ -267,10 +274,6 @@ public class SdfWriter extends AbstractSdfWriter {
       }
 
       if (mHasQuality) {
-        if (qs[0] == -1) {
-          throw new NoTalkbackSlimException(ErrorType.INVALID_QUALITY_LENGTH, mCurrentLabel == null ? Long.toString(mNumberOfSequences) : mCurrentLabel.toString());
-        }
-        clipQuality(qs, length);
         mCurrentSeq.writeQuality(qs, bytesWritten, bytesToWrite);
       }
 
