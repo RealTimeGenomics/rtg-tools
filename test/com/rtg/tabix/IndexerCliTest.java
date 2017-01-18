@@ -63,9 +63,9 @@ public class IndexerCliTest extends AbstractCliTest {
       checkHandleFlagsOut("-f", "sam", f.getPath());
       checkHandleFlagsOut("-f", "bam", f.getPath());
       checkHandleFlagsOut("-f", "vcf", f.getPath());
+      checkHandleFlagsOut("-f", "auto", f.getPath());
       checkHandleFlagsOut("-f", "coveragetsv", f.getPath());
       checkHandleFlagsErr("-f", "hobbit", f.getPath());
-      checkHandleFlagsErr(f.getPath());
     }
   }
 

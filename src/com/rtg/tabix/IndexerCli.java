@@ -60,17 +60,29 @@ public class IndexerCli extends AbstractCli {
    */
   public enum IndexFormat {
     /** <code>SAM</code> format */
-    SAM,
+    SAM(".sam.gz"),
     /** <code>BAM</code> format */
-    BAM,
+    BAM(".bam"),
     /** <code>SV</code> format */
-    SV,
+    SV(".sv"),
     /** Coverage format */
-    COVERAGETSV,
+    COVERAGETSV(".tsv.gz"),
     /** BED format */
-    BED,
+    BED(".bed.gz"),
     /** <code>VCF</code> format */
-    VCF
+    VCF(".vcf.gz"),
+    /** Automatically determine format */
+    AUTO(null);
+
+    private final String mExtension;
+
+    IndexFormat(final String extension) {
+      mExtension = extension;
+    }
+
+    String getExtension() {
+      return mExtension;
+    }
   }
 
   @Override
@@ -100,7 +112,7 @@ public class IndexerCli extends AbstractCli {
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setPsuedoMinMaxRangeString(0, Integer.MAX_VALUE);
     final Flag listFlag = flags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of block compressed files (1 per line) containing genome position data").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerRequired('f', INPUT_FORMAT, IndexFormat.class, "FORMAT", "format of input to index").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerOptional('f', INPUT_FORMAT, IndexFormat.class, "FORMAT", "format of input to index", IndexFormat.AUTO).setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.addRequiredSet(inFlag);
     flags.addRequiredSet(listFlag);
   }
@@ -112,11 +124,35 @@ public class IndexerCli extends AbstractCli {
     }
   }
 
+  private static IndexFormat getIndexFormat(final Collection<File> inputFiles, final IndexFormat suppliedFormat) {
+    if (suppliedFormat != IndexFormat.AUTO) {
+      return suppliedFormat;
+    }
+    IndexFormat res = null;
+    for (final File f : inputFiles) {
+      final String name = f.getName();
+      for (final IndexFormat format : IndexFormat.values()) {
+        final String ext = format.getExtension();
+        if (ext != null && name.endsWith(ext)) {
+          if (res != null && res != format) {
+            return null; // Inputs appear to be mixed file types
+          }
+          res = format;
+        }
+      }
+    }
+    return res;
+  }
+
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     int retCode = 0;
-    final IndexFormat format = (IndexFormat) mFlags.getValue(INPUT_FORMAT);
     Collection<File> inputFiles = CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false);
+    final IndexFormat format = getIndexFormat(inputFiles, (IndexFormat) mFlags.getValue(INPUT_FORMAT));
+    if (format == null) {
+      Diagnostic.warning("Could not automatically determine file format type, please use --" + INPUT_FORMAT);
+      return 1;
+    }
     if (mFlags.isSet(CommonFlags.FORCE)) {
       inputFiles = IndexUtils.ensureBlockCompressed(inputFiles);
     }
