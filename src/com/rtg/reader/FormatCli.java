@@ -743,19 +743,19 @@ public final class FormatCli extends LoggedCli {
             useQuality, useNames, (Boolean) mFlags.getValue(COMPRESS_FLAG), (Boolean) mFlags.getValue(XMAPPED_SAM),
             selectReadGroup, samReadGroupRecord, mFlags.isSet(XDEDUP_SECONDARY));
           final ArrayList<ReadTrimmer> trimmers = new ArrayList<>();
+          if (mFlags.isSet(TRIM_END_FLAG) && (Integer) mFlags.getValue(TRIM_END_FLAG) > 0) {
+            trimmers.add(new LastBasesReadTrimmer((Integer) mFlags.getValue(TRIM_END_FLAG)));
+          }
           if (mFlags.isSet(TRIM_THRESHOLD_FLAG) && (Integer) mFlags.getValue(TRIM_THRESHOLD_FLAG) > 0) {
             if (inputformat == InputFormat.FASTA) {
               throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Input must contain qualities to perform quality-based read trimming.");
             }
             trimmers.add(new BestSumReadTrimmer((Integer) mFlags.getValue(TRIM_THRESHOLD_FLAG)));
           }
-          if (mFlags.isSet(TRIM_END_FLAG) && (Integer) mFlags.getValue(TRIM_END_FLAG) > 0) {
-            trimmers.add(new LastBasesReadTrimmer((Integer) mFlags.getValue(TRIM_END_FLAG)));
-          }
           if (trimmers.size() == 1) {
             pre.setReadTrimmer(trimmers.get(0));
           } else if (trimmers.size() > 1) {
-            pre.setReadTrimmer(new MinReadTrimmer(trimmers.toArray(new ReadTrimmer[0])));
+            pre.setReadTrimmer(new MultiReadTrimmer(trimmers.toArray(new ReadTrimmer[0])));
           }
           if (files.size() == 0) {
             final File left = (File) mFlags.getValue(LEFT_FILE_FLAG);

@@ -33,9 +33,9 @@ package com.rtg.reader;
 import java.util.Arrays;
 
 /**
- * Clips sequences to the minimum end position suggested by delegate trimmers.
+ * Applies a succession of delegate trimmers.
  */
-public final class MinReadTrimmer implements ReadTrimmer {
+public final class MultiReadTrimmer implements ReadTrimmer {
 
   private final ReadTrimmer[] mTrimmers;
 
@@ -43,20 +43,20 @@ public final class MinReadTrimmer implements ReadTrimmer {
    * Construct a read trimmer
    * @param trimmers the delegate trimmers to iterate through
    */
-  public MinReadTrimmer(ReadTrimmer... trimmers) {
+  public MultiReadTrimmer(ReadTrimmer... trimmers) {
     mTrimmers = trimmers;
   }
 
   @Override
   public String toString() {
-    return "Min(trimmers=" + Arrays.toString(mTrimmers) + ")";
+    return "Multi(trimmers=" + Arrays.toString(mTrimmers) + ")";
   }
 
   @Override
-  public int getTrimPosition(byte[] qualities, int length) {
+  public int trimRead(byte[] read, byte[] qualities, int length) {
     int pos = length;
     for (ReadTrimmer t : mTrimmers) {
-      pos = Math.min(pos, t.getTrimPosition(qualities, length));
+      pos = Math.min(pos, t.trimRead(read, qualities, length));
     }
     return pos;
   }

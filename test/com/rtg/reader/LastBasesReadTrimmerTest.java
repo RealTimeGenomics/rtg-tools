@@ -30,14 +30,19 @@
 
 package com.rtg.reader;
 
+import com.rtg.mode.DnaUtils;
+import com.rtg.util.PortableRandom;
+import com.rtg.util.test.RandomDna;
+
 import junit.framework.TestCase;
 
 public class LastBasesReadTrimmerTest extends TestCase {
 
   private void check(String raw) {
     final ReadTrimmer t = new LastBasesReadTrimmer(20);
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(raw.length(), new PortableRandom(42)));
     final byte[] quals = FastaUtils.asciiToRawQuality(raw);
-    assertEquals(Math.max(0, raw.length() - 20), t.getTrimPosition(quals, raw.length()));
+    assertEquals(Math.max(0, raw.length() - 20), t.trimRead(read, quals, raw.length()));
   }
 
   public void testExamples() {

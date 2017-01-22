@@ -30,6 +30,10 @@
 
 package com.rtg.reader;
 
+import com.rtg.mode.DnaUtils;
+import com.rtg.util.PortableRandom;
+import com.rtg.util.test.RandomDna;
+
 import junit.framework.TestCase;
 
 /**
@@ -38,47 +42,50 @@ public class BestSumReadTrimmerTest extends TestCase {
 
   public void testVeryGoodQual() {
     final byte[] quals = {73, 73, 73, 73, 73, 73, 73, 73, 73};
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(quals.length, new PortableRandom(42)));
     final BestSumReadTrimmer bsrt = new BestSumReadTrimmer(15);
 
-    assertEquals(quals.length, bsrt.getTrimPosition(quals, quals.length));
-    assertEquals(8, bsrt.getTrimPosition(quals, 8));
+    assertEquals(quals.length, bsrt.trimRead(read, quals, quals.length));
+    assertEquals(8, bsrt.trimRead(read, quals, 8));
   }
 
   public void testHalfGoodQual() {
     final byte[] quals = {73, 73, 73, 73, 13, 13, 13, 13};
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(quals.length, new PortableRandom(42)));
     BestSumReadTrimmer bsrt = new BestSumReadTrimmer(15);
 
-    assertEquals(4, bsrt.getTrimPosition(quals, quals.length));
-    assertEquals(4, bsrt.getTrimPosition(quals, 6));
+    assertEquals(4, bsrt.trimRead(read, quals, quals.length));
+    assertEquals(4, bsrt.trimRead(read, quals, 6));
     bsrt = new BestSumReadTrimmer(14);
-    assertEquals(4, bsrt.getTrimPosition(quals, 6));
+    assertEquals(4, bsrt.trimRead(read, quals, 6));
     bsrt = new BestSumReadTrimmer(13);
-    assertEquals(6, bsrt.getTrimPosition(quals, 6));
+    assertEquals(6, bsrt.trimRead(read, quals, 6));
   }
 
   public void testGoodBadGoodOk() {
     final byte[] quals = {73, 73, 73, 73, 13, 13, 13, 13, 20, 20, 20, 20};
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(quals.length, new PortableRandom(42)));
     BestSumReadTrimmer bsrt = new BestSumReadTrimmer(15);
 
-    assertEquals(quals.length, bsrt.getTrimPosition(quals, quals.length));
-    assertEquals(quals.length - 1, bsrt.getTrimPosition(quals, quals.length - 1));
-    assertEquals(quals.length - 2, bsrt.getTrimPosition(quals, quals.length - 2));
-    assertEquals(quals.length - 3, bsrt.getTrimPosition(quals, quals.length - 3));  //passes because the last value is gt threshold
-    assertEquals(4, bsrt.getTrimPosition(quals, 6));
+    assertEquals(quals.length, bsrt.trimRead(read, quals, quals.length));
+    assertEquals(quals.length - 1, bsrt.trimRead(read, quals, quals.length - 1));
+    assertEquals(quals.length - 2, bsrt.trimRead(read, quals, quals.length - 2));
+    assertEquals(quals.length - 3, bsrt.trimRead(read, quals, quals.length - 3));  //passes because the last value is gt threshold
+    assertEquals(4, bsrt.trimRead(read, quals, 6));
     bsrt = new BestSumReadTrimmer(1);
-    assertEquals(quals.length, bsrt.getTrimPosition(quals, quals.length));
-    assertEquals(8, bsrt.getTrimPosition(quals, 8));
+    assertEquals(quals.length, bsrt.trimRead(read, quals, quals.length));
+    assertEquals(8, bsrt.trimRead(read, quals, 8));
     bsrt = new BestSumReadTrimmer(14);
-    assertEquals(4, bsrt.getTrimPosition(quals, 6));
+    assertEquals(4, bsrt.trimRead(read, quals, 6));
     bsrt = new BestSumReadTrimmer(13);
-    assertEquals(6, bsrt.getTrimPosition(quals, 6));
+    assertEquals(6, bsrt.trimRead(read, quals, 6));
     bsrt = new BestSumReadTrimmer(23);
-    assertEquals(4, bsrt.getTrimPosition(quals, 8));
+    assertEquals(4, bsrt.trimRead(read, quals, 8));
   }
 
   public void testZeroLength() {
     final BestSumReadTrimmer bsrt = new BestSumReadTrimmer(65535);
-    bsrt.getTrimPosition(new byte[0], 1);
+    bsrt.trimRead(new byte[0], new byte[0], 1);
   }
 
 }

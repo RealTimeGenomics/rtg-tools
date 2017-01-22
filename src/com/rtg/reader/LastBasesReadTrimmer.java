@@ -51,7 +51,7 @@ public final class LastBasesReadTrimmer implements ReadTrimmer {
   }
 
   @Override
-  public int getTrimPosition(byte[] qualities, int length) {
+  public int trimRead(byte[] read, byte[] qualities, int length) {
     return Math.max(0, length - mNumBases);
   }
 }

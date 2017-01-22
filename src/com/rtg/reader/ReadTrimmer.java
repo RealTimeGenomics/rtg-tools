@@ -35,11 +35,13 @@ package com.rtg.reader;
 public interface ReadTrimmer {
 
   /**
-   * Return a position to trim this read after
-   * @param qualities the quality data
-   * @param length length of sequence
-   * @return int the zero based position to trim after
+   * Trim a read in-place
+   *
+   * @param read the array containing encoded read bases (contents will be modified)
+   * @param qualities the array containing encoded quality data (contents will be modified)
+   * @param length input length of read
+   * @return int the length of the trimmed read
    */
-  int getTrimPosition(/*byte[] read, */byte[] qualities, int length/*, int qualityThreshold*/);
+  int trimRead(byte[] read, byte[] qualities, int length);
 
 }

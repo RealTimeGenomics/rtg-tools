@@ -30,14 +30,19 @@
 
 package com.rtg.reader;
 
+import com.rtg.mode.DnaUtils;
+import com.rtg.util.PortableRandom;
+import com.rtg.util.test.RandomDna;
+
 import junit.framework.TestCase;
 
 public class NullReadTrimmerTest extends TestCase {
 
   private void check(String raw) {
     final NullReadTrimmer t = new NullReadTrimmer();
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(raw.length(), new PortableRandom(42)));
     final byte[] quals = FastaUtils.asciiToRawQuality(raw);
-    assertEquals(raw.length(), t.getTrimPosition(quals, raw.length()));
+    assertEquals(raw.length(), t.trimRead(read, quals, raw.length()));
   }
 
   public void testExamples() {

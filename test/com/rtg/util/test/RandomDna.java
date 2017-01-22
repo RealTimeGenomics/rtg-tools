@@ -44,6 +44,17 @@ public final class RandomDna {
   /**
    * Random nucleotide string.
    *
+   * @param length length of string
+   * @param seed seed for random number generator
+   * @return random string
+   */
+  public static String random(final int length, final long seed) {
+    return random(length, new PortableRandom(seed));
+  }
+
+  /**
+   * Random nucleotide string.
+   *
    * @param len length of string
    * @param r random number generator
    * @return random string
@@ -109,5 +120,6 @@ public final class RandomDna {
       }
     }
   }
+
 }
 

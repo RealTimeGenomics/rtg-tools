@@ -55,7 +55,7 @@ public final class DefaultReadTrimmer implements ReadTrimmer {
   }
 
   @Override
-  public int getTrimPosition(byte[] qualities, int length) {
+  public int trimRead(byte[] read, byte[] qualities, int length) {
     if (qualities == null || qualities.length == 0) {
       return length;
     }

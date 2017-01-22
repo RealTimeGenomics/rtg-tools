@@ -161,20 +161,23 @@ public class SequencesWriter {
 
   void processSingleSequence(final AbstractSdfWriter sdfWriter) throws IOException {
     final String label = mDataSource.name();
+    final int length = mDataSource.currentLength();
 
     //filtering, not related to format of data
     for (final String s : mNamesToExclude) {
       if (label.contains(s)) {
         ++mExcludedSequencesCount;
-        mExcludedResiduesCount += mDataSource.currentLength();
+        mExcludedResiduesCount += length;
         return;
       }
     }
 
-    final int length = mReadTrimmer.getTrimPosition(mDataSource.qualityData(), mDataSource.currentLength());
-    mExcludedResiduesCount += mDataSource.currentLength() - length;
+    final byte[] read = mDataSource.sequenceData();
+    final byte[] qualities = mDataSource.qualityData();
+    final int newLength = mReadTrimmer.trimRead(read, qualities, length);
+    mExcludedResiduesCount += length - newLength;
     sdfWriter.startSequence(label);
-    sdfWriter.write(mDataSource.sequenceData(), mDataSource.qualityData(), length);  //may write 0 length
+    sdfWriter.write(read, qualities, newLength);  //may write 0 length
     sdfWriter.endSequence();
   }
 

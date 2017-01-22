@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,27 +30,33 @@
 
 package com.rtg.reader;
 
-import junit.framework.TestCase;
+/**
+ * Always removes the specified number of bases from the start of the read.
+ */
+public final class FirstBasesReadTrimmer implements ReadTrimmer {
 
-public class MinReadTrimmerTest extends TestCase {
+  private final int mNumBases;
 
-  private void check(String raw, String exp) {
-    final ReadTrimmer t = new MinReadTrimmer(new LastBasesReadTrimmer(20), new BestSumReadTrimmer(20));
-    final byte[] quals = FastaUtils.asciiToRawQuality(raw);
-    assertEquals(exp, raw.substring(0, t.getTrimPosition(quals, raw.length())));
+  /**
+   * Constructor
+   * @param numBases the number of bases to remove
+   */
+  public FirstBasesReadTrimmer(int numBases) {
+    mNumBases = numBases;
   }
 
-  public void testExamples() {
-    check(";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/",
-          ";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7");
-    check("??<?89.43---+3,79=?5?;??=??????????>??;>>?9;8441,,+14479;9976,2//-,,,-/),13++.43/12",
-          "??<?89.43---+3,79=?5?;??=??????????>??;>>?9;8");
-    check("::::18:5:4:458:::':::8664/.(1,,''.22(262/.",
-          "::::18:5:4:458:::':::8");
-    check("3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''-')*1+0+23++45661885",
-          "3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''");
-    check(">???>??>???", "");  //shorter than the window length!
+  @Override
+  public String toString() {
+    return "First(bases=" + mNumBases + ")";
   }
 
+  @Override
+  public int trimRead(byte[] read, byte[] qualities, int length) {
+    final int newLength = Math.max(0, length - mNumBases);
+    if (newLength > 0) {
+      System.arraycopy(read, mNumBases, read, 0, newLength);
+      System.arraycopy(qualities, mNumBases, qualities, 0, newLength);
+    }
+    return newLength;
+  }
 }
-

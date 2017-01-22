@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -36,28 +36,23 @@ import com.rtg.util.test.RandomDna;
 
 import junit.framework.TestCase;
 
-/**
- */
-public class DefaultReadTrimmerTest extends TestCase {
+public class FirstBasesReadTrimmerTest extends TestCase {
 
-  private void check(String raw, int expLenq15w15, int expLenq15w30) {
-    final DefaultReadTrimmer grt15 = new DefaultReadTrimmer(15, 15);
-    final DefaultReadTrimmer grt30 = new DefaultReadTrimmer(30, 15);
-
+  private void check(String raw, String expect) {
+    final ReadTrimmer t = new FirstBasesReadTrimmer(20);
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(raw.length(), new PortableRandom(42)));
     final byte[] quals = FastaUtils.asciiToRawQuality(raw);
-    final byte[] read = DnaUtils.encodeString(RandomDna.random(quals.length, new PortableRandom(42)));
-
-    assertEquals(expLenq15w15, grt15.trimRead(read, quals, raw.length()));
-    assertEquals(expLenq15w30, grt30.trimRead(read, quals, raw.length()));
-
+    final int newlen = t.trimRead(read, quals, raw.length());
+    assertEquals(Math.max(0, raw.length() - 20), newlen);
+    assertEquals(FastaUtils.rawToAsciiString(quals, 0, newlen), expect);
   }
 
   public void testExamples() {
-    check(";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/", 94, 94);
-    check("??<?89.43---+3,79=?5?;??=??????????>??;>>?9;8441,,+14479;9976,2//-,,,-/),13++.43/12", 73, 83);
-    check("::::18:5:4:458:::':::8664/.(1,,''.22(262/.", 35, 42);
-    check("3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''-')*1+0+23++45661885", 0, 56);
-    check(">???>??>???", 0, 0);  //shorter than the window length!
+    check(";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/",
+                              "2*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/");
+    check("::::18:5:4:458:5::':2", "2");
+    check("3.1-'''''))'11+2.628", "");
+    check(">???>??>???", "");  //shorter than the window length!
   }
 
 }
