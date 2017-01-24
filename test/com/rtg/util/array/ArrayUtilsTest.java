@@ -178,7 +178,9 @@ public class ArrayUtilsTest extends TestCase {
     }
   }
 
-
-
+  public void testIdentity() {
+    final int[] a = ArrayUtils.identity(3);
+    assertEquals("[0, 1, 2]", Arrays.toString(a));
+  }
 }
 

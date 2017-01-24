@@ -257,4 +257,26 @@ public final class ArrayUtils {
     return true;
   }
 
+  /**
+   * Make the array an identity map up to entry <code>n</code>.
+   * @param a array
+   * @param n maximum entry
+   * @return the array
+   */
+  public static int[] identity(final int[] a, final int n) {
+    for (int k = 0; k < n; ++k) {
+      a[k] = k;
+    }
+    return a;
+  }
+
+  /**
+   * Make the array an identity map up to entry <code>n</code>.
+   * @param length length of array
+   * @return the array
+   */
+  public static int[] identity(final int length) {
+    return identity(new int[length], length);
+  }
+
 }
