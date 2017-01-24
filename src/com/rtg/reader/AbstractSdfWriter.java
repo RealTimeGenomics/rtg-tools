@@ -44,7 +44,7 @@ import com.rtg.util.diagnostic.WarningType;
  *
  */
 @TestClass(value = {"com.rtg.reader.SequencesWriterTest"})
-public abstract class AbstractSdfWriter implements AutoCloseable {
+public abstract class AbstractSdfWriter implements SequenceWriter, AutoCloseable {
 
 
   static final int MAX_HISTOGRAM = 1000;
@@ -151,6 +151,13 @@ public abstract class AbstractSdfWriter implements AutoCloseable {
 
     mSeqDataChecksum = new CRC32();
     mQualDataChecksum = new CRC32();
+  }
+
+  @Override
+  public void write(String label, byte[] rs, byte[] qs, int length) throws IOException {
+    startSequence(label);
+    write(rs, qs, length);
+    endSequence();
   }
 
   /**

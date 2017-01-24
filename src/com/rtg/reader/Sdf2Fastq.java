@@ -116,7 +116,7 @@ public final class Sdf2Fastq extends AbstractCli {
       final int lineLength = (Integer) mFlags.getValue(LINE_LENGTH);
       final boolean gzip = !mFlags.isSet(NO_GZIP);
       final boolean rename = mFlags.isSet(RENAME);
-      final int def = mFlags.isSet(DEFAULT_QUALITY) ? (Integer) mFlags.getValue(DEFAULT_QUALITY) + (int) '!' : -1;
+      final int def = mFlags.isSet(DEFAULT_QUALITY) ? (Integer) mFlags.getValue(DEFAULT_QUALITY) : -1;
 
       try (SdfReaderWrapper reader = new SdfReaderWrapper((File) mFlags.getValue(INPUT), false, false)) {
         try (WriterWrapper writer = new FastqWriterWrapper((File) mFlags.getValue(OUTPUT), reader, lineLength, rename, gzip, def, mFlags.isSet(INTERLEAVE))) {

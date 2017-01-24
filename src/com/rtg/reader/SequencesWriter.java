@@ -176,9 +176,7 @@ public class SequencesWriter {
     final byte[] qualities = mDataSource.qualityData();
     final int newLength = mReadTrimmer.trimRead(read, qualities, length);
     mExcludedResiduesCount += length - newLength;
-    sdfWriter.startSequence(label);
-    sdfWriter.write(read, qualities, newLength);  //may write 0 length
-    sdfWriter.endSequence();
+    sdfWriter.write(label, read, qualities, newLength);  //may write 0 length
   }
 
   /**

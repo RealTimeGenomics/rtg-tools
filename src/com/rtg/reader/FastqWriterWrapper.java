@@ -35,19 +35,31 @@ import java.io.IOException;
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.SequenceType;
 import com.rtg.util.InvalidParamsException;
-import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.io.LineWriter;
 
 /**
- * Wrapper for writing FASTA that can handle single end or paired end data
+ * Wrapper for writing SDF as FASTQ that can handle single end or paired end data
  */
 @TestClass("com.rtg.reader.Sdf2FastqTest")
 public final class FastqWriterWrapper extends FastaWriterWrapper {
 
   private static final String[] EXTS = {".fastq", ".fq"};
 
-  private String mDefaultQualities = null;
+  private static class FastqWriterFactory implements WriterFactory {
+    private final int mLineLength; // Maximum residues per line -- 0 denotes infinite line length
+    private final byte mDefaultQuality;
+    FastqWriterFactory(int lineLength, byte defaultQuality) {
+      mLineLength = lineLength;
+      mDefaultQuality = defaultQuality;
+    }
+
+    @Override
+    public SequenceWriter make(LineWriter w) {
+      return new FastqWriter(w, mLineLength, mDefaultQuality, true);
+    }
+  }
+
 
   /**
    * Convenience wrapper for writing.
@@ -56,56 +68,27 @@ public final class FastqWriterWrapper extends FastaWriterWrapper {
    * @param lineLength the maximum line length, 0 means no bound.
    * @param rename if true, rename sequences to their sequence id
    * @param gzip if true, compress the output.
-   * @param def the default quality value to use if input data does not contain quality scores.
+   * @param def the default quality value to use if input data does not contain quality scores, 0 - 63.
    * @param interleavePaired if true, paired end output should be interleaved into a single output
    * @throws IOException if there is a problem constructing the writer.
    */
   public FastqWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, int def, boolean interleavePaired) throws IOException {
-    super(baseOutput, reader, lineLength, rename, gzip, interleavePaired, EXTS);
+    super(reader, baseOutput, new FastqWriterFactory(lineLength, (byte) def), rename, gzip, interleavePaired, EXTS);
     if (reader.type() != SequenceType.DNA) {
       throw new InvalidParamsException(ErrorType.INFO_ERROR, "The input SDF contains protein data, which cannot be converted to FASTQ.");
     }
-    if (!reader.hasQualityData()) {
-      if (def >= (int) '!') {
-        mDefaultQualities = StringUtils.getCharString((char) def, reader.maxLength());
-      } else {
-        throw new InvalidParamsException(ErrorType.INFO_ERROR, "The input SDF does not have quality data and no default was provided.");
-      }
+    if (!reader.hasQualityData() && def < 0) {
+      throw new InvalidParamsException(ErrorType.INFO_ERROR, "The input SDF does not have quality data and no default was provided.");
     }
   }
 
   @Override
-  protected void writeSequence(SequencesReader reader, long seqId, LineWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
-    final int length = reader.read(seqId, dataBuffer);
-    for (int i = 0; i < length; ++i) {
-      dataBuffer[i] = mCodeToBytes[dataBuffer[i]];
+  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
+    assert reader.hasQualityData() == (qualityBuffer != null);
+    if (reader.hasQualityData()) {
+      reader.readQuality(seqId, qualityBuffer);
     }
-    final String name = !mRename && mHasNames ? reader.fullName(seqId) : ("" + seqId);
-    writer.writeln("@" + name);
-    if (mLineLength == 0) {
-      writer.writeln(new String(dataBuffer, 0, length));
-      writer.writeln("+" + name);
-      writer.writeln(getScore(reader, seqId, qualityBuffer));
-    } else {
-      for (long k = 0; k < length; k += mLineLength) {
-        writer.writeln(new String(dataBuffer, (int) k, Math.min(mLineLength, length - (int) k)));
-      }
-      writer.writeln("+" + name);
-      final String qual = getScore(reader, seqId, qualityBuffer);
-      final int qualLen = qual.length();
-      for (long i = 0; i < qualLen; i += mLineLength) {
-        writer.writeln(qual.substring((int) i, (int) Math.min(i + mLineLength, qualLen)));
-      }
-    }
-  }
-
-  private String getScore(final SequencesReader read, long seqId, byte[] qualityBuffer) throws IOException {
-    if (read.hasQualityData()) {
-      final int length = read.readQuality(seqId, qualityBuffer);
-      return FastaUtils.rawToAsciiString(qualityBuffer, length);
-    } else {
-      return mDefaultQualities.substring(0, read.length(seqId));
-    }
+    super.writeSequence(reader, seqId, writer, dataBuffer, qualityBuffer);
   }
 
 }

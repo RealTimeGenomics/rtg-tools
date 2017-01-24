@@ -46,18 +46,31 @@ import com.rtg.util.io.LineWriter;
 @TestClass("com.rtg.reader.Sdf2FastaTest")
 public class FastaWriterWrapper implements WriterWrapper {
 
+  protected interface WriterFactory {
+    SequenceWriter make(LineWriter w);
+  }
 
-  private final boolean mIsPaired;
+  private static class FastaWriterFactory implements WriterFactory {
+    private final int mLineLength; // Maximum residues per line -- 0 denotes infinite line length
+    private final byte[] mCodeToBytes;
+    FastaWriterFactory(int lineLength, byte[] codeToBytes) {
+      mLineLength = lineLength;
+      mCodeToBytes = codeToBytes;
+    }
+    @Override
+    public SequenceWriter make(LineWriter w) {
+      return new FastaWriter(w, mLineLength, mCodeToBytes);
+    }
+  }
+
   private final SdfReaderWrapper mReader;
-  protected final int mLineLength; // Maximum residues per line -- 0 denotes infinite line length
+  private final boolean mIsPaired;
   protected final boolean mRename; // Replace sequence names with their SDF sequence ID
   protected final boolean mHasNames;
-  protected final byte[] mCodeToBytes;
 
-  private final LineWriter mLeft;
-  private final LineWriter mRight;
-  private final LineWriter mSingle;
-
+  private final SequenceWriter mLeft;
+  private final SequenceWriter mRight;
+  private final SequenceWriter mSingle;
 
   /**
    * Convenience wrapper for writing.
@@ -70,42 +83,40 @@ public class FastaWriterWrapper implements WriterWrapper {
    * @throws IOException if there is a problem constructing the writer.
    */
   public FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired) throws IOException {
-    this(baseOutput, reader, lineLength, rename, gzip, interleavePaired, FastaUtils.extensions());
+    this(reader, baseOutput, new FastaWriterFactory(lineLength, SdfSubseq.getByteMapping(reader.type(), false)), rename, gzip, interleavePaired, FastaUtils.extensions());
   }
 
-  protected FastaWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, boolean interleavePaired, String[] extensions) throws IOException {
+  protected FastaWriterWrapper(SdfReaderWrapper reader, File baseOutput, WriterFactory fact, boolean rename, boolean gzip, boolean interleavePaired, String[] extensions) throws IOException {
+
     assert reader != null;
     assert extensions.length > 0;
     mReader = reader;
     mIsPaired = reader.isPaired();
     mHasNames = reader.hasNames();
+    mRename = rename;
     final long maxLength = reader.maxLength();
     if (maxLength > Integer.MAX_VALUE) {
       throw new NoTalkbackSlimException(ErrorType.SEQUENCE_LENGTH_ERROR);
     }
-    mCodeToBytes = SdfSubseq.getByteMapping(reader.type(), false);
-    mLineLength = lineLength;
-    mRename = rename;
-
 
     final BaseFile baseFile = FileUtils.getBaseFile(baseOutput, gzip, extensions);
 
     if (mIsPaired) {
       mSingle = null;
       if (interleavePaired) {
-        mLeft = getStream(baseFile, "");
+        mLeft = fact.make(getStream(baseFile, ""));
         mRight = mLeft;
       } else {
         if (FileUtils.isStdio(baseOutput)) {
           throw new NoTalkbackSlimException("Sending non-interleaved paired-end data to stdout is not supported.");
         }
-        mLeft = getStream(baseFile, "_1");
-        mRight = getStream(baseFile, "_2");
+        mLeft = fact.make(getStream(baseFile, "_1"));
+        mRight = fact.make(getStream(baseFile, "_2"));
       }
     } else {
       mLeft = null;
       mRight = null;
-      mSingle = getStream(baseFile, "");
+      mSingle = fact.make(getStream(baseFile, ""));
     }
   }
 
@@ -126,20 +137,10 @@ public class FastaWriterWrapper implements WriterWrapper {
     }
   }
 
-  protected void writeSequence(SequencesReader reader, long seqId, LineWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
-    final int length = reader.read(seqId, dataBuffer);
-    for (int i = 0; i < length; ++i) {
-      dataBuffer[i] = mCodeToBytes[dataBuffer[i]];
-    }
+  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
     final String name = !mRename && mHasNames ? reader.fullName(seqId) : ("" + seqId);
-    writer.writeln(">" + name);
-    if (mLineLength == 0) {
-      writer.writeln(new String(dataBuffer, 0, length));
-    } else {
-      for (long k = 0; k < length; k += mLineLength) {
-        writer.writeln(new String(dataBuffer, (int) k, Math.min(mLineLength, length - (int) k)));
-      }
-    }
+    final int length = reader.read(seqId, dataBuffer);
+    writer.write(name, dataBuffer, qualityBuffer, length);
   }
 
   @Override
