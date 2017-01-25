@@ -355,6 +355,21 @@ public final class FileUtils {
   }
 
   /**
+   * Creates an output stream for a <code>BaseFile</code>, automatically determining whether to compress.
+   *
+   * @param baseFile the output <code>BaseFile</code>. If this is '-', stdout will be used as the destination.
+   * @param suffix a suffix to insert before the extensions
+   * @return an <code>OutputStream</code> value
+   * @exception IOException if an error occurs.
+   */
+  public static OutputStream createOutputStream(final BaseFile baseFile, String suffix) throws IOException {
+    if (isStdio(baseFile.getBaseFile())) {
+      return getStdoutAsOutputStream();
+    }
+    return createOutputStream(baseFile.suffixedFile(suffix), baseFile.isGzip());
+  }
+
+  /**
    * Creates an output stream for a file, determining from the filename whether to compress.
    *
    * @param file the output <code>File</code>. If this is '-', stdout will be used as the destination.

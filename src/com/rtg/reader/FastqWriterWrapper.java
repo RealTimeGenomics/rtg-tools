@@ -44,8 +44,6 @@ import com.rtg.util.io.LineWriter;
 @TestClass("com.rtg.reader.Sdf2FastqTest")
 public final class FastqWriterWrapper extends FastaWriterWrapper {
 
-  private static final String[] EXTS = {".fastq", ".fq"};
-
   private static class FastqWriterFactory implements WriterFactory {
     private final int mLineLength; // Maximum residues per line -- 0 denotes infinite line length
     private final byte mDefaultQuality;
@@ -73,7 +71,7 @@ public final class FastqWriterWrapper extends FastaWriterWrapper {
    * @throws IOException if there is a problem constructing the writer.
    */
   public FastqWriterWrapper(File baseOutput, SdfReaderWrapper reader, int lineLength, boolean rename, boolean gzip, int def, boolean interleavePaired) throws IOException {
-    super(reader, baseOutput, new FastqWriterFactory(lineLength, (byte) def), rename, gzip, interleavePaired, EXTS);
+    super(reader, baseOutput, new FastqWriterFactory(lineLength, (byte) def), rename, gzip, interleavePaired, FastqUtils.extensions());
     if (reader.type() != SequenceType.DNA) {
       throw new InvalidParamsException(ErrorType.INFO_ERROR, "The input SDF contains protein data, which cannot be converted to FASTQ.");
     }

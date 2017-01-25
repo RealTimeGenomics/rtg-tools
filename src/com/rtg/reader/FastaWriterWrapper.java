@@ -121,10 +121,7 @@ public class FastaWriterWrapper implements WriterWrapper {
   }
 
   static LineWriter getStream(final BaseFile baseFile, String fileSuffix) throws IOException {
-    if (FileUtils.isStdio(baseFile.getBaseFile())) {
-      return new LineWriter(new OutputStreamWriter(FileUtils.getStdoutAsOutputStream()));
-    }
-    return new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseFile.suffixedFile(fileSuffix), baseFile.isGzip())));
+    return new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseFile, fileSuffix)));
   }
 
   @Override

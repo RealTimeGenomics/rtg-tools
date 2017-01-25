@@ -54,6 +54,14 @@ public class FastqWriter implements SequenceWriter {
   /**
    * Create a FASTQ writer for DNA
    * @param writer the destination
+   */
+  public FastqWriter(Writer writer) {
+    this(writer, 0, (byte) 0);
+  }
+
+  /**
+   * Create a FASTQ writer for DNA
+   * @param writer the destination
    * @param lineLength the maximum line length, 0 means no bound.
    * @param defaultQual default quality value, 0 to 63 scale.
    */
