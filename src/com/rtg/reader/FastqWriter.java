@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.rtg.mode.SequenceType;
-import com.rtg.util.StringUtils;
 
 /**
  * FASTQ writing
@@ -94,26 +93,26 @@ public class FastqWriter implements SequenceWriter {
       mQBuff[i] = quality == null ? mDefaultQual : FastaUtils.rawToAsciiQuality(quality[i]);
     }
 
-    mWriter.append("@").append(name).append(StringUtils.LS);
+    mWriter.append("@").append(name).append('\n');
     if (mLineLength == 0) {
-      mWriter.append(new String(mBuff, 0, length)).append(StringUtils.LS);
+      mWriter.append(new String(mBuff, 0, length)).append('\n');
       mWriter.append("+");
       if (mRedundantName) {
         mWriter.append(name);
       }
-      mWriter.append(StringUtils.LS);
-      mWriter.append(new String(mQBuff, 0, length)).append(StringUtils.LS);
+      mWriter.append('\n');
+      mWriter.append(new String(mQBuff, 0, length)).append('\n');
     } else {
       for (long k = 0; k < length; k += mLineLength) {
-        mWriter.append(new String(mBuff, (int) k, Math.min(mLineLength, length - (int) k))).append(StringUtils.LS);
+        mWriter.append(new String(mBuff, (int) k, Math.min(mLineLength, length - (int) k))).append('\n');
       }
       mWriter.append("+");
       if (mRedundantName) {
         mWriter.append(name);
       }
-      mWriter.append(StringUtils.LS);
+      mWriter.append('\n');
       for (long i = 0; i < length; i += mLineLength) {
-        mWriter.append(new String(mQBuff, (int) i, Math.min(mLineLength, length - (int) i))).append(StringUtils.LS);
+        mWriter.append(new String(mQBuff, (int) i, Math.min(mLineLength, length - (int) i))).append('\n');
       }
     }
   }

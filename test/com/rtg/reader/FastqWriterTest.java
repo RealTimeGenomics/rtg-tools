@@ -30,7 +30,6 @@
 
 package com.rtg.reader;
 
-import com.rtg.util.StringUtils;
 import com.rtg.util.io.MemoryPrintStream;
 
 import junit.framework.TestCase;
@@ -46,6 +45,6 @@ public class FastqWriterTest extends TestCase {
     f.write("0 foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
     f.write("1 foo 1", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
     f.write("1 foo 2", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    assertEquals("@0 foo" + StringUtils.LS + "NACGT" + StringUtils.LS + "+" + StringUtils.LS + "55555" + StringUtils.LS + "@1 foo 1" + StringUtils.LS + "NACGT" + StringUtils.LS + "+" + StringUtils.LS + "55555" + StringUtils.LS + "@1 foo 2" + StringUtils.LS + "NACGT" + StringUtils.LS + "+" + StringUtils.LS + "55555" + StringUtils.LS + "", out.toString());
+    assertEquals("@0 foo\nNACGT\n+\n55555\n@1 foo 1\nNACGT\n+\n55555\n@1 foo 2\nNACGT\n+\n55555\n", out.toString());
   }
 }

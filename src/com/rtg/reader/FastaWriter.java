@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Writer;
 
 import com.rtg.mode.SequenceType;
-import com.rtg.util.StringUtils;
 
 /**
  * FASTA writing
@@ -77,12 +76,12 @@ public class FastaWriter implements SequenceWriter {
     for (int i = 0; i < length; ++i) {
       mBuff[i] = mCodeToBytes[data[i]];
     }
-    mWriter.append(">").append(name).append(StringUtils.LS);
+    mWriter.append(">").append(name).append('\n');
     if (mLineLength == 0) {
-      mWriter.append(new String(mBuff, 0, length)).append(StringUtils.LS);
+      mWriter.append(new String(mBuff, 0, length)).append('\n');
     } else {
       for (long k = 0; k < length; k += mLineLength) {
-        mWriter.append(new String(mBuff, (int) k, Math.min(mLineLength, length - (int) k))).append(StringUtils.LS);
+        mWriter.append(new String(mBuff, (int) k, Math.min(mLineLength, length - (int) k))).append('\n');
       }
     }
   }

@@ -29,7 +29,7 @@
  */
 package com.rtg.reader;
 
-import com.rtg.util.StringUtils;
+import com.rtg.mode.SequenceType;
 import com.rtg.util.io.MemoryPrintStream;
 
 import junit.framework.TestCase;
@@ -45,6 +45,13 @@ public class FastaWriterTest extends TestCase {
     f.write("0 foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
     f.write("1 foo/Left", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
     f.write("1 foo/Right", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    assertEquals(">0 foo" + StringUtils.LS + "NACGT" + StringUtils.LS + ">1 foo/Left" + StringUtils.LS + "NACGT" + StringUtils.LS + ">1 foo/Right" + StringUtils.LS + "NACGT" + StringUtils.LS + "", out.toString());
+    assertEquals(">0 foo\nNACGT\n>1 foo/Left\nNACGT\n>1 foo/Right\nNACGT\n", out.toString());
+  }
+
+  public void testProtein() throws Exception {
+    final MemoryPrintStream out = new MemoryPrintStream();
+    final FastaWriter f = new FastaWriter(out.lineWriter(), 0, SdfSubseq.getByteMapping(SequenceType.PROTEIN, false));
+    f.write("0 foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+    assertEquals(">0 foo\nX*ARN\n", out.toString());
   }
 }
