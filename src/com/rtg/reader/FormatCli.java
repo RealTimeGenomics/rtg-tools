@@ -342,16 +342,9 @@ public final class FormatCli extends LoggedCli {
    * @return true if quality encoding type is recognized or format other than <code>fastq</code> is chosen
    */
   public static boolean validateQualityFormatFlags(CFlags flags, String format) {
-    if (format.equals(FASTQ_FORMAT)) {
-      if (!flags.isSet(CommonFlags.QUALITY_FLAG)) {
-        flags.setParseMessage("--" + CommonFlags.QUALITY_FLAG + " is required for \"fastq\" format.");
-        return false;
-      }
-    } else {
-      if (flags.isSet(CommonFlags.QUALITY_FLAG)) {
-        flags.setParseMessage("--" + CommonFlags.QUALITY_FLAG + " is only allowed for \"fastq\" format.");
-        return false;
-      }
+    if (!format.equals(FASTQ_FORMAT) && flags.isSet(CommonFlags.QUALITY_FLAG)) {
+      flags.setParseMessage("--" + CommonFlags.QUALITY_FLAG + " is only allowed for \"fastq\" format.");
+      return false;
     }
     return true;
   }
@@ -814,7 +807,7 @@ public final class FormatCli extends LoggedCli {
    */
   public static InputFormat getFormat(CFlags flags, boolean checkFastqQuality) {
     final String format = (String) flags.getValue(FORMAT_FLAG);
-    final String qualityFormat = (checkFastqQuality && flags.isSet(CommonFlags.QUALITY_FLAG)) ? (String) flags.getValue(CommonFlags.QUALITY_FLAG) : null;
+    final String qualityFormat = checkFastqQuality ? (String) flags.getValue(CommonFlags.QUALITY_FLAG) : null;
     return getFormat(format, qualityFormat, checkFastqQuality);
   }
 

@@ -409,7 +409,7 @@ public final class CommonFlags {
    * @param flags shared flags
    */
   public static void initQualityFormatFlag(CFlags flags) {
-    final Flag qualFormatFlag = flags.registerOptional('q', QUALITY_FLAG, String.class, "FORMAT", "format of quality data for fastq files (use sanger for Illumina 1.8+)").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    final Flag qualFormatFlag = flags.registerOptional('q', QUALITY_FLAG, String.class, "FORMAT", "format of quality data for fastq input files (use sanger for Illumina 1.8+)", SANGER_FORMAT).setCategory(CommonFlagCategories.INPUT_OUTPUT);
     qualFormatFlag.setParameterRange(QUALITY_FORMAT_OPTIONS);
   }
 
