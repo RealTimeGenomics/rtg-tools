@@ -42,7 +42,6 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.ProteinFastaSymbolTable;
-import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -70,7 +69,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
     assertTrue(x.exists());
     //final BufferedReader r = new BufferedReader(new FileReader(x));
     try {
-      compareToFile(">test" + StringUtils.LS + "ACGT" + StringUtils.LS + ">bob" + StringUtils.LS + "TAGTACCC" + StringUtils.LS + ">cat" + StringUtils.LS + "CAT" + StringUtils.LS + ">dog" + StringUtils.LS + "CCC" + StringUtils.LS, x);
+      compareToFile(">test\n" + "ACGT\n" + ">bob\n" + "TAGTACCC\n" + ">cat\n" + "CAT\n" + ">dog\n" + "CCC\n", x);
     } finally {
       assertTrue(x.delete());
     }
@@ -79,7 +78,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
   private void checkContent2(File x) throws Exception {
     assertTrue(x.exists());
     try {
-      compareToFile(">test" + StringUtils.LS + "ACG" + StringUtils.LS + "T" + StringUtils.LS + ">bob" + StringUtils.LS + "TAG" + StringUtils.LS + "TAC" + StringUtils.LS + "CC" + StringUtils.LS + ">cat" + StringUtils.LS + "CAT" + StringUtils.LS + ">dog" + StringUtils.LS + "CCC" + StringUtils.LS, x);
+      compareToFile(">test\n" + "ACG\n" + "T\n" + ">bob\n" + "TAG\n" + "TAC\n" + "CC\n" + ">cat\n" + "CAT\n" + ">dog\n" + "CCC\n", x);
     } finally {
       assertTrue(x.delete());
     }
@@ -170,7 +169,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
       checkMainInitOk("-o", new File(tempDir, JUNITOUT).getPath(), "-i", pathpr, "-l", "2", "-Z");
       final File f = new File(tempDir, JUNITOUT + ".fasta");
       assertTrue(f.exists());
-      compareToFile(">x" + StringUtils.LS + "AC" + StringUtils.LS + "TG" + StringUtils.LS + "N" + StringUtils.LS, f);
+      compareToFile(">x\n" + "AC\n" + "TG\n" + "N\n", f);
     }
   }
   private void createPreread(final String s, final File dir) throws IOException {
@@ -182,14 +181,14 @@ public class Sdf2FastaTest extends AbstractCliTest {
 
   private void createPrereadProtein(final File dir) throws IOException {
     final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(new ByteArrayInputStream((">x" + StringUtils.LS + "X*ARNDCQEGHILKMFPSTWYV" + StringUtils.LS).getBytes()));
+    al.add(new ByteArrayInputStream((">x\n" + "X*ARNDCQEGHILKMFPSTWYV\n").getBytes()));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
     new SequencesWriter(ds, dir, 100000, PrereadType.UNKNOWN, false).processSequences();
   }
 
   public void testValidUse() throws Exception {
     try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
-      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, dir);
+      createPreread(">x\n" + "actgn\n", dir);
       final String pathpr = dir.getPath();
       try {
         runCommandWithNamedOutput(JUNITOUT, pathpr, "ACTGN");
@@ -206,8 +205,8 @@ public class Sdf2FastaTest extends AbstractCliTest {
 
   public void testValidUse2() throws Exception {
     try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
-      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "left"));
-      createPreread(">x" + StringUtils.LS + "actgn" + StringUtils.LS, new File(dir, "right"));
+      createPreread(">x\n" + "actgn\n", new File(dir, "left"));
+      createPreread(">x\n" + "actgn\n", new File(dir, "right"));
       final String pathpr = dir.getPath();
       runCommandWithNamedOutput(JUNITOUT, pathpr, "ACTGN", "ACTGN");
       runCommandWithNamedOutput(JUNITOUT + ".FA", pathpr, "ACTGN", "ACTGN");
@@ -228,10 +227,10 @@ public class Sdf2FastaTest extends AbstractCliTest {
   }
 
   private static final String FULL_NAME_DATA = ""
-          + ">name suffix" + StringUtils.LS
-          + "ACGTCG" + StringUtils.LS
-          + ">second suffix" + StringUtils.LS
-          + "ACGGGT" + StringUtils.LS;
+          + ">name suffix\n"
+          + "ACGTCG\n"
+          + ">second suffix\n"
+          + "ACGGGT\n";
 
   public void testFullName() throws IOException {
     try (TestDirectory dir = new TestDirectory("sdf2fasta")) {

@@ -34,7 +34,6 @@ import java.io.IOException;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
-import com.rtg.util.StringUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -62,14 +61,14 @@ public class Sdf2FastqTest extends AbstractCliTest {
 }
 
   static final String FULL_NAME_DATA = ""
-          + "@name suffix" + StringUtils.LS
-          + "ACGTCG" + StringUtils.LS
-          + "+name suffix" + StringUtils.LS
-          + "123456" + StringUtils.LS
-          + "@second suffixes" + StringUtils.LS
-          + "ACGGGT" + StringUtils.LS
-          + "+second suffixes" + StringUtils.LS
-          + "123456" + StringUtils.LS;
+          + "@name suffix\n"
+          + "ACGTCG\n"
+          + "+name suffix\n"
+          + "123456\n"
+          + "@second suffixes\n"
+          + "ACGGGT\n"
+          + "+second suffixes\n"
+          + "123456\n";
 
   public void testFullName() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
