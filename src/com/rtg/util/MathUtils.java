@@ -472,4 +472,24 @@ public final class MathUtils {
   public static int unboxNatural(final Integer x) {
     return x == null ? -1 : x;
   }
+
+  /**
+   * Compute the median of a set of values. Warning: this procedure will sort the array.
+   * @param values array of values
+   * @return median
+   */
+  public static double median(final double[] values) {
+    if (values.length == 0) {
+      return Double.NaN;
+    }
+    Arrays.sort(values);
+    final double median;
+    if (values.length % 2 == 0) {
+      median = (values[values.length / 2] + values[values.length / 2 - 1]) / 2;
+    } else {
+      median = values[values.length / 2];
+    }
+    return median;
+  }
+
 }

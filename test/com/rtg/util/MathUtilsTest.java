@@ -342,4 +342,13 @@ public class MathUtilsTest extends TestCase {
     assertEquals(0, MathUtils.unboxNatural(0));
     assertEquals(Integer.MAX_VALUE, MathUtils.unboxNatural(Integer.MAX_VALUE));
   }
+
+  public void testMedian() {
+    assertTrue(Double.isNaN(MathUtils.median(new double[0])));
+    assertEquals(42.0, MathUtils.median(new double[] {42}));
+    assertEquals(42.0, MathUtils.median(new double[] {42, 42}));
+    assertEquals(42.0, MathUtils.median(new double[] {42, 42}));
+    assertEquals(42.0, MathUtils.median(new double[] {42, 42, 42}));
+    assertEquals(42.0, MathUtils.median(new double[] {Double.POSITIVE_INFINITY, 8, 42, 78, 12}));
+  }
 }
