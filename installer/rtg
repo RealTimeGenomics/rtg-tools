@@ -14,7 +14,7 @@ fi
 if [ "$(uname -s)" == "Darwin" ]; then
     # Determine the directory that this script is installed in
     # MacOS X doesn't support readlink -f, so do it slow and crufty
-    THIS_DIR="$(cd "$(dirname "$0")"; TARGET=$(basename "$0"); while [ -L "$TARGET" ]; do TARGET="$(readlink "$TARGET")"; cd $(dirname "$TARGET"); TARGET="$(basename "$TARGET")"; done; pwd -P)"
+    THIS_DIR="$(cd "$(dirname "$0")"; TARGET=$(basename "$0"); while [ -L "$TARGET" ]; do TARGET="$(readlink "$TARGET")"; cd "$(dirname "$TARGET")"; TARGET="$(basename "$TARGET")"; done; pwd -P)"
 else
     # Determine the canonical directory that this script is installed in, using readlink -f if possible
     THIS_SCRIPT="$(readlink -f "$0" 2>/dev/null || echo "$0")"
@@ -49,7 +49,7 @@ if [ ! -r "$THIS_DIR/rtg.cfg" ] ; then
 
         if [ -r "$THIS_DIR/rtg-license.txt" ]; then
             echo
-            echo "This software has been prepared for $(awk -F= '/^!person=/{print $2}'<$THIS_DIR/rtg-license.txt)"
+            echo "This software has been prepared for $(awk -F= '/^!person=/{print $2}'<"$THIS_DIR"/rtg-license.txt)"
         fi
         echo
         read -p "Do you agree to the terms and conditions (y/n)? " EULA_REPLY
@@ -166,8 +166,8 @@ else
     RTG_JAVA="java"                  # Path to java (for no-JRE versions assume java is on current PATH)
 fi
 RTG_JAR="$THIS_DIR/RTG.jar"          # Path to RTG.jar (default assumes jarfile in directory of this script)
-RTG_JAVA_OPTS=                       # Additional JVM options (e.g.: "-Djava.io.tmpdir=XXYY -XX:+UseLargePages")
-RTG_MEM=                             # Maximum memory for rtg to use (e.g. 48g)
+RTG_JAVA_OPTS=''                     # Additional JVM options (e.g.: "-Djava.io.tmpdir=XXYY -XX:+UseLargePages")
+RTG_MEM=''                           # Maximum memory for rtg to use (e.g. 48g)
 RTG_MEM_PCT=90                       # If RTG_MEM is not defined use this percentage of total RAM
 
 # Read in default config (primarily containing talkback/usage prefs)
@@ -252,6 +252,7 @@ fi
 if [ ! -z "$RTG_TALKBACK" ]; then
     RTG_TALKBACK="-Dtalkback=$RTG_TALKBACK"
     if [ "$TEST_TALKBACK" == "y" ]; then  # First run only, perform test of crash reporting
+        # shellcheck disable=SC2086
         if ! "$RTG_JAVA" $RTG_USAGE $RTG_TALKBACK $RTG_PROXY $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "Post-install talkback test"; then
             echo "Initial crash-report connectivity test did not succeed, probably due to firewall issues."
             echo "You will be asked to manually submit any error logs."
@@ -281,12 +282,14 @@ fi
 
 # Now run the primary RTG command
 HSLOG=./hs_err_pid$$.log
+# shellcheck disable=SC2086
 "$RTG_JAVA" -Djava.library.path="$THIS_DIR" -XX:ErrorFile=$HSLOG $RTG_JAVA_OPTS "$RTG_REFERENCES_DIR" "$RTG_MODELS_DIR" $RTG_USAGE $RTG_TALKBACK $RTG_DEFAULT_THREADS -Xmx$RTG_MEM $RTG_PROXY -jar "$RTG_JAR" "$@"
 ECODE=$?
 if [ -f "$HSLOG" ]; then
     if grep -q "insufficient memory" "$HSLOG"; then
         echo "The operating system did not make requested memory available to the JVM.  Try removing other jobs on this machine, adjusting allocated memory appropriate to currently available memory, or adjusting command parameters to reduce memory requirements. More information is contained in the file: $HSLOG" >&2
     else
+        # shellcheck disable=SC2086
         "$RTG_JAVA" $RTG_TALKBACK $RTG_PROXY $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "$HSLOG" "$@"
     fi
 fi
