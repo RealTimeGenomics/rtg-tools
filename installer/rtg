@@ -1,20 +1,20 @@
 #!/bin/bash
 
 # Pre-flight safety-belts
-if [ "$(uname -s)" != "Linux" ] && [ "$(uname -s)" != "Darwin" ]; then
+if [[ "$(uname -s)" != "Linux" ]] && [[ "$(uname -s)" != "Darwin" ]]; then
     # If you comment this check out you are on your own :-)
     echo "Sorry, only Linux and MacOS are supported."
     exit 1
-elif [ "$(uname -m)" != "x86_64" ]; then
+elif [[ "$(uname -m)" != "x86_64" ]]; then
     # If you comment this check out you are on your own :-)
     echo "Sorry, you must be running a 64bit operating system."
     exit 1
 fi
 
-if [ "$(uname -s)" == "Darwin" ]; then
+if [[ "$(uname -s)" == "Darwin" ]]; then
     # Determine the directory that this script is installed in
     # MacOS X doesn't support readlink -f, so do it slow and crufty
-    THIS_DIR="$(cd "$(dirname "$0")"; TARGET=$(basename "$0"); while [ -L "$TARGET" ]; do TARGET="$(readlink "$TARGET")"; cd "$(dirname "$TARGET")"; TARGET="$(basename "$TARGET")"; done; pwd -P)"
+    THIS_DIR="$(set -e; cd "$(dirname "$0")"; TARGET=$(basename "$0"); while [ -L "$TARGET" ]; do TARGET="$(readlink "$TARGET")"; cd "$(dirname "$TARGET")"; TARGET="$(basename "$TARGET")"; done; pwd -P)"
 else
     # Determine the canonical directory that this script is installed in, using readlink -f if possible
     THIS_SCRIPT="$(readlink -f "$0" 2>/dev/null || echo "$0")"
@@ -22,10 +22,10 @@ else
 fi
 
 # Allow RTG_MEM/RTG_JAVA_OPTS to be set before subcommand name
-while [ "${1:0:4}" == "RTG_" ]; do
-    if [ "${1:0:8}" == "RTG_MEM=" ]; then
+while [[ "${1:0:4}" == "RTG_" ]]; do
+    if [[ "${1:0:8}" == "RTG_MEM=" ]]; then
         RTG_MEM=${1:8}
-    elif [ "${1:0:14}" == "RTG_JAVA_OPTS=" ]; then
+    elif [[ "${1:0:14}" == "RTG_JAVA_OPTS=" ]]; then
         RTG_JAVA_OPTS=${1:14}
     else
         echo "Error: expected RTG_MEM=NNg or RTG_JAVA_OPTS=\"<jvm arguments>\", e.g.:"
@@ -39,20 +39,20 @@ done
 USER_RTG_MEM=$RTG_MEM
 USER_JAVA_OPTS=$RTG_JAVA_OPTS
 
-if [ ! -r "$THIS_DIR/rtg.cfg" ] ; then
+if [[ ! -r "$THIS_DIR/rtg.cfg" ]]; then
     shopt -s nocasematch
     # Perform initial setup
 
-    if [ -r "$THIS_DIR/LICENSE.txt" ] && ! head -n 1 "$THIS_DIR/LICENSE.txt" | grep -q BSD; then
+    if [[ -r "$THIS_DIR/LICENSE.txt" ]] && ! head -n 1 "$THIS_DIR/LICENSE.txt" | grep -q BSD; then
         # If this distribution includes an EULA that requires display and agreement to it
         more "$THIS_DIR/LICENSE.txt"
 
-        if [ -r "$THIS_DIR/rtg-license.txt" ]; then
+        if [[ -r "$THIS_DIR/rtg-license.txt" ]]; then
             echo
             echo "This software has been prepared for $(awk -F= '/^!person=/{print $2}'<"$THIS_DIR"/rtg-license.txt)"
         fi
         echo
-        read -p "Do you agree to the terms and conditions (y/n)? " EULA_REPLY
+        read -r -p "Do you agree to the terms and conditions (y/n)? " EULA_REPLY
         echo
         [[ "$EULA_REPLY" == "y" ]] || [[ "$EULA_REPLY" == "yes" ]] || {
             echo "You must agree with the license terms before you can use the software."
@@ -71,7 +71,7 @@ Time Genomics. This does not contain confidential information such as
 command-line parameters or dataset contents.
 
 EOF
-    read -p "Would you like to enable automatic usage logging (y/n)? " REPLY
+    read -r -p "Would you like to enable automatic usage logging (y/n)? " REPLY
     echo
     if [[ "$REPLY" == "y" ]] || [[ "$REPLY" == "yes" ]]; then
         RTG_USAGE=true
@@ -132,7 +132,7 @@ RTG_USAGE_OPTIONAL=username,hostname
 # Allows specification of the HTTP proxy to use for
 # talkback/usage, specified in host:port form. 
 # If unset, assume no http proxy is required.
-# RTG_PROXY=http://my.proxy.host:3128/
+# RTG_PROXY=my.proxy.host:3128
 
 
 # Directory in which to look for pipeline reference datasets.
@@ -160,7 +160,7 @@ EOF
 fi
 
 # Set other defaults
-if [ -x "$THIS_DIR/jre/bin/java" ]; then
+if [[ -x "$THIS_DIR/jre/bin/java" ]]; then
     RTG_JAVA="$THIS_DIR/jre/bin/java" # Path to java (for JRE bundled versions)
 else
     RTG_JAVA="java"                  # Path to java (for no-JRE versions assume java is on current PATH)
@@ -171,89 +171,91 @@ RTG_MEM=''                           # Maximum memory for rtg to use (e.g. 48g)
 RTG_MEM_PCT=90                       # If RTG_MEM is not defined use this percentage of total RAM
 
 # Read in default config (primarily containing talkback/usage prefs)
-if [ ! -r "$THIS_DIR/rtg.cfg" ] ; then
+if [[ ! -r "$THIS_DIR/rtg.cfg" ]]; then
     echo "No initial configuration."
     exit 1
 fi
 source "$THIS_DIR/rtg.cfg" || exit 1
 
 # Read in machine specific customizations installed in system location
-if [ -r /etc/rtg.cfg ] ; then
+if [[ -r /etc/rtg.cfg ]]; then
   source /etc/rtg.cfg || exit 1
 fi
 
 # Read in machine specific customizations installed in local directory (without requiring sysadmin setup)
 hostname=$(hostname -s)
-if [ "${hostname}" ] && [ -r "$THIS_DIR/rtg.${hostname}.cfg" ] ; then
+if [[ "${hostname}" ]] && [[ -r "$THIS_DIR/rtg.${hostname}.cfg" ]]; then
   source "$THIS_DIR/rtg.${hostname}.cfg" || exit 1
 fi
 
 # Apply settings from user environment
 RTG_MEM=${USER_RTG_MEM:-$RTG_MEM}
 RTG_JAVA_OPTS=${USER_JAVA_OPTS:-$RTG_JAVA_OPTS}
+RTG_JAVA_OPTS_ARRAY=($RTG_JAVA_OPTS)  # explicit word split into array
 
 # Check that the mandatory config is present
-if [ -z "$RTG_JAVA" ] ; then
+if [[ -z "$RTG_JAVA" ]]; then
   echo "RTG_JAVA must be specified in /etc/rtg.cfg or $THIS_DIR/rtg.${hostname}.cfg"
   exit 1
 fi
-if [ -z "$RTG_JAR" ] ; then
+if [[ -z "$RTG_JAR" ]]; then
   echo "RTG_JAR must be specified in /etc/rtg.cfg or $THIS_DIR/rtg.${hostname}.cfg"
   exit 1
 fi
 
 # Check that the config is suitable
 java_path=$(which "$RTG_JAVA" 2> /dev/null)
-if [ -z "$java_path" -o ! -x "$java_path" ] ; then
+if [[ -z "$java_path" ]] || [[ ! -x "$java_path" ]]; then
   echo "Unable to execute $RTG_JAVA"
   exit 1
 fi
 
 RTG_MIN_MEM=-Xmx64m                  # Minimal memory just used for java version checking, log sending etc.
 version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | sed -n '/^.* version/s/.* version "\([0-9]\)\.\([0-9]*\).*/\1\2/p')
-if [ ! "$version" ] || [ ! "$version" -ge 18 ]; then
+if [[ ! "$version" ]] || [[ ! "$version" -ge 18 ]]; then
   echo "$RTG_JAVA is not Java 8 or later"
   exit 1
 fi
 
-if [ ! -r "$RTG_JAR" ] ; then
+if [[ ! -r "$RTG_JAR" ]]; then
   echo "Unable to read $RTG_JAR"
   exit 1
 fi
 
-if [ ! -z "$RTG_PROXY" ] ; then
-  proxy_host=$(echo "$RTG_PROXY" | awk '{print $1}' FS=:)
-  proxy_port=$(echo "$RTG_PROXY" | awk '{print $2}' FS=:)
-  if [ -z "$proxy_port" ] ; then
+RTG_PROXY_ARRAY=()
+if [[ ! -z "$RTG_PROXY" ]]; then
+  proxy_host=${RTG_PROXY%%:*}
+  proxy_port=${RTG_PROXY#*:}
+  if [[ -z "$proxy_port" ]]; then
     proxy_port=80
   fi
-  RTG_PROXY="-Dhttp.proxyHost=$proxy_host -Dhttp.proxyPort=$proxy_port"
+  RTG_PROXY_ARRAY=("-Dhttp.proxyHost=$proxy_host" "-Dhttp.proxyPort=$proxy_port")
 fi
 
-if [ ! -z "$RTG_USAGE" ]; then
-    RTG_USAGE="-Dusage=$RTG_USAGE"
-    if [ ! -z "$RTG_USAGE_HOST" ]; then
-        RTG_USAGE="$RTG_USAGE -Dusage.host=$RTG_USAGE_HOST"
+RTG_USAGE_ARRAY=()
+if [[ ! -z "$RTG_USAGE" ]]; then
+    RTG_USAGE_ARRAY+=("-Dusage=$RTG_USAGE")
+    if [[ ! -z "$RTG_USAGE_HOST" ]]; then
+        RTG_USAGE_ARRAY+=("-Dusage.host=$RTG_USAGE_HOST")
     fi
-    if [ ! -z "$RTG_USAGE_DIR" ]; then
-        RTG_USAGE="$RTG_USAGE -Dusage.dir=$RTG_USAGE_DIR"
+    if [[ ! -z "$RTG_USAGE_DIR" ]]; then
+        RTG_USAGE_ARRAY+=("-Dusage.dir=$RTG_USAGE_DIR")
     fi
     if [[ "$RTG_USAGE_OPTIONAL" == *username* ]]; then
-        RTG_USAGE="$RTG_USAGE -Dusage.log.username=true"
+        RTG_USAGE_ARRAY+=("-Dusage.log.username=true")
     fi
     if [[ "$RTG_USAGE_OPTIONAL" == *hostname* ]]; then
-        RTG_USAGE="$RTG_USAGE -Dusage.log.hostname=true"
+        RTG_USAGE_ARRAY+=("-Dusage.log.hostname=true")
     fi
     if [[ "$RTG_USAGE_OPTIONAL" == *commandline* ]]; then
-        RTG_USAGE="$RTG_USAGE -Dusage.log.commandline=true"
+        RTG_USAGE_ARRAY+=("-Dusage.log.commandline=true")
     fi
 fi
 
-if [ ! -z "$RTG_TALKBACK" ]; then
+if [[ ! -z "$RTG_TALKBACK" ]]; then
     RTG_TALKBACK="-Dtalkback=$RTG_TALKBACK"
-    if [ "$TEST_TALKBACK" == "y" ]; then  # First run only, perform test of crash reporting
-        # shellcheck disable=SC2086
-        if ! "$RTG_JAVA" $RTG_USAGE $RTG_TALKBACK $RTG_PROXY $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "Post-install talkback test"; then
+    if [[ "$TEST_TALKBACK" == "y" ]]; then  # First run only, perform test of crash reporting
+        if ! "$RTG_JAVA" "${RTG_USAGE_ARRAY[@]}" "${RTG_PROXY_ARRAY[@]}" $RTG_TALKBACK $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "Post-install talkback test"; then
             echo "Initial crash-report connectivity test did not succeed, probably due to firewall issues."
             echo "You will be asked to manually submit any error logs."
         fi
@@ -261,36 +263,35 @@ if [ ! -z "$RTG_TALKBACK" ]; then
     fi
 fi
 
-if [ -z "$RTG_MEM" ] ; then
+if [[ -z "$RTG_MEM" ]]; then
   RTG_MEM=$("$RTG_JAVA" $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.ChooseMemory $RTG_MEM_PCT)
 fi
 
-if [ ! -z "$RTG_REFERENCES_DIR" ]; then
+if [[ ! -z "$RTG_REFERENCES_DIR" ]]; then
     RTG_REFERENCES_DIR="-Dreferences.dir=$RTG_REFERENCES_DIR"
 else
     RTG_REFERENCES_DIR="-Dreferences.dir=$THIS_DIR/references"
 fi
-if [ ! -z "$RTG_MODELS_DIR" ]; then
+if [[ ! -z "$RTG_MODELS_DIR" ]]; then
     RTG_MODELS_DIR="-Dmodels.dir=$RTG_MODELS_DIR"
 else
     RTG_MODELS_DIR="-Dmodels.dir=$THIS_DIR/models"
 fi
 
-if [ ! -z "$RTG_DEFAULT_THREADS" ] ; then
-    RTG_DEFAULT_THREADS="-Druntime.defaultThreads=$RTG_DEFAULT_THREADS"
+RTG_DEFAULT_THREADS_ARRAY=()
+if [[ ! -z "$RTG_DEFAULT_THREADS" ]]; then
+    RTG_DEFAULT_THREADS_ARRAY=("-Druntime.defaultThreads=$RTG_DEFAULT_THREADS")
 fi
 
 # Now run the primary RTG command
 HSLOG=./hs_err_pid$$.log
-# shellcheck disable=SC2086
-"$RTG_JAVA" -Djava.library.path="$THIS_DIR" -XX:ErrorFile=$HSLOG $RTG_JAVA_OPTS "$RTG_REFERENCES_DIR" "$RTG_MODELS_DIR" $RTG_USAGE $RTG_TALKBACK $RTG_DEFAULT_THREADS -Xmx$RTG_MEM $RTG_PROXY -jar "$RTG_JAR" "$@"
+"$RTG_JAVA" -Djava.library.path="$THIS_DIR" -XX:ErrorFile=$HSLOG "${RTG_JAVA_OPTS_ARRAY[@]}" "$RTG_REFERENCES_DIR" "$RTG_MODELS_DIR" "${RTG_USAGE_ARRAY[@]}" "${RTG_PROXY_ARRAY[@]}" "${RTG_DEFAULT_THREADS_ARRAY[@]}" $RTG_TALKBACK "-Xmx$RTG_MEM" -jar "$RTG_JAR" "$@"
 ECODE=$?
-if [ -f "$HSLOG" ]; then
+if [[ -f "$HSLOG" ]]; then
     if grep -q "insufficient memory" "$HSLOG"; then
         echo "The operating system did not make requested memory available to the JVM.  Try removing other jobs on this machine, adjusting allocated memory appropriate to currently available memory, or adjusting command parameters to reduce memory requirements. More information is contained in the file: $HSLOG" >&2
     else
-        # shellcheck disable=SC2086
-        "$RTG_JAVA" $RTG_TALKBACK $RTG_PROXY $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "$HSLOG" "$@"
+        "$RTG_JAVA" "${RTG_PROXY_ARRAY[@]}" $RTG_TALKBACK $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "$HSLOG" "$@"
     fi
 fi
 exit $ECODE
