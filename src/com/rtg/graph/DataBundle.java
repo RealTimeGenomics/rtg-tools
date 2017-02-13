@@ -115,9 +115,7 @@ final class DataBundle {
       scores.add(mScores[i]);
       points.add(mPoints[i]);
     }
-    for (int i = smin; i < Math.min(smax, mPrecisionRecall.length - 1); ++i) {
-      precisionRecallPoints.add(mPrecisionRecall[i]);
-    }
+    precisionRecallPoints.addAll(Arrays.asList(mPrecisionRecall).subList(smin, Math.min(smax, mPrecisionRecall.length - 1)));
 
     mRangedPoints = points.toArray(new Point2D[points.size()]);
     mRangedPrecisionRecall = precisionRecallPoints.toArray(new Point2D[precisionRecallPoints.size()]);
