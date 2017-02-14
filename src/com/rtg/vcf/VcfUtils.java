@@ -81,6 +81,9 @@ public final class VcfUtils {
   /** Confidence interval for POS columns. */
   public static final String CONFIDENCE_INTERVAL_POS = "CIPOS";
 
+  /** Confidence interval for END columns. */
+  public static final String CONFIDENCE_INTERVAL_END = "CIEND";
+
   /** Allele frequency for alt alleles. */
   public static final String INFO_ALLELE_FREQ = "AF";
 
@@ -406,11 +409,38 @@ public final class VcfUtils {
           return Double.NaN;
         }
         return Double.parseDouble(fieldVal);
-      } catch (NumberFormatException ex) {
+      } catch (final NumberFormatException ex) {
         throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return Double.NaN;
+    }
+  }
+
+  /**
+   * Get a multivalued integer field for a sample in the form of an integer array.
+   * @param rec VCF record
+   * @param field string ID of field to extract
+   * @return the value or null if missing
+   */
+  public static int[] getConfidenceInterval(final VcfRecord rec, final String field) {
+    final ArrayList<String> info = rec.getInfo().get(field);
+    if (info != null) {
+      try {
+        final int[] res = new int[info.size()];
+        for (int k = 0; k < res.length; ++k) {
+          final String fieldVal = info.get(k);
+          if (fieldVal.equals(VcfRecord.MISSING)) {
+            return null;
+          }
+          res[k] = Integer.parseInt(fieldVal);
+        }
+        return res;
+      } catch (final NumberFormatException ex) {
+        throw new VcfFormatException("Invalid value \"" + info + "\" in \"" + field + "\" for VCF record :" + rec);
+      }
+    } else {
+      return null;
     }
   }
 

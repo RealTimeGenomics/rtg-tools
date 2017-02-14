@@ -44,6 +44,7 @@ public class VcfUtilsTest extends TestCase {
 
   public void test() {
     assertEquals("CIPOS", VcfUtils.CONFIDENCE_INTERVAL_POS);
+    assertEquals("CIEND", VcfUtils.CONFIDENCE_INTERVAL_END);
     assertEquals(".", VcfRecord.MISSING);
     assertEquals("PASS", VcfUtils.FILTER_PASS);
     assertEquals("GT", VcfUtils.FORMAT_GENOTYPE);
@@ -162,6 +163,16 @@ public class VcfUtilsTest extends TestCase {
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf")).getName());
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test.vcf.gz")).getName());
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf.gz")).getName());
+  }
+
+  public void testConfidenceIntervalRetrieval() {
+    final VcfRecord rec = makeRecord("1/1", "A", "T");
+    assertNull(VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS));
+    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "-10,42");
+    final int[] ci = VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS);
+    assertEquals(2, ci.length);
+    assertEquals(-10, ci[0]);
+    assertEquals(42, ci[1]);
   }
 
 }
