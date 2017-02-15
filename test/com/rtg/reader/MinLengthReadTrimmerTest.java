@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,35 +30,34 @@
 
 package com.rtg.reader;
 
-import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import com.rtg.mode.DnaUtils;
+import com.rtg.util.PortableRandom;
+import com.rtg.util.test.RandomDna;
 
 /**
- * Applies a succession of delegate trimmers.
  */
-public final class MultiReadTrimmer implements ReadTrimmer {
+public class MinLengthReadTrimmerTest {
 
-  private final ReadTrimmer[] mTrimmers;
-
-  /**
-   * Construct a read trimmer
-   * @param trimmers the delegate trimmers to iterate through
-   */
-  public MultiReadTrimmer(ReadTrimmer... trimmers) {
-    mTrimmers = trimmers;
-  }
-
-  @Override
-  public String toString() {
-    return "Multi(trimmers=" + Arrays.toString(mTrimmers) + ")";
-  }
-
-  @Override
-  public int trimRead(byte[] read, byte[] qualities, int length) {
-    int pos = length;
-    for (ReadTrimmer t : mTrimmers) {
-      pos = t.trimRead(read, qualities, pos);
+  private void check(MinLengthReadTrimmer t, String raw, boolean zeroLength) {
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(raw.length(), new PortableRandom(42)));
+    final byte[] quals = FastaUtils.asciiToRawQuality(raw);
+    if (zeroLength) {
+      assertEquals(0, t.trimRead(read, quals, raw.length()));
+    } else {
+      assertEquals(raw.length(), t.trimRead(read, quals, raw.length()));
     }
-    return pos;
+  }
+
+  @Test
+  public void testExamples() {
+    check(new MinLengthReadTrimmer(5), ";88/;5=8??<??;?=;2222*274=???0?;?????", false);
+    check(new MinLengthReadTrimmer(5), ";88/", true);
+    check(new MinLengthReadTrimmer(37), ";88/;5=8??<??;?=;2222*274=???0?;?????", false);
+    check(new MinLengthReadTrimmer(38), ";88/;5=8??<??;?=;2222*274=???0?;?????", true);
   }
 
 }

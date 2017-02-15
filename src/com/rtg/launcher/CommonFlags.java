@@ -65,6 +65,8 @@ public final class CommonFlags {
   public static final String MIN_FRAGMENT_SIZE = "min-fragment-size";
   /** maximum fragment size flag */
   public static final String MAX_FRAGMENT_SIZE = "max-fragment-size";
+  /** Minimum read length filtering */
+  public static final String MIN_READ_LENGTH = "min-read-length";
   /** sort flag */
   public static final String SORT_FLAG = "sort";
   /** Flag which decides if unmapped sequences are to be written. */
@@ -452,6 +454,17 @@ public final class CommonFlags {
    */
   public static void initMinAvrScore(final CFlags flags) {
     flags.registerOptional(FILTER_AVR_FLAG, Double.class, "Float", "if set, fail variants with AVR scores below this value").setCategory(CommonFlagCategories.REPORTING);
+  }
+
+  /**
+   * Initialise flag for minimum read length
+   * @param flags shared flags
+   */
+  public static void initMinReadLength(CFlags flags) {
+    if (flags.getFlag(MIN_READ_LENGTH) == null) {
+      flags.registerOptional(MIN_READ_LENGTH, Integer.class, CommonFlags.INT, "if a read ends up below this threshold it will be trimmed to 0 length", 0)
+        .setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    }
   }
 
   /**

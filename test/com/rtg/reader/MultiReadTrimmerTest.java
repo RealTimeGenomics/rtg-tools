@@ -30,13 +30,15 @@
 
 package com.rtg.reader;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.test.RandomDna;
 
-import junit.framework.TestCase;
-
-public class MultiReadTrimmerTest extends TestCase {
+public class MultiReadTrimmerTest {
 
   private void check(String raw, String exp) {
     final ReadTrimmer t = new MultiReadTrimmer(new LastBasesReadTrimmer(20), new BestSumReadTrimmer(20));
@@ -45,6 +47,7 @@ public class MultiReadTrimmerTest extends TestCase {
     assertEquals(exp, raw.substring(0, t.trimRead(read, quals, raw.length())));
   }
 
+  @Test
   public void testExamples() {
     check(";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/",
           ";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7");
@@ -52,10 +55,27 @@ public class MultiReadTrimmerTest extends TestCase {
           "??<?89.43---+3,79=?5?;??=??????????>??;>>?9;8");
     check("::::18:5:4:458:::':::8664/.(1,,''.22(262/.",
           "::::18:5:4:458:::':::8");
-    check("3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''-')*1+0+23++45661885",
-          "3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''");
+    check(":.:::'''':)'1:+2:68::::88:6::4:4,440111*))'--''AAAA4.55.32888-''''-')*1+0+23++45661885",
+          ":.:::");
+    check("3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''-')*1+0+23++45661885,,,,,,,,,,,,,,,,,,,,",
+          "3.1-'''''))'11+2.6811::88:6::484,440111*))'--''**1+4.55.32(*--''''-')*1+0+23++45661885");
+
     check(">???>??>???", "");  //shorter than the window length!
   }
 
+  @Test
+  public void testBestSumAfterTrim() {
+    check(":::::::::::::::::::::::::::::::::::::::::::::::AAAA4.55.32888-''''-')*1+0+23++45661885",
+      ":::::::::::::::::::::::::::::::::::::::::::::::AAAA");
+  }
+
+  @Test
+  public void testMultipleLastBases() {
+    final ReadTrimmer t = new MultiReadTrimmer(new LastBasesReadTrimmer(20), new LastBasesReadTrimmer(5));
+    final String raw = ";88/;5=8??<??;?=;2222*274=???0?;????????3????3????>8?7>>>=>?>?>==:97*744*7799/=6=<975)'''+,',/";
+    final byte[] read = DnaUtils.encodeString(RandomDna.random(raw.length(), new PortableRandom(42)));
+    final byte[] quals = FastaUtils.asciiToRawQuality(raw);
+    assertEquals(raw.length() - 20 - 5, t.trimRead(read, quals, raw.length()));
+  }
 }
 

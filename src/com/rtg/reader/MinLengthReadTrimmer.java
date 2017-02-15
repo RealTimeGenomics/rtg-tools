@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,35 +30,26 @@
 
 package com.rtg.reader;
 
-import java.util.Arrays;
-
 /**
- * Applies a succession of delegate trimmers.
+ * Trims reads that are below the threshold to length 0
  */
-public final class MultiReadTrimmer implements ReadTrimmer {
-
-  private final ReadTrimmer[] mTrimmers;
+public class MinLengthReadTrimmer implements ReadTrimmer {
+  private final int mMinLength;
 
   /**
-   * Construct a read trimmer
-   * @param trimmers the delegate trimmers to iterate through
+   * @param minLength reads shorter than this will be trimmed to length 0
    */
-  public MultiReadTrimmer(ReadTrimmer... trimmers) {
-    mTrimmers = trimmers;
+  public MinLengthReadTrimmer(int minLength) {
+    mMinLength = minLength;
+  }
+  @Override
+  public int trimRead(byte[] read, byte[] qualities, int length) {
+    return length < mMinLength ? 0 : length;
   }
 
   @Override
   public String toString() {
-    return "Multi(trimmers=" + Arrays.toString(mTrimmers) + ")";
-  }
-
-  @Override
-  public int trimRead(byte[] read, byte[] qualities, int length) {
-    int pos = length;
-    for (ReadTrimmer t : mTrimmers) {
-      pos = t.trimRead(read, qualities, pos);
-    }
-    return pos;
+    return "MinLength(" + mMinLength + ")";
   }
 
 }
