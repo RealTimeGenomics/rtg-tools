@@ -168,7 +168,8 @@ public class VcfUtilsTest extends TestCase {
   public void testConfidenceIntervalRetrieval() {
     final VcfRecord rec = makeRecord("1/1", "A", "T");
     assertNull(VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS));
-    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "-10,42");
+    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "-10");
+    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "42");
     final int[] ci = VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS);
     assertEquals(2, ci.length);
     assertEquals(-10, ci[0]);
