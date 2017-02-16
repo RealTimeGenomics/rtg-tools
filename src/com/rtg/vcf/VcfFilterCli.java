@@ -222,8 +222,8 @@ public final class VcfFilterCli extends AbstractCli {
     javascript.setCategory(FILTERING);
     javascript.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
-    mFlags.addRequiredSet(input, output);
-    mFlags.addRequiredSet(input, javascript);
+    mFlags.addRequiredSet(output);
+    mFlags.addRequiredSet(javascript);
     mFlags.setValidator(new VcfFilterValidator());
   }
 
