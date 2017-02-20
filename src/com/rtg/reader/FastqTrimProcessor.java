@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Process a block of fastq sequences
+ * Process a block of FASTQ sequences
  */
 class FastqTrimProcessor implements Runnable {
   final Batch<FastqSequence> mBatch;

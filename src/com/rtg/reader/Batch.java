@@ -33,7 +33,7 @@ package com.rtg.reader;
 import java.util.List;
 
 /**
- * Represenst a numbered batch of some type to be treated as one chunk of work
+ * Represents a numbered batch of some type to be treated as one chunk of work
  */
 public class Batch<T> {
   private final List<T> mItems;
