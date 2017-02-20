@@ -49,6 +49,7 @@ public class BlockingExecutorTest {
 
     }
     CountDownLatch mLatch = new CountDownLatch(1);
+    @Override
     public void run() {
       try {
         mLatch.await();
@@ -57,14 +58,13 @@ public class BlockingExecutorTest {
       } finally {
         mDone.countDown();
       }
-      ;
     }
   }
 
   static class JobSubmission implements Runnable {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
-    CountDownLatch mLatch;
+    final CountDownLatch mLatch;
     private Future<?> mSubmit;
 
     JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
@@ -72,6 +72,7 @@ public class BlockingExecutorTest {
       mExecutor = executor;
       mTask = new LockedRunnable(doneLatch);
     }
+    @Override
     public void run() {
       mSubmit = mExecutor.submit(mTask);
       mLatch.countDown();
