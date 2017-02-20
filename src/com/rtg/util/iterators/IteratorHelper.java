@@ -33,14 +33,11 @@ package com.rtg.util.iterators;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.reeltwo.jumble.annotations.TestClass;
-
 /**
  * A class to help build iterators where it is necessary to do a look ahead to check if the next
  * case is available.
  * @param <X> type the iterator operates over.
  */
-@TestClass({"com.rtg.util.iterators.ArrayToIteratorTest", "com.rtg.util.iterators.IteratorHelperTest"})
 public abstract class IteratorHelper<X> implements Iterator<X> {
 
   protected abstract void step();

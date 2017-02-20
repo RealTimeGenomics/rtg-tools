@@ -35,6 +35,8 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.junit.Test;
 
@@ -46,10 +48,10 @@ public class BlockingExecutorTest {
       mDone = done;
 
     }
-    CountDownLatch latch = new CountDownLatch(1);
+    CountDownLatch mLatch = new CountDownLatch(1);
     public void run() {
       try {
-        latch.await();
+        mLatch.await();
       } catch (InterruptedException e) {
         e.printStackTrace();
       } finally {
@@ -63,13 +65,15 @@ public class BlockingExecutorTest {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
     CountDownLatch mLatch;
+    private Future<?> mSubmit;
+
     JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
       mLatch = latch;
       mExecutor = executor;
       mTask = new LockedRunnable(doneLatch);
     }
     public void run() {
-      mExecutor.submit(mTask);
+      mSubmit = mExecutor.submit(mTask);
       mLatch.countDown();
     }
   }
@@ -91,9 +95,14 @@ public class BlockingExecutorTest {
       latch.await();
       assertEquals(4, blockingExecutor.getTaskCount());
       for (JobSubmission job : jobs) {
-        job.mTask.latch.countDown();
+        job.mTask.mLatch.countDown();
       }
       doneLatch.await();
+      for (JobSubmission job : jobs) {
+        job.mSubmit.get();
+      }
+    } catch (ExecutionException e) {
+      e.printStackTrace();
     } finally {
       blockingExecutor.shutdown();
     }
