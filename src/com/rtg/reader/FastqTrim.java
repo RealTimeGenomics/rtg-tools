@@ -62,7 +62,7 @@ import com.rtg.util.io.FileUtils;
  */
 public final class FastqTrim extends AbstractCli {
 
-  private static final String END_TRIM_THRESHOLD = "end-trim-threshold";
+  private static final String END_TRIM_THRESHOLD = "end-quality-threshold";
 
   private static final String TRIM_START_FLAG = "trim-start-bases";
 
