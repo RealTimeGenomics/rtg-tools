@@ -100,6 +100,6 @@ public class FastqSequenceTest {
 
   static FastqSequence getFastq(String name, String bases, byte[] qualities) {
     assert bases.length() == qualities.length;
-    return new FastqSequence(name, DnaUtils.encodeString(bases), qualities, bases.length());
+    return new FastqSequence(name, DnaUtils.encodeStringWithHyphen(bases), qualities, bases.length());
   }
 }
