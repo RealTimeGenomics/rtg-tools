@@ -41,12 +41,19 @@ import org.junit.Test;
 public class BlockingExecutorTest {
 
   static class LockedRunnable implements Runnable {
+    private final CountDownLatch mDone;
+    LockedRunnable(CountDownLatch done) {
+      mDone = done;
+
+    }
     CountDownLatch latch = new CountDownLatch(1);
     public void run() {
       try {
         latch.await();
       } catch (InterruptedException e) {
         e.printStackTrace();
+      } finally {
+        mDone.countDown();
       }
       ;
     }
@@ -56,10 +63,10 @@ public class BlockingExecutorTest {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
     CountDownLatch mLatch;
-    JobSubmission(CountDownLatch latch, BlockingExecutor executor) {
+    JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
       mLatch = latch;
       mExecutor = executor;
-      mTask = new LockedRunnable();
+      mTask = new LockedRunnable(doneLatch);
     }
     public void run() {
       mExecutor.submit(mTask);
@@ -70,19 +77,27 @@ public class BlockingExecutorTest {
   @Test
   public void testBlockingExecutor() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(4);
+    final CountDownLatch doneLatch = new CountDownLatch(10);
     final BlockingExecutor blockingExecutor = new BlockingExecutor(2, 2);
-    blockingExecutor.getTaskCount();
-    final List<JobSubmission> jobs = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
-      final JobSubmission job = new JobSubmission(latch, blockingExecutor);
-      new Thread(job).start();
-      jobs.add(job);
+    try {
+      blockingExecutor.getTaskCount();
+      final List<JobSubmission> jobs = new ArrayList<>();
+      for (int i = 0; i < 10; i++) {
+        final JobSubmission job = new JobSubmission(latch, doneLatch, blockingExecutor);
+        final Thread thread = new Thread(job);
+        thread.start();
+        jobs.add(job);
+      }
+      latch.await();
+      assertEquals(4, blockingExecutor.getTaskCount());
+      for (JobSubmission job : jobs) {
+        job.mTask.latch.countDown();
+      }
+      doneLatch.await();
+    } finally {
+      blockingExecutor.shutdown();
     }
-    latch.await();
-    assertEquals(4, blockingExecutor.getTaskCount());
-    for (JobSubmission job : jobs) {
-      job.mTask.latch.countDown();
-    }
+
   }
 
 }
