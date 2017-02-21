@@ -92,6 +92,8 @@ public class FastqTrimTest  extends AbstractCliTest {
       for (File f : files) {
         assertTrue(f.createNewFile());
       }
+      getFlags(false, "-i", files[0].getPath(), "-o", files[1].getPath());
+      assertTrue(files[1].delete());
       getFlags(true, "-i", files[0].getPath(), "-o", files[1].getPath());
       //assertParseMessage("The value for --", "-l", files[0].getPath(), "-r", files[1].getPath(), "-o", files[2].getPath(), "-S", "-1");
     }
