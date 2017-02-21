@@ -103,6 +103,7 @@ public final class FastqTrim extends AbstractCli {
 
     flags.setValidator(innerFlags ->
       CommonFlags.validateInputFile(innerFlags, CommonFlags.INPUT_FLAG)
+        && CommonFlags.validateOutputFile(innerFlags, (File) innerFlags.getValue(OUTPUT_FLAG))
         && innerFlags.checkInRange(BATCH_SIZE, 1, Integer.MAX_VALUE)
         && innerFlags.checkInRange(END_TRIM_THRESHOLD, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_START_FLAG, 0, Integer.MAX_VALUE)
