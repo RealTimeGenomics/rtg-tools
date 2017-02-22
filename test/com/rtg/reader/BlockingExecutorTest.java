@@ -65,7 +65,7 @@ public class BlockingExecutorTest {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
     final CountDownLatch mLatch;
-    private Future<?> mSubmit;
+    private volatile Future<?> mSubmit;
 
     JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
       mLatch = latch;
