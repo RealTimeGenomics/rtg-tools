@@ -44,7 +44,7 @@ import htsjdk.samtools.util.RuntimeIOException;
  */
 abstract class AbstractAsyncChunkWriter<T> extends AbstractAsyncWriter<T> implements Consumer<List<T>> {
   /**
-   * Creates an AbstractAsyncWriter that will use the provided WriterRunnable to consume from the
+   * Creates an <code>AbstractAsyncWriter</code> that will use the provided <code>WriterRunnable</code> to consume from the
    * internal queue and write records into the synchronous writer.
    *
    * @param queueSize size of the internal queue
