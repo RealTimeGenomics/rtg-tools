@@ -56,6 +56,7 @@ public class PedStatsCli extends AbstractCli {
   private static final String FOUNDER_IDS = "founder-ids";
   private static final String FAMILIES_OUT = "families";
   private static final String DOT_OUT = "dot";
+  private static final String DOT_SIMPLE = "simple-dot";
   private static final String DUMP = "Xdump";
   private static final String FAMILY_FLAGS = "Xfamily-flags";
   private static final String ORDERING = "Xordering";
@@ -89,6 +90,7 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(FOUNDER_IDS, "output ids of all founders").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILIES_OUT, "output information about family structures").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(DOT_OUT, String.class, "STRING", "output pedigree in GraphViz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_SIMPLE, "when outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees").setCategory(CommonFlagCategories.REPORTING);
 
     mFlags.registerOptional(DUMP, "dump full relationships structure").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILY_FLAGS, "output command-line flags for family caller").setCategory(CommonFlagCategories.REPORTING);
@@ -112,8 +114,7 @@ public class PedStatsCli extends AbstractCli {
       try {
 
         if (mFlags.isSet(DOT_OUT)) {      // Output dotty stuff
-          w.writeln(pedigree.toGraphViz((String) mFlags.getValue(DOT_OUT)));
-
+          w.writeln(pedigree.toGraphViz((String) mFlags.getValue(DOT_OUT), mFlags.isSet(DOT_SIMPLE)));
         } else if (mFlags.isSet(PRIMARY_IDS)) {
           writeIds(w, pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)));
         } else if (mFlags.isSet(MALE_IDS)) {

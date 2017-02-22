@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +89,8 @@ public class GenomeRelationships {
    */
   public static final String PRIMARY_GENOME_PROPERTY = "primary-genome";
 
+  // Node properties used for hidden nodes (e.g. marriage, child fan-out) in dotty output
+  private static final String INVIS_NODE = " [shape=point,style=filled,label=\"\",height=.001,width=.001];\n";
 
   private final Collection<String> mGenomes;
   private final Map<String, Properties> mGenomeProperties;
@@ -327,12 +330,7 @@ public class GenomeRelationships {
 
   // Make a graphviz-safe ID for a node given a non-safe name
   private static String nodeId(Map<String, String> nodeIds, String name) {
-    String id = nodeIds.get(name);
-    if (id == null) {
-      id = "node" + nodeIds.size();
-      nodeIds.put(name, id);
-    }
-    return id;
+    return nodeIds.computeIfAbsent(name, k -> "node" + nodeIds.size());
   }
 
   static final Map<String, String> REL_LABELS = new HashMap<>();
@@ -347,9 +345,10 @@ public class GenomeRelationships {
    * a node representing the marriage, to better group offspring from the same parents. Diseased
    * status is indicated with afflicted individuals show in grey.
    * @param title the text to use as the graph title
+   * @param simpleLayout if true, use a layout that looks less traditional, but which dot doesn't render very well with large complex pedigrees
    * @return the <code>graphviz</code> output
    */
-  String toGraphViz(final String title) {
+  String toGraphViz(final String title, boolean simpleLayout) {
     final StringBuilder sb = new StringBuilder();
     sb.append("digraph Ped {\n" + "  ratio =\"auto\";\n" + "  mincross = 2.0;\n" + "  labelloc = \"t\";\n" + "  label=\"").append(title).append("\";\n").append("\n");
 
@@ -365,14 +364,51 @@ public class GenomeRelationships {
         final String fatherId = nodeId(nodeIds, family.getFather());
         final String motherId = nodeId(nodeIds, family.getMother());
         final String marriageId = nodeId(nodeIds, "m" + family.getFather() + "x" + family.getMother());
-        sb.append("  {\n");
-        //sb.append("    rank = same;\n");
-        sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
-        sb.append("    ").append(motherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
-        sb.append("    ").append(marriageId).append(" [shape=diamond,style=filled,label=\"\",height=.1,width=.1];\n");
-        sb.append("  }\n");
+
+        if (simpleLayout) {
+          // Use a simpler layout that dot can handle better for larger complex pedigrees
+          sb.append("  {\n");
+          sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
+          sb.append("    ").append(motherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
+          sb.append("    ").append(marriageId).append(INVIS_NODE);
+          sb.append("  }\n");
+        } else {
+          // We can use a layout that looks nicer, but doesn't work well with large complex pedigrees
+          sb.append("  {\n");
+          sb.append("    rank = same;\n");
+          sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append("b [dir=none];\n");
+          sb.append("    ").append(marriageId).append("b").append(INVIS_NODE);
+          sb.append("    ").append(marriageId).append("b -> ").append(motherId).append(" [dir=none];\n");
+          sb.append("  }\n");
+          sb.append("  ").append(marriageId).append("b -> ").append(marriageId).append(" [dir=none];\n");
+          sb.append("  ").append(marriageId).append(INVIS_NODE);
+
+          if (family.getChildren().length > 1) {
+            sb.append("  {\n");
+            sb.append("    rank = same;\n");
+
+            final String[] c2 = Arrays.copyOf(family.getChildren(), family.getChildren().length + 1);
+            for (int i = 0; i < c2.length - 1; i++) {
+              c2[i] = nodeId(nodeIds, c2[i]) + "b";
+              sb.append("  ").append(c2[i]).append(INVIS_NODE);
+            }
+            final int cpos = (c2.length - 1) / 2;
+            System.arraycopy(c2, cpos, c2, cpos + 1, c2.length - 1 - cpos);
+            c2[cpos] = marriageId;
+
+            String last = c2[0];
+            for (int i = 1; i < c2.length; i++) {
+              sb.append("  ").append(last).append(" -> ");
+              last = c2[i];
+              sb.append(last).append(" [dir=none];\n");
+            }
+            sb.append("  }\n");
+          }
+        }
+
         for (final String child : family.getChildren()) {
-          sb.append("  ").append(marriageId).append(" -> ").append(nodeId(nodeIds, child)).append(" [];\n");
+          final String from = family.getChildren().length == 1 || simpleLayout ? marriageId : (nodeId(nodeIds, child) + "b");
+          sb.append("  ").append(from).append(" -> ").append(nodeId(nodeIds, child)).append(" [];\n");
           for (final Relationship r : relationships(child, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child))) {
             seen.add(r);
             seenGenomes.add(child);

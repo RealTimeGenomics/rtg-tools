@@ -62,8 +62,11 @@ public class PedStatsCliTest extends AbstractCliTest {
       final GenomeRelationships ped = makeTestPed();
       FileUtils.stringToFile(PedFileParser.toString(ped), relationFile);
 
-      final String output = checkMainInitOk("--dot", "My Title", relationFile.toString());
+      final String output = checkMainInitOk("--dot", "My Title", "--simple-dot", relationFile.toString());
       mNano.check("pedstats-todot.txt", output);
+
+      final String outputnew = checkMainInitOk("--dot", "My Title", relationFile.toString());
+      mNano.check("pedstats-todot-new.txt", outputnew);
     }
   }
 
