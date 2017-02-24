@@ -31,16 +31,20 @@
 package com.rtg.reader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
 
 public class BlockingExecutorTest {
+
+  private static AtomicInteger sQueued = new AtomicInteger(0);
 
   static class LockedRunnable implements Runnable {
     private final CountDownLatch mDone;
@@ -65,16 +69,20 @@ public class BlockingExecutorTest {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
     final CountDownLatch mLatch;
+    private final CountDownLatch mDone;
     private volatile Future<?> mSubmit;
 
     JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
       mLatch = latch;
+      mDone = doneLatch;
       mExecutor = executor;
       mTask = new LockedRunnable(doneLatch);
     }
     @Override
     public void run() {
       mSubmit = mExecutor.submit(mTask);
+      sQueued.getAndIncrement();
+      mDone.countDown();
       mLatch.countDown();
     }
   }
@@ -82,7 +90,7 @@ public class BlockingExecutorTest {
   @Test
   public void testBlockingExecutor() throws InterruptedException {
     final CountDownLatch latch = new CountDownLatch(4);
-    final CountDownLatch doneLatch = new CountDownLatch(10);
+    final CountDownLatch doneLatch = new CountDownLatch(20);
     final BlockingExecutor blockingExecutor = new BlockingExecutor(2, 2);
     try {
       blockingExecutor.getTaskCount();
@@ -94,7 +102,8 @@ public class BlockingExecutorTest {
         jobs.add(job);
       }
       latch.await();
-      assertEquals(4, blockingExecutor.getTaskCount());
+      assertTrue(blockingExecutor.getTaskCount() <= 4);
+      assertEquals(4, sQueued.get());
       for (JobSubmission job : jobs) {
         job.mTask.mLatch.countDown();
       }
