@@ -81,6 +81,7 @@ public final class SpawnJvm {
     final String slash = System.getProperty("file.separator");
     final String javahome = System.getProperty("java.home");
     final String classpath = System.getProperty("java.class.path");
+    final String librarypath = System.getProperty("java.library.path");
 
     final ArrayList<String> command = new ArrayList<>();
     command.add(javahome + slash + "bin" + slash + "java");
@@ -92,6 +93,7 @@ public final class SpawnJvm {
     //command.add("-Xms" + maxMem); //doesn't work on Linux ok on MacOSX back out till we understand what is going on - JC
     command.add("-cp");
     command.add(classpath);
+    command.add("-Djava.library.path=" + librarypath);
     command.add(className);
     command.addAll(Arrays.asList(args));
     return new ProcessBuilder(command).start();
