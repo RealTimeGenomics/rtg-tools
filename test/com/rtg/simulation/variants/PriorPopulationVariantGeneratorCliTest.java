@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.variants;
+
+import java.io.IOException;
+
+import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.AbstractCliTest;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Test the corresponding class
  */
-public enum PrereadArm {
+public class PriorPopulationVariantGeneratorCliTest extends AbstractCliTest {
 
-  /** UNKNOWN */
- UNKNOWN,
+  @Override
+  public void setUp() throws IOException {
+    super.setUp();
+  }
 
-  /** LEFT */
-  LEFT,
+  @Override
+  public void tearDown() throws IOException {
+    super.tearDown();
+  }
 
-  /** RIGHT */
-  RIGHT
+  @Override
+  protected AbstractCli getCli() {
+    return new PriorPopulationVariantGeneratorCli();
+  }
+
+  public void testInitParams() {
+    checkHelp("reference", "input genome",
+        "-o", "output=", "output VCF",
+        "print help on command-line flag usage",
+        "seed=", "seed for the random number generator");
+
+    checkExtendedHelp("bias frequency",
+        "properties file specifying the priors");
+  }
+
 }
-

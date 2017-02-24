@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.variants;
+
+import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.AbstractCliTest;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class FixedStepPopulationVariantGeneratorCliTest extends AbstractCliTest {
 
-  /** UNKNOWN */
- UNKNOWN,
+  @Override
+  protected AbstractCli getCli() {
+    return new FixedStepPopulationVariantGeneratorCli();
+  }
 
-  /** LEFT */
-  LEFT,
+  /** Test for an error that will be picked up during flags parsing. */
+  private void checkFlagsError(final String[] args, final String exp) {
+    final String err = checkHandleFlagsErr(args);
+    assertTrue("<" + exp + "> was not in <" + err + ">", err.contains(exp));
+  }
 
-  /** RIGHT */
-  RIGHT
+  private static final String EXP_F1 = "Error: You must provide values for -d INT -o FILE -i SDF --spec STRING";
+
+  public void testErrorFlags() {
+    checkFlagsError(new String[] {}, EXP_F1);
+  }
+
+
+  public void testInitParams() {
+    checkHelp("-d INT -o FILE -i SDF --spec STRING",
+        "distance between mutations",
+        "SDF containing input genome",
+        "allele frequency"
+    );
+  }
 }
-

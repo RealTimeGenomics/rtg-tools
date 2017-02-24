@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,54 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation;
+
+import java.util.Arrays;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Utility methods for simulation
  */
-public enum PrereadArm {
+public final class SimulationUtils {
 
-  /** UNKNOWN */
- UNKNOWN,
+  private SimulationUtils() { }
 
-  /** LEFT */
-  LEFT,
+  /**
+   * Generates an accumulated distribution from an input distribution. The input distribution need not sum to 1
+   * @param dist the non-cumulative distribution
+   * @return the cumulative distribution
+   */
+  public static double[] cumulativeDistribution(final double... dist) {
+    double sum = 0;
+    for (final double r : dist) {
+      sum += r;
+    }
 
-  /** RIGHT */
-  RIGHT
+    final double[] thres = new double[dist.length];
+    double currentThres = 0;
+    for (int i = 0; i < dist.length; ++i) {
+      currentThres += dist[i];
+      thres[i] = currentThres / sum;
+    }
+    return thres;
+  }
+
+  /**
+   * Find entry position in a cumulative distribution.
+   * @param dist cumulative distribution
+   * @param rand a double chosen between 0.0 and 1.0
+   * @return a chosen length
+   */
+  public static int chooseLength(final double[] dist, final double rand) {
+    assert rand <= 1.0 && rand >= 0.0;
+    int len = Arrays.binarySearch(dist, rand);
+    if (len < 0) {
+      len = -len - 1;
+    }
+    while (len < dist.length && dist[len] == 0.0) {
+      ++len;
+    }
+    return len;
+  }
+
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.variants;
+
+import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.AbstractCliTest;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Test the corresponding class
  */
-public enum PrereadArm {
+public class ChildSampleSimulatorCliTest extends AbstractCliTest {
 
-  /** UNKNOWN */
- UNKNOWN,
 
-  /** LEFT */
-  LEFT,
+  @Override
+  protected AbstractCli getCli() {
+    return new ChildSampleSimulatorCli();
+  }
 
-  /** RIGHT */
-  RIGHT
+  public void testInitParams() {
+    checkHelp("reference", "input genome",
+        "-i", "input=", "input VCF",
+        "-o", "output=", "output VCF",
+        "--mother", "--father", "--sex",
+        "print help on command-line flag usage",
+        "seed=", "seed for the random number generator");
+  }
+
 }
-

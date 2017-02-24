@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,20 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.reads;
+
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class FragmentTooSmallException extends NoTalkbackSlimException {
 
-  /** UNKNOWN */
- UNKNOWN,
-
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
+  /**
+   * @param fragmentLength The length of the fragment the read was to be generated from
+   * @param readLength the target read length
+   */
+  public FragmentTooSmallException(int fragmentLength, int readLength) {
+    super(String.format("Fragment length (%d) was not large enough to accomodate read of length %d after indels, try increasing fragment length", fragmentLength, readLength));
+  }
 }
-

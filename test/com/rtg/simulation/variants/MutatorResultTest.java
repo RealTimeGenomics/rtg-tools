@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,45 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.variants;
+
+import java.util.Arrays;
+
+import com.rtg.util.integrity.Exam.ExamException;
+
+import junit.framework.TestCase;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class MutatorResultTest extends TestCase {
 
-  /** UNKNOWN */
- UNKNOWN,
+  public void test0() {
+    final MutatorResult mr = new MutatorResult(new byte[] {}, new byte[] {}, 0);
+    mr.integrity();
+    assertEquals("0::", mr.toString());
+  }
 
-  /** LEFT */
-  LEFT,
+  public void test1() {
+    final MutatorResult mr = new MutatorResult(new byte[] {0, 1, 2}, new byte[] {3, 4}, 2);
+    mr.integrity();
+    assertEquals("2:NAC:GT", mr.toString());
+    assertEquals(2, mr.getConsumed());
+    assertTrue(Arrays.equals(new byte[] {0, 1, 2}, mr.getFirstHaplotype()));
+    assertTrue(Arrays.equals(new byte[] {3, 4}, mr.getSecondHaplotype()));
+  }
 
-  /** RIGHT */
-  RIGHT
+  public void testCheckHaplotype() {
+    failHaplotype(new byte[]{-1});
+    failHaplotype(new byte[]{5});
+  }
+
+  private void failHaplotype(byte[] haplotypes) {
+    try {
+      MutatorResult.checkHaplotype(haplotypes);
+      fail();
+    } catch (final ExamException e) {
+      // expected
+    }
+  }
 }
-

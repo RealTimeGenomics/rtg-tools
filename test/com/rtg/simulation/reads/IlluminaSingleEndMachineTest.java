@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.reads;
+
+import java.io.IOException;
+import java.util.Arrays;
+
+import com.rtg.util.io.MemoryPrintStream;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Test class
  */
-public enum PrereadArm {
+public class IlluminaSingleEndMachineTest extends DummyIlluminaMachineTest {
 
-  /** UNKNOWN */
- UNKNOWN,
+  public void testPaired() throws Exception {
+    final IlluminaSingleEndMachine m = new IlluminaSingleEndMachine(42);
+    assertFalse(m.isPaired());
+  }
 
-  /** LEFT */
-  LEFT,
+  @Override
+  public void test() throws Exception {
+    final IlluminaSingleEndMachine m = (IlluminaSingleEndMachine) getMachine(42);
+    final MemoryPrintStream out = new MemoryPrintStream();
+    final FastaReadWriter w = new FastaReadWriter(out.lineWriter()) {
+        @Override
+        public void writeRead(String name, byte[] data, byte[] qual, int length) throws IOException {
+          super.writeRead(name, data, qual, length);
+          assertEquals("[20, 20, 20, 20]", Arrays.toString(qual));
+        }
+      };
+    m.setReadWriter(w);
+    final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    m.setReadLength(4);
 
-  /** RIGHT */
-  RIGHT
+    m.processFragment("name/", 30, frag, frag.length);
+    assertEquals(">0 name/31/F/4.\nAAAA\n", out.toString());
+
+    assertEquals(4, m.mResidueCount);
+    assertEquals(4, m.mWorkspace.length);
+  }
 }
-

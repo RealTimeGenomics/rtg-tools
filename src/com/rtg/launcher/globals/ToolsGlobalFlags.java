@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -52,6 +52,13 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** When writing VCFs asynchronously, the maximum number of records to buffer (per VCF) */
   public static final String VCF_ASYNC_BUFFER_SIZE = "com.rtg.vcf.async-buffer-size";
 
+  /** Which strand simulated reads are sequenced from: 0 = random, -1 = reverse, 1 = forward */
+  public static final String READ_STRAND = "com.rtg.simulation.reads.read-strand";
+  /** Supply explicit sequence used for fragment read-through */
+  public static final String READ_THROUGH = "com.rtg.simulation.reads.read-through";
+  /** If set, assume fragments are from OS-Seq sequencing, with this minimum size (e.g. probe length) */
+  public static final String OS_SEQ_FRAGMENTS = "com.rtg.simulation.reads.os-seq-fragments";
+
   /** Output the best path found along with the haplotypes */
   public static final String VCFEVAL_DUMP_BEST_PATH = "com.rtg.vcf.eval.dump-path";
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
@@ -82,6 +89,12 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
     registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
 
+    // Simulation
+    registerFlag(READ_THROUGH, String.class, "default");
+    registerFlag(READ_STRAND, Integer.class, 0);
+    registerFlag(OS_SEQ_FRAGMENTS, Integer.class, 0);
+
+    // vcfeval
     registerFlag(VCFEVAL_DUMP_BEST_PATH);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");

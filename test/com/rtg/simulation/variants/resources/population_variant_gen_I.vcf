@@ -1,0 +1,16 @@
+##fileformat=VCFv4.1
+##reference=null
+##contig=<ID=ref,length=120>
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+ref	10	.	C	CG	.	.	AF=0.5
+ref	20	.	G	GC	.	.	AF=0.5
+ref	30	.	A	AC	.	.	AF=0.5
+ref	40	.	A	AC	.	.	AF=0.5
+ref	50	.	T	TA	.	.	AF=0.5
+ref	60	.	A	AG	.	.	AF=0.5
+ref	70	.	T	TA	.	.	AF=0.5
+ref	80	.	C	CC	.	.	AF=0.5
+ref	90	.	A	AT	.	.	AF=0.5
+ref	100	.	C	CC	.	.	AF=0.5
+ref	110	.	T	TC	.	.	AF=0.5

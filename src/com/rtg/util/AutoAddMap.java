@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.util;
+
+import java.util.TreeMap;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Map that will automatically add a default value as produced by the make method if the requested key isn't currently
+ * there.
+ * Should <code>getOrAdd</code> override regular get method?
  */
-public enum PrereadArm {
+public abstract class AutoAddMap<K, V> extends TreeMap<K, V> {
+  /**
+   * Retrieve the value stored at <code>name</code> or a new instance if it doesn't exist
+   * @param name key of value to retrieve
+   * @return the stored value or a new one
+   */
+  public V getOrAdd(K name) {
+    if (containsKey(name)) {
+      return get(name);
+    }
+    final V res = make();
+    put(name, res);
+    return res;
+  }
 
-  /** UNKNOWN */
- UNKNOWN,
-
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
+  /**
+   * @return a newly constructed instance of the stored type
+   */
+  public abstract V make();
 }
-

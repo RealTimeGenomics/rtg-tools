@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,32 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation;
+
+import junit.framework.TestCase;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class SimulationUtilsTest extends TestCase {
 
-  /** UNKNOWN */
- UNKNOWN,
 
-  /** LEFT */
-  LEFT,
 
-  /** RIGHT */
-  RIGHT
+  public void testDistUtils() {
+
+    final double[] cumDist = SimulationUtils.cumulativeDistribution(0.1, 0.1, 0.1, 0.4, 0.1);
+
+    final double[] expected = {0.125, 0.25, 0.375, 0.875, 1.0};
+    assertEquals(expected.length, cumDist.length);
+    for (int i = 0; i < expected.length; ++i) {
+      assertEquals(expected[i], cumDist[i], 0.000001);
+    }
+
+    assertEquals(0, SimulationUtils.chooseLength(cumDist, 0.1));
+    assertEquals(1, SimulationUtils.chooseLength(cumDist, 0.25));
+    assertEquals(2, SimulationUtils.chooseLength(cumDist, 0.3));
+    assertEquals(3, SimulationUtils.chooseLength(cumDist, 0.8));
+    assertEquals(4, SimulationUtils.chooseLength(cumDist, 1.0));
+  }
+
 }
-

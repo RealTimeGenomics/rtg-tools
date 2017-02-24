@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -42,8 +42,10 @@ import com.rtg.util.PseudoEnum;
  * "B" and "Z" should be translated to "X".
  */
 public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
+
   /** Unknown */
   public static final Protein X = new XProtein(0, "X", "Xaa", "Any amino acid");
+
 
   private static class XProtein extends Protein {
     XProtein(final int ordinal, final String ename,  final String sname, final String name) {
@@ -235,6 +237,66 @@ public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
   @Override
   public int hashCode() {
     return ordinal();
+  }
+
+
+
+  private static final byte UNKNOWN_RESIDUE = 0;
+  private static final char[] PBASES = {
+    Character.toLowerCase(Protein.values()[0].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[1].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[2].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[3].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[4].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[5].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[6].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[7].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[8].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[9].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[10].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[11].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[12].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[13].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[14].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[15].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[16].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[17].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[18].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[19].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[20].toString().charAt(0)),
+    Character.toLowerCase(Protein.values()[21].toString().charAt(0)),
+  };
+
+  /**
+   * Convert an internal amino acid code into an ascii character.
+   * @param a array of amino acid internal codes.
+   * @param p index into <code>a</code>
+   * @return a lowercase char
+   */
+  public static int pbase(final byte[] a, final int p) {
+    return p >= 0 && p < a.length ? PBASES[a[p]] : PBASES[UNKNOWN_RESIDUE];
+  }
+
+  /**
+   * Convert an ascii amino acid character into internal encoding
+   * @param c the amino acid character.
+   * @return the encoded value
+   */
+  public static byte encodeProtein(final char c) {
+    return (byte) valueOf(String.valueOf(c)).ordinal();
+  }
+
+  /**
+   * Convert an ascii amino acid string into internal encoding
+   * @param str the amino acid sequence.
+   * @return the encoded value
+   */
+  public static byte[] encodeProteins(final String str) {
+    final byte[] b = new byte[str.length()];
+    for (int i = 0; i < str.length(); ++i) {
+      b[i] = encodeProtein(str.charAt(i));
+    }
+    return b;
   }
 }
 

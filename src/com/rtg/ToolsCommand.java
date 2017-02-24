@@ -43,6 +43,14 @@ import com.rtg.reader.SdfSubseq;
 import com.rtg.reader.SdfSubset;
 import com.rtg.relation.PedFilterCli;
 import com.rtg.relation.PedStatsCli;
+import com.rtg.simulation.genome.GenomeSimulator;
+import com.rtg.simulation.reads.CgSimCli;
+import com.rtg.simulation.reads.ReadSimCli;
+import com.rtg.simulation.variants.ChildSampleSimulatorCli;
+import com.rtg.simulation.variants.DeNovoSampleSimulatorCli;
+import com.rtg.simulation.variants.PriorPopulationVariantGeneratorCli;
+import com.rtg.simulation.variants.SampleReplayerCli;
+import com.rtg.simulation.variants.SampleSimulatorCli;
 import com.rtg.tabix.BgZip;
 import com.rtg.tabix.ExtractCli;
 import com.rtg.tabix.IndexerCli;
@@ -76,6 +84,33 @@ public final class ToolsCommand {
 
   /** For converting SDF into SAM/BAM format */
   static final Command SDF2SAM = new Command(new Sdf2Sam(), CommandCategory.FORMAT, ReleaseLevel.GA);
+
+
+  /** Generate simulated reads */
+  static final Command GENOMESIM = new Command(new GenomeSimulator(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate Complete Genomics style simulated reads */
+  static final Command CGSIM = new Command(new CgSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate simulated reads */
+  static final Command READSIM = new Command(new ReadSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+
+  /** Generate a VCF containing population variants for a reference */
+  static final Command POPSIM = new Command(new PriorPopulationVariantGeneratorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate a VCF containing a generated genotype for a new sample according to allele frequencies */
+  static final Command SAMPLESIM = new Command(new SampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate a VCF containing a generated child genotype for a new sample from two parents */
+  static final Command CHILDSIM = new Command(new ChildSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate a VCF containing a derived genotype containing de novo variants */
+  static final Command DENOVOSIM = new Command(new DeNovoSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
+  /** Generate a genome SDF corresponding to a genotype contained in a VCF file */
+  static final Command SAMPLEREPLAY = new Command(new SampleReplayerCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+
 
   /** BGZips an input file (for use with index module) */
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -143,6 +178,11 @@ public final class ToolsCommand {
   private static final Command[] DISPLAY_ORDER = {
     // Formatting
     FORMAT, SDF2FASTA, SDF2FASTQ, SDF2SAM, FASTQTRIM,
+
+    // Simulation
+    GENOMESIM,                                           // Reference simulation
+    CGSIM, READSIM,                                      // Read simulation
+    POPSIM, SAMPLESIM, CHILDSIM, DENOVOSIM, SAMPLEREPLAY, // Variant simulation
 
     // Utility
     BGZIP, INDEX, EXTRACT,                        // General purpose

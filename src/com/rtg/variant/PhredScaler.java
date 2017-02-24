@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,24 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.variant;
+
+import com.rtg.reader.Arm;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Interface for phred score scaler objects.
  */
-public enum PrereadArm {
+public interface PhredScaler {
 
-  /** UNKNOWN */
- UNKNOWN,
-
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
+  /**
+   * Get a phred score from a binary quality optionally
+   * correcting it.
+   * @param qual original quality value.
+   * @param readPosition position on read of <code>qualChar</code>
+   * @param arm For paired end reads, which arm this is. Use {@code Arm.LEFT} if single end.
+   * @return the possibly corrected phred score.
+   */
+  int getScaledPhred(byte qual, int readPosition, Arm arm);
 }
 

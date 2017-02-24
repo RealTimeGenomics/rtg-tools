@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,30 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.reads;
+
+import java.io.IOException;
+
+import com.rtg.reader.SequencesReader;
+import com.rtg.simulation.genome.SequenceDistribution;
+import com.rtg.util.intervals.ReferenceRegions;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class FilteringFragmenter extends GenomeFragmenter {
+  final ReferenceRegions mRegions;
 
-  /** UNKNOWN */
- UNKNOWN,
+  FilteringFragmenter(ReferenceRegions regions, long randomSeed, SequenceDistribution[] selectionProb, SequencesReader[] sdfs) throws IOException {
+    super(randomSeed, selectionProb, sdfs);
+    mRegions = regions;
+  }
 
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
+  @Override
+  boolean emitFragment(int fragLength, int seqId, int readerId, String seqName, int fragStart) throws IOException {
+    if (mRegions.overlapped(seqName, fragStart, fragStart + fragLength)) {
+      return super.emitFragment(fragLength, seqId, readerId, seqName, fragStart);
+    }
+    return false;
+  }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,26 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.reads;
+
+import com.rtg.util.io.MemoryPrintStream;
+
+import junit.framework.TestCase;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Test class
  */
-public enum PrereadArm {
+public class FastqReadWriterTest extends TestCase {
 
-  /** UNKNOWN */
- UNKNOWN,
+  public void test() throws Exception {
+    final MemoryPrintStream out = new MemoryPrintStream();
+    final FastqReadWriter f = new FastqReadWriter(out.lineWriter());
+    f.writeRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+    f.writeLeftRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+    f.writeRightRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+    assertEquals("@0 foo\nNACGT\n+\n55555\n@1 foo 1\nNACGT\n+\n55555\n@1 foo 2\nNACGT\n+\n55555\n", out.toString());
+    assertEquals(2, f.readsWritten());
+  }
 
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
 }
-

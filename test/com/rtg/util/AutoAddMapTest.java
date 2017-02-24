@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.util;
+
+import junit.framework.TestCase;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class AutoAddMapTest extends TestCase {
 
-  /** UNKNOWN */
- UNKNOWN,
+  private static class TestMap extends AutoAddMap<String, String> {
+    @Override
+    public String make() {
+      return "DEFAULT";
+    }
+  }
 
-  /** LEFT */
-  LEFT,
-
-  /** RIGHT */
-  RIGHT
+  public void testAutoAdd() {
+    final TestMap map = new TestMap();
+    assertEquals("DEFAULT", map.getOrAdd("key"));
+    assertEquals("DEFAULT", map.getOrAdd("key2"));
+    map.put("key", "value");
+    assertEquals("value", map.getOrAdd("key"));
+  }
 }
-

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,43 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.variants;
+
+import com.rtg.util.PortableRandom;
+import com.rtg.util.test.NotRandomRandom;
+
+import junit.framework.TestCase;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
  */
-public enum PrereadArm {
+public class MutatorTest extends TestCase {
 
-  /** UNKNOWN */
- UNKNOWN,
+  public void test1() {
+    final Mutator mu = new Mutator("XX:DD");
+    mu.integrity();
+    assertEquals("Mutator:XX:DD", mu.toString());
+    final PortableRandom ra = new NotRandomRandom();
+    final MutatorResult mr = mu.generateMutation(new byte[] {1, 2, 3, 4}, 0, ra);
+    assertEquals("2:CG:", mr.toString());
+  }
 
-  /** LEFT */
-  LEFT,
+  public void test1Underscore() {
+    final Mutator mu = new Mutator("XX_DD");
+    mu.integrity();
+    assertEquals("Mutator:XX:DD", mu.toString());
+    final PortableRandom ra = new NotRandomRandom();
+    final MutatorResult mr = mu.generateMutation(new byte[] {1, 2, 3, 4}, 0, ra);
+    assertEquals("2:CG:", mr.toString());
+  }
 
-  /** RIGHT */
-  RIGHT
+
+  public void test2() {
+    final Mutator mu = new Mutator("XX");
+    mu.integrity();
+    assertEquals("Mutator:XX", mu.toString());
+    final PortableRandom ra = new NotRandomRandom();
+    final MutatorResult mr = mu.generateMutation(new byte[] {1, 2, 3, 4}, 0, ra);
+    assertEquals("2:CG:CG", mr.toString());
+  }
 }
-

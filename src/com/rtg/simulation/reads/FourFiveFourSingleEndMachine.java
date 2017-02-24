@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,42 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
+
+package com.rtg.simulation.reads;
+
+import java.io.IOException;
+
+import com.rtg.util.InvalidParamsException;
+import com.rtg.util.machine.MachineType;
+import com.rtg.variant.AbstractMachineErrorParams;
+import com.rtg.variant.MachineErrorParamsBuilder;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * 454 single end machine
  */
-public enum PrereadArm {
+public class FourFiveFourSingleEndMachine extends SingleEndRandomLengthMachine {
 
-  /** UNKNOWN */
- UNKNOWN,
+  /**
+   * Construct with given priors and seed
+   * @param params priors
+   * @param randomSeed seed for random number generation
+   */
+  public FourFiveFourSingleEndMachine(AbstractMachineErrorParams params, long randomSeed) {
+    super(params, randomSeed);
+  }
 
-  /** LEFT */
-  LEFT,
+  /**
+   * Construct with given random seed and default 454 priors
+   * @param randomSeed seed for random number generation
+   * @throws InvalidParamsException If priors fail to load
+   * @throws IOException whenever
+   */
+  public FourFiveFourSingleEndMachine(long randomSeed) throws InvalidParamsException, IOException {
+    this(new MachineErrorParamsBuilder().errors("ls454_se").create(), randomSeed);
+  }
 
-  /** RIGHT */
-  RIGHT
+  @Override
+  public MachineType machineType() {
+    return MachineType.FOURFIVEFOUR_SE;
+  }
 }
-

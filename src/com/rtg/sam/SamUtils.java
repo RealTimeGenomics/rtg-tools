@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -199,6 +199,14 @@ public final class SamUtils {
   public static final char CIGAR_UNMAPPED = 'u';
 
   private static final char[] CIGAR_CODES = {CIGAR_SAME_OR_MISMATCH, CIGAR_INSERTION_INTO_REF, CIGAR_DELETION_FROM_REF, CIGAR_GAP_IN_READ, CIGAR_SOFT_CLIP, CIGAR_HARD_CLIP, 'P', CIGAR_SAME, CIGAR_MISMATCH};
+
+  /** Super CIGAR value for OVERLAP IN READ */
+  public static final char CIGAR_OVERLAP_IN_READ = 'B';
+  /** Super CIGAR value for UNKNOWN IN TEMPLATE */
+  public static final char CIGAR_UNKNOWN_TEMPLATE = 'T';
+  /** Super CIGAR value for UNKNOWN IN READ - note if both template AND read are unknown, you should use this value. */
+  public static final char CIGAR_UNKNOWN_READ = 'R';
+
 
   /** The attribute used in a comment line to indicate the SDF ID of the reads */
   public static final String READ_SDF_ATTRIBUTE = "READ-SDF-ID:";

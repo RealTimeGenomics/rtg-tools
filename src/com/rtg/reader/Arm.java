@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2016. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,20 +27,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.reader;
 
 /**
- * Stores the sequencing arm for CG or paired-end data, if known.
+ * Represent which arm of paired sequencing a read is from
+ * Order is important.
  */
-public enum PrereadArm {
-
-  /** UNKNOWN */
- UNKNOWN,
-
-  /** LEFT */
+public enum Arm {
+  /** Left arm of read, or the read for single end */
   LEFT,
-
-  /** RIGHT */
+  /** Right arm of read */
   RIGHT
 }
-
