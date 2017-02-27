@@ -462,8 +462,8 @@ public final class CommonFlags {
    */
   public static void initMinReadLength(CFlags flags) {
     if (flags.getFlag(MIN_READ_LENGTH) == null) {
-      flags.registerOptional(MIN_READ_LENGTH, Integer.class, CommonFlags.INT, "if a read ends up below this threshold it will be trimmed to 0 length", 0)
-        .setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+      flags.registerOptional(MIN_READ_LENGTH, Integer.class, CommonFlags.INT, "if a read ends up shorter than this threshold it will be trimmed to zero length", 0)
+        .setCategory(CommonFlagCategories.FILTERING);
     }
   }
 
