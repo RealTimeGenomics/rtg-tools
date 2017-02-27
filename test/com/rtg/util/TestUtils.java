@@ -72,40 +72,37 @@ public final class TestUtils {
    */
   public static <T extends Enum<T>> void testEnum(final Class<T> clazz, final String expectedToString) {
     // Check toString of values
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        try {
-          final Method values = clazz.getMethod("values");
-          values.setAccessible(true);
-          final Object[] r = (Object[]) values.invoke(null);
-          Assert.assertEquals(expectedToString, Arrays.toString(r));
+    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+      try {
+        final Method values = clazz.getMethod("values");
+        values.setAccessible(true);
+        final Object[] r = (Object[]) values.invoke(null);
+        Assert.assertEquals(expectedToString, Arrays.toString(r));
 
-          final Method valueOf = clazz.getMethod("valueOf", String.class);
-          valueOf.setAccessible(true);
+        final Method valueOf = clazz.getMethod("valueOf", String.class);
+        valueOf.setAccessible(true);
 
 
-          final Method ordinal = clazz.getMethod("ordinal");
-          ordinal.setAccessible(true);
+        final Method ordinal = clazz.getMethod("ordinal");
+        ordinal.setAccessible(true);
 
-          final Method nameMethod = clazz.getMethod("name");
-          nameMethod.setAccessible(true);
+        final Method nameMethod = clazz.getMethod("name");
+        nameMethod.setAccessible(true);
 
-          // Check ordinal and valueOf
-          for (int i = 0; i < r.length; ++i) {
-            final int oi = (Integer) ordinal.invoke(r[i]);
-            Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
-            final String name = (String) nameMethod.invoke(r[i]);
-            Assert.assertEquals(r[i], valueOf.invoke(null, name));
-            Assert.assertEquals(Enum.valueOf(clazz, name), r[i]);
-          }
-        } catch (final RuntimeException e) {
-          throw e;
-        } catch (final Exception e) {
-          throw new RuntimeException(e);
+        // Check ordinal and valueOf
+        for (int i = 0; i < r.length; ++i) {
+          final int oi = (Integer) ordinal.invoke(r[i]);
+          Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
+          final String name = (String) nameMethod.invoke(r[i]);
+          Assert.assertEquals(r[i], valueOf.invoke(null, name));
+          Assert.assertEquals(Enum.valueOf(clazz, name), r[i]);
         }
-        return null;
+      } catch (final RuntimeException e) {
+        throw e;
+      } catch (final Exception e) {
+        throw new RuntimeException(e);
       }
+      return null;
     });
   }
 
@@ -122,39 +119,36 @@ public final class TestUtils {
    */
   public static <T extends PseudoEnum> void testPseudoEnum(final Class<T> clazz, final String expectedToString) {
     // Check toString of values
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        try {
-          final Method values = clazz.getMethod("values");
-          values.setAccessible(true);
-          final Object[] r = (Object[]) values.invoke(null);
-          Assert.assertEquals(expectedToString, Arrays.toString(r));
+    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+      try {
+        final Method values = clazz.getMethod("values");
+        values.setAccessible(true);
+        final Object[] r = (Object[]) values.invoke(null);
+        Assert.assertEquals(expectedToString, Arrays.toString(r));
 
-          final Method valueOf = clazz.getMethod("valueOf", String.class);
-          valueOf.setAccessible(true);
+        final Method valueOf = clazz.getMethod("valueOf", String.class);
+        valueOf.setAccessible(true);
 
 
-          final Method ordinal = clazz.getMethod("ordinal");
-          ordinal.setAccessible(true);
+        final Method ordinal = clazz.getMethod("ordinal");
+        ordinal.setAccessible(true);
 
-          final Method nameMethod = clazz.getMethod("name");
-          nameMethod.setAccessible(true);
+        final Method nameMethod = clazz.getMethod("name");
+        nameMethod.setAccessible(true);
 
-          // Check ordinal and valueOf
-          for (int i = 0; i < r.length; ++i) {
-            final int oi = (Integer) ordinal.invoke(r[i]);
-            Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
-            final String name = (String) nameMethod.invoke(r[i]);
-            Assert.assertEquals(r[i], valueOf.invoke(null, name));
-          }
-        } catch (final RuntimeException e) {
-          throw e;
-        } catch (final Exception e) {
-          throw new RuntimeException(e);
+        // Check ordinal and valueOf
+        for (int i = 0; i < r.length; ++i) {
+          final int oi = (Integer) ordinal.invoke(r[i]);
+          Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
+          final String name = (String) nameMethod.invoke(r[i]);
+          Assert.assertEquals(r[i], valueOf.invoke(null, name));
         }
-        return null;
+      } catch (final RuntimeException e) {
+        throw e;
+      } catch (final Exception e) {
+        throw new RuntimeException(e);
       }
+      return null;
     });
   }
 
