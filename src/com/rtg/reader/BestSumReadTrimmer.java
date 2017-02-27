@@ -39,18 +39,29 @@ package com.rtg.reader;
 public final class BestSumReadTrimmer implements ReadTrimmer {
 
   private final int mQualityThreshold;
+  private final boolean mStart;
 
   /**
    * Construct a best sum read trimmer
    * @param qualityThreshold the threshold the sum the remainder of the read must be higher than
    */
   public BestSumReadTrimmer(int qualityThreshold) {
+    this(qualityThreshold, false);
+  }
+
+  /**
+   * Construct a best sum read trimmer for a specific direction
+   * @param qualityThreshold the threshold the sum the remainder of the read must be higher than
+   * @param start if true, trim from the start of the read, else trim from the end
+   */
+  public BestSumReadTrimmer(int qualityThreshold, boolean start) {
     mQualityThreshold = qualityThreshold;
+    mStart = start;
   }
 
   @Override
   public String toString() {
-    return "BestSum(threshold=" + mQualityThreshold + ")";
+    return "BestSum(threshold=" + mQualityThreshold + ",side=" + (mStart ? "start" : "end") + ")";
   }
 
   @Override
@@ -58,7 +69,37 @@ public final class BestSumReadTrimmer implements ReadTrimmer {
     if (qualities == null || qualities.length == 0) {
       return length;
     }
-    int bestPos = length > qualities.length ? qualities.length : length;
+    if (length > qualities.length) {
+      throw new IllegalArgumentException("Declared read length is longer than supplied qualities array");
+    }
+    return mStart ? trimStart(read, qualities, length) : trimEnd(qualities, length);
+  }
+
+  private int trimStart(byte[] read, byte[] qualities, int length) {
+    if (length == 0 || qualities[0] >= mQualityThreshold) {
+      return length;
+    }
+    int bestPos = 0;
+    int bestSum = 0;
+    int sum = 0;
+    for (int i = 0; i < length; ++i) {
+      sum += mQualityThreshold - qualities[i];
+      if (sum >= bestSum) {
+        bestSum = sum;
+        bestPos = i + 1;
+      }
+    }
+    final int newLength = length - bestPos;
+    if (newLength > 0) {
+      System.arraycopy(read, bestPos, read, 0, newLength);
+      System.arraycopy(qualities, bestPos, qualities, 0, newLength);
+    }
+
+    return newLength;
+  }
+
+  private int trimEnd(byte[] qualities, int length) {
+    int bestPos = length;
     if (length > 0 && qualities[length - 1] < mQualityThreshold) {
       int bestSum = 0;
       int sum = 0;

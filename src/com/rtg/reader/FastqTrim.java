@@ -62,11 +62,12 @@ import com.rtg.util.io.FileUtils;
  */
 public final class FastqTrim extends AbstractCli {
 
+  private static final String TRIM_START_FLAG = "trim-start-bases";
+  private static final String TRIM_END_FLAG = "trim-end-bases";
+
+  private static final String START_TRIM_THRESHOLD = "start-quality-threshold";
   private static final String END_TRIM_THRESHOLD = "end-quality-threshold";
 
-  private static final String TRIM_START_FLAG = "trim-start-bases";
-
-  private static final String TRIM_END_FLAG = "trim-end-bases";
   static final String BATCH_SIZE = "Xbatch-size";
   static final String DISCARD_EMPTY_READS = "discard-empty-reads";
 
@@ -86,25 +87,28 @@ public final class FastqTrim extends AbstractCli {
     mFlags.setDescription(description());
     initFlags(mFlags);
   }
-    protected static void initFlags(CFlags flags) {
+  protected static void initFlags(CFlags flags) {
     flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, "FILE", "input FASTQ file").setCategory(INPUT_OUTPUT);
+    flags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, "FILE", "input FASTQ file, Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     flags.registerRequired('o', OUTPUT_FLAG, File.class, "FILE", "output filename. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initQualityFormatFlag(flags);
     CommonFlags.initThreadsFlag(flags);
-    flags.registerOptional(END_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold", 0).setCategory(FILTERING);
+    CommonFlags.initNoGzip(flags);
+    CommonFlags.initForce(flags);
+    flags.registerOptional('S', START_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read starts to maximise base quality above the given threshold", 0).setCategory(FILTERING);
+    flags.registerOptional('E', END_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold", 0).setCategory(FILTERING);
     flags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
     flags.registerOptional('e', TRIM_END_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read end", 0).setCategory(FILTERING);
-    flags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
     CommonFlags.initMinReadLength(flags);
-    flags.registerOptional(DISCARD_EMPTY_READS, "discard reads that end up 0 length").setCategory(FILTERING);
-    CommonFlags.initNoGzip(flags);
+    flags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
+    flags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
 
     flags.setValidator(innerFlags ->
       CommonFlags.validateInputFile(innerFlags, CommonFlags.INPUT_FLAG)
-        && CommonFlags.validateOutputFile(innerFlags, (File) innerFlags.getValue(OUTPUT_FLAG))
+        && CommonFlags.validateOutputFile(innerFlags, FileUtils.getOutputFileName((File) innerFlags.getValue(OUTPUT_FLAG), !innerFlags.isSet(NO_GZIP), FastqUtils.extensions()))
         && innerFlags.checkInRange(BATCH_SIZE, 1, Integer.MAX_VALUE)
+        && innerFlags.checkInRange(START_TRIM_THRESHOLD, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(END_TRIM_THRESHOLD, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_START_FLAG, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_END_FLAG, 0, Integer.MAX_VALUE)
@@ -113,11 +117,10 @@ public final class FastqTrim extends AbstractCli {
 
   private ReadTrimmer getTrimmer() {
     return getTrimmer((Integer) mFlags.getValue(TRIM_START_FLAG),
-      (Integer) mFlags.getValue(TRIM_END_FLAG),
-      (Integer) mFlags.getValue(END_TRIM_THRESHOLD),
-      (Integer) mFlags.getValue(MIN_READ_LENGTH));
+      (Integer) mFlags.getValue(START_TRIM_THRESHOLD), (Integer) mFlags.getValue(TRIM_END_FLAG),
+      (Integer) mFlags.getValue(END_TRIM_THRESHOLD), (Integer) mFlags.getValue(MIN_READ_LENGTH));
   }
-  static ReadTrimmer getTrimmer(int start, int end, int threshold, int minReadLength) {
+  static ReadTrimmer getTrimmer(int start, int startThreshold, int end, int endThreshold, int minReadLength) {
     final ArrayList<ReadTrimmer> trimmers = new ArrayList<>();
     // If doing fixed trimming, ensure these come first
     if (start > 0) {
@@ -127,8 +130,11 @@ public final class FastqTrim extends AbstractCli {
       trimmers.add(new LastBasesReadTrimmer(end));
     }
     // Then quality trimming
-    if (threshold > 0) {
-      trimmers.add(new BestSumReadTrimmer(threshold));
+    if (startThreshold > 0) {
+      trimmers.add(new BestSumReadTrimmer(startThreshold, true));
+    }
+    if (endThreshold > 0) {
+      trimmers.add(new BestSumReadTrimmer(endThreshold, false));
     }
     if (minReadLength > 0) {
       trimmers.add(new MinLengthReadTrimmer(minReadLength));
@@ -158,7 +164,7 @@ public final class FastqTrim extends AbstractCli {
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final File output = FileUtils.getOutputFileName((File) mFlags.getValue(OUTPUT_FLAG), gzip, FastqUtils.extensions());
+    final File output = FileUtils.getOutputFileName((File) mFlags.getValue(OUTPUT_FLAG), gzip, FastqUtils.extensions()) ;
     final FastQScoreType encoding = qualityFlagToFastQScoreType((String) mFlags.getValue(QUALITY_FLAG));
     final int batchSize = (Integer) mFlags.getValue(BATCH_SIZE);
     final boolean discardZeroLengthReads = mFlags.isSet(DISCARD_EMPTY_READS);
@@ -166,7 +172,9 @@ public final class FastqTrim extends AbstractCli {
     // All trimming and aligning is done in separate threads from reading
     final int threads = CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG));
     final ReadTrimmer trimmer = getTrimmer();
-    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(Collections.singletonList(FileUtils.createInputStream((File) mFlags.getValue(CommonFlags.INPUT_FLAG), true)), encoding)) {
+    final File inFile = (File) mFlags.getValue(CommonFlags.INPUT_FLAG);
+    final boolean stdin = FileUtils.isStdio(inFile);
+    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(Collections.singletonList(stdin ? System.in : FileUtils.createInputStream(inFile, true)), encoding)) {
 
       final Timer t = new Timer("FastqPairTrimmer");
       t.start();
