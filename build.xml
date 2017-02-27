@@ -70,6 +70,7 @@
     <fileset dir="${build.src}" />
     <fileset dir="${tools.src.dir}">
       <include name="com/**/*.properties"/>
+      <include name="com/rtg/simulation/variants/*.txt"/>
       <include name="com/rtg/reference/resources/**/*"/>
       <include name="com/rtg/report/resources/*"/>
       <include name="com/rtg/vcf/resources/*"/>
