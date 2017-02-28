@@ -62,7 +62,7 @@ public class FastqTrimTest  extends AbstractCliTest {
     checkHelp("rtg fastqtrim"
       , "-i", "--input=FILE", "input FASTQ file"
       , "-o", "--output=FILE", "output filename. Use '-' to write to standard output"
-      , "-q", "--quality-format=FORMAT", "format of quality data for fastq input files (use sanger for Illumina 1.8+). Allowed values are [sanger, solexa, illumina] (Default is sanger)"
+      , "-q", "--quality-format=FORMAT", "quality data encoding", "Allowed values are [sanger, solexa, illumina] (Default is sanger)"
       , "-e", "--trim-end-bases=INT", "always trim the specified number of bases from read end (Default is 0)"
       , "-s", "--trim-start-bases=INT", "always trim the specified number of bases from read start (Default is 0)"
       , "--end-quality-threshold=INT", "trim read ends to maximise base quality above the given threshold (Default is 0)"
