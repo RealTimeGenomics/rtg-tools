@@ -103,7 +103,9 @@ public class BlockingExecutorTest {
       assertEquals(0, taskQueue.size());
       assertTrue(blockingExecutor.getTaskCount() <= executorSize);
       // Let all the jobs run.
-      submissions.forEach(JobSubmission::unlatch);
+      for (JobSubmission submission : submissions) {
+        submission.unlatch();
+      }
       // All jobs should eventually finish
       finish(getFutures(numberOfJobs - executorSize, taskQueue));
       finish(firstFutures);
