@@ -189,7 +189,7 @@ public enum MachineOrientation {
    * @param sam the SAM record being checked.
    * @return true iff the record would appear first on template in normal case.
    */
-  public abstract boolean firstOnTemplate(final SAMRecord sam);
+  public abstract boolean firstOnTemplate(SAMRecord sam);
 
   /**
    * check orientation of pairs against required orientation

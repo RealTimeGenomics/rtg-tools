@@ -45,9 +45,9 @@ public abstract class AbstractIntIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  protected abstract IntIndex create(final long length);
+  protected abstract IntIndex create(long length);
 
-  protected abstract IntIndex create(final long length, final int bits);
+  protected abstract IntIndex create(long length, int bits);
 
   public void testMasks() {
     assertEquals(IntIndex.INT_MASK & IntIndex.HIGH_MASK, 0);

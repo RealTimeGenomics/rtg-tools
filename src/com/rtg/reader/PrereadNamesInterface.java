@@ -49,7 +49,7 @@ public interface PrereadNamesInterface {
    * @param id sequence id
    * @return sequence name
    */
-  String name(final long id);
+  String name(long id);
 
   /**
    * Calculate the checksum of the names in a manner compatible with
@@ -72,7 +72,7 @@ public interface PrereadNamesInterface {
    * @param id a <code>long</code> value
    * @throws IOException when writing to the appendable.
    */
-  void writeName(final Appendable a, final long id) throws IOException;
+  void writeName(Appendable a, long id) throws IOException;
 
   /**
    * Convenience method to append a name to an Appendable.  This avoid

@@ -43,7 +43,7 @@ public abstract class FastaSymbolTable {
    * @param code byte read from FASTA file
    * @return residue representing code
    */
-  public abstract Residue scanResidue(final int code);
+  public abstract Residue scanResidue(int code);
 
   /**
    * Returns the residue to use for unknown values

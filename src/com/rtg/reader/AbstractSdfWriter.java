@@ -165,7 +165,7 @@ public abstract class AbstractSdfWriter implements SequenceWriter, AutoCloseable
    * @param label name of the sequence
    * @throws IOException if an I/O Error occurs
    */
-  public abstract void startSequence(final String label) throws IOException;
+  public abstract void startSequence(String label) throws IOException;
 
   /**
    * Write multiple residues

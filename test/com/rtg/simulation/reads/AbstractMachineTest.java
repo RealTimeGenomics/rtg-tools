@@ -54,23 +54,25 @@ public abstract class AbstractMachineTest extends TestCase {
 
   protected abstract AbstractMachineErrorParams getPriors() throws IOException, InvalidParamsException;
 
-  protected abstract Machine getMachine(final long seed) throws IOException, InvalidParamsException;
+  protected abstract Machine getMachine(long seed) throws IOException, InvalidParamsException;
 
   protected NanoRegression mNano;
 
   @Override
-  public void setUp() {
+  public void setUp() throws Exception {
+    super.setUp();
     Diagnostic.setLogStream();
     mNano = new NanoRegression(this.getClass());
   }
 
   @Override
-  public void tearDown() throws IOException {
+  public void tearDown() throws Exception {
     try {
       mNano.finish();
     } finally {
       mNano = null;
     }
+    super.tearDown();
   }
 
 

@@ -43,9 +43,9 @@ public abstract class AbstractLongIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  protected abstract LongIndex create(final long length);
+  protected abstract LongIndex create(long length);
 
-  protected abstract LongIndex create(final long length, final int bits);
+  protected abstract LongIndex create(long length, int bits);
 
   private static final String TO_STR = ""
     + "Index [100]" + LS

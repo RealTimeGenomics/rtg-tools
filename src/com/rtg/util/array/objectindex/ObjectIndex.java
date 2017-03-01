@@ -183,7 +183,7 @@ public abstract class ObjectIndex<A> extends IntegralAbstract {
    * @throws UnsupportedOperationException if the underlying type
    * is not a <code>long</code>.
    */
-  public abstract A get(final long index);
+  public abstract A get(long index);
 
   /**
    * Set the <code>value</code> at the specified index
@@ -191,7 +191,7 @@ public abstract class ObjectIndex<A> extends IntegralAbstract {
    * @param index the index
    * @param value the value
    */
-  public abstract void set(final long index, final A value);
+  public abstract void set(long index, A value);
 
   /**
    * For indexes backed by a file closes the file and flushes any modifications.

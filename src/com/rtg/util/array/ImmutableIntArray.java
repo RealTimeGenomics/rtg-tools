@@ -40,7 +40,7 @@ public interface ImmutableIntArray {
    * @param index into the array.
    * @return the value.
    */
-  int get(final int index);
+  int get(int index);
 
   /**
    * Get the length of the wrapped array.

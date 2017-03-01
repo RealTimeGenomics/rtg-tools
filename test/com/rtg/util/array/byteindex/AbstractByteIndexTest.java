@@ -43,9 +43,9 @@ public abstract class AbstractByteIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  protected abstract ByteIndex create(final long length);
+  protected abstract ByteIndex create(long length);
 
-  protected abstract ByteIndex create(final long length, final int bits);
+  protected abstract ByteIndex create(long length, int bits);
 
   public void testMasks() {
     assertEquals(ByteIndex.BYTE_MASK & ByteIndex.HIGH_MASK, 0);

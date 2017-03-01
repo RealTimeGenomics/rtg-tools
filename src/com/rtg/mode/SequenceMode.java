@@ -337,7 +337,7 @@ public abstract class SequenceMode implements Serializable, PseudoEnum {
    * @param value the integer value code that uniquely specifies the frame.
    * @return the corresponding frame.
    */
-  public abstract Frame frameFromCode(final int value);
+  public abstract Frame frameFromCode(int value);
 
   /**
    * Translate from a sequence id as used by the preread to an internal id
@@ -347,14 +347,14 @@ public abstract class SequenceMode implements Serializable, PseudoEnum {
    * @param frame the frame of the internal sequence.
    * @return the internal sequence id.
    */
-  public abstract int internalId(final long id, final long offset, final Frame frame);
+  public abstract int internalId(long id, long offset, Frame frame);
 
   /**
    * Get the frame of an internal sequence id.
    * @param internalId internal id of the sequence.
    * @return the frame of the internal sequence.
    */
-  public abstract Frame frame(final int internalId);
+  public abstract Frame frame(int internalId);
 
   /**
    * Get the external sequence id corresponding to an internal sequence id.
@@ -362,7 +362,7 @@ public abstract class SequenceMode implements Serializable, PseudoEnum {
    * @param offset the first sequence held internally.
    * @return the external sequence id.
    */
-  public abstract long sequenceId(final int internalId, final long offset);
+  public abstract long sequenceId(int internalId, long offset);
 
   /**
    * Get all the possible frames for this mode.

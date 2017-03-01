@@ -40,7 +40,7 @@ public interface CommonIndex {
    * @param index1 the first index to be swapped
    * @param index2 the second index to be swapped
    */
-  void swap(final long index1, final long index2);
+  void swap(long index1, long index2);
 
   /**
    * Note: the length returned by this function should be precisely controlled
@@ -67,7 +67,7 @@ public interface CommonIndex {
    * @param offset the position in this index
    * @return the value as a long, regardless of the underlying type
    */
-  long get(final long offset);
+  long get(long offset);
 
   /**
    * Sets the value at the specified position.
@@ -79,7 +79,7 @@ public interface CommonIndex {
    * @param offset the position in this index
    * @param value the value as a long, regardless of the underlying type
    */
-  void set(final long offset, final long value);
+  void set(long offset, long value);
 
   /**
    * Interrogate whether this index implementation is safe from word tearing for get and set operations.

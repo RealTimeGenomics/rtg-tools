@@ -65,7 +65,8 @@ public abstract class AbstractMachineErrorParams implements Params, PhredScaler 
    * @param arm which arm of paired end reads is this. Use {@code LEFT} if single end.
    * @return the possibly corrected phred score.
    */
-  public abstract int getScaledPhred(final byte quality, int readPos, Arm arm);
+  @Override
+  public abstract int getScaledPhred(byte quality, int readPos, Arm arm);
 
   /**
    * Get the CG v1 small gap distribution for 0,1,2,3.

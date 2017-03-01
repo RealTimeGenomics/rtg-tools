@@ -133,7 +133,7 @@ public abstract class ShortIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if the underlying type
    * is not a <code>long</code>.
    */
-  public abstract short getShort(final long index);
+  public abstract short getShort(long index);
 
   /**
    * Set the <code>short</code> at the specified index
@@ -143,7 +143,7 @@ public abstract class ShortIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if they underlying type
    * is not a <code>long</code>.
    */
-  public abstract void setShort(final long index, final short value);
+  public abstract void setShort(long index, short value);
 
   /**
    * Save this index such that it can be loaded again from {@link ShortCreate#loadIndex(java.io.ObjectInputStream)}

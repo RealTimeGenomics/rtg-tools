@@ -240,7 +240,7 @@ public abstract class ArrayType {
    * @param length of the new array.
    * @return an unsigned array of the specified length.
    */
-  public abstract ExtensibleIndex createUnsigned(final long length);
+  public abstract ExtensibleIndex createUnsigned(long length);
 
   /**
    * Return the memory that would be consumed by an array of the specified size.

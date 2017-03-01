@@ -44,9 +44,9 @@ public abstract class AbstractObjectIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  protected abstract ObjectIndex<Integer> create(final long length);
+  protected abstract ObjectIndex<Integer> create(long length);
 
-  protected abstract ObjectIndex<Integer> create(final long length, final int bits);
+  protected abstract ObjectIndex<Integer> create(long length, int bits);
 
   public void testMasks() {
     assertEquals(ObjectIndex.INT_MASK & ObjectIndex.HIGH_MASK, 0);

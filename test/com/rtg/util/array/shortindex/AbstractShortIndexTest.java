@@ -43,9 +43,9 @@ public abstract class AbstractShortIndexTest extends TestCase {
   /** Local new line convention */
   private static final String LS = System.lineSeparator();
 
-  protected abstract ShortIndex create(final long length);
+  protected abstract ShortIndex create(long length);
 
-  protected abstract ShortIndex create(final long length, final int bits);
+  protected abstract ShortIndex create(long length, int bits);
 
   public void testMasks() {
     assertEquals(ShortIndex.SHORT_MASK & ShortIndex.HIGH_MASK, 0);

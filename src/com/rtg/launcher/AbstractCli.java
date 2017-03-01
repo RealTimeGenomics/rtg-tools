@@ -120,7 +120,7 @@ public abstract class AbstractCli {
    * @return return code.
    * @exception IOException if an I/O error occurs.
    */
-  protected abstract int mainExec(final OutputStream out, final PrintStream err) throws IOException;
+  protected abstract int mainExec(OutputStream out, PrintStream err) throws IOException;
 
   /**
    * Get name of module to be used in external communications such as

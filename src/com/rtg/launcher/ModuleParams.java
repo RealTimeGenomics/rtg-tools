@@ -83,7 +83,7 @@ public abstract class ModuleParams extends ObjectParams implements OutputDirPara
    * @return a child file in the output directory.
    */
   @ParamsNoField
-  public abstract File file(final String name);
+  public abstract File file(String name);
 
   /**
    * @return the external name of the application.

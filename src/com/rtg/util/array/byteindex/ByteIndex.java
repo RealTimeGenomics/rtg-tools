@@ -130,7 +130,7 @@ public abstract class ByteIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if the underlying type
    * is not a <code>long</code>.
    */
-  public abstract byte getByte(final long index);
+  public abstract byte getByte(long index);
 
   /**
    * Set the <code>byte</code> at the specified index
@@ -140,7 +140,7 @@ public abstract class ByteIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if they underlying type
    * is not a <code>long</code>.
    */
-  public abstract void setByte(final long index, final byte value);
+  public abstract void setByte(long index, byte value);
 
 }
 

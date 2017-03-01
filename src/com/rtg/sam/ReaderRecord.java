@@ -50,7 +50,7 @@ public interface ReaderRecord<T extends ReaderRecord<T>> extends SequenceIdLocus
   /**
    * @param rec next record to set in the chain
    */
-  void setNextInChain(final T rec);
+  void setNextInChain(T rec);
 
   /**
    * Used to create a consistent ordering on duplicate records.
@@ -58,5 +58,5 @@ public interface ReaderRecord<T extends ReaderRecord<T>> extends SequenceIdLocus
    * @param rec the record to compare with
    * @return negative if this record is less than other, zero if equal and positive if greater
    */
-  int disambiguateDuplicate(final T rec);
+  int disambiguateDuplicate(T rec);
 }

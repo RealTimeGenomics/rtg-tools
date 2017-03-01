@@ -41,7 +41,7 @@ public interface Statistics {
    * @param reportStream stream to write to
    * @throws IOException if an exception occurs
    */
-  void printStatistics(final OutputStream reportStream) throws IOException;
+  void printStatistics(OutputStream reportStream) throws IOException;
 
   /**
    * Generate an HTML report for this statistics type.

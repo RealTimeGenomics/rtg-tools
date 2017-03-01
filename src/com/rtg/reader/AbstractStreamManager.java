@@ -95,7 +95,7 @@ abstract class AbstractStreamManager {
     mPointers = new RollingFile(mDir, pointerPrefix, mIndex.numberEntries());
   }
 
-  protected abstract void seekImpl(final long seqNum) throws IOException;
+  protected abstract void seekImpl(long seqNum) throws IOException;
 
   /**
    * Returns the random access file pointing at the last seek position

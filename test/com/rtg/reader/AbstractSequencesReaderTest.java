@@ -59,12 +59,13 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
     return createSequencesReader(dir, LongRange.NONE);
   }
 
-  protected abstract SequencesReader createSequencesReader(final File dir, LongRange region) throws IOException;
+  protected abstract SequencesReader createSequencesReader(File dir, LongRange region) throws IOException;
 
   protected File mDir;
 
   @Override
   public void setUp() throws Exception {
+    super.setUp();
     mDir = FileHelper.createTempDirectory();
     Diagnostic.setLogStream();
   }
@@ -74,6 +75,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
     FileHelper.deleteAll(mDir);
     Diagnostic.setLogStream();
     mDir = null;
+    super.tearDown();
   }
 
   protected InputStream createStream(final String data) {

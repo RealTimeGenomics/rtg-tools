@@ -33,5 +33,5 @@ package com.rtg.vcf;
  * Definition of an operation.
  */
 interface Operation<T> {
-  boolean compare(final T a, final T b);
+  boolean compare(T a, T b);
 }

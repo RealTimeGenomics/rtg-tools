@@ -48,7 +48,7 @@ public abstract class ByteArray {
    * @param offset the position to start reading from.
    * @param count how many bytes to cover.
    */
-  public abstract void get(final byte[] dest, final long offset, final int count);
+  public abstract void get(byte[] dest, long offset, int count);
 
   /**
    * Set a single byte.
@@ -66,7 +66,7 @@ public abstract class ByteArray {
    * @param buffer the bytes to copy.
    * @param count how many bytes to copy.
    */
-  public abstract void set(final long offset, final byte[] buffer, final int count);
+  public abstract void set(long offset, byte[] buffer, int count);
 
   /**
    * Writes <code>buffer[0 .. count-1]</code> into the byte array, starting at <code>offset</code>.
@@ -75,7 +75,7 @@ public abstract class ByteArray {
    * @param bOffset offset into buffer to start copying from
    * @param count how many bytes to copy.
    */
-  public abstract void set(final long offset, final byte[] buffer, final int bOffset, final int count);
+  public abstract void set(long offset, byte[] buffer, int bOffset, int count);
 
   /** @return the total number of values that can be stored in this array. */
   public abstract long length();

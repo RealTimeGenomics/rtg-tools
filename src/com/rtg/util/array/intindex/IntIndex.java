@@ -118,7 +118,7 @@ public abstract class IntIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if the underlying type
    * is not an <code>int</code>.
    */
-  public abstract int getInt(final long index);
+  public abstract int getInt(long index);
 
   /**
    * Set the <code>int</code> at the specified index
@@ -128,7 +128,7 @@ public abstract class IntIndex extends AbstractIndex {
    * @throws UnsupportedOperationException if they underlying type
    * is not an <code>int</code>.
    */
-  public abstract void setInt(final long index, final int value);
+  public abstract void setInt(long index, int value);
 
   /**
    * Save this index such that it can be loaded again from {@link IntCreate#loadIndex(java.io.ObjectInputStream)}
