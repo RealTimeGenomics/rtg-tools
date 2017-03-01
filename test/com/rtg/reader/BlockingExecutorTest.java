@@ -32,35 +32,32 @@ package com.rtg.reader;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
 public class BlockingExecutorTest {
 
-  private static AtomicInteger sQueued = new AtomicInteger(0);
 
   static class LockedRunnable implements Runnable {
-    private final CountDownLatch mDone;
-    LockedRunnable(CountDownLatch done) {
-      mDone = done;
-
-    }
-    CountDownLatch mLatch = new CountDownLatch(1);
+    /** This latch prevents the jobs from finishing until the main thread gives it's OK */
+    final CountDownLatch mLatch = new CountDownLatch(1);
     @Override
     public void run() {
       try {
+        // Wait till main thread lets us through
         mLatch.await();
       } catch (InterruptedException e) {
         e.printStackTrace();
-      } finally {
-        mDone.countDown();
       }
     }
   }
@@ -68,55 +65,78 @@ public class BlockingExecutorTest {
   static class JobSubmission implements Runnable {
     private final BlockingExecutor mExecutor;
     private final LockedRunnable mTask;
-    final CountDownLatch mLatch;
-    private final CountDownLatch mDone;
-    private volatile Future<?> mSubmit;
+    private final BlockingQueue<Future<?>> mQueue;
 
-    JobSubmission(CountDownLatch latch, CountDownLatch doneLatch, BlockingExecutor executor) {
-      mLatch = latch;
-      mDone = doneLatch;
+    JobSubmission(BlockingExecutor executor, BlockingQueue<Future<?>> queue) {
       mExecutor = executor;
-      mTask = new LockedRunnable(doneLatch);
+      mTask = new LockedRunnable();
+      mQueue = queue;
     }
     @Override
     public void run() {
-      mSubmit = mExecutor.submit(mTask);
-      sQueued.getAndIncrement();
-      mDone.countDown();
-      mLatch.countDown();
+      try {
+        // Communicate the job status via a concurrent queue
+        mQueue.put(mExecutor.submit(mTask));
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    public void unlatch() {
+      mTask.mLatch.countDown();
     }
   }
 
   @Test
   public void testBlockingExecutor() throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(4);
-    final CountDownLatch doneLatch = new CountDownLatch(20);
+    final int numberOfJobs = 10;
+    final int executorSize = 4;
     final BlockingExecutor blockingExecutor = new BlockingExecutor(2, 2);
+    final BlockingQueue<Future<?>> taskQueue = new LinkedBlockingDeque<>();
     try {
       blockingExecutor.getTaskCount();
-      final List<JobSubmission> jobs = new ArrayList<>();
-      for (int i = 0; i < 10; i++) {
-        final JobSubmission job = new JobSubmission(latch, doneLatch, blockingExecutor);
-        final Thread thread = new Thread(job);
-        thread.start();
-        jobs.add(job);
+      final List<JobSubmission> submissions = new ArrayList<>();
+      for (int i = 0; i < numberOfJobs; i++) {
+        submissions.add(startJob(blockingExecutor, taskQueue));
       }
-      latch.await();
-      assertTrue(blockingExecutor.getTaskCount() <= 4);
-      assertEquals(4, sQueued.get());
-      for (JobSubmission job : jobs) {
-        job.mTask.mLatch.countDown();
-      }
-      doneLatch.await();
-      for (JobSubmission job : jobs) {
-        job.mSubmit.get();
-      }
-    } catch (ExecutionException e) {
-      e.printStackTrace();
+      final List<Future<?>> firstFutures = getFutures(executorSize, taskQueue);
+      // No further jobs should have been queued as submission threads should be blocked by the executor
+      assertEquals(0, taskQueue.size());
+      assertTrue(blockingExecutor.getTaskCount() <= executorSize);
+      // Let all the jobs run.
+      submissions.forEach(JobSubmission::unlatch);
+      // All jobs should eventually finish
+      finish(getFutures(numberOfJobs - executorSize, taskQueue));
+      finish(firstFutures);
     } finally {
       blockingExecutor.shutdown();
     }
 
+  }
+
+  private JobSubmission startJob(BlockingExecutor blockingExecutor, BlockingQueue<Future<?>> taskQueue) {
+    final JobSubmission job = new JobSubmission(blockingExecutor, taskQueue);
+    final Thread thread = new Thread(job);
+    thread.start();
+    return job;
+  }
+
+  private void finish(List<Future<?>> futures) throws InterruptedException {
+    for (Future<?> future : futures) {
+      try {
+        future.get();
+      } catch (ExecutionException e) {
+        fail();
+      }
+    }
+  }
+
+  private List<Future<?>> getFutures(int count, BlockingQueue<Future<?>> taskQueue) throws InterruptedException {
+    final List<Future<?>> futures = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      // This timeout should prevent a broken implementation from freezing unit tests forever.
+      futures.add(taskQueue.poll(500, TimeUnit.MILLISECONDS));
+    }
+    return futures;
   }
 
 }
