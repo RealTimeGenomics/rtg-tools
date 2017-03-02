@@ -686,7 +686,10 @@ public class Flag implements Comparable<Flag> {
 
     final List<String> range = getParameterRange();
     if (range != null) {
-      description.append(". Allowed values are ").append(Arrays.toString(range.toArray()));
+      if (description.length() > 0) {
+        description.append(". ");
+      }
+      description.append("Allowed values are ").append(Arrays.toString(range.toArray()));
     }
     final String minMaxUsage;
     if (mPsuedoMinMaxString != null) {
@@ -708,7 +711,10 @@ public class Flag implements Comparable<Flag> {
       } else {
         defs = def.toString();
       }
-      description.append(" (Default is ").append(defs).append(")");
+      if (description.length() > 0) {
+        description.append(" ");
+      }
+      description.append("(Default is ").append(defs).append(")");
     }
     return description.toString();
   }
