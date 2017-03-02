@@ -32,6 +32,7 @@ package com.rtg.launcher.globals;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
+import com.rtg.reference.Ploidy;
 import com.rtg.util.cli.Flag;
 
 /**
@@ -51,6 +52,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
   /** When writing VCFs asynchronously, the maximum number of records to buffer (per VCF) */
   public static final String VCF_ASYNC_BUFFER_SIZE = "com.rtg.vcf.async-buffer-size";
+
+  /** When looking at chromosomes declared as polyploid, treat as though they were actually the given ploidy */
+  public static final String TREAT_POLYPLOID_AS = "com.rtg.reference.polyploid-as";
 
   /** Which strand simulated reads are sequenced from: 0 = random, -1 = reverse, 1 = forward */
   public static final String READ_STRAND = "com.rtg.simulation.reads.read-strand";
@@ -86,6 +90,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
     registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, true);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
+
+    registerFlag(TREAT_POLYPLOID_AS, Ploidy.class, Ploidy.HAPLOID);
 
     registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
 

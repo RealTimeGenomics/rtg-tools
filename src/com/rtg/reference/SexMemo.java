@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.util.Pair;
@@ -47,6 +49,8 @@ import com.rtg.util.intervals.SequenceNameLocus;
  *
  */
 public class SexMemo {
+
+  private static final Ploidy POLYPLOID_AS = (Ploidy) GlobalFlags.getFlag(ToolsGlobalFlags.TREAT_POLYPLOID_AS).getValue();
 
   private final ReferenceGenome[] mReferences;
 
@@ -149,9 +153,9 @@ public class SexMemo {
       }
     }
 
-    // For our callers we are treating Polyploid as haploid
+    // We don't currently natively handle polyploid, so treat them as the given ploidy
     if (rs.ploidy() == Ploidy.POLYPLOID) {
-      return Ploidy.HAPLOID;
+      return POLYPLOID_AS;
     }
     return rs.ploidy();
   }
@@ -164,9 +168,9 @@ public class SexMemo {
       */
   public Ploidy getEffectivePloidy(final Sex sex, final String refName) {
     final Ploidy real = getRealPloidy(sex, refName);
-    // For our callers we are treating Polyploid as haploid
+    // We don't currently natively handle polyploid, so treat them as the given ploidy
     if (real == Ploidy.POLYPLOID) {
-      return Ploidy.HAPLOID;
+      return POLYPLOID_AS;
     }
     return real;
   }
