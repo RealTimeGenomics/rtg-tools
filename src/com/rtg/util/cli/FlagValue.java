@@ -29,18 +29,27 @@
  */
 package com.rtg.util.cli;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Encapsulates a flag and value pairing. This is used when retrieving the set
  * of flags in the order they were set.
+ * @param <T> Flags value type
  */
-public class FlagValue {
-  private final Flag mFlag;
+public class FlagValue<T> {
+  private final Flag<T> mFlag;
 
-  private final Object mValue;
+  private final List<T> mValue = new ArrayList<>();
 
-  FlagValue(final Flag flag, final Object value) {
+  FlagValue(final Flag<T> flag, final T value) {
     mFlag = flag;
-    mValue = value;
+    mValue.add(value);
+  }
+
+  FlagValue(Flag<T> flag, List<T> values) {
+    mFlag = flag;
+    mValue.addAll(values);
   }
 
   /**
@@ -48,7 +57,7 @@ public class FlagValue {
    *
    * @return the Flag that this value was supplied to.
    */
-  public Flag getFlag() {
+  public Flag<T> getFlag() {
     return mFlag;
   }
 
@@ -57,7 +66,16 @@ public class FlagValue {
    *
    * @return the value supplied to the flag.
    */
-  public Object getValue() {
+  public T getValue() {
+    return mValue.get(0);
+  }
+
+  /**
+   * Gets the values supplied to the flag.
+   *
+   * @return the value supplied to the flag.
+   */
+  public List<T> getValues() {
     return mValue;
   }
 
@@ -71,6 +89,6 @@ public class FlagValue {
     if (name == null) {
       name = mFlag.getParameterDescription();
     }
-    return name + "=" + mValue;
+    return name + "=" + (mValue.size() == 1 ? mValue.get(0).toString() : mValue.toString());
   }
 }

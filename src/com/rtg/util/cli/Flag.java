@@ -52,9 +52,10 @@ import com.rtg.util.Utils;
 
 /**
  * Encapsulates a single flag.
+ * @param <T> flag value type
  */
 @TestClass(value = {"com.rtg.util.cli.CFlagsTest"})
-public class Flag implements Comparable<Flag> {
+public class Flag<T> implements Comparable<Flag<T>> {
 
   enum Level { DEFAULT, EXTENDED, EXPERIMENTAL }
 
@@ -76,11 +77,11 @@ public class Flag implements Comparable<Flag> {
   /** The minimum number of times the flag can occur. */
   private int mMinCount;
 
-  private final Class<?> mParameterType;
+  private final Class<T> mParameterType;
 
-  private final String mParameterDescription;
+  private String mParameterDescription;
 
-  private Object mParameterDefault = null;
+  private T mParameterDefault = null;
 
   private String mCategory = null;
 
@@ -92,7 +93,7 @@ public class Flag implements Comparable<Flag> {
   private boolean mRangeList = false;
 
   /** Values supplied by the user */
-  private List<Object> mParameter = new ArrayList<>();
+  private List<T> mParameter = new ArrayList<>();
 
   /**
    * Creates a new <code>Flag</code> for which the name must be supplied on
@@ -109,10 +110,9 @@ public class Flag implements Comparable<Flag> {
    * accepted. Maybe null for "switch" type flags.
    * @param paramDescription a description of the meaning of the flag.
    * @param paramDefault a default value that can be used for optional flags.
-   * @param <T> flag value type
    * @param category The flag category
    */
-  public <T> Flag(final Character flagChar, final String flagName, final String flagDescription,
+  public Flag(final Character flagChar, final String flagName, final String flagDescription,
       final int minCount, final int maxCount, final Class<T> paramType, final String paramDescription,
       final T paramDefault, final String category) {
     if (flagDescription == null) {
@@ -290,7 +290,7 @@ public class Flag implements Comparable<Flag> {
    * @param count the maximum number of times the flag can be specified.
    * @return this flag, so calls can be chained.
    */
-  public Flag setMaxCount(final int count) {
+  public Flag<T> setMaxCount(final int count) {
     if ((count < 1) || (count < mMinCount)) {
       throw new IllegalArgumentException("MaxCount (" + count
           + ") must not be 0 or less than MinCount (" + mMinCount + ")");
@@ -314,7 +314,7 @@ public class Flag implements Comparable<Flag> {
    * @param count the minimum number of times the flag can be specified.
    * @return this flag, so calls can be chained.
    */
-  public Flag setMinCount(final int count) {
+  public Flag<T> setMinCount(final int count) {
     if (count > mMaxCount) {
       throw new IllegalArgumentException("MinCount (" + count
           + ") must not be greater than MaxCount (" + mMaxCount + ")");
@@ -392,6 +392,10 @@ public class Flag implements Comparable<Flag> {
     return mParameterDescription;
   }
 
+  protected void setParameterDescription(String desc) {
+    mParameterDescription = desc;
+  }
+
   /**
    * Gets the type of the parameter. This will return null for untyped
    * (switch) flags. Parameters will be checked that they are of the specified
@@ -418,7 +422,7 @@ public class Flag implements Comparable<Flag> {
    * @param paramDefault a default value that can be used for optional flags.
    * @return this flag, so calls can be chained.
    */
-  public Flag setParameterDefault(final Object paramDefault) {
+  public Flag<T> setParameterDefault(final T paramDefault) {
     if (mParameterType == null) {
       throw new IllegalArgumentException("Cannot set default parameter for untyped flags");
     }
@@ -432,7 +436,7 @@ public class Flag implements Comparable<Flag> {
    * @param range a collection of Strings.
    * @return this flag, so calls can be chained.
    */
-  public Flag setParameterRange(final Collection<String> range) {
+  public Flag<T> setParameterRange(final Collection<String> range) {
     //System.err.println("setParameterRange range=" + range.toString());
     final String[] rarray = range.toArray(new String[range.size()]);
     return setParameterRange(rarray);
@@ -444,7 +448,7 @@ public class Flag implements Comparable<Flag> {
    * @param range an array of Strings.
    * @return this flag, so calls can be chained.
    */
-  public Flag setParameterRange(final String[] range) {
+  public Flag<T> setParameterRange(final String[] range) {
     if (mParameterType == null) {
       throw new IllegalArgumentException("Cannot set parameter range for no-arg flags.");
     }
@@ -500,9 +504,8 @@ public class Flag implements Comparable<Flag> {
    *
    * @return a value for this flag.
    */
-  public Object getValue() {
-    return (isSet()) ? mParameter.get(0) : (mParameterType == null) ? Boolean.FALSE
-        : mParameterDefault;
+  public T getValue() {
+    return (isSet()) ? mParameter.get(0) : mParameterDefault;
   }
 
   /**
@@ -512,15 +515,13 @@ public class Flag implements Comparable<Flag> {
    *
    * @return a <code>Collection</code> of the supplied values.
    */
-  public List<Object> getValues() {
-    final List<Object> result;
+  public List<T> getValues() {
+    final List<T> result;
     if (isSet()) {
       result = mParameter;
     } else {
       result = new ArrayList<>();
-      if (mParameterType == null) {
-        result.add(Boolean.FALSE);
-      } else if (mParameterDefault != null) {
+      if (mParameterDefault != null) {
         result.add(mParameterDefault);
       }
     }
@@ -531,7 +532,7 @@ public class Flag implements Comparable<Flag> {
     mParameter = new ArrayList<>();
   }
 
-  FlagValue setValue(final String valueStr) {
+  FlagValue<T> setValue(final String valueStr) {
     if (mParameter.size() >= mMaxCount) {
       throw new FlagCountException("Value cannot be set more than " + mMaxCount + "times for flag: " + mFlagName);
     }
@@ -550,18 +551,18 @@ public class Flag implements Comparable<Flag> {
       }
     }
     if (mRangeList) {
-      final List<Object> values = new ArrayList<>();
       final String[] valueStrs = StringUtils.split(valueStr, ',');
+      final List<T> values = new ArrayList<>();
       for (final String valueStr2 : valueStrs) {
-        final Object value = parseValue(valueStr2);
+        final T value = parseValue(valueStr2);
         mParameter.add(value);
         values.add(value);
       }
-      return new FlagValue(this, values);
+      return new FlagValue<T>(this, values);
     } else {
-      final Object value = parseValue(valueStr);
+      final T value = parseValue(valueStr);
       mParameter.add(value);
-      return new FlagValue(this, value);
+      return new FlagValue<>(this, value);
     }
   }
 
@@ -573,13 +574,13 @@ public class Flag implements Comparable<Flag> {
    * @param valueStr the value to parse
    * @return the parsed value
    */
-  Object parseValue(final String valueStr) {
-    return mParameterType == null ? Boolean.TRUE : Flag.instanceHelper(mParameterType, valueStr);
+  T parseValue(final String valueStr) {
+    return Flag.instanceHelper(mParameterType, valueStr);
   }
 
   @Override
   public boolean equals(final Object other) {
-    return other instanceof Flag && getName().equals(((Flag) other).getName());
+    return other instanceof Flag && getName().equals(((Flag<T>) other).getName());
   }
 
   @Override
@@ -588,7 +589,7 @@ public class Flag implements Comparable<Flag> {
   }
 
   @Override
-  public int compareTo(final Flag other) {
+  public int compareTo(final Flag<T> other) {
     if (other == null) {
       return -1;
     }
@@ -731,43 +732,44 @@ public class Flag implements Comparable<Flag> {
     BOOLEAN_NEGATIVE.addAll(Arrays.asList("false", "no", "n", "f", "0", "off"));
   }
 
-  static Object instanceHelper(final Class<?> type, final String stringRep) {
+  @SuppressWarnings("unchecked")
+  static <T> T instanceHelper(final Class<T> type, final String stringRep) {
     try {
       if (type == Boolean.class) {
         final String lStr = stringRep.toLowerCase(Locale.getDefault());
         if (BOOLEAN_AFFIRMATIVE.contains(lStr)) {
-          return Boolean.TRUE;
+          return (T) Boolean.TRUE;
         } else if (BOOLEAN_NEGATIVE.contains(lStr)) {
-          return Boolean.FALSE;
+          return (T) Boolean.FALSE;
         } else {
           throw new IllegalArgumentException("Invalid boolean value " + stringRep);
         }
       } else if (type == Byte.class) {
-        return Byte.valueOf(stringRep);
+        return (T) Byte.valueOf(stringRep);
       } else if (type == Character.class) {
-        return stringRep.charAt(0);
+        return (T) Character.valueOf(stringRep.charAt(0));
       } else if (type == Float.class) {
-        return Float.valueOf(stringRep);
+        return (T) Float.valueOf(stringRep);
       } else if (type == Double.class) {
-        return Double.valueOf(stringRep);
+        return (T) Double.valueOf(stringRep);
       } else if (type == Integer.class) {
-        return Integer.valueOf(stringRep);
+        return (T) Integer.valueOf(stringRep);
       } else if (type == Long.class) {
-        return Long.valueOf(stringRep);
+        return (T) Long.valueOf(stringRep);
       } else if (type == Short.class) {
-        return Short.valueOf(stringRep);
+        return (T) Short.valueOf(stringRep);
       } else if (type == File.class) {
-        return new File(stringRep);
+        return (T) new File(stringRep);
       } else if (type == URL.class) {
-        return new URL(stringRep);
+        return (T) new URL(stringRep);
       } else if (type == String.class) {
-        return stringRep;
+        return (T) stringRep;
       } else if (isValidEnum(type)) {
-        return valueOf(type, stringRep.toUpperCase(Locale.getDefault()));
+        return (T) valueOf(type, stringRep.toUpperCase(Locale.getDefault()));
       } else if (type == Class.class) {
-        return Class.forName(stringRep);
+        return (T) Class.forName(stringRep);
       } else if (type == IntegerOrPercentage.class) {
-        return IntegerOrPercentage.valueOf(stringRep);
+        return (T) IntegerOrPercentage.valueOf(stringRep);
       }
     } catch (final MalformedURLException e) {
       throw new IllegalArgumentException("Badly formatted URL: " + stringRep);
@@ -784,7 +786,7 @@ public class Flag implements Comparable<Flag> {
    * and produce an list of those values
    * @return this flag, so calls can be chained.
    */
-  public Flag enableCsv() {
+  public Flag<T> enableCsv() {
     mRangeList = true;
     return this;
   }
@@ -793,7 +795,7 @@ public class Flag implements Comparable<Flag> {
    * @param category the category to set
    * @return this flag, so calls can be chained.
    */
-  public Flag setCategory(final String category) {
+  public Flag<T> setCategory(final String category) {
     mCategory = category;
     return this;
   }

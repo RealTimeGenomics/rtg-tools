@@ -206,7 +206,7 @@ public class CFlagsTest extends TestCase {
     assertTrue(mFlags.getValue("file").equals(new File("afilename")));
 
     // getOptional and getRequired
-    final Collection<Flag> optional = mFlags.getOptional();
+    final Collection<Flag<?>> optional = mFlags.getOptional();
     assertNotNull(optional);
     assertTrue(4 == optional.size()); // always has help / XXhelp
     assertFalse(optional.contains(mFlags.getFlag("boolean")));
@@ -214,7 +214,7 @@ public class CFlagsTest extends TestCase {
     assertTrue(optional.contains(mFlags.getFlag("long")));
     assertTrue(optional.contains(mFlags.getFlag("file")));
 
-    final Collection<Flag> required = mFlags.getRequired();
+    final Collection<Flag<?>> required = mFlags.getRequired();
     assertNotNull(required);
     assertTrue(7 == required.size());
     assertFalse(required.contains(mFlags.getFlag("long")));
@@ -248,20 +248,20 @@ public class CFlagsTest extends TestCase {
 
   public void testHelpFlag() {
     final CFlags f = new CFlags();
-    final Flag x = f.getFlag("help");
+    final Flag<?> x = f.getFlag("help");
     assertNotNull(x);
     assertEquals(Character.valueOf('h'), x.getChar());
     assertEquals("print help on command-line flag usage", x.getDescription());
   }
 
   public void testVariousKinds() {
-    Flag f = mFlags.registerOptional("aa", "bb");
-    assertNotNull(f);
-    assertEquals("bb", f.getDescription());
-    f = mFlags.registerOptional('v', "cc", "dd");
-    assertNotNull(f);
-    assertEquals("dd", f.getDescription());
-    f = mFlags.registerRequired(File.class, "hi", "there");
+    Switch s = mFlags.registerOptional("aa", "bb");
+    assertNotNull(s);
+    assertEquals("bb", s.getDescription());
+    s = mFlags.registerOptional('v', "cc", "dd");
+    assertNotNull(s);
+    assertEquals("dd", s.getDescription());
+    Flag<File> f = mFlags.registerRequired(File.class, "hi", "there");
     assertNotNull(f);
     f = mFlags.registerRequired("zz", File.class, "hix", "therex");
     assertNotNull(f);
@@ -343,7 +343,7 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testMultiValue() {
-    final Flag f = new Flag('x', "xx", "mv", 3, 4, Integer.class, "kk", 42, "try");
+    final Flag<Integer> f = new Flag<>('x', "xx", "mv", 3, 4, Integer.class, "kk", 42, "try");
     mFlags.register(f);
     assertEquals("try", f.getCategory());
     assertFalse(mFlags.isSet("xx"));
@@ -380,13 +380,13 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testParseInt() {
-    final Flag f = new AnonymousFlag("mv", Integer.class, "kk");
+    final Flag<Integer> f = new AnonymousFlag<>("mv", Integer.class, "kk");
     mFlags.register(f);
     assertTrue(mFlags.setFlags("09"));
     assertEquals(9, mFlags.getAnonymousValue(0));
   }
   public void testMultiValueAnon() {
-    final Flag f = new AnonymousFlag("mv", Integer.class, "kk");
+    final Flag<Integer> f = new AnonymousFlag<>("mv", Integer.class, "kk");
     f.setMaxCount(4);
     f.setMinCount(3);
     mFlags.register(f);
@@ -426,7 +426,7 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testRequired2() {
-    Flag f = mFlags.registerRequired("zz", File.class, "hix", "therex");
+    Flag<File> f = mFlags.registerRequired("zz", File.class, "hix", "therex");
     assertNotNull(f);
     f = mFlags.registerRequired('j', "zzz", File.class, "hiz", "therez");
     assertNotNull(f);
@@ -454,7 +454,7 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testRange() {
-    final Flag f = new Flag('x', "xx", "mv", 1, 1, String.class, "kk", null, "");
+    final Flag<String> f = new Flag<>('x', "xx", "mv", 1, 1, String.class, "kk", null, "");
     final HashSet<String> m = new HashSet<>();
     try {
       f.setParameterRange(m);
@@ -554,15 +554,15 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testSpecialAnonProps() {
-    final AnonymousFlag f1 = new AnonymousFlag("mv", Integer.class, "kk");
-    final AnonymousFlag f2 = new AnonymousFlag("mx", Integer.class, "zz");
+    final AnonymousFlag<Integer> f1 = new AnonymousFlag<>("mv", Integer.class, "kk");
+    final AnonymousFlag<Integer> f2 = new AnonymousFlag<>("mx", Integer.class, "zz");
     assertEquals(1, f2.compareTo(f1));
     assertEquals(-1, f1.compareTo(f2));
     assertEquals(0, f1.compareTo(f1));
   }
 
   public void testFlagInnerClass() {
-    Flag f = new Flag('x', "xx", "mv", 0, 1, Integer.class, "kk", 42, "");
+    Flag<Integer> f = new Flag<>('x', "xx", "mv", 0, 1, Integer.class, "kk", 42, "");
     try {
       f.setMaxCount(0);
       fail();
@@ -577,26 +577,26 @@ public class CFlagsTest extends TestCase {
     } catch (final IllegalArgumentException e) {
       // ok
     }
-    Collection<Object> c = f.getValues();
+    Collection<Integer> c = f.getValues();
     assertTrue(c.contains(42));
-    f = new Flag('x', "xx", "mv", 3, 4, null, "kk", 42, "");
+    f = new Flag<>('x', "xx", "mv", 3, 4, null, "kk", 42, "");
     c = f.getValues();
-    assertTrue(c.contains(Boolean.FALSE));
-    final Flag f1 = new Flag('x', "xx", "mv", 3, 4, Integer.class, "kk", 42, "");
-    final Flag f2 = new Flag('y', "xy", "my", 3, 4, Integer.class, "ky", 42, "");
+    assertFalse(c.contains(4242));
+    final Flag<Integer> f1 = new Flag<>('x', "xx", "mv", 3, 4, Integer.class, "kk", 42, "");
+    final Flag<Integer> f2 = new Flag<>('y', "xy", "my", 3, 4, Integer.class, "ky", 42, "");
     assertEquals(1, f2.compareTo(f1));
     assertEquals(-1, f1.compareTo(f2));
     assertEquals(0, f1.compareTo(f1));
-    f = new Flag('x', "xx", "mv", 0, Integer.MAX_VALUE, Integer.class, "kk", 42, "");
+    f = new Flag<>('x', "xx", "mv", 0, Integer.MAX_VALUE, Integer.class, "kk", 42, "");
     mFlags.register(f);
     assertEquals(LS + "Optional flags: " + LS
         + "  -h, --help  print help on command-line flag usage" + LS
         + "  -x, --xx=KK mv. May be specified 0 or more times (Default is 42)" + LS, mFlags
         .getUsageString());
     mFlags.setFlags("-x", "22");
-    final List<FlagValue> i = mFlags.getReceivedValues();
+    final List<FlagValue<?>> i = mFlags.getReceivedValues();
     assertEquals(1, i.size());
-    final FlagValue fv = i.get(0);
+    final FlagValue<?> fv = i.get(0);
     assertNotNull(fv);
     assertEquals(f, fv.getFlag());
     assertEquals(22, fv.getValue());
@@ -708,7 +708,7 @@ public class CFlagsTest extends TestCase {
     final CFlags flags = new CFlags("", err, null);
 
     flags.registerOptional('a', "A", "a");
-    Flag f = flags.unregister("A");
+    Flag<?> f = flags.unregister("A");
     assertNotNull(f);
 
     f = flags.unregister("B");

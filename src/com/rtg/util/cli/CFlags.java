@@ -164,15 +164,15 @@ public final class CFlags {
   static final String REQUIRED_FLAG_USAGE_PREFIX = "Required flags: ";
   static final String OPTIONAL_FLAG_USAGE_PREFIX = "Optional flags: ";
 
-  private final SortedSet<Flag> mRegisteredFlags;
+  private final SortedSet<Flag<?>> mRegisteredFlags;
 
-  private final List<SortedSet<Flag>> mRequiredSets;
+  private final List<SortedSet<Flag<?>>> mRequiredSets;
 
-  private final List<Flag> mAnonymousFlags;
+  private final List<Flag<?>> mAnonymousFlags;
   /** Maps from long names to all registered flags. */
-  private final NavigableMap<String, Flag> mLongNames;
+  private final NavigableMap<String, Flag<?>> mLongNames;
   /** Maps from short char names to flags (only for those that have short names). */
-  private final Map<Character, Flag> mShortNames;
+  private final Map<Character, Flag<?>> mShortNames;
   /** Where error messages are written. */
   private final Appendable mErr;
   /** Where output is written */
@@ -197,7 +197,7 @@ public final class CFlags {
   /** The original command line. */
   private String[] mArguments = new String[0];
   /** Stores all the read flags and their values, in the order they were seen. */
-  private List<FlagValue> mReceivedFlags;
+  private List<FlagValue<?>> mReceivedFlags;
   private String mParseMessageString = "";
 
   /**
@@ -233,7 +233,7 @@ public final class CFlags {
 
   /** Registers the <code>--Xhelp</code> flag */
   public void registerExtendedHelp() {
-    final Flag f = registerOptional(EXTENDED_HELP_FLAG, "print help on extended command-line flag usage");
+    final Switch f = registerOptional(EXTENDED_HELP_FLAG, "print help on extended command-line flag usage");
     if (mHelpCategory != null) {
       f.setCategory(mHelpCategory);
     }
@@ -255,8 +255,8 @@ public final class CFlags {
    * @param description the option description.
    * @return the flag.
    */
-  public Flag registerOptional(final String name, final String description) {
-    return registerOptional(name, null, "", description);
+  public Switch registerOptional(final String name, final String description) {
+    return register(new Switch(null, name, description));
   }
 
   /**
@@ -268,8 +268,8 @@ public final class CFlags {
    * @param description the option description.
    * @return the flag.
    */
-  public Flag registerOptional(final char nameChar, final String name, final String description) {
-    return registerOptional(nameChar, name, null, "", description, null);
+  public Switch registerOptional(final char nameChar, final String name, final String description) {
+    return register(new Switch(nameChar, name, description));
   }
 
   // Required flags
@@ -284,10 +284,11 @@ public final class CFlags {
    * <code>File</code>, <code>URL</code> and <code>String</code>.
    * @param usage a one-word usage description of the expected parameter.
    * @param description the option description.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerRequired(final Class<?> type, final String usage, final String description) {
-    final Flag flag = new AnonymousFlag(description, type, usage);
+  public <T> AnonymousFlag<T> registerRequired(final Class<T> type, final String usage, final String description) {
+    final AnonymousFlag<T> flag = new AnonymousFlag<>(description, type, usage);
     register(flag);
     return flag;
   }
@@ -303,10 +304,11 @@ public final class CFlags {
    * @param usage a one-word usage description of the expected parameter type.
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerRequired(final String name, final Class<?> type, final String usage,
-      final String description) {
+  public <T> Flag<T> registerRequired(final String name, final Class<T> type, final String usage,
+                                  final String description) {
     return registerRequired(null, name, type, usage, description);
   }
 
@@ -322,14 +324,15 @@ public final class CFlags {
    * @param usage a one-word usage description of the expected parameter type.
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerRequired(final char nameChar, final String name, final Class<?> type, final String usage, final String description) {
+  public <T> Flag<T> registerRequired(final char nameChar, final String name, final Class<T> type, final String usage, final String description) {
     return registerRequired(Character.valueOf(nameChar), name, type, usage, description);
   }
 
-  private Flag registerRequired(final Character nameChar, final String name, final Class<?> type, final String usage, final String description) {
-    return register(new Flag(nameChar, name, description, 1, 1, type, usage, null, ""));
+  private <T> Flag<T> registerRequired(final Character nameChar, final String name, final Class<T> type, final String usage, final String description) {
+    return register(new Flag<>(nameChar, name, description, 1, 1, type, usage, null, ""));
   }
 
   // Optional flags
@@ -346,9 +349,10 @@ public final class CFlags {
    * @param usage a one-word usage description of the expected parameter type.
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerOptional(final String name, final Class<?> type, final String usage, final String description) {
+  public <T> Flag<T> registerOptional(final String name, final Class<T> type, final String usage, final String description) {
     return registerOptional(name, type, usage, description, null);
   }
 
@@ -367,7 +371,7 @@ public final class CFlags {
    * @param <T> flag value type
    * @return the flag.
    */
-  public <T> Flag registerOptional(final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
+  public <T> Flag<T> registerOptional(final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
     return registerOptional(null, name, type, usage, description, defaultValue);
   }
 
@@ -383,9 +387,10 @@ public final class CFlags {
    * @param usage a one-word usage description of the expected parameter type.
    * For example this might be <code>FILE</code>, <code>DIR</code>.
    * @param description the option description.
+   * @param <T> flag value type
    * @return the flag.
    */
-  public Flag registerOptional(final char nameChar, final String name, final Class<?> type, final String usage, final String description) {
+  public <T> Flag<T> registerOptional(final char nameChar, final String name, final Class<T> type, final String usage, final String description) {
     return registerOptional(nameChar, name, type, usage, description, null);
   }
 
@@ -405,16 +410,18 @@ public final class CFlags {
    * @param <T> Flags value type
    * @return the flag.
    */
-  public <T> Flag registerOptional(final Character nameChar, final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
-    return register(new Flag(nameChar, name, description, 0, 1, type, usage, defaultValue, ""));
+  public <T> Flag<T> registerOptional(final Character nameChar, final String name, final Class<T> type, final String usage, final String description, final T defaultValue) {
+    return register(new Flag<>(nameChar, name, description, 0, 1, type, usage, defaultValue, ""));
   }
 
   /**
    * Register a flag.
    * @param flag flag to register
    * @return registered instance
+   * @param <T> Flags value type
+   * @param <U> Flag type
    */
-  public Flag register(final Flag flag) {
+  public <T, U extends Flag<T>> U register(final U flag) {
     if (flag instanceof AnonymousFlag) {
       mAnonymousFlags.add(flag);
       mRegisteredFlags.add(flag);
@@ -440,11 +447,11 @@ public final class CFlags {
    * @param name the name of the flag
    * @return the flag that was removed, or <code>null</code> if it wasn't registered already
    */
-  public Flag unregister(final String name) {
+  public Flag<?> unregister(final String name) {
     if (!mLongNames.containsKey(name)) {
       return null;
     }
-    final Flag flag = mLongNames.get(name);
+    final Flag<?> flag = mLongNames.get(name);
     mLongNames.remove(flag.getName());
     if (flag.getChar() != null) {
       mShortNames.remove(flag.getChar());
@@ -457,9 +464,9 @@ public final class CFlags {
    * Returns a set of the required flags that have not been fully set during <code>setFlags</code>.
    * @return a set of flags.
    */
-  private List<Flag> getPendingRequired() {
-    final List<Flag> results = new ArrayList<>();
-    for (final Flag f : mRegisteredFlags) {
+  private List<Flag<?>> getPendingRequired() {
+    final List<Flag<?>> results = new ArrayList<>();
+    for (final Flag<?> f : mRegisteredFlags) {
       if (f.getCount() < f.getMinCount()) {
         results.add(f);
       }
@@ -471,9 +478,9 @@ public final class CFlags {
    * Returns a collection of the required flags.
    * @return a collection of flags.
    */
-  public List<Flag> getRequired() {
-    final List<Flag> results = new ArrayList<>();
-    for (final Flag f : mRegisteredFlags) {
+  public List<Flag<?>> getRequired() {
+    final List<Flag<?>> results = new ArrayList<>();
+    for (final Flag<?> f : mRegisteredFlags) {
       if (f.getMinCount() > 0) {
         results.add(f);
       }
@@ -485,9 +492,9 @@ public final class CFlags {
    * Returns a collection of the optional flags.
    * @return a collection of flags.
    */
-  public List<Flag> getOptional() {
-    final List<Flag> results = new ArrayList<>();
-    for (final Flag f : mRegisteredFlags) {
+  public List<Flag<?>> getOptional() {
+    final List<Flag<?>> results = new ArrayList<>();
+    for (final Flag<?> f : mRegisteredFlags) {
       if (f.getMinCount() == 0) {
         results.add(f);
       }
@@ -542,7 +549,7 @@ public final class CFlags {
     setParseMessage(usage.toString());
   }
 
-  private void setPendingParseMessage(final Collection<Flag> pendingRequired) {
+  private void setPendingParseMessage(final Collection<Flag<?>> pendingRequired) {
     final StringBuilder usage = new StringBuilder();
     if ((pendingRequired != null) && !pendingRequired.isEmpty()) {
       if (pendingRequired.size() == 1) {
@@ -550,7 +557,7 @@ public final class CFlags {
       } else {
         usage.append("You must provide values for");
       }
-      for (Flag f : pendingRequired) {
+      for (Flag<?> f : pendingRequired) {
         usage.append(' ').append(f.getCompactFlagUsage());
         if (f.getMinCount() > 1) {
           final int count = f.getMinCount() - f.getCount();
@@ -576,8 +583,8 @@ public final class CFlags {
    * and once with <code>-I</code>.
    * @param set flags to be added to usage header
    */
-  public void addRequiredSet(Flag... set) {
-    final TreeSet<Flag> tset = new TreeSet<>();
+  public void addRequiredSet(Flag<?>... set) {
+    final TreeSet<Flag<?>> tset = new TreeSet<>();
     Collections.addAll(tset, set);
     mRequiredSets.add(tset);
   }
@@ -606,7 +613,7 @@ public final class CFlags {
     mProgramDescription = description;
   }
 
-  private void setFlag(final Flag flag, final String strValue) {
+  private void setFlag(final Flag<?> flag, final String strValue) {
 //    if (strValue != null && strValue.contains("\n")) {
 //      throw new IllegalArgumentException("Value cannot contain new line characters.");
 //    }
@@ -624,10 +631,10 @@ public final class CFlags {
   /** Resets the list of flags received and their values. */
   public void reset() {
     mReceivedFlags = new ArrayList<>();
-    for (final Flag f : mRegisteredFlags) {
+    for (final Flag<?> f : mRegisteredFlags) {
       f.reset();
     }
-    for (final Flag f : mAnonymousFlags) {
+    for (final Flag<?> f : mAnonymousFlags) {
       f.reset();
     }
     setParseMessage("");
@@ -673,7 +680,7 @@ public final class CFlags {
     boolean restAnonymous = false;
     for (int i = 0; i < args.length && success; ++i) {
       final String nameArg = args[i];
-      Flag flag = null;
+      Flag<?> flag = null;
       String value = null;
       if (!restAnonymous && nameArg.equals(LONG_FLAG_PREFIX)) {
         restAnonymous = true;
@@ -735,7 +742,7 @@ public final class CFlags {
       setRemainingParseMessage(remaining);
       success = false;
     }
-    final List<Flag> pendingRequired = getPendingRequired();
+    final List<Flag<?>> pendingRequired = getPendingRequired();
     if (success && !pendingRequired.isEmpty()) {
       setPendingParseMessage(pendingRequired);
       success = false;
@@ -753,7 +760,7 @@ public final class CFlags {
    * Get an iterator over anonymous flags.
    * @return iterator over anonymous flags.
    */
-  public Iterator<Flag> getAnonymousFlags() {
+  public Iterator<Flag<?>> getAnonymousFlags() {
     return mAnonymousFlags.iterator();
   }
 
@@ -762,7 +769,7 @@ public final class CFlags {
    * @param index the index
    * @return the flag
    */
-  public Flag getAnonymousFlag(final int index) {
+  public Flag<?> getAnonymousFlag(final int index) {
     return mAnonymousFlags.get(index);
   }
 
@@ -772,7 +779,7 @@ public final class CFlags {
    * @param flag flag name
    * @return the flag, or null if no matching flag
    */
-  Flag getFlagWithExpansion(final String flag) {
+  Flag<?> getFlagWithExpansion(final String flag) {
     return mLongNames.get(StringUtils.expandPrefix(mLongNames.navigableKeySet(), flag));
   }
 
@@ -781,7 +788,7 @@ public final class CFlags {
    * @param flag flag name
    * @return the flag, or null if no matching flag
    */
-  public Flag getFlag(final String flag) {
+  public Flag<?> getFlag(final String flag) {
     return mLongNames.get(flag);
   }
 
@@ -802,7 +809,7 @@ public final class CFlags {
    * @param flag the flag
    * @return values of the flag
    */
-  public List<Object> getValues(final String flag) {
+  public List<?> getValues(final String flag) {
     return getFlag(flag).getValues();
   }
 
@@ -820,7 +827,7 @@ public final class CFlags {
    * @param index the index
    * @return anonymous values
    */
-  public List<Object> getAnonymousValues(final int index) {
+  public List<?> getAnonymousValues(final int index) {
     return getAnonymousFlag(index).getValues();
   }
 
@@ -829,7 +836,7 @@ public final class CFlags {
    * that they were supplied. Each element of the Iterator is a FlagValue.
    * @return an <code>Iterator</code> of <code>FlagValue</code>s.
    */
-  public List<FlagValue> getReceivedValues() {
+  public List<FlagValue<?>> getReceivedValues() {
     return mReceivedFlags;
   }
 
@@ -839,7 +846,7 @@ public final class CFlags {
    * @return true if the option was provided in the arguments.
    */
   public boolean isSet(final String flag) {
-    final Flag aFlag = getFlag(flag);
+    final Flag<?> aFlag = getFlag(flag);
     return (aFlag != null) && aFlag.isSet();
   }
 
@@ -850,7 +857,7 @@ public final class CFlags {
    */
   public boolean checkRequired(String... flags) {
     for (final String flag : flags) {
-      final Flag aFlag = getFlag(flag);
+      final Flag<?> aFlag = getFlag(flag);
       if ((aFlag == null) || !aFlag.isSet()) {
         setParseMessage("The flag " + LONG_FLAG_PREFIX + flag + " is required");
         return false;
@@ -871,7 +878,7 @@ public final class CFlags {
     String firstFlag = null;
     boolean isset = false;
     for (final String flag : flags) {
-      final Flag aFlag = getFlag(flag);
+      final Flag<?> aFlag = getFlag(flag);
       if ((aFlag != null) && aFlag.isSet()) {
         if (!isset) {
           isset = true;
@@ -898,7 +905,7 @@ public final class CFlags {
     boolean isset = false;
     boolean toomany = false;
     for (final String flag : flags) {
-      final Flag aFlag = getFlag(flag);
+      final Flag<?> aFlag = getFlag(flag);
       if ((aFlag != null) && aFlag.isSet()) {
         if (!isset) {
           isset = true;
@@ -931,7 +938,7 @@ public final class CFlags {
     }
     final StringBuilder sb = new StringBuilder();
     for (final String flag : flags) {
-      final Flag aFlag = getFlag(flag);
+      final Flag<?> aFlag = getFlag(flag);
       if ((aFlag != null) && aFlag.isSet()) {
         return true;
       }
@@ -977,7 +984,7 @@ public final class CFlags {
    */
   public boolean checkBanned(String... flags) {
     for (final String flag : flags) {
-      final Flag aFlag = getFlag(flag);
+      final Flag<?> aFlag = getFlag(flag);
       if ((aFlag != null) && aFlag.isSet()) {
         setParseMessage("The flag " + LONG_FLAG_PREFIX + flag + " is not permitted for this set of arguments");
         return false;
@@ -1175,10 +1182,10 @@ public final class CFlags {
 
   private void appendCompactFlagUsage(final WrappingStringBuilder wb) {
     if (mRequiredSets.size() == 0) {
-      mRequiredSets.add(new TreeSet<Flag>());
+      mRequiredSets.add(new TreeSet<>());
     }
     boolean first = true;
-    for (final SortedSet<Flag> ops : mRequiredSets) {
+    for (final SortedSet<Flag<?>> ops : mRequiredSets) {
       if (!first) {
         wb.wrap();
       }
@@ -1191,17 +1198,17 @@ public final class CFlags {
    * Adds compact flag usage information to the given WrappingStringBuilder,
    * wrapping at appropriate places.
    */
-  private void appendCompactFlagUsage(final WrappingStringBuilder wb, final SortedSet<Flag> optionals) {
+  private void appendCompactFlagUsage(final WrappingStringBuilder wb, final SortedSet<Flag<?>> optionals) {
     boolean first = true;
     if (getOptional().size() > 0) {
       wb.wrapWord("[OPTION]...");
       first = false;
     }
-    for (Flag flag : getRequired()) {
+    for (Flag<?> flag : getRequired()) {
       wb.wrapWord((first ? "" : " ") + flag.getCompactFlagUsage());
       first = false;
     }
-    for (final Flag f : optionals) {
+    for (final Flag<?> f : optionals) {
       wb.wrapWord((first ? "" : " ") + f.getCompactFlagUsage());
       first = false;
     }
@@ -1273,9 +1280,9 @@ public final class CFlags {
     return usage.toString();
   }
 
-  List<Flag> getFlagFromType(final String type) {
-    final List<Flag> results = new ArrayList<>();
-    for (final Flag f : mRegisteredFlags) {
+  List<Flag<?>> getFlagFromType(final String type) {
+    final List<Flag<?>> results = new ArrayList<>();
+    for (final Flag<?> f : mRegisteredFlags) {
       if (f.getCategory().equals(type)) {
         results.add(f);
       }
@@ -1295,11 +1302,11 @@ public final class CFlags {
 
     // We do all the required flags first
     for (final String mCategorie : mCategories) {
-      final List<Flag> flags = getFlagFromType(mCategorie);
-      final Iterator<Flag> flagItr = flags.iterator();
+      final List<Flag<?>> flags = getFlagFromType(mCategorie);
+      final Iterator<Flag<?>> flagItr = flags.iterator();
       int flagsCount = 0;
       while (flagItr.hasNext()) {
-        final Flag flag = flagItr.next();
+        final Flag<?> flag = flagItr.next();
         if (displayFlag(flag, level)) {
           ++flagsCount;
         }
@@ -1308,7 +1315,7 @@ public final class CFlags {
         wb.append(LS);
         wb.append(mCategorie).append(LS);
         wb.setWrapIndent(longestUsageLength + 7);
-        for (final Flag flag : flags) {
+        for (final Flag<?> flag : flags) {
           flag.appendLongFlagUsage(wb, longestUsageLength, level);
         }
       }
@@ -1332,8 +1339,8 @@ public final class CFlags {
         final RstTable table = new RstTable(1, category.length(), 6, usageLength + 4, descriptionLength);
         table.addHeading(category);
 
-        final List<Flag> flags = getFlagFromType(category);
-        for (Flag flag : flags) {
+        final List<Flag<?>> flags = getFlagFromType(category);
+        for (Flag<?> flag : flags) {
           if (displayFlag(flag, level)) {
             final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
             table.addRow(
@@ -1354,7 +1361,7 @@ public final class CFlags {
     int longestUsageLength = 0;
     // Get longest string lengths for use below in pretty-printing.
     //final int[] counts = new int[mCategories.length];
-    for (Flag flag : mRegisteredFlags) {
+    for (Flag<?> flag : mRegisteredFlags) {
       //counts[getCategoryLocation(flag.getCategory())]++;
       if (!displayFlag(flag, level)) {
         continue;
@@ -1368,9 +1375,9 @@ public final class CFlags {
   }
 
   private int getUsageDescriptionLength(Flag.Level level, String category) {
-    final List<Flag> flags = getFlagFromType(category);
+    final List<Flag<?>> flags = getFlagFromType(category);
     int usageLength = 0;
-    for (Flag flag : flags) {
+    for (Flag<?> flag : flags) {
       if (displayFlag(flag, level)) {
         final String usageDescription = flag.getUsageDescription();
         if (usageDescription.length() > usageLength) {
@@ -1381,7 +1388,7 @@ public final class CFlags {
     return usageLength;
   }
 
-  static boolean displayFlag(Flag flag, Flag.Level level) {
+  static boolean displayFlag(Flag<?> flag, Flag.Level level) {
     return flag.level() == level;
   }
 
@@ -1416,9 +1423,9 @@ public final class CFlags {
   private void appendLongFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
     int longestUsageLength = 0;
     // Get longest string lengths for use below in pretty-printing.
-    Iterator<Flag> flagItr = mRegisteredFlags.iterator();
+    Iterator<Flag<?>> flagItr = mRegisteredFlags.iterator();
     while (flagItr.hasNext()) {
-      final Flag flag = flagItr.next();
+      final Flag<?> flag = flagItr.next();
       if (displayFlag(flag, level)) {
         final String usageStr = flag.getFlagUsage();
         if (usageStr.length() > longestUsageLength) {
@@ -1427,11 +1434,11 @@ public final class CFlags {
       }
     }
     // We do all the required flags first
-    final List<Flag> required = getRequired();
+    final List<Flag<?>> required = getRequired();
     flagItr = required.iterator();
     int requiredCount = 0;
     while (flagItr.hasNext()) {
-      final Flag flag = flagItr.next();
+      final Flag<?> flag = flagItr.next();
       if (displayFlag(flag, level)) {
         ++requiredCount;
       }
@@ -1440,16 +1447,16 @@ public final class CFlags {
       wb.append(LS);
       wb.append(REQUIRED_FLAG_USAGE_PREFIX).append(LS);
       wb.setWrapIndent(longestUsageLength + 7);
-      for (final Flag flag : required) {
+      for (final Flag<?> flag : required) {
         flag.appendLongFlagUsage(wb, longestUsageLength, level);
       }
     }
     // Then all the optional flags
-    final List<Flag> optional = getOptional();
+    final List<Flag<?>> optional = getOptional();
     flagItr = optional.iterator();
     int optionalCount = 0;
     while (flagItr.hasNext()) {
-      final Flag flag = flagItr.next();
+      final Flag<?> flag = flagItr.next();
       if (displayFlag(flag, level)) {
         ++optionalCount;
       }
@@ -1459,7 +1466,7 @@ public final class CFlags {
       wb.append(LS);
       wb.append(OPTIONAL_FLAG_USAGE_PREFIX).append(LS);
       wb.setWrapIndent(longestUsageLength + 7);
-      for (final Flag flag : optional) {
+      for (final Flag<?> flag : optional) {
         flag.appendLongFlagUsage(wb, longestUsageLength, level);
       }
     }
@@ -1518,7 +1525,7 @@ public final class CFlags {
     cli.registerRequired(String.class, "ARGS", "these are some extra required args");
     cli.registerRequired(String.class, "BARGS", "these are some extra required args");
 
-    final Flag intFlag = cli.registerRequired('i', "int", Integer.class, "my_int",
+    final Flag<Integer> intFlag = cli.registerRequired('i', "int", Integer.class, "my_int",
     "This sets an int value.");
     intFlag.setMaxCount(5);
     // intFlag.setMaxCount(Integer.MAX_VALUE);
@@ -1528,7 +1535,7 @@ public final class CFlags {
     cli.registerOptional('b', "boolean", Boolean.class, "true/false", "this sets a boolean value.",
         Boolean.TRUE);
 
-    final Flag f = cli.registerOptional('f', "float", Float.class, null, "this sets a float value.", (float) 20);
+    final Flag<Float> f = cli.registerOptional('f', "float", Float.class, null, "this sets a float value.", (float) 20);
     f.setParameterRange(new String[] {"0.2", "0.4", "0.6" });
     cli.registerOptional("string", String.class, null, "this sets a string value. and for this one I'm going to have quite a long description. Possibly long enough to need wrapping.",
     "myDefault");
@@ -1544,7 +1551,7 @@ public final class CFlags {
     System.out.println("--int: " + cli.getValues("int"));
 
     System.out.println(LS + "Received values in order:");
-    for (FlagValue fv : cli.getReceivedValues()) {
+    for (FlagValue<?> fv : cli.getReceivedValues()) {
       System.out.println(fv);
     }
   }
@@ -1593,11 +1600,11 @@ public final class CFlags {
   private void setHelpCategory(String helpCategory) {
     mHelpCategory = helpCategory;
     getFlag(HELP_FLAG).setCategory(helpCategory);
-    final Flag f = getFlag(EXTENDED_HELP_FLAG);
+    final Flag<?> f = getFlag(EXTENDED_HELP_FLAG);
     if (f != null) {
       f.setCategory(helpCategory);
     }
-    final Flag f2 = getFlag(EXPERIMENTAL_HELP_FLAG);
+    final Flag<?> f2 = getFlag(EXPERIMENTAL_HELP_FLAG);
     if (f2 != null) {
       f2.setCategory(helpCategory);
     }

@@ -35,7 +35,7 @@ import com.reeltwo.jumble.annotations.TestClass;
  * <code>AnonymousFlag</code> is a flag with no name.
  */
 @TestClass(value = {"com.rtg.util.cli.CFlagsTest"})
-public class AnonymousFlag extends Flag {
+public class AnonymousFlag<T> extends Flag<T> {
 
   private static int sAnonCounter = 0;
   private static synchronized int nextAnonCounter() {
@@ -55,7 +55,7 @@ public class AnonymousFlag extends Flag {
    * accepted.
    * @param paramDescription a description of the meaning of the flag.
    */
-  public AnonymousFlag(final String flagDescription, final Class<?> paramType,
+  public AnonymousFlag(final String flagDescription, final Class<T> paramType,
       final String paramDescription) {
     super(null, null, flagDescription, 1, 1, paramType, paramDescription, null, "");
     mFlagRank = nextAnonCounter();
@@ -87,7 +87,7 @@ public class AnonymousFlag extends Flag {
   }
 
   @Override
-  public int compareTo(final Flag other) {
+  public int compareTo(final Flag<T> other) {
     if (other instanceof AnonymousFlag) {
       return mFlagRank - ((AnonymousFlag) other).mFlagRank;
     }

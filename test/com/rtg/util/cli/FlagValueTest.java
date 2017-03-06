@@ -46,11 +46,11 @@ public class FlagValueTest extends TestCase {
   }
 
   public void testFlagIntVlaue() {
-    final Flag f = new Flag('I', "integer", "integer Flag", 1, 1, Integer.class, "Integer Value", Integer.MAX_VALUE, "");
-    final FlagValue v = new FlagValue(f, 55);
-    assertEquals(55, v.getValue());
+    final Flag<Integer> f = new Flag<>('I', "integer", "integer Flag", 1, 1, Integer.class, "Integer Value", Integer.MAX_VALUE, "");
+    final FlagValue<Integer> v = new FlagValue<>(f, 55);
+    assertEquals((Integer) 55, v.getValue());
     assertEquals("integer=55", v.toString());
-    final Flag n = v.getFlag();
+    final Flag<Integer> n = v.getFlag();
     assertEquals(f.isSet(), n.isSet());
     assertEquals(f.getCount(), n.getCount());
     assertEquals(f.getDescription(), n.getDescription());
@@ -63,8 +63,8 @@ public class FlagValueTest extends TestCase {
   }
 
   public void testFlagDoubleVlaue() {
-    final Flag f = new Flag('D', "double", "double Flag", 1, 1, Double.class, "Double Value", Double.MAX_VALUE, "");
-    final FlagValue v = new FlagValue(f, 55.000256);
+    final Flag<Double> f = new Flag<>('D', "double", "double Flag", 1, 1, Double.class, "Double Value", Double.MAX_VALUE, "");
+    final FlagValue<Double> v = new FlagValue<>(f, 55.000256);
     assertEquals(55.000256, v.getValue());
     assertEquals("double=55.000256", v.toString());
     final Flag n = v.getFlag();
