@@ -125,7 +125,7 @@ public class ExtractCli extends AbstractCli {
       }
     });
     flags.registerRequired(File.class, "FILE", "the indexed block compressed genome position data file to extract").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    final Flag region = flags.registerRequired(String.class, "STRING", "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.FILTERING);
+    final Flag<String> region = flags.registerRequired(String.class, "STRING", "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.FILTERING);
     region.setMinCount(0);
     region.setMaxCount(Integer.MAX_VALUE);
     flags.registerOptional(HEADER_FLAG, "print out header also").setCategory(CommonFlagCategories.REPORTING);
@@ -140,7 +140,7 @@ public class ExtractCli extends AbstractCli {
     if (!TabixIndexer.isBlockCompressed(input)) {
       throw new NoTalkbackSlimException("" + input.getPath() + " is not in bgzip format. Cannot extract records.");
     }
-    final List<Object> rStrings = mFlags.getAnonymousValues(1);
+    final List<?> rStrings = mFlags.getAnonymousValues(1);
     final ReferenceRanges<String> regions;
     if (rStrings.isEmpty()) {
       regions = new ReferenceRanges<>(true);

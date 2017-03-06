@@ -111,7 +111,7 @@ public final class SdfSubset extends LoggedCli {
         }
 
         if (mFlags.getAnonymousFlag(0).isSet()) {
-          final Collection<Object> seqs = mFlags.getAnonymousValues(0);
+          final Collection<?> seqs = mFlags.getAnonymousValues(0);
           for (final Object oi : seqs) {
             filter.transfer((String) oi);
           }

@@ -93,11 +93,11 @@ public final class Cg2Sdf extends LoggedCli {
     mFlags.setDescription("Converts Complete Genomics sequencing system reads to RTG SDF format.");
     CommonFlagCategories.setCategories(mFlags);
 
-    final Flag inFlag = mFlags.registerRequired(File.class, "FILE", "file in Complete Genomics format");
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, "FILE", "file in Complete Genomics format");
     inFlag.setMinCount(0);
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setCategory(INPUT_OUTPUT);
-    final Flag list = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of Complete Genomics files (1 per line)").setCategory(INPUT_OUTPUT);
+    final Flag<File> list = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of Complete Genomics files (1 per line)").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.registerOptional(MAXIMUM_NS, Integer.class, "INT", "maximum number of Ns allowed in either side for a read", 5).setCategory(FILTERING);

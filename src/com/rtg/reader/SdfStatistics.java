@@ -116,7 +116,7 @@ public final class SdfStatistics extends AbstractCli {
     CommonFlagCategories.setCategories(flags);
 
     try {
-      final Flag inFlag = flags.registerRequired(File.class, SDF_FLAG, "SDF directories");
+      final Flag<File> inFlag = flags.registerRequired(File.class, SDF_FLAG, "SDF directories");
       inFlag.setMinCount(1);
       inFlag.setMaxCount(Integer.MAX_VALUE);
       inFlag.setCategory(INPUT_OUTPUT);
@@ -143,7 +143,7 @@ public final class SdfStatistics extends AbstractCli {
     @Override
     public boolean isValid(final CFlags flags) {
 
-      final Collection<Object> values = flags.getAnonymousValues(0);
+      final Collection<?> values = flags.getAnonymousValues(0);
       for (final Object o : values) {
         final File f = (File) o;
         if (!CommonFlags.validateSDF(f)) {
@@ -453,7 +453,7 @@ public final class SdfStatistics extends AbstractCli {
 
   @Override
   protected int mainExec(final OutputStream out, final PrintStream err) throws IOException {
-    final Collection<Object> values = mFlags.getAnonymousValues(0);
+    final Collection<?> values = mFlags.getAnonymousValues(0);
 
     final Queue<File> dirs = new LinkedList<>();
     for (final Object o : values) {

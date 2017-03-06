@@ -80,7 +80,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** Turn on alternate ROC slope calculation */
   public static final String VCFEVAL_ALT_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.alt-roc-slope";
 
-  ToolsGlobalFlags(List<Flag> flags) {
+  ToolsGlobalFlags(List<Flag<?>> flags) {
     super(flags);
   }
 

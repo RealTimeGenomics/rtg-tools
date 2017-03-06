@@ -114,7 +114,7 @@ public final class SnpIntersection extends LoggedCli {
     CommonFlags.initOutputDirFlag(flags);
     flags.registerOptional('c', COMPARE_ALTS, "do a basic comparison on ALT calls in addition to position").setCategory(CommonFlagCategories.REPORTING);
 CommonFlags.initNoGzip(flags);
-    final Flag forceMerge = flags.registerOptional(FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
+    final Flag<String> forceMerge = flags.registerOptional(FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
     flags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
@@ -164,7 +164,7 @@ CommonFlags.initNoGzip(flags);
     final File outputFile = (File) mFlags.getValue(OUTPUT_FLAG);
     final RegionRestriction region = mFlags.isSet(RESTRICTION_FLAG) ? new RegionRestriction((String) mFlags.getValue(RESTRICTION_FLAG)) : null;
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
-    final List<Object> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
+    final List<?> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
     final HashSet<String> forceMerge = new HashSet<>();
     for (Object o : forceMergeRaw) {
       forceMerge.add((String) o);

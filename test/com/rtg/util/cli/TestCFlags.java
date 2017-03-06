@@ -79,7 +79,7 @@ public final class TestCFlags {
     PDESC.add("STRING|FILE");
   }
 
-  private static void checkDescriptionConstraints(final Flag f) {
+  private static void checkDescriptionConstraints(final Flag<?> f) {
     // Most of these conventions are based on what is seen in standard Unix commands
     // and man pages
     final String desc = f.getDescription();
@@ -133,11 +133,11 @@ public final class TestCFlags {
     try {
       CheckSpelling.setSpelling(problems);
       final Set<String> cats = flags.getCategories() == null ? null : new HashSet<>(Arrays.asList(flags.getCategories()));
-      for (final Flag f : flags.getRequired()) {
+      for (final Flag<?> f : flags.getRequired()) {
         checkDescriptionConstraints(f);
         checkFlagCategory(cats, f);
       }
-      for (final Flag f : flags.getOptional()) {
+      for (final Flag<?> f : flags.getOptional()) {
         checkDescriptionConstraints(f);
         checkFlagCategory(cats, f);
       }
@@ -155,7 +155,7 @@ public final class TestCFlags {
     }
   }
 
-  private static void checkFlagCategory(Set<String> categories, Flag f) {
+  private static void checkFlagCategory(Set<String> categories, Flag<?> f) {
     if (categories != null) {
       Assert.assertTrue("--" + f.getName() + " has no category set but flags requires categories.", f.getCategory().length() > 0);
       Assert.assertTrue("--" + f.getName() + " has category " + f.getCategory() + " which is not within flag categories: " + categories, categories.contains(f.getCategory()));

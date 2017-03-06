@@ -158,7 +158,7 @@ public final class FormatCli extends LoggedCli {
     try {
       mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
-      final Flag formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, RESOURCE.getString("FORMAT_TYPE"), RESOURCE.getString("FORMAT_DESC"), RESOURCE.getString("FORMAT_FASTA")).setCategory(INPUT_OUTPUT);
+      final Flag<String> formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, RESOURCE.getString("FORMAT_TYPE"), RESOURCE.getString("FORMAT_DESC"), RESOURCE.getString("FORMAT_FASTA")).setCategory(INPUT_OUTPUT);
       String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT };
       if (License.isDeveloper()) {
         formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
@@ -171,20 +171,20 @@ public final class FormatCli extends LoggedCli {
       mFlags.registerOptional(TRIM_THRESHOLD_FLAG, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold").setCategory(FILTERING);
       mFlags.registerOptional(TRIM_END_FLAG, Integer.class, CommonFlags.INT, "trim the specified number of bases from read ends").setCategory(FILTERING);
 
-      final Flag inputListFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of input read files (1 per line)").setCategory(INPUT_OUTPUT);
+      final Flag<File> inputListFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of input read files (1 per line)").setCategory(INPUT_OUTPUT);
 
-      final Flag exFlag = mFlags.registerOptional(EXCLUDE_FLAG, String.class, RESOURCE.getString("STRING_TYPE"), RESOURCE.getString("EXCLUDE_DESC"));
+      final Flag<String> exFlag = mFlags.registerOptional(EXCLUDE_FLAG, String.class, RESOURCE.getString("STRING_TYPE"), RESOURCE.getString("EXCLUDE_DESC"));
       exFlag.setMinCount(0);
       exFlag.setMaxCount(Integer.MAX_VALUE);
       exFlag.setCategory(FILTERING);
-      final Flag leftFlag = mFlags.registerOptional('l', LEFT_FILE_FLAG, File.class, "FILE", "left input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
-      final Flag rightFlag = mFlags.registerOptional('r', RIGHT_FILE_FLAG, File.class, "FILE", "right input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
+      final Flag<File> leftFlag = mFlags.registerOptional('l', LEFT_FILE_FLAG, File.class, "FILE", "left input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
+      final Flag<File> rightFlag = mFlags.registerOptional('r', RIGHT_FILE_FLAG, File.class, "FILE", "right input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
       mFlags.registerOptional(NO_QUALITY, "do not include quality data in the SDF output").setCategory(UTILITY);
       mFlags.registerOptional(NO_NAMES, "do not include name data in the SDF output").setCategory(UTILITY);
       mFlags.registerOptional(COMPRESS_FLAG, Boolean.class, "BOOL", "compress sdf", Boolean.TRUE).setCategory(UTILITY);
       mFlags.registerOptional(DISABLE_DUPLICATE_DETECTOR, "disable checking for duplicate sequence names").setCategory(UTILITY);
       SamCommandHelper.initSamRg(mFlags, "ILLUMINA", UTILITY);
-      final Flag inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, RESOURCE.getString("INPUT_DESC"));
+      final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, RESOURCE.getString("INPUT_DESC"));
       inFlag.setMinCount(0);
       inFlag.setMaxCount(Integer.MAX_VALUE);
       inFlag.setCategory(INPUT_OUTPUT);

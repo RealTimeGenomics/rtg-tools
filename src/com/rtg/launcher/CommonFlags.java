@@ -411,7 +411,7 @@ public final class CommonFlags {
    * @param flags shared flags
    */
   public static void initQualityFormatFlag(CFlags flags) {
-    final Flag qualFormatFlag = flags.registerOptional('q', QUALITY_FLAG, String.class, "FORMAT", "quality data encoding method used in FASTQ input files (Illumina 1.8+ uses sanger)", SANGER_FORMAT).setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    final Flag<String> qualFormatFlag = flags.registerOptional('q', QUALITY_FLAG, String.class, "FORMAT", "quality data encoding method used in FASTQ input files (Illumina 1.8+ uses sanger)", SANGER_FORMAT).setCategory(CommonFlagCategories.INPUT_OUTPUT);
     qualFormatFlag.setParameterRange(QUALITY_FORMAT_OPTIONS);
   }
 

@@ -85,7 +85,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
 
     assertNotNull(flags.getFlag("unknowns"));
 
-    final Flag inFlag = flags.getAnonymousFlag(0);
+    final Flag<?> inFlag = flags.getAnonymousFlag(0);
     assertEquals(1, inFlag.getMinCount());
     assertEquals(Integer.MAX_VALUE, inFlag.getMaxCount());
 

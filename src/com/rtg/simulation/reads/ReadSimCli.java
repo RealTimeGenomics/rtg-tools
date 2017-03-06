@@ -178,8 +178,8 @@ public class ReadSimCli extends LoggedCli {
     mFlags.registerExtendedHelp();
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "name for reads output SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('t', INPUT, File.class, "SDF", "SDF containing input genome").setCategory(INPUT_OUTPUT);
-    final Flag covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, "float", "coverage, must be positive").setCategory(CAT_FRAGMENTS);
-    final Flag nFlag = mFlags.registerOptional('n', READS, Long.class, "int", "number of reads to be generated").setCategory(CAT_FRAGMENTS);
+    final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, "float", "coverage, must be positive").setCategory(CAT_FRAGMENTS);
+    final Flag<Long> nFlag = mFlags.registerOptional('n', READS, Long.class, "int", "number of reads to be generated").setCategory(CAT_FRAGMENTS);
 
     // Fragmenter
     mFlags.registerOptional('N', ALLOW_UNKNOWNS, "allow reads to be drawn from template fragments containing unknown nucleotides").setCategory(CAT_FRAGMENTS);
@@ -219,7 +219,7 @@ public class ReadSimCli extends LoggedCli {
     initIlluminaFlags();
     init454Flags();
     initIonFlags();
-    final Flag machType = mFlags.registerRequired(MACHINE_TYPE, String.class, "string", "select the sequencing technology to model").setCategory(INPUT_OUTPUT);
+    final Flag<String> machType = mFlags.registerRequired(MACHINE_TYPE, String.class, "string", "select the sequencing technology to model").setCategory(INPUT_OUTPUT);
     machType.setParameterRange(new String[]{MachineType.ILLUMINA_SE.name(), MachineType.ILLUMINA_PE.name(), MachineType.COMPLETE_GENOMICS.name(), MachineType.COMPLETE_GENOMICS_2.name(), MachineType.FOURFIVEFOUR_PE.name(), MachineType.FOURFIVEFOUR_SE.name(), MachineType.IONTORRENT.name()});
     mFlags.registerOptional('E', MACHINE_ERROR_PRIORS, String.class, "string", "selects the sequencer machine error settings. One of [default, illumina, ls454_se, ls454_pe, complete, completegenomics, iontorrent]").setCategory(UTILITY);
   }

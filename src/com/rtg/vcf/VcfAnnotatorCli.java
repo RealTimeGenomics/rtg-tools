@@ -136,7 +136,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
 
     private boolean checkFileList(CFlags flags, String flag) {
       if (flags.isSet(flag)) {
-        final Collection<Object> files = flags.getValues(flag);
+        final Collection<?> files = flags.getValues(flag);
         for (final Object f : files) {
           if (!CommonFlags.validateInputFile(flags, (File) f)) {
             return false;
@@ -148,7 +148,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   }
 
   private Collection<File> getFiles(String flag) {
-    final Collection<Object> inputFiles = mFlags.getValues(flag);
+    final Collection<?> inputFiles = mFlags.getValues(flag);
     return inputFiles.stream().map(file -> (File) file).collect(Collectors.toCollection(ArrayList::new));
   }
 

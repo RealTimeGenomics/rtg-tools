@@ -60,7 +60,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testIH() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerMaxHitsFlag(flags, 'x');
+    final Flag<Integer> f = SamFilterOptions.registerMaxHitsFlag(flags, 'x');
     assertNotNull(f);
     assertEquals(f, flags.getFlag(SamFilterOptions.MAX_HITS_FLAG));
     assertEquals(Character.valueOf('x'), f.getChar());
@@ -68,7 +68,7 @@ public class SamFilterOptionsTest extends TestCase {
     assertEquals("INT", f.getParameterDescription());
     assertTrue(f.getDescription().contains("alignment count"));
     final CFlags glags = new CFlags();
-    final Flag g = SamFilterOptions.registerMaxHitsFlag(glags, '\0');
+    final Flag<Integer> g = SamFilterOptions.registerMaxHitsFlag(glags, '\0');
     assertNotNull(g);
     assertEquals(g, glags.getFlag(SamFilterOptions.MAX_HITS_FLAG));
     assertNull(g.getChar());
@@ -79,7 +79,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testASMated() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerMaxASMatedFlag(flags, 'x');
+    final Flag<IntegerOrPercentage> f = SamFilterOptions.registerMaxASMatedFlag(flags, 'x');
     assertNotNull(f);
     assertEquals(f, flags.getFlag(SamFilterOptions.MAX_AS_MATED_FLAG));
     assertEquals(Character.valueOf('x'), f.getChar());
@@ -88,7 +88,7 @@ public class SamFilterOptionsTest extends TestCase {
     assertTrue(f.getDescription().contains("AS"));
     assertTrue(f.getDescription().contains("mated"));
     final CFlags glags = new CFlags();
-    final Flag g = SamFilterOptions.registerMaxASMatedFlag(glags, '\0');
+    final Flag<IntegerOrPercentage> g = SamFilterOptions.registerMaxASMatedFlag(glags, '\0');
     assertNotNull(g);
     assertEquals(g, glags.getFlag(SamFilterOptions.MAX_AS_MATED_FLAG));
     assertNull(g.getChar());
@@ -100,7 +100,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testASUnmated() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerMaxASUnmatedFlag(flags, 'x');
+    final Flag<IntegerOrPercentage> f = SamFilterOptions.registerMaxASUnmatedFlag(flags, 'x');
     assertNotNull(f);
     assertEquals(f, flags.getFlag(SamFilterOptions.MAX_AS_UNMATED_FLAG));
     assertEquals(Character.valueOf('x'), f.getChar());
@@ -109,7 +109,7 @@ public class SamFilterOptionsTest extends TestCase {
     assertTrue(f.getDescription().contains("AS"));
     assertTrue(f.getDescription().contains("unmated"));
     final CFlags glags = new CFlags();
-    final Flag g = SamFilterOptions.registerMaxASUnmatedFlag(glags, '\0');
+    final Flag<IntegerOrPercentage> g = SamFilterOptions.registerMaxASUnmatedFlag(glags, '\0');
     assertNotNull(g);
     assertEquals(g, glags.getFlag(SamFilterOptions.MAX_AS_UNMATED_FLAG));
     assertNull(g.getChar());
@@ -121,7 +121,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testExcludeMated() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerExcludeMatedFlag(flags);
+    final Flag<Boolean> f = SamFilterOptions.registerExcludeMatedFlag(flags);
     assertNotNull(f);
     assertEquals(f, flags.getFlag(SamFilterOptions.EXCLUDE_MATED_FLAG));
     assertNull(f.getParameterType());
@@ -131,7 +131,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testExcludeUnmated() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerExcludeUnmatedFlag(flags);
+    final Flag<Boolean> f = SamFilterOptions.registerExcludeUnmatedFlag(flags);
     assertNotNull(f);
     assertEquals(f, flags.getFlag(SamFilterOptions.EXCLUDE_UNMATED_FLAG));
     assertNull(f.getParameterType());
@@ -141,7 +141,7 @@ public class SamFilterOptionsTest extends TestCase {
 
   public void testRestriction() {
     final CFlags flags = new CFlags();
-    final Flag f = SamFilterOptions.registerRestrictionFlag(flags);
+    final Flag<String> f = SamFilterOptions.registerRestrictionFlag(flags);
     assertNotNull(f);
     assertEquals(f, flags.getFlag(CommonFlags.RESTRICTION_FLAG));
     assertEquals(String.class, f.getParameterType());

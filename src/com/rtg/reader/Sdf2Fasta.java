@@ -120,10 +120,10 @@ public class Sdf2Fasta extends AbstractCli {
   static void registerExtractorFlags(CFlags flags) {
     flags.registerRequired('i', INPUT, File.class, "SDF", "SDF containing sequences").setCategory(INPUT_OUTPUT);
     flags.registerOptional('n', NAMES_FLAG, "interpret supplied sequence as names instead of numeric ids").setCategory(FILTERING);
-    final Flag listFlag = flags.registerOptional('I', ID_FILE_FLAG, File.class, "FILE", "file containing sequence ids, or sequence names if --" + NAMES_FLAG + " flag is set, one per line").setCategory(FILTERING);
-    final Flag idFlag = flags.registerRequired(String.class, "STRING", "id of sequence to extract, or sequence name if --" + NAMES_FLAG + " flag is set").setMinCount(0).setMaxCount(Integer.MAX_VALUE).setCategory(FILTERING);
-    final Flag startFlag = flags.registerOptional(START_SEQUENCE, Long.class, "INT", "inclusive lower bound on sequence id").setCategory(FILTERING);
-    final Flag endFlag = flags.registerOptional(END_SEQUENCE, Long.class, "INT", "exclusive upper bound on sequence id").setCategory(FILTERING);
+    final Flag<File> listFlag = flags.registerOptional('I', ID_FILE_FLAG, File.class, "FILE", "file containing sequence ids, or sequence names if --" + NAMES_FLAG + " flag is set, one per line").setCategory(FILTERING);
+    final Flag<String> idFlag = flags.registerRequired(String.class, "STRING", "id of sequence to extract, or sequence name if --" + NAMES_FLAG + " flag is set").setMinCount(0).setMaxCount(Integer.MAX_VALUE).setCategory(FILTERING);
+    final Flag<Long> startFlag = flags.registerOptional(START_SEQUENCE, Long.class, "INT", "inclusive lower bound on sequence id").setCategory(FILTERING);
+    final Flag<Long> endFlag = flags.registerOptional(END_SEQUENCE, Long.class, "INT", "exclusive upper bound on sequence id").setCategory(FILTERING);
     flags.addRequiredSet(idFlag);
     flags.addRequiredSet(listFlag);
     flags.addRequiredSet(startFlag, endFlag);

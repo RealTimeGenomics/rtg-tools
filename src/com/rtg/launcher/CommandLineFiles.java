@@ -307,7 +307,7 @@ public class CommandLineFiles {
     final List<File> files = new ArrayList<>();
     mErrorCount = 0;
 
-    final Collection<Object> fValues;
+    final Collection<?> fValues;
     if (mSingleInputFlag == null) {
       fValues = flags.getAnonymousValues(0);
     } else {

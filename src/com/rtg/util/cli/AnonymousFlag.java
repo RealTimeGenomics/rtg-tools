@@ -89,7 +89,7 @@ public class AnonymousFlag<T> extends Flag<T> {
   @Override
   public int compareTo(final Flag<T> other) {
     if (other instanceof AnonymousFlag) {
-      return mFlagRank - ((AnonymousFlag) other).mFlagRank;
+      return mFlagRank - ((AnonymousFlag<?>) other).mFlagRank;
     }
     return 1;
   }

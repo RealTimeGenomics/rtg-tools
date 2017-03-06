@@ -52,7 +52,7 @@ public class GlobalFlagsTest extends TestCase {
   static final Integer TEST_DEFAULT = 20;
 
   static class TestGlobalFlags extends GlobalFlagsInitializer {
-    TestGlobalFlags(List<Flag> flags) {
+    TestGlobalFlags(List<Flag<?>> flags) {
       super(flags);
     }
 

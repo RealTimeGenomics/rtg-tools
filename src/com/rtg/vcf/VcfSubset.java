@@ -177,7 +177,7 @@ public class VcfSubset extends AbstractCli {
         return annotator;
       } else {
         if (mFlags.isSet(removeFlag) || mFlags.isSet(keepFlag)) {
-          final List<Object> infoslist;
+          final List<?> infoslist;
           final boolean keep;
           if (mFlags.isSet(removeFlag)) {
             infoslist = mFlags.getValues(removeFlag);

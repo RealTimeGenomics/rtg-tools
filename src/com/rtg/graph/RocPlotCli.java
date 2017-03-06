@@ -76,15 +76,19 @@ public class RocPlotCli extends AbstractCli {
   static final String PNG_EXTENSION = ".png";
   static final String SVG_EXTENSION = ".svg";
 
+  private Flag<String> mCurveFlag;
+  private Flag<File> mFileFlag;
+
   private static class FlagValidator implements Validator {
     @Override
+    @SuppressWarnings("unchecked")
     public boolean isValid(CFlags flags) {
       if (!(flags.getAnonymousValues(0).size() > 0 || flags.isSet(CURVE_FLAG))) {
         flags.setParseMessage("Must supply at least 1 ROC file");
         return false;
       }
       if (flags.isSet(CURVE_FLAG)) {
-        for (Pair<File, String> filepair : parseNamedFileStrings(flags.getValues(CURVE_FLAG))) {
+        for (Pair<File, String> filepair : parseNamedFileStrings(((Flag<String>) flags.getFlag(CURVE_FLAG)).getValues())) {
           if (!CommonFlags.validateInputFile(flags, filepair.getA())) {
             return false;
           }
@@ -118,7 +122,7 @@ public class RocPlotCli extends AbstractCli {
     initFlags(mFlags);
   }
 
-  static void initFlags(CFlags flags) {
+  private void initFlags(CFlags flags) {
     CommonFlagCategories.setCategories(flags);
     flags.setDescription("Plot ROC curves from vcfeval ROC data files, either to an image, or an interactive GUI.");
     flags.registerExtendedHelp();
@@ -130,14 +134,14 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class , "INT", "sets the plot line width", 2).setCategory(REPORTING);
     flags.registerOptional(PNG_FLAG, File.class , "FILE", "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
     flags.registerOptional(SVG_FLAG, File.class , "FILE", "if set, output a SVG image to the given file").setCategory(INPUT_OUTPUT);
-    final Flag curveFlag = flags.registerOptional(CURVE_FLAG, String.class, "STRING", "ROC data file with title optionally specified (path[=title])").setCategory(INPUT_OUTPUT);
-    curveFlag.setMinCount(0);
-    curveFlag.setMaxCount(Integer.MAX_VALUE);
-    final Flag fileFlag = flags.registerRequired(File.class, "FILE", "ROC data file").setCategory(INPUT_OUTPUT);
-    fileFlag.setMinCount(0);
-    fileFlag.setMaxCount(Integer.MAX_VALUE);
-    flags.addRequiredSet(fileFlag);
-    flags.addRequiredSet(curveFlag);
+    mCurveFlag = flags.registerOptional(CURVE_FLAG, String.class, "STRING", "ROC data file with title optionally specified (path[=title])").setCategory(INPUT_OUTPUT);
+    mCurveFlag.setMinCount(0);
+    mCurveFlag.setMaxCount(Integer.MAX_VALUE);
+    mFileFlag = flags.registerRequired(File.class, "FILE", "ROC data file").setCategory(INPUT_OUTPUT);
+    mFileFlag.setMinCount(0);
+    mFileFlag.setMaxCount(Integer.MAX_VALUE);
+    flags.addRequiredSet(mFileFlag);
+    flags.addRequiredSet(mCurveFlag);
     flags.setValidator(new FlagValidator());
   }
 
@@ -160,7 +164,7 @@ public class RocPlotCli extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final ArrayList<File> fileList = new ArrayList<>();
     final ArrayList<String> nameList = new ArrayList<>();
-    extractNamedFiles(mFlags.getFlag(CURVE_FLAG), mFlags.getAnonymousFlag(0), fileList, nameList);
+    extractNamedFiles(mCurveFlag, mFileFlag, fileList, nameList);
 
     final BufferedWriter outWriter = new BufferedWriter(new OutputStreamWriter(out));
     try {
@@ -202,7 +206,7 @@ public class RocPlotCli extends AbstractCli {
     }
   }
 
-  static List<Pair<File, String>> parseNamedFileStrings(List<Object> curveStrings) {
+  static List<Pair<File, String>> parseNamedFileStrings(List<String> curveStrings) {
     final ArrayList<Pair<File, String>> ret = new ArrayList<>();
     for (final Object o : curveStrings) {
       final String curveString = (String) o;
@@ -232,14 +236,13 @@ public class RocPlotCli extends AbstractCli {
     return pngFile;
   }
 
-  private static void extractNamedFiles(Flag curveFlag, Flag fileFlag, ArrayList<File> fileList, ArrayList<String> nameList) {
+  private static void extractNamedFiles(Flag<String> curveFlag, Flag<File> fileFlag, ArrayList<File> fileList, ArrayList<String> nameList) {
     final List<Pair<File, String>> curveList = parseNamedFileStrings(curveFlag.getValues());
     for (Pair<File, String> filenamepair : curveList) {
       fileList.add(filenamepair.getA());
       nameList.add(filenamepair.getB());
     }
-    for (final Object o : fileFlag.getValues()) {
-      final File file = (File) o;
+    for (final File file : fileFlag.getValues()) {
       fileList.add(file);
       nameList.add("");
     }

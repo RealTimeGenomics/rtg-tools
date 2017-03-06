@@ -61,7 +61,7 @@ public final class SamFilterOptions {
    * @param singleLetter single letter code for option, or 0 for no single letter option
    * @return the flag
    */
-  public static Flag registerMaxHitsFlag(final CFlags flags, final char singleLetter) {
+  public static Flag<Integer> registerMaxHitsFlag(final CFlags flags, final char singleLetter) {
     if (singleLetter != NO_SINGLE_LETTER) {
       return flags.registerOptional(singleLetter, MAX_HITS_FLAG, Integer.class, "int", HITS_DESC).setCategory(SENSITIVITY_TUNING);
     } else {
@@ -96,7 +96,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerMinMapQFlag(final CFlags flags) {
+  public static Flag<Integer> registerMinMapQFlag(final CFlags flags) {
     return flags.registerOptional(MIN_MAPQ_FLAG, Integer.class, "int", MAPQ_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -111,7 +111,7 @@ public final class SamFilterOptions {
    * @param singleLetter single letter code for option, or 0 for no single letter option
    * @return the flag
    */
-  public static Flag registerMaxASMatedFlag(final CFlags flags, final char singleLetter) {
+  public static Flag<IntegerOrPercentage> registerMaxASMatedFlag(final CFlags flags, final char singleLetter) {
     if (singleLetter != NO_SINGLE_LETTER) {
       return flags.registerOptional(singleLetter, MAX_AS_MATED_FLAG, IntegerOrPercentage.class, CommonFlags.INT, AS_MATED_DESC).setCategory(SENSITIVITY_TUNING);
     } else {
@@ -130,7 +130,7 @@ public final class SamFilterOptions {
    * @param singleLetter single letter code for option, or 0 for no single letter option
    * @return the flag
    */
-  public static Flag registerMaxASUnmatedFlag(final CFlags flags, final char singleLetter) {
+  public static Flag<IntegerOrPercentage> registerMaxASUnmatedFlag(final CFlags flags, final char singleLetter) {
     if (singleLetter != NO_SINGLE_LETTER) {
       return flags.registerOptional(singleLetter, MAX_AS_UNMATED_FLAG, IntegerOrPercentage.class, CommonFlags.INT, AS_UNMATED_DESC).setCategory(SENSITIVITY_TUNING);
     } else {
@@ -149,7 +149,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerExcludeMatedFlag(final CFlags flags) {
+  public static Flag<Boolean> registerExcludeMatedFlag(final CFlags flags) {
     return flags.registerOptional(EXCLUDE_MATED_FLAG, EXCLUDE_MATED_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -164,7 +164,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerExcludeUnmatedFlag(final CFlags flags) {
+  public static Flag<Boolean> registerExcludeUnmatedFlag(final CFlags flags) {
     return flags.registerOptional(EXCLUDE_UNMATED_FLAG, EXCLUDE_UNMATED_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -179,7 +179,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerExcludeUnmappedFlag(final CFlags flags) {
+  public static Flag<Boolean> registerExcludeUnmappedFlag(final CFlags flags) {
     return flags.registerOptional(EXCLUDE_UNMAPPED_FLAG, EXCLUDE_UNMAPPED_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -194,7 +194,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerExcludeUnplacedFlag(final CFlags flags) {
+  public static Flag<Boolean> registerExcludeUnplacedFlag(final CFlags flags) {
     return flags.registerOptional(EXCLUDE_UNPLACED_FLAG, EXCLUDE_UNPLACED_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -209,7 +209,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerExcludeDuplicatesFlag(final CFlags flags) {
+  public static Flag<Boolean> registerExcludeDuplicatesFlag(final CFlags flags) {
     return flags.registerOptional(EXCLUDE_DUPLICATES_FLAG, EXCLUDE_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -224,7 +224,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerKeepDuplicatesFlag(final CFlags flags) {
+  public static Flag<Boolean> registerKeepDuplicatesFlag(final CFlags flags) {
     return flags.registerOptional(KEEP_DUPLICATES_FLAG, KEEP_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
@@ -236,7 +236,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerRestrictionFlag(final CFlags flags) {
+  public static Flag<String> registerRestrictionFlag(final CFlags flags) {
     return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
   }
 
@@ -246,7 +246,7 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    * @return the flag
    */
-  public static Flag registerBedRestrictionFlag(final CFlags flags) {
+  public static Flag<File> registerBedRestrictionFlag(final CFlags flags) {
     return flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "FILE", "if set, only read SAM records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
   }
 

@@ -106,12 +106,12 @@ public class IndexerCli extends AbstractCli {
     CommonFlagCategories.setCategories(flags);
     flags.setValidator(new IndexerValidator());
     flags.registerOptional(CommonFlags.FORCE, "If the file isn't block compressed then perform this step as well").setCategory(CommonFlagCategories.UTILITY);
-    final Flag inFlag = flags.registerRequired(File.class, "FILE", "block compressed files containing data to be indexed");
+    final Flag<File> inFlag = flags.registerRequired(File.class, "FILE", "block compressed files containing data to be indexed");
     inFlag.setCategory(CommonFlagCategories.INPUT_OUTPUT);
     inFlag.setMinCount(0);
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setPsuedoMinMaxRangeString(0, Integer.MAX_VALUE);
-    final Flag listFlag = flags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of block compressed files (1 per line) containing genome position data").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    final Flag<File> listFlag = flags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of block compressed files (1 per line) containing genome position data").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerOptional('f', INPUT_FORMAT, IndexFormat.class, "FORMAT", "format of input to index", IndexFormat.AUTO).setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.addRequiredSet(inFlag);
     flags.addRequiredSet(listFlag);

@@ -67,7 +67,7 @@ public class FlagValueTest extends TestCase {
     final FlagValue<Double> v = new FlagValue<>(f, 55.000256);
     assertEquals(55.000256, v.getValue());
     assertEquals("double=55.000256", v.toString());
-    final Flag n = v.getFlag();
+    final Flag<?> n = v.getFlag();
     assertEquals(f.isSet(), n.isSet());
     assertEquals(f.getCount(), n.getCount());
     assertEquals(f.getDescription(), n.getDescription());

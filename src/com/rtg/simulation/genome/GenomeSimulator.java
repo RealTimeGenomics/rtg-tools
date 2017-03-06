@@ -88,10 +88,10 @@ public class GenomeSimulator extends LoggedCli {
 
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "output SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('s', SEED, Integer.class, "int", "seed for random number generator").setCategory(UTILITY);
-    final Flag numContigs = mFlags.registerOptional('n', NUM_CONTIGS, Integer.class, "int", "number of sequences to generate").setCategory(UTILITY);
-    final Flag maxLength = mFlags.registerOptional(MAX_LENGTH, Integer.class, "int", "maximum sequence length").setCategory(UTILITY);
-    final Flag minLength = mFlags.registerOptional(MIN_LENGTH, Integer.class, "int", "minimum sequence length").setCategory(UTILITY);
-    final Flag lFlag = mFlags.registerOptional('l', LENGTH, Integer.class, "int", "length of generated sequence");
+    final Flag<Integer> numContigs = mFlags.registerOptional('n', NUM_CONTIGS, Integer.class, "int", "number of sequences to generate").setCategory(UTILITY);
+    final Flag<Integer> maxLength = mFlags.registerOptional(MAX_LENGTH, Integer.class, "int", "maximum sequence length").setCategory(UTILITY);
+    final Flag<Integer> minLength = mFlags.registerOptional(MIN_LENGTH, Integer.class, "int", "minimum sequence length").setCategory(UTILITY);
+    final Flag<Integer> lFlag = mFlags.registerOptional('l', LENGTH, Integer.class, "int", "length of generated sequence");
     lFlag.setMaxCount(Integer.MAX_VALUE).enableCsv();
     lFlag.setCategory(UTILITY);
     mFlags.registerOptional(FREQUENCY, String.class, "string", "relative frequencies of A,C,G,T in the generated sequence", "1,1,1,1").setCategory(UTILITY);
@@ -127,7 +127,7 @@ public class GenomeSimulator extends LoggedCli {
           cflags.setParseMessage("Must either specify explicit sequence length OR number of sequences plus minimum and maximum lengths.");
           return false;
         }
-        final Collection<Object> lengths = cflags.getValues(LENGTH);
+        final Collection<?> lengths = cflags.getValues(LENGTH);
         for (Object obj : lengths) {
           final int length = (Integer) obj;
           if (length <= 0) {

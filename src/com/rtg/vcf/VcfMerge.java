@@ -111,7 +111,7 @@ public class VcfMerge extends AbstractCli {
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('F', FORCE_MERGE_ALL, "attempt merging of all non-matching header declarations").setCategory(UTILITY);
-    final Flag forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
+    final Flag<String> forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(PRESERVE_FORMATS, "if set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
@@ -153,7 +153,7 @@ public class VcfMerge extends AbstractCli {
     if (mFlags.isSet(FORCE_MERGE_ALL)) {
       forceMerge = null;
     } else {
-      final List<Object> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
+      final List<?> forceMergeRaw = mFlags.getValues(FORCE_MERGE);
       forceMerge = new HashSet<>();
       for (final Object o : forceMergeRaw) {
         forceMerge.add((String) o);

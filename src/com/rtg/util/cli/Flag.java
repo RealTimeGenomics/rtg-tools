@@ -578,9 +578,8 @@ public class Flag<T> implements Comparable<Flag<T>> {
     return Flag.instanceHelper(mParameterType, valueStr);
   }
 
-  @Override
-  public boolean equals(final Object other) {
-    return other instanceof Flag && getName().equals(((Flag<T>) other).getName());
+  public boolean equals(final Flag<T> other) {
+    return getName().equals(other.getName());
   }
 
   @Override

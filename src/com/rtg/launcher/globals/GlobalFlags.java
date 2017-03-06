@@ -77,7 +77,7 @@ public final class GlobalFlags {
   private static final Set<String> ACCESSED_FLAGS = new HashSet<>();
   /** Category for global flags */
   public static final String CATEGORY = "Highly Experimental";
-  private static final ArrayList<Flag> FLAGS = new ArrayList<>();
+  private static final ArrayList<Flag<?>> FLAGS = new ArrayList<>();
 
   private static final CFlags DEFAULT_FLAGS = new CFlags();
   static { //this ensures default values are available in tests and classes which don't use <code>CLI</code> framework
@@ -106,7 +106,7 @@ public final class GlobalFlags {
       copy[copy.length - 1] = CATEGORY;
       flags.setCategories(flags.getHelpCategory(), copy);
     }
-    for (final Flag flag : FLAGS) {
+    for (final Flag<?> flag : FLAGS) {
       flags.register(flag);
     }
     sFlags = flags;
@@ -116,7 +116,7 @@ public final class GlobalFlags {
    * @param name name of flag (without <code>XX</code> prefix)
    * @return flag object
    */
-  public static Flag getFlag(String name) {
+  public static Flag<?> getFlag(String name) {
     final String innerName = "XX" + name;
     ACCESSED_FLAGS.add(innerName);
     return sFlags.getFlag(innerName);
@@ -188,7 +188,7 @@ public final class GlobalFlags {
    * @return true iff all set flags were also accessed since registration
    */
   public static boolean finalAccessCheck() {
-    for (final Flag f : FLAGS) {
+    for (final Flag<?> f : FLAGS) {
       if (f.isSet() && !ACCESSED_FLAGS.contains(f.getName())) {
         Diagnostic.warning("Flag: --" + f.getName() + " is set but never accessed.");
         resetAccessedStatus();

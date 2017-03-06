@@ -95,7 +95,7 @@ public class VcfStatsCli extends AbstractCli {
   private static final class FlagValidator implements Validator {
     @Override
     public boolean isValid(CFlags flags) {
-      final List<Object> files = flags.getAnonymousValues(0);
+      final List<?> files = flags.getAnonymousValues(0);
       if (files.size() > 1) {
         for (Object file : files) {
           if (FileUtils.isStdio((File) file)) {
@@ -111,7 +111,7 @@ public class VcfStatsCli extends AbstractCli {
   @Override
   protected int mainExec(final OutputStream out, final PrintStream err) throws IOException {
     final List<File> inputs;
-    final List<Object> files = mFlags.getAnonymousValues(0);
+    final List<?> files = mFlags.getAnonymousValues(0);
     // Kludge to let '-' as a single filename through the file checking to make std in possible
     if (files.size() == 1 && FileUtils.isStdio((File) files.get(0))) {
       inputs = new ArrayList<>();

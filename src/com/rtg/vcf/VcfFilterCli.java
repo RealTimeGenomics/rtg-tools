@@ -154,7 +154,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
 
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    final Flag output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    final Flag<File> output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
@@ -215,10 +215,10 @@ public final class VcfFilterCli extends AbstractCli {
     // Xflags
     mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, FLOAT, "minimum allowed posterior score").setCategory(FILTERING);
     mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, FLOAT, "maximum allowed posterior score").setCategory(FILTERING);
-    final Flag expr = mFlags.registerOptional(EXPR_FLAG, String.class, STRING, "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
+    final Flag<String> expr = mFlags.registerOptional(EXPR_FLAG, String.class, STRING, "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
     expr.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, STRING, "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
-    final Flag javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, STRING, "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
+    final Flag<String> javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, STRING, "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
     javascript.setCategory(FILTERING);
     javascript.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);

@@ -74,7 +74,7 @@ public class CommonFlagsTest extends TestCase {
         }
         final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
         flags.registerOptional(listFlag, File.class, "FILE", "files");
-        final Flag reads = flags.registerRequired(File.class, "File", "input sam files");
+        final Flag<File> reads = flags.registerRequired(File.class, "File", "input sam files");
         reads.setMinCount(0);
         reads.setMaxCount(4000);
         final String[] args = new String[files.length];
@@ -163,7 +163,7 @@ public class CommonFlagsTest extends TestCase {
   public void testCheckFile() throws IOException {
     try (TestDirectory dir = new TestDirectory("commonflags")) {
       final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
-      final Flag inFlag = flags.registerRequired(File.class, "FILE", "");
+      final Flag<File> inFlag = flags.registerRequired(File.class, "FILE", "");
       inFlag.setMinCount(0);
       inFlag.setMaxCount(Integer.MAX_VALUE);
       flags.registerOptional("input", File.class, "FILE", "i");

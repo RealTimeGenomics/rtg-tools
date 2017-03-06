@@ -42,9 +42,9 @@ import com.rtg.util.cli.Flag;
 @TestClass("com.rtg.launcher.globals.GlobalFlagsTest")
 public abstract class GlobalFlagsInitializer {
 
-  private final List<Flag> mFlags;
+  private final List<Flag<?>> mFlags;
 
-  GlobalFlagsInitializer(List<Flag> flags) {
+  GlobalFlagsInitializer(List<Flag<?>> flags) {
     mFlags = flags;
   }
 
@@ -61,6 +61,6 @@ public abstract class GlobalFlagsInitializer {
     if (type != null && def == null) {
       throw new IllegalArgumentException("Default value must be non-null for experimental flags with a type");
     }
-    mFlags.add(new Flag(null, "XX" + name, "", 0, 1, type, type == null ? "" : type.getSimpleName(), def, CATEGORY));
+    mFlags.add(new Flag<>(null, "XX" + name, "", 0, 1, type, type == null ? "" : type.getSimpleName(), def, CATEGORY));
   }
 }
