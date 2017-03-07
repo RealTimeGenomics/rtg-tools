@@ -177,8 +177,6 @@ public final class CFlags {
   private final Appendable mErr;
   /** Where output is written */
   private final Appendable mOut;
-  /** Custom text to tack on to the usage header. */
-  private String mRemainderHeaderString = "";
   /** Typically a description of what the program does. */
   private String mProgramDescription = "";
   /** The name of the program accepting flags. */
@@ -224,6 +222,7 @@ public final class CFlags {
     mAnonymousFlags = new ArrayList<>();
     mRegisteredFlags = new TreeSet<>();
     mRequiredSets = new ArrayList<>();
+    mRequiredSets.add(new TreeSet<>());
     mLongNames = new TreeMap<>();
     mShortNames = new TreeMap<>();
     registerOptional('h', HELP_FLAG, "print help on command-line flag usage");
@@ -569,14 +568,6 @@ public final class CFlags {
   }
 
   /**
-   * Sets the header text giving usage regarding standard input and output.
-   * @param usageString a short description to append to the header text.
-   */
-  public void setRemainderHeader(final String usageString) {
-    mRemainderHeaderString = usageString;
-  }
-
-  /**
    * Adds a set of optional flags to the usage header. Should be called for each set of optional required flags
    * i.e. flag <code>-f</code> is a required flag and also one of optional flags <code>-i</code> and
    * <code>-I</code> are required to have valid arguments so you would call this method once with <code>-i</code>
@@ -584,6 +575,9 @@ public final class CFlags {
    * @param set flags to be added to usage header
    */
   public void addRequiredSet(Flag<?>... set) {
+    if (mRequiredSets.size() == 1 && mRequiredSets.get(0).size() == 0) {
+      mRequiredSets.clear();
+    }
     final TreeSet<Flag<?>> tset = new TreeSet<>();
     Collections.addAll(tset, set);
     mRequiredSets.add(tset);
@@ -1153,16 +1147,6 @@ public final class CFlags {
       ret.append(' ');
       ret.setWrapIndent();
       appendCompactFlagUsage(ret);
-      if (!mRemainderHeaderString.equals("")) {
-        ret.append(' ');
-        final String[] splitRemainderHeaderString = mRemainderHeaderString.split(LS);
-        for (int i = 0; i < splitRemainderHeaderString.length; ++i) {
-          ret.wrapText(splitRemainderHeaderString[i]);
-          if (i != splitRemainderHeaderString.length - 1) {
-            ret.wrap();
-          }
-        }
-      }
       ret.append(LS);
       return ret.toString();
     }
@@ -1181,9 +1165,6 @@ public final class CFlags {
   }
 
   private void appendCompactFlagUsage(final WrappingStringBuilder wb) {
-    if (mRequiredSets.size() == 0) {
-      mRequiredSets.add(new TreeSet<>());
-    }
     boolean first = true;
     for (final SortedSet<Flag<?>> ops : mRequiredSets) {
       if (!first) {
@@ -1228,7 +1209,7 @@ public final class CFlags {
    * Program description is omitted.
    */
   public String getUsageString() {
-    return getUsageString(DEFAULT_WIDTH);
+    return Boolean.getBoolean(TABLE_USAGE) ? getTableUsageString(DEFAULT_WIDTH) : getUsageString(DEFAULT_WIDTH);
   }
 
   /**
@@ -1246,7 +1227,7 @@ public final class CFlags {
    * @param width width of output
    * @return usage wrapped to given width
    */
-  public String getUsageString(final int width) {
+  private String getUsageString(final int width) {
     final WrappingStringBuilder usage = new WrappingStringBuilder();
     usage.setWrapWidth(width);
     appendUsageHeader(usage);
@@ -1268,7 +1249,7 @@ public final class CFlags {
    * @param level the level of extended help that should be output
    * @return usage wrapped to given width
    */
-  public String getExtendedUsageString(final int width, Flag.Level level) {
+  private String getExtendedUsageString(final int width, Flag.Level level) {
     final WrappingStringBuilder usage = new WrappingStringBuilder();
     usage.setWrapWidth(width);
     appendUsageHeader(usage);
@@ -1291,18 +1272,13 @@ public final class CFlags {
   }
 
   private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
-    if (Boolean.getBoolean(TABLE_USAGE)) {
-      wb.setWrapWidth(0);
-      wb.append(getTableUsage(level));
-      return;
-    }
     // Get longest string lengths for use below in pretty-printing.
     //final int[] counts = new int[mCategories.length];
     final int longestUsageLength = getUsageLength(level);
 
     // We do all the required flags first
-    for (final String mCategorie : mCategories) {
-      final List<Flag<?>> flags = getFlagFromType(mCategorie);
+    for (final String category : mCategories) {
+      final List<Flag<?>> flags = getFlagFromType(category);
       final Iterator<Flag<?>> flagItr = flags.iterator();
       int flagsCount = 0;
       while (flagItr.hasNext()) {
@@ -1313,7 +1289,7 @@ public final class CFlags {
       }
       if (flagsCount > 0) {
         wb.append(LS);
-        wb.append(mCategorie).append(LS);
+        wb.append(category).append(LS);
         wb.setWrapIndent(longestUsageLength + 7);
         for (final Flag<?> flag : flags) {
           flag.appendLongFlagUsage(wb, longestUsageLength, level);
@@ -1322,7 +1298,39 @@ public final class CFlags {
     }
   }
 
-  private String getTableUsage(Flag.Level level) {
+  // Gets something resembling reStructuredText
+  private String getTableUsageString(int width) {
+    final WrappingStringBuilder wb = new WrappingStringBuilder();
+    wb.setWrapWidth(width);
+    final Flag.Level level = Flag.Level.DEFAULT;
+    if (mProgramName != null) {
+      wb.append(mProgramName).append(LS);
+      wb.append(StringUtils.repeat("~", mProgramName.length())).append(LS).append(LS);
+      if (!mProgramDescription.equals("")) {
+        wb.append("**Synopsis:**").append(LS).append(LS);
+        wb.wrapTextWithNewLines(mProgramDescription).append(LS);
+      }
+      wb.append("**Syntax:**").append(LS).append(LS);
+      for (final SortedSet<Flag<?>> ops : mRequiredSets) {
+        wb.append(".. code-block:: text").append(LS).append(LS);
+        wb.append("  $ ");
+        wb.setWrapIndent();
+        wb.setWrapSuffix(" \\");
+        wb.append(mProgramName).append(' ');
+        appendCompactFlagUsage(wb, ops);
+        wb.append(LS).append(LS);
+      }
+      wb.setWrapSuffix("");
+      wb.setWrapIndent(0);
+    }
+    wb.append(getTableFlagUsage(level));
+    wb.append("**Usage:**").append(LS).append(LS);
+    wb.append(".. seealso::").append(LS).append(LS);
+    return wb.toString();
+  }
+
+
+  private String getTableFlagUsage(Flag.Level level) {
     final int usageLength = getUsageLength(level);
 
     //layout:
@@ -1332,6 +1340,7 @@ public final class CFlags {
     //| ``-x`` | ``--usage=VAL`` | longer description |
     //+--------+-----------------+--------------------+
     final StringBuilder sb = new StringBuilder();
+    sb.append("**Parameters:**").append(LS).append(LS);
     for (final String category : mCategories) {
       final int descriptionLength = getUsageDescriptionLength(level, category);
 
@@ -1343,15 +1352,18 @@ public final class CFlags {
         for (Flag<?> flag : flags) {
           if (displayFlag(flag, level)) {
             final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
+            final String desc = flag.getUsageDescription().length() <= 1
+              ? flag.getUsageDescription()
+              : Character.toTitleCase(flag.getUsageDescription().charAt(0)) + flag.getUsageDescription().substring(1);
             table.addRow(
               shortFlag,
               "``" + flag.getFlagUsage() + "``",
-              flag.getUsageDescription()
+              desc
             );
           }
         }
-        sb.append(StringUtils.LS);
-        sb.append(table.getText());
+        sb.append(".. tabularcolumns:: |l|l|L|").append(LS).append(LS);
+        sb.append(table.getText()).append(LS);
       }
     }
     return sb.toString();

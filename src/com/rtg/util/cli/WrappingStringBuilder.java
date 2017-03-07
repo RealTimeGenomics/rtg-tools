@@ -39,6 +39,7 @@ import com.rtg.util.StringUtils;
 public class WrappingStringBuilder {
 
   private final StringBuilder mSB = new StringBuilder();
+  private String mSuffix = "";
   private String mPrefix = "";
   private int mWrapWidth = 0;
   private int mLineStart = 0;
@@ -104,6 +105,14 @@ public class WrappingStringBuilder {
   }
 
   /**
+   * Sets a particular string to be used to terminate any wrapped lines
+   * @param suffix the wrap suffix
+   */
+  public void setWrapSuffix(final String suffix) {
+    mSuffix = suffix;
+  }
+
+  /**
    * Appends a character without implicit wrapping.
    *
    * @param c char to append
@@ -158,6 +167,7 @@ public class WrappingStringBuilder {
    * Add a newline character and then prefix spacing
    */
   public void wrap() {
+    append(mSuffix);
     append(StringUtils.LS);
     append(mPrefix);
   }
@@ -178,7 +188,7 @@ public class WrappingStringBuilder {
       append(s);
       return this;
     }
-    final int available = mWrapWidth - lineLength();
+    final int available = mWrapWidth - lineLength() - mSuffix.length();
     if (s.length() >= available) {
       if (lineLength() != mPrefix.length()) {
         wrap();

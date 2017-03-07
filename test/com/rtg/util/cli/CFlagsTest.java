@@ -304,8 +304,7 @@ public class CFlagsTest extends TestCase {
     assertEquals("", mFlags.getParseMessage());
     mFlags.setDescription("flunky test");
     mFlags.setName("dogbreath");
-    mFlags.setRemainderHeader("%%");
-    TestUtils.containsAll(mFlags.getUsageString(), "Usage: dogbreath [OPTION]... --zz HIX -j HIZ HI %%" + LS + LS
+    TestUtils.containsAll(mFlags.getUsageString(), "Usage: dogbreath [OPTION]... --zz HIX -j HIZ HI" + LS + LS
         + "flunky test" + LS + LS
         + "Required flags: " + LS + "      --zz=HIX          therex" + LS
         + "  -j, --zzz=HIZ         therez" + LS + "      HI                there" + LS + LS
