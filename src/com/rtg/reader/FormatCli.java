@@ -137,7 +137,7 @@ public final class FormatCli extends LoggedCli {
   private static final String COMPRESS_FLAG = "Xcompress";
   private static final String DISABLE_DUPLICATE_DETECTOR = "allow-duplicate-names";
   private static final String TRIM_THRESHOLD_FLAG = "trim-threshold";
-  private static final String TRIM_END_FLAG = "trim-end-bases";
+  private static final String TRIM_END_FLAG = "Xtrim-end-bases";
   private static final String SELECT_READ_GROUP = "select-read-group";
 
   @Override
