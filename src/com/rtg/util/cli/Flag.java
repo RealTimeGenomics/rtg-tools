@@ -558,7 +558,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
         mParameter.add(value);
         values.add(value);
       }
-      return new FlagValue<T>(this, values);
+      return new FlagValue<>(this, values);
     } else {
       final T value = parseValue(valueStr);
       mParameter.add(value);
@@ -578,8 +578,9 @@ public class Flag<T> implements Comparable<Flag<T>> {
     return Flag.instanceHelper(mParameterType, valueStr);
   }
 
-  public boolean equals(final Flag<T> other) {
-    return getName().equals(other.getName());
+  @Override
+  public boolean equals(final Object other) {
+    return other instanceof Flag && getName().equals(((Flag<?>) other).getName());
   }
 
   @Override
