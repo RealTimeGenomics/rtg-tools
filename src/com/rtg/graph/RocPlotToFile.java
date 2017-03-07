@@ -39,7 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.reeltwo.plot.Graph2D;
+import com.reeltwo.plot.Box2D;
 import com.reeltwo.plot.renderer.GraphicsRenderer;
 import com.reeltwo.plot.ui.ImageWriter;
 import com.rtg.util.io.FileUtils;
@@ -62,7 +62,7 @@ public final class RocPlotToFile {
     PNG
   }
 
-  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type, boolean precisionRecall) throws IOException {
+  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type, boolean precisionRecall, Box2D initialZoom) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>();
     for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
@@ -77,11 +77,14 @@ public final class RocPlotToFile {
 
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
-    final Graph2D graph;
+    final RocPlot.ExternalZoomGraph2D graph;
     if (precisionRecall) {
       graph = new RocPlot.PrecisionRecallGraph2D(paths, lineWidth, scores, data, title != null ? title : "Precision/Recall");
     } else {
       graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
+    }
+    if (initialZoom != null) {
+      graph.setZoom(initialZoom);
     }
     if (type == SVG) {
       try (final FileOutputStream os = new FileOutputStream(pngFile)) {

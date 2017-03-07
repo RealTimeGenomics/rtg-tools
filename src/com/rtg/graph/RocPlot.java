@@ -80,6 +80,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
+import com.reeltwo.plot.Box2D;
 import com.reeltwo.plot.Graph2D;
 import com.reeltwo.plot.KeyPosition;
 import com.reeltwo.plot.Plot2D;
@@ -410,6 +411,12 @@ public class RocPlot {
     if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
       sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
     }
+    if (mZoomPP.isZoomed()) {
+      final ExternalZoomGraph2D graph = (ExternalZoomGraph2D) mZoomPP.getGraph();
+      if (graph != null) {
+        sb.append(" --").append(RocPlotCli.ZOOM_FLAG).append(' ').append(graph.getZoomString());
+      }
+    }
     for (final Component component : mRocLinesPanel.getComponents()) {
       final RocLinePanel cp = (RocLinePanel) component;
       if (cp.isSelected()) {
@@ -446,10 +453,39 @@ public class RocPlot {
     void setCrossHair(Point2D p) {
       mCrosshair = p;
     }
+
+    public void setZoom(Box2D zoom) {
+      final ExternalZoomGraph2D graph = (ExternalZoomGraph2D) getGraph();
+      if (graph != null) {
+        graph.setZoom(zoom);
+      }
+    }
+  }
+
+  abstract static class ExternalZoomGraph2D extends Graph2D {
+    void setZoom(Box2D zoom) {
+      if (uses(Graph2D.Y, Graph2D.TWO)) { // Update alternate axis before setting new range on the primary
+        final Mapping m = new Mapping(getLo(Graph2D.Y, Graph2D.ONE), getHi(Graph2D.Y, Graph2D.ONE), getLo(Graph2D.Y, Graph2D.TWO), getHi(Graph2D.Y, Graph2D.TWO));
+        setRange(Graph2D.Y, Graph2D.TWO, m.worldToScreen(zoom.getYLo()), m.worldToScreen(zoom.getYHi()));
+      }
+      setRange(Graph2D.X, zoom.getXLo(), zoom.getXHi());
+      setRange(Graph2D.Y, zoom.getYLo(), zoom.getYHi());
+    }
+    String getZoomString() {
+      final int xlo = Math.round(getLo(Graph2D.X, Graph2D.ONE));
+      final int ylo = Math.round(getLo(Graph2D.Y, Graph2D.ONE));
+      final int xhi = Math.round(getHi(Graph2D.X, Graph2D.ONE));
+      final int yhi = Math.round(getHi(Graph2D.Y, Graph2D.ONE));
+      if (xlo == 0 && ylo == 0) {
+        return String.format("%d,%d", xhi, yhi);
+      } else {
+        return String.format("%d,%d,%d,%d", xlo, ylo, xhi, yhi);
+      }
+    }
   }
 
   @JumbleIgnore
-  static class PrecisionRecallGraph2D extends Graph2D {
+  static class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
     PrecisionRecallGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
@@ -478,7 +514,7 @@ public class RocPlot {
   }
 
   @JumbleIgnore
-  static class RocGraph2D extends Graph2D {
+  static class RocGraph2D extends ExternalZoomGraph2D {
     private final int mMaxVariants;
     RocGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
@@ -615,13 +651,17 @@ public class RocPlot {
     mStatusLabel.setText(message);
   }
 
-  private void loadData(ArrayList<File> files, ArrayList<String> names, boolean showProgress) throws IOException {
+  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom, boolean showProgress) throws IOException {
     for (int i = 0; i < files.size(); ++i) {
       final File f = files.get(i);
       final String name = names.get(i);
       loadFile(f, name, showProgress);
     }
-    SwingUtilities.invokeLater(() -> mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
+    if (initialZoom == null) {
+      SwingUtilities.invokeLater(() -> mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
+    } else {
+      SwingUtilities.invokeLater(() -> mZoomPP.setZoom(initialZoom));
+    }
     if (showProgress) {
       updateProgress();
     }
@@ -747,7 +787,7 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall) throws InterruptedException, InvocationTargetException, IOException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom) throws InterruptedException, InvocationTargetException, IOException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
@@ -765,8 +805,6 @@ public class RocPlot {
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
-//    frame.setGlassPane(rp.mZoomPP);
-//    frame.getGlassPane().setVisible(true);
     final CountDownLatch lock = new CountDownLatch(1);
     rp.mPopup.add(new AbstractAction("Exit", null) {
       @Override
@@ -788,7 +826,7 @@ public class RocPlot {
         rp.setSplitPaneDividerLocation(1.0);
       }
     });
-    rp.loadData(fileList, nameList, true);
+    rp.loadData(fileList, nameList, initialZoom, true);
     SwingUtilities.invokeAndWait(rp::showCurrentGraph);
     lock.await();
   }

@@ -39,8 +39,8 @@ import java.util.Collections;
 
 import javax.imageio.ImageIO;
 
+import com.reeltwo.plot.Box2D;
 import com.rtg.AbstractTest;
-import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -49,22 +49,24 @@ import com.rtg.util.io.TestDirectory;
  */
 public class RocPlotToFileTest extends AbstractTest {
 
-  private static final String ROC = ""
-          + "#total baseline variants: 3092754" + StringUtils.LS
-          + "#score\ttrue_positives\tfalse_positives" + StringUtils.LS
-          + "3.300\t0.000\t15" + StringUtils.LS
-          + "2.261\t70000.000\t137" + StringUtils.LS
-          + "1.226\t180000.000\t516" + StringUtils.LS
-          + "0.700\t406000.000\t11337" + StringUtils.LS
-          + "0.533\t1971000.000\t1446920" + StringUtils.LS
-          + "0.333\t2071000.000\t1646920" + StringUtils.LS
-          + "0.200\t2995295.000\t1864591" + StringUtils.LS;
-
   public void testPng() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
-      final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
+      final File roc = new File(dir, "roc.tsv");
+      FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File png = new File(dir, "PNG.png");
-      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG, false);
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG, false, null);
+      final BufferedImage buf = ImageIO.read(png);
+      assertEquals(800, buf.getWidth());
+      assertEquals(600, buf.getHeight());
+    }
+  }
+
+  public void testPng2() throws IOException {
+    try (final TestDirectory dir = new TestDirectory()) {
+      final File roc = new File(dir, "roc.tsv");
+      FileUtils.copyResource("com/rtg/graph/resources/roc2.tsv", roc);
+      final File png = new File(dir, "PNG.png");
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, png, PNG, false, new Box2D(10, 10, 100, 100));
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
@@ -79,9 +81,10 @@ public class RocPlotToFileTest extends AbstractTest {
 
   public void testSvg() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
-      final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
+      final File roc = new File(dir, "roc.tsv");
+      FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File svg = new File(dir, "example.svg");
-      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
       checkSvg(svg, 113,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
@@ -95,17 +98,12 @@ public class RocPlotToFileTest extends AbstractTest {
     }
   }
 
-  private static final String ROC_NO_TOTAL = ""
-    + "#total baseline variants: 0" + StringUtils.LS
-    + "#score\ttrue_positives\tfalse_positives" + StringUtils.LS
-    + "3.300\t0.000\t15" + StringUtils.LS
-    + "2.261\t0.000\t137" + StringUtils.LS;
-
   public void testNoTotal() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
-      final File roc = FileUtils.stringToFile(ROC_NO_TOTAL, new File(dir, "roc.tsv"));
+      final File roc = new File(dir, "roc.tsv");
+      FileUtils.copyResource("com/rtg/graph/resources/roc-nototal.tsv", roc);
       final File svg = new File(dir, "example.svg");
-      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false);
+      RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
       checkSvg(svg, 107,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",

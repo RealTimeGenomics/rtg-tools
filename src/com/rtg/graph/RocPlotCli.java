@@ -49,6 +49,7 @@ import java.util.List;
 
 import javax.swing.UIManager;
 
+import com.reeltwo.plot.Box2D;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.Pair;
@@ -71,6 +72,7 @@ public class RocPlotCli extends AbstractCli {
   static final String LINE_WIDTH_FLAG = "line-width";
   static final String CURVE_FLAG = "curve";
   static final String PRECISION_SENSITIVITY_FLAG = "precision-sensitivity";
+  static final String ZOOM_FLAG = "zoom";
 
 
   static final String PNG_EXTENSION = ".png";
@@ -113,6 +115,12 @@ public class RocPlotCli extends AbstractCli {
       if (!flags.checkInRange(LINE_WIDTH_FLAG, RocPlot.LINE_WIDTH_MIN, RocPlot.LINE_WIDTH_MAX)) {
         return false;
       }
+      try {
+        initialZoom(flags);
+      } catch (IllegalArgumentException e) {
+        flags.setParseMessage(e.getMessage());
+        return false;
+      }
       return true;
     }
   }
@@ -132,6 +140,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the sidepane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class , "INT", "sets the plot line width", 2).setCategory(REPORTING);
+    flags.registerOptional(ZOOM_FLAG, String.class , "STRING", "show a zoomed view with the given coordinates, supplied in the form <xmax>,<ymax> or <xmin>,<ymin>,<xmax>,<ymax>").setCategory(INPUT_OUTPUT);
     flags.registerOptional(PNG_FLAG, File.class , "FILE", "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
     flags.registerOptional(SVG_FLAG, File.class , "FILE", "if set, output a SVG image to the given file").setCategory(INPUT_OUTPUT);
     mCurveFlag = flags.registerOptional(CURVE_FLAG, String.class, "STRING", "ROC data file with title optionally specified (path[=title])").setCategory(INPUT_OUTPUT);
@@ -170,15 +179,15 @@ public class RocPlotCli extends AbstractCli {
     try {
       if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
         System.setProperty("java.awt.headless", "true");
-        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG, mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
-        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG, mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
+        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG);
+        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG);
       } else {   //Create and set up as a stand alone app.
         if (isReallyHeadless()) {
           Diagnostic.error("No graphics environment is available to open the rocplot GUI");
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime
@@ -199,10 +208,30 @@ public class RocPlotCli extends AbstractCli {
     return 0;
   }
 
-  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat svg, boolean precisionRecall) throws IOException {
+  private static Box2D initialZoom(CFlags flags) {
+    if (flags.isSet(ZOOM_FLAG)) {
+      final String[] parts = StringUtils.split((String) flags.getValue(ZOOM_FLAG), ',');
+      try {
+        switch (parts.length) {
+          case 2:
+            return new Box2D(0, 0, Float.parseFloat(parts[0]), Float.parseFloat(parts[1]));
+          case 4:
+            return new Box2D(Float.parseFloat(parts[0]), Float.parseFloat(parts[1]), Float.parseFloat(parts[2]), Float.parseFloat(parts[3]));
+          default:
+            throw new IllegalArgumentException("Invalid zoom specifier: expected 4 numbers");
+        }
+      } catch (NumberFormatException nfe) {
+        throw new IllegalArgumentException("Invalid zoom specifier: " + nfe.getMessage());
+      }
+    } else {
+      return null;
+    }
+  }
+
+  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat svg) throws IOException {
     if (mFlags.isSet(flagName)) {
       final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
-      RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg, precisionRecall);
+      RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg, mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags));
     }
   }
 
