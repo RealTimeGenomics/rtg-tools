@@ -45,6 +45,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.rtg.util.RstTable;
 import com.rtg.util.StringUtils;
@@ -478,13 +479,7 @@ public final class CFlags {
    * @return a collection of flags.
    */
   public List<Flag<?>> getRequired() {
-    final List<Flag<?>> results = new ArrayList<>();
-    for (final Flag<?> f : mRegisteredFlags) {
-      if (f.getMinCount() > 0) {
-        results.add(f);
-      }
-    }
-    return results;
+    return getRequired(mRegisteredFlags);
   }
 
   /**
@@ -492,13 +487,7 @@ public final class CFlags {
    * @return a collection of flags.
    */
   public List<Flag<?>> getOptional() {
-    final List<Flag<?>> results = new ArrayList<>();
-    for (final Flag<?> f : mRegisteredFlags) {
-      if (f.getMinCount() == 0) {
-        results.add(f);
-      }
-    }
-    return results;
+    return getOptional(mRegisteredFlags);
   }
 
   public String getParseMessage() {
@@ -1244,9 +1233,9 @@ public final class CFlags {
       if (mCategories == null) {
         throw new IllegalStateException("Please set categories first");
       }
-      appendCategoryFlagUsage(usage, Flag.Level.DEFAULT);
+      appendCategoryFlagUsage(usage, getDisplayable(Flag.Level.DEFAULT));
     } else {
-      appendLongFlagUsage(usage, Flag.Level.DEFAULT);
+      appendLongFlagUsage(usage, getDisplayable(Flag.Level.DEFAULT));
     }
     return usage.toString();
   }
@@ -1265,43 +1254,31 @@ public final class CFlags {
     usage.setWrapIndent(6);
     usage.wrapText("Note: Extended command line options are often experimental and untested. These options may come and go between releases. Use them with caution!");
     usage.append(LS);
-    appendLongFlagUsage(usage, level);
+    appendLongFlagUsage(usage, getDisplayable(level));
     return usage.toString();
   }
 
-  List<Flag<?>> getFlagFromType(final String type) {
-    final List<Flag<?>> results = new ArrayList<>();
-    for (final Flag<?> f : mRegisteredFlags) {
-      if (f.getCategory().equals(type)) {
-        results.add(f);
-      }
+  private void appendCategoryFlagUsage(final WrappingStringBuilder wb, List<Flag<?>> flags) {
+    final int usageLength = getUsageLength(flags);
+    for (final String category : mCategories) {
+      appendLongFlagUsage(wb, usageLength, category, getByCategory(flags, category));
     }
-    return results;
   }
 
-  private void appendCategoryFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
+  private void appendLongFlagUsage(final WrappingStringBuilder wb, List<Flag<?>> flags) {
     // Get longest string lengths for use below in pretty-printing.
-    //final int[] counts = new int[mCategories.length];
-    final int longestUsageLength = getUsageLength(level);
+    final int usageLength = getUsageLength(flags);
+    appendLongFlagUsage(wb, usageLength, REQUIRED_FLAG_USAGE_PREFIX, getRequired(flags));
+    appendLongFlagUsage(wb, usageLength, OPTIONAL_FLAG_USAGE_PREFIX, getOptional(flags));
+  }
 
-    // We do all the required flags first
-    for (final String category : mCategories) {
-      final List<Flag<?>> flags = getFlagFromType(category);
-      final Iterator<Flag<?>> flagItr = flags.iterator();
-      int flagsCount = 0;
-      while (flagItr.hasNext()) {
-        final Flag<?> flag = flagItr.next();
-        if (displayFlag(flag, level)) {
-          ++flagsCount;
-        }
-      }
-      if (flagsCount > 0) {
-        wb.append(LS);
-        wb.append(category).append(LS);
-        wb.setWrapIndent(longestUsageLength + 7);
-        for (final Flag<?> flag : flags) {
-          flag.appendLongFlagUsage(wb, longestUsageLength, level);
-        }
+  private void appendLongFlagUsage(WrappingStringBuilder wb, int usageLength, String label, List<Flag<?>> flags) {
+    if (flags.size() > 0) {
+      wb.append(LS);
+      wb.append(label).append(LS);
+      wb.setWrapIndent(usageLength + 7);
+      for (final Flag<?> flag : flags) {
+        flag.appendLongFlagUsage(wb, usageLength);
       }
     }
   }
@@ -1316,12 +1293,13 @@ public final class CFlags {
       final String subCommand = (spos > 0) ? mProgramName.substring(spos + 1) : mProgramName;
       wb.append(subCommand).append(LS);
       wb.append(StringUtils.repeat('~', subCommand.length())).append(LS).append(LS);
-      if (!mProgramDescription.equals("")) {
-        wb.append("**Synopsis:**").append(LS).append(LS);
-        wb.wrapTextWithNewLines(mProgramDescription).append(LS);
-      }
+
+      wb.append("**Synopsis:**").append(LS).append(LS);
+      wb.wrapTextWithNewLines(mProgramDescription.equals("") ? "[TODO]" : mProgramDescription).append(LS);
+
       wb.append("**Syntax:**").append(LS).append(LS);
       for (final SortedSet<Flag<?>> ops : mRequiredSets) {
+        wb.append("[TODO]").append(LS).append(LS);
         wb.append(".. code-block:: text").append(LS).append(LS);
         wb.append("  $ ");
         wb.setWrapIndent();
@@ -1333,18 +1311,18 @@ public final class CFlags {
       wb.setWrapSuffix("");
       wb.setWrapIndent(0);
     }
-    wb.append(getTableFlagUsage(level));
+    wb.append(getTableFlagUsage(getDisplayable(level)));
+
     wb.append("**Usage:**").append(LS).append(LS);
     wb.append("[TODO]").append(LS).append(LS);
+
     wb.append(".. seealso::").append(LS).append(LS);
     wb.append("  [TODO]").append(LS).append(LS);
     return wb.toString();
   }
 
 
-  private String getTableFlagUsage(Flag.Level level) {
-    final int usageLength = getUsageLength(level);
-
+  private String getTableFlagUsage(List<Flag<?>> flags) {
     //layout:
     //+--------+-----------------+--------------------+
     //| Category                                      |
@@ -1353,65 +1331,76 @@ public final class CFlags {
     //+--------+-----------------+--------------------+
     final StringBuilder sb = new StringBuilder();
     sb.append("**Parameters:**").append(LS).append(LS);
-    for (final String category : mCategories) {
-      final int descriptionLength = getUsageDescriptionLength(level, category);
-
-      if (usageLength > 0 && descriptionLength > 0) {
-        final RstTable table = new RstTable(1, category.length(), 6, usageLength + 4, descriptionLength);
-        table.addHeading(category);
-
-        final List<Flag<?>> flags = getFlagFromType(category);
-        for (Flag<?> flag : flags) {
-          if (displayFlag(flag, level)) {
-            final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
-            final String desc = StringUtils.sentencify(flag.getUsageDescription());
-            table.addRow(
-              shortFlag,
-              "``" + flag.getFlagUsage() + "``",
-              desc
-            );
-          }
+    if (flags.size() > 0) {
+      final int usageLength = getUsageLength(flags);
+      if (mUseCategories) {
+        for (final String category : mCategories) {
+          appendTableFlagUsage(sb, usageLength, category, getByCategory(flags, category));
         }
-        sb.append(".. tabularcolumns:: |l|l|L|").append(LS).append(LS);
-        sb.append(table.getText()).append(LS);
+      } else {
+        appendTableFlagUsage(sb, usageLength, REQUIRED_FLAG_USAGE_PREFIX, getRequired(flags));
+        appendTableFlagUsage(sb, usageLength, OPTIONAL_FLAG_USAGE_PREFIX, getOptional(flags));
       }
     }
     return sb.toString();
   }
 
-  private int getUsageLength(Flag.Level level) {
-    int longestUsageLength = 0;
-    // Get longest string lengths for use below in pretty-printing.
-    //final int[] counts = new int[mCategories.length];
-    for (Flag<?> flag : mRegisteredFlags) {
-      //counts[getCategoryLocation(flag.getCategory())]++;
-      if (!displayFlag(flag, level)) {
-        continue;
+  private void appendTableFlagUsage(StringBuilder sb, int usageWidth, String label, List<Flag<?>> flags) {
+    if (flags.size() > 0) {
+      final int descriptionLength = getUsageDescriptionLength(flags);
+      final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, Math.max(descriptionLength + 1, 100));
+      table.addHeading(label);
+      for (Flag<?> flag : flags) {
+        final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
+        final String desc = StringUtils.sentencify(flag.getUsageDescription());
+        table.addRow(
+          shortFlag,
+          "``" + flag.getFlagUsage() + "``",
+          desc
+        );
       }
-      final String usageStr = flag.getFlagUsage();
-      if (usageStr.length() > longestUsageLength) {
-        longestUsageLength = usageStr.length();
-      }
+      sb.append(".. tabularcolumns:: |l|l|L|").append(LS).append(LS);
+      sb.append(table.getText()).append(LS);
     }
-    return longestUsageLength;
   }
 
-  private int getUsageDescriptionLength(Flag.Level level, String category) {
-    final List<Flag<?>> flags = getFlagFromType(category);
-    int usageLength = 0;
+  private int getUsageLength(List<Flag<?>> flags) {
+    int longest = 0;
     for (Flag<?> flag : flags) {
-      if (displayFlag(flag, level)) {
-        final String usageDescription = flag.getUsageDescription();
-        if (usageDescription.length() > usageLength) {
-          usageLength = usageDescription.length();
-        }
+      final String s = flag.getFlagUsage();
+      if (s.length() > longest) {
+        longest = s.length();
       }
     }
-    return usageLength;
+    return longest;
   }
 
-  static boolean displayFlag(Flag<?> flag, Flag.Level level) {
-    return flag.level() == level;
+  private int getUsageDescriptionLength(List<Flag<?>> flags) {
+    int longest = 0;
+    for (Flag<?> flag : flags) {
+      final String s = flag.getUsageDescription();
+      if (s.length() > longest) {
+        longest = s.length();
+      }
+    }
+    return longest;
+  }
+
+  List<Flag<?>> getDisplayable(final Flag.Level level) {
+    return getDisplayable(mRegisteredFlags, level);
+  }
+
+  private static List<Flag<?>> getDisplayable(Collection<Flag<?>> flags, Flag.Level level) {
+    return flags.stream().filter(f -> f.level() == level).collect(Collectors.toList());
+  }
+  private static List<Flag<?>> getByCategory(Collection<Flag<?>> flags, final String category) {
+    return flags.stream().filter(f -> f.getCategory().equals(category)).collect(Collectors.toList());
+  }
+  private static List<Flag<?>> getRequired(Collection<Flag<?>> flags) {
+    return flags.stream().filter(f -> f.getMinCount() > 0).collect(Collectors.toList());
+  }
+  private static List<Flag<?>> getOptional(Collection<Flag<?>> flags) {
+    return flags.stream().filter(f -> f.getMinCount() == 0).collect(Collectors.toList());
   }
 
   /**
@@ -1442,57 +1431,6 @@ public final class CFlags {
     return wb.toString();
   }
 
-  private void appendLongFlagUsage(final WrappingStringBuilder wb, final Flag.Level level) {
-    int longestUsageLength = 0;
-    // Get longest string lengths for use below in pretty-printing.
-    Iterator<Flag<?>> flagItr = mRegisteredFlags.iterator();
-    while (flagItr.hasNext()) {
-      final Flag<?> flag = flagItr.next();
-      if (displayFlag(flag, level)) {
-        final String usageStr = flag.getFlagUsage();
-        if (usageStr.length() > longestUsageLength) {
-          longestUsageLength = usageStr.length();
-        }
-      }
-    }
-    // We do all the required flags first
-    final List<Flag<?>> required = getRequired();
-    flagItr = required.iterator();
-    int requiredCount = 0;
-    while (flagItr.hasNext()) {
-      final Flag<?> flag = flagItr.next();
-      if (displayFlag(flag, level)) {
-        ++requiredCount;
-      }
-    }
-    if (requiredCount > 0) {
-      wb.append(LS);
-      wb.append(REQUIRED_FLAG_USAGE_PREFIX).append(LS);
-      wb.setWrapIndent(longestUsageLength + 7);
-      for (final Flag<?> flag : required) {
-        flag.appendLongFlagUsage(wb, longestUsageLength, level);
-      }
-    }
-    // Then all the optional flags
-    final List<Flag<?>> optional = getOptional();
-    flagItr = optional.iterator();
-    int optionalCount = 0;
-    while (flagItr.hasNext()) {
-      final Flag<?> flag = flagItr.next();
-      if (displayFlag(flag, level)) {
-        ++optionalCount;
-      }
-    }
-    if (optionalCount > 0) {
-      wb.setWrapIndent(0);
-      wb.append(LS);
-      wb.append(OPTIONAL_FLAG_USAGE_PREFIX).append(LS);
-      wb.setWrapIndent(longestUsageLength + 7);
-      for (final Flag<?> flag : optional) {
-        flag.appendLongFlagUsage(wb, longestUsageLength, level);
-      }
-    }
-  }
 
   /**
    * Prints the full usage information.

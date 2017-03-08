@@ -653,11 +653,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
     return ret.toString();
   }
 
-  void appendLongFlagUsage(final WrappingStringBuilder wb, final int longestUsageLength, final Flag.Level level) {
-    if (level != level()) {
-      return;
-    }
-
+  void appendLongFlagUsage(final WrappingStringBuilder wb, final int longestUsageLength) {
     wb.append("  ");
     if (getChar() == null) {
       wb.append("    ");
