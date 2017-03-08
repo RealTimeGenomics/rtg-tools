@@ -1304,8 +1304,10 @@ public final class CFlags {
     wb.setWrapWidth(width);
     final Flag.Level level = Flag.Level.DEFAULT;
     if (mProgramName != null) {
-      wb.append(mProgramName).append(LS);
-      wb.append(StringUtils.repeat("~", mProgramName.length())).append(LS).append(LS);
+      final int spos = mProgramName.indexOf(' ');
+      final String subCommand = (spos > 0) ? mProgramName.substring(spos + 1) : mProgramName;
+      wb.append(subCommand).append(LS);
+      wb.append(StringUtils.repeat('~', subCommand.length())).append(LS).append(LS);
       if (!mProgramDescription.equals("")) {
         wb.append("**Synopsis:**").append(LS).append(LS);
         wb.wrapTextWithNewLines(mProgramDescription).append(LS);
@@ -1325,7 +1327,9 @@ public final class CFlags {
     }
     wb.append(getTableFlagUsage(level));
     wb.append("**Usage:**").append(LS).append(LS);
+    wb.append("[TODO]").append(LS).append(LS);
     wb.append(".. seealso::").append(LS).append(LS);
+    wb.append("  [TODO]").append(LS).append(LS);
     return wb.toString();
   }
 
@@ -1352,9 +1356,7 @@ public final class CFlags {
         for (Flag<?> flag : flags) {
           if (displayFlag(flag, level)) {
             final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
-            final String desc = flag.getUsageDescription().length() <= 1
-              ? flag.getUsageDescription()
-              : Character.toTitleCase(flag.getUsageDescription().charAt(0)) + flag.getUsageDescription().substring(1);
+            final String desc = StringUtils.titleCase(flag.getUsageDescription());
             table.addRow(
               shortFlag,
               "``" + flag.getFlagUsage() + "``",

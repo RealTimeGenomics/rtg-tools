@@ -90,7 +90,7 @@ public class StringUtilsTest extends TestCase {
     assertEquals("", StringUtils.getSpaceString(0));
     assertEquals(" ", StringUtils.getSpaceString(1));
     assertEquals("  ", StringUtils.getSpaceString(2));
-    assertEquals("---", StringUtils.getCharString('-', 3));
+    assertEquals("---", StringUtils.repeat('-', 3));
     assertEquals("    ", StringUtils.getSpaceString(4));
   }
 

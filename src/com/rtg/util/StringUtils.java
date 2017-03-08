@@ -106,19 +106,18 @@ public final class StringUtils {
    * @exception IllegalArgumentException if <code>length</code> is negative.
    */
   public static String getSpaceString(final int length) {
-    return getCharString(' ', length);
+    return repeat(' ', length);
   }
 
   /**
    * Return a string consisting of the specified character, repeated.
-   *
    *
    * @param theChar the character to repeat
    * @param length number of repetitions
    * @return the string
    * @exception IllegalArgumentException if <code>length</code> is negative.
    */
-  public static String getCharString(char theChar, final int length) {
+  public static String repeat(char theChar, final int length) {
     if (length < 0) {
       throw new IllegalArgumentException("bad length");
     }
@@ -632,5 +631,16 @@ public final class StringUtils {
       --end;
     }
     return new String(c, start, end - start);
+  }
+
+  /**
+   * Capitalize the first word in the text
+   * @param text input text
+   * @return text with first character capitalized
+   */
+  public static String titleCase(String text) {
+    return text.length() <= 1
+                ? text
+                : Character.toTitleCase(text.charAt(0)) + text.substring(1);
   }
 }
