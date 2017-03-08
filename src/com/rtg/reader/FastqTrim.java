@@ -49,7 +49,6 @@ import java.util.function.Function;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -85,26 +84,23 @@ public final class FastqTrim extends AbstractCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription(description());
-    initFlags(mFlags);
-  }
-  protected static void initFlags(CFlags flags) {
-    flags.registerExtendedHelp();
-    CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, "FILE", "input FASTQ file, Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('o', OUTPUT_FLAG, File.class, "FILE", "output filename. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
-    CommonFlags.initQualityFormatFlag(flags);
-    CommonFlags.initThreadsFlag(flags);
-    CommonFlags.initNoGzip(flags);
-    CommonFlags.initForce(flags);
-    flags.registerOptional('S', START_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read starts to maximise base quality above the given threshold", 0).setCategory(FILTERING);
-    flags.registerOptional('E', END_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold", 0).setCategory(FILTERING);
-    flags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
-    flags.registerOptional('e', TRIM_END_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read end", 0).setCategory(FILTERING);
-    CommonFlags.initMinReadLength(flags);
-    flags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
-    flags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
+    mFlags.registerExtendedHelp();
+    CommonFlagCategories.setCategories(mFlags);
+    mFlags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, "FILE", "input FASTQ file, Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "FILE", "output filename. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    CommonFlags.initQualityFormatFlag(mFlags);
+    CommonFlags.initThreadsFlag(mFlags);
+    CommonFlags.initNoGzip(mFlags);
+    CommonFlags.initForce(mFlags);
+    mFlags.registerOptional('S', START_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read starts to maximise base quality above the given threshold", 0).setCategory(FILTERING);
+    mFlags.registerOptional('E', END_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold", 0).setCategory(FILTERING);
+    mFlags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
+    mFlags.registerOptional('e', TRIM_END_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read end", 0).setCategory(FILTERING);
+    CommonFlags.initMinReadLength(mFlags);
+    mFlags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
+    mFlags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
 
-    flags.setValidator(innerFlags ->
+    mFlags.setValidator(innerFlags ->
       CommonFlags.validateInputFile(innerFlags, CommonFlags.INPUT_FLAG)
         && CommonFlags.validateOutputFile(innerFlags, FileUtils.getOutputFileName((File) innerFlags.getValue(OUTPUT_FLAG), !innerFlags.isSet(NO_GZIP), FastqUtils.extensions()))
         && innerFlags.checkInRange(BATCH_SIZE, 1, Integer.MAX_VALUE)
