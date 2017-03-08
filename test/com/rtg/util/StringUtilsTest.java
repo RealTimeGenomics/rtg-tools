@@ -82,16 +82,16 @@ public class StringUtilsTest extends TestCase {
 
   public void testSpaces() {
     try {
-      StringUtils.getSpaceString(-1);
+      StringUtils.spaces(-1);
       fail();
     } catch (final IllegalArgumentException e) {
       assertEquals("bad length", e.getMessage());
     }
-    assertEquals("", StringUtils.getSpaceString(0));
-    assertEquals(" ", StringUtils.getSpaceString(1));
-    assertEquals("  ", StringUtils.getSpaceString(2));
+    assertEquals("", StringUtils.spaces(0));
+    assertEquals(" ", StringUtils.spaces(1));
+    assertEquals("  ", StringUtils.spaces(2));
     assertEquals("---", StringUtils.repeat('-', 3));
-    assertEquals("    ", StringUtils.getSpaceString(4));
+    assertEquals("    ", StringUtils.spaces(4));
   }
 
   public void testIsJavaIdentifier() {

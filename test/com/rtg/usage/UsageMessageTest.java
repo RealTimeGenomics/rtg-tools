@@ -75,7 +75,7 @@ public class UsageMessageTest extends TestCase {
     us2.setUsername("bob");
     us2.setHostname("jimbo");
     us2.setCommandLine("FirstArg1" + StringUtils.LS + "SecondArg3");
-    final String expectedCommandline = "FirstArg1" + StringUtils.getSpaceString(StringUtils.LS.length()) + "SecondArg3";
+    final String expectedCommandline = "FirstArg1" + StringUtils.spaces(StringUtils.LS.length()) + "SecondArg3";
     final String secondLine = us2.formatLine(us.getChecksum());
     final String expected1 = FIRST_DATE + "\t009\t00000000-0000-04d2-0000-00000000162e\trtg version test\ttestclass\tStart\tN/A\tbob\tjimbo\t" + expectedCommandline;
     final String expected1Sig = MD5Utils.md5(expected1);

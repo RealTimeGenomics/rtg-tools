@@ -105,7 +105,7 @@ public final class StringUtils {
    * @return space string
    * @exception IllegalArgumentException if <code>length</code> is negative.
    */
-  public static String getSpaceString(final int length) {
+  public static String spaces(final int length) {
     return repeat(' ', length);
   }
 
@@ -245,7 +245,7 @@ public final class StringUtils {
    */
   public static String padLeft(final String s, final int length) {
     final int pad = length - s.length();
-    return pad > 0 ? getSpaceString(pad) + s : s;
+    return pad > 0 ? spaces(pad) + s : s;
   }
 
   /**
@@ -256,7 +256,7 @@ public final class StringUtils {
    */
   public static String padRight(final String s, final int length) {
     final int pad = length - s.length();
-    return pad > 0 ? s + getSpaceString(pad) : s;
+    return pad > 0 ? s + spaces(pad) : s;
   }
 
   /**
@@ -269,7 +269,7 @@ public final class StringUtils {
    */
   public static String padBetween(final String first, final int length, final String last) {
     final int padlen = length - (first.length() + last.length());
-    return first + (padlen > 0 ? getSpaceString(padlen) : "") + last;
+    return first + (padlen > 0 ? spaces(padlen) : "") + last;
   }
 
 
