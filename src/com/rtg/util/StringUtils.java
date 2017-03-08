@@ -105,20 +105,19 @@ public final class StringUtils {
    * @return space string
    * @exception IllegalArgumentException if <code>length</code> is negative.
    */
-  public static String getSpaceString(final int length) {
-    return getCharString(' ', length);
+  public static String spaces(final int length) {
+    return repeat(' ', length);
   }
 
   /**
    * Return a string consisting of the specified character, repeated.
-   *
    *
    * @param theChar the character to repeat
    * @param length number of repetitions
    * @return the string
    * @exception IllegalArgumentException if <code>length</code> is negative.
    */
-  public static String getCharString(char theChar, final int length) {
+  public static String repeat(char theChar, final int length) {
     if (length < 0) {
       throw new IllegalArgumentException("bad length");
     }
@@ -246,7 +245,7 @@ public final class StringUtils {
    */
   public static String padLeft(final String s, final int length) {
     final int pad = length - s.length();
-    return pad > 0 ? getSpaceString(pad) + s : s;
+    return pad > 0 ? spaces(pad) + s : s;
   }
 
   /**
@@ -257,7 +256,7 @@ public final class StringUtils {
    */
   public static String padRight(final String s, final int length) {
     final int pad = length - s.length();
-    return pad > 0 ? s + getSpaceString(pad) : s;
+    return pad > 0 ? s + spaces(pad) : s;
   }
 
   /**
@@ -270,7 +269,7 @@ public final class StringUtils {
    */
   public static String padBetween(final String first, final int length, final String last) {
     final int padlen = length - (first.length() + last.length());
-    return first + (padlen > 0 ? getSpaceString(padlen) : "") + last;
+    return first + (padlen > 0 ? spaces(padlen) : "") + last;
   }
 
 
@@ -632,5 +631,26 @@ public final class StringUtils {
       --end;
     }
     return new String(c, start, end - start);
+  }
+
+  /**
+   * Capitalize the first word in the text
+   * @param text input text
+   * @return text with first character capitalized
+   */
+  public static String titleCase(String text) {
+    return text.length() == 0
+                ? text
+                : Character.toTitleCase(text.charAt(0)) + text.substring(1);
+  }
+
+  /**
+   * Capitalize the first word and add a terminal full stop if the text does not already have one.
+   * @param text input text
+   * @return text with first character capitalized
+   */
+  public static String sentencify(String text) {
+    final String cap = titleCase(text.trim());
+    return cap.length() == 0 || !Character.isLetterOrDigit(cap.charAt(cap.length() - 1)) ? cap : cap + ".";
   }
 }

@@ -255,22 +255,22 @@ public class CommonFlagsTest extends TestCase {
 
       flags.setFlags("--start", "-1");
       assertFalse(CommonFlags.validateStartEnd(flags, "start", "end"));
-      assertTrue(mps.toString().contains("--start should be positive"));
+      assertTrue(flags.getParseMessage().contains("--start should be positive"));
 
       mps.reset();
       flags.setFlags("--end", "-1");
       assertFalse(CommonFlags.validateStartEnd(flags, "start", "end"));
-      assertTrue(mps.toString().contains("--end should be greater than 0"));
+      assertTrue(flags.getParseMessage().contains("--end should be greater than 0"));
 
       mps.reset();
       flags.setFlags("--start", "3", "--end", "1");
       assertFalse(CommonFlags.validateStartEnd(flags, "start", "end"));
-      assertTrue(mps.toString().contains("--start should be less than --end"));
+      assertTrue(flags.getParseMessage().contains("--start should be less than --end"));
 
       mps.reset();
       flags.setFlags("--start", "0", "--end", "" + Long.MAX_VALUE);
       assertFalse(CommonFlags.validateStartEnd(flags, "start", "end"));
-      assertTrue(mps.toString().contains("You have specified too many sequences, please specify a range of less than " + Integer.MAX_VALUE));
+      assertTrue(flags.getParseMessage().contains("You have specified too many sequences, please specify a range of less than " + Integer.MAX_VALUE));
     } finally {
       Diagnostic.setLogStream();
     }

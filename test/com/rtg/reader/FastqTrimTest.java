@@ -33,13 +33,11 @@ package com.rtg.reader;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
-
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.NullStreamUtils;
-import com.rtg.util.cli.CFlags;
+import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.TestDirectory;
 
@@ -74,16 +72,8 @@ public class FastqTrimTest  extends AbstractCliTest {
     );
   }
 
-  CFlags getFlags(boolean valid, String... strings) {
-
-    final CFlags flags = new CFlags("fastqtrim", "", NullStreamUtils.getNullPrintStream(), NullStreamUtils.getNullPrintStream());
-    FastqTrim.initFlags(flags);
-    Assert.assertEquals("Flags were unexpectedly " + (valid ? "invalid" : "valid"), valid, flags.setFlags(strings));
-    return flags;
-  }
-
   public void testFlags() throws IOException {
-    assertParseMessage("You must provide a value for -o FILE", "-i", "foo");
+    TestUtils.containsAll(checkHandleFlagsErr("-i", "foo"), "You must provide a value for -o FILE");
     try (TestDirectory tmp = new TestDirectory()) {
       final File[] files = {
         new File(tmp, "foo"),
@@ -92,16 +82,11 @@ public class FastqTrimTest  extends AbstractCliTest {
       for (File f : files) {
         assertTrue(f.createNewFile());
       }
-      getFlags(false, "-i", files[0].getPath(), "-o", files[1].getPath());
+      checkHandleFlagsErr("-i", files[0].getPath(), "-o", files[1].getPath());
       assertTrue(files[1].delete());
-      getFlags(true, "-i", files[0].getPath(), "-o", files[1].getPath());
+      checkHandleFlags("-i", files[0].getPath(), "-o", files[1].getPath());
       //assertParseMessage("The value for --", "-l", files[0].getPath(), "-r", files[1].getPath(), "-o", files[2].getPath(), "-S", "-1");
     }
-  }
-
-  private void assertParseMessage(String expected, String... strings) {
-    final CFlags flags = getFlags(false, strings);
-    assertEquals(expected, flags.getParseMessage());
   }
 
   public void testNullTrimmer() {

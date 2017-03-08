@@ -33,10 +33,10 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.io.StringReader;
 
+import org.junit.Assert;
+
 import com.reeltwo.spelling.Spelling;
 import com.rtg.util.StringUtils;
-
-import org.junit.Assert;
 
 /**
  * Separate class to keep Sharpen happy.
@@ -58,7 +58,7 @@ public final class CheckSpelling {
 
         @Override
         protected void warning(final String source, final int lineNumber, final String msg) {
-          problems.append("Flag: --").append(source).append(" ").append(msg).append(StringUtils.LS);
+          problems.append("Source: ").append(source).append(" ").append(msg).append(StringUtils.LS);
         }
       };
   }

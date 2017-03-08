@@ -172,13 +172,13 @@ public final class CommonFlags {
   public static boolean validateStartEnd(CFlags flags, String startFlag, String endFlag) {
     if (flags.isSet(startFlag)) {
       if ((Long) flags.getValue(startFlag) < 0) {
-        flags.error("--" + startFlag + " should be positive");
+        flags.setParseMessage("--" + startFlag + " should be positive");
         return false;
       }
     }
     if (flags.isSet(endFlag)) {
       if ((Long) flags.getValue(endFlag) < 1) {
-        flags.error("--" + endFlag + " should be greater than 0");
+        flags.setParseMessage("--" + endFlag + " should be greater than 0");
         return false;
       }
     }
@@ -186,11 +186,11 @@ public final class CommonFlags {
       final long start = (Long) flags.getValue(startFlag);
       final long end = (Long) flags.getValue(endFlag);
       if (start >= end) {
-        flags.error("--" + startFlag + " should be less than --" + endFlag);
+        flags.setParseMessage("--" + startFlag + " should be less than --" + endFlag);
         return false;
       }
       if (end - start > Integer.MAX_VALUE) {
-        flags.error("You have specified too many sequences, please specify a range of less than " + Integer.MAX_VALUE);
+        flags.setParseMessage("You have specified too many sequences, please specify a range of less than " + Integer.MAX_VALUE);
         return false;
       }
     }
@@ -594,7 +594,7 @@ public final class CommonFlags {
   public static boolean validateSexTemplateReference(CFlags flags, String sexFlag, String pedigreeFlag, File template) {
     if (flags.isSet(sexFlag) || (pedigreeFlag != null && flags.isSet(pedigreeFlag))) {
       if (!new File(template, ReferenceGenome.REFERENCE_FILE).isFile()) {
-        flags.error("Sex-specific processing was specified but " + template + " is missing a '" + ReferenceGenome.REFERENCE_FILE + "'");
+        flags.setParseMessage("Sex-specific processing was specified but " + template + " is missing a '" + ReferenceGenome.REFERENCE_FILE + "'");
         return false;
       }
     }

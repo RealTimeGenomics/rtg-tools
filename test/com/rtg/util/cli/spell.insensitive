@@ -1,6 +1,7 @@
 fasta
 mapq
 fastq
+quala
 solexa
 solexa1
 illumina
@@ -15,9 +16,12 @@ cgfastq
 blosum62
 blosum45
 blosum80
+contigs
 breakends
 breakend
 kmer
 denovo
 germline
 javascript
+rtg
+metagenomic

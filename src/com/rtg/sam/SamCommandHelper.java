@@ -85,10 +85,10 @@ public final class SamCommandHelper {
     final String rg = (String) flags.getValue(SAM_RG);
     final File in = new File(rg);
     if (!in.exists() && rg.indexOf('\t') != -1) {
-      flags.setParseMessage("given string \"" + rg + "\" for --" + SAM_RG + " contains literal tab characters, please use \\t instead");
+      flags.setParseMessage("Given string \"" + rg + "\" for --" + SAM_RG + " contains literal tab characters, please use \\t instead");
       return false;
     } else if (in.isDirectory()) {
-      flags.setParseMessage("given input file \"" + in.getPath() + "\" for --" + SAM_RG + " is a directory, must be a file");
+      flags.setParseMessage("Given input file \"" + in.getPath() + "\" for --" + SAM_RG + " is a directory, must be a file");
       return false;
     }
     return true;
