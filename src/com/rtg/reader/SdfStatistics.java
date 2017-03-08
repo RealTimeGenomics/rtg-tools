@@ -154,11 +154,11 @@ public final class SdfStatistics extends AbstractCli {
         }
         if (flags.isSet(TAXONOMY_FLAG)) {
           if (!new File(f, TaxonomyUtils.TAXONOMY_FILE).isFile()) {
-            flags.error("--" + TAXONOMY_FLAG + " was specified but " + f + " is missing a '" + TaxonomyUtils.TAXONOMY_FILE + "'");
+            flags.setParseMessage("--" + TAXONOMY_FLAG + " was specified but " + f + " is missing a '" + TaxonomyUtils.TAXONOMY_FILE + "'");
             return false;
           }
           if (!new File(f, TaxonomyUtils.TAXONOMY_TO_SEQUENCE_FILE).isFile()) {
-            flags.error("--" + TAXONOMY_FLAG + " was specified but " + f + " is missing a '" + TaxonomyUtils.TAXONOMY_TO_SEQUENCE_FILE + "'");
+            flags.setParseMessage("--" + TAXONOMY_FLAG + " was specified but " + f + " is missing a '" + TaxonomyUtils.TAXONOMY_TO_SEQUENCE_FILE + "'");
             return false;
           }
         }

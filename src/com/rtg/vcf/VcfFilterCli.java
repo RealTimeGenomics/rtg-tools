@@ -261,7 +261,7 @@ public final class VcfFilterCli extends AbstractCli {
       }
       if (flags.isSet(MIN_DENOVO_SCORE) || flags.isSet(MAX_DENOVO_SCORE)) {
         if (flags.isSet(ALL_SAMPLES) || flags.getValues(SAMPLE).size() != 1) {
-          flags.error("De Novo filtering requires a single sample to be specified");
+          flags.setParseMessage("De Novo filtering requires a single sample to be specified");
           return false;
         }
       }

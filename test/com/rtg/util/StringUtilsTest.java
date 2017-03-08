@@ -74,6 +74,22 @@ public class StringUtilsTest extends TestCase {
     assertEquals("a b" + (char) 27, StringUtils.trimSpaces(" a b" + (char) 27 + " "));
   }
 
+  public void testTitleCase() {
+    assertEquals("T", StringUtils.titleCase("t"));
+    assertEquals("Cat", StringUtils.titleCase("cat"));
+    assertEquals("Cat", StringUtils.titleCase("Cat"));
+    assertEquals("123cat", StringUtils.titleCase("123cat"));
+  }
+
+  public void testSentencify() {
+    assertEquals("T.", StringUtils.sentencify("t"));
+    assertEquals("Cat.", StringUtils.sentencify("cat"));
+    assertEquals("Cat.", StringUtils.sentencify("Cat."));
+    assertEquals("123 cat1.", StringUtils.sentencify("123 cat1."));
+    assertEquals("123 cat1!", StringUtils.sentencify("123 cat1!"));
+    assertEquals("123 cat1 (maybe)", StringUtils.sentencify("123 cat1 (maybe)"));
+  }
+
   public void test() {
     final int length = LS.length();
     assertTrue(length == 1 || length == 2);

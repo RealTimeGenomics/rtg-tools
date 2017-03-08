@@ -639,8 +639,18 @@ public final class StringUtils {
    * @return text with first character capitalized
    */
   public static String titleCase(String text) {
-    return text.length() <= 1
+    return text.length() == 0
                 ? text
                 : Character.toTitleCase(text.charAt(0)) + text.substring(1);
+  }
+
+  /**
+   * Capitalize the first word and add a terminal full stop if the text does not already have one.
+   * @param text input text
+   * @return text with first character capitalized
+   */
+  public static String sentencify(String text) {
+    final String cap = titleCase(text.trim());
+    return cap.length() == 0 || !Character.isLetterOrDigit(cap.charAt(cap.length() - 1)) ? cap : cap + ".";
   }
 }

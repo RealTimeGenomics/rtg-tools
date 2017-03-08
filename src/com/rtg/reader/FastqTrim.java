@@ -49,6 +49,7 @@ import java.util.function.Function;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -83,7 +84,7 @@ public final class FastqTrim extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.setDescription(description());
+    mFlags.setDescription(StringUtils.sentencify(description()));
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, "FILE", "input FASTQ file, Use '-' to read from standard input").setCategory(INPUT_OUTPUT);

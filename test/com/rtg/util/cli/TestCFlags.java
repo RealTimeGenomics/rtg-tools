@@ -79,7 +79,19 @@ public final class TestCFlags {
     PDESC.add("STRING|FILE");
   }
 
-  private static void checkDescriptionConstraints(final Flag<?> f) {
+  private static void checkProgramDescription(CFlags flags) {
+    // The overall description is more "englishy" than the flag descriptions
+    final String desc = flags.getDescription();
+    if (desc == null || desc.length() == 0) {
+      return;
+    }
+    Assert.assertTrue(flags.getName() + ": Program description is too short: " + desc, desc.length() > 8);
+    Assert.assertTrue(flags.getName() + ": Program description must start with uppercase: " + desc, Character.isUpperCase(desc.charAt(0)));
+    Assert.assertTrue(flags.getName() + ": Program description should end with \".\": " + desc, desc.endsWith("."));
+    CheckSpelling.check(flags.getName(), desc);
+  }
+
+  private static void checkFlagDescriptionConstraints(final Flag<?> f) {
     // Most of these conventions are based on what is seen in standard Unix commands
     // and man pages
     final String desc = f.getDescription();
@@ -89,17 +101,17 @@ public final class TestCFlags {
     if ((name != null) && (name.charAt(0) == 'X')) {
       return;
     }
-    Assert.assertTrue("Description is too short: --" + name + " desc: " + desc, desc.length() > 8);
-    Assert.assertTrue("Description should start with lowercase: --" + name + " desc: " + desc, Character.isLowerCase(desc.charAt(0)) || Character.isUpperCase(desc.charAt(1)));
-    Assert.assertTrue("Description should start with lowercase: --" + name + " desc: " + desc, Character.isLetterOrDigit(desc.charAt(0)));
-    Assert.assertFalse("Description should not end with \".\": --" + name + " desc: " + desc, desc.endsWith("."));
+    Assert.assertTrue("Flag description is too short: --" + name + " desc: " + desc, desc.length() > 8);
+    Assert.assertTrue("Flag description should start with lowercase: --" + name + " desc: " + desc, Character.isLowerCase(desc.charAt(0)) || Character.isUpperCase(desc.charAt(1)));
+    Assert.assertTrue("Flag description should start with lowercase: --" + name + " desc: " + desc, Character.isLetterOrDigit(desc.charAt(0)));
+    Assert.assertFalse("Flag description should not end with \".\": --" + name + " desc: " + desc, desc.endsWith("."));
     final String[] parts = desc.split("\\s.,;:\"!?");
     for (final String o : OUTLAWS) {
       for (final String p : parts) {
         Assert.assertFalse("Outlawed \"" + o + "\" occurs in flag --" + name + " usage: " + desc, o.equals(p));
       }
     }
-    CheckSpelling.check(name, desc);
+    CheckSpelling.check("--" + name, desc);
     final String lcDesc = desc.toLowerCase(Locale.getDefault());
 
     // Should not mention the word default twice
@@ -132,13 +144,14 @@ public final class TestCFlags {
     final StringBuilder problems = new StringBuilder();
     try {
       CheckSpelling.setSpelling(problems);
+      checkProgramDescription(flags);
       final Set<String> cats = flags.getCategories() == null ? null : new HashSet<>(Arrays.asList(flags.getCategories()));
       for (final Flag<?> f : flags.getRequired()) {
-        checkDescriptionConstraints(f);
+        checkFlagDescriptionConstraints(f);
         checkFlagCategory(cats, f);
       }
       for (final Flag<?> f : flags.getOptional()) {
-        checkDescriptionConstraints(f);
+        checkFlagDescriptionConstraints(f);
         checkFlagCategory(cats, f);
       }
       if (problems.length() > 0) {

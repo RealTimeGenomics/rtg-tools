@@ -80,7 +80,7 @@ class ReadSimCliValidator implements Validator {
       return false;
     }
     if (cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) && !(cflags.isSet(ReadSimCli.ABUNDANCE) || cflags.isSet(ReadSimCli.DNA_FRACTION))) {
-      cflags.setParseMessage("either --" + ReadSimCli.ABUNDANCE + " or --" + ReadSimCli.DNA_FRACTION + " must be set if using --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
+      cflags.setParseMessage("Either --" + ReadSimCli.ABUNDANCE + " or --" + ReadSimCli.DNA_FRACTION + " must be set if using --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
       return false;
 
     }
@@ -151,7 +151,7 @@ class ReadSimCliValidator implements Validator {
         return false;
       }
       if ((Integer) cflags.getValue(ReadSimCli.READLENGTH) > (Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT)) {
-        cflags.error("Read length is too large for selected fragment size");
+        cflags.setParseMessage("Read length is too large for selected fragment size");
         return false;
       }
       if (!cflags.checkBanned(ReadSimCli.LEFT_READLENGTH, ReadSimCli.RIGHT_READLENGTH, ReadSimCli.MIN_TOTAL_454_LENGTH, ReadSimCli.MAX_TOTAL_454_LENGTH, ReadSimCli.MIN_TOTAL_IONTORRENT_LENGTH, ReadSimCli.MAX_TOTAL_IONTORRENT_LENGTH)) {
@@ -163,12 +163,12 @@ class ReadSimCliValidator implements Validator {
       }
       if (((Integer) cflags.getValue(ReadSimCli.LEFT_READLENGTH) <= 1)
         || ((Integer) cflags.getValue(ReadSimCli.RIGHT_READLENGTH) <= 1)) {
-        cflags.error("Read length is too small");
+        cflags.setParseMessage("Read length is too small");
         return false;
       }
       if (((Integer) cflags.getValue(ReadSimCli.LEFT_READLENGTH) > (Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT))
         || ((Integer) cflags.getValue(ReadSimCli.RIGHT_READLENGTH) > (Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT))) {
-        cflags.error("Read length is too large for selected fragment size");
+        cflags.setParseMessage("Read length is too large for selected fragment size");
         return false;
       }
       if (!cflags.checkBanned(ReadSimCli.READLENGTH, ReadSimCli.MIN_TOTAL_454_LENGTH, ReadSimCli.MAX_TOTAL_454_LENGTH)) {
@@ -188,7 +188,7 @@ class ReadSimCliValidator implements Validator {
         return false;
       }
       if ((Integer) cflags.getValue(ReadSimCli.MAX_TOTAL_454_LENGTH) > (Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT)) {
-        cflags.error("Read length is too large for selected fragment size");
+        cflags.setParseMessage("Read length is too large for selected fragment size");
         return false;
       }
     } else if (mt == MachineType.IONTORRENT) {
@@ -199,7 +199,7 @@ class ReadSimCliValidator implements Validator {
         return false;
       }
       if ((Integer) cflags.getValue(ReadSimCli.MAX_TOTAL_IONTORRENT_LENGTH) > (Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT)) {
-        cflags.error("Read length is too large for selected fragment size");
+        cflags.setParseMessage("Read length is too large for selected fragment size");
         return false;
       }
     } else {

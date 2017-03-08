@@ -607,6 +607,14 @@ public final class CFlags {
     mProgramDescription = description;
   }
 
+  /**
+   * Gets the description of the program reading the arguments.
+   * @return the description.
+   */
+  public String getDescription() {
+    return mProgramDescription;
+  }
+
   private void setFlag(final Flag<?> flag, final String strValue) {
 //    if (strValue != null && strValue.contains("\n")) {
 //      throw new IllegalArgumentException("Value cannot contain new line characters.");
@@ -1356,7 +1364,7 @@ public final class CFlags {
         for (Flag<?> flag : flags) {
           if (displayFlag(flag, level)) {
             final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
-            final String desc = StringUtils.titleCase(flag.getUsageDescription());
+            final String desc = StringUtils.sentencify(flag.getUsageDescription());
             table.addRow(
               shortFlag,
               "``" + flag.getFlagUsage() + "``",
@@ -1518,7 +1526,7 @@ public final class CFlags {
    * Prints message to the specified output.
    * @param msg message to be written to output.
    */
-  public void out(final String msg) {
+  private void out(final String msg) {
     try {
       mOut.append(msg);
       mOut.append(LS);
