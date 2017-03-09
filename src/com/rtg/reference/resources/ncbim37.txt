@@ -1,0 +1,32 @@
+# Reference specification for NCBIM37 mouse genome
+# See http://may2012.archive.ensembl.org/Mus_musculus/Info/Index
+version	1
+
+either	def	diploid	linear
+
+either	seq	1	diploid	linear
+either	seq	2	diploid	linear
+either	seq	3	diploid	linear
+either	seq	4	diploid	linear
+either	seq	5	diploid	linear
+either	seq	6	diploid	linear
+either	seq	7	diploid	linear
+either	seq	8	diploid	linear
+either	seq	9	diploid	linear
+either	seq	10	diploid	linear
+either	seq	11	diploid	linear
+either	seq	12	diploid	linear
+either	seq	13	diploid	linear
+either	seq	14	diploid	linear
+either	seq	15	diploid	linear
+either	seq	16	diploid	linear
+either	seq	17	diploid	linear
+either	seq	18	diploid	linear
+either	seq	19	diploid	linear
+
+male	seq	X	haploid	linear	Y
+male	seq	Y	haploid	linear	X
+female	seq	X	diploid	linear
+female	seq	Y	none	linear
+
+either	seq	MT	polyploid	circular

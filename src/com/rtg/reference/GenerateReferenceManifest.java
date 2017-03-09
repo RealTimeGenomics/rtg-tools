@@ -29,9 +29,15 @@
  */
 package com.rtg.reference;
 
+import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.SDF;
+import static com.rtg.launcher.CommonFlags.STRING;
+import static com.rtg.launcher.CommonFlags.TEMPLATE_FLAG;
+
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -50,6 +56,7 @@ import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.Resources;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.cli.Validator;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -62,6 +69,7 @@ public class GenerateReferenceManifest extends AbstractCli {
     ReferenceManifest.CheckTypes.LENGTH
   };
   private static final String DESCRIPTION_FLAG = "description";
+  private static final String REFERENCE_ID_FLAG = "reference-id";
 
   private interface GetCheckValue {
     String getValue(SequencesReader reader, long seqId) throws IOException;
@@ -94,35 +102,41 @@ public class GenerateReferenceManifest extends AbstractCli {
   /**
    * Generates a reference manifest from an SDF an reference description file
    * @param sdfDir directory of reference SDF
-   * @param refTxtResource resource path to reference description file
+   * @param refTxtName short name for description file
    * @param writer writer to write output reference manifest
    * @param description description for the manifest
    * @throws IOException if an IO error occurs
    */
-  public static void generateManifest(File sdfDir, String refTxtResource, Writer writer, String description) throws IOException {
+  public static void generateManifest(File sdfDir, String refTxtName, Writer writer, String description) throws IOException {
     final String descUse = description != null ? description : ("Generated from " + sdfDir);
+    final String refTxtResource = "com/rtg/reference/resources/" + refTxtName + ".txt";
     try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(sdfDir)) {
       if (reader.hasNames() && reader.numberSequences() <= ReferenceManifest.MAX_SEQUENCE_NAMES) {
-        try (InputStreamReader refReader = new InputStreamReader(Resources.getResourceAsStream(refTxtResource))) {
-          final Map<String, Long> names = ReaderUtils.getSequenceNameMap(reader);
-          final ReferenceGenome ref = new ReferenceGenome(reader, refReader, Sex.MALE);
-          writer.write("#ref-manifest v2.0\n");
-          writer.write("@desc\t" + descUse + "\n");
-          writer.write("@source\t" + refTxtResource + "\n");
-          writer.write("@checks\t" + Arrays.stream(CHECKS).map(t -> t.name().toLowerCase(Locale.getDefault())).collect(Collectors.joining("\t")) + "\n");
-          final GetCheckValue[] getters = new GetCheckValue[CHECKS.length - 1];
-          for (int i = 0; i < CHECKS.length - 1; ++i) {
-            getters[i] = checkValueFactory(CHECKS[i + 1]);
+        try (InputStream is = Resources.getResourceAsStream(refTxtResource)) {
+          if (is == null) {
+            throw new IOException("Expected to find existing resource at: " + refTxtResource);
           }
-          for (ReferenceSequence sequence : ref.sequences()) {
-            if (sequence.isSpecified()) {
-              final long seqId = names.get(sequence.name());
-              writer.write(sequence.name());
-              for (int i = 0; i < getters.length; ++i) {
-                writer.write("\t");
-                writer.write(getters[i].getValue(reader, seqId));
+          try (InputStreamReader refReader = new InputStreamReader(is)) {
+            final Map<String, Long> names = ReaderUtils.getSequenceNameMap(reader);
+            final ReferenceGenome ref = new ReferenceGenome(reader, refReader, Sex.MALE);
+            writer.write("#ref-manifest v2.0\n");
+            writer.write("@desc\t" + descUse + "\n");
+            writer.write("@source\t" + refTxtResource + "\n");
+            writer.write("@checks\t" + Arrays.stream(CHECKS).map(t -> t.name().toLowerCase(Locale.getDefault())).collect(Collectors.joining("\t")) + "\n");
+            final GetCheckValue[] getters = new GetCheckValue[CHECKS.length - 1];
+            for (int i = 0; i < CHECKS.length - 1; ++i) {
+              getters[i] = checkValueFactory(CHECKS[i + 1]);
+            }
+            for (ReferenceSequence sequence : ref.sequences()) {
+              if (sequence.isSpecified()) {
+                final long seqId = names.get(sequence.name());
+                writer.write(sequence.name());
+                for (int i = 0; i < getters.length; ++i) {
+                  writer.write("\t");
+                  writer.write(getters[i].getValue(reader, seqId));
+                }
+                writer.write("\n");
               }
-              writer.write("\n");
             }
           }
         }
@@ -132,29 +146,52 @@ public class GenerateReferenceManifest extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    initFlags(mFlags);
+    mFlags.setDescription("Creates a manifest that allows a reference.txt to be auto-installed during format. The reference configuration file should already exist in the references resource directory");
+    mFlags.registerExtendedHelp();
+    CommonFlags.initForce(mFlags);
+    mFlags.registerRequired('t', TEMPLATE_FLAG, File.class, SDF, "reference SDF to generate manifest for").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('r', REFERENCE_ID_FLAG, String.class, STRING, "short identifier of reference").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional('d', DESCRIPTION_FLAG, String.class, STRING, "short text description for manifest");
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "resource directory into which manifest is written, or - for standard out").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.setValidator(new Validator() {
+      @Override
+      public boolean isValid(CFlags flags) {
+        final File outdir = (File) flags.getValue(OUTPUT_FLAG);
+        if (!FileUtils.isStdio(outdir)) {
+          if (!outdir.exists() || !outdir.isDirectory()) {
+            flags.setParseMessage("Resource directory is not an existing directory");
+            return false;
+          }
+          final String id = (String) flags.getValue(REFERENCE_ID_FLAG);
+          if (!CommonFlags.validateInputFile(flags, new File(outdir, id + ".txt"))) {
+            return false;
+          }
+          if (!CommonFlags.validateOutputFile(flags, getManifestFile(outdir, id))) {
+            return false;
+          }
+        }
+        return true;
+      }
+    });
   }
 
-  private static void initFlags(CFlags flags) {
-    flags.registerExtendedHelp();
-    flags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "Reference to generate manifest for").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerRequired(String.class, CommonFlags.STRING, "Resource name of reference description").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.FILE, "Output file name or - for standard out").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    flags.registerOptional('d', DESCRIPTION_FLAG, String.class, "STRING", "description for manifest");
+  private static File getManifestFile(File out, String refId) {
+    return FileUtils.isStdio(out) ? out : new File(out, refId + ".manifest");
   }
 
-  private static Writer getFileWriter(File out) throws IOException {
-    if (FileUtils.isStdio(out)) {
-      return new OutputStreamWriter(FileUtils.getStdoutAsOutputStream());
-    }
-    return new FileWriter(out);
-
+  private static Writer getFileWriter(File out, String refId) throws IOException {
+    return new OutputStreamWriter(FileUtils.createOutputStream(getManifestFile(out, refId)));
   }
+
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
-    final File outFile = (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
-    try (Writer writer = getFileWriter(outFile)) {
-      generateManifest((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG), (String) mFlags.getAnonymousValue(0), writer, (String) mFlags.getValue(DESCRIPTION_FLAG));
+    final File outFile = (File) mFlags.getValue(OUTPUT_FLAG);
+    final String refId = (String) mFlags.getValue(REFERENCE_ID_FLAG);
+    try (Writer writer = getFileWriter(outFile, refId)) {
+      generateManifest((File) mFlags.getValue(TEMPLATE_FLAG), refId, writer, (String) mFlags.getValue(DESCRIPTION_FLAG));
+    }
+    if (!FileUtils.isStdio(outFile)) {
+      System.out.println("Done, don't forget to update the manifest.list if necessary");
     }
     return 0;
   }

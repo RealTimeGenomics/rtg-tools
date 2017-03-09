@@ -34,24 +34,23 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
 
+import com.rtg.AbstractTest;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.TestCase;
-
 /**
  *
  */
-public class GenerateReferenceManifestTest extends TestCase {
+public class GenerateReferenceManifestTest extends AbstractTest {
 
   public void test() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
       final String dna = FileHelper.resourceToString("com/rtg/reference/resources/testref.fasta");
       final File sdfDir = ReaderTestUtils.getDNADir(dna, new File(dir, "sdf"));
       final StringWriter writer = new StringWriter();
-      GenerateReferenceManifest.generateManifest(sdfDir, "com/rtg/reference/resources/testref-reference.txt", writer, null);
+      GenerateReferenceManifest.generateManifest(sdfDir, "testref-reference", writer, null);
       final String exp = StringUtils.grepMinusV(FileHelper.resourceToString("com/rtg/reference/resources/testref.manifest"), "@desc");
       final String actual = StringUtils.grepMinusV(writer.toString(), "@desc");
       assertEquals(exp, actual);
