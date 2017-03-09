@@ -213,6 +213,10 @@ public final class ReferenceDetector {
     return mDesc;
   }
 
+  String getRefTxt() {
+    return mRefTxt;
+  }
+
   /**
    * Installs linked reference configuration into SDF
    * @param sr the SDF to install to

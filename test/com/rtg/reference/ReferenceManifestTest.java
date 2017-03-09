@@ -31,6 +31,9 @@
 package com.rtg.reference;
 
 import java.io.IOException;
+import java.io.InputStream;
+
+import com.rtg.util.Resources;
 
 import junit.framework.TestCase;
 
@@ -41,6 +44,14 @@ public class ReferenceManifestTest extends TestCase {
 
   public void test() throws IOException {
     assertEquals(5, ReferenceManifest.getReferenceDetectors().size());
+  }
+
+  public void testReferencesExist() throws IOException {
+    for (final ReferenceDetector referenceDetector : ReferenceManifest.getReferenceDetectors()) {
+      try (final InputStream refStream = Resources.getResourceAsStream(referenceDetector.getRefTxt())) {
+        assertNotNull(refStream);
+      }
+    }
   }
 
 }
