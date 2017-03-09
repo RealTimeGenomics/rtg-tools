@@ -29,6 +29,6 @@ male	seq	Y	haploid	linear	X
 female	seq	X	diploid	linear
 female	seq	Y	none	linear
 #PAR pseudoautosomal region
-male	dup	chrX:169969759-170931299	chrY:90745845-91644698
+male	dup	X:169969759-170931299	Y:90745845-91644698
 
 either	seq	MT	polyploid	circular
