@@ -44,7 +44,7 @@ public class SampleSimulatorCliTest extends AbstractCliTest {
   }
 
   public void testInitParams() {
-    checkHelp("reference", "input genome",
+    checkHelp("reference", "reference genome",
         "-i", "input=", "input VCF",
         "-o", "output=", "output VCF",
         "print help on command-line flag usage",

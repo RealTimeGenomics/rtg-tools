@@ -90,7 +90,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     mFlags.setDescription("Generates a VCF containing a derived genotype containing de novo variants.");
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerRequired('t', REFERENCE_SDF, File.class, "SDF", "SDF containing input genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_SDF, File.class, "SDF", "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('i', INPUT_VCF, File.class, "FILE", "input VCF containing genotype of original sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
@@ -110,13 +110,9 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
 
     @Override
     public boolean isValid(final CFlags cflags) {
-      if (!cflags.checkNand(OUTPUT_SDF, CommonFlags.NO_GZIP)) {
-        return false;
-      }
-      if (!CommonFlags.validateNotStdout((File) cflags.getValue(OUTPUT_VCF))) {
-        return false;
-      }
-      return !(cflags.isSet(OUTPUT_SDF) && !CommonFlags.validateOutputDirectory(cflags, OUTPUT_SDF));
+      return cflags.checkNand(OUTPUT_SDF, CommonFlags.NO_GZIP)
+        && CommonFlags.validateNotStdout((File) cflags.getValue(OUTPUT_VCF))
+        && (!cflags.isSet(OUTPUT_SDF) || CommonFlags.validateOutputDirectory(cflags, OUTPUT_SDF));
     }
   }
 

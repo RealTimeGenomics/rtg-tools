@@ -84,7 +84,7 @@ public class SampleSimulatorCli extends AbstractCli {
     mFlags.setDescription("Generates a VCF containing a genotype simulated from a population.");
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerRequired('t', REFERENCE_SDF, File.class, "SDF", "SDF containing input genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_SDF, File.class, "SDF", "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('i', POPULATION_VCF, File.class, "FILE", "input VCF containing population variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);

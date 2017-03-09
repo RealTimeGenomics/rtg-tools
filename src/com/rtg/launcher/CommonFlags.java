@@ -380,6 +380,29 @@ public final class CommonFlags {
   }
 
   /**
+   * Initialize the flag for specifying reference genome SDF
+   * @param flags shared flags
+   * @param required true if the reference is a required parameter
+   */
+  public static void initReferenceTemplate(CFlags flags, boolean required) {
+    initReferenceTemplate(flags, TEMPLATE_FLAG, required, "");
+  }
+
+  /**
+   * Initialize the flag for specifying reference genome SDF
+   * @param flags shared flags
+   * @param name the flag name
+   * @param required true if the reference is a required parameter
+   * @param suffix appended to description
+   */
+  public static void initReferenceTemplate(CFlags flags, String name, boolean required, String suffix) {
+    final Flag<File> f = flags.registerOptional('t', name, File.class, "SDF", "SDF containing the reference genome" + suffix).setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    if (required) {
+      f.setMinCount(1);
+    }
+  }
+
+  /**
    * Initialize the flag that permits overwriting existing files/directories
    * @param flags shared flags
    */

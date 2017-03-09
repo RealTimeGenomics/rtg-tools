@@ -1316,8 +1316,8 @@ public final class CFlags {
     wb.append("**Usage:**").append(LS).append(LS);
     wb.append("[TODO]").append(LS).append(LS);
 
-    wb.append(".. seealso::").append(LS).append(LS);
-    wb.append("  [TODO]").append(LS).append(LS);
+    wb.append(".. seealso::").append(LS);
+    wb.append("  :ref:[TODO]").append(LS).append(LS);
     return wb.toString();
   }
 
