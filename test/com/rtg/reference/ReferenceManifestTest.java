@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class ReferenceManifestTest extends TestCase {
 
   public void test() throws IOException {
-    assertEquals(4, ReferenceManifest.getReferenceDetectors().size());
+    assertEquals(5, ReferenceManifest.getReferenceDetectors().size());
   }
 
 }
