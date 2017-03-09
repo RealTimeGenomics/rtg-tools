@@ -77,23 +77,6 @@ public class ReferenceParseTest extends TestCase {
     assertNull(ReferenceParse.getSex("xxx"));
   }
 
-  public void testLength() {
-    final Map<String, Integer> names = new HashMap<>();
-    names.put("s1", 4);
-    assertEquals(4, ReferenceParse.length(names, new RegionRestriction("s1:1-4")));
-    assertEquals(3, ReferenceParse.length(names, new RegionRestriction("s1:1-3")));
-    assertEquals(3, ReferenceParse.length(names, new RegionRestriction("s1:2-4")));
-    assertEquals(4, ReferenceParse.length(names, new RegionRestriction("s1", RegionRestriction.MISSING, RegionRestriction.MISSING)));
-  }
-
-  public void testLengthEqual() {
-    final Map<String, Integer> names = new HashMap<>();
-    names.put("s1", 4);
-    assertTrue(ReferenceParse.lengthsEqual(names, new RegionRestriction("s1:1-4"), new RegionRestriction("s1", RegionRestriction.MISSING, RegionRestriction.MISSING)));
-    assertFalse(ReferenceParse.lengthsEqual(names, new RegionRestriction("s1:2-4"), new RegionRestriction("s1", RegionRestriction.MISSING, RegionRestriction.MISSING)));
-    assertTrue(ReferenceParse.lengthsEqual(names, new RegionRestriction("s1:1-3"), new RegionRestriction("s1:1-3")));
-  }
-
   public void testSexMatch() {
     assertEquals(true, ReferenceParse.sexMatch(Sex.EITHER, Sex.EITHER));
     assertEquals(true, ReferenceParse.sexMatch(Sex.MALE, Sex.EITHER));
@@ -285,15 +268,6 @@ public class ReferenceParseTest extends TestCase {
     names.put("s1", 3);
     final ReferenceParse parse = new ReferenceParse(names, null, Sex.MALE);
     assertEquals("Invalid region:xxx", parse.dup(new String[] {"male", "dup", "s1:1-3", "xxx"}, true));
-  }
-
-  //lengths disagree
-  public void testDup5() {
-    final Map<String, Integer> names = new HashMap<>();
-    names.put("s1", 3);
-    names.put("s2", 8);
-    final ReferenceParse parse = new ReferenceParse(names, null, Sex.MALE);
-    assertEquals("Lengths of regions disagree.", parse.dup(new String[] {"male", "dup", "s1:1-3", "s2:4-7"}, true));
   }
 
   //valid

@@ -55,7 +55,7 @@ class ReferenceParse {
       final String name = reg.getSequenceName();
       final Integer length = sequenceLengths.get(name);
 
-      if (length == null || reg.getEnd() > length) {
+      if (length == null || reg.getStart() == RegionRestriction.MISSING || reg.getEnd() == RegionRestriction.MISSING || reg.getEnd() > length) {
         return null;
       }
       return reg;
@@ -78,23 +78,6 @@ class ReferenceParse {
     } catch (final IllegalArgumentException e) {
       return null;
     }
-  }
-
-  /**
-   * Test if lengths of regions the same.
-   * @param sequenceLengths map containing sequence lengths, used to resolve unresolved lengths in regions
-   * @param r1 first region to be checked.
-   * @param r2 second region to be tested.
-   * @return true iff their lengths are the same.
-   */
-  static boolean lengthsEqual(final Map<String, Integer> sequenceLengths, RegionRestriction r1, RegionRestriction r2) {
-    return length(sequenceLengths, r1) == length(sequenceLengths, r2);
-  }
-
-  static int length(final Map<String, Integer> names, RegionRestriction r) {
-    final int start = r.getStart() == RegionRestriction.MISSING ? 0 : r.getStart();
-    final int end = r.getEnd() == RegionRestriction.MISSING ? names.get(r.getSequenceName()) : r.getEnd();
-    return end - start;
   }
 
   static boolean sexMatch(final Sex actual, final Sex lineSex) {
@@ -230,9 +213,6 @@ class ReferenceParse {
     final RegionRestriction r2 = region(mNames, dup2);
     if (r2 == null) {
       return "Invalid region:" + dup2;
-    }
-    if (!lengthsEqual(mNames, r1, r2)) {
-      return "Lengths of regions disagree.";
     }
     if (match) {
       mDuplicates.add(new Pair<>(r1, r2));
