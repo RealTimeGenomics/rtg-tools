@@ -60,21 +60,15 @@ import htsjdk.samtools.SAMReadGroupRecord;
 /**
  * Perform the prereading of CG sequence data, into a format that is understood
  * by RTG.
- *
  */
 public final class Cg2Sdf extends LoggedCli {
 
   static final String MODULE_NAME = "cg2sdf";
-
-
-  //static final String VERSION_1 = "Xversion1";
   static final String MAXIMUM_NS = "max-unknowns";
   static final String NO_QUALITY = "no-quality";
 
   static final String COMPRESS_FLAG = "Xcompress";
   private static final String KEEP_NAMES = "Xkeep-names";
-
-  //private final boolean mHasQuality;
 
   @Override
   public String moduleName() {
@@ -100,10 +94,8 @@ public final class Cg2Sdf extends LoggedCli {
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.registerOptional(MAXIMUM_NS, Integer.class, "INT", "maximum number of Ns allowed in either side for a read", 5).setCategory(FILTERING);
-    //
     mFlags.registerOptional(NO_QUALITY, "does not include quality data in the resulting SDF").setCategory(UTILITY);
     mFlags.registerOptional(COMPRESS_FLAG, Boolean.class, "BOOL", "compress sdf", Boolean.TRUE).setCategory(UTILITY);
-    //ags.registerOptional(VERSION_1, "input files are Complete Genomics Version 1.xx");
     mFlags.registerOptional(KEEP_NAMES, "add name data to the resulting SDF").setCategory(UTILITY);
     SamCommandHelper.initSamRg(mFlags, "COMPLETE", UTILITY);
     mFlags.addRequiredSet(inFlag);
@@ -167,13 +159,9 @@ public final class Cg2Sdf extends LoggedCli {
 
       // perform the actual work
       writer.processSequences(useQuality, includeNames);
-      //int maxNs = 0;
       long minInputLength = Long.MAX_VALUE;
       long maxInputLength = 0;
       for (final CgSequenceDataSource s : sources) {
-        //if (maxNs < s.getMaxNCount()) {
-        //  maxNs = s.getMaxNCount();
-        //}
         skippedResidues += s.getSkippedResidues();
         skippedNReads += s.getSkippedReads();
         if (s.getMaxLength() > maxInputLength) {
@@ -222,25 +210,12 @@ public final class Cg2Sdf extends LoggedCli {
           printLine("Minimum length     : " + writer.getMinLength(), summaries);
           printLine("Maximum length     : " + writer.getMaxLength(), summaries);
         }
-        //if (maximumNs != null) {
-        //printLine("\nMaximum Ns seen in a side of a retained read: " + maxNs, summaries);
-        //}
         if (skippedNReads > 0) {
           printLine("", summaries);
           printLine("There were " + skippedNReads + " pairs skipped due to filters", summaries);
         }
       }
     }
-  }
-
-
-  /**
-   * Format Complete Genomics data files.
-   *
-   * @param args Command line arguments
-   */
-  public static void main(final String[] args) {
-    new Cg2Sdf().mainExit(args);
   }
 
   @Override

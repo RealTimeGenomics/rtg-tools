@@ -38,12 +38,6 @@ package com.rtg.reader;
 public interface CgSequenceDataSource extends SequenceDataSource {
 
   /**
-   * return the largest number of Ns seen in any of the arms
-   * @return maximum N count
-   */
-  int getMaxNCount();
-
-  /**
    * Method to get how many reads were skipped due to filter conditions.
    * @return number of skipped reads
    */

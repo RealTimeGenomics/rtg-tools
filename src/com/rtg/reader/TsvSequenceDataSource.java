@@ -62,7 +62,6 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
   private BufferedReader mReader;
   private final Integer mMaximumNs;
   private final File mReads;
-  private int mMaximumNsCount = 0;
   private int mSkippedNReads = 0;
   private long mSkippedNResidues = 0;
   private long mMaxLength = 0;
@@ -135,14 +134,7 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
       }
     }
     final boolean r = ncountLeft <= mMaximumNs && ncountRight <= mMaximumNs;
-    if (r) {
-      if (ncountLeft > mMaximumNsCount) {
-        mMaximumNsCount = ncountLeft;
-      }
-      if (ncountRight > mMaximumNsCount) {
-        mMaximumNsCount = ncountRight;
-      }
-    } else {
+    if (!r) {
       ++mSkippedNReads;
       mSkippedNResidues += size;
     }
@@ -275,11 +267,6 @@ public class TsvSequenceDataSource implements CgSequenceDataSource {
   @Override
   public void setDusting(final boolean val) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getMaxNCount() {
-    return mMaximumNsCount;
   }
 
   @Override
