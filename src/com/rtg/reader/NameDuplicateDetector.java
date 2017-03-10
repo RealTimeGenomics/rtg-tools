@@ -112,7 +112,7 @@ public class NameDuplicateDetector {
    * @return true if there were duplicates detected
    * @throws IOException if there is an error
    */
-  public boolean checkPrereadDuplicates(PrereadNamesInterface[] prereadNames, File duplicatesOutputFile) throws IOException {
+  public boolean checkPrereadDuplicates(NamesInterface[] prereadNames, File duplicatesOutputFile) throws IOException {
     assert mCount == mHashes.length();
     boolean duplicatesDetected = false;
     if (mCount > 0) {
@@ -167,7 +167,7 @@ public class NameDuplicateDetector {
    * @throws IOException if there is an error
    */
   public boolean checkSequenceDuplicates(SequencesReader[] readers, File duplicatesOutputFile) throws IOException {
-    final PrereadNamesInterface[] prereadNames = new PrereadNamesInterface[readers.length];
+    final NamesInterface[] prereadNames = new NamesInterface[readers.length];
     for (int i = 0; i < readers.length; ++i) {
       prereadNames[i] = readers[i] != null ? readers[i].names() : null;
     }
@@ -196,12 +196,12 @@ public class NameDuplicateDetector {
    * @return true if duplicates are in the given sequence, false otherwise.
    * @throws IOException if the sequences readers throw an exception.
    */
-  public static boolean checkPrereadNames(PrereadNamesInterface prereadNames, File outputFile) throws IOException {
+  public static boolean checkPrereadNames(NamesInterface prereadNames, File outputFile) throws IOException {
     final long numberSequences = prereadNames.length();
     final NameDuplicateDetector dupDetector = new NameDuplicateDetector(numberSequences);
     for (long i = 0; i < numberSequences; ++i) {
       dupDetector.addPair(prereadNames.name(i), (int) i, 0);
     }
-    return dupDetector.checkPrereadDuplicates(new PrereadNamesInterface[] {prereadNames}, outputFile);
+    return dupDetector.checkPrereadDuplicates(new NamesInterface[] {prereadNames}, outputFile);
   }
 }

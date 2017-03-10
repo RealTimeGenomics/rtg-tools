@@ -46,7 +46,7 @@ import junit.framework.TestCase;
 public class SimplePrereadNamesTest extends TestCase {
 
   public void testSomeMethod() throws IOException {
-    final SimplePrereadNames sprn = new SimplePrereadNames();
+    final SimpleNames sprn = new SimpleNames();
     sprn.setName(0, "first");
     sprn.setName(1, "second");
     sprn.setName(2, "third");
@@ -70,8 +70,8 @@ public class SimplePrereadNamesTest extends TestCase {
     final File dir = FileHelper.createTempDirectory();
     try {
       final File queryDir = ReaderTestUtils.getDNADir(PrereadNamesTest.SEQ_DNA_A2, new File(dir, "q"));
-      final PrereadNames names = new PrereadNames(queryDir, LongRange.NONE);
-      final SimplePrereadNames sprn = new SimplePrereadNames();
+      final Names names = new Names(queryDir, LongRange.NONE);
+      final SimpleNames sprn = new SimpleNames();
       for (long i = 0; i < names.length(); ++i) {
         sprn.setName(i, names.name(i));
       }

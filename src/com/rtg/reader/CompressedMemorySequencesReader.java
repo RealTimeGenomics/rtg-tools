@@ -132,8 +132,8 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   // Delayed initialization
   private ByteCompression mQualityData;
   private ByteArray mQualityChecksums;
-  private PrereadNamesInterface mNames;
-  private PrereadNamesInterface mNameSuffixes;
+  private NamesInterface mNames;
+  private NamesInterface mNameSuffixes;
 
   private int mReadCount = 0;    // Number of reads read out (to indicate when to perform checksum check)
   private int mQualityCount = 0; // Number of qualities read out (to indicate when to perform checksum check)
@@ -173,7 +173,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
    * @param nameSuffixes suffixes of names of sequences
    * @param region region restriction
    */
-  public CompressedMemorySequencesReader(File originPath, IndexFile indexFile, BitwiseByteArray seqData, ByteCompression qualityData, ByteArray seqChecksums, ByteArray qualityChecksums, ExtensibleIndex positions, PrereadNamesInterface names, PrereadNamesInterface nameSuffixes, LongRange region) {
+  public CompressedMemorySequencesReader(File originPath, IndexFile indexFile, BitwiseByteArray seqData, ByteCompression qualityData, ByteArray seqChecksums, ByteArray qualityChecksums, ExtensibleIndex positions, NamesInterface names, NamesInterface nameSuffixes, LongRange region) {
     mDirectory = originPath;
     mCanonicalDirectory = null;
     mIndex = indexFile;
@@ -214,7 +214,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     mIndex = new IndexFile(Long.MAX_VALUE, type.ordinal(), totalLength, max, min, counts.length);
     mDirectory = null;
     mCanonicalDirectory = null;
-    mNames = new ArrayPrereadNames(labels);
+    mNames = new ArrayNames(labels);
     final int range = type.numberKnownCodes() + type.firstValid();
     mSeqData = new BitwiseByteArray(totalLength, CompressedByteArray.minBits(range));
     mQualityData = null;
@@ -324,7 +324,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   public void close() { } // no need to do anything
 
   @Override
-  public PrereadNamesInterface names() {
+  public NamesInterface names() {
     if (mNames == null) {
       throw new IllegalStateException("Names have not been loaded or are not present in the SDF");
     }
@@ -335,7 +335,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
    * @throws IOException if an I/O related error occurs
    */
   private void loadNames() throws IOException {
-    mNames = new PrereadNames(mDirectory, mRegion, false);
+    mNames = new Names(mDirectory, mRegion, false);
     if (mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION && mRegion.getStart() == 0 && mRegion.getEnd() == mIndex.getNumberSequences()) {
       if (mNames.calcChecksum() != mIndex.getNameChecksum()) {
         throw new CorruptSdfException("Sequence names failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");
@@ -346,7 +346,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   }
 
   private void loadNameSuffixes(boolean attemptLoad, boolean suffixExists) throws IOException {
-    mNameSuffixes = attemptLoad && suffixExists ? new PrereadNames(mDirectory, mRegion, true) : new EmptyStringPrereadNames(mRegion.getLength());
+    mNameSuffixes = attemptLoad && suffixExists ? new Names(mDirectory, mRegion, true) : new EmptyStringNames(mRegion.getLength());
     if (attemptLoad && suffixExists) {
       if (mRegion.getStart() == 0 && mRegion.getEnd() == mIndex.getNumberSequences()) {
         if (mNameSuffixes.calcChecksum() != mIndex.getNameSuffixChecksum()) {

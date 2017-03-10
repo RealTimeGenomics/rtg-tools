@@ -79,7 +79,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
   }
 
   public void testPrereadNames() {
-    final ArrayPrereadNames pn = new ArrayPrereadNames(new String[] {"blah", "fah", "rah"});
+    final ArrayNames pn = new ArrayNames(new String[] {"blah", "fah", "rah"});
     assertEquals("fah", pn.name(1));
   }
 
@@ -88,7 +88,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     MyMemorySequencesReader(final byte[][] data, final String[] labels, final long[] counts,
         final int min, final int max, final SequenceType type) {
       super(data, labels, counts, min, max, type);
-      final ArrayPrereadNames arr = new ArrayPrereadNames(new String[]{"someFile"});
+      final ArrayNames arr = new ArrayNames(new String[]{"someFile"});
       assertEquals("someFile", arr.name(0));
       final MultiByteArray mba = new MultiByteArray(10L);
       //System.err.println(mba.get(1));

@@ -53,7 +53,7 @@ import java.util.Map;
 import com.rtg.bed.BedUtils;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.mode.SequenceType;
-import com.rtg.reader.PrereadNamesInterface;
+import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamCommandHelper;
@@ -413,7 +413,7 @@ public class ReadSimCli extends LoggedCli {
         final double[] selectionDist = new double[numSeq];
         try (FileInputStream is = new FileInputStream((File) mFlags.getValue(DISTRIBUTION))) {
           final Map<String, Double> selectionMap = createSelectionDistribution(is);
-          final PrereadNamesInterface names = reader.names();
+          final NamesInterface names = reader.names();
           final int[] lengths = reader.sequenceLengths(0, numSeq);
           double sum = 0;
           for (int k = 0; k < numSeq; ++k) {
@@ -497,7 +497,7 @@ public class ReadSimCli extends LoggedCli {
     // Verify regions sequencess match the reader
     final Collection<String> regionSequenceNames = referenceRegions.sequenceNames();
     final int total = regionSequenceNames.size();
-    final PrereadNamesInterface names = reader.names();
+    final NamesInterface names = reader.names();
     int removed = 0;
     for (long k = 0; k < names.length(); ++k) {
       if (regionSequenceNames.remove(names.name(k))) {

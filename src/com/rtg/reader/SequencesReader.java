@@ -317,7 +317,7 @@ public interface SequencesReader extends AutoCloseable {
    * @return names
    * @throws IOException If in I/O error occurs
    */
-  PrereadNamesInterface names() throws IOException;
+  NamesInterface names() throws IOException;
 
   /**
    * count the number of residue in the sequences between <code>start</code>(inclusive) and <code>end</code>(exclusive).

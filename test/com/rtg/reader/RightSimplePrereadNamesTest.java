@@ -40,8 +40,8 @@ import junit.framework.TestCase;
  */
 public class RightSimplePrereadNamesTest extends TestCase {
   public void testSomeMethod() throws IOException {
-    final SimplePrereadNames sprn = new SimplePrereadNames();
-    final RightSimplePrereadNames rprn = new RightSimplePrereadNames(sprn);
+    final SimpleNames sprn = new SimpleNames();
+    final RightSimpleNames rprn = new RightSimpleNames(sprn);
     sprn.setName(0, "first");
     sprn.setName(1, "second/1");
     sprn.setName(2, "third");

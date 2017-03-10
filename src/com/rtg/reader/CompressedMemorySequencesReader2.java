@@ -45,8 +45,8 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
 
   private final IndexFile mIndexFile;
 
-  private PrereadNamesInterface mNames;
-  private PrereadNamesInterface mNameSuffixes;
+  private NamesInterface mNames;
+  private NamesInterface mNameSuffixes;
   private final DataInMemory mData;
   private final long mNumberSequences;
   final File mDirectory;
@@ -102,7 +102,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
    * @throws IOException if an I/O related error occurs
    */
   private void loadNames() throws IOException {
-    mNames = new PrereadNames(mDirectory, mRegion, false);
+    mNames = new Names(mDirectory, mRegion, false);
     if (mIndexFile.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION && mRegion.getStart() == 0 && mRegion.getEnd() == mIndexFile.getNumberSequences()) {
       if (mNames.calcChecksum() != mIndexFile.getNameChecksum()) {
         throw new CorruptSdfException("Sequence names failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");
@@ -113,7 +113,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   private void loadNameSuffixes(boolean attemptLoad, boolean suffixExists) throws IOException {
-    mNameSuffixes = attemptLoad && suffixExists ? new PrereadNames(mDirectory, mRegion, true) : new EmptyStringPrereadNames(mEnd - mStart);
+    mNameSuffixes = attemptLoad && suffixExists ? new Names(mDirectory, mRegion, true) : new EmptyStringNames(mEnd - mStart);
     if (attemptLoad && suffixExists) {
       if (mRegion.getStart() == 0 && mRegion.getEnd() == mIndexFile.getNumberSequences()) {
         if (mNameSuffixes.calcChecksum() != mIndexFile.getNameSuffixChecksum()) {
@@ -200,7 +200,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
-  public PrereadNamesInterface names() {
+  public NamesInterface names() {
     return mNames;
   }
 

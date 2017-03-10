@@ -122,7 +122,7 @@ public abstract class DummySequencesReader implements SequencesReader {
     return 0;
   }
   @Override
-  public PrereadNamesInterface names() {
+  public NamesInterface names() {
     return null;
   }
   @Override

@@ -208,8 +208,8 @@ public class ArraySequencesReader extends DummySequencesReader {
   }
 
   @Override
-  public PrereadNamesInterface names() {
-    return new PrereadNamesInterface() {
+  public NamesInterface names() {
+    return new NamesInterface() {
       @Override
       public long length() {
         return numberSequences();

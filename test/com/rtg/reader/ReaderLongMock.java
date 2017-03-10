@@ -53,7 +53,7 @@ public class ReaderLongMock extends DummySequencesReader {
     return 1;
   }
 
-  private static class NullNames extends PrereadNames {
+  private static class NullNames extends Names {
     @Override
     public String name(final long id) {
       return null;
@@ -61,7 +61,7 @@ public class ReaderLongMock extends DummySequencesReader {
   }
 
   @Override
-  public PrereadNames names() {
+  public Names names() {
     return new NullNames();
   }
 

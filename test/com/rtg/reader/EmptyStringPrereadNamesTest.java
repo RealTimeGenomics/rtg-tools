@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class EmptyStringPrereadNamesTest extends TestCase {
 
   public void testSomeMethod() throws IOException {
-    final EmptyStringPrereadNames thing = new EmptyStringPrereadNames(5);
+    final EmptyStringNames thing = new EmptyStringNames(5);
     assertEquals(5, thing.length());
     assertEquals("", thing.name(3));
     final StringBuilder sb = new StringBuilder();
@@ -49,7 +49,7 @@ public class EmptyStringPrereadNamesTest extends TestCase {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     thing.writeName(baos, 0);
     assertEquals("", baos.toString());
-    final SimplePrereadNames prni = new SimplePrereadNames();
+    final SimpleNames prni = new SimpleNames();
     prni.setName(0, "");
     prni.setName(1, "");
     prni.setName(2, "");

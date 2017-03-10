@@ -62,8 +62,8 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
   private int mCurrentLength;
   private long mCurrentPosition;
 
-  private final SimplePrereadNames mNames;
-  private final SimplePrereadNames mNameSuffixes;
+  private final SimpleNames mNames;
+  private final SimpleNames mNameSuffixes;
   private boolean mHasData;
   private final boolean mWriteFullNames;
 
@@ -86,7 +86,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
    * @param type preread type
    * @param restriction restrict reader to given range of reads
    */
-  public CompressedMemorySequencesWriter(File originPath, PrereadType prereadType, boolean hasQuality, SimplePrereadNames names, SimplePrereadNames suffixes, boolean compressed, SequenceType type, LongRange restriction) {
+  public CompressedMemorySequencesWriter(File originPath, PrereadType prereadType, boolean hasQuality, SimpleNames names, SimpleNames suffixes, boolean compressed, SequenceType type, LongRange restriction) {
     super(prereadType, hasQuality, names != null, compressed, type);
     setSdfId(new SdfId(0)); //we don't know the provenance of the reads
     final int range = type.numberKnownCodes() + type.firstValid();

@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rtg.reader.PrereadNamesInterface;
+import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.AutoAddMap;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -75,7 +75,7 @@ public class TaxonomyDistribution {
   TaxonomyDistribution(InputStream taxonomyDist, Map<String, Integer> taxonLookup, SequencesReader reader, DistributionType type) throws IOException {
     final Map<Integer, Double> taxonmyDistribution = parseTaxonDistribution(taxonomyDist);
     final AutoAddMap<Integer, TaxonSequences> taxon = new TaxonMap();
-    final PrereadNamesInterface names = reader.names();
+    final NamesInterface names = reader.names();
     final long numSeq = reader.numberSequences();
     final int[] lengths = reader.sequenceLengths(0, numSeq);
     for (int sequenceId = 0; sequenceId < numSeq; ++sequenceId) {

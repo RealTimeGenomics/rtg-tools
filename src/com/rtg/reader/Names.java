@@ -46,7 +46,7 @@ import com.rtg.util.io.FileUtils;
  * In memory copy of sequence names.
  *
  */
-public class PrereadNames implements PrereadNamesInterface {
+public class Names implements NamesInterface {
 
 
   static int loadPointers(ArrayList<int[]> pointersList, final File preread, final long start, final long end, final DataFileIndex nameIndex, boolean suffixes) throws IOException {
@@ -129,7 +129,7 @@ public class PrereadNames implements PrereadNamesInterface {
   private final boolean mSuffixes;
 
   /** Constructor only for testing purposes. */
-  PrereadNames() {
+  Names() {
     mSuffixes = false;
   }
 
@@ -140,7 +140,7 @@ public class PrereadNames implements PrereadNamesInterface {
    * @param region the region of the SDF to load names for
    * @exception IOException if an I/O error occurs.
    */
-  public PrereadNames(File preread, LongRange region) throws IOException {
+  public Names(File preread, LongRange region) throws IOException {
     this(preread, region, false);
   }
 
@@ -151,7 +151,7 @@ public class PrereadNames implements PrereadNamesInterface {
    * @param suffixes load name suffixes instead of names
    * @exception IOException if an I/O error occurs.
    */
-  public PrereadNames(final File preread, LongRange region, boolean suffixes) throws IOException {
+  public Names(final File preread, LongRange region, boolean suffixes) throws IOException {
     mSuffixes = suffixes;
     final IndexFile id = new IndexFile(preread);
     if (!id.hasNames()) {
@@ -306,7 +306,7 @@ public class PrereadNames implements PrereadNamesInterface {
    * @throws IOException all the time.
    */
   public static void main(String[] args) throws IOException {
-    final PrereadNames names = new PrereadNames(new File(args[0]), LongRange.NONE);
+    final Names names = new Names(new File(args[0]), LongRange.NONE);
     for (int i = 0; i < names.length(); ++i) {
       System.out.println(i + ": " + names.name(i));
     }

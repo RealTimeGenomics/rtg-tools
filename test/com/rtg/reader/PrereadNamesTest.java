@@ -68,14 +68,14 @@ public class PrereadNamesTest extends TestCase {
 
   public void testViaFile() throws Exception {
     final File queryDir = ReaderTestUtils.getDNADir(SEQ_DNA_A2, new File(mDir, "q"));
-    final PrereadNames names = new PrereadNames(queryDir, LongRange.NONE);
+    final Names names = new Names(queryDir, LongRange.NONE);
     assertEquals("u", names.name(0));
     assertEquals("v", names.name(1));
   }
 
   public void testViaFile2() throws Exception {
     final File queryDir = ReaderTestUtils.getDNADir(SEQ_DNA_A1, new File(mDir, "q"));
-    final PrereadNames names = new PrereadNames(queryDir, LongRange.NONE);
+    final Names names = new Names(queryDir, LongRange.NONE);
     assertEquals("x", names.name(0));
   }
 
@@ -101,7 +101,7 @@ public class PrereadNamesTest extends TestCase {
     final File queryDir = FileUtils.createTempDir("test", "protein");
     try {
       writeProtein(SEQ, queryDir);
-      final PrereadNames names = new PrereadNames(queryDir, LongRange.NONE);
+      final Names names = new Names(queryDir, LongRange.NONE);
       assertEquals("null+1", names.name(0));
       assertEquals("null+2", names.name(1));
       assertEquals("null+3", names.name(2));
@@ -141,7 +141,7 @@ public class PrereadNamesTest extends TestCase {
     //long[] seqIndex = {2, 1, 1, 1, 1};
     final DataFileIndex seqIndex = DataFileIndex.loadLabelDataFileIndex(new IndexFile(mDir).dataIndexVersion(), mDir);
     final ArrayList<int[]> pointers = new ArrayList<>();
-    PrereadNames.loadPointers(pointers, mDir, 3, 8, seqIndex, false);
+    Names.loadPointers(pointers, mDir, 3, 8, seqIndex, false);
 
     assertEquals(2, pointers.get(0).length);
     assertEquals(0, pointers.get(0)[0]);
@@ -165,7 +165,7 @@ public class PrereadNamesTest extends TestCase {
     final DataFileIndex seqIndex = DataFileIndex.loadLabelDataFileIndex(new IndexFile(mDir).dataIndexVersion(), mDir);
     //final long[] seqIndex = ArrayUtils.readLongArray(Bsd.labelIndexFile(mDir));
     final ArrayList<int[]> pointers = new ArrayList<>();
-    PrereadNames.loadPointers(pointers, mDir, 5, 8, seqIndex, false);
+    Names.loadPointers(pointers, mDir, 5, 8, seqIndex, false);
     assertEquals(2, pointers.size());
 
     assertEquals(2, pointers.get(0).length);
@@ -183,7 +183,7 @@ public class PrereadNamesTest extends TestCase {
   public void testPartialLoad() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    final PrereadNames names = new PrereadNames(mDir, new LongRange(3, 8));
+    final Names names = new Names(mDir, new LongRange(3, 8));
     assertEquals(5, names.length());
     assertEquals("3234567890123456789", names.name(0));
     assertEquals("423456", names.name(1));
@@ -196,7 +196,7 @@ public class PrereadNamesTest extends TestCase {
   public void testPartialLoad2() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    final PrereadNames names = new PrereadNames(mDir, new LongRange(5, 8));
+    final Names names = new Names(mDir, new LongRange(5, 8));
     assertEquals(3, names.length());
     assertEquals("523456", names.name(0));
     assertEquals("623456", names.name(1));
@@ -207,7 +207,7 @@ public class PrereadNamesTest extends TestCase {
   public void testFullLoad() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    final PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
+    final Names names = new Names(mDir, LongRange.NONE);
 
     assertEquals("0234567890123456", names.name(0));
     assertEquals("1234567890123456", names.name(1));
@@ -240,14 +240,14 @@ public class PrereadNamesTest extends TestCase {
   public void testEmpty() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(1L), 20);
     reader.close();
-    final PrereadNames names = new PrereadNames(mDir, LongRange.NONE);
+    final Names names = new Names(mDir, LongRange.NONE);
     assertEquals(0, names.length());
   }
 
   public void testEmptyRegion() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA(NAMES_FASTA, mDir, new SdfId(1L), 20);
     reader.close();
-    final PrereadNames names = new PrereadNames(mDir, new LongRange(2, 2));
+    final Names names = new Names(mDir, new LongRange(2, 2));
     assertEquals(0, names.length());
   }
 

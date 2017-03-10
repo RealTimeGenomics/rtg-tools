@@ -792,7 +792,7 @@ public final class FormatCli extends LoggedCli {
       final boolean resRight = containsDuplicatedNames(ReaderUtils.getRightEnd(outputDir));
       return resLeft || resRight;
     }
-    final PrereadNamesInterface names = new PrereadNames(outputDir, LongRange.NONE);
+    final NamesInterface names = new Names(outputDir, LongRange.NONE);
     return NameDuplicateDetector.checkPrereadNames(names, new File(outputDir.getPath(), "duplicate-names.txt"));
   }
 

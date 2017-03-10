@@ -160,7 +160,7 @@ public class AlternatingSequencesReader implements SequencesReader {
   }
 
   @Override
-  public PrereadNames names() {
+  public Names names() {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 

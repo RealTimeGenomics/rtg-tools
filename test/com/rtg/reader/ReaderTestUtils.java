@@ -212,7 +212,7 @@ public final class ReaderTestUtils {
   public static SequencesReader getReaderDnaMemory(String sequence) throws IOException {
     final SequencesWriter sw = new SequencesWriter(new FastaSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(sequence.getBytes())), new DNAFastaSymbolTable()), null, PrereadType.UNKNOWN, true);
     sw.setSdfId(DUMMY_TEST_ID);
-    return sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
+    return sw.processSequencesInMemory(null, true, new SimpleNames(), new SimpleNames(), LongRange.NONE);
   }
 
   /**
@@ -314,7 +314,7 @@ public final class ReaderTestUtils {
   public static SequencesReader getReaderProteinMemory(String sequence) throws IOException {
     final SequencesWriter sw = new SequencesWriter(new FastaSequenceDataSource(Collections.singletonList((InputStream) new ByteArrayInputStream(sequence.getBytes())), new ProteinFastaSymbolTable()), null, PrereadType.UNKNOWN, true);
     sw.setSdfId(DUMMY_TEST_ID);
-    return sw.processSequencesInMemory(null, true, new SimplePrereadNames(), new SimplePrereadNames(), LongRange.NONE);
+    return sw.processSequencesInMemory(null, true, new SimpleNames(), new SimpleNames(), LongRange.NONE);
   }
 
   /**

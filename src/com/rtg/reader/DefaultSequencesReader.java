@@ -67,7 +67,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
   private final long mStart;
   private final long mEnd;
   private final CRC32 mChecksum = new CRC32();
-  private PrereadNames mNames = null;
+  private Names mNames = null;
 
   /**
    * @param dir directory containing the SDF files.
@@ -286,9 +286,9 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
   }
 
   @Override
-  public PrereadNames names() throws IOException {
+  public Names names() throws IOException {
     if (mNames == null) {
-      mNames = new PrereadNames(mDirectory, LongRange.NONE);
+      mNames = new Names(mDirectory, LongRange.NONE);
       if (mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION) {
         if (mNames.calcChecksum() != mIndex.getNameChecksum()) {
           throw new CorruptSdfException("Sequence names failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");

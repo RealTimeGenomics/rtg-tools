@@ -130,10 +130,10 @@ public class AlternatingSequencesWriter extends SequencesWriter {
    * @return the reader from reading the sequence data
    * @throws IOException If an I/O error occurs
    */
-  public CompressedMemorySequencesReader[] processSequencesInMemoryPaired(File sourceFile, boolean includeQuality, SimplePrereadNames names, SimplePrereadNames suffixes, LongRange region) throws IOException {
+  public CompressedMemorySequencesReader[] processSequencesInMemoryPaired(File sourceFile, boolean includeQuality, SimpleNames names, SimpleNames suffixes, LongRange region) throws IOException {
     final CompressedMemorySequencesWriter sdfWriterLeft = new CompressedMemorySequencesWriter(sourceFile, mPrereadType, mDataSource.hasQualityData() && includeQuality, names, suffixes, true, mDataSource.type(), region);
-    final RightSimplePrereadNames rNames = names == null ? null : new RightSimplePrereadNames(names);
-    final RightSimplePrereadNames rSuffixes = suffixes == null ? null : new RightSimplePrereadNames(suffixes);
+    final RightSimpleNames rNames = names == null ? null : new RightSimpleNames(names);
+    final RightSimpleNames rSuffixes = suffixes == null ? null : new RightSimpleNames(suffixes);
     final CompressedMemorySequencesWriter sdfWriterRight = new CompressedMemorySequencesWriter(sourceFile, mPrereadType, mDataSource.hasQualityData() && includeQuality, rNames, rSuffixes, true, mDataSource.type(), region);
     processSequences(sdfWriterLeft, sdfWriterRight, region);
     return new CompressedMemorySequencesReader[] {sdfWriterLeft.getReader(), sdfWriterRight.getReader()};

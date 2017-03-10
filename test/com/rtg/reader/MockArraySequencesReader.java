@@ -128,8 +128,8 @@ public class MockArraySequencesReader extends MockSequencesReader {
   }
 
   @Override
-  public PrereadNames names() {
-    return new PrereadNames() {
+  public Names names() {
+    return new Names() {
         @Override
         public String name(final long id) {
           if (mNames == null) {

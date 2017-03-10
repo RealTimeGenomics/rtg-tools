@@ -140,7 +140,7 @@ public final class ReverseComplementingReader extends AbstractSequencesReader {
   }
 
   @Override
-  public PrereadNamesInterface names() throws IOException {
+  public NamesInterface names() throws IOException {
     return mUnderlyingReader.names();
   }
 

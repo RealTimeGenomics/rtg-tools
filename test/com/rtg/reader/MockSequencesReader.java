@@ -39,7 +39,7 @@ import com.rtg.mode.SequenceType;
  */
 public class MockSequencesReader extends DummySequencesReader {
 
-  private static final class SimplePrereadNames extends PrereadNames {
+  private static final class SimpleNames extends Names {
     @Override
     public String name(final long id) {
       return "seq" + id;
@@ -155,8 +155,8 @@ public class MockSequencesReader extends DummySequencesReader {
   }
 
   @Override
-  public PrereadNames names() {
-    return new SimplePrereadNames();
+  public Names names() {
+    return new SimpleNames();
   }
 
   @Override

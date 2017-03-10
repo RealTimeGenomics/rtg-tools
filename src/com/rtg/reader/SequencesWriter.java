@@ -238,7 +238,7 @@ public class SequencesWriter {
    * @return the reader from reading the sequence data
    * @throws IOException If an I/O error occurs
    */
-  public CompressedMemorySequencesReader processSequencesInMemory(File sourceFile, boolean includeQuality, SimplePrereadNames names, SimplePrereadNames suffixes, LongRange region) throws IOException {
+  public CompressedMemorySequencesReader processSequencesInMemory(File sourceFile, boolean includeQuality, SimpleNames names, SimpleNames suffixes, LongRange region) throws IOException {
     final CompressedMemorySequencesWriter sdfWriter = new CompressedMemorySequencesWriter(sourceFile, mPrereadType, mDataSource.hasQualityData() && includeQuality, names, suffixes, true, mDataSource.type(), region);
     processSequences(sdfWriter, region);
     return sdfWriter.getReader();

@@ -34,10 +34,10 @@ import java.io.OutputStream;
 /**
  * Names implementation where all values are the empty string
  */
-class EmptyStringPrereadNames implements PrereadNamesInterface {
+class EmptyStringNames implements NamesInterface {
   private final long mLength;
 
-  EmptyStringPrereadNames(long length) {
+  EmptyStringNames(long length) {
     this.mLength = length;
   }
 

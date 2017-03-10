@@ -59,8 +59,8 @@ public class NameDuplicateDetectorTest extends TestCase {
       return mNames.length;
     }
     @Override
-    public PrereadNamesInterface names() {
-      return new PrereadNamesInterface() {
+    public NamesInterface names() {
+      return new NamesInterface() {
         @Override
         public void writeName(OutputStream os, long id) { }
         @Override

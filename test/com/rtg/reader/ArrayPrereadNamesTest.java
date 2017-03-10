@@ -32,12 +32,12 @@ package com.rtg.reader;
 import junit.framework.TestCase;
 
 /**
- * Test class for ArrayPrereadNames
+ * Test class for ArrayNames
  */
 public class ArrayPrereadNamesTest extends TestCase {
 
   public void testPrereadNames() {
-    final ArrayPrereadNames pn = new ArrayPrereadNames(new String[] {"blah", "fah", "rah"});
+    final ArrayNames pn = new ArrayNames(new String[] {"blah", "fah", "rah"});
     assertEquals("fah", pn.name(1));
     assertEquals(3, pn.length());
   }

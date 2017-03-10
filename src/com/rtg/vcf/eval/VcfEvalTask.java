@@ -44,7 +44,7 @@ import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.ParamsTask;
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
-import com.rtg.reader.PrereadNamesInterface;
+import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SdfUtils;
 import com.rtg.reader.SequencesReader;
@@ -121,7 +121,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       throw new IOException("Unable to create directory \"" + outdir.getPath() + "\"");
     }
 
-    final PrereadNamesInterface names = templateSequences.names();
+    final NamesInterface names = templateSequences.names();
     final Map<String, Long> nameMap = new HashMap<>();
     for (long i = 0; i < names.length(); ++i) {
       nameMap.put(names.name(i), i);

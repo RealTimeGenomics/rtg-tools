@@ -27,61 +27,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.reader;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Container for sequence names accessed by sequence id
+ * Utility class for writing names
  */
-public interface PrereadNamesInterface {
+class ArrayNames extends Names {
 
-  /**
-   * Returns number of names
-   * @return length of names
-   */
-  long length();
+  private final String[] mNames;
 
-  /**
-   * Returns the sequence name for a specified id.
-   * @param id sequence id
-   * @return sequence name
-   */
-  String name(long id);
+  protected ArrayNames(final String[] names) {
+    mNames = names;
+  }
 
-  /**
-   * Calculate the checksum of the names in a manner compatible with
-   * how the checksum is calculated in the SDF.
-   *
-   * @return the checksum of the names.
-   */
-  long calcChecksum();
+  @Override
+  public long length() {
+    return mNames.length;
+  }
 
-  /**
-   * @return size of object in bytes
-   */
-  long bytes();
+  @Override
+  public String name(final long id) {
+    return mNames[(int) id];
+  }
 
-  /**
-   * Convenience method to append a name to an Appendable.  This avoid
-   * the string creation of the <code>name()</code> method.
-   *
-   * @param a an <code>Appendable</code> value
-   * @param id a <code>long</code> value
-   * @throws IOException when writing to the appendable.
-   */
-  void writeName(Appendable a, long id) throws IOException;
+  @Override
+  public void writeName(final Appendable a, final long id) throws IOException {
+    a.append(name(id));
+  }
 
-  /**
-   * Convenience method to append a name to an Appendable.  This avoid
-   * the string creation of the <code>name()</code> method.
-   *
-   * @param os an <code>OutputStream</code> value
-   * @param id a <code>long</code> value
-   * @throws IOException when writing to the stream.
-   */
-  void writeName(OutputStream os, long id) throws IOException;
-
+  @Override
+  public void writeName(final OutputStream os, final long id) throws IOException {
+    os.write(name(id).getBytes());
+  }
 }
