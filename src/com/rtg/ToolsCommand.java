@@ -121,7 +121,7 @@ public final class ToolsCommand {
   /** Extracts regions from indexed files */
   static final Command EXTRACT = new Command(new ExtractCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
-  /** Print statistics about prereads */
+  /** Print statistics about an SDF */
   static final Command SDFSTATS = new Command(new SdfStatistics(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
   /** Creates a subset of an SDF file */

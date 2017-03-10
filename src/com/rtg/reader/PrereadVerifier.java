@@ -54,12 +54,9 @@ public final class PrereadVerifier {
   private PrereadVerifier() {
   }
 
-  private static final Validator VALIDATOR = new Validator() {
-    @Override
-    public boolean isValid(final CFlags flags) {
-      final File input = (File) flags.getAnonymousValue(0);
-      return CommonFlags.validateSDF(input);
-    }
+  private static final Validator VALIDATOR = flags -> {
+    final File input = (File) flags.getAnonymousValue(0);
+    return CommonFlags.validateSDF(input);
   };
 
   private static final String APPLICATION_NAME = "SDFVerify";
@@ -139,11 +136,7 @@ public final class PrereadVerifier {
       //reader = SequencesReaderFactory.createDefaultSequencesReader(f);
       //reader.globalIntegrity();
       return verify(reader, f);
-    } catch (final IOException e) {
-      Diagnostic.error(ErrorType.SDF_VERIFICATION_FAILED);
-      return false;
-    } catch (final RuntimeException ex) {
-      //failed to create reader
+    } catch (final IOException | RuntimeException e) {
       Diagnostic.error(ErrorType.SDF_VERIFICATION_FAILED);
       return false;
     }
