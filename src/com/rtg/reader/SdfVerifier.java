@@ -49,9 +49,9 @@ import com.rtg.util.io.LogStream;
 
 /**
  */
-public final class PrereadVerifier {
+public final class SdfVerifier {
 
-  private PrereadVerifier() {
+  private SdfVerifier() {
   }
 
   private static final Validator VALIDATOR = flags -> {
@@ -77,13 +77,13 @@ public final class PrereadVerifier {
    * @return exit code - 0 if all ok - 1 if command line arguments failed.
    */
   static int mainInit(final String[] args, final PrintStream out, final PrintStream err) {
-    return mainExec(args, out, err, PrereadVerifier.initialLog(APPLICATION_NAME));
+    return mainExec(args, out, err, SdfVerifier.initialLog(APPLICATION_NAME));
   }
 
   static int mainExec(final String[] args, final PrintStream out, final PrintStream err, final LogStream initLog) {
     CliDiagnosticListener listener = null;
     try {
-      listener = PrereadVerifier.initializeLogs(args, err, initLog);
+      listener = SdfVerifier.initializeLogs(args, err, initLog);
       final CFlags flags = getCFlags(APPLICATION_NAME, out, err);
       if (flags.setFlags(args)) {
         if (mainParsed(flags, out)) {

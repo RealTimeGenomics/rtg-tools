@@ -49,7 +49,7 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
-public class PrereadVerifierTest extends TestCase {
+public class SdfVerifierTest extends TestCase {
 
   private static final String LS = System.lineSeparator();
 
@@ -90,7 +90,7 @@ public class PrereadVerifierTest extends TestCase {
     createBasePreread();
 
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertTrue(PrereadVerifier.verify(dsr, new File("data")));
+      assertTrue(SdfVerifier.verify(dsr, new File("data")));
     }
   }
 
@@ -126,7 +126,7 @@ public class PrereadVerifierTest extends TestCase {
         new DNAFastaSymbolTable());
     new SequencesWriter(ds, mDir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertTrue(PrereadVerifier.verify(dsr, new File("data")));
+      assertTrue(SdfVerifier.verify(dsr, new File("data")));
     }
   }
 
@@ -195,7 +195,7 @@ public class PrereadVerifierTest extends TestCase {
           try {
             final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir);
             try {
-              final boolean res = PrereadVerifier.verify(dsr, new File("data"));
+              final boolean res = SdfVerifier.verify(dsr, new File("data"));
               if (res) {
                 failures.append("FAILED: ").append(desc).append('\n');
               }
@@ -276,7 +276,7 @@ public class PrereadVerifierTest extends TestCase {
             try {
               final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir);
               try {
-                final boolean res = PrereadVerifier.verify(dsr, new File("data"));
+                final boolean res = SdfVerifier.verify(dsr, new File("data"));
                 if (res) {
                   failures.append("FAILED: ").append(desc).append('\n');
                 }
@@ -314,7 +314,7 @@ public class PrereadVerifierTest extends TestCase {
     try (PrintStream out = new PrintStream(outstream)) {
       final PrintStream err = new PrintStream(stream);
       try {
-        assertEquals(1, PrereadVerifier.mainInit(new String[]{"-x"}, out, err));
+        assertEquals(1, SdfVerifier.mainInit(new String[]{"-x"}, out, err));
       } finally {
         err.close();
       }
@@ -338,7 +338,7 @@ public class PrereadVerifierTest extends TestCase {
     try (PrintStream out = new PrintStream(outstream)) {
       final PrintStream err = new PrintStream(stream);
       try {
-        assertEquals(1, PrereadVerifier.mainInit(new String[]{"-h"}, out, err));
+        assertEquals(1, SdfVerifier.mainInit(new String[]{"-h"}, out, err));
       } finally {
         err.close();
       }
@@ -356,7 +356,7 @@ public class PrereadVerifierTest extends TestCase {
     try (PrintStream out = new PrintStream(outstream)) {
       final PrintStream err = new PrintStream(stream);
       try {
-        final int code = PrereadVerifier.mainInit(new String[]{mDir.getPath()}, out, err);
+        final int code = SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err);
         assertEquals(stream.toString(), 0, code);
       } finally {
         err.close();
@@ -376,7 +376,7 @@ public class PrereadVerifierTest extends TestCase {
       try (PrintStream out = new PrintStream(outstream)) {
         final PrintStream err = new PrintStream(stream);
         try {
-          assertEquals(1, PrereadVerifier.mainInit(new String[]{f.getPath()}, out, err));
+          assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
         } finally {
           err.close();
         }
@@ -398,7 +398,7 @@ public class PrereadVerifierTest extends TestCase {
       try (PrintStream out = new PrintStream(outstream)) {
         final PrintStream err = new PrintStream(stream);
         try {
-          assertEquals(1, PrereadVerifier.mainInit(new String[]{f.getPath()}, out, err));
+          assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
         } finally {
           err.close();
         }
@@ -425,7 +425,7 @@ public class PrereadVerifierTest extends TestCase {
     try (PrintStream out = new PrintStream(outstream)) {
       final PrintStream err = new PrintStream(stream);
       try {
-        assertEquals(1, PrereadVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
+        assertEquals(1, SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
       } finally {
         err.close();
       }
@@ -433,7 +433,7 @@ public class PrereadVerifierTest extends TestCase {
     assertEquals("", outstream.toString());
 
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertFalse(PrereadVerifier.verify(dsr, new File("data")));
+      assertFalse(SdfVerifier.verify(dsr, new File("data")));
     }
   }
 
@@ -450,7 +450,7 @@ public class PrereadVerifierTest extends TestCase {
     try (PrintStream out = new PrintStream(outstream)) {
       final PrintStream err = new PrintStream(stream);
       try {
-        assertEquals(1, PrereadVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
+        assertEquals(1, SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
       } finally {
         err.close();
       }
@@ -459,7 +459,7 @@ public class PrereadVerifierTest extends TestCase {
     assertTrue(stream.toString().contains("The SDF verification failed."));
 
     try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertFalse(PrereadVerifier.verify(dsr, new File("data")));
+      assertFalse(SdfVerifier.verify(dsr, new File("data")));
     }
   }
 
@@ -469,7 +469,7 @@ public class PrereadVerifierTest extends TestCase {
     final File tmp = File.createTempFile("prepreadverifier", "test");
     try {
       try (PrintStream diag = new PrintStream(err)) {
-        PrereadVerifier.mainInit(new String[]{tmp.getPath()}, null, diag);
+        SdfVerifier.mainInit(new String[]{tmp.getPath()}, null, diag);
       } catch (final RuntimeException ex) {
         fail();
       } finally {
