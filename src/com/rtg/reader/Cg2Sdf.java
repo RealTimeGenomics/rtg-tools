@@ -46,7 +46,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.sam.SamCommandHelper;
 import com.rtg.util.Constants;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
@@ -117,27 +116,24 @@ public final class Cg2Sdf extends LoggedCli {
     return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
   }
 
-  private static final Validator VALIDATOR = new Validator() {
-    @Override
-    public boolean isValid(final CFlags flags) {
+  private static final Validator VALIDATOR = flags -> {
 
-      if (!CommonFlags.validateOutputDirectory(flags)) {
-        return false;
-      }
-
-      if (!CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)) {
-        return false;
-      }
-
-      if (0 > (Integer) flags.getValue(MAXIMUM_NS)) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAXIMUM_NS, flags.getValue(MAXIMUM_NS).toString(), "0");
-        return false;
-      }
-      if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
-        return false;
-      }
-      return true;
+    if (!CommonFlags.validateOutputDirectory(flags)) {
+      return false;
     }
+
+    if (!CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)) {
+      return false;
+    }
+
+    if (0 > (Integer) flags.getValue(MAXIMUM_NS)) {
+      Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAXIMUM_NS, flags.getValue(MAXIMUM_NS).toString(), "0");
+      return false;
+    }
+    if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
+      return false;
+    }
+    return true;
   };
 
   static String getBaseInputPath(final File inputFile) {

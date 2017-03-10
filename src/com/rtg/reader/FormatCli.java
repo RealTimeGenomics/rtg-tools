@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -216,78 +216,75 @@ public final class FormatCli extends LoggedCli {
     return true;
   }
 
-  private static final Validator VALIDATOR = new Validator() {
-    @Override
-    public boolean isValid(final CFlags flags) {
-      final boolean leftFileSet = flags.isSet(LEFT_FILE_FLAG);
-      final boolean rightFileSet = flags.isSet(RIGHT_FILE_FLAG);
+  private static final Validator VALIDATOR = flags -> {
+    final boolean leftFileSet = flags.isSet(LEFT_FILE_FLAG);
+    final boolean rightFileSet = flags.isSet(RIGHT_FILE_FLAG);
 
-      final List<File> files;
-      try {
-        files = CommonFlags.getFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, false);
-      } catch (final IOException e) {
-        flags.setParseMessage("An error occurred reading " + flags.getValue(CommonFlags.INPUT_LIST_FLAG));
-        return false;
-      }
-      if (!validateQualityFormatFlags(flags, (String) flags.getValue(FORMAT_FLAG))) {
-        return false;
-      }
-      final boolean useQuality = !flags.isSet(NO_QUALITY);
-      final InputFormat inputformat = getFormat(flags, useQuality);
-      if (files.size() == 0) {  //if no anonymous input files have been specified
-        if (!leftFileSet && !rightFileSet) {
-          flags.setParseMessage("No input files specified.");
-          return false;
-        } else if (!leftFileSet || !rightFileSet) {
-          flags.setParseMessage("Both left and right reads must be specified.");
-          return false;
-        } else if (flags.isSet(PROTEIN_FLAG)) {
-          flags.setParseMessage("Cannot set protein flag when left and right files are specified.");
-          return false;
-        } else if (inputformat.isSam()) {
-          flags.setParseMessage("Do not use left and right flags when using SAM input.");
-          return false;
-        }
-        int nonFiles = 0;
-        if (!validFile((File) flags.getValue(LEFT_FILE_FLAG))) {
-          ++nonFiles;
-        }
-        if (!validFile((File) flags.getValue(RIGHT_FILE_FLAG))) {
-          ++nonFiles;
-        }
-        if (nonFiles > 0) {
-          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "There were " + nonFiles + " invalid input file paths");
-        }
-      } else if (leftFileSet || rightFileSet) { //anon input files specified and left or right specified
-        flags.setParseMessage("Either specify individual input files or left and right files, not both.");
-        return false;
-      }
-      if (inputformat.isSam() && flags.isSet(DUST_FLAG)) {
-        flags.setParseMessage("--" + DUST_FLAG + " is not supported when --" + FORMAT_FLAG + " is " + flags.getValue(FORMAT_FLAG) + ".");
-        return false;
-      }
-
-      if (flags.isSet(TRIM_THRESHOLD_FLAG) && (Integer) flags.getValue(TRIM_THRESHOLD_FLAG) < 0) {
-        flags.setParseMessage("--" + TRIM_THRESHOLD_FLAG + " must not be negative");
-        return false;
-      }
-      if (flags.isSet(TRIM_END_FLAG) && (Integer) flags.getValue(TRIM_END_FLAG) < 0) {
-        flags.setParseMessage("--" + TRIM_END_FLAG + " must not be negative");
-        return false;
-      }
-
-      if (!CommonFlags.validateOutputDirectory(flags)) {
-        return false;
-      }
-      if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
-        return false;
-      }
-      if (flags.isSet(SELECT_READ_GROUP) && !inputformat.isSam()) {
-        flags.setParseMessage("--" + SELECT_READ_GROUP + " can only be used when formatting SAM/BAM");
-        return false;
-      }
-      return true;
+    final List<File> files;
+    try {
+      files = CommonFlags.getFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, false);
+    } catch (final IOException e) {
+      flags.setParseMessage("An error occurred reading " + flags.getValue(CommonFlags.INPUT_LIST_FLAG));
+      return false;
     }
+    if (!validateQualityFormatFlags(flags, (String) flags.getValue(FORMAT_FLAG))) {
+      return false;
+    }
+    final boolean useQuality = !flags.isSet(NO_QUALITY);
+    final InputFormat inputformat = getFormat(flags, useQuality);
+    if (files.size() == 0) {  //if no anonymous input files have been specified
+      if (!leftFileSet && !rightFileSet) {
+        flags.setParseMessage("No input files specified.");
+        return false;
+      } else if (!leftFileSet || !rightFileSet) {
+        flags.setParseMessage("Both left and right reads must be specified.");
+        return false;
+      } else if (flags.isSet(PROTEIN_FLAG)) {
+        flags.setParseMessage("Cannot set protein flag when left and right files are specified.");
+        return false;
+      } else if (inputformat.isSam()) {
+        flags.setParseMessage("Do not use left and right flags when using SAM input.");
+        return false;
+      }
+      int nonFiles = 0;
+      if (!validFile((File) flags.getValue(LEFT_FILE_FLAG))) {
+        ++nonFiles;
+      }
+      if (!validFile((File) flags.getValue(RIGHT_FILE_FLAG))) {
+        ++nonFiles;
+      }
+      if (nonFiles > 0) {
+        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "There were " + nonFiles + " invalid input file paths");
+      }
+    } else if (leftFileSet || rightFileSet) { //anon input files specified and left or right specified
+      flags.setParseMessage("Either specify individual input files or left and right files, not both.");
+      return false;
+    }
+    if (inputformat.isSam() && flags.isSet(DUST_FLAG)) {
+      flags.setParseMessage("--" + DUST_FLAG + " is not supported when --" + FORMAT_FLAG + " is " + flags.getValue(FORMAT_FLAG) + ".");
+      return false;
+    }
+
+    if (flags.isSet(TRIM_THRESHOLD_FLAG) && (Integer) flags.getValue(TRIM_THRESHOLD_FLAG) < 0) {
+      flags.setParseMessage("--" + TRIM_THRESHOLD_FLAG + " must not be negative");
+      return false;
+    }
+    if (flags.isSet(TRIM_END_FLAG) && (Integer) flags.getValue(TRIM_END_FLAG) < 0) {
+      flags.setParseMessage("--" + TRIM_END_FLAG + " must not be negative");
+      return false;
+    }
+
+    if (!CommonFlags.validateOutputDirectory(flags)) {
+      return false;
+    }
+    if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
+      return false;
+    }
+    if (flags.isSet(SELECT_READ_GROUP) && !inputformat.isSam()) {
+      flags.setParseMessage("--" + SELECT_READ_GROUP + " can only be used when formatting SAM/BAM");
+      return false;
+    }
+    return true;
   };
 
   /**
@@ -519,8 +516,8 @@ public final class FormatCli extends LoggedCli {
     public void performPreread(File leftFile, File rightFile) throws IOException {
 
       formattingMessage(true);
-      final SequenceDataSource leftds = getDnaDataSource(Arrays.asList(leftFile), mInputFormat, PrereadArm.LEFT, mMappedSam, false, mSamReadGroup, mDedupSecondary);
-      final SequenceDataSource rightds = getDnaDataSource(Arrays.asList(rightFile), mInputFormat, PrereadArm.RIGHT, mMappedSam, false, mSamReadGroup, mDedupSecondary);
+      final SequenceDataSource leftds = getDnaDataSource(Collections.singletonList(leftFile), mInputFormat, PrereadArm.LEFT, mMappedSam, false, mSamReadGroup, mDedupSecondary);
+      final SequenceDataSource rightds = getDnaDataSource(Collections.singletonList(rightFile), mInputFormat, PrereadArm.RIGHT, mMappedSam, false, mSamReadGroup, mDedupSecondary);
       leftds.setDusting(mDusting);
       rightds.setDusting(mDusting);
 
