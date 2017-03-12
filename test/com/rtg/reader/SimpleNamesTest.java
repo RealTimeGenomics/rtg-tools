@@ -27,34 +27,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.reader;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+
+import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.LongRange;
+import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
 
 /**
- * Test class
+ * Test class.
  */
-public class EmptyStringPrereadNamesTest extends TestCase {
+public class SimpleNamesTest extends TestCase {
 
   public void testSomeMethod() throws IOException {
-    final EmptyStringNames thing = new EmptyStringNames(5);
-    assertEquals(5, thing.length());
-    assertEquals("", thing.name(3));
+    final SimpleNames sprn = new SimpleNames();
+    sprn.setName(0, "first");
+    sprn.setName(1, "second");
+    sprn.setName(2, "third");
+    sprn.setName(3, "fourth");
+    assertEquals(4L, sprn.length());
+    assertEquals("first", sprn.name(0));
+    assertEquals("second", sprn.name(1));
+    assertEquals("third", sprn.name(2));
+    assertEquals("fourth", sprn.name(3));
+    assertEquals(62, sprn.bytes());
     final StringBuilder sb = new StringBuilder();
-    thing.writeName(sb, 2);
-    assertEquals("", sb.toString());
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    thing.writeName(baos, 0);
-    assertEquals("", baos.toString());
-    final SimpleNames prni = new SimpleNames();
-    prni.setName(0, "");
-    prni.setName(1, "");
-    prni.setName(2, "");
-    prni.setName(3, "");
-    prni.setName(4, "");
-    assertEquals(prni.calcChecksum(), thing.calcChecksum());
+    sprn.writeName(sb, 2);
+    assertEquals("third", sb.toString());
+    final MemoryPrintStream mps = new MemoryPrintStream();
+    sprn.writeName(mps.outputStream(), 1);
+    assertEquals("second", mps.toString());
   }
+
+  public void testViaFile() throws Exception {
+    Diagnostic.setLogStream();
+    final File dir = FileHelper.createTempDirectory();
+    try {
+      final File queryDir = ReaderTestUtils.getDNADir(NamesTest.SEQ_DNA_A2, new File(dir, "q"));
+      final Names names = new Names(queryDir, LongRange.NONE);
+      final SimpleNames sprn = new SimpleNames();
+      for (long i = 0; i < names.length(); ++i) {
+        sprn.setName(i, names.name(i));
+      }
+      assertEquals(names.calcChecksum(), sprn.calcChecksum());
+    } finally {
+      assertTrue(FileHelper.deleteAll(dir));
+    }
+  }
+
+
 }

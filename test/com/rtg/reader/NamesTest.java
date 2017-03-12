@@ -48,10 +48,9 @@ import com.rtg.util.test.FileHelper;
 import junit.framework.TestCase;
 
 /**
- *
- *
+ * Test the corresponding class.
  */
-public class PrereadNamesTest extends TestCase {
+public class NamesTest extends TestCase {
   private File mDir = null;
 
   /** Subject sequence used for the calibration runs.  */

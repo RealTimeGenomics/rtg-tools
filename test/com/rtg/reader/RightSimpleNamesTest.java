@@ -30,56 +30,51 @@
 
 package com.rtg.reader;
 
-import java.io.File;
 import java.io.IOException;
 
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.MemoryPrintStream;
-import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
 
 /**
- * Test class
  */
-public class SimplePrereadNamesTest extends TestCase {
-
+public class RightSimpleNamesTest extends TestCase {
   public void testSomeMethod() throws IOException {
     final SimpleNames sprn = new SimpleNames();
+    final RightSimpleNames rprn = new RightSimpleNames(sprn);
     sprn.setName(0, "first");
-    sprn.setName(1, "second");
+    sprn.setName(1, "second/1");
     sprn.setName(2, "third");
-    sprn.setName(3, "fourth");
+    sprn.setName(3, "fourth/1");
+    rprn.setName(0, "f");
+    rprn.setName(1, "sec");
+    rprn.setName(2, "thi");
+    rprn.setName(3, "fou");
     assertEquals(4L, sprn.length());
+    assertEquals(4L, rprn.length());
     assertEquals("first", sprn.name(0));
-    assertEquals("second", sprn.name(1));
+    assertEquals("second/1", sprn.name(1));
     assertEquals("third", sprn.name(2));
-    assertEquals("fourth", sprn.name(3));
-    assertEquals(62, sprn.bytes());
-    final StringBuilder sb = new StringBuilder();
+    assertEquals("fourth/1", sprn.name(3));
+    assertEquals("first", rprn.name(0));
+    assertEquals("second/1", rprn.name(1));
+    assertEquals("third", rprn.name(2));
+    assertEquals("fourth/1", rprn.name(3));
+    assertEquals(66, sprn.bytes());
+    assertEquals(0, rprn.bytes());
+    StringBuilder sb = new StringBuilder();
     sprn.writeName(sb, 2);
     assertEquals("third", sb.toString());
-    final MemoryPrintStream mps = new MemoryPrintStream();
+    MemoryPrintStream mps = new MemoryPrintStream();
     sprn.writeName(mps.outputStream(), 1);
-    assertEquals("second", mps.toString());
-  }
+    assertEquals("second/1", mps.toString());
 
-  public void testViaFile() throws Exception {
-    Diagnostic.setLogStream();
-    final File dir = FileHelper.createTempDirectory();
-    try {
-      final File queryDir = ReaderTestUtils.getDNADir(PrereadNamesTest.SEQ_DNA_A2, new File(dir, "q"));
-      final Names names = new Names(queryDir, LongRange.NONE);
-      final SimpleNames sprn = new SimpleNames();
-      for (long i = 0; i < names.length(); ++i) {
-        sprn.setName(i, names.name(i));
-      }
-      assertEquals(names.calcChecksum(), sprn.calcChecksum());
-    } finally {
-      assertTrue(FileHelper.deleteAll(dir));
-    }
-  }
-
+    sb = new StringBuilder();
+    rprn.writeName(sb, 2);
+    assertEquals("third", sb.toString());
+    mps = new MemoryPrintStream();
+    rprn.writeName(mps.outputStream(), 1);
+    assertEquals("second/1", mps.toString());
+}
 
 }

@@ -29,17 +29,32 @@
  */
 package com.rtg.reader;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
 /**
- * Test class for ArrayNames
+ * Test class
  */
-public class ArrayPrereadNamesTest extends TestCase {
+public class EmptyStringNamesTest extends TestCase {
 
-  public void testPrereadNames() {
-    final ArrayNames pn = new ArrayNames(new String[] {"blah", "fah", "rah"});
-    assertEquals("fah", pn.name(1));
-    assertEquals(3, pn.length());
+  public void testSomeMethod() throws IOException {
+    final EmptyStringNames thing = new EmptyStringNames(5);
+    assertEquals(5, thing.length());
+    assertEquals("", thing.name(3));
+    final StringBuilder sb = new StringBuilder();
+    thing.writeName(sb, 2);
+    assertEquals("", sb.toString());
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    thing.writeName(baos, 0);
+    assertEquals("", baos.toString());
+    final SimpleNames prni = new SimpleNames();
+    prni.setName(0, "");
+    prni.setName(1, "");
+    prni.setName(2, "");
+    prni.setName(3, "");
+    prni.setName(4, "");
+    assertEquals(prni.calcChecksum(), thing.calcChecksum());
   }
-
 }
