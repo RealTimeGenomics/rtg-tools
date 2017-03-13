@@ -394,8 +394,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
 
       res = MainResult.run(getCli(), "-n", fullSdf.getPath(), "--taxonomy");
       assertEquals(1, res.rc());
-      assertTrue(res.err().contains("--taxonomy was specified but"));
-      assertTrue(res.err().contains("is missing a 'taxonomy.tsv'"));
+      TestUtils.containsAllUnwrapped(res.err(), "--taxonomy was specified but", "is missing a 'taxonomy.tsv'");
 
       // cp taxonomy files to sdf
       final File taxonomy = new File(fullSdf, "taxonomy.tsv");
