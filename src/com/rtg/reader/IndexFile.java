@@ -869,6 +869,7 @@ public class IndexFile implements Integrity {
       case SDF:
       case FASTA:
       case FASTQ:
+      case FASTQ_INTERLEAVED:
       case SAM_PE:
       case SAM_SE:
         return PrereadType.UNKNOWN;

@@ -37,13 +37,7 @@ import junit.framework.TestCase;
  */
 public class InputFormatTest extends TestCase {
 
-  /**
-   */
-  public InputFormatTest(String name) {
-    super(name);
-  }
-
   public void testEnum() {
-    TestUtils.testEnum(InputFormat.class, "[SDF, FASTA, FASTQ, SOLEXA, SOLEXA1_3, TSV_CG, FASTQ_CG, SAM_CG, SAM_SE, SAM_PE]");
+    TestUtils.testEnum(InputFormat.class, "[SDF, FASTA, FASTQ, FASTQ_INTERLEAVED, SOLEXA, SOLEXA1_3, TSV_CG, FASTQ_CG, SAM_CG, SAM_SE, SAM_PE]");
   }
 }

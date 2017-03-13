@@ -96,6 +96,8 @@ public final class FormatCli extends LoggedCli {
   public static final String FASTA_FORMAT = "fasta";
   /** FASTQ input format */
   public static final String FASTQ_FORMAT = "fastq";
+  /** Interleaved FASTQ input format */
+  public static final String INTERLEAVED_FASTQ_FORMAT = "interleaved-fastq";
   /** SAM / BAM paired end input format */
   public static final String SAM_PE_FORMAT = "sam-pe";
   /** SAM / BAM single end input format */
@@ -159,7 +161,7 @@ public final class FormatCli extends LoggedCli {
       mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
 
       final Flag<String> formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, RESOURCE.getString("FORMAT_TYPE"), RESOURCE.getString("FORMAT_DESC"), RESOURCE.getString("FORMAT_FASTA")).setCategory(INPUT_OUTPUT);
-      String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT };
+      String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, INTERLEAVED_FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT };
       if (License.isDeveloper()) {
         formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
       }
@@ -301,7 +303,7 @@ public final class FormatCli extends LoggedCli {
   public static SequenceDataSource getDnaDataSource(List<File> files, InputFormat format, PrereadArm arm, boolean mappedSam, boolean flattenPaired, String samReadGroup, boolean dedupSecondary) {
     if (format == InputFormat.FASTA) {
       return new FastaSequenceDataSource(files, new DNAFastaSymbolTable(), arm);
-    } else if (format == InputFormat.FASTQ || format == InputFormat.FASTQ_CG) {
+    } else if (format == InputFormat.FASTQ || format == InputFormat.FASTQ_CG || format == InputFormat.FASTQ_INTERLEAVED) {
       return new FastqSequenceDataSource(files, FastQScoreType.PHRED, arm);
     } else if (format == InputFormat.SOLEXA) {
       return new FastqSequenceDataSource(files, FastQScoreType.SOLEXA, arm);
@@ -339,7 +341,7 @@ public final class FormatCli extends LoggedCli {
    * @return true if quality encoding type is recognized or format other than <code>fastq</code> is chosen
    */
   public static boolean validateQualityFormatFlags(CFlags flags, String format) {
-    if (!format.equals(FASTQ_FORMAT) && flags.isSet(CommonFlags.QUALITY_FLAG)) {
+    if (!format.equals(FASTQ_FORMAT) && !format.equals(INTERLEAVED_FASTQ_FORMAT) && flags.isSet(CommonFlags.QUALITY_FLAG)) {
       flags.setParseMessage("--" + CommonFlags.QUALITY_FLAG + " is only allowed for \"fastq\" format.");
       return false;
     }
@@ -422,6 +424,9 @@ public final class FormatCli extends LoggedCli {
         case SOLEXA1_3:
           inputFileType = "FASTQ";
           break;
+        case FASTQ_INTERLEAVED:
+          inputFileType = "INTERLEAVED-FASTQ";
+          break;
         case FASTA:
         default:
           inputFileType = "FASTA";
@@ -449,7 +454,7 @@ public final class FormatCli extends LoggedCli {
       } else {
         ds = getDnaDataSource(files, mInputFormat, PrereadArm.UNKNOWN, mMappedSam, false, mSamReadGroup, mDedupSecondary);
         ds.setDusting(mDusting);
-        if (mInputFormat.isPairedSam()) {
+        if (mInputFormat.isPairedSam() || mInputFormat == InputFormat.FASTQ_INTERLEAVED) {
           writer = new AlternatingSequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
         } else {
           writer = new SequencesWriter(ds, mOutDir, Constants.MAX_FILE_SIZE, mNamesToExclude, IndexFile.typeFromFormat(mInputFormat), mCompressed);
@@ -830,6 +835,21 @@ public final class FormatCli extends LoggedCli {
               return InputFormat.SOLEXA;
             case CommonFlags.ILLUMINA_FORMAT:
               return InputFormat.SOLEXA1_3;
+            default:
+              throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
+          }
+        } else {
+          return InputFormat.FASTQ;
+        }
+      case INTERLEAVED_FASTQ_FORMAT:
+        if (checkFastqQuality) {
+          switch (qualityFormat) {
+            case CommonFlags.SANGER_FORMAT:
+              return InputFormat.FASTQ_INTERLEAVED;
+//            case CommonFlags.SOLEXA_FORMAT:
+//              return InputFormat.SOLEXA;
+//            case CommonFlags.ILLUMINA_FORMAT:
+//              return InputFormat.SOLEXA1_3;
             default:
               throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
           }

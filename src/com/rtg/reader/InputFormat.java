@@ -39,6 +39,8 @@ public enum InputFormat {
   FASTA,
   /** FASTQ, Sanger quality encoding */
   FASTQ,
+  /** Interleaved FASTQ, Sanger quality encoding */
+  FASTQ_INTERLEAVED,
   /** FASTQ, Solexa earlier than version 1.3 quality encoding */
   SOLEXA,
   /** FASTQ, Solexa 1.3 quality encoding */
