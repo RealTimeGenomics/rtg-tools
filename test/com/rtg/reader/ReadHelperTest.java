@@ -37,7 +37,6 @@ import java.util.Arrays;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.mode.SequenceType;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
@@ -140,7 +139,7 @@ public class ReadHelperTest extends TestCase {
           + "actgcatc\n"
           + "+\n"
           + "!<><##!<").getBytes()));
-      final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+      final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, QualityFormat.SANGER);
       final SequencesWriter sw = new SequencesWriter(fq, temp, 20, PrereadType.CG, false);
       sw.processSequences();
       try (SequencesReader msr = CompressedMemorySequencesReader.createSequencesReader(temp, true, false, LongRange.NONE)) {

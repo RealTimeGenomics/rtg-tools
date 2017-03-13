@@ -47,7 +47,6 @@ import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.Protein;
 import com.rtg.mode.ProteinFastaSymbolTable;
 import com.rtg.mode.SequenceType;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.DiagnosticEvent;
@@ -333,7 +332,7 @@ public class SequencesWriterTest extends TestCase {
       + "IIIIII" + StringUtils.LS;
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(seq));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -520,19 +519,10 @@ public class SequencesWriterTest extends TestCase {
                       + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
                       + "@hobos-r us\naccccaccccacaaacccaa\n"
                       + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.SOLEXA, compress);
     sw.processSequences();
   }
-
-  /*private void createQualDataCG() {
-    InputStream cc = new ArrayList<>();
-    cc.add(createStream("GTTTC" + StringUtils.LS);
-    FastqSequenceDataSource ds = new FastqSequenceDataSource(al, false);
-    // set mDir
-    SequencesWriter sw = new SequencesWriter(ds, mDir, 20, InputFormat.SOLEXA);
-    sw.processSequences();
-  }*/
 
  public void testWrite() throws Exception {
     //create data source
@@ -813,7 +803,7 @@ public class SequencesWriterTest extends TestCase {
                       + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
                       + "@hobos-r us\naccccaccccacaaacccaa\n"
                       + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false);
     sw.setReadTrimmer(new BestSumReadTrimmer(50));
     final SequencesReader sr = sw.processSequencesInMemory(null, true, null, null, LongRange.NONE);

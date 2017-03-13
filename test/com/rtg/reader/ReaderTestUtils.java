@@ -41,7 +41,6 @@ import java.util.UUID;
 
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.ProteinFastaSymbolTable;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.Constants;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.LongRange;
@@ -227,7 +226,7 @@ public final class ReaderTestUtils {
   public static SequencesReader getReaderDNAFastq(final String inputDnaSequence, final File dir, SdfId sdfId, final long maxFileSize) throws IOException {
     final ArrayList<InputStream> inputStreams = new ArrayList<>();
     inputStreams.add(new ByteArrayInputStream(inputDnaSequence.getBytes()));
-    final FastaSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, FastQScoreType.PHRED);
+    final FastaSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, QualityFormat.SANGER);
     final SequencesWriter sequenceWriter = new SequencesWriter(ds, dir, maxFileSize, PrereadType.UNKNOWN, true);
     if (sdfId != null) {
       sequenceWriter.setSdfId(sdfId);
@@ -260,7 +259,7 @@ public final class ReaderTestUtils {
   public static SequencesReader getReaderDNAFastq(final String inputDnaSequence, final File dir, final long maxFileSize, final boolean isSolexa) throws IOException {
     final ArrayList<InputStream> inputStreams = new ArrayList<>();
     inputStreams.add(new ByteArrayInputStream(inputDnaSequence.getBytes()));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, isSolexa ? FastQScoreType.SOLEXA : FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, isSolexa ? QualityFormat.SOLEXA : QualityFormat.SANGER);
     final SequencesWriter sequenceWriter = new SequencesWriter(ds, dir, maxFileSize, PrereadType.UNKNOWN, true);
     sequenceWriter.setSdfId(DUMMY_TEST_ID);
     sequenceWriter.processSequences();
@@ -279,7 +278,7 @@ public final class ReaderTestUtils {
   public static SequencesReader getReaderDNAFastqCG(final String inputDnaSequence, final File dir, final PrereadArm prereadArm) throws IOException {
     final ArrayList<InputStream> inputStreams = new ArrayList<>();
     inputStreams.add(new ByteArrayInputStream(inputDnaSequence.getBytes()));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, QualityFormat.SANGER);
     final SequencesWriter sequenceWriter = new SequencesWriter(ds, dir, Constants.MAX_FILE_SIZE, PrereadType.CG, true);
     sequenceWriter.setSdfId(DUMMY_TEST_ID);
     sequenceWriter.setPrereadArm(prereadArm);
@@ -412,7 +411,7 @@ public final class ReaderTestUtils {
   public static File getDNAFastqDir(final String inputDnaSequence, final File dir, final boolean isSolexa) throws IOException {
     final ArrayList<InputStream> inputStreams = new ArrayList<>();
     inputStreams.add(new ByteArrayInputStream(inputDnaSequence.getBytes()));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, isSolexa ? FastQScoreType.SOLEXA : FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(inputStreams, isSolexa ? QualityFormat.SOLEXA : QualityFormat.SANGER);
     final SequencesWriter sequenceWriter = new SequencesWriter(ds, dir, Constants.MAX_FILE_SIZE, PrereadType.UNKNOWN, true);
     sequenceWriter.setSdfId(DUMMY_TEST_ID);
     sequenceWriter.processSequences();

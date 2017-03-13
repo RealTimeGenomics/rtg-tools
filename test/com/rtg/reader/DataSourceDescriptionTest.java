@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,17 +27,21 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package com.rtg.reader;
 
-import com.rtg.util.TestUtils;
+package com.rtg.reader;
 
 import junit.framework.TestCase;
 
 /**
+ * Tests the corresponding class.
  */
-public class InputFormatTest extends TestCase {
+public class DataSourceDescriptionTest extends TestCase {
 
-  public void testEnum() {
-    TestUtils.testEnum(InputFormat.class, "[SDF, FASTA, FASTQ, FASTQ_INTERLEAVED, SOLEXA, SOLEXA1_3, TSV_CG, FASTQ_CG, SAM_CG, SAM_SE, SAM_PE]");
+  public void test() {
+    final DataSourceDescription desc = new DataSourceDescription(SourceFormat.FASTQ, QualityFormat.SANGER, false, true, false);
+    assertTrue(desc.isInterleaved());
+    assertFalse(desc.isCompleteGenomics());
+    assertEquals(SourceFormat.FASTQ, desc.getSourceFormat());
+    assertEquals(QualityFormat.SANGER, desc.getQualityFormat());
   }
 }

@@ -56,13 +56,13 @@ public class FastqIteratorTest {
 
   @Test
   public void testEmptyDataSource() {
-    final FastqSequenceDataSource fastqSequenceDataSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(new byte[0])), FastqSequenceDataSource.FastQScoreType.SOLEXA);
+    final FastqSequenceDataSource fastqSequenceDataSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(new byte[0])), QualityFormat.SOLEXA);
     final FastqIterator fastqIterator = new FastqIterator(fastqSequenceDataSource);
     assertFalse(fastqIterator.hasNext());
   }
   @Test
   public void testSequenceDataSource() {
-    final FastqSequenceDataSource fastqSequenceDataSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(FASTQ.getBytes())), FastqSequenceDataSource.FastQScoreType.SOLEXA);
+    final FastqSequenceDataSource fastqSequenceDataSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(FASTQ.getBytes())), QualityFormat.SOLEXA);
     final FastqIterator fastqIterator = new FastqIterator(fastqSequenceDataSource);
     assertTrue(fastqIterator.hasNext());
     checkRead(fastqIterator.next(), "name", "ACGTACGT");

@@ -41,7 +41,6 @@ import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.DnaUtils;
 import com.rtg.mode.Protein;
 import com.rtg.mode.ProteinFastaSymbolTable;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.integrity.Exam;
 import com.rtg.util.intervals.LongRange;
@@ -353,7 +352,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
                         + "actgcatc\n"
                         + "+\n"
                         + "!<><##!<"));
-    final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+    final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(fq, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -399,7 +398,7 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
     final String seq = "@TotallyUniqueName\n" + dnas.toString() + "\n+\n" + quals.toString();
     final ArrayList<InputStream> streams = new ArrayList<>();
     streams.add(createStream(seq));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(streams, FastQScoreType.PHRED);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(streams, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 

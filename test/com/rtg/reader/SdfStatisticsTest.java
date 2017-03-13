@@ -42,7 +42,6 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.mode.DNAFastaSymbolTable;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.Constants;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
@@ -302,7 +301,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
     } finally {
       archive.close();
     }
-    final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Collections.singletonList(Resources.getResourceAsStream(fastqRes)), FastQScoreType.PHRED);
+    final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Collections.singletonList(Resources.getResourceAsStream(fastqRes)), QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(fastq, newDir, 1000000, PrereadType.UNKNOWN, false);
     sw.processSequences();
     final byte[][] newData;

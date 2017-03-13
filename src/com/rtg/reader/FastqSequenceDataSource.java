@@ -60,20 +60,10 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
 
   private int mSequenceLabelMistmatchCount = 0;
 
-  private final FastQScoreType mScoreType;
+  private final QualityFormat mScoreType;
 
-  /** Enumeration of score type. */
-  public enum FastQScoreType {
-    /** phred */
-    PHRED,
-    /** Solexa */
-    SOLEXA,
-    /** Solexa 1.3 */
-    SOLEXA1_3
-  }
-
-  private void initQualityTable(final FastQScoreType scoreType) {
-    if (scoreType.equals(FastQScoreType.SOLEXA)) {
+  private void initQualityTable(final QualityFormat scoreType) {
+    if (scoreType == QualityFormat.SOLEXA) {
       for (char c = (char) FastaUtils.PHRED_LOWER_LIMIT_CHAR; c <= FastaUtils.PHRED_UPPER_LIMIT_CHAR; ++c) {
         mQualityTable[c - FastaUtils.PHRED_LOWER_LIMIT_CHAR] = (byte) (10 * Math.log10(1 + Math.pow(10, (c - 64) / 10.0)) + 0.5);
       }
@@ -89,7 +79,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
    * @param iss list of InputStreams
    * @param scoreType what type of quality score is represented
    */
-  public FastqSequenceDataSource(List<InputStream> iss, final FastQScoreType scoreType) {
+  public FastqSequenceDataSource(List<InputStream> iss, final QualityFormat scoreType) {
     super(iss, new DNAFastaSymbolTable());
     mScoreType = scoreType;
     initQualityTable(scoreType);
@@ -104,7 +94,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
    * @param scoreType what type of quality score is represented
    * @param arm the arm that this source belongs to
    */
-  public FastqSequenceDataSource(List<File> files, final FastQScoreType scoreType, PrereadArm arm) {
+  public FastqSequenceDataSource(List<File> files, final QualityFormat scoreType, PrereadArm arm) {
     super(files, new DNAFastaSymbolTable(), arm);
     mScoreType = scoreType;
     initQualityTable(scoreType);
@@ -240,16 +230,16 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
       inputByte = mInputBuffer[mInputBufferPosition];
 
       if (isQualityCharacter(inputByte)) {
-        if (!mScoreType.equals(FastQScoreType.SOLEXA) && !mScoreType.equals(FastQScoreType.SOLEXA1_3) && inputByte > 90 && !mQualityWarned) {
+        if (mScoreType != QualityFormat.SOLEXA && mScoreType != QualityFormat.SOLEXA1_3 && inputByte > 90 && !mQualityWarned) {
           Diagnostic.warning(WarningType.POSSIBLY_SOLEXA);
           mQualityWarned = true;
         }
-        if (mScoreType.equals(FastQScoreType.SOLEXA1_3)) {
+        if (mScoreType == QualityFormat.SOLEXA1_3) {
           qualityValue = (byte) (inputByte - '@');
         } else {
           qualityValue = (byte) (inputByte - FastaUtils.PHRED_LOWER_LIMIT_CHAR);
         }
-        if (qualityValue < 0 || qualityValue >= mQualityTable.length || (mScoreType.equals(FastQScoreType.SOLEXA) && inputByte < (byte) 59)) {
+        if (qualityValue < 0 || qualityValue >= mQualityTable.length || (mScoreType == QualityFormat.SOLEXA && inputByte < (byte) 59)) {
           throw new NoTalkbackSlimException(ErrorType.INVALID_QUALITY);
         }
         if (mQualityBufferPosition == mQualityBuffer.length) {

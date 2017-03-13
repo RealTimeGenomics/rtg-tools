@@ -861,31 +861,17 @@ public class IndexFile implements Integrity {
 
   /**
    * Gets the preread type from a format
-   * @param format input format
+   * @param desc input format
    * @return the preread type
    */
-  public static PrereadType typeFromFormat(InputFormat format) {
-    switch(format) {
-      case SDF:
-      case FASTA:
-      case FASTQ:
-      case FASTQ_INTERLEAVED:
-      case SAM_PE:
-      case SAM_SE:
-        return PrereadType.UNKNOWN;
-
-      case TSV_CG:
-      case FASTQ_CG:
-      case SAM_CG:
-        return PrereadType.CG;
-
-      case SOLEXA:
-      case SOLEXA1_3:
-        return PrereadType.SOLEXA;
-
-      default:
-        throw new IllegalArgumentException("Unknown Input format " + format);
+  public static PrereadType typeFromFormat(DataSourceDescription desc) {
+    if (desc.isCompleteGenomics()) {
+      return PrereadType.CG;
     }
+    if (desc.getQualityFormat() == QualityFormat.SOLEXA || desc.getQualityFormat() == QualityFormat.SOLEXA1_3) {
+      return PrereadType.SOLEXA;
+    }
+    return PrereadType.UNKNOWN;
   }
 
   /**

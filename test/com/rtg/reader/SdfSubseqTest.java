@@ -39,7 +39,6 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.ProteinFastaSymbolTable;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
@@ -108,7 +107,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     try {
       al = new ArrayList<>();
       al.add(createStream(EX2));
-      ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+      ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
       sw = new SequencesWriter(ds, normal, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
 
@@ -138,7 +137,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     try {
       al = new ArrayList<>();
       al.add(createStream(EX2));
-      ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+      ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
       sw = new SequencesWriter(ds, noQualName, 20, PrereadType.UNKNOWN, false);
       sw.processSequences(false, false);
 
@@ -174,7 +173,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     try {
       al = new ArrayList<>();
       al.add(createStream(EX2));
-      ds = new FastqSequenceDataSource(al, FastQScoreType.PHRED);
+      ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
       sw = new SequencesWriter(ds, normal, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       out = checkMainInitOk("-i", normal.toString(), "TEST:1+5");

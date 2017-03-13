@@ -115,7 +115,7 @@ public class DataInMemoryTest extends TestCase {
       final IndexFile f = new IndexFile(dir);
 
       final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 6);
-      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), FastqSequenceDataSource.FastQScoreType.PHRED);
+      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), QualityFormat.SANGER);
       assertTrue(fastq.nextSequence());
         final byte[] exp = Arrays.copyOfRange(fastq.sequenceData(), 25, 30);
         final byte[] act = new byte[5];
@@ -140,7 +140,7 @@ public class DataInMemoryTest extends TestCase {
       final IndexFile f = new IndexFile(dir);
 
       final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 1000);
-      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(data.getBytes())), FastqSequenceDataSource.FastQScoreType.PHRED);
+      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(data.getBytes())), QualityFormat.SANGER);
 
       int index = 0;
       while (fastq.nextSequence()) {
@@ -164,7 +164,7 @@ public class DataInMemoryTest extends TestCase {
       final IndexFile f = new IndexFile(dir);
 
       final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 0, 6);
-      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), FastqSequenceDataSource.FastQScoreType.PHRED);
+      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), QualityFormat.SANGER);
       int i = 0;
       while (fastq.nextSequence()) {
         final byte[] exp = Arrays.copyOf(fastq.sequenceData(), fastq.currentLength());
@@ -190,7 +190,7 @@ public class DataInMemoryTest extends TestCase {
       final IndexFile f = new IndexFile(dir);
 
       final DataInMemory mem = DataInMemory.loadDelayQuality(dir, f, DataFileIndex.loadSequenceDataFileIndex(f.dataIndexVersion(), dir), 1, 4);
-      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), FastqSequenceDataSource.FastQScoreType.PHRED);
+      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), QualityFormat.SANGER);
       final int iadj = 1;
       final int imax = 4;
       int i = 0;

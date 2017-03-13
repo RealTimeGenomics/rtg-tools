@@ -277,7 +277,7 @@ public class FormatCliTest extends AbstractCliTest {
         , "Formatting paired-end FASTA data"
         , "Input Data" + StringUtils.LS
           + "Files              : raw1 raw2" + StringUtils.LS
-          + "Format             : FASTA" + StringUtils.LS
+          + "Format             : paired-end FASTA" + StringUtils.LS
           + "Type               : DNA" + StringUtils.LS
           + "Number of pairs    : 2" + StringUtils.LS
           + "Number of sequences: 4" + StringUtils.LS
@@ -343,7 +343,7 @@ public class FormatCliTest extends AbstractCliTest {
 
         final File outputDir = new File(tempDir, JUNITOUT);
         final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "cg-fastq", "-l", raw1.getPath(), "-r", raw2.getPath());
-        assertTrue(out.contains("Format             : FASTQ_CG"));
+        assertTrue(out.contains("Format             : paired-end FASTQ-CG"));
         assertTrue(out.contains("Type               : DNA"));
         assertTrue(out.contains("SDF-ID"));
         assertTrue(out.contains("Number of sequences: 2"));
@@ -495,13 +495,12 @@ public class FormatCliTest extends AbstractCliTest {
   }
 
   public void testGetFormat() {
-    assertEquals(InputFormat.FASTA, FormatCli.getFormat("fasta", null, true));
-    assertEquals(InputFormat.FASTQ, FormatCli.getFormat("fastq", "sanger", true));
-    //assertEquals(InputFormat.CG, FormatCli.getFormat("cgfastq", null, true));
-    assertEquals(InputFormat.SOLEXA, FormatCli.getFormat("fastq", "solexa", true));
-    assertEquals(InputFormat.SOLEXA1_3, FormatCli.getFormat("fastq", "illumina", true));
+    assertEquals(SourceFormat.FASTA, FormatCli.getFormat("fasta", null, true, false).getSourceFormat());
+    assertEquals(SourceFormat.FASTQ, FormatCli.getFormat("fastq", "sanger", true, false).getSourceFormat());
+    assertEquals(QualityFormat.SOLEXA, FormatCli.getFormat("fastq", "solexa", true, false).getQualityFormat());
+    assertEquals(QualityFormat.SOLEXA1_3, FormatCli.getFormat("fastq", "illumina", true, false).getQualityFormat());
     try {
-      FormatCli.getFormat("blah", null, true);
+      FormatCli.getFormat("blah", null, true, false);
     } catch (final NoTalkbackSlimException e) {
       assertEquals("Invalid file format=blah", e.getMessage());
     }
@@ -518,9 +517,11 @@ public class FormatCliTest extends AbstractCliTest {
     }
   }
 
+  private static final DataSourceDescription FASTQ_DS = new DataSourceDescription(SourceFormat.FASTQ, QualityFormat.SANGER, false, false, false);
+
   public void testBadFormatCombinationException() throws IOException {
     Diagnostic.setLogStream();
-    final PrereadExecutor ex = new PrereadExecutor(true, false, InputFormat.FASTQ, null, null, null, false, false, false, true, null, null, false);
+    final PrereadExecutor ex = new PrereadExecutor(true, false, FASTQ_DS, null, null, null, false, false, false, true, null, null, false);
     try {
       ex.performPreread(null);
       fail();
@@ -530,16 +531,20 @@ public class FormatCliTest extends AbstractCliTest {
   }
 
   public void testFormattingMessage() {
-    testMessage("CGFASTQ", InputFormat.FASTQ_CG);
-    testMessage("FASTA", InputFormat.FASTA);
-    testMessage("FASTQ", InputFormat.FASTQ, InputFormat.SOLEXA, InputFormat.SOLEXA1_3);
-    testMessage("SAM/BAM", InputFormat.SAM_PE, InputFormat.SAM_SE);
+    testMessage("FASTQ-CG", new DataSourceDescription(SourceFormat.FASTQ, QualityFormat.UNKNOWN, true, false, true));
+    testMessage("FASTA", new DataSourceDescription(SourceFormat.FASTA, QualityFormat.UNKNOWN, false, false, false));
+    testMessage("FASTQ", FASTQ_DS);
+    testMessage("FASTQ-SOLEXA", new DataSourceDescription(SourceFormat.FASTQ, QualityFormat.SOLEXA, false, false, false));
+    testMessage("FASTQ-SOLEXA1_3", new DataSourceDescription(SourceFormat.FASTQ, QualityFormat.SOLEXA1_3, false, false, false));
+    testMessage("SAM/BAM", new DataSourceDescription(SourceFormat.SAM, QualityFormat.SANGER, true, false, false));
+    testMessage("SAM/BAM", new DataSourceDescription(SourceFormat.SAM, QualityFormat.SANGER, false, false, false));
   }
 
-  private void testMessage(String formatString, InputFormat... types) {
-    for (InputFormat format : types) {
-      assertEquals("Formatting paired-end " + formatString + " data", FormatCli.PrereadExecutor.formattingMessage(true, format));
-      assertEquals("Formatting " + formatString + " data", FormatCli.PrereadExecutor.formattingMessage(false, format));
+  private void testMessage(String formatString, DataSourceDescription desc) {
+    if (desc.isPairedEnd()) {
+      assertEquals("Formatting paired-end " + formatString + " data", FormatCli.PrereadExecutor.formattingMessage(desc));
+    } else {
+      assertEquals("Formatting " + formatString + " data", FormatCli.PrereadExecutor.formattingMessage(desc));
     }
   }
 

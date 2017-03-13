@@ -48,7 +48,6 @@ import java.util.function.Function;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.reader.FastqSequenceDataSource.FastQScoreType;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.ErrorType;
@@ -145,14 +144,14 @@ public final class FastqTrim extends AbstractCli {
     }
   }
 
-  static FastQScoreType qualityFlagToFastQScoreType(String qualityFormat) {
+  static QualityFormat qualityFlagToFastQScoreType(String qualityFormat) {
     switch (qualityFormat) {
       case CommonFlags.SANGER_FORMAT:
-        return FastQScoreType.PHRED;
+        return QualityFormat.SANGER;
       case CommonFlags.SOLEXA_FORMAT:
-        return FastQScoreType.SOLEXA;
+        return QualityFormat.SOLEXA;
       case CommonFlags.ILLUMINA_FORMAT:
-        return FastQScoreType.SOLEXA1_3;
+        return QualityFormat.SOLEXA1_3;
       default:
         throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Invalid quality format=" + qualityFormat);
     }
@@ -162,7 +161,7 @@ public final class FastqTrim extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final File output = FileUtils.getOutputFileName((File) mFlags.getValue(OUTPUT_FLAG), gzip, FastqUtils.extensions()) ;
-    final FastQScoreType encoding = qualityFlagToFastQScoreType((String) mFlags.getValue(QUALITY_FLAG));
+    final QualityFormat encoding = qualityFlagToFastQScoreType((String) mFlags.getValue(QUALITY_FLAG));
     final int batchSize = (Integer) mFlags.getValue(BATCH_SIZE);
     final boolean discardZeroLengthReads = mFlags.isSet(DISCARD_EMPTY_READS);
 

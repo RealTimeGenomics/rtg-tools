@@ -130,6 +130,6 @@ public class CompressedMemorySequencesWriterTest extends TestCase {
 
 
   private FastqSequenceDataSource getFastqSource(String str) {
-    return new FastqSequenceDataSource(Arrays.asList(new InputStream[] {new ByteArrayInputStream(str.getBytes())}), FastqSequenceDataSource.FastQScoreType.PHRED);
+    return new FastqSequenceDataSource(Arrays.asList(new InputStream[] {new ByteArrayInputStream(str.getBytes())}), QualityFormat.SANGER);
   }
 }

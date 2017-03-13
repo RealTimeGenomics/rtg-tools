@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -29,60 +29,16 @@
  */
 package com.rtg.reader;
 
-/**
- * Sequence data input formats
- */
-public enum InputFormat {
-  /** SDF */
-  SDF,
-  /** FASTA */
-  FASTA,
-  /** FASTQ, Sanger quality encoding */
-  FASTQ,
-  /** Interleaved FASTQ, Sanger quality encoding */
-  FASTQ_INTERLEAVED,
-  /** FASTQ, Solexa earlier than version 1.3 quality encoding */
-  SOLEXA,
-  /** FASTQ, Solexa 1.3 quality encoding */
-  SOLEXA1_3,
-  /** CG TSV */
-  TSV_CG,
-  /** CG FASTQ */
-  FASTQ_CG,
-  /** SAM/BAM containing CG attributes */
-  SAM_CG {
-    @Override
-    boolean isSam() {
-      return true;
-    }
-    @Override
-    public boolean isPairedSam() {
-      return true;
-    }
-  },
-  /** SAM/BAM single end */
-  SAM_SE {
-    @Override
-    boolean isSam() {
-      return true;
-    }
-  },
-  /** SAM/BAM paired end */
-  SAM_PE {
-    @Override
-    boolean isSam() {
-      return true;
-    }
-    @Override
-    public boolean isPairedSam() {
-      return true;
-    }
-  };
+import com.rtg.util.TestUtils;
 
-  boolean isSam() {
-    return false;
-  }
-  public boolean isPairedSam() {
-    return false;
+import junit.framework.TestCase;
+
+/**
+ * Test the corresponding class.
+ */
+public class SourceFormatTest extends TestCase {
+
+  public void testEnum() {
+    TestUtils.testEnum(SourceFormat.class, "[SDF, FASTA, FASTQ, SAM/BAM, TSV]");
   }
 }
