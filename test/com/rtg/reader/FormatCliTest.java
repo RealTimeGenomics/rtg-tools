@@ -666,4 +666,44 @@ public class FormatCliTest extends AbstractCliTest {
       TestUtils.containsAll(err, "Multiple read groups present in the input file");
     }
   }
+
+  public void testInterleavedFastq() throws Exception {
+    try (final TestDirectory tempDir = new TestDirectory("format")) {
+      final File input = new File(tempDir, "input.fastq");
+      FileHelper.resourceToFile("com/rtg/reader/resources/interleaved.fastq", input);
+      final File output = new File(tempDir, "output");
+      final MainResult res = checkMainInit("-o",  output.getPath(), "-f", "interleaved-fastq", input.getPath());
+      TestUtils.containsAll(res.out()
+        , "Formatting interleaved paired-end FASTQ data"
+        , "Input Data" + StringUtils.LS
+          + "Files              : input.fastq" + StringUtils.LS
+          + "Format             : interleaved paired-end FASTQ" + StringUtils.LS
+          + "Type               : DNA" + StringUtils.LS
+          + "Number of pairs    : 20" + StringUtils.LS
+          + "Number of sequences: 40" + StringUtils.LS
+          + "Total residues     : 4040" + StringUtils.LS
+          + "Minimum length     : 101" + StringUtils.LS
+          + "Maximum length     : 101" + StringUtils.LS
+          + StringUtils.LS
+          + "Output Data" + StringUtils.LS
+          + "SDF-ID             : "
+        , "Number of pairs    : 20" + StringUtils.LS
+          + "Number of sequences: 40" + StringUtils.LS
+          + "Total residues     : 4040" + StringUtils.LS
+          + "Minimum length     : 101" + StringUtils.LS
+          + "Maximum length     : 101" + StringUtils.LS
+      );
+
+      assertTrue(output.isDirectory());
+      assertTrue(new File(output, "left").isDirectory());
+      assertTrue(new File(output, "right").isDirectory());
+      assertTrue(new File(new File(output, "left"), "mainIndex").exists());
+      assertTrue(new File(new File(output, "right"), "mainIndex").exists());
+      final File progress = new File(output, "progress");
+      assertTrue(progress.exists());
+      final String prog = FileUtils.fileToString(progress);
+      TestUtils.containsAll(prog, "Formatting interleaved paired-end FASTQ data", "Finished successfully");
+    }
+  }
+
 }
