@@ -37,6 +37,7 @@ import java.util.Map;
 
 import com.rtg.bed.BedRangeLoader;
 import com.rtg.bed.BedRecord;
+import com.rtg.bed.SimpleBedRangeLoader;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -71,7 +72,7 @@ public final class SamRangeUtils {
   public static ReferenceRanges<String> createReferenceRanges(SAMFileHeader header, SamFilterParams params) throws IOException {
     final ReferenceRanges<String> nameRangeMap;
     if (params.bedRegionsFile() != null) {
-      nameRangeMap = createBedReferenceRanges(header, params.bedRegionsFile());
+      nameRangeMap = createBedReferenceRanges(params.bedRegionsFile(), header);
     } else if (params.restriction() != null) { // Single restriction region
       final SamRegionRestriction regionRestriction = params.restriction();
       nameRangeMap = createSingleReferenceRange(header, regionRestriction);
@@ -87,18 +88,15 @@ public final class SamRangeUtils {
 
 
   /**
-   * Make a reference range list from all regions contained in a BED file
-   * @param header the SAM header containing sequence information
+   * Make a reference range list from all regions contained in a BED file.  These have had the ranges checked against
+   * the provided sequence dictionary, and a reference sequence id map set.
    * @param bedFile the BED file to load
+   * @param header the SAM header containing sequence information
    * @return the ReferenceRanges lookup
    * @throws java.io.IOException if there was a problem loading the BED file
    */
-  public static ReferenceRanges<String> createBedReferenceRanges(SAMFileHeader header, File bedFile) throws IOException {
-    final BedRangeLoader<String> brl = new ResolvedBedRangeLoader(header);
-    brl.loadRanges(bedFile);
-    final ReferenceRanges<String> ranges = brl.getReferenceRanges();
-    ranges.setIdMap(SamUtils.getSequenceIdLookup(header.getSequenceDictionary()));
-    return ranges;
+  public static ReferenceRanges<String> createBedReferenceRanges(File bedFile, SAMFileHeader header) throws IOException {
+    return BedRangeLoader.getReferenceRanges(new ResolvedBedRangeLoader(header), bedFile);
   }
 
   /**
@@ -109,9 +107,7 @@ public final class SamRangeUtils {
    * @throws java.io.IOException if there was a problem loading the BED file
    */
   public static ReferenceRanges<String> createBedReferenceRanges(File bedFile) throws IOException {
-    final BedRangeLoader<String> brl = new SimpleBedRangeLoader();
-    brl.loadRanges(bedFile);
-    return brl.getReferenceRanges();
+    return BedRangeLoader.getReferenceRanges(new SimpleBedRangeLoader(), bedFile);
   }
 
 
@@ -254,32 +250,7 @@ public final class SamRangeUtils {
     return new SequenceNameLocusSimple(range.getSequenceName(), start, end);
   }
 
-
-  /** Loads BED records into range data that has either name (if present) or string representation of the region as meta data */
-  private static class SimpleBedRangeLoader extends BedRangeLoader<String> {
-    SimpleBedRangeLoader() {
-      super(0);
-    }
-
-    @Override
-    protected RangeList.RangeData<String> getRangeData(BedRecord rec) {
-      SequenceNameLocus region = rec;
-      if (region.getEnd() == region.getStart()) {
-        region = new SequenceNameLocusSimple(rec.getSequenceName(), rec.getStart(), rec.getEnd() + 1);
-      }
-      return new RangeList.RangeData<>(region, getMeta(rec));
-    }
-
-    @Override
-    protected String getMeta(final BedRecord rec) {
-      if (rec.getAnnotations() != null && rec.getAnnotations().length > 0) {
-        return rec.getAnnotations()[0];
-      }
-      return rec.getSequenceName() + ":" + (rec.getStart() + 1) + "-" + rec.getEnd();
-    }
-  }
-
-  /** Adds checking that referenced sequences and coordinates are valid */
+  /** Adds checking that referenced sequences and coordinates are valid, and sets the ID map */
   private static class ResolvedBedRangeLoader extends SimpleBedRangeLoader {
     private final SAMSequenceDictionary mDictionary;
 
@@ -299,5 +270,11 @@ public final class SamRangeUtils {
       return new RangeList.RangeData<>(r, getMeta(rec));
     }
 
+    @Override
+    public ReferenceRanges<String> getReferenceRanges() {
+      final ReferenceRanges<String> ranges = super.getReferenceRanges();
+      ranges.setIdMap(SamUtils.getSequenceIdLookup(mDictionary));
+      return ranges;
+    }
   }
 }

@@ -46,6 +46,19 @@ import com.rtg.util.intervals.RegionRestriction;
 @TestClass("com.rtg.vcf.VcfAnnotatorCliTest")
 public abstract class BedRangeLoader<T> {
 
+  /**
+   * Convenience method to load BED ranges from a file using the supplied loader
+   * @param brl the BED range loader
+   * @param bedFile the BED file
+   * @param <U> type of data associated with the ReferenceRanges
+   * @return the ReferenceRanges
+   * @throws IOException if an exception occurs while reading a BED file
+   */
+  public static <U> ReferenceRanges<U> getReferenceRanges(BedRangeLoader<U> brl, File bedFile) throws IOException {
+    brl.loadRanges(bedFile);
+    return brl.getReferenceRanges();
+  }
+
   private final ReferenceRanges.Accumulator<T> mRangeData = new ReferenceRanges.Accumulator<>();
 
   private final int mMinAnnotations;
@@ -108,7 +121,6 @@ public abstract class BedRangeLoader<T> {
    */
   public ReferenceRanges<T> getReferenceRanges() {
     return mRangeData.getReferenceRanges();
-
   }
 
   /**
@@ -123,7 +135,7 @@ public abstract class BedRangeLoader<T> {
       ++end;
       // warning - need to have a range of at least 1
       if (mExtendWarningCount < 10) {
-        Diagnostic.warning("Zero length range, extending end by 1 : " + rec.toString());
+        Diagnostic.warning("Zero length range in BED record, extending end by 1 : " + rec.toString());
       }
       ++mExtendWarningCount;
     }

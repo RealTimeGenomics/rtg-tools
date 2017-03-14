@@ -105,7 +105,7 @@ public class SamRangeUtilsTest extends TestCase {
       assertNull(seqRanges.find(1000));
       assertNotNull(seqRanges.find(450));
 
-      refRanges = SamRangeUtils.createBedReferenceRanges(header, bedfile);
+      refRanges = SamRangeUtils.createBedReferenceRanges(bedfile, header);
       seqRanges = refRanges.get("g1");
       assertNull(seqRanges.find(450)); // Validation against header will have clipped to length of g1
     }

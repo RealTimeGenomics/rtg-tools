@@ -36,8 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.bed.BedRangeLoader;
-import com.rtg.bed.BedRecord;
+import com.rtg.bed.NamedBedRangeLoader;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.header.InfoField;
@@ -51,16 +50,6 @@ import com.rtg.vcf.header.VcfNumber;
  */
 @TestClass("com.rtg.vcf.VcfAnnotatorCliTest")
 public class BedVcfAnnotator implements VcfAnnotator {
-
-  private static final class AnnotatorBedLoader extends BedRangeLoader<String> {
-    private AnnotatorBedLoader() {
-      super(1);
-    }
-    @Override
-    public String getMeta(BedRecord rec) {
-      return new String(rec.getAnnotations()[0].toCharArray());
-    }
-  }
 
 
   /** Per chromosome annotations. */
@@ -79,7 +68,7 @@ public class BedVcfAnnotator implements VcfAnnotator {
   public BedVcfAnnotator(String infoId, String description, Collection<File> bedFiles) throws IOException {
     mInfoId = infoId;
     mInfoDescription = description;
-    final BedVcfAnnotator.AnnotatorBedLoader bedLoader = new AnnotatorBedLoader();
+    final NamedBedRangeLoader bedLoader = new NamedBedRangeLoader();
     bedLoader.loadRanges(bedFiles);
     mAnnotations = bedLoader.getReferenceRanges();
   }
