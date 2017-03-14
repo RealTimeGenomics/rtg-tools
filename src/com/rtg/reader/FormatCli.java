@@ -774,6 +774,7 @@ public final class FormatCli extends LoggedCli {
    * @param format file format
    * @param qualityFormat quality data encoding
    * @param checkFastqQuality true if FASTQ quality values are going to be used
+   * @param isPairedEnd true if the inputs is paired end
    * @return the input format
    */
   static DataSourceDescription getFormat(String format, String qualityFormat, boolean checkFastqQuality, boolean isPairedEnd) {
