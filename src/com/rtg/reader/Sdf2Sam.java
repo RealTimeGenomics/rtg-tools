@@ -77,7 +77,7 @@ public final class Sdf2Sam extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
 
     Sdf2Fasta.registerExtractorFlags(mFlags);
-    mFlags.registerRequired('o', OUTPUT, File.class, "FILE", "output filename (extension added if not present). Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT, File.class, CommonFlags.FILE, "output filename (extension added if not present). Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
 
     mFlags.setValidator(VALIDATOR);

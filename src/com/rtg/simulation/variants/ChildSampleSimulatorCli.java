@@ -90,17 +90,17 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     mFlags.setDescription("Generates a VCF containing a genotype simulated as a child of two parents.");
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerRequired('t', REFERENCE_SDF, File.class, "SDF", "SDF containing input genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_SDF, File.class, "SDF", "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('i', INPUT_VCF, File.class, "FILE", "input VCF containing parent variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('s', SAMPLE_FLAG, String.class, "STRING", "name for new child sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired(FATHER_FLAG, String.class, "STRING", "name of the existing sample to use as the father").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired(MOTHER_FLAG, String.class, "STRING", "name of the existing sample to use as the mother").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('t', REFERENCE_SDF, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT_VCF, File.class, CommonFlags.FILE, "input VCF containing parent variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('s', SAMPLE_FLAG, String.class, CommonFlags.STRING, "name for new child sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired(FATHER_FLAG, String.class, CommonFlags.STRING, "name of the existing sample to use as the father").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired(MOTHER_FLAG, String.class, CommonFlags.STRING, "name of the existing sample to use as the mother").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(SEX, Sex.class, "SEX", "sex of individual", Sex.EITHER).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, "string", "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(EXTRA_CROSSOVERS, Double.class, "FLOAT", "likelihood of extra crossovers per chromosome", EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(SEED, Integer.class, "INT", "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(EXTRA_CROSSOVERS, Double.class, CommonFlags.FLOAT, "likelihood of extra crossovers per chromosome", EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SHOW_CROSSOVERS, "if set, display information regarding haplotype selection and crossover points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 

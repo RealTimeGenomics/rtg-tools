@@ -37,6 +37,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -95,8 +96,8 @@ public class UsageServerCli extends AbstractCli {
     }
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Start usage tracking server.");
-    mFlags.registerOptional('p', PORT, Integer.class, "INT", "port on which to listen for usage logging connections.", defaultPort).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional('T', THREADS, Integer.class, "INT", "number of worker threads to handle incoming connections.", 4).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional('p', PORT, Integer.class, CommonFlags.INT, "port on which to listen for usage logging connections.", defaultPort).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional('T', THREADS, Integer.class, CommonFlags.INT, "number of worker threads to handle incoming connections.", 4).setCategory(CommonFlagCategories.UTILITY);
   }
 
   @Override

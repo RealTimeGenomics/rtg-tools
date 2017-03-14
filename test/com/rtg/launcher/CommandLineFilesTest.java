@@ -78,8 +78,8 @@ public class CommandLineFilesTest extends TestCase {
 
   public CFlags makeFlags() {
     final CFlags flags = new CFlags();
-    flags.registerRequired(File.class, "FILE", "file list").setMaxCount(Integer.MAX_VALUE).setMinCount(0);
-    flags.registerOptional(CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "File list flag");
+    flags.registerRequired(File.class, CommonFlags.FILE, "file list").setMaxCount(Integer.MAX_VALUE).setMinCount(0);
+    flags.registerOptional(CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "File list flag");
     return flags;
   }
 
@@ -273,7 +273,7 @@ public class CommandLineFilesTest extends TestCase {
   public void testOutputFile() throws IOException {
     final CommandLineFiles cmf = CommandLineFiles.outputFile();
     final CFlags flags = new CFlags();
-      flags.registerRequired(CommonFlags.OUTPUT_FLAG, File.class, "FILE", "output").setMaxCount(Integer.MAX_VALUE).setMinCount(0);
+      flags.registerRequired(CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.FILE, "output").setMaxCount(Integer.MAX_VALUE).setMinCount(0);
 
       final File subdir = new File(mOne, "subdir");
       final File subdir2 = new File(mTwo, "subdir2");

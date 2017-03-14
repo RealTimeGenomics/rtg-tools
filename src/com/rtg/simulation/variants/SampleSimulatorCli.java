@@ -85,13 +85,13 @@ public class SampleSimulatorCli extends AbstractCli {
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
-    mFlags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_SDF, File.class, "SDF", "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('i', POPULATION_VCF, File.class, "FILE", "input VCF containing population variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('s', SAMPLE_NAME, String.class, "STRING", "name for sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('i', POPULATION_VCF, File.class, CommonFlags.FILE, "input VCF containing population variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('s', SAMPLE_NAME, String.class, CommonFlags.STRING, "name for sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(SEX, Sex.class, "SEX", "sex of individual", Sex.EITHER).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, "string", "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(SEED, Integer.class, "INT", "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
     mFlags.setValidator(new SampleSimulatorFlagValidator());

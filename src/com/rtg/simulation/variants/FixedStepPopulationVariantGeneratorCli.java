@@ -39,12 +39,12 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.vcf.VcfUtils;
 
@@ -83,18 +83,15 @@ public class FixedStepPopulationVariantGeneratorCli extends AbstractCli {
   public void initFlags(CFlags flags) {
     flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('i', REFERENCE_SDF, File.class, "SDF", "SDF containing input genome").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "name for population output VCF").setCategory(INPUT_OUTPUT);
-    flags.registerRequired(SNP_SPECIFICATION, String.class, "string", "generated mutation format").setCategory(INPUT_OUTPUT);
-    flags.registerOptional(SEED, Integer.class, "INT", "seed for the random number generator").setCategory(UTILITY);
-    flags.registerRequired('d', DISTANCE, Integer.class, "INT", "distance between mutations").setCategory(INPUT_OUTPUT);
-    flags.registerOptional('a', FREQUENCY, Double.class, "FLOAT", "allele frequency", 0.5).setCategory(UTILITY);
-    flags.setValidator(new Validator() {
-      @Override
-      public boolean isValid(CFlags flags) {
-        final Double af = (Double) flags.getValue(FREQUENCY);
-        return af != null && af >= 0 && af <= 1 && !af.isNaN();
-      }
+    flags.registerRequired('i', REFERENCE_SDF, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
+    flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "name for population output VCF").setCategory(INPUT_OUTPUT);
+    flags.registerRequired(SNP_SPECIFICATION, String.class, CommonFlags.STRING, "generated mutation format").setCategory(INPUT_OUTPUT);
+    flags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(UTILITY);
+    flags.registerRequired('d', DISTANCE, Integer.class, CommonFlags.INT, "distance between mutations").setCategory(INPUT_OUTPUT);
+    flags.registerOptional('a', FREQUENCY, Double.class, CommonFlags.FLOAT, "allele frequency", 0.5).setCategory(UTILITY);
+    flags.setValidator(flags1 -> {
+      final Double af = (Double) flags1.getValue(FREQUENCY);
+      return af != null && af >= 0 && af <= 1 && !af.isNaN();
     });
   }
 

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.reference.Sex;
 import com.rtg.util.TextTable;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -80,7 +81,7 @@ public class PedStatsCli extends AbstractCli {
         + "  dot -Tpdf -o mypedigree.pdf <(rtg pedstats --dot \"A Title\" PEDFILE)\n"
     );
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerRequired(File.class, "FILE", "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired(File.class, CommonFlags.FILE, "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);
 
     mFlags.registerOptional(PRIMARY_IDS, "output ids of all primary individuals").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(MALE_IDS, "output ids of all males").setCategory(CommonFlagCategories.REPORTING);
@@ -89,7 +90,7 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(MATERNAL_IDS, "output ids of maternal individuals").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FOUNDER_IDS, "output ids of all founders").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILIES_OUT, "output information about family structures").setCategory(CommonFlagCategories.REPORTING);
-    mFlags.registerOptional(DOT_OUT, String.class, "STRING", "output pedigree in GraphViz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_OUT, String.class, CommonFlags.STRING, "output pedigree in GraphViz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(DOT_SIMPLE, "when outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees").setCategory(CommonFlagCategories.REPORTING);
 
     mFlags.registerOptional(DUMP, "dump full relationships structure").setCategory(CommonFlagCategories.REPORTING);

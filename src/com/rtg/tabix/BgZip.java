@@ -80,7 +80,7 @@ public class BgZip extends AbstractCli {
     mFlags.registerOptional('d', DECOMPRESS_FLAG, "decompress").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('f', FORCE_FLAG, "force overwrite of output file").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(NO_TERMINATE_FLAG, "if set, do not add the block gzip termination block").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional('l', LEVEL_FLAG, Integer.class, "INT", "the compression level to use, between 1 (least but fast) and 9 (highest but slow)", BlockCompressedOutputStream.getDefaultCompressionLevel()).setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('l', LEVEL_FLAG, Integer.class, CommonFlags.INT, "the compression level to use, between 1 (least but fast) and 9 (highest but slow)", BlockCompressedOutputStream.getDefaultCompressionLevel()).setCategory(INPUT_OUTPUT);
 
     mFlags.setValidator(flags -> flags.checkInRange(LEVEL_FLAG, 1, 9)
       && flags.checkNand(STDOUT_FLAG, FORCE_FLAG)

@@ -51,6 +51,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.rtg.bed.BedUtils;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.mode.SequenceType;
 import com.rtg.reader.NamesInterface;
@@ -176,41 +177,41 @@ public class ReadSimCli extends LoggedCli {
     mFlags.setDescription("Generates reads from a reference genome.");
     mFlags.setCategories(UTILITY, new String[]{INPUT_OUTPUT, CAT_FRAGMENTS, CAT_ILLUMINA_PE, CAT_ILLUMINA_SE, CAT_454_PE, CAT_ION_SE, CAT_CG, UTILITY});
     mFlags.registerExtendedHelp();
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "name for reads output SDF").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('t', INPUT, File.class, "SDF", "SDF containing input genome").setCategory(INPUT_OUTPUT);
-    final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, "float", "coverage, must be positive").setCategory(CAT_FRAGMENTS);
-    final Flag<Long> nFlag = mFlags.registerOptional('n', READS, Long.class, "int", "number of reads to be generated").setCategory(CAT_FRAGMENTS);
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for reads output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('t', INPUT, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
+    final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, CommonFlags.FLOAT, "coverage, must be positive").setCategory(CAT_FRAGMENTS);
+    final Flag<Long> nFlag = mFlags.registerOptional('n', READS, Long.class, CommonFlags.INT, "number of reads to be generated").setCategory(CAT_FRAGMENTS);
 
     // Fragmenter
     mFlags.registerOptional('N', ALLOW_UNKNOWNS, "allow reads to be drawn from template fragments containing unknown nucleotides").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional('D', DISTRIBUTION, File.class, "file", "file containing probability distribution for sequence selection").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional(TAXONOMY_DISTRIBUTION, File.class, "file", "file containing probability distribution for sequence selection expressed as taxonomy id").setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional('D', DISTRIBUTION, File.class, CommonFlags.FILE, "file containing probability distribution for sequence selection").setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional(TAXONOMY_DISTRIBUTION, File.class, CommonFlags.FILE, "file containing probability distribution for sequence selection expressed as taxonomy id").setCategory(CAT_FRAGMENTS);
     mFlags.registerOptional(ABUNDANCE, "taxonomy distribution represents desired abundance").setCategory(CAT_FRAGMENTS);
     mFlags.registerOptional(DNA_FRACTION, "taxonomy distribution represents desired DNA fraction").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional(N_RATE, Double.class, "float", "rate that the machine will generate new unknowns in the read", 0.0).setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional(N_RATE, Double.class, CommonFlags.FLOAT, "rate that the machine will generate new unknowns in the read", 0.0).setCategory(CAT_FRAGMENTS);
 
-    mFlags.registerOptional('s', SEED, Long.class, "int", "seed for random number generator").setCategory(UTILITY);
-    mFlags.registerOptional(COMMENT, String.class, "string", "comment to include in the generated SDF").setCategory(UTILITY);
+    mFlags.registerOptional('s', SEED, Long.class, CommonFlags.INT, "seed for random number generator").setCategory(UTILITY);
+    mFlags.registerOptional(COMMENT, String.class, CommonFlags.STRING, "comment to include in the generated SDF").setCategory(UTILITY);
     SamCommandHelper.initSamRg(mFlags, "ILLUMINA", UTILITY);
 
     mFlags.addRequiredSet(covFlag);
     mFlags.addRequiredSet(nFlag);
 
-    mFlags.registerOptional('q', QUAL_RANGE, String.class, "string", "set the range of base quality values permitted e.g.: 3-40 (Default is fixed qualities corresponding to overall machine base error rate)").setCategory(UTILITY);
+    mFlags.registerOptional('q', QUAL_RANGE, String.class, CommonFlags.STRING, "set the range of base quality values permitted e.g.: 3-40 (Default is fixed qualities corresponding to overall machine base error rate)").setCategory(UTILITY);
 
     //reduce wastage
     mFlags.registerOptional(NO_NAMES, "do not create read names in result sdf").setCategory(UTILITY);
     mFlags.registerOptional(NO_QUAL, "do not create read qualities in result sdf").setCategory(UTILITY);
 
     // Override rate options
-    mFlags.registerOptional(MNP_EVENT_RATE, Double.class, "float", "override the overall MNP event rate in the priors").setCategory(UTILITY);
-    mFlags.registerOptional(INS_EVENT_RATE, Double.class, "float", "override the overall insertion event rate in the priors").setCategory(UTILITY);
-    mFlags.registerOptional(DEL_EVENT_RATE, Double.class, "float", "override the overall deletion event rate in the priors").setCategory(UTILITY);
+    mFlags.registerOptional(MNP_EVENT_RATE, Double.class, CommonFlags.FLOAT, "override the overall MNP event rate in the priors").setCategory(UTILITY);
+    mFlags.registerOptional(INS_EVENT_RATE, Double.class, CommonFlags.FLOAT, "override the overall insertion event rate in the priors").setCategory(UTILITY);
+    mFlags.registerOptional(DEL_EVENT_RATE, Double.class, CommonFlags.FLOAT, "override the overall deletion event rate in the priors").setCategory(UTILITY);
     // Limit to bed regions
-    mFlags.registerOptional(BED_FILE, File.class, "FILE", "simulate exome capture by only generating reads that lie over the specified regions").setCategory(UTILITY);
+    mFlags.registerOptional(BED_FILE, File.class, CommonFlags.FILE, "simulate exome capture by only generating reads that lie over the specified regions").setCategory(UTILITY);
 
-    mFlags.registerOptional(PCR_DUP_RATE, Double.class, "float", "set the PCR duplication error rate", 0.0).setCategory(UTILITY);
-    mFlags.registerOptional(CHIMERA_RATE, Double.class, "float", "set the chimeric fragment error rate", 0.0).setCategory(UTILITY);
+    mFlags.registerOptional(PCR_DUP_RATE, Double.class, CommonFlags.FLOAT, "set the PCR duplication error rate", 0.0).setCategory(UTILITY);
+    mFlags.registerOptional(CHIMERA_RATE, Double.class, CommonFlags.FLOAT, "set the chimeric fragment error rate", 0.0).setCategory(UTILITY);
 
     mFlags.setValidator(new ReadSimCliValidator());
     initMachineFlags();
@@ -219,29 +220,29 @@ public class ReadSimCli extends LoggedCli {
     initIlluminaFlags();
     init454Flags();
     initIonFlags();
-    final Flag<String> machType = mFlags.registerRequired(MACHINE_TYPE, String.class, "string", "select the sequencing technology to model").setCategory(INPUT_OUTPUT);
+    final Flag<String> machType = mFlags.registerRequired(MACHINE_TYPE, String.class, CommonFlags.STRING, "select the sequencing technology to model").setCategory(INPUT_OUTPUT);
     machType.setParameterRange(new String[]{MachineType.ILLUMINA_SE.name(), MachineType.ILLUMINA_PE.name(), MachineType.COMPLETE_GENOMICS.name(), MachineType.COMPLETE_GENOMICS_2.name(), MachineType.FOURFIVEFOUR_PE.name(), MachineType.FOURFIVEFOUR_SE.name(), MachineType.IONTORRENT.name()});
-    mFlags.registerOptional('E', MACHINE_ERROR_PRIORS, String.class, "string", "selects the sequencer machine error settings. One of [default, illumina, ls454_se, ls454_pe, complete, completegenomics, iontorrent]").setCategory(UTILITY);
+    mFlags.registerOptional('E', MACHINE_ERROR_PRIORS, String.class, CommonFlags.STRING, "selects the sequencer machine error settings. One of [default, illumina, ls454_se, ls454_pe, complete, completegenomics, iontorrent]").setCategory(UTILITY);
   }
 
   protected void initIlluminaFlags() {
     // Illumina SE
-    mFlags.registerOptional('r', READLENGTH, Integer.class, "int", "target read length, must be positive").setCategory(CAT_ILLUMINA_SE);
-    mFlags.registerOptional('M', MAX_FRAGMENT, Integer.class, "int", "maximum fragment size", 250).setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional('m', MIN_FRAGMENT, Integer.class, "int", "minimum fragment size", 200).setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional('r', READLENGTH, Integer.class, CommonFlags.INT, "target read length, must be positive").setCategory(CAT_ILLUMINA_SE);
+    mFlags.registerOptional('M', MAX_FRAGMENT, Integer.class, CommonFlags.INT, "maximum fragment size", 250).setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional('m', MIN_FRAGMENT, Integer.class, CommonFlags.INT, "minimum fragment size", 200).setCategory(CAT_FRAGMENTS);
     // Illumina PE
-    mFlags.registerOptional('L', LEFT_READLENGTH, Integer.class, "int", "target read length on the left side").setCategory(CAT_ILLUMINA_PE);
-    mFlags.registerOptional('R', RIGHT_READLENGTH, Integer.class, "int", "target read length on the right side").setCategory(CAT_ILLUMINA_PE);
+    mFlags.registerOptional('L', LEFT_READLENGTH, Integer.class, CommonFlags.INT, "target read length on the left side").setCategory(CAT_ILLUMINA_PE);
+    mFlags.registerOptional('R', RIGHT_READLENGTH, Integer.class, CommonFlags.INT, "target read length on the right side").setCategory(CAT_ILLUMINA_PE);
   }
 
   protected void init454Flags() {
-    mFlags.registerOptional(MAX_TOTAL_454_LENGTH, Integer.class, "int", "maximum 454 read length (in paired end case the sum of the left and the right read lengths)").setCategory(CAT_454_PE);
-    mFlags.registerOptional(MIN_TOTAL_454_LENGTH, Integer.class, "int", "minimum 454 read length (in paired end case the sum of the left and the right read lengths)").setCategory(CAT_454_PE);
+    mFlags.registerOptional(MAX_TOTAL_454_LENGTH, Integer.class, CommonFlags.INT, "maximum 454 read length (in paired end case the sum of the left and the right read lengths)").setCategory(CAT_454_PE);
+    mFlags.registerOptional(MIN_TOTAL_454_LENGTH, Integer.class, CommonFlags.INT, "minimum 454 read length (in paired end case the sum of the left and the right read lengths)").setCategory(CAT_454_PE);
   }
 
   protected void initIonFlags() {
-    mFlags.registerOptional(MAX_TOTAL_IONTORRENT_LENGTH, Integer.class, "int", "maximum IonTorrent read length").setCategory(CAT_ION_SE);
-    mFlags.registerOptional(MIN_TOTAL_IONTORRENT_LENGTH, Integer.class, "int", "minimum IonTorrent read length").setCategory(CAT_ION_SE);
+    mFlags.registerOptional(MAX_TOTAL_IONTORRENT_LENGTH, Integer.class, CommonFlags.INT, "maximum IonTorrent read length").setCategory(CAT_ION_SE);
+    mFlags.registerOptional(MIN_TOTAL_IONTORRENT_LENGTH, Integer.class, CommonFlags.INT, "minimum IonTorrent read length").setCategory(CAT_ION_SE);
   }
 
   private Machine createMachine() {

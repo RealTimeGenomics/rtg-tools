@@ -47,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.RstTable;
 import com.rtg.util.StringUtils;
 
@@ -1485,7 +1486,7 @@ public final class CFlags {
     cli.registerRequired(String.class, "ARGS", "these are some extra required args");
     cli.registerRequired(String.class, "BARGS", "these are some extra required args");
 
-    final Flag<Integer> intFlag = cli.registerRequired('i', "int", Integer.class, "my_int",
+    final Flag<Integer> intFlag = cli.registerRequired('i', CommonFlags.INT, Integer.class, "my_int",
     "This sets an int value.");
     intFlag.setMaxCount(5);
     // intFlag.setMaxCount(Integer.MAX_VALUE);
@@ -1495,9 +1496,9 @@ public final class CFlags {
     cli.registerOptional('b', "boolean", Boolean.class, "true/false", "this sets a boolean value.",
         Boolean.TRUE);
 
-    final Flag<Float> f = cli.registerOptional('f', "float", Float.class, null, "this sets a float value.", (float) 20);
+    final Flag<Float> f = cli.registerOptional('f', CommonFlags.FLOAT, Float.class, null, "this sets a float value.", (float) 20);
     f.setParameterRange(new String[] {"0.2", "0.4", "0.6" });
-    cli.registerOptional("string", String.class, null, "this sets a string value. and for this one I'm going to have quite a long description. Possibly long enough to need wrapping.",
+    cli.registerOptional(CommonFlags.STRING, String.class, null, "this sets a string value. and for this one I'm going to have quite a long description. Possibly long enough to need wrapping.",
     "myDefault");
     cli.setFlags(args);
 

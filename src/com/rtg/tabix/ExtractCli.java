@@ -36,6 +36,7 @@ import java.io.PrintStream;
 import java.util.List;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.sam.RecordIterator;
 import com.rtg.sam.SamClosedFileReader;
 import com.rtg.sam.SamRangeUtils;
@@ -124,8 +125,8 @@ public class ExtractCli extends AbstractCli {
         return true;
       }
     });
-    flags.registerRequired(File.class, "FILE", "the indexed block compressed genome position data file to extract").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    final Flag<String> region = flags.registerRequired(String.class, "STRING", "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerRequired(File.class, CommonFlags.FILE, "the indexed block compressed genome position data file to extract").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    final Flag<String> region = flags.registerRequired(String.class, CommonFlags.STRING, "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.FILTERING);
     region.setMinCount(0);
     region.setMaxCount(Integer.MAX_VALUE);
     flags.registerOptional(HEADER_FLAG, "print out header also").setCategory(CommonFlagCategories.REPORTING);

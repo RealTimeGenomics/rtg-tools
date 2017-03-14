@@ -91,15 +91,15 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
-    mFlags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_SDF, File.class, "SDF", "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('i', INPUT_VCF, File.class, "FILE", "input VCF containing genotype of original sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('s', SAMPLE_FLAG, String.class, "STRING", "name for new derived sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional('p', PRIORS_FLAG, String.class, "STRING", "selects a properties file specifying the mutation priors. Either a file name or one of [human]", "human").setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerRequired(ORIGINAL_FLAG, String.class, "STRING", "name of the existing sample to use as the original genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, "string", "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(EXPECTED_MUTATIONS, Integer.class, "INT", "expected number of mutations per genome", DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(SEED, Integer.class, "INT", "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT_VCF, File.class, CommonFlags.FILE, "input VCF containing genotype of original sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('s', SAMPLE_FLAG, String.class, CommonFlags.STRING, "name for new derived sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the mutation priors. Either a file name or one of [human]", "human").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerRequired(ORIGINAL_FLAG, String.class, CommonFlags.STRING, "name of the existing sample to use as the original genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of mutations per genome", DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SHOW_MUTATIONS, "if set, display information regarding de novo mutation points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 

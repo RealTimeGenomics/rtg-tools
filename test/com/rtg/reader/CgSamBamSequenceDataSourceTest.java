@@ -48,7 +48,7 @@ public class CgSamBamSequenceDataSourceTest extends AbstractNanoTest {
       final File sdf = new File(tempDir, "sdf");
       final File sample = new File(tempDir, "sample.sam.gz");
       FileHelper.stringToGzFile(FileHelper.resourceToString("com/rtg/reader/resources/sample-cg-v2.sam"), sample);
-      MainResult res = MainResult.run(new FormatCli(), sample.getPath(), "--format", "cg-sam", "-o", sdf.getPath());
+      MainResult res = MainResult.run(new FormatCli(), sample.getPath(), "--format", "sam-cg", "-o", sdf.getPath());
       assertEquals(res.err(), 0, res.rc());
 
       final File out = new File(tempDir, "out.tsv.gz");

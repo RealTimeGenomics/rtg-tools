@@ -361,7 +361,7 @@ public final class SdfVerifier {
 
   private static CFlags getCFlags(final String name, final Appendable out, final Appendable err) {
     final CFlags flags = new CFlags(name, out, err);
-    flags.registerRequired(File.class, "SDF", "the SDF to be verified");
+    flags.registerRequired(File.class, CommonFlags.SDF, "the SDF to be verified");
     flags.setValidator(VALIDATOR);
     return flags;
   }

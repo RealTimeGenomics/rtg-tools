@@ -48,8 +48,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.InvalidParamsException;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -83,29 +83,26 @@ public final class Sdf2Fastq extends AbstractCli {
 
     Sdf2Fasta.registerTextExtractorFlags(mFlags);
 
-    mFlags.registerOptional('q', DEFAULT_QUALITY, Integer.class, "INT", "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
+    mFlags.registerOptional('q', DEFAULT_QUALITY, Integer.class, CommonFlags.INT, "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
     mFlags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
 
     mFlags.setValidator(VALIDATOR);
   }
 
-  private static final Validator VALIDATOR = new Validator() {
-    @Override
-    public boolean isValid(final CFlags flags) {
-      if (flags.isSet(DEFAULT_QUALITY)) {
-        final int qual = (Integer) flags.getValue(DEFAULT_QUALITY);
-        if (qual < 0) {
-          Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, DEFAULT_QUALITY, Integer.toString(qual), "0");
-          return false;
-        }
-        if (qual > 63) {
-          Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, DEFAULT_QUALITY, Integer.toString(qual), "63");
-          return false;
-        }
+  private static final Validator VALIDATOR = flags -> {
+    if (flags.isSet(DEFAULT_QUALITY)) {
+      final int qual = (Integer) flags.getValue(DEFAULT_QUALITY);
+      if (qual < 0) {
+        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, DEFAULT_QUALITY, Integer.toString(qual), "0");
+        return false;
       }
-
-      return Sdf2Fasta.validateTextExtractorFlags(flags);
+      if (qual > 63) {
+        Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, DEFAULT_QUALITY, Integer.toString(qual), "63");
+        return false;
+      }
     }
+
+    return Sdf2Fasta.validateTextExtractorFlags(flags);
   };
 
 

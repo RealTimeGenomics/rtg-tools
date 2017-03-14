@@ -36,6 +36,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.io.LineWriter;
 import com.rtg.vcf.header.VcfHeader;
@@ -63,7 +64,7 @@ public class PedFilterCli extends AbstractCli {
     mFlags.setDescription("Filter and convert a pedigree file.");
     CommonFlagCategories.setCategories(mFlags);
 
-    mFlags.registerRequired(File.class, "FILE", "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired(File.class, CommonFlags.FILE, "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);
 
     mFlags.registerOptional(KEEP_PRIMARY, "keep only primary individuals (those with a PED individual line / VCF sample column)").setCategory(CommonFlagCategories.FILTERING);
     mFlags.registerOptional(REMOVE_PARENTAGE, "remove all parent-child relationship information").setCategory(CommonFlagCategories.FILTERING);

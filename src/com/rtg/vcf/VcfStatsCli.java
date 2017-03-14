@@ -77,14 +77,14 @@ public class VcfStatsCli extends AbstractCli {
     mFlags.registerExtendedHelp();
     mFlags.setDescription("Display statistics from a set of VCF files.");
     mFlags.registerOptional("Xvariant", "calculate statistics via Variant API rather than VcfRecord API").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(SAMPLE, String.class, "STRING", "only calculate statistics for the specified sample (Default is to include all samples)")
+    mFlags.registerOptional(SAMPLE, String.class, CommonFlags.STRING, "only calculate statistics for the specified sample (Default is to include all samples)")
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(KNOWN, "only calculate statistics for known variants (Default is to ignore known/novel status)").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(NOVEL, "only calculate statistics for novel variants (Default is to ignore known/novel status)").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(LENGTHS, "output variant length histogram").setCategory(REPORTING);
     mFlags.registerOptional(COUNTS, "output alleles per variant site histogram").setCategory(REPORTING);
-    mFlags.registerRequired(File.class, "FILE", "input VCF files from which to derive statistics or '-' to read from standard input")
+    mFlags.registerRequired(File.class, CommonFlags.FILE, "input VCF files from which to derive statistics or '-' to read from standard input")
       .setMinCount(1)
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);

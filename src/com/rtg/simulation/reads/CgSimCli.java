@@ -33,6 +33,7 @@ package com.rtg.simulation.reads;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.machine.MachineType;
 
@@ -98,9 +99,9 @@ public class CgSimCli extends ReadSimCli {
 
   @Override
   protected void initMachineFlags() {
-    mFlags.registerOptional('M', MAX_FRAGMENT, Integer.class, "int", "maximum fragment size", 500).setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional('m', MIN_FRAGMENT, Integer.class, "int", "minimum fragment size", 350).setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional('E', XMACHINE_ERROR_PRIORS, String.class, "string", "override default machine error priors").setCategory(UTILITY);
-    mFlags.registerRequired('V', CG_VERSION, Integer.class, "int", "select Complete Genomics read structure version, 1 (35 bp) or 2 (29 bp)").setCategory(CAT_CG);
+    mFlags.registerOptional('M', MAX_FRAGMENT, Integer.class, CommonFlags.INT, "maximum fragment size", 500).setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional('m', MIN_FRAGMENT, Integer.class, CommonFlags.INT, "minimum fragment size", 350).setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional('E', XMACHINE_ERROR_PRIORS, String.class, CommonFlags.STRING, "override default machine error priors").setCategory(UTILITY);
+    mFlags.registerRequired('V', CG_VERSION, Integer.class, CommonFlags.INT, "select Complete Genomics read structure version, 1 (35 bp) or 2 (29 bp)").setCategory(CAT_CG);
   }
 }

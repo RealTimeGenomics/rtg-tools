@@ -88,12 +88,12 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
     flags.setDescription("Generates a VCF containing simulated population variants.");
     flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('t', REFERENCE_SDF, File.class, "SDF", "SDF containing input genome").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('o', OUTPUT_VCF, File.class, "FILE", "output VCF file name").setCategory(INPUT_OUTPUT);
-    flags.registerOptional('p', PRIORS_FLAG, String.class, "STRING", "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
-    flags.registerOptional(BIAS_FLAG, Double.class, "FLOAT", "bias frequency of variants towards alt alleles.", 0.0).setCategory(UTILITY);
-    flags.registerOptional(RATE_FLAG, Double.class, "FLOAT", "per base rate of variant generation (overrides that loaded from priors).").setCategory(UTILITY);
-    flags.registerOptional(SEED, Integer.class, "INT", "seed for the random number generator").setCategory(UTILITY);
+    flags.registerRequired('t', REFERENCE_SDF, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
+    flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);
+    flags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
+    flags.registerOptional(BIAS_FLAG, Double.class, CommonFlags.FLOAT, "bias frequency of variants towards alt alleles.", 0.0).setCategory(UTILITY);
+    flags.registerOptional(RATE_FLAG, Double.class, CommonFlags.FLOAT, "per base rate of variant generation (overrides that loaded from priors).").setCategory(UTILITY);
+    flags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(UTILITY);
     CommonFlags.initNoGzip(flags);
   }
 

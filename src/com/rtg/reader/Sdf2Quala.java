@@ -93,12 +93,12 @@ public final class Sdf2Quala extends AbstractCli {
     flags.setDescription("Converts SDF data into FASTA/QUALA files.");
     CommonFlagCategories.setCategories(flags);
     CommonFlags.initNoGzip(flags);
-    flags.registerRequired('i', INPUT, File.class, "SDF", "SDF containing sequences").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('o', OUTPUT_FILE, File.class, "FILE", "basename for output files (extensions will be added)").setCategory(INPUT_OUTPUT);
+    flags.registerRequired('i', INPUT, File.class, CommonFlags.SDF, "SDF containing sequences").setCategory(INPUT_OUTPUT);
+    flags.registerRequired('o', OUTPUT_FILE, File.class, CommonFlags.FILE, "basename for output files (extensions will be added)").setCategory(INPUT_OUTPUT);
     flags.registerOptional('R', RENAME, "rename the reads to their consecutive number; name of first read in file is '0'").setCategory(UTILITY);
-    flags.registerOptional('q', DEFAULT_QUALITY, Integer.class, "INT", "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
-    flags.registerOptional(START_SEQUENCE, Long.class, "INT", "inclusive lower bound on sequence id").setCategory(CommonFlagCategories.FILTERING);
-    flags.registerOptional(END_SEQUENCE, Long.class, "INT", "exclusive upper bound on sequence id").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerOptional('q', DEFAULT_QUALITY, Integer.class, CommonFlags.INT, "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
+    flags.registerOptional(START_SEQUENCE, Long.class, CommonFlags.INT, "inclusive lower bound on sequence id").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerOptional(END_SEQUENCE, Long.class, CommonFlags.INT, "exclusive upper bound on sequence id").setCategory(CommonFlagCategories.FILTERING);
     flags.setValidator(VALIDATOR);
   }
 

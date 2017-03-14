@@ -36,8 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
@@ -100,12 +98,11 @@ public class FormatCliTest extends AbstractCliTest {
       final File xx = new File(dir, "xx");
       FileUtils.stringToFile("", xx);
       final File nsd = new File(dir, "no-such-dir");
-      final ResourceBundle resource = ResourceBundle.getBundle(FormatCli.PREREAD_RESOURCE_BUNDLE, Locale.getDefault());
-      checkHandleFlagsOut("-p", "-o", nsd.getPath(), "-f", resource.getString("FORMAT_FASTQ"), "-q", "sanger", xx.getPath());
+      checkHandleFlagsOut("-p", "-o", nsd.getPath(), "-f", "fastq", "-q", "sanger", xx.getPath());
       final CFlags flags = getCFlags();
-      assertTrue(flags.isSet(resource.getString("PROTEIN_FLAG")));
-      assertEquals(resource.getString("FORMAT_FASTQ"), flags.getValue(resource.getString("FORMAT_FLAG")));
-      assertEquals(nsd.getPath(), ((File) flags.getValue(resource.getString("OUTPUT_FLAG"))).getPath());
+      assertTrue(flags.isSet("protein"));
+      assertEquals("fastq", flags.getValue("format"));
+      assertEquals(nsd.getPath(), ((File) flags.getValue("output")).getPath());
       assertEquals(xx, flags.getAnonymousFlag(0).getValue());
     } finally {
       assertTrue(FileHelper.deleteAll(dir));
@@ -342,7 +339,7 @@ public class FormatCliTest extends AbstractCliTest {
         FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw2);
 
         final File outputDir = new File(tempDir, JUNITOUT);
-        final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "cg-fastq", "-l", raw1.getPath(), "-r", raw2.getPath());
+        final String out = checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq-cg", "-l", raw1.getPath(), "-r", raw2.getPath());
         assertTrue(out.contains("Format             : paired-end FASTQ-CG"));
         assertTrue(out.contains("Type               : DNA"));
         assertTrue(out.contains("SDF-ID"));
@@ -677,7 +674,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File input = new File(tempDir, "input.fastq");
       FileHelper.resourceToFile("com/rtg/reader/resources/interleaved.fastq", input);
       final File output = new File(tempDir, "output");
-      final MainResult res = checkMainInit("-o",  output.getPath(), "-f", "interleaved-fastq", input.getPath());
+      final MainResult res = checkMainInit("-o",  output.getPath(), "-f", "fastq-interleaved", input.getPath());
       TestUtils.containsAll(res.out()
         , "Formatting interleaved paired-end FASTQ data"
         , "Input Data" + StringUtils.LS

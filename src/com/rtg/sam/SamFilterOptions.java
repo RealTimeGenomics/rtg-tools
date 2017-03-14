@@ -63,9 +63,9 @@ public final class SamFilterOptions {
    */
   public static Flag<Integer> registerMaxHitsFlag(final CFlags flags, final char singleLetter) {
     if (singleLetter != NO_SINGLE_LETTER) {
-      return flags.registerOptional(singleLetter, MAX_HITS_FLAG, Integer.class, "int", HITS_DESC).setCategory(SENSITIVITY_TUNING);
+      return flags.registerOptional(singleLetter, MAX_HITS_FLAG, Integer.class, CommonFlags.INT, HITS_DESC).setCategory(SENSITIVITY_TUNING);
     } else {
-      return flags.registerOptional(MAX_HITS_FLAG, Integer.class, "int", HITS_DESC).setCategory(SENSITIVITY_TUNING);
+      return flags.registerOptional(MAX_HITS_FLAG, Integer.class, CommonFlags.INT, HITS_DESC).setCategory(SENSITIVITY_TUNING);
     }
   }
   
@@ -81,8 +81,8 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    */
   public static void registerSubsampleFlags(final CFlags flags) {
-    flags.registerOptional(SUBSAMPLE_FLAG, Double.class, "FLOAT", "if set, subsample SAM records to retain this fraction of reads").setCategory(SENSITIVITY_TUNING);
-    flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, "INT", "seed used during subsampling").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional(SUBSAMPLE_FLAG, Double.class, CommonFlags.FLOAT, "if set, subsample SAM records to retain this fraction of reads").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, CommonFlags.INT, "seed used during subsampling").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name for filter on <code>MAPQ</code> field of SAM record. */
@@ -97,7 +97,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Integer> registerMinMapQFlag(final CFlags flags) {
-    return flags.registerOptional(MIN_MAPQ_FLAG, Integer.class, "int", MAPQ_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(MIN_MAPQ_FLAG, Integer.class, CommonFlags.INT, MAPQ_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name for filter of <code>AS</code> attribute of mated SAM records. */
@@ -237,7 +237,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<String> registerRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, "string", RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
+    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.STRING, RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
   }
 
   /**
@@ -247,7 +247,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<File> registerBedRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "FILE", "if set, only read SAM records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    return flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, CommonFlags.FILE, "if set, only read SAM records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
   }
 
 
@@ -259,8 +259,8 @@ public final class SamFilterOptions {
    * @param flags the flags to add in to
    */
   public static void registerMaskFlags(CFlags flags) {
-    flags.registerOptional('f', REQUIRE_FLAGS, Integer.class, "INT", "decimal mask indicating SAM FLAG bits that must be set for the record").setCategory(SENSITIVITY_TUNING);
-    flags.registerOptional('F', FILTER_FLAGS, Integer.class, "INT", "decimal mask indicating SAM FLAG bits that must not be set for the record").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional('f', REQUIRE_FLAGS, Integer.class, CommonFlags.INT, "decimal mask indicating SAM FLAG bits that must be set for the record").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional('F', FILTER_FLAGS, Integer.class, CommonFlags.INT, "decimal mask indicating SAM FLAG bits that must not be set for the record").setCategory(SENSITIVITY_TUNING);
   }
 
   /**

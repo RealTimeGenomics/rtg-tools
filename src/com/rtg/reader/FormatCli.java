@@ -43,10 +43,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
@@ -75,7 +72,6 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.InformationType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.InputFileUtils;
@@ -96,7 +92,7 @@ public final class FormatCli extends LoggedCli {
   /** FASTQ input format. */
   public static final String FASTQ_FORMAT = "fastq";
   /** Interleaved FASTQ input format. */
-  private static final String INTERLEAVED_FASTQ_FORMAT = "interleaved-fastq";
+  private static final String INTERLEAVED_FASTQ_FORMAT = "fastq-interleaved";
   /** SAM / BAM paired end input format. */
   public static final String SAM_PE_FORMAT = "sam-pe";
   /** SAM / BAM single end input format. */
@@ -104,9 +100,9 @@ public final class FormatCli extends LoggedCli {
   /** CG TSV format. */
   public static final String TSV_FORMAT = "tsv";
   /** CG FASTQ format. */
-  public static final String CGFASTQ_FORMAT = "cg-fastq";
+  public static final String CGFASTQ_FORMAT = "fastq-cg";
   /** CG SAM format. */
-  public static final String CGSAM_FORMAT = "cg-sam";
+  public static final String CGSAM_FORMAT = "sam-cg";
 
   private static final String XMAPPED_SAM = "Xmapped-sam";
   private static final String XDEDUP_SECONDARY = "Xdedup-secondary-alignments";
@@ -117,20 +113,15 @@ public final class FormatCli extends LoggedCli {
     }
   }
 
-  /** Properties file with all non-logged strings used in the prereader. */
-  static final String PREREAD_RESOURCE_BUNDLE = "com.rtg.reader.Prereader";
-  /** Internationalized messages. */
-  private static final ResourceBundle RESOURCE = ResourceBundle.getBundle(PREREAD_RESOURCE_BUNDLE, Locale.getDefault());
   /** Input sequence format flag. */
   public static final String FORMAT_FLAG = "format";
-  private static final String PROTEIN_FLAG = RESOURCE.getString("PROTEIN_FLAG");
-  private static final String EXCLUDE_FLAG = RESOURCE.getString("EXCLUDE_FLAG");
-  private static final String DUST_FLAG = RESOURCE.getString("DUST_FLAG");
+  private static final String PROTEIN_FLAG = "protein";
+  private static final String EXCLUDE_FLAG = "exclude";
+  private static final String DUST_FLAG = "duster";
   /** Flag for left input file. */
-  public static final String LEFT_FILE_FLAG = RESOURCE.getString("LEFT_FILE_FLAG");
+  public static final String LEFT_FILE_FLAG = "left";
   /** Flag for right input file. */
-  public static final String RIGHT_FILE_FLAG = RESOURCE.getString("RIGHT_FILE_FLAG");
-  private static final String MODULE_NAME = "format";
+  public static final String RIGHT_FILE_FLAG = "right";
   /** Flag to specify no quality should be stored in SDF. */
   public static final String NO_QUALITY = "no-quality";
   /** Flag to specify no names should be stored in SDF. */
@@ -143,7 +134,7 @@ public final class FormatCli extends LoggedCli {
 
   @Override
   public String moduleName() {
-    return MODULE_NAME;
+    return "format";
   }
 
   @Override
@@ -154,51 +145,46 @@ public final class FormatCli extends LoggedCli {
   @Override
   protected void initFlags() {
     mFlags.registerExtendedHelp();
-    mFlags.setDescription("Converts the contents of sequence data files (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format."); //RESOURCE.getString("PROGRAM_DESC")
+    mFlags.setDescription("Converts the contents of sequence data files (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format.");
     CommonFlagCategories.setCategories(mFlags);
-    try {
-      mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "name of output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.SDF, "name of output SDF").setCategory(INPUT_OUTPUT);
 
-      final Flag<String> formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, RESOURCE.getString("FORMAT_TYPE"), RESOURCE.getString("FORMAT_DESC"), RESOURCE.getString("FORMAT_FASTA")).setCategory(INPUT_OUTPUT);
-      String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, INTERLEAVED_FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT };
-      if (License.isDeveloper()) {
-        formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
-      }
-      formatFlag.setParameterRange(formats);
-      CommonFlags.initQualityFormatFlag(mFlags);
-      mFlags.registerOptional(SELECT_READ_GROUP, String.class, "String", "when formatting from SAM/BAM input, only include reads with this read group ID").setCategory(FILTERING);
-      mFlags.registerOptional('p', PROTEIN_FLAG, RESOURCE.getString("PROTEIN_DESC")).setCategory(INPUT_OUTPUT);
-      mFlags.registerOptional(DUST_FLAG, RESOURCE.getString("DUST_DESC")).setCategory(FILTERING);
-      mFlags.registerOptional(TRIM_THRESHOLD_FLAG, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold").setCategory(FILTERING);
-      mFlags.registerOptional(TRIM_END_FLAG, Integer.class, CommonFlags.INT, "trim the specified number of bases from read ends").setCategory(FILTERING);
-
-      final Flag<File> inputListFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of input read files (1 per line)").setCategory(INPUT_OUTPUT);
-
-      final Flag<String> exFlag = mFlags.registerOptional(EXCLUDE_FLAG, String.class, RESOURCE.getString("STRING_TYPE"), RESOURCE.getString("EXCLUDE_DESC"));
-      exFlag.setMinCount(0);
-      exFlag.setMaxCount(Integer.MAX_VALUE);
-      exFlag.setCategory(FILTERING);
-      final Flag<File> leftFlag = mFlags.registerOptional('l', LEFT_FILE_FLAG, File.class, "FILE", "left input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
-      final Flag<File> rightFlag = mFlags.registerOptional('r', RIGHT_FILE_FLAG, File.class, "FILE", "right input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
-      mFlags.registerOptional(NO_QUALITY, "do not include quality data in the SDF output").setCategory(UTILITY);
-      mFlags.registerOptional(NO_NAMES, "do not include name data in the SDF output").setCategory(UTILITY);
-      mFlags.registerOptional(COMPRESS_FLAG, Boolean.class, "BOOL", "compress sdf", Boolean.TRUE).setCategory(UTILITY);
-      mFlags.registerOptional(DISABLE_DUPLICATE_DETECTOR, "disable checking for duplicate sequence names").setCategory(UTILITY);
-      SamCommandHelper.initSamRg(mFlags, "ILLUMINA", UTILITY);
-      final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, RESOURCE.getString("INPUT_DESC"));
-      inFlag.setMinCount(0);
-      inFlag.setMaxCount(Integer.MAX_VALUE);
-      inFlag.setCategory(INPUT_OUTPUT);
-      mFlags.addRequiredSet(inFlag);
-      mFlags.addRequiredSet(inputListFlag);
-      mFlags.addRequiredSet(leftFlag, rightFlag);
-      mFlags.setValidator(VALIDATOR);
-      mFlags.registerOptional(XMAPPED_SAM, Boolean.class, "BOOL", "set to true to use the mapped SAM input implementation", Boolean.TRUE).setCategory(INPUT_OUTPUT);
-      mFlags.registerOptional(XDEDUP_SECONDARY, "deduplicate secondary alignments by name").setCategory(FILTERING);
-
-    } catch (final MissingResourceException e) {
-      throw new SlimException(e);
+    final Flag<String> formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, "format", "format of input", FASTA_FORMAT).setCategory(INPUT_OUTPUT);
+    String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, INTERLEAVED_FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT};
+    if (License.isDeveloper()) {
+      formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
     }
+    formatFlag.setParameterRange(formats);
+    CommonFlags.initQualityFormatFlag(mFlags);
+    mFlags.registerOptional(SELECT_READ_GROUP, String.class, "String", "when formatting from SAM/BAM input, only include reads with this read group ID").setCategory(FILTERING);
+    mFlags.registerOptional('p', PROTEIN_FLAG, "input is protein. If this option is not specified, then the input is assumed to consist of nucleotides").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(DUST_FLAG, "treat lower case residues as unknowns").setCategory(FILTERING);
+    mFlags.registerOptional(TRIM_THRESHOLD_FLAG, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold").setCategory(FILTERING);
+    mFlags.registerOptional(TRIM_END_FLAG, Integer.class, CommonFlags.INT, "trim the specified number of bases from read ends").setCategory(FILTERING);
+
+    final Flag<File> inputListFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "file containing a list of input read files (1 per line)").setCategory(INPUT_OUTPUT);
+
+    final Flag<String> exFlag = mFlags.registerOptional(EXCLUDE_FLAG, String.class, CommonFlags.STRING, "exclude input sequences based on their name. If the input sequence contains the specified string then that sequence is excluded from the SDF");
+    exFlag.setMinCount(0);
+    exFlag.setMaxCount(Integer.MAX_VALUE);
+    exFlag.setCategory(FILTERING);
+    final Flag<File> leftFlag = mFlags.registerOptional('l', LEFT_FILE_FLAG, File.class, CommonFlags.FILE, "left input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
+    final Flag<File> rightFlag = mFlags.registerOptional('r', RIGHT_FILE_FLAG, File.class, CommonFlags.FILE, "right input file for FASTA/FASTQ paired end data").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(NO_QUALITY, "do not include quality data in the SDF output").setCategory(UTILITY);
+    mFlags.registerOptional(NO_NAMES, "do not include name data in the SDF output").setCategory(UTILITY);
+    mFlags.registerOptional(COMPRESS_FLAG, Boolean.class, "BOOL", "compress sdf", Boolean.TRUE).setCategory(UTILITY);
+    mFlags.registerOptional(DISABLE_DUPLICATE_DETECTOR, "disable checking for duplicate sequence names").setCategory(UTILITY);
+    SamCommandHelper.initSamRg(mFlags, "ILLUMINA", UTILITY);
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, "input sequence files");
+    inFlag.setMinCount(0);
+    inFlag.setMaxCount(Integer.MAX_VALUE);
+    inFlag.setCategory(INPUT_OUTPUT);
+    mFlags.addRequiredSet(inFlag);
+    mFlags.addRequiredSet(inputListFlag);
+    mFlags.addRequiredSet(leftFlag, rightFlag);
+    mFlags.setValidator(VALIDATOR);
+    mFlags.registerOptional(XMAPPED_SAM, Boolean.class, "BOOL", "set to true to use the mapped SAM input implementation", Boolean.TRUE).setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(XDEDUP_SECONDARY, "deduplicate secondary alignments by name").setCategory(FILTERING);
   }
 
   @Override

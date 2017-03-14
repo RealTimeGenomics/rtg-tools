@@ -75,9 +75,9 @@ public class SampleReplayerCli extends LoggedCli {
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "name for output SDF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('i', SAMPLE_VCF, File.class, "FILE", "input VCF containing the sample genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('s', SAMPLE_NAME, String.class, "STRING", "name of the sample to select from the VCF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for output SDF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('i', SAMPLE_VCF, File.class, CommonFlags.FILE, "input VCF containing the sample genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('s', SAMPLE_NAME, String.class, CommonFlags.STRING, "name of the sample to select from the VCF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.setValidator(new Validator() {
       @Override
       public boolean isValid(CFlags flags) {

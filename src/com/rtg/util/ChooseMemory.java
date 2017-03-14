@@ -29,8 +29,8 @@
  */
 package com.rtg.util;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.cli.Validator;
 
 
 /**
@@ -46,20 +46,17 @@ public final class ChooseMemory {
    */
   public static void main(String[] args) {
     final CFlags flags = new CFlags("ChooseMemory", "Program to get the appropriate RAM to use", System.out, System.err);
-    flags.registerRequired(Integer.class, "INT", "Percentage of RAM to use (1-100)");
-    flags.setValidator(new Validator() {
-      @Override
-      public boolean isValid(CFlags flags) {
-        final int percentage = (Integer) flags.getAnonymousValue(0);
-        if (percentage < 1) {
-          flags.setParseMessage("Percentage must be greater than 0.");
-          return false;
-        } else if (percentage > 100) {
-          flags.setParseMessage("Percentage must be less than or equal to 100.");
-          return false;
-        }
-        return true;
+    flags.registerRequired(Integer.class, CommonFlags.INT, "Percentage of RAM to use (1-100)");
+    flags.setValidator(flags1 -> {
+      final int percentage = (Integer) flags1.getAnonymousValue(0);
+      if (percentage < 1) {
+        flags1.setParseMessage("Percentage must be greater than 0.");
+        return false;
+      } else if (percentage > 100) {
+        flags1.setParseMessage("Percentage must be less than or equal to 100.");
+        return false;
       }
+      return true;
     });
     if (!flags.setFlags(args)) {
       return;

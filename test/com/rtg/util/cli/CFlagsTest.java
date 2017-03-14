@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.util.EnumHelper;
 import com.rtg.util.PseudoEnum;
 import com.rtg.util.TestUtils;
@@ -52,16 +53,16 @@ public class CFlagsTest extends TestCase {
 
   protected CFlags mFlags;
 
-  /** Used by JUnit (called after each test method) */
   @Override
-  public void setUp() {
+  public void setUp() throws Exception {
+    super.setUp();
     mFlags = new CFlags();
     mFlags.setInvalidFlagHandler(null);
   }
 
-  /** Used by JUnit (called before each test method) */
   @Override
-  public void tearDown() {
+  public void tearDown() throws Exception {
+    super.tearDown();
     mFlags = null;
   }
 
@@ -476,8 +477,8 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testNumericRangeChecks() {
-    mFlags.registerOptional("a", Integer.class, "int", "therex");
-    mFlags.registerOptional("b", Double.class, "float", "therex");
+    mFlags.registerOptional("a", Integer.class, CommonFlags.INT, "therex");
+    mFlags.registerOptional("b", Double.class, CommonFlags.FLOAT, "therex");
     mFlags.setFlags("--a", "2", "--b", "2");
     assertTrue(mFlags.checkInRange("a", 2, true, 4, true));
     assertFalse(mFlags.checkInRange("a", 2, false, 4, true));
@@ -656,7 +657,7 @@ public class CFlagsTest extends TestCase {
   }
 
   public void testTypeChecking() {
-    mFlags.registerRequired(Integer.class, "int", "");
+    mFlags.registerRequired(Integer.class, CommonFlags.INT, "");
     assertFalse(mFlags.setFlags("abc123"));
   }
 

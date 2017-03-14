@@ -86,17 +86,17 @@ public class GenomeSimulator extends LoggedCli {
     mFlags.setDescription("Simulates a reference genome.");
     CommonFlagCategories.setCategories(mFlags);
 
-    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, "SDF", "output SDF").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional('s', SEED, Integer.class, "int", "seed for random number generator").setCategory(UTILITY);
-    final Flag<Integer> numContigs = mFlags.registerOptional('n', NUM_CONTIGS, Integer.class, "int", "number of sequences to generate").setCategory(UTILITY);
-    final Flag<Integer> maxLength = mFlags.registerOptional(MAX_LENGTH, Integer.class, "int", "maximum sequence length").setCategory(UTILITY);
-    final Flag<Integer> minLength = mFlags.registerOptional(MIN_LENGTH, Integer.class, "int", "minimum sequence length").setCategory(UTILITY);
-    final Flag<Integer> lFlag = mFlags.registerOptional('l', LENGTH, Integer.class, "int", "length of generated sequence");
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('s', SEED, Integer.class, CommonFlags.INT, "seed for random number generator").setCategory(UTILITY);
+    final Flag<Integer> numContigs = mFlags.registerOptional('n', NUM_CONTIGS, Integer.class, CommonFlags.INT, "number of sequences to generate").setCategory(UTILITY);
+    final Flag<Integer> maxLength = mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "maximum sequence length").setCategory(UTILITY);
+    final Flag<Integer> minLength = mFlags.registerOptional(MIN_LENGTH, Integer.class, CommonFlags.INT, "minimum sequence length").setCategory(UTILITY);
+    final Flag<Integer> lFlag = mFlags.registerOptional('l', LENGTH, Integer.class, CommonFlags.INT, "length of generated sequence");
     lFlag.setMaxCount(Integer.MAX_VALUE).enableCsv();
     lFlag.setCategory(UTILITY);
-    mFlags.registerOptional(FREQUENCY, String.class, "string", "relative frequencies of A,C,G,T in the generated sequence", "1,1,1,1").setCategory(UTILITY);
-    mFlags.registerOptional(COMMENT, String.class, "string", "comment to include in the generated SDF").setCategory(UTILITY);
-    mFlags.registerOptional(PREFIX, String.class, "string", "sequence name prefix", DEFAULT_PREFIX).setCategory(UTILITY);
+    mFlags.registerOptional(FREQUENCY, String.class, CommonFlags.STRING, "relative frequencies of A,C,G,T in the generated sequence", "1,1,1,1").setCategory(UTILITY);
+    mFlags.registerOptional(COMMENT, String.class, CommonFlags.STRING, "comment to include in the generated SDF").setCategory(UTILITY);
+    mFlags.registerOptional(PREFIX, String.class, CommonFlags.STRING, "sequence name prefix", DEFAULT_PREFIX).setCategory(UTILITY);
 
     mFlags.addRequiredSet(numContigs, minLength, maxLength);
     mFlags.addRequiredSet(lFlag);

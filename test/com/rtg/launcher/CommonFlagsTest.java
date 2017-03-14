@@ -73,7 +73,7 @@ public class CommonFlagsTest extends TestCase {
           }
         }
         final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
-        flags.registerOptional(listFlag, File.class, "FILE", "files");
+        flags.registerOptional(listFlag, File.class, CommonFlags.FILE, "files");
         final Flag<File> reads = flags.registerRequired(File.class, "File", "input sam files");
         reads.setMinCount(0);
         reads.setMaxCount(4000);
@@ -83,7 +83,7 @@ public class CommonFlagsTest extends TestCase {
         }
         flags.setFlags(args);
         final CFlags flags2 = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
-        flags2.registerOptional(listFlag, File.class, "FILE", "files");
+        flags2.registerOptional(listFlag, File.class, CommonFlags.FILE, "files");
         //final Flag reads2 =
         flags2.registerRequired(File.class, "File", "input sam files");
         reads.setMinCount(0);
@@ -163,10 +163,10 @@ public class CommonFlagsTest extends TestCase {
   public void testCheckFile() throws IOException {
     try (TestDirectory dir = new TestDirectory("commonflags")) {
       final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
-      final Flag<File> inFlag = flags.registerRequired(File.class, "FILE", "");
+      final Flag<File> inFlag = flags.registerRequired(File.class, CommonFlags.FILE, "");
       inFlag.setMinCount(0);
       inFlag.setMaxCount(Integer.MAX_VALUE);
-      flags.registerOptional("input", File.class, "FILE", "i");
+      flags.registerOptional("input", File.class, CommonFlags.FILE, "i");
 
       final String[] files = new String[2];
       for (int i = 0; i < 2; ++i) {
@@ -220,7 +220,7 @@ public class CommonFlagsTest extends TestCase {
     try {
 
       final CFlags flags = new CFlags("blah", TestUtils.getNullPrintStream(), TestUtils.getNullPrintStream());
-      flags.registerRequired('i', CommonFlags.READS_FLAG, File.class, "SDF", "");
+      flags.registerRequired('i', CommonFlags.READS_FLAG, File.class, CommonFlags.SDF, "");
       final File sdf = new File(tmpFile, "sdf");
       flags.setFlags("-i", sdf.getPath());
 

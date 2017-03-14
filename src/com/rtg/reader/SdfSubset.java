@@ -76,7 +76,7 @@ public final class SdfSubset extends LoggedCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Extracts a subset of sequences from one SDF and outputs them to another SDF.");
     Sdf2Fasta.registerExtractorFlags(mFlags);
-    mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, "SDF", "output SDF").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.SDF, "output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.setValidator(VALIDATOR);
   }

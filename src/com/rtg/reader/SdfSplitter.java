@@ -81,13 +81,13 @@ public final class SdfSplitter extends LoggedCli {
     mFlags.registerExtendedHelp();
     mFlags.setDescription("Splits SDF data into multiple equal segments.");
     CommonFlagCategories.setCategories(mFlags);
-    final Flag<File> inFlag = mFlags.registerRequired(File.class, "SDF", "input SDF");
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.SDF, "input SDF");
     inFlag.setMinCount(0);
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setCategory(INPUT_OUTPUT);
-    final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, "FILE", "file containing a list of SDFs (1 per line)").setCategory(INPUT_OUTPUT);
+    final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "file containing a list of SDFs (1 per line)").setCategory(INPUT_OUTPUT);
     CommonFlags.initOutputDirFlag(mFlags);
-    mFlags.registerRequired('n', COUNT_FLAG, Integer.class, "INT", "number of reads per output").setCategory(UTILITY);
+    mFlags.registerRequired('n', COUNT_FLAG, Integer.class, CommonFlags.INT, "number of reads per output").setCategory(UTILITY);
     mFlags.registerOptional(DISABLE_DUPLICATE_DETECTOR, "disable checking for duplicate sequence names").setCategory(UTILITY);
 
     mFlags.registerOptional(ENABLE_MEMORY_READER, "process in memory (faster but requires more RAM)").setCategory(UTILITY);

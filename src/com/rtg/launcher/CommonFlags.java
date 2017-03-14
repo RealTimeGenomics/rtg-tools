@@ -103,6 +103,8 @@ public final class CommonFlags {
   public static final String RESTRICTION_FLAG = "region";
   /** Flag name for restricting operation to within regions contained in a BED file. */
   public static final String BED_REGIONS_FLAG = "bed-regions";
+  /** Repeat frequency flag. */
+  public static final String REPEAT_FREQUENCY_FLAG = "repeat-freq";
   /**
    * Flag to indicate that it is OK to take a less cautious approach
    * to allow the command to proceed. For example, allow writing into
@@ -396,7 +398,7 @@ public final class CommonFlags {
    * @param suffix appended to description
    */
   public static void initReferenceTemplate(CFlags flags, String name, boolean required, String suffix) {
-    final Flag<File> f = flags.registerOptional('t', name, File.class, "SDF", "SDF containing the reference genome" + suffix).setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    final Flag<File> f = flags.registerOptional('t', name, File.class, CommonFlags.SDF, "SDF containing the reference genome" + suffix).setCategory(CommonFlagCategories.INPUT_OUTPUT);
     if (required) {
       f.setMinCount(1);
     }
@@ -423,10 +425,21 @@ public final class CommonFlags {
   /**
    * Initialise mapping IO flags (input, output, template)
    * @param flags shared flags
+   * @return the registered flag
    */
-  public static void initOutputDirFlag(CFlags flags) {
-    flags.registerRequired('o', OUTPUT_FLAG, File.class, DIR, "directory for output").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+  public static Flag<File> initOutputDirFlag(CFlags flags) {
+    final Flag<File> flag = flags.registerRequired('o', OUTPUT_FLAG, File.class, DIR, "directory for output").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     initForce(flags);
+    return flag;
+  }
+
+  /**
+   * Initialise flag for setting maximum repeat frequency.
+   * @param flags shared flags
+   * @return the registered flag
+   */
+  public static Flag<Integer> initRepeatFrequencyFlag(CFlags flags) {
+    return flags.registerOptional('r', REPEAT_FREQUENCY_FLAG, Integer.class, INT, "maximum repeat frequency", 1000);
   }
 
   /**
@@ -467,8 +480,8 @@ public final class CommonFlags {
    * @param flags shared flags
    */
   public static void initReadRange(final CFlags flags) {
-    flags.registerOptional(CommonFlags.START_READ_ID, Long.class, "INT", "inclusive lower bound on read id").setCategory(CommonFlagCategories.FILTERING);
-    flags.registerOptional(CommonFlags.END_READ_ID, Long.class, "INT", "exclusive upper bound on read id").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerOptional(CommonFlags.START_READ_ID, Long.class, CommonFlags.INT, "inclusive lower bound on read id").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerOptional(CommonFlags.END_READ_ID, Long.class, CommonFlags.INT, "exclusive upper bound on read id").setCategory(CommonFlagCategories.FILTERING);
   }
 
   /**
