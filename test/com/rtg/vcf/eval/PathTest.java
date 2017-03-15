@@ -33,6 +33,7 @@ package com.rtg.vcf.eval;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import com.rtg.launcher.AbstractNanoTest;
@@ -48,6 +49,21 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class PathTest extends AbstractNanoTest {
 
+  /**
+   * Find the path through the two sequences of variants that best reconciles
+   * them.
+   *
+   * @param template original reference sequence.
+   * @param templateName name of the current reference sequence
+   * @param calledVariants first sequence of variants to be applied to the template.
+   * @param baseLineVariants second sequence of variants to be applied to the template.
+   * @param <T> the type parameter
+   * @return the best path (non-null).
+   */
+  public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
+    return new PathFinder(template, templateName, baseLineVariants, calledVariants, Orientor.UNPHASED, Orientor.UNPHASED, new PathFinder.Config()).bestPath();
+  }
+
   public void testBestPath() {
     final byte[] template = {1, 1, 1, 1};
     final List<Variant> mutations = new ArrayList<>();
@@ -56,14 +72,14 @@ public class PathTest extends AbstractNanoTest {
     mutations.add(mutation);
     final MockVariant call = new MockVariant(2, 3, new byte[] {3}, null);
     calls.add(call);
-    PathFinder f = new PathFinder(template, "currentName", calls, mutations, new MockOrientor(), new MockOrientor(), PathFinder.getPathPreference());
+    PathFinder f = new PathFinder(template, "currentName", calls, mutations, new MockOrientor(), new MockOrientor(), new PathFinder.Config());
     final Path best = f.bestPath();
 
     assertTrue(best.getCalledIncluded().get(0).variant().equals(mutation));
     assertTrue(best.getCalledExcluded().isEmpty());
     assertTrue(best.getBaselineIncluded().get(0).variant().equals(call));
     assertTrue(best.getBaselineExcluded().isEmpty());
-    f = new PathFinder(template, "currentName", mutations, calls, new MockOrientor(), new MockOrientor(), PathFinder.getPathPreference());
+    f = new PathFinder(template, "currentName", mutations, calls, new MockOrientor(), new MockOrientor(), new PathFinder.Config());
     final Path best2 = f.bestPath();
     assertTrue(best.equals(best2));
     assertTrue(best2.equals(best));
@@ -135,7 +151,7 @@ public class PathTest extends AbstractNanoTest {
   }
 
   private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide, Orientor o) {
-    final PathFinder f = new PathFinder(template, "currentName", getVariations(bSide), getVariations(aSide), o, o, PathFinder.getPathPreference());
+    final PathFinder f = new PathFinder(template, "currentName", getVariations(bSide), getVariations(aSide), o, o, new PathFinder.Config());
     final Path best = f.bestPath();
     //System.err.println("*****************************");
     //System.err.println(best);
@@ -498,11 +514,11 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1.0, 1.0};
 
-    final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
+    final Path original = bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
     Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
 
-    final Path originalRev = PathFinder.bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
+    final Path originalRev = bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
     Path.calculateWeights(originalRev);
     check(originalRev.getCalledIncluded(), expectedWeights);
   }
@@ -530,11 +546,11 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1.0, 1.0};
 
-    final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
+    final Path original = bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
     Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
 
-    final Path originalRev = PathFinder.bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
+    final Path originalRev = bestPath(template, "currentName", Arrays.asList(b), Arrays.asList(a));
     Path.calculateWeights(originalRev);
     check(originalRev.getCalledIncluded(), expectedWeights);
   }
@@ -555,7 +571,8 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1, 0, 0, 1.0};
 
-    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(b), Arrays.asList(a), Orientor.UNPHASED, Orientor.UNPHASED, new PathFinder.MaxCallsMinBaseline());
+    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(b), Arrays.asList(a), Orientor.UNPHASED, Orientor.UNPHASED,
+      new PathFinder.Config(new MaxCallsMinBaseline(), 1000, 1000));
     final Path original = finder.bestPath();
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP
     assertEquals(2, original.getBaselineIncluded().size());
@@ -578,7 +595,7 @@ public class PathTest extends AbstractNanoTest {
     };
     final double[] expectedWeights = {0.5, 0.5};
 
-    final Path original = PathFinder.bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
+    final Path original = bestPath(template, "currentName", Arrays.asList(a), Arrays.asList(b));
     Path.calculateWeights(original);
     check(original.getCalledIncluded(), expectedWeights);
   }
@@ -591,7 +608,7 @@ public class PathTest extends AbstractNanoTest {
     final List<Variant> al = Arrays.asList(a);
     //Testing that having variants outside the template will not attempt to advance the path past the end of the
     //template when the path is in sync
-    PathFinder.bestPath(template, "seq", al, al);
+    bestPath(template, "seq", al, al);
   }
 
   public void testNoInfiniloop() throws Exception {

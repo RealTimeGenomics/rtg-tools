@@ -60,6 +60,7 @@ class SequenceEvaluator implements IORunnable {
   private final SequencesReader mTemplate;
   private final Map<String, Long> mNameMap;
   private final List<Pair<Orientor, Orientor>> mOrientors;
+  private final PathFinder.Config mPathFinderConfig = new PathFinder.Config();
 
   SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template) {
     this(variantSets, nameMap, template, Collections.singletonList(new Pair<>(Orientor.UNPHASED, Orientor.UNPHASED)));
@@ -100,7 +101,7 @@ class SequenceEvaluator implements IORunnable {
 
         //find the best path for variant calls
         Pair<Orientor, Orientor> op = mOrientors.get(0);
-        final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), PathFinder.getPathPreference());
+        final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), mPathFinderConfig);
 
         final Path best = f.bestPath();
 
@@ -128,7 +129,7 @@ class SequenceEvaluator implements IORunnable {
         Path bestHap = null;
         if (mOrientors.size() == 2) {  // Run haploid pathfinding on the FP / FN to find common alleles
           op = mOrientors.get(1);
-          final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), PathFinder.getPathPreference());
+          final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), mPathFinderConfig);
           bestHap = f2.bestPath();
 
           halfPositives = bestHap.getCalledIncluded();

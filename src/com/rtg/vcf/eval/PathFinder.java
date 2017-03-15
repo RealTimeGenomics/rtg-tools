@@ -47,22 +47,65 @@ public final class PathFinder {
 
   private static final boolean TRACE = false;
 
-  private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
-  private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
+  // Bundles up some configuration variables that can be re-used between runs of the path finding
+  static final class Config {
 
+    private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
+    private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
+
+    final PathPreference mPathSelector;
+    final int mMaxComplexity;
+    final int mMaxIterations;
+
+    /**
+     * Construct a default configuration
+     */
+    Config() {
+      this(getPathPreference(), MAX_COMPLEXITY, MAX_ITERATIONS);
+    }
+
+    /**
+     * Constructor using explicitly selected configuration
+     * @param selector path selection criteria
+     * @param maxComplexity threshold on number of concurrently active paths
+     * @param maxIterations threshold on number of iterations since the last sync point
+     */
+    Config(PathPreference selector, int maxComplexity, int maxIterations) {
+      mMaxComplexity = maxComplexity;
+      mMaxIterations = maxIterations;
+      mPathSelector = selector;
+    }
+
+    private static PathPreference getPathPreference() {
+      final String mode = GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
+      Diagnostic.developerLog("Path finder maximisation: " + mode);
+      final PathPreference maximiseMode;
+      switch (mode) {
+        case "calls-min-base":
+          maximiseMode = new MaxCallsMinBaseline();
+          break;
+        case "default":
+        case "sum":
+        default:
+          maximiseMode = new MaxSumBoth();
+      }
+      return maximiseMode;
+    }
+  }
+
+  private final Config mConfig;
   private final byte[] mTemplate;
   private final String mTemplateName;
   private final Variant[] mCalledVariants;
   private final Variant[] mBaseLineVariants;
-  private final PathPreference mMaximizeMode;
   private final Orientor mBaselineOrientor;
   private final Orientor mCallOrientor;
   private int mCurrentMaxPos;
 
-  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> baseLineVariants, Collection<T> calledVariants, Orientor baselineOrientor, Orientor callOrientor, PathPreference maximizeMode) {
+  <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> baseLineVariants, Collection<T> calledVariants, Orientor baselineOrientor, Orientor callOrientor, Config config) {
     mTemplate = template;
     mTemplateName = templateName;
-    mMaximizeMode = maximizeMode;
+    mConfig = config;
     mCallOrientor = callOrientor;
     mBaselineOrientor = baselineOrientor;
     mCalledVariants = calledVariants.toArray(new Variant[calledVariants.size()]);
@@ -70,37 +113,6 @@ public final class PathFinder {
 
     mBaseLineVariants = baseLineVariants.toArray(new Variant[baseLineVariants.size()]);
     Arrays.sort(mBaseLineVariants, Variant.NATURAL_COMPARATOR);
-  }
-
-  /**
-   * Find the path through the two sequences of variants that best reconciles
-   * them.
-   *
-   * @param template original reference sequence.
-   * @param templateName name of the current reference sequence
-   * @param calledVariants first sequence of variants to be applied to the template.
-   * @param baseLineVariants second sequence of variants to be applied to the template.
-   * @param <T> the type parameter
-   * @return the best path (non-null).
-   */
-  public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
-    return new PathFinder(template, templateName, baseLineVariants, calledVariants, Orientor.UNPHASED, Orientor.UNPHASED, getPathPreference()).bestPath();
-  }
-
-  static PathPreference getPathPreference() {
-    final String mode = GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_MAXIMIZE_MODE); // What to maximize when comparing paths
-    Diagnostic.developerLog("Path finder maximisation: " + mode);
-    final PathPreference maximiseMode;
-    switch (mode) {
-      case "calls-min-base":
-        maximiseMode = new MaxCallsMinBaseline();
-        break;
-      case "default":
-      case "sum":
-      default:
-        maximiseMode = new SumBoth();
-    }
-    return maximiseMode;
   }
 
   Path bestPath() {
@@ -140,7 +152,7 @@ public final class PathFinder {
         currentIterations = 0;
         lastSyncPos = currentSyncPos;
         lastSyncPath = head;
-      } else if (sortedPaths.size() > MAX_COMPLEXITY || currentIterations > MAX_ITERATIONS) {
+      } else if (sortedPaths.size() > mConfig.mMaxComplexity || currentIterations > mConfig.mMaxIterations) {
         lastWarnMessage = "Evaluation too complex (" + sortedPaths.size() + " unresolved paths, " + currentIterations + " iterations) at reference region " + mTemplateName + ":" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 2) + ". Variants in this region will not be included in results.";
         sortedPaths.clear();    // Drop all paths currently in play
         currentIterations = 0;
@@ -151,7 +163,7 @@ public final class PathFinder {
       if (head.finished()) {
         // Path is done. Remember the best
         final BasicLinkedListNode<Integer> syncPoints = new BasicLinkedListNode<>(head.mCalledPath.getPosition(), head.mSyncPointList);
-        best = mMaximizeMode.better(best, new Path(head, syncPoints));
+        best = mConfig.mPathSelector.better(best, new Path(head, syncPoints));
         continue;
       }
       if (enqueueVariant(sortedPaths, head, true)) {
@@ -279,108 +291,13 @@ public final class PathFinder {
   private void addIfBetter(Path add, TreeSet<Path> sortedPaths) {
     if (sortedPaths.contains(add)) {
       final Path other = sortedPaths.floor(add);
-      final Path best = mMaximizeMode.better(add, other);
+      final Path best = mConfig.mPathSelector.better(add, other);
       if (best == add) {
         sortedPaths.remove(other);
         sortedPaths.add(best);
       }
     } else {
       sortedPaths.add(add);
-    }
-  }
-
-  interface PathPreference {
-    Path better(Path first, Path second);
-  }
-
-  static final class SumBoth implements PathPreference {
-    private static boolean hasNoOp(Path path) {
-      return (path.mBSinceSync == 0 && path.mCSinceSync > 0)
-        || (path.mCSinceSync == 0 && path.mBSinceSync > 0);
-    }
-
-    @Override
-    public Path better(Path first, Path second) {
-      // See if we have obvious no-ops we would rather drop
-      final boolean fSync = first != null && (first.inSync() || first.finished());
-      final boolean sSync = second != null && (second.inSync() || second.finished());
-      if (fSync && sSync) { // See if we have no-ops we would rather drop
-        if (hasNoOp(first)) {
-          Diagnostic.developerLog("Discard no-op path with (" + first.mBSinceSync + "," + first.mCSinceSync + ") at " + first.mCalledPath.getPosition());
-          return second;
-        } else if (hasNoOp(second)) {
-          Diagnostic.developerLog("Discard no-op path with (" + second.mBSinceSync + "," + second.mCSinceSync + ") at " + first.mCalledPath.getPosition());
-          return first;
-        }
-      }
-
-      // Prefer paths that maximise total number of included variants (baseline + called)
-      BasicLinkedListNode<OrientedVariant> firstIncluded = first == null ? null : first.mCalledPath.getIncluded();
-      BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
-      int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-      int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-      firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
-      secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
-      firstSize += firstIncluded == null ? 0 : firstIncluded.size();
-      secondSize += secondIncluded == null ? 0 : secondIncluded.size();
-      if (firstSize == secondSize) {
-        // Tie break equivalently scoring paths for greater aesthetics
-        if (firstIncluded != null && secondIncluded != null) {
-
-          // Prefer solutions that minimize discrepencies between baseline and call counts since last sync point
-          final int fDelta = Math.abs(first.mBSinceSync - first.mCSinceSync);
-          final int sDelta = Math.abs(second.mBSinceSync - second.mCSinceSync);
-          if (fDelta != sDelta) {
-            return fDelta < sDelta ? first : second;
-          }
-
-          // Prefer solutions that sync more regularly (more likely to be "simpler")
-          final int syncDelta = (first.mSyncPointList == null ? 0 : first.mSyncPointList.getValue()) - (second.mSyncPointList == null ? 0 : second.mSyncPointList.getValue());
-          if (syncDelta != 0) {
-            return syncDelta > 0 ? first : second;
-          }
-
-        /*
-        Diagnostic.developerLog("Sum: Remaining break at: " + first.mBaselinePath.getPosition() + " sum = " + firstSize
-            + " first = (" + first.mBSinceSync + "," + first.mCSinceSync + ")"
-            + " second = (" + second.mBSinceSync + "," + second.mCSinceSync + ")"
-            + " " + first.inSync() + "," + second.inSync() + " syncdelta=" + syncDelta
-        );
-        */
-
-          // At this point break ties arbitrarily based on allele ordering
-          return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
-        }
-      }
-      return firstSize > secondSize ? first : second;
-    }
-  }
-
-  @TestClass("com.rtg.vcf.eval.AlleleAccumulatorTest")
-  static final class MaxCallsMinBaseline implements PathPreference {
-    @Override
-    public Path better(Path first, Path second) {
-      // Prefer paths that maximise the number of called variants included
-      // Better for integrating a sample into population alleles
-      BasicLinkedListNode<OrientedVariant> firstIncluded = first == null ? null : first.mCalledPath.getIncluded();
-      BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
-      int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-      int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-      if (firstSize == secondSize) {
-        firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
-        secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
-        firstSize = firstIncluded == null ? 0 : firstIncluded.size();
-        secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-
-        if (firstSize == secondSize) {
-          // At this point try to break ties arbitrarily based on allele ordering
-          if (firstIncluded != null && secondIncluded != null) {
-            return (firstIncluded.getValue().alleleId() < secondIncluded.getValue().alleleId()) ? first : second;
-          }
-        }
-        return firstSize < secondSize ? first : second;
-      }
-      return firstSize > secondSize ? first : second;
     }
   }
 }
