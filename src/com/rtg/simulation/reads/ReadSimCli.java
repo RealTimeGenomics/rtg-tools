@@ -180,14 +180,14 @@ public class ReadSimCli extends LoggedCli {
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for reads output SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('t', INPUT, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
     final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, CommonFlags.FLOAT, "coverage, must be positive").setCategory(CAT_FRAGMENTS);
-    final Flag<Long> nFlag = mFlags.registerOptional('n', READS, Long.class, CommonFlags.INT, "number of reads to be generated").setCategory(CAT_FRAGMENTS);
+    final Flag<Integer> nFlag = mFlags.registerOptional('n', READS, Integer.class, CommonFlags.INT, "number of reads to be generated").setCategory(CAT_FRAGMENTS);
 
     // Fragmenter
     mFlags.registerOptional('N', ALLOW_UNKNOWNS, "allow reads to be drawn from template fragments containing unknown nucleotides").setCategory(CAT_FRAGMENTS);
     mFlags.registerOptional('D', DISTRIBUTION, File.class, CommonFlags.FILE, "file containing probability distribution for sequence selection").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional(TAXONOMY_DISTRIBUTION, File.class, CommonFlags.FILE, "file containing probability distribution for sequence selection expressed as taxonomy id").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional(ABUNDANCE, "taxonomy distribution represents desired abundance").setCategory(CAT_FRAGMENTS);
-    mFlags.registerOptional(DNA_FRACTION, "taxonomy distribution represents desired DNA fraction").setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional(TAXONOMY_DISTRIBUTION, File.class, CommonFlags.FILE, "file containing probability distribution for sequence selection expressed by taxonomy id").setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional(ABUNDANCE, "if set, the user-supplied distribution represents desired abundance").setCategory(CAT_FRAGMENTS);
+    mFlags.registerOptional(DNA_FRACTION, "if set, the user-supplied distribution represents desired DNA fraction").setCategory(CAT_FRAGMENTS);
     mFlags.registerOptional(N_RATE, Double.class, CommonFlags.FLOAT, "rate that the machine will generate new unknowns in the read", 0.0).setCategory(CAT_FRAGMENTS);
 
     mFlags.registerOptional('s', SEED, Long.class, CommonFlags.INT, "seed for random number generator").setCategory(UTILITY);
@@ -409,6 +409,7 @@ public class ReadSimCli extends LoggedCli {
       }
       final int numSeq = (int) reader.numberSequences();
       final double[] selectionProb;
+      final boolean byDnaFraction = mFlags.isSet(DNA_FRACTION);
       if (mFlags.isSet(DISTRIBUTION)) {
         Diagnostic.userLog("Using standard distribution");
         final double[] selectionDist = new double[numSeq];
@@ -421,7 +422,7 @@ public class ReadSimCli extends LoggedCli {
             final Double p = selectionMap.get(names.name(k));
             if (p != null) {
               sum += p;
-              selectionDist[k] = p * lengths[k];
+              selectionDist[k] = byDnaFraction ? p : p * lengths[k];
             }
           }
           if (Math.abs(sum - 1) > 0.00001) {
@@ -431,10 +432,13 @@ public class ReadSimCli extends LoggedCli {
         }
         Diagnostic.userLog("Distribution complete");
       } else if (mFlags.isSet(TAXONOMY_DISTRIBUTION)) {
+        if (!TaxonomyUtils.hasTaxonomyInfo(reader)) {
+          throw new NoTalkbackSlimException("Input SDF does not contain taxonomy information, cannot use taxonomy distribution.");
+        }
         Diagnostic.userLog("Using taxonomy distribution");
         final TaxonomyDistribution dist;
         try (final FileInputStream is = new FileInputStream((File) mFlags.getValue(TAXONOMY_DISTRIBUTION))) {
-          dist = new TaxonomyDistribution(is, TaxonomyUtils.loadTaxonomyMapping(reader), reader, mFlags.isSet(DNA_FRACTION) ? TaxonomyDistribution.DistributionType.DNA_FRACTION : TaxonomyDistribution.DistributionType.ABUNDANCE);
+          dist = new TaxonomyDistribution(is, TaxonomyUtils.loadTaxonomyMapping(reader), reader, byDnaFraction ? TaxonomyDistribution.DistributionType.DNA_FRACTION : TaxonomyDistribution.DistributionType.ABUNDANCE);
         }
          selectionProb = dist.getDistribution();
         Diagnostic.userLog("Distribution complete");
@@ -550,8 +554,8 @@ public class ReadSimCli extends LoggedCli {
   }
 
   private void fragmentByCount(GenomeFragmenter gf, ReadWriter writer) throws IOException {
-    final long targetReads = (Long) mFlags.getValue(READS);
-    final long percentageIncrement = Math.max(targetReads / 100, 1);
+    final int targetReads = (Integer) mFlags.getValue(READS);
+    final int percentageIncrement = Math.max(targetReads / 100, 1);
     int lastIncrement = 0;
     int written;
     while ((written = writer.readsWritten()) < targetReads) {

@@ -68,8 +68,8 @@ public class CgSimCliTest extends AbstractCliTest {
         final File reads = new File(tempDir, "reads");
         TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", reads.getPath(), "-n", "100"), "Usage: rtg cgsim [OPTION]... -V INT -t SDF -o SDF -c FLOAT", "You must provide values for -V INT -t SDF");
         TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-n", "100"), "You must provide values for -V INT -o SDF");
-        TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-c", "0", "-V", "1"), "Coverage should be positive");
-        TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-n", "0", "-V", "1"), "Number of reads should be greater than 0");
+        TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-c", "0", "-V", "1"), "--coverage must be greater than 0.0");
+        TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-n", "0", "-V", "1"), "--num-reads must be at least 1");
         TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-n", "1", "--cg-read-version", "0"), "Version must be 1 or 2");
         TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-t", genomeDir.getPath(), "-o", reads.getPath(), "-n", "1", "--cg-read-version", "3"), "Version must be 1 or 2");
 

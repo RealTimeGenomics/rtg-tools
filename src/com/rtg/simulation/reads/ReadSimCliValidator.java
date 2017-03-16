@@ -44,53 +44,39 @@ class ReadSimCliValidator implements Validator {
 
   @Override
   public boolean isValid(final CFlags cflags) {
-
-    if (!cflags.checkInRange(ReadSimCli.MNP_EVENT_RATE, 0.0, 1.0)
-      || !cflags.checkInRange(ReadSimCli.INS_EVENT_RATE, 0.0, 1.0)
-      || !cflags.checkInRange(ReadSimCli.DEL_EVENT_RATE, 0.0, 1.0)
-      || !cflags.checkXor(ReadSimCli.COVERAGE, ReadSimCli.READS)) {
+    return cflags.checkInRange(ReadSimCli.MNP_EVENT_RATE, 0.0, 1.0)
+      && cflags.checkInRange(ReadSimCli.INS_EVENT_RATE, 0.0, 1.0)
+      && cflags.checkInRange(ReadSimCli.DEL_EVENT_RATE, 0.0, 1.0)
+      && cflags.checkXor(ReadSimCli.COVERAGE, ReadSimCli.READS)
+      && cflags.checkInRange(ReadSimCli.READS, 1, Integer.MAX_VALUE)
+      && cflags.checkInRange(ReadSimCli.COVERAGE, 0.0, false, Double.MAX_VALUE, true)
+      && cflags.checkNand(ReadSimCli.DISTRIBUTION, ReadSimCli.TAXONOMY_DISTRIBUTION)
+      && cflags.checkNand(ReadSimCli.ABUNDANCE, ReadSimCli.DNA_FRACTION)
+      && cflags.checkNand(ReadSimCli.BED_FILE, ReadSimCli.COVERAGE)
+      && cflags.checkMinMaxInRange(ReadSimCli.MIN_FRAGMENT, ReadSimCli.MAX_FRAGMENT, 0, Integer.MAX_VALUE)
+      && CommonFlags.validateOutputDirectory(cflags)
+      && CommonFlags.validateInputFile(cflags, ReadSimCli.DISTRIBUTION)
+      && CommonFlags.validateInputFile(cflags, ReadSimCli.TAXONOMY_DISTRIBUTION)
+      && CommonFlags.validateInputFile(cflags, ReadSimCli.BED_FILE)
+      && CommonFlags.validateSDF(cflags, ReadSimCli.INPUT)
+      && checkDistributionType(cflags)
+      && checkQualRange(cflags)
+      && checkMachines(cflags);
+  }
+  private boolean checkDistributionType(CFlags cflags) {
+    if ((cflags.isSet(ReadSimCli.ABUNDANCE) || cflags.isSet(ReadSimCli.DNA_FRACTION))
+      && !(cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) || cflags.isSet(ReadSimCli.DISTRIBUTION))) {
+      cflags.setParseMessage("--" + ReadSimCli.ABUNDANCE + " and --" + ReadSimCli.DNA_FRACTION + " are only applicable if using --" + ReadSimCli.DISTRIBUTION + " or --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
       return false;
     }
-    if (cflags.isSet(ReadSimCli.READS)) {
-      if ((Long) cflags.getValue(ReadSimCli.READS) <= 0) {
-        cflags.setParseMessage("Number of reads should be greater than 0");
-        return false;
-      }
-    } else if (cflags.isSet(ReadSimCli.COVERAGE)) {
-      final double coverage = (Double) cflags.getValue(ReadSimCli.COVERAGE);
-      if (coverage <= 0.0) {
-        cflags.setParseMessage("Coverage should be positive");
-        return false;
-      } else if (coverage > 1000000.0) {
-        cflags.setParseMessage("Coverage cannot be greater than 1000000.0");
-        return false;
-      }
-    }
-    if (!CommonFlags.validateOutputDirectory(cflags)) {
+    if ((cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) || cflags.isSet(ReadSimCli.DISTRIBUTION))
+      && !(cflags.isSet(ReadSimCli.ABUNDANCE) || cflags.isSet(ReadSimCli.DNA_FRACTION))) {
+      cflags.setParseMessage("Either --" + ReadSimCli.ABUNDANCE + " or --" + ReadSimCli.DNA_FRACTION + " must be set if using --" + ReadSimCli.DISTRIBUTION + " or --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
       return false;
     }
-    if (!cflags.checkNand(ReadSimCli.DISTRIBUTION, ReadSimCli.TAXONOMY_DISTRIBUTION)) {
-      return false;
-    }
-    if (cflags.isSet(ReadSimCli.DISTRIBUTION) && !CommonFlags.validateInputFile(cflags, ReadSimCli.DISTRIBUTION)) {
-        return false;
-    }
-    if (!cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) && (cflags.isSet(ReadSimCli.ABUNDANCE) || cflags.isSet(ReadSimCli.DNA_FRACTION))) {
-      cflags.setParseMessage("--" + ReadSimCli.ABUNDANCE + " and --" + ReadSimCli.DNA_FRACTION + " are only applicable if using --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
-      return false;
-    }
-    if (cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) && !(cflags.isSet(ReadSimCli.ABUNDANCE) || cflags.isSet(ReadSimCli.DNA_FRACTION))) {
-      cflags.setParseMessage("Either --" + ReadSimCli.ABUNDANCE + " or --" + ReadSimCli.DNA_FRACTION + " must be set if using --" + ReadSimCli.TAXONOMY_DISTRIBUTION);
-      return false;
-
-    }
-    if (!cflags.checkNand(ReadSimCli.ABUNDANCE, ReadSimCli.DNA_FRACTION)) {
-      return false;
-    }
-    if (cflags.isSet(ReadSimCli.TAXONOMY_DISTRIBUTION) && !CommonFlags.validateInputFile(cflags, ReadSimCli.TAXONOMY_DISTRIBUTION)) {
-      return false;
-    }
-
+    return true;
+  }
+  private boolean checkQualRange(CFlags cflags) {
     if (cflags.isSet(ReadSimCli.QUAL_RANGE)) {
       final String range = (String) cflags.getValue(ReadSimCli.QUAL_RANGE);
       final String[] vals = range.split("-");
@@ -119,25 +105,7 @@ class ReadSimCliValidator implements Validator {
         }
       }
     }
-    if (!CommonFlags.validateSDF(cflags, ReadSimCli.INPUT)) {
-      return false;
-    }
-    if ((Integer) cflags.getValue(ReadSimCli.MIN_FRAGMENT) > (Integer) cflags.getValue(ReadSimCli.MAX_FRAGMENT)) {
-      cflags.setParseMessage("--" + ReadSimCli.MAX_FRAGMENT + " should not be smaller than --" + ReadSimCli.MIN_FRAGMENT);
-      return false;
-    }
-
-    if (cflags.isSet(ReadSimCli.BED_FILE)) {
-      if (!CommonFlags.validateInputFile(cflags, ReadSimCli.BED_FILE)) {
-        return false;
-      }
-      if (cflags.isSet(ReadSimCli.COVERAGE)) {
-        cflags.setParseMessage("--" + ReadSimCli.BED_FILE + " is incompatible with --" + ReadSimCli.COVERAGE);
-        return false;
-      }
-    }
-
-    return checkMachines(cflags);
+    return true;
   }
 
   protected boolean checkMachines(CFlags cflags) {
