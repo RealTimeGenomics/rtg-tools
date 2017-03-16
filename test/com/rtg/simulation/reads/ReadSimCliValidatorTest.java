@@ -57,11 +57,11 @@ public class ReadSimCliValidatorTest extends AbstractCliTest {
     try (final TestDirectory tempDir = new TestDirectory("readsimclitest")) {
       final File genomeDir = new File(tempDir, "genome.sdf");
       ReaderTestUtils.getReaderDNA(">seq1" + StringUtils.LS + "acgt", genomeDir, null).close();
-      final String EASY = ""
+      final String easy = ""
         + "# HEADER Line should be ignored" + StringUtils.LS
         + "0.5\t0" + StringUtils.LS
         + "0.5\t2" + StringUtils.LS;
-      final File distFile = FileUtils.stringToFile(EASY, new File(tempDir, "dist.txt"));
+      final File distFile = FileUtils.stringToFile(easy, new File(tempDir, "dist.txt"));
       //final File xgenomeFile = new File(tempDir, "xgenome");
       final File reads = new File(tempDir, "reads");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", reads.getPath(), "-r", "36", "-n", "100"), "You must provide values for -t SDF --machine STRING");
