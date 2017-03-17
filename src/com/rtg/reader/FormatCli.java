@@ -417,7 +417,7 @@ public final class FormatCli extends LoggedCli {
         }
       }
       writer.setReadTrimmer(mReadTrimmer);
-      writer.setReadGroup(mReadGroupRecord == null ? null : mReadGroupRecord.toString());
+      writer.setReadGroup(mReadGroupRecord == null ? null : mReadGroupRecord.getSAMString());
       // perform the actual work
       writer.processSequences(mIncludeQuality, mIncludeNames);
 
@@ -494,7 +494,7 @@ public final class FormatCli extends LoggedCli {
       rightSequenceProc.setIncludeNames(mIncludeNames);
       leftSequenceProc.setIncludeQuality(mIncludeQuality);
       rightSequenceProc.setIncludeQuality(mIncludeQuality);
-      final String readGroup = mReadGroupRecord == null ? null : mReadGroupRecord.toString();
+      final String readGroup = mReadGroupRecord == null ? null : mReadGroupRecord.getSAMString();
       leftSequenceProc.setReadGroup(readGroup);
       rightSequenceProc.setReadGroup(readGroup);
       try {

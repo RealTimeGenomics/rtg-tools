@@ -155,7 +155,7 @@ public final class Cg2Sdf extends LoggedCli {
     try (ConcatSequenceDataSource<CgSequenceDataSource> dsl = new ConcatSequenceDataSource<>(sources, names)) {
       final AlternatingSequencesWriter writer = new AlternatingSequencesWriter(dsl, output, Constants.MAX_FILE_SIZE, null, PrereadType.CG, compress);
       writer.setSdfId(sdfId);
-      writer.setReadGroup(samReadGroupRecord == null ? null : samReadGroupRecord.toString());
+      writer.setReadGroup(samReadGroupRecord == null ? null : samReadGroupRecord.getSAMString());
 
       // perform the actual work
       writer.processSequences(useQuality, includeNames);

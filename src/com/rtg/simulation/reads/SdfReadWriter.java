@@ -120,10 +120,10 @@ public class SdfReadWriter implements ReadWriter {
   public void setReadGroup(SAMReadGroupRecord readGroup) {
     if (readGroup != null) {
       if (mIsPaired) {
-        mLeft.setReadGroup(readGroup.toString());
-        mRight.setReadGroup(readGroup.toString());
+        mLeft.setReadGroup(readGroup.getSAMString());
+        mRight.setReadGroup(readGroup.getSAMString());
       } else {
-        mSingle.setReadGroup(readGroup.toString());
+        mSingle.setReadGroup(readGroup.getSAMString());
       }
     }
   }
