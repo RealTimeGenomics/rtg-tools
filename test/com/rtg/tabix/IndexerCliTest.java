@@ -101,4 +101,14 @@ public class IndexerCliTest extends AbstractCliTest {
       assertEquals("Cannot create index for " + file4.getPath() + " as it is not in bgzip format." + StringUtils.LS, res.err());
     }
   }
+
+  public void testCramOperation() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("indexercli")) {
+      final File file1 = FileHelper.resourceToFile("com/rtg/sam/resources/test.cram", new File(dir, "test1.cram"));
+      final MainResult res = MainResult.run(getCli(), "-f", "cram", file1.getPath());
+      assertEquals(res.err(), 0, res.rc());
+      TestUtils.containsAll(StringUtils.grep(res.out(), Pattern.quote(file1.getPath())), "Creating index for", "test1.cram.bai");
+    }
+  }
+
 }

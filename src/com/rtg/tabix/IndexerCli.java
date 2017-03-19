@@ -47,6 +47,11 @@ import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.WarningType;
+import com.rtg.util.io.ClosedFileInputStream;
+
+import htsjdk.samtools.CRAMBAIIndexer;
+import htsjdk.samtools.SamReader;
+import htsjdk.samtools.ValidationStringency;
 
 /**
  * Provides front end indexing various formats.
@@ -63,6 +68,8 @@ public class IndexerCli extends AbstractCli {
     SAM(".sam.gz"),
     /** <code>BAM</code> format */
     BAM(".bam"),
+    /** <code>CRAM</code> format */
+    CRAM(".cram"),
     /** <code>SV</code> format */
     SV(".sv"),
     /** Coverage format */
@@ -157,12 +164,17 @@ public class IndexerCli extends AbstractCli {
       inputFiles = IndexUtils.ensureBlockCompressed(inputFiles);
     }
     for (final File f : inputFiles) {
-      if (!TabixIndexer.isBlockCompressed(f)) {
+      if (format != IndexFormat.CRAM && !TabixIndexer.isBlockCompressed(f)) {
         Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not in bgzip format.");
         retCode = 1;
         continue;
       }
-      File indexFile =  new File(f.getParentFile(), f.getName() + TabixIndexer.TABIX_EXTENSION);
+      final File indexFile;
+      if (format == IndexFormat.BAM || format == IndexFormat.CRAM) {
+        indexFile = new File(f.getParentFile(), f.getName() + BamIndexer.BAM_INDEX_EXTENSION);
+      } else {
+        indexFile = new File(f.getParentFile(), f.getName() + TabixIndexer.TABIX_EXTENSION);
+      }
       final boolean indexExisted = indexFile.exists();
       try {
         switch (format) {
@@ -204,14 +216,22 @@ public class IndexerCli extends AbstractCli {
             Diagnostic.info("Creating index for: " + f.getPath() + " (" + indexFile.getName() + ")");
             new TabixIndexer(f, indexFile).saveBedIndex();
             break;
+          case CRAM:
+            final SamReader.Type samType = SamUtils.getSamType(f);
+            if (samType != SamReader.Type.CRAM_TYPE) {
+              Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not a CRAM file.");
+              retCode = 1;
+              continue;
+            }
+            Diagnostic.info("Creating index for: " + f.getPath() + " (" + indexFile.getName() + ")");
+            CRAMBAIIndexer.createIndex(new ClosedFileInputStream(f), indexFile, null, ValidationStringency.SILENT);
+            break;
           case BAM:
             if (!SamUtils.isBAMFile(f)) {
               Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not a BAM file.");
               retCode = 1;
               continue;
             }
-            //override file name for bam index
-            indexFile =  new File(f.getParentFile(), f.getName() + BamIndexer.BAM_INDEX_EXTENSION);
             Diagnostic.info("Creating index for: " + f.getPath() + " (" + indexFile.getName() + ")");
             BamIndexer.saveBamIndex(f, indexFile);
             break;
