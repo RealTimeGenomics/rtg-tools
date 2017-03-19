@@ -31,6 +31,8 @@ package com.rtg.sam;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.LocusIndex;
@@ -38,12 +40,16 @@ import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.VirtualOffsets;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.ClosedFileInputStream;
 
+import htsjdk.samtools.QueryInterval;
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMRecordIterator;
+import htsjdk.samtools.SamFiles;
+import htsjdk.samtools.SamInputResource;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.CloseableIterator;
@@ -101,6 +107,16 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
     }
   }
 
+  QueryInterval[] getQueryIntervals(ReferenceRanges<?> ranges) {
+    final List<QueryInterval> intervals = new ArrayList<>();
+    for (Integer seqId : ranges.sequenceIds()) {
+      assert seqId != null;
+      for (RangeList.RangeData<?> r : ranges.get(seqId).getRangeList()) {
+        intervals.add(new QueryInterval(seqId, r.getStart(), r.getEnd()));
+      }
+    }
+    return intervals.toArray(new QueryInterval[0]);
+  }
 
   /**
    * Creates a closed file input stream backed {@link SAMRecord} iterator over the given region.
@@ -136,8 +152,19 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
         }
       }
       index = new BamIndexReader(indexFileName, mHeader.getSequenceDictionary());
+    } else if (mType == SamReader.Type.CRAM_TYPE) {
+      // A more vanilla htsjdk indexed retrieval:
+      // - still wrapped around CFIS to minimize open files
+      // - Creates a new header copy for every file, rather than using the single uberheader available here, so janky for metagenomics
+      // - Uses htsjdk multi-region lookups rather than our code
+      final File indexFile = SamFiles.findIndex(mFile);
+      if (indexFile == null) {
+        throw new NoTalkbackSlimException("File " + mFile.getPath() + " is not indexed for " + mType.fileExtension());
+      }
+      final SamReader samRecords = SamUtils.getSamReaderFactory(mReference).open(SamInputResource.of(mStream).index(indexFile).assumeType(mType));
+      return samRecords.queryContained(getQueryIntervals(mRegions));
     } else {
-      throw new NoTalkbackSlimException("Indexed extraction from " + mType.fileExtension() + " " + mFile.getPath());
+      throw new NoTalkbackSlimException("Indexed extraction from " + mType.fileExtension() + " " + mFile.getPath() + " is not supported");
     }
 
     final VirtualOffsets filePointers = index.getFilePointers(mRegions);

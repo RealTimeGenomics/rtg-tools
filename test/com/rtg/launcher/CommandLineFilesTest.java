@@ -210,7 +210,7 @@ public class CommandLineFilesTest extends TestCase {
     final CommandLineFiles cmf = new CommandLineFiles(null, null, CommandLineFiles.VARIANT_INPUT);
 
     makeFile(new File(mOne + TabixIndexer.TABIX_EXTENSION));
-    checkInvalid(cmf, "The file \"" + mTwo.getPath() + "\" does not have a tabix index", 1, defaultFlags());
+    checkInvalid(cmf, "The file \"" + mTwo.getPath() + "\" does not have an associated index file", 1, defaultFlags());
     makeFile(new File(mTwo + TabixIndexer.TABIX_EXTENSION));
     checkValid(cmf, defaultFlags());
 
@@ -223,7 +223,7 @@ public class CommandLineFilesTest extends TestCase {
     final File f = new File(mDir, "test" + SamUtils.BAM_SUFFIX);
     makeFile(f);
     final String[] args = {f.getPath()};
-    checkInvalid(cmf2, "The file \"" + f.getPath() + "\" does not have a \".bai\" index", 1, getFlags(args));
+    checkInvalid(cmf2, "The file \"" + f.getPath() + "\" does not have an associated index file", 1, getFlags(args));
     File f2 = new File(mDir, "test" + SamUtils.BAI_SUFFIX);
 //    System.err.println(f.getPath());
 //    System.err.println(f2.getPath());

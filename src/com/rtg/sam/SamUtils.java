@@ -56,6 +56,7 @@ import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SequencesReader;
+import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
 import com.rtg.util.StringUtils;
@@ -81,6 +82,7 @@ import htsjdk.samtools.SAMRecord;
 import htsjdk.samtools.SAMSequenceDictionary;
 import htsjdk.samtools.SAMSequenceRecord;
 import htsjdk.samtools.SAMTextHeaderCodec;
+import htsjdk.samtools.SamFiles;
 import htsjdk.samtools.SamInputResource;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.SamReaderFactory;
@@ -552,6 +554,22 @@ public final class SamUtils {
   }
 
   /**
+   * Test whether an index file exists
+   * @param file supplying alignments
+   * @return true if the file has an index
+   */
+  public static boolean isIndexed(File file) {
+    final SamReader.Type t = getSamType(file);
+    if (t == null) {
+      return false;
+    } else if (t == SamReader.Type.SAM_TYPE) { // We support tabixed block-compressed SAM
+      return TabixIndexer.indexFileName(file).exists();
+    } else {
+      return SamFiles.findIndex(file) != null;
+    }
+  }
+
+  /**
    * @param zippedSam zipped file to check
    * @return true if it starts with a <code>SAM</code> header (i.e. first character is @)
    * @throws IOException if an IO Error occurs
@@ -941,7 +959,13 @@ public final class SamUtils {
     }
   }
 
-  private static SamReaderFactory getSamReaderFactory(SequencesReader reference) throws IOException {
+  /**
+   * Creates a SamReaderFactory using our preferences for validation stringency and setting up a reference
+   * for use by CRAM reading
+   * @param reference the reference, or null if none
+   * @return the SamReaderFactory
+   */
+  public static SamReaderFactory getSamReaderFactory(SequencesReader reference) {
     return SamReaderFactory.make()
       .referenceSource(reference == null ? NO_CRAM_REFERENCE_SOURCE : reference.referenceSource())
       .validationStringency(ValidationStringency.SILENT);
@@ -1018,7 +1042,7 @@ public final class SamUtils {
    * @throws IOException if an I/O problem occurs opening the file
    */
   public static SamReader makeSamReader(InputStream stream) throws IOException {
-    return makeSamReader(stream, null, null);
+    return makeSamReader(stream, null);
   }
 
   /**
