@@ -116,6 +116,7 @@ public final class FastqTrim extends AbstractCli {
         && innerFlags.checkInRange(END_TRIM_THRESHOLD, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_START_FLAG, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_END_FLAG, 0, Integer.MAX_VALUE)
+        && innerFlags.checkInRange(SUBSAMPLE_FLAG, 0.0, 1.0)
     );
   }
 
