@@ -51,7 +51,6 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.vcf.VcfUtils;
@@ -64,17 +63,23 @@ import com.rtg.vcf.eval.VcfEvalParams.VcfEvalParamsBuilder;
  */
 public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
-  private static final String MODULE_NAME = "vcfeval";
-  private static final String BASELINE = "baseline";
-  private static final String CALLS = "calls";
-  private static final String SORT_ORDER = "sort-order";
-  private static final String ALL_RECORDS = "all-records";
+  /** Flag used for supplying truth variants */
+  public static final String BASELINE = "baseline";
+  /** Flag used for supplying query variants */
+  public static final String CALLS = "calls";
+  /** Flag used to specify whether to load non-pass variants */
+  public static final String ALL_RECORDS = "all-records";
+  /** Flag used for supplying evaluation regions */
+  public static final String EVAL_REGIONS_FLAG = "evaluation-regions";
+  /** Flag used for setting the score field */
+  public static final String SCORE_FIELD = "vcf-score-field";
+  /** Flag used to specify a "good" score is high vs low */
+  public static final String SORT_ORDER = "sort-order";
+
   private static final String SAMPLE = "sample";
-  static final String SORT_FIELD = "vcf-score-field";
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String REF_OVERLAP = "ref-overlap";
   private static final String OUTPUT_MODE = "output-mode";
-  private static final String EVAL_REGIONS_FLAG = "evaluation-regions";
 
   private static final String ROC_SUBSET = "Xroc-subset";
   private static final String SLOPE_FILES = "Xslope-files";
@@ -126,7 +131,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   @Override
   public String moduleName() {
-    return MODULE_NAME;
+    return "vcfeval";
   }
 
   @Override
@@ -141,113 +146,108 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   @Override
   protected void initFlags() {
-    initFlags(mFlags);
-  }
+    CommonFlagCategories.setCategories(mFlags);
+    mFlags.registerExtendedHelp();
+    mFlags.setDescription("Evaluates called variants for genotype agreement with a baseline variant set irrespective of representational differences. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called variants not matched in the baseline), false negatives (baseline variants not matched in the call set), and true positives (variants that match between the baseline and calls).");
+    CommonFlags.initOutputDirFlag(mFlags);
+    mFlags.registerRequired('b', BASELINE, File.class, CommonFlags.FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('c', CALLS, File.class, CommonFlags.FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
 
-  private static void initFlags(final CFlags flags) {
-    CommonFlagCategories.setCategories(flags);
-    flags.registerExtendedHelp();
-    flags.setDescription("Evaluates called variants for genotype agreement with a baseline variant set irrespective of representational differences. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called variants not matched in the baseline), false negatives (baseline variants not matched in the call set), and true positives (variants that match between the baseline and calls).");
-    CommonFlags.initOutputDirFlag(flags);
-    flags.registerRequired('b', BASELINE, File.class, CommonFlags.FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('c', CALLS, File.class, CommonFlags.FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
-    flags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
-    flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
-    flags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('e', EVAL_REGIONS_FLAG, File.class, "File", "if set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set high-confidence regions or other regions of interest where region boundary effects should be minimized").setCategory(INPUT_OUTPUT);
 
-    flags.registerOptional('e', EVAL_REGIONS_FLAG, File.class, "File", "if set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set high-confidence regions or other regions of interest where region boundary effects should be minimized").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(SAMPLE, String.class, CommonFlags.STRING, "the name of the sample to select. Use <baseline_sample>,<calls_sample> to select different sample names for baseline and calls. (Required when using multi-sample VCF files)").setCategory(FILTERING);
+    mFlags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
+    mFlags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences").setCategory(FILTERING);
+    mFlags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)").setCategory(FILTERING);
 
-    flags.registerOptional(SAMPLE, String.class, CommonFlags.STRING, "the name of the sample to select. Use <baseline_sample>,<calls_sample> to select different sample names for baseline and calls. (Required when using multi-sample VCF files)").setCategory(FILTERING);
-    flags.registerOptional(ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
-    flags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences").setCategory(FILTERING);
-    flags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)").setCategory(FILTERING);
-
-    flags.registerOptional('f', SORT_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
-    flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
-    final Flag<String> modeFlag = flags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
+    mFlags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
+    mFlags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
+    final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
-    flags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
 
-    flags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
-    flags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
-    flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
-    flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
-    flags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
+    mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
+    mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
+    mFlags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
+    mFlags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
+    mFlags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
 
-    CommonFlags.initThreadsFlag(flags);
-    CommonFlags.initNoGzip(flags);
-    flags.setValidator(new VcfEvalFlagsValidator());
+    CommonFlags.initThreadsFlag(mFlags);
+    CommonFlags.initNoGzip(mFlags);
+
+    mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
+      && CommonFlags.validateTabixedInputFile(flags, BASELINE, CALLS)
+      && CommonFlags.validateThreads(flags)
+      && CommonFlags.validateTemplate(flags)
+      && CommonFlags.validateRegions(flags)
+      && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
+      && validateScoreField(flags)
+      && validatePairedFlag(flags, OBEY_PHASE, "phase type")
+      && validatePairedFlag(flags, OBEY_PHASE, "phase type")
+      && validatePairedFlag(flags, SAMPLE, "sample name")
+      && validatePairedFlag(flags, OBEY_PHASE, "phase type"));
   }
 
-  static class VcfEvalFlagsValidator implements Validator {
-
-    @Override
-    public boolean isValid(final CFlags flags) {
-      return CommonFlags.validateOutputDirectory(flags)
-        && CommonFlags.validateTabixedInputFile(flags, BASELINE, CALLS)
-        && CommonFlags.validateThreads(flags)
-        && CommonFlags.validateTemplate(flags)
-        && CommonFlags.validateRegions(flags)
-        && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
-        && validateSortField(flags)
-        && validatePairedFlag(flags, OBEY_PHASE, "phase type")
-        && validatePairedFlag(flags, OBEY_PHASE, "phase type")
-        && validatePairedFlag(flags, SAMPLE, "sample name")
-        && validatePairedFlag(flags, OBEY_PHASE, "phase type");
-    }
-
-    private boolean validateSortField(CFlags flags) {
-      if (flags.isSet(SORT_FIELD)) {
-        final String field = (String) flags.getValue(SORT_FIELD);
-        final int pIndex = field.indexOf('=');
-        if (pIndex != -1) {
-          final String fieldTypeName = field.substring(0, pIndex).toUpperCase(Locale.getDefault());
-          try {
-            final RocScoreField f = RocScoreField.valueOf(fieldTypeName);
-            if (f == RocScoreField.DERIVED) {
-              try {
-                final DerivedAnnotations ann = DerivedAnnotations.valueOf(field.substring(pIndex + 1).toUpperCase(Locale.getDefault()));
-                if (!DerivedAnnotations.singleValueNumericAnnotations().contains(ann)) {
-                  throw new IllegalArgumentException("Non single value numeric annotation");
-                }
-              } catch (IllegalArgumentException e) {
-                flags.setParseMessage("Unrecognized derived annotation \"" + field + "\", must be one of " + Arrays.toString(DerivedAnnotations.singleValueNumericAnnotations().toArray()));
-                return false;
+  /**
+   * Validates that the VCF score field is well formed
+   * @param flags the populated flags
+   * @return true if the score field is well formed
+   */
+  public static boolean validateScoreField(CFlags flags) {
+    if (flags.isSet(SCORE_FIELD)) {
+      final String field = (String) flags.getValue(SCORE_FIELD);
+      final int pIndex = field.indexOf('=');
+      if (pIndex != -1) {
+        final String fieldTypeName = field.substring(0, pIndex).toUpperCase(Locale.getDefault());
+        try {
+          final RocScoreField f = RocScoreField.valueOf(fieldTypeName);
+          if (f == RocScoreField.DERIVED) {
+            try {
+              final DerivedAnnotations ann = DerivedAnnotations.valueOf(field.substring(pIndex + 1).toUpperCase(Locale.getDefault()));
+              if (!DerivedAnnotations.singleValueNumericAnnotations().contains(ann)) {
+                throw new IllegalArgumentException("Non single value numeric annotation");
               }
+            } catch (IllegalArgumentException e) {
+              flags.setParseMessage("Unrecognized derived annotation \"" + field + "\", must be one of " + Arrays.toString(DerivedAnnotations.singleValueNumericAnnotations().toArray()));
+              return false;
             }
-          } catch (IllegalArgumentException e) {
-            flags.setParseMessage("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
-            return false;
           }
-        }
-      }
-      return true;
-    }
-    private boolean validatePairedFlag(CFlags flags, String flag, String label) {
-      if (flags.isSet(flag)) {
-        final String flagValue = (String) flags.getValue(flag);
-        if (flagValue.length() == 0) {
-          flags.setParseMessage("Supplied " + label + " cannot be empty");
-          return false;
-        }
-        final String[] split = StringUtils.split(flagValue, ',');
-        if (split.length > 2) {
-          flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". At most 1 comma is permitted");
-          return false;
-        }
-        if (split[0].length() == 0) {
-          flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". Supplied baseline " + label + " cannot be empty");
-          return false;
-        }
-        final String callsValue = split.length == 2 ? split[1] : split[0];
-        if (callsValue.length() == 0) {
-          flags.setParseMessage("Invalid sample name specification " + flagValue + ". Supplied calls " + label + " cannot be empty");
+        } catch (IllegalArgumentException e) {
+          flags.setParseMessage("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
           return false;
         }
       }
-      return true;
     }
+    return true;
+  }
+
+  private static boolean validatePairedFlag(CFlags flags, String flag, String label) {
+    if (flags.isSet(flag)) {
+      final String flagValue = (String) flags.getValue(flag);
+      if (flagValue.length() == 0) {
+        flags.setParseMessage("Supplied " + label + " cannot be empty");
+        return false;
+      }
+      final String[] split = StringUtils.split(flagValue, ',');
+      if (split.length > 2) {
+        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". At most 1 comma is permitted");
+        return false;
+      }
+      if (split[0].length() == 0) {
+        flags.setParseMessage("Invalid " + label + " specification " + flagValue + ". Supplied baseline " + label + " cannot be empty");
+        return false;
+      }
+      final String callsValue = split.length == 2 ? split[1] : split[0];
+      if (callsValue.length() == 0) {
+        flags.setParseMessage("Invalid sample name specification " + flagValue + ". Supplied calls " + label + " cannot be empty");
+        return false;
+      }
+    }
+    return true;
   }
 
 
@@ -289,7 +289,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final File calls = (File) mFlags.getValue(CALLS);
     builder.baseLineFile(baseline).callsFile(calls);
     builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
-    builder.scoreField((String) mFlags.getValue(SORT_FIELD));
+    builder.scoreField((String) mFlags.getValue(SCORE_FIELD));
     builder.maxLength((Integer) mFlags.getValue(MAX_LENGTH));
     if (mFlags.isSet(CommonFlags.RESTRICTION_FLAG)) {
       builder.restriction(new RegionRestriction((String) mFlags.getValue(CommonFlags.RESTRICTION_FLAG)));
