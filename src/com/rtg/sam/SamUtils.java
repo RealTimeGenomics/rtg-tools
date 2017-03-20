@@ -960,10 +960,10 @@ public final class SamUtils {
   }
 
   /**
-   * Creates a SamReaderFactory using our preferences for validation stringency and setting up a reference
+   * Creates a <code>SamReaderFactory</code> using our preferences for validation stringency and setting up a reference
    * for use by CRAM reading
    * @param reference the reference, or null if none
-   * @return the SamReaderFactory
+   * @return the <code>SamReaderFactory</code>
    */
   public static SamReaderFactory getSamReaderFactory(SequencesReader reference) {
     return SamReaderFactory.make()
