@@ -34,6 +34,8 @@ import static com.rtg.launcher.CommonFlags.MIN_READ_LENGTH;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.QUALITY_FLAG;
+import static com.rtg.sam.SamFilterOptions.SUBSAMPLE_FLAG;
+import static com.rtg.sam.SamFilterOptions.SUBSAMPLE_SEED_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 
@@ -44,16 +46,21 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.function.Function;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.sam.SamFilterOptions;
+import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
+import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.Timer;
 import com.rtg.util.io.FileUtils;
+import com.rtg.util.iterators.SubsampleIterator;
 
 /**
  * Paired-end FASTQ read trimming. Allows various fixed trimming and uses arm-to-arm alignment to
@@ -92,6 +99,7 @@ public final class FastqTrim extends AbstractCli {
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initForce(mFlags);
+    SamFilterOptions.registerSubsampleFlags(mFlags);
     mFlags.registerOptional('S', START_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read starts to maximise base quality above the given threshold", 0).setCategory(FILTERING);
     mFlags.registerOptional('E', END_TRIM_THRESHOLD, Integer.class, CommonFlags.INT, "trim read ends to maximise base quality above the given threshold", 0).setCategory(FILTERING);
     mFlags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
@@ -157,6 +165,15 @@ public final class FastqTrim extends AbstractCli {
     }
   }
 
+  static <T> Iterator<T> maybeSubsample(CFlags flags, Iterator<T> inner) {
+    if (flags.isSet(SUBSAMPLE_FLAG)) {
+      final PortableRandom r = (flags.isSet(SUBSAMPLE_SEED_FLAG)) ? new PortableRandom((Integer) flags.getValue(SUBSAMPLE_SEED_FLAG)) : new PortableRandom();
+      final double fraction = (Double) flags.getValue(SUBSAMPLE_FLAG);
+      return new SubsampleIterator<>(inner, r, fraction);
+    }
+    return inner;
+  }
+
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
@@ -178,7 +195,7 @@ public final class FastqTrim extends AbstractCli {
         final BatchReorderingWriter<FastqSequence> batchWriter = new BatchReorderingWriter<>(writer);
         final Function<Batch<FastqSequence>, Runnable> listRunnableFunction = batch -> new FastqTrimProcessor(batch, discardZeroLengthReads, trimmer, batchWriter);
         final BatchProcessor<FastqSequence> processor = new BatchProcessor<>(listRunnableFunction, threads, batchSize);
-        processor.process(new FastqIterator(fastqReader));
+        processor.process(maybeSubsample(mFlags, new FastqIterator(fastqReader)));
       }
       t.log();
     }

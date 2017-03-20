@@ -31,11 +31,13 @@ package com.rtg.sam;
 
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.IntegerOrPercentage;
+import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -70,7 +72,7 @@ public final class SamFilterOptions {
   }
   
   /** Flag name for enabling subsampling records. */
-  public static final String SUBSAMPLE_FLAG = "subsample-fraction";
+  public static final String SUBSAMPLE_FLAG = "subsample";
 
   /** Flag name for specifying the seed when subsampling. */
   public static final String SUBSAMPLE_SEED_FLAG = "seed";
@@ -81,8 +83,8 @@ public final class SamFilterOptions {
    * @param flags flags to add into
    */
   public static void registerSubsampleFlags(final CFlags flags) {
-    flags.registerOptional(SUBSAMPLE_FLAG, Double.class, CommonFlags.FLOAT, "if set, subsample SAM records to retain this fraction of reads").setCategory(SENSITIVITY_TUNING);
-    flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, CommonFlags.INT, "seed used during subsampling").setCategory(SENSITIVITY_TUNING);
+    flags.registerOptional(SUBSAMPLE_FLAG, Double.class, CommonFlags.FLOAT, "if set, subsample the input to retain this fraction of reads").setCategory(UTILITY);
+    flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, CommonFlags.INT, "seed used during subsampling").setCategory(UTILITY);
   }
 
   /** Flag name for filter on <code>MAPQ</code> field of SAM record. */
@@ -333,6 +335,8 @@ public final class SamFilterOptions {
     }
     if (flags.isSet(SUBSAMPLE_SEED_FLAG)) {
       builder.subsampleSeed((Integer) flags.getValue(SUBSAMPLE_SEED_FLAG));
+    } else {
+      builder.subsampleSeed(new PortableRandom().nextLong());
     }
     if (flags.isSet(MAX_AS_MATED_FLAG)) {
       final IntegerOrPercentage matedAS = (IntegerOrPercentage) flags.getValue(MAX_AS_MATED_FLAG);
