@@ -44,6 +44,12 @@ public class SubsampleIterator<T> extends IteratorHelper<T> {
   private T mNext;
   private boolean mOk = true;
 
+  /**
+   * Constructor
+   * @param inner the iterator to wrap around
+   * @param random supplies random numbers
+   * @param fraction the fraction of input elements to retain, between 0 and 1.0
+   */
   public SubsampleIterator(Iterator<T> inner, PortableRandom random, double fraction) {
     mInternal = inner;
     mRandom = random;
