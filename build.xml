@@ -232,36 +232,44 @@
        prevent the triggering of expensive targets multiple times.
   -->
   <macrodef name="set-version-file">
-    <attribute name="version.file"/>
-    <attribute name="version.value"/>
+    <attribute name="file"/>
+    <attribute name="value"/>
+    <attribute name="strict" default="false"/>
     <sequential>
-      <local name="old-version.value"/>
-      <loadfile property="old-version.value" srcFile="@{version.file}" failonerror="false" quiet="true"/>
+      <local name="old-value"/>
+      <loadfile property="old-value" srcFile="@{file}" failonerror="false" quiet="true"/>
+      <fail message="Need to clean first. (last='${old-value}' current='@{value}')">
+        <condition>
+          <and>
+            <istrue value="@{strict}"/>
+            <available file="@{file}"/>
+            <not>
+              <equals arg1="${old-value}" arg2="@{value}"/>
+            </not>
+          </and>
+        </condition>
+      </fail>
       <if>
         <not>
-          <equals arg1="${old-version.value}" arg2="@{version.value}"/>
+          <equals arg1="${old-value}" arg2="@{value}"/>
         </not>
         <then>
-          <echo message="Setting @{version.file} to @{version.value}"/>
-          <echo file="@{version.file}" message="@{version.value}"/>
+          <echo message="Setting @{file} to @{value}"/>
+          <echo file="@{file}" message="@{value}"/>
         </then>
       </if>
     </sequential>
   </macrodef>
 
   <target name="set-rtg-build-version" depends="init,rtg-vcs-info">
-    <set-version-file version.file="${build.src}/com/rtg/build.version"
-                      version.value="${rtg.vcs.commit.revision}"/>
     <tstamp> <format property="build.time" pattern="yyyy-MM-dd" /></tstamp>
-    <set-version-file version.file="${build.src}/com/rtg/build.time"
-                      version.value="${build.time}"/>
+    <set-version-file file="${build.src}/com/rtg/build.version" value="${rtg.vcs.commit.revision}"/>
+    <set-version-file file="${build.src}/com/rtg/build.time" value="${build.time}"/>
   </target>
 
   <target name="set-rtg-build-product">
-    <set-version-file version.file="${build.misc}/com/rtg/product.version"
-                      version.value="${product.version}"/>
-    <set-version-file version.file="${build.misc}/com/rtg/product.name"
-                      version.value="${product}"/>
+    <set-version-file file="${build.misc}/com/rtg/product.version" value="${product.version}"/>
+    <set-version-file file="${build.misc}/com/rtg/product.name" value="${product}" strict="true"/>
   </target>
 
 
