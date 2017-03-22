@@ -38,6 +38,7 @@ import static com.rtg.sam.SamFilterOptions.SUBSAMPLE_FLAG;
 import static com.rtg.sam.SamFilterOptions.SUBSAMPLE_SEED_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,6 +75,8 @@ public final class FastqTrim extends AbstractCli {
   private static final String START_TRIM_THRESHOLD = "start-quality-threshold";
   private static final String END_TRIM_THRESHOLD = "end-quality-threshold";
 
+  private static final String REVERSE_FLAG = "reverse-complement";
+
   static final String BATCH_SIZE = "Xbatch-size";
   static final String DISCARD_EMPTY_READS = "discard-empty-reads";
 
@@ -105,6 +108,7 @@ public final class FastqTrim extends AbstractCli {
     mFlags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
     mFlags.registerOptional('e', TRIM_END_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read end", 0).setCategory(FILTERING);
     CommonFlags.initMinReadLength(mFlags);
+    mFlags.registerOptional('r', REVERSE_FLAG, "if set, output in reverse complement").setCategory(UTILITY);
     mFlags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
     mFlags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
 
@@ -123,9 +127,10 @@ public final class FastqTrim extends AbstractCli {
   private ReadTrimmer getTrimmer() {
     return getTrimmer((Integer) mFlags.getValue(TRIM_START_FLAG),
       (Integer) mFlags.getValue(START_TRIM_THRESHOLD), (Integer) mFlags.getValue(TRIM_END_FLAG),
-      (Integer) mFlags.getValue(END_TRIM_THRESHOLD), (Integer) mFlags.getValue(MIN_READ_LENGTH));
+      (Integer) mFlags.getValue(END_TRIM_THRESHOLD), (Integer) mFlags.getValue(MIN_READ_LENGTH),
+      mFlags.isSet(REVERSE_FLAG));
   }
-  static ReadTrimmer getTrimmer(int start, int startThreshold, int end, int endThreshold, int minReadLength) {
+  static ReadTrimmer getTrimmer(int start, int startThreshold, int end, int endThreshold, int minReadLength, boolean reverse) {
     final ArrayList<ReadTrimmer> trimmers = new ArrayList<>();
     // If doing fixed trimming, ensure these come first
     if (start > 0) {
@@ -143,6 +148,9 @@ public final class FastqTrim extends AbstractCli {
     }
     if (minReadLength > 0) {
       trimmers.add(new MinLengthReadTrimmer(minReadLength));
+    }
+    if (reverse) {
+      trimmers.add(new ReverseComplementReadTrimmer());
     }
     if (trimmers.size() == 1) {
       return trimmers.get(0);

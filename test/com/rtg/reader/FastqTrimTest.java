@@ -90,49 +90,56 @@ public class FastqTrimTest  extends AbstractCliTest {
   }
 
   public void testNullTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 0, 0);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 0, 0, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
     checkTrimmer(read, readString, trimmer);
   }
 
+  public void testRCTrimmer() {
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 0, 0, true);
+    final String readString = "ACGTGGGAGATTTGATG";
+    final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
+    checkTrimmer(read, DnaUtils.reverseComplement(readString), trimmer);
+  }
+
   public void testStartTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(1, 0, 0, 0, 0);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(1, 0, 0, 0, 0, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
     checkTrimmer(read, readString.substring(1), trimmer);
   }
 
   public void testEndTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 1, 0, 0);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 1, 0, 0, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
     checkTrimmer(read, readString.substring(0, readString.length() - 1), trimmer);
   }
 
   public void testStartQualityTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 27, 0, 0, 0);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 27, 0, 0, 0, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString, FastaUtils.asciiToRawQuality(";;;;;;;;EEEEEEEEE"));
     checkTrimmer(read, "GATTTGATG", trimmer);
   }
 
   public void testEndQualityTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 27, 0);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 27, 0, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString, FastaUtils.asciiToRawQuality("EEEEEEEEE;;;;;;;;"));
     checkTrimmer(read, "ACGTGGGAG", trimmer);
   }
 
   public void testMinLengthTrimmer() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 0, 18);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(0, 0, 0, 0, 18, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
     checkTrimmer(read, "", trimmer);
   }
 
   public void testMinLengthAfterTrim() {
-    final ReadTrimmer trimmer = FastqTrim.getTrimmer(4, 0, 3, 0, 11);
+    final ReadTrimmer trimmer = FastqTrim.getTrimmer(4, 0, 3, 0, 11, false);
     final String readString = "ACGTGGGAGATTTGATG";
     final FastqSequence read = FastqSequenceTest.getFastq("sequence", readString);
     checkTrimmer(read, "", trimmer);

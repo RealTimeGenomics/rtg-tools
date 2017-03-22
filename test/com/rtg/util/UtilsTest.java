@@ -228,6 +228,13 @@ public class UtilsTest extends TestCase {
     assertEquals(13, a[2]);
     assertEquals(12, a[3]);
     assertEquals(11, a[4]);
+
+    Utils.reverseInPlace(a, 1, 3);
+    assertEquals(15, a[0]);
+    assertEquals(12, a[1]);
+    assertEquals(13, a[2]);
+    assertEquals(14, a[3]);
+    assertEquals(11, a[4]);
   }
 
   public void testDecimalPlaces() {

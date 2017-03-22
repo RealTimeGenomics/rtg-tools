@@ -408,7 +408,17 @@ public final class Utils {
    * @param a a non-null array of bytes.
    */
   public static void reverseInPlace(final byte[] a) {
-    for (int start = 0, end = a.length - 1; start < end; ++start, --end) {
+    reverseInPlace(a, 0, a.length);
+  }
+
+  /**
+   * Reverse all of a byte array in-place.
+   * @param a a non-null array of bytes.
+   * @param first index of first position
+   * @param length number of items to reverse
+   */
+  public static void reverseInPlace(final byte[] a, int first, int length) {
+    for (int start = first, end = first + length - 1; start < end; ++start, --end) {
       final byte tmp = a[start];
       a[start] = a[end];
       a[end] = tmp;
