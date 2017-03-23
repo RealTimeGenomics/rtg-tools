@@ -68,7 +68,7 @@ public class FastqTrimTest  extends AbstractCliTest {
       , "-T", "--threads=INT", "number of threads (Default is the number of available cores)"
     );
     checkExtendedHelp("rtg fastqtrim",
-      "--Xbatch-size=INT",  "number of reads to process per batch (Default is 100000)"
+      "--Xbatch-size=INT",  "number of reads to process per batch"
     );
   }
 

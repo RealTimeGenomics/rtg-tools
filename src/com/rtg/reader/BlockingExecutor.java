@@ -30,12 +30,17 @@
 
 package com.rtg.reader;
 
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
 
 /**
@@ -43,6 +48,7 @@ import com.rtg.util.diagnostic.Diagnostic;
  */
 class BlockingExecutor extends ThreadPoolExecutor {
   private final Semaphore mSemaphore;
+  private final AtomicReference<Throwable> mThrown = new AtomicReference<>(null);
 
   BlockingExecutor(final int poolSize, final int queueSize) {
     super(poolSize, poolSize, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>());
@@ -51,6 +57,7 @@ class BlockingExecutor extends ThreadPoolExecutor {
 
   @Override
   public void execute(final Runnable task) {
+    checkAndRethrow();
     boolean acquired = false;
     do {
       try {
@@ -67,11 +74,57 @@ class BlockingExecutor extends ThreadPoolExecutor {
       mSemaphore.release();
       throw e;
     }
+    checkAndRethrow();
   }
 
   @Override
-  protected void afterExecute(final Runnable r, final Throwable t) {
+  protected void beforeExecute(Thread t, Runnable r) {
+    ProgramState.checkAbort();
+    super.beforeExecute(t, r);
+  }
+
+  @Override
+  protected void afterExecute(final Runnable r, Throwable t) {
     super.afterExecute(r, t);
+
+    Throwable t2 = t;
+    if (t == null && r instanceof Future<?>) {
+      try {
+        ((Future<?>) r).get();
+      } catch (CancellationException ce) {
+        t2 = ce;
+      } catch (ExecutionException ee) {
+        t2 = ee.getCause();
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+      }
+    }
+    if (t2 != null) {
+      mThrown.compareAndSet(null, t2);
+    }
     mSemaphore.release();
+  }
+
+  @Override
+  public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+    final boolean res = super.awaitTermination(timeout, unit);
+    checkAndRethrow();
+    return res;
+  }
+
+  // Called from the submission thread, passes out any exception from inner jobs
+  private void checkAndRethrow() {
+    final Throwable t = this.mThrown.getAndSet(null);
+    if (t != null) {
+      ProgramState.setAbort();
+      if (t instanceof Error) {
+        throw (Error) t;
+      }
+      if (t instanceof RuntimeException) {
+        throw (RuntimeException) t;
+      } else {
+        throw new RuntimeException(t);
+      }
+    }
   }
 }

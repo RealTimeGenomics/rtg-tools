@@ -31,23 +31,13 @@
 package com.rtg.reader;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hamcrest.CoreMatchers;
 import org.junit.Test;
-
-import com.rtg.util.ProgramState;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.io.MemoryPrintStream;
-
-import htsjdk.samtools.util.RuntimeIOException;
 
 /**
  */
@@ -84,45 +74,6 @@ public class DummyAsyncChunkWriterTest {
     }
 
     assertEquals(Arrays.asList(1, 2, 3, 4, 14, 13, 12, 11), ints);
-  }
-
-  @Test
-  public void testAborted() throws IOException {
-    try {
-      final List<Integer> ints = new ArrayList<>();
-      try (AbstractAsyncChunkWriter<Integer> writer = new MockAbstractAsyncChunkWriter(10, ints)) {
-        writer.accept(Arrays.asList(1, 2, 3, 4));
-        ProgramState.setAbort();
-        writer.accept(Arrays.asList(14, 13, 12, 11));
-        fail();
-      } catch (RuntimeException e) {
-        // Expected
-      }
-      assertEquals(Arrays.asList(1, 2, 3, 4), ints);
-    } finally {
-      ProgramState.clearAbort();
-    }
-  }
-
-  @Test
-  public void testAbortTrigger() throws IOException {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    try {
-      final List<Integer> ints = new ArrayList<>();
-      try (AbstractAsyncChunkWriter<Integer> writer = new MockAbstractAsyncChunkWriter(10, ints) {
-        @Override
-        public void write(Integer val) {
-                                       throw new RuntimeIOException("Expected");
-                                                                                }
-      }) {
-        writer.accept(Arrays.asList(1, 2, 3, 4));
-      }
-      assertThat(mps.toString(), CoreMatchers.containsString("Output writing failed: Expected"));
-      assertTrue(ProgramState.isAbort());
-    } finally {
-      ProgramState.clearAbort();
-    }
   }
 
 }

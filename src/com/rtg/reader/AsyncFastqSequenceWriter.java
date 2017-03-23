@@ -30,6 +30,7 @@
 
 package com.rtg.reader;
 
+import java.io.Closeable;
 import java.io.IOException;
 
 import htsjdk.samtools.util.RuntimeIOException;
@@ -60,9 +61,12 @@ class AsyncFastqSequenceWriter extends AbstractAsyncChunkWriter<FastqSequence> {
   }
 
   @Override
+  @SuppressWarnings("try")
   protected void synchronouslyClose() {
     try {
-      mWriter.close();
+      try (Closeable ignored = mWriter) {
+        // Just for nice closing behaviour
+      }
     } catch (IOException e) {
       throw new RuntimeIOException(e);
     }

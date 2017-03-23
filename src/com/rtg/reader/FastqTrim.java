@@ -48,6 +48,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.concurrent.FutureTask;
 import java.util.function.Function;
 
 import com.rtg.launcher.AbstractCli;
@@ -202,7 +203,7 @@ public final class FastqTrim extends AbstractCli {
       t.start();
       try (final AsyncFastqSequenceWriter writer = new AsyncFastqSequenceWriter(new FastqWriter(new OutputStreamWriter(FileUtils.createOutputStream(output))))) {
         final BatchReorderingWriter<FastqSequence> batchWriter = new BatchReorderingWriter<>(writer);
-        final Function<Batch<FastqSequence>, Runnable> listRunnableFunction = batch -> new FastqTrimProcessor(batch, discardZeroLengthReads, trimmer, batchWriter);
+        final Function<Batch<FastqSequence>, FutureTask<?>> listRunnableFunction = batch -> new FutureTask<>(new FastqTrimProcessor(batch, discardZeroLengthReads, trimmer, batchWriter), null);
         final BatchProcessor<FastqSequence> processor = new BatchProcessor<>(listRunnableFunction, threads, batchSize);
         processor.process(maybeSubsample(mFlags, new FastqIterator(fastqReader)));
       }

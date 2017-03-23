@@ -33,11 +33,7 @@ package com.rtg.reader;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.rtg.util.ProgramState;
-import com.rtg.util.diagnostic.Diagnostic;
-
 import htsjdk.samtools.util.AbstractAsyncWriter;
-import htsjdk.samtools.util.RuntimeIOException;
 
 /**
  * Support writing a whole list of elements at once
@@ -59,14 +55,8 @@ abstract class AbstractAsyncChunkWriter<T> extends AbstractAsyncWriter<T> implem
    */
   @Override
   public synchronized void accept(List<T> sequences) {
-    ProgramState.checkAbort();
-    try {
-      for (T sequence : sequences) {
-        write(sequence);
-      }
-    } catch (RuntimeIOException e) {
-      Diagnostic.error("Output writing failed: " + e.getMessage());
-      ProgramState.setAbort();
+    for (T sequence : sequences) {
+      write(sequence);
     }
   }
 }

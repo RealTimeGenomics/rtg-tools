@@ -33,21 +33,21 @@ package com.rtg.reader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Process elements in an iterator in chunks.
  */
 class BatchProcessor<T> {
-  private final Function<Batch<T>, Runnable> mRunnableSupplier;
+  private final Function<Batch<T>, FutureTask<?>> mRunnableSupplier;
   private final int mBatchSize;
   private final int mThreads;
 
-  BatchProcessor(Function<Batch<T>, Runnable> runnableSupplier, int threads, int batchSize) {
+  BatchProcessor(Function<Batch<T>, FutureTask<?>> runnableSupplier, int threads, int batchSize) {
     mRunnableSupplier = runnableSupplier;
     mThreads = threads;
     mBatchSize = batchSize;
@@ -58,7 +58,6 @@ class BatchProcessor<T> {
     ArrayList<T> batch = new ArrayList<>(mBatchSize);
     int batchNumber = 0;
     while (true) {
-      ProgramState.checkAbort();
       if (!iterator.hasNext()) {
         break;
       }

@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.FutureTask;
 import java.util.function.Function;
 
 import org.junit.Test;
@@ -47,7 +48,7 @@ public class BatchProcessorTest {
   public void testBatches() {
     Diagnostic.setLogStream();
     final List<Batch<Integer>> accumulator = new ArrayList<>();
-    final Function<Batch<Integer>, Runnable> listRunnableFunction = batch -> (Runnable) () -> accumulator.add(batch);
+    final Function<Batch<Integer>, FutureTask<?>> listRunnableFunction = batch -> new FutureTask<>(() -> accumulator.add(batch), null);
     final BatchProcessor<Integer> processor = new BatchProcessor<>(listRunnableFunction, 1, 3);
     processor.process(Arrays.asList(1, 2, 3, 4, 5, 6, 7).iterator());
 
