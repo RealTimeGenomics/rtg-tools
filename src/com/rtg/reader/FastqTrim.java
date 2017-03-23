@@ -111,7 +111,7 @@ public final class FastqTrim extends AbstractCli {
     CommonFlags.initMinReadLength(mFlags);
     mFlags.registerOptional('r', REVERSE_FLAG, "if set, output in reverse complement").setCategory(UTILITY);
     mFlags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
-    mFlags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 100000).setCategory(FILTERING);
+    mFlags.registerOptional(BATCH_SIZE, Integer.class, CommonFlags.INT, "number of reads to process per batch", 10000).setCategory(FILTERING);
 
     mFlags.setValidator(innerFlags ->
       CommonFlags.validateInputFile(innerFlags, CommonFlags.INPUT_FLAG)
