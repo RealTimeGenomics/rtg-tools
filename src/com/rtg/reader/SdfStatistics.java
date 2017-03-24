@@ -51,12 +51,11 @@ import com.rtg.mode.DNA;
 import com.rtg.mode.Protein;
 import com.rtg.mode.SequenceType;
 import com.rtg.reference.ReferenceGenome;
+import com.rtg.reference.ReferenceSequence;
 import com.rtg.reference.Sex;
 import com.rtg.sam.SamUtils;
 import com.rtg.taxonomy.Taxonomy;
 import com.rtg.taxonomy.TaxonomyUtils;
-import com.rtg.util.Constants;
-import com.rtg.util.Environment;
 import com.rtg.util.MathUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
@@ -70,7 +69,6 @@ import com.rtg.util.diagnostic.SlimException;
 
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMFileWriterFactory;
-import htsjdk.samtools.SAMProgramRecord;
 import htsjdk.samtools.SAMSequenceRecord;
 
 /**
@@ -88,6 +86,8 @@ public final class SdfStatistics extends AbstractCli {
   private static final String TAXONOMY_FLAG = "taxonomy";
   private static final String NAMES_AND_LENGTHS_FLAG = "lengths";
   private static final String SAM_FLAG = "Xsam-header";
+  private static final String BED_FLAG = "Xbed";
+  private static final String SPECIFIED = "Xspecified";
 
   //private static final String SUMMARY_FLAG = "summary";
 
@@ -130,6 +130,8 @@ public final class SdfStatistics extends AbstractCli {
 
       flags.registerOptional(NAMES_AND_LENGTHS_FLAG, "print out the name and length of each sequence. (Not recommended for read sets)").setCategory(REPORTING);
       flags.registerOptional(SAM_FLAG, "print out a SAM format header corresponding to this SDF").setCategory(REPORTING);
+      flags.registerOptional(BED_FLAG, "print out BED format regions corresponding to sequences in this SDF").setCategory(REPORTING);
+      flags.registerOptional(SPECIFIED, "BED/SAM output should only include sequences specified in the reference configuration").setCategory(REPORTING);
       //flags.setDescription("prints statistics about sequences");
 
       flags.setValidator(VALIDATOR);
@@ -266,16 +268,19 @@ public final class SdfStatistics extends AbstractCli {
     printReadMe(reader, out);
   }
 
-  static void printSAMHeader(SequencesReader reader, final Appendable out) throws IOException {
-    out.append("SAM Header:").append(StringUtils.LS);
+  static void printSAMHeader(SequencesReader reader, final Appendable out, boolean specified) throws IOException {
+    final ReferenceGenome rg = new ReferenceGenome(reader, ReferenceGenome.SEX_ALL, ReferenceGenome.ReferencePloidy.AUTO);
     final SAMFileHeader header = new SAMFileHeader();
     header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
-    final SAMProgramRecord pg = new SAMProgramRecord(Constants.APPLICATION_NAME);
-    pg.setProgramVersion(Environment.getVersion());
+    SamUtils.addProgramRecord(header);
     final int[] lengths = reader.sequenceLengths(0, reader.numberSequences());
     for (int i = 0; i < lengths.length; ++i) {
-      final SAMSequenceRecord record = new SAMSequenceRecord(reader.name(i), lengths[i]);
-      header.addSequence(record);
+      final String name = reader.hasNames() ? reader.name(i) : ("sequence_" + i);
+      final ReferenceSequence s = specified ? rg.sequence(name) : null;
+      if (s == null || s.isSpecified()) {
+        final SAMSequenceRecord record = new SAMSequenceRecord(name, lengths[i]);
+        header.addSequence(record);
+      }
     }
     if (reader.getSdfId().available()) {
       header.addComment(SamUtils.TEMPLATE_SDF_ATTRIBUTE + reader.getSdfId().toString());
@@ -285,6 +290,16 @@ public final class SdfStatistics extends AbstractCli {
     out.append(bo.toString());
   }
 
+  static void printBed(SequencesReader sr, final PrintStream out, boolean specified) throws IOException {
+    final ReferenceGenome rg = new ReferenceGenome(sr, ReferenceGenome.SEX_ALL, ReferenceGenome.ReferencePloidy.AUTO);
+    for (long seq = 0; seq < sr.numberSequences(); ++seq) {
+      final String name = sr.hasNames() ? sr.name(seq) : ("sequence_" + seq);
+      final ReferenceSequence s = specified ? rg.sequence(name) : null;
+      if (s == null || s.isSpecified()) {
+        out.println(name + "\t0\t" + sr.length(seq));
+      }
+    }
+  }
 
   static void printReferenceSequences(SequencesReader reader, Sex sex, final Appendable out) throws IOException {
     final ReferenceGenome rg = new ReferenceGenome(reader, sex);
@@ -372,13 +387,14 @@ public final class SdfStatistics extends AbstractCli {
     }
   }
 
-  static void printSequenceNameAndLength(SequencesReader sr, PrintStream out) throws IOException {
+  static void printSequenceNameAndLength(SequencesReader sr, PrintStream out, boolean specified) throws IOException {
+    final ReferenceGenome rg = new ReferenceGenome(sr, ReferenceGenome.SEX_ALL, ReferenceGenome.ReferencePloidy.AUTO);
     out.println("Sequence lengths: ");
     for (long seq = 0; seq < sr.numberSequences(); ++seq) {
-      if (sr.hasNames()) {
-        out.println(sr.name(seq) + "\t" + sr.length(seq));
-      } else {
-        out.println("sequence_" + seq + "\t" + sr.length(seq));
+      final String name = sr.hasNames() ? sr.name(seq) : ("sequence_" + seq);
+      final ReferenceSequence s = specified ? rg.sequence(name) : null;
+      if (s == null || s.isSpecified()) {
+        out.println(name + "\t" + sr.length(seq));
       }
     }
   }
@@ -472,25 +488,28 @@ public final class SdfStatistics extends AbstractCli {
     try {
       for (File dir : dirs) {
         try (AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+          if (mFlags.isSet(BED_FLAG)) {
+            printBed(reader, ps, mFlags.isSet(SPECIFIED));
+          } else if (mFlags.isSet(SAM_FLAG)) {
+            printSAMHeader(reader, ps, mFlags.isSet(SPECIFIED));
+          } else {
+            performStatistics(reader, dir, ps, mFlags.isSet(NS_FLAG), mFlags.isSet(POSITIONS_FLAG), mFlags.isSet(QS_FLAG));
+            if (mFlags.isSet(NAMES_AND_LENGTHS_FLAG)) {
+              printSequenceNameAndLength(reader, ps, mFlags.isSet(SPECIFIED));
+            }
+            if (mFlags.isSet(SEX_FLAG)) {
+              for (Object o : mFlags.getValues(SEX_FLAG)) {
+                final Sex s = (Sex) o;
+                printReferenceSequences(reader, s, ps);
+              }
+            }
+            if (mFlags.isSet(TAXONOMY_FLAG)) {
+              if (!TaxonomyUtils.hasTaxonomyInfo(reader)) {
+                throw new NoTalkbackSlimException("The supplied SDF does not contain taxonomy information");
+              }
+              printTaxonomyStatistics(reader, ps);
+            }
 
-          performStatistics(reader, dir, ps, mFlags.isSet(NS_FLAG), mFlags.isSet(POSITIONS_FLAG), mFlags.isSet(QS_FLAG));
-          if (mFlags.isSet(NAMES_AND_LENGTHS_FLAG)) {
-            printSequenceNameAndLength(reader, ps);
-          }
-          if (mFlags.isSet(SEX_FLAG)) {
-            for (Object o : mFlags.getValues(SEX_FLAG)) {
-              final Sex s = (Sex) o;
-              printReferenceSequences(reader, s, ps);
-            }
-          }
-          if (mFlags.isSet(TAXONOMY_FLAG)) {
-            if (!TaxonomyUtils.hasTaxonomyInfo(reader)) {
-              throw new NoTalkbackSlimException("The supplied SDF does not contain taxonomy information");
-            }
-            printTaxonomyStatistics(reader, ps);
-          }
-          if (mFlags.isSet(SAM_FLAG)) {
-            printSAMHeader(reader, ps);
           }
         }
       }

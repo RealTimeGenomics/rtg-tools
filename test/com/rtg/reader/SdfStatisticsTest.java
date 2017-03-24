@@ -162,7 +162,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
     try (final TestDirectory dir = new TestDirectory()) {
       final File preread = ReaderTestUtils.getDNADir(fasta, dir);
       try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(preread)) {
-        SdfStatistics.printSequenceNameAndLength(reader, ps.printStream());
+        SdfStatistics.printSequenceNameAndLength(reader, ps.printStream(), false);
         TestUtils.containsAll(ps.toString(), "123456789012345678901\t32", "bob\t17", "hobos\t23");
       }
     }
