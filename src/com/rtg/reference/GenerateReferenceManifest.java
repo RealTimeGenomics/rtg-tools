@@ -118,7 +118,7 @@ public class GenerateReferenceManifest extends AbstractCli {
           }
           try (InputStreamReader refReader = new InputStreamReader(is)) {
             final Map<String, Long> names = ReaderUtils.getSequenceNameMap(reader);
-            final ReferenceGenome ref = new ReferenceGenome(reader, refReader, Sex.MALE);
+            final ReferenceGenome ref = new ReferenceGenome(reader, refReader, ReferenceGenome.SEX_ALL);
             writer.write("#ref-manifest v2.0\n");
             writer.write("@desc\t" + descUse + "\n");
             writer.write("@source\t" + refTxtResource + "\n");

@@ -73,6 +73,9 @@ public class ReferenceGenome {
   /** Default reference contents. */
   public static final String REFERENCE_DEFAULT_HAPLOID = "#Default haploid\nversion 0\neither\tdef\thaploid\tlinear\n";
 
+  /** This sex allows retrieval of all the chromosomes. This should be handled an a way that supports ZX */
+  public static final Sex SEX_ALL = Sex.MALE;
+
   /**
    * Possible values that may be used to override reference file based ploidy
    */
