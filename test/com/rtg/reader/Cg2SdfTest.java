@@ -63,9 +63,9 @@ public class Cg2SdfTest extends AbstractCliTest {
   public void testHelp() {
     checkHelp("rtg cg2sdf"
       , "Converts Complete Genomics sequencing system reads to RTG SDF format"
-      , "-I,", "--input-list-file", "file containing a list of Complete Genomics files (1 per line)"
+      , "-I,", "--input-list-file", "file containing a list of Complete Genomics TSV files (1 per line)"
       , "-o,", "name of output SDF"
-      , "FILE+", "file in Complete Genomics format. May be specified 0 or more times"
+      , "FILE+", "file in Complete Genomics TSV format. May be specified 0 or more times"
       , "--max-unknowns=INT", "maximum number of Ns allowed in either side for a read (Default is 5)"
       , "--no-quality", "does not include quality data in the resulting SDF"
     );
@@ -108,7 +108,7 @@ public class Cg2SdfTest extends AbstractCliTest {
 
       assertTrue(FileHelper.deleteAll(outdir));
 
-      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"), "The specified flag \"--max-unknowns\" has invalid value \"-1\". It should be greater than or equal to \"0\".");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"), "--max-unknowns", "must be at least 0");
 
       final String err = checkHandleFlagsErr("-o", outdir.getPath(), "-I", "x");
       TestUtils.containsAll(err,

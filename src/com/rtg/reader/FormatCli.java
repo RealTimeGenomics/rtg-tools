@@ -265,7 +265,7 @@ public final class FormatCli extends LoggedCli {
     if (!CommonFlags.validateOutputDirectory(flags)) {
       return false;
     }
-    if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
+    if (!SamCommandHelper.validateSamRg(flags)) {
       return false;
     }
     if (flags.isSet(SELECT_READ_GROUP) && inputformat.getSourceFormat() != SourceFormat.SAM) {

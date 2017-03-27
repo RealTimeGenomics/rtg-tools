@@ -77,51 +77,51 @@ public class SamCommandHelperTest extends TestCase {
     }
   }
 
-    public void testSamRGErrors() throws IOException, InvalidParamsException {
-   final File outer = FileUtils.createTempDir("rammap", "end2end");
-   try {
+  public void testSamRGErrors() throws IOException, InvalidParamsException {
+    final File outer = FileUtils.createTempDir("rammap", "end2end");
+    try {
 
-       final File header = new File(outer, "header");
-       FileUtils.stringToFile("", header);
+      final File header = new File(outer, "header");
+      FileUtils.stringToFile("", header);
 
-       final MemoryPrintStream mps = new MemoryPrintStream();
-       Diagnostic.setLogStream(mps.printStream());
-       try {
-         try {
-           SamCommandHelper.validateAndCreateSamRG(header.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
-           fail();
-         } catch (final InvalidParamsException ipe) {
-           assertTrue(ipe.getMessage().contains("file \"" + header.getPath()));
+      final MemoryPrintStream mps = new MemoryPrintStream();
+      Diagnostic.setLogStream(mps.printStream());
+      try {
+        try {
+          SamCommandHelper.validateAndCreateSamRG(header.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
+          fail();
+        } catch (final InvalidParamsException ipe) {
+          assertTrue(ipe.getMessage().contains("file \"" + header.getPath()));
 //           assertTrue(mps.toString().contains("No read group information present in the input file \"" + header.getPath() + "\", please provide file with single read group line"));
-         }
-         assertNull(SamCommandHelper.validateAndCreateSamRG(header.toString(), SamCommandHelper.ReadGroupStrictness.OPTIONAL));
+        }
+        assertNull(SamCommandHelper.validateAndCreateSamRG(header.toString(), SamCommandHelper.ReadGroupStrictness.OPTIONAL));
 
-         final File header2 = new File(outer, "header2");
-         FileUtils.stringToFile("@RG\tID:L23\tSM:NA123" + "\n" + "@RG\tID:L43\tSM:NA123", header2);
+        final File header2 = new File(outer, "header2");
+        FileUtils.stringToFile("@RG\tID:L23\tSM:NA123" + "\n" + "@RG\tID:L43\tSM:NA123", header2);
 
-         final MemoryPrintStream mps2 = new MemoryPrintStream();
-         Diagnostic.setLogStream(mps2.printStream());
-         try {
-           SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
-           fail();
-         } catch (final InvalidParamsException ipe) {
-           assertTrue(ipe.getMessage().contains("file \"" + header2.getPath()));
+        final MemoryPrintStream mps2 = new MemoryPrintStream();
+        Diagnostic.setLogStream(mps2.printStream());
+        try {
+          SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
+          fail();
+        } catch (final InvalidParamsException ipe) {
+          assertTrue(ipe.getMessage().contains("file \"" + header2.getPath()));
 //           assertTrue(mps2.toString().contains("Multiple read group information present in the input file \"" + header2.getPath() + "\", please provide file with single read group line"));
-         }
-         try {
-           SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.AT_MOST_ONE);
-           fail();
-         } catch (final InvalidParamsException ipe) {
-           assertTrue(ipe.getMessage().contains("file \"" + header2.getPath()));
+        }
+        try {
+          SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.AT_MOST_ONE);
+          fail();
+        } catch (final InvalidParamsException ipe) {
+          assertTrue(ipe.getMessage().contains("file \"" + header2.getPath()));
 //           assertTrue(mps2.toString().contains("Multiple read group information present in the input file \"" + header2.getPath() + "\", please provide file with single read group line"));
-         }
-         assertNull(SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.OPTIONAL));
-       } finally {
-         Diagnostic.setLogStream();
-       }
-   } finally {
-     assertTrue(FileHelper.deleteAll(outer));
-   }
+        }
+        assertNull(SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.OPTIONAL));
+      } finally {
+        Diagnostic.setLogStream();
+      }
+    } finally {
+      assertTrue(FileHelper.deleteAll(outer));
+    }
   }
 
   public void testStrictnessEnum() {

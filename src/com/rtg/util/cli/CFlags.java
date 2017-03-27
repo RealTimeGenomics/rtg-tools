@@ -1349,11 +1349,11 @@ public final class CFlags {
   private void appendTableFlagUsage(StringBuilder sb, int usageWidth, String label, List<Flag<?>> flags) {
     if (flags.size() > 0) {
       final int descriptionLength = getUsageDescriptionLength(flags);
-      final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, Math.max(descriptionLength + 1, 100));
+      final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, Math.max(descriptionLength, 100));
       table.addHeading(label);
       for (Flag<?> flag : flags) {
         final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
-        final String desc = StringUtils.sentencify(flag.getUsageDescription());
+        final String desc = getTableUsageDescription(flag);
         table.addRow(
           shortFlag,
           "``" + flag.getFlagUsage() + "``",
@@ -1379,12 +1379,16 @@ public final class CFlags {
   private int getUsageDescriptionLength(List<Flag<?>> flags) {
     int longest = 0;
     for (Flag<?> flag : flags) {
-      final String s = flag.getUsageDescription();
+      final String s = getTableUsageDescription(flag);
       if (s.length() > longest) {
         longest = s.length();
       }
     }
     return longest;
+  }
+
+  private String getTableUsageDescription(Flag<?> flag) {
+    return StringUtils.sentencify(flag.getUsageDescription()).replaceAll("\"", "``");
   }
 
   List<Flag<?>> getDisplayable(final Flag.Level level) {

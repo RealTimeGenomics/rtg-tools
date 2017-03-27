@@ -52,7 +52,7 @@ public class BgZipTest extends AbstractCliTest {
         "Compress a file with block gzip",
         "--decompress", "file to (de)compress",
         "--stdout", "write on standard output, keep original files",
-        "--force", "force overwrite of output file");
+        "--force", "force overwrite of existing output file");
   }
 
   public void testCompress() throws Exception {

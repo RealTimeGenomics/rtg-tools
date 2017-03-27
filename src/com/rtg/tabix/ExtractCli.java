@@ -131,8 +131,8 @@ public class ExtractCli extends AbstractCli {
     region.setMaxCount(Integer.MAX_VALUE);
     flags.registerOptional(HEADER_FLAG, "print out header also").setCategory(CommonFlagCategories.REPORTING);
     flags.registerOptional(HEADER_ONLY_FLAG, "print out header only").setCategory(CommonFlagCategories.REPORTING);
-    flags.addRequiredSet();
     flags.addRequiredSet(region);
+    flags.addRequiredSet();
   }
 
   @Override

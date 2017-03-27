@@ -82,14 +82,16 @@ public final class SamCommandHelper {
    * @return true if all OK, false otherwise
    */
   public static boolean validateSamRg(CFlags flags) {
-    final String rg = (String) flags.getValue(SAM_RG);
-    final File in = new File(rg);
-    if (!in.exists() && rg.indexOf('\t') != -1) {
-      flags.setParseMessage("Given string \"" + rg + "\" for --" + SAM_RG + " contains literal tab characters, please use \\t instead");
-      return false;
-    } else if (in.isDirectory()) {
-      flags.setParseMessage("Given input file \"" + in.getPath() + "\" for --" + SAM_RG + " is a directory, must be a file");
-      return false;
+    if (flags.isSet(SAM_RG)) {
+      final String rg = (String) flags.getValue(SAM_RG);
+      final File in = new File(rg);
+      if (!in.exists() && rg.indexOf('\t') != -1) {
+        flags.setParseMessage("Given string \"" + rg + "\" for --" + SAM_RG + " contains literal tab characters, please use \\t instead");
+        return false;
+      } else if (in.isDirectory()) {
+        flags.setParseMessage("Given input file \"" + in.getPath() + "\" for --" + SAM_RG + " is a directory, must be a file");
+        return false;
+      }
     }
     return true;
   }

@@ -48,7 +48,6 @@ import com.rtg.sam.SamCommandHelper;
 import com.rtg.util.Constants;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -86,11 +85,11 @@ public final class Cg2Sdf extends LoggedCli {
     mFlags.setDescription("Converts Complete Genomics sequencing system reads to RTG SDF format.");
     CommonFlagCategories.setCategories(mFlags);
 
-    final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, "file in Complete Genomics format");
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.FILE, "file in Complete Genomics TSV format");
     inFlag.setMinCount(0);
     inFlag.setMaxCount(Integer.MAX_VALUE);
     inFlag.setCategory(INPUT_OUTPUT);
-    final Flag<File> list = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "file containing a list of Complete Genomics files (1 per line)").setCategory(INPUT_OUTPUT);
+    final Flag<File> list = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "file containing a list of Complete Genomics TSV files (1 per line)").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.SDF, "name of output SDF").setCategory(INPUT_OUTPUT);
 
     mFlags.registerOptional(MAXIMUM_NS, Integer.class, CommonFlags.INT, "maximum number of Ns allowed in either side for a read", 5).setCategory(FILTERING);
@@ -100,33 +99,16 @@ public final class Cg2Sdf extends LoggedCli {
     SamCommandHelper.initSamRg(mFlags, "COMPLETE", UTILITY);
     mFlags.addRequiredSet(inFlag);
     mFlags.addRequiredSet(list);
-    mFlags.setValidator(VALIDATOR);
+    mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
+      && CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)
+      && flags.checkInRange(MAXIMUM_NS, 0, Integer.MAX_VALUE)
+      && SamCommandHelper.validateSamRg(flags));
   }
 
   @Override
   protected File outputDirectory() {
     return (File) mFlags.getValue(CommonFlags.OUTPUT_FLAG);
   }
-
-  private static final Validator VALIDATOR = flags -> {
-
-    if (!CommonFlags.validateOutputDirectory(flags)) {
-      return false;
-    }
-
-    if (!CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)) {
-      return false;
-    }
-
-    if (0 > (Integer) flags.getValue(MAXIMUM_NS)) {
-      Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + MAXIMUM_NS, flags.getValue(MAXIMUM_NS).toString(), "0");
-      return false;
-    }
-    if (flags.isSet(SamCommandHelper.SAM_RG) && !SamCommandHelper.validateSamRg(flags)) {
-      return false;
-    }
-    return true;
-  };
 
   static String getBaseInputPath(final File inputFile) {
     String name = inputFile.getPath();

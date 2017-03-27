@@ -200,8 +200,8 @@ public class ReadSimCli extends LoggedCli {
     mFlags.registerOptional('q', QUAL_RANGE, String.class, CommonFlags.STRING, "set the range of base quality values permitted e.g.: 3-40 (Default is fixed qualities corresponding to overall machine base error rate)").setCategory(UTILITY);
 
     //reduce wastage
-    mFlags.registerOptional(NO_NAMES, "do not create read names in result sdf").setCategory(UTILITY);
-    mFlags.registerOptional(NO_QUAL, "do not create read qualities in result sdf").setCategory(UTILITY);
+    mFlags.registerOptional(NO_NAMES, "do not create read names in the output SDF").setCategory(UTILITY);
+    mFlags.registerOptional(NO_QUAL, "do not create read qualities in the output SDF").setCategory(UTILITY);
 
     // Override rate options
     mFlags.registerOptional(MNP_EVENT_RATE, Double.class, CommonFlags.FLOAT, "override the overall MNP event rate in the priors").setCategory(UTILITY);
