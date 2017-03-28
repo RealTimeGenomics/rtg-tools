@@ -51,16 +51,16 @@ public class ProgressStats implements MonStats {
 
   @Override
   public void addColumnLabelsTop(Appendable out) throws IOException {
-    out.append("Current ");
+    out.append(" Current ");
   }
 
   @Override
   public void addColumnLabelsBottom(Appendable out) throws IOException {
-    out.append("progress");
+    out.append(" progress");
   }
 
   @Override
   public void addColumnData(Appendable out) throws IOException {
-    out.append(Diagnostic.lastProgress());
+    out.append(' ').append(Diagnostic.lastProgress());
   }
 }

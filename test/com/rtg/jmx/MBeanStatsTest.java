@@ -43,7 +43,7 @@ public class MBeanStatsTest extends TestCase {
     final MBeanStats ds = new MBeanStats();
     final StringBuffer sb = new StringBuffer();
     ds.addHeader(sb);
-    assertEquals(8, sb.toString().split(LS).length);
+    assertTrue(sb.toString().split(LS).length >= 6); // SunOS bits may not be present, and may have variable number of GC beans
   }
 }
 

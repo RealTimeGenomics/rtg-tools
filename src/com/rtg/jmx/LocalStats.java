@@ -36,15 +36,38 @@ import java.io.PrintStream;
 
 /**
  * Set up a separate stats monitoring thread from within the same JVM
- * as SLIM.
- *
+ * as RTG.
  */
 public final class LocalStats {
 
+  /*
+
+   Quick start:
+
+   Monitor what's going on in the JVM via JMX to a file.
+   There is a small (~2%) performance penalty when jmx monitoring is enabled.
+
+   Enable jmx monitoring by setting one of the following (e.g. via RTG_JAVA_OPTS):
+     -Drtg.jmxmon=outdir   sends monitor output to jmxmon.txt in the rtg command output directory
+     -Drtg.jmxmon=userdir  sends monitor output to jmxmon.UNIQUEID.txt in the current directory
+     -Drtg.jmxmon=stderr   sends monitor output to stderr
+     -Drtg.jmxmon=stdout   sends monitor output to stdout
+     -Drtg.jmxmon=filename sends monitor output to the specified file
+
+  Disk monitoring (requires /usr/bin/iostat): use -Drtg.jxmmon.disk=sda,sdb etc to customize the disks to monitor
+
+  Ethernet monitoring (requires /sbin/ifconfig): use -Drtg.jxmmon.disk=eth0,eth1 etc to customize the network interfaces to monitor
+
+   */
+
   /** Name of property specifying monitor output destination */
   public static final String MON_DEST = "rtg.jmxmon";
+
   /** Destination specifier for within output directory */
   public static final String MON_DEST_OUTDIR = "outdir";
+
+  /** Destination specifier for within current user directory */
+  private static final String MON_DEST_USERDIR = "userdir";
 
   /** Delay in seconds between updates */
   private static final int MON_DELAY = Integer.parseInt(System.getProperty("rtg.jmxmon.delay", "10"));
@@ -53,7 +76,7 @@ public final class LocalStats {
   private static final String MON_DISK = System.getProperty("rtg.jmxmon.disk", "sda");
 
   /** Comma separated list of network interfaces to monitor */
-  private static final String MON_NET = System.getProperty("rtg.jmxmon.net", "eth0");
+  private static final String MON_NET = System.getProperty("rtg.jmxmon.net", "eth0,enp2s0");
 
 
   private static RecordStats sStats = null;
@@ -82,15 +105,24 @@ public final class LocalStats {
     if (dest != null) {
       try {
         final PrintStream monout;
-        if (dest.equals("auto")) {
-          monout = new PrintStream(new FileOutputStream(File.createTempFile("jmxmon", ".txt", new File(System.getProperty("user.dir")))), true);
-        } else if (dest.equals("err")) {
-          monout = System.err;
-        } else if (dest.equals("outdir")) {
-          System.err.println("Output directory has not been set");
-          throw new IOException();
-        } else {
-          monout = new PrintStream(new File(dest));
+        switch (dest) {
+          case "err":
+          case "stderr":
+            monout = System.err;
+            break;
+          case "out":
+          case "stdout":
+            monout = System.out;
+            break;
+          case MON_DEST_USERDIR:
+            monout = new PrintStream(new FileOutputStream(File.createTempFile("jmxmon", ".txt", new File(System.getProperty("user.dir")))), true);
+            break;
+          case MON_DEST_OUTDIR:
+            System.err.println("Output directory has not been set");
+            throw new IOException();
+          default:
+            monout = new PrintStream(new File(dest));
+            break;
         }
         rs = new RecordStats(monout, delay * 1000);
         rs.addStats(new MBeanStats());

@@ -34,6 +34,7 @@ import static com.rtg.jmx.MonUtils.NF1;
 import static com.rtg.jmx.MonUtils.NF2;
 
 import java.io.IOException;
+import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
@@ -41,6 +42,7 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.rtg.util.Constants;
@@ -71,12 +73,14 @@ public class MBeanStats implements MonStats {
   private final RuntimeMXBean mRBean;
   private final ThreadMXBean mTBean;
   private final OperatingSystemMXBean mOBean;
+  private final List<GarbageCollectorMXBean> mGcBean;
 
   MBeanStats() {
     mMBean = ManagementFactory.getMemoryMXBean();
     mRBean = ManagementFactory.getRuntimeMXBean();
     mTBean = ManagementFactory.getThreadMXBean();
     mOBean = ManagementFactory.getOperatingSystemMXBean();
+    mGcBean = ManagementFactory.getGarbageCollectorMXBeans();
   }
 
   private long getSunOsValue(String method) {
@@ -103,15 +107,26 @@ public class MBeanStats implements MonStats {
     out.append("# Heap-init    = ").append(NF2.format(mMBean.getHeapMemoryUsage().getInit() / GB)).append(" GB").append(LS);
     out.append("# Nonheap-max  = ").append(NF2.format(mMBean.getNonHeapMemoryUsage().getMax() / GB)).append(" GB").append(LS);
     out.append("# Nonheap-init = ").append(NF2.format(mMBean.getNonHeapMemoryUsage().getInit() / GB)).append(" GB").append(LS);
+
+    for (int i = 0; i < mGcBean.size(); i++) {
+      final GarbageCollectorMXBean gc = mGcBean.get(i);
+      out.append("# GC-").append(String.valueOf(i)).append(" = ").append(gc.getName()).append(LS);
+    }
   }
 
   @Override
   public void addColumnLabelsTop(Appendable out) throws IOException {
-    out.append("---Up");
+    out.append(" ---Up");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append(" ------OS-mem-----");
     }
-    out.append(" ---Heap---- -Non-heap-- -Thrd ---OS");
+    out.append(" ---Heap---- -Non-heap--");
+
+    for (int i = 0; i < mGcBean.size(); i++) {
+      out.append(" ---GC-").append(String.valueOf(i)).append("----");
+    }
+
+    out.append(" -Thrd ---OS");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append(" ---CPU");
     }
@@ -119,11 +134,17 @@ public class MBeanStats implements MonStats {
 
   @Override
   public void addColumnLabelsBottom(Appendable out) throws IOException {
-    out.append(" secs");
+    out.append("  secs");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append("  comm   mem  swap");
     }
-    out.append("  comm  used  comm  used count  load");
+    out.append("  comm  used  comm  used");
+
+    for (int i = 0; i < mGcBean.size(); i++) {
+      out.append(" count  time");
+    }
+
+    out.append(" count  load");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append("   time");
     }
@@ -132,6 +153,7 @@ public class MBeanStats implements MonStats {
   @Override
   public void addColumnData(Appendable out) throws IOException {
     final int width = 5;
+    out.append(" ");
     MonUtils.pad(out, "" + mRBean.getUptime() / 1000, 5); // Seconds
 
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
@@ -151,8 +173,18 @@ public class MBeanStats implements MonStats {
     MonUtils.pad(out, NF2.format(mMBean.getNonHeapMemoryUsage().getCommitted() / GB), width);
     out.append(" ");
     MonUtils.pad(out, NF2.format(mMBean.getNonHeapMemoryUsage().getUsed() / GB), width);
+
+    for (GarbageCollectorMXBean gc : mGcBean) {
+      out.append(" ");
+      MonUtils.pad(out, "" + gc.getCollectionCount(), width);
+      out.append(" ");
+      MonUtils.pad(out, "" + gc.getCollectionTime(), width);
+    }
+
     out.append(" ");
     MonUtils.pad(out, "" + mTBean.getThreadCount(), width);
+
+
     out.append(" ");
     MonUtils.pad(out, NF1.format(mOBean.getSystemLoadAverage()), width);
 

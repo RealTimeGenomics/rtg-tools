@@ -73,25 +73,35 @@ public class RecordStats implements Runnable {
   }
 
   void addColumnLabels() throws IOException {
-    mOut.append("#");
-    for (MonStats s : mStats) {
-      mOut.append(" ");
-      s.addColumnLabelsTop(mOut);
-    }
+    final String top = getColumnLabelsTop();
+    mOut.append(top).append(LS);
+    final String bot = getColumnLabelsBottom();
+    mOut.append(bot).append(LS);
+    MonUtils.padRight(mOut, "# ", Math.max(top.length(), bot.length()), '=');
     mOut.append(LS);
-    mOut.append("#");
+  }
+
+  private String getColumnLabelsTop() throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("#");
     for (MonStats s : mStats) {
-      mOut.append(" ");
-      s.addColumnLabelsBottom(mOut);
+      s.addColumnLabelsTop(sb);
     }
-    mOut.append(LS);
-    mOut.append("#=============================================================================================================================").append(LS);
+    return sb.toString();
+  }
+
+  private String getColumnLabelsBottom() throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("#");
+    for (MonStats s : mStats) {
+      s.addColumnLabelsBottom(sb);
+    }
+    return sb.toString();
   }
 
   void addColumnData() throws IOException {
     mOut.append(" ");
     for (MonStats s : mStats) {
-      mOut.append(" ");
       s.addColumnData(mOut);
     }
     mOut.append(LS);

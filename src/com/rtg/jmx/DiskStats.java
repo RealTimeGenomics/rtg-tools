@@ -41,7 +41,7 @@ public class DiskStats extends ExternalCommand implements MonStats {
 
   private static final String IO_STAT = "/usr/bin/iostat";
   private static final String NA = "n/a";
-  private static final String HEADERBOT = " r/s  w/s  rMB/s  wMB/s  %util";
+  private static final String HEADERBOT = "  r/s  w/s  rMB/s  wMB/s  %util";
 
   private final String mDisk;
 
@@ -74,7 +74,7 @@ public class DiskStats extends ExternalCommand implements MonStats {
     if (!mEnabled) {
       return;
     }
-    MonUtils.padRight(out, "---Disk-" + mDisk, HEADERBOT.length(), '-');
+    MonUtils.padRight(out, " ---Disk-" + mDisk, HEADERBOT.length(), '-');
   }
 
   @Override
@@ -111,6 +111,7 @@ public class DiskStats extends ExternalCommand implements MonStats {
       }
     }
     final int width = 6;
+    out.append(" ");
     MonUtils.pad(out, rs, 4);
     out.append(" ");
     MonUtils.pad(out, ws, 4);

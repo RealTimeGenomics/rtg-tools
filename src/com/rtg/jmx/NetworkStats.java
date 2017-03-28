@@ -41,7 +41,7 @@ import com.rtg.util.Constants;
 public class NetworkStats extends ExternalCommand implements MonStats {
 
   private static final String IFCONFIG = "/sbin/ifconfig";
-  private static final String HEADERBOT = "txMB/s rxMB/s";
+  private static final String HEADERBOT = " txMB/s rxMB/s";
   private static final String NA = "n/a";
   private static final double MB = Constants.MB; // Convert to double
 
@@ -75,7 +75,7 @@ public class NetworkStats extends ExternalCommand implements MonStats {
     if (!mEnabled) {
       return;
     }
-    MonUtils.padRight(out, "--Net-" + mInterface, HEADERBOT.length(), '-');
+    MonUtils.padRight(out, " --Net-" + mInterface, HEADERBOT.length(), '-');
   }
 
   @Override
@@ -116,6 +116,7 @@ public class NetworkStats extends ExternalCommand implements MonStats {
         }
       }
     }
+    out.append(" ");
     MonUtils.pad(out, txs, 6);
     out.append(" ");
     MonUtils.pad(out, rxs, 6);
