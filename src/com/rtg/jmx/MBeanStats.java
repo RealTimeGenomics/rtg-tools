@@ -94,6 +94,17 @@ public class MBeanStats implements MonStats {
     }
   }
 
+  private double getSunOsDoubleValue(String method) {
+    try {
+      final Method m1 = OPERATING_SYSTEM_MX_BEAN_CLASS.getMethod(method, (Class<?>[]) null);
+      return (Double) m1.invoke(mOBean, (Object[]) null);
+    } catch (final IllegalAccessException | InvocationTargetException e) {
+      throw new RuntimeException(e);
+    } catch (final NoSuchMethodException e) {
+      throw new IllegalStateException();
+    }
+  }
+
   @Override
   public void addHeader(Appendable out) throws IOException {
     out.append("# Start-time   = ").append(String.valueOf(new java.util.Date(mRBean.getStartTime()))).append(LS);
@@ -110,7 +121,7 @@ public class MBeanStats implements MonStats {
 
     for (int i = 0; i < mGcBean.size(); i++) {
       final GarbageCollectorMXBean gc = mGcBean.get(i);
-      out.append("# GC-").append(String.valueOf(i)).append(" = ").append(gc.getName()).append(LS);
+      out.append("# GC-").append(String.valueOf(i)).append("         = ").append(gc.getName()).append(LS);
     }
   }
 
@@ -126,9 +137,12 @@ public class MBeanStats implements MonStats {
       out.append(" ---GC-").append(String.valueOf(i)).append("----");
     }
 
-    out.append(" -Thrd ---OS");
+    out.append(" -Thrd");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
-      out.append(" ---CPU");
+      out.append(" -----CPU-----");
+      out.append(" ---OS-CPU---");
+    } else {
+      out.append(" ---OS");
     }
   }
 
@@ -144,10 +158,13 @@ public class MBeanStats implements MonStats {
       out.append(" count  time");
     }
 
-    out.append(" count  load");
+    out.append(" count");
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append("   time");
+      out.append("   cpu%");
+      out.append("   cpu%");
     }
+    out.append("  load");
   }
 
   @Override
@@ -178,19 +195,23 @@ public class MBeanStats implements MonStats {
       out.append(" ");
       MonUtils.pad(out, "" + gc.getCollectionCount(), width);
       out.append(" ");
-      MonUtils.pad(out, "" + gc.getCollectionTime(), width);
+      MonUtils.pad(out, "" + gc.getCollectionTime() / 1000, width);
     }
 
     out.append(" ");
     MonUtils.pad(out, "" + mTBean.getThreadCount(), width);
 
+    if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
+      out.append(" ");
+      MonUtils.pad(out, NF0.format(getSunOsValue("getProcessCpuTime") / BILLION), width + 1);
+      out.append(" ");
+      MonUtils.pad(out, NF1.format(getSunOsDoubleValue("getProcessCpuLoad") * 100), width + 1);
+      out.append(" ");
+      MonUtils.pad(out, NF1.format(getSunOsDoubleValue("getSystemCpuLoad") * 100), width + 1);
+    }
 
     out.append(" ");
     MonUtils.pad(out, NF1.format(mOBean.getSystemLoadAverage()), width);
 
-    if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
-      out.append(" ");
-      MonUtils.pad(out, NF0.format(getSunOsValue("getProcessCpuTime") / BILLION), width + 1);
-    }
   }
 }

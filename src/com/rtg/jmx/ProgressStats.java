@@ -45,7 +45,7 @@ public class ProgressStats implements MonStats {
   public void addHeader(Appendable out) throws IOException {
     final String cl = CommandLine.getCommandLine();
     if (cl != null) {
-      out.append("# Command line = ").append(cl).append(LS);
+      out.append("# Command-line = ").append(cl).append(LS);
     }
   }
 

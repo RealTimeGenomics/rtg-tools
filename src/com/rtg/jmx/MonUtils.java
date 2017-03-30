@@ -46,12 +46,15 @@ public final class MonUtils {
   // Formatter with 2 fraction digits
   static final NumberFormat NF2 = NumberFormat.getInstance();
   static {
+    NF0.setGroupingUsed(false);
     NF0.setMinimumIntegerDigits(1);
     NF0.setMaximumFractionDigits(0);
     NF0.setMinimumFractionDigits(0);
+    NF1.setGroupingUsed(false);
     NF1.setMinimumIntegerDigits(1);
     NF1.setMaximumFractionDigits(1);
     NF1.setMinimumFractionDigits(1);
+    NF2.setGroupingUsed(false);
     NF2.setMinimumIntegerDigits(1);
     NF2.setMaximumFractionDigits(2);
     NF2.setMinimumFractionDigits(2);

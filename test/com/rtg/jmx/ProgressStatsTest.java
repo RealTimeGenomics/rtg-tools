@@ -44,7 +44,7 @@ public class ProgressStatsTest extends TestCase {
     final StringBuffer sb = new StringBuffer();
     CommandLine.setCommandArgs("a", "simple", "command", "line");
     ds.addHeader(sb);
-    assertTrue(sb.toString().startsWith("# Command line "));
+    assertTrue(sb.toString().startsWith("# Command-line "));
     assertTrue(sb.toString().contains("a simple command line"));
   }
 }
