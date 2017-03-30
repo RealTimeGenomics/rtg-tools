@@ -41,6 +41,8 @@ import com.rtg.util.io.TestDirectory;
  */
 public class PedStatsCliTest extends AbstractCliTest {
 
+  private static final String RESOURCE_DIR = "com/rtg/relation/resources/";
+
   @Override
   protected AbstractCli getCli() {
     return new PedStatsCli();
@@ -70,7 +72,16 @@ public class PedStatsCliTest extends AbstractCliTest {
     }
   }
 
-  private static final String RESOURCE_DIR = "com/rtg/relation/resources/";
+  public void testDotAlt() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("pedstats")) {
+      final File relationFile = new File(dir, "octet.ped");
+      FileUtils.copyResource(RESOURCE_DIR + "octet.ped", relationFile);
+      final File propsFile = new File(dir, "dot.properties");
+      FileUtils.copyResource(RESOURCE_DIR + "dot.properties", propsFile);
+      final String output = checkMainInitOk("--dot", "My Title", "--Xdot-properties", propsFile.toString(), relationFile.toString());
+      mNano.check("pedstats-todot-alt.txt", output);
+    }
+  }
 
   public void testIds() throws IOException {
     try (final TestDirectory dir = new TestDirectory("pedstats")) {

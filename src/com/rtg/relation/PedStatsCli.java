@@ -30,11 +30,14 @@
 package com.rtg.relation;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import com.rtg.launcher.AbstractCli;
@@ -61,6 +64,7 @@ public class PedStatsCli extends AbstractCli {
   private static final String DUMP = "Xdump";
   private static final String FAMILY_FLAGS = "Xfamily-flags";
   private static final String ORDERING = "Xordering";
+  private static final String DOT_PROPERTIES = "Xdot-properties";
 
   @Override
   public String moduleName() {
@@ -96,6 +100,7 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(DUMP, "dump full relationships structure").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILY_FLAGS, "output command-line flags for family caller").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(ORDERING, "output family processing order for use during forward backward algorithm").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_PROPERTIES, File.class, CommonFlags.FILE, "properties file containing overrides for GraphViz attributes").setCategory(CommonFlagCategories.REPORTING);
 
     mFlags.checkAtMostOne(PRIMARY_IDS, MALE_IDS, FEMALE_IDS, PATERNAL_IDS, MATERNAL_IDS, FAMILIES_OUT, DOT_OUT, DUMP, ORDERING, FAMILY_FLAGS);
   }
@@ -104,6 +109,16 @@ public class PedStatsCli extends AbstractCli {
     for (String genome : genomes) {
       w.writeln(genome);
     }
+  }
+
+  private Properties loadProperties() throws IOException {
+    final Properties props = new Properties();
+    if (mFlags.isSet(DOT_PROPERTIES)) {
+      try (Reader r = new FileReader((File) mFlags.getValue(DOT_PROPERTIES))) {
+        props.load(r);
+      }
+    }
+    return props;
   }
 
   @Override
@@ -115,7 +130,7 @@ public class PedStatsCli extends AbstractCli {
       try {
 
         if (mFlags.isSet(DOT_OUT)) {      // Output dotty stuff
-          w.writeln(pedigree.toGraphViz((String) mFlags.getValue(DOT_OUT), mFlags.isSet(DOT_SIMPLE)));
+          w.writeln(pedigree.toGraphViz(loadProperties(), (String) mFlags.getValue(DOT_OUT), mFlags.isSet(DOT_SIMPLE)));
         } else if (mFlags.isSet(PRIMARY_IDS)) {
           writeIds(w, pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)));
         } else if (mFlags.isSet(MALE_IDS)) {

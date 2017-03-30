@@ -89,9 +89,6 @@ public class GenomeRelationships {
    */
   public static final String PRIMARY_GENOME_PROPERTY = "primary-genome";
 
-  // Node properties used for hidden nodes (e.g. marriage, child fan-out) in dotty output
-  private static final String INVIS_NODE = " [shape=point,style=filled,label=\"\",height=.001,width=.001];\n";
-
   private final Collection<String> mGenomes;
   private final Map<String, Properties> mGenomeProperties;
   private final MultiMap<String, Relationship> mRelationships;
@@ -344,13 +341,33 @@ public class GenomeRelationships {
    * in some kind of relationship are shown. Families where both parents are known are denoted with
    * a node representing the marriage, to better group offspring from the same parents. Diseased
    * status is indicated with afflicted individuals show in grey.
+   * @param props Properties object containing overrides for how to draw the nodes etc.
    * @param title the text to use as the graph title
    * @param simpleLayout if true, use a layout that looks less traditional, but which dot doesn't render very well with large complex pedigrees
    * @return the <code>graphviz</code> output
    */
-  String toGraphViz(final String title, boolean simpleLayout) {
+  String toGraphViz(Properties props, final String title, boolean simpleLayout) {
+    final String invisNode = " " + props.getProperty("invisible.node", "[shape=point,style=filled,label=\"\",height=.001,width=.001]") + ";\n";
+    final String font = props.getProperty("font", "");
+    final String color = props.getProperty("color", "");
+    final String gradientangle = props.getProperty("gradientangle", "270");
+    final String maleShape = props.getProperty("male.shape", "box");
+    final String femaleShape = props.getProperty("male.shape", "oval");
+    final String unknownShape = props.getProperty("male.shape", "diamond");
+    final String maleFill = props.getProperty("male.fill", "skyblue");
+    final String femaleFill = props.getProperty("female.fill", "pink");
+    final String unknownFill = props.getProperty("unknown.fill", "none");
+    final String diseaseFill = props.getProperty("disease.fill", "grey");
+
     final StringBuilder sb = new StringBuilder();
-    sb.append("digraph Ped {\n" + "  ratio =\"auto\";\n" + "  mincross = 2.0;\n" + "  labelloc = \"t\";\n" + "  label=\"").append(title).append("\";\n").append("\n");
+    sb.append("digraph Ped {\n"
+      + "  graph [fontname = \"" + font + "\", color=\"" + color + "\"];\n"
+      + "  node [fontname = \"" + font + "\", color=\"" + color + "\", gradientangle=\"" + gradientangle + "\"];\n"
+      + "  edge [fontname = \"" + font + "\", color=\"" + color + "\"];\n"
+      + "  ratio =\"auto\";\n"
+      + "  mincross = 2.0;\n"
+      + "  labelloc = \"t\";\n"
+      + "  label=\"").append(title).append("\";\n").append("\n");
 
     final HashSet<Relationship> seen = new HashSet<>();
     final HashSet<String> seenGenomes = new LinkedHashSet<>();
@@ -358,7 +375,7 @@ public class GenomeRelationships {
 
     // Output family specific stuff (i.e. node representing a marriage, with children coming off that)
     try {
-      for (final Family family : Family.getFamilies(this, false, null)) {
+      for (final Family family : Family.getFamilies(this, true, null)) {
         seenGenomes.add(family.getFather());
         seenGenomes.add(family.getMother());
         final String fatherId = nodeId(nodeIds, family.getFather());
@@ -370,18 +387,18 @@ public class GenomeRelationships {
           sb.append("  {\n");
           sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
           sb.append("    ").append(motherId).append(" -> ").append(marriageId).append(" [dir=none];\n");
-          sb.append("    ").append(marriageId).append(INVIS_NODE);
+          sb.append("    ").append(marriageId).append(invisNode);
           sb.append("  }\n");
         } else {
           // We can use a layout that looks nicer, but doesn't work well with large complex pedigrees
           sb.append("  {\n");
           sb.append("    rank = same;\n");
           sb.append("    ").append(fatherId).append(" -> ").append(marriageId).append("b [dir=none];\n");
-          sb.append("    ").append(marriageId).append("b").append(INVIS_NODE);
+          sb.append("    ").append(marriageId).append("b").append(invisNode);
           sb.append("    ").append(marriageId).append("b -> ").append(motherId).append(" [dir=none];\n");
           sb.append("  }\n");
           sb.append("  ").append(marriageId).append("b -> ").append(marriageId).append(" [dir=none];\n");
-          sb.append("  ").append(marriageId).append(INVIS_NODE);
+          sb.append("  ").append(marriageId).append(invisNode);
 
           if (family.getChildren().length > 1) {
             sb.append("  {\n");
@@ -390,7 +407,7 @@ public class GenomeRelationships {
             final String[] c2 = Arrays.copyOf(family.getChildren(), family.getChildren().length + 1);
             for (int i = 0; i < c2.length - 1; i++) {
               c2[i] = nodeId(nodeIds, c2[i]) + "b";
-              sb.append("  ").append(c2[i]).append(INVIS_NODE);
+              sb.append("  ").append(c2[i]).append(invisNode);
             }
             final int cpos = (c2.length - 1) / 2;
             System.arraycopy(c2, cpos, c2, cpos + 1, c2.length - 1 - cpos);
@@ -435,19 +452,20 @@ public class GenomeRelationships {
     // Output genome nodes
     for (final String genome : seenGenomes) {
       final Sex s = getSex(genome);
-      String style = "";
+      String style;
       final String shape;
       if (s == Sex.MALE) {
-        shape = ", shape=box";
-        style = ", style=filled, fillcolor=skyblue";
+        shape = ", shape=\"" + maleShape + "\"";
+        style = ", style=filled, fillcolor=\"" + maleFill + "\"";
       } else if (s == Sex.FEMALE) {
-        shape = ", shape=oval";
-        style = ", style=filled, fillcolor=pink";
+        shape = ", shape=\"" + femaleShape + "\"";
+        style = ", style=filled, fillcolor=\"" + femaleFill + "\"";
       } else {
-        shape = ", shape=diamond";
+        shape = ", shape=\"" + unknownShape + "\"";
+        style = ", style=filled, fillcolor=\"" + unknownFill + "\"";
       }
       if (isDiseased(genome)) {
-        style = ", style=filled, fillcolor=grey";
+        style = ", style=filled, fillcolor=\"" + diseaseFill + "\"";
       }
       sb.append("  ").append(nodeId(nodeIds, genome)).append(" [label=\"").append(genome).append("\"").append(shape).append(style).append("];\n");
     }
