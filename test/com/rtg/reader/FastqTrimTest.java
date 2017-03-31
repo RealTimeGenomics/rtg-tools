@@ -40,6 +40,7 @@ import com.rtg.util.NullStreamUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.TestDirectory;
+import com.rtg.util.test.FileHelper;
 
 /**
  */
@@ -146,6 +147,25 @@ public class FastqTrimTest  extends AbstractCliTest {
 
   }
 
+  public void testEndToEnd() throws IOException {
+    try (TestDirectory dir = new TestDirectory("fastqtrim")) {
+      final File fqIn = new File(dir, "reads50_R1.gz");
+      FileHelper.resourceToGzFile("com/rtg/reader/resources/reads50_R1.fastq", fqIn);
+
+      final File out1 = new File(dir, "readsout1.fastq");
+      checkMainInitOk("-i", fqIn.toString(), "-o", out1.toString(), "-Z", "--trim-start-bases=30", "--trim-end-bases=30");
+      mNano.check("fastqtrim-e2e-trim.fastq", FileHelper.fileToString(out1));
+
+      final File out2 = new File(dir, "readsout2.fastq");
+      checkMainInitOk("-i", fqIn.toString(), "-o", out2.toString(), "-Z", "--trim-start-bases=30", "--trim-end-bases=30", "--discard-empty-reads");
+      mNano.check("fastqtrim-e2e-trim-drop.fastq", FileHelper.fileToString(out2));
+
+      final File out3 = new File(dir, "readsout3.fastq");
+      checkMainInitOk("-i", fqIn.toString(), "-o", out3.toString(), "-Z", "--reverse-complement");
+      mNano.check("fastqtrim-e2e-rc.fastq", FileHelper.fileToString(out3));
+
+    }
+  }
 
   public void checkTrimmer(FastqSequence seq, String expected, ReadTrimmer trimmer) {
     seq.trim(trimmer);

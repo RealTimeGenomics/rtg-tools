@@ -106,7 +106,7 @@ public final class FastqTrim extends AbstractCli {
     mFlags.registerOptional('s', TRIM_START_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read start", 0).setCategory(FILTERING);
     mFlags.registerOptional('e', TRIM_END_FLAG, Integer.class, CommonFlags.INT, "always trim the specified number of bases from read end", 0).setCategory(FILTERING);
     CommonFlags.initMinReadLength(mFlags);
-    mFlags.registerOptional(DISCARD_EMPTY_READS, "discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
+    mFlags.registerOptional(DISCARD_EMPTY_READS, "if set, discard reads that have zero length after trimming. Should not be used with paired-end data").setCategory(FILTERING);
 
     mFlags.registerOptional('r', REVERSE_FLAG, "if set, output in reverse complement").setCategory(UTILITY);
     CommonFlags.initThreadsFlag(mFlags);
@@ -123,6 +123,7 @@ public final class FastqTrim extends AbstractCli {
         && innerFlags.checkInRange(END_TRIM_THRESHOLD, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_START_FLAG, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(TRIM_END_FLAG, 0, Integer.MAX_VALUE)
+        && innerFlags.checkInRange(MIN_READ_LENGTH, 0, Integer.MAX_VALUE)
         && innerFlags.checkInRange(SUBSAMPLE_FLAG, 0.0, 1.0)
     );
   }
