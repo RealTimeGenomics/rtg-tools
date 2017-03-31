@@ -83,7 +83,7 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
       checkHandleFlagsErr(flagStrings);
       ReaderTestUtils.getDNADir(">t" + StringUtils.LS + "ACGT" + StringUtils.LS, template);
 
-      TestUtils.containsAllUnwrapped(checkHandleFlagsErr( "-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
         "--output-mode", "combine", "--sample", "ALT"), "--output-mode=combine cannot be used");
 
       checkHandleFlags(flagStrings);
