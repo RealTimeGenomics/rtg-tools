@@ -186,10 +186,19 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && CommonFlags.validateRegions(flags)
       && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
       && validateScoreField(flags)
-      && validatePairedFlag(flags, OBEY_PHASE, "phase type")
-      && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validatePairedFlag(flags, SAMPLE, "sample name")
-      && validatePairedFlag(flags, OBEY_PHASE, "phase type"));
+      && validatePairedFlag(flags, OBEY_PHASE, "phase type")
+      && validateModeSample(flags)
+    );
+  }
+
+  private static boolean validateModeSample(CFlags flags) {
+    final String mode = (String) flags.getValue(OUTPUT_MODE);
+    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains("ALT") && (mode.equals(VcfEvalTask.MODE_COMBINE) || mode.equals(VcfEvalTask.MODE_GA4GH))) {
+      flags.setParseMessage("--" + OUTPUT_MODE + "=combine cannot be used when either sample is ALT");
+      return false;
+    }
+    return true;
   }
 
   /**

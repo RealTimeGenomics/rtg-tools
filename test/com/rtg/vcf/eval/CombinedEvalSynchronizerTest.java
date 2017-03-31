@@ -44,6 +44,11 @@ public class CombinedEvalSynchronizerTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_combine2", false, "--sample", "sample1,sample2", "--ref-overlap", "--output-mode", "combine", "--squash-ploidy");
   }
 
+  // This is not currently possible, as when either sample is ALT, there is no sample column to combine
+//  public void testCombined3() throws IOException, UnindexableDataException {
+//    endToEnd("vcfeval_combine2", false, "--sample", "sample1,ALT", "--ref-overlap", "--output-mode", "combine", "--squash-ploidy");
+//  }
+
   public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     endToEnd(id, new String[] {"output.vcf"}, expectWarn, args);
   }
