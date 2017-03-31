@@ -175,21 +175,21 @@ public class MBeanStats implements MonStats {
 
     if (OPERATING_SYSTEM_MX_BEAN_CLASS != null) {
       out.append(" ");
-      MonUtils.pad(out, NF2.format(getSunOsValue("getCommittedVirtualMemorySize") / GB), width);
+      MonUtils.pad(out, NF1.format(getSunOsValue("getCommittedVirtualMemorySize") / GB), width);
       out.append(" ");
-      MonUtils.pad(out, NF2.format(getSunOsValue("getFreePhysicalMemorySize") / GB), width);
+      MonUtils.pad(out, NF1.format(getSunOsValue("getFreePhysicalMemorySize") / GB), width);
       out.append(" ");
-      MonUtils.pad(out, NF2.format(getSunOsValue("getFreeSwapSpaceSize") / GB), width);
+      MonUtils.pad(out, NF1.format(getSunOsValue("getFreeSwapSpaceSize") / GB), width);
     }
 
     out.append(" ");
-    MonUtils.pad(out, NF2.format(mMBean.getHeapMemoryUsage().getCommitted() / GB), width);
+    MonUtils.pad(out, NF1.format(mMBean.getHeapMemoryUsage().getCommitted() / GB), width);
     out.append(" ");
-    MonUtils.pad(out, NF2.format(mMBean.getHeapMemoryUsage().getUsed() / GB), width);
+    MonUtils.pad(out, NF1.format(mMBean.getHeapMemoryUsage().getUsed() / GB), width);
     out.append(" ");
-    MonUtils.pad(out, NF2.format(mMBean.getNonHeapMemoryUsage().getCommitted() / GB), width);
+    MonUtils.pad(out, NF1.format(mMBean.getNonHeapMemoryUsage().getCommitted() / GB), width);
     out.append(" ");
-    MonUtils.pad(out, NF2.format(mMBean.getNonHeapMemoryUsage().getUsed() / GB), width);
+    MonUtils.pad(out, NF1.format(mMBean.getNonHeapMemoryUsage().getUsed() / GB), width);
 
     for (GarbageCollectorMXBean gc : mGcBean) {
       out.append(" ");
