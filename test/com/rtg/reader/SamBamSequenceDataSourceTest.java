@@ -267,8 +267,7 @@ public class SamBamSequenceDataSourceTest extends TestCase {
     Diagnostic.setLogStream();
     final File tmpDir = FileUtils.createTempDir("test", "sambamdatasource");
     try {
-      final String sb = SAM_HEADER +
-        String.format(SAM_LINE_SINGLE, SAM_NL, READS_REF_IDENTITY[0], READS_REF_IDENTITY[1], READS_REF_IDENTITY[2]);
+      final String sb = SAM_HEADER + String.format(SAM_LINE_SINGLE, SAM_NL, READS_REF_IDENTITY[0], READS_REF_IDENTITY[1], READS_REF_IDENTITY[2]);
       final File input = FileUtils.stringToFile(sb, new File(tmpDir, "input.sam"));
       final List<File> inputs = new ArrayList<>();
       inputs.add(input);
