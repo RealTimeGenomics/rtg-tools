@@ -133,12 +133,12 @@ class TabixVcfRecordSet implements VariantSet {
             mNames.add(orderedNameLength);
           } else {
             mNames.add(orderedNameLength);
-            Diagnostic.warning("Reference sequence " + name + " is used in baseline but not in calls (variants will be treated as FN).");
+            Diagnostic.warning("Reference sequence " + name + " is used in baseline but not in calls.");
           }
         } else {
           if (callnames.contains(name)) {
             mNames.add(orderedNameLength);
-            Diagnostic.warning("Reference sequence " + name + " is used in calls but not in baseline (variants will be treated as FP).");
+            Diagnostic.warning("Reference sequence " + name + " is used in calls but not in baseline.");
           } else {
             Diagnostic.userLog("Skipping reference sequence " + name + " that is used by neither baseline or calls.");
           }
