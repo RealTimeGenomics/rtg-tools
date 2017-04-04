@@ -256,10 +256,20 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
     return mRecords[mRecordIndex].getReadName();
   }
 
+  private void failIfReferenceIdentityBases(final byte[] bases) {
+    for (final byte b : bases) {
+      if (b == '=') {
+        throw new NoTalkbackSlimException("SAM/BAM sequences using \"=\" (reference identity bases) are not supported.");
+      }
+    }
+  }
+
   @Override
   public byte[] sequenceData() throws IllegalStateException, IOException {
     assert mRecords[mRecordIndex] != null;
-    final byte[] seq = DNA.byteDNAtoByte(mRecords[mRecordIndex].getReadBases());
+    final byte[] readBases = mRecords[mRecordIndex].getReadBases();
+    failIfReferenceIdentityBases(readBases);
+    final byte[] seq = DNA.byteDNAtoByte(readBases);
     if (mRecords[mRecordIndex].getReadNegativeStrandFlag()) {
       DNA.reverseComplementInPlace(seq);
     }

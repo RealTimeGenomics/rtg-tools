@@ -67,11 +67,13 @@ public class SamBamSequenceDataSourceTest extends TestCase {
       ;
 
   static final String[][] READS = {new String[]{"name0", "ATCGACG", "```````"},
-                                                          new String[]{"name1", "ATCGACG", "```````"},
-                                                          new String[]{"name2", "GACGCTC", "```````"},
-                                                          new String[]{"name3", "GACGCTC", "```````"},
-                                                          new String[]{"name4", "TTCAGCTA", "`IJ`````"},
-                                                          new String[]{"name5", "TTCNGCTA", "````````"}};
+    new String[]{"name1", "ATCGACG", "```````"},
+    new String[]{"name2", "GACGCTC", "```````"},
+    new String[]{"name3", "GACGCTC", "```````"},
+    new String[]{"name4", "TTCAGCTA", "`IJ`````"},
+    new String[]{"name5", "TTCNGCTA", "````````"}};
+
+  private static final String[] READS_REF_IDENTITY = {"name0", "===T===", "```````"};
 
   /**
    *  Template SAM line for a SAM / BAM sequences data source
@@ -260,4 +262,25 @@ public class SamBamSequenceDataSourceTest extends TestCase {
       assertEquals(numReads * 2, recordCount);
     }
   }
+
+  public void testReferenceIdentityReads() throws IOException {
+    Diagnostic.setLogStream();
+    final File tmpDir = FileUtils.createTempDir("test", "sambamdatasource");
+    try {
+      final String sb = SAM_HEADER +
+        String.format(SAM_LINE_SINGLE, SAM_NL, READS_REF_IDENTITY[0], READS_REF_IDENTITY[1], READS_REF_IDENTITY[2]);
+      final File input = FileUtils.stringToFile(sb, new File(tmpDir, "input.sam"));
+      final List<File> inputs = new ArrayList<>();
+      inputs.add(input);
+      final SamBamSequenceDataSource source = getSourceFromFiles(inputs, false, null);
+      try {
+        checkBasic(source);
+      } catch (final NoTalkbackSlimException e) {
+        assertEquals("SAM/BAM sequences using \"=\" (reference identity bases) are not supported.", e.getMessage());
+      }
+    } finally {
+      assertTrue(FileHelper.deleteAll(tmpDir));
+    }
+  }
+
 }
