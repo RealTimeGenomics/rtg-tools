@@ -151,6 +151,7 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         }
         sync = Integer.toString(mCSyncStart2 + 1);
       } else if (mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
+        ++mCallOutside;
         status = STATUS_OUTSIDE;
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {

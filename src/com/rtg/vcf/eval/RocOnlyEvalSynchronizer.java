@@ -100,6 +100,8 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
       if (!mCv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
         ++mFalsePositives;
         addToROCContainer(0, 1, 0, false);
+      } else {
+        ++mCallOutside;
       }
     }
   }

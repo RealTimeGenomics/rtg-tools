@@ -131,6 +131,8 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
         ++mFalsePositives;
         mFp.write(mCrv);
         addToROCContainer(0, 1, 0, false);
+      } else {
+        ++mCallOutside;
       }
     }
   }

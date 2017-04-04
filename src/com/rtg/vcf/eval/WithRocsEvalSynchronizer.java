@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
+import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -62,6 +63,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   protected int mFalsePositives = 0;
   protected int mFalseNegativesCommonAllele = 0;
   protected int mFalsePositivesCommonAllele = 0;
+  protected int mCallOutside = 0;
   private int mUnphasable = 0;
   private int mMisPhasings = 0;
   private int mCorrectPhasings = 0;
@@ -133,7 +135,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   protected void addToROCContainer(double tpWeight, double fpWeight, double tpqWeight, boolean alleleMatch) {
     if (mDefaultRoc != null) {
       if (alleleMatch) { // Consider these FP for GT ROCs
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, fpWeight, tpWeight, 0); // XXXLen 0 vs ???
+        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0, 1, 0);
       } else {
         mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
       }
@@ -161,6 +163,10 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     super.finish();
     if (mDefaultRoc != null) {
       mDefaultRoc.missingScoreWarning();
+    }
+    if (mCallOutside > 0) {
+      final int callTotal = mCallTruePositives + mFalsePositives;
+      Diagnostic.userLog("Fraction of calls outside evaluation regions: " + Utils.realFormat((double) mCallOutside / callTotal, 4) + " (" + mCallOutside + "/" + callTotal + ")");
     }
     writePhasingInfo();
     if (mAlleleRoc != null) {
