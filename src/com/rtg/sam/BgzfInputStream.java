@@ -39,6 +39,7 @@ import java.util.zip.CRC32;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.ByteArrayIOUtils;
 
 /**
@@ -156,9 +157,14 @@ public class BgzfInputStream extends InputStream {
     mBlockEndPos += len;
     mUncompressBuf = inflate(mInflater, mCurrentBlock.mData, mUncompressBuf, mCurrentBlock.mInputSize);
     mCrc.reset();
+    if (mCurrentBlock.mInputSize < 0) {
+      // See Bug#1630, a customer observed this, file corruption?
+      Diagnostic.userLog("Possible input corruption: startPos=" + mBlockStartPos + " length=" + len + " size=" + mCurrentBlock.mInputSize);
+      throw new IOException("Input file had a block with negative length " + mCurrentBlock.mInputSize + " (possible corruption of input file)");
+    }
     mCrc.update(mUncompressBuf, 0, mCurrentBlock.mInputSize);
     if (((long) mCurrentBlock.mCrc & 0xFFFFFFFFL) != mCrc.getValue()) {
-      throw new IOException("Crc doesn't match block");
+      throw new IOException("CRC doesn't match block (probable corruption of input file)");
     }
     mDataLength = mCurrentBlock.mInputSize;
     return true;
