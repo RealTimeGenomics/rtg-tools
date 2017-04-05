@@ -199,8 +199,7 @@ public final class FastqTrim extends AbstractCli {
     final int threads = CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG));
     final ReadTrimmer trimmer = getTrimmer();
     final File inFile = (File) mFlags.getValue(CommonFlags.INPUT_FLAG);
-    final boolean stdin = FileUtils.isStdio(inFile);
-    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(Collections.singletonList(stdin ? System.in : FileUtils.createInputStream(inFile, true)), encoding)) {
+    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(Collections.singletonList(FileUtils.createInputStream(inFile, true)), encoding)) {
 
       final Timer t = new Timer("FastqPairTrimmer");
       t.start();

@@ -437,7 +437,7 @@ public final class FileUtils {
    * choosing between basic file input, gzip input and bzip2 input based on
    * file extension.
    *
-   * @param file the input <code>File</code>
+   * @param file the input <code>File</code>. If this is '-', stdin will be used directly as the source.
    * @param async if true, the input will be asynchronous (not to be used with picard)
    * @return a <code>Reader</code> value
    * @exception IOException if an error occurs.
@@ -452,7 +452,7 @@ public final class FileUtils {
    * choosing between basic file input, gzip input and bzip2 input based on
    * file extension.
    *
-   * @param file the input <code>File</code>
+   * @param file the input <code>File</code>. If this is '-', stdin will be used directly as the source.
    * @param async if true, the input will be asynchronous (not to be used with picard)
    * @return an <code>BufferedInputStream</code> value
    * @exception IOException if an error occurs.
@@ -470,18 +470,14 @@ public final class FileUtils {
   /**
    * Creates a <code>BufferedInputStream</code> for a file.
    *
-   * @param file the input <code>File</code>
+   * @param file the input <code>File</code>. If this is '-', stdin will be used directly as the source.
    * @param async if true, the input will be asynchronous (not to be used with picard)
    * @return an <code>BufferedInputStream</code> value
    * @exception IOException if an error occurs.
    */
   public static BufferedInputStream createFileInputStream(File file, boolean async) throws IOException {
-    final InputStream inStream;
-    if (async) {
-      inStream = new AsynchInputStream(new FileInputStream(file));
-    } else {
-      inStream = new FileInputStream(file);
-    }
+    final InputStream raw = isStdio(file) ? System.in : new FileInputStream(file);
+    final InputStream inStream = async ? new AsynchInputStream(raw) : raw;
     return new BufferedInputStream(inStream, BUFFERED_STREAM_SIZE);
   }
 

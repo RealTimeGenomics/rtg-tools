@@ -98,12 +98,11 @@ public class BedReader implements IOIterator<BedRecord> {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static BedReader openBedReader(File f, ReferenceRanges<String> ranges, int minAnnotations) throws IOException {
-    final boolean stdin = FileUtils.isStdio(f);
     final BedReader bedr;
     if (ranges == null || ranges.allAvailable()) {
-      bedr = new BedReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
+      bedr = new BedReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
     } else {
-      if (stdin) {
+      if (FileUtils.isStdio(f)) {
         throw new IOException("Cannot apply region restrictions when reading BED from stdin");
       }
       bedr = new BedReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), f, minAnnotations);
@@ -120,15 +119,14 @@ public class BedReader implements IOIterator<BedRecord> {
    * @throws IOException if an I/O error occurs
    */
   public static BedReader openBedReader(RegionRestriction region, File f, int minAnnotations) throws IOException {
-    final boolean stdin = FileUtils.isStdio(f);
     final BedReader bedr;
-    if (region != null) {
-      if (stdin) {
+    if (region == null) {
+      bedr = new BedReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))), minAnnotations);
+    } else {
+      if (FileUtils.isStdio(f)) {
         throw new IOException("Cannot apply region restriction when reading BED from stdin");
       }
       bedr = new BedReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), f, minAnnotations);
-    } else {
-      bedr = new BedReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))), minAnnotations);
     }
     return bedr;
   }

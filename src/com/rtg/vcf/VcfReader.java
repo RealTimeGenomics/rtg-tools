@@ -102,8 +102,7 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs
    */
   public static VcfReader openVcfReader(File f) throws IOException {
-    final boolean stdin = FileUtils.isStdio(f);
-    return new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
+    return new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
   }
 
   /**
@@ -114,12 +113,11 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, ReferenceRanges<String> ranges) throws IOException {
-    final boolean stdin = FileUtils.isStdio(f);
     final VcfReader vcfr;
     if (ranges == null || ranges.allAvailable()) {
-      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
+      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
     } else {
-      if (stdin) {
+      if (FileUtils.isStdio(f)) {
         throw new IOException("Cannot apply region restrictions when reading VCF from stdin");
       }
       vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), VcfUtils.getHeader(f));
@@ -135,12 +133,11 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, RegionRestriction region) throws IOException {
-    final boolean stdin = FileUtils.isStdio(f);
     final VcfReader vcfr;
     if (region == null) {
-      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(stdin ? System.in : FileUtils.createInputStream(f, true))));
+      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
     } else {
-      if (stdin) {
+      if (FileUtils.isStdio(f)) {
         throw new IOException("Cannot apply region restriction when reading VCF from stdin");
       }
       vcfr = new VcfReader(new TabixLineReader(f, TabixIndexer.indexFileName(f), region), VcfUtils.getHeader(f));

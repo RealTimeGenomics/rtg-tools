@@ -118,7 +118,7 @@ public class GenomeRelationships {
     } else if (pedFile.getName().endsWith(".ped")) {
       pedigree = PedFileParser.loadFile(pedFile);
     } else { // Guess based on content
-      pedigree = loadGenomeRelationships(new InputStreamReader(FileUtils.isStdio(pedFile) ? System.in : FileUtils.createInputStream(pedFile, false)));
+      pedigree = loadGenomeRelationships(new InputStreamReader(FileUtils.createInputStream(pedFile, false)));
     }
     return pedigree;
   }
