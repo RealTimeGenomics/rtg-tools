@@ -944,6 +944,21 @@ public final class CFlags {
   }
 
   /**
+   * Checks that if the first flag is set, the second flag is also set. Sets the parse message
+   * on failure.
+   * @param flag1 first flag
+   * @param flag2 second flag
+   * @return true if passes.
+   */
+  public boolean checkIf(String flag1, String flag2) {
+    if (isSet(flag1) && !isSet(flag2)) {
+      setParseMessage("The flag " + LONG_FLAG_PREFIX + flag1 + " requires that " + LONG_FLAG_PREFIX + flag2 + " also be set");
+      return false;
+    }
+    return true;
+  }
+
+  /**
    * Checks neither flag is set, or both flags are set. Sets the parse message
    * on failure.
    * @param flag1 first flag
