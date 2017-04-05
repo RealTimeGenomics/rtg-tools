@@ -31,6 +31,7 @@ package com.rtg.util.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * An input stream that does the reading in a separate thread.  It
@@ -127,11 +128,15 @@ public class AsynchInputStream extends InputStream {
   }
 
   private void checkException() throws IOException {
-    if (mAsynchInput.mException != null) {
-      try {
-        throw mAsynchInput.mException;
-      } finally {
-        mAsynchInput.mException = null;
+    final Throwable t = mAsynchInput.mException.getAndSet(null);
+    if (t != null) {
+      if (t instanceof Error) {
+        throw (Error) t;
+      }
+      if (t instanceof IOException) {
+        throw (IOException) t;
+      } else {
+        throw new RuntimeException(t);
       }
     }
   }
@@ -169,7 +174,7 @@ public class AsynchInputStream extends InputStream {
     /** A buffer for the decompressed input. */
     private final byte[] mBuffer;
 
-    volatile IOException mException = null; // tell the parent about an error.
+    private final AtomicReference<Throwable> mException = new AtomicReference<>(null);
 
     AsynchInput(InputStream input, ConcurrentByteQueue queue, int inputSize) {
       mInput = input;
@@ -191,16 +196,14 @@ public class AsynchInputStream extends InputStream {
           }
         }
       } catch (final IOException e) {
-        mException = e; // tell the other end of the pipe about this error.
+        mException.compareAndSet(null, e); // tell the other end of the pipe about this error.
       } catch (final InterruptedException e) {
         // okay, because we assume that the other thread was asking us to stop early
       } finally {
         try {
           mInput.close();
         } catch (final IOException e2) {
-          if (mException == null) {
-            mException = e2;
-          }
+          mException.compareAndSet(null, e2); // tell the other end of the pipe about this error.
         } finally {
           mQueue.close();
         }
