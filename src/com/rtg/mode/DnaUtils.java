@@ -228,6 +228,31 @@ public final class DnaUtils {
   }
 
   /**
+   * Complement an ASCII representation of a nucleotide base, always returning an
+   * uppercase result even if input is lowercase.
+   * @param asciiBase nucleotide
+   * @return complment
+   */
+  public static byte complement(final byte asciiBase) {
+    switch (asciiBase) {
+      case (byte) 'a':
+      case (byte) 'A':
+        return (byte) 'T';
+      case (byte) 'c':
+      case (byte) 'C':
+        return (byte) 'G';
+      case (byte) 'g':
+      case (byte) 'G':
+        return (byte) 'C';
+      case (byte) 't':
+      case (byte) 'T':
+        return (byte) 'A';
+      default:
+        return (byte) 'N';
+    }
+  }
+
+  /**
    * Transform a human-readable DNA sequence into the reverse complemented version, uppercase.
    * @param src Eg. {'a','c','g','t','n'} will become {'N', 'A', 'C', 'G', 'T'}.
    * @param dest destination byte array
@@ -235,31 +260,11 @@ public final class DnaUtils {
    */
   public static void reverseComplement(byte[] src, byte[] dest, int length) {
     for (int k = 0; k < length; ++k) {
-      switch (src[k]) {
-      case (byte) 'a':
-      case (byte) 'A':
-        dest[length - 1 - k] = 'T';
-        break;
-      case (byte) 'c':
-      case (byte) 'C':
-        dest[length - 1 - k] = 'G';
-        break;
-      case (byte) 'g':
-      case (byte) 'G':
-        dest[length - 1 - k] = 'C';
-        break;
-      case (byte) 't':
-      case (byte) 'T':
-        dest[length - 1 - k] = 'A';
-        break;
-      default:
-        dest[length - 1 - k] = 'N';
-        break;
-      }
+      dest[length - 1 - k] = complement(src[k]);
     }
   }
 
-  /**
+  /**2459436115319725613232837371054614860252501574178492476172691043990697800070965679021476257943586241285807432481
    * Transform (in-situ) a human-readable DNA sequence into internal 0..4 bytes.
    * @param a Eg. {'a','c','g','t','n'} will become {1,2,3,4,0}.
    * @return the encoded array (which will be the same array as <code>a</code>)
