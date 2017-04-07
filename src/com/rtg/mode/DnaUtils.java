@@ -231,7 +231,7 @@ public final class DnaUtils {
    * Complement an ASCII representation of a nucleotide base, always returning an
    * uppercase result even if input is lowercase.
    * @param asciiBase nucleotide
-   * @return complment
+   * @return complement
    */
   public static byte complement(final byte asciiBase) {
     switch (asciiBase) {
