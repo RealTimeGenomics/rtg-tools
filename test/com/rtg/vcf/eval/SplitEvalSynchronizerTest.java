@@ -40,7 +40,6 @@ import java.util.Map;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
-import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
 import com.rtg.util.SimpleThreadPool;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -56,6 +55,7 @@ import com.rtg.vcf.header.VcfHeader;
 import junit.framework.TestCase;
 
 public class SplitEvalSynchronizerTest extends TestCase {
+
   private static class MockVariantSet implements VariantSet {
     int mSetId = 0;
     final VcfHeader mHeader;
@@ -74,7 +74,7 @@ public class SplitEvalSynchronizerTest extends TestCase {
       final List<Variant> empty = Collections.emptyList();
       result.put(VariantSetType.CALLS, empty);
       result.put(VariantSetType.BASELINE, empty);
-      return new Pair<String, Map<VariantSetType, List<Variant>>>("name" + mSetId, result);
+      return new Pair<>("name" + mSetId, result);
     }
 
     @Override
@@ -96,7 +96,6 @@ public class SplitEvalSynchronizerTest extends TestCase {
     public int getNumberOfSkippedCalledVariants() {
       return 0;
     }
-
   }
 
   private static final String REC1_1 = "name1 3 . A G 0.0 PASS . GT 1/1".replaceAll(" ", "\t");
@@ -148,27 +147,20 @@ public class SplitEvalSynchronizerTest extends TestCase {
           assertEquals("name2", pair2.getA());
 
           final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
-          simpleThreadPool.execute(new IORunnable() {
-            @Override
-            public void run() throws IOException {
-              sync.write("name2",
-                Arrays.asList(createVariant(VcfReader.vcfLineToRecord(REC5_2), 5)),
-                Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0), true), createVariant(VcfReader.vcfLineToRecord(REC3_2), 3)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
-            }
-          });
-          simpleThreadPool.execute(new IORunnable() {
-            @Override
-            public void run() throws IOException {
-              sync.write("name1",
-                Arrays.asList(createVariant(VcfReader.vcfLineToRecord(REC6_1), 6)),
-                Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReader.vcfLineToRecord(REC4_1), 4)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
-            }
-          });
+          simpleThreadPool.execute(() -> sync.write("name2",
+            Collections.singletonList(createVariant(VcfReader.vcfLineToRecord(REC5_2), 5)),
+            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0), true), createVariant(VcfReader.vcfLineToRecord(REC3_2), 3)), Collections.emptyList(), Collections.emptyList()));
+          simpleThreadPool.execute(() -> sync.write("name1",
+            Collections.singletonList(createVariant(VcfReader.vcfLineToRecord(REC6_1), 6)),
+            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReader.vcfLineToRecord(REC4_1), 4)), Collections.emptyList(), Collections.emptyList()));
           simpleThreadPool.terminate();
 
           assertEquals(2, sync.mCallTruePositives);
           assertEquals(2, sync.mFalseNegatives);
           assertEquals(2, sync.mFalsePositives);
+          assertEquals(0, sync.getCorrectPhasings());
+          assertEquals(0, sync.getMisPhasings());
+          assertEquals(0, sync.getUnphasable());
           assertEquals("name3", sync.nextSet().getA());
           assertEquals(null, sync.nextSet());
         }
@@ -193,28 +185,21 @@ public class SplitEvalSynchronizerTest extends TestCase {
         assertEquals("name2", pair2.getA());
 
         final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
-        simpleThreadPool.execute(new IORunnable() {
-          @Override
-          public void run() throws IOException {
-            sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
-            fail("Should have aborted in thread");
-          }
+        simpleThreadPool.execute(() -> {
+          sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
+          fail("Should have aborted in thread");
         });
-        simpleThreadPool.execute(new IORunnable() {
-          @Override
-          public void run() throws IOException {
-            throw new IOException();
-          }
+        simpleThreadPool.execute(() -> {
+          throw new IOException();
         });
         try {
           simpleThreadPool.terminate();
         } catch (final IOException e) {
-
+          assertNull(e.getMessage());
         }
       }
     }
   }
-
 
   public void testInterrupt() throws IOException, InterruptedException, UnindexableDataException {
     try (final TestDirectory dir = new TestDirectory()) {
@@ -228,17 +213,15 @@ public class SplitEvalSynchronizerTest extends TestCase {
         assertEquals("name2", pair2.getA());
 
         final Exception[] internalException = new Exception[1];
-        final Thread t = new Thread() {
-          @Override
-          public void run() {
-            try {
-              sync.write("name2", null, Arrays.asList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
-            } catch (final IllegalStateException e) {
-              internalException[0] = e;
-            } catch (final IOException e) {
-            }
+        final Thread t = new Thread(() -> {
+          try {
+            sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
+          } catch (final IllegalStateException e) {
+            internalException[0] = e;
+          } catch (final IOException e) {
+            assertNull(e.getMessage());
           }
-        };
+        });
         t.start();
         t.interrupt();
         t.join();
