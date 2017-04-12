@@ -302,8 +302,7 @@ public class FormatCliTest extends AbstractCliTest {
       final File progress = new File(outputDir, "progress");
       assertTrue(progress.exists());
       final String prog = FileUtils.fileToString(progress);
-
-      TestUtils.containsAll(prog, "Formatting paired-end FASTA data", "paired-end prereader");
+      TestUtils.containsAll(prog, "Formatting paired-end FASTA data", "paired-end SDF");
     }
   }
 

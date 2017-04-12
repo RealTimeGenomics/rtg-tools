@@ -487,7 +487,7 @@ public final class FormatCli extends LoggedCli {
       final PrereadType prereadType = IndexFile.typeFromFormat(mInputDescription);
 
 
-      final SimpleThreadPool pool = new SimpleThreadPool(2, "paired-end prereader", true);
+      final SimpleThreadPool pool = new SimpleThreadPool(2, "paired-end SDF", true);
       pool.enableBasicProgress(2);
       final SequenceProcessor leftSequenceProc = new SequenceProcessor(leftds, prereadType, PrereadArm.LEFT, new File(mOutDir, "left"), sdfId, mNamesToExclude, mCompressed, mReadTrimmer);
       final SequenceProcessor rightSequenceProc = new SequenceProcessor(rightds, prereadType, PrereadArm.RIGHT, new File(mOutDir, "right"), sdfId, mNamesToExclude, mCompressed, mReadTrimmer);
