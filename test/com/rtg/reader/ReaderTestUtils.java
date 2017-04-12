@@ -120,7 +120,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where pre-reader placed.
    * @return SequencesReader using the directory.
@@ -131,7 +131,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where pre-reader placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
@@ -143,7 +143,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where pre-reader placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
@@ -164,7 +164,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where pre-reader placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default

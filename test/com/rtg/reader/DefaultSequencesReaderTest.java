@@ -215,5 +215,19 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
     }
   }
 
+  public void testRemovalBeforeDuplication() throws IOException {
+    ReaderTestUtils.getReaderDNA(FASTA, mOutDir, new SdfId(0L)).close();
+    try (final DefaultSequencesReader reader = new DefaultSequencesReader(mOutDir, new LongRange(1, 3))) {
+      assertTrue(FileHelper.deleteAll(mOutDir));
+      try {
+        reader.copy();
+        fail();
+      } catch (final IllegalStateException e) {
+        // ok
+      }
+    }
+
+  }
+
 }
 

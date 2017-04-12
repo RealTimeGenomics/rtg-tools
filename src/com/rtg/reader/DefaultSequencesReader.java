@@ -516,7 +516,10 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     try {
       return new DefaultSequencesReader(mDirectory, mRegion);
     } catch (final IOException ex) {
-      throw new IllegalStateException("this should not happen, but it did due to : " + ex.getMessage());
+      Diagnostic.userLog(ex);
+      Diagnostic.userLog("Error copying sequences reader for SDF at " + mDirectory);
+      Diagnostic.userLog("Region: " + mRegion.toString());
+      throw new IllegalStateException("An error occurred trying to make a copy of the sequences reader backed by " + mDirectory + " on region " + mRegion.toString() + " (possibly the SDF was moved or deleted part way through the run.");
     }
   }
 
