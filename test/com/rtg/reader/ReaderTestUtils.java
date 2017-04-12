@@ -82,7 +82,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct a SDF directory containing the specified fasta sequence.
    * @param inputDnaSequenceLeft the left sequence.
    * @param inputDnaSequenceRight the right sequence.
    * @param dir SDF dir
@@ -101,7 +101,7 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct a SDF directory containing the specified fasta sequence.
    * @param inputDnaSequenceLeft the left sequence.
    * @param inputDnaSequenceRight the right sequence.
    * @param dir SDF dir
@@ -122,7 +122,7 @@ public final class ReaderTestUtils {
   /**
    * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @return SequencesReader using the directory.
    * @throws IOException whenever.
    */
@@ -133,7 +133,7 @@ public final class ReaderTestUtils {
   /**
    * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
    * @return SequencesReader using the directory.
    * @throws IOException whenever.
@@ -145,7 +145,7 @@ public final class ReaderTestUtils {
   /**
    * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
    * @param memSeqReader use memory sequences Reader
    * @return SequencesReader using the directory.
@@ -166,7 +166,7 @@ public final class ReaderTestUtils {
   /**
    * Construct an SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
    * @param maxFileSize maximum file size for each chunk
    * @return SequencesReader using the directory.
@@ -185,9 +185,9 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct a SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param memSeqReader use memory sequences Reader
    * @param guid the guid for this input
    * @return SequencesReader using the directory.
@@ -215,9 +215,9 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fasta sequence.
+   * Construct a SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param sdfId Id to use for SDF, <code>null</code> for default
    * @param maxFileSize maximum file size for each chunk
    * @return SequencesReader using the directory.
@@ -236,9 +236,9 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fastq sequence.
+   * Construct a SDF directory containing the specified fastq sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param isSolexa is Solexa
    * @return SequencesReader using the directory.
    * @throws IOException whenever.
@@ -248,9 +248,9 @@ public final class ReaderTestUtils {
   }
 
   /**
-   * Construct a pre-reader directory containing the specified fastq sequence.
+   * Construct a SDF directory containing the specified fastq sequence.
    * @param inputDnaSequence the sequence.
-   * @param dir directory where pre-reader placed.
+   * @param dir directory where SDF placed.
    * @param maxFileSize maximum size for output files
    * @param isSolexa is Solexa
    * @return SequencesReader using the directory.
