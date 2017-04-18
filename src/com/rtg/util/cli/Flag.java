@@ -170,7 +170,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
   }
 
   /**
-   * Gets the object specified by str.
+   * Gets the enum object specified by str.
    * @param type of object.
    * @param str string to specify object.
    * @return object of class type (null if the type does not look sufficiently like an Enum).
@@ -189,7 +189,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
       if (!type.isAssignableFrom(returnType)) {
         return null;
       }
-      return m.invoke(null, str);
+      return m.invoke(null, str.toUpperCase(Locale.getDefault()).replace('-', '_'));
     } catch (final NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
       //Should never happen
       throw new RuntimeException(e);
@@ -217,7 +217,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
         final String[] res = new String[ret.length];
 
         for (int i = 0; i < ret.length; ++i) {
-          res[i] = ret[i].toString().toLowerCase(Locale.getDefault()); // List enums as lowercase by default
+          res[i] = ret[i].toString().toLowerCase(Locale.getDefault()).replace('_', '-'); // List enums as lowercase by default
         }
         return res;
       }
@@ -761,7 +761,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
       } else if (type == String.class) {
         return (T) stringRep;
       } else if (isValidEnum(type)) {
-        return (T) valueOf(type, stringRep.toUpperCase(Locale.getDefault()));
+        return (T) valueOf(type, stringRep);
       } else if (type == Class.class) {
         return (T) Class.forName(stringRep);
       } else if (type == IntegerOrPercentage.class) {
