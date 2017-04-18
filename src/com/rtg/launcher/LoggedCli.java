@@ -144,7 +144,7 @@ public abstract class LoggedCli extends AbstractCli {
       }
     } finally {
       Spy.report();
-      final String time = (successful ? "Finished successfully" : "Run failed") + " in " + timeDifference(System.currentTimeMillis(), startTime) + " s.";
+      final String time = getDuration(startTime, successful);
       Diagnostic.userLog(time);
       Diagnostic.progress(time);
       Diagnostic.closeLog();
@@ -152,6 +152,16 @@ public abstract class LoggedCli extends AbstractCli {
         FileUtils.deleteFiles(mDirectory);
       }
     }
+  }
+
+  /**
+   * Get the duration for a run.
+   * @param startTime start time in milliseconds
+   * @param successful true if the run was successful
+   * @return time description
+   */
+  public static String getDuration(long startTime, boolean successful) {
+    return (successful ? "Finished successfully" : "Run failed") + " in " + timeDifference(System.currentTimeMillis(), startTime) + " s.";
   }
 
   /**
