@@ -97,24 +97,32 @@ class RocLinesPanel extends Box {
         final RocLinePanel cp = (RocLinePanel) components[i];
 
         if (cp == mPanel) {
-          if ("up".equals(e.getActionCommand())) {
-            //System.err.println("Move up ");
-            if (i > 0) {
+          switch (e.getActionCommand()) {
+            case "up":
+              if (i > 0) {
+                mPlotOrder.remove(i);
+                mPlotOrder.add(i - 1, mPanel.getPath());
+                remove(mPanel);
+                add(mPanel, i - 1);
+              }
+              break;
+            case "down":
+              if (i < components.length - 1) {
+                mPlotOrder.remove(i);
+                mPlotOrder.add(i + 1, mPanel.getPath());
+                remove(mPanel);
+                add(mPanel, i + 1);
+              }
+              break;
+            case "remove":
               mPlotOrder.remove(i);
-              mPlotOrder.add(i - 1, mPanel.getPath());
               remove(mPanel);
-              add(mPanel, i - 1);
-            }
-          } else {
-            //System.err.println("Move down ");
-            if (i < components.length - 1) {
-              mPlotOrder.remove(i);
-              mPlotOrder.add(i + 1, mPanel.getPath());
-              remove(mPanel);
-              add(mPanel, i + 1);
-            }
+              break;
+            default:
+              System.err.println("Unhandled event!");
           }
-          validate();
+          revalidate();
+          repaint();
           mRocPlot.showCurrentGraph();
           break;
         }

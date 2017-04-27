@@ -56,6 +56,21 @@ public final class ParseRocFile {
   /** Legacy headings */
   private static final List<String> SIMPLE_HEADINGS = Arrays.asList(SCORE, TRUE_POSITIVES, FALSE_POSITIVES);
 
+  // Can be used when no load progress updates are required
+  static class NullProgressDelegate implements ProgressDelegate {
+    @Override
+    public void setProgress(int progress) {
+    }
+
+    @Override
+    public void addFile(int numberLines) {
+    }
+
+    @Override
+    public void done() {
+    }
+  }
+
   private ParseRocFile() {
   }
 
@@ -64,11 +79,10 @@ public final class ParseRocFile {
    * @param progressBarDelegate called every 100 lines with progress, and at end with file stats
    * @param is input data. this stream is closed by this method.
    * @param shortName name for line
-   * @param showProgress true if progress should be sent
    * @return the data bundle
    * @throws IOException if an IO error occurs
    */
-  static DataBundle loadStream(ProgressDelegate progressBarDelegate, final BufferedInputStream is, final String shortName, boolean showProgress) throws IOException {
+  static DataBundle loadStream(ProgressDelegate progressBarDelegate, final BufferedInputStream is, final String shortName) throws IOException {
     int lines = 0;
     int totalVariants = -1;
     final ArrayList<RocPoint> points = new ArrayList<>();
@@ -150,7 +164,7 @@ public final class ParseRocFile {
         prevScore = score;
 
         ++lines;
-        if (showProgress && lines % 100 == 0) {
+        if (lines % 100 == 0) {
           progressBarDelegate.setProgress(lines);
         }
       }

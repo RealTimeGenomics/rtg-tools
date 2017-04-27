@@ -39,13 +39,17 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
@@ -71,6 +75,8 @@ class RocLinePanel extends JPanel {
   private final JTextField mTextField;
   private final RocPlot mRocPlot;
   private final JProgressBar mStatusBar;
+  private final JPopupMenu mPopup = new JPopupMenu();
+  private final JMenuItem mRemoveItem;
 
   RocLinePanel(RocPlot rocPlot, final String path, final String name, DataBundle data, JProgressBar statusBar) {
     super(new GridBagLayout());
@@ -162,6 +168,32 @@ class RocLinePanel extends JPanel {
     rangeConstraints.gridx = 0; rangeConstraints.gridy = 1;
     rangeConstraints.gridwidth = 2; rangeConstraints.fill = GridBagConstraints.HORIZONTAL;
     add(rangeSlider, rangeConstraints);
+
+    mRemoveItem = new JMenuItem("Remove");
+    mRemoveItem.setActionCommand("remove");
+    mPopup.add(mRemoveItem);
+    final MouseListener l = new MouseAdapter() {
+      @Override
+      public void mousePressed(MouseEvent e) {
+        maybeShowPopup(e);
+      }
+      @Override
+      public void mouseReleased(MouseEvent e) {
+        maybeShowPopup(e);
+      }
+      private void maybeShowPopup(MouseEvent e) {
+        if (e.isPopupTrigger()) {
+          mPopup.show(e.getComponent(), e.getX(), e.getY());
+        }
+      }
+    };
+    addMouseListener(l);
+    rangeSlider.addMouseListener(l);
+    mCheckBox.addMouseListener(l);
+    mTextField.addMouseListener(l);
+    mUpButton.addMouseListener(l);
+    mDownButton.addMouseListener(l);
+
     setMaximumSize(new Dimension(getMaximumSize().width, getPreferredSize().height));
   }
 
@@ -202,5 +234,6 @@ class RocLinePanel extends JPanel {
   public void addActionListener(ActionListener listener) {
     mUpButton.addActionListener(listener);
     mDownButton.addActionListener(listener);
+    mRemoveItem.addActionListener(listener);
   }
 }

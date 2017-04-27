@@ -48,7 +48,8 @@ public class ProgressBarDelegate implements ProgressDelegate {
    * @param prog progress bar to display progress on
    */
   public ProgressBarDelegate(JProgressBar prog) {
-    this.mProgressBar = prog;
+    mProgressBar = prog;
+    mProgressBar.setString("Loading...");
   }
 
   @Override

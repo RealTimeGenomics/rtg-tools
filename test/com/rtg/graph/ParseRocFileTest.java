@@ -64,7 +64,7 @@ public class ParseRocFileTest extends TestCase {
     try (final TestDirectory dir = new TestDirectory()) {
       final File roc = FileUtils.stringToFile(ROC, new File(dir, "roc.tsv"));
       try (final BufferedInputStream buf = new BufferedInputStream(new FileInputStream(roc))) {
-        final DataBundle bundle = ParseRocFile.loadStream(new MyProgressDelegate(), buf, "Monkey", false);
+        final DataBundle bundle = ParseRocFile.loadStream(new MyProgressDelegate(), buf, "Monkey");
 
         assertEquals("Monkey", bundle.getTitle());
         assertEquals(3092754, bundle.getTotalVariants());
@@ -92,7 +92,7 @@ public class ParseRocFileTest extends TestCase {
         final File roc = FileUtils.stringToFile(mal, new File(dir, "roc.tsv"));
         try (final BufferedInputStream buf = new BufferedInputStream(new FileInputStream(roc))) {
           try {
-            ParseRocFile.loadStream(new MyProgressDelegate(), buf, "Monkey", false);
+            ParseRocFile.loadStream(new MyProgressDelegate(), buf, "Monkey");
             fail("Should get exception: " + mal);
           } catch (RuntimeException | IOException e) {
 
@@ -117,7 +117,7 @@ public class ParseRocFileTest extends TestCase {
       final File roc = FileUtils.stringToFile(sb.toString(), new File(dir, "roc.tsv"));
       try (final BufferedInputStream buf = new BufferedInputStream(new FileInputStream(roc))) {
         final MyProgressDelegate progressBarDelegate = new MyProgressDelegate();
-        final DataBundle bundle = ParseRocFile.loadStream(progressBarDelegate, buf, "Monkey", true);
+        final DataBundle bundle = ParseRocFile.loadStream(progressBarDelegate, buf, "Monkey");
         assertEquals(1000, progressBarDelegate.mNumberLines);
         assertEquals(Arrays.asList(new Integer[] {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}), progressBarDelegate.mProgressLog);
         assertEquals(2, bundle.getPlot(1, 1).getData().length);

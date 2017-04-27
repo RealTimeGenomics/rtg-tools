@@ -120,8 +120,6 @@ public class RocPlot {
 
   private static final String ROC = "ROC";
 
-  private final ProgressBarDelegate mProgressBarDelegate;
-
   private final JPanel mMainPanel;
   /** panel showing plot */
   private final RocZoomPlotPanel mZoomPP;
@@ -188,7 +186,6 @@ public class RocPlot {
     mProgressBar.setVisible(true);
     mProgressBar.setStringPainted(true);
     mProgressBar.setIndeterminate(true);
-    mProgressBarDelegate = new ProgressBarDelegate(mProgressBar);
     mStatusLabel = new JLabel();
     mPopup = new JPopupMenu();
     mRocLinesPanel = new RocLinesPanel(this);
@@ -384,9 +381,7 @@ public class RocPlot {
         final File f = mFileChooser.getSelectedFile();
         if (f != null) {
           try {
-            loadFile(f, "", true);
-            updateProgress();
-            showCurrentGraph();
+            loadFile(f, "", new ParseRocFile.NullProgressDelegate());
           } catch (final IOException | NoTalkbackSlimException e1) {
             JOptionPane.showMessageDialog(mMainPanel.getTopLevelAncestor(),
               "Could not open file: " + f.getPath() + "\n"
@@ -602,10 +597,6 @@ public class RocPlot {
     }
   }
 
-  void updateProgress() {
-    mProgressBarDelegate.done();
-  }
-
   /**
    * Set the title of the plot
    * @param title plot title
@@ -651,27 +642,41 @@ public class RocPlot {
     mStatusLabel.setText(message);
   }
 
-  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom, boolean showProgress) throws IOException {
+  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom) throws IOException {
+    final StringBuilder sb = new StringBuilder();
+    final ProgressBarDelegate progress = new ProgressBarDelegate(mProgressBar);
     for (int i = 0; i < files.size(); ++i) {
       final File f = files.get(i);
       final String name = names.get(i);
-      loadFile(f, name, showProgress);
+      try {
+        loadFile(f, name, progress);
+      } catch (final IOException | NoTalkbackSlimException e1) {
+        sb.append(f.getPath()).append('\n');
+      }
+    }
+    progress.done();
+    if (sb.length() > 0) {
+      JOptionPane.showMessageDialog(mMainPanel.getTopLevelAncestor(),
+        "Some files could not be loaded:\n" + sb.toString() + "\n",
+        "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
     }
     if (initialZoom == null) {
       SwingUtilities.invokeLater(() -> mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
     } else {
       SwingUtilities.invokeLater(() -> mZoomPP.setZoom(initialZoom));
     }
-    if (showProgress) {
-      updateProgress();
-    }
   }
 
-  private void loadFile(final File f, final String name, boolean showProgress) throws IOException {
+  private void loadFile(final File f, final String name, ProgressDelegate progress) throws IOException {
     mFileChooserParent = f.getParentFile();
-    final DataBundle data = ParseRocFile.loadStream(mProgressBarDelegate, FileUtils.createInputStream(f, false), f.getAbsolutePath(), showProgress);
-    setBundleTitle(data, f, name);
-    addLine(f.getAbsolutePath(), data);
+    final String path = f.getAbsolutePath();
+    if (mRocLinesPanel.plotOrder().contains(path)) {
+      mProgressBar.setString("This file has already been loaded");
+    } else {
+      final DataBundle data = ParseRocFile.loadStream(progress, FileUtils.createInputStream(f, false), f.getAbsolutePath());
+      setBundleTitle(data, f, name);
+      addLine(path, data);
+    }
   }
 
   static void setBundleTitle(DataBundle data, File f, String name) throws IOException {
@@ -826,7 +831,7 @@ public class RocPlot {
         rp.setSplitPaneDividerLocation(1.0);
       }
     });
-    rp.loadData(fileList, nameList, initialZoom, true);
+    rp.loadData(fileList, nameList, initialZoom);
     SwingUtilities.invokeAndWait(rp::showCurrentGraph);
     lock.await();
   }

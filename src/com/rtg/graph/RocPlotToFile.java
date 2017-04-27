@@ -67,7 +67,7 @@ public final class RocPlotToFile {
     for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
-      final DataBundle db = ParseRocFile.loadStream(new NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), false);
+      final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath());
       RocPlot.setBundleTitle(db, f, name);
       data.put(db.getTitle(), db);
     }
@@ -92,20 +92,6 @@ public final class RocPlotToFile {
       }
     } else {
       iw.toPNG(pngFile, graph, 800, 600, null);
-    }
-  }
-
-  private static class NullProgressDelegate implements ProgressDelegate {
-    @Override
-    public void setProgress(int progress) {
-    }
-
-    @Override
-    public void addFile(int numberLines) {
-    }
-
-    @Override
-    public void done() {
     }
   }
 }
