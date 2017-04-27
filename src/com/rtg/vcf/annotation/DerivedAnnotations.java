@@ -70,7 +70,9 @@ public enum DerivedAnnotations {
   /** Difference in mean quality between called alleles */
   MEANQAD(new MeanQualityDifferenceAnnotation()),
   /** Difference in mean quality between called alleles */
-  QA(new AltAlleleQualityAnnotation())
+  QA(new AltAlleleQualityAnnotation()),
+  /** Ref-Alt type */
+  RA(new RefAltAnnotation()),
   ;
 
   private final transient AbstractDerivedAnnotation<?> mAnnotation;

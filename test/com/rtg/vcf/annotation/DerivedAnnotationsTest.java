@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class DerivedAnnotationsTest extends TestCase {
 
   public void testEnum() {
-    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, COC, COF, VAF, ZY, PD, MEANQAD, QA]");
+    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, COC, COF, VAF, ZY, PD, MEANQAD, QA, RA]");
     assertTrue(DerivedAnnotations.IC.getAnnotation() instanceof InbreedingCoefficientAnnotation);
     assertTrue(DerivedAnnotations.EP.getAnnotation() instanceof EquilibriumProbabilityAnnotation);
     assertTrue(DerivedAnnotations.LAL.getAnnotation() instanceof LongestAlleleAnnotation);
@@ -54,6 +54,7 @@ public class DerivedAnnotationsTest extends TestCase {
     assertTrue(DerivedAnnotations.PD.getAnnotation() instanceof PloidyAnnotation);
     assertTrue(DerivedAnnotations.MEANQAD.getAnnotation() instanceof MeanQualityDifferenceAnnotation);
     assertTrue(DerivedAnnotations.QA.getAnnotation() instanceof AltAlleleQualityAnnotation);
+    assertTrue(DerivedAnnotations.RA.getAnnotation() instanceof RefAltAnnotation);
   }
 
 }
