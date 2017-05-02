@@ -45,7 +45,7 @@ public class ChildSampleSimulatorCliTest extends AbstractCliTest {
   }
 
   public void testInitParams() {
-    checkHelp("reference", "input genome",
+    checkHelp("reference", "reference genome",
         "-i", "input=", "input VCF",
         "-o", "output=", "output VCF",
         "--mother", "--father", "--sex",

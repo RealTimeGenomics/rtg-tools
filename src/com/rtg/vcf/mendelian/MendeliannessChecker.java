@@ -107,7 +107,7 @@ public final class MendeliannessChecker extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Check a multi-sample VCF for Mendelian consistency.");
     mFlags.registerRequired('i', INPUT_FLAG, File.class, CommonFlags.FILE, "VCF file containing multi-sample variant calls or '-' to read from standard input").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF containing template sequences").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    CommonFlags.initReferenceTemplate(mFlags, true);
     mFlags.registerOptional(OUTPUT_INCONSISTENT_FLAG, File.class, CommonFlags.FILE, "if set, output only non-Mendelian calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_CONSISTENT_FLAG, File.class, CommonFlags.FILE, "if set, output only consistent calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_FLAG, File.class, CommonFlags.FILE, "if set, output annotated calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);

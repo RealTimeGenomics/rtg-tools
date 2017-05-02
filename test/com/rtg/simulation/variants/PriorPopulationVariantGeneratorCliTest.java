@@ -56,7 +56,7 @@ public class PriorPopulationVariantGeneratorCliTest extends AbstractCliTest {
   }
 
   public void testInitParams() {
-    checkHelp("reference", "input genome",
+    checkHelp("reference", "reference genome",
         "-o", "output=", "output VCF",
         "print help on command-line flag usage",
         "seed=", "seed for the random number generator");

@@ -88,7 +88,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
     flags.setDescription("Generates a VCF containing simulated population variants.");
     flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
-    flags.registerRequired('t', REFERENCE_SDF, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
+    CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);
     flags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
     flags.registerOptional(BIAS_FLAG, Double.class, CommonFlags.FLOAT, "bias frequency of variants towards alt alleles.", 0.0).setCategory(UTILITY);

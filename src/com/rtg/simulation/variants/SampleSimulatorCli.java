@@ -81,12 +81,12 @@ public class SampleSimulatorCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.setDescription("Generates a VCF containing a genotype simulated from a population.");
+    mFlags.setDescription("Generates a VCF containing a genotype simulated from population variants according to allele frequency.");
     mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output an SDF containing the sample genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('i', POPULATION_VCF, File.class, CommonFlags.FILE, "input VCF containing population variants").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('s', SAMPLE_NAME, String.class, CommonFlags.STRING, "name for sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(SEX, Sex.class, "SEX", "sex of individual", Sex.EITHER).setCategory(CommonFlagCategories.UTILITY);

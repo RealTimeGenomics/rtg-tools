@@ -92,7 +92,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output genome SDF name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output an SDF containing the sample genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('i', INPUT_VCF, File.class, CommonFlags.FILE, "input VCF containing genotype of original sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('s', SAMPLE_FLAG, String.class, CommonFlags.STRING, "name for new derived sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the mutation priors. Either a file name or one of [human]", "human").setCategory(CommonFlagCategories.UTILITY);

@@ -154,7 +154,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
 
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    final Flag<File> output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    final Flag<File> output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output. This option is required, unless \"--javascript\" is being used").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
