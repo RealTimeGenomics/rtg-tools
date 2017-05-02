@@ -35,6 +35,7 @@ import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.cli.Flag;
+import com.rtg.util.cli.Switch;
 
 /**
  * Base class for registering a bundle of experimental flags
@@ -58,9 +59,12 @@ public abstract class GlobalFlagsInitializer {
   }
 
   protected <T> void registerFlag(String name, Class<T> type, T def) {
-    if (type != null && def == null) {
+    if (type == null) {
+      mFlags.add(new Switch(null, "XX" + name, "").setCategory(CATEGORY));
+    } else if (def == null) {
       throw new IllegalArgumentException("Default value must be non-null for experimental flags with a type");
+    } else {
+      mFlags.add(new Flag<>(null, "XX" + name, "", 0, 1, type, type.getSimpleName(), def, CATEGORY));
     }
-    mFlags.add(new Flag<>(null, "XX" + name, "", 0, 1, type, type == null ? "" : type.getSimpleName(), def, CATEGORY));
   }
 }
