@@ -176,11 +176,13 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       // Do we want the allele-level summary too?
       //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
     }
+    final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
+    final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
     if (mDefaultRoc != null) {
-      final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
-      final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
       mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mCallTruePositives, mZip, mSlope);
       mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFn, mCallTruePositives, strictFp);
+    } else {
+      new RocContainer(RocSortValueExtractor.NULL_EXTRACTOR).writeSummary(mOutDir, mBaselineTruePositives, strictFn, mCallTruePositives, strictFp);
     }
   }
 

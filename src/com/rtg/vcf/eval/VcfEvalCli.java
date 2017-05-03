@@ -194,8 +194,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   private static boolean validateModeSample(CFlags flags) {
     final String mode = (String) flags.getValue(OUTPUT_MODE);
-    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains("ALT") && (mode.equals(VcfEvalTask.MODE_COMBINE) || mode.equals(VcfEvalTask.MODE_GA4GH))) {
-      flags.setParseMessage("--" + OUTPUT_MODE + "=combine cannot be used when either sample is ALT");
+    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (mode.equals(VcfEvalTask.MODE_COMBINE) || mode.equals(VcfEvalTask.MODE_GA4GH))) {
+      flags.setParseMessage("--" + OUTPUT_MODE + "=combine cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
       return false;
     }
     return true;

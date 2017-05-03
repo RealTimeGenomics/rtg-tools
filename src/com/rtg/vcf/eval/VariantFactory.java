@@ -41,6 +41,9 @@ import com.rtg.vcf.VcfUtils;
  */
 public interface VariantFactory {
 
+  /** The special sample name used to denote using ALTs rather than a particular sample */
+  String ALT_SAMPLE = "ALT";
+
   /** Name used to select the sample variants factory */
   String SAMPLE_FACTORY = "sample";
 
@@ -63,7 +66,7 @@ public interface VariantFactory {
         return f.length == 1 ? f[0] : f[1];
       }
     } else {
-      return "ALT".equals(sampleName) ? ALL_FACTORY : SAMPLE_FACTORY;
+      return ALT_SAMPLE.equals(sampleName) ? ALL_FACTORY : SAMPLE_FACTORY;
     }
   }
 

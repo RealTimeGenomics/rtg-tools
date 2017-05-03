@@ -1,2 +1,2 @@
 There were 4 variants not thresholded in ROC data files due to missing or invalid QUAL values.
-Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --vcf-score-field
+Could not maximize F-measure from ROC data, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --vcf-score-field

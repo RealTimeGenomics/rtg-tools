@@ -349,7 +349,7 @@ public class RocContainer {
 
       final RocPoint best = mBest;
       if (best == null) {
-        Diagnostic.warning("Not enough ROC data to maximize F-measure, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
+        Diagnostic.warning("Could not maximize F-measure from ROC data, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
       } else {
         addRow(table, Utils.realFormat(best.mThreshold, SCORE_DP), best.mTruePositives, totalPositives - best.mTruePositives, best.mRawTruePositives, best.mFalsePositives);
       }
