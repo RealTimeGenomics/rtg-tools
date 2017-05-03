@@ -52,9 +52,7 @@ import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
-public class SplitEvalSynchronizerTest extends TestCase {
+public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
 
   private static class MockVariantSet implements VariantSet {
     int mSetId = 0;
@@ -229,4 +227,17 @@ public class SplitEvalSynchronizerTest extends TestCase {
       }
     }
   }
+
+  public void testSplit() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_split", false, "--ref-overlap", "--output-mode", "split", "--sample", "sample1,sample1", "--vcf-score-field", "QUAL");
+  }
+
+  public void testSplitNoRoc() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_split_no_roc", true, "--ref-overlap", "--output-mode", "split", "--sample", "ALT");
+  }
+
+  public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+    endToEnd(id, new String[] {"tp-baseline.vcf", "fn.vcf", "tp.vcf", "fp.vcf", "summary.txt", "phasing.txt"}, expectWarn, args);
+  }
+
 }

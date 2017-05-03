@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.OutputParams;
@@ -61,6 +62,7 @@ import com.rtg.vcf.eval.VcfEvalParams.VcfEvalParamsBuilder;
  * Compare detected SNPs with the generated SNPs
  *
  */
+@TestClass(value = {"com.rtg.vcf.eval.VcfEvalCliTest", "com.rtg.vcf.eval.VcfEvalNanoTest"})
 public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   /** Flag used for supplying truth variants */

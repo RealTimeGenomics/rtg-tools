@@ -1,0 +1,1 @@
+Could not maximize F-measure from ROC data, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --vcf-score-field
