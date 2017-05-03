@@ -89,9 +89,13 @@ public final class CFlags {
 
   static final String LS = System.lineSeparator();
 
+  private static final int MIN_WIDTH = 80;
+  private static final int MAX_WIDTH = 160;
+
   /**
    * Default width to which help is printed. This is semi-intelligent in that it
-   * attempts to look at environment variables to determine the terminal width.
+   * attempts to look at environment variables to determine the terminal width, but
+   * constrained between MIN_WIDTH and MAX_WIDTH.
    */
   public static final int DEFAULT_WIDTH;
 
@@ -104,7 +108,7 @@ public final class CFlags {
     if (defaultWidth == -1) {
       defaultWidth = getTermWidth("stty -f /dev/tty size", "([0-9]+) ([0-9]+)", 2);
     }
-    DEFAULT_WIDTH = Math.max(80, Math.min(defaultWidth, 160));
+    DEFAULT_WIDTH = Math.max(MIN_WIDTH, Math.min(defaultWidth, MAX_WIDTH));
   }
 
   private static int getTermWidth(String command, String regex, int group) {
@@ -1363,8 +1367,8 @@ public final class CFlags {
 
   private void appendTableFlagUsage(StringBuilder sb, int usageWidth, String label, List<Flag<?>> flags) {
     if (flags.size() > 0) {
-      final int descriptionLength = getUsageDescriptionLength(flags);
-      final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, Math.max(descriptionLength, 100));
+      final int descriptionLength = Math.max(MIN_WIDTH, Math.max(getUsageDescriptionLength(flags), MAX_WIDTH));
+      final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, descriptionLength);
       table.addHeading(label);
       for (Flag<?> flag : flags) {
         final String shortFlag = flag.getChar() != null ? "``" + SHORT_FLAG_PREFIX + flag.getChar() + "``" : "";
@@ -1403,7 +1407,7 @@ public final class CFlags {
   }
 
   private String getTableUsageDescription(Flag<?> flag) {
-    return StringUtils.sentencify(flag.getUsageDescription()).replaceAll("\"", "``");
+    return StringUtils.sentencify(flag.getUsageDescription()).replaceAll("\"", "``").replaceAll("\\*", "\\\\*");
   }
 
   List<Flag<?>> getDisplayable(final Flag.Level level) {

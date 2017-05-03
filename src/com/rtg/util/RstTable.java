@@ -31,6 +31,8 @@ package com.rtg.util;
 
 import java.util.Arrays;
 
+import com.rtg.util.cli.WrappingStringBuilder;
+
 /**
  * Simple class to output text into an <code>RST</code> formatted table. Need to know max width of columns in advance.
  * Does not do any escaping itself
@@ -103,17 +105,33 @@ public class RstTable {
     if (text.length != mWidths.length) {
       throw new IllegalArgumentException("Expected " + mWidths.length + " columns, got " + text.length);
     }
-    for (int i = 0; i < text.length; ++i) {
-      if (text[i].length() > mWidths[i]) {
-        System.err.println("Arrays.toString(mWidths) = " + Arrays.toString(mWidths));
-        System.err.println("Arrays.toString(text) = " + Arrays.toString(text));
-        throw new IllegalArgumentException("text too wide, expected: " + mWidths[i] + " got: " + text[i].length());
-      }
-      final String formatString = "|" + widthString(mSpacing) + widthString(mWidths[i]) + widthString(mSpacing);
-      mTable.append(String.format(formatString, "", text[i], ""));
+    final String[][] cols = new String[text.length][];
+    int rows = 0;
+    for (int col = 0; col < text.length; ++col) {
+      cols[col] = splitToWidthWithWrap(mWidths[col], text[col]);
+      rows = Math.max(rows, cols[col].length);
     }
-    mTable.append("|").append(StringUtils.LS);
+    for (int row = 0; row < rows; row++) {
+      for (int col = 0; col < cols.length; ++col) {
+        final String s = (row < cols[col].length) ? cols[col][row] : "";
+        if (s.length() > mWidths[col]) {
+          System.err.println("Arrays.toString(mWidths) = " + Arrays.toString(mWidths));
+          System.err.println("Arrays.toString(text) = " + Arrays.toString(text));
+          throw new IllegalArgumentException("text too wide, expected: " + mWidths[col] + " got: " + s.length() + " " + s);
+        }
+        final String formatString = "|" + widthString(mSpacing) + widthString(mWidths[col]) + widthString(mSpacing);
+        mTable.append(String.format(formatString, "", s, ""));
+      }
+      mTable.append("|").append(StringUtils.LS);
+    }
     addSeparator();
+  }
+
+  private static String[] splitToWidthWithWrap(int width, String text) {
+    final WrappingStringBuilder sb = new WrappingStringBuilder();
+    sb.setWrapWidth(width + StringUtils.LS.length()); // Don't let line breaks count toward width, since they'll get removed by split.
+    sb.wrapTextWithNewLines(text);
+    return sb.toString().split(StringUtils.LS);
   }
 
   /**
