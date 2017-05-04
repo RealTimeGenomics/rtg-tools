@@ -1367,7 +1367,7 @@ public final class CFlags {
 
   private void appendTableFlagUsage(StringBuilder sb, int usageWidth, String label, List<Flag<?>> flags) {
     if (flags.size() > 0) {
-      final int descriptionLength = Math.max(MIN_WIDTH, Math.max(getUsageDescriptionLength(flags), MAX_WIDTH));
+      final int descriptionLength = Math.max(MIN_WIDTH, Math.min(getUsageDescriptionLength(flags), MAX_WIDTH));
       final RstTable table = new RstTable(1, label.length(), 6, usageWidth + 4, descriptionLength);
       table.addHeading(label);
       for (Flag<?> flag : flags) {
