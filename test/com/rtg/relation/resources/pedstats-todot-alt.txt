@@ -46,11 +46,11 @@ digraph Ped {
   node0 [label="NA12877-1", shape="box", style=filled, fillcolor="/rdylbu11/7:/rdylbu11/8"];
   node1 [label="NA12878", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
   node3 [label="NA12880-1", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
+  node11 [label="NA12880-half", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
   node4 [label="NA12883", shape="box", style=filled, fillcolor="/rdylbu11/7:/rdylbu11/8"];
   node5 [label="NA12889", shape="box", style=filled, fillcolor="/rdylbu11/7:/rdylbu11/8"];
   node6 [label="NA12890", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
   node8 [label="NA12891-1", shape="box", style=filled, fillcolor="/rdylbu11/7:/rdylbu11/8"];
   node9 [label="NA12892-1", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
-  node11 [label="NA12880-half", shape="oval", style=filled, fillcolor="/rdpu9/2:/rdpu9/4"];
 }
 
