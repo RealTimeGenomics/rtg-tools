@@ -83,15 +83,21 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      */
     function infoSet(field) {
         return function (value) {
-            var values = value.toString().split(',');
-            var ArrayList = Java.type("java.util.ArrayList");
-            var list = new ArrayList();
-            if (Array.isArray(values)) {
-                values.forEach(function (val) {
-                    list.add(val.toString());
-                });
+            if (value == null || value == "." || value == false) {
+                RTG_VCF_RECORD.removeInfo(field);
+            } else {
+                var ArrayList = Java.type("java.util.ArrayList");
+                var list = new ArrayList();
+                if (value != true) {
+                    var values = value.toString().split(',');
+                    if (Array.isArray(values)) {
+                        values.forEach(function (val) {
+                            list.add(val.toString());
+                        });
+                    }
+                }
+                RTG_VCF_RECORD.getInfo().put(field, list);
             }
-            RTG_VCF_RECORD.getInfo().put(field, list);
         }
     }
 

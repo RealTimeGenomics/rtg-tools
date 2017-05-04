@@ -263,6 +263,30 @@ public class ScriptedVcfFilterTest {
   }
 
   @Test
+  public void testUpdateInfoFlag() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addInfo("IN");
+    assertTrue(record.getInfo().containsKey("IN"));
+    assertTrue(getScriptedVcfFilter("INFO.IN = false; true").accept(record));
+    assertFalse(record.getInfo().containsKey("IN"));
+    assertTrue(getScriptedVcfFilter("INFO.IN = true; true").accept(record));
+    assertTrue(record.getInfo().containsKey("IN"));
+  }
+
+  @Test
+  public void testClearInfo() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+
+    record.addInfo("IN");
+    assertTrue(getScriptedVcfFilter("INFO.IN = null; true").accept(record));
+    assertFalse(record.getInfo().containsKey("IN"));
+
+    record.addInfo("IN");
+    assertTrue(getScriptedVcfFilter("INFO.IN = '.'; true").accept(record));
+    assertFalse(record.getInfo().containsKey("IN"));
+  }
+
+  @Test
   public void testRecordFunctionNoReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addInfo("IN", "FOO");
