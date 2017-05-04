@@ -450,7 +450,7 @@ public class GenomeRelationships {
     }
 
     // Output genome nodes
-    for (final String genome : seenGenomes) {
+    for (final String genome : mGenomes) {
       final Sex s = getSex(genome);
       String style;
       final String shape;
