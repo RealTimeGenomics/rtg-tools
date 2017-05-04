@@ -37,6 +37,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -370,14 +371,11 @@ public class GenomeRelationships {
       + "  label=\"").append(title).append("\";\n").append("\n");
 
     final HashSet<Relationship> seen = new HashSet<>();
-    final HashSet<String> seenGenomes = new LinkedHashSet<>();
     final Map<String, String> nodeIds = new HashMap<>();
 
     // Output family specific stuff (i.e. node representing a marriage, with children coming off that)
     try {
       for (final Family family : Family.getFamilies(this, true, null)) {
-        seenGenomes.add(family.getFather());
-        seenGenomes.add(family.getMother());
         final String fatherId = nodeId(nodeIds, family.getFather());
         final String motherId = nodeId(nodeIds, family.getMother());
         final String marriageId = nodeId(nodeIds, "m" + family.getFather() + "x" + family.getMother());
@@ -426,10 +424,7 @@ public class GenomeRelationships {
         for (final String child : family.getChildren()) {
           final String from = family.getChildren().length == 1 || simpleLayout ? marriageId : (nodeId(nodeIds, child) + "b");
           sb.append("  ").append(from).append(" -> ").append(nodeId(nodeIds, child)).append(" [];\n");
-          for (final Relationship r : relationships(child, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child))) {
-            seen.add(r);
-            seenGenomes.add(child);
-          }
+          Collections.addAll(seen, relationships(child, new RelationshipTypeFilter(RelationshipType.PARENT_CHILD), new SecondInRelationshipFilter(child)));
         }
       }
     } catch (PedigreeException e) {
@@ -443,8 +438,6 @@ public class GenomeRelationships {
           final String relname = REL_LABELS.containsKey(r.type().name()) ? REL_LABELS.get(r.type().name()) : r.type().name();
           sb.append("  ").append(nodeId(nodeIds, r.first())).append(" -> ").append(nodeId(nodeIds, r.second())).append(" [label=\"").append(relname).append("\", fontsize=10];\n");
           seen.add(r);
-          seenGenomes.add(r.first());
-          seenGenomes.add(r.second());
         }
       }
     }
