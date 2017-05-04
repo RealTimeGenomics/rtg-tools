@@ -361,14 +361,24 @@ public class GenomeRelationships {
     final String diseaseFill = props.getProperty("disease.fill", "grey");
 
     final StringBuilder sb = new StringBuilder();
-    sb.append("digraph Ped {\n"
-      + "  graph [fontname = \"" + font + "\", color=\"" + color + "\"];\n"
-      + "  node [fontname = \"" + font + "\", color=\"" + color + "\", gradientangle=\"" + gradientangle + "\"];\n"
-      + "  edge [fontname = \"" + font + "\", color=\"" + color + "\"];\n"
-      + "  ratio =\"auto\";\n"
-      + "  mincross = 2.0;\n"
-      + "  labelloc = \"t\";\n"
-      + "  label=\"").append(title).append("\";\n").append("\n");
+    sb.append("digraph Ped {\n  graph [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\"];\n")
+      .append("  node [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\", gradientangle=\"")
+      .append(gradientangle)
+      .append("\"];\n  edge [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\"];\n  ratio =\"auto\";\n  mincross = 2.0;\n  labelloc = \"t\";\n  label=\"")
+      .append(title)
+      .append("\";\n\n");
 
     final HashSet<Relationship> seen = new HashSet<>();
     final Map<String, String> nodeIds = new HashMap<>();
@@ -504,7 +514,12 @@ public class GenomeRelationships {
   public Properties addGenome(String genome, String sex) {
     final Properties props = addGenome(genome);
     if (sex != null) {
-      props.put(SEX_PROPERTY, sex);
+      final String existingSex = props.getProperty(SEX_PROPERTY);
+      if (existingSex == null) {
+        props.put(SEX_PROPERTY, sex);
+      } else if (!existingSex.equalsIgnoreCase(sex)) {
+        throw new NoTalkbackSlimException("Conflicting sex definitions for individual " + genome);
+      }
     }
     return props;
   }
