@@ -49,11 +49,13 @@ public class VcfPedigreeParserTest extends TestCase {
   private NanoRegression mNano = null;
 
   @Override
-  public void setUp() {
+  public void setUp() throws Exception {
+    super.setUp();
     mNano = new NanoRegression(this.getClass());
   }
   @Override
   public void tearDown() throws Exception {
+    super.tearDown();
     try {
       mNano.finish();
     } finally {
