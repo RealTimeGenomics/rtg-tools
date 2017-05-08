@@ -1,6 +1,6 @@
 # RTG Tools
 
-Copyright (c) 2016 Real Time Genomics Ltd
+Copyright (c) 2017 Real Time Genomics Ltd
 
 This software is provided under the Simplified BSD License. See
 [LICENSE.txt](LICENSE.txt)
@@ -61,8 +61,10 @@ please consider our full analysis suite
 
 ## Support
 
-A PDF user manual is included in the installation or can be
-[viewed online](installer/resources/tools/RTGOperationsManual.pdf).
+A user manual is included within the installation in both PDF and HTML
+versions. These may also be viewed
+online ([HTML](https://cdn.rawgit.com/RealTimeGenomics/rtg-tools/master/installer/resources/tools/RTGOperationsManual/index.html),
+[PDF](https://cdn.rawgit.com/RealTimeGenomics/rtg-tools/master/installer/resources/tools/RTGOperationsManual.pdf)).
 
 You can use the commands in RTG Tools to format your own reference
 datasets, or download common

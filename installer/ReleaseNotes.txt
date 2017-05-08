@@ -4,6 +4,236 @@ Below are the release notes for RTG Core, upon which RTG.VERSION
 is based.  Not all features described below may be included in this
 product.
 
+RTG Core 3.8 (2017-05-15)
+-------------------------
+
+Major features of this release:
+
+* Improvements aimed at preprocessing and QC. In particular, RTG
+  includes two new commands, fastqtrim and petrim, for preprocessing
+  FASTQ files to apply various kinds of trimming before entering the NGS
+  pipeline. These commands greatly expand what was previously available
+  during data formatting.
+
+* The suite of simulation commands that were previously only available
+  as part of RTG Core have been included in the RTG Tools package. These
+  commands encompass simulation of reference genomes (genomesim),
+  simulation of population-level variants (popsim), individual sample
+  genomes using population variants (samplesim), simulation of samples
+  as member of a pedigree obeying inheritance rules (childsim),
+  simulation of de-novo variants (denovosom), generation of a genome
+  given a VCF of sample variants (samplereplay), and read simulation
+  according to a range of sequencer parameters (readsim/cgsim).
+
+* Initial support for accepting CRAM files as input to variant calling
+  commands and most other commands that accept alignments as input. For
+  some commands this may now require specifying a reference SDF in order
+  to decode the CRAM files.
+
+* Improvements to the prebuilt AVR models that perform variant
+  scoring. These models have been rebuilt using training data
+  incorporating the latest truth sets produced by the GIAB initiative as
+  well as improvements to the underlying machine learning algorithms.
+
+* User manual improvements, in particular the baseline progressions
+  section has been rearranged to better illustrate how to run end-to-end
+  RTG calling pipelines that make best use of RTG features such as
+  sex-aware and pedigree-aware variant calling.
+
+Detailed changes are listed below by area.  For more information on
+new features, see the RTG Operations Manual.
+
+## Basic Formatting and Mapping
+
+* fastqtrim: This new command allows trimming of FASTQ files with much
+  more flexibility and control than is available directly from
+  format. See the user manual for more information and examples.
+
+* petrim: This new command allows trimming of read bases in paired-end
+  data where read-through has occurred, as determined by alignment
+  overlap. See the user manual for more information and examples.
+
+* format: Support for reading interleaved paired-end FASTQ added. This
+  is useful for formatting directly from streamed output of the petrim
+  command, avoiding additional disk I/O.
+
+* format/map: The quality encoding for FASTQ input files now defaults to
+  the sanger encoding used by the majority of modern FASTQ files, and so
+  the --quality-format flag typically only needs to be specified when
+  processing older FASTQ files employing an alternative encoding.
+
+* many: When outputting FASTA/FASTQ, ensure consistent use of unix line
+  endings across the various commands.
+
+* calibrate: When calibrating multiple BAM files, each is calibrated in
+  an independent thread, obeying --threads flag.
+
+* sammerge: New flag --subsample that permits a fraction of the
+  alignments through to the output.  In addition, the new flag --seed
+  lets you control which seed is used for this filtering.
+
+* coverage: Computes additional QC metrics fold-80 penalty and median
+  coverage.
+
+* coverage: New flag --per-region to which changes how BED/BEDGRAPH
+  coverage records are triggered, from being whenever the coverage level
+  changes, to only when the region changes.
+
+* sammerge: Will now create output files in CRAM format if the output
+  filename ends with ".cram". This requires the user to specify the
+  reference SDF via the new --template flag.
+
+* index: Now allows creating indexes for CRAM files. These are the
+  `.bai` indexes currently supported by htsjdk, rather than `.crai`
+  indexes.
+
+### Variant Calling
+
+* snp: Includes INFO.DP annotations in output VCF, for consistency with
+  the existing multi-sample caller output.
+
+* family/population/somatic: New VCF annotations (OCOC/OCOF/DCOC/DCOF)
+  that indicate the count/fraction of contrary evidence observed in the
+  original(parent) vs derived(child) samples.
+
+* snp/family/population/somatic: These commands now support SAM/BAM
+  files that make use of the '=' character in the SEQ field (such as can
+  be created by BamUtil:convert)
+
+* snp/family/population/somatic: These commands now support CRAM files
+  as input.
+
+* family/population: Improved error reporting for semantically incorrect
+  user-supplied pedigree information.
+
+* snp/family/population/somatic: Improvements to the accuracy of the
+  pre-built AVR models. These models have been rebuilt using training
+  data incorporating the latest truth sets produced by the GIAB
+  initiative as well as improvements to the underlying machine learning
+  algorithm.
+
+* snp/family/population: The default AVR model is now illumina-wgs.avr
+  (previously the default was illumina-exome.avr). For exome calling,
+  the illumina-exome.avr model provides an advantage over
+  illumina-wgs.avr only when the primary interest is maximising the
+  scoring of variants called outside of exome target regions.
+
+* many: For compatibility with non-human species, sex handling of PAR
+  regions has been extended to allow the length of a PAR region in each
+  member of an allosome pair to be of different length.
+
+* svprep: Add the ability to run on merged alignment files rather than
+  requiring alignment files to be separated into mated vs unmated vs
+  unmapped.
+
+* svprep: New flag --no-augment flag permits the computation of read
+  group statistics files only, for use when collecting statistics from
+  third party alignment files.
+
+* avrpredict: New flag --sample to allow AVR scoring of only the
+  specified sample names.
+
+* avrpredict: New flag --vcf-score-field to allow storing the AVR score
+  into a format field with a different name, useful when comparing
+  multiple scoring models.
+
+* avrbuild: Improvements to the quality of models built in the presence
+  of missing annotations.
+
+### Variant Processing and Analysis
+
+* vcfmerge: When combining records at the same position, vcfmerge will
+  now not combine records at a site where some records use a VCF padding
+  base (as required by the VCF specification to prevent REF or ALT being
+  zero-length) and some records do not. This is because a record which
+  utilizes a padding base is not making an assertion about the genotype
+  of the padding base itself, and merging these records loses this
+  semantic distinction. (The old behaviour can be obtained via
+  --Xnon-padding-aware.)
+
+* vcfannotate: New flag --no-header to suppress output of the VCF header.
+
+* vcfsubset: New flag --remove-ids to allow clearing the ID column.
+
+* rocplot: New flag --zoom which allows the specification of an initial
+  zoom to display. See the user manual for a description of the
+  coordinate syntax.
+
+* rocplot: (GUI) Add ability to remove a curve via per-curve pop-up menu
+  in the side-pane.
+
+* rocplot: (GUI) Prevent loading the same ROC data file multiple times,
+  and improve error handling on invalid files.
+
+* rocplot: (GUI) Improvements to the open file dialog. Now defaults to
+  displaying ROC data files only, permits opening multiple ROC data
+  files at once via multi-select, and other minor changes.
+
+* rocplot: (GUI) The "Cmd" button now shows the command in a pop-up
+  dialog rather than sending it to the terminal, which eliminates the
+  need to search through multiple tmux windows to find where rocplot was
+  started from.
+
+* many: Invalid VCF header contig length specifications are now reported
+  gracefully.
+
+* many: Improved error reporting of general VCF header parsing errors,
+  now include the problematic line where possible.
+
+* many: Improved error reporting of malformed GT fields.
+
+### Metagenomics
+
+* species: Fix the handling of mappings that contain non-unique
+  read-names (as could arise when mapping directly from FASTQ files as
+  separate mapping runs and passing the resulting alignments to
+  species).
+
+* species: Accuracy improvements when using paired-end data as the
+  underlying data source.
+
+### Other
+
+* pedstats: Improved the GraphViz pedigree visualization layout for
+  normal pedigree structures. The old layout is available with the new
+  ``--simple-dot`` flag.
+
+* many: The following simulation commands are now included as part of
+  RTG Tools: genomesim, cgsim, readsim, popsim, samplesim, childsim,
+  denovosim, samplereplay.
+
+* readsim: When using --taxonomy-distribution and --distribution, one of
+  --abundance or --dna-fraction must be supplied in order to indicate
+  the desired interpretation.
+
+* index: the -f flag is now optional and by default index will attempt to
+  determine the file format by the extension.
+
+* many: Most commands accept the advanced flag --Xforce that allows them
+  to continue in the case of pre-existing output files or
+  directories. Be aware that particularly in the case of output
+  directories the final directory contents may include files from
+  previous runs (or even other commands), so this option should not be
+  used in production scenarios.
+
+* many: Fixed an exception that could occur when performing multiple
+  region based querying of SAM/BED/VCF records, where the regions were
+  densely packed near the ends of chromosomes.
+
+* many: Almost all commands that take SAM/BAM as input now support CRAM
+  files as input. Some of these commands have a new flag used to supply
+  the reference SDF which is required when decoding CRAM.
+
+* misc: The rtg bash command completion has been improved to be more
+  portable and no longer caches completion data on disk.
+
+* many: Linux and Windows packages have updated the bundled JRE to the
+  latest from Oracle.
+
+
+Previous releases
+=================
+
 RTG Core 3.7.1 (2016-10-18)
 ---------------------------
 
@@ -36,9 +266,6 @@ This release primarily includes bugfixes and minor improvements:
 
 * Minor documentation fixes.
 
-
-Previous releases
-=================
 
 RTG Core 3.7 (2016-08-25)
 -------------------------
