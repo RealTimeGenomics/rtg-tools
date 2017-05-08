@@ -1,3 +1,4 @@
+# -*- mode: sh -*-
 #
 # Provides bash programmable completion for rtg commands and flags.
 # To use this, you need to source the file. e.g.:
@@ -11,27 +12,18 @@
 function _complete_rtg() {
     local rtg=$1
     local cur prev opts cmd flagtype
-    local cachedir=$HOME/.rtg-completion
     local IFS=$'\n'
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
  
-    #echo "$(date)" >~/.rtgcomp
-    #echo "ARGS=$@" >>~/.rtgcomp
-    #echo "COMP_LINE=$COMP_LINE" >>~/.rtgcomp
-    #echo "COMP_CWORD=${COMP_CWORD}" >>~/.rtgcomp
-    #echo "COMP_WORDS=${COMP_WORDS[@]}" >>~/.rtgcomp
-    #echo "cur=$cur prev=$prev" >>~/.rtgcomp
     if [ "${prev}" == "$rtg" ] || [ "${prev:0:4}" == "RTG_" ]; then
-        #echo "prev=main" >>~/.rtgcomp
         opts="$("$rtg" --Xhelp 2>&1 | sed -E -n '/^'$'\t''[a-z]/s/^[[:blank:]][[:blank:]]*([[:graph:]][[:graph:]]*).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
-        #echo "$opts" >>~/.rtgcomp
         COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
         return 0
-    elif [ $COMP_CWORD -gt 1 ]; then
+    elif [ "$COMP_CWORD" -gt 1 ]; then
         # Crazy scan to find the subcommand name, handling RTG_MEM/RTG_JAVA_OPTS being split on = by bash
-        for ((cmdi=1, cmdl=0; cmdi < $COMP_CWORD; cmdi++, cmdl++)); do
+        for ((cmdi=1, cmdl=0; cmdi < "$COMP_CWORD"; cmdi++, cmdl++)); do
             cmd="${COMP_WORDS[$cmdi]}"
             if [ "${cmd:0:4}" == "RTG_" ]; then
                 continue;
@@ -42,63 +34,53 @@ function _complete_rtg() {
             fi
             break;
         done
-        #echo "cmd=$cmd" >>~/.rtgcomp
-        
+
         case "${cur}" in
             --XX*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --XXhelp | sed -n '/^  *-/s/.*\(--XX[^= ][^= ]*\)[= ].*/\1/p')"
-                #echo "cmd-help=$opts" >>~/.rtgcomp
+                _complete_rtghelp "$rtg" "$cmd" --XXhelp
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--XX[^= ][^= ]*\)[= ].*/\1/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-                #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             --X*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --Xhelp | sed -n '/^  *-/s/.*\(--X[^= ][^= ]*\)[= ].*/\1/p')"
-                #echo "cmd-help=$opts" >>~/.rtgcomp
+                _complete_rtghelp "$rtg" "$cmd" --Xhelp
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--X[^= ][^= ]*\)[= ].*/\1/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-                #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             -*)
-                opts="$(_complete_rtghelp "$rtg" $cmd --help | sed -n '/^  *-/s/.*\(--[^= ][^= ]*\)[= ].*/\1/p')"
-                #echo "cmd-help=$opts" >>~/.rtgcomp
+                _complete_rtghelp "$rtg" "$cmd" --help
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--[^= ][^= ]*\)[= ].*/\1/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-                #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                 return 0
                 ;;
             *)
+                _complete_rtghelp "$rtg" "$cmd" --help
                 if [ "${prev:0:1}" == "-" ]; then
-                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -E -n -e "/  *${prev}.*=[A-Z][A-Z]*/s/.*=([A-Z][A-Z]*)[[:blank:]].*/\1/p")"
+                    flagtype="$(echo "$_rtg_help" | sed -E -n -e "/  *${prev}.*=[A-Z][A-Z]*/s/.*=([A-Z][A-Z]*)[[:blank:]].*/\1/p")"
                 else   # Completion for anonymous flags
-                    flagtype="$(_complete_rtghelp "$rtg" $cmd --help | sed -E -n -e "/^    *[A-Z][A-Z]*\+?  */s/^  *([A-Z][A-Z]*).*/\1/p")"
+                    flagtype="$(echo "$_rtg_help" | sed -E -n -e "/^    *[A-Z][A-Z]*\+?  */s/^  *([A-Z][A-Z]*).*/\1/p")"
                 fi
-                #echo "flagtype=$flagtype" >>~/.rtgcomp
                 case ${flagtype} in
                     FILE)
-                        #echo "files=$opts" >>~/.rtgcomp
                         COMPREPLY=( $(compgen -o dirnames -f "${cur}") )
-                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                         return 0
                         ;;
 	            DIR|SDF)
-                        #echo "dir/sdf=$opts" >>~/.rtgcomp
                         COMPREPLY=( $(compgen -o dirnames -d "${cur}") )
-                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                         return 0
                         ;;
                     *)
-                        enumfile=$cachedir/$cmd.$prev
-                        if [ -f $enumfile ]; then
-                            #echo "enum flag type $flagtype" >>~/.rtgcomp
-                            COMPREPLY=( $(compgen -W "$(tr ' ' '\n' <$enumfile)" -- "${cur}") )
+                        enumvar="_rtg_${cmd}_${prev//-/_}"
+                        enumval="${!enumvar}"
+                        if [ "$enumval" ]; then
+                            COMPREPLY=( $(compgen -W "$(echo "${enumval// /$'\n'}")" -- "${cur}") )
                         else
-                            #echo "unknown flag type $flagtype" >>~/.rtgcomp
                             oifs="$IFS"
                             IFS=$'\n' 
                             COMPREPLY=( $(compgen -f -- "${cur}") )
                             IFS="$oifs"
                         fi
-                        #echo "comprely=${COMPREPLY[@]}" >>~/.rtgcomp
                         return 0
                         ;;
                 esac
@@ -110,35 +92,25 @@ function _complete_rtg() {
 # Helper for completion that caches help output per command. Use cache
 # whenever it exists and we are running the same command as last time.
 # Also automatically works out options for enums (e.g. --sex, --format
-# --machine) and stashes into $HOME/.rtg-completion/$1.<flagname> for later
-# retrieval.
+# --machine) and stashes for later enum expansion into variables named
+# e.g. _rtg_format___quality_format="illumina solexa sanger"
 function _complete_rtghelp () {
     local rtg=$1
     local cmd=$2
     local help=$3
-    # echo "_complete_rtghelp $rtg $cmd $help" >>~/.rtgcomp
-    local cachedir=$HOME/.rtg-completion
-    [ -d $cachedir ] || mkdir $cachedir
-    local cache=$cachedir/$cmd.$help
-    local lastcmd=$cachedir/lastcmd
-    [ -f $cache ] && [ -f $lastcmd ] && [ "$cmd" == "$(cat $lastcmd)" ] || {
-        "$rtg" $cmd $help 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' >$cache && \
-        <$cache tr -d ',' | awk --posix 'match($0,/(--[^=]+)=.*Allowed values are \[([^]]+)\]/)
-{
-  l=substr($0, RSTART, RLENGTH - 1);
-  if (match(l,/(--[^=]+)=/)) {
-    f=substr(l, RSTART, RLENGTH - 1)
-    if (match(l,/Allowed values are \[([^]]+)/)) {
-      o=substr(l, RSTART+20, RLENGTH);
-      file="'$cachedir/$cmd.'"f; print o>file
-    }
-  }
-}'
-        echo $cmd >$lastcmd
-    }
-    cat $cache
+    if [ -z "$_rtg_help" ] || [ -z "$_rtg_lastcmd" ] || [ "$_rtg_lastcmd" != "$cmd$help" ]; then
+        _rtg_help="$("$rtg" "$cmd" "$help" 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' | sed -n "/^  *[-A-Z]/p")"
+        while IFS=' ' read flag rest; do
+            enumvar="_rtg_${cmd}___${flag//-/_}"
+            # Kind of yuk setting of dynamic variables. Can't use declare -g with bash <4.2
+            eval "${enumvar}=\"${rest}\""
+        done < <(echo "$_rtg_help" | sed -n -e "s/,//g" -e "/.*--[^=]*=.*Allowed values are/s/.*--\([^=]*\)=.*Allowed values are \[\([^]]*\)\].*/\1 \2/p")
+        _rtg_lastcmd="$cmd$help"
+    fi
 }
 
+_rtg_help=
+_rtg_lastcmd=
 
 complete -o filenames -F _complete_rtg rtg
 
