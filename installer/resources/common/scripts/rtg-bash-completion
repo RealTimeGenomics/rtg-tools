@@ -3,7 +3,7 @@
 # Provides bash programmable completion for rtg commands and flags.
 # To use this, you need to source the file. e.g.:
 #
-# . /path/to/rtg-bash-completion
+# . /path/to/rtg/scripts/rtg-bash-completion
 #
 # To enable permanently, put that command into your $HOME/.bashrc
 #

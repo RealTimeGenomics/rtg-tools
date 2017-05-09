@@ -153,10 +153,13 @@ RTG_USAGE_OPTIONAL=username,hostname
 
 
 EOF
-    echo
-    echo "Initial configuration complete.  Advanced user configuration is"
-    echo "available by editing settings in rtg.cfg"
-    echo
+cat <<EOF
+
+Initial configuration complete.  Advanced user configuration is
+available by editing settings in rtg.cfg and users of bash may wish to
+enable bash completion, see ${THIS_DIR}/scripts/rtg-bash-completion
+
+EOF
 fi
 
 # Set other defaults
