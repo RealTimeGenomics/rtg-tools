@@ -11,18 +11,14 @@
 # Main bash completion function
 function _complete_rtg() {
     local rtg=$1
-    local cur prev opts cmd flagtype
+    local cur prev opts cmd flagtype enumvar enumval
     local IFS=$'\n'
+    local cmdi=0
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
- 
-    if [ "${prev}" == "$rtg" ] || [ "${prev:0:4}" == "RTG_" ]; then
-        opts="$("$rtg" --Xhelp 2>&1 | sed -E -n '/^'$'\t''[a-z]/s/^[[:blank:]][[:blank:]]*([[:graph:]][[:graph:]]*).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
-        COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
-        return 0
-    elif [ "$COMP_CWORD" -gt 1 ]; then
-        # Crazy scan to find the subcommand name, handling RTG_MEM/RTG_JAVA_OPTS being split on = by bash
+    if [ "$COMP_CWORD" -gt 1 ]; then
+        # Scan to look for a subcommand name, skipping RTG_MEM/RTG_JAVA_OPTS being split on = by bash
         for ((cmdi=1, cmdl=0; cmdi < "$COMP_CWORD"; cmdi++, cmdl++)); do
             cmd="${COMP_WORDS[$cmdi]}"
             if [ "${cmd:0:4}" == "RTG_" ]; then
@@ -34,7 +30,13 @@ function _complete_rtg() {
             fi
             break;
         done
+    fi
 
+    if [[ "${prev}" == "$rtg" ]] || [[ "$cmdi" -ge "$COMP_CWORD" ]]; then
+        _complete_rtgcommands "$rtg"
+        COMPREPLY=($(compgen -W "${_rtg_cmds// /$'\n'}" -- "${cur}"))
+        return 0
+    elif [ "$COMP_CWORD" -gt 1 ]; then
         case "${cur}" in
             --XX*)
                 _complete_rtghelp "$rtg" "$cmd" --XXhelp
@@ -74,7 +76,7 @@ function _complete_rtg() {
                         enumvar="_rtg_${cmd}_${prev//-/_}"
                         enumval="${!enumvar}"
                         if [ "$enumval" ]; then
-                            COMPREPLY=( $(compgen -W "$(echo "${enumval// /$'\n'}")" -- "${cur}") )
+                            COMPREPLY=( $(compgen -W "${enumval// /$'\n'}" -- "${cur}") )
                         else
                             oifs="$IFS"
                             IFS=$'\n' 
@@ -89,6 +91,16 @@ function _complete_rtg() {
     fi
 }
 
+# Helper for completion that caches list of RTG subcommands. Use cache
+# whenever it exists and we are running the same rtg as last time.
+function _complete_rtgcommands () {
+    local rtg=$1
+    if [ -z "$_rtg_cmds" ] || [ -z "$_rtg_lastrtg" ] || [ "$_rtg_lastrtg" != "$rtg" ]; then
+        _rtg_lastrtg="$rtg"
+        _rtg_cmds="$("$rtg" --Xhelp 2>&1 | sed -E -n '/^'$'\t''[a-z]/s/^[[:blank:]][[:blank:]]*([[:graph:]][[:graph:]]*).*/\1/p') RTG_MEM RTG_JAVA_OPTS"
+    fi
+}
+
 # Helper for completion that caches help output per command. Use cache
 # whenever it exists and we are running the same command as last time.
 # Also automatically works out options for enums (e.g. --sex, --format
@@ -98,17 +110,21 @@ function _complete_rtghelp () {
     local rtg=$1
     local cmd=$2
     local help=$3
-    if [ -z "$_rtg_help" ] || [ -z "$_rtg_lastcmd" ] || [ "$_rtg_lastcmd" != "$cmd$help" ]; then
+    local enumvar
+    if [ -z "$_rtg_help" ] || [ -z "$_rtg_lastcmd" ] || [ "$_rtg_lastrtg" != "$rtg" ] || [ "$_rtg_lastcmd" != "$cmd$help" ]; then
+        _rtg_lastrtg="$rtg"
+        _rtg_lastcmd="$cmd$help"
         _rtg_help="$("$rtg" "$cmd" "$help" 2>/dev/null | tr '\n' '\a' | sed -e "s/"$'\a'"            */ /g" | tr '\a' '\n' | sed -n "/^  *[-A-Z]/p")"
         while IFS=' ' read flag rest; do
             enumvar="_rtg_${cmd}___${flag//-/_}"
             # Kind of yuk setting of dynamic variables. Can't use declare -g with bash <4.2
             eval "${enumvar}=\"${rest}\""
         done < <(echo "$_rtg_help" | sed -n -e "s/,//g" -e "/.*--[^=]*=.*Allowed values are/s/.*--\([^=]*\)=.*Allowed values are \[\([^]]*\)\].*/\1 \2/p")
-        _rtg_lastcmd="$cmd$help"
     fi
 }
 
+_rtg_lastrtg=
+_rtg_cmds=
 _rtg_help=
 _rtg_lastcmd=
 
