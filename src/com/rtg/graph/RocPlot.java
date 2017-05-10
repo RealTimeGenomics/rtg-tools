@@ -59,6 +59,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.prefs.Preferences;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -77,6 +78,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.WindowConstants;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
@@ -153,7 +155,7 @@ public class RocPlot {
 
   private final JScrollPane mScrollPane;
 
-  private final JFileChooser mFileChooser = new JFileChooser();
+  private final JFileChooser mFileChooser;
   private File mFileChooserParent = null;
 
   static final Color[] PALETTE = {
@@ -179,6 +181,12 @@ public class RocPlot {
    */
   RocPlot(boolean precisionRecall) {
     mMainPanel = new JPanel();
+    UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+    mFileChooser = new JFileChooser();
+    final Action details = mFileChooser.getActionMap().get("viewTypeDetails");
+    if (details != null) {
+      details.actionPerformed(null);
+    }
     mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
     mZoomPP.setColors(PALETTE);
@@ -388,11 +396,11 @@ public class RocPlot {
                 + (e1.getMessage().length() > 100 ? e1.getMessage().substring(0, 100) + "..." : e1.getMessage()),
               "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
           }
-          final Dimension r = mFileChooser.getSize();
-          prefs.putInt(CHOOSER_WIDTH, (int) r.getWidth());
-          prefs.putInt(CHOOSER_HEIGHT, (int) r.getHeight());
         }
       }
+      final Dimension r = mFileChooser.getSize();
+      prefs.putInt(CHOOSER_WIDTH, (int) r.getWidth());
+      prefs.putInt(CHOOSER_HEIGHT, (int) r.getHeight());
     }
   }
 
