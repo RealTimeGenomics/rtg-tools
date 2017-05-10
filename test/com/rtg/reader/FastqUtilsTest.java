@@ -53,10 +53,10 @@ public class FastqUtilsTest extends TestCase {
     checkBaseFile("input.fast", ".fastq", true, FastqUtils.baseFile(new File("input.fast.gz"), true));
 
     final BaseFile bf = FastqUtils.baseFile(new File("input.fastq.gz"), true);
-    assertEquals("input.fastq.gz", bf.suffixedFile("").getName());
+    assertEquals("input.fastq.gz", bf.file().getName());
     assertEquals("input_moo.fastq.gz", bf.suffixedFile("_moo").getName());
     final BaseFile bf2 = FastqUtils.baseFile(new File("input.fastq.gz"), false);
-    assertEquals("input.fastq", bf2.suffixedFile("").getName());
+    assertEquals("input.fastq", bf2.file().getName());
     assertEquals("input_moo.fastq", bf2.suffixedFile("_moo").getName());
   }
 

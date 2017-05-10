@@ -52,10 +52,10 @@ public class SamBamBaseFileTest extends TestCase {
     assertEquals(new File("filename"), file1.getBaseFile());
     assertEquals(".bam", file1.getExtension());
     assertFalse(file1.isGzip());
-    assertEquals(new File("filename.bam"), file1.suffixedFile(""));
+    assertEquals(new File("filename.bam"), file1.file());
     assertEquals(new File("filename_suffix.bam"), file1.suffixedFile("_suffix"));
     final SamBamBaseFile file2 = new SamBamBaseFile(new File("filename"), ".sam", true, SamBamBaseFile.SamFormat.SAM);
-    assertEquals(new File("filename.sam.gz"), file2.suffixedFile(""));
+    assertEquals(new File("filename.sam.gz"), file2.file());
     assertEquals(new File("filename_suffix.sam.gz"), file2.suffixedFile("_suffix"));
   }
 }

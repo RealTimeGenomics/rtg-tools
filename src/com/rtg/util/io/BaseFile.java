@@ -72,6 +72,14 @@ public class BaseFile {
   }
 
   /**
+   * Get the file name with all relevant extensions
+   * @return the fully named file
+   */
+  public File file() {
+    return suffixedFile("");
+  }
+
+  /**
    * Apply suffix to base file and add all relevant extensions
    * @param suffix suffix for base file
    * @return the fully named file

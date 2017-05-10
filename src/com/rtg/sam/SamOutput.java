@@ -102,7 +102,7 @@ public final class SamOutput implements Closeable {
       type = SamBamBaseFile.SamFormat.SAM;
       compress = false;
     } else {
-      outputFile = baseFile.suffixedFile("");
+      outputFile = baseFile.file();
       outputStream = null;
       type = baseFile.format();
       compress = type != SamBamBaseFile.SamFormat.SAM || baseFile.isGzip();

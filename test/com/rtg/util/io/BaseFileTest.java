@@ -44,10 +44,10 @@ public class BaseFileTest extends TestCase {
     assertEquals(new File("filename"), file1.getBaseFile());
     assertEquals(".extension", file1.getExtension());
     assertTrue(file1.isGzip());
-    assertEquals(new File("filename.extension.gz"), file1.suffixedFile(""));
+    assertEquals(new File("filename.extension.gz"), file1.file());
     assertEquals(new File("filename_suffix.extension.gz"), file1.suffixedFile("_suffix"));
     final BaseFile file2 = new BaseFile(new File("filename"), ".extension", false);
-    assertEquals(new File("filename.extension"), file2.suffixedFile(""));
+    assertEquals(new File("filename.extension"), file2.file());
     assertEquals(new File("filename_suffix.extension"), file2.suffixedFile("_suffix"));
   }
 }

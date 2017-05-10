@@ -1018,7 +1018,7 @@ public final class FileUtils {
    * @return the final output file name
    */
   public static File getOutputFileName(File userSuppliedFile, boolean gzip, String... exts) {
-    return isStdio(userSuppliedFile) ? userSuppliedFile : getBaseFile(userSuppliedFile, gzip, exts).suffixedFile("");
+    return isStdio(userSuppliedFile) ? userSuppliedFile : getBaseFile(userSuppliedFile, gzip, exts).file();
   }
 
   private static class TeeOutputStream extends OutputStream {
