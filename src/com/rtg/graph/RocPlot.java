@@ -183,7 +183,7 @@ public class RocPlot {
     }
     @Override
     public boolean accept(File f) {
-      final String flc = f.getName().toLowerCase();
+      final String flc = f.getName();
       return f.isDirectory() || flc.endsWith(RocFilter.ROC_EXT) || flc.endsWith(RocFilter.ROC_EXT + FileUtils.GZ_SUFFIX);
     }
   }
