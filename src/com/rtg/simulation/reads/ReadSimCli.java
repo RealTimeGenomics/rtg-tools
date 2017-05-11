@@ -415,6 +415,8 @@ public class ReadSimCli extends LoggedCli {
         final double[] selectionDist = new double[numSeq];
         try (FileInputStream is = new FileInputStream((File) mFlags.getValue(DISTRIBUTION))) {
           final Map<String, Double> selectionMap = createSelectionDistribution(is);
+          Diagnostic.userLog("Sequence distribution:" + selectionMap.toString());
+
           final NamesInterface names = reader.names();
           final int[] lengths = reader.sequenceLengths(0, numSeq);
           double sum = 0;
@@ -440,7 +442,7 @@ public class ReadSimCli extends LoggedCli {
         try (final FileInputStream is = new FileInputStream((File) mFlags.getValue(TAXONOMY_DISTRIBUTION))) {
           dist = new TaxonomyDistribution(is, TaxonomyUtils.loadTaxonomyMapping(reader), reader, byDnaFraction ? TaxonomyDistribution.DistributionType.DNA_FRACTION : TaxonomyDistribution.DistributionType.ABUNDANCE);
         }
-         selectionProb = dist.getDistribution();
+        selectionProb = dist.getDistribution();
         Diagnostic.userLog("Distribution complete");
       } else {
         selectionProb = null;

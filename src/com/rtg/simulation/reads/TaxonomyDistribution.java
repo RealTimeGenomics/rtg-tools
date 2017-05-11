@@ -66,14 +66,17 @@ public class TaxonomyDistribution {
 
   /**
    * Build a distribution
-   * @param taxonomyDist input stream specifying the relative DNA fraction of taxonomy ids
+   * @param taxonomyDist input stream specifying the distribution with respect to taxonomy ids
    * @param taxonLookup mapping from sequence name to taxonomy id
    * @param reader reader providing length and name information
-   * @param type specifies how to interpret the loaded distribution
+   * @param type specifies how to interpret the loaded distribution (as DNA fraction or abundance)
    * @throws IOException if either the input stream parsing or sequence reader fails
    */
   TaxonomyDistribution(InputStream taxonomyDist, Map<String, Integer> taxonLookup, SequencesReader reader, DistributionType type) throws IOException {
-    final Map<Integer, Double> taxonmyDistribution = parseTaxonDistribution(taxonomyDist);
+    final Map<Integer, Double> taxonomyDistribution = parseTaxonDistribution(taxonomyDist);
+    Diagnostic.userLog("Taxonomy distribution:" + taxonomyDistribution.toString());
+
+    // Identify the sequences corresponding to each taxon ID
     final AutoAddMap<Integer, TaxonSequences> taxon = new TaxonMap();
     final NamesInterface names = reader.names();
     final long numSeq = reader.numberSequences();
@@ -81,7 +84,7 @@ public class TaxonomyDistribution {
     for (int sequenceId = 0; sequenceId < numSeq; ++sequenceId) {
       final String name = names.name(sequenceId);
       final Integer taxonId = taxonLookup.get(name);
-      final Double dist = taxonmyDistribution.get(taxonId);
+      final Double dist = taxonomyDistribution.get(taxonId);
       if (dist != null) {
         final TaxonSequences sequences = taxon.getOrAdd(taxonId);
         if (sequences != null) {
@@ -90,20 +93,23 @@ public class TaxonomyDistribution {
         }
       }
     }
+
+    // Compute non-normalized distribution over selected sequences
     final Map<Integer, Double> sequenceDist = new HashMap<>();
     for (TaxonSequences sequences : taxon.values()) {
       final Map<Integer, Double> dist;
       switch (type) {
-       case ABUNDANCE:
-        dist = sequences.simulationAbundanceDist();
-         break;
-       default:
-         dist = sequences.simulationDnaFractionDist();
-         break;
+        case ABUNDANCE:
+          dist = sequences.simulationAbundanceDist();
+          break;
+        default:
+          dist = sequences.simulationDnaFractionDist();
+          break;
       }
       sequenceDist.putAll(dist);
     }
-    Diagnostic.developerLog("Taxonomy distribution:" + sequenceDist.toString());
+
+    // Create normalized probability distribution over all sequences
     mDistribution = new double[(int) reader.numberSequences()];
     double sum = 0;
     for (int i = 0; i < mDistribution.length; ++i) {
@@ -114,9 +120,8 @@ public class TaxonomyDistribution {
     for (int i = 0; i < mDistribution.length; ++i) {
       mDistribution[i] = mDistribution[i] / sum;
     }
-
-
   }
+
   public double[] getDistribution() {
     return mDistribution;
   }
