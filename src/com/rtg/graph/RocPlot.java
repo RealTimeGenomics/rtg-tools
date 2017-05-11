@@ -80,6 +80,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.WindowConstants;
+import javax.swing.filechooser.FileFilter;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.reeltwo.plot.Box2D;
@@ -175,6 +176,18 @@ public class RocPlot {
     new Color(0xB0B0B0),
   };
 
+  private static class RocFileFilter extends FileFilter {
+    @Override
+    public String getDescription() {
+        return "ROC data files(*" + RocFilter.ROC_EXT + ",*" + RocFilter.ROC_EXT + FileUtils.GZ_SUFFIX + ")";
+    }
+    @Override
+    public boolean accept(File f) {
+      final String flc = f.getName().toLowerCase();
+      return f.isDirectory() || flc.endsWith(RocFilter.ROC_EXT) || flc.endsWith(RocFilter.ROC_EXT + FileUtils.GZ_SUFFIX);
+    }
+  }
+
   /**
    * Creates a new swing plot.
    * @param precisionRecall true defaults to precision recall graph
@@ -187,6 +200,8 @@ public class RocPlot {
     if (details != null) {
       details.actionPerformed(null);
     }
+    mFileChooser.setMultiSelectionEnabled(true);
+    mFileChooser.setFileFilter(new RocFileFilter());
     mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
     mZoomPP.setColors(PALETTE);
@@ -386,8 +401,8 @@ public class RocPlot {
         mFileChooser.setPreferredSize(new Dimension(prefs.getInt(CHOOSER_WIDTH, 640), prefs.getInt(CHOOSER_HEIGHT, 480)));
       }
       if (mFileChooser.showOpenDialog(mMainPanel.getTopLevelAncestor()) == JFileChooser.APPROVE_OPTION) {
-        final File f = mFileChooser.getSelectedFile();
-        if (f != null) {
+        final File[] files = mFileChooser.getSelectedFiles();
+        for (File f : files) {
           try {
             loadFile(f, "", new ParseRocFile.NullProgressDelegate());
           } catch (final IOException | NoTalkbackSlimException e1) {
