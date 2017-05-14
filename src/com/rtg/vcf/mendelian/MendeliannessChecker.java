@@ -195,6 +195,7 @@ CommonFlags.initNoGzip(mFlags);
 //      }
     }
 
+    header.addRunInfo(); // Ensure CL in output
     final VcfHeader header2 = header.copy();
     mendAnnot.updateHeader(header2);
     for (final VcfAnnotator annotator: annotators) {

@@ -903,12 +903,12 @@ public final class TestUtils {
    */
   public static String sanitizeVcfHeader(String vcfString) {
     return vcfString.replace("Version", "")
-      .replaceAll("##CL=.*\n", "")
-      .replaceAll("##TEMPLATE-SDF-ID=.*\n", "")
-      .replaceAll("##RUN-ID=.*\n", "")
-      .replaceAll("##fileDate=.*\n", "")
-      .replaceAll("##reference=.*\n", "")
-      .replaceAll("##source=.*\n", "");
+      .replaceAll("##CL=.*\n", "##CL=[...]\n")
+      .replaceAll("##TEMPLATE-SDF-ID=.*\n", "##TEMPLATE-SDF-ID=[...]\n")
+      .replaceAll("##RUN-ID=.*\n", "##RUN-ID=[...]\n")
+      .replaceAll("##fileDate=.*\n", "##fileDate=[...]\n")
+      .replaceAll("##reference=.*\n", "##reference=[...]\n")
+      .replaceAll("##source=.*\n", "##source=[...]\n");
   }
 
   /**

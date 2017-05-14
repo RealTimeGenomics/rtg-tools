@@ -36,6 +36,7 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.reader.ReaderTestUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.io.IOUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -116,10 +117,10 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       final String s = res.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
       //System.err.println(s);
       mNano.check("mendelian1", s);
-      final String s2 = IOUtils.readAll(inconsistent);
+      final String s2 = TestUtils.sanitizeVcfHeader(IOUtils.readAll(inconsistent));
       //System.err.println(s2);
       mNano.check("mendelian2", s2);
-      final String s2b = IOUtils.readAll(consistent);
+      final String s2b = TestUtils.sanitizeVcfHeader(IOUtils.readAll(consistent));
       //System.err.println(s2);
       mNano.check("mendelian2b", s2b);
 

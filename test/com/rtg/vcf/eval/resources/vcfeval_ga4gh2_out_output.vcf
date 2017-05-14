@@ -1,4 +1,8 @@
 ##fileformat=VCFv4.1
+##fileDate=[...]
+##source=[...]
+##CL=[...]
+##CL=[...]
 ##contig=<ID=1,length=100>
 ##INFO=<ID=BS,Number=.,Type=Integer,Description="Benchmarking superlocus ID for these variants.">
 ##INFO=<ID=CALL_WEIGHT,Number=1,Type=Float,Description="Call weight (equivalent number of truth variants). When unspecified, assume 1.0">

@@ -1,10 +1,11 @@
 ##fileformat=VCFv4.0
-##fileDate=20110728
-##source=RTGvPOST-2.2-DEV build <not found> (<not found>)
-##RUN-ID=14ba7445-9965-4667-977f-4b08062b3990
-##reference=/rtgshare/data/human/ref/sdf/hg18
+##fileDate=[...]
+##source=[...]
+##RUN-ID=[...]
+##reference=[...]
 ##source_20110701.1=/rtgshare/tools/vcftools/bin/vcf-merge na19238.vcf.gz na19239.vcf.gz na19240.vcf.gz
 ##sourceFiles_20110701.1=0:na19238.vcf.gz,1:na19239.vcf.gz,2:na19240.vcf.gz
+##CL=[...]
 ##contig=<ID=chr21,length=46944323>
 ##FILTER=<ID=c100,Description="Coverage exceeded 100">
 ##FILTER=<ID=a10.0,Description="Ambiguity exceeded 10.0">

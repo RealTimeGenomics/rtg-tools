@@ -79,7 +79,9 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
   }
 
   static VcfWriter makeVcfWriter(VcfHeader h, File output, boolean zip) throws IOException {
-    return new AsyncVcfWriter(new DefaultVcfWriter(h, output, null, zip, true));
+    final VcfHeader h2 = h.copy();
+    h2.addRunInfo();
+    return new AsyncVcfWriter(new DefaultVcfWriter(h2, output, null, zip, true));
   }
 
   private int floorSyncPos(List<Integer> syncPoints, int vPos, int sId) {

@@ -1,4 +1,7 @@
 ##fileformat=VCFv4.1
+##fileDate=[...]
+##source=[...]
+##CL=[...]
 ##contig=<ID=18,length=31>
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##SAMPLE=<ID=sample1,Sex=FEMALE>

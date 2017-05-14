@@ -1,4 +1,8 @@
 ##fileformat=VCFv4.1
+##fileDate=[...]
+##source=[...]
+##CL=[...]
+##CL=[...]
 ##contig=<ID=1,length=100>
 ##INFO=<ID=SYNC,Number=.,Type=Integer,Description="Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.">
 ##INFO=<ID=BASE,Number=1,Type=String,Description="Baseline genotype status">

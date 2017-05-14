@@ -167,11 +167,12 @@ public class VcfHeader {
   }
 
   /**
-   * Add header fields giving run id and command line args, for appending to an existing VCF file
+   * Add header fields giving command line args, for appending within an an existing VCF header
    */
   public void addRunInfo() {
-    addLine(META_STRING + "CL=" + CommandLine.getCommandLine());
-    addLine(META_STRING + "RUN-ID=" + CommandLine.getRunId());
+    if (CommandLine.getCommandLine() != null) {
+      addLine(META_STRING + "CL=" + CommandLine.getCommandLine());
+    }
   }
 
   /**

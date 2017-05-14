@@ -1,4 +1,9 @@
 ##fileformat=VCFv4.1
+##CL=[...]
+##CL=[...]
+##CL=[...]
+##CL=[...]
+##CL=[...]
 ##contig=<ID=22,length=51304566,assembly=hg19>
 ##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each alternative allele, in the same order as listed">
 ##INFO=<ID=STATUS,Number=.,Type=String,Description="Recoding variant status">
