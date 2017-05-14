@@ -1,7 +1,10 @@
 ##fileformat=VCFv4.1
-##fileDate=20121211
-##source=RTGvPOST-2.7 build c5deca9 (2012-12-11)
-##reference=c:\Workspace\rtg\internal\com\rtg\regression\data\snp_chr22\tiny\template_sdf
+##fileDate=[...]
+##source=[...]
+##CL=[...]
+##RUN-ID=[...]
+##reference=[...]
+##CL=[...]
 ##contig=<ID=gi|89161203|ref|NC_000022.9|NC_000022,length=70070>
 ##FILTER=<ID=OC,Description="Coverage threshold exceeded">
 ##FILTER=<ID=a10.0,Description="Ambiguity exceeded 10.0">

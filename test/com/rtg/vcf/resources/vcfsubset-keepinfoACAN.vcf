@@ -1,5 +1,6 @@
 ##fileformat=VCFv4.1
-##reference=GRCh37
+##reference=[...]
+##CL=[...]
 ##ALT=<ID=DEL,Description="Deletion">
 ##FILTER=<ID=NAH,Description="Nah">
 ##FILTER=<ID=YEA,Description="Yeah">

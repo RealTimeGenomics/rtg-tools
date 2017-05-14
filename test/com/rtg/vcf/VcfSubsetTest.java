@@ -57,10 +57,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-info", "AC", "--keep-info", "AN", "-Z");
-
-      final String content = FileHelper.fileToString(out);
-      final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");
-      mNano.check("vcfsubset-keepinfoACAN.vcf", editedContent);
+      mNano.check("vcfsubset-keepinfoACAN.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
     }
   }
 
@@ -70,10 +67,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "YEA", "-Z");
-
-      final String content = FileHelper.fileToString(out);
-      final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");
-      mNano.check("vcfsubset-keepfilter.vcf", editedContent);
+      mNano.check("vcfsubset-keepfilter.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
     }
   }
 
@@ -83,10 +77,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-sample", "HG00096", "--keep-sample", "HG00100", "-Z");
-
-      final String content = FileHelper.fileToString(out);
-      final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");
-      mNano.check("vcfsubset-keepsamples.vcf", editedContent);
+      mNano.check("vcfsubset-keepsamples.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
     }
   }
 
@@ -96,10 +87,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--remove-format", "DS", "-Z");
-
-      final String content = FileHelper.fileToString(out);
-      final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");
-      mNano.check("vcfsubset-removeformat.vcf", editedContent);
+      mNano.check("vcfsubset-removeformat.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
     }
   }
 
@@ -109,10 +97,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--remove-ids", "--remove-qual", "--remove-samples", "--keep-info", "AN", "--keep-info", "AC", "--keep-filter", "YEA", "-Z");
-
-      final String content = FileHelper.fileToString(out);
-      final String editedContent = StringUtils.grepMinusV(StringUtils.grepMinusV(content, "^##RUN-ID"), "^##CL");
-      mNano.check("vcfsubset-multi.vcf", editedContent);
+      mNano.check("vcfsubset-multi.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
     }
   }
 

@@ -38,6 +38,7 @@ import java.util.NavigableSet;
 import java.util.Random;
 import java.util.TreeSet;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
@@ -45,36 +46,16 @@ import com.rtg.simulation.variants.PopulationVariantGenerator.PopulationVariant;
 import com.rtg.util.Counter;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.SequenceIdLocusComparator;
 import com.rtg.util.intervals.SequenceIdLocusSimple;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class PopulationVariantGeneratorTest extends TestCase {
-
-  private NanoRegression mNano;
-
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
-    mNano = new NanoRegression(PopulationVariantGeneratorTest.class);
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class PopulationVariantGeneratorTest extends AbstractNanoTest {
 
   private static final String REF = ">ref" + StringUtils.LS
           + "cgtacattac" + "gagcgactag" + "ctagctagta" + "cgtacgtaca"
@@ -87,7 +68,7 @@ public class PopulationVariantGeneratorTest extends TestCase {
     final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
     final MemoryPrintStream out = new MemoryPrintStream();
     PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr);
-    final String act = StringUtils.grepMinusV(out.toString(), "((##fileDate)|(##source)|(##CL)|(##TEMPLATE-SDF-ID)|(##RUN-ID))");
+    final String act = TestUtils.sanitizeVcfHeader(out.toString());
     mNano.check("population_variant_gen_X.vcf", act, false);
   }
 
@@ -97,7 +78,7 @@ public class PopulationVariantGeneratorTest extends TestCase {
     final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
     final MemoryPrintStream out = new MemoryPrintStream();
     PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr);
-    final String act = StringUtils.grepMinusV(out.toString(), "((##fileDate)|(##source)|(##CL)|(##TEMPLATE-SDF-ID)|(##RUN-ID))");
+    final String act = TestUtils.sanitizeVcfHeader(out.toString());
     mNano.check("population_variant_gen_X_X.vcf", act, false);
   }
 
@@ -111,7 +92,7 @@ public class PopulationVariantGeneratorTest extends TestCase {
       final File outFile = new File(tempDir, "out.vcf.gz");
       PopulationVariantGenerator.writeAsVcf(outFile, null, variants, sr);
       final String outStr = FileHelper.gzFileToString(outFile);
-      final String act = StringUtils.grepMinusV(outStr, "((##fileDate)|(##source)|(##CL)|(##TEMPLATE-SDF-ID)|(##RUN-ID))");
+      final String act = TestUtils.sanitizeVcfHeader(outStr);
       mNano.check("population_variant_gen_I.vcf", act, false);
     } finally {
       assertTrue(FileHelper.deleteAll(tempDir));

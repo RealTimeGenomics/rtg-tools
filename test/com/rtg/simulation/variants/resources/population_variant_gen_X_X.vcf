@@ -1,5 +1,8 @@
 ##fileformat=VCFv4.1
-##reference=null
+##fileDate=[...]
+##source=[...]
+##TEMPLATE-SDF-ID=[...]
+##reference=[...]
 ##contig=<ID=ref,length=120>
 ##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO

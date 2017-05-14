@@ -1,10 +1,19 @@
 ##fileformat=VCFv4.1
-##fileDate=20141103
-##source=RTG Core Core vPOST-3.3 build 4e2843a (2014-10-30)
-##TEMPLATE-SDF-ID=f1765b39-de93-481a-925d-282fe62ec8a6
-##reference=/rtgshare/data/human/ref/1000g_v37_phase2/sdf
+##fileDate=[...]
+##source=[...]
+##CL=[...]
+##RUN-ID=[...]
+##TEMPLATE-SDF-ID=[...]
+##reference=[...]
+##CL=[...]
+##RUN-ID=[...]
+##CL=[...]
+##RUN-ID=[...]
+##CL=[...]
+##RUN-ID=[...]
 ##extraline=foo
 ##extraline2=bar
+##CL=[...]
 ##contig=<ID=1,length=249250621>
 ##contig=<ID=2,length=243199373>
 ##contig=<ID=3,length=198022430>

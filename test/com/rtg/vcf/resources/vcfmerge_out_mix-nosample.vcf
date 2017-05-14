@@ -1,5 +1,6 @@
 ##fileformat=VCFv4.1
-##reference=file:///seq/references/Homo_sapiens_assembly19/v1/Homo_sapiens_assembly19.fasta
+##reference=[...]
+##CL=[...]
 ##contig=<ID=1,length=249250621>
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##SAMPLE=<ID=NA12878,Sex=FEMALE>

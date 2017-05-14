@@ -1,6 +1,7 @@
 ##fileformat=VCFv4.1
 ##extraline=foo
 ##extraline2=bar
+##CL=[...]
 ##contig=<ID=chr2,length=10000>
 ##contig=<ID=chr3,length=10000>
 ##contig=<ID=1,length=10000000>

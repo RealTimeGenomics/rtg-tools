@@ -37,7 +37,7 @@ import java.util.List;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.tabix.TabixIndexer;
-import com.rtg.util.StringUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -175,10 +175,10 @@ public class VcfMergeTest extends AbstractCliTest {
       new TabixIndexer(f3, TabixIndexer.indexFileName(f3)).saveVcfIndex();
       final File output = new File(dir, "out.vcf");
       checkMainInit("-Z", "-o", output.getPath(), "--Xnon-padding-aware", f1.getPath(), f2.getPath(), f3.getPath());
-      mNano.check("vcfmerge_testSamePosDiffRef.vcf", StringUtils.grepMinusV(FileUtils.fileToString(output), "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n"), false);
+      mNano.check("vcfmerge_testSamePosDiffRef.vcf", TestUtils.sanitizeVcfHeader(FileUtils.fileToString(output)), false);
       final File output2 = new File(dir, "out2.vcf");
       checkMainInit("-Z", "-o", output2.getPath(), f1.getPath(), f2.getPath(), f3.getPath());
-      mNano.check("vcfmerge_testSamePosDiffRef_pa.vcf", StringUtils.grepMinusV(FileUtils.fileToString(output2), "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n"), false);
+      mNano.check("vcfmerge_testSamePosDiffRef_pa.vcf", TestUtils.sanitizeVcfHeader(FileUtils.fileToString(output2)), false);
     }
   }
 
@@ -200,9 +200,7 @@ public class VcfMergeTest extends AbstractCliTest {
       checkMainInit("-o", output.getPath(), f2.getPath(), f3.getPath());
       final File output2 = new File(dir, "out2.vcf");
       checkMainInit("-Z", "-o", output2.getPath(), f1.getPath(), output.getPath());
-      String actual = FileUtils.fileToString(output2);
-      actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
-      mNano.check("vcfmerge_testSamePos.vcf", actual, false);
+      mNano.check("vcfmerge_testSamePos.vcf", TestUtils.sanitizeVcfHeader(FileUtils.fileToString(output2)), false);
     }
   }
 
@@ -214,9 +212,7 @@ public class VcfMergeTest extends AbstractCliTest {
       new TabixIndexer(f1, TabixIndexer.indexFileName(f1)).saveVcfIndex();
       final File output = new File(dir, "out.vcf");
       checkMainInitOk("-Z", "-o", output.getPath(), "-a", "##extraline=foo", "-a", "##extraline2=bar", f1.getPath());
-      String actual = FileUtils.fileToString(output);
-      actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
-      mNano.check("vcfmerge_testSingle.vcf", actual, false);
+      mNano.check("vcfmerge_testSingle.vcf", TestUtils.sanitizeVcfHeader(FileUtils.fileToString(output)), false);
     }
   }
 
@@ -233,10 +229,8 @@ public class VcfMergeTest extends AbstractCliTest {
         snpsA.toString(), snpsB.toString()));
       args.addAll(Arrays.asList(argsIn));
       final String out = checkMainInit(args.toArray(new String[args.size()])).out();
-      String actual = FileHelper.gzFileToString(output);
-      actual = StringUtils.grepMinusV(actual, "^##(RUN-ID)|(CL)").replaceAll("[\r\n]+", "\n");
       assertTrue(new File(dir, output.getName() + ".tbi").isFile());
-      mNano.check("vcfmerge_out_" + id + ".vcf", actual, false);
+      mNano.check("vcfmerge_out_" + id + ".vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(output)), false);
       mNano.check("vcfmerge_stats_" + id + ".txt", out);
     }
   }

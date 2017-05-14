@@ -1,4 +1,7 @@
 ##fileformat=VCFv4.1
+##fileDate=[...]
+##source=[...]
+##CL=[...]
 ##diseased=child,father
 ##SAMPLE=<ID=child,Sex=MALE>
 ##SAMPLE=<ID=father,Sex=MALE>

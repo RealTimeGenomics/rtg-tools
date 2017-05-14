@@ -39,6 +39,7 @@ import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SdfId;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
+import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -67,11 +68,11 @@ public class AlleleAccumulatorTest extends AbstractNanoTest {
 
       // Accumulate 4 samples into population alleles
       final File current = accumulate(dir, template, samples, empty);
-      mNano.check(id + "_alleles.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(current)));
+      mNano.check(id + "_alleles.vcf", TestUtils.sanitizeVcfHeader(StringUtils.grepMinusV(FileHelper.gzFileToString(current), "^##CL")));
 
       // Run recode of the original samples w.r.t. population alleles
       final File merged = recode(dir, template, samples, current);
-      mNano.check(id + "_recoded.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(merged)));
+      mNano.check(id + "_recoded.vcf", TestUtils.sanitizeVcfHeader(StringUtils.grepMinusV(FileHelper.gzFileToString(merged), "^##CL")));
     }
   }
 

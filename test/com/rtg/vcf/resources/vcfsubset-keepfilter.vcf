@@ -1,5 +1,6 @@
 ##fileformat=VCFv4.1
-##reference=GRCh37
+##reference=[...]
+##CL=[...]
 ##ALT=<ID=DEL,Description="Deletion">
 ##FILTER=<ID=YEA,Description="Yeah">
 ##INFO=<ID=LDAF,Number=1,Type=Float,Description="MLE Allele Frequency Accounting for LD">

@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
-import com.rtg.util.StringUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 
@@ -64,7 +64,7 @@ public class PedFilterCliTest extends AbstractCliTest {
       FileUtils.stringToFile(PedFileParser.toString(ped), relationFile);
 
       final String output = checkMainInitOk("--vcf", relationFile.toString());
-      mNano.check("pedfilter-tovcf.txt", StringUtils.grepMinusV(output, "^##(RUN-ID|CL|fileDate|source)"));
+      mNano.check("pedfilter-tovcf.txt", TestUtils.sanitizeVcfHeader(output));
     }
   }
 
