@@ -1,20 +1,20 @@
 Appendix
 ========
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: appendix_alignment.inc.rst
 
 RTG reference file format
 --------------------------
 
-Additional information about the structure of a reference genome can be
-provided for RTG mapping and variant calling by creating a
-``reference.txt`` file in the reference genome’s SDF directory. This
-file specifies information about the structure of the chromosomes in the
-reference genome including sex information.
+Many RTG commands can make use of additional information about the
+structure of a reference genome, such as expected ploidy, sex
+chromosomes, location of PAR regions, etc.  When appropriate, this
+information may be stored inside a reference genome's SDF directory in a
+file called ``reference.txt``.
 
-The ``format`` command will automatically identify several common human
+The ``format`` command will automatically identify several common
 reference genomes during formatting and will create a ``reference.txt``
 in the resulting SDF.  However, for non-human reference genomes, or less
 common human reference genomes, a pre-built reference configuration file
@@ -239,7 +239,7 @@ while the Y chromosome sections will be skipped. There may be some edge
 effects up to a read length either side of a pseudo-autosomal region
 boundary.
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: appendix_taxonomy.inc.rst
 
@@ -247,7 +247,8 @@ Pedigree PED input file format
 -------------------------------
 
 The PED file format is a white space (tab or space) delimited ASCII
-file. It has exactly six required columns in the following order.
+file. Lines starting with ``#`` are ignored. It has exactly six required
+columns in the following order.
 
 +-------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Column            | Definition                                                                                                                                                        |
@@ -314,7 +315,7 @@ for files from third party sources or RTG command output where the
 ``--no-index`` or ``--no-gzip`` parameters were set, use the RTG
 ``bgzip`` and ``index`` commands.
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: appendix_output_formats.inc.rst
 
@@ -453,7 +454,7 @@ Writes the provided string to standard output.
   For javascript filtering usage and examples see :ref:`vcffilter`
 
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: appendix_parallel_processing.inc.rst
 
@@ -495,7 +496,7 @@ notice. While every effort has been made to make this guide as complete
 and accurate as possible as of the publication date, no warranty of
 fitness is implied.
 
-© 2016 Real Time Genomics All rights reserved.
+© 2017 Real Time Genomics All rights reserved.
 
 Illumina, Solexa, Complete Genomics, Ion Torrent, Roche, ABI, Life
 Technologies, and PacBio are registered trademarks and all other brands

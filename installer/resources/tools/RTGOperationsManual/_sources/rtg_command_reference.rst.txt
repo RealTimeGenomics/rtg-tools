@@ -1,0 +1,290 @@
+
+:tocdepth: 3
+
+RTG Command Reference
+=====================
+
+This chapter describes RTG commands with a generic description of
+parameter options and usage. This section also includes expected
+operation and output results.
+
+Command line interface (CLI)
+----------------------------
+
+RTG is installed as a single executable in any system subdirectory where
+permissions authorize a particular community of users to run the
+application. RTG commands are executed through the RTG command-line
+interface (CLI). Each command has its own set of parameters and options
+described in this section. The availability of each command may be
+determined by the RTG license that has been installed. Contact
+``support@realtimegenomics.com`` to discuss changing the set of commands
+that are enabled by your license.
+
+Results are organized in results directories defined by command
+parameters and settings. The command line shell environment should
+include a set of familiar text post-processing tools, such as ``grep``,
+``awk``, or ``perl``. Otherwise, no additional applications such as
+databases or directory services are required.
+
+RTG command syntax
+------------------
+
+**Usage:**
+
+.. code-block:: text
+
+      rtg COMMAND [OPTIONS] <REQUIRED>
+
+To run an RTG command at the command prompt (either DOS window or Unix
+terminal), type the product name followed by the command and all
+required and optional parameters. For example:
+
+.. code-block:: text
+
+      $ rtg format -o human_REF_SDF human_REF.fasta
+
+Typically results are written to output files specified with the ``-o``
+option. There is no default filename or filename extension added to
+commands requiring specification of an output directory or format.
+
+Many times, unfiltered output files are very large; the built-in
+compression option generates block compressed output files with the
+.\ ``gz`` extension automatically unless the parameter ``-Z`` or ``--no-gzip``
+is issued with the command.
+
+Many command parameters require user-supplied information of various
+types, as shown in the following:
+
+.. tabularcolumns:: |l|L|
+
++-------------+---------------------------------------------------------------+
+| Type        | Description                                                   |
++=============+===============================================================+
+| DIR, FILE   | File or directory name(s)                                     |
++-------------+---------------------------------------------------------------+
+| SDF         | Sequence data that has been formatted to SDF                  |
++-------------+---------------------------------------------------------------+
+| INT         | Integer value                                                 |
++-------------+---------------------------------------------------------------+
+| FLOAT       | Floating point decimal value                                  |
++-------------+---------------------------------------------------------------+
+| STRING      | A sequence of characters for comments, filenames, or labels   |
++-------------+---------------------------------------------------------------+
+
+To display all parameters and syntax associated with an RTG command,
+enter the command and type ``--help``. For example: all parameters
+available for the RTG ``format`` command are displayed when ``rtg format
+--help`` is executed, the output of which is shown below.
+
+.. TERMCAP=':CO#80:' rtg format --help >../rtg-docs-test/source/rtg.format.help.txt
+.. literalinclude:: include-rtg-format-help.txt
+  :language: text
+
+Required parameters are indicated in the usage display; optional
+parameters are listed immediately below the usage information in
+organized categories.
+
+Use the double-dash when typing the full-word command option, as in
+``--output``:
+
+.. code-block:: text
+
+  $ rtg format --output human_REF_SDF human_REF.fasta
+
+Commonly used command options provide an abbreviated single-character
+version of a full command parameter, indicated with only a single dash,
+(Thus ``--output`` is the same as specifying the command option with the
+abbreviated character ``-o``):
+
+.. code-block:: text
+
+  $ rtg format -o human_REF human_REF.fasta
+
+A set of utility commands are provided through the CLI: ``version``,
+``license``, and ``help``. Start with these commands to familiarize yourself
+with the software.
+
+The ``rtg version`` command invokes the RTG software and triggers the
+launch of RTG product commands, options, and utilities:
+
+.. code-block:: text
+
+  $ rtg version
+
+It will display the version of the RTG software installed, RAM
+requirements, and license expiration, for example:
+
+.. code-block:: text
+
+  $rtg version
+  Product: RTG Core 3.5
+  Core Version: 6236f4e (2014-10-31)
+  RAM: 40.0GB of 47.0GB RAM can be used by rtg (84%)
+  License: Expires on 2015-09-30
+  License location: /home/rtgcustomer/rtg/rtg-license.txt
+  Contact: support@realtimegenomics.com
+
+  Patents / Patents pending:
+  US: 7,640,256, 13/129,329, 13/681,046, 13/681,215, 13/848,653,
+  13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810
+  UK: 1222923.3, 1222921.7, 1304502.6, 1311209.9, 1314888.7, 1314908.3
+  New Zealand: 626777, 626783, 615491, 614897, 614560
+  Australia: 2005255348, Singapore: 128254
+
+  Citation:
+  John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart
+  Inglis, Sean A. Irvine, Alan Jackson, Richard Littin, Sahar
+  Nohzadeh-Malakshah, Mehul Rathod, David Ware, Len Trigg, and Francisco
+  M. De La Vega. "Joint Variant and De Novo Mutation Identification on
+  Pedigrees from High-Throughput Sequencing Data." Journal of
+  Computational Biology. June 2014, 21(6): 405-419.
+  doi:10.1089/cmb.2014.0029.
+  (c) Real Time Genomics Inc, 2014
+
+To see what commands you are licensed to use, type ``rtg license``:
+
+.. code-block:: text
+
+  $rtg license
+  License: Expires on 2015-03-30
+  Licensed to: John Doe
+  License location: /home/rtgcustomer/rtg/rtg-license.txt
+
+      Command name    Licensed?  Release Level
+
+  Data formatting:
+      format          Licensed   GA
+      sdf2fasta       Licensed   GA
+      sdf2fastq       Licensed   GA
+
+  Utility:
+      bgzip           Licensed   GA
+      index           Licensed   GA
+      extract         Licensed   GA
+      sdfstats        Licensed   GA
+      sdfsubset       Licensed   GA
+      sdfsubseq       Licensed   GA
+      mendelian       Licensed   GA
+      vcfstats        Licensed   GA
+      vcfmerge        Licensed   GA
+      vcffilter       Licensed   GA
+      vcfannotate     Licensed   GA
+      vcfsubset       Licensed   GA
+      vcfeval         Licensed   GA
+      pedfilter       Licensed   GA
+      pedstats        Licensed   GA
+      rocplot         Licensed   GA
+      version         Licensed   GA
+      license         Licensed   GA
+      help            Licensed   GA
+
+To display all commands and usage parameters available to use with your
+license, type ``rtg help``:
+
+
+.. code-block:: text
+
+  $ rtg help
+  Usage: rtg COMMAND [OPTION]...
+         rtg RTG_MEM=16G COMMAND [OPTION]...  (e.g. to set maximum memory use to 16 GB)
+
+  Type ``rtg help COMMAND`` for help on a specific command. The
+  following commands are available:
+
+  Data formatting:
+        format                 convert a FASTA file to SDF
+        cg2sdf                 convert Complete Genomics reads to SDF
+        sdf2fasta              convert SDF to FASTA
+        sdf2fastq              convert SDF to FASTQ
+        sdf2sam                convert SDF to SAM/BAM
+  Read mapping:
+        map                    read mapping
+        mapf                   read mapping for filtering purposes
+        cgmap                  read mapping for Complete Genomics data
+  Protein search:
+        mapx                   translated protein search
+  Assembly:
+        assemble               assemble reads into long sequences
+        addpacbio              add Pacific Biosciences reads to an assembly
+  Variant detection:
+        calibrate              create calibration data from SAM/BAM files
+        svprep                 prepare SAM/BAM files for sv analysis
+        sv                     find structural variants
+        discord                detect structural variant breakends using discordant reads
+        coverage               calculate depth of coverage from SAM/BAM files
+        snp                    call variants from SAM/BAM files
+        family                 call variants for a family following Mendelian inheritance
+        somatic                call variants for a tumor/normal pair
+        population             call variants for multiple potentially-related individuals
+        lineage                call de novo variants in a cell lineage
+        avrbuild               AVR model builder
+        avrpredict             run AVR on a VCF file
+        cnv                    call CNVs from paired SAM/BAM files
+  Metagenomics:
+        species                estimate species frequency in metagenomic samples
+        similarity             calculate similarity matrix and nearest neighbor tree
+  Simulation:
+        genomesim              generate simulated genome sequence
+        cgsim                  generate simulated reads from a sequence
+        readsim                generate simulated reads from a sequence
+        readsimeval            evaluate accuracy of mapping simulated reads
+        popsim                 generate a VCF containing simulated population variants
+        samplesim              generate a VCF containing a genotype simulated from a population
+        childsim               generate a VCF containing a genotype simulated as a child of two parents
+        denovosim              generate a VCF containing a derived genotype containing de novo variants
+        samplereplay           generate the genome corresponding to a sample genotype
+        cnvsim                 generate a mutated genome by adding CNVs to a template
+  Utility:
+        bgzip                  compress a file using block gzip
+        index                  create a tabix index
+        extract                extract data from a tabix indexed file
+        sdfstats               print statistics about an SDF
+        sdfsplit               split an SDF into multiple parts
+        sdfsubset              extract a subset of an SDF into a new SDF
+        sdfsubseq              extract a subsequence from an SDF as text
+        sam2bam                convert SAM file to BAM file and create index
+        sammerge               merge sorted SAM/BAM files
+        samstats               print statistics about a SAM/BAM file
+        samrename              rename read id to read name in SAM/BAM files
+        mapxrename             rename read id to read name in mapx output files
+        mendelian              check a multi-sample VCF for Mendelian consistency
+        vcfstats               print statistics from about variants contained within a VCF file
+        vcfmerge               merge single-sample VCF files into a single multi-sample VCF
+        vcffilter              filter records within a VCF file
+        vcfannotate            annotate variants within a VCF file
+        vcfsubset              create a VCF file containing a subset of the original columns
+        vcfeval                evaluate called variants for agreement with a baseline variant set
+        pedfilter              filter and convert a pedigree file
+        pedstats               print information about a pedigree file
+        avrstats               print statistics about an AVR model
+        rocplot                plot ROC curves from vcfeval ROC data files
+        usageserver            run a local server for collecting RTG command usage information
+        version                print version and license information
+        license                print license information for all commands
+        help                   print this screen or help for specified command
+
+The help command will only list the commands for which you have a
+license to use.
+
+To display help and syntax information for a specific command from the
+command line, type the command and then the --help option, as in:
+
+.. code-block:: text
+
+  $ rtg format --help
+
+.. note:: The following commands are synonymous:
+  ``rtg help format`` and ``rtg format --help``
+
+.. seealso:: Refer to :ref:`Installation and deployment` for information
+  about installing the RTG product executable.
+
+.. include:: rtg_command_reference_data_formatting.inc.rst
+
+.. only:: core or extra
+
+  .. include:: rtg_command_reference_mapish.inc.rst
+
+.. include:: rtg_command_reference_simulation.inc.rst
+
+.. include:: rtg_command_reference_utility.inc.rst

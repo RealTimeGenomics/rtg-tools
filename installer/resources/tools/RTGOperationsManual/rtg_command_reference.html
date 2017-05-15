@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.7</title>
+    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.8</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,18 +15,20 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.7',
+        VERSION:     '3.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
-    <link rel="top" title="RTG Tools Operations Manual v3.7" href="index.html" />
-    <link rel="next" title="RTG product usage - baseline progressions" href="product_usage_wrapper.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RTG product usage - baseline progressions" href="product_usage.html" />
     <link rel="prev" title="Overview" href="overview.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -41,12 +43,12 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="product_usage_wrapper.html" title="RTG product usage - baseline progressions"
+          <a href="product_usage.html" title="RTG product usage - baseline progressions"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="overview.html" title="Overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.7</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -64,6 +66,18 @@
 <li><a class="reference internal" href="#sdf2fasta">sdf2fasta</a></li>
 <li><a class="reference internal" href="#sdf2fastq">sdf2fastq</a></li>
 <li><a class="reference internal" href="#sdf2sam">sdf2sam</a></li>
+<li><a class="reference internal" href="#fastqtrim">fastqtrim</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulation-commands">Simulation Commands</a><ul>
+<li><a class="reference internal" href="#genomesim">genomesim</a></li>
+<li><a class="reference internal" href="#cgsim">cgsim</a></li>
+<li><a class="reference internal" href="#denovosim">denovosim</a></li>
+<li><a class="reference internal" href="#readsim">readsim</a></li>
+<li><a class="reference internal" href="#popsim">popsim</a></li>
+<li><a class="reference internal" href="#samplesim">samplesim</a></li>
+<li><a class="reference internal" href="#childsim">childsim</a></li>
+<li><a class="reference internal" href="#samplereplay">samplereplay</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#utility-commands">Utility Commands</a><ul>
@@ -97,12 +111,12 @@
   <p class="topless"><a href="overview.html"
                         title="previous chapter">Overview</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="product_usage_wrapper.html"
+  <p class="topless"><a href="product_usage.html"
                         title="next chapter">RTG product usage - baseline progressions</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/rtg_command_reference.txt"
+      <li><a href="_sources/rtg_command_reference.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -127,7 +141,7 @@ application. RTG commands are executed through the RTG command-line
 interface (CLI). Each command has its own set of parameters and options
 described in this section. The availability of each command may be
 determined by the RTG license that has been installed. Contact
-<a class="reference external" href="mailto:support&#37;&#52;&#48;realtimegenomics&#46;com">support<span>&#64;</span>realtimegenomics<span>&#46;</span>com</a> to discuss changing the set of commands
+<code class="docutils literal"><span class="pre">support&#64;realtimegenomics.com</span></code> to discuss changing the set of commands
 that are enabled by your license.</p>
 <p>Results are organized in results directories defined by command
 parameters and settings. The command line shell environment should
@@ -328,7 +342,7 @@ license, type <code class="docutils literal"><span class="pre">rtg</span> <span 
 Usage: rtg COMMAND [OPTION]...
        rtg RTG_MEM=16G COMMAND [OPTION]...  (e.g. to set maximum memory use to 16 GB)
 
-Type &#39;rtg help COMMAND&#39; for help on a specific command. The
+Type ``rtg help COMMAND`` for help on a specific command. The
 following commands are available:
 
 Data formatting:
@@ -447,11 +461,11 @@ reference, sequencing reads, protein sequences, etc.</p>
 </pre></div>
 </div>
 <p><strong>Examples:</strong></p>
-<p>For FASTA (.fa) genome reference data:</p>
+<p>For FASTA (<code class="docutils literal"><span class="pre">.fa</span></code>) genome reference data:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -o maize_reference maize_chr*.fa
 </pre></div>
 </div>
-<p>For FASTQ (.fq) sequence read data:</p>
+<p>For FASTQ (<code class="docutils literal"><span class="pre">.fq</span></code>) sequence read data:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -f fastq -q sanger -o h1_reads -l h1_sample_left.fq -r h1_sample_right.fq
 </pre></div>
 </div>
@@ -469,7 +483,7 @@ reference, sequencing reads, protein sequences, etc.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--format=FORMAT</span></code></td>
-<td>The format of the input file(s). Allowed values are [fasta, fastq, sam-se, sam-pe, cg-fastq, cg-sam] (Default is fasta).</td>
+<td>The format of the input file(s). Allowed values are [fasta, fastq, fastq-interleaved, sam-se, sam-pe] (Default is fasta).</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-I</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input-list-file=FILE</span></code></td>
@@ -495,7 +509,7 @@ reference, sequencing reads, protein sequences, etc.</p>
 <td><code class="docutils literal"><span class="pre">--right=FILE</span></code></td>
 <td>The right input file for FASTA/FASTQ paired end data.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
 <td>Specifies a sequence data file to be converted into an SDF. May be specified 0 or more times.</td>
 </tr>
@@ -512,20 +526,20 @@ reference, sequencing reads, protein sequences, etc.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--duster</span></code></td>
 <td>Treat lower case residues as unknowns.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--exclude=STRING</span></code></td>
 <td>Exclude individual input sequences based on their name. If the input sequence name contains the specified string then that sequence is excluded from the
 SDF. May be specified 0 or more times.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--select-read-group=STRING</span></code></td>
 <td>Set to only include only reads with this read group ID when formatting from SAM/BAM files.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--trim-threshold=INT</span></code></td>
 <td>Set to trim the read ends to maximise the base quality above the given threshold.</td>
 </tr>
@@ -542,7 +556,7 @@ SDF. May be specified 0 or more times.</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--allow-duplicate-names</span></code></td>
 <td>Set to disable duplicate name detection.</td>
 </tr>
@@ -550,15 +564,15 @@ SDF. May be specified 0 or more times.</td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Prints help on command-line flag usage.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-names</span></code></td>
 <td>Do not include sequence names in the resulting SDF.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-quality</span></code></td>
 <td>Do not include sequence quality data in the resulting SDF.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sam-rg=STRING|FILE</span></code></td>
 <td>Specifies a file containing a single valid read group SAM header line or a string in the form <code class="docutils literal"><span class="pre">&#64;RG\tID:RG1\tSM:G1_SAMP\tPL:ILLUMINA</span></code>.</td>
 </tr>
@@ -591,8 +605,11 @@ earlier Illumina pipeline versions should be formatted using
 <code class="docutils literal"><span class="pre">--quality-format=illumina</span></code> for Illumina pipeline versions starting with
 1.3 and before 1.8, or <code class="docutils literal"><span class="pre">--quality-format=solexa</span></code> for Illumina pipeline
 versions less than 1.3.</p>
-<p>For files that represent paired-end read data, indicate each side
-respectively using the <code class="docutils literal"><span class="pre">--left=FILE</span></code> and <code class="docutils literal"><span class="pre">--right=FILE</span></code> flags.</p>
+<p>For FASTQ files that represent paired-end read data, indicate each side
+respectively using the <code class="docutils literal"><span class="pre">--left=FILE</span></code> and <code class="docutils literal"><span class="pre">--right=FILE</span></code> flags.
+Sometimes paired-end reads are represented in a single FASTQ file by
+interleaving each side of the read.  This type of input can be
+formatted by specifying <code class="docutils literal"><span class="pre">fastq-interleaved</span></code> as the format type.</p>
 <p>The <code class="docutils literal"><span class="pre">mapx</span></code> command maps translated DNA sequence data against a protein
 reference. You must use the <code class="docutils literal"><span class="pre">-p</span></code>, <code class="docutils literal"><span class="pre">--protein</span></code> flag to format the protein
 reference used by <code class="docutils literal"><span class="pre">mapx</span></code>.</p>
@@ -602,13 +619,13 @@ input SAM/BAM files are sorted in coordinate order (for example if they
 have already been aligned to a reference), it is recommended that they
 be shuffled before formatting, so that subsequent mapping is not biased
 by processing reads in chromosome order. For example, a BAM file can be
-shuffled using <code class="docutils literal"><span class="pre">samtools</span> <span class="pre">bamshuf</span></code> as follows:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ samtools bamshuf -uOn 256 reads.bam tmp-prefix &gt;reads_shuffled.bam
+shuffled using <code class="docutils literal"><span class="pre">samtools</span> <span class="pre">collate</span></code> as follows:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ samtools collate -uOn 256 reads.bam tmp-prefix &gt;reads_shuffled.bam
 </pre></div>
 </div>
 <p>And this can be carried out on the fly during formatting using bash
 process redirection in order to reduce intermediate I/O, for example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format --format sam-pe &lt;(samtools bamshuf -uOn 256 reads.bam temp-prefix) ...
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format --format sam-pe &lt;(samtools collate -uOn 256 reads.bam temp-prefix) ...
 </pre></div>
 </div>
 <p>The SDF for a read set can contain a SAM read group which will be
@@ -653,10 +670,7 @@ since the output many commands identifies sequences by their names.</p>
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#sdf2fasta"><span class="std std-ref">sdf2fasta</span></a>,
 <a class="reference internal" href="#sdf2fastq"><span class="std std-ref">sdf2fastq</span></a>,
-<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a>,
-<a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
-<a class="reference internal" href="#map"><span class="std std-ref">map</span></a>,
-<a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
+<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
 </div>
 <div class="section" id="sdf2fasta">
@@ -674,9 +688,9 @@ since the output many commands identifies sequences by their names.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="10%" />
-<col width="21%" />
-<col width="69%" />
+<col width="7%" />
+<col width="19%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -685,11 +699,11 @@ since the output many commands identifies sequences by their names.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=SDF</span></code></td>
-<td>Specifies the SDF data to be converted.</td>
+<td>SDF containing sequences.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>Specifies the file name used to write the resulting FASTA output.</td>
+<td>Output filename (extension added if not present). Use &#8216;-&#8216; to write to standard output.</td>
 </tr>
 </tbody>
 </table>
@@ -704,11 +718,11 @@ since the output many commands identifies sequences by their names.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--end-id=INT</span></code></td>
 <td>Only output sequences with sequence id less than the given number. (Sequence ids start at 0).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--start-id=INT</span></code></td>
 <td>Only output sequences with sequence id greater than or equal to the given number. (Sequence ids start at 0).</td>
 </tr>
@@ -716,15 +730,15 @@ since the output many commands identifies sequences by their names.</p>
 <td><code class="docutils literal"><span class="pre">--id-file=FILE</span></code></td>
 <td>Name of a file containing a list of sequences to extract, one per line.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--names</span></code></td>
 <td>Interpret any specified sequence as names instead of numeric sequence ids.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--taxons</span></code></td>
 <td>Interpret any specified sequence as taxon ids instead of numeric sequence ids. This option only applies to a metagenomic reference species SDF.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specify one or more explicit sequences to extract, as sequence id, or sequence name if &#8211;names flag is set.</td>
 </tr>
@@ -745,7 +759,7 @@ since the output many commands identifies sequences by their names.</p>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Prints help on command-line flag usage.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--interleave</span></code></td>
 <td>Interleave paired data into a single output file. Default is to split to separate output files.</td>
 </tr>
@@ -794,9 +808,7 @@ following command:</p>
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#format"><span class="std std-ref">format</span></a>,
 <a class="reference internal" href="#sdf2fastq"><span class="std std-ref">sdf2fastq</span></a>,
-<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a>,
-<a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
-<a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
+<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
 </div>
 <div class="section" id="sdf2fastq">
@@ -844,11 +856,11 @@ following command:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--end-id=INT</span></code></td>
 <td>Only output sequences with sequence id less than the given number. (Sequence ids start at 0).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--start-id=INT</span></code></td>
 <td>Only output sequences with sequence id greater than or equal to the given number. (Sequence ids start at 0).</td>
 </tr>
@@ -856,11 +868,11 @@ following command:</p>
 <td><code class="docutils literal"><span class="pre">--id-file=FILE</span></code></td>
 <td>Name of a file containing a list of sequences to extract, one per line.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--names</span></code></td>
 <td>Interpret any specified sequence as names instead of numeric sequence ids.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specify one or more explicit sequences to extract, as sequence id, or sequence name if &#8211;names flag is set.</td>
 </tr>
@@ -885,7 +897,7 @@ following command:</p>
 <td><code class="docutils literal"><span class="pre">--default-qualty=INT</span></code></td>
 <td>Set the default quality to use if the SDF does not contain sequence quality data (0-63).</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--interleave</span></code></td>
 <td>Interleave paired data into a single output file. Default is to split to separate output files.</td>
 </tr>
@@ -920,9 +932,7 @@ and may also be more convenient when dealing with paired-end data.</p>
 <p class="last"><a class="reference internal" href="#format"><span class="std std-ref">format</span></a>,
 <a class="reference internal" href="#sdf2fasta"><span class="std std-ref">sdf2fasta</span></a>,
 <a class="reference internal" href="#sdf2sam"><span class="std std-ref">sdf2sam</span></a>,
-<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a>,
-<a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
-<a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
+<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
 </div>
 <div class="section" id="sdf2sam">
@@ -971,11 +981,11 @@ filename specified. If &#8216;-&#8216; is given, the data is written as uncompre
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--end-id=INT</span></code></td>
 <td>Only output sequences with sequence id less than the given number. (Sequence ids start at 0).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--start-id=INT</span></code></td>
 <td>Only output sequences with sequence id greater than or equal to the given number. (Sequence ids start at 0).</td>
 </tr>
@@ -983,11 +993,11 @@ filename specified. If &#8216;-&#8216; is given, the data is written as uncompre
 <td><code class="docutils literal"><span class="pre">--id-file=FILE</span></code></td>
 <td>Name of a file containing a list of sequences to extract, one per line.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--names</span></code></td>
 <td>Interpret any specified sequence as names instead of numeric sequence ids.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specify one or more explicit sequences to extract, as sequence id, or sequence name if &#8211;names flag is set.</td>
 </tr>
@@ -1026,7 +1036,7 @@ stored in the SDF.</p>
 e.g. <code class="docutils literal"><span class="pre">output.sam</span></code> or <code class="docutils literal"><span class="pre">output.sam.gz</span></code> will output as SAM, whereas
 <code class="docutils literal"><span class="pre">output.bam</span></code> will output as BAM. If neither SAM or BAM format is indicated by
 the file name then BAM will be used and the output file name adjusted
-accordingly. e.g <code class="docutils literal"><span class="pre">output</span></code> will become <code class="docutils literal"><span class="pre">output.bam</span></code>. However if stardard
+accordingly. e.g <code class="docutils literal"><span class="pre">output</span></code> will become <code class="docutils literal"><span class="pre">output.bam</span></code>. However if standard
 output is selected (<code class="docutils literal"><span class="pre">-</span></code>) then the output will always be in uncompressed SAM
 format.</p>
 <p>The <code class="docutils literal"><span class="pre">--start-id</span></code> and <code class="docutils literal"><span class="pre">--end-if</span></code> behave as in <code class="docutils literal"><span class="pre">sdf2fasta</span></code>.</p>
@@ -1038,6 +1048,1225 @@ format.</p>
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a>,
 <a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
 <a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
+</div>
+</div>
+<div class="section" id="fastqtrim">
+<h3>fastqtrim<a class="headerlink" href="#fastqtrim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Trim reads in FASTQ files.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg fastqtrim [OPTION]... -i FILE -o FILE
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<p>Apply hard base removal from the start of the read and quality-based trimming of terminal bases:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg fastqtrim -s 12 -E 18 -i S12_R1.fastq.gz -o S12_trimmed_R1.fastq.gz
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="18%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>Input FASTQ file, Use &#8216;-&#8216; to read from standard input.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output filename. Use &#8216;-&#8216; to write to standard output.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code></td>
+<td><code class="docutils literal"><span class="pre">--quality-format=FORMAT</span></code></td>
+<td>Quality data encoding method used in FASTQ input files (Illumina 1.8+ uses sanger). Allowed values are [sanger, solexa, illumina] (Default is sanger)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="24%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Filtering</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--discard-empty-reads</span></code></td>
+<td>Discard reads that have zero length after trimming. Should not be used with paired-end data.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-E</span></code></td>
+<td><code class="docutils literal"><span class="pre">--end-quality-threshold=INT</span></code></td>
+<td>Trim read ends to maximise base quality above the given threshold (Default is 0)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--min-read-length=INT</span></code></td>
+<td>If a read ends up shorter than this threshold it will be trimmed to zero length (Default is 0)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-S</span></code></td>
+<td><code class="docutils literal"><span class="pre">--start-quality-threshold=INT</span></code></td>
+<td>Trim read starts to maximise base quality above the given threshold (Default is 0)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-e</span></code></td>
+<td><code class="docutils literal"><span class="pre">--trim-end-bases=INT</span></code></td>
+<td>Always trim the specified number of bases from read end (Default is 0)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--trim-start-bases=INT</span></code></td>
+<td>Always trim the specified number of bases from read start (Default is 0)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="24%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reverse-complement</span></code></td>
+<td>If set, output in reverse complement.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed used during subsampling.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--subsample=FLOAT</span></code></td>
+<td>If set, subsample the input to retain this fraction of reads.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-T</span></code></td>
+<td><code class="docutils literal"><span class="pre">--threads=INT</span></code></td>
+<td>Number of threads (Default is the number of available cores)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>Use <code class="docutils literal"><span class="pre">fastqtrim</span></code> to apply custom trimming and preprocessing to raw
+FASTQ files prior to mapping and alignment. The <code class="docutils literal"><span class="pre">format</span></code> command
+contains some limited trimming options, which are applied to all input
+files, however in some cases different or specific trimming operations
+need to be applied to the various input files. For example, for
+paired-end data, different trimming may need to be applied for the left
+read files compared to the right read files. In these cases,
+<code class="docutils literal"><span class="pre">fastqtrim</span></code> should be used to process the FASTQ files first.</p>
+<p>The <code class="docutils literal"><span class="pre">--end-trim-threshold</span></code> flag can be used to trim poor quality bases
+from the ends of the input reads by inspecting base qualities from FASTQ
+input. If and only if the quality of the final base of the read is less
+than the threshold given, a new read length is found which maximizes the
+overall quality of the retained bases using the following formula:</p>
+<div class="math">
+<p><img src="_images/math/d87c941fdcf46735e757ab196fe03da2ea08ec45.png" alt="\arg \max x\left({\sum_{i=x+1}^l (T - q(i))}\right) \text{ if } q(l) &lt; T"/></p>
+</div><p>where <em>l</em> is the original read length, <em>x</em> is the new read length, <em>T</em>
+is the given threshold quality and <em>q(n)</em> is the quality of the base at
+the position <em>n</em> of the read.  Similarly, <code class="docutils literal"><span class="pre">--start-quality-threshold</span></code>
+can be used to apply this quality-based thresholding to the start of
+reads.</p>
+<p>Some of the trimming options may result in reads that have no bases
+remaining. By default, these are output as zero-length FASTQ reads,
+which RTG commands are able to handle normally. It is also possible to
+remove zero-length reads altogether from the output with the
+<code class="docutils literal"><span class="pre">--discard-empty-reads</span></code> option, however this should not be used when
+processing FASTQ files corresponding to paired-end data, otherwise the
+pairs in the two files will no longer be matched.</p>
+<p>Similarly, when using the <code class="docutils literal"><span class="pre">--subsample</span></code> option to down-sample a FASTQ
+file for paired-end data, you should specify an explicit randomization
+seed via <code class="docutils literal"><span class="pre">--seed</span></code> and use the same seed value for the left and right
+files.</p>
+<div class="section" id="formatting-with-filtering-on-the-fly">
+<h4>Formatting with filtering on the fly<a class="headerlink" href="#formatting-with-filtering-on-the-fly" title="Permalink to this headline">¶</a></h4>
+<p>Running custom filtering with <code class="docutils literal"><span class="pre">fastqtrim</span></code> need not mean that
+additional disk space is required or that formatting be slowed down due
+to additional disk I/O.  It is possible when using standard unix shells
+to perform the filtering on the fly.  The following example demonstrates
+how to apply different trimming options to left and right files while
+formatting to SDF:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -f fastq -o S12_trimmed.sdf \
+    -l &lt;(rtg fastqtrim -s 12 -E 18 -i S12_R1.fastq.gz -o -)
+    -r &lt;(rtg fastqtrim -E 18 -i S12_R2.fastq.gz -o -)
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#format"><span class="std std-ref">format</span></a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="simulation-commands">
+<h2>Simulation Commands<a class="headerlink" href="#simulation-commands" title="Permalink to this headline">¶</a></h2>
+<p>RTG includes some simulation commands that may be useful for
+experimenting with effects of various RTG command parameters or when
+getting familiar with RTG work flows. A simple simulation series might
+involve the following commands:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg genomesim --output sim-ref-sdf --min-length 500000 --max-length 5000000 \
+  --num-contigs 5
+$ rtg popsim --reference sim-ref-sdf --output population.vcf.gz
+$ rtg samplesim --input population.vcf.gz --output sample1.vcf.gz \
+  --output-sdf sample1-sdf --reference sim-ref-sdf --sample sample1
+$ rtg readsim --input sample1-sdf --output reads-sdf --machine illumina_pe \
+  -L 75 -R 75 --coverage 10
+$ rtg map --template sim-ref-sdf --input reads-sdf --output sim-mapping \
+  --sam-rg &quot;@RG\tID:sim-rg\tSM:sample1\tPL:ILLUMINA&quot;
+$ rtg snp --template sim-ref-sdf --output sim-name-snp sim-mapping/alignments.bam
+</pre></div>
+</div>
+<div class="section" id="genomesim">
+<h3>genomesim<a class="headerlink" href="#genomesim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">genomesim</span></code> command to simulate a reference genome, or to create
+a baseline reference genome for a research project when an actual genome
+reference sequence is unavailable.</p>
+<p><strong>Syntax:</strong></p>
+<p>Specify number of sequences, plus minimum and maximum lengths:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg genomesim [OPTION]... -o SDF --max-length INT --min-length INT -n INT
+</pre></div>
+</div>
+<p>Specify explicit sequence lengths (one more sequences):</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg genomesim [OPTION]... -o SDF -l INT
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg genomesim -o genomeTest -l 500000
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="16%" />
+<col width="33%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=SDF</span></code></td>
+<td>The name of the output SDF.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="17%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--comment=STRING</span></code></td>
+<td>Specify a comment to include in the generated SDF.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--freq=STRING</span></code></td>
+<td>Set the relative frequencies of A,C,G,T in the generated sequence. (Default is 1,1,1,1).</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Prints help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-l</span></code></td>
+<td><code class="docutils literal"><span class="pre">--length=INT</span></code></td>
+<td>Specify the length of generated sequence. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--max-length=INT</span></code></td>
+<td>Specify the maximum sequence length.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--min-length=INT</span></code></td>
+<td>Specify the minimum sequence length.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-n</span></code></td>
+<td><code class="docutils literal"><span class="pre">--num-contigs=INT</span></code></td>
+<td>Specify the number of sequences to generate.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--prefix=STRING</span></code></td>
+<td>Specify a sequence name prefix to be used for the generated sequences. The default is to name the output sequences
+&#8216;simulatedSequenceN&#8217;, where N is increasing for each sequence.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Specify seed for the random number generator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">genomesim</span></code> command allows one to create a simulated genome with one
+or more contiguous sequences - exact lengths of each contig or number of
+contigs with minimum and maximum lengths provided. The contents of an
+SDF directory created by <code class="docutils literal"><span class="pre">genomesim</span></code> can be exported to a FASTA file
+using the <code class="docutils literal"><span class="pre">sdf2fasta</span></code> command.</p>
+<p>This command is primarily useful for providing a simple randomly
+generated base genome for use with subsequent simulation commands.</p>
+<p>Each generated contig is named by appending an increasing numeric index
+to the specified prefix. For example <code class="docutils literal"><span class="pre">--prefix=chr</span> <span class="pre">--num-contigs=10</span></code>
+would yield contigs named <code class="docutils literal"><span class="pre">chr1</span></code> through <code class="docutils literal"><span class="pre">chr10</span></code>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cgsim"><span class="std std-ref">cgsim</span></a>,
+<a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
+</div>
+</div>
+<div class="section" id="cgsim">
+<h3>cgsim<a class="headerlink" href="#cgsim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Simulate Complete Genomics Inc sequencing reads. Supports the original 35 bp read structure (5-10-10-10), and the newer 29 bp read structure (10-9-10).</p>
+<p><strong>Syntax:</strong></p>
+<p>Generation by genomic coverage multiplier:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg cgsim [OPTION]... -V INT -t SDF -o SDF -c FLOAT
+</pre></div>
+</div>
+<p>Generation by explicit number of reads:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg cgsim [OPTION]... -V INT -t SDF -o SDF -n INT
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg cgsim -V 1 -t HUMAN_reference -o CG_3x_readst -c 3
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="24%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=SDF</span></code></td>
+<td>SDF containing input genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=SDF</span></code></td>
+<td>Name for reads output SDF.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="24%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Fragment Generation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--abundance</span></code></td>
+<td>If set, the user-supplied distribution represents desired abundance.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-N</span></code></td>
+<td><code class="docutils literal"><span class="pre">--allow-unknowns</span></code></td>
+<td>Allow reads to be drawn from template fragments containing unknown nucleotides.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
+<td><code class="docutils literal"><span class="pre">--coverage=FLOAT</span></code></td>
+<td>Coverage, must be positive.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-D</span></code></td>
+<td><code class="docutils literal"><span class="pre">--distribution=FILE</span></code></td>
+<td>File containing probability distribution for sequence selection.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--dna-fraction</span></code></td>
+<td>If set, the user-supplied distribution represents desired DNA fraction.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-M</span></code></td>
+<td><code class="docutils literal"><span class="pre">--max-fragment-size=INT</span></code></td>
+<td>Maximum fragment size (Default is 500)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td><code class="docutils literal"><span class="pre">--min-fragment-size=INT</span></code></td>
+<td>Minimum fragment size (Default is 350)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--n-rate=FLOAT</span></code></td>
+<td>Rate that the machine will generate new unknowns in the read (Default is 0.0)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-n</span></code></td>
+<td><code class="docutils literal"><span class="pre">--num-reads=INT</span></code></td>
+<td>Number of reads to be generated.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--taxonomy-distribution=FILE</span></code></td>
+<td>File containing probability distribution for sequence selection expressed by taxonomy id.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="9%" />
+<col width="25%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Complete Genomics</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-V</span></code></td>
+<td><code class="docutils literal"><span class="pre">--cg-read-version=INT</span></code></td>
+<td>Select Complete Genomics read structure version, 1 (35 bp) or 2 (29 bp)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="19%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--comment=STRING</span></code></td>
+<td>Comment to include in the generated SDF.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-names</span></code></td>
+<td>Do not create read names in the output SDF.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-qualities</span></code></td>
+<td>Do not create read qualities in the output SDF.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code></td>
+<td><code class="docutils literal"><span class="pre">--qual-range=STRING</span></code></td>
+<td>Set the range of base quality values permitted e.g.: 3-40 (Default is fixed qualities corresponding to overall machine base error rate)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sam-rg=STRING|FILE</span></code></td>
+<td>File containing a single valid read group SAM header line or a string in the form <code class="docutils literal"><span class="pre">&#64;RG\tID:READGROUP1\tSM:BACT_SAMPLE\tPL:ILLUMINA</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for random number generator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">cgsim</span></code> command to set either <code class="docutils literal"><span class="pre">--coverage</span></code> or <code class="docutils literal"><span class="pre">--num-reads</span></code> in
+simulated Complete Genomics reads. For more information about Complete
+Genomics reads, refer to <a class="reference external" href="http://www.completegenomics.com">http://www.completegenomics.com</a></p>
+<p>RTG simulation tools allows for deterministic experiment repetition. The
+<code class="docutils literal"><span class="pre">--seed</span></code> parameter, for example, allows for regeneration of exact same
+reads by setting the random number generator to be repeatable (without
+supplying this flag a different set of reads will be generated each
+time).</p>
+<p>The <code class="docutils literal"><span class="pre">--distribution</span></code> parameter allows you to specify the probability
+that a read will come from a particular named sequence for use with
+metagenomic databases. Probabilities are numbers between zero and one
+and must sum to one in the file.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
+</div>
+</div>
+<div class="section" id="denovosim">
+<h3>denovosim<a class="headerlink" href="#denovosim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">denovosim</span></code> command to generate a VCF containing a derived
+genotype containing <em>de novo</em> variants.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim [OPTION]... -i FILE --original STRING -o FILE -t SDF -s STRING
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim -i sample.vcf --original personA -o 2samples.vcf \
+  -t HUMAN_reference -s personB
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="24%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>The input VCF containing parent variants.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--original=STRING</span></code></td>
+<td>The name of the existing sample to use as the original genotype.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>The output VCF file name.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--output-sdf=FILE</span></code></td>
+<td>Set to output an SDF of the genome generated.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>The SDF containing the reference genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>The name for the new derived sample.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="15%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Prints help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Set this flag to create the VCF output file without compression.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--num-mutations=INT</span></code></td>
+<td>Set the expected number of mutations per genome. (Default is 70).</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
+<td>The ploidy to use when the reference genome does not contain a reference text file. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Set the seed for the random number generator.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--show-mutations</span></code></td>
+<td>Set this flag to display information regarding de novo mutation points.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">denovosim</span></code> command is used to simulate a derived genotype
+containing <em>de novo</em> variants from a VCF containing an existing
+genotype. The new output VCF will contain all the existing variants and
+samples with a new column for the new sample.</p>
+<p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
+derived genome which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
+simulate a read set for the new genome.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="readsim">
+<h3>readsim<a class="headerlink" href="#readsim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">readsim</span></code> command to generate single or paired end reads of
+fixed or variable length from a reference genome, introducing machine
+errors.</p>
+<p><strong>Syntax:</strong></p>
+<p>Generation by genomic coverage multiplier:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg readsim [OPTION]... -t SDF --machine STRING -o SDF -c FLOAT
+</pre></div>
+</div>
+<p>Generation by explicit number of reads:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg readsim [OPTION]... -t SDF --machine STRING -o SDF -n INT
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg readsim -t genome_ref -o sim_reads -r 75 --machine illumina_se  -c 30
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="17%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=SDF</span></code></td>
+<td>SDF containing input genome.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--machine=STRING</span></code></td>
+<td>Select the sequencing technology to model. Allowed values are [illumina_se, illumina_pe, complete_genomics, complete_genomics_2, 454_pe, 454_se, iontorrent]</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=SDF</span></code></td>
+<td>Name for reads output SDF.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="26%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Fragment Generation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--abundance</span></code></td>
+<td>If set, the user-supplied distribution represents desired abundance.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-N</span></code></td>
+<td><code class="docutils literal"><span class="pre">--allow-unknowns</span></code></td>
+<td>Allow reads to be drawn from template fragments containing unknown nucleotides.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
+<td><code class="docutils literal"><span class="pre">--coverage=FLOAT</span></code></td>
+<td>Coverage, must be positive.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-D</span></code></td>
+<td><code class="docutils literal"><span class="pre">--distribution=FILE</span></code></td>
+<td>File containing probability distribution for sequence selection.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--dna-fraction</span></code></td>
+<td>If set, the user-supplied distribution represents desired DNA fraction.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-M</span></code></td>
+<td><code class="docutils literal"><span class="pre">--max-fragment-size=INT</span></code></td>
+<td>Maximum fragment size (Default is 250)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td><code class="docutils literal"><span class="pre">--min-fragment-size=INT</span></code></td>
+<td>Minimum fragment size (Default is 200)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--n-rate=FLOAT</span></code></td>
+<td>Rate that the machine will generate new unknowns in the read (Default is 0.0)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-n</span></code></td>
+<td><code class="docutils literal"><span class="pre">--num-reads=INT</span></code></td>
+<td>Number of reads to be generated.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--taxonomy-distribution=FILE</span></code></td>
+<td>File containing probability distribution for sequence selection expressed by taxonomy id.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="27%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Illumina PE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-L</span></code></td>
+<td><code class="docutils literal"><span class="pre">--left-read-length=INT</span></code></td>
+<td>Target read length on the left side.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-R</span></code></td>
+<td><code class="docutils literal"><span class="pre">--right-read-length=INT</span></code></td>
+<td>Target read length on the right side.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="27%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Illumina SE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
+<td><code class="docutils literal"><span class="pre">--read-length=INT</span></code></td>
+<td>Target read length, must be positive.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="25%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">454 SE/PE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--454-max-total-size=INT</span></code></td>
+<td>Maximum 454 read length (in paired end case the sum of the left and the right read lengths)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--454-min-total-size=INT</span></code></td>
+<td>Minimum 454 read length (in paired end case the sum of the left and the right read lengths)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="27%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">IonTorrent SE</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ion-max-total-size=INT</span></code></td>
+<td>Maximum IonTorrent read length.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ion-min-total-size=INT</span></code></td>
+<td>Minimum IonTorrent read length.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="19%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--comment=STRING</span></code></td>
+<td>Comment to include in the generated SDF.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-names</span></code></td>
+<td>Do not create read names in the output SDF.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-qualities</span></code></td>
+<td>Do not create read qualities in the output SDF.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code></td>
+<td><code class="docutils literal"><span class="pre">--qual-range=STRING</span></code></td>
+<td>Set the range of base quality values permitted e.g.: 3-40 (Default is fixed qualities corresponding to overall machine base error rate)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sam-rg=STRING|FILE</span></code></td>
+<td>File containing a single valid read group SAM header line or a string in the form <code class="docutils literal"><span class="pre">&#64;RG\tID:READGROUP1\tSM:BACT_SAMPLE\tPL:ILLUMINA</span></code></td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for random number generator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>Create simulated reads from a reference genome by either specifying
+coverage depth or a total number of reads.</p>
+<p>A typical use case involves creating a mutated genome by introducing
+SNPs or CNVs with <code class="docutils literal"><span class="pre">popsim</span></code> and <code class="docutils literal"><span class="pre">samplesim</span></code> generating reads from the
+mutated genome with <code class="docutils literal"><span class="pre">readsim</span></code>, and mapping them back to the original
+reference to verify the parameters used for mapping or variant
+detection.</p>
+<p>RTG simulation tools allows for deterministic experiment repetition. The
+<code class="docutils literal"><span class="pre">--seed</span></code> parameter, for example, allows for regeneration of exact same
+reads by setting the random number generator to be repeatable (without
+supplying this flag a different set of reads will be generated each
+time).</p>
+<p>The <code class="docutils literal"><span class="pre">--distribution</span></code> parameter allows you to specify the sequence
+composition of the resulting read set, primarily for use with
+metagenomic databases.  The distribution file is a text file containing
+lines of the form:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>&lt;probability&gt;&lt;space&gt;&lt;sequence name&gt;
+</pre></div>
+</div>
+<p>Probabilities must be between zero and one and must sum to one in the
+file. For reference databases containing taxonomy information, where
+each species may be comprised of more than one sequence, it is instead
+possible to use the <code class="docutils literal"><span class="pre">--taxonomy-distribution</span></code> option to specify the
+probabilities at a per-species level. The format of each line in this
+case is:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>&lt;probability&gt;&lt;space&gt;&lt;taxon id&gt;
+</pre></div>
+</div>
+<p>When using <code class="docutils literal"><span class="pre">--distribution</span></code> or <code class="docutils literal"><span class="pre">--taxonomy-distribution</span></code>, the
+interpretation must be specified one of <code class="docutils literal"><span class="pre">--abundance</span></code> or
+<code class="docutils literal"><span class="pre">--dna-fraction</span></code>. When using <code class="docutils literal"><span class="pre">--abundance</span></code> each specified
+probability reflects the chance of selecting the specified sequence
+(or taxon id) from the set of sequences, and thus for a given abundance
+a large sequence will be represented by more reads in the resulting set
+than a short sequence. In contrast, with <code class="docutils literal"><span class="pre">--dna-fraction</span></code> each
+specified probability reflects the chance of a read being derived
+from the designated sequence, and thus for a given fraction, a large
+sequence will have a lower depth of coverage than a short sequence.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#cgsim"><span class="std std-ref">cgsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
+</div>
+</div>
+<div class="section" id="popsim">
+<h3>popsim<a class="headerlink" href="#popsim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">popsim</span></code> command to generate a VCF containing simulated
+population variants. Each variant allele generated has an associated
+frequency INFO field describing how frequent in the population that
+allele is.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg popsim [OPTION]... -o FILE -t SDF
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg popsim -o pop.vcf -t HUMAN_reference
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="19%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output VCF file name.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>SDF containing the reference genome.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="19%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for the random number generator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">popsim</span></code> command is used to create a VCF containing variants with
+frequency in population information that can be subsequently used to
+simulate individual samples using the <code class="docutils literal"><span class="pre">samplesim</span></code> command. The frequency
+in population is contained in a VCF <code class="docutils literal"><span class="pre">INFO</span></code> field called <code class="docutils literal"><span class="pre">AF</span></code>. The types
+of variants and the allele-frequency distribution has been drawn from
+observed variants and allele frequency distribution in human studies.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
+<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="samplesim">
+<h3>samplesim<a class="headerlink" href="#samplesim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">samplesim</span></code> command to generate a VCF containing a genotype
+simulated from population variants according to allele frequency.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg samplesim [OPTION]... -i FILE -o FILE -t SDF -s STRING
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<p>From a population frequency VCF:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg samplesim -i pop.vcf -o 1samples.vcf -t HUMAN_reference -s person1 --sex male
+</pre></div>
+</div>
+<p>From an existing simulated VCF:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg samplesim -i 1samples.vcf -o 2samples.vcf -t HUMAN_reference -s person2 \
+  --sex female
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="20%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>Input VCF containing population variants.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output VCF file name.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--output-sdf=SDF</span></code></td>
+<td>If set, output an SDF containing the sample genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>SDF containing the reference genome.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>Name for sample.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="13%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Prints help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Set this flag to create the VCF output file without compression.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
+<td>The ploidy to use when the reference genome does not contain a reference text file. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Set the seed for the random number generator.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sex=SEX</span></code></td>
+<td>Specifies the sex of the individual. Allowed values are [male, female, either] (Default is either).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">samplesim</span></code> command is used to simulate an individuals genotype
+information from a population variant frequency VCF generated by the
+<code class="docutils literal"><span class="pre">popsim</span></code> command or by previous <code class="docutils literal"><span class="pre">samplesim</span></code> or <code class="docutils literal"><span class="pre">childsim</span></code> commands. The
+new output VCF will contain all the existing variants and samples with a
+new column for the new sample. The genotype at each record of the VCF
+will be chosen randomly according to the allele frequency specified in
+the <code class="docutils literal"><span class="pre">AF</span></code> field.</p>
+<p>The ploidy for each genotype is generated according to the ploidy of
+that chromosome for the specified sex of the individual, as defined in
+the reference genome <code class="docutils literal"><span class="pre">reference.txt</span></code> file. For more information see
+<a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>.</p>
+<p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
+individuals genotype which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
+simulate a read set for the individual.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="childsim">
+<h3>childsim<a class="headerlink" href="#childsim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">childsim</span></code> command to generate a VCF containing a genotype
+simulated as a child of two parents.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg childsim [OPTION]... --father STRING -i FILE --mother STRING -o FILE -t SDF \
+  -s STRING
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg childsim --father person1 --mother person2 -i 2samples.vcf -o 3samples.vcf \
+  -t HUMAN_reference -s person3
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--father=STRING</span></code></td>
+<td>Name of the existing sample to use as the father.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>Input VCF containing parent variants.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--mother=STRING</span></code></td>
+<td>Name of the existing sample to use as the mother.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output VCF file name.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--output-sdf=SDF</span></code></td>
+<td>If set, output an SDF containing the sample genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>SDF containing the reference genome.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>Name for new child sample.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--num-crossovers=FLOAT</span></code></td>
+<td>Likelihood of extra crossovers per chromosome (Default is 0.01)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
+<td>Ploidy to use. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for the random number generator.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sex=SEX</span></code></td>
+<td>Sex of individual. Allowed values are [male, female, either] (Default is either)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--show-crossovers</span></code></td>
+<td>If set, display information regarding haplotype selection and crossover points.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">childsim</span></code> command is used to simulate an individuals genotype
+information from a VCF containing the two parent genotypes generated by
+previous <code class="docutils literal"><span class="pre">samplesim</span></code> or <code class="docutils literal"><span class="pre">childsim</span></code> commands. The new output VCF will
+contain all the existing variants and samples with a new column for the
+new sample.</p>
+<p>The ploidy for each genotype is generated according to the ploidy of
+that chromosome for the specified sex of the individual, as defined in
+the reference genome <code class="docutils literal"><span class="pre">reference.txt</span></code> file. For more information see
+<a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>. The generated genotypes are all consistent
+with Mendelian inheritance (<em>de novo</em> variants can be simulated with the
+<code class="docutils literal"><span class="pre">denovosim</span></code> command).</p>
+<p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
+child&#8217;s genotype which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
+simulate a read set for the child.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="samplereplay">
+<h3>samplereplay<a class="headerlink" href="#samplereplay" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">samplereplay</span></code> command to generate the genome SDF corresponding
+to a sample genotype in a VCF file.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg samplereplay [OPTION]... -i FILE -o SDF -t SDF -s STRING
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg samplereplay -i 3samples.vcf -o child.sdf -t HUMAN_reference -s person3
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="19%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>Input VCF containing the sample genotype.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=SDF</span></code></td>
+<td>Name for output SDF.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>SDF containing the reference genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>Name of the sample to select from the VCF.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="19%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">samplereplay</span></code> command can be used to generate an SDF of a genotype
+for a given sample from an existing VCF file. This can be used to
+generate a genome from the outputs of the <code class="docutils literal"><span class="pre">samplesim</span></code> and <code class="docutils literal"><span class="pre">childsim</span></code>
+commands. The output genome can then be used in simulating a read set
+for the sample using the <code class="docutils literal"><span class="pre">readsim</span></code> command.</p>
+<p>Every chromosome for which the individual is diploid will have two
+sequences in the resulting SDF.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
+<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a></p>
 </div>
 </div>
 </div>
@@ -1061,9 +2290,9 @@ standard gzip tools such as <code class="docutils literal"><span class="pre">gun
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
+<col width="6%" />
 <col width="21%" />
-<col width="72%" />
+<col width="73%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -1072,36 +2301,35 @@ standard gzip tools such as <code class="docutils literal"><span class="pre">gun
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-l</span></code></td>
 <td><code class="docutils literal"><span class="pre">--compression-level=INT</span></code></td>
-<td>the compression level to use, between 1 (least but fast) and 9 (highest but slow) (Default is 5)</td>
+<td>The compression level to use, between 1 (least but fast) and 9 (highest but slow) (Default is 5)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-d</span></code></td>
 <td><code class="docutils literal"><span class="pre">--decompress</span></code></td>
-<td>Set to decompress the input file.</td>
+<td>Decompress.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--force</span></code></td>
-<td>Overwrite the output file if it already exists.</td>
+<td>Force overwrite of output file.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-terminate</span></code></td>
-<td>if set, do not add the block gzip termination block</td>
+<td>If set, do not add the block gzip termination block.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
 <td><code class="docutils literal"><span class="pre">--stdout</span></code></td>
-<td>Write output to standard output, keep the original files unchanged. Implied when using standard input.</td>
+<td>Write on standard output, keep original files unchanged. Implied when using standard input.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
-<td>Specifies the file to be compressed or decompressed. Use
-&#8216;-&#8216; to read from standard input. Must be specified 1 or more times.</td>
+<td>File to (de)compress, use &#8216;-&#8216; for standard input. Must be specified 1 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
+<col width="6%" />
 <col width="21%" />
-<col width="64%" />
+<col width="73%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -1110,7 +2338,7 @@ standard gzip tools such as <code class="docutils literal"><span class="pre">gun
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
@@ -1130,11 +2358,11 @@ retrieval of records corresponding to specific genomic regions.</p>
 position data files or BAM index files for BAM files.</p>
 <p><strong>Syntax:</strong></p>
 <p>Multi-file input specified from command line:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg index [OPTION]... -f FORMAT FILE+
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg index [OPTION]... FILE+
 </pre></div>
 </div>
 <p>Multi-file input specified in a text file:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg index [OPTION]... -f FORMAT -I FILE
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg index [OPTION]... -I FILE
 </pre></div>
 </div>
 <p><strong>Example:</strong></p>
@@ -1145,8 +2373,8 @@ position data files or BAM index files for BAM files.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="5%" />
-<col width="16%" />
-<col width="78%" />
+<col width="19%" />
+<col width="76%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -1155,23 +2383,23 @@ position data files or BAM index files for BAM files.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--format=FORMAT</span></code></td>
-<td>Specifies format of the input files to be indexed. Allowed values are [sam, bam, sv, coveragetsv, bed, vcf]</td>
+<td>Format of input to index. Allowed values are [sam, bam, cram, sv, coveragetsv, bed, vcf, auto] (Default is auto)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-I</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input-list-file=FILE</span></code></td>
-<td>Specifies a file containing a list of block compressed files (1 per line) containing data in the specified genome position format.</td>
+<td>File containing a list of block compressed files (1 per line) containing genome position data.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
-<td>Specifies a block compressed file containing data in the specified genome position format to be indexed. May be specified 0 or more times.</td>
+<td>Block compressed files containing data to be indexed. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="21%" />
-<col width="64%" />
+<col width="6%" />
+<col width="20%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -1180,22 +2408,20 @@ position data files or BAM index files for BAM files.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
 <p>Use the <code class="docutils literal"><span class="pre">index</span></code> command to produce tabix indexes for block compressed
-genome position data files like SAM files and the output from <code class="docutils literal"><span class="pre">sv</span></code>,
-<code class="docutils literal"><span class="pre">discord</span></code>, <code class="docutils literal"><span class="pre">coverage</span></code> and <code class="docutils literal"><span class="pre">snp</span></code> commands. The <code class="docutils literal"><span class="pre">index</span></code> command can also
-be used to produce BAM indexes for BAM files with no index.</p>
+genome position data files like SAM files, VCF files, BED files, and the
+TSV output from RTG commands such as <code class="docutils literal"><span class="pre">coverage</span></code>. The <code class="docutils literal"><span class="pre">index</span></code> command
+can also be used to produce BAM indexes for BAM files with no index.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#map"><span class="std std-ref">map</span></a>,
 <a class="reference internal" href="#coverage"><span class="std std-ref">coverage</span></a>,
 <a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
-<a class="reference internal" href="#sv"><span class="std std-ref">sv</span></a>,
-<a class="reference internal" href="#discord"><span class="std std-ref">discord</span></a>,
 <a class="reference internal" href="#extract"><span class="std std-ref">extract</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a></p>
 </div>
@@ -1230,7 +2456,7 @@ data file.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE</span></code></td>
 <td>The indexed block compressed genome position data file to extract.</td>
 </tr>
@@ -1247,7 +2473,7 @@ data file.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specifies the region to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length. May be specified 0 or more times.</td>
 </tr>
@@ -1264,11 +2490,11 @@ data file.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--header</span></code></td>
 <td>Set to also display the file header.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--header-only</span></code></td>
 <td>Set to only display the file header.</td>
 </tr>
@@ -1293,13 +2519,13 @@ data file.</p>
 </table>
 <p><strong>Usage:</strong></p>
 <p>Use the <code class="docutils literal"><span class="pre">extract</span></code> command to view specific parts of indexed block
-compressed genome position data files.</p>
+compressed genome position data files such as those in SAM/BAM/BED/VCF
+format.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#map"><span class="std std-ref">map</span></a>,
 <a class="reference internal" href="#coverage"><span class="std std-ref">coverage</span></a>,
 <a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
-<a class="reference internal" href="#sv"><span class="std std-ref">sv</span></a>,
 <a class="reference internal" href="#index"><span class="std std-ref">index</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a></p>
 </div>
@@ -1321,9 +2547,9 @@ with output as ASCII to the terminal, or HTML.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="20%" />
-<col width="74%" />
+<col width="5%" />
+<col width="21%" />
+<col width="73%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -1332,7 +2558,7 @@ with output as ASCII to the terminal, or HTML.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-b</span></code></td>
 <td><code class="docutils literal"><span class="pre">--baseline=FILE</span></code></td>
-<td>VCF file containing baseline variants</td>
+<td>VCF file containing baseline variants.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-B</span></code></td>
 <td><code class="docutils literal"><span class="pre">--bed=FILE</span></code></td>
@@ -1344,27 +2570,27 @@ with output as ASCII to the terminal, or HTML.</p>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-I</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input-list-file=FILE</span></code></td>
-<td>file containing a list of SAM/BAM format files (1 per line).</td>
+<td>File containing a list of SAM/BAM format files (1 per line)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
 <td><code class="docutils literal"><span class="pre">--reads=SDF</span></code></td>
-<td>read SDF (only needed to indicate correctness of simulated read mappings). May be specified 0 or more times.</td>
+<td>Read SDF (only needed to indicate correctness of simulated read mappings). May be specified 0 or more times.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
 <td><code class="docutils literal"><span class="pre">--template=SDF</span></code></td>
-<td>reference SDF to which mappings and variants apply</td>
+<td>SDF containing the reference genome.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
-<td>The indexed block compressed genome position data file to extract.</td>
+<td>Alignment SAM/BAM files. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="5%" />
-<col width="11%" />
-<col width="84%" />
+<col width="18%" />
+<col width="77%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
@@ -1373,96 +2599,96 @@ with output as ASCII to the terminal, or HTML.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-p</span></code></td>
 <td><code class="docutils literal"><span class="pre">--padding=INT</span></code></td>
-<td>Padding around region of interest. Default is to automatically determine padding to avoid read truncation.</td>
+<td>Padding around region of interest (Default is to automatically determine padding to avoid read truncation)</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
-<td>Specifies the region to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length. May be specified 0 or more times.</td>
+<td>The region of interest to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
-<td>Specify name of sample to select. May be specified 0 or more times, or as a comma separated list</td>
+<td>Specify name of sample to select. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="22%" />
-<col width="75%" />
+<col width="5%" />
+<col width="21%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--html</span></code></td>
 <td>Output as HTML.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-base-colors</span></code></td>
-<td>Do not use base-colors</td>
+<td>Do not use base-colors.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-color</span></code></td>
 <td>Do not use colors.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-dots</span></code></td>
 <td>Display nucleotide instead of dots.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-cigars</span></code></td>
 <td>Print alignment cigars.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-mapq</span></code></td>
 <td>Print alignment MAPQ values.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-mate-position</span></code></td>
 <td>Print mate position.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-names</span></code></td>
 <td>Print read names.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-readgroup</span></code></td>
 <td>Print read group id for each alignment.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-reference-line=INT</span></code></td>
-<td>print reference line every N lines (Default is 0).</td>
+<td>Print reference line every N lines (Default is 0)</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-soft-clipped-bases</span></code></td>
-<td>Print soft clipped bases</td>
+<td>Print soft clipped bases.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--project-track=INT</span></code></td>
-<td>If set, project highlighting for the specified track down through reads. Default projects the union of tracks.</td>
+<td>If set, project highlighting for the specified track down through reads (Default projects the union of tracks)</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sort-readgroup</span></code></td>
 <td>Sort reads first on read group and then on start position.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sort-reads</span></code></td>
 <td>Sort reads on start position.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--unflatten</span></code></td>
-<td>Display unflattened CGI reads when present</td>
+<td>Display unflattened CGI reads when present.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="21%" />
-<col width="64%" />
+<col width="6%" />
+<col width="23%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -1471,7 +2697,7 @@ with output as ASCII to the terminal, or HTML.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
@@ -1531,7 +2757,7 @@ Quality scores available on this SDF
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">SDF+</span></code></td>
 <td>Specifies an SDF on which statistics are to be reported. May be specified 1 or more times.</td>
 </tr>
@@ -1548,7 +2774,7 @@ Quality scores available on this SDF
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--lengths</span></code></td>
 <td>Set to print out the name and length of each sequence. (Not recommended for read sets).</td>
 </tr>
@@ -1560,11 +2786,11 @@ Quality scores available on this SDF
 <td><code class="docutils literal"><span class="pre">--quality</span></code></td>
 <td>Set to display mean of quality.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sex=SEX</span></code></td>
 <td>Set to display the reference sequence list for the given sex. Allowed values are [male, female, either]. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--taxonomy</span></code></td>
 <td>Set to display information about the taxonomy.</td>
 </tr>
@@ -1653,11 +2879,11 @@ to another SDF.</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--end-id=INT</span></code></td>
 <td>Only output sequences with sequence id less than the given number. (Sequence ids start at 0).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--start-id=INT</span></code></td>
 <td>Only output sequences with sequence id greater than or equal to the given number. (Sequence ids start at 0).</td>
 </tr>
@@ -1665,11 +2891,11 @@ to another SDF.</p>
 <td><code class="docutils literal"><span class="pre">--id-file=FILE</span></code></td>
 <td>Name of a file containing a list of sequences to extract, one per line.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--names</span></code></td>
 <td>Interpret any specified sequence as names instead of numeric sequence ids.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specifies the sequence id, or sequence name if the names flag is set to extract from the input SDF. May be specified 0 or more times.</td>
 </tr>
@@ -1761,7 +2987,7 @@ zero and are the same as the ids that <code class="docutils literal"><span class
 <td><code class="docutils literal"><span class="pre">--sequence-id</span></code></td>
 <td>Set to use sequence id instead of sequence name in region flag (0-based).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
 <td>Specifies the region to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length. Must be specified 1 or more times</td>
 </tr>
@@ -1827,9 +3053,9 @@ concordance.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="24%" />
-<col width="68%" />
+<col width="6%" />
+<col width="23%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -1838,60 +3064,60 @@ concordance.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>VCF file containing the multiple sample variant calls. Use &#8216;-&#8216; to read from standard input.</td>
+<td>VCF file containing multi-sample variant calls or &#8216;-&#8216; to read from standard input.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>Set to output annotated calls to this VCF file.</td>
+<td>If set, output annotated calls to this VCF file.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--output-consistent=FILE</span></code></td>
-<td>Set to output only consistent calls to this VCF file.</td>
+<td>If set, output only consistent calls to this VCF file.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--output-inconsistent=FILE</span></code></td>
-<td>Set to output only non-Mendelian calls to this VCF file.</td>
+<td>If set, output only non-Mendelian calls to this VCF file.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
 <td><code class="docutils literal"><span class="pre">--template=SDF</span></code></td>
-<td>SDF containing template to which was used to create the VCF.</td>
+<td>SDF containing the reference genome.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="18%" />
-<col width="76%" />
+<col width="5%" />
+<col width="21%" />
+<col width="74%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Sensitivity Tuning</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-l</span></code></td>
-<td><code class="docutils literal"><span class="pre">--lenient</span></code></td>
-<td>Set to allow homozygous diploid variant calls in place of haploid calls and assume missing values are equal to the reference.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--all-records</span></code></td>
-<td>Use all records, regardless of filters. Default is to only process records where FILTER is &#8221;.&#8221; or &#8220;PASS&#8221;.</td>
+<td>Use all records, regardless of filters (Default is to only process records where FILTER is <code class="docutils literal"><span class="pre">.</span></code> or <code class="docutils literal"><span class="pre">PASS</span></code>)</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-l</span></code></td>
+<td><code class="docutils literal"><span class="pre">--lenient</span></code></td>
+<td>Allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--min-concordance=FLOAT</span></code></td>
-<td>The percentage concordance required for parentage to be considered as consistent. The default is 99.0.</td>
+<td>Percentage concordance required for consistent parentage (Default is 99.0)</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--pedigree=FILE</span></code></td>
-<td>Specify a genome relationships PED file. The default is to extract pedigree information from the VCF header fields.</td>
+<td>Genome relationships PED file (Default is to extract pedigree information from VCF header fields)</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="6%" />
-<col width="11%" />
-<col width="83%" />
+<col width="23%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -1900,11 +3126,15 @@ concordance.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the VCF output file without compression. By default the output file is compressed with blocked gzip.</td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
+<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
@@ -1924,11 +3154,12 @@ created by the RTG pedigree-aware variant calling commands. If this
 pedigree information is absent from the VCF header or is incorrect, a
 pedigree file can be explicitly supplied with the <code class="docutils literal"><span class="pre">--pedigree</span></code> flag.</p>
 <p>To ensure correct behavior when dealing with sex chromosomes it is
-necessary to specify a template and ensure the sex of each sample is
-supplied as part of the pedigree information. While it is best to give
-the template used in the creation of the VCF, for checking third-party
-outputs any template containing the same chromosome names and an
-appropriate <code class="docutils literal"><span class="pre">reference.txt</span></code> file will work.</p>
+necessary to specify a sex-aware reference and ensure the sex of each
+sample is supplied as part of the pedigree information. While it is best
+to give the reference SDF used in the creation of the VCF, for checking
+third-party outputs any reference SDF containing the same chromosome
+names and an appropriate <code class="docutils literal"><span class="pre">reference.txt</span></code> file will work. For more
+information, see <a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>.</p>
 <p>Particularly when evaluating VCF files that have been produced by third
 party tools or when the VCF is the result of combining independent
 per-sample calling, you can end up with situations where calls are not
@@ -2004,19 +3235,19 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--known</span></code></td>
 <td>Set to only calculate statistics for known variants.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--novel</span></code></td>
 <td>Set to only calculate statistics for novel variants.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=FILE</span></code></td>
 <td>Set to only calculate statistics for the specified sample. (Default is to include all samples). May be specified 0 or more times.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td>FILE+</td>
 <td>VCF file from which to derive statistics. Use &#8216;-&#8216; to read from standard input. Must be specified 1 or more times.</td>
 </tr>
@@ -2033,7 +3264,7 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--allele-lengths</span></code></td>
 <td>Set to output variant length histogram.</td>
 </tr>
@@ -2065,8 +3296,9 @@ statistics for each sample are shown individually.</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
 <a class="reference internal" href="#family"><span class="std std-ref">family</span></a>,
 <a class="reference internal" href="#somatic"><span class="std std-ref">somatic</span></a>,
+<a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
 <a class="reference internal" href="#vcfmerge"><span class="std std-ref">vcfmerge</span></a>,
-<a class="reference internal" href="#discord"><span class="std std-ref">discord</span></a></p>
+<a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
 </div>
 <div class="section" id="vcfmerge">
@@ -2087,9 +3319,9 @@ multiple samples to form a multi-sample VCF file.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
+<col width="7%" />
 <col width="22%" />
-<col width="70%" />
+<col width="71%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -2102,19 +3334,19 @@ multiple samples to form a multi-sample VCF file.</p>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>The output VCF file name. Use &#8216;-&#8216; to write to standard output.</td>
+<td>Output VCF file. Use &#8216;-&#8216; to write to standard output.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td>FILE+</td>
-<td>VCF files to be merged. Must be specified 1 or more times.</td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
+<td>Input VCF files to merge. Must be specified 1 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="18%" />
-<col width="76%" />
+<col width="4%" />
+<col width="13%" />
+<col width="83%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -2123,7 +3355,7 @@ multiple samples to form a multi-sample VCF file.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--force-merge=STRING</span></code></td>
-<td>Set to allow merging of specified header ID even when descriptions do not match. May be specified 0 or more times.</td>
+<td>Allow merging of specified header ID even when descriptions do not match. May be specified 0 or more times.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-F</span></code></td>
 <td><code class="docutils literal"><span class="pre">--force-merge-all</span></code></td>
@@ -2131,25 +3363,24 @@ multiple samples to form a multi-sample VCF file.</p>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the VCF output file without compression. By default the output file is compressed with
-blocked gzip.</td>
+<td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Set this flag to not produce the index for the VCF output file.</td>
+<td>Do not produce indexes for output files.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--preserve-formats</span></code></td>
-<td>If set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those
-FORMAT fields so the variants can be combined).</td>
+<td>If set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be
+combined)</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--stats</span></code></td>
-<td>Set to output statistics for the merged VCF file.</td>
+<td>Output statistics for the merged VCF file.</td>
 </tr>
 </tbody>
 </table>
@@ -2183,16 +3414,17 @@ refusing to merge the records (separate records will be output).</p>
 <a class="reference internal" href="#family"><span class="std std-ref">family</span></a>,
 <a class="reference internal" href="#population"><span class="std std-ref">population</span></a>,
 <a class="reference internal" href="#somatic"><span class="std std-ref">somatic</span></a>,
-<a class="reference internal" href="#discord"><span class="std std-ref">discord</span></a>,
+<a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
+<a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a>,
-:ref: <cite>index</cite></p>
+<a class="reference internal" href="#index"><span class="std std-ref">index</span></a></p>
 </div>
 </div>
 <div class="section" id="vcffilter">
 <h3>vcffilter<a class="headerlink" href="#vcffilter" title="Permalink to this headline">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
-<p>Filter VCF output files to include or exclude records based on various
-criteria.</p>
+<p>Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be
+filtered.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter [OPTION]... -i FILE -o FILE
 </pre></div>
@@ -2204,38 +3436,38 @@ criteria.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="15%" />
-<col width="79%" />
+<col width="4%" />
+<col width="18%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--all-samples</span></code></td>
-<td>Set to apply sample-specific criteria to all samples contained in the input VCF.</td>
+<td>Apply sample-specific criteria to all samples contained in the input VCF.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-regions=FILE</span></code></td>
-<td>If set, only read VCF records that overlap the ranges contained in the specified BED file. Requires the input VCF to be tabix indexed.</td>
+<td>If set, only read VCF records that overlap the ranges contained in the specified BED file.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>Specifies the VCF file containing variants to be filtered. Use &#8216;-&#8216; to read from standard input.</td>
+<td>VCF file containing variants to be filtered. Use &#8216;-&#8216; to read from standard input.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>Specifies the output VCF file. Use &#8216;-&#8216; to write to standard output. This option is required, unless <code class="docutils literal"><span class="pre">--javascript</span></code> is being used.</td>
+<td>Output VCF file. Use &#8216;-&#8216; to write to standard output. This option is required, unless <code class="docutils literal"><span class="pre">--javascript</span></code> is being used.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
-<td>if set, only read VCF records within the specified range. The format is one of &lt;template_name&gt;, &lt;template_name&gt;:start-end.</td>
+<td>If set, only read VCF records within the specified range. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
-<td>Set to apply sample-specific criteria to the named sample contained in the input VCF. May be specified 0 or more times.</td>
+<td>Apply sample-specific criteria to the named sample contained in the input VCF. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
@@ -2254,19 +3486,19 @@ criteria.</p>
 <td><code class="docutils literal"><span class="pre">--density-window=INT</span></code></td>
 <td>Set a window length in which multiple called variants are discarded.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--exclude-bed=FILE</span></code></td>
 <td>Set to discard all variants within the regions contained in the BED file.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--exclude-vcf=FILE</span></code></td>
 <td>Set to discard all variants that overlap with the ones in this VCF file.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--include-bed=FILE</span></code></td>
 <td>Set to only keep variants within the regions contained in the BED file.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--include-vcf=FILE</span></code></td>
 <td>Set to only keep variants that overlap with the ones in this VCF file.</td>
 </tr>
@@ -2307,7 +3539,7 @@ or as a comma separated list.</td>
 <td><code class="docutils literal"><span class="pre">--min-quality=FLOAT</span></code></td>
 <td>Set the minimum allowed quality.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--non-snps-only</span></code></td>
 <td>Set to output MNPs and INDELs only.</td>
 </tr>
@@ -2321,11 +3553,11 @@ or as a comma separated list.</td>
 <td>Set to remove variants with this INFO tag. May be specified 0 or more times,
 or as a comma separated list.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-overlapping</span></code></td>
 <td>Set to remove records that overlap with previous records.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--snps-only</span></code></td>
 <td>Set to output simple SNPs only.</td>
 </tr>
@@ -2346,11 +3578,11 @@ or as a comma separated list.</td>
 <td><code class="docutils literal"><span class="pre">--max-ambiguity-ratio=FLOAT</span></code></td>
 <td>Set the maximum allowed ambiguity ratio.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--max-avr-score=FLOAT</span></code></td>
 <td>Set the maximum allowed AVR score.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--max-denovo-score=FLOAT</span></code></td>
 <td>Set the maximum allowed de novo score.</td>
 </tr>
@@ -2362,11 +3594,11 @@ or as a comma separated list.</td>
 <td><code class="docutils literal"><span class="pre">--max-read-depth=INT</span></code></td>
 <td>Set the maximum allowed sample read depth.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--min-avr-score=FLOAT</span></code></td>
 <td>Set the minimum allowed AVR score.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--min-denovo-score=FLOAT</span></code></td>
 <td>Set the minimum allowed de novo score.</td>
 </tr>
@@ -2378,15 +3610,15 @@ or as a comma separated list.</td>
 <td><code class="docutils literal"><span class="pre">--min-read-depth=INT</span></code></td>
 <td>Set the minimum allowed sample read depth.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-all-same-as-ref</span></code></td>
 <td>Set to remove records where all the samples are same as the reference.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-hom</span></code></td>
 <td>Remove where sample is homozygous.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-same-as-ref</span></code></td>
 <td>Set to remove variants where the sample is the same as reference.</td>
 </tr>
@@ -2394,30 +3626,30 @@ or as a comma separated list.</td>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="22%" />
-<col width="75%" />
+<col width="6%" />
+<col width="28%" />
+<col width="66%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--clear-failed-samples</span></code></td>
-<td>Set to have the GT field of failing samples set to the missing value instead of removing the record.</td>
+<td>Instead of removing failed records set the sample GT fields to missing.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--fail=STRING</span></code></td>
-<td>Set to have the filter field of a failed record set to the provided value instead of removing it.</td>
+<td>Instead of removing failed records set their filter field to the provided value.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="6%" />
-<col width="11%" />
-<col width="83%" />
+<col width="28%" />
+<col width="66%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -2426,19 +3658,19 @@ or as a comma separated list.</td>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the output file without compression. By default the output file is compressed with tabix compatible blocked gzip.</td>
+<td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
-<td>prevent VCF header from being written</td>
+<td>Prevent VCF header from being written.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Set this flag to not produce the tabix index for the output file.</td>
+<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
@@ -2489,7 +3721,7 @@ an error.</p>
 <span id="expression-examples"></span><h5><code class="docutils literal"><span class="pre">--keep-expr</span></code> examples:<a class="headerlink" href="#keep-expr-examples" title="Permalink to this headline">¶</a></h5>
 <p>The following expression keeps records where the <code class="docutils literal"><span class="pre">NA12878</span></code> sample has
 <code class="docutils literal"><span class="pre">GQ</span></code> &gt; 30 and the total depth is &gt; 20. JavaScript will auto convert
-numerical strings when comparing a string with a number, so calls to parseInt can be omitted.</p>
+numerical strings when comparing a string with a number, so calls to <code class="docutils literal"><span class="pre">parseInt</span></code> can be omitted.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
 --keep-expr &quot;&#39;NA12878&#39;.GQ &gt; 30 &amp;&amp; INFO.DP &gt; 20&quot;
 </pre></div>
@@ -2666,9 +3898,9 @@ as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
-<col width="16%" />
-<col width="76%" />
+<col width="7%" />
+<col width="26%" />
+<col width="68%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -2677,11 +3909,11 @@ as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>Specifies the VCF file containing variants to annotate. Use &#8216;-&#8216; to read from standard input.</td>
+<td>VCF file containing variants to annotate. Use &#8216;-&#8216; to read from standard input.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>Specifies the output VCF file for the annotated variants. Use &#8216;-&#8216; to write to standard output.</td>
+<td>Output VCF file name. Use &#8216;-&#8216; to write to standard output.</td>
 </tr>
 </tbody>
 </table>
@@ -2696,34 +3928,34 @@ as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-ids=FILE</span></code></td>
 <td>Specifies a file in BED format containing variant ids in the name column to be added to the VCF id field. May be
 specified 0 or more times.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-info=FILE</span></code></td>
 <td>Specifies a file in BED format containing annotations in the name column to be added to the VCF info field. May be
 specified 0 or more times.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--fill-an-ac</span></code></td>
 <td>Set to add or update the AN and AC info fields to the VCF.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--info-description=STRING</span></code></td>
 <td>If the BED INFO field is not already declared, use this description in the header. (Default is &#8216;Annotation&#8217;).</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--info-id=STRING</span></code></td>
 <td>The INFO ID for BED INFO annotations. (Default is &#8216;ANN&#8217;)</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--relabel</span></code></td>
 <td>Relabel samples according to <code class="docutils literal"><span class="pre">old-name&nbsp;new-name</span></code> pairs in specified file. If only a single sample needs to be
 relabelled then a construct like <code class="docutils literal"><span class="pre">&lt;(echo</span> <span class="pre">old-name</span> <span class="pre">new-name)</span></code> can be used.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--vcf-ids=FILE</span></code></td>
 <td>Specifies a file in VCF format containing variant ids to be added to the VCF id field. May be specified 0 or more
 times.</td>
@@ -2732,9 +3964,9 @@ times.</td>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="11%" />
-<col width="83%" />
+<col width="7%" />
+<col width="26%" />
+<col width="68%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -2743,21 +3975,25 @@ times.</td>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the output file without compression. By default the output file is compressed with tabix compatible blocked gzip.</td>
+<td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
+<td>Prevent VCF header from being written.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Set this flag to not produce the tabix index for the output file.</td>
+<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
 <p>Use <code class="docutils literal"><span class="pre">vcfannotate</span></code> to add text annotations to variants that fall within
-ranges specified in a BED file. The annotations from the BED file are
+ranges specified in a BED or VCF file. The annotations from the BED file are
 added as an <code class="docutils literal"><span class="pre">INFO</span></code> field in the output VCF file.</p>
 <p>If the <code class="docutils literal"><span class="pre">--bed-ids</span></code> flag is used, instead of adding the annotation to the
 <code class="docutils literal"><span class="pre">INFO</span></code> fields, it is added to the <code class="docutils literal"><span class="pre">ID</span></code> column of the VCF file instead.
@@ -2791,9 +4027,9 @@ updated.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
-<col width="16%" />
-<col width="76%" />
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -2802,80 +4038,84 @@ updated.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>Specifies the VCF file containing variants to manipulate. Use &#8216;-&#8216; to read from standard input.</td>
+<td>VCF file containing variants to manipulate. Use &#8216;-&#8216; to read from standard input.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>Specifies the output VCF file for the subset records. Use &#8216;-&#8216; to write to standard output.</td>
-</tr>
-</tbody>
-</table>
-<table border="1" class="docutils">
-<colgroup>
-<col width="3%" />
-<col width="24%" />
-<col width="73%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head" colspan="3">Filtering</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--keep-filter=STRING</span></code></td>
-<td>Specifies a VCF FILTER tag to keep in the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--keep-format=STRING</span></code></td>
-<td>Specifies a VCF FORMAT tag to keep in the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--keep-info=STRING</span></code></td>
-<td>Specifies a VCF INFO tag to keep in the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--keep-sample=STRING</span></code></td>
-<td>Specifies a sample to keep in the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-filter=STRING</span></code></td>
-<td>Specifies a VCF FILTER tag to remove from the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-filters</span></code></td>
-<td>Set to remove all of the FILTER tags from the output.</td>
-</tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-format=STRING</span></code></td>
-<td>Specifies a VCF FORMAT tag to remove from the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-info=STRING</span></code></td>
-<td>Specifies a VCF INFO tag to remove from the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-infos</span></code></td>
-<td>Set to remove all of the INFO tags from the output.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-qual</span></code></td>
-<td>Remove the QUAL field.</td>
-</tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-sample=STRING</span></code></td>
-<td>Specifies a sample to remove from the output. May be specified 0 or more times.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--remove-samples</span></code></td>
-<td>Set to remove all of the sample data from the output.</td>
+<td>Output VCF file. Use &#8216;-&#8216; to write to standard output.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="6%" />
-<col width="11%" />
-<col width="83%" />
+<col width="21%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Filtering</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-filter=STRING</span></code></td>
+<td>Keep the specified FILTER tag. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-format=STRING</span></code></td>
+<td>Keep the specified FORMAT field. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-info=STRING</span></code></td>
+<td>Keep the specified INFO tag. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-sample=STRING</span></code></td>
+<td>Keep the specified sample. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-filter=STRING</span></code></td>
+<td>Remove the specified FILTER tag. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-filters</span></code></td>
+<td>Remove all FILTER tags.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-format=STRING</span></code></td>
+<td>Remove the specified FORMAT field. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-ids</span></code></td>
+<td>Remove the contents of the ID field.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-info=STRING</span></code></td>
+<td>Remove the specified INFO tag. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-infos</span></code></td>
+<td>Remove all INFO tags.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-qual</span></code></td>
+<td>Remove the QUAL field.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-sample=STRING</span></code></td>
+<td>Remove the specified sample. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-samples</span></code></td>
+<td>Remove all samples.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -2884,15 +4124,19 @@ updated.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the output file without compression. By default the output file is compressed with tabix compatible blocked gzip.</td>
+<td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
+<td>Prevent VCF header from being written.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Set this flag to not produce the tabix index for the output file.</td>
+<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
@@ -2946,11 +4190,11 @@ a known baseline variant set.</p>
 sample, a gold-standard VCF corresponding to a reference sample such as NA12878, or simply an alternative call-set being used
 as a basis for comparison.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-regions=FILE</span></code></td>
 <td>If set, only read VCF records that overlap the ranges contained in the specified BED file.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--evaluation-regions=FILE</span></code></td>
 <td>If set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set
 high-confidence regions or other regions of interest where region boundary effects should be minimized.</td>
@@ -2963,7 +4207,7 @@ high-confidence regions or other regions of interest where region boundary effec
 <td><code class="docutils literal"><span class="pre">--output=DIR</span></code></td>
 <td>The name of the output directory.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
 <td>If set, only read VCF records that overlap the specified region. The format is one of &lt;template_name&gt;,
 &lt;template_name&gt;:start-end or &lt;template_name&gt;:start+length</td>
@@ -2985,20 +4229,20 @@ high-confidence regions or other regions of interest where region boundary effec
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--all-records</span></code></td>
 <td>Set to use all records regardless of filters. Default is to only process records where FILTER is . or PASS.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--ref-overlap</span></code></td>
 <td>Allow alleles to overlap where bases of either allele are same-as-ref. (Default is to only allow VCF anchor base overlap).</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
 <td>Set the name of the sample to select. Use the form &lt;baseline_sample&gt;,&lt;calls_sample&gt; to select different sample names for baseline and
 calls. (Required when using multi-sample VCF files).</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--squash-ploidy</span></code></td>
 <td>Treat heterozygous variants as homozygous ALT in both baseline and calls.</td>
 </tr>
@@ -3015,7 +4259,7 @@ calls. (Required when using multi-sample VCF files).</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--output-mode</span></code></td>
 <td>Output reporting mode (Must be one of [split, annotate, combine, ga4gh, roc-only]). (Default is split).</td>
 </tr>
@@ -3104,18 +4348,20 @@ a more lenient comparison is desired. The <code class="docutils literal"><span c
 permit such overlapping variants to both match, as long as any overlap
 only occurs where one variant or other has asserted haplotype bases as
 being the same as reference.</p>
-<div class="section" id="haploid-matching-with-squash-ploidy">
-<h4>Haploid matching with <code class="docutils literal"><span class="pre">--squash-ploidy</span></code><a class="headerlink" href="#haploid-matching-with-squash-ploidy" title="Permalink to this headline">¶</a></h4>
-<p>When <code class="docutils literal"><span class="pre">--squash-ploidy</span></code> is specified, a match is attempted using <em>each</em>
-of the non-reference alleles used in the sample genotype. For example if
-the baseline and call VCFs each had a record with the same REF and ALT
-alleles declared, the following GT fields would be considered a match:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>0/1, 1/1, 1/2
-0/2, 1/2, 2/2
+<div class="section" id="common-allele-matching-with-squash-ploidy">
+<h4>Common allele matching with <code class="docutils literal"><span class="pre">--squash-ploidy</span></code><a class="headerlink" href="#common-allele-matching-with-squash-ploidy" title="Permalink to this headline">¶</a></h4>
+<p>When <code class="docutils literal"><span class="pre">--squash-ploidy</span></code> is specified, a haploid match is attempted
+using <em>each</em> of the non-reference alleles used in the sample
+genotype. For example if the baseline and call VCFs each had a record
+with the same REF and ALT alleles declared, the following GT fields
+would be considered a match:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>0/1, 1/1, 1/2   (genotypes match due to the 1 allele)
+0/2, 1/2, 2/2   (genotypes match due to the 2 allele)
 </pre></div>
 </div>
-<p>Thus a haploid match is where the baseline and calls share a common
-allele.</p>
+<p>Thus <code class="docutils literal"><span class="pre">--squash-ploidy</span></code> matches any case where the baseline and calls
+share a common allele.  This is most often used to run matching that
+does not penalize for genotyping errors.</p>
 </div>
 <div class="section" id="comparing-with-a-vcf-that-has-no-sample-column">
 <h4>Comparing with a VCF that has no sample column<a class="headerlink" href="#comparing-with-a-vcf-that-has-no-sample-column" title="Permalink to this headline">¶</a></h4>
@@ -3136,9 +4382,9 @@ for example:</p>
 </pre></div>
 </div>
 <p>Which would perform a haploid matching of the GT of the called sample
-&#8216;tumor&#8217; against all possible haploid genotypes in the cosmic VCF. The
+&#8216;tumor&#8217; against all possible haploid genotypes in the COSMIC VCF. The
 resulting true positives file contains all the calls containing an
-allele present in the cosmic VCF.</p>
+allele present in the COSMIC VCF.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">It is also possible to run a diploid comparison by omitting
@@ -3266,14 +4512,25 @@ between the baseline and the call.</li>
 variants which were not represented as SNPs. As above, not all
 metrics are computed for this file.</li>
 </ul>
+<p>A common desire is to perform analysis separately for SNPs vs
+indels. However, it is important to note that due the representation
+ambiguity problem, it is not always trivial to decide in a global sense
+whether a variant is a SNP or an indel or other complex variant. A group
+of variants that may be represented as single SNPs in one call-set may
+be represented as a single complex variant in another call-set. In the
+<code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> and <code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> files above, the representation
+used by the called variants is used to classify the variant type, as it
+is the called variants which contain the scores which are used to
+determine the ranking for ROC curves. Thus the type-specific ROC data
+files should not be considered portable from one caller to another.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">In addition, <code class="docutils literal"><span class="pre">vcfeval</span></code> has an output mode
 (<code class="docutils literal"><span class="pre">--output-mode=ga4gh</span></code>) which produces the intermediate evaluation
 format defined by the GA4GH Benchmarking Team, without additional
 statistics files. This mode is not generally intended for end users,
-rather it is used when vcfeval is selected as the comparison engine
-inside the hap.py benchmarking tool see:
+rather it is used when <code class="docutils literal"><span class="pre">vcfeval</span></code> is selected as the comparison engine
+inside the <code class="docutils literal"><span class="pre">hap.py</span></code> benchmarking tool see:
 <a class="reference external" href="https://github.com/ga4gh/benchmarking-tools">https://github.com/ga4gh/benchmarking-tools</a> and
 <a class="reference external" href="https://github.com/Illumina/hap.py">https://github.com/Illumina/hap.py</a></p>
 </div>
@@ -3281,7 +4538,7 @@ inside the hap.py benchmarking tool see:
 be plotted with the <code class="docutils literal"><span class="pre">rocplot</span></code> command, which allows output to a PNG or
 SVG image or analysis in an interactive GUI that provides zooming and
 visualization of the effects of threshold adjustment. As these files are
-simple Tab-Separated-Value format, they can also be loaded into a
+simple tab-separated-value format, they can also be loaded into a
 spreadsheet tool or processed with shell scripts.</p>
 <p>While ROC curve analysis provides a much more thorough method for
 examining the performance of a call set with respect to a baseline truth
@@ -3294,6 +4551,25 @@ curve. While this latter point is somewhat arbitrary, it represents a
 balanced tradeoff between precision and sensitivity which is likely to
 provide a fairer comparison when comparing call sets from different
 callers.</p>
+<p>Note that <code class="docutils literal"><span class="pre">vcfeval</span></code> reports true positives both counted using the
+baseline variant representation as well as counted using the call
+variant representation. When these numbers differ greatly, it indicates
+a general difference in representational conventions used between the
+two call sets. Since false negatives can only be measured in terms of
+the baseline representation, sensitivity is defined as:</p>
+<div class="math">
+<p><img src="_images/math/ca6bde58f63a209ce866a8c7c057013ac32a96f8.png" alt="\text{Sensitivity} = \text{TP}_\text{baseline} / (\text{TP}_\text{baseline} + \text{FN})"/></p>
+</div><p>Conversely since false positives can only be measured in terms of the
+call representation, precision is defined as:</p>
+<div class="math">
+<p><img src="_images/math/af345ac831a9384b6a73d461690c4e06b557f21c.png" alt="\text{Precision} = \text{TP}_\text{call} / (\text{TP}_\text{call} + \text{FP})"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For definitions of the terminology used when evaluating caller
+accuracy, see:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">https://en.wikipedia.org/wiki/Receiver_operating_characteristic</a>
+and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
+</div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
@@ -3320,37 +4596,37 @@ callers.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="4%" />
-<col width="13%" />
-<col width="83%" />
+<col width="6%" />
+<col width="18%" />
+<col width="76%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
-<td>FILE</td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">FILE</span></code></td>
 <td>The pedigree file to process, may be PED or VCF, use &#8216;-&#8216; to read from stdin.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="22%" />
-<col width="75%" />
+<col width="6%" />
+<col width="18%" />
+<col width="76%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--keep-primary</span></code></td>
-<td>Keep only primary individuals (those with a PED individual line / VCF sample column).</td>
+<td>Keep only primary individuals (those with a PED individual line / VCF sample column)</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-parentage</span></code></td>
 <td>Remove all parent-child relationship information.</td>
 </tr>
@@ -3358,16 +4634,16 @@ callers.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="5%" />
-<col width="15%" />
-<col width="80%" />
+<col width="6%" />
+<col width="18%" />
+<col width="76%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--vcf</span></code></td>
 <td>Output pedigree in in the form of a VCF header rather than PED.</td>
 </tr>
@@ -3375,9 +4651,9 @@ callers.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="21%" />
-<col width="64%" />
+<col width="6%" />
+<col width="18%" />
+<col width="76%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -3386,14 +4662,14 @@ callers.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>The <code class="docutils literal"><span class="pre">pedfilter</span></code> comand can be used to perform manipulations on pedigree
+<p>The <code class="docutils literal"><span class="pre">pedfilter</span></code> command can be used to perform manipulations on pedigree
 information and convert pedigree information between PED and VCF header
-format.</p>
+format.  For more information about the PED file format see <a class="reference internal" href="appendix.html#pedigree-ped-input-file-format"><span class="std std-ref">Pedigree PED input file format</span></a>.</p>
 <p>The VCF files output by the <code class="docutils literal"><span class="pre">family</span></code> and <code class="docutils literal"><span class="pre">population</span></code> commands contain
 full pedigree information represented as VCF header lines, and the
 <code class="docutils literal"><span class="pre">pedfilter</span></code> command allows this information to be extracted in PED
@@ -3433,15 +4709,6 @@ Other relationships:          0
 Families:                     3
 </pre></div>
 </div>
-<p>For quick pedigree visualization using graphviz and ImageMagick, use a
-command-line such as:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ dot -Tpng &lt;(rtg pedstats --dot &quot;A Title&quot; mypedigree.ped) | display -
-</pre></div>
-</div>
-<p>For a larger pedigree:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ dot -Tpdf -o mypedigree.pdf &lt;(rtg pedstats --dot &quot;Study&quot; mypedigree.ped)
-</pre></div>
-</div>
 <p>To output a list of all founders:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg pedstats --founder-ids ceph_pedigree.ped
 NA12889
@@ -3450,74 +4717,83 @@ NA12891
 NA12892
 </pre></div>
 </div>
+<p>For quick pedigree visualization using GraphViz and ImageMagick, use a
+command-line such as:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ dot -Tpng &lt;(rtg pedstats --dot &quot;A Title&quot; mypedigree.ped) | display -
+</pre></div>
+</div>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="4%" />
-<col width="13%" />
-<col width="83%" />
+<col width="7%" />
+<col width="18%" />
+<col width="75%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
-<td>FILE</td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">FILE</span></code></td>
 <td>The pedigree file to process, may be PED or VCF, use &#8216;-&#8216; to read from stdin.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="4%" />
-<col width="22%" />
-<col width="74%" />
+<col width="5%" />
+<col width="11%" />
+<col width="84%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--dot=STRING</span></code></td>
 <td>Output pedigree in GraphViz format, using the supplied text as a title.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--families</span></code></td>
 <td>Output information about family structures.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--female-ids</span></code></td>
 <td>Output ids of all females.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--founder-ids</span></code></td>
 <td>Output ids of all founders.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--male-ids</span></code></td>
 <td>Output ids of all males.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--maternal-ids</span></code></td>
 <td>Output ids of maternal individuals.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--paternal-ids</span></code></td>
 <td>Output ids of paternal individuals.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--primary-ids</span></code></td>
 <td>Output ids of all primary individuals.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--simple-dot</span></code></td>
+<td>When outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="21%" />
-<col width="64%" />
+<col width="7%" />
+<col width="18%" />
+<col width="75%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -3526,17 +4802,45 @@ NA12892
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>Used to show pedigree summary statistics or select groups of individual
-Ids. In particular, it is possible to generate a simple pedigree
-visualization.</p>
-<p>The VCF files output by the <code class="docutils literal"><span class="pre">family</span></code> and <code class="docutils literal"><span class="pre">population</span></code> commands contain
-full pedigree information represented as VCF header lines, and the
-<code class="docutils literal"><span class="pre">pedstats</span></code> command can also take these VCFs as input.</p>
+<p>This command is used to show pedigree summary statistics or select
+groups of individual Ids. In addition, it is possible to generate a
+simple pedigree visualization, using GraphViz, which can be saved to PNG
+or PDF.  For example, with the following <code class="docutils literal"><span class="pre">chinese-trio.ped</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>#PED format pedigree
+#
+#fam-id/ind-id/pat-id/mat-id: 0=unknown
+#sex: 1=male; 2=female; 0=unknown
+#phenotype: -9=missing, 0=missing; 1=unaffected; 2=affected
+#
+#fam-id ind-id  pat-id  mat-id  sex     phen
+0       NA24631 NA24694 NA24695 1       0
+0       NA24694 0       0       1       0
+0       NA24695 0       0       2       0
+</pre></div>
+</div>
+<p>We can visualize the pedigree with:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ dot -Tpng &lt;(rtg pedstats --dot &quot;Chinese Trio&quot; chinese-trio.ped) -o chinese-trio.png
+</pre></div>
+</div>
+<p>This will create a PNG image that can be displayed in any image viewing
+tool and contains the pedigree structure as shown below.</p>
+<img alt="_images/chinese-trio.png" src="_images/chinese-trio.png" />
+<p>For more information about the PED file format see <a class="reference internal" href="appendix.html#pedigree-ped-input-file-format"><span class="std std-ref">Pedigree PED input file format</span></a>.</p>
+<p>The VCF files output by the RTG pedigree-aware variant calling commands
+contain full pedigree information represented as VCF header lines, and
+the <code class="docutils literal"><span class="pre">pedstats</span></code> command can also take these VCFs as input. For example,
+given a VCF produced by the <code class="docutils literal"><span class="pre">population</span></code> command after calling the
+CEPH-1463 pedigree:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ dot -Tpng &lt;(rtg pedstats --dot &quot;CEPH 1463&quot; population-ceph-calls.vcf.gz) -o ceph-1463.png
+</pre></div>
+</div>
+<p>Would produce the following pedigree directly from the VCF:</p>
+<img alt="_images/ceph-1463.png" src="_images/ceph-1463.png" />
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#family"><span class="std std-ref">family</span></a>,
@@ -3563,71 +4867,75 @@ to an image, or using an interactive GUI.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="16%" />
-<col width="81%" />
+<col width="5%" />
+<col width="19%" />
+<col width="75%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--curve=STRING</span></code></td>
-<td>Specify a ROC data file with title optionally specified (path[=title]). May be specified 0 or more times.</td>
+<td>ROC data file with title optionally specified (path[=title]). May be specified 0 or more times.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--png=FILE</span></code></td>
-<td>Set to output a PNG image to the given file instead of loading the interactive plot.</td>
+<td>If set, output a PNG image to the given file.</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--svg=FILE</span></code></td>
-<td>Set to output a SVG image to the given file instead of loading the interactive plot.</td>
+<td>If set, output a SVG image to the given file.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--zoom=STRING</span></code></td>
+<td>Show a zoomed view with the given coordinates, supplied in the form &lt;xmax&gt;,&lt;ymax&gt; or &lt;xmin&gt;,&lt;ymin&gt;,&lt;xmax&gt;,&lt;ymax&gt;</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
-<td>Specify the ROC data file to plot. May be specified 0 or more times.</td>
+<td>ROC data file. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="11%" />
-<col width="32%" />
-<col width="58%" />
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&nbsp;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--hide-sidepane</span></code></td>
-<td>Set to hide the sidepane from the GUI on startup.</td>
+<td>If set, hide the side pane from the GUI on startup.</td>
 </tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--line-width=INT</span></code></td>
-<td>Set the line width for the plots. (Default is 2).</td>
+<td>Sets the plot line width (Default is 2)</td>
 </tr>
-<tr class="row-even"><td>&nbsp;</td>
-<td><code class="docutils literal"><span class="pre">--scores</span></code></td>
-<td>Set to show scores on the plot.</td>
-</tr>
-<tr class="row-odd"><td>&nbsp;</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-P</span></code></td>
 <td><code class="docutils literal"><span class="pre">--precision-sensitivity</span></code></td>
-<td>Produce a precision/sensitivity plot instead of ROC</td>
+<td>If set, plot precision vs sensitivity rather than ROC.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--scores</span></code></td>
+<td>If set, show scores on the plot.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
 <td><code class="docutils literal"><span class="pre">--title=STRING</span></code></td>
-<td>Set the title for the plot.</td>
+<td>Title for the plot.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="15%" />
-<col width="21%" />
-<col width="64%" />
+<col width="7%" />
+<col width="24%" />
+<col width="69%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -3636,7 +4944,7 @@ to an image, or using an interactive GUI.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
+<td>Print help on command-line flag usage.</td>
 </tr>
 </tbody>
 </table>
@@ -3645,6 +4953,21 @@ to an image, or using an interactive GUI.</p>
 and <code class="docutils literal"><span class="pre">vcfeval</span></code>. By default this opens the ROC plots in an interactive
 viewer. On a system with only console access the plot can be saved
 directly to an image file using the either the <code class="docutils literal"><span class="pre">--png</span></code> or <code class="docutils literal"><span class="pre">--svg</span></code> parameter.</p>
+<p>Strictly speaking, a true ROC curve should use <em>rates</em> rather than
+absolute numbers on the X and Y axes (e.g. True Positive / Total
+Positives rather than True Positives on the Y, and False Positive /
+Total Negatives on the X axis). However, there are a couple of
+difficulties involved with computing these rates with variant calling
+datasets. Firstly, the truth sets do not include any indication of
+the set of negatives (the closest we may get is in the cases of truth
+sets which contain a set of confidence regions, where it can be assumed
+that no other variants may be present inside the specified regions);
+secondly even with knowledge of negative regions, how do you count the
+set of possible negative calls, when a call could occupy multiple
+reference bases, or even (in the case of insertions) zero reference
+bases. It is conceptually even possible to have a call-set contain more
+false positives than there are reference bases. For this reason the ROC
+curves are plotted using the absolute counts.</p>
 <p>Some quick tips for the interactive GUI:</p>
 <ul class="simple">
 <li>Select regions within the graph to zoom in. Right click to bring up a
@@ -3655,21 +4978,33 @@ the axes will clear the cross-hair. Note that sensitivity depends on
 the baseline total number of variants being correct. If for example
 the ROC curve corresponds to evaluating an exome call-set against a
 whole-genome baseline, this number will be inaccurate.</li>
-<li>Additional ROC data files can be loaded by clicking on the &#8216;Open...&#8217;
-button.</li>
+<li>Additional ROC data files can be loaded by clicking on the &#8220;Open...&#8221;
+button, and multiple ROC data files within a directory can be loaded
+at once using multi-select.</li>
 <li>Each ROC curve can be shown/hidden, renamed, and reordered in it&#8217;s
 widget area on the right hand side of the UI.</li>
+<li>Right-clicking within the ROC widget area allows permanently removing
+that ROC curve.</li>
 <li>Each ROC curve has a slider to simulate the effect of applying a
-threshold on the scoring attribute. If the &#8216;show scores&#8217; option is
+threshold on the scoring attribute. If the &#8220;show scores&#8221; option is
 set, this provides an easy way to select appropriate filter threshold
-values.</li>
-<li>The &#8216;Cmd&#8217; button will print to the console a command-line which is
-equivalent to the currently displayed set of ROC curves, which gives
-an easy way to replicate the current set of curves in another
-session.</li>
+values, which you might apply to variant sets using <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">vcffilter</span></code>
+or similar VCF filtering tools.</li>
+<li>The &#8216;Cmd&#8217; button will open a message window that contains a
+command-line equivalent to the currently displayed set of
+ROC curves. This command-line may be copy-pasted, providing an easy
+way to replicate the current set of curves in another session,
+generate a curve in a script, or share with a colleague.</li>
 <li>There is a drop down that allows for switching between ROC and
 precision/sensitivity graph types.</li>
 </ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For definitions of the terminology used when evaluating caller
+accuracy, see:
+<a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">https://en.wikipedia.org/wiki/Receiver_operating_characteristic</a>
+and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
+</div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#readsimeval"><span class="std std-ref">readsimeval</span></a>,
@@ -3786,17 +5121,17 @@ licensed status, and command release level.</p>
           <a href="genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
-          <a href="product_usage_wrapper.html" title="RTG product usage - baseline progressions"
+          <a href="product_usage.html" title="RTG product usage - baseline progressions"
              >next</a> |</li>
         <li class="right" >
           <a href="overview.html" title="Overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.7</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Real Time Genomics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+        &#169; Copyright 2017, Real Time Genomics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
     </div>
   </body>
 </html>

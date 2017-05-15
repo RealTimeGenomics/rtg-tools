@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Appendix &#8212; RTG Tools Operations Manual v3.7</title>
+    <title>Appendix &#8212; RTG Tools Operations Manual v3.8</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,17 +15,19 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.7',
+        VERSION:     '3.8',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
-    <link rel="top" title="RTG Tools Operations Manual v3.7" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Administration &amp; Capacity Planning" href="administration.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <!--[if lt IE 9]>
@@ -42,7 +44,7 @@
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.7</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -89,7 +91,7 @@
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
-      <li><a href="_sources/appendix.txt"
+      <li><a href="_sources/appendix.rst.txt"
             rel="nofollow">Show Source</a></li>
     </ul>
    </div>
@@ -105,12 +107,12 @@
 <h1>Appendix<a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="rtg-reference-file-format">
 <h2>RTG reference file format<a class="headerlink" href="#rtg-reference-file-format" title="Permalink to this headline">¶</a></h2>
-<p>Additional information about the structure of a reference genome can be
-provided for RTG mapping and variant calling by creating a
-<code class="docutils literal"><span class="pre">reference.txt</span></code> file in the reference genome’s SDF directory. This
-file specifies information about the structure of the chromosomes in the
-reference genome including sex information.</p>
-<p>The <code class="docutils literal"><span class="pre">format</span></code> command will automatically identify several common human
+<p>Many RTG commands can make use of additional information about the
+structure of a reference genome, such as expected ploidy, sex
+chromosomes, location of PAR regions, etc.  When appropriate, this
+information may be stored inside a reference genome&#8217;s SDF directory in a
+file called <code class="docutils literal"><span class="pre">reference.txt</span></code>.</p>
+<p>The <code class="docutils literal"><span class="pre">format</span></code> command will automatically identify several common
 reference genomes during formatting and will create a <code class="docutils literal"><span class="pre">reference.txt</span></code>
 in the resulting SDF.  However, for non-human reference genomes, or less
 common human reference genomes, a pre-built reference configuration file
@@ -309,7 +311,8 @@ boundary.</p>
 <div class="section" id="pedigree-ped-input-file-format">
 <h2>Pedigree PED input file format<a class="headerlink" href="#pedigree-ped-input-file-format" title="Permalink to this headline">¶</a></h2>
 <p>The PED file format is a white space (tab or space) delimited ASCII
-file. It has exactly six required columns in the following order.</p>
+file. Lines starting with <code class="docutils literal"><span class="pre">#</span></code> are ignored. It has exactly six required
+columns in the following order.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="10%" />
@@ -539,7 +542,7 @@ No-JRE:
 
   The no-JRE distribution does not include a Java Runtime Environment
   and instead uses the system-installed Java.  Ensure that at the
-  command line you can enter &#39;java -version&#39; and that this command
+  command line you can enter &quot;java -version&quot; and that this command
   reports a java version of 1.7 or higher before proceeding with the
   steps below. This may require setting your PATH environment variable
   to include the location of an appropriate version of java.
@@ -553,7 +556,7 @@ Linux/MacOS X:
   distribution directory.
 
   In a terminal, cd to the installation directory and test for success
-  by entering &#39;./rtg version&#39;
+  by entering &quot;./rtg version&quot;
 
   On MacOS X, depending on your operating system version and
   configuration regarding unsigned applications, you may encounter the
@@ -569,14 +572,14 @@ Linux/MacOS X:
   The first time rtg is executed you will be prompted with some
   questions to customize your installation. Follow the prompts.
 
-  Enter &#39;./rtg help&#39; for a list of rtg commands.  Help for any individual
-  command is available using the --help flag, e.g.: &#39;./rtg format --help&#39;
+  Enter &quot;./rtg help&quot; for a list of rtg commands.  Help for any individual
+  command is available using the --help flag, e.g.: &quot;./rtg format --help&quot;
 
   By default, RTG software scripts establish a memory space of 90% of
   the available RAM - this is automatically calculated.  One may
   override this limit in the rtg.cfg settings file or on a per-run
   basis by supplying RTG_MEM as an environment variable or as the
-  first program argument, e.g.: &#39;./rtg RTG_MEM=48g map&#39;
+  first program argument, e.g.: &quot;./rtg RTG_MEM=48g map&quot;
 
   [OPTIONAL] If you will be running rtg on multiple machines and would
   like to customize settings on a per-machine basis, copy
@@ -594,12 +597,12 @@ Windows:
   copy the license file from Real Time Genomics into the RTG
   distribution directory.
 
-  Test for success by entering &#39;rtg version&#39; at the command line.  The
+  Test for success by entering &quot;rtg version&quot; at the command line.  The
   first time rtg is executed you will be prompted with some
   questions to customize your installation. Follow the prompts.
 
-  Enter &#39;rtg help&#39; for a list of rtg commands.  Help for any individual
-  command is available using the --help flag, e.g.: &#39;rtg format --help&#39;
+  Enter &quot;rtg help&quot; for a list of rtg commands.  Help for any individual
+  command is available using the --help flag, e.g.: &quot;rtg format --help&quot;
 
   By default, RTG software scripts establish a memory space of 90% of
   the available RAM - this is automatically calculated.  One may
@@ -728,8 +731,8 @@ You should have received a copy of the GNU General Public License version
 Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
 
 Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
-or visit www.oracle.com if you need additional information or have any
-questions.
+or visit http://www.oracle.com if you need additional information or have
+any questions.
 
 -------------------------
 
@@ -788,7 +791,7 @@ processes, products, or parts thereof, described herein, without
 notice. While every effort has been made to make this guide as complete
 and accurate as possible as of the publication date, no warranty of
 fitness is implied.</p>
-<p>© 2016 Real Time Genomics All rights reserved.</p>
+<p>© 2017 Real Time Genomics All rights reserved.</p>
 <p>Illumina, Solexa, Complete Genomics, Ion Torrent, Roche, ABI, Life
 Technologies, and PacBio are registered trademarks and all other brands
 referenced in this document are the property of their respective owners.</p>
@@ -810,12 +813,12 @@ referenced in this document are the property of their respective owners.</p>
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.7</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2016, Real Time Genomics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.4.6.
+        &#169; Copyright 2017, Real Time Genomics.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
     </div>
   </body>
 </html>

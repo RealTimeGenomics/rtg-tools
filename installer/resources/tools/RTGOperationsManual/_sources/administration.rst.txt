@@ -85,7 +85,7 @@ processing and otherwise working with smaller genomes, RTG works just
 fine on a newer laptop system with an Intel processor. For example,
 product testing in support of this documentation was executed on a
 MacBook PC (Intel Core 2 Duo processor, 2.1 GHz clock speed, 1
-processor, 2 cores, 3MB L2 Cache, 4 GB RAM, 290 GB 5400 RPM Serial-ATA
+processor, 2 cores, 3 MB L2 Cache, 4 GB RAM, 290 GB 5400 RPM Serial-ATA
 disk)
 
 **Clustered system** — The comparison of genomic variation on a large

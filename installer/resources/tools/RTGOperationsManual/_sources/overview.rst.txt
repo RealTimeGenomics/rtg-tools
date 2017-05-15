@@ -20,7 +20,7 @@ and speed.
 
   .. include:: overview_tools_intro.inc.rst
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: overview_core_intro.inc.rst
 
@@ -38,7 +38,7 @@ Usage:
 
   rtg COMMAND [OPTIONS] <REQUIRED>
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: overview_core_intro2.inc.rst
 
@@ -49,7 +49,7 @@ Usage:
 .. comment
 
 
-.. only:: core
+.. only:: core or extra
 
   .. include:: overview_core_descriptions.inc.rst
 
@@ -150,7 +150,7 @@ Linux/MacOS X:
    ``/etc/rtg.cfg``, editing per-machine settings appropriately (requires
    root privileges).  An alternative that does not require root
    privileges is to copy ``rtg.cfg`` to ``rtg.HOSTNAME.cfg``, editing
-   per-machine settings appropriately, where HOSTNAME is the short host
+   per-machine settings appropriately, where ``HOSTNAME`` is the short host
    name output by the command ``hostname -s``
 
 Windows:
@@ -197,7 +197,7 @@ Technical assistance and support
 
 For assistance with any technical or conceptual issue that may arise
 during use of the RTG product, contact Real Time Genomics Technical
-Support via email at support@realtimegenomics.com
+Support via email at ``support@realtimegenomics.com``
 
 In addition, a discussion group is available at:
 https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users
