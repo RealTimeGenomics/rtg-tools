@@ -359,12 +359,12 @@
   </target>
 
   <resources id="tools.zip.text">
-    <file file="${public.tools.basedir}/LICENSE.txt"/>
     <file file="${public.tools.basedir}/installer/README.txt"/>
     <file file="${public.tools.basedir}/installer/ReleaseNotes.txt"/>
   </resources>
   <union id="zip.text">
     <resources refid="tools.zip.text"/>
+    <file file="${public.tools.basedir}/LICENSE.txt"/>
   </union>
   <target name="zip-text">
     <copy todir="${build.text}">
