@@ -109,7 +109,7 @@ public enum VariantType {
     if (allele.length() > 0) {
       if (allele.charAt(0) == '<') {
         return VariantType.SV_SYMBOLIC;
-      } else if (allele.charAt(0) == '*' && allele.length() == 1) {
+      } else if (allele.charAt(0) == VcfUtils.ALT_SPANNING_DELETION && allele.length() == 1) {
         return VariantType.SV_MISSING;
       } else {
         for (int i = 0; i < allele.length(); ++i) {
@@ -137,6 +137,7 @@ public enum VariantType {
         allMissing = false;
         if (g != 0) {
           altId = g;
+          break;
         }
       }
     }
@@ -147,7 +148,13 @@ public enum VariantType {
       return VariantType.UNCHANGED;
     }
     final String[] alleles = VcfUtils.getAlleleStrings(rec);
-    return getType(alleles[0], alleles[altId]);
+    VariantType altType = getType(alleles[0], alleles[altId]);
+    for (int i = altId + 1; i < gtSplit.length; i++) {
+      if (gtSplit[i] > 0 && gtSplit[i] != altId) {
+        altType = getPrecedence(altType, getType(alleles[0], alleles[i]));
+      }
+    }
+    return altType;
   }
 
   /**
@@ -159,7 +166,7 @@ public enum VariantType {
   public static VariantType getType(String refAllele, String altAllele) {
     if (refAllele.equals(altAllele)) {
       return VariantType.UNCHANGED;
-    } else if (refAllele.length() == 1 && altAllele.length() == 1 && altAllele.charAt(0) != '*') {
+    } else if (refAllele.length() == 1 && altAllele.length() == 1 && altAllele.charAt(0) != VcfUtils.ALT_SPANNING_DELETION) {
       return VariantType.SNP;
     }
     final VariantType svType = getSymbolicAlleleType(altAllele);

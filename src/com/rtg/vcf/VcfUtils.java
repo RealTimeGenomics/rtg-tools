@@ -69,6 +69,9 @@ public final class VcfUtils {
   /** Character indicating field value is missing. */
   public static final char MISSING_VALUE = '.';
 
+  /** ALT allele used to indicate haplotype is missing due to spanning deletion. */
+  public static final char ALT_SPANNING_DELETION = '*';
+
   /** QUAL column label. */
   public static final String QUAL = "QUAL";
 
