@@ -69,27 +69,10 @@ public final class WarningType implements DiagnosticType, PseudoEnum, Serializab
   public static final WarningType SEQUENCE_TOO_LONG = new WarningType(++sOrdinal, "SEQUENCE_TOO_LONG", 1);
 
   /**
-   * Warning produced when SLIM failed to delete a directory that it expected could be
-   * deleted.  The parameter is the directory name.
-   */
-  public static final WarningType DIRECTORY_DELETION_FAILED = new WarningType(++sOrdinal, "DIRECTORY_DELETION_FAILED", 1);
-
-  /**
    * A file or directory could not be converted to a canonical path (this may be
    * because the file does not exist).  The parameter is the supplied path.
    */
   public static final WarningType BAD_PATH = new WarningType(++sOrdinal, "BAD_PATH", 1);
-
-  /**
-   * We caught an out of memory error, but were able to attack the problem using
-   * a different approach.
-   */
-  public static final WarningType MEMORY_ALERT = new WarningType(++sOrdinal, "MEMORY_ALERT", 0);
-
-  /**
-   * Supplied sequence input was empty.
-   */
-  public static final WarningType EMPTY_SEQUENCE_INPUT = new WarningType(++sOrdinal, "EMPTY_SEQUENCE_INPUT", 0);
 
   /**
    * A sequence label was present but not sequence data followed.
@@ -110,45 +93,9 @@ public final class WarningType implements DiagnosticType, PseudoEnum, Serializab
   public static final WarningType SEQUENCE_LABEL_MISMATCH = new WarningType(++sOrdinal, "SEQUENCE_LABEL_MISMATCH", 2);
 
   /**
-   * Sequences contained N, not allowed in colorspace.
-   */
-  public static final WarningType COLORSPACE_WARNING = new WarningType(++sOrdinal, "COLORSPACE_WARNING", 1);
-
-  /**
-   * The current environment (operating system, JVM or machine) has not been tested
-   * for use. There is a risk of performance degradation or failure.
-   */
-  public static final WarningType ENVIRONMENT_MAY_NOT_BE_USEABLE = new WarningType(++sOrdinal, "ENVIRONMENT_MAY_NOT_BE_USEABLE", 0);
-
-  /**
    * A read length does not agree with the length expected and will be ignored (in Ngs).
    */
   public static final WarningType INCORRECT_LENGTH = new WarningType(++sOrdinal, "INCORRECT_LENGTH", 3);
-
-  /**
-   * SNP score was specified but the output format was not SNP.
-   */
-  public static final WarningType SCORE_NOT_SNP = new WarningType(++sOrdinal, "SCORE_NOT_SNP", 1);
-
-  /**
-   * Top n has been set but output format is \"%1\" not top equal.
-   */
-  public static final WarningType TOPN_NOT_TOPEQUAL = new WarningType(++sOrdinal, "TOPN_NOT_TOPEQUAL", 1);
-
-  /**
-   * Number of excluded sequences.
-   */
-  public static final WarningType EXCLUDED_SEQUENCES = new WarningType(++sOrdinal, "EXCLUDED_SEQUENCES", 1);
-
-  /**
-   * SNP score was specified but the output format was not SNP.
-   */
-  public static final WarningType MASK_FLAGS_SET = new WarningType(++sOrdinal, "MASK_FLAGS_SET", 0);
-
-  /**
-   * The specified file \"%1\" does not exist.
-   */
-  public static final WarningType FILE_DOES_NOT_EXIST = new WarningType(++sOrdinal, "FILE_DOES_NOT_EXIST", 1);
 
   /**
    * %1 out of %2 Symbols corresponded to A, C, G, T, or N.
@@ -170,20 +117,8 @@ public final class WarningType implements DiagnosticType, PseudoEnum, Serializab
    */
   public static final WarningType POSSIBLY_SOLEXA = new WarningType(++sOrdinal, "POSSIBLY_SOLEXA", 0);
 
-  /** Expected file format was not found. */
-  public static final WarningType FILE_CORRUPTION = new WarningType(++sOrdinal, "FILE_CORRUPTION", 1);
-
   /** Total bad character warnings. */
   public static final WarningType BAD_CHAR_WARNINGS = new WarningType(++sOrdinal, "BAD_CHAR_WARNINGS", 1);
-
-  /** Number of record overflows during SAM writing. */
-  public static final WarningType OVERFLOW_RECORDS = new WarningType(++sOrdinal, "OVERFLOW_RECORDS", 1);
-
-  /** Warning resulting from problems with command line parameters. */
-  public static final WarningType PARAMS_WARNING = new WarningType(++sOrdinal, "PARAMS_WARNING", 1);
-
-  /** Warning that sam records were ignored because of faulty cigar syntax. */
-  public static final WarningType SAM_IGNORED_RECORDS_CIGAR = new WarningType(++sOrdinal, "SAM_IGNORED_RECORDS_CIGAR", 1);
 
   /** Warning that sam records were ignored because of corrupted record content. */
   public static final WarningType SAM_IGNORED_RECORDS = new WarningType(++sOrdinal, "SAM_IGNORED_RECORDS", 2);
@@ -196,9 +131,6 @@ public final class WarningType implements DiagnosticType, PseudoEnum, Serializab
 
   /** SAM record has invalid format. */
   public static final WarningType SAM_BAD_FORMAT_WARNING = new WarningType(++sOrdinal, "SAM_BAD_FORMAT_WARNING", 2);
-
-  /** SAM record has invalid cigar format. */
-  public static final WarningType CIGAR_BAD_FORMAT_WARNING = new WarningType(++sOrdinal, "CIGAR_BAD_FORMAT_WARNING", 1);
 
   /** %1 */
   public static final WarningType INFO_WARNING = new WarningType(++sOrdinal, "INFO_WARNING", 1);
@@ -214,35 +146,20 @@ public final class WarningType implements DiagnosticType, PseudoEnum, Serializab
     NUMBER_OF_BAD_TIDE,
     NO_NAME,
     SEQUENCE_TOO_LONG,
-    DIRECTORY_DELETION_FAILED,
     BAD_PATH,
-    MEMORY_ALERT,
-    EMPTY_SEQUENCE_INPUT,
     NO_SEQUENCE,
     SEQUENCE_LABEL_TOO_LONG,
     SEQUENCE_LABEL_MISMATCH,
-    COLORSPACE_WARNING,
-    ENVIRONMENT_MAY_NOT_BE_USEABLE,
     INCORRECT_LENGTH,
-    SCORE_NOT_SNP,
-    TOPN_NOT_TOPEQUAL,
-    EXCLUDED_SEQUENCES,
-    MASK_FLAGS_SET,
-    FILE_DOES_NOT_EXIST,
     POSSIBLY_NOT_PROTEIN,
     NUMBER_OF_INCORRECT_LENGTH,
     NOT_FASTA_FILE,
     POSSIBLY_SOLEXA,
-    FILE_CORRUPTION,
     BAD_CHAR_WARNINGS,
-    OVERFLOW_RECORDS,
-    PARAMS_WARNING,
-    SAM_IGNORED_RECORDS_CIGAR,
     SAM_IGNORED_RECORDS,
     SAM_INCOMPATIBLE_HEADERS,
     SAM_BAD_FORMAT_WARNING1,
     SAM_BAD_FORMAT_WARNING,
-    CIGAR_BAD_FORMAT_WARNING,
     INFO_WARNING,
     NOT_FASTQ_FILE
   });

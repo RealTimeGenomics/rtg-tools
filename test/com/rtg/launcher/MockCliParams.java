@@ -49,7 +49,7 @@ public class MockCliParams extends ModuleParams {
     @Override
     public boolean isValid(final CFlags flags) {
       if (flags.isSet("validator")) {
-        Diagnostic.error(ErrorType.INVALID_INTEGER_FLAG_VALUE, "validator", Integer.toString(42));
+        Diagnostic.error("The specified flag \"validator\" has invalid value \"42\". It should be greater than or equal to 1.");
         return false;
       }
       return true;
