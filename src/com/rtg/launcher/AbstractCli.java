@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
+import com.rtg.VersionCommand;
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.usage.UsageLogging;
 import com.rtg.usage.UsageMetric;
@@ -155,10 +156,11 @@ public abstract class AbstractCli {
    * @param args command line arguments.
    */
   protected void mainExit(final String[] args) {
-    if (!License.checkLicense()) {
-      throw new NoTalkbackSlimException(ErrorType.INVALID_LICENSE);
-    }
     try {
+      if (!License.checkLicense()) {
+        VersionCommand.mainInit(System.err);
+        throw new NoTalkbackSlimException(ErrorType.INVALID_LICENSE);
+      }
       System.exit(mainInit(args, FileUtils.getStdoutAsOutputStream(), System.err));
     } catch (final SlimException e) {
       System.exit(1);
