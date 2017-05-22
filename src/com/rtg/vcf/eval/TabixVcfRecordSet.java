@@ -56,6 +56,7 @@ import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.vcf.VcfUtils;
@@ -190,7 +191,7 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   @Override
-  public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
+  public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() throws IOException {
     final Map<VariantSetType, List<Variant>> map = new HashMap<>();
     final Iterator<Pair<String, Integer>> iterator = mNames.iterator();
     if (!iterator.hasNext()) {
@@ -216,7 +217,13 @@ class TabixVcfRecordSet implements VariantSet {
       Diagnostic.userLog("Reference " + currentName + " baseline contains " + map.get(VariantSetType.BASELINE).size() + " variants.");
       Diagnostic.userLog("Reference " + currentName + " calls contains " + map.get(VariantSetType.CALLS).size() + " variants.");
     } catch (final ExecutionException e) {
-      throw new NoTalkbackSlimException(e.getCause(), ErrorType.INFO_ERROR, e.getCause().getMessage());
+      if (e.getCause() instanceof IOException) {
+        throw (IOException) e.getCause();
+      } else if (e.getCause() instanceof SlimException) {
+        throw (SlimException) e.getCause();
+      } else {
+        throw new SlimException(e.getCause(), ErrorType.INFO_ERROR, e.getCause().getMessage());
+      }
     } catch (final InterruptedException e) {
       throw new NoTalkbackSlimException(e, ErrorType.INFO_ERROR, e.getCause().getMessage());
     } finally {

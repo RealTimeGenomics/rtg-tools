@@ -114,6 +114,9 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
         } catch (SkippedVariantException e) {
           Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " was skipped: " + e.getMessage());
           ++skipped;
+        } catch (RuntimeException e) {
+          Diagnostic.userLog("Got an exception processing " + mType.label() + " VCF record: " + rec);
+          throw e;
         }
       }
     }
