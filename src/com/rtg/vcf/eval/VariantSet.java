@@ -30,6 +30,7 @@
 
 package com.rtg.vcf.eval;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -43,8 +44,9 @@ public interface VariantSet {
 
   /**
    * @return the variants for the next sequence or null if there are no more.
+   * @throws IOException for any problem reading variants from the underlying source
    */
-  Pair<String, Map<VariantSetType, List<Variant>>> nextSet();
+  Pair<String, Map<VariantSetType, List<Variant>>> nextSet() throws IOException;
 
   /**
    * @return header for baseline files
