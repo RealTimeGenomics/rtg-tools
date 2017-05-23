@@ -123,14 +123,30 @@ public class VariantFactoryTest extends TestCase {
     assertEquals(-1, av.alleleB());
   }
 
+  static final String SNP_LINE8 = "chr 23 . T A,*,TAAA . PASS . GT 2|.";
+  static final String SNP_LINE9 = "chr 23 . T A,TAAA,* . PASS . GT 2|.";
+  static final String SNP_LINE10 = "chr 23 . T <DEL>,* . PASS . GT 2|.";
+
   public void testAlts() throws Exception {
-    final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
+    Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
     assertEquals(null, variant.allele(-1)); // missing allele is ignored
     assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
     assertEquals("T", variant.alleleStr(1));
     assertEquals("C", variant.alleleStr(2));
     assertEquals("G", variant.alleleStr(3));
+
+    variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE8), 0);
+    assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
+    assertEquals(null, variant.allele(-1)); // missing allele is ignored
+    assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
+    assertEquals("A", variant.alleleStr(1));
+    assertEquals("<24-24>AAA", variant.alleleStr(2));
+
+    variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE9), 0);
+    assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
+
+    assertNull(new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE10), 0));
   }
 
 }

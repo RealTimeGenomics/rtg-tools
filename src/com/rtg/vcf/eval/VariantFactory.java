@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
+
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.StringUtils;
@@ -151,13 +153,29 @@ public interface VariantFactory {
       mExplicitHalfCall = explicitHalfCall;
     }
 
+    // Remove any of the ALT entries that have not been assigned an Allele
+    static Allele[] pruneEmptyAlts(Allele[] alleles) {
+      int b = 2;
+      for (int a = 2; a < alleles.length; a++, b++) { // Ignore positions 0 (missing) and 1 (REF)
+        if (alleles[a] == null) {
+          b--;
+        } else if (a != b) {
+          alleles[b] = alleles[a];
+        }
+      }
+      return b == alleles.length ? alleles : Arrays.copyOf(alleles, b);
+    }
+
     @Override
     public Variant variant(final VcfRecord rec, final int id) {
       if (rec.getAltCalls().size() == 0) {
         return null;
-      } // TODO should also ignore SV/symbolic alts, and entirely skip variants where there are no alts remaining.
+      }
 
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall);
+      final Allele[] alleles = pruneEmptyAlts(Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall));
+      if (alleles.length < 3) { // No actual ALTs remaining
+        return null;
+      }
       final Range bounds = Allele.getAlleleBounds(alleles);
 
       return new Variant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, false);
