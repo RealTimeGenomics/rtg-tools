@@ -158,6 +158,7 @@ public class RocPlot {
 
   private final JFileChooser mFileChooser;
   private File mFileChooserParent = null;
+  private int mColorCounter = -1;
 
   static final Color[] PALETTE = {
     new Color(0xFF4030),
@@ -204,7 +205,6 @@ public class RocPlot {
     mFileChooser.setFileFilter(new RocFileFilter());
     mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
-    mZoomPP.setColors(PALETTE);
     mProgressBar = new JProgressBar(-1, -1);
     mProgressBar.setVisible(true);
     mProgressBar.setStringPainted(true);
@@ -582,17 +582,27 @@ public class RocPlot {
   void showCurrentGraph() {
     SwingUtilities.invokeLater(() -> {
       final Graph2D graph;
+      final ArrayList<String> ordering = RocPlot.this.mRocLinesPanel.plotOrder();
       if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-        graph = new PrecisionRecallGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        graph = new PrecisionRecallGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
       } else {
-        graph = new RocGraph2D(RocPlot.this.mRocLinesPanel.plotOrder(), RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        graph = new RocGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
       }
       if (graph.getPlots().length > 0) {
         maintainZoomBounds(graph);
       }
+      final Color[] colors;
       if (!Float.isNaN(mMaxX)) {
         graph.addPlot(invisibleGraph());
+        colors = PALETTE;
+      } else {
+        colors = new Color[ordering.size()];
+        int k = 0;
+        for (final Component cp : RocPlot.this.mRocLinesPanel.getComponents()) {
+          colors[k++] = ((RocLinePanel) cp).getColor();
+        }
       }
+      mZoomPP.setColors(colors);
       mZoomPP.setGraph(graph, true);
     });
   }
@@ -728,9 +738,11 @@ public class RocPlot {
     }
   }
 
+
   private void addLine(String path, DataBundle dataBundle) {
+    final Color initialColor = PALETTE[++mColorCounter % PALETTE.length];
     mData.put(path, dataBundle);
-    mRocLinesPanel.addLine(new RocLinePanel(this, path, dataBundle.getTitle(), dataBundle, mProgressBar));
+    mRocLinesPanel.addLine(new RocLinePanel(this, path, dataBundle.getTitle(), dataBundle, mProgressBar, initialColor));
     showCurrentGraph();
   }
 

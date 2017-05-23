@@ -85,7 +85,7 @@ public class RocPlotToFileTest extends AbstractTest {
       FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
-      checkSvg(svg, 113,
+      checkSvg(svg, 97,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
@@ -104,7 +104,7 @@ public class RocPlotToFileTest extends AbstractTest {
       FileUtils.copyResource("com/rtg/graph/resources/roc-nototal.tsv", roc);
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
-      checkSvg(svg, 107,
+      checkSvg(svg, 99,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
