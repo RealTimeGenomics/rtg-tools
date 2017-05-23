@@ -45,6 +45,10 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     check("vcfeval_small_squash/vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "all,snp,xrx", "--squash-ploidy");
   }
 
+  public void testNanoSmallAlt() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_small_alt/vcfeval_small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--sample", "ALT", "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
+  }
+
   public void testNanoTricky() throws IOException, UnindexableDataException {
     // Tricky cases where the notion of equivalence depends on the treatment of reference bases in the calls
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory)

@@ -36,6 +36,7 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
+import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -132,12 +133,18 @@ public class Allele extends SequenceNameLocusSimple {
         return null;
       }
       final String alt = rec.getAllele(allele);
+      if (VariantType.getSymbolicAlleleType(alt) != null) {
+        return null;
+      }
       final int stripLeading = StringUtils.longestPrefix(ref, alt);
       final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
       return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
         DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
     } else {
       final String alt = rec.getAllele(allele);
+      if (VariantType.getSymbolicAlleleType(alt) != null) {
+        return null;
+      }
       return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(),
         DnaUtils.encodeString(removePaddingBase ? alt.substring(1) : alt));
     }
