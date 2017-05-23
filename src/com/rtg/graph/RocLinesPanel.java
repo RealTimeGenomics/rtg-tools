@@ -33,11 +33,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 
@@ -59,15 +63,12 @@ class RocLinesPanel extends Box {
     return mPlotOrder;
   }
 
-
   public void addLine(final RocLinePanel cp) {
     cp.addActionListener(new MoveActionListener(cp));
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        mPlotOrder.add(cp.getPath());
-        add(cp);
-      }
+    cp.addReorderListener(new ReorderListener(cp));
+    SwingUtilities.invokeLater(() -> {
+      mPlotOrder.add(cp.getPath());
+      add(cp);
     });
   }
 
@@ -93,41 +94,88 @@ class RocLinesPanel extends Box {
     @Override
     public void actionPerformed(ActionEvent e) {
       final Component[] components = getComponents();
-      for (int i = 0; i < components.length; ++i) {
-        final RocLinePanel cp = (RocLinePanel) components[i];
-
+      for (final Component component : components) {
+        final RocLinePanel cp = (RocLinePanel) component;
         if (cp == mPanel) {
           switch (e.getActionCommand()) {
-            case "up":
-              if (i > 0) {
-                mPlotOrder.remove(i);
-                mPlotOrder.add(i - 1, mPanel.getPath());
-                remove(mPanel);
-                add(mPanel, i - 1);
-              }
-              break;
-            case "down":
-              if (i < components.length - 1) {
-                mPlotOrder.remove(i);
-                mPlotOrder.add(i + 1, mPanel.getPath());
-                remove(mPanel);
-                add(mPanel, i + 1);
-              }
-              break;
             case "remove":
-              mPlotOrder.remove(i);
               remove(mPanel);
+              mRocPlot.mData.remove(mPanel.getPath());
               break;
             default:
               System.err.println("Unhandled event!");
           }
-          revalidate();
-          repaint();
-          mRocPlot.showCurrentGraph();
+          updateCurves();
           break;
         }
       }
     }
   }
 
-}
+  private void updateCurves() {
+    revalidate();
+    repaint();
+    mPlotOrder.clear();
+    for (Component cp : getComponents()) {
+      mPlotOrder.add(((RocLinePanel) cp).getPath());
+    }
+    mRocPlot.showCurrentGraph();
+  }
+
+  private class ReorderListener extends MouseAdapter {
+
+    private int mOriginalScreenY;
+    private int mOriginalY;
+    private final RocLinePanel mPanel;
+    private final Border mBorder;
+    private boolean mIsDragging = false;
+
+    ReorderListener(final RocLinePanel panel) {
+      mPanel = panel;
+      mBorder = mPanel.getBorder();
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+      if (e.getButton() == MouseEvent.BUTTON1) {
+        if (mIsDragging) {
+          mouseReleased(e); // Somehow clicked left mouse again while dragging?
+        } else if (!e.isPopupTrigger()) {
+          mIsDragging = true;
+          mPanel.setBorder(LineBorder.createGrayLineBorder());
+          setComponentZOrder(mPanel, 0); // Also moves this item to component 0
+          mOriginalScreenY = e.getYOnScreen();
+          mOriginalY = mPanel.getY();
+        }
+      }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+      if (mIsDragging && e.getButton() == MouseEvent.BUTTON1) {
+        final int deltaY = e.getYOnScreen() - mOriginalScreenY;
+        final int newY = mOriginalY + deltaY;
+        final Component[] components = getComponents();
+        // Find new position for mPanel (it is currently at position 0 due to Z order)
+        int i;
+        for (i = 1; i < components.length; ++i) {
+          if (components[i].getY() >= newY) {
+            break;
+          }
+        }
+        mPanel.setBorder(mBorder);
+        remove(mPanel);
+        add(mPanel, i - 1);
+        updateCurves();
+        mIsDragging = false;
+      }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+      if (mIsDragging) {
+        final int deltaY = e.getYOnScreen() - mOriginalScreenY;
+        mPanel.setLocation(mPanel.getX(), mOriginalY + deltaY);
+      }
+    }
+  }}
