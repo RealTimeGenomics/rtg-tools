@@ -232,6 +232,9 @@ public class RocPlot {
     mIconLabel.setFont(new Font("Arial", Font.BOLD, 24));
     mIconLabel.setHorizontalAlignment(JLabel.LEFT);
     mIconLabel.setIconTextGap(50);
+    if (icon != null) {
+      mIconLabel.setMinimumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+    }
     mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_SENSITIVITY});
     mGraphType.setSelectedItem(precisionRecall ? PRECISION_SENSITIVITY : ROC_PLOT);
     configureUI();
