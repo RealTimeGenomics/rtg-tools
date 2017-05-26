@@ -115,4 +115,11 @@ Follow the instructions contained in the `README.txt`. This build will
 use the system Java by default, so ensure that it is Java 1.8 or
 later.
 
+For a quick demonstration of the features of RTG Tools for simulation
+and VCF processing on data generated from scratch, run the
+`demo-tools.sh` script contained in the scripts subdirectory of the
+installation directory:
+
+    $ cd /my/install/dir/rtg-tools-VERSION/
+    $ ./scripts/demo-tools.sh $PWD/rtg
 
