@@ -61,6 +61,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
+import com.reeltwo.jumble.annotations.TestClass;
 import com.reeltwo.plot.TextPoint2D;
 import com.rtg.util.Environment;
 
@@ -268,6 +269,7 @@ class RocLinePanel extends JPanel {
    * Filter all right mouse button events.  We use this to get around a bug where
    * the JSlider responds to right mouse button events on the mac.
    */
+  @TestClass("com.rtg.graph.RightMouseButtonFilterTest")
   static final class RightMouseButtonFilter implements MouseListener {
 
     private final MouseListener[] mListeners;
