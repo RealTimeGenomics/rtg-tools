@@ -58,14 +58,21 @@ public final class VersionCommand {
   static final String CPU_STR = "CPU:";
   static final String JAVA_VERSION_STR = "JVM:";
 
-  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2016";
+  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2017";
 
-  static final String CITE_STR = "Citation:" + LS
+  static final String CITE_STR_1 = "Citation (variant calling):" + LS
     + "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
     + "Sean A. Irvine, Alan Jackson, Richard Littin, Sahar Nohzadeh-Malakshah, "
     + "Mehul Rathod, David Ware, Len Trigg, and Francisco M. De La Vega. "
     + "\"Joint Variant and De Novo Mutation Identification on Pedigrees from High-Throughput Sequencing Data.\" "
     + "Journal of Computational Biology. June 2014, 21(6): 405-419. doi:10.1089/cmb.2014.0029.";
+
+  static final String CITE_STR_2 = "Citation (vcfeval):" + LS
+    + "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
+    + "Sean A. Irvine, Alan Jackson, Richard Littin, Mehul Rathod, David Ware, Justin M. Zook, "
+    + "Len Trigg, and Francisco M. De La Vega. "
+    + "\"Comparing Variant Call Files for Performance Benchmarking of Next-Generation Sequencing Variant Calling Pipelines.\" "
+    + "bioRxiv, 2015. doi:10.1101/023754.";
 
   static final String PATENTS_STR = "Patents / Patents pending:" + LS
     + "US: 7,640,256, 9,165,253, 13/129,329, 13/681,046, 13/681,215, 13/848,653, 13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810" + LS
@@ -170,7 +177,9 @@ public final class VersionCommand {
     sb.append(LS);
     sb.append(PATENTS_STR).append(LS);
     sb.append(LS);
-    sb.append(CITE_STR).append(LS);
+    sb.append(CITE_STR_1).append(LS);
+    sb.append(LS);
+    sb.append(CITE_STR_2).append(LS);
     sb.append(LS);
     sb.append(COPYRIGHT_STR).append(LS);
     sb.append(LS);

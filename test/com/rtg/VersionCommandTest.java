@@ -103,7 +103,7 @@ public class VersionCommandTest extends TestCase {
         "Core Version: " + Environment.getCoreVersion(),
         "Contact: " + Constants.SUPPORT_EMAIL_ADDR + StringUtils.LS,
         "Patents / Patents pending:",
-        "Citation:",
+        "Citation",
         "(c) Real Time Genomics, 201");
 
   }
