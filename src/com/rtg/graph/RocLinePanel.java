@@ -268,11 +268,11 @@ class RocLinePanel extends JPanel {
    * Filter all right mouse button events.  We use this to get around a bug where
    * the JSlider responds to right mouse button events on the mac.
    */
-  private static final class RightMouseButtonFilter implements MouseListener {
+  static final class RightMouseButtonFilter implements MouseListener {
 
     private final MouseListener[] mListeners;
 
-    private RightMouseButtonFilter(final MouseListener[] listeners) {
+    RightMouseButtonFilter(final MouseListener[] listeners) {
       mListeners = listeners;
     }
 

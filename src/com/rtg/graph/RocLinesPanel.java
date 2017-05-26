@@ -122,6 +122,7 @@ class RocLinesPanel extends Box {
     mRocPlot.showCurrentGraph();
   }
 
+  @JumbleIgnore
   private class ReorderListener extends MouseAdapter {
 
     private int mOriginalScreenY;
