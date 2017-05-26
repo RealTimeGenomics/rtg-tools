@@ -594,9 +594,11 @@ public class RocPlot {
       if (graph.getPlots().length > 0) {
         maintainZoomBounds(graph);
       }
-      final Color[] colors;
       if (!Float.isNaN(mMaxX)) {
         graph.addPlot(invisibleGraph());
+      }
+      final Color[] colors;
+      if (ordering.isEmpty()) {
         colors = PALETTE;
       } else {
         colors = new Color[ordering.size()];
