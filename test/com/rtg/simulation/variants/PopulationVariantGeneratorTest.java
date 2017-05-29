@@ -64,20 +64,22 @@ public class PopulationVariantGeneratorTest extends AbstractNanoTest {
 
   public void testFixedStepXVcfWriting() throws IOException {
     final SequencesReader sr = ReaderTestUtils.getReaderDnaMemory(REF);
-    final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(10), 0.5);
+    final int seed = 10;
+    final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(seed), 0.5);
     final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
     final MemoryPrintStream out = new MemoryPrintStream();
-    PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr);
+    PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr, seed);
     final String act = TestUtils.sanitizeVcfHeader(out.toString());
     mNano.check("population_variant_gen_X.vcf", act, false);
   }
 
   public void testFixedStepHetXVcfWriting() throws IOException {
     final SequencesReader sr = ReaderTestUtils.getReaderDnaMemory(REF);
-    final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X_X"), new PortableRandom(118), 0.5);
+    final int seed = 118;
+    final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X_X"), new PortableRandom(seed), 0.5);
     final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
     final MemoryPrintStream out = new MemoryPrintStream();
-    PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr);
+    PopulationVariantGenerator.writeAsVcf(null, out.outputStream(), variants, sr, seed);
     final String act = TestUtils.sanitizeVcfHeader(out.toString());
     mNano.check("population_variant_gen_X_X.vcf", act, false);
   }
@@ -87,10 +89,11 @@ public class PopulationVariantGeneratorTest extends AbstractNanoTest {
     final File tempDir = FileUtils.createTempDir("PVGT", "vcfFileWriting");
     try {
       final SequencesReader sr = ReaderTestUtils.getReaderDnaMemory(REF);
-      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("I"), new PortableRandom(10), 0.5);
+      final int seed = 10;
+      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("I"), new PortableRandom(seed), 0.5);
       final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
       final File outFile = new File(tempDir, "out.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(outFile, null, variants, sr);
+      PopulationVariantGenerator.writeAsVcf(outFile, null, variants, sr, seed);
       final String outStr = FileHelper.gzFileToString(outFile);
       final String act = TestUtils.sanitizeVcfHeader(outStr);
       mNano.check("population_variant_gen_I.vcf", act, false);

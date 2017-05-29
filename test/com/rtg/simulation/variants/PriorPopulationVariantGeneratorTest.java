@@ -93,10 +93,11 @@ public class PriorPopulationVariantGeneratorTest extends TestCase {
       .create();
 
       // Generate variants
-      final PriorPopulationVariantGenerator gen = new PriorPopulationVariantGenerator(sr, new PopulationMutatorPriors(priors), new PortableRandom(10), 1);
+      final int seed = 10;
+      final PriorPopulationVariantGenerator gen = new PriorPopulationVariantGenerator(sr, new PopulationMutatorPriors(priors), new PortableRandom(seed), 1);
       final List<PopulationVariantGenerator.PopulationVariant> variants = gen.generatePopulation();
       final File popVcf = new File(dir, "popVcf.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr);
+      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr, seed);
       final String popVarStr = FileHelper.gzFileToString(popVcf);
       //System.out.println("-- Population Variants --");
       //System.out.println(popVarStr);

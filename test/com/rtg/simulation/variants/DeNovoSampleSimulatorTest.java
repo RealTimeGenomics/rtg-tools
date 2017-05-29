@@ -100,10 +100,11 @@ public class DeNovoSampleSimulatorTest extends TestCase {
       FileUtils.stringToFile(REFTXT, new File(sdf, ReferenceGenome.REFERENCE_FILE));
 
       // Generate variants
-      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 30, new Mutator("X"), new PortableRandom(10), 0.5);
+      final int seed = 10;
+      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 30, new Mutator("X"), new PortableRandom(seed), 0.5);
       final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
       final File popVcf = new File(dir, "popVcf.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr);
+      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr, seed);
       //String popVarStr = FileHelper.gzFileToString(popVcf);
       //System.out.println("-- Population Variants --");
       //System.out.println(popVarStr);

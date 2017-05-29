@@ -162,12 +162,14 @@ public abstract class PopulationVariantGenerator {
    * @param vcfOutput output file (should have gzip extension)
    * @param stream output stream (will be used if output file is null)
    * @param variants variants to output
-   * @param reference reference sequences reader   @throws IOException whatever
+   * @param reference reference sequences reader
+   * @param seed the seed used during generation
    * @throws java.io.IOException if there is a problem during writing
    */
-  public static void writeAsVcf(File vcfOutput, OutputStream stream, List<PopulationVariant> variants, SequencesReader reference) throws IOException {
+  public static void writeAsVcf(File vcfOutput, OutputStream stream, List<PopulationVariant> variants, SequencesReader reference, long seed) throws IOException {
     final VcfHeader header = new VcfHeader();
     header.addCommonHeader();
+    header.addLine(VcfHeader.META_STRING + "SEED=" + seed);
     header.addReference(reference);
     header.addContigFields(reference);
     header.addInfoField(VcfUtils.INFO_ALLELE_FREQ, VcfUtils.INFO_ALLELE_FREQ_TYPE, VcfUtils.INFO_ALLELE_FREQ_NUM, VcfUtils.INFO_ALLELE_FREQ_DESC);
