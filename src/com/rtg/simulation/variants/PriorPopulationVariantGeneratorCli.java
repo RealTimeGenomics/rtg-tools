@@ -106,7 +106,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
     } else {
       random = new PortableRandom();
     }
-
+    final long seed = random.getSeed();
     final PopulationMutatorPriors priors;
     try {
       priors = new PopulationMutatorPriors(GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create());
@@ -126,7 +126,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
         targetVariants = (int) (dsr.totalLength() * priors.rate());
       }
       final PriorPopulationVariantGenerator fs = new PriorPopulationVariantGenerator(dsr, priors, random, (Double) flags.getValue(BIAS_FLAG), targetVariants);
-      PopulationVariantGenerator.writeAsVcf(vcfFile, output, fs.generatePopulation(), dsr);
+      PopulationVariantGenerator.writeAsVcf(vcfFile, output, fs.generatePopulation(), dsr, seed);
     }
     return 0;
   }

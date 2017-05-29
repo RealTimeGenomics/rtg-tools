@@ -1,6 +1,7 @@
 ##fileformat=VCFv4.1
 ##fileDate=[...]
 ##source=[...]
+##SEED=118
 ##TEMPLATE-SDF-ID=[...]
 ##reference=[...]
 ##contig=<ID=ref,length=120>

@@ -73,10 +73,11 @@ public class SampleSimulatorTest extends TestCase {
       final String sref = DnaUtils.bytesToSequenceIncCG(buffr, 0, lenr);
 
       // Generate variants
-      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(10), 0.5);
+      final int seed = 10;
+      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(seed), 0.5);
       final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
       final File popVcf = new File(dir, "popVcf.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr);
+      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr, seed);
       final String popVarStr = FileHelper.gzFileToString(popVcf);
       //System.out.println("-- Population Variants --");
       //System.out.println(popVarStr);
