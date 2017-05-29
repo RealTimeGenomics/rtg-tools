@@ -53,7 +53,7 @@ if dot -V >/dev/null 2>&1; then
 else
     cat<<EOF >&2
 
-Could not execute "dot" from graphviz. The demo will still work, but
+Could not execute "dot" from graphviz.  The demo will still work, but
 will skip displaying pedigree diagrams. (You might want to run this demo
 again after installing graphviz).
 
@@ -197,8 +197,8 @@ contained within.  RTG commands use SDFs for both reference and read
 storage.
 
 The reference SDF can optionally contain configuration that specifies
-additional genomic information regarding ploidy and sex chromosomes. For
-typical reference genomes, RTG will automatically recognize the
+additional genomic information regarding ploidy and sex chromosomes.
+For typical reference genomes, RTG will automatically recognize the
 reference and use an appropriate metadata file.  For this simulated
 dataset, we have manually set that up using the following reference
 configuration:
@@ -212,7 +212,7 @@ cat <<EOF
 You can find out more information about any SDF by using the
 \`sdfstats\` command.  Here we will also request specific information
 about how the reference sequences are interpreted for a male by adding
-the flags \`--sex male\'.  Every RTG command accepts the \`--help\`
+the flags \`--sex male\`.  Every RTG command accepts the \`--help\`
 option in order to display the list of available options.
 
 EOF
@@ -244,10 +244,10 @@ docommand "$RTG" popsim --reference reference.sdf --seed 42 --output pop.vcf.gz
 
 cat<<EOF
 
-The generated VCF contains variants with allele frequencies
+The generated VCF contains variants with allele frequency
 annotations that can be used to simulate a member of the population.
 The types of variants and frequencies are based off variants from the
-1000 Genomes Project.  We can pull out some example variants using \`rtg
+1000 Genomes Project.  We can examine some example variants using \`rtg
 extract\`.  The \`extract\` command can be used with any SAM/BAM/BED/VCF
 file that has been coordinate-sorted, block-compressed and indexed
 according to standard NGS practise.  RTG commands automatically index
@@ -264,11 +264,11 @@ Sample Simulation (including pedigree)
 --------------------------------------
 
 Now let's simulate a couple of members of the population that we can
-use as parents for a family. For each sample we specify the desired
+use as parents for a family.  For each sample we specify the desired
 sample name and sex.  The \`samplesim\` command outputs a VCF including a
 new sample column for the generated individual (and optionally an SDF
 containing the whole genome for the sample, which we will use
-later). We will run this twice, to generate each parent.
+later).  We will run this twice, to generate each parent.
 
 EOF
 pause
@@ -281,7 +281,7 @@ cat<<EOF
 The genotypes selected for the two samples were determined on the basis
 of the allele frequency annotations in the input VCF so a large fraction
 of the low frequency population variants were not used.  Let's prune
-them from the VCF to keep things simple. First we use the \`vcffilter\`
+them from the VCF to keep things simple.  First we use the \`vcffilter\`
 (which performs "row-wise" VCF processing) to filter the whole file, and
 then \`extract\` to pull out a subset of records for display.
 
@@ -314,22 +314,20 @@ docommand "$RTG" childsim --reference reference.sdf --seed 837 --input parents.v
 docommand "$RTG" childsim --reference reference.sdf --seed 923 --input family-1.vcf.gz --output family-2.vcf.gz --output-sdf genome-son2.sdf --father father --mother mother --sex male --sample son2
 docommand "$RTG" childsim --reference reference.sdf --seed 269 --input family-2.vcf.gz --output family-3.vcf.gz --output-sdf genome-daughter1.sdf --father father --mother mother --sex female --sample daughter1
 docommand "$RTG" childsim --reference reference.sdf --seed 284 --input family-3.vcf.gz --output family-4.vcf.gz --father father --mother mother --sex female --sample daughter2-initial
-docommand "$RTG" denovosim --reference reference.sdf --seed 841 --num-mutations 50 --input family-4.vcf.gz --output family-5.vcf.gz --output-sdf genome-daughter2.sdf --original daughter2-initial --sample daughter2
+docommand "$RTG" denovosim --reference reference.sdf --seed 841 --num-mutations 50 --input family-4.vcf.gz --output family.vcf.gz --output-sdf genome-daughter2.sdf --original daughter2-initial --sample daughter2
 
 
 cat<<EOF
 
 The sample called "daughter-initial" is an intermediate sample
-representing the daughter before the addition of de-novo variants.  We
-won't be needing that, so it can be removed with the \`vcfsubset\`
-command (which performs "columnwise" vcf modifications), and then we
+representing the daughter before the addition of de novo variants.  We
 will use \`vcfstats\` to get summary statistics for every sample
 contained in the VCF.
 
 EOF
 
 pause
-docommand "$RTG" vcfsubset --remove-sample daughter2-initial --input family-5.vcf.gz --output family.vcf.gz
+#docommand "$RTG" vcfsubset --remove-sample daughter2-initial --input family-5.vcf.gz --output family.vcf.gz
 rm pop-[0-9]*.vcf* family-[0-9]*.vcf*
 docommand "$RTG" vcfstats family.vcf.gz
 
@@ -342,7 +340,9 @@ information is encoded in a VCF header using standard VCF SAMPLE and
 PEDIGREE header fields.
 
 EOF
-    docommand "$RTG" pedstats family.vcf.gz
+
+pause
+docommand "$RTG" pedstats family.vcf.gz
 
 cat<<EOF
 
@@ -353,7 +353,7 @@ EOF
     docommand "$RTG" pedfilter family.vcf.gz
 pause
 
-if [ "$$HAVEDOT" ]; then
+if [ "$HAVEDOT" ]; then
     cat<<EOF
 
 We can use the \`pedstats\` command in conjunction with \`dot\` to
@@ -386,7 +386,7 @@ EOF
 
 docommand cat family.ped
 
-if [ "$$HAVEDOT" ]; then
+if [ "$HAVEDOT" ]; then
     cat<<EOF
 
 Here is the graphviz representation of the new pedigree.
@@ -403,10 +403,11 @@ pause
 cat<<EOF
 
 We can look at some of the variants produced for the samples on Chr9
-(one of the sex chromosomes in our synthetic genome) and see that those
-for the male samples are generated as haploid variants, as well as the
-occasional de novo variant (annotated with a DN value of 'Y') in the
-final sample column corresponding to daughter1.
+(one of the sex chromosomes in our synthetic genome).  For the males
+they are generated as haploid variants and for the female they are
+diploid.  In addition, the second daughter has the occasional de novo
+variant (annotated with a DN value of 'Y') in the final sample column
+corresponding to daughter2.
 
 EOF
 pause
@@ -434,23 +435,22 @@ cat<<EOF
 Read Simulation
 ---------------
 
-Now we have a reference genome and have also generated simulated genomes
-for the members of our family, we can simulate next generation
+Now we have a reference genome and have also generated simulated
+genomes for the members of our family, we can simulate next generation
 sequencing of the sample genomes, using \`rtg readsim\`.  We will
-simulate 2 x 100bp paired-end Illumina sequencing using a mean fragment
-size of 300bp, at a sequencing coverage of about 20x for most of our
-samples (since our sample genome SDFs include two copies of each diploid
-chromosome, we instruct the \`readsim\` command to use coverage 10).
-One of the samples will be generated at a lower coverage.  The simulated
-reads included sequencer errors according to the selected machine type,
-but in this case we will increase the error rates in order to make the
-mapping and variant calling harder.  The results of read simulation will
-be stored in an SDF containing the reads for each sample.
+simulate 2 x 100bp paired-end Illumina sequencing using a mean
+fragment size of 300bp, at a sequencing coverage of about 20x for most
+of our samples (since our sample genome SDFs include two copies of
+each diploid chromosome, we instruct the \`readsim\` command to use
+coverage 10).  One of the samples will be generated at a lower
+coverage.  The simulated reads include sequencer errors according to
+the selected machine type.  The results of read simulation will be
+stored in an SDF containing the reads for each sample.
 
 EOF
 pause
 #readsim_opts="--machine=illumina_pe -L 100 -R 100 -m 200 -M 400 --coverage 10 --qual-range 2-20 --Xmnp-event-rate=0.02 --Xinsert-event-rate=0.005 --Xdelete-event-rate=0.005"
-readsim_opts="--machine=illumina_pe -L 100 -R 100 -m 200 -M 400 --qual-range 2-20 --Xmnp-event-rate=0.02 --Xinsert-event-rate=0.0005 --Xdelete-event-rate=0.0005"
+readsim_opts="--machine=illumina_pe -L 100 -R 100 -m 200 -M 400 --qual-range 2-20"
 rgcommon="PL:ILLUMINA\tPI:300\tDS:Simulated dataset"
 seed=5643
 for genome in father mother son2 daughter1 daughter2; do
@@ -461,30 +461,30 @@ for genome in son1; do
     seed=$[seed + 5]
     docommand "$RTG" readsim --input genome-$genome.sdf --output reads-$genome.sdf --seed $seed --sam-rg "@RG\tID:rg_$genome\tSM:$genome\t$rgcommon" --coverage 5 $readsim_opts|| exit 1
 done
-pause
 
 cat<<EOF
 
 The \`sdfstats\` command can also be used to retrieve information about
-read sets.  We have included SAM read group information directly in the
-SDF (this information could also be supplied at alignment time).  Let's
-also extract some of the reads in SAM format using \`rtg sdf2sam\` so you
-can see what they look like.  Similarly, the reads could be extracted
-using \`rtg sdf2fastq\` in order to generate FASTQ files for read alignment
-tools.
+read sets as we have included SAM read group information directly in the
+SDF.  Let's also extract some of the reads in SAM format using
+\`rtg sdf2sam\` so you can see what they look like.  Similarly, the reads
+could be extracted using \`rtg sdf2fastq\` in order to generate FASTQ
+files for read alignment tools.
 
 EOF
 
+pause
 docommand "$RTG" sdfstats reads-son1.sdf
 docommand "$RTG" sdf2sam --input reads-son1.sdf --output - --start-id 0 --end-id 5
-pause
 
 
 cat<<EOF
 
 At this point the VCF and read sets we have created could be used as the
 basis of running alignment and variant calling tests to simulate various
-scenarios.
+scenarios.  RTG Core provides a full suite of alignment and variant
+calling modules, but here we continue with the processing and analysis
+available in RTG Tools.
 
 
 
@@ -502,7 +502,7 @@ command outputs statistics on parental concordance and calls
 inconsistent with Mendelian inheritance.  In this case we use the
 explicit pedigree file we created earlier rather than the pedigree
 embedded in the VCF header.  There will be be some non-mendelian
-variants corresonding to the de novo events in one child.
+variants corresonding to the de novo events in the second daughter.
 
 EOF
 pause
@@ -536,7 +536,7 @@ for a "baseline" VCF and a "calls" VCF.  Variants that are matched
 between both files are called "true positives", those contained in the
 baseline but not in the calls are called "false negatives", and those
 contained in the calls but not in the baseline are called "false
-positives".  This terminology follows from the common practise of
+positives".  This terminology follows from the common practice of
 comparing a call set with a set of known gold-standard variants for the
 sample, but the actual process of finding matches between two samples is
 quite general.
@@ -561,11 +561,11 @@ docommand "$RTG" vcfeval --template reference.sdf --baseline family.vcf.gz --cal
 cat<<EOF
 
 We can see how many genotype matches there are between the father and
-son, and some common benchmarking accuracy metrics are also included in
-the summary. If we want to see how many variants are shared, regardless
-of zygosity, we can use the \`--squash-ploidy\` option (this is also an
-appropriate option to use when looking to match somatic variant calls
-against a variant database).
+son, and some common benchmarking accuracy metrics are also included
+in the summary.  If we want to see how many variants are shared,
+regardless of zygosity, we can use the \`--squash-ploidy\` option
+(this is also an appropriate option to use when looking to match
+somatic variant calls against a variant database).
 
 EOF
 pause
@@ -583,16 +583,16 @@ precision with respect to a filter threshold.  The default is to analyse
 using the GQ FORMAT field, which is not present in our simulated VCF,
 but when you run \`vcfeval\`, you can supply the \`--vcf-score-field\`
 option to use a different attribute that should be correlated with the
-correctness of the variant (such as QUAL, or AVR).
+correctness of the variant (such as QUAL or AVR).
 
-For our simulated case we only have the allele frequency INFO annotation
-created during the initial \`popsim\` command, however we would expect
-to see that alleles that both parents have in common are more likely to
-be those with high allele frequency in the population, and those that
-are not in common are more likely to be those with low population allele
-frequency.  Let's see if that is true, first by running the \`vcfeval\`
-using the AF field as the ROC scoring attribute, and then generating the
-ROC plot using the \`rocplot\` command.
+For our simulation we only have the allele frequency INFO annotation
+created during the initial \`popsim\` command.  However, we expect
+alleles common to both parents to more likely be alleles with higher
+frequency in the population, and that those not in common to be those
+with lower population allele frequency.  Let's see if that is true,
+first by running the \`vcfeval\` using the AF field as the ROC scoring
+attribute, and then generating the ROC plot using the \`rocplot\`
+command.
 
 EOF
 pause
@@ -618,18 +618,17 @@ cat<<EOF
 
 In an ideal ROC curve, sorting variants by the scoring field would
 result in all of the true positive variants coming first (on the left
-hand side of the curve), resulting in an initial steep incline. The
+hand side of the curve), resulting in an initial steep incline.  The
 false positive variants would come in toward the end of the set
 (i.e. resulting in a flattening of the curve heading to the right).  You
 can see from the shape of the ROC curve above that indeed, AF is a
 somewhat reasonable indicator of the likelihood of the variants being
 shared between the samples that we compared.
 
-That's it for the demo, hopefully it gave you a taste of what you can do
-with RTG.  Feel free to look around in the various output files that
-were created inside this ${DEMODIR} directory, and try out RTG on some
-real data of your own.
+That's it for the demo, hopefully it gave you a taste of what you can
+do with RTG Tools.  Feel free to look around in the various output
+files that were created inside this ${DEMODIR} directory, and try out
+RTG on some real data of your own.
 
 EOF
-
 
