@@ -1,8 +1,53 @@
 # Release Notes for RTG.VERSION
 
-Below are the release notes for RTG Core, upon which RTG.VERSION
-is based.  Not all features described below may be included in this
-product.
+Below are the release notes for the full RTG suite, upon which
+RTG.VERSION is based.  Not all features described below may be included
+in this product.
+
+RTG Core 3.8.1 (2017-05-29)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* rocplot: (GUI) The right hand panel now includes a visual indication
+  of the color for each curve.
+
+* rocplot: (GUI) The color for a curve can now be set via color picker
+  available from the per-curve context menu.
+
+* rocplot: (GUI) Reordering the curves is now achieved by drag and drop
+  rather than the (now removed) reorder buttons.
+
+* misc: The RTG Tools release includes a scripts/demo-tools.sh that
+  gives a quick end-to-end demonstration of simulation and VCF
+  manipulation commands. This is similar in nature to the
+  scripts/demo-family.sh script that is included in RTG Core.
+
+* vcfeval: Fix an exception caused by the skipping of heterozygous
+  structural variants being dependent on the GT field allele
+  ordering. These variants are now correctly skipped. In previous
+  releases the cases that slipped through would enter matching with a
+  stub allele representing the SV allele.
+
+* vcfeval: When running a sample-free comparison via the option
+  `--sample ALT`, ignore records/alleles corresponding to structural
+  variants.  In 3.8 these could produce an exception, and in previous
+  releases any SV alleles present were included as a generic token
+  during matching.
+
+* vcfeval: Improve the handling of non-user exceptions encountered
+  during VCF loading.  Previously these would produce an often
+  inscrutable message.
+
+* version: Update copyright year and include an alternative citation
+  more appropriate for those using RTG Tools.
+
+* popsim: Now includes the random number seed in the VCF header for
+  consistency with with other simulation commands.
+
+
+Previous releases
+=================
 
 RTG Core 3.8 (2017-05-15)
 -------------------------
@@ -230,9 +275,6 @@ new features, see the RTG Operations Manual.
 * many: Linux and Windows packages have updated the bundled JRE to the
   latest from Oracle.
 
-
-Previous releases
-=================
 
 RTG Core 3.7.1 (2016-10-18)
 ---------------------------
