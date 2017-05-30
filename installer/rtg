@@ -144,7 +144,7 @@ RTG_USAGE_OPTIONAL=username,hostname
 # RTG_MODELS_DIR=
 
 # Allows passing additional arguments passed to the JVM. e.g:
-# RTG_JAVA_OPTIONS="-Djava.io.tmpdir=XXYY -XX:+UseLargePages"
+# RTG_JAVA_OPTS="-Djava.io.tmpdir=XXYY -XX:+UseLargePages"
 
 
 # Set the number of threads to use when not otherwise specified via command line flags. 
