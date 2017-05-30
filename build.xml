@@ -450,6 +450,8 @@
       <arg line="${test.class}" />
       <jvmarg value="-server" />
       <jvmarg value="-ea" />
+      <jvmarg value="-Duser.language=US" />
+      <jvmarg value="-Duser.country=US" />
       <jvmarg value="-Djava.awt.headless=true" />
       <jvmarg value="-Drtg.developer=true" />
       <jvmarg value="-Djunit.printFailures=true" />

@@ -30,7 +30,6 @@
 package com.rtg.vcf.mendelian;
 
 import java.io.PrintStream;
-import java.text.NumberFormat;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +40,7 @@ import com.rtg.reference.SexMemo;
 import com.rtg.relation.Family;
 import com.rtg.relation.GenomeRelationships;
 import com.rtg.util.Pair;
+import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -64,13 +64,6 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   private static final String INFO_VIOLATION = "MCV";
 
   private static final String[] REFERENCE_GENOTYPES = {VcfRecord.MISSING, "0", "0/0", "0/0/0", "0/0/0/0"};
-
-  private static final NumberFormat NF = NumberFormat.getNumberInstance();
-  static {
-    NF.setMinimumFractionDigits(2);
-    NF.setMaximumFractionDigits(2);
-  }
-
 
   private final Set<Family> mFamilies;
   private final SexMemo mSexMemo;
@@ -451,15 +444,15 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     if (mTotalRecords == 0) {
       out.println("No variants processed");
     } else {
-      out.println(mBadPloidyRecords + "/" + mTotalRecords + " (" + NF.format(100.0 * mBadPloidyRecords / mTotalRecords) + "%) records did not conform to expected call ploidy");
+      out.println(mBadPloidyRecords + "/" + mTotalRecords + " (" + Utils.realFormat(100.0 * mBadPloidyRecords / mTotalRecords, 2) + "%) records did not conform to expected call ploidy");
       if (mNonRefFamilyRecords < mTotalRecords) {
-        out.println(mNonRefFamilyRecords + "/" + mTotalRecords + " (" + NF.format(100.0 * mNonRefFamilyRecords / mTotalRecords) + "%) records were variant in at least 1 family member and checked for Mendelian constraints");
+        out.println(mNonRefFamilyRecords + "/" + mTotalRecords + " (" + Utils.realFormat(100.0 * mNonRefFamilyRecords / mTotalRecords, 2) + "%) records were variant in at least 1 family member and checked for Mendelian constraints");
       }
       if (mNonRefFamilyRecords > 0) {
-        out.println(mBadMendelianRecords + "/" + mNonRefFamilyRecords + " (" + NF.format(100.0 * mBadMendelianRecords / mNonRefFamilyRecords) + "%) records contained a violation of Mendelian constraints");
+        out.println(mBadMendelianRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mBadMendelianRecords / mNonRefFamilyRecords, 2) + "%) records contained a violation of Mendelian constraints");
       }
       if (mStrangeChildPloidyRecords > 0) {
-        out.println(mStrangeChildPloidyRecords + "/" + mNonRefFamilyRecords + " (" + NF.format(100.0 * mStrangeChildPloidyRecords / mNonRefFamilyRecords) + "%) records were not adequately checked due to a child call that was neither haploid nor diploid");
+        out.println(mStrangeChildPloidyRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mStrangeChildPloidyRecords / mNonRefFamilyRecords, 2) + "%) records were not adequately checked due to a child call that was neither haploid nor diploid");
       }
     }
   }
