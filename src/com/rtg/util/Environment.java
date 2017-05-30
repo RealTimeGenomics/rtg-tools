@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -49,6 +50,10 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
  *
  */
 public final class Environment {
+
+  static {
+    Locale.setDefault(Locale.US); // To ensure number formatting is consistent
+  }
 
   private static Class<?> getOperatingSystemMXBeanClass() {
     Class<?> c;

@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -83,12 +82,6 @@ public final class MendeliannessChecker extends AbstractCli {
   private static final String SEGREGATION_PROBABILITY_FLAG = "Xsegregation";
   private static final String STRICT_MISSING_FLAG = "Xstrict-missing";
   private static final String PEDIGREE_FLAG = "pedigree";
-
-  private static final NumberFormat NF = NumberFormat.getNumberInstance();
-  static {
-    NF.setMinimumFractionDigits(2);
-    NF.setMaximumFractionDigits(2);
-  }
 
 
   @Override
