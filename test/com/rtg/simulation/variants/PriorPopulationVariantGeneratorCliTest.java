@@ -30,25 +30,22 @@
 
 package com.rtg.simulation.variants;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
+import com.rtg.reader.ReaderTestUtils;
+import com.rtg.util.TestUtils;
+import com.rtg.util.io.TestDirectory;
+import com.rtg.util.test.FileHelper;
+import com.rtg.util.test.RandomDna;
 
 /**
  * Test the corresponding class
  */
 public class PriorPopulationVariantGeneratorCliTest extends AbstractCliTest {
-
-  @Override
-  public void setUp() throws IOException {
-    super.setUp();
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    super.tearDown();
-  }
 
   @Override
   protected AbstractCli getCli() {
@@ -65,4 +62,13 @@ public class PriorPopulationVariantGeneratorCliTest extends AbstractCliTest {
         "properties file specifying the priors");
   }
 
+  public void testSimple() throws IOException {
+    try (TestDirectory dir = new TestDirectory("popsim")) {
+      final File template = ReaderTestUtils.getDNASubDir(">s1\n" + RandomDna.random(4000, 43) + "\n>s2\n" + RandomDna.random(5000, 54) + "\n>s3\nacgt\n>s4\nacgt\n", dir);
+      final File vcfout = new File(dir, "popsim.vcf.gz");
+      final MainResult r = MainResult.run(getCli(), "-t", template.getPath(), "--seed", "42", "--output", vcfout.getPath());
+      assertEquals(r.err(), 0, r.rc());
+      mNano.check("popsim-simple.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(vcfout)));
+    }
+  }
 }
