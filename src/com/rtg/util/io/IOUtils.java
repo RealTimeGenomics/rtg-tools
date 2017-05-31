@@ -41,6 +41,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
 
+import com.rtg.util.diagnostic.ErrorType;
+import com.rtg.util.diagnostic.SlimException;
+
+import htsjdk.samtools.util.RuntimeIOException;
+
 /**
  * Access to io functionality.
  *
@@ -205,6 +210,36 @@ public final class IOUtils {
         }
       }
       return str.toString();
+    }
+  }
+
+  /**
+   * Re-throw the underlying cause throwable obtained during execution in another thread.
+   * @param cause the inner Throwable, typically an <code>ExecutionException.getCause()</code>
+   * @throws IOException if the cause was an IOException
+   */
+  public static void rethrow(Throwable cause) throws IOException {
+    if (cause instanceof IOException) {
+      throw (IOException) cause;
+    } else {
+      rethrowWrapIO(cause);
+    }
+  }
+
+  /**
+   * Re-throw the underlying cause throwable obtained during execution in another thread.
+   * This method wraps any underlying <code>IOException</code> in a <code>RuntimeIOException</code>
+   * @param cause the inner Throwable, typically an <code>ExecutionException.getCause()</code>
+   */
+  public static void rethrowWrapIO(Throwable cause) {
+    if (cause instanceof Error) {
+      throw (Error) cause;
+    } else if (cause instanceof RuntimeException) {
+      throw (RuntimeException) cause;
+    } else if (cause instanceof IOException) {
+      throw new RuntimeIOException(cause);
+    } else {
+      throw new SlimException(cause, ErrorType.INFO_ERROR, cause.getMessage());
     }
   }
 }

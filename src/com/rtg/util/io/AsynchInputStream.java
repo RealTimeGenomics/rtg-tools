@@ -130,14 +130,7 @@ public class AsynchInputStream extends InputStream {
   private void checkException() throws IOException {
     final Throwable t = mAsynchInput.mException.getAndSet(null);
     if (t != null) {
-      if (t instanceof Error) {
-        throw (Error) t;
-      }
-      if (t instanceof IOException) {
-        throw (IOException) t;
-      } else {
-        throw new RuntimeException(t);
-      }
+      IOUtils.rethrow(t);
     }
   }
   @Override

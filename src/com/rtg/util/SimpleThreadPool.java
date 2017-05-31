@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Queue;
 
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.SlimException;
+import com.rtg.util.io.IOUtils;
 
 /**
  * A simple of way of using threads.
@@ -299,18 +299,7 @@ public final class SimpleThreadPool {
 
   void rethrow() throws IOException {
     if (mThrown != null) {
-      //mThrown.printStackTrace();
-      if (mThrown instanceof IOException) {
-        throw (IOException) mThrown;
-      } else if (mThrown instanceof SlimException) {
-        throw (SlimException) mThrown;
-      } else if (mThrown instanceof RuntimeException) {
-        throw (RuntimeException) mThrown;
-      } else if (mThrown instanceof Error) {
-        throw (Error) mThrown;
-      } else {
-        throw new SlimException(mThrown);
-      }
+      IOUtils.rethrow(mThrown);
     }
   }
 }

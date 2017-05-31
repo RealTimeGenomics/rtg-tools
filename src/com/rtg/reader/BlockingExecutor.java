@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.io.IOUtils;
 
 /**
  * Provides multi-threaded processing with limited read-ahead
@@ -117,14 +118,7 @@ class BlockingExecutor extends ThreadPoolExecutor {
     final Throwable t = this.mThrown.getAndSet(null);
     if (t != null) {
       ProgramState.setAbort();
-      if (t instanceof Error) {
-        throw (Error) t;
-      }
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException) t;
-      } else {
-        throw new RuntimeException(t);
-      }
+      IOUtils.rethrowWrapIO(t);
     }
   }
 }
