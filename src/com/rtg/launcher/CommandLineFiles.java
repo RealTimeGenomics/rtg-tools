@@ -313,6 +313,11 @@ public class CommandLineFiles {
 
     if (mListFileFlag != null && flags.isSet(mListFileFlag)) {
       final File listFile = (File) flags.getValue(mListFileFlag);
+      if (!listFile.exists()) {
+        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Input file list \"" + listFile.getPath() + "\" does not exist");
+      } else if (!listFile.isFile()) {
+        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Input file list \"" + listFile.getPath() + "\" must be an ordinary file");
+      }
       try (BufferedReader br = new BufferedReader(new FileReader(listFile))) {
         for (String line = br.readLine(); line != null; line = br.readLine()) {
           line = line.trim();
