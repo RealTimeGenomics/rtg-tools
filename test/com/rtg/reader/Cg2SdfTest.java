@@ -111,8 +111,7 @@ public class Cg2SdfTest extends AbstractCliTest {
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", outdir.getPath(), in.getPath(), "--max-unknowns", "-1"), "--max-unknowns", "must be at least 0");
 
       final String err = checkHandleFlagsErr("-o", outdir.getPath(), "-I", "x");
-      TestUtils.containsAll(err,
-        "An error occurred reading " + getCFlags().getValue(CommonFlags.INPUT_LIST_FLAG));
+      TestUtils.containsAllUnwrapped(err, "does not exist");
     }
   }
 
