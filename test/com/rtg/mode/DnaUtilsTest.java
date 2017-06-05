@@ -31,6 +31,8 @@ package com.rtg.mode;
 
 import java.util.Arrays;
 
+import com.rtg.util.TestUtils;
+
 import junit.framework.TestCase;
 
 /**
@@ -51,6 +53,11 @@ public class DnaUtilsTest extends TestCase {
     final byte[] b = DnaUtils.encodeString(exp);
     final String s = DnaUtils.bytesToSequenceIncCG(b);
     assertEquals(exp, s);
+    try {
+      DnaUtils.encodeString("X");
+    } catch (IllegalBaseException e) {
+      TestUtils.containsAll(e.getMessage(), "Illegal DNA", "X");
+    }
   }
 
   public void testEncodeArrayCopy() {

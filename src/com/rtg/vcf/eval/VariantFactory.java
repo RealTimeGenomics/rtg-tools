@@ -33,6 +33,7 @@ import java.util.Arrays;
 
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
+import com.rtg.mode.IllegalBaseException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
@@ -119,7 +120,12 @@ public interface VariantFactory {
       if (gtArray.length == 0 || gtArray.length > 2) {
         throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
       }
-      final Allele[] alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitHalfCall);
+      final Allele[] alleles;
+      try {
+        alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitHalfCall);
+      } catch (IllegalBaseException e) {
+        throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
+      }
       final Range bounds = Allele.getAlleleBounds(alleles);
 
       final int alleleA = gtArray[0];
@@ -167,12 +173,17 @@ public interface VariantFactory {
     }
 
     @Override
-    public Variant variant(final VcfRecord rec, final int id) {
+    public Variant variant(final VcfRecord rec, final int id) throws SkippedVariantException {
       if (rec.getAltCalls().size() == 0) {
         return null;
       }
 
-      final Allele[] alleles = pruneEmptyAlts(Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall));
+      final Allele[] alleles;
+      try {
+        alleles = pruneEmptyAlts(Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall));
+      } catch (IllegalBaseException e) {
+        throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
+      }
       if (alleles.length < 3) { // No actual ALTs remaining
         return null;
       }
