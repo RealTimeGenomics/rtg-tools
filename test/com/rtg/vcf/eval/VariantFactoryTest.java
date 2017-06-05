@@ -149,4 +149,21 @@ public class VariantFactoryTest extends TestCase {
     assertNull(new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE10), 0));
   }
 
+  static final String SNP_LINE11 = "chr 23 . T G--- . PASS . GT 1|1";
+
+  public void testBadAlts() throws Exception {
+    try {
+      new VariantFactory.SampleVariants(0, true, false).variant(VariantTest.createRecord(SNP_LINE11), 0);
+      fail();
+    } catch (SkippedVariantException e) {
+      // Expected
+    }
+    try {
+      new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE11), 0);
+      fail();
+    } catch (SkippedVariantException e) {
+      // Expected
+    }
+  }
+
 }
