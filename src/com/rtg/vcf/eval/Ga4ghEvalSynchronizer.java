@@ -57,17 +57,17 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String INFO_SUPERLOCUS_ID = "BS";
   private static final String INFO_CALL_WEIGHT = "CALL_WEIGHT";
 
-  private static final String FORMAT_DECISION = "BD";
-  private static final String DECISION_TP = "TP";
-  private static final String DECISION_FN = "FN";
-  private static final String DECISION_FP = "FP";
-  private static final String DECISION_OTHER = "N";
+  static final String FORMAT_DECISION = "BD";
+  static final String DECISION_TP = "TP";
+  static final String DECISION_FN = "FN";
+  static final String DECISION_FP = "FP";
+  static final String DECISION_OTHER = "N";
 
-  private static final String FORMAT_MATCH_KIND = "BK";
-  private static final String SUBTYPE_MISMATCH = ".";
-  private static final String SUBTYPE_GT_MATCH = "gm";
-  private static final String SUBTYPE_ALLELE_MATCH = "am";
-  private static final String SUBTYPE_REGIONAL_MATCH = "lm"; // perhaps implement some loose positional comparison?
+  static final String FORMAT_MATCH_KIND = "BK";
+  static final String SUBTYPE_MISMATCH = ".";
+  static final String SUBTYPE_GT_MATCH = "gm";
+  static final String SUBTYPE_ALLELE_MATCH = "am";
+  static final String SUBTYPE_REGIONAL_MATCH = "lm";
 
   private static final String FORMAT_EXTRA = "BI";
   private static final String EXTRA_MULTI = "multi";
@@ -81,8 +81,8 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String SAMPLE_QUERY = "QUERY";
 
   // Order of sample columns in the output VCF
-  private static final int TRUTH_SAMPLE_INDEX = 0;
-  private static final int QUERY_SAMPLE_INDEX = 1;
+  static final int TRUTH_SAMPLE_INDEX = 0;
+  static final int QUERY_SAMPLE_INDEX = 1;
 
   // Record order during merging (first has field priority)
   private static final int QUERY_MERGE_INDEX = 0;
@@ -111,12 +111,13 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
+   * @param looseMatchDistance if greater than 0, apply loose matching rules with the supplied distance
    * @throws IOException if there is a problem opening output files
    */
   Ga4ghEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
                         String baselineSampleName, String callsSampleName,
                         RocSortValueExtractor extractor,
-                        File outdir, boolean zip) throws IOException {
+                        File outdir, boolean zip, int looseMatchDistance) throws IOException {
     super(baseLineFile, callsFile, variants, ranges);
     mRocExtractor = extractor;
     mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
@@ -126,16 +127,15 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutHeader.addCommonHeader();
     mOutHeader.addContigFields(variants.baseLineHeader());
     variants.calledHeader().getFilterLines().forEach(mOutHeader::addFilterField);
-    mOutHeader.addInfoField(new InfoField(INFO_SUPERLOCUS_ID, MetaType.INTEGER, VcfNumber.DOT, "Benchmarking superlocus ID for these variants."));
+    mOutHeader.addInfoField(new InfoField(INFO_SUPERLOCUS_ID, MetaType.INTEGER, VcfNumber.DOT, "Benchmarking superlocus ID for these variants"));
     mOutHeader.addInfoField(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of truth variants). When unspecified, assume 1.0"));
     mOutHeader.addFormatField(new FormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, new VcfNumber("1"), "Genotype"));
     mOutHeader.addFormatField(new FormatField(FORMAT_DECISION, MetaType.STRING, new VcfNumber("1"), "Decision for call (TP/FP/FN/N)"));
-    mOutHeader.addFormatField(new FormatField(FORMAT_MATCH_KIND, MetaType.STRING, new VcfNumber("1"), "Sub-type for decision (match/mismatch type)"));
+    mOutHeader.addFormatField(new FormatField(FORMAT_MATCH_KIND, MetaType.STRING, new VcfNumber("1"), "Sub-type for decision (match/mismatch type)" + (looseMatchDistance >= 0 ? ". (Loose match distance is " + looseMatchDistance + ")" : "")));
     mOutHeader.addFormatField(new FormatField(FORMAT_EXTRA, MetaType.STRING, new VcfNumber("1"), "Additional comparison information"));
-    mOutHeader.addFormatField(new FormatField(FORMAT_ROC_SCORE, MetaType.FLOAT, new VcfNumber("1"), "Variant quality for ROC creation."));
+    mOutHeader.addFormatField(new FormatField(FORMAT_ROC_SCORE, MetaType.FLOAT, new VcfNumber("1"), "Variant quality for ROC creation"));
     mOutHeader.addSampleName(SAMPLE_TRUTH);
     mOutHeader.addSampleName(SAMPLE_QUERY);
-
     mInHeaders[TRUTH_MERGE_INDEX] = variants.baseLineHeader().copy();
     mInHeaders[TRUTH_MERGE_INDEX].removeAllSamples();
     mInHeaders[TRUTH_MERGE_INDEX].addSampleName(SAMPLE_TRUTH);
@@ -144,7 +144,8 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mInHeaders[QUERY_MERGE_INDEX].addSampleName(SAMPLE_QUERY);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mVcfOut = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip, false);
+    final VcfWriter w = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip, false);
+    mVcfOut = looseMatchDistance >= 0 ? new Ga4ghLooseMatchFilter(w, looseMatchDistance) : w;
   }
 
   @Override
