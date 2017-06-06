@@ -89,6 +89,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
+  private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
   /** Defines the RocFilters that make sense to use with vcfeval */
   public enum VcfEvalRocFilter {
@@ -177,6 +178,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     mFlags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
     mFlags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
+    mFlags.registerOptional(LOOSE_MATCH_DISTANCE, Integer.class, CommonFlags.INT, "if set, GA4GH mode will also apply distance-based loose-matching with the specified distance", 30).setCategory(FILTERING);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
@@ -302,6 +304,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
     builder.scoreField((String) mFlags.getValue(SCORE_FIELD));
     builder.maxLength((Integer) mFlags.getValue(MAX_LENGTH));
+    builder.looseMatchDistance((Integer) mFlags.getValue(LOOSE_MATCH_DISTANCE));
     if (mFlags.isSet(CommonFlags.RESTRICTION_FLAG)) {
       builder.restriction(new RegionRestriction((String) mFlags.getValue(CommonFlags.RESTRICTION_FLAG)));
     }
