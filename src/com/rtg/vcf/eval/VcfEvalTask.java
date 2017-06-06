@@ -189,7 +189,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_GA4GH:
-        processor = new Ga4ghEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed());
+        processor = new Ga4ghEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
         break;
       case MODE_ROC_ONLY:
         processor = new RocOnlyEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());

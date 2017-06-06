@@ -69,6 +69,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     private boolean mSquashPloidy = false;
     private boolean mRefOverlap = false;
     int mMaxLength = -1;
+    private int mLooseMatchDistance = -1;
     boolean mOutputSlopeFiles = false;
     private RegionRestriction mRestriction = null;
     private File mBedRegionsFile = null;
@@ -227,6 +228,16 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
+     * @param looseMatchDistance the distance used for loose matching, or negative to disable loose matching
+     * @return this builder, so calls can be chained
+     */
+    public VcfEvalParamsBuilder looseMatchDistance(int looseMatchDistance) {
+      mLooseMatchDistance = looseMatchDistance;
+      return self();
+    }
+
+
+    /**
      * @param filters the set of ROC outputs to produce
      * @return this builder, so calls can be chained
      */
@@ -323,6 +334,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final boolean mSquashPloidy;
   private final boolean mRefOverlap;
   private final int mMaxLength;
+  private final int mLooseMatchDistance;
   private final Set<RocFilter> mRocFilters;
   private final boolean mOutputSlopeFiles;
   private final Orientor mBaselinePhaseOrientor;
@@ -351,6 +363,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mSquashPloidy = builder.mSquashPloidy;
     mRefOverlap = builder.mRefOverlap;
     mMaxLength = builder.mMaxLength;
+    mLooseMatchDistance = builder.mLooseMatchDistance;
     mRocFilters = builder.mRocFilters;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
     mBaselinePhaseOrientor = builder.mBaselinePhaseOrientor;
@@ -484,6 +497,13 @@ public final class VcfEvalParams extends OutputModuleParams {
    */
   public int maxLength() {
     return mMaxLength;
+  }
+
+  /**
+   * @return the distance used for loose matching, or negative to disable loose matching
+   */
+  public int looseMatchDistance() {
+    return mLooseMatchDistance;
   }
 
   /**
