@@ -40,33 +40,17 @@ import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.AbstractTest;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.PortableRandom;
-import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.TestCase;
-public class SdfVerifierTest extends TestCase {
+public class SdfVerifierTest extends AbstractTest {
 
   private static final String LS = System.lineSeparator();
-
-  private File mDir = null;
-  @Override
-  public void setUp() throws Exception {
-    mDir = FileHelper.createTempDirectory();
-    Diagnostic.setLogStream();
-  }
-
-  @Override
-  public void tearDown() {
-    GlobalFlags.resetAccessedStatus();
-    FileHelper.deleteAll(mDir);
-    mDir = null;
-    Diagnostic.deleteLog();
-  }
 
   private InputStream createStream(final String data) {
     return new ByteArrayInputStream(data.getBytes());
@@ -76,21 +60,20 @@ public class SdfVerifierTest extends TestCase {
       + "acgtgtgtgtcttagggctcactggtcatgca" + LS + ">bob the builder" + LS
       + "tagttcagcatcgatca" + LS + ">hobos r us" + LS + "accccaccccacaaacccaa";
 
-  private void createBasePreread() throws IOException {
+  private void createBasePreread(File dir) throws IOException {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(EX1));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(
-        al, new DNAFastaSymbolTable());
-    // mDir = FileHelper.createTempDirectory();
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final SequencesWriter sw = new SequencesWriter(ds, dir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
   }
 
   public void testVerifier() throws IOException {
-    createBasePreread();
-
-    try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertTrue(SdfVerifier.verify(dsr, new File("data")));
+    try (TestDirectory dir = new TestDirectory()) {
+      createBasePreread(dir);
+      try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+        assertTrue(SdfVerifier.verify(dsr, new File("data")));
+      }
     }
   }
 
@@ -122,98 +105,70 @@ public class SdfVerifierTest extends TestCase {
   public void testVerifier2() throws IOException {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(EX2));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-        new DNAFastaSymbolTable());
-    new SequencesWriter(ds, mDir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
-    try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertTrue(SdfVerifier.verify(dsr, new File("data")));
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    try (TestDirectory dir = new TestDirectory()) {
+      new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
+      try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+        assertTrue(SdfVerifier.verify(dsr, new File("data")));
+      }
     }
   }
 
   private static class MyFileFilter implements FileFilter {
     @Override
     public boolean accept(final File file) {
-      return file != null && !file.getPath().endsWith("log")
-          && file.length() > 0;
+      return file != null && !file.getPath().endsWith("log") && file.length() > 0;
     }
   }
 
   public void testVerifierRandomMutation() throws IOException {
     final StringBuilder failures = new StringBuilder();
     final PortableRandom rnd = new PortableRandom();
-    try {
-      // int count = 0;
+    try (TestDirectory topDir = new TestDirectory("testVerifierRandomMutation")) {
       for (int k = 0; k < 20; ++k) {
-        boolean failed = false;
-        try {
-          try {
-            createBasePreread();
-          } catch (final RuntimeException ex) {
-            // this is for windows, as sometime windows wont allow
-            // reusing mDir
-            --k;
-            // System.out.println(count++);
-            failed = true;
-            continue;
+        final File dir = new File(topDir, "sub-" + k);
+        createBasePreread(dir);
+        // Random mutate base preread
+        final File[] targets = dir.listFiles(new MyFileFilter());
+        assertNotNull(targets);
+        assertTrue("Targets length > 0, seed was: " + rnd.getSeed(), targets.length > 0);
+        final File target = targets[rnd.nextInt(targets.length)];
+        // Following loss of precision ok, because of 1GB file size
+        // limit we have and because test file is small
+        final long size = target.length();
+        final int placeToMutate = rnd.nextInt((int) size);
+        if (target.getName().equals("seqpointer0") && placeToMutate == 0) {
+          //corruption of this byte does not affect sdf
+          continue;
+        }
+        assertTrue("PlaceToMutate fail, seed was: " + rnd.getSeed(), placeToMutate < size && placeToMutate >= 0);
+        final String desc;
+        try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
+          f.seek(placeToMutate);
+          final int current = f.readByte();
+          int replace;
+          do {
+            replace = rnd.nextInt(256);
+          } while ((byte) replace == (byte) current);
+          f.seek(placeToMutate);
+          f.writeByte(replace);
+          desc = "Changed " + current + " to " + replace + " at position " + placeToMutate + " in " + target.getPath();
+        }
+        assertEquals("Size > target length, seed was: " + rnd.getSeed(), size, target.length());
 
-          } finally {
-            if (failed) {
-              FileHelper.deleteAll(mDir);
-            }
+        // Now make sure the verifier karks it
+        try (final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+          final boolean res = SdfVerifier.verify(dsr, new File("data"));
+          if (res) {
+            failures.append("FAILED: ").append(desc).append('\n');
           }
-          // Random mutate base preread
-          final File[] targets = mDir.listFiles(new MyFileFilter());
-          assertNotNull(targets);
-          assertTrue("Targets length > 0, seed was: " + rnd.getSeed(), targets.length > 0);
-          final File target = targets[rnd.nextInt(targets.length)];
-          // Following loss of precision ok, because of 1GB file size
-          // limit we have
-          // and because test file is small
-          final long size = target.length();
-          final int placeToMutate = rnd.nextInt((int) size);
-          if (target.getName().equals("seqpointer0") && placeToMutate == 0) {
-            //corruption of this byte does not affect sdf
-            continue;
-          }
-          assertTrue("PlaceToMutate fail, seed was: " + rnd.getSeed(), placeToMutate < size && placeToMutate >= 0);
-          final String desc;
-          try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
-            f.seek(placeToMutate);
-            final int current = f.readByte();
-            int replace;
-            do {
-              replace = rnd.nextInt(256);
-            } while ((byte) replace == (byte) current);
-            f.seek(placeToMutate);
-            f.writeByte(replace);
-            desc = "Changed " + current + " to " + replace + " at position "
-              + placeToMutate + " in " + target.getPath();
-          }
-          assertEquals("Size > target length, seed was: " + rnd.getSeed(), size, target.length());
-
-          // Now make sure the verifier karks it
-          try {
-            final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir);
-            try {
-              final boolean res = SdfVerifier.verify(dsr, new File("data"));
-              if (res) {
-                failures.append("FAILED: ").append(desc).append('\n');
-              }
-            } finally {
-              if (dsr != null) {
-                dsr.close();
-              }
-            }
-          } catch (final NoTalkbackSlimException ex) {
-            assertTrue("Didn't contain 'newer version', seed was: " + rnd.getSeed(), ex.getMessage().contains("newer version")); // This may happen if we mutate the indexfile version high
-          } catch (final CorruptSdfException ex) {
-            // if (ex.getMessage() == null) {
-            // ex.printStackTrace();
-            // }
-            //assertEquals("Corrupt index.", ex.getMessage());
-          }
-        } finally {
-          FileHelper.deleteAll(mDir);
+        } catch (final NoTalkbackSlimException ex) {
+          assertTrue("Didn't contain 'newer version', seed was: " + rnd.getSeed(), ex.getMessage().contains("newer version")); // This may happen if we mutate the indexfile version high
+        } catch (final CorruptSdfException ex) {
+          // if (ex.getMessage() == null) {
+          // ex.printStackTrace();
+          // }
+          //assertEquals("Corrupt index.", ex.getMessage());
         }
       }
       if (failures.length() != 0) {
@@ -228,72 +183,42 @@ public class SdfVerifierTest extends TestCase {
   public void testVerifierRandomTruncation() throws IOException {
     final StringBuilder failures = new StringBuilder();
     final PortableRandom rnd = new PortableRandom();
-    try {
+    try (TestDirectory topDir = new TestDirectory()) {
       for (int k = 0; k < 10; ++k) {
-        boolean failed = false;
-        try {
-          try {
-            createBasePreread();
-          } catch (final RuntimeException ex) {
-            --k;
-            // this is for windows, as sometime windows wont allow
-            // creating new dir
-            failed = true;
-            continue;
+        final File dir = new File(topDir, "sub-" + k);
+        createBasePreread(dir);
+        // Random mutate base preread
+        final File[] targets = dir.listFiles(new MyFileFilter());
+        assertNotNull(targets);
+        assertTrue("Targets > 0, seed was: " + rnd.getSeed(), targets.length > 0);
 
-          } finally {
-            if (failed) {
-              FileHelper.deleteAll(mDir);
-            }
+        final int t = rnd.nextInt(targets.length);
+        final File target = targets[t];
+        // Following loss of precision ok, because of 1GB file size
+        // limit we have and because test file is small
+        final long size = target.length();
+        if (size > 1) {
+          final int placeToTruncate = size == 32 ? 24 : rnd.nextInt((int) size);
+          assertTrue("PlaceToTruncate fail, seed was: " + rnd.getSeed(), placeToTruncate < size && placeToTruncate >= 0);
+          final String desc;
+          try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
+            f.setLength(placeToTruncate);
+            desc = "Truncated target " + t + "/" + targets.length + " " + target.getPath() + " (length " + size + ") to " + placeToTruncate + " bytes";
           }
-          // Random mutate base preread
-          final File[] targets = mDir.listFiles(new MyFileFilter());
-          assertNotNull(targets);
-          assertTrue("Targets > 0, seed was: " + rnd.getSeed(), targets.length > 0);
+          assertTrue("Size != target length, seed was: " + rnd.getSeed(), size != target.length());
 
-          final int t = rnd.nextInt(targets.length);
-          // System.out.println("Files");
-          // for (int i = 0; i < targets.length; ++i) {
-          //   System.out.println((i==t?"*":" ") + targets[i].getPath());
-          // }
-          final File target = targets[t];
-          // Following loss of precision ok, because of 1GB file size
-          // limit we have
-          // and because test file is small
-          final long size = target.length();
-          if (size > 1) {
-            final int placeToTruncate = size == 32 ? 24 : rnd.nextInt((int) size);
-            assertTrue("PlaceToTruncate fail, seed was: " + rnd.getSeed(), placeToTruncate < size && placeToTruncate >= 0);
-            final String desc;
-            try (RandomAccessFile f = new RandomAccessFile(target, "rws")) {
-              f.setLength(placeToTruncate);
-              desc = "Truncated target " + t + "/" + targets.length + " " + target.getPath() + " (length " + size + ") to " + placeToTruncate
-                + " bytes";
+          // Now make sure the verifier karks it
+          try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+            final boolean res = SdfVerifier.verify(dsr, new File("data"));
+            if (res) {
+              failures.append("FAILED: ").append(desc).append('\n');
             }
-            assertTrue("Size != target length, seed was: " + rnd.getSeed(), size != target.length());
-
-            // Now make sure the verifier karks it
-            try {
-              final SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir);
-              try {
-                final boolean res = SdfVerifier.verify(dsr, new File("data"));
-                if (res) {
-                  failures.append("FAILED: ").append(desc).append('\n');
-                }
-              } finally {
-                if (dsr != null) {
-                  dsr.close();
-                }
-              }
-            } catch (final CorruptSdfException ex) {
-              // if (ex.getMessage() == null) {
-              // ex.printStackTrace();
-              // }
-              //assertEquals("Corrupt index.", ex.getMessage());
-            }
+          } catch (final CorruptSdfException ex) {
+            // if (ex.getMessage() == null) {
+            // ex.printStackTrace();
+            // }
+            //assertEquals("Corrupt index.", ex.getMessage());
           }
-        } finally {
-          FileHelper.deleteAll(mDir);
         }
       }
       if (failures.length() != 0) {
@@ -305,22 +230,17 @@ public class SdfVerifierTest extends TestCase {
     }
   }
 
-  private static final String MSG = "Usage: SDFVerify [OPTION]... SDF" + LS + LS
-      + "Try '--help' for more information" + LS + "";
+  private static final String MSG = "Usage: SDFVerify [OPTION]... SDF";
 
   public void testFlags() {
     final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
     final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream)) {
-      final PrintStream err = new PrintStream(stream);
-      try {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{"-x"}, out, err));
-      } finally {
-        err.close();
-      }
+    try (PrintStream out = new PrintStream(outstream);
+         PrintStream err = new PrintStream(stream)) {
+      assertEquals(1, SdfVerifier.mainInit(new String[]{"-x"}, out, err));
     }
     assertEquals("", outstream.toString());
-    assertEquals("Error: Unknown flag -x" + LS + LS + MSG, stream.toString());
+    TestUtils.containsAllUnwrapped(stream.toString(), "Error: Unknown flag -x", MSG);
   }
 
   /*private static final String HELP_MSG = "Usage: SDFVerify [OPTION]... SDF" + LS
@@ -335,13 +255,9 @@ public class SdfVerifierTest extends TestCase {
   public void testHelpMessages() {
     final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
     final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream)) {
-      final PrintStream err = new PrintStream(stream);
-      try {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{"-h"}, out, err));
-      } finally {
-        err.close();
-      }
+    try (PrintStream out = new PrintStream(outstream);
+         PrintStream err = new PrintStream(stream)) {
+      assertEquals(1, SdfVerifier.mainInit(new String[]{"-h"}, out, err));
     }
     assertEquals("", stream.toString());
   }
@@ -350,65 +266,51 @@ public class SdfVerifierTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(EX2));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    new SequencesWriter(ds, mDir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
-    final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream)) {
-      final PrintStream err = new PrintStream(stream);
-      try {
-        final int code = SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err);
-        assertEquals(stream.toString(), 0, code);
-      } finally {
-        err.close();
+    try (TestDirectory dir = new TestDirectory()) {
+      new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
+      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+      try (PrintStream out = new PrintStream(outstream)) {
+        try (final PrintStream err = new PrintStream(stream)) {
+          final int code = SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err);
+          assertEquals(stream.toString(), 0, code);
+        }
       }
+      assertTrue(outstream.toString().contains("erified okay."));
+      assertEquals("", stream.toString());
     }
-    assertTrue(outstream.toString().contains("erified okay."));
-    assertEquals("", stream.toString());
   }
 
   public void testErrorMessage() throws IOException {
-    final File f = FileUtils.createTempDir("prereadverifier", "test");
-    try {
+    try (final TestDirectory f = new TestDirectory("prepreadverifier")) {
       final File mainIndex = new File(f, "mainindex");
       assertTrue(mainIndex.createNewFile());
       final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
       final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream)) {
-        final PrintStream err = new PrintStream(stream);
-        try {
-          assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
-        } finally {
-          err.close();
-        }
+      try (PrintStream out = new PrintStream(outstream);
+           PrintStream err = new PrintStream(stream)) {
+        assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
       }
       assertEquals("", outstream.toString());
       assertEquals("Error: The SDF verification failed." + LS, stream.toString());
     } catch (final RuntimeException e) {
       //okay
-    } finally {
-      FileHelper.deleteAll(f);
     }
   }
 
   public void testInvalidFlagMessage() throws IOException {
-    final File f = File.createTempFile("preread", "verifier");
-    try {
+    try (final TestDirectory tmpDir = new TestDirectory("prepreadverifier")) {
+      final File f = FileHelper.createTempFile(tmpDir);
       final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
       final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream)) {
-        final PrintStream err = new PrintStream(stream);
-        try {
-          assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
-        } finally {
-          err.close();
-        }
+      try (PrintStream out = new PrintStream(outstream);
+           PrintStream err = new PrintStream(stream)) {
+        assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
       }
       assertEquals("", outstream.toString());
       assertTrue(stream.toString(), stream.toString().contains("The specified file, \"" + f.getPath() + "\", is not an SDF."));
     } catch (final RuntimeException e) {
       //okay
-    } finally {
-      FileHelper.deleteAll(f);
     }
   }
 
@@ -416,24 +318,22 @@ public class SdfVerifierTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(EX2));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    new SequencesWriter(ds, mDir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
-    final IndexFile f = new IndexFile(mDir);
-    f.setDataChecksum(0);
-    f.save(mDir);
-    final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream)) {
-      final PrintStream err = new PrintStream(stream);
-      try {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
-      } finally {
-        err.close();
+    try (TestDirectory dir = new TestDirectory()) {
+      new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
+      final IndexFile f = new IndexFile(dir);
+      f.setDataChecksum(0);
+      f.save(dir);
+      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+      try (PrintStream out = new PrintStream(outstream);
+           PrintStream err = new PrintStream(stream)) {
+        assertEquals(1, SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err));
       }
-    }
-    assertEquals("", outstream.toString());
+      assertEquals("", outstream.toString());
 
-    try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertFalse(SdfVerifier.verify(dsr, new File("data")));
+      try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+        assertFalse(SdfVerifier.verify(dsr, new File("data")));
+      }
     }
   }
 
@@ -441,47 +341,40 @@ public class SdfVerifierTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(EX2));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    new SequencesWriter(ds, mDir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
-    final IndexFile f = new IndexFile(mDir);
-    f.setDataChecksum(123233);
-    f.save(mDir);
-    final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream)) {
-      final PrintStream err = new PrintStream(stream);
-      try {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{mDir.getPath()}, out, err));
-      } finally {
-        err.close();
-      }
-    }
-    assertEquals("", outstream.toString());
-    assertTrue(stream.toString().contains("The SDF verification failed."));
+    try (TestDirectory dir = new TestDirectory()) {
+      new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
+      final IndexFile f = new IndexFile(dir);
+      f.setDataChecksum(123233);
+      f.save(dir);
 
-    try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(mDir)) {
-      assertFalse(SdfVerifier.verify(dsr, new File("data")));
+      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
+      try (PrintStream out = new PrintStream(outstream);
+           PrintStream err = new PrintStream(stream)) {
+        assertEquals(1, SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err));
+      }
+      assertEquals("", outstream.toString());
+      assertTrue(stream.toString().contains("The SDF verification failed."));
+
+      try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
+        assertFalse(SdfVerifier.verify(dsr, new File("data")));
+      }
     }
   }
 
   public void testValidator() throws IOException {
-    Diagnostic.setLogStream();
     final ByteArrayOutputStream err = new ByteArrayOutputStream();
-    final File tmp = File.createTempFile("prepreadverifier", "test");
-    try {
+    try (final TestDirectory tmp = new TestDirectory("prepreadverifier")) {
+      final File f = FileHelper.createTempFile(tmp);
       try (PrintStream diag = new PrintStream(err)) {
-        SdfVerifier.mainInit(new String[]{tmp.getPath()}, null, diag);
+        SdfVerifier.mainInit(new String[]{f.getPath()}, null, diag);
       } catch (final RuntimeException ex) {
         fail();
-      } finally {
-        assertTrue(FileHelper.deleteAll(tmp));
-
       }
     } finally {
       err.close();
     }
-    final String expected = "Error: The specified file, \"" + tmp.getPath() + "\", is not an SDF." + LS
-    + MSG;
+    TestUtils.containsAllUnwrapped(err.toString(), "Error: The specified file, \"", "\", is not an SDF.", MSG);
 
-    assertEquals(expected, err.toString());
   }
 }
