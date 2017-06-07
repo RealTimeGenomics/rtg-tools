@@ -52,6 +52,7 @@ import com.rtg.util.io.ClosedFileInputStream;
 import htsjdk.samtools.CRAMBAIIndexer;
 import htsjdk.samtools.SamReader;
 import htsjdk.samtools.ValidationStringency;
+import htsjdk.samtools.util.BlockCompressedInputStream;
 
 /**
  * Provides front end indexing various formats.
@@ -59,6 +60,7 @@ import htsjdk.samtools.ValidationStringency;
 public class IndexerCli extends AbstractCli {
 
   private static final String INPUT_FORMAT = "format";
+  private static final String TEST_EOF = "Xtest-eof";
 
   /**
    * Supported formats for indexer
@@ -120,6 +122,7 @@ public class IndexerCli extends AbstractCli {
     inFlag.setPsuedoMinMaxRangeString(0, Integer.MAX_VALUE);
     final Flag<File> listFlag = flags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, CommonFlags.FILE, "file containing a list of block compressed files (1 per line) containing genome position data").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     flags.registerOptional('f', INPUT_FORMAT, IndexFormat.class, "FORMAT", "format of input to index", IndexFormat.AUTO).setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerOptional(TEST_EOF, "if set, check that compressed files contain a termination block").setCategory(CommonFlagCategories.UTILITY);
     flags.addRequiredSet(inFlag);
     flags.addRequiredSet(listFlag);
   }
@@ -169,6 +172,10 @@ public class IndexerCli extends AbstractCli {
         retCode = 1;
         continue;
       }
+      if (mFlags.isSet(TEST_EOF) && BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK != BlockCompressedInputStream.checkTermination(f)) {
+        Diagnostic.warning("No BGZF EOF marker, file may be truncated: " + f);
+      }
+
       final File indexFile;
       if (format == IndexFormat.BAM || format == IndexFormat.CRAM) {
         indexFile = new File(f.getParentFile(), f.getName() + BamIndexer.BAM_INDEX_EXTENSION);
