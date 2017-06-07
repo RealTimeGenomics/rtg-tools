@@ -37,9 +37,10 @@ import com.rtg.launcher.AbstractCliTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.io.IOUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+
+import htsjdk.samtools.util.BlockCompressedInputStream;
 
 /**
  * Test class
@@ -110,19 +111,21 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory("mendelianness")) {
       final File sdf = ReaderTestUtils.getDNADir(">chr21\nacgt", dir);
       final File file1 = FileHelper.resourceToFile("com/rtg/vcf/mendelian/resources/merge.vcf", new File(dir, "merge.vcf"));
-      final File inconsistent = new File(dir, "failed.vcf");
-      final File consistent = new File(dir, "nonfailed.vcf");
-      final MainResult res = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath(), "-Z", "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath());
+      final File inconsistent = new File(dir, "failed.vcf.gz");
+      final File consistent = new File(dir, "nonfailed.vcf.gz");
+      final MainResult res = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath(), "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath());
       assertEquals(0, res.rc());
       final String s = res.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
       //System.err.println(s);
       mNano.check("mendelian1", s);
-      final String s2 = TestUtils.sanitizeVcfHeader(IOUtils.readAll(inconsistent));
+      final String s2 = TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(inconsistent));
       //System.err.println(s2);
       mNano.check("mendelian2", s2);
-      final String s2b = TestUtils.sanitizeVcfHeader(IOUtils.readAll(consistent));
+      final String s2b = TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(consistent));
       //System.err.println(s2);
       mNano.check("mendelian2b", s2b);
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(inconsistent));
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(consistent));
 
       final MainResult res2 = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath());
       assertEquals(0, res2.rc());

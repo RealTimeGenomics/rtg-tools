@@ -40,6 +40,8 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
+import htsjdk.samtools.util.BlockCompressedInputStream;
+
 /**
  */
 public class VcfAnnotatorCliTest extends AbstractCliTest {
@@ -97,13 +99,14 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
     try (final TestDirectory dir = new TestDirectory()) {
       final File inVcf = new File(dir, "input.vcf");
       final File idVcf = new File(dir, "id.vcf");
-      final File outFile = new File(dir, "output.vcf");
+      final File outFile = new File(dir, "output.vcf.gz");
       FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small.vcf"), inVcf);
       FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small_ids_vcf.vcf"), idVcf);
-      final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
+      final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
       assertEquals("", str);
       assertTrue(outFile.isFile());
-      final String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(outFile));
+      final String actual = StringUtils.grep(FileHelper.gzFileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
       mNano.check("snpAnnotate_small_vcf_ids_exp.vcf", actual, false);
     }
   }
