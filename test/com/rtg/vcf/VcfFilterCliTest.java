@@ -51,6 +51,8 @@ import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.header.VcfHeader;
 
+import htsjdk.samtools.util.BlockCompressedInputStream;
+
 /**
  */
 public class VcfFilterCliTest extends AbstractCliTest {
@@ -254,14 +256,13 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final String snps = FileUtils.streamToString(stream);
         FileUtils.stringToFile(snps, in);
       }
-      final File out = new File(dir, "out.vcf");
-      final String[] args = {
-          "-i", in.getPath(), "-o", out.getPath(), "-Z",
-      };
-      final String output = checkMainInitOk(Utils.append(args, extraArgs));
+      final File out = new File(dir, "out.vcf.gz");
+      final String output = checkMainInitOk(Utils.append(extraArgs, "-i", in.getPath(), "-o", out.getPath()));
       mNano.check(expResourceLoc + ".txt", output, true);
 
-      final String o = StringUtils.grep(FileUtils.fileToString(out), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
+
+      final String o = StringUtils.grep(FileHelper.gzFileToString(out), "^[^#]").replaceAll("[\r|\n]+", "\n");
       mNano.check(expResourceLoc, o, true);
     }
   }

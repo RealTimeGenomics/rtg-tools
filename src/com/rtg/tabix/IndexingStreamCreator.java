@@ -115,14 +115,14 @@ public final class IndexingStreamCreator implements Closeable {
     if (mIndexerFactory == null) {
       throw new UnsupportedOperationException("This method is not for use with BAM writing");
     }
-    return createStreamsAndStartThreads(-1, true, false);
+    return createStreamsAndStartThreads(-1, true, true);
   }
 
   /**
    * Create the output stream
    * @param numberReferences the number of reference sequences (needed for BAM)
    * @param expectHeader true if BAM indexing should expect to see a header at the start of the file (may be false if doing indexing of chunks)
-   * @param terminateBlockGzip true if the output stream should contain a termination block (may be false if doing indexing of chunks)
+   * @param terminateBlockGzip true if the output stream should contain a termination block (may be false if doing indexing of chunks), ignored for BAM or uncompressed output
    * @return the output stream
    * @throws IOException if there is a problem
    */
@@ -146,7 +146,7 @@ public final class IndexingStreamCreator implements Closeable {
         mIndexThread = new Thread(mProxy);
         mIndexThread.start();
       } else {
-        mOutputStream = FileUtils.createOutputStream(mOutputFile, gzonly, false, true);
+        mOutputStream = FileUtils.createOutputStream(mOutputFile, gzonly, false, terminateBlockGzip);
       }
     }
     return mOutputStream;

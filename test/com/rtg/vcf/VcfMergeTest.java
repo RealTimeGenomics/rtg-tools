@@ -47,6 +47,8 @@ import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
 
+import htsjdk.samtools.util.BlockCompressedInputStream;
+
 /**
  * Test class
  */
@@ -229,6 +231,7 @@ public class VcfMergeTest extends AbstractCliTest {
         snpsA.toString(), snpsB.toString()));
       args.addAll(Arrays.asList(argsIn));
       final String out = checkMainInit(args.toArray(new String[args.size()])).out();
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(output));
       assertTrue(new File(dir, output.getName() + ".tbi").isFile());
       mNano.check("vcfmerge_out_" + id + ".vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(output)), false);
       mNano.check("vcfmerge_stats_" + id + ".txt", out);

@@ -38,6 +38,8 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
+import htsjdk.samtools.util.BlockCompressedInputStream;
+
 /**
  */
 public class VcfSubsetTest extends AbstractCliTest {
@@ -54,20 +56,22 @@ public class VcfSubsetTest extends AbstractCliTest {
   public void testKeepInfoACAN() throws Exception {
     try (TestDirectory td = new TestDirectory()) {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
-      final File out = new File(td, "out.vcf");
+      final File out = new File(td, "out.vcf.gz");
 
-      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-info", "AC", "--keep-info", "AN", "-Z");
-      mNano.check("vcfsubset-keepinfoACAN.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
+      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-info", "AC", "--keep-info", "AN");
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
+      mNano.check("vcfsubset-keepinfoACAN.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(out)));
     }
   }
 
   public void testKeepFilter() throws Exception {
     try (TestDirectory td = new TestDirectory()) {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
-      final File out = new File(td, "out.vcf");
+      final File out = new File(td, "out.vcf.gz");
 
-      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "YEA", "-Z");
-      mNano.check("vcfsubset-keepfilter.vcf", TestUtils.sanitizeVcfHeader(FileHelper.fileToString(out)));
+      checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "YEA");
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
+      mNano.check("vcfsubset-keepfilter.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(out)));
     }
   }
 
