@@ -169,14 +169,14 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final VcfRecord rec = VcfReader.vcfLineToRecord(var.replaceAll(" ", "\t"));
       baselineList.put(VariantTest.createVariant(rec, 0), rec.toString());
     }
-    try (final BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true, false)))) {
+    try (final BufferedWriter callOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(calls, true)))) {
       callOut.write(CALLS_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
       for (final Entry<Variant, String> var : callList.entrySet()) {
         callOut.write(var.getValue() + "\n");
       }
     }
     new TabixIndexer(calls).saveVcfIndex();
-    try (final BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseline, true, false)))) {
+    try (final BufferedWriter mutOut = new BufferedWriter(new OutputStreamWriter(FileUtils.createOutputStream(baseline, true)))) {
       mutOut.write(BASELINE_HEADER.replaceAll(" ", "\t") + StringUtils.LS);
       for (final Entry<Variant, String> var : baselineList.entrySet()) {
         mutOut.write(var.getValue() + "\n");

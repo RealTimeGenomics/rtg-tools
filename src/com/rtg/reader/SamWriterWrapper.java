@@ -125,7 +125,7 @@ public class SamWriterWrapper implements WriterWrapper {
     if (FileUtils.isStdio(baseOutput)) {
       os = FileUtils.getStdoutAsOutputStream();
     } else {
-      os = FileUtils.createOutputStream(baseFile.suffixedFile("", gzip && !bam), gzip && !bam);
+      os = FileUtils.createOutputStream(baseFile.suffixedFile("", gzip && !bam));
     }
 
     final SAMFileWriterFactory fact = new SAMFileWriterFactory();

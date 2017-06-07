@@ -88,7 +88,7 @@ public abstract class AbstractStatistics implements Statistics {
       }
       //write to summary file if we have an output directory
       if (mOutputDirectory != null && mOutputDirectory.isDirectory()) {
-        try (OutputStream summaryFile = FileUtils.createOutputStream(new File(mOutputDirectory, CommonFlags.SUMMARY_FILE), false)) {
+        try (OutputStream summaryFile = FileUtils.createOutputStream(new File(mOutputDirectory, CommonFlags.SUMMARY_FILE))) {
           summaryFile.write(stats.getBytes());
         }
       }

@@ -146,7 +146,7 @@ public final class IndexingStreamCreator implements Closeable {
         mIndexThread = new Thread(mProxy);
         mIndexThread.start();
       } else {
-        mOutputStream = FileUtils.createOutputStream(mOutputFile, gzonly, false, terminateBlockGzip);
+        mOutputStream = FileUtils.createOutputStream(mOutputFile, gzonly, terminateBlockGzip);
       }
     }
     return mOutputStream;

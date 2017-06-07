@@ -164,7 +164,7 @@ public final class BamIndexer {
   }
 
   private static void saveBamIndex(SequenceIndexContainer bic, File bamIndex) throws IOException {
-    try (OutputStream indexOut = FileUtils.createOutputStream(bamIndex, false, false)) {
+    try (OutputStream indexOut = FileUtils.createOutputStream(bamIndex)) {
       writeIndex(bic, indexOut);
     }
   }

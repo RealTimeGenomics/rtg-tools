@@ -377,13 +377,12 @@ public final class FileUtils {
    * @exception IOException if an error occurs.
    */
   public static OutputStream createOutputStream(File file) throws IOException {
-    return createOutputStream(file, FileUtils.isGzipFilename(file), false);
+    return createOutputStream(file, FileUtils.isGzipFilename(file));
   }
 
   /**
-   * Creates an output stream for a file, wrapping in a
-   * <code>BufferedOutputStream</code> stream and optionally a
-   * <code>GZIPOutputStream</code>.
+   * Creates an output stream for a file, where auto-detection of whether to compress based on file name is not
+   * sufficient.
    *
    * @param file the output <code>File</code>. If this is '-', stdout will be used as the destination.
    * @param zip if true, the output will be gzip compressed.
@@ -401,29 +400,13 @@ public final class FileUtils {
    *
    * @param file the output <code>File</code>. If this is '-', stdout will be used as the destination.
    * @param zip if true, the output will be gzip compressed.
-   * @param append if true, the output will be appended to the file.
-   * @return an <code>OutputStream</code> value
-   * @exception IOException if an error occurs.
-   */
-  public static OutputStream createOutputStream(File file, boolean zip, boolean append) throws IOException {
-    return createOutputStream(file, zip, append, false);
-  }
-
-  /**
-   * Creates an output stream for a file, wrapping in a
-   * <code>BufferedOutputStream</code> OutputStream and optionally a
-   * <code>GZIPOutputStream</code>.
-   *
-   * @param file the output <code>File</code>. If this is '-', stdout will be used as the destination.
-   * @param zip if true, the output will be gzip compressed.
-   * @param append if true, the output will be appended to the file.
    * @param terminate if true (and block compressed), terminate the file
    * @return an <code>OutputStream</code> value
    * @exception IOException if an error occurs.
    */
-  public static OutputStream createOutputStream(File file, boolean zip, boolean append, boolean terminate) throws IOException {
-    Diagnostic.developerLog("FileUtils.outputStream " + file.getAbsolutePath() + " " + zip + " " + append);
-    OutputStream outStream = isStdio(file) ? getStdoutAsOutputStream() : new FileOutputStream(file, append);
+  public static OutputStream createOutputStream(File file, boolean zip, boolean terminate) throws IOException {
+    Diagnostic.developerLog("FileUtils.outputStream " + file.getAbsolutePath() + " " + zip);
+    OutputStream outStream = isStdio(file) ? getStdoutAsOutputStream() : new FileOutputStream(file);
     outStream = new BufferedOutputStreamFix(outStream, BUFFERED_STREAM_SIZE);
     if (zip) {
       outStream = new GzipAsynchOutputStream(outStream, terminate);

@@ -61,10 +61,10 @@ public final class GzipAsynchOutputStream extends AsynchOutputStream {
       throw new IllegalArgumentException("File cannot be null");
     }
     if (!BGZIP) {
-      return new BufferedOutputStreamFix(new AdjustableGZIPOutputStream(FileUtils.createOutputStream(file, false, false), gzipSize, DEFAULT_GZIP_LEVEL));
+      return new BufferedOutputStreamFix(new AdjustableGZIPOutputStream(FileUtils.createOutputStream(file, false), gzipSize, DEFAULT_GZIP_LEVEL));
     } else {
     // Use BlockCompressedOutputStream so that the file is tabix compatible.
-      return new BufferedOutputStreamFix(new BlockCompressedOutputStream(FileUtils.createOutputStream(file, false, false), null, DEFAULT_GZIP_LEVEL, false));
+      return new BufferedOutputStreamFix(new BlockCompressedOutputStream(FileUtils.createOutputStream(file, false), null, DEFAULT_GZIP_LEVEL, false));
     }
   }
 

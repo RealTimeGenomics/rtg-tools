@@ -218,7 +218,7 @@ public final class FileHelper {
     if (content == null) {
       throw new NullPointerException("null string given");
     }
-    try (OutputStream out = FileUtils.createOutputStream(file, true, false, true)) {
+    try (OutputStream out = FileUtils.createOutputStream(file, true, true)) {
       out.write(content.getBytes());
     }
     return file;

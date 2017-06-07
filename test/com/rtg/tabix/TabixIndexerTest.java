@@ -219,7 +219,7 @@ public class TabixIndexerTest extends TestCase {
     final File f = FileUtils.createTempDir("temp", "tabixindextest");
     try {
       final File file = new File(f, "regions.bed.gz");
-      final OutputStream o = FileUtils.createOutputStream(file, true, false, true);
+      final OutputStream o = FileUtils.createOutputStream(file, true, true);
       o.close();
       new TabixIndexer(file, new File(file.getParent(), file.getName() + TabixIndexer.TABIX_EXTENSION)).saveBedIndex();
     } finally {

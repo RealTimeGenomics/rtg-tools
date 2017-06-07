@@ -169,8 +169,8 @@ public final class Sdf2Quala extends AbstractCli {
       final String qualFileName = basename + QUALA_EXT;
       final File sequenceOutputFile = gzip ? new File(seqFileName + FileUtils.GZ_SUFFIX) : new File(seqFileName);
       final File qualityOutputFile = gzip ? new File(qualFileName + FileUtils.GZ_SUFFIX) : new File(qualFileName);
-      try (LineWriter seqWriter = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(sequenceOutputFile, gzip, false)))) {
-        try (LineWriter qualWriter = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(qualityOutputFile, gzip, false)))) {
+      try (LineWriter seqWriter = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(sequenceOutputFile)))) {
+        try (LineWriter qualWriter = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(qualityOutputFile)))) {
           process(read, seqWriter, qualWriter, rename, def);
         }
       }

@@ -199,7 +199,7 @@ CommonFlags.initNoGzip(mFlags);
     try (VcfWriter outputVcf = outputVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, outputVcfFile, null, gzip, index)) : null) {
       try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, inconsistentVcfFile, null, gzip, index)) : null) {
         try (VcfWriter consistentVcf = consistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header, consistentVcfFile, null, gzip, index)) : null) {
-          try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile, gzip, false)) : null) {
+          try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile)) : null) {
             while (vr.hasNext()) {
               final VcfRecord rec = vr.next();
               if (passOnly && rec.isFiltered()) {

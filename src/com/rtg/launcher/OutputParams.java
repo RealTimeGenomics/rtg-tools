@@ -85,7 +85,7 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
     if (!directory().exists() && !directory().mkdirs()) {
       throw new IOException("Unable to create directory \"" + directory().getPath() + "\"");
     }
-    return FileUtils.createOutputStream(outFile(name), mZip, false, true);
+    return FileUtils.createOutputStream(outFile(name), mZip, true);
   }
 
 

@@ -237,7 +237,7 @@ public class RocContainer {
       final RocFilter filter = entry.getKey();
       final SortedMap<Double, RocPoint> points = entry.getValue();
       final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, mFilePrefix + filter.fileName()));
-      try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile, zip)))) {
+      try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile)))) {
         final RocPoint cumulative = new RocPoint();
         String prevScore = null;
         final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
@@ -260,7 +260,7 @@ public class RocContainer {
         }
       }
       if (slope) {
-        produceSlopeFile(rocFile, zip);
+        produceSlopeFile(rocFile);
       }
     }
   }
@@ -310,11 +310,11 @@ public class RocContainer {
     os.newLine();
   }
 
-  private void produceSlopeFile(File input, boolean zip) throws IOException {
+  private void produceSlopeFile(File input) throws IOException {
     if (input.exists() && input.length() > 0) {
       final File output = new File(input.getParentFile(), input.getName().replaceAll(RocFilter.ROC_EXT, SLOPE_EXT));
-      try (final PrintStream printOut = new PrintStream(FileUtils.createOutputStream(output, zip));
-           final InputStream in = zip ? FileUtils.createGzipInputStream(input, false) : FileUtils.createFileInputStream(input, false)) {
+      try (final PrintStream printOut = new PrintStream(FileUtils.createOutputStream(output));
+           final InputStream in = FileUtils.createInputStream(input, false)) {
         RocSlope.writeSlope(in, printOut);
       }
     }
@@ -359,7 +359,7 @@ public class RocContainer {
       summary = "0 total baseline variants, no summary statistics available" + StringUtils.LS;
     }
     Diagnostic.info(summary);
-    try (OutputStream os = FileUtils.createOutputStream(summaryFile, false)) {
+    try (OutputStream os = FileUtils.createOutputStream(summaryFile)) {
       os.write(summary.getBytes());
     }
   }
