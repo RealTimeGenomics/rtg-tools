@@ -390,7 +390,7 @@ public final class FileUtils {
    * @exception IOException if an error occurs.
    */
   public static OutputStream createOutputStream(File file, boolean zip) throws IOException {
-    return createOutputStream(file, zip, false);
+    return createOutputStream(file, zip, true);
   }
 
   /**
