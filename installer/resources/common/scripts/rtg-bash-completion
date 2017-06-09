@@ -8,6 +8,19 @@
 # To enable permanently, put that command into your $HOME/.bashrc
 #
 
+
+# NOTE: Some distro bash-completion systems install a _minimal
+# completion function that is hooked up dynamically when you try
+# completing a command that has no completion function defined yet. On
+# these systems, if you've already accidentally attempted to
+# tab-complete rtg *before* sourcing this file, it can block us from
+# working now. It's easiest to just start a new shell with this file
+# sourced before you do any tab completion.
+if complete | grep "rtg$" | grep -q -v _complete_rtg; then
+    echo "WARNING: It looks like some other form of completion has been registered for rtg commands in this shell. It may be best to start a new shell to avoid unpredictable behaviour."
+fi
+
+
 # Main bash completion function
 function _complete_rtg() {
     local rtg=$1
