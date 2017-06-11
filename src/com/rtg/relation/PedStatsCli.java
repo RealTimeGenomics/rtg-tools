@@ -78,11 +78,10 @@ public class PedStatsCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Output information from pedigree files of various formats. For quick pedigree visualization using graphviz, try:\n\n"
-        + "  dot -Tpng <(rtg pedstats --dot \"A Title\" PEDFILE) | display -\n"
-        + "\nor for a larger pedigree:\n\n"
-        + "  dot -Tpdf -o mypedigree.pdf <(rtg pedstats --dot \"A Title\" PEDFILE)\n"
+      + "  dot -Tpng <(rtg pedstats --dot \"A Title\" PEDFILE) | display -\n"
+      + "\nor for a larger pedigree:\n\n"
+      + "  dot -Tpdf -o mypedigree.pdf <(rtg pedstats --dot \"A Title\" PEDFILE)\n"
     );
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired(File.class, CommonFlags.FILE, "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);

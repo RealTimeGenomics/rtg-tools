@@ -78,7 +78,6 @@ public final class SdfSplitter extends LoggedCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Splits SDF data into multiple equal segments.");
     CommonFlagCategories.setCategories(mFlags);
     final Flag<File> inFlag = mFlags.registerRequired(File.class, CommonFlags.SDF, "input SDF");

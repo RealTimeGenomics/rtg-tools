@@ -70,7 +70,6 @@ public class BgZip extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Compress a file with block gzip.");
     CommonFlagCategories.setCategories(mFlags);
 

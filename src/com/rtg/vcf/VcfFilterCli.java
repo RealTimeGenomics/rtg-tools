@@ -149,7 +149,6 @@ public final class VcfFilterCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered.");
     CommonFlagCategories.setCategories(mFlags);
 

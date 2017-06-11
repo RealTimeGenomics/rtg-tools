@@ -104,7 +104,6 @@ public class VcfSubset extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Removes columnar data from VCF records.");
     CommonFlagCategories.setCategories(mFlags);
 

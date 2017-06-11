@@ -95,7 +95,6 @@ public final class FastqTrim extends AbstractCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription(StringUtils.sentencify(description()));
-    mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', CommonFlags.INPUT_FLAG, File.class, CommonFlags.FILE, "input FASTQ file, Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.FILE, "output filename. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);

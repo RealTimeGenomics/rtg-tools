@@ -144,7 +144,6 @@ public final class FormatCli extends LoggedCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts the contents of sequence data files (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format.");
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.SDF, "name of output SDF").setCategory(INPUT_OUTPUT);

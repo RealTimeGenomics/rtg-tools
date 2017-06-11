@@ -77,7 +77,6 @@ public final class Sdf2Fastq extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts SDF data into FASTQ file(s).");
     CommonFlagCategories.setCategories(mFlags);
 

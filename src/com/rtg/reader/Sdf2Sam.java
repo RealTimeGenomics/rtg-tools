@@ -72,7 +72,6 @@ public final class Sdf2Sam extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts SDF data into SAM/BAM.");
     CommonFlagCategories.setCategories(mFlags);
 

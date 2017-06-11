@@ -72,7 +72,6 @@ public class SampleReplayerCli extends LoggedCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription("Generates the genome corresponding to a sample genotype.");
-    mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for output SDF").setCategory(CommonFlagCategories.INPUT_OUTPUT);

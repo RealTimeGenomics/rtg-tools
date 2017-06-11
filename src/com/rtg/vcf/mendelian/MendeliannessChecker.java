@@ -96,7 +96,6 @@ public final class MendeliannessChecker extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Check a multi-sample VCF for Mendelian consistency.");
     mFlags.registerRequired('i', INPUT_FLAG, File.class, CommonFlags.FILE, "VCF file containing multi-sample variant calls or '-' to read from standard input").setCategory(CommonFlagCategories.INPUT_OUTPUT);
@@ -113,7 +112,7 @@ public final class MendeliannessChecker extends AbstractCli {
     mFlags.registerOptional(SEGREGATION_PROBABILITY_FLAG, "add segregation probability based on pedigree (only if exactly one family is present)").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     mFlags.registerOptional('l', ALLOW_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     CommonFlags.initIndexFlags(mFlags);
-CommonFlags.initNoGzip(mFlags);
+    CommonFlags.initNoGzip(mFlags);
     mFlags.registerOptional(PEDIGREE_FLAG, File.class, CommonFlags.FILE, "genome relationships PED file (Default is to extract pedigree information from VCF header fields)").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
   }
 

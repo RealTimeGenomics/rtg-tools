@@ -103,7 +103,6 @@ public final class VcfAnnotatorCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Adds annotations to a VCF file, either to the VCF ID field, or as a VCF INFO sub-field.");
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to annotate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);

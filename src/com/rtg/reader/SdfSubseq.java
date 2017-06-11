@@ -114,12 +114,11 @@ public final class SdfSubseq extends AbstractCli {
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Prints a subsequence of a given sequence in an SDF.");
     mFlags.registerRequired('i', INPUT_FLAG, File.class, CommonFlags.SDF, "input SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired(String.class, CommonFlags.STRING, "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length")
-    .setCategory(FILTERING)
-    .setMaxCount(Integer.MAX_VALUE);
+      .setCategory(FILTERING)
+      .setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional('r', REVERSE_FLAG, "if set, output in reverse complement").setCategory(UTILITY);
     mFlags.registerOptional('f', FASTA_FLAG, "if set, output in FASTA format").setCategory(UTILITY);
     mFlags.registerOptional('q', FASTQ_FLAG, "if set, output in FASTQ format").setCategory(UTILITY);

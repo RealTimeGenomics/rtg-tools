@@ -69,7 +69,6 @@ public final class Sdf2Cg extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts SDF formatted data into Complete Genomics TSV file(s).");
     CommonFlagCategories.setCategories(mFlags);
 

@@ -88,7 +88,6 @@ public class ChildSampleSimulatorCli extends AbstractCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription("Generates a VCF containing a genotype simulated as a child of two parents.");
-    mFlags.registerExtendedHelp();
     CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);

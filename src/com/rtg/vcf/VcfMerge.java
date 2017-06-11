@@ -100,7 +100,6 @@ public class VcfMerge extends AbstractCli {
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Merge a set of VCF files.");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('a', ADD_HEADER_FLAG, String.class, STRING, "add the supplied text to the output VCF header")

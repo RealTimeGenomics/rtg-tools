@@ -86,7 +86,6 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
    */
   public void initFlags(CFlags flags) {
     flags.setDescription("Generates a VCF containing simulated population variants.");
-    flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);

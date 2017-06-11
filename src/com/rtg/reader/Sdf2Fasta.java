@@ -81,7 +81,6 @@ public class Sdf2Fasta extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts SDF data into FASTA file(s).");
     CommonFlagCategories.setCategories(mFlags);
 

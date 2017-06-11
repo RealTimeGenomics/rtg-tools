@@ -89,7 +89,6 @@ public final class Sdf2Quala extends AbstractCli {
   }
 
   static void initFlags(final CFlags flags) {
-    flags.registerExtendedHelp();
     flags.setDescription("Converts SDF data into FASTA/QUALA files.");
     CommonFlagCategories.setCategories(flags);
     CommonFlags.initNoGzip(flags);

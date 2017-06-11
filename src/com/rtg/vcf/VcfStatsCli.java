@@ -74,7 +74,6 @@ public class VcfStatsCli extends AbstractCli {
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Display statistics from a set of VCF files.");
     mFlags.registerOptional("Xvariant", "calculate statistics via Variant API rather than VcfRecord API").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(SAMPLE, String.class, CommonFlags.STRING, "only calculate statistics for the specified sample (Default is to include all samples)")

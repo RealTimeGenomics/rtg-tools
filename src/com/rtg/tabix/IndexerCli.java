@@ -110,7 +110,6 @@ public class IndexerCli extends AbstractCli {
   }
 
   private static void initFlags(CFlags flags) {
-    flags.registerExtendedHelp();
     flags.setDescription("Creates index files for block compressed TAB-delimited genome position files.");
     CommonFlagCategories.setCategories(flags);
     flags.setValidator(new IndexerValidator());

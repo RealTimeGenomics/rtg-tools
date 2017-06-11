@@ -149,7 +149,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Evaluates called variants for genotype agreement with a baseline variant set irrespective of representational differences. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called variants not matched in the baseline), false negatives (baseline variants not matched in the call set), and true positives (variants that match between the baseline and calls).");
     CommonFlags.initOutputDirFlag(mFlags);
     mFlags.registerRequired('b', BASELINE, File.class, CommonFlags.FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);

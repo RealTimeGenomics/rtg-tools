@@ -81,7 +81,6 @@ public final class Cg2Sdf extends LoggedCli {
 
   @Override
   protected void initFlags() {
-    mFlags.registerExtendedHelp();
     mFlags.setDescription("Converts Complete Genomics sequencing system reads to RTG SDF format.");
     CommonFlagCategories.setCategories(mFlags);
 

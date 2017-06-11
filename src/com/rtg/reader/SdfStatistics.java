@@ -111,7 +111,6 @@ public final class SdfStatistics extends AbstractCli {
    * @param flags flags object to initialise
    */
   public void initFlags(final CFlags flags) {
-    flags.registerExtendedHelp();
     flags.setDescription("Print statistics that describe a directory of SDF formatted data.");
     CommonFlagCategories.setCategories(flags);
 

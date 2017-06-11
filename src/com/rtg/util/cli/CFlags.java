@@ -232,16 +232,9 @@ public final class CFlags {
     mLongNames = new TreeMap<>();
     mShortNames = new TreeMap<>();
     registerOptional('h', HELP_FLAG, "print help on command-line flag usage");
+    registerOptional(EXTENDED_HELP_FLAG, "print help on extended command-line flag usage");
     registerOptional(EXPERIMENTAL_HELP_FLAG, "");
     setName(programName);
-  }
-
-  /** Registers the <code>--Xhelp</code> flag */
-  public void registerExtendedHelp() {
-    final Switch f = registerOptional(EXTENDED_HELP_FLAG, "print help on extended command-line flag usage");
-    if (mHelpCategory != null) {
-      f.setCategory(mHelpCategory);
-    }
   }
 
   /** Creates a new <code>CFlags</code> instance. */

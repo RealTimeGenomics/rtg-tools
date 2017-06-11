@@ -209,7 +209,7 @@ public class CFlagsTest extends TestCase {
     // getOptional and getRequired
     final Collection<Flag<?>> optional = mFlags.getOptional();
     assertNotNull(optional);
-    assertTrue(4 == optional.size()); // always has help / XXhelp
+    assertEquals(5, optional.size()); // always has help / Xhelp / XXhelp
     assertFalse(optional.contains(mFlags.getFlag("boolean")));
     assertTrue(optional.contains(mFlags.getFlag("help"))); // always has help
     assertTrue(optional.contains(mFlags.getFlag("long")));
@@ -683,7 +683,6 @@ public class CFlagsTest extends TestCase {
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
     final PrintStream err = new PrintStream(bos);
     final CFlags f = new CFlags("", err, null);
-    f.registerExtendedHelp();
     f.registerOptional("Xoptional", "Test of --X options");
     f.setFlags("-h");
     err.flush();

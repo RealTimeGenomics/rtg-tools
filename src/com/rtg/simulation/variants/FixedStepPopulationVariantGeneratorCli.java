@@ -81,7 +81,6 @@ public class FixedStepPopulationVariantGeneratorCli extends AbstractCli {
    * @param flags the flags to set up
    */
   public void initFlags(CFlags flags) {
-    flags.registerExtendedHelp();
     CommonFlagCategories.setCategories(flags);
     flags.registerRequired('i', REFERENCE_SDF, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
     flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "name for population output VCF").setCategory(INPUT_OUTPUT);

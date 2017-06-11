@@ -147,7 +147,6 @@ public class GenerateReferenceManifest extends AbstractCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription("Creates a manifest that allows a reference.txt to be auto-installed during format. The reference configuration file should already exist in the references resource directory");
-    mFlags.registerExtendedHelp();
     CommonFlags.initForce(mFlags);
     mFlags.registerRequired('t', TEMPLATE_FLAG, File.class, SDF, "reference SDF to generate manifest for").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('r', REFERENCE_ID_FLAG, String.class, STRING, "short identifier of reference").setCategory(CommonFlagCategories.INPUT_OUTPUT);
