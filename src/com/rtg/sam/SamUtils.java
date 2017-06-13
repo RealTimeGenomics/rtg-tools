@@ -622,6 +622,19 @@ public final class SamUtils {
     return sam.getIntegerAttribute(ATTRIBUTE_IH);
   }
 
+  /**
+   * Use MAPQ and IH/NH attributes to determine if the read was uniquely mapped.
+   * @param record the sam record
+   * @return true if the record was uniquely mapped
+   */
+  public static boolean uniquelyMapped(SAMRecord record) {
+    assert !record.getReadUnmappedFlag();
+    if (record.getMappingQuality() == 0 || record.getNotPrimaryAlignmentFlag()) {
+      return false;
+    }
+    final Integer nh = SamUtils.getNHOrIH(record);
+    return (nh == null) || nh == 1;
+  }
 
   /**
    * @param header combined sam header
