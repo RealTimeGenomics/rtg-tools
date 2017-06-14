@@ -51,7 +51,9 @@ public abstract class AbstractVcfFilter implements VcfFilter {
   @Override
   public boolean accept(VcfRecord record) {
     if (!acceptCondition(record)) {
-      mStatistics.increment(mStat);
+      if (mStatistics != null) {
+        mStatistics.increment(mStat);
+      }
       return false;
     }
     return true;

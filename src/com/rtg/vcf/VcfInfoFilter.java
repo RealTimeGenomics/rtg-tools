@@ -49,18 +49,33 @@ public abstract class VcfInfoFilter extends AbstractVcfFilter {
     private final String mField;
     private final int mMin;
     private final int mMax;
-    MinMaxIntFilter(VcfFilterStatistics stats, Stat stat, int min, int max, String field) {
+
+    /**
+     * Create an filter on integer INFO field values.
+     * The value must be missing or within range to be accepted.
+     * @param stats collects statistics on number of items filtered. May be null.
+     * @param stat the statistic indicator.
+     * @param min the minimum value that will be accepted
+     * @param max the maximum value that will be accepted
+     * @param field the INFO field name
+     */
+    public MinMaxIntFilter(VcfFilterStatistics stats, Stat stat, int min, int max, String field) {
       super(stats, stat);
       mMin = min;
       mMax = max;
       mField = field;
     }
+
     @Override
     boolean acceptCondition(VcfRecord record) {
       final ArrayList<String> values = record.getInfo().get(mField);
       if (values != null && values.size() == 1) {
-        final Integer value = Integer.valueOf(values.get(0));
-        return !(value < mMin || value > mMax);
+        try {
+          final Integer value = Integer.valueOf(values.get(0));
+          return !(value < mMin || value > mMax);
+        } catch (NumberFormatException e) {
+          throw new VcfFormatException("Expected numeric value in INFO " + mField + " at record: " + record);
+        }
       }
       return true;
     }
