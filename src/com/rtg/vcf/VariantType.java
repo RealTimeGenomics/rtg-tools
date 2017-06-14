@@ -107,17 +107,14 @@ public enum VariantType {
    */
   public static VariantType getSymbolicAlleleType(String allele) {
     if (allele.length() > 0) {
-      if (allele.charAt(0) == '<') {
+      final char first = allele.charAt(0);
+      final char last = allele.charAt(allele.length() - 1);
+      if (first == '<' || last == '>') { // Includes "C<ctg1>"
         return VariantType.SV_SYMBOLIC;
-      } else if (allele.charAt(0) == VcfUtils.ALT_SPANNING_DELETION && allele.length() == 1) {
+      } else if (first == VcfUtils.ALT_SPANNING_DELETION && allele.length() == 1) {
         return VariantType.SV_MISSING;
-      } else {
-        for (int i = 0; i < allele.length(); ++i) {
-          final char c = allele.charAt(i);
-          if ((c == '[') || (c == ']')) {
-            return VariantType.SV_BREAKEND;
-          }
-        }
+      } else if ((first == '[') || (first == ']') || (last == '[') || (last == ']')) {
+        return VariantType.SV_BREAKEND;
       }
     }
     return null;
