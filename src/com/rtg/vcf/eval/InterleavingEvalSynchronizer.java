@@ -79,8 +79,14 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
   }
 
   static VcfWriter makeVcfWriter(VcfHeader h, File output, boolean zip) throws IOException {
+    return makeVcfWriter(h, output, zip, true);
+  }
+
+  static VcfWriter makeVcfWriter(VcfHeader h, File output, boolean zip, boolean addRunInfo) throws IOException {
     final VcfHeader h2 = h.copy();
-    h2.addRunInfo();
+    if (addRunInfo) {
+      h2.addRunInfo();
+    }
     return new AsyncVcfWriter(new DefaultVcfWriter(h2, output, null, zip, true));
   }
 
