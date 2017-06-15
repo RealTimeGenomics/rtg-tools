@@ -1,0 +1,31 @@
+##fileformat=VCFv4.1
+##fileDate=[...]
+##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=Uncertain,Description="Uncertain genotype due to reason in filter INFO field">
+##INFO=<ID=BS,Number=.,Type=Integer,Description="Benchmarking superlocus ID for these variants">
+##INFO=<ID=CALL_WEIGHT,Number=1,Type=Float,Description="Call weight (equivalent number of truth variants). When unspecified, assume 1.0">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=BD,Number=1,Type=String,Description="Decision for call (TP/FP/FN/N)">
+##FORMAT=<ID=BK,Number=1,Type=String,Description="Sub-type for decision (match/mismatch type)">
+##FORMAT=<ID=BI,Number=1,Type=String,Description="Additional comparison information">
+##FORMAT=<ID=QQ,Number=1,Type=Float,Description="Variant quality for ROC creation">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	TRUTH	QUERY
+18-1	11	.	AT	A	.	.	BS=315510	GT:BD:BK:QQ	0|1:TP:gm	0/1:TP:gm:2958.0
+18-1	12	.	T	A	.	.	BS=315510	GT:QQ:BD:BK	.	0/1:5.0:FP:lm
+18-2	2	.	G	A	.	.	BS=513095	GT:BD:BK:QQ	1|1:TP:gm	1/1:TP:gm:4589.0
+18-2	11	.	GAGAGGGA	G	.	.	BS=513105	GT:QQ:BD:BK	.	0/1:2791.0:FP:lm
+18-2	17	.	GA	G	.	.	BS=513105	GT:BD:BK:QQ	1|0:TP:gm	0/1:TP:gm:3296.0
+18-3	0	.	CA	C	.	.	BS=560144	GT:BD:BK:QQ	1|0:TP:gm	0/1:TP:gm:3513.0
+18-3	10	.	A	T	.	.	BS=560153	GT:BD:BK:QQ	0|1:TP:gm	0/1:TP:gm:8520.0
+18-3	11	.	A	T	.	.	BS=560153	GT:BD:BK:QQ	1|0:TP:gm	0/1:TP:gm:6658.0
+18-3	11	.	AA	A	.	.	BS=560155	GT:QQ:BD:BK	.	0/1:3544.0:FP:lm
+18-4	11	.	T	TTAAAAA	.	.	BS=675821	GT:BD:BK	1|0:FN:lm	.
+18-4	12	.	TTTTG	T	.	.	BS=675822	GT:QQ:BD:BK	.	0/1:9209.0:FP:lm
+18-4	13	.	T	A	.	.	BS=675822	GT:BD:BK	1|0:FN:lm	.
+18-4	15	.	T	A	.	.	BS=675824	GT:BD:BK	1|0:FN:lm	.
+18-4	16	.	G	GAAAAAA	.	.	BS=675824	GT:QQ:BD:BK	.	0/1:9740.0:FP:lm
+18-5	11	.	T	TTAC	.	.	BS=2989618	GT:BD:BK	1|1:FN:lm	.
+18-5	12	.	T	TAC	.	.	BS=2989619	GT:QQ:BD:BK	.	1/1:23997.0:FP:lm
+18-5	13	.	T	TA	.	.	BS=2989620	GT:QQ:BD:BK	.	1/1:24599.0:FP
+18-6	11	.	G	C	.	.	BS=11750	GT:BD:BK	1|0:FN	.
+18-6	41	.	G	A	.	.	BS=11780	GT:QQ:BD:BK	.	0/1:1823.0:FP
