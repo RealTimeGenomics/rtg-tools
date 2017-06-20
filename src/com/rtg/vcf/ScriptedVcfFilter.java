@@ -47,7 +47,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.VcfHeader;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-import jdk.nashorn.internal.runtime.Undefined;
 
 /**
  * Filter than runs supplied Javascript to determine if record should be accepted
@@ -127,7 +126,7 @@ public class ScriptedVcfFilter implements VcfFilter {
     }
     try {
       final Object o = mRecordFunction.call(null);
-      if (o instanceof Undefined) {
+      if (ScriptObjectMirror.isUndefined(o)) {
         return true;
       }
       if (!(o instanceof Boolean)) {
