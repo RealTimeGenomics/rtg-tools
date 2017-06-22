@@ -205,6 +205,7 @@ public class RocPlot {
     mFileChooser.setFileFilter(new RocFileFilter());
     mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
+    mZoomPP.setTextAntialiasing(true);
     mProgressBar = new JProgressBar(-1, -1);
     mProgressBar.setVisible(true);
     mProgressBar.setStringPainted(true);
