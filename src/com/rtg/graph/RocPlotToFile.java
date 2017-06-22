@@ -73,6 +73,7 @@ public final class RocPlotToFile {
     }
     final GraphicsRenderer gr = new GraphicsRenderer();
     gr.setColors(RocPlot.PALETTE);
+    gr.setTextAntialiasing(true);
     final ImageWriter iw = new ImageWriter(gr);
 
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
