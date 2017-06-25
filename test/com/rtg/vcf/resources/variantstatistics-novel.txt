@@ -1,7 +1,7 @@
 Identified Variants          : novel only
 Failed Filters               : 0
-Passed Filters               : 5
-Complex Called               : 4
+Passed Filters               : 6
+Complex Called               : 5
 
 Sample Name: EM0231
 SNPs                         : 2
@@ -10,6 +10,7 @@ Insertions                   : 0
 Deletions                    : 3
 Indels                       : 0
 Same as reference            : 0
+Polyploid Genotypes          : 1
 SNP Transitions/Transversions: 2.00 (2/1)
 Total Het/Hom ratio          : 0.25 (1/4)
 SNP Het/Hom ratio            : 1.00 (1/1)
@@ -27,6 +28,7 @@ Insertions                   : 0
 Deletions                    : 4
 Indels                       : 0
 Same as reference            : 1
+Partial Genotype             : 1
 Somatic Genotypes            : 1
 De Novo Genotypes            : 1
 SNP Transitions/Transversions: - (0/0)

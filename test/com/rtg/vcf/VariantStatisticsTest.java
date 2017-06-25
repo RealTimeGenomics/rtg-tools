@@ -33,41 +33,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 
-import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.header.VcfHeader;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class VariantStatisticsTest extends TestCase {
-
-  private NanoRegression mNano = null;
-
-  @Override
-  public void setUp() {
-    mNano = new NanoRegression(this.getClass(), false);
-    Diagnostic.setLogStream();
-    GlobalFlags.resetAccessedStatus();
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    GlobalFlags.resetAccessedStatus();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class VariantStatisticsTest extends AbstractNanoTest {
 
   public void testGetRatio() {
     assertEquals("- (1/0)", VariantStatistics.divide(1L, 0L));
@@ -387,11 +364,11 @@ public class VariantStatisticsTest extends TestCase {
       + "chr1\t92998003\t.\tCT\tCC,C\t5.1\tPASS\tLOH=-1.0;RSS=0.2;DP=26;XRX\tGT:DP:RE:GQ\t1/1:10:1.217:11.9\t2/1:16:1.343:4.9\n"
       + "chr1\t181263907\t.\tTTCCT\tTTC,TTCCC\t5.3\tPASS\tLOH=-1.0;RSS=0.1;DP=66;XRX\tGT:DP:RE:GQ:SS\t1/1:26:3.559:15.8\t1/2:40:4.499:3.6:2\n"
       + "chr1\t240295482\t.\tTC\tT,TT\t31.8\tPASS\tLOH=-1.0;RSS=2.9;DP=67;XRX\tGT:DP:RE:GQ\t1/1:30:2.627:29.4\t1/2:37:5.703:30.5\n"
+      + "chr1\t240295492\t.\tTC\tT,TT\t31.8\tPASS\tLOH=-1.0;RSS=2.9;DP=67;XRX\tGT:DP:RE:GQ\t1/1/2:30:2.627:29.4\t./2:37:5.703:30.5\n"
       + "chr1\t240430567\t.\tAT\tA,AA\t10.6\tPASS\tLOH=-1.0;RSS=1.0;DP=88;XRX\tGT:DP:RE:GQ:DN\t1/1:38:2.961:14.8\t1/2:50:4.304:11.3:Y\n";
 
 
   public void testBasic() throws IOException {
-    Diagnostic.setLogStream();
     final File vcfFile = FileHelper.createTempFile();
     try {
       FileUtils.stringToFile(VCF, vcfFile);
@@ -421,7 +398,6 @@ public class VariantStatisticsTest extends TestCase {
   }
 
   public void testBasicLengthHistogram() throws IOException {
-    Diagnostic.setLogStream();
     final File vcfFile = FileHelper.createTempFile();
     try {
       FileUtils.stringToFile(VCF, vcfFile);
