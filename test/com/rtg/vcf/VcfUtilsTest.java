@@ -88,28 +88,38 @@ public class VcfUtilsTest extends TestCase {
     }
   }
 
+  public void checkIsNonVariantGt(String gt, boolean expect) {
+    assertEquals(expect, VcfUtils.isNonVariantGt(gt));
+    assertEquals(VcfUtils.isNonVariantGt(gt), VcfUtils.isNonVariantGt(VcfUtils.splitGt(gt)));
+  }
+
   public void testIsNonVariantGt() {
-    assertFalse(VcfUtils.isNonVariantGt("1"));
-    assertFalse(VcfUtils.isNonVariantGt("0/1"));
-    assertFalse(VcfUtils.isNonVariantGt("0|1"));
-    assertFalse(VcfUtils.isNonVariantGt("./1"));
-    assertTrue(VcfUtils.isNonVariantGt("."));
-    assertTrue(VcfUtils.isNonVariantGt("./."));
-    assertTrue(VcfUtils.isNonVariantGt("./0"));
-    assertTrue(VcfUtils.isNonVariantGt("0"));
-    assertTrue(VcfUtils.isNonVariantGt("0|0|0"));
+    checkIsNonVariantGt("1", false);
+    checkIsNonVariantGt("0/1", false);
+    checkIsNonVariantGt("0|1", false);
+    checkIsNonVariantGt("./1", false);
+    checkIsNonVariantGt(".", true);
+    checkIsNonVariantGt("./.", true);
+    checkIsNonVariantGt("./0", true);
+    checkIsNonVariantGt("0", true);
+    checkIsNonVariantGt("0|0|0", true);
+  }
+
+  public void checkIsNonMissingGt(String gt, boolean expect) {
+    assertEquals(expect, VcfUtils.isNonMissingGt(gt));
+    assertEquals(VcfUtils.isNonMissingGt(gt), VcfUtils.isNonMissingGt(VcfUtils.splitGt(gt)));
   }
 
   public void testIsNonMissingGt() {
-    assertTrue(VcfUtils.isNonMissingGt("1"));
-    assertTrue(VcfUtils.isNonMissingGt("0/1"));
-    assertTrue(VcfUtils.isNonMissingGt("0|1"));
-    assertFalse(VcfUtils.isNonMissingGt("."));
-    assertFalse(VcfUtils.isNonMissingGt("./."));
-    assertTrue(VcfUtils.isNonMissingGt("./0"));
-    assertTrue(VcfUtils.isNonMissingGt("./1"));
-    assertTrue(VcfUtils.isNonMissingGt("0"));
-    assertTrue(VcfUtils.isNonMissingGt("0|0|0"));
+    checkIsNonMissingGt("1", true);
+    checkIsNonMissingGt("0/1", true);
+    checkIsNonMissingGt("0|1", true);
+    checkIsNonMissingGt(".", false);
+    checkIsNonMissingGt("./.", false);
+    checkIsNonMissingGt("./0", true);
+    checkIsNonMissingGt("./1", true);
+    checkIsNonMissingGt("0", true);
+    checkIsNonMissingGt("0|0|0", true);
   }
 
   private VcfRecord makeRecord(String gt, String ref, String... alts) {

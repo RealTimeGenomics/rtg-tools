@@ -292,6 +292,19 @@ public final class VcfUtils {
     return sampleIndex;
   }
 
+  /**
+   * If GT is either missing or is same as reference then return true.
+   * @param gt GT to check
+   * @return true if gt does not represent a variant, false otherwise
+   */
+  public static boolean isNonVariantGt(int[] gt) {
+    for (int g : gt) {
+      if (g > 0) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   /**
    * If GT is either missing or is same as reference then return true.
@@ -320,6 +333,15 @@ public final class VcfUtils {
    * @param gt GT to check
    * @return true if gt represents a variant, false otherwise
    */
+  public static boolean isVariantGt(int[] gt) {
+    return !isNonVariantGt(gt);
+  }
+
+  /**
+   * If GT is not missing and not the same as reference then return true.
+   * @param gt GT to check
+   * @return true if gt represents a variant, false otherwise
+   */
   public static boolean isVariantGt(String gt) {
     return !isNonVariantGt(gt);
   }
@@ -330,6 +352,20 @@ public final class VcfUtils {
    */
   public static boolean isPhasedGt(String gt) {
     return gt.indexOf(PHASED_SEPARATOR) >= 0;
+  }
+
+  /**
+   * If any of the GT is non missing return true.
+   * @param gt GT to check
+   * @return true if gt is not entirely should be skipped, false otherwise
+   */
+  public static boolean isNonMissingGt(int[] gt) {
+    for (int g : gt) {
+      if (g > -1) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -351,6 +387,15 @@ public final class VcfUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * If all sub-alleles of the GT is missing return true.
+   * @param gt GT to check
+   * @return true if gt should be skipped, false otherwise
+   */
+  public static boolean isMissingGt(int[] gt) {
+    return !isNonMissingGt(gt);
   }
 
   /**
