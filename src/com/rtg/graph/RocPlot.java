@@ -43,6 +43,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -323,7 +324,7 @@ public class RocPlot {
             mTitleEntry.setText(ROC);
           }
         }
-        mZoomPP.setCrossHair(null);
+        mZoomPP.resetCrossHair();
         mZoomPP.getDefaultZoomAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
       });
     });
@@ -452,7 +453,8 @@ public class RocPlot {
   // Adds the notion of painting a current crosshair position
   @JumbleIgnore
   private static class RocZoomPlotPanel extends InnerZoomPlot {
-    private Point2D mCrosshair; // In TP / FP coordinates.
+    private Point2D mCrosshair; // In underlying metric coordinates (e.g. TP/FP).
+    private Point2D mCrosshair2;
     RocZoomPlotPanel() {
       super();
     }
@@ -460,21 +462,45 @@ public class RocPlot {
     public void paint(Graphics g) {
       super.paint(g);
       final Mapping[] mapping = getMapping();
-      if (mapping != null && mapping.length > 1 && mCrosshair != null) {
-        Point p = new Point((int) mapping[0].worldToScreen(mCrosshair.getX()), (int) mapping[1].worldToScreen(mCrosshair.getY()));
+      if (mapping != null && mapping.length > 1) {
+        paintCrosshair(g, mapping, mCrosshair, true);
+        paintCrosshair(g, mapping, mCrosshair2, false);
+      }
+    }
+
+    protected void paintCrosshair(Graphics g, Mapping[] mapping, Point2D crosshair, boolean first) {
+      if (crosshair != null) {
+        Point p = new Point((int) mapping[0].worldToScreen(crosshair.getX()), (int) mapping[1].worldToScreen(crosshair.getY()));
         final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
           && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
         if (inView) {
           p = SwingUtilities.convertPoint(this, p, this);
           g.setColor(Color.BLACK);
-          final int size = 9;
-          g.drawLine(p.x - size, p.y - size, p.x + size, p.y + size);
-          g.drawLine(p.x - size, p.y + size, p.x + size, p.y - size);
+          final int size = 7;
+          final int size2 = 10;
+          //g.drawOval(p.x - size2, p.y - size2, size2 * 2, size2 * 2);
+          if (first) {
+            g.drawLine(p.x - size, p.y - size, p.x + size, p.y + size);
+            g.drawLine(p.x - size, p.y + size, p.x + size, p.y - size);
+          } else {
+            g.drawLine(p.x - size2, p.y, p.x + size2, p.y);
+            g.drawLine(p.x, p.y + size2, p.x, p.y - size2);
+          }
         }
       }
     }
-    void setCrossHair(Point2D p) {
-      mCrosshair = p;
+
+    public void resetCrossHair() {
+      mCrosshair = null;
+      mCrosshair2 = null;
+    }
+
+    void setCrossHair(Point2D p, boolean alternate) {
+      if (alternate) {
+        mCrosshair2 = p;
+      } else {
+        mCrosshair = p;
+      }
     }
 
     public void setZoom(Box2D zoom) {
@@ -737,6 +763,7 @@ public class RocPlot {
       final Point p = e.getPoint();
       final Mapping[] mapping = mZoomPP.getMapping();
       final Graph2D zoomedGraph = mZoomPP.getGraph();
+      final boolean alternate = (e.getModifiers() & InputEvent.SHIFT_MASK) != 0;
       if (zoomedGraph instanceof RocGraph2D) {
         if (mapping != null && mapping.length > 1) {
           final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
@@ -746,10 +773,11 @@ public class RocPlot {
           if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
             final RocGraph2D graph = (RocGraph2D) zoomedGraph;
             final int maxVariants = graph.getMaxVariants();
-            mProgressBar.setString(getMetricString(tp, fp, maxVariants));
-            mZoomPP.setCrossHair(new Point2D(fp, tp));
+            final Point2D p2 = new Point2D(fp, tp);
+            mZoomPP.setCrossHair(p2, alternate);
+            mProgressBar.setString(getMetricString(maxVariants, p2, alternate ? mZoomPP.mCrosshair : mZoomPP.mCrosshair2));
           } else {
-            mZoomPP.setCrossHair(null);
+            mZoomPP.setCrossHair(null, alternate);
             mProgressBar.setString("");
           }
         }
@@ -760,11 +788,12 @@ public class RocPlot {
           final float recall = mapping[0].screenToWorld((float) p.getX());
           final float precision = mapping[1].screenToWorld((float) p.getY());
           if (inView && recall >= 0 && precision >= 0 && (recall + precision > 0)) {
-            mZoomPP.setCrossHair(new Point2D(recall, precision));
-            mProgressBar.setString(getPrecisionRecallString(precision, recall));
+            final Point2D p2 = new Point2D(recall, precision);
+            mZoomPP.setCrossHair(p2, alternate);
+            mProgressBar.setString(getPrecisionRecallString(p2, alternate ? mZoomPP.mCrosshair : mZoomPP.mCrosshair2));
           } else {
-            mZoomPP.setCrossHair(null);
-            mProgressBar.setString(getPrecisionRecallString(precision, recall));
+            mZoomPP.setCrossHair(null, alternate);
+            mProgressBar.setString("");
           }
         }
 
@@ -788,9 +817,17 @@ public class RocPlot {
     }
   }
 
-  static String getMetricString(double truePositive, double falsePositive, int totalPositive) {
+  static String getMetricString(int totalPositive, Point2D location, Point2D alternate) {
+    final double falsePositive = location.getX();
+    final double truePositive = location.getY();
     final double precision = ContingencyTable.precision(truePositive, falsePositive);
-    String message = String.format("TP=%.0f FP=%.0f Precision=%.2f%%", truePositive, falsePositive, precision * 100);
+    String message;
+    if (alternate == null) {
+      message = String.format("TP=%.0f FP=%.0f Precision=%.2f%%", truePositive, falsePositive, precision * 100);
+    } else {
+      message = String.format("TP=%.0f (%+d) FP=%.0f (%+d) Precision=%.2f%%", truePositive, (int) (truePositive - alternate.getY()),
+        falsePositive, (int) (falsePositive - alternate.getX()), precision * 100);
+    }
     if (totalPositive > 0) {
       final double falseNegative = totalPositive - truePositive;
       final double recall = ContingencyTable.recall(truePositive, falseNegative);
@@ -800,10 +837,19 @@ public class RocPlot {
     return message;
   }
 
-  private static String getPrecisionRecallString(double precision, double recall) {
-    String message = String.format("Precision=%.2f%%", precision);
+  private static String getPrecisionRecallString(Point2D location, Point2D alternate) {
+    final double precision = location.getY();
+    final double recall = location.getX();
     final double fMeasure = ContingencyTable.fMeasure(precision, recall);
-    message += String.format(" Sensitivity=%.2f%% F-measure=%.2f%%", recall, fMeasure);
+    final String message;
+    if (alternate == null) {
+      message = String.format("Precision=%.2f%% Sensitivity=%.2f%% F-measure=%.2f%%", precision, recall, fMeasure);
+    } else {
+      final double altf = ContingencyTable.fMeasure(alternate.getY(), alternate.getX());
+      message = String.format("Precision=%.2f%% (%+.2f) Sensitivity=%.2f%% (%+.2f) F-measure=%.2f%% (%+.2f)", precision, precision - alternate.getY(),
+        recall, recall - alternate.getX(),
+        fMeasure, fMeasure - altf);
+    }
     return message;
   }
 

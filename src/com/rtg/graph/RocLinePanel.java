@@ -167,7 +167,7 @@ class RocLinePanel extends JPanel {
       mRocPlot.showCurrentGraph();
       final TextPoint2D data1 = mDataBundle.getMaxRangedPoint();
       if (data1 != null) {
-        mStatusBar.setString(RocPlot.getMetricString(data1.getY(), data1.getX(), mDataBundle.getTotalVariants()) + " Threshold=" + data1.getText());
+        mStatusBar.setString(RocPlot.getMetricString(mDataBundle.getTotalVariants(), data1, null) + " Threshold=" + data1.getText());
       }
     });
 
