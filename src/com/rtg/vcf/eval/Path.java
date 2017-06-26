@@ -32,14 +32,13 @@ package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import com.rtg.util.BasicLinkedListNode;
-import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * Record a path that reconciles two sequences of variants. Also provides
@@ -150,40 +149,37 @@ public final class Path implements Comparable<Path> {
    * @return the set of variants included on call side
    */
   public List<OrientedVariant> getCalledIncluded() {
-    return toReversedList(mCalledPath.getIncluded());
+    return BasicLinkedListNode.toReversedList(mCalledPath.getIncluded());
   }
 
   /**
    * @return the set of variants excluded on call side
    */
   public List<Variant> getCalledExcluded() {
-    return toReversedList(mCalledPath.getExcluded());
+    return BasicLinkedListNode.toReversedList(mCalledPath.getExcluded());
   }
 
   /**
    * @return the set of variants included on baseline side
    */
   public List<OrientedVariant> getBaselineIncluded() {
-    return toReversedList(mBaselinePath.getIncluded());
+    return BasicLinkedListNode.toReversedList(mBaselinePath.getIncluded());
   }
 
   /**
    * @return the set of variants excluded on baseline side
    */
   public List<Variant> getBaselineExcluded() {
-    return toReversedList(mBaselinePath.getExcluded());
+    return BasicLinkedListNode.toReversedList(mBaselinePath.getExcluded());
   }
 
-  private static <T> List<T> toReversedList(BasicLinkedListNode<T> input) {
-    if (input == null) {
-      return new ArrayList<>();
-    }
-    final List<T> list = new ArrayList<>(input.size());
-    for (final T orientedVariant : input) {
-      list.add(orientedVariant);
-    }
-    Collections.reverse(list);
-    return list;
+  /**
+   * Get the list of sync points for the path. Sync points are created when the path is in sync,
+   * at the reference position immediately before where a new variant is to be added.
+   * @return the sync point list
+   */
+  public List<Integer> getSyncPoints() {
+    return BasicLinkedListNode.toReversedList(mSyncPointList);
   }
 
   void include(boolean side, OrientedVariant var, int varIndex) {
@@ -278,21 +274,15 @@ public final class Path implements Comparable<Path> {
 
   @Override
   public String toString() {
-    return "Path:" + StringUtils.LS + "baseline=" + mBaselinePath + "called=" + mCalledPath + "syncpoints(0-based)=" + HalfPath.listToString(this.mSyncPointList);
-  }
-
-  /**
-   * Get the list of sync points for the path. Sync points are created when the path is in sync,
-   * at the reference position immediately before where a new variant is to be added.
-   * @return the sync point list
-   */
-  public List<Integer> getSyncPoints() {
-    final List<Integer> result = new ArrayList<>();
-    for (final Integer syncpoint : mSyncPointList) {
-      result.add(syncpoint);
+    final StringBuilder sb = new StringBuilder();
+    sb.append("Path: baseline=").append(mBaselinePath).append("\t\tcalled=").append(mCalledPath).append("\t\tsyncpoints(0-based)=").append(getSyncPoints());
+    if (mBaselinePath.getPosition() != -1) {
+      final boolean match = matches();
+      final boolean insync = inSync();
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(match  ? "   match" : " mismatch", match ? DisplayHelper.GREEN : DisplayHelper.RED));
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(insync ? " in-sync" : " no-sync", insync ? DisplayHelper.GREEN : DisplayHelper.RED));
     }
-    Collections.reverse(result);
-    return result;
+    return sb.toString();
   }
 
   // Counts the baseline and called variants between each sync point

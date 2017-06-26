@@ -30,7 +30,10 @@
 
 package com.rtg.util;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * @param <T> the type of object to collect
@@ -55,9 +58,48 @@ public class BasicLinkedListNode<T> implements Iterable<T> {
     }
   }
 
+  /**
+   * Reverses the entries in this linked list and returns as a standard List
+   * @param input the head of the list
+   * @param <T> the type of entry
+   * @return a List containing all the items, in reverse order
+   */
+  public static <T> List<T> toReversedList(BasicLinkedListNode<T> input) {
+    if (input == null) {
+      return new ArrayList<>();
+    }
+    final List<T> list = new ArrayList<>(input.size());
+    for (final T item : input) {
+      list.add(item);
+    }
+    Collections.reverse(list);
+    return list;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    String join = "";
+    for (final T v : this) {
+      sb.append(join);
+      sb.append(v.toString());
+      join = ", ";
+    }
+    sb.append("]");
+    return sb.toString();
+  }
+
   @Override
   public Iterator<T> iterator() {
     return new BasicLinkedListNodeIterator<>(this);
+  }
+
+  /**
+   * @return the next linked node
+   */
+  public BasicLinkedListNode<T> next() {
+    return mNext;
   }
 
   /**

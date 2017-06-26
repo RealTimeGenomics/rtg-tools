@@ -31,6 +31,8 @@
 package com.rtg.visualization;
 
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.StringUtils;
 
 /**
@@ -38,6 +40,31 @@ import com.rtg.util.StringUtils;
  * This base class displays without any markup, and subclasses add markup capability.
  */
 public class DisplayHelper {
+
+  /** Possible markup implementations */
+  public enum MarkupType {
+    /** Perform no markup */
+    NONE,
+    /** Markup with <code>ANSI</code> escape sequences */
+    ANSI,
+    /** Markup with <code>HTML</code> sequences */
+    HTML,
+  }
+
+  /** A default instance that can be used for text display */
+  public static final DisplayHelper DEFAULT = getDefault();
+
+  static DisplayHelper getDefault() {
+    switch ((MarkupType) GlobalFlags.getFlag(ToolsGlobalFlags.DEFAULT_MARKUP).getValue()) {
+      case ANSI:
+        return new AnsiDisplayHelper();
+      case HTML:
+        return new HtmlDisplayHelper();
+      case NONE:
+      default:
+        return new DisplayHelper();
+    }
+  }
 
   static final int LABEL_LENGTH = 6;
 
@@ -175,27 +202,6 @@ public class DisplayHelper {
     return decorateForeground(shortLabel, DisplayHelper.CYAN) + " ";
   }
 
-  // Decorates a section of DNA with highlight colors, not marking up space characters at the ends
-  protected String trimHighlighting(final String dna, int bgcolor) {
-    final String trimmed = StringUtils.trimSpaces(dna);
-    if (trimmed.length() == 0) { // All whitespace, no markup needed
-      return dna;
-    }
-    if (trimmed.length() == dna.length()) { // No trimming needed
-      return decorateBackground(dna, bgcolor);
-    } else {
-      if (dna.charAt(0) == ' ') { // Some amount of non-marked up prefix needed
-        int prefixEnd = 0;
-        while (dna.charAt(prefixEnd) == ' ') {
-          ++prefixEnd;
-        }
-        return dna.substring(0, prefixEnd) + decorateBackground(trimmed, bgcolor) + dna.substring(prefixEnd + trimmed.length());
-      } else { // Trimming was only at the end
-        return decorateBackground(trimmed, bgcolor) + dna.substring(trimmed.length());
-      }
-    }
-  }
-
   protected boolean isMarkupStart(char c) {
     return false;
   }
@@ -203,6 +209,16 @@ public class DisplayHelper {
     return false;
   }
 
+  /**
+   * Mark up a section of text that contains DNA bases, coloring each base accordingly
+   * @param text the text
+   * @return the marked up text
+   */
+  public String decorateBases(final String text) {
+    return decorateWithHighlight(text, null, BLACK, true);
+  }
+
+  // Decorates a section of DNA with highlight colors, not marking up space characters at the ends
   protected String decorateWithHighlight(final String str, boolean[] highlightMask, int bgcolor, boolean colorBases) {
     final StringBuilder output = new StringBuilder();
     int coord = 0; // coordinate ignoring markup
@@ -243,6 +259,26 @@ public class DisplayHelper {
       output.append(trimHighlighting(toHighlight.toString(), bgcolor));
     }
     return output.toString();
+  }
+
+  private String trimHighlighting(final String dna, int bgcolor) {
+    final String trimmed = StringUtils.trimSpaces(dna);
+    if (trimmed.length() == 0) { // All whitespace, no markup needed
+      return dna;
+    }
+    if (trimmed.length() == dna.length()) { // No trimming needed
+      return decorateBackground(dna, bgcolor);
+    } else {
+      if (dna.charAt(0) == ' ') { // Some amount of non-marked up prefix needed
+        int prefixEnd = 0;
+        while (dna.charAt(prefixEnd) == ' ') {
+          ++prefixEnd;
+        }
+        return dna.substring(0, prefixEnd) + decorateBackground(trimmed, bgcolor) + dna.substring(prefixEnd + trimmed.length());
+      } else { // Trimming was only at the end
+        return decorateBackground(trimmed, bgcolor) + dna.substring(trimmed.length());
+      }
+    }
   }
 
   /**

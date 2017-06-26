@@ -245,15 +245,15 @@ public class HalfPathTest extends TestCase {
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(8, 9, new byte[]{3}, new byte[]{4}), true), 3);
     TestUtils.containsAll(path.toString()
       , "included:"
-      , "[8-9 (G^:Tv), 3-4 (G^:Tv)]"
+      , "[3-4 (G^:Tv), 8-9 (G^:Tv)]"
       , "excluded:"
       , "[5:6 C:T, 5:6 C:T]");
-    assertEquals("1-17 AAgAAGCgAACGTACGT|AAtAAGCtAACGTACGT", path.dumpHaplotypes());
-    assertEquals("3-10 gAAGCgAA|tAAGCtAA", path.dumpHaplotypes(new Range(2, 10)));
-    assertEquals("4-8 AAGCg|AAGCt", path.dumpHaplotypes(new Range(3, 8)));
-    assertEquals("4-7 AAGC|AAGC", path.dumpHaplotypes(new Range(3, 7)));
-
+    assertEquals("1-17 aaGaagcGaacgtacgt|aaTaagcTaacgtacgt", path.dumpHaplotypes());
+    assertEquals("3-10 GaagcGaa|TaagcTaa", path.dumpHaplotypes(new Range(2, 10)));
+    assertEquals("4-8 aagcG|aagcT", path.dumpHaplotypes(new Range(3, 8)));
+    assertEquals("4-7 aagc|aagc", path.dumpHaplotypes(new Range(3, 7)));
   }
+
   private static final String[] CALLS_TRICKY = {
       "seq 1 . A T 1 PASS . GT 1/1"
     , "seq 2 . A AT 9 PASS . GT 1/1"

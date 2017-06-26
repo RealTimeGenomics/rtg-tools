@@ -36,6 +36,7 @@ import com.rtg.util.Utils;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.visualization.DisplayHelper;
 
 
 /**
@@ -162,7 +163,7 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
     if (a.getStart() != getStart() || a.getEnd() != getEnd()) {
       pos = "<" + (a.getStart() + 1) + "-" + (a.getEnd() + 1) + ">";
     }
-    return pos + DnaUtils.bytesToSequenceIncCG(a.nt());
+    return pos + DisplayHelper.DEFAULT.decorateBases(DnaUtils.bytesToSequenceIncCG(a.nt()));
   }
 
   int numAlleles() {

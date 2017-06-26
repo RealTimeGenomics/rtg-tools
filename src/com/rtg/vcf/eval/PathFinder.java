@@ -135,7 +135,8 @@ public final class PathFinder {
       currentMaxIterations = Math.max(currentMaxIterations, currentIterations++);
       Path head = sortedPaths.pollFirst();
       if (TRACE) {
-        System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n\nHead: " + head);
+        System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n");
+        System.err.println("Head is " + head);
       }
       if (sortedPaths.size() == 0) { // Only one path currently in play
         if (lastWarnMessage != null) { // Issue a warning if we encountered problems during the previous region
@@ -174,22 +175,18 @@ public final class PathFinder {
       }
 
       head.step();
+      if (TRACE) {
+        System.err.println("Stepped " + head);
+      }
 
       if (head.inSync()) {
         skipToNextVariant(head);
         if (TRACE) {
-          System.err.println("In sync, skipping: " + head);
-        }
-      } else {
-        if (TRACE) {
-          System.err.println("Not in sync");
+          System.err.println("Skipped " + head);
         }
       }
 
       if (head.matches()) {
-        if (TRACE) {
-          System.err.println("Head matches, keeping");
-        }
         addIfBetter(head, sortedPaths);
       } else {
         if (TRACE) {
@@ -295,8 +292,18 @@ public final class PathFinder {
       if (best == add) {
         sortedPaths.remove(other);
         sortedPaths.add(best);
+        if (TRACE) {
+          System.err.println("Replace " + other);
+        }
+      } else {
+        if (TRACE) {
+          System.err.println("Prefer  " + other);
+        }
       }
     } else {
+      if (TRACE) {
+        System.err.println("Keeping " + add);
+      }
       sortedPaths.add(add);
     }
   }

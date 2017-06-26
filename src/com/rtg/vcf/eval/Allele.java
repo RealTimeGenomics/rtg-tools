@@ -39,6 +39,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * Hold a variant allele, one allele of a genotype.
@@ -85,7 +86,7 @@ public class Allele extends SequenceNameLocusSimple {
 
   @Override
   public String toString() {
-    return String.valueOf(getStart() + 1) + ":" + (getEnd() + 1) + "(" + DnaUtils.bytesToSequenceIncCG(mNt) + ")";
+    return String.valueOf(getStart() + 1) + ":" + (getEnd() + 1) + "(" + DisplayHelper.DEFAULT.decorateBases(DnaUtils.bytesToSequenceIncCG(mNt)) + ")";
   }
 
 

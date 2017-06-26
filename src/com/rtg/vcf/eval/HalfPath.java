@@ -30,8 +30,6 @@
 
 package com.rtg.vcf.eval;
 
-import static com.rtg.util.StringUtils.LS;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +38,7 @@ import com.rtg.mode.DnaUtils;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.Utils;
 import com.rtg.util.intervals.Range;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * One half of a path that reconciles two sequences of variants.
@@ -128,7 +127,8 @@ public final class HalfPath implements Comparable<HalfPath> {
         break;
       }
       if (haplotype.templatePosition() >= region.getStart()) {
-        sb.append(!haplotype.isOnTemplate() ? DnaUtils.getBaseLower(haplotype.nt()) : DnaUtils.getBase(haplotype.nt()));
+        final char c = haplotype.isOnTemplate() ? DnaUtils.getBaseLower(haplotype.nt()) : DnaUtils.getBase(haplotype.nt());
+        sb.append(haplotype.isOnTemplate() ? c : DisplayHelper.DEFAULT.decorateBases(String.valueOf(c)));
       }
     }
     return sb.toString();
@@ -341,38 +341,23 @@ public final class HalfPath implements Comparable<HalfPath> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(" +:");
     sb.append(mHaplotypeA.templatePosition() + 1);
     if (!mHaplotypeA.isOnTemplate()) {
-      sb.append('^').append(mHaplotypeA.positionInVariant());
+      sb.append('.').append(mHaplotypeA.positionInVariant());
     }
-    sb.append(" -:");
+    sb.append("^:");
     sb.append(mHaplotypeB.templatePosition() + 1);
     if (!mHaplotypeB.isOnTemplate()) {
-      sb.append('^').append(mHaplotypeB.positionInVariant());
+      sb.append('.').append(mHaplotypeB.positionInVariant());
     }
-    sb.append(LS);
-    sb.append("included:");
-    sb.append(listToString(mIncluded));
-    sb.append(LS);
-    sb.append("excluded:");
-    sb.append(listToString(mExcluded));
-    sb.append(LS);
+    sb.append("v ");
+    sb.append(' ');
+    sb.append(DisplayHelper.DEFAULT.decorateForeground("included:", DisplayHelper.GREEN));
+    sb.append(BasicLinkedListNode.toReversedList(mIncluded));
+    sb.append(' ');
+    sb.append(DisplayHelper.DEFAULT.decorateForeground("excluded:", DisplayHelper.RED));
+    sb.append(BasicLinkedListNode.toReversedList(mExcluded));
     return sb.toString();
   }
 
-  static <T> String listToString(BasicLinkedListNode<T> list) {
-    final StringBuilder sb = new StringBuilder();
-    sb.append("[");
-    String join = "";
-    if (list != null) {
-      for (final T v : list) {
-        sb.append(join);
-        sb.append(v.toString());
-        join = ", ";
-      }
-    }
-    sb.append("]");
-    return sb.toString();
-  }
 }
