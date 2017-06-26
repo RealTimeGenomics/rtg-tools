@@ -267,12 +267,12 @@ public class RocPlot {
     mMainPanel.add(mStatusLabel, BorderLayout.SOUTH);
 
     mPopup.setLightWeightPopupEnabled(false);
-    mPopup.add(mZoomPP.getZoomOutAction());
+    mPopup.add(mZoomPP.getUndoZoomAction());
+    mPopup.add(mZoomPP.getDefaultZoomAction());
     mPopup.addSeparator();
     mPopup.add(mZoomPP.getPrintAction());
     mPopup.add(mZoomPP.getSaveImageAction());
     mPopup.add(mZoomPP.getSnapShotAction());
-    mPopup.addSeparator();
 
     mZoomPP.addMouseListener(new PopupListener());
 
@@ -322,7 +322,7 @@ public class RocPlot {
           }
         }
         mZoomPP.setCrossHair(null);
-        mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
+        mZoomPP.getDefaultZoomAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
       });
     });
 
@@ -479,6 +479,7 @@ public class RocPlot {
       final ExternalZoomGraph2D graph = (ExternalZoomGraph2D) getGraph();
       if (graph != null) {
         graph.setZoom(zoom);
+        addZoomLevel(graph);
       }
     }
   }
@@ -699,7 +700,7 @@ public class RocPlot {
         "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
     }
     if (initialZoom == null) {
-      SwingUtilities.invokeLater(() -> mZoomPP.getZoomOutAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
+      SwingUtilities.invokeLater(() -> mZoomPP.getDefaultZoomAction().actionPerformed(new ActionEvent(this, 0, "LoadComplete")));
     } else {
       SwingUtilities.invokeLater(() -> mZoomPP.setZoom(initialZoom));
     }
@@ -851,6 +852,7 @@ public class RocPlot {
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
     final CountDownLatch lock = new CountDownLatch(1);
+    rp.mPopup.addSeparator();
     rp.mPopup.add(new AbstractAction("Exit", null) {
       @Override
       public void actionPerformed(ActionEvent e) {
