@@ -46,6 +46,8 @@ public interface VariantId extends SequenceNameLocus {
   byte STATUS_NO_MATCH = 0b1000;
   /** Variant was outside eval regions */
   byte STATUS_OUTSIDE_EVAL = 0b10000;
+  /** Variant was able to be matched in any explored path */
+  byte STATUS_ANY_MATCH = 0b100000;
 
   /** @return the ID assigned to this variant */
   int getId();

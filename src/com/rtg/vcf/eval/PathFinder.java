@@ -45,23 +45,24 @@ import com.rtg.util.diagnostic.Diagnostic;
 @TestClass("com.rtg.vcf.eval.PathTest")
 public final class PathFinder {
 
-  private static final boolean TRACE = false;
+  static final boolean TRACE = false;
 
   // Bundles up some configuration variables that can be re-used between runs of the path finding
   static final class Config {
 
-    private static final int MAX_COMPLEXITY = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS); // Threshold on number of unresolved paths
-    private static final int MAX_ITERATIONS = GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS);  // Threshold on number of iterations since last sync point
-
     final PathPreference mPathSelector;
     final int mMaxComplexity;
     final int mMaxIterations;
+    final boolean mFlagAlternates;
 
     /**
      * Construct a default configuration
      */
     Config() {
-      this(getPathPreference(), MAX_COMPLEXITY, MAX_ITERATIONS);
+      this(getPathPreference(),
+        GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS),
+        GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS),
+        GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_FLAG_ALTERNATES));
     }
 
     /**
@@ -69,11 +70,13 @@ public final class PathFinder {
      * @param selector path selection criteria
      * @param maxComplexity threshold on number of concurrently active paths
      * @param maxIterations threshold on number of iterations since the last sync point
+     * @param flagAlternates if set, mark variants matched in alternative paths
      */
-    Config(PathPreference selector, int maxComplexity, int maxIterations) {
+    Config(PathPreference selector, int maxComplexity, int maxIterations, boolean flagAlternates) {
       mMaxComplexity = maxComplexity;
       mMaxIterations = maxIterations;
       mPathSelector = selector;
+      mFlagAlternates = flagAlternates;
     }
 
     private static PathPreference getPathPreference() {
@@ -163,6 +166,9 @@ public final class PathFinder {
       }
       if (head.finished()) {
         // Path is done. Remember the best
+        if (mConfig.mFlagAlternates) {
+          head.flagIncluded();
+        }
         final BasicLinkedListNode<Integer> syncPoints = new BasicLinkedListNode<>(head.mCalledPath.getPosition(), head.mSyncPointList);
         best = best == null ? new Path(head, syncPoints) : mConfig.mPathSelector.better(best, new Path(head, syncPoints));
         continue;
@@ -180,7 +186,12 @@ public final class PathFinder {
       }
 
       if (head.inSync()) {
+        assert head.matches();
+        if (mConfig.mFlagAlternates) {
+          head.flagIncluded();
+        }
         skipToNextVariant(head);
+        assert head.matches();
         if (TRACE) {
           System.err.println("Skipped " + head);
         }
@@ -295,9 +306,19 @@ public final class PathFinder {
         if (TRACE) {
           System.err.println("Replace " + other);
         }
+        if (mConfig.mFlagAlternates) {
+          if (!other.inSync()) {
+            add.linkEquivalent(other);
+          }
+        }
       } else {
         if (TRACE) {
           System.err.println("Prefer  " + other);
+        }
+        if (mConfig.mFlagAlternates) {
+          if (!add.inSync()) {
+            other.linkEquivalent(add);
+          }
         }
       }
     } else {

@@ -51,6 +51,69 @@ public final class Path implements Comparable<Path> {
   final BasicLinkedListNode<Integer> mSyncPointList;
   int mCSinceSync;
   int mBSinceSync;
+  BasicLinkedListNode<Path> mEquivalents; // Paths previously determined to be equivalent
+
+  /**
+   * Flags all variants included by this path as having been matched, regardless of whether this path turns out to be that which
+   * is finally accepted. It is only acceptable here to flag variants from a path that is in sync or finished.
+   */
+  void flagIncluded() {
+    assert inSync() || finished();
+    flagIncluded(1);
+  }
+
+  /**
+   * Flags all variants included by this path as having been matched (as well as any included by paths that were
+   * determined to be equivalent, even if they were not in sync at the time).
+   * @param depth current depth indicator (used for debugging output)
+   */
+  private void flagIncluded(int depth) {
+    if (mSyncPointList == null || (mCSinceSync == 0 && mBSinceSync == 0 && mEquivalents == null)) {
+      return;
+    }
+    if (PathFinder.TRACE) {
+      System.err.println("Flag(" + depth + ") " + toString());
+    }
+
+    // Mark all variants included by this path
+    final int lastSync = mSyncPointList.getValue();
+    BasicLinkedListNode<OrientedVariant> node = mBaselinePath.getIncluded();
+    int count = 0;
+    while (node != null && node.getValue().getStart() >= lastSync) {
+      node.getValue().setStatus(VariantId.STATUS_ANY_MATCH);
+      node = node.next();
+      count++;
+    }
+    assert count == mBSinceSync;
+
+    node = mCalledPath.getIncluded();
+    count = 0;
+    while (node != null && node.getValue().getStart() >= lastSync) {
+      node.getValue().setStatus(VariantId.STATUS_ANY_MATCH);
+      node = node.next();
+      count++;
+    }
+    assert count == mCSinceSync;
+
+    // Mark all variants included by any paths previously determined to be equivalent
+    BasicLinkedListNode<Path> equiv = mEquivalents;
+    while (equiv != null) {
+      equiv.getValue().flagIncluded(depth + 1);
+      equiv = equiv.next();
+    }
+    mEquivalents = null;
+  }
+
+  /**
+   * Add the supplied path as being found equivalent to this path.
+   * @param other the equivalent path
+   */
+  void linkEquivalent(Path other) {
+    if (PathFinder.TRACE) {
+      System.err.println("Linked  " + other);
+    }
+    mEquivalents = new BasicLinkedListNode<>(other, mEquivalents);
+  }
 
   static class SyncPoint implements Comparable<SyncPoint> {
     private final int mPos;
@@ -108,19 +171,20 @@ public final class Path implements Comparable<Path> {
     mSyncPointList = syncPoints;
     mCSinceSync = parent.mCSinceSync;
     mBSinceSync = parent.mBSinceSync;
+    mEquivalents = parent.mEquivalents;
   }
 
   /**
    * @return true if the path has finished
    */
-  public boolean finished() {
+  boolean finished() {
     return mCalledPath.finished() && mBaselinePath.finished();
   }
 
   /**
    * @return true if all positions are the same
    */
-  public boolean inSync() {
+  boolean inSync() {
     if (mCalledPath.compareHaplotypePositions() != 0) {
       return false;
     }
@@ -204,7 +268,13 @@ public final class Path implements Comparable<Path> {
     final ArrayList<Path> paths = new ArrayList<>();
     final BasicLinkedListNode<Integer> syncPoints;
     if (this.inSync()) {
-      syncPoints = new BasicLinkedListNode<>(mCalledPath.getPosition(), mSyncPointList);
+      final int syncPos = mCalledPath.getPosition();
+      if (mSyncPointList != null && syncPos == mSyncPointList.getValue()) {
+        // Prevent creation of redundant sync points at the same position (e.g. due to excluded variants)
+        syncPoints = mSyncPointList;
+      } else {
+        syncPoints = new BasicLinkedListNode<>(syncPos, mSyncPointList);
+      }
       mCSinceSync = 0;
       mBSinceSync = 0;
     } else {

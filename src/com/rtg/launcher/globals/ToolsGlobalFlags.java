@@ -79,6 +79,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public static final String VCFEVAL_EXPLICIT_HALF_CALL = "com.rtg.vcf.eval.explicit-half-call";
   /** Turn on alternate ROC slope calculation */
   public static final String VCFEVAL_ALT_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.alt-roc-slope";
+  /** Mark variants matched in alternative paths */
+  public static final String VCFEVAL_FLAG_ALTERNATES = "com.rtg.vcf.eval.flag-alternates";
 
   ToolsGlobalFlags(List<Flag<?>> flags) {
     super(flags);
@@ -109,5 +111,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
     registerFlag(VCFEVAL_EXPLICIT_HALF_CALL, Boolean.class, Boolean.TRUE);
+    registerFlag(VCFEVAL_FLAG_ALTERNATES, Boolean.class, Boolean.FALSE);
   }
 }

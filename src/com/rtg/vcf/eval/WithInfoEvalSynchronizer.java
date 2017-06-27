@@ -62,6 +62,8 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
   static final String STATUS_FP = "FP";
   static final String STATUS_FN_CA = "FN_CA";
   static final String STATUS_FP_CA = "FP_CA";
+  static final String INFO_BASE_ALTERNATE = "BASE_ALTERNATE";
+  static final String INFO_CALL_ALTERNATE = "CALL_ALTERNATE";
 
   /**
    * @param baseLineFile tabix indexed base line VCF file
@@ -106,15 +108,18 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
     header.ensureContains(new InfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed."));
     if (type == null || type == VariantSetType.BASELINE) {
       header.ensureContains(new InfoField(INFO_BASE, MetaType.STRING, VcfNumber.ONE, "Baseline genotype status"));
+      header.ensureContains(new InfoField(INFO_BASE_ALTERNATE, MetaType.FLAG, VcfNumber.ONE, "Baseline variant could be matched in an alternate path"));
     }
     if (type == null || type == VariantSetType.CALLS) {
       header.ensureContains(new InfoField(INFO_CALL, MetaType.STRING, VcfNumber.ONE, "Call genotype status"));
       header.ensureContains(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, VcfNumber.ONE, "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0"));
+      header.ensureContains(new InfoField(INFO_CALL_ALTERNATE, MetaType.FLAG, VcfNumber.ONE, "Call variant could be matched in an alternate path"));
     }
   }
 
   protected Map<String, String> updateForCall(boolean unknown, Map<String, String> newInfo) {
     final String status;
+    boolean altMatch = false;
     if (unknown) {
       status = STATUS_IGNORED;
     } else {
@@ -155,6 +160,9 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         status = STATUS_OUTSIDE;
         sync = null;
       } else if (mCv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        if (mCv.hasStatus(VariantId.STATUS_ANY_MATCH)) {
+          altMatch = true;
+        }
         ++mFalsePositives;
         addToROCContainer(0, 1, 0, false);
         status = STATUS_FP;
@@ -171,11 +179,15 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       }
     }
     newInfo.put(INFO_CALL, status);
+    if (altMatch) {
+      newInfo.put(INFO_CALL_ALTERNATE, null);
+    }
     return newInfo;
   }
 
   protected Map<String, String> updateForBaseline(boolean unknown, Map<String, String> newInfo) {
     final String status;
+    boolean altMatch = false;
     if (unknown) {
       status = STATUS_IGNORED;
     } else {
@@ -195,6 +207,9 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
         status = STATUS_FN_CA;
         sync = Integer.toString(mBSyncStart2 + 1);
       } else if (mBv.hasStatus(VariantId.STATUS_NO_MATCH)) {
+        if (mBv.hasStatus(VariantId.STATUS_ANY_MATCH)) {
+          altMatch = true;
+        }
         ++mFalseNegatives;
         status = STATUS_FN;
         sync = mBSyncStart2 > 0 ? Integer.toString(mBSyncStart2 + 1) : Integer.toString(mBSyncStart + 1);
@@ -207,12 +222,19 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
       }
     }
     newInfo.put(INFO_BASE, status);
+    if (altMatch) {
+      newInfo.put(INFO_BASE_ALTERNATE, null);
+    }
     return newInfo;
   }
 
   protected void setNewInfoFields(VcfRecord rec, Map<String, String> newInfo) {
     for (Map.Entry<String, String> e : newInfo.entrySet()) {
-      rec.addInfo(e.getKey(), e.getValue());
+      if (e.getValue() == null) {
+        rec.addInfo(e.getKey());
+      } else {
+        rec.addInfo(e.getKey(), e.getValue());
+      }
     }
   }
 }
