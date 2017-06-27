@@ -62,7 +62,7 @@ public class LongCreateTest extends TestCase {
     final long mem = Runtime.getRuntime().freeMemory();
     //System.err.println("FREE_LIMIT=" + FREE_LIMIT + " mem=" + mem);
     if (mem > FREE_LIMIT && Runtime.getRuntime().freeMemory() < 4000000000L) {
-      // SAI: There can be some JVM overheads that prevent Integer.MAX_VALUE lengths
+      // There can be some JVM overheads that prevent Integer.MAX_VALUE lengths
       final int safeLength = Integer.MAX_VALUE - 5;
       final LongIndex b = LongCreate.createIndex(safeLength);
       assertEquals(safeLength, b.length());

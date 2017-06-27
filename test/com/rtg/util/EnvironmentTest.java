@@ -99,20 +99,6 @@ public class EnvironmentTest extends TestCase {
 
     assertTrue(hs.containsKey("runtime.totalMemory"));
     assertTrue(hs.containsKey("processor.arch"));
-    /*
-    //Test commented out due to its inabilty to compile on anything other than the Sun JDK
-    final OperatingSystemMXBean bean = ManagementFactory.getOperatingSystemMXBean();
-    if (bean instanceof com.sun.management.OperatingSystemMXBean) {
-      assertTrue(hs.containsKey(Environment.OS_FREEMEM));
-      assertTrue(hs.containsKey("processor.count"));
-      // SAI comment out buggy test, memory can change in between the calls!
-      //      assertEquals(Environment.getFreeMemory(), ((com.sun.management.OperatingSystemMXBean) bean).getFreePhysicalMemorySize());
-
-      assertEquals(Environment.getTotalMemory(), ((com.sun.management.OperatingSystemMXBean) bean).getTotalPhysicalMemorySize());
-      assertEquals(Environment.getAvailableProcessors(), bean.getAvailableProcessors());
-     }
-    */
-
     assertTrue(Environment.getTotalMemory() > 500000000); //more than 500M
   }
 

@@ -52,7 +52,7 @@ public final class LongCreate {
     if (length < 0) {
       throw new NegativeArraySizeException("Negative length=" + length);
     }
-    // SAI: It seems it is not always possible to get exactly Integer.MAX_VALUE
+    // It seems it is not always possible to get exactly Integer.MAX_VALUE
     // array entries.  Perhaps the JVM uses some slots for housekeeping.
     if (length <= Integer.MAX_VALUE - 5) {
       return new LongArray(length);
