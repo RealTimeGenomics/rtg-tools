@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -863,4 +864,20 @@ public final class VcfUtils {
       return false;
     }
   }
+
+  /**
+   * Add additional lines to the header
+   * @param header the header
+   * @param extraHeaderLines lines to add
+   */
+  public static void addHeaderLines(VcfHeader header, Collection<String> extraHeaderLines) {
+    for (final String extraLine : extraHeaderLines) {
+      try {
+        header.addMetaInformationLine(extraLine);
+      } catch (final VcfFormatException e) {
+        throw new VcfFormatException("Additional header line '" + extraLine + "', " + e.getMessage()); // Add context information
+      }
+    }
+  }
+
 }

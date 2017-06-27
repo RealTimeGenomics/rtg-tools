@@ -113,6 +113,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(INFO_ID_FLAG, String.class, STRING, "the INFO ID for BED INFO annotations", "ANN").setCategory(REPORTING);
     mFlags.registerOptional(INFO_DESCR_FLAG, String.class, STRING, "if the BED INFO field is not already declared, use this description in the header", "Annotation").setCategory(REPORTING);
     mFlags.registerOptional(RELABEL_FLAG, File.class, FILE, "relabel samples according to \"old-name new-name\" pairs in specified file").setCategory(REPORTING);
+    VcfMerge.initAddHeaderFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
@@ -178,12 +179,14 @@ public final class VcfAnnotatorCli extends AbstractCli {
       annotators.add(VcfSampleNameRelabeller.create((File) mFlags.getValue(RELABEL_FLAG)));
     }
 
+    final Collection<String> extraHeaderLines = VcfMerge.getHeaderLines(mFlags);
     final File inputFile = (File) mFlags.getValue(INPUT_FLAG);
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean stdout = FileUtils.isStdio(output);
     try (VcfReader reader = VcfReader.openVcfReader(inputFile)) {
       final VcfHeader header = reader.getHeader();
+      VcfUtils.addHeaderLines(header, extraHeaderLines);
       for (final VcfAnnotator annotator : annotators) {
         annotator.updateHeader(header);
       }

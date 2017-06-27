@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -163,6 +164,8 @@ public final class VcfFilterCli extends AbstractCli {
 
     mFlags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+
+    VcfMerge.initAddHeaderFlag(mFlags);
 
     // What to apply to, what to do with the results of filtering
     mFlags.registerOptional(FAIL_FLAG, String.class, STRING, "instead of removing failed records set their filter field to the provided value").setCategory(REPORTING);
@@ -403,12 +406,14 @@ public final class VcfFilterCli extends AbstractCli {
     final Optional<ScriptedVcfFilter> scriptFilter = buildScriptFilter(mFlags, output);
     scriptFilter.ifPresent(mVcfFilterTask.mFilters::add);
 
+    final Collection<String> extraHeaderLines = VcfMerge.getHeaderLines(mFlags);
     final File in = (File) mFlags.getValue(INPUT_FLAG);
     final File out = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean stdout = out != null && FileUtils.isStdio(out);
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
       final VcfHeader header = r.getHeader();
+      VcfUtils.addHeaderLines(header, extraHeaderLines);
       mVcfFilterTask.setHeader(header);
       try (VcfWriter w = getVcfWriter(header, output, out)) {
         mVcfFilterTask.process(r, w);

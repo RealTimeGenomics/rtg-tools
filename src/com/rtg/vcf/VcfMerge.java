@@ -34,6 +34,7 @@ import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
+import static com.rtg.launcher.CommonFlags.STRING_OR_FILE;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 import static com.rtg.vcf.VcfUtils.FORMAT_ALLELIC_DEPTH;
@@ -49,6 +50,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -104,9 +106,7 @@ public class VcfMerge extends AbstractCli {
     CommonFlags.initForce(mFlags);
     mFlags.setDescription("Merge a set of VCF files.");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional('a', ADD_HEADER_FLAG, String.class, STRING, "add the supplied text to the output VCF header")
-      .setMaxCount(Integer.MAX_VALUE)
-      .setCategory(INPUT_OUTPUT);
+    initAddHeaderFlag(mFlags);
     final Flag<File> inFlag = mFlags.registerRequired(File.class, FILE, "input VCF files to merge")
       .setMinCount(0)
       .setMaxCount(Integer.MAX_VALUE)
@@ -135,6 +135,42 @@ public class VcfMerge extends AbstractCli {
     }
   }
 
+  static void initAddHeaderFlag(CFlags flags) {
+    flags.registerOptional('a', ADD_HEADER_FLAG, String.class, STRING_OR_FILE, "file containing VCF header lines to add, or a literal header line")
+      .setMaxCount(Integer.MAX_VALUE)
+      .setCategory(UTILITY);
+  }
+
+  static Collection<String> getHeaderLines(CFlags flags) throws IOException {
+    final List<String> extraHeaderLines = new ArrayList<>();
+    if (flags.isSet(ADD_HEADER_FLAG)) {
+      for (final Object o : flags.getValues(ADD_HEADER_FLAG)) {
+        final String lineOrFile = (String) o;
+        if (lineOrFile.length() > 0) {
+          if (VcfHeader.isMetaLine(lineOrFile)) {
+            extraHeaderLines.add(lineOrFile);
+          } else if (new File(lineOrFile).exists()) {
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(FileUtils.createInputStream(new File(lineOrFile), false)))) {
+              String line;
+              while ((line = r.readLine()) != null) {
+                if (line.length() > 0) {
+                  if (VcfHeader.isMetaLine(line)) {
+                    extraHeaderLines.add(line);
+                  } else {
+                    throw new VcfFormatException("In additional header file " + lineOrFile + ", line '" + line + "', doesn't look like a VCF header line");
+                  }
+                }
+              }
+            }
+          } else {
+            throw new VcfFormatException("Additional header argument '" + lineOrFile + "', doesn't look like a VCF header line or a file");
+          }
+        }
+      }
+    }
+    return extraHeaderLines;
+  }
+
   @Override
   protected int mainExec(final OutputStream out, final PrintStream err) throws IOException {
     final File outFile = (File) mFlags.getValue(OUTPUT_FLAG);
@@ -145,12 +181,7 @@ public class VcfMerge extends AbstractCli {
         throw new NoTalkbackSlimException("File: " + f.getPath() + " is specified more than once.");
       }
     }
-    final ArrayList<String> extraHeaderLines = new ArrayList<>();
-    if (mFlags.isSet(ADD_HEADER_FLAG)) {
-      for (final Object o : mFlags.getValues(ADD_HEADER_FLAG)) {
-        extraHeaderLines.add((String) o);
-      }
-    }
+    final Collection<String> extraHeaderLines = getHeaderLines(mFlags);
     final HashSet<String> forceMerge;
     if (mFlags.isSet(FORCE_MERGE_ALL)) {
       forceMerge = null;
@@ -167,13 +198,7 @@ public class VcfMerge extends AbstractCli {
     final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
     final VcfPositionZipper posZip = new VcfPositionZipper(null, forceMerge, inputs.toArray(new File[inputs.size()]));
     final VcfHeader header = posZip.getHeader();
-    for (final String extraLine : extraHeaderLines) {
-      try {
-        header.addMetaInformationLine(extraLine);
-      } catch (final IllegalArgumentException e) {
-        throw new NoTalkbackSlimException("Invalid extra header line: " + extraLine);
-      }
-    }
+    VcfUtils.addHeaderLines(header, extraHeaderLines);
     header.addRunInfo();
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 

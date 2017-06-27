@@ -147,6 +147,8 @@ public final class CommonFlags {
   public static final String STRING = "STRING";
   /** FILE OR SDF */
   public static final String SDF_OR_FILE = "SDF|FILE";
+  /** FILE OR STRING */
+  public static final String STRING_OR_FILE = "STRING|FILE";
 
   /** Name of summary file. */
   public static final String SUMMARY_FILE = "summary.txt";
