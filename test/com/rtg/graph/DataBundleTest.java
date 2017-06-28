@@ -29,6 +29,8 @@
  */
 package com.rtg.graph;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.reeltwo.plot.Datum2D;
@@ -42,16 +44,25 @@ import junit.framework.TestCase;
 /**
  */
 public class DataBundleTest extends TestCase {
-  public void test() {
+  public void test() throws IOException {
     final RocPoint[] points = {new RocPoint(0, 5.0f, 4.0f, 0), new RocPoint(0, 200.0f, 100.0f, 0)};
     final String[] scores = {"5.0", "9.0"};
     final DataBundle db = new DataBundle("Monkey", points, scores, 300);
+    db.setScoreName("age");
     assertEquals(300, db.getTotalVariants());
     assertEquals(100.0, db.getPlot(1, 1).getHi(Graph2D.X), 1e-9);
     assertEquals(200.0, db.getPlot(1, 1).getHi(Graph2D.Y), 1e-9);
     assertEquals(4.0, db.getPlot(1, 1).getLo(Graph2D.X), 1e-9);
     assertEquals(5.0, db.getPlot(1, 1).getLo(Graph2D.Y), 1e-9);
     assertEquals("Monkey", db.getTitle());
+    db.setTitle(new File("vcfeval-monkey", "weighted_roc.tsv"), "");
+    assertEquals("monkey age", db.getTitle());
+    db.setTitle(new File("vcfeval_monkey.vcfeval", "weighted_roc.tsv"), "");
+    assertEquals("monkey age", db.getTitle());
+    db.setTitle(new File("eval.monkey-eval", "weighted_roc.tsv"), "");
+    assertEquals("monkey age", db.getTitle());
+    db.setTitle(new File("monkey_vcfeval.repeat", "snp_roc.tsv"), "");
+    assertEquals("monkey_vcfeval.repeat snp age", db.getTitle());
     assertEquals(2, db.getPlot(1, 1).getData().length);
   }
 

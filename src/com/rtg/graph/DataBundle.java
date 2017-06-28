@@ -30,6 +30,8 @@
 
 package com.rtg.graph;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +42,7 @@ import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.TextPlot2D;
 import com.reeltwo.plot.TextPoint2D;
 import com.rtg.util.ContingencyTable;
+import com.rtg.vcf.eval.RocFilter;
 import com.rtg.vcf.eval.RocPoint;
 
 /**
@@ -101,6 +104,34 @@ final class DataBundle {
 
   void setTitle(String title) {
     mTitle = title;
+  }
+
+  // Set an automatic name based on directory name of file and score field if no explicit name was provided
+  void setTitle(File f, String name) throws IOException {
+    if (name.length() > 0) {
+      setTitle(name);
+    } else {
+      final StringBuilder autoname = new StringBuilder();
+      final String parentDir = f.getAbsoluteFile().getParentFile().getName().replaceFirst("^(vcf)?eval[-_.]", "").replaceFirst("[-_.](vcf)?eval$", "");
+      autoname.append(parentDir);
+
+      final String fname = f.getName();
+      final int rocIdx = fname.indexOf(RocFilter.ROC_EXT);
+      if (rocIdx != -1 && !fname.startsWith(RocFilter.ALL.fileName())) {
+        if (autoname.length() > 0) {
+          autoname.append(' ');
+        }
+        autoname.append(fname.substring(0, rocIdx));
+      }
+
+      if (getScoreName() != null) {
+        if (autoname.length() > 0) {
+          autoname.append(' ');
+        }
+        autoname.append(getScoreName());
+      }
+      setTitle(autoname.toString());
+    }
   }
 
   void setScoreRange(float min, float max) {
