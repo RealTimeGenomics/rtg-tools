@@ -68,10 +68,14 @@ public class VcfSubsetTest extends AbstractCliTest {
     try (TestDirectory td = new TestDirectory()) {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf.gz");
-
       checkMainInitOk("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "YEA");
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
       mNano.check("vcfsubset-keepfilter.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(out)));
+
+      final File out2 = new File(td, "out2.vcf.gz");
+      checkMainInitOk("-i", f.getPath(), "-o", out2.getPath(), "--keep-filter", "PASS");
+      assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out2));
+      mNano.check("vcfsubset-keepfilter-pass.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(out2)));
     }
   }
 

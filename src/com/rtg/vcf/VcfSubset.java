@@ -41,13 +41,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -161,7 +163,10 @@ public class VcfSubset extends AbstractCli {
   private abstract class AnnotatorAdder {
 
     abstract List<? extends IdField<?>> getHeaderFields(VcfHeader header);
-
+    @SuppressWarnings("rawtypes")
+    Collection<String> getHeaderIds(VcfHeader header) {
+      return getHeaderFields(header).stream().map(IdField::getId).collect(Collectors.toSet());
+    }
     void additionalChecks(Set<String> flagValues, VcfHeader header) { }
     abstract VcfAnnotator makeAnnotator(boolean removeAll);
     abstract VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep);
@@ -177,42 +182,20 @@ public class VcfSubset extends AbstractCli {
         return annotator;
       } else {
         if (mFlags.isSet(removeFlag) || mFlags.isSet(keepFlag)) {
-          final List<?> infoslist;
-          final boolean keep;
-          if (mFlags.isSet(removeFlag)) {
-            infoslist = mFlags.getValues(removeFlag);
-            keep = false;
-          } else {
-            infoslist = mFlags.getValues(keepFlag);
-            keep = true;
-          }
-
-          final Set<String> infosset = new LinkedHashSet<>();
-          for (final Object anInfoslist : infoslist) {
-            Collections.addAll(infosset, (String) anInfoslist);
-          }
+          final boolean keep = !mFlags.isSet(removeFlag);
+          final Set<String> ids = mFlags.getValues(mFlags.isSet(removeFlag) ? removeFlag : keepFlag).stream().map(f -> (String) f).collect(Collectors.toCollection(LinkedHashSet::new));
 
           if (checkHeader) {
-            final Set<String> infoHeaderStrings = new LinkedHashSet<>();
-            for (final IdField<?> infoField : getHeaderFields(header)) {
-              infoHeaderStrings.add(infoField.getId());
-            }
-
-            final Set<String> infossetdup = new LinkedHashSet<>(infosset);
-            infossetdup.removeAll(infoHeaderStrings);
-
-            if (infossetdup.size() > 0) {
-              final StringBuilder sb = new StringBuilder();
-              for (final String s : infossetdup) {
-                sb.append(s).append(' ');
-              }
-              throw new NoTalkbackSlimException(fieldname + " fields not contained in VCF meta-information: " + sb.toString().trim());
+            final Set<String> unknownIds = new LinkedHashSet<>(ids);
+            unknownIds.removeAll(getHeaderIds(header));
+            if (!unknownIds.isEmpty()) {
+              throw new NoTalkbackSlimException(fieldname + " fields not contained in VCF meta-information: " + StringUtils.join(' ', unknownIds));
             }
           }
 
-          additionalChecks(infosset, header);
+          additionalChecks(ids, header);
 
-          final VcfAnnotator annotator = makeAnnotator(infosset, keep);
+          final VcfAnnotator annotator = makeAnnotator(ids, keep);
           annotators.add(annotator);
           return annotator;
         }
@@ -286,6 +269,14 @@ public class VcfSubset extends AbstractCli {
         @Override
         List<FilterField> getHeaderFields(VcfHeader header) {
           return header.getFilterLines();
+        }
+        @Override
+        Collection<String> getHeaderIds(VcfHeader header) {
+          final Collection<String> res = super.getHeaderIds(header);
+          if (!res.contains(VcfUtils.FILTER_PASS)) {
+            res.add(VcfUtils.FILTER_PASS);
+          }
+          return res;
         }
         @Override
         VcfAnnotator makeAnnotator(boolean removeAll) {
