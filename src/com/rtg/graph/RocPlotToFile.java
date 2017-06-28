@@ -68,7 +68,7 @@ public final class RocPlotToFile {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
       final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath());
-      RocPlot.setBundleTitle(db, f, name);
+      db.setTitle(f, name);
       data.put(db.getTitle(), db);
     }
     final GraphicsRenderer gr = new GraphicsRenderer();

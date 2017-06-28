@@ -713,37 +713,10 @@ public class RocPlot {
       mProgressBar.setString("This file has already been loaded");
     } else {
       final DataBundle data = ParseRocFile.loadStream(progress, FileUtils.createInputStream(f, false), f.getAbsolutePath());
-      setBundleTitle(data, f, name);
+      data.setTitle(f, name);
       addLine(path, data);
     }
   }
-
-  static void setBundleTitle(DataBundle data, File f, String name) throws IOException {
-    if (name.length() > 0) {
-      data.setTitle(name);
-    } else {
-      final StringBuilder autoname = new StringBuilder();
-      autoname.append(f.getAbsoluteFile().getParentFile().getName());
-
-      final String fname = f.getName();
-      final int rocIdx = fname.indexOf(RocFilter.ROC_EXT);
-      if (rocIdx != -1 && !fname.startsWith(RocFilter.ALL.fileName())) {
-        if (autoname.length() > 0) {
-          autoname.append(' ');
-        }
-        autoname.append(fname.substring(0, rocIdx));
-      }
-
-      if (data.getScoreName() != null) {
-        if (autoname.length() > 0) {
-          autoname.append(' ');
-        }
-        autoname.append(data.getScoreName());
-      }
-      data.setTitle(autoname.toString());
-    }
-  }
-
 
   private void addLine(String path, DataBundle dataBundle) {
     final Color initialColor = PALETTE[++mColorCounter % PALETTE.length];
