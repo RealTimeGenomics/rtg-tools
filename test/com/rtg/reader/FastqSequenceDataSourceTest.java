@@ -373,7 +373,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     assertEquals((byte) ('W' - '!'), q[6]);
     assertEquals((byte) ('@' - '!'), q[7]);
     assertEquals(0, q[8]);
-    assertEquals(DNA.N.ordinal(), b[7]);
+    assertEquals(DNA.N.ordinal(), b[7]); // Mapped from 'h'
     assertEquals(0, b[8]);
 
     assertTrue(ds.nextSequence());
@@ -390,11 +390,11 @@ public class FastqSequenceDataSourceTest extends TestCase {
     assertEquals((byte) ('$' - '!'), q[2]);
     assertEquals((byte) ('%' - '!'), q[3]);
     assertTrue(!ds.nextSequence());
-    assertEquals(1, ds.getWarningCount());
+    assertEquals(0, ds.getWarningCount());
 
     //testing solexa quality values
     al = new ArrayList<>();
-    al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n;~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
+    al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n;~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA);
     assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
@@ -410,7 +410,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
 
     //testing solexa 1.3 quality values
     al = new ArrayList<>();
-    al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n@~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
+    al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n@~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA1_3);
     assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
@@ -424,7 +424,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
     assertTrue(ds.hasQualityData());
     assertEquals(1, ds.getWarningCount());
     al = new ArrayList<>();
-    al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
+    al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA1_3);
     assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
 
@@ -434,7 +434,7 @@ public class FastqSequenceDataSourceTest extends TestCase {
         if (event.getType().equals(ErrorType.INVALID_QUALITY)) {
           assertEquals("Error: Quality data was invalid. You may need to try a different format type.", event.getMessage());
         } else if (event.getType().equals(WarningType.BAD_TIDE)) {
-          assertEquals("Unexpected symbol \"h\" in sequence \"test\" replaced with \"N\".", event.getMessage());
+          assertEquals("Unexpected symbol \"f\" in sequence \"test\" replaced with \"N\".", event.getMessage());
         } else {
           fail();
         }

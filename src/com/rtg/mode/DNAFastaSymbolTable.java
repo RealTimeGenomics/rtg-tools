@@ -47,18 +47,33 @@ public class DNAFastaSymbolTable extends FastaSymbolTable {
   @Override
   public final Residue scanResidue(int code) {
     switch (code & ~32) {
-    case 'A':
-      return DNA.A;
-    case 'C':
-      return DNA.C;
-    case 'G':
-      return DNA.G;
-    case 'T':
-    case 'U':
-      return DNA.T;
-    case 'N':
-      return DNA.N;
-    default:
+      case 'A':
+        return DNA.A;
+      case 'C':
+        return DNA.C;
+      case 'G':
+        return DNA.G;
+      case 'T':
+      case 'U':
+        return DNA.T;
+
+      // Explicitly map the IUPAC ambiguity codes to prevent "unrecognized symbol" warnings.
+      // Currently map to N, giving same SDF as previous releases. In future it may be
+      // worth either retaining enough bits to permit compatibile MD5 computation.
+      case 'W':
+      case 'M':
+      case 'R':
+      case 'D':
+      case 'H':
+      case 'V':
+      case 'B':
+      case 'S':
+      case 'Y':
+      case 'K':
+
+      case 'N':
+        return DNA.N;
+      default:
     }
     return null;
   }
