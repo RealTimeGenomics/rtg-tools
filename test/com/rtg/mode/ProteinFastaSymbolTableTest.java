@@ -72,9 +72,13 @@ public class ProteinFastaSymbolTableTest extends TestCase {
     assertEquals(Protein.X, t.scanResidue('Z'));
     assertEquals(Protein.X, t.scanResidue('B'));
 
-    assertNull(t.scanResidue('J'));
-    assertNull(t.scanResidue('O'));
-    assertNull(t.scanResidue('U'));
+    assertEquals(Protein.X, t.scanResidue('J'));
+    assertEquals(Protein.X, t.scanResidue('O'));
+    assertEquals(Protein.X, t.scanResidue('U'));
+
+    assertNull(t.scanResidue('1'));
+    assertNull(t.scanResidue('.'));
+    assertNull(t.scanResidue('%'));
 
     assertEquals(Protein.STOP, t.scanResidue('*'));
   }

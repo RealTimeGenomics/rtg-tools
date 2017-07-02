@@ -53,52 +53,58 @@ public class ProteinFastaSymbolTable extends FastaSymbolTable {
       return Protein.STOP;
     }
     switch (code & ~32) {
-    case 'A':
-      return Protein.A;
-    case 'C':
-      return Protein.C;
-    case 'D':
-      return Protein.D;
-    case 'E':
-      return Protein.E;
-    case 'F':
-      return Protein.F;
-    case 'G':
-      return Protein.G;
-    case 'H':
-      return Protein.H;
-    case 'I':
-      return Protein.I;
-    case 'K':
-      return Protein.K;
-    case 'L':
-      return Protein.L;
-    case 'M':
-      return Protein.M;
-    case 'N':
-      return Protein.N;
-    case 'P':
-      return Protein.P;
-    case 'Q':
-      return Protein.Q;
-    case 'R':
-      return Protein.R;
-    case 'S':
-      return Protein.S;
-    case 'T':
-      return Protein.T;
-    case 'V':
-      return Protein.V;
-    case 'W':
-      return Protein.W;
-    case 'Y':
-      return Protein.Y;
-    case 'X': //unknown residue
-    case 'Z': //Z has 2 options
-    case 'B': //B has 2 options
-      return Protein.X;
-    default:
-      return null;
+      case 'A':
+        return Protein.A;
+      case 'C':
+        return Protein.C;
+      case 'D':
+        return Protein.D;
+      case 'E':
+        return Protein.E;
+      case 'F':
+        return Protein.F;
+      case 'G':
+        return Protein.G;
+      case 'H':
+        return Protein.H;
+      case 'I':
+        return Protein.I;
+      case 'K':
+        return Protein.K;
+      case 'L':
+        return Protein.L;
+      case 'M':
+        return Protein.M;
+      case 'N':
+        return Protein.N;
+      case 'P':
+        return Protein.P;
+      case 'Q':
+        return Protein.Q;
+      case 'R':
+        return Protein.R;
+      case 'S':
+        return Protein.S;
+      case 'T':
+        return Protein.T;
+      case 'V':
+        return Protein.V;
+      case 'W':
+        return Protein.W;
+      case 'Y':
+        return Protein.Y;
+
+        // O and U, are new and should really have their own Residues. This is the backward compatibility option.
+      case 'O':
+      case 'U':
+
+      case 'J': //J has 2 options
+      case 'Z': //Z has 2 options
+      case 'B': //B has 2 options
+      case 'X': //unknown residue
+        return Protein.X;
+      default:
+        return null;
     }
   }
   @Override
