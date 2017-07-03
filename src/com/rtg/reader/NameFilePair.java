@@ -78,7 +78,8 @@ class NameFilePair {
    */
   public void writeName(final String name) throws IOException {
     mPointers.writeInt(mDataSize);
-    final byte[] rawChars = name.getBytes();
+    final byte[] rawChars = name.getBytes("iso8859-1");
+    //final byte[] rawChars = name.getBytes();
     mNameData.write(rawChars);
     mNameData.write(0); //it worked for c (kinda)
     mDataSize += rawChars.length + 1;

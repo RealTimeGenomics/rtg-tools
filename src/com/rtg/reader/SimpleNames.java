@@ -97,9 +97,9 @@ public class SimpleNames implements NamesInterface {
   public long calcChecksum() {
     final PrereadHashFunction namef = new PrereadHashFunction();
     for (long k = 0; k < length(); ++k) {
-      final byte[] name = getNameBytes(k);
+      final String name = name(k);
       namef.irvineHash(name);
-      namef.irvineHash(name.length);
+      namef.irvineHash(name.length());
     }
     return namef.getHash();
   }

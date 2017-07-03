@@ -188,7 +188,8 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     if (data.read() != 0) {
       throw new CorruptSdfException(mDirectory);
     }
-    return new String(bytes);
+    return new String(bytes, "iso8859-1");
+    //return new String(bytes);
   }
 
   private int readDataInternal(byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
