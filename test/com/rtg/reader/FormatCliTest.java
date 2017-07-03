@@ -116,6 +116,7 @@ public class FormatCliTest extends AbstractCliTest {
     + "Number of sequences: 2" + StringUtils.LS
     + "Total residues     : 10" + StringUtils.LS
     + "Minimum length     : 5" + StringUtils.LS
+    + "Mean length        : 5" + StringUtils.LS
     + "Maximum length     : 5" + StringUtils.LS;
 
   public void testValidUseA() throws Exception {
@@ -150,6 +151,7 @@ public class FormatCliTest extends AbstractCliTest {
         , "Number of sequences: 1" + StringUtils.LS
         + "Total residues     : 5" + StringUtils.LS
         + "Minimum length     : 5" + StringUtils.LS
+        + "Mean length        : 5" + StringUtils.LS
         + "Maximum length     : 5" + StringUtils.LS
         + StringUtils.LS
         + "There were 1 sequences skipped due to filters" + StringUtils.LS
@@ -194,27 +196,19 @@ public class FormatCliTest extends AbstractCliTest {
     }
   }
 
-  private static final String EXPECTED_FASTQ_MSG = "" + StringUtils.LS
-    + "Format             : FASTQ" + StringUtils.LS
-    + "Type               : DNA" + StringUtils.LS
-    + "Number of sequences: 1" + StringUtils.LS
-    + "Total residues     : 5" + StringUtils.LS
-    + "Minimum length     : 5" + StringUtils.LS
-    + "Maximum length     : 5" + StringUtils.LS;
-
   public void testValidUseQ() throws Exception {
     try (final TestDirectory tempDir = new TestDirectory("format")) {
       final File raw = new File(tempDir, "raw");
       FileUtils.stringToFile("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n", raw);
       final File outputDir = new File(tempDir, JUNITOUT);
       final String bout = checkMainInitOk("-o", outputDir.getPath(), "-f", "fastq", "-q", "sanger", raw.getPath());
-      TestUtils.containsAll(bout, EXPECTED_FASTQ_MSG);
+      mNano.check("format-useq.txt", StringUtils.grepMinusV(bout, "SDF-ID|Processing|Formatting FASTQ"));
       assertTrue(outputDir.isDirectory());
       assertTrue(new File(outputDir, "mainIndex").exists());
       final File summary = new File(outputDir, "summary.txt");
       assertTrue(summary.exists());
       final String sum = FileUtils.fileToString(summary);
-      assertTrue(sum, sum.contains(EXPECTED_FASTQ_MSG));
+      mNano.check("format-useq.txt", StringUtils.grepMinusV(sum, "SDF-ID"));
 
       final File outf = new File(tempDir, "out.fasta");
       //System.err.println("bos 1 ' " + bos.toString());
@@ -280,6 +274,7 @@ public class FormatCliTest extends AbstractCliTest {
           + "Number of sequences: 4" + StringUtils.LS
           + "Total residues     : 20" + StringUtils.LS
           + "Minimum length     : 5" + StringUtils.LS
+          + "Mean length        : 5" + StringUtils.LS
           + "Maximum length     : 5" + StringUtils.LS
           + StringUtils.LS
           + "Output Data" + StringUtils.LS
@@ -288,6 +283,7 @@ public class FormatCliTest extends AbstractCliTest {
           + "Number of sequences: 2" + StringUtils.LS
           + "Total residues     : 10" + StringUtils.LS
           + "Minimum length     : 5" + StringUtils.LS
+          + "Mean length        : 5" + StringUtils.LS
           + "Maximum length     : 5" + StringUtils.LS
           + StringUtils.LS
           + "There were 1 pairs skipped due to filters" + StringUtils.LS
@@ -356,27 +352,19 @@ public class FormatCliTest extends AbstractCliTest {
     }
   }
 
-  private static final String EXPECTED_PRT_MSG = "" + StringUtils.LS
-    + "Format             : FASTA" + StringUtils.LS
-    + "Type               : PROTEIN" + StringUtils.LS
-    + "Number of sequences: 1" + StringUtils.LS
-    + "Total residues     : 22" + StringUtils.LS
-    + "Minimum length     : 22" + StringUtils.LS
-    + "Maximum length     : 22" + StringUtils.LS;
-
   public void testValidUseProtein() throws Exception {
     try (TestDirectory tempDir = new TestDirectory("format")) {
       final File raw = new File(tempDir, "in.fasta");
       FileUtils.stringToFile(">x\nX*ARNDCQEGHILKMFPSTWYV\n", raw);
       final File outputDir = new File(tempDir, JUNITOUT);
       final String outStr = checkMainInitOk("-o", outputDir.getPath(), "-p", raw.getPath());
-      assertTrue(outStr.contains(EXPECTED_PRT_MSG));
+      mNano.check("format-useprotein.txt", StringUtils.grepMinusV(outStr, "SDF-ID|Processing|Formatting FASTA"));
       assertTrue(outputDir.isDirectory());
       assertTrue(new File(outputDir, "mainIndex").exists());
       final File summary = new File(outputDir, "summary.txt");
       assertTrue(summary.exists());
       final String sum = FileUtils.fileToString(summary);
-      assertTrue(sum, sum.contains(EXPECTED_PRT_MSG));
+      mNano.check("format-useprotein.txt", StringUtils.grepMinusV(sum, "SDF-ID"));
       final File outf = new File(tempDir, "out.fasta");
       final MainResult res = MainResult.run(new Sdf2Fasta(), "-o", outf.getPath(), "-i", outputDir.getPath(), "-Z");
       assertEquals(0, res.out().length());
@@ -674,26 +662,7 @@ public class FormatCliTest extends AbstractCliTest {
       FileHelper.resourceToFile("com/rtg/reader/resources/interleaved.fastq", input);
       final File output = new File(tempDir, "output");
       final MainResult res = checkMainInit("-o",  output.getPath(), "-f", "fastq-interleaved", input.getPath());
-      TestUtils.containsAll(res.out()
-        , "Formatting interleaved paired-end FASTQ data"
-        , "Input Data" + StringUtils.LS
-          + "Files              : input.fastq" + StringUtils.LS
-          + "Format             : interleaved paired-end FASTQ" + StringUtils.LS
-          + "Type               : DNA" + StringUtils.LS
-          + "Number of pairs    : 20" + StringUtils.LS
-          + "Number of sequences: 40" + StringUtils.LS
-          + "Total residues     : 4040" + StringUtils.LS
-          + "Minimum length     : 101" + StringUtils.LS
-          + "Maximum length     : 101" + StringUtils.LS
-          + StringUtils.LS
-          + "Output Data" + StringUtils.LS
-          + "SDF-ID             : "
-        , "Number of pairs    : 20" + StringUtils.LS
-          + "Number of sequences: 40" + StringUtils.LS
-          + "Total residues     : 4040" + StringUtils.LS
-          + "Minimum length     : 101" + StringUtils.LS
-          + "Maximum length     : 101" + StringUtils.LS
-      );
+      mNano.check("format-interleaved.txt", StringUtils.grepMinusV(res.out(), "SDF-ID|Processing"));
 
       assertTrue(output.isDirectory());
       assertTrue(new File(output, "left").isDirectory());

@@ -195,12 +195,12 @@ public class Cg2SdfTest extends AbstractCliTest {
       FileUtils.stringToFile(">flags\treads\tscores\n1\tANAAANAAAACCCCCCCCCC\tABCDEFGHIJJIHGFEDCBA\n2\tANAAANNAAACCCCCNCCCC\tABCDEFGHIJJIHGFEDCBA\n", in);
 
       final String outStr = checkMainInitOk("-o", out.getPath(), "--max-unknowns", "2", in.getPath());
-      TestUtils.containsAll(outStr, EXPECTED_MSGS);
+      mNano.check("cg2sdf-testns.txt", StringUtils.grepMinusV(outStr, "SDF-ID|Processing"));
 
       final File summary = new File(out, "summary.txt");
       assertTrue(summary.exists());
-      final String sum = FileUtils.fileToString(summary);
-      TestUtils.containsAll(sum, EXPECTED_MSGS);
+      final String sum = StringUtils.grepMinusV(FileUtils.fileToString(summary), "SDF-ID");
+      mNano.check("cg2sdf-testns.txt", sum);
     }
   }
 

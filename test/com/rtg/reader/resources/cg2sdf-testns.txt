@@ -1,0 +1,21 @@
+
+Input Data
+Files              : in.tsv
+Format             : CG
+Type               : DNA
+Number of pairs    : 2
+Number of sequences: 4
+Total residues     : 40
+Minimum length     : 10
+Mean length        : 10
+Maximum length     : 10
+
+Output Data
+Number of pairs    : 1
+Number of sequences: 2
+Total residues     : 20
+Minimum length     : 10
+Mean length        : 10
+Maximum length     : 10
+
+There were 1 pairs skipped due to filters

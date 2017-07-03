@@ -1,0 +1,20 @@
+Formatting interleaved paired-end FASTQ data
+
+Input Data
+Files              : input.fastq
+Format             : interleaved paired-end FASTQ
+Type               : DNA
+Number of pairs    : 20
+Number of sequences: 40
+Total residues     : 4040
+Minimum length     : 101
+Mean length        : 101
+Maximum length     : 101
+
+Output Data
+Number of pairs    : 20
+Number of sequences: 40
+Total residues     : 4040
+Minimum length     : 101
+Mean length        : 101
+Maximum length     : 101

@@ -33,6 +33,7 @@ import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -118,7 +119,7 @@ public final class Cg2Sdf extends LoggedCli {
     return name;
   }
 
-  private static void performPreread(final Collection<File> inputFiles, final File output, final Integer maximumNs, boolean useQuality, PrintStream[] summaries, boolean compress, boolean includeNames, SAMReadGroupRecord samReadGroupRecord) throws IOException {
+  private static void performPreread(final Collection<File> inputFiles, final File output, final Integer maximumNs, boolean useQuality, PrintStream ps, boolean compress, boolean includeNames, SAMReadGroupRecord samReadGroupRecord) throws IOException {
 
     final SdfId sdfId = new SdfId();
 
@@ -163,39 +164,11 @@ public final class Cg2Sdf extends LoggedCli {
         }
       }
 
-      if (summaries != null) {
-        final StringBuilder fileList = new StringBuilder();
-        for (final File f : inputFiles) {
-          fileList.append(" ").append(f.getName());
-        }
-        printLine("", summaries);
-        printLine("Input Data", summaries);
-        printLine("Files              :" + fileList.toString(), summaries);
-        printLine("Format             : " + PrereadType.CG.toString(), summaries);
-        printLine("Type               : " + "DNA", summaries);
-        printLine("Number of pairs    : " + (writer.getNumberOfSequences() / 2 + skippedNReads), summaries);
-        printLine("Number of sequences: " + (writer.getNumberOfSequences() + skippedNReads * 2), summaries);
-        printLine("Total residues     : " + (writer.getTotalLength() + skippedResidues), summaries);
-        if (maxInputLength >= minInputLength) {
-          printLine("Minimum length     : " + minInputLength, summaries);
-          printLine("Maximum length     : " + maxInputLength, summaries);
-        }
-
-        printLine("", summaries);
-        printLine("Output Data", summaries);
-        printLine("SDF-ID             : " + writer.getSdfId().toString(), summaries);
-        printLine("Number of pairs    : " + writer.getNumberOfSequences() / 2, summaries);
-        printLine("Number of sequences: " + writer.getNumberOfSequences(), summaries);
-        printLine("Total residues     : " + writer.getTotalLength(), summaries);
-        if (writer.getMaxLength() >= writer.getMinLength()) {
-          printLine("Minimum length     : " + writer.getMinLength(), summaries);
-          printLine("Maximum length     : " + writer.getMaxLength(), summaries);
-        }
-        if (skippedNReads > 0) {
-          printLine("", summaries);
-          printLine("There were " + skippedNReads + " pairs skipped due to filters", summaries);
-        }
-      }
+      final long inResidues = writer.getTotalLength() + skippedResidues;
+      final long inSeqs = writer.getNumberOfSequences() + skippedNReads * 2;
+      final FormatCli.PrereadExecutor.Counts inputCounts = new FormatCli.PrereadExecutor.Counts(inSeqs, inResidues, maxInputLength, minInputLength);
+      final FormatCli.PrereadExecutor.Counts outputCounts = new FormatCli.PrereadExecutor.Counts(writer.getNumberOfSequences(), writer.getTotalLength(), writer.getMaxLength(), writer.getMinLength());
+      FormatCli.PrereadExecutor.writeStats(inputFiles, PrereadType.CG.toString(), "DNA", true, 0, inputCounts, outputCounts, writer.getSdfId(), ps);
     }
   }
 
@@ -209,7 +182,6 @@ public final class Cg2Sdf extends LoggedCli {
         final Integer maximumNs = (Integer) mFlags.getValue(MAXIMUM_NS);
 
         final boolean useQuality = !mFlags.isSet(NO_QUALITY);
-        final PrintStream[] summaries = {outStream, summaryStream};
         final SAMReadGroupRecord samReadGroupRecord;
         if (mFlags.isSet(SamCommandHelper.SAM_RG)) {
           samReadGroupRecord = SamCommandHelper.validateAndCreateSamRG((String) mFlags.getValue(SamCommandHelper.SAM_RG), SamCommandHelper.ReadGroupStrictness.REQUIRED);
@@ -224,8 +196,12 @@ public final class Cg2Sdf extends LoggedCli {
         } else {
           samReadGroupRecord = null;
         }
-        try {
-          performPreread(inputFiles, output, maximumNs, useQuality, summaries, (Boolean) mFlags.getValue(COMPRESS_FLAG), mFlags.isSet(KEEP_NAMES), samReadGroupRecord);
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try (final PrintStream ps = new PrintStream(bos)) {
+          performPreread(inputFiles, output, maximumNs, useQuality, ps, (Boolean) mFlags.getValue(COMPRESS_FLAG), mFlags.isSet(KEEP_NAMES), samReadGroupRecord);
+          ps.flush();
+          outStream.print(bos.toString());
+          summaryStream.print(bos.toString());
         } catch (final IOException e) {
           if (output.getUsableSpace() == 0) {
             throw new NoTalkbackSlimException(e, ErrorType.DISK_SPACE, output.getPath());

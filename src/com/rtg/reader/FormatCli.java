@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -424,7 +425,7 @@ public final class FormatCli extends LoggedCli {
       final Counts inputCounts = new Counts(writer.getNumberOfSequences() + writer.getNumberOfExcludedSequences(), writer.getTotalLength() + writer.getExcludedResidueCount(), ds.getMaxLength() , ds.getMinLength());
       final Counts outputCounts = new Counts(writer.getNumberOfSequences(), writer.getTotalLength(), writer.getMaxLength(), writer.getMinLength());
       mNumSequences = mInputDescription.isInterleaved() ? writer.getNumberOfSequences() / 2 : writer.getNumberOfSequences();
-      writeStats(files.toArray(new File[files.size()]), mInputDescription.isInterleaved(), inputCounts, outputCounts, writer.getSdfId(), ds.getDusted());
+      writeStats(files, mInputDescription.toString(), mProtein ? "PROTEIN" : "DNA", mInputDescription.isInterleaved(), ds.getDusted(), inputCounts, outputCounts, writer.getSdfId(), mOut);
       checkAndInstallReferenceDescription();
     }
 
@@ -526,10 +527,10 @@ public final class FormatCli extends LoggedCli {
 
       final long dusted = leftds.getDusted() + rightds.getDusted();
       mNumSequences = outputSeqs / 2;
-      writeStats(new File[] {leftFile, rightFile}, true, inputCounts, outputCounts, sdfId, dusted);
+      writeStats(Arrays.asList(leftFile, rightFile), mInputDescription.toString(), mProtein ? "PROTEIN" : "DNA", true, dusted, inputCounts, outputCounts, sdfId, mOut);
     }
 
-    private static class Counts {
+    static class Counts {
       protected final long mSequences;
       protected final long mResidues;
       protected final long mMaxLen;
@@ -543,50 +544,52 @@ public final class FormatCli extends LoggedCli {
       }
     }
 
-    private void writeStats(File[] files, boolean paired, Counts input, Counts output, SdfId sdfId, long dusted) {
-      if (mOut != null) {
+    static void writeStats(Collection<File> files, String formatType, String dataType, boolean paired, long dusted, Counts input, Counts output, SdfId sdfId, PrintStream out) {
+      if (out != null) {
         final StringBuilder fileList = new StringBuilder();
         for (final File f : files) {
           fileList.append(" ").append(f.getName());
         }
-        mOut.println();
-        mOut.println("Input Data");
-        mOut.println("Files              :" + fileList.toString());
-        mOut.println("Format             : " + mInputDescription.toString());
-        mOut.println("Type               : " + (mProtein ? "PROTEIN" : "DNA"));
+        out.println();
+        out.println("Input Data");
+        out.println("Files              :" + fileList.toString());
+        out.println("Format             : " + formatType);
+        out.println("Type               : " + dataType);
         if (paired) {
-          mOut.println("Number of pairs    : " + (input.mSequences / 2));
+          out.println("Number of pairs    : " + (input.mSequences / 2));
         }
-        mOut.println("Number of sequences: " + input.mSequences);
-        mOut.println("Total residues     : " + input.mResidues);
-        if (input.mMaxLen >= input.mMinLen) {
-          mOut.println("Minimum length     : " + input.mMinLen);
-          mOut.println("Maximum length     : " + input.mMaxLen);
+        out.println("Number of sequences: " + input.mSequences);
+        out.println("Total residues     : " + input.mResidues);
+        if (input.mSequences > 0) {
+          out.println("Minimum length     : " + input.mMinLen);
+          out.println("Mean length        : " + (input.mResidues / input.mSequences));
+          out.println("Maximum length     : " + input.mMaxLen);
         }
-        mOut.println("");
-        mOut.println("Output Data");
-        mOut.println("SDF-ID             : " + sdfId.toString());
+        out.println("");
+        out.println("Output Data");
+        out.println("SDF-ID             : " + sdfId.toString());
         if (paired) {
-          mOut.println("Number of pairs    : " + (output.mSequences / 2));
+          out.println("Number of pairs    : " + (output.mSequences / 2));
         }
-        mOut.println("Number of sequences: " + output.mSequences);
-        mOut.println("Total residues     : " + output.mResidues);
-        if (output.mMaxLen >= output.mMinLen) {
-          mOut.println("Minimum length     : " + output.mMinLen);
-          mOut.println("Maximum length     : " + output.mMaxLen);
+        out.println("Number of sequences: " + output.mSequences);
+        out.println("Total residues     : " + output.mResidues);
+        if (output.mSequences > 0) {
+          out.println("Minimum length     : " + output.mMinLen);
+          out.println("Mean length        : " + (output.mResidues / output.mSequences));
+          out.println("Maximum length     : " + output.mMaxLen);
         }
         final long excluded = input.mSequences - output.mSequences;
         if (excluded > 0 || dusted > 0) {
-          mOut.println("");
+          out.println("");
           if (excluded > 0) {
             if (paired) {
-              mOut.println("There were " + (excluded / 2) + " pairs skipped due to filters");
+              out.println("There were " + (excluded / 2) + " pairs skipped due to filters");
             } else {
-              mOut.println("There were " + excluded + " sequences skipped due to filters");
+              out.println("There were " + excluded + " sequences skipped due to filters");
             }
           }
           if (dusted > 0) {
-            mOut.println("There were " + dusted + " residues converted from lower case to unknowns");
+            out.println("There were " + dusted + " residues converted from lower case to unknowns");
           }
         }
       }

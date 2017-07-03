@@ -1,0 +1,17 @@
+
+Input Data
+Files              : in.fasta
+Format             : FASTA
+Type               : PROTEIN
+Number of sequences: 1
+Total residues     : 22
+Minimum length     : 22
+Mean length        : 22
+Maximum length     : 22
+
+Output Data
+Number of sequences: 1
+Total residues     : 22
+Minimum length     : 22
+Mean length        : 22
+Maximum length     : 22
