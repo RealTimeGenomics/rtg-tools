@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import com.rtg.AbstractTest;
@@ -121,6 +122,20 @@ public class SdfVerifierTest extends AbstractTest {
     }
   }
 
+  long hashChar(int c) throws UnsupportedEncodingException {
+    final PrereadHashFunction h = new PrereadHashFunction();
+    h.irvineHash(new String(new byte[] {(byte) c}));
+    //h.irvineHash(new String(new byte[] {(byte) c}, "cp1252"));
+    return h.getHash();
+  }
+
+  // irvineHash(String) only checks the lower 8 bits of each character, and under some encodings
+  // this gives a hash collision (e.g. 32 collides with 134 when decoded with default windows encodings
+  // such as cp1252.
+  protected boolean hashCollision(int current, int replace) throws UnsupportedEncodingException {
+    return hashChar(current) == hashChar(replace);
+  }
+
   public void testVerifierRandomMutation() throws IOException {
     final StringBuilder failures = new StringBuilder();
     final PortableRandom rnd = new PortableRandom();
@@ -149,7 +164,7 @@ public class SdfVerifierTest extends AbstractTest {
           int replace;
           do {
             replace = rnd.nextInt(256);
-          } while ((byte) replace == (byte) current);
+          } while ((byte) replace == (byte) current || hashCollision(current, replace));
           f.seek(placeToMutate);
           f.writeByte(replace);
           desc = "Changed " + current + " to " + replace + " at position " + placeToMutate + " in " + target.getPath();
