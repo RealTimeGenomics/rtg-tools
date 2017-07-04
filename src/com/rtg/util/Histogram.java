@@ -30,6 +30,8 @@
 
 package com.rtg.util;
 
+import static com.rtg.util.StringUtils.LS;
+
 import java.util.Arrays;
 
 /**
@@ -101,6 +103,22 @@ public class Histogram {
       sb.append(i).append("\t");
     }
     return sb.toString().trim();
+  }
+
+  /**
+   * Output the table as basic tab separated
+   * @param includeZeros if true, include rows containing zero counts.
+   * @return the <code>TSV</code> representation
+   */
+  public String getAsTsv(boolean includeZeros) {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < getLength(); ++i) {
+      final long count = mHistogram[i];
+      if (includeZeros || count > 0) {
+        sb.append(i).append('\t').append(count).append(LS);
+      }
+    }
+    return sb.toString();
   }
 
   /**

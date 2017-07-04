@@ -30,6 +30,8 @@
 
 package com.rtg.util;
 
+import static com.rtg.util.StringUtils.LS;
+
 import junit.framework.TestCase;
 
 /**
@@ -59,6 +61,7 @@ public class HistogramTest extends TestCase {
     hist2.addHistogram(hist.toString());
     assertEquals(10, hist2.getLength());
     assertEquals("1\t0\t10\t1\t0\t0\t0\t0\t0\t9", hist2.toString());
+    assertEquals("0\t1" + LS + "2\t10" + LS + "3\t1" + LS + "9\t9" + LS, hist2.getAsTsv(false));
     final double[] dist = hist.toDistribution();
     assertEquals(10, dist.length);
     assertEquals(0.0476, dist[0], 0.00005);
