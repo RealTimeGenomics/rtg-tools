@@ -93,9 +93,14 @@ public class FastqSequenceTest {
   }
 
   static FastqSequence getFastq(String name, String bases) {
-    final byte[] qualities = new byte[bases.length()];
-    Arrays.fill(qualities, (byte) 64);
-    return getFastq(name, bases, qualities);
+    return getFastq(name, bases, 64);
+  }
+
+  static FastqSequence getFastq(String name, String bases, int quality) {
+    final byte[] basesStr = DnaUtils.encodeStringWithHyphen(bases);
+    final byte[] qualities = new byte[basesStr.length];
+    Arrays.fill(qualities, (byte) Math.min(quality, 64));
+    return new FastqSequence(name, basesStr, qualities, qualities.length);
   }
 
   static FastqSequence getFastq(String name, String bases, byte[] qualities) {
