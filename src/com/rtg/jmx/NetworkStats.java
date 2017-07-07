@@ -31,7 +31,11 @@ package com.rtg.jmx;
 
 import static com.rtg.jmx.MonUtils.NF2;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import com.rtg.util.Constants;
 
@@ -45,6 +49,8 @@ public class NetworkStats extends ExternalCommand implements MonStats {
   private static final String NA = "n/a";
   private static final double MB = Constants.MB; // Convert to double
 
+  private static final String RX_STATS_FILE_BASE = "/sys/class/net/%s/statistics/rx_bytes";
+  private static final String TX_STATS_FILE_BASE = "/sys/class/net/%s/statistics/tx_bytes";
 
   private final boolean mEnabled;
   private final String mInterface;
@@ -86,36 +92,53 @@ public class NetworkStats extends ExternalCommand implements MonStats {
     out.append(HEADERBOT);
   }
 
+  private Long readFirstLineAsLong(String filePathBase) throws IOException {
+    final File file = new File(String.format(filePathBase, mInterface));
+    if (file.exists()) {
+      final Path path = file.toPath();
+      final List<String> strings = Files.readAllLines(path);
+      if (strings.size() > 0) {
+        try {
+          return Long.parseLong(strings.get(0));
+        } catch (NumberFormatException e) {
+          return null;
+        }
+      }
+    }
+    return null;
+  }
+
+  private Long readRxBytes() throws IOException {
+    return readFirstLineAsLong(RX_STATS_FILE_BASE);
+  }
+
+  private Long readTxBytes() throws IOException {
+    return readFirstLineAsLong(TX_STATS_FILE_BASE);
+  }
+
   @Override
   public void addColumnData(Appendable out) throws IOException {
     if (!mEnabled) {
       return;
     }
-    final String[] lines = runCommand();
     String txs = NA;
     String rxs = NA;
-    if (lines != null) {
-      for (int i = lines.length - 1; i >= 0; --i) {
-        //System.err.println("network line : " + lines[i]);
-        if (lines[i].contains("RX bytes")) {
-          final String[] res = lines[i].trim().split("[  ]+");
-          final long rx = Long.parseLong(res[1].split(":")[1]);
-          final long tx = Long.parseLong(res[5].split(":")[1]);
-          final long time = System.currentTimeMillis();
-          final long dt = tx - mTx;
-          final long dr = rx - mRx;
-          final double dtime = (time - mTime) / 1000.0;
-          mTx = tx;
-          mRx = rx;
-          mTime = time;
-          if (dt >= 0 && dr >= 0) {
-            txs = NF2.format(dt / dtime / MB);
-            rxs = NF2.format(dr / dtime / MB);
-          }
-          break;
-        }
+    final Long tx = readTxBytes();
+    final Long rx = readRxBytes();
+    if (tx != null && rx != null) {
+      final long time = System.currentTimeMillis();
+      final long dt = tx - mTx;
+      final long dr = rx - mRx;
+      final double dtime = (time - mTime) / 1000.0;
+      mTx = tx;
+      mRx = rx;
+      mTime = time;
+      if (dt >= 0 && dr >= 0) {
+        txs = NF2.format(dt / dtime / MB);
+        rxs = NF2.format(dr / dtime / MB);
       }
     }
+
     out.append(" ");
     MonUtils.pad(out, txs, 6);
     out.append(" ");
