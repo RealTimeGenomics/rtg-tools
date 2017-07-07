@@ -42,7 +42,9 @@ import com.rtg.reader.SourceTemplateReadWriter;
 import com.rtg.reference.ReferenceGenome;
 import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.reference.Sex;
-import com.rtg.simulation.genome.SequenceDistribution;
+import com.rtg.simulation.DistributionSampler;
+import com.rtg.simulation.IntSampler;
+import com.rtg.simulation.SimulationUtils;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -51,10 +53,11 @@ import com.rtg.util.diagnostic.Diagnostic;
  * Produces fragments for read simulation from provided genomes.
  */
 public class GenomeFragmenter {
+
   private static final int NUMBER_TRIES = 1000;
   private static final int MAX_WARNINGS = 5;
   private static final boolean OS_SEQ = GlobalFlags.isSet(ToolsGlobalFlags.OS_SEQ_FRAGMENTS);
-  private static final int OS_SEQ_MIN = GlobalFlags.getIntegerValue(ToolsGlobalFlags.OS_SEQ_FRAGMENTS);
+  static final int OS_SEQ_MIN = GlobalFlags.getIntegerValue(ToolsGlobalFlags.OS_SEQ_FRAGMENTS);
 
   private Machine mMachine;
   private int mCounter;
@@ -62,22 +65,24 @@ public class GenomeFragmenter {
   private final ReferenceGenome[] mRefGenome;
   private final int[][] mSequenceLengths;
   private boolean mAllowNs;
-  private int mMinFragmentSize;
-  private int mMaxFragmentSize;
+  private IntSampler mLengthChooser = null;
   private final PortableRandom mPositionRandom;
   private final PortableRandom mLengthRandom;
   private byte[] mByteBuffer;
   private byte[] mWorkspace;
   private int mWarnCount = 0;
-  private final SequenceDistribution[] mSelectionDistributions;
+  private final DistributionSampler[] mSelectionDistributions;
   private boolean mHasIdentified = false;
   private final int[][] mSequenceCounts;
 
-  GenomeFragmenter(long randomSeed, SequenceDistribution[] selectionProb, SequencesReader[] sdfs) throws IOException {
+  GenomeFragmenter(long randomSeed, DistributionSampler[] selectionProb, SequencesReader[] sdfs) throws IOException {
     mLengthRandom = new PortableRandom(randomSeed);
     mPositionRandom = new PortableRandom(mLengthRandom.nextLong() * 11);
     mReaders = sdfs;
     mSelectionDistributions = selectionProb;
+    for (DistributionSampler s : selectionProb) {
+      s.setRandom(mPositionRandom);
+    }
     mSequenceLengths = new int[sdfs.length][];
     mSequenceCounts = new int[sdfs.length][];
     for (int i = 0; i < mReaders.length; ++i) {
@@ -97,10 +102,11 @@ public class GenomeFragmenter {
   GenomeFragmenter(long randomSeed, SequencesReader... sdfs) throws IOException {
     this(randomSeed, defaultDistributions(sdfs), sdfs);
   }
-  static SequenceDistribution[] defaultDistributions(SequencesReader[] sdfs) throws IOException {
-    final SequenceDistribution[] result = new SequenceDistribution[sdfs.length];
+
+  static DistributionSampler[] defaultDistributions(SequencesReader[] sdfs) throws IOException {
+    final DistributionSampler[] result = new DistributionSampler[sdfs.length];
     for (int i = 0; i < result.length; ++i) {
-      result[i] = SequenceDistribution.defaultDistribution(sdfs[i]);
+      result[i] = SimulationUtils.defaultDistribution(sdfs[i]);
     }
     return result;
   }
@@ -122,19 +128,12 @@ public class GenomeFragmenter {
   }
 
   /**
-   * Minimum size of a fragment
-   * @param min the size
+   * Set the object responsible for selecting the length of each subsequent fragment
+   * @param chooser the length chooser
    */
-  public void setMinFragmentSize(int min) {
-    mMinFragmentSize = min;
-  }
-
-  /**
-   * Maximum size of a fragment
-   * @param max the size
-   */
-  public void setMaxFragmentSize(int max) {
-    mMaxFragmentSize = max;
+  public void setLengthChooser(IntSampler chooser) {
+    mLengthChooser = chooser;
+    mLengthChooser.setRandom(mLengthRandom);
   }
 
   private boolean checkNs(int fragLength) {
@@ -155,23 +154,15 @@ public class GenomeFragmenter {
    * @throws NullPointerException if the machine is null.
    */
   public void makeFragment() throws IOException {
-    if (mMaxFragmentSize < mMinFragmentSize) {
-      throw new IllegalStateException();
-    }
-    if (mMinFragmentSize < OS_SEQ_MIN) {
-      throw new IllegalStateException();
-    }
-    final double mid = (mMaxFragmentSize + mMinFragmentSize) * 0.5 + 0.5;
-    final double width = (mMaxFragmentSize - mMinFragmentSize) * 0.25; // 2 std devs per side
-    int fragLength = 0;
-    for (int x = 0; x < NUMBER_TRIES; ++x) {
-      fragLength = (int) (mLengthRandom.nextGaussian() * width + mid);
-      if ((fragLength >= mMinFragmentSize) && (fragLength <= mMaxFragmentSize)) {
-        break;
-      }
-    }
-    if ((fragLength >= mMinFragmentSize) && (fragLength <= mMaxFragmentSize)) {
-      if (OS_SEQ) { // Virtual truncation of off-probe end
+    int fragLength = mLengthChooser.next();
+    if (fragLength == Integer.MIN_VALUE) {
+      makeWarning("Could not generate fragment length within specified min and max length. Fragment skipped.");
+    } else {
+      if (OS_SEQ && OS_SEQ_MIN > 0) { // Virtual truncation of off-probe end
+        if (fragLength <= OS_SEQ_MIN) {
+          Diagnostic.developerLog("Length chooser returned fragment length smaller than OS_SEQ_MIN: " + fragLength + " <= " + OS_SEQ_MIN);
+          return;
+        }
         fragLength = mLengthRandom.nextInt(fragLength - OS_SEQ_MIN) + OS_SEQ_MIN;
       }
       if (mByteBuffer.length < fragLength) {
@@ -183,7 +174,7 @@ public class GenomeFragmenter {
         final int readerId = mPositionRandom.nextInt(mSequenceLengths.length);
 
         // Choose sequence
-        final int seqId = mSelectionDistributions[readerId].selectSequence(mPositionRandom.nextDouble());
+        final int seqId = mSelectionDistributions[readerId].next();
         final String seqName = mReaders[readerId].name(seqId);
         // Choose position on sequence
         final int sequenceLength = mSequenceLengths[readerId][seqId];
@@ -216,8 +207,6 @@ public class GenomeFragmenter {
         }
       }
       makeWarning("Could not generate fragment with length " + fragLength + ". Fragment skipped.");
-    } else {
-      makeWarning("Could not generate fragment length within specified min and max length. Fragment skipped.");
     }
   }
 

@@ -201,11 +201,11 @@ public class PopulationMutatorPriors {
       case SNP:
         return 1;
       case MNP:
-        return SimulationUtils.chooseLength(mMnpLengthDist, rand);
+        return SimulationUtils.chooseFromCumulative(mMnpLengthDist, rand);
       case INSERT:
       case DELETE:
       case INSDEL:
-        return SimulationUtils.chooseLength(mIndelLengthDist, rand) + 1; // the indel distribution starts from length 1
+        return SimulationUtils.chooseFromCumulative(mIndelLengthDist, rand) + 1; // the indel distribution starts from length 1
       default:
         throw new IllegalStateException("Unpossible");
     }

@@ -39,16 +39,8 @@ import java.util.Arrays;
  */
 public class Histogram {
 
-  private long[] mHistogram;
-  private int mLength;
-
-  /**
-   * Constructor
-   */
-  public Histogram() {
-    mHistogram = new long[100];
-    mLength = 0;
-  }
+  private long[] mHistogram = new long[100];
+  private int mLength = 0;
 
   /**
    * Increment the value at position by 1.

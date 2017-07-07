@@ -64,7 +64,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public static final String READ_STRAND = "com.rtg.simulation.reads.read-strand";
   /** Supply explicit sequence used for fragment read-through */
   public static final String READ_THROUGH = "com.rtg.simulation.reads.read-through";
-  /** If set, assume fragments are from OS-Seq sequencing, with this minimum size (e.g. probe length) */
+  /** If set, assume supplied fragments are from OS-Seq sequencing, and if this size is greater than 0, simulate fragment truncation */
   public static final String OS_SEQ_FRAGMENTS = "com.rtg.simulation.reads.os-seq-fragments";
 
   /** Output the best path found along with the haplotypes */

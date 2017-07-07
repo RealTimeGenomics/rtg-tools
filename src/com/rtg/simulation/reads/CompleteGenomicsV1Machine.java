@@ -75,15 +75,15 @@ public class CompleteGenomicsV1Machine extends CompleteGenomicsMachine {
   }
 
   private int generateOverlapLength() {
-    return SimulationUtils.chooseLength(mOverlapDistribution, mSegmentRandom.nextDouble()) - 4;
+    return SimulationUtils.chooseFromCumulative(mOverlapDistribution, mSegmentRandom.nextDouble()) - 4;
   }
 
   private int generateGapLength() {
-    return SimulationUtils.chooseLength(mGapDistribution, mSegmentRandom.nextDouble()) + 4;
+    return SimulationUtils.chooseFromCumulative(mGapDistribution, mSegmentRandom.nextDouble()) + 4;
   }
 
   private int generateSmallGapLength() {
-    return SimulationUtils.chooseLength(mSmallGapDistribution, mSegmentRandom.nextDouble());
+    return SimulationUtils.chooseFromCumulative(mSmallGapDistribution, mSegmentRandom.nextDouble());
   }
 
   @Override

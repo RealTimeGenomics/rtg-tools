@@ -66,7 +66,7 @@ public class CompleteGenomicsV2Machine extends CompleteGenomicsMachine {
   }
 
   private int generateOverlapLength() {
-    return SimulationUtils.chooseLength(mOverlapDistribution2, mSegmentRandom.nextDouble()) - 7;
+    return SimulationUtils.chooseFromCumulative(mOverlapDistribution2, mSegmentRandom.nextDouble()) - 7;
   }
 
   @Override

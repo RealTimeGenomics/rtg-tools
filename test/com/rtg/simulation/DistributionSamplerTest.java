@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rtg.simulation.genome;
+package com.rtg.simulation;
 
 import java.io.IOException;
 
@@ -39,36 +39,35 @@ import junit.framework.TestCase;
 
 /**
  */
-public class SequenceDistributionTest extends TestCase {
+public class DistributionSamplerTest extends TestCase {
   static final double E = 0.1E-9;
   static final double[] PROB = {0.1, 0.3, 0.1, 0.2, 0.2, 0.1};
   public void testDistribution() {
-    final SequenceDistribution dist = new SequenceDistribution(PROB);
+    final DistributionSampler dist = new DistributionSampler(PROB);
     check(dist);
   }
-  private void check(SequenceDistribution dist) {
-    assertEquals(0, dist.selectSequence(0.1 - E));
-    assertEquals(1, dist.selectSequence(0.4 - E));
-    assertEquals(2, dist.selectSequence(0.5 - E));
-    assertEquals(3, dist.selectSequence(0.7 - E));
-    assertEquals(4, dist.selectSequence(0.9 - E));
-    assertEquals(5, dist.selectSequence(1.0 - E));
+  private void check(DistributionSampler dist) {
+    assertEquals(0, dist.next(0.1 - E));
+    assertEquals(1, dist.next(0.4 - E));
+    assertEquals(2, dist.next(0.5 - E));
+    assertEquals(3, dist.next(0.7 - E));
+    assertEquals(4, dist.next(0.9 - E));
+    assertEquals(5, dist.next(1.0 - E));
 
-    assertEquals(1, dist.selectSequence(0.1 + E));
-    assertEquals(2, dist.selectSequence(0.4 + E));
-    assertEquals(3, dist.selectSequence(0.5 + E));
-    assertEquals(4, dist.selectSequence(0.7 + E));
-    assertEquals(5, dist.selectSequence(0.9 + E));
-
+    assertEquals(1, dist.next(0.1 + E));
+    assertEquals(2, dist.next(0.4 + E));
+    assertEquals(3, dist.next(0.5 + E));
+    assertEquals(4, dist.next(0.7 + E));
+    assertEquals(5, dist.next(0.9 + E));
   }
 
   public void testDefaults() throws IOException {
     final SequencesReader readerDnaMemory = ReaderTestUtils.getReaderDnaMemory(ReaderTestUtils.fasta("A", "AAA", "A", "AA", "AA", "A"));
-    check(SequenceDistribution.createDistribution(readerDnaMemory, null));
+    check(SimulationUtils.createDistribution(readerDnaMemory, null));
   }
 
   public void testOverrideDefaults() throws IOException {
     final SequencesReader readerDnaMemory = ReaderTestUtils.getReaderDnaMemory(ReaderTestUtils.fasta("AA", "AA", "AA", "AA", "AA", "AA"));
-    check(SequenceDistribution.createDistribution(readerDnaMemory, PROB));
+    check(SimulationUtils.createDistribution(readerDnaMemory, PROB));
   }
 }

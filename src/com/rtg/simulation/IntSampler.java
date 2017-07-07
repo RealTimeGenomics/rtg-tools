@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,30 +27,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.rtg.simulation;
 
-package com.rtg.simulation.reads;
-
-import java.io.IOException;
-
-import com.rtg.reader.SequencesReader;
-import com.rtg.simulation.DistributionSampler;
-import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.PortableRandom;
 
 /**
+ * Chooses integers according to a distribution
  */
-public class FilteringFragmenter extends GenomeFragmenter {
-  final ReferenceRegions mRegions;
+public interface IntSampler {
 
-  FilteringFragmenter(ReferenceRegions regions, long randomSeed, DistributionSampler[] selectionProb, SequencesReader[] sdfs) throws IOException {
-    super(randomSeed, selectionProb, sdfs);
-    mRegions = regions;
-  }
+  /**
+   * Sets the randomization source
+   * @param r the random number source
+   */
+  void setRandom(PortableRandom r);
 
-  @Override
-  boolean emitFragment(int fragLength, int seqId, int readerId, String seqName, int fragStart) throws IOException {
-    if (mRegions.overlapped(seqName, fragStart, fragStart + fragLength)) {
-      return super.emitFragment(fragLength, seqId, readerId, seqName, fragStart);
-    }
-    return false;
-  }
+  /**
+   * @return the next integer in the sequence, or Integer.MIN_VALUE when one could not be found
+   */
+  int next();
 }

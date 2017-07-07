@@ -215,7 +215,6 @@ public class GenomeSimulator extends LoggedCli {
     freqDist = ArrayUtils.parseIntArray((String) mFlags.getValue(FREQUENCY));
 
     final RandomDistribution frequencyDistribution = new RandomDistribution(freqDist, rand);
-
     generator = new SequenceGenerator(rand, frequencyDistribution, lengths, (File) mFlags.getValue(OUTPUT_FLAG), (String) mFlags.getValue(PREFIX));
     generator.setComment((String) mFlags.getValue(COMMENT));
     generator.createSequences();

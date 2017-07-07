@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,30 +27,35 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.rtg.simulation;
 
-package com.rtg.simulation.reads;
-
-import java.io.IOException;
-
-import com.rtg.reader.SequencesReader;
-import com.rtg.simulation.DistributionSampler;
-import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.PortableRandom;
 
 /**
+ * Choose values according to a Gaussian distribution specified by mean and standard deviation.
  */
-public class FilteringFragmenter extends GenomeFragmenter {
-  final ReferenceRegions mRegions;
+public class GaussianSampler implements IntSampler {
+  private final double mMean;
+  private final double mStdDev;
+  private PortableRandom mRandom = new PortableRandom(42);
 
-  FilteringFragmenter(ReferenceRegions regions, long randomSeed, DistributionSampler[] selectionProb, SequencesReader[] sdfs) throws IOException {
-    super(randomSeed, selectionProb, sdfs);
-    mRegions = regions;
+  /**
+   * Constructor
+   * @param mean distribution mean
+   * @param stdDev standard deviation
+   */
+  public GaussianSampler(double mean, double stdDev) {
+    mMean = mean;
+    mStdDev = stdDev;
   }
 
   @Override
-  boolean emitFragment(int fragLength, int seqId, int readerId, String seqName, int fragStart) throws IOException {
-    if (mRegions.overlapped(seqName, fragStart, fragStart + fragLength)) {
-      return super.emitFragment(fragLength, seqId, readerId, seqName, fragStart);
-    }
-    return false;
+  public void setRandom(PortableRandom r) {
+    mRandom = r;
+  }
+
+  @Override
+  public int next() {
+    return (int) (mRandom.nextGaussian() * mStdDev + mMean);
   }
 }

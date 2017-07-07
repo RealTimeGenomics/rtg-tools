@@ -47,7 +47,6 @@ public abstract class SingleEndRandomLengthMachine extends AbstractMachine {
   private int mMinSize;
   private int mMaxSize;
   protected final PortableRandom mReadSizeRandom;
-//  protected final PortableRandom mPairPositionRandom;
   protected final PortableRandom mFrameRandom;
 
   /**
@@ -58,13 +57,11 @@ public abstract class SingleEndRandomLengthMachine extends AbstractMachine {
   public SingleEndRandomLengthMachine(AbstractMachineErrorParams params, long randomSeed) {
     super(params);
     mReadSizeRandom = new PortableRandom(randomSeed);
-//    mPairPositionRandom = new PortableRandom();
     mFrameRandom = new PortableRandom();
   }
 
   protected void reseedErrorRandom() {
     final long seed = mReadSizeRandom.nextLong();
-//    mPairPositionRandom.setSeed(seed + 1);
     mFrameRandom.setSeed(seed + 2);
     super.reseedErrorRandom(seed + 2);
   }

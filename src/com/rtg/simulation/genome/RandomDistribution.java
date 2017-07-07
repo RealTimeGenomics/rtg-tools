@@ -30,36 +30,37 @@
 
 package com.rtg.simulation.genome;
 
+import com.rtg.simulation.IntSampler;
 import com.rtg.util.PortableRandom;
 
 /**
- * Produces random values with specified relative frequency values will be
+ * Produces random values with specified relative integer frequency values will be
  * between 0 (inclusive) and the size number of frequencies provided
  * (exclusive).
- *
- *
  */
-public class RandomDistribution {
+public class RandomDistribution implements IntSampler {
 
   private final int[] mDistribution;
   private final int mTotal;
-  private final PortableRandom mGenerator;
+  private PortableRandom mRandom;
 
   /**
-   *
-   * @param distribution relative distribution of the values (0, array length -
-   *        1]
-   * @param generator random number generator
+   * Constructor
+   * @param distribution relative distribution of the values (0, array length - 1] as integers
    */
-  public RandomDistribution(int[] distribution, PortableRandom generator) {
-    mGenerator = generator;
-    if (distribution != null) {
-      mDistribution =  distribution.clone();
-      mTotal = arraySum(distribution);
-    } else {
-      mDistribution = null;
-      mTotal = 0;
-    }
+  public RandomDistribution(int... distribution) {
+    this(distribution, new PortableRandom());
+  }
+
+  /**
+   * Constructor
+   * @param distribution relative distribution of the values (0, array length - 1]
+   * @param rand the random number source
+   */
+  public RandomDistribution(int[] distribution, PortableRandom rand) {
+    mDistribution = distribution.clone();
+    mTotal = arraySum(distribution);
+    mRandom = rand;
   }
 
   private int arraySum(int[] source) {
@@ -70,14 +71,14 @@ public class RandomDistribution {
     return sum;
   }
 
-  /**
-   * @return a the next random value
-   */
-  public int nextValue() {
-    if (mDistribution == null) {
-      return 0;
-    }
-    int random = mGenerator.nextInt(mTotal);
+  @Override
+  public void setRandom(PortableRandom r) {
+    mRandom = r;
+  }
+
+  @Override
+  public int next() {
+    int random = mRandom.nextInt(mTotal);
     int i = 0;
     while (i < mDistribution.length && random >= 0) {
       random -= mDistribution[i];
@@ -85,14 +86,4 @@ public class RandomDistribution {
     }
     return i - 1;
   }
-
-  /**
-   * get the number of values in the distribution
-   *
-   * @return number of values in the distribution
-   */
-  public int valueCount() {
-    return mDistribution.length;
-  }
-
 }

@@ -80,8 +80,7 @@ public class GenomeFragmenterTest extends TestCase {
     try {
       try (SequencesReader sr = ReaderTestUtils.getReaderDNA(">g\nggggggggggggggggggggggggggggggggggggggggggggggg", new File(temp, "seq"), null)) {
         final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
-        gf.setMaxFragmentSize(10);
-        gf.setMaxFragmentSize(5);
+        gf.setLengthChooser(new MinMaxGaussianSampler(0, 5));
         final MyMachine m = new MyMachine();
         gf.setMachine(m);
         gf.makeFragment();
@@ -112,7 +111,7 @@ public class GenomeFragmenterTest extends TestCase {
         final int[] counts0 = new int[testSize];
         //final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
         final GenomeFragmenter gf = new GenomeFragmenter(0, sr);
-        gf.setMaxFragmentSize(0);
+        gf.setLengthChooser(new MinMaxGaussianSampler(0, 0));
         gf.setMachine(new DummyMachineTest.MockMachine() {
           @Override
           public void processFragment(final String id, final int fragmentStart, final byte[] data, final int length) {
@@ -138,31 +137,6 @@ public class GenomeFragmenterTest extends TestCase {
     }
   }
 
-  public void testBogusParameters() throws Exception {
-    final File temp = FileUtils.createTempDir("genomefrag", "test");
-    try {
-      try (SequencesReader sr = ReaderTestUtils.getReaderDNA(">0\n" + g(42), new File(temp, "seq"), null)) {
-        final GenomeFragmenter gf = new GenomeFragmenter(0, sr);
-        gf.setMinFragmentSize(20);
-        gf.setMaxFragmentSize(10);
-        gf.setMachine(new DummyMachineTest.MockMachine() {
-          @Override
-          public void processFragment(final String id, final int fragmentStart, final byte[] data, final int length) {
-            fail(); // should not get here
-          }
-        });
-        try {
-          gf.makeFragment();
-          fail();
-        } catch (final IllegalStateException e) {
-          // expected
-        }
-      }
-    } finally {
-      assertTrue(FileHelper.deleteAll(temp));
-    }
-  }
-
   public void testUniformityOfStartPositionTwoUnequalTemplates() throws Exception {
     final int testSize = 100;
     Exam.assertEquals(testSize & 1, 0);
@@ -173,7 +147,7 @@ public class GenomeFragmenterTest extends TestCase {
         final int[] counts1 = new int[testSize / 2];
         //final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
         final GenomeFragmenter gf = new GenomeFragmenter(0, sr);
-        gf.setMaxFragmentSize(0);
+        gf.setLengthChooser(new MinMaxGaussianSampler(0, 0));
         gf.setMachine(new DummyMachineTest.MockMachine() {
           @Override
           public void processFragment(final String id, final int fragmentStart, final byte[] data, final int length) {
@@ -211,57 +185,6 @@ public class GenomeFragmenterTest extends TestCase {
     }
   }
 
-  public void checkNormalityOfLengths(final int min, final int max) throws Exception {
-    final int testSize = 1000;
-    final File temp = FileUtils.createTempDir("genomefrag", "test");
-    try {
-      try (SequencesReader sr = ReaderTestUtils.getReaderDNA(">0\n" + g(testSize), new File(temp, "seq"), null)) {
-        final int[] counts0 = new int[max + 1];
-        //final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
-        final GenomeFragmenter gf = new GenomeFragmenter(0, sr);
-        gf.setMinFragmentSize(min);
-        gf.setMaxFragmentSize(max);
-        gf.setMachine(new  DummyMachineTest.MockMachine() {
-          @Override
-          public void processFragment(final String id, final int fragmentStart, final byte[] data, final int length) {
-            assertTrue(length >= min);
-            assertTrue(length <= max);
-            counts0[length]++;
-          }
-        });
-        for (long k = 0; k < testSize; ++k) {
-          gf.makeFragment();
-        }
-
-        // Perform chi-squared test for uniformity
-        final double mean = (max + min) * 0.5;
-        final double variance = (max - min) * 0.25;
-        double sum = 0;
-        assertEquals(0.5, ChiSquared.normal(0), 1e-10);
-        assertEquals(1, ChiSquared.normal(1e300), 1e-10);
-        for (int k = min; k < counts0.length; ++k) {
-          final int c = counts0[k];
-          final double left = (k - 0.5 - mean) / variance;
-          final double right = (k + 0.5 - mean) / variance;
-          final double e = (ChiSquared.normal(right) - ChiSquared.normal(left)) * testSize;
-          //System.out.println(k + " " + c + " " + e);
-          final double g = c - e;
-          sum += g * g / e;
-        }
-        assertTrue(sum < ChiSquared.chi(max - min, CONFIDENCE_LEVEL));
-        assertTrue(sum > ChiSquared.chi(max - min, 1 - CONFIDENCE_LEVEL));
-      }
-    } finally {
-      assertTrue(FileHelper.deleteAll(temp));
-    }
-  }
-
-  public void testNormalityOfLengths() throws Exception {
-    checkNormalityOfLengths(5, 55);
-    checkNormalityOfLengths(5, 6);
-    checkNormalityOfLengths(0, 3);
-  }
-
   public void testCircularRef() throws Exception {
     for (int k = 1; k < 7; ++k) {
       final File temp = FileUtils.createTempDir("genomefrag", "test");
@@ -270,7 +193,7 @@ public class GenomeFragmenterTest extends TestCase {
         FileUtils.stringToFile("version 1" + StringUtils.LS + "either\tdef\thaploid\tcircular", new File(sr.path(), ReferenceGenome.REFERENCE_FILE));
         try {
           final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
-          gf.setMaxFragmentSize(5);
+          gf.setLengthChooser(new MinMaxGaussianSampler(0, 5));
           final MyMachine m = new MyMachine();
           gf.setMachine(m);
           gf.makeFragment();
@@ -288,8 +211,7 @@ public class GenomeFragmenterTest extends TestCase {
     try (TestDirectory temp = new TestDirectory()) {
       try (SequencesReader sr = ReaderTestUtils.getReaderDNA(">g\ngnggggnggggnggggggngggggggggggggggggggggggggggg", new File(temp, "seq"), null)) {
         final GenomeFragmenter gf = new GenomeFragmenter(42, sr);
-        gf.setMaxFragmentSize(10);
-        gf.setMinFragmentSize(10);
+        gf.setLengthChooser(new MinMaxGaussianSampler(10, 10));
         final MyMachine m = new MyMachine();
         m.mAllGs = false;
         gf.setMachine(m);
@@ -315,8 +237,7 @@ public class GenomeFragmenterTest extends TestCase {
         assertTrue(nsFound);
 
         // Ns allowed but will be above threshold
-        gf.setMaxFragmentSize(9);
-        gf.setMinFragmentSize(9);
+        gf.setLengthChooser(new MinMaxGaussianSampler(9, 9));
         for (int i = 0; i < 100; ++i) {
           gf.makeFragment();
           for (byte b : m.mLastFragment) {

@@ -30,7 +30,10 @@
 
 package com.rtg.simulation;
 
+import java.io.IOException;
 import java.util.Arrays;
+
+import com.rtg.reader.SequencesReader;
 
 /**
  * Utility methods for simulation
@@ -65,7 +68,7 @@ public final class SimulationUtils {
    * @param rand a double chosen between 0.0 and 1.0
    * @return a chosen length
    */
-  public static int chooseLength(final double[] dist, final double rand) {
+  public static int chooseFromCumulative(final double[] dist, final double rand) {
     assert rand <= 1.0 && rand >= 0.0;
     int len = Arrays.binarySearch(dist, rand);
     if (len < 0) {
@@ -77,4 +80,37 @@ public final class SimulationUtils {
     return len;
   }
 
+  /**
+   * Create a distribution using either the provided distribution or a default one based on sequence lengths
+   * @param sr the sequences this distribution should cover
+   * @param prob the desired distribution or null if default should be used
+   * @return an instantiated distribution
+   * @throws IOException if the reader complains
+   */
+  public static DistributionSampler createDistribution(SequencesReader sr, double... prob) throws IOException {
+    if (prob == null) {
+      return defaultDistribution(sr);
+    } else {
+      return new DistributionSampler(prob);
+    }
+  }
+
+  /**
+   * Create a distribution where the odds of selecting a sequence are proportional to it's length
+   * @param sr the sequences this distribution should cover
+   * @return an instantiated distribution
+   * @throws IOException if the reader complains
+   */
+  public static DistributionSampler defaultDistribution(SequencesReader sr) throws IOException {
+    final int[] lengths = sr.sequenceLengths(0, sr.numberSequences());
+    long total = 0;
+    for (int length : lengths) {
+      total += length;
+    }
+    final double[] nonCumulative = new double[lengths.length];
+    for (int i = 0; i < lengths.length; ++i) {
+      nonCumulative[i] = (double) lengths[i] / (double) total;
+    }
+    return new DistributionSampler(nonCumulative);
+  }
 }

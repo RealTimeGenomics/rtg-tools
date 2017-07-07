@@ -50,11 +50,8 @@ public class RandomDistributionTest extends TestCase {
     final int[] distribution = {1, 2, 6, 4, 0, 9};
     final RandomDistribution dist = new RandomDistribution(distribution, rand);
     final int[] results = new int[distribution.length];
-    for (int i = 0; i < results.length; ++i) {
-      results[i] = 0;
-    }
     for (int i = 0; i < 1000000; ++i) {
-      results[dist.nextValue()]++;
+      results[dist.next()]++;
     }
     assertEquals(2, (double) results[1] / results[0], 0.1);
     assertEquals(6, (double) results[2] / results[0], 0.1);
@@ -69,24 +66,13 @@ public class RandomDistributionTest extends TestCase {
     final int[] distribution = {0, 0, 0, 1};
     final RandomDistribution dist = new RandomDistribution(distribution, rand);
     final int[] results = new int[distribution.length];
-    for (int i = 0; i < results.length; ++i) {
-      results[i] = 0;
-    }
     for (int i = 0; i < 1000000; ++i) {
-      results[dist.nextValue()]++;
+      results[dist.next()]++;
     }
     assertEquals(0, results[0]);
     assertEquals(0, results[1]);
     assertEquals(0, results[2]);
     assertEquals(1000000, results[3]);
-
-  }
-
-  public void testValueCount() {
-    final PortableRandom rand = new PortableRandom(1);
-    final int[] distribution = {1, 2, 6, 4, 9};
-    final RandomDistribution dist = new RandomDistribution(distribution, rand);
-    assertEquals(5, dist.valueCount());
   }
 
 }

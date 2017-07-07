@@ -58,8 +58,11 @@ import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.sam.SamCommandHelper;
-import com.rtg.simulation.genome.SequenceDistribution;
+import com.rtg.simulation.DistributionSampler;
+import com.rtg.simulation.IntSampler;
+import com.rtg.simulation.SimulationUtils;
 import com.rtg.taxonomy.TaxonomyUtils;
+import com.rtg.util.DoubleMultiSet;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.MathUtils;
 import com.rtg.util.PortableRandom;
@@ -105,6 +108,7 @@ public class ReadSimCli extends LoggedCli {
   // Options for library generation
   static final String MAX_FRAGMENT = "max-fragment-size";   // Fragment size from which reads are taken
   static final String MIN_FRAGMENT = "min-fragment-size";
+  static final String FRAGMENT_SIZE_DIST = "Xfragment-size-distribution"; // Explicit fragment size distribution
   static final String ALLOW_UNKNOWNS = "allow-unknowns";
   //static final String TRIM_FRAGMENT_BELL = "Xtrim-fragment-bell"; // Not currently implemented
 
@@ -232,6 +236,7 @@ public class ReadSimCli extends LoggedCli {
     // Illumina PE
     mFlags.registerOptional('L', LEFT_READLENGTH, Integer.class, CommonFlags.INT, "target read length on the left side").setCategory(CAT_ILLUMINA_PE);
     mFlags.registerOptional('R', RIGHT_READLENGTH, Integer.class, CommonFlags.INT, "target read length on the right side").setCategory(CAT_ILLUMINA_PE);
+    mFlags.registerOptional(FRAGMENT_SIZE_DIST, File.class, CommonFlags.FILE, "file containing probability distribution for fragment lengths").setCategory(CAT_FRAGMENTS);
   }
 
   protected void init454Flags() {
@@ -399,6 +404,7 @@ public class ReadSimCli extends LoggedCli {
       Diagnostic.warning(WarningType.INFO_WARNING, "The template contains some sequences that have length less than the minimum fragment length and these will not be present in the output.");
     }
   }
+
   @Override
   protected int mainExec(OutputStream out, LogStream log) throws IOException {
     final File input = (File) mFlags.getValue(INPUT);
@@ -406,43 +412,12 @@ public class ReadSimCli extends LoggedCli {
       if (reader.numberSequences() > Integer.MAX_VALUE) {
         throw new NoTalkbackSlimException("Too many sequences");
       }
-      final int numSeq = (int) reader.numberSequences();
-      final double[] selectionProb;
       final boolean byDnaFraction = mFlags.isSet(DNA_FRACTION);
+      final double[] selectionProb;
       if (mFlags.isSet(DISTRIBUTION)) {
-        Diagnostic.userLog("Using standard distribution");
-        final double[] selectionDist = new double[numSeq];
-        try (FileInputStream is = new FileInputStream((File) mFlags.getValue(DISTRIBUTION))) {
-          final Map<String, Double> selectionMap = createSelectionDistribution(is);
-          Diagnostic.userLog("Sequence distribution:" + selectionMap.toString());
-
-          final NamesInterface names = reader.names();
-          final int[] lengths = reader.sequenceLengths(0, numSeq);
-          double sum = 0;
-          for (int k = 0; k < numSeq; ++k) {
-            final Double p = selectionMap.get(names.name(k));
-            if (p != null) {
-              sum += p;
-              selectionDist[k] = byDnaFraction ? p : p * lengths[k];
-            }
-          }
-          if (Math.abs(sum - 1) > 0.00001) {
-            throw new NoTalkbackSlimException("Some sequences not seen in supplied template, sum:" + String.format("%1.5g", sum));
-          }
-          selectionProb = MathUtils.renormalize(selectionDist);
-        }
-        Diagnostic.userLog("Distribution complete");
+        selectionProb = loadDistribution(reader, (File) mFlags.getValue(DISTRIBUTION), byDnaFraction);
       } else if (mFlags.isSet(TAXONOMY_DISTRIBUTION)) {
-        if (!TaxonomyUtils.hasTaxonomyInfo(reader)) {
-          throw new NoTalkbackSlimException("Input SDF does not contain taxonomy information, cannot use taxonomy distribution.");
-        }
-        Diagnostic.userLog("Using taxonomy distribution");
-        final TaxonomyDistribution dist;
-        try (final FileInputStream is = new FileInputStream((File) mFlags.getValue(TAXONOMY_DISTRIBUTION))) {
-          dist = new TaxonomyDistribution(is, TaxonomyUtils.loadTaxonomyMapping(reader), reader, byDnaFraction ? TaxonomyDistribution.DistributionType.DNA_FRACTION : TaxonomyDistribution.DistributionType.ABUNDANCE);
-        }
-        selectionProb = dist.getDistribution();
-        Diagnostic.userLog("Distribution complete");
+        selectionProb = loadTaxonomyDistribution(reader, (File) mFlags.getValue(TAXONOMY_DISTRIBUTION), byDnaFraction);
       } else {
         selectionProb = null;
       }
@@ -463,7 +438,7 @@ public class ReadSimCli extends LoggedCli {
         return 1;
       }
       // Construct appropriate GenomeFragmenter / Machine / ReadWriter and validate
-      final GenomeFragmenter gf = getGenomeFragmenter(reader, SequenceDistribution.createDistribution(reader, selectionProb));
+      final GenomeFragmenter gf = getGenomeFragmenter(reader, SimulationUtils.createDistribution(reader, selectionProb));
 
       final Machine m;
 
@@ -499,6 +474,45 @@ public class ReadSimCli extends LoggedCli {
     return 0;
   }
 
+  private double[] loadDistribution(SequencesReader reader, File file, boolean byDnaFraction) throws IOException {
+    Diagnostic.userLog("Using standard distribution");
+    final int numSeq = (int) reader.numberSequences();
+    final double[] selectionDist = new double[numSeq];
+    try (FileInputStream is = new FileInputStream(file)) {
+      final Map<String, Double> selectionMap = createSelectionDistribution(is);
+      Diagnostic.userLog("Sequence distribution:" + selectionMap.toString());
+
+      final NamesInterface names = reader.names();
+      final int[] lengths = reader.sequenceLengths(0, numSeq);
+      double sum = 0;
+      for (int k = 0; k < numSeq; ++k) {
+        final Double p = selectionMap.get(names.name(k));
+        if (p != null) {
+          sum += p;
+          selectionDist[k] = byDnaFraction ? p : p * lengths[k];
+        }
+      }
+      if (Math.abs(sum - 1) > 0.00001) {
+        throw new NoTalkbackSlimException("Some sequences not seen in supplied template, sum:" + String.format("%1.5g", sum));
+      }
+    }
+    Diagnostic.userLog("Distribution complete");
+    return MathUtils.renormalize(selectionDist);
+  }
+
+  private double[] loadTaxonomyDistribution(SequencesReader reader, File file, boolean byDnaFraction) throws IOException {
+    if (!TaxonomyUtils.hasTaxonomyInfo(reader)) {
+      throw new NoTalkbackSlimException("Input SDF does not contain taxonomy information, cannot use taxonomy distribution.");
+    }
+    Diagnostic.userLog("Using taxonomy distribution");
+    final TaxonomyDistribution dist;
+    try (final FileInputStream is = new FileInputStream(file)) {
+      dist = new TaxonomyDistribution(is, TaxonomyUtils.loadTaxonomyMapping(reader), reader, byDnaFraction ? TaxonomyDistribution.DistributionType.DNA_FRACTION : TaxonomyDistribution.DistributionType.ABUNDANCE);
+    }
+    Diagnostic.userLog("Distribution complete");
+    return dist.getDistribution();
+  }
+
   private void verifyRegionsMatchSdf(SequencesReader reader, ReferenceRegions referenceRegions) throws IOException {
     // Verify regions sequencess match the reader
     final Collection<String> regionSequenceNames = referenceRegions.sequenceNames();
@@ -517,12 +531,12 @@ public class ReadSimCli extends LoggedCli {
     }
   }
 
-  private GenomeFragmenter getGenomeFragmenter(SequencesReader reader, SequenceDistribution distribution) throws IOException {
+  private GenomeFragmenter getGenomeFragmenter(SequencesReader reader, DistributionSampler distribution) throws IOException {
     final SequencesReader[] readers = {
       reader
     };
     assert reader.hasNames();
-    final SequenceDistribution[] distributions = {
+    final DistributionSampler[] distributions = {
       distribution
     };
     final GenomeFragmenter gf;
@@ -533,10 +547,55 @@ public class ReadSimCli extends LoggedCli {
     } else {
       gf = new GenomeFragmenter(mRandom.nextLong(), distributions, readers);
     }
-    gf.setMaxFragmentSize((Integer) mFlags.getValue(MAX_FRAGMENT));
-    gf.setMinFragmentSize((Integer) mFlags.getValue(MIN_FRAGMENT));
+    final IntSampler lengthSelector;
+    if (mFlags.isSet(FRAGMENT_SIZE_DIST)) {
+      lengthSelector = loadLengthDistribution((File) mFlags.getValue(FRAGMENT_SIZE_DIST));
+    } else {
+      lengthSelector = new MinMaxGaussianSampler((Integer) mFlags.getValue(MIN_FRAGMENT), (Integer) mFlags.getValue(MAX_FRAGMENT));
+    }
+    gf.setLengthChooser(lengthSelector);
     gf.allowNs(mFlags.isSet(ALLOW_UNKNOWNS));
     return gf;
+  }
+
+  private static IntSampler loadLengthDistribution(File file) throws IOException {
+    final DoubleMultiSet<Integer> h = new DoubleMultiSet<>();
+    try (BufferedReader b = new BufferedReader(FileUtils.createReader(file, true))) {
+      String line;
+      int max = Integer.MIN_VALUE;
+      while ((line = b.readLine()) != null) {
+        line = line.trim();
+        if (line.length() == 0 || line.startsWith("#")) {
+          continue;
+        }
+        final String[] parts = line.split("\\s");
+        if (parts.length != 2) {
+          throw new IOException("Expected two fields on line: " + line);
+        }
+        try {
+          final int length = Integer.parseInt(parts[0]);
+          if (length <= 0) {
+            throw new IOException("Length must be greater than 0, on line: " + line);
+          }
+          final double count = Double.parseDouble(parts[1]);
+          if (count < 0) {
+            throw new IOException("Count cannot be negative, on line: " + line);
+          }
+          max = Math.max(max, length);
+          h.add(length, count);
+        } catch (NumberFormatException e) {
+          throw new IOException("Malformed number on line: " + line);
+        }
+      }
+      if (max == Integer.MIN_VALUE) {
+        throw new IOException("No distribution information contained in file: " + file);
+      }
+      final double[] dist = new double[max];
+      for (int i = 0; i < max; i++) {
+        dist[i] = h.get(i);
+      }
+      return new DistributionSampler(dist);
+    }
   }
 
   private void fragmentByCoverage(long totalResidues, GenomeFragmenter gf, Machine m) throws IOException {

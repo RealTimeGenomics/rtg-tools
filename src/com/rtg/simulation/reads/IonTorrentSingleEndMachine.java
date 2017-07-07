@@ -137,7 +137,7 @@ public class IonTorrentSingleEndMachine extends SingleEndRandomLengthMachine {
         final SimErrorType e = getErrorType(mErrorTypeRandom.nextDouble());
         switch (e) {
           case MNP:
-            final int mnpLength = Math.min(templateLength - refUsed, Math.min(readLength - readBases, SimulationUtils.chooseLength(mMnpLengthDistribution, mErrorLengthRandom.nextDouble())));
+            final int mnpLength = Math.min(templateLength - refUsed, Math.min(readLength - readBases, SimulationUtils.chooseFromCumulative(mMnpLengthDistribution, mErrorLengthRandom.nextDouble())));
             assert mnpLength > 0;
             for (int i = 0; i < mnpLength; ++i) {
               mReadBytes[readStartPos + (mReadBytesUsed + readBases) * readDirection] = chooseBase(data[startPos + refUsed * direction]);
@@ -156,13 +156,13 @@ public class IonTorrentSingleEndMachine extends SingleEndRandomLengthMachine {
             addCigarState(1, ActionsHelper.SAME);
             break;
           case DELETE:
-            final int delLength = Math.min(templateLength - refUsed, SimulationUtils.chooseLength(mDeleteLengthDistribution, mErrorLengthRandom.nextDouble()));
+            final int delLength = Math.min(templateLength - refUsed, SimulationUtils.chooseFromCumulative(mDeleteLengthDistribution, mErrorLengthRandom.nextDouble()));
             refUsed += delLength;
             addCigarState(delLength, ActionsHelper.DELETION_FROM_REFERENCE);
             // Deletion
             break;
           case INSERT:
-            final int insLength = Math.min(readLength - readBases, SimulationUtils.chooseLength(mInsertLengthDistribution, mErrorLengthRandom.nextDouble()));
+            final int insLength = Math.min(readLength - readBases, SimulationUtils.chooseFromCumulative(mInsertLengthDistribution, mErrorLengthRandom.nextDouble()));
             assert insLength > 0;
             for (int k = 0; k < insLength; ++k) {
               mReadBytes[readStartPos + (mReadBytesUsed + readBases) * readDirection] = chooseBase((byte) 0);

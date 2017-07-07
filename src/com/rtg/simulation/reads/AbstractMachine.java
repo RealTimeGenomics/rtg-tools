@@ -320,7 +320,7 @@ public abstract class AbstractMachine implements Machine {
       final int templateAvail = mExtension == null ? templateLength - templateUsed : Integer.MAX_VALUE;
       switch (e) {
         case MNP:
-          final int mnpLength = Math.min(templateAvail, Math.min(readLength - readBases, SimulationUtils.chooseLength(mMnpLengthDistribution, mErrorLengthRandom.nextDouble())));
+          final int mnpLength = Math.min(templateAvail, Math.min(readLength - readBases, SimulationUtils.chooseFromCumulative(mMnpLengthDistribution, mErrorLengthRandom.nextDouble())));
           assert mnpLength > 0;
           for (int i = 0; i < mnpLength; ++i) {
             final int templatePos = startPos + templateUsed * direction;
@@ -332,7 +332,7 @@ public abstract class AbstractMachine implements Machine {
           addCigarState(mnpLength, ActionsHelper.MISMATCH);
           break;
         case INSERT:
-          final int insLength = Math.min(readLength - readBases, SimulationUtils.chooseLength(mInsertLengthDistribution, mErrorLengthRandom.nextDouble()));
+          final int insLength = Math.min(readLength - readBases, SimulationUtils.chooseFromCumulative(mInsertLengthDistribution, mErrorLengthRandom.nextDouble()));
           assert insLength > 0;
           for (int k = 0; k < insLength; ++k) {
             mReadBytes[readStartPos + (mReadBytesUsed + readBases) * readDirection] = chooseBase((byte) 0);
@@ -342,7 +342,7 @@ public abstract class AbstractMachine implements Machine {
           addCigarState(insLength, ActionsHelper.INSERTION_INTO_REFERENCE);
           break;
         case DELETE:
-          final int delLength = Math.min(templateAvail, SimulationUtils.chooseLength(mDeleteLengthDistribution, mErrorLengthRandom.nextDouble()));
+          final int delLength = Math.min(templateAvail, SimulationUtils.chooseFromCumulative(mDeleteLengthDistribution, mErrorLengthRandom.nextDouble()));
           templateUsed += delLength;
           addCigarState(delLength, ActionsHelper.DELETION_FROM_REFERENCE);
           // Deletion

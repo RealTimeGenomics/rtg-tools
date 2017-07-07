@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -28,29 +28,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rtg.simulation.reads;
+package com.rtg.simulation;
 
-import java.io.IOException;
-
-import com.rtg.reader.SequencesReader;
-import com.rtg.simulation.DistributionSampler;
-import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.PortableRandom;
 
 /**
+ * Encapsulate the random selection of integers according to a supplied distribution
  */
-public class FilteringFragmenter extends GenomeFragmenter {
-  final ReferenceRegions mRegions;
+public class DistributionSampler implements IntSampler {
 
-  FilteringFragmenter(ReferenceRegions regions, long randomSeed, DistributionSampler[] selectionProb, SequencesReader[] sdfs) throws IOException {
-    super(randomSeed, selectionProb, sdfs);
-    mRegions = regions;
+  private final double[] mCumulative;
+  private PortableRandom mRandom = new PortableRandom();
+
+  /**
+   * create a sequence distribution based on the distribution provided in <code>nonCumulative</code>
+   * @param nonCumulative the ratios between sequences
+   */
+  public DistributionSampler(double... nonCumulative) {
+    mCumulative = SimulationUtils.cumulativeDistribution(nonCumulative);
   }
 
   @Override
-  boolean emitFragment(int fragLength, int seqId, int readerId, String seqName, int fragStart) throws IOException {
-    if (mRegions.overlapped(seqName, fragStart, fragStart + fragLength)) {
-      return super.emitFragment(fragLength, seqId, readerId, seqName, fragStart);
-    }
-    return false;
+  public void setRandom(PortableRandom r) {
+    mRandom = r;
+  }
+
+  @Override
+  public int next() {
+    return next(mRandom.nextDouble());
+  }
+
+  protected int next(double rand) {
+    return SimulationUtils.chooseFromCumulative(mCumulative, rand);
   }
 }

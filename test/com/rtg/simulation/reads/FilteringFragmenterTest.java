@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
-import com.rtg.simulation.genome.SequenceDistribution;
+import com.rtg.simulation.DistributionSampler;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.ReferenceRegions;
 
@@ -53,12 +53,11 @@ public class FilteringFragmenterTest extends TestCase {
   public void test() throws IOException {
     final ReferenceRegions bed = new ReferenceRegions();
     bed.add("foo", 20, 29);
-    final SequenceDistribution[] dist = {new SequenceDistribution(new double[] {1.0})};
+    final DistributionSampler[] dist = {new DistributionSampler(new double[] {1.0})};
     final SequencesReader[] readers = {ReaderTestUtils.getReaderDnaMemory(">foo" + StringUtils.LS + "ACGTACCCACAGAGATAGACACACGTAGATGACACAGCCATGTCCCGCCATAT")};
     final MockMachine m = new MockMachine();
     final FilteringFragmenter fragmenter = new FilteringFragmenter(bed, 23, dist, readers);
-    fragmenter.setMinFragmentSize(2);
-    fragmenter.setMaxFragmentSize(2);
+    fragmenter.setLengthChooser(new MinMaxGaussianSampler(2, 2));
     fragmenter.setMachine(m);
     fragmenter.emitFragment(2, 0, 0, "foo", 18);
     assertNull(m.mLastStart);

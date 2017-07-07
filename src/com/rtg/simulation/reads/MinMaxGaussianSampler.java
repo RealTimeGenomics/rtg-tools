@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,30 +27,53 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.simulation.reads;
 
-import java.io.IOException;
-
-import com.rtg.reader.SequencesReader;
-import com.rtg.simulation.DistributionSampler;
-import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.simulation.GaussianSampler;
 
 /**
+ * Choose values according to a Gaussian distribution specified by outer bounds plus the number of deviations that
+ * should fall within the bounds.
  */
-public class FilteringFragmenter extends GenomeFragmenter {
-  final ReferenceRegions mRegions;
+public class MinMaxGaussianSampler extends GaussianSampler {
 
-  FilteringFragmenter(ReferenceRegions regions, long randomSeed, DistributionSampler[] selectionProb, SequencesReader[] sdfs) throws IOException {
-    super(randomSeed, selectionProb, sdfs);
-    mRegions = regions;
+  private static final int NUMBER_TRIES = 1000;
+
+  private final int mMin;
+  private final int mMax;
+
+  /**
+   * Constructor, occupying four standard deviations of a Gaussian
+   * @param min the minimum value to output
+   * @param max the maximum value to output
+   */
+  public MinMaxGaussianSampler(int min, int max) {
+    this(min, max, 4);  // default 2 std devs per side
+  }
+
+  /**
+   * Constructor
+   * @param min the minimum value to output
+   * @param max the maximum value to output
+   * @param numDevs the number of standard deviations to include
+   */
+  public MinMaxGaussianSampler(int min, int max, double numDevs) {
+    super((max + min) * 0.5 + 0.5, (max - min) / numDevs);
+    mMin = min;
+    mMax = max;
+    if (mMax < mMin) {
+      throw new IllegalArgumentException();
+    }
   }
 
   @Override
-  boolean emitFragment(int fragLength, int seqId, int readerId, String seqName, int fragStart) throws IOException {
-    if (mRegions.overlapped(seqName, fragStart, fragStart + fragLength)) {
-      return super.emitFragment(fragLength, seqId, readerId, seqName, fragStart);
+  public int next() {
+    for (int x = 0; x < NUMBER_TRIES; ++x) {
+      final int fragLength = super.next();
+      if ((fragLength >= mMin) && (fragLength <= mMax)) {
+        return fragLength;
+      }
     }
-    return false;
+    return Integer.MIN_VALUE;
   }
 }

@@ -37,7 +37,6 @@ import junit.framework.TestCase;
 public class SimulationUtilsTest extends TestCase {
 
 
-
   public void testDistUtils() {
 
     final double[] cumDist = SimulationUtils.cumulativeDistribution(0.1, 0.1, 0.1, 0.4, 0.1);
@@ -48,11 +47,11 @@ public class SimulationUtilsTest extends TestCase {
       assertEquals(expected[i], cumDist[i], 0.000001);
     }
 
-    assertEquals(0, SimulationUtils.chooseLength(cumDist, 0.1));
-    assertEquals(1, SimulationUtils.chooseLength(cumDist, 0.25));
-    assertEquals(2, SimulationUtils.chooseLength(cumDist, 0.3));
-    assertEquals(3, SimulationUtils.chooseLength(cumDist, 0.8));
-    assertEquals(4, SimulationUtils.chooseLength(cumDist, 1.0));
+    assertEquals(0, SimulationUtils.chooseFromCumulative(cumDist, 0.1));
+    assertEquals(1, SimulationUtils.chooseFromCumulative(cumDist, 0.25));
+    assertEquals(2, SimulationUtils.chooseFromCumulative(cumDist, 0.3));
+    assertEquals(3, SimulationUtils.chooseFromCumulative(cumDist, 0.8));
+    assertEquals(4, SimulationUtils.chooseFromCumulative(cumDist, 1.0));
   }
 
 }

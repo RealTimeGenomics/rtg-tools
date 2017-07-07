@@ -121,7 +121,7 @@ public class SequenceGenerator {
       if (mDistribution == null) {
         return mResidues[1 + mSource.nextInt(mResidues.length - 1)];
       }
-      return mResidues[1 + mDistribution.nextValue()];
+      return mResidues[1 + mDistribution.next()];
     }
 
     @Override
