@@ -96,8 +96,12 @@ public class VcfReaderTest extends TestCase {
   }
 
   static final String[] BAD_RECORD = {
+    "chr1   .      .    G    A    29    PASS    DP=7",                           // Missing POS column
+    "chr1   123    ." + TAB + TAB + "A    29    PASS    DP=7",                            // Empty REF value
+ // "chr1   123    .    .    A    29    PASS    DP=7",                           // Missing REF value?
     "chr1   123    .    G    A    29    PASS",                                   // Missing INFO column
-    "chr1   .      .    G    A    29    PASS    DP=7",                           // Missing INFO column
+    "chr1   123    .    G    A,    29    PASS    DP=7",                          // Empty ALT allele
+    "chr1   123    .    G    A,,T    29    PASS    DP=7",                        // Empty ALT allele
     "chr1   123    foo  G    A    29    PASS    X=yy;DP=7    GT:GQ",             // HEADER0 says should not be any samples
     "chr1   123    foo  G    A    29    PASS    NS=3;DP=7    GT:GQ   0|0:34",    // HEADER0 says should not be any samples
   };
