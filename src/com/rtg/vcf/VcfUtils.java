@@ -682,17 +682,12 @@ public final class VcfUtils {
    * @return true if the leading base of the variant is redundant.
    */
   public static boolean hasRedundantFirstNucleotide(final VcfRecord rec) {
-    // Can only strip previous nucleotide if all alleles have the same first char
-    try {
-      final Character c = rec.getRefCall().charAt(0);
-      for (final String alt : rec.getAltCalls()) {
-        if (!c.equals(alt.charAt(0))) {
-          return false;
-        }
+    final String ref = rec.getRefCall();
+    final Character c = ref.length() == 0 ? VcfUtils.MISSING_VALUE : ref.charAt(0);
+    for (final String alt : rec.getAltCalls()) {
+      if (!c.equals(alt.charAt(0))) {
+        return false;
       }
-    } catch (Exception e) {
-      System.err.println("rec = " + rec);
-      throw e;
     }
     return !rec.getAltCalls().isEmpty();
   }
