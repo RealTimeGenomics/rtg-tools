@@ -187,11 +187,18 @@ public class VcfReader implements VcfIterator {
     } catch (NumberFormatException e) {
       throw new VcfFormatException(e.getMessage());
     }
-    final VcfRecord rec = new VcfRecord(StringUtils.deepCopy(field[CHROM_FIELD]), pos, StringUtils.deepCopy(field[REF_FIELD]));
+    final String ref = StringUtils.deepCopy(field[REF_FIELD]);
+    if (ref.length() == 0) {  /// VCF spec implies (but is not specific) that we could also reject if VcfRecord.MISSING.equals(ref)
+      throw new VcfFormatException("REF field cannot be missing");
+    }
+    final VcfRecord rec = new VcfRecord(StringUtils.deepCopy(field[CHROM_FIELD]), pos, ref);
     rec.setId(StringUtils.deepCopy(field[ID_FIELD]));
     if (!VcfRecord.MISSING.equals(field[ALT_FIELD])) {
       final String[] altSplit = StringUtils.split(field[ALT_FIELD], ',');
       for (final String anAltSplit : altSplit) {
+        if (anAltSplit.length() == 0) {
+          throw new VcfFormatException("An empty ALT allele is not permitted");
+        }
         rec.addAltCall(StringUtils.deepCopy(anAltSplit));
       }
     }
