@@ -33,6 +33,7 @@ package com.rtg.vcf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -198,6 +199,17 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("'BOB'.GT == '0/1'").accept(record));
+  }
+
+  @Test
+  public void testBadExpression() {
+    try {
+      // That's a user-typo'ed greater-than-or-equals which is a bogus javascript arrow function expression that gave a new flavour of parsing exception
+      getScriptedVcfFilter("'BOB'.GT => 30");
+      fail("Expected JVM javascript engine to choke while parsing invalid expression");
+    } catch (NoTalkbackSlimException e) {
+      // Expected
+    }
   }
 
   @Test
