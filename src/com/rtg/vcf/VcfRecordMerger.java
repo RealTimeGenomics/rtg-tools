@@ -94,7 +94,7 @@ public class VcfRecordMerger implements AutoCloseable {
     for (final VcfRecord vcf : records) {
       if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
         throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
-      } else if (!refCall.equals(vcf.getRefCall())) {
+      } else if (!refCall.toLowerCase().equals(vcf.getRefCall().toLowerCase())) {
         throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
       }
       final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
