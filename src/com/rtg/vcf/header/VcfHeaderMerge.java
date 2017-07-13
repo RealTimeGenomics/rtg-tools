@@ -62,11 +62,13 @@ public final class VcfHeaderMerge {
    */
   public static VcfHeader mergeHeaders(VcfHeader first, VcfHeader second, Set<String> forceMerge) {
     final VcfHeader ret = new VcfHeader();
-    if (!first.getVersionLine().equals(second.getVersionLine())) {
+    if (first.getVersionLine() == null) {
+      ret.setVersionValue(second.getVersionValue() == null ? VcfHeader.VERSION_VALUE : second.getVersionValue());
+    } else if (first.getVersionLine().equals(second.getVersionLine())) {
+      ret.setVersionValue(first.getVersionValue());
+    } else {
       //just set to current;
       ret.setVersionValue(VcfHeader.VERSION_VALUE);
-    } else {
-      ret.setVersionValue(first.getVersionValue());
     }
 
     final ArrayList<String> errors = new ArrayList<>();

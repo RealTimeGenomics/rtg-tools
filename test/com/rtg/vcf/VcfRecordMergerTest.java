@@ -32,6 +32,7 @@ package com.rtg.vcf;
 
 import java.util.Set;
 
+import com.rtg.AbstractTest;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.vcf.header.FormatField;
@@ -40,12 +41,10 @@ import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfHeaderMerge;
 import com.rtg.vcf.header.VcfNumber;
 
-import junit.framework.TestCase;
-
 /**
  * Tests the corresponding class.
  */
-public class VcfRecordMergerTest extends TestCase {
+public class VcfRecordMergerTest extends AbstractTest {
 
   private static final String VCF_RECORD_FORMAT = "%1$s\t%2$d\t.\t%3$s\t%4$s\t.\tPASS\t.\tGT:E1:E2\t%5$d/%6$d:.:.";
   private static final String VCF_RECORD_FORMAT_MISSING = "%1$s\t%2$d\t.\t%3$s\t.\t.\tPASS\t.\tGT:E1:E2\t.";
@@ -296,4 +295,21 @@ public class VcfRecordMergerTest extends TestCase {
     }
   }
 
+  public void testCaseHandling() {
+    try (final VcfRecordMerger merger = new VcfRecordMerger()) {
+      final VcfHeader h1 = new VcfHeader();
+      final VcfHeader h2 = new VcfHeader();
+      final VcfHeader h3 = new VcfHeader();
+      VcfHeader mh = VcfHeaderMerge.mergeHeaders(h1, h2, null);
+      mh = VcfHeaderMerge.mergeHeaders(mh, h3, null);
+      final VcfHeader[] heads = {h1, h2, h3};
+      final VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tg\ta,C\t.\tPASS\t.");
+      final VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tc,t\t.\tPASS\t.");
+      final VcfRecord r3 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tc]Chr1:123]g\t.\tPASS\t.");
+      final VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2, r3}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
+      assertEquals(1, mergedArr.length);
+      // All alleles have nucleotide case normalized
+      assertEquals("chr1\t100\t.\tG\tA,C,T,C]Chr1:123]G\t.\tPASS\t.", mergedArr[0].toString());
+    }
+  }
 }

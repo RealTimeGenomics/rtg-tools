@@ -178,4 +178,12 @@ public class VcfUtilsTest extends TestCase {
     assertEquals(42, ci[1]);
   }
 
+  public void testNormalizeAllele() {
+    assertEquals(".", ".");
+    assertEquals("AGCT", VcfUtils.normalizeAllele("agct"));
+    assertEquals("*", VcfUtils.normalizeAllele("*"));
+    assertEquals("C<ctg1>", VcfUtils.normalizeAllele("c<ctg1>"));
+    assertEquals("A]chr2:13454]ATN", VcfUtils.normalizeAllele("a]chr2:13454]atn"));
+    assertEquals("A]<ctg1>:7]ATN", VcfUtils.normalizeAllele("a]<ctg1>:7]atn"));
+  }
 }

@@ -87,20 +87,20 @@ public class VcfRecordMerger implements AutoCloseable {
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
   public VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    final String refCall = records[0].getRefCall();
+    final String refCall = VcfUtils.normalizeAllele(records[0].getRefCall());
     final int pos = records[0].getStart();
     final int length = records[0].getLength();
     final Set<String> uniqueIds = new LinkedHashSet<>();
     for (final VcfRecord vcf : records) {
       if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
         throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
-      } else if (!refCall.equals(vcf.getRefCall())) {
+      } else if (!refCall.equalsIgnoreCase(vcf.getRefCall())) {
         throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
       }
       final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
       Collections.addAll(uniqueIds, ids);
     }
-    final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), records[0].getRefCall());
+    final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), refCall);
 
     final StringBuilder idsb = new StringBuilder();
     int z = 0;
@@ -120,7 +120,7 @@ public class VcfRecordMerger implements AutoCloseable {
       final int numAlts = vcf.getAltCalls().size();
       gtMap[i] = new int[numAlts + 1];
       for (int j = 0; j < numAlts; ++j) {
-        final String alt = vcf.getAltCalls().get(j);
+        final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
         if (alt.equals(refCall)) {
           gtMap[i][j + 1] = 0;
           altsChanged = true;
