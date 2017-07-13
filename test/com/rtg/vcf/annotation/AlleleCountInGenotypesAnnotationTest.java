@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -61,7 +62,7 @@ public class AlleleCountInGenotypesAnnotationTest extends TestCase {
     assertEquals(2, vals.length);
     assertEquals(3, vals[0]);
     assertEquals(1, vals[1]);
-    assertEquals("Derived annotation AC missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(null));
+    assertEquals("Derived annotation AC missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(new VcfHeader()));
   }
 
   public void testNoAlt() {

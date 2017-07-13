@@ -72,13 +72,11 @@ public abstract class AbstractDerivedAnnotation<T extends TypedField<T>> impleme
   protected String checkHeader(VcfHeader header, String[] infoFields, String[] formatFields) {
     final Set<String> infoHeaderIds = new HashSet<>();
     final Set<String> formatHeaderIds = new HashSet<>();
-    if (header != null) {
-      for (final InfoField field : header.getInfoLines()) {
-        infoHeaderIds.add(field.getId());
-      }
-      for (final FormatField field : header.getFormatLines()) {
-        formatHeaderIds.add(field.getId());
-      }
+    for (final InfoField field : header.getInfoLines()) {
+      infoHeaderIds.add(field.getId());
+    }
+    for (final FormatField field : header.getFormatLines()) {
+      formatHeaderIds.add(field.getId());
     }
     final StringBuilder missingInfos = new StringBuilder();
     if (infoFields != null) {

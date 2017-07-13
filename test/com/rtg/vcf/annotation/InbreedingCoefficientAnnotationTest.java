@@ -33,6 +33,7 @@ package com.rtg.vcf.annotation;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -47,7 +48,7 @@ public class InbreedingCoefficientAnnotationTest extends TestCase {
     assertEquals("IC", icAnn.getName());
     assertEquals("Inbreeding Coefficient", icAnn.getDescription());
     assertEquals(MetaType.FLOAT, icAnn.getField().getType());
-    assertEquals("Derived annotation IC missing required fields in VCF header (FORMAT fields: GT)", icAnn.checkHeader(null));
+    assertEquals("Derived annotation IC missing required fields in VCF header (FORMAT fields: GT)", icAnn.checkHeader(new VcfHeader()));
   }
 
   public void testHaploidNoCalculation() {

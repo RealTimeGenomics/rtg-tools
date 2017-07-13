@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -64,6 +65,6 @@ public class PloidyAnnotationTest extends TestCase {
     assertEquals("h", pdAnn.getValue(rec, 4));
     assertEquals("h", pdAnn.getValue(rec, 5));
     assertNull(pdAnn.getValue(rec, 6));
-    assertEquals("Derived annotation PD missing required fields in VCF header (FORMAT fields: GT)", pdAnn.checkHeader(null));
+    assertEquals("Derived annotation PD missing required fields in VCF header (FORMAT fields: GT)", pdAnn.checkHeader(new VcfHeader()));
   }
 }

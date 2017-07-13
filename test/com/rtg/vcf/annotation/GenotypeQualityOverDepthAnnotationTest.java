@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -72,6 +73,6 @@ public class GenotypeQualityOverDepthAnnotationTest extends TestCase {
     rec.setNumberOfSamples(7);
     rec.addFormatAndSample("GQ", "11");
     assertNull(gqdAnn.getValue(rec, 0));
-    assertEquals("Derived annotation GQD missing required fields in VCF header (FORMAT fields: DP GQ)", gqdAnn.checkHeader(null));
+    assertEquals("Derived annotation GQD missing required fields in VCF header (FORMAT fields: DP GQ)", gqdAnn.checkHeader(new VcfHeader()));
   }
 }

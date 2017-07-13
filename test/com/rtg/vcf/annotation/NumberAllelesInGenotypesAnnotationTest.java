@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -58,7 +59,7 @@ public class NumberAllelesInGenotypesAnnotationTest extends TestCase {
     record.addFormatAndSample("GT", ".");
     record.addFormatAndSample("GT", "2");
     assertEquals(3, ((Integer) ann.getValue(record, -1)).intValue());
-    assertEquals("Derived annotation AN missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(null));
+    assertEquals("Derived annotation AN missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(new VcfHeader()));
   }
 
 }

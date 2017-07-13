@@ -32,6 +32,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -58,6 +59,6 @@ public class ZygosityAnnotationTest extends TestCase {
     assertNull(zyAnn.getValue(rec, 1));
     assertEquals("o", zyAnn.getValue(rec, 2));
     assertNull(zyAnn.getValue(rec, 3));
-    assertEquals("Derived annotation ZY missing required fields in VCF header (FORMAT fields: GT)", zyAnn.checkHeader(null));
+    assertEquals("Derived annotation ZY missing required fields in VCF header (FORMAT fields: GT)", zyAnn.checkHeader(new VcfHeader()));
   }
 }

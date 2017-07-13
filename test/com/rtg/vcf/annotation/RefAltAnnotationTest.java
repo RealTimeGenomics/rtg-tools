@@ -33,6 +33,7 @@ package com.rtg.vcf.annotation;
 import com.rtg.util.TestUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
 
@@ -59,7 +60,7 @@ public class RefAltAnnotationTest extends TestCase {
     assertNull(ann.getValue(rec, 1));
     assertEquals("AA", ann.getValue(rec, 2));
     assertNull(ann.getValue(rec, 3));
-    assertEquals("Derived annotation RA missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(null));
+    assertEquals("Derived annotation RA missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(new VcfHeader()));
   }
 
   public void testMore() {
