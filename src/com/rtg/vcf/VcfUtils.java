@@ -419,6 +419,56 @@ public final class VcfUtils {
     }
   }
 
+  /**
+   * Normalize by converting any DNA characters within a VCF allele into uppercase. Annoyingly,
+   * VCF specification says that DNA bases are case-insensitive, while symbolic alleles,
+   * chromosome names (which may be embedded inside break-ends) are case-sensitive.
+   * @param allele the VCF allele
+   * @return the normalized allele
+   */
+  public static String normalizeAllele(String allele) {
+    if (allele.length() == 0) {
+      return allele;
+    } else {
+      int ntype = 0;
+      final char[] res = allele.toCharArray();
+      for (int i = 0; i < res.length; ++i) {
+        final char c = res[i];
+        switch (c) {
+          case 'a':
+          case 't':
+          case 'c':
+          case 'g':
+          case 'n':
+            if (ntype == 0) {  // Inside nucleotides
+              res[i] = Character.toUpperCase(c);
+            }
+            break;
+          case '<':
+            if (ntype == 0) {
+              ntype = 1;  // Start symbolic allele
+            }
+            break;
+          case '>':
+            if (ntype == 1) {
+              ntype = 0;   // End symbolic allele
+            }
+            break;
+          case '[':
+          case ']':
+            if (ntype == 0) {
+              ntype = 2; // Start breakend
+            } else if (ntype == 2) {
+              ntype = 0; // End breakend
+            }
+            break;
+          default:
+            break;
+        }
+      }
+      return new String(res);
+    }
+  }
 
   // The following could all be moved to VcfRecord itself
 
