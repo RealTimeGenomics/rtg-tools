@@ -83,14 +83,14 @@ public class ScriptedVcfFilter implements VcfFilter {
     } else {
       try {
         mCompiledExpression = compileable.compile(expression);
-      } catch (ScriptException e) {
+      } catch (ScriptException | AssertionError e) {
         throw new NoTalkbackSlimException("Could not evaluate the provided expression" + StringUtils.LS + e.getMessage());
       }
     }
     for (String beginning : beginnings) {
       try {
         mBeginnings.add(compileable.compile(beginning));
-      } catch (ScriptException e) {
+      } catch (ScriptException | AssertionError e) {
         throw new NoTalkbackSlimException("Could not evaluate the beginning expression" + StringUtils.LS + e.getMessage());
       }
     }
