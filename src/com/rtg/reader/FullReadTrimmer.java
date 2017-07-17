@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -31,20 +31,20 @@
 package com.rtg.reader;
 
 /**
- * Implementation for when no trimming is to be carried out.
+ * Implementation which trims every base, regardless.
  */
-public final class NullReadTrimmer implements ReadTrimmer {
+public final class FullReadTrimmer implements ReadTrimmer {
 
   /** Singleton trimmer instance */
-  public static final ReadTrimmer SINGLETON = new NullReadTrimmer();
+  public static final ReadTrimmer SINGLETON = new FullReadTrimmer();
 
   @Override
   public String toString() {
-    return "no trimming";
+    return "trim all bases";
   }
 
   @Override
   public int trimRead(byte[] read, byte[] qualities, int length) {
-    return length;
+    return 0;
   }
 }

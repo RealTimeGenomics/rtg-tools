@@ -344,7 +344,7 @@ public final class FormatCli extends LoggedCli {
     private final boolean mMappedSam;
     private final String mSamReadGroup;
     private final SAMReadGroupRecord mReadGroupRecord;
-    private ReadTrimmer mReadTrimmer = new NullReadTrimmer();
+    private ReadTrimmer mReadTrimmer = NullReadTrimmer.SINGLETON;
     private long mNumSequences = 0;
     private final boolean mDedupSecondary;
 

@@ -75,7 +75,7 @@ public class SequencesWriter {
   long mNumberOfSequences = 0;
   final boolean mCompressed;
 
-  ReadTrimmer mReadTrimmer = new NullReadTrimmer();
+  ReadTrimmer mReadTrimmer = NullReadTrimmer.SINGLETON;
 
   /**
    * Creates a writer for processing sequences from provided data source.

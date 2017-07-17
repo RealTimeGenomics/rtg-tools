@@ -39,7 +39,7 @@ import com.rtg.util.Utils;
 /**
  */ // Bundles up a single sequence
 class FastqSequence {
-  private final String mName;
+  private String mName;
   private byte[] mBases;
   private byte[] mQualities;
 
@@ -92,4 +92,17 @@ class FastqSequence {
     return mQualities;
   }
 
+  public void append(FastqSequence other, String suffix) {
+    if (other.length() > 0) {
+      final int oldLen = length();
+      final int newLen = oldLen + other.length();
+      mBases = Arrays.copyOf(mBases, newLen);
+      mQualities = Arrays.copyOf(mQualities, newLen);
+      System.arraycopy(other.mBases, 0, mBases, oldLen, other.length());
+      System.arraycopy(other.mQualities, 0, mQualities, oldLen, other.length());
+      if (suffix != null) {
+        mName += suffix;
+      }
+    }
+  }
 }
