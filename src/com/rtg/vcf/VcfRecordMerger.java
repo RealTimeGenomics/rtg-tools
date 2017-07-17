@@ -102,16 +102,8 @@ public class VcfRecordMerger implements AutoCloseable {
     }
     final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), refCall);
 
-    final StringBuilder idsb = new StringBuilder();
-    int z = 0;
-    for (final String id : uniqueIds) {
-      if (z > 0) {
-        idsb.append(VcfUtils.VALUE_SEPARATOR);
-      }
-      idsb.append(id);
-      ++z;
-    }
-    merged.setId(idsb.toString());
+    merged.setId(StringUtils.join(VcfUtils.VALUE_SEPARATOR, uniqueIds));
+
     boolean altsChanged = false;
     final int[][] gtMap = new int[records.length][];
     final List<String> mergedAltCalls = merged.getAltCalls();
@@ -144,14 +136,7 @@ public class VcfRecordMerger implements AutoCloseable {
     merged.getFilters().addAll(records[0].getFilters());
     merged.setNumberOfSamples(destHeader.getNumberOfSamples());
     for (final Map.Entry<String, ArrayList<String>> entry : records[0].getInfo().entrySet()) {
-      ArrayList<String> val = merged.getInfo().get(entry.getKey());
-      if (val == null) {
-        val = new ArrayList<>();
-        merged.getInfo().put(entry.getKey(), val);
-      }
-      for (final String s : entry.getValue()) {
-        val.add(s);
-      }
+      merged.getInfo().computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).addAll(entry.getValue());
     }
 
     final List<String> names = destHeader.getSampleNames();
@@ -187,13 +172,7 @@ public class VcfRecordMerger implements AutoCloseable {
                   splitGt[gti] = gtMap[i][splitGt[gti]];
                 }
               }
-              final char sep = gtStr.indexOf(VcfUtils.PHASED_SEPARATOR) != -1 ? VcfUtils.PHASED_SEPARATOR : VcfUtils.UNPHASED_SEPARATOR;
-              final StringBuilder sb = new StringBuilder();
-              sb.append(splitGt[0] == -1 ? VcfRecord.MISSING : splitGt[0]);
-              for (int gti = 1; gti < splitGt.length; ++gti) {
-                sb.append(sep).append(splitGt[gti] == -1 ? VcfRecord.MISSING : splitGt[gti]);
-              }
-              field.set(destSampleIndex, sb.toString());
+              field.set(destSampleIndex, VcfUtils.joinGt(VcfUtils.isPhasedGt(gtStr), splitGt));
             } else {
               field.set(destSampleIndex, records[i].getFormat(key).get(sampleIndex));
             }
