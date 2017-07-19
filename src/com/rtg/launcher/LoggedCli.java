@@ -101,33 +101,25 @@ public abstract class LoggedCli extends AbstractCli {
       LocalStats.startRecording();
     }
     final String prefix = moduleName().length() > 0 ? moduleName() : applicationName();
-    final String logFile = prefix + LOG_EXT;
-    final LogStream outputLog = new LogFile(new File(outputDir, logFile));
+    final File logFile = new File(outputDir, prefix + LOG_EXT);
+    removePrevious(logFile);
+    final LogStream outputLog = new LogFile(logFile);
     final long startTime = System.currentTimeMillis();
     boolean successful = false;
     try {
+      removePrevious(new File(outputDir, "done"));
+      removePrevious(new File(outputDir, "progress"));
       initializeLogs(outputLog);
       try {
         final List<DiagnosticListener> listeners = initializeOtherListeners();
         try {
-          final File doneFile = new File(outputDir, "done");
-          if (doneFile.exists()) {
-            if (!doneFile.isFile()) {
-              throw new IOException("Status file \"" + doneFile.getPath() + "\" cannot be removed: not a file");
-            } else if (!doneFile.delete()) {
-              throw new IOException("Status file \"" + doneFile.getPath() + "\" could not be removed");
-            } else {
-              Diagnostic.userLog("Removing pre-existing status file: " + doneFile.getPath());
-            }
-          }
           final int ret = mainExec(out, outputLog);
           if (ret == 0) {
             successful = true;
             final String time = "Finished successfully in " + timeDifference(System.currentTimeMillis(), startTime) + " s.";
-            try (PrintStream done = new PrintStream(new FileOutputStream(doneFile))) {
+            try (PrintStream done = new PrintStream(new FileOutputStream(new File(outputDir, "done")))) {
               done.println(time);
             }
-
           }
           return ret;
         } finally {
@@ -150,6 +142,16 @@ public abstract class LoggedCli extends AbstractCli {
       Diagnostic.closeLog();
       if (mCleanDirectory) {
         FileUtils.deleteFiles(mDirectory);
+      }
+    }
+  }
+
+  private void removePrevious(File file) throws IOException {
+    if (file.exists()) {
+      if (!file.isFile()) {
+        throw new IOException("Previous file \"" + file.getPath() + "\" cannot be removed: not a file");
+      } else if (!file.delete()) {
+        throw new IOException("Previous file \"" + file.getPath() + "\" could not be removed");
       }
     }
   }
