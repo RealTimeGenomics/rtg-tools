@@ -40,12 +40,14 @@ import java.util.Arrays;
 public class Histogram {
 
   private long[] mHistogram;
+  private int mLength;
 
   /**
    * Constructor
    */
   public Histogram() {
-    mHistogram = new long[0];
+    mHistogram = new long[100];
+    mLength = 0;
   }
 
   /**
@@ -63,8 +65,9 @@ public class Histogram {
    */
   public void increment(int position, long value) {
     assert value >= 0;
+    mLength = Math.max(mLength, position + 1);
     if (position >= mHistogram.length) {
-      mHistogram = Arrays.copyOf(mHistogram, position + 1);
+      mHistogram = Arrays.copyOf(mHistogram, position + position / 3);
     }
     mHistogram[position] += value;
   }
@@ -74,7 +77,7 @@ public class Histogram {
    * @return the length of the histogram
    */
   public int getLength() {
-    return mHistogram.length;
+    return mLength;
   }
 
   /**
@@ -99,8 +102,9 @@ public class Histogram {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for (long i : mHistogram) {
-      sb.append(i).append("\t");
+    for (int i = 0; i < getLength(); ++i) {
+      final long count = mHistogram[i];
+      sb.append(count).append("\t");
     }
     return sb.toString().trim();
   }
