@@ -237,7 +237,8 @@ public class DisplayHelper {
           inMarkup = true;
           output.append(c);
         } else {
-          if (highlightMask != null && highlightMask[coord] != highlight) {
+          final boolean hl = highlightMask != null && coord < highlightMask.length && highlightMask[coord];
+          if (hl != highlight) {
             if (highlight) {
               output.append(trimHighlighting(toHighlight.toString(), bgcolor));
               toHighlight.setLength(0);
