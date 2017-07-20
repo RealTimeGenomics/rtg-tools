@@ -42,9 +42,8 @@ import com.rtg.util.Constants;
 /**
  * Output network utilization stats.
  */
-public class NetworkStats extends ExternalCommand implements MonStats {
+public class NetworkStats implements MonStats {
 
-  private static final String IFCONFIG = "/sbin/ifconfig";
   private static final String HEADERBOT = " txMB/s rxMB/s";
   private static final String NA = "n/a";
   private static final double MB = Constants.MB; // Convert to double
@@ -60,16 +59,7 @@ public class NetworkStats extends ExternalCommand implements MonStats {
   private long mTime = Long.MAX_VALUE;
 
   NetworkStats(String interfaceName) {
-    super(IFCONFIG, interfaceName);
-    boolean enabled = false;
-    try {
-      if (runCommand() != null) {
-        enabled = true;
-      }
-    } catch (IOException e) {
-      // Ignore
-    }
-    mEnabled = enabled;
+    mEnabled = getStatsFile(RX_STATS_FILE_BASE).exists() && getStatsFile(TX_STATS_FILE_BASE).exists();
     mInterface = interfaceName;
   }
 
@@ -92,8 +82,12 @@ public class NetworkStats extends ExternalCommand implements MonStats {
     out.append(HEADERBOT);
   }
 
+  private File getStatsFile(String filePathBase) {
+    return new File(String.format(filePathBase, mInterface));
+  }
+
   private Long readFirstLineAsLong(String filePathBase) throws IOException {
-    final File file = new File(String.format(filePathBase, mInterface));
+    final File file = getStatsFile(filePathBase);
     if (file.exists()) {
       final Path path = file.toPath();
       final List<String> strings = Files.readAllLines(path);
