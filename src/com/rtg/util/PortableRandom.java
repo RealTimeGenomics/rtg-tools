@@ -161,7 +161,7 @@ public class PortableRandom {
    */
   public int nextInt(int exclMaxBound) {
     if (exclMaxBound <= 0) {
-      throw new IllegalArgumentException("n must be positive");
+      throw new IllegalArgumentException("n must be positive: " + exclMaxBound);
     }
 
     if ((exclMaxBound & -exclMaxBound) == exclMaxBound) {
