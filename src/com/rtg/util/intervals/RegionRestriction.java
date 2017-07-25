@@ -51,7 +51,12 @@ public class RegionRestriction implements SequenceNameLocus {
 
   /**
    * Restriction to named sequence, accepts restrictions of
-   * the form name, name:start, name:start-end or name:start+length
+   * the following forms:
+   *   <code>name</code>               (corresponds to the whole chromosome)
+   *   <code>name:start</code>         (corresponds to a point on the chromosome)
+   *   <code>name:start-end</code>     (a range from start to end)
+   *   <code>name:start+length</code>  (a range from start to start+length)
+   *   <code>name:start~length</code>  (a range from start-length to start+length)
    * @param restriction restriction string
    */
   public RegionRestriction(String restriction) {
@@ -64,16 +69,10 @@ public class RegionRestriction implements SequenceNameLocus {
       final String range = restriction.substring(rangepos + 1);
       final NumberFormat fmt = NumberFormat.getInstance(Locale.getDefault());
       fmt.setParseIntegerOnly(true);
-      final boolean useLength = range.contains("+");
-      final String[] parts;
-      if (useLength) {
-        if (range.contains("-")) {
-          throw malformedRange(restriction);
-        }
-        parts = range.split("\\+");
-      } else {
-        parts = range.split("-");
-      }
+      final boolean hasPlus = range.contains("+");
+      final boolean hasMinus = range.contains("-");
+      final boolean hasTilde = range.contains("~");
+      final String[] parts = range.split("[-~+]");
       if (parts.length != 2 && parts.length != 1) {
         throw malformedRange(restriction);
       }
@@ -82,8 +81,8 @@ public class RegionRestriction implements SequenceNameLocus {
       if (parts[0].length() != pos.getIndex() || pos.getIndex() == 0) {
         throw malformedRange(restriction);
       }
-      mStart = start.intValue() - 1;
       if (parts.length == 1) {
+        mStart = start.intValue() - 1;
         mEnd = MISSING;
       } else {
         pos.setIndex(0);
@@ -91,7 +90,18 @@ public class RegionRestriction implements SequenceNameLocus {
         if (parts[1].length() != pos.getIndex() || pos.getIndex() == 0) {
           throw malformedRange(restriction);
         }
-        mEnd = (useLength ? mStart : 0) + last.intValue();
+        if (hasPlus) {
+          mStart = start.intValue() - 1;
+          mEnd = start.intValue() - 1 + last.intValue();
+        } else if (hasTilde) {
+          mStart = Math.max(start.intValue() - 1 - last.intValue(), 0); // Allow truncation at 0
+          mEnd = start.intValue() - 1 + last.intValue();
+        } else if (hasMinus) {
+          mStart = start.intValue() - 1;
+          mEnd = last.intValue();
+        } else {
+          throw malformedRange(restriction);
+        }
       }
       if ((mStart < 0) || (mEnd != MISSING && mEnd < (mStart + 1))) {
         throw malformedRange(restriction);

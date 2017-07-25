@@ -38,16 +38,27 @@ public class RegionRestrictionTest extends TestCase {
   public void test() {
     checkMalformed("");
     checkMalformed("blah:");
+    checkMalformed("blah:-600");
     checkMalformed("blah:600-400");
     checkMalformed("blah:600-+400");
+    checkMalformed("blah:600+-400");
     checkMalformed("blah:600-599");
     checkMalformed("blah:600+0");
+    checkMalformed("blah:600~0");
     checkMalformed("blah:0+10");
     checkMalformed("chr16:2194033+5000QRST");
     checkMalformed("chr16:2194033-2194060QRST");
     checkMalformed("chr16:2Q-3T");
     checkMalformed("chr16:2-T3");
     checkSuccess("blah:600-600", "blah", 599, 600, "blah:600-600");
+    checkSuccess("blah:600+1", "blah", 599, 600, "blah:600-600");
+    checkSuccess("blah:600~1", "blah", 598, 600, "blah:599-600");
+    checkSuccess("blah:600+2", "blah", 599, 601, "blah:600-601");
+    checkSuccess("blah:600~2", "blah", 597, 601, "blah:598-601");
+    checkSuccess("blah:600-609", "blah", 599, 609, "blah:600-609");
+    checkSuccess("blah:600+10", "blah", 599, 609, "blah:600-609");
+    checkSuccess("blah:600~10", "blah", 589, 609, "blah:590-609");
+    checkSuccess("blah:50~100", "blah", 0, 149, "blah:1-149"); // Check truncation on left
     checkSuccess("blah", "blah", RegionRestriction.MISSING, RegionRestriction.MISSING, "blah");
     checkSuccess("blah:1-2", "blah", 0, 2, "blah:1-2");
     checkSuccess("blah:1+2", "blah", 0, 2, "blah:1-2");
