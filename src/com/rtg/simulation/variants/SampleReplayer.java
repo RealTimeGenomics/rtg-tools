@@ -108,7 +108,7 @@ public class SampleReplayer {
     //System.err.println("setting sex to: " + sex);
     final StringBuilder referenceThing = new StringBuilder();
     referenceThing.append("version 1").append(StringUtils.LS);
-    referenceThing.append("either\tdef\tnone\tlinear").append(StringUtils.LS);
+    referenceThing.append("either\tdef\thaploid\tlinear").append(StringUtils.LS); // This comes into play if someone needs to map to this SDF without specifying the same sex
     try (SdfWriter sdf = new SdfWriter(outputDir, Constants.MAX_FILE_SIZE, PrereadType.UNKNOWN, false, true, true, SequenceType.DNA)) {
       sdf.setCommandLine(CommandLine.getCommandLine());
       final ReferenceGenome rg = new ReferenceGenome(mReference, sex, ReferencePloidy.AUTO);
@@ -122,7 +122,11 @@ public class SampleReplayer {
           referenceThing.append(sexStr).append("\tseq\t").append(deriveName(refSeq.name(), 0, count)).append("\thaploid\t").append(circleString).append("\t").append(deriveName(refSeq.name(), 1, count)).append(StringUtils.LS);
           referenceThing.append(sexStr).append("\tseq\t").append(deriveName(refSeq.name(), 1, count)).append("\thaploid\t").append(circleString).append("\t").append(deriveName(refSeq.name(), 0, count)).append(StringUtils.LS);
         } else if (count == 1) {
-          referenceThing.append(sexStr).append("\tseq\t").append(deriveName(refSeq.name(), 0, count)).append("\t").append(ploidyStr).append("\t").append(circleString).append(StringUtils.LS);
+          referenceThing.append(sexStr).append("\tseq\t").append(deriveName(refSeq.name(), 0, count)).append("\t").append(ploidyStr).append("\t").append(circleString);
+          if (refSeq.haploidComplementName() != null) {
+            referenceThing.append("\t").append(refSeq.haploidComplementName());
+          }
+          referenceThing.append(StringUtils.LS);
         }
         replaySequence(sampleVcf, sdf, count, i, sampleNum, header);
       }
