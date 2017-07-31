@@ -38,6 +38,7 @@ public class ToolsCommandTest extends TestCase {
   public void test() {
     assertNotNull(ToolsCommand.INFO.commands());
     for (final Command c : ToolsCommand.INFO.commands()) {
+      assertTrue(c.getCommandDescription() != null || c.isHidden());
       assertNotNull(c);
     }
   }

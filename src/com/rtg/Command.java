@@ -59,7 +59,6 @@ public class Command {
 
   Command(final AbstractCli cli, final String commandName, String description, final CommandCategory category, final ReleaseLevel level, final String key, final String altKey) {
     assert commandName != null;
-    assert description != null;
     assert category != null;
     assert level != null;
     assert key != null;
