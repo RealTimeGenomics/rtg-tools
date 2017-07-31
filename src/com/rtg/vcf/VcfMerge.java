@@ -105,10 +105,11 @@ public class VcfMerge extends AbstractCli {
     mFlags.registerOptional('a', ADD_HEADER_FLAG, String.class, STRING, "add the supplied text to the output VCF header")
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired(File.class, FILE, "input VCF files to merge")
-      .setMinCount(1)
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, FILE, "input VCF files to merge")
+      .setMinCount(0)
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
+    final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, FILE, "file containing a list of VCF format files (1 per line) to be merged").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('F', FORCE_MERGE_ALL, "attempt merging of all non-matching header declarations").setCategory(UTILITY);
     final Flag<String> forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
     forceMerge.setMinCount(0);
@@ -116,26 +117,26 @@ public class VcfMerge extends AbstractCli {
     mFlags.registerOptional(PRESERVE_FORMATS, "if set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
     mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
+
+    mFlags.addRequiredSet(inFlag);
+    mFlags.addRequiredSet(listFlag);
+
     mFlags.setValidator(new VcfMergeValidator());
   }
 
   private static class VcfMergeValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      if (!CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))) {
-        return false;
-      }
-      if (!flags.checkNand(FORCE_MERGE_ALL, FORCE_MERGE)) {
-        return false;
-      }
-      return true;
+      return CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)
+        && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
+        && flags.checkNand(FORCE_MERGE_ALL, FORCE_MERGE);
     }
   }
 
   @Override
   protected int mainExec(final OutputStream out, final PrintStream err) throws IOException {
     final File outFile = (File) mFlags.getValue(OUTPUT_FLAG);
-    final List<File> inputs = CommonFlags.getFileList(mFlags, null, null, false);
+    final List<File> inputs = CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false);
     final HashSet<File> dupTest = new HashSet<>();
     for (final File f : inputs) {
       if (!dupTest.add(f.getCanonicalFile())) {

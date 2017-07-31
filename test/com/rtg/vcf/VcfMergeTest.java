@@ -30,14 +30,14 @@
 package com.rtg.vcf;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.tabix.TabixIndexer;
+import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
+import com.rtg.util.Utils;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -225,15 +225,17 @@ public class VcfMergeTest extends AbstractCliTest {
       final File snpsB = BgzipFileHelper.bytesToBgzipFile(FileHelper.resourceToString("com/rtg/vcf/resources/" + resourceb).getBytes(), new File(dir, "fileB.vcf.gz"));
       new TabixIndexer(snpsB, TabixIndexer.indexFileName(snpsB)).saveVcfIndex();
       final File output = new File(dir, "out.vcf.gz");
-      final List<String> args = new ArrayList<>();
-      args.addAll(Arrays.asList("-o", output.toString(),
-        "--stats",
-        snpsA.toString(), snpsB.toString()));
-      args.addAll(Arrays.asList(argsIn));
-      final String out = checkMainInit(args.toArray(new String[args.size()])).out();
+      final String out = checkMainInit(Utils.append(argsIn, "-o", output.toString(), "--stats", snpsA.toString(), snpsB.toString())).out();
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(output));
       assertTrue(new File(dir, output.getName() + ".tbi").isFile());
       mNano.check("vcfmerge_out_" + id + ".vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(output)), false);
+      mNano.check("vcfmerge_stats_" + id + ".txt", out);
+
+      final File inlist = new File(dir, "infiles.txt");
+      FileUtils.stringToFile(snpsA.getAbsolutePath() + StringUtils.LS + snpsB.getAbsolutePath() + StringUtils.LS, inlist);
+      final File output2 = new File(dir, "out2.vcf.gz");
+      checkMainInit(Utils.append(argsIn, "-o", output2.toString(), "--stats", "-I", inlist.toString()));
+      mNano.check("vcfmerge_out_" + id + ".vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(output2)), false);
       mNano.check("vcfmerge_stats_" + id + ".txt", out);
     }
   }
