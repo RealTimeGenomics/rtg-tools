@@ -105,20 +105,7 @@ public final class Utils {
    * @return string giving bit decomposition of x.
    */
   public static String toBits(final long x) {
-    final StringBuilder sb = new StringBuilder();
-    long t = x;
-    boolean first = false;
-    for (int i = 0; i < 64; ++i) {
-      if (t < 0) {
-        sb.append("1");
-        first = true;
-      } else if (first) {
-        sb.append("0");
-      }
-      t = t << 1;
-    }
-    assert t == 0;
-    return sb.toString();
+    return Long.toBinaryString(x);
   }
 
   /**

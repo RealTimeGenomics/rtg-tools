@@ -76,7 +76,7 @@ public class UtilsTest extends TestCase {
 
   public void testToBits() {
     checkBits("1111111111111111111111111111111111111111111111111111111111111111", -1L);
-    checkBits("", 0L);
+    checkBits("0", 0L);
     checkBits("1000000000000000000000000000000000000000000000000000000000000000", Long.MIN_VALUE);
     checkBits("1", 1L);
     checkBits("110000000", 3L << 7);
