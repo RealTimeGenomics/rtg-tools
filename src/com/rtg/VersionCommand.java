@@ -106,23 +106,18 @@ public final class VersionCommand {
   }
 
   /**
-   * Main function, entry-point for help
-   * These next two methods are strictly for sharpen, do not remove them however stupid they look.
+   * Main function, entry-point for version command.
    * @param out regular output stream, only for passing to delegate help printers
    * @return shell return code 0 for success, anything else for failure
    */
   public static int mainInit(final PrintStream out) {
-    printVersion(out);
-    return 0;
-  }
-  private static void printVersion(final PrintStream out) {
     try {
       out.print(getVersion());
     } finally {
       out.flush();
     }
+    return 0;
   }
-
 
   static String getRamString() {
     final double maxMemory = Runtime.getRuntime().maxMemory() * 10.0 / 1024 / 1024 / 1024;
