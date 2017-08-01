@@ -30,8 +30,10 @@
 
 package com.rtg.vcf;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -798,4 +800,23 @@ public final class VcfUtils {
     }
   }
 
+  /**
+   * @param zippedVcf zipped file to check
+   * @return true if this looks like a <code>VCF</code> file.
+   * @throws IOException if an IO Error occurs
+   */
+  public static boolean isVcfFormat(File zippedVcf) throws IOException {
+    try (BufferedReader r = new BufferedReader(new InputStreamReader(FileUtils.createGzipInputStream(zippedVcf, false)))) {
+      String line;
+      while ((line = r.readLine()) != null) {
+        if (line.startsWith("##fileformat=VCF")) {
+          return true;
+        }
+        if (!line.startsWith("##")) {
+          return false;
+        }
+      }
+      return false;
+    }
+  }
 }

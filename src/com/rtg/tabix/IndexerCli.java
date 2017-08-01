@@ -48,6 +48,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.io.ClosedFileInputStream;
+import com.rtg.vcf.VcfUtils;
 
 import htsjdk.samtools.CRAMBAIIndexer;
 import htsjdk.samtools.SamReader;
@@ -201,7 +202,7 @@ public class IndexerCli extends AbstractCli {
             new TabixIndexer(f, indexFile).saveTsvIndex();
             break;
           case VCF:
-            if (!Utils.isVcfFormat(f)) {
+            if (!VcfUtils.isVcfFormat(f)) {
               Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not in VCF format.");
               retCode = 1;
               continue;
