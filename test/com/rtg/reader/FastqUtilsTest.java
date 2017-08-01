@@ -60,6 +60,14 @@ public class FastqUtilsTest extends TestCase {
     assertEquals("input_moo.fastq", bf2.suffixedFile("_moo").getName());
   }
 
+  public void testIsFastQExtension() {
+    assertTrue(FastqUtils.isFastqExtension(new File("foo.fq")));
+    assertTrue(FastqUtils.isFastqExtension(new File("foo.fastq")));
+    assertTrue(FastqUtils.isFastqExtension(new File("foo.fastq.gz")));
+    assertFalse(FastqUtils.isFastqExtension(new File("foo.fasta.gz")));
+    assertFalse(FastqUtils.isFastqExtension(new File("foo.fasta.Z")));
+  }
+
   public void testWriteSequence() throws IOException {
     try (final StringWriter sw = new StringWriter()) {
       final String seqString = "GATCAGGTAGTT";

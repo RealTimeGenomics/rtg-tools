@@ -67,6 +67,16 @@ public final class FastqUtils {
   }
 
   /**
+   * Check if the supplied file is has an extension indicative of FASTQ.
+   * @param f file to test
+   * @return true if file has FASTQ extension
+   */
+  public static boolean isFastqExtension(File f) {
+    final String name = FileUtils.isGzipFilename(f) ? FileUtils.removeExtension(f.getName()) : f.getName();
+    return Arrays.stream(EXTS).anyMatch(name::endsWith);
+  }
+
+  /**
    * Write a FASTQ sequence
    * @param w writer to output FASTQ to
    * @param seqName the name of the sequence

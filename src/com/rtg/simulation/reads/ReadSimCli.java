@@ -38,12 +38,10 @@ import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,6 +52,7 @@ import com.rtg.bed.BedUtils;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.mode.SequenceType;
+import com.rtg.reader.FastqUtils;
 import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
@@ -69,7 +68,6 @@ import com.rtg.util.PortableRandom;
 import com.rtg.util.Utils;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.intervals.LongRange;
@@ -161,7 +159,7 @@ public class ReadSimCli extends LoggedCli {
   @Override
   protected File outputDirectory() {
     File f = (File) mFlags.getValue(OUTPUT_FLAG);
-    if ("-".equals(f.getName())) {
+    if (FastqUtils.isFastqExtension(f) || FileUtils.isStdio(f)) {
       try {
         f = FileUtils.createTempDir("readsim", null);
         cleanDirectory();
@@ -298,12 +296,9 @@ public class ReadSimCli extends LoggedCli {
     return result;
   }
 
-  private ReadWriter createReadWriter(Machine m) throws IOException {
-    final File f = (File) mFlags.getValue(OUTPUT_FLAG);
-    if (f.getName().endsWith(".fq")) {
+  private ReadWriter createReadWriter(Machine m, File f) throws IOException {
+    if (FastqUtils.isFastqExtension(f) || FileUtils.isStdio(f)) {
       return new FastqReadWriter(f);
-    } else if ("-".equals(f.getName())) {
-      return new FastqReadWriter(new OutputStreamWriter(System.out));
     } else {
       final SdfReadWriter rw = new SdfReadWriter(f, m.isPaired(), m.prereadType(), !mFlags.isSet(NO_NAMES), !mFlags.isSet(NO_QUAL));
       rw.setComment((String) mFlags.getValue(COMMENT));
@@ -451,7 +446,8 @@ public class ReadSimCli extends LoggedCli {
       }
 
       Diagnostic.userLog("ReadSimParams" + LS + " input=" + input + LS + " machine=" + m.prereadType() + LS + " output=" + outputDirectory() + LS + (mFlags.isSet(READS) ? " num-reads=" + mFlags.getValue(READS) + LS : "") + (mFlags.isSet(COVERAGE) ? " coverage=" + mFlags.getValue(COVERAGE) + LS : "") + (selectionProb == null ? "" : " distribution=" + Arrays.toString(selectionProb) + LS) + " allow-unknowns=" + mFlags.isSet(ALLOW_UNKNOWNS) + LS + " max-fragment=" + mFlags.getValue(MAX_FRAGMENT) + LS + " min-fragment=" + mFlags.getValue(MIN_FRAGMENT) + LS + " seed=" + seed + LS + LS + mPriors.toString() + LS);
-      try (ReadWriter rw = getNFilter(createReadWriter(m))) {
+      final File f = (File) mFlags.getValue(OUTPUT_FLAG);
+      try (ReadWriter rw = getNFilter(createReadWriter(m, f))) {
         m.setReadWriter(rw);
         gf.setMachine(m);
         // Run generation
@@ -461,15 +457,15 @@ public class ReadSimCli extends LoggedCli {
           fragmentByCoverage(reader.totalLength(), gf, m);
         }
         final double effectiveCoverage = (double) m.residues() / reader.totalLength();
-        Diagnostic.info("Generated " + rw.readsWritten() + " reads, effective coverage " + Utils.realFormat(effectiveCoverage, 2));
         if (selectionProb != null) {
           FileUtils.stringToFile(gf.fractionStatistics(), new File(outputDirectory(), "fractions.tsv"));
         }
         //writeTemplateMappingFile(getTemplateMapping(reader, twinReader));
-        Diagnostic.info(m.formatActionsHistogram());
+        if (!FileUtils.isStdio(f)) {
+          Diagnostic.info("Generated " + rw.readsWritten() + " reads, effective coverage " + Utils.realFormat(effectiveCoverage, 2));
+          Diagnostic.info(m.formatActionsHistogram());
+        }
       }
-    } catch (final FileNotFoundException e) {
-      throw new NoTalkbackSlimException(ErrorType.SDF_INDEX_NOT_VALID, input.toString());
     }
     return 0;
   }

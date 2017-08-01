@@ -32,45 +32,74 @@ package com.rtg.simulation.reads;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import com.rtg.reader.FastqUtils;
 import com.rtg.reader.FastqWriter;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SequenceWriter;
+import com.rtg.util.io.BaseFile;
+import com.rtg.util.io.FileUtils;
 
 /**
  * FASTQ style read simulator output
  */
 public class FastqReadWriter implements ReadWriter {
 
+  private final BaseFile mBaseFile;
   private SequenceWriter mAppend;
-  private final SequenceWriter mAppendLeft;
-  private final SequenceWriter mAppendRight;
+  private SequenceWriter mAppendLeft;
+  private SequenceWriter mAppendRight;
   private int mTotal = 0;
   private boolean mExpectLeft = true;
 
   /**
    * Constructor
    * @param append destination for output
+   * @param paired true if being used for paired end output
    */
-  public FastqReadWriter(Writer append) {
-    mAppend = new FastqWriter(append, 0, (byte) 0);
+  FastqReadWriter(Writer append, boolean paired) {
+    mBaseFile = null;
+    if (paired) {
+      mAppend = null;
+      mAppendLeft = new FastqWriter(append, 0, (byte) 0);
+      mAppendRight = mAppendLeft;
+    } else {
+      mAppend = new FastqWriter(append, 0, (byte) 0);
+      mAppendLeft = null;
+      mAppendRight = null;
+    }
+  }
+
+  /**
+   * Constructor for use with file-based output.
+   * @param fastqBaseFileName base name of FASTQ file to output to
+   */
+  public FastqReadWriter(File fastqBaseFileName) {
+    mBaseFile = FastqUtils.baseFile(fastqBaseFileName, true);
+  }
+
+  private void initSingleEnd() throws IOException {
+    mAppend = getFastqWriter("");
     mAppendLeft = null;
     mAppendRight = null;
   }
 
-  /**
-   * Constructor for use with two appendables (e.g. paired end <code>fastq</code> output)
-   * @param fastqBaseFileName base name of a paired end <code>fastq</code> file to output to
-   * @throws IOException if an exception occurs when instantiating writers
-   */
-  public FastqReadWriter(File fastqBaseFileName) throws IOException {
-    final String fpath = fastqBaseFileName.getPath();
-    final String base = fpath.substring(0, fpath.length() - 3);
-    mAppendLeft = new FastqWriter(new FileWriter(base + "_1.fq"), 0, (byte) 0);
-    mAppendRight = new FastqWriter(new FileWriter(base + "_2.fq"), 0, (byte) 0);
+  private void initPairedEnd() throws IOException {
+    mAppend = null;
+    if (FileUtils.isStdio(mBaseFile.getBaseFile())) {
+      mAppendLeft = getFastqWriter("");
+      mAppendRight = mAppendLeft;
+    } else {
+      mAppendLeft = getFastqWriter("_1");
+      mAppendRight = getFastqWriter("_2");
+    }
+  }
+
+  private FastqWriter getFastqWriter(String suffix) throws IOException {
+    return new FastqWriter(new OutputStreamWriter(FileUtils.createOutputStream(mBaseFile, suffix)), 0, (byte) 0);
   }
 
   @Override
@@ -85,43 +114,45 @@ public class FastqReadWriter implements ReadWriter {
 
   @Override
   public void writeLeftRead(String name, byte[] data, byte[] qual, int length) throws IOException {
-    if (!mExpectLeft) {
+    if (!mExpectLeft || mAppend != null) {
       throw new IllegalStateException();
     }
-    if (mAppendLeft != null) {
-      mAppend = mAppendLeft;
+    if (mAppendLeft == null) {
+      initPairedEnd();
     }
-    writeSequence(mTotal + " " + name + " 1", data, qual, length);
+    mAppendLeft.write(mTotal + " " + name + " 1", data, qual, length);
     mExpectLeft = !mExpectLeft;
   }
 
   @Override
   public void writeRightRead(String name, byte[] data, byte[] qual, int length) throws IOException {
-    if (mExpectLeft) {
+    if (mExpectLeft || mAppend != null) {
       throw new IllegalStateException();
     }
-    if (mAppendRight != null) {
-      mAppend = mAppendRight;
+    if (mAppendLeft == null) {
+      initPairedEnd();
     }
-    writeSequence(mTotal + " " + name + " 2", data, qual, length);
+    mAppendRight.write(mTotal + " " + name + " 2", data, qual, length);
     mExpectLeft = !mExpectLeft;
     ++mTotal;
   }
 
   @Override
   public void writeRead(String name, byte[] data, byte[] qual, int length) throws IOException {
-    writeSequence(mTotal + " " + name, data, qual, length);
+    if (mAppendLeft != null || mAppendRight != null) {
+      throw new IllegalStateException("Cannot mix single and paired end writing");
+    }
+    if (mAppend == null) {
+      initSingleEnd();
+    }
+    mAppend.write(mTotal + " " + name, data, qual, length);
     ++mTotal;
-  }
-
-  private void writeSequence(String name, byte[] data, byte[] qual, int length) throws IOException {
-    mAppend.write(name, data, qual, length);
   }
 
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
-    try (Closeable ignored = mAppendLeft; Closeable ignored2 = mAppendRight) {
+    try (Closeable ignored = mAppendLeft; Closeable ignored2 = mAppendRight; Closeable ignored3 = mAppend) {
       // we want the sexy closing side effects
     }
   }

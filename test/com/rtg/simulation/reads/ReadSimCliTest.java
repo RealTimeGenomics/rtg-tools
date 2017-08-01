@@ -42,7 +42,6 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
-import com.rtg.util.test.FileHelper;
 
 /**
  */
@@ -93,12 +92,9 @@ public class ReadSimCliTest extends AbstractCliTest {
       final File genomeDir = new File(tmpDir, "genome");
       final File outDir = new File(tmpDir, "out");
 
-      assertTrue(genomeDir.mkdir());
       String outstr = checkMainInitBadFlags("-t", genomeDir.getPath(), "--machine=illumina_se", "-o", outDir.getPath(), "-n", "2", "--read-length", "2", "-M", "10", "-m", "5", "--seed", "17");
-      assertTrue(outstr.contains("The specified SDF, \"" + genomeDir.getPath() + "\", does not seem to contain a valid SDF index."));
+      TestUtils.containsAll(outstr, "The specified SDF, ", "does not exist");
 
-      FileHelper.deleteAll(genomeDir);
-      FileHelper.deleteAll(outDir);
       ReaderTestUtils.getReaderDNA(">t" + StringUtils.LS + "acgtgtcactacgacgtacgtactgatgcacgactactagctagtcgac", genomeDir, null).close();
 
       outstr = checkMainInitOk("-t", genomeDir.getPath(), "--machine=illumina_se", "-o", outDir.getPath(), "-n", "2", "--read-length", "2", "-M", "10", "-m", "5", "--seed", "17");
