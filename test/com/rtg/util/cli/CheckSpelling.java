@@ -39,8 +39,7 @@ import com.reeltwo.spelling.Spelling;
 import com.rtg.util.StringUtils;
 
 /**
- * Separate class to keep Sharpen happy.
- *
+ * Static access to spelling checking system.
  */
 public final class CheckSpelling {
 
