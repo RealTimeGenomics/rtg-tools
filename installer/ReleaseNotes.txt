@@ -4,6 +4,40 @@ Below are the release notes for the full RTG suite, upon which
 RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
+RTG Core 3.8.3 (2017-08-02)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* rocplot: (GUI) Improvements to graph zooming, to allow stepping back
+  to previous zoom levels as well as fully un-zooming.
+
+* rocplot: Improve the automatic curve naming heuristic to ignore
+  directory name suffixes like "-eval", ".vcfeval" etc, and similar
+  prefixes.
+
+* rocplot: Enable text antialiasing in GUI and PNG output.
+
+* vcfeval: More graceful handling of input VCFs containing REF values
+  that are not valid according to VCF specifications.
+
+* vcfmerge/vcfeval: Normalize the casing of nucleotides in REF/ALT,
+  which permits merging records where the REF/ALT differ in casing.
+
+* vcffilter: Graceful error handling of a new category of invalid
+  javascript expression.
+
+* vcfsubset: Don't complain when using --keep-filter/--remove-filter
+  flags with "PASS" and the VCF header doesn't contain a declaration for
+  that filter.
+
+* misc: Prevent a unit test failure when running on newer versions of
+  Ubuntu.
+
+
+Previous releases
+=================
+
 RTG Core 3.8.2 (2017-06-20)
 ---------------------------
 
@@ -44,10 +78,6 @@ This release primarily includes bugfixes and minor improvements:
 * minor: Fix a typo in the example configuration settings in rtg.cfg
   (specifically, RTG_JAVA_OPTS was incorrectly listed as
   RTG_JAVA_OPTIONS).
-
-
-Previous releases
-=================
 
 RTG Core 3.8.1 (2017-05-29)
 ---------------------------
