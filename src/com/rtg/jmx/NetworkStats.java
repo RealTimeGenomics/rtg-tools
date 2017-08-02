@@ -59,8 +59,8 @@ public class NetworkStats implements MonStats {
   private long mTime = Long.MAX_VALUE;
 
   NetworkStats(String interfaceName) {
-    mEnabled = getStatsFile(RX_STATS_FILE_BASE).exists() && getStatsFile(TX_STATS_FILE_BASE).exists();
     mInterface = interfaceName;
+    mEnabled = getStatsFile(RX_STATS_FILE_BASE).exists() && getStatsFile(TX_STATS_FILE_BASE).exists();
   }
 
   @Override
