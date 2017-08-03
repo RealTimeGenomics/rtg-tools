@@ -144,7 +144,7 @@ public final class MathUtils {
       // Use Gospers Formula.
       res = Math.log(C0 + n * C1) * 0.5 + (Math.log(n) - 1.0) * n;
     }
-    assert res >= 0.0 && !Double.isNaN(res) && !Double.isInfinite(res);
+    assert res >= 0.0 && Double.isFinite(res);
     return res;
   }
 
@@ -285,7 +285,7 @@ public final class MathUtils {
    * @return <code>ln(x)</code>
    */
   public static double log(final double x) {
-    assert x >= 0 && !Double.isInfinite(x) && !Double.isNaN(x);
+    assert x >= 0 && Double.isFinite(x);
     if (x == 0.0) {
       return Double.NEGATIVE_INFINITY;
     }

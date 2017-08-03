@@ -259,7 +259,7 @@ public final class Exam {
    * @throws AssertionError if the assertion failed
    */
   public static boolean assertIsNumber(final double a) {
-    if (!Double.isInfinite(a) && !Double.isNaN(a)) {
+    if (Double.isFinite(a)) {
       return true;
     }
     throw new ExamException(a + " not finite number");
