@@ -167,7 +167,13 @@ public final class TabixIndexer {
     saveIndex(new BedIndexerFactory(skip));
   }
 
-  void saveIndex(IndexerFactory factory) throws IOException, UnindexableDataException {
+  /**
+   * Creates a <code>TABIX</code> index using the supplied index factory.
+   * @param factory the indexer factory
+   * @throws IOException if an IO Error occurs.
+   * @throws UnindexableDataException If data cannot be indexed because of properties of the data
+   */
+  public void saveIndex(IndexerFactory factory) throws IOException, UnindexableDataException {
     saveIndex(mInputHandler, factory);
   }
 
@@ -440,9 +446,15 @@ public final class TabixIndexer {
     return "(" + (l >> 16) + ", " + (l & 0xFFFF) + ")";
   }
 
-  static class TabixOptions {
+  /**
+   * Encapsulates a tabix indexing configuration.
+   */
+  public static class TabixOptions {
+    /** Generic indexing mode, determines span from end column */
     public static final int FORMAT_GENERIC = 0;
+    /** SAM indexing mode, determines span from CIGAR */
     public static final int FORMAT_SAM = 1;
+    /** VCF indexing mode, determines span from length of reference allele. */
     public static final int FORMAT_VCF = 2;
     int mFormat;
     int mSeqCol;
@@ -461,7 +473,7 @@ public final class TabixIndexer {
      * @param skip number of lines to skip at beginning.
      * @param positionStyle true for <code>BED</code> style (0-based half-closed half-open), false for <code>GFF</code> style (1-based closed).
      */
-    TabixOptions(int format, int seqCol, int startCol, int endCol, char meta, int skip, boolean positionStyle) {
+    public TabixOptions(int format, int seqCol, int startCol, int endCol, char meta, int skip, boolean positionStyle) {
       mFormat = format | (positionStyle ? 0x10000 : 0);
       mSeqCol = seqCol;
       mStartCol = startCol;
@@ -554,8 +566,17 @@ public final class TabixIndexer {
       mSkip = skip;
     }
 
-    abstract TabixOptions getOptions();
-    abstract BlockCompressedPositionReader getReader(InputStream is) throws IOException;
+    /**
+     * @return the Tabix indexing parameters
+     */
+    public abstract TabixOptions getOptions();
+
+    /**
+     * @param is underlying input stream
+     * @return the reader capable of returning genomic positions for each entry
+     * @throws IOException if an IO error occurs
+     */
+    public abstract BlockCompressedPositionReader getReader(InputStream is) throws IOException;
   }
 
   static class BedIndexerFactory extends IndexerFactory {
