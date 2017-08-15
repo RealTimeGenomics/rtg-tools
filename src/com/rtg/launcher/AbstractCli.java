@@ -106,22 +106,13 @@ public abstract class AbstractCli {
   }
 
   /**
-   * Initialize command line flags processor.
-   * That is register the flags descriptions etc against <code>mFlags</code>
+   * Get name of application to be used in external communications such as
+   * warning messages, command line information etc.
+   * @return name of application.
    */
-  protected abstract void initFlags();
-
-  /**
-   * Perform the work of the module. Do not capture Exceptions within
-   * this method -- they should be allowed to propagate up past this
-   * method so they can be handled by <code>AbstractCli</code>.
-   *
-   * @param out standard output.
-   * @param err standard error
-   * @return return code.
-   * @exception IOException if an I/O error occurs.
-   */
-  protected abstract int mainExec(OutputStream out, PrintStream err) throws IOException;
+  public String applicationName() {
+    return Constants.APPLICATION_NAME;
+  }
 
   /**
    * Get name of module to be used in external communications such as
@@ -139,13 +130,22 @@ public abstract class AbstractCli {
   }
 
   /**
-   * Get name of application to be used in external communications such as
-   * warning messages, command line information etc.
-   * @return name of application.
+   * Initialize command line flags processor.
+   * That is register the flags descriptions etc against <code>mFlags</code>
    */
-  public String applicationName() {
-    return Constants.APPLICATION_NAME;
-  }
+  protected abstract void initFlags();
+
+  /**
+   * Perform the work of the module. Do not capture Exceptions within
+   * this method -- they should be allowed to propagate up past this
+   * method so they can be handled by <code>AbstractCli</code>.
+   *
+   * @param out standard output.
+   * @param err standard error
+   * @return return code.
+   * @exception IOException if an I/O error occurs.
+   */
+  protected abstract int mainExec(OutputStream out, PrintStream err) throws IOException;
 
   /**
    * Main program. Use -h to get help.  DO NOT call this for
