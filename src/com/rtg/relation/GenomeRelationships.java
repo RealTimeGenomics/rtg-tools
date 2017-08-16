@@ -90,6 +90,9 @@ public class GenomeRelationships {
    */
   public static final String PRIMARY_GENOME_PROPERTY = "primary-genome";
 
+  /** Property name used to store family ID (basically informational only and for PED round-tripping). */
+  public static final String FAMILY_ID_PROPERTY = "family-id";
+
   private final Collection<String> mGenomes;
   private final Map<String, Properties> mGenomeProperties;
   private final MultiMap<String, Relationship> mRelationships;
@@ -656,23 +659,76 @@ public class GenomeRelationships {
   }
 
   /**
+   * Accepts genomes that have the specified IDs
+   */
+  public static class IdFilter implements GenomeFilter {
+    final GenomeRelationships mPed;
+    final Collection<String> mIds;
+
+    /**
+     * Accepts genomes that are assigned to the specified families
+     * @param ped the pedigree indicating whether the genome is primary
+     * @param ids the IDs of families to retain
+     */
+    public IdFilter(GenomeRelationships ped, Collection<String> ids) {
+      mPed = ped;
+      mIds = ids;
+    }
+    @Override
+    public boolean accept(String genome) {
+      return mPed.hasGenome(genome) && mIds.contains(genome);
+    }
+  }
+
+  /**
+   * Accepts genomes that are members of the specified families
+   */
+  public static class FamilyIdFilter implements GenomeFilter {
+    final GenomeRelationships mPed;
+    final Collection<String> mFamilies;
+
+    /**
+     * Accepts genomes that are assigned to the specified families
+     * @param ped the pedigree indicating whether the genome is primary
+     * @param familyIds the IDs of families to retain
+     */
+    public FamilyIdFilter(GenomeRelationships ped, Collection<String> familyIds) {
+      mPed = ped;
+      mFamilies = familyIds;
+    }
+    @Override
+    public boolean accept(String genome) {
+      final String family = mPed.getProperties(genome).getProperty(FAMILY_ID_PROPERTY);
+      return mPed.hasGenome(genome) && mFamilies.contains(family);
+    }
+  }
+
+  /**
    * Accepts genomes that are match the specified sex
    */
   public static class GenomeSexFilter implements GenomeFilter {
     final GenomeRelationships mPed;
-    final Sex mSex;
+    final Collection<Sex> mSex;
+    /**
+     * Accepts genomes that have the specified sex
+     * @param ped the pedigree indicating the sex of each genome
+     * @param sex the sex to accept by this filter
+     */
+    public GenomeSexFilter(GenomeRelationships ped, Sex sex) {
+      this(ped, Collections.singleton(sex));
+    }
     /**
      * Accepts genomes that are marked as primary
      * @param ped the pedigree indicating the sex of each genome
      * @param sex the sex to accept by this filter
      */
-    public GenomeSexFilter(GenomeRelationships ped, Sex sex) {
+    public GenomeSexFilter(GenomeRelationships ped, Collection<Sex> sex) {
       mPed = ped;
       mSex = sex;
     }
     @Override
     public boolean accept(String genome) {
-      return mSex == mPed.getSex(genome);
+      return mSex.contains(mPed.getSex(genome));
     }
   }
 

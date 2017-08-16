@@ -29,6 +29,8 @@
  */
 package com.rtg.relation;
 
+import static com.rtg.relation.PedStatsCliTest.RESOURCE_DIR;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -65,6 +67,32 @@ public class PedFilterCliTest extends AbstractCliTest {
 
       final String output = checkMainInitOk("--vcf", relationFile.toString());
       mNano.check("pedfilter-tovcf.txt", TestUtils.sanitizeVcfHeader(output));
+    }
+  }
+
+  public void testFiltering() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("pedfilter")) {
+      final File relationFile = new File(dir, "octet.ped");
+      FileUtils.copyResource(RESOURCE_DIR + "octet.ped", relationFile);
+
+      String output = checkMainInitOk("--keep-family=1", relationFile.toString());
+      mNano.check("pedfilter-filtering-1.ped", output);
+
+      output = checkMainInitOk("--keep-family=1", "--keep-ids=NA12878,NA12877-1", relationFile.toString());
+      mNano.check("pedfilter-filtering-2.ped", output);
+
+      output = checkMainInitOk("--Xkeep-sex=male", relationFile.toString());
+      mNano.check("pedfilter-filtering-3.ped", output);
+    }
+  }
+
+  public void testIdsOut() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("pedfilter")) {
+      final File relationFile = new File(dir, "octet.ped");
+      FileUtils.copyResource(RESOURCE_DIR + "octet.ped", relationFile);
+
+      final String output = checkMainInitOk("--Xids", relationFile.toString());
+      mNano.check("pedfilter-toIds.ped", output);
     }
   }
 

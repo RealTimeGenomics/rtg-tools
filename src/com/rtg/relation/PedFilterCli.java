@@ -34,9 +34,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.reference.Sex;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.io.LineWriter;
 import com.rtg.vcf.header.VcfHeader;
@@ -46,8 +51,12 @@ import com.rtg.vcf.header.VcfHeader;
 public class PedFilterCli extends AbstractCli {
 
   private static final String KEEP_PRIMARY = "keep-primary";
+  private static final String KEEP_FAMILY = "keep-family";
+  private static final String KEEP_IDS = "keep-ids";
+  private static final String KEEP_SEX = "Xkeep-sex"; // TODO - behaviour of 'either' is counterintuitive
   private static final String REMOVE_PARENTAGE = "remove-parentage";
   private static final String VCF_OUT = "vcf";
+  private static final String IDS_OUT = "Xids"; // XXX Handy with vcffilter --keep-sample/--remove-sample, but overlaps with pedstats *-ids flags
 
   @Override
   public String moduleName() {
@@ -67,9 +76,13 @@ public class PedFilterCli extends AbstractCli {
     mFlags.registerRequired(File.class, CommonFlags.FILE, "the pedigree file to process, may be PED or VCF, use '-' to read from stdin").setCategory(CommonFlagCategories.INPUT_OUTPUT);
 
     mFlags.registerOptional(KEEP_PRIMARY, "keep only primary individuals (those with a PED individual line / VCF sample column)").setCategory(CommonFlagCategories.FILTERING);
+    mFlags.registerOptional(KEEP_FAMILY, String.class, "STRING", "keep only individuals with the specified family ID").setCategory(CommonFlagCategories.FILTERING).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_IDS, String.class, "STRING", "keep only individuals with the specified ID").setCategory(CommonFlagCategories.FILTERING).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_SEX, Sex.class, "STRING", "keep only individuals with the specified sex").setCategory(CommonFlagCategories.FILTERING).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_PARENTAGE, "remove all parent-child relationship information").setCategory(CommonFlagCategories.FILTERING);
 
-    mFlags.registerOptional(VCF_OUT, "output pedigree in in the form of a VCF header rather than PED").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(VCF_OUT, "output pedigree in the form of a VCF header").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(IDS_OUT, "output as a comma separated list of individual IDs").setCategory(CommonFlagCategories.REPORTING);
   }
 
   @Override
@@ -77,9 +90,22 @@ public class PedFilterCli extends AbstractCli {
     final File pedFile = (File) mFlags.getAnonymousValue(0);
     GenomeRelationships pedigree = GenomeRelationships.loadGenomeRelationships(pedFile);
 
+    final Collection<GenomeRelationships.GenomeFilter> filters = new ArrayList<>();
     if (mFlags.isSet(KEEP_PRIMARY)) {
-      pedigree = pedigree.filterByGenomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree));
+      filters.add(new GenomeRelationships.PrimaryGenomeFilter(pedigree));
     }
+    if (mFlags.isSet(KEEP_FAMILY)) {
+      filters.add(new GenomeRelationships.FamilyIdFilter(pedigree, mFlags.getValues(KEEP_FAMILY).stream().map(String.class::cast).collect(Collectors.toSet())));
+    }
+    if (mFlags.isSet(KEEP_IDS)) {
+      filters.add(new GenomeRelationships.IdFilter(pedigree, mFlags.getValues(KEEP_IDS).stream().map(String.class::cast).collect(Collectors.toSet())));
+    }
+    if (mFlags.isSet(KEEP_SEX)) {
+      filters.add(new GenomeRelationships.GenomeSexFilter(pedigree, mFlags.getValues(KEEP_SEX).stream().map(Sex.class::cast).collect(Collectors.toSet())));
+    }
+
+    pedigree = pedigree.filterByGenomes(filters.toArray(new GenomeRelationships.GenomeFilter[0]));
+
     if (mFlags.isSet(REMOVE_PARENTAGE)) {
       pedigree = pedigree.filterByRelationships(new Relationship.NotFilter(new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD)));
     }
@@ -93,7 +119,8 @@ public class PedFilterCli extends AbstractCli {
           header.addSampleName(sample);
         }
         w.write(header.toString());
-
+      } else if (mFlags.isSet(IDS_OUT)) {      // Output only individual IDs
+        w.writeln(StringUtils.join(",", pedigree.genomes()));
       } else {             // Output the relationships in ped format
         w.write(PedFileParser.toString(pedigree));
 

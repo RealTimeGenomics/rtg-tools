@@ -41,7 +41,7 @@ import com.rtg.util.io.TestDirectory;
  */
 public class PedStatsCliTest extends AbstractCliTest {
 
-  private static final String RESOURCE_DIR = "com/rtg/relation/resources/";
+  static final String RESOURCE_DIR = "com/rtg/relation/resources/";
 
   @Override
   protected AbstractCli getCli() {

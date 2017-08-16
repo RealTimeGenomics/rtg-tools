@@ -59,9 +59,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
  */
 public final class PedFileParser {
 
-  /** Property name used to store family ID (basically informational only and for round-tripping). */
-  private static final String FAMILY_ID_PROPERTY = "family-id";
-
   /** Reserved to indicate an unknown genome ID (only permitted to be used in maternal or paternal columns) */
   private static final String UNKNOWN = "0";
 
@@ -185,7 +182,7 @@ public final class PedFileParser {
     if (phen != null) {
       ped.getProperties(individualId).put(GenomeRelationships.DISEASE_PROPERTY, phen);
     }
-    ped.getProperties(individualId).put(FAMILY_ID_PROPERTY, familyId);
+    ped.getProperties(individualId).put(GenomeRelationships.FAMILY_ID_PROPERTY, familyId);
     ped.getProperties(individualId).put(GenomeRelationships.PRIMARY_GENOME_PROPERTY, "true");
 
     if (!UNKNOWN.equals(paternalId)) {
@@ -226,7 +223,7 @@ public final class PedFileParser {
     sb.append("#fam-id\tind-id\tpat-id\tmat-id\tsex\tphen").append(StringUtils.LS);
     for (final String genome : pedigree.genomes()) {
       final Properties p = pedigree.getProperties(genome);
-      sb.append(p.getProperty(FAMILY_ID_PROPERTY, UNKNOWN)).append("\t");
+      sb.append(p.getProperty(GenomeRelationships.FAMILY_ID_PROPERTY, UNKNOWN)).append("\t");
       sb.append(genome).append("\t");
       String paternal = UNKNOWN;
       String maternal = UNKNOWN;
