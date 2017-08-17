@@ -354,6 +354,19 @@ public class VcfHeader {
   }
 
   /**
+   * Ensure that the header contains the specified ALT field (or one that is compatible)
+   * @param field the new ALT field
+   */
+  public void ensureContains(AltField field) {
+    for (AltField f : getAltLines()) {
+      if (f.getId().equals(field.getId())) {
+        return; // ALT already present
+      }
+    }
+    addAltField(field);
+  }
+
+  /**
    * @return get the meta line containing file format version
    */
   public String getVersionLine() {
