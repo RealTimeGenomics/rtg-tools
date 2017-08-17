@@ -31,7 +31,6 @@ package com.rtg.util.integrity;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -195,9 +194,7 @@ public abstract class IntegralAbstract implements Integrity {
   private static Object fieldObject(final Object obj, final Field field) {
     try {
       return field.get(obj);
-    } catch (final IllegalArgumentException e) {
-      return null;
-    } catch (final IllegalAccessException e) {
+    } catch (final IllegalArgumentException | IllegalAccessException e) {
       return null;
     }
   }
@@ -217,10 +214,7 @@ public abstract class IntegralAbstract implements Integrity {
     }
     try {
       final String methodName = "toString";
-      final Method m = clazz.getDeclaredMethod(methodName);
-      if (m == null) {
-        return toStringDeclared(clazz.getSuperclass());
-      }
+      clazz.getDeclaredMethod(methodName); // Can throw NoSuchMethodException
     } catch (final SecurityException e) {
       return false;
     } catch (final NoSuchMethodException e) {
