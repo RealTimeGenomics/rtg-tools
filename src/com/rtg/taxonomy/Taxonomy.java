@@ -30,15 +30,14 @@
 
 package com.rtg.taxonomy;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.rtg.util.TsvParser;
 import com.rtg.util.io.LineWriter;
 
 /**
@@ -281,43 +280,42 @@ public class Taxonomy {
    */
   public final void read(InputStream in) throws IOException {
     mReason = null;
-    try (final BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-      String line;
-      int lineNumber = 0;
-      while ((line = reader.readLine()) != null) {
-        ++lineNumber;
-        if (lineNumber == 1) {
-          // expect first line to have RTG taxomony version
-          if (!line.contains("RTG taxonomy")) {
-            throw new IOException("No version information on first line of file.");
-          }
-          final String[] parts = line.split("\\s");
-          if (!VERSION.equals(parts[parts.length - 1])) {
-            throw new IOException("Expecting version " + VERSION + " but saw " + parts[parts.length - 1]);
-          }
-          continue;
-        }
-        if (line.length() == 0 || line.startsWith("#")) {
-          continue;
-        }
+    final TaxonomyParser r = new TaxonomyParser();
+    r.parse(in);
+  }
 
-        final String[] parts = line.split("\t");
-        if (parts.length != 4) {
-          throw new IOException("Malformed taxonomy file line " + lineNumber + ": " + line);
+  private class TaxonomyParser extends TsvParser<Void> {
+    @Override
+    protected void parseHeader(String line) throws IOException {
+      if (lineNumber() == 1) {
+        // expect first line to have RTG taxomony version
+        if (!line.contains("RTG taxonomy")) {
+          throw new IOException("No version information on first line of file.");
         }
+        final String[] parts = line.split("\\s");
+        if (!VERSION.equals(parts[parts.length - 1])) {
+          throw new IOException("Expecting version " + VERSION + " but saw " + parts[parts.length - 1]);
+        }
+      }
+    }
+
+    @Override
+    protected void parseLine(String... columns) throws IOException {
+      if (columns.length != 4) {
+        throw new IOException("Malformed taxonomy file line " + lineNumber() + ": " + line());
+      }
+      try {
+        final int taxId = Integer.parseInt(columns[0]);
+        final int parentId = Integer.parseInt(columns[1]);
+        final String rank = new String(columns[2].toCharArray());
+        final String name = new String(columns[3].toCharArray());
         try {
-          final int taxId = Integer.parseInt(parts[0]);
-          final int parentId = Integer.parseInt(parts[1]);
-          final String rank = new String(parts[2].toCharArray());
-          final String name = new String(parts[3].toCharArray());
-          try {
-            addNode(taxId, parentId, name, rank);
-          } catch (final IllegalArgumentException e) {
-            throw new IOException(e.getMessage());
-          }
-        } catch (final NumberFormatException e) {
-          throw new IOException("Malformed taxonomy file line " + lineNumber + ": " + line);
+          addNode(taxId, parentId, name, rank);
+        } catch (final IllegalArgumentException e) {
+          throw new IOException(e.getMessage());
         }
+      } catch (final NumberFormatException e) {
+        throw new IOException("Malformed taxonomy file line " + lineNumber() + ": " + line());
       }
     }
   }

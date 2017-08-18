@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import com.rtg.util.TsvParser;
 import com.rtg.util.integrity.Exam;
 import com.rtg.util.integrity.Integrity;
 
@@ -95,37 +96,38 @@ public abstract class ScoringMatrix implements Serializable, Integrity {
   }
 
   protected void parse(final BufferedReader in) throws IOException {
-    final ProteinFastaSymbolTable table = new ProteinFastaSymbolTable();
-    int[] colids = null;
-    String line;
-    while ((line = in.readLine()) != null) {
-      if (!line.startsWith("#")) {
-        //get the ids for the columns
-        final String[] splits = line.split("\\ +");
-        colids = new int[splits.length];
-        for (int i = 1; i < splits.length; ++i) {
-          final String x = splits[i];
-          colids[i] = codeIndex(table, x);
-        }
-        break;
+    new TsvParser<Void>() {
+      private final ProteinFastaSymbolTable mTable = new ProteinFastaSymbolTable();
+      private int[] mColIds = null;
+      @Override
+      protected String[] split() {
+        return line().split("\\ +");
       }
-    }
-    //System.err.println(Arrays.toString(colids));
-    while ((line = in.readLine()) != null) {
-      final String[] splits = line.split("\\ +");
-      final int row = codeIndex(table, splits[0]);
-      if (row > -1) {
-        //System.err.println("row=" + row);
-        for (int i = 1; i < splits.length; ++i) {
-          final int col = colids[i];
-          if (col == -1) {
-            continue;
+      @Override
+      protected void parseLine(String... splits) {
+        if (mColIds == null) {
+          //get the ids for the columns
+          mColIds = new int[splits.length];
+          for (int i = 1; i < splits.length; ++i) {
+            final String x = splits[i];
+            mColIds[i] = codeIndex(mTable, x);
           }
-          final int sc = Integer.parseInt(splits[i]);
-          mScores[row][col] = sc;
-          //System.err.println("[" + i + "]" + splits[i].length() + ":" + splits[i]);
+        } else {
+          final int row = codeIndex(mTable, splits[0]);
+          if (row > -1) {
+            //System.err.println("row=" + row);
+            for (int i = 1; i < splits.length; ++i) {
+              final int col = mColIds[i];
+              if (col == -1) {
+                continue;
+              }
+              final int sc = Integer.parseInt(splits[i]);
+              mScores[row][col] = sc;
+              //System.err.println("[" + i + "]" + splits[i].length() + ":" + splits[i]);
+            }
+          }
         }
       }
-    }
+    }.parse(in);
   }
 }

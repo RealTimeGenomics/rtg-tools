@@ -29,22 +29,48 @@
  */
 package com.rtg.taxonomy;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.rtg.util.StringUtils;
+import com.rtg.util.TsvParser;
 
 /**
- * Utility methods providing support for a mapping from sequence id to taxonomy id.
+ * Class providing support for a mapping from sequence id to taxonomy id.
  */
-public final class SequenceToTaxonIds {
+public final class SequenceToTaxonIds extends TsvParser<Map<String, Integer>> {
 
-  private SequenceToTaxonIds() { }
+  private final Map<String, Integer> mMap = new HashMap<>();
+
+  @Override
+  protected void parseLine(String... parts) throws IOException {
+    if (parts.length != 2) {
+      throw new IOException("Malformed line: " + line());
+    }
+    final String name;
+    final int indexOfSpace = parts[1].indexOf(' ');
+    if (indexOfSpace != -1) {
+      name = parts[1].substring(0, indexOfSpace);
+    } else {
+      name = parts[1];
+    }
+
+    final int taxId;
+    try {
+      taxId = Integer.parseInt(parts[0]);
+    } catch (NumberFormatException e) {
+      throw new IOException("Malformed line: " + line());
+    }
+    if (mMap.put(new String(name.toCharArray()), taxId) != null) {
+      throw new IOException("Duplicate name detected: " + line());
+    }
+  }
+
+  @Override
+  protected Map<String, Integer> result() {
+    return mMap;
+  }
 
   /**
    * Load a map from (short) sequence names to taxon ids supplied as tab separated input.
@@ -53,46 +79,6 @@ public final class SequenceToTaxonIds {
    * @throws IOException if there are problems reading the input
    */
   public static Map<String, Integer> sequenceToIds(File tsv) throws IOException {
-    return sequenceToIds(new FileReader(tsv));
-  }
-
-  /**
-   * Load a map from (short) sequence names to taxon ids supplied as tab separated input.
-   * @param input input source
-   * @return the map
-   * @throws IOException if there are problems reading the input
-   */
-  public static Map<String, Integer> sequenceToIds(Reader input) throws IOException {
-    final Map<String, Integer> ret = new HashMap<>();
-    try (BufferedReader mergedReader = new BufferedReader(input)) {
-      String line;
-      while ((line = mergedReader.readLine()) != null) {
-        if (line.startsWith("#") || line.length() == 0) {
-          continue;
-        }
-        final String[] parts = StringUtils.split(line, '\t');
-        if (parts.length != 2) {
-          throw new IOException("Malformed line: " + line);
-        }
-        final String name;
-        final int indexOfSpace = parts[1].indexOf(' ');
-        if (indexOfSpace != -1) {
-          name = parts[1].substring(0, indexOfSpace);
-        } else {
-          name = parts[1];
-        }
-
-        final int taxId;
-        try {
-          taxId = Integer.parseInt(parts[0]);
-        } catch (NumberFormatException e) {
-          throw new IOException("Malformed line: " + line);
-        }
-        if (ret.put(new String(name.toCharArray()), taxId) != null) {
-          throw new IOException("Duplicate name detected: " + line) ;
-        }
-      }
-    }
-    return ret;
+    return new SequenceToTaxonIds().parse(tsv);
   }
 }
