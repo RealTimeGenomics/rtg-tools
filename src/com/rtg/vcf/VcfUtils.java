@@ -54,6 +54,20 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public final class VcfUtils {
 
+  /** Types of structural variants that may be used in <code>SVTYPE</code> field */
+  public enum SvType {
+    /** Break-end */
+    BND,
+    /** Deletion */
+    DEL,
+    /** Duplication */
+    DUP,
+    /** Inversion */
+    INV,
+    /** Insertion */
+    INS,
+  }
+
   private VcfUtils() { }
 
   /** Character used to separate alleles in unphased genotypes. */
@@ -71,8 +85,9 @@ public final class VcfUtils {
   /** Character indicating field value is missing. */
   public static final char MISSING_VALUE = '.';
 
-  /** ALT allele used to indicate haplotype is missing due to spanning deletion. */
-  public static final char ALT_SPANNING_DELETION = '*';
+  /** Missing field (e.g. filter/QUAL). */
+  public static final String MISSING_FIELD = "" + MISSING_VALUE;
+
 
   /** QUAL column label. */
   public static final String QUAL = "QUAL";
@@ -80,14 +95,34 @@ public final class VcfUtils {
   /** Pass filter flag. */
   public static final String FILTER_PASS = "PASS";
 
-  /** Missing field (e.g. filter/QUAL). */
-  public static final String MISSING_FIELD = "" + MISSING_VALUE;
+
+  /** ALT allele used to indicate haplotype is missing due to spanning deletion. */
+  public static final char ALT_SPANNING_DELETION = '*';
+
+  /** ALT corresponding to deletion */
+  public static final String ALT_DEL = "<" + SvType.DEL + ">";
+
+  /** ALT corresponding to duplication */
+  public static final String ALT_DUP = "<" + SvType.DUP + ">";
+
+  /** ALT corresponding to insertion */
+  public static final String ALT_INS = "<" + SvType.INS + ">";
+
+
+  /** Type of structural variant */
+  public static final String INFO_SVTYPE = "SVTYPE";
 
   /** Confidence interval for POS columns. */
-  public static final String CONFIDENCE_INTERVAL_POS = "CIPOS";
+  public static final String INFO_CIPOS = "CIPOS";
 
   /** Confidence interval for END columns. */
-  public static final String CONFIDENCE_INTERVAL_END = "CIEND";
+  public static final String INFO_CIEND = "CIEND";
+
+  /** End position of structural variant */
+  public static final String INFO_END = "END";
+
+  /** Imprecise structural variant */
+  public static final String INFO_IMPRECISE = "IMPRECISE";
 
   /** Allele frequency for alt alleles. */
   public static final String INFO_ALLELE_FREQ = "AF";
@@ -103,6 +138,7 @@ public final class VcfUtils {
 
   /** Combined depth field. */
   public static final String INFO_COMBINED_DEPTH = "DP";
+
 
   /** Genotype format field. */
   public static final String FORMAT_GENOTYPE = "GT";

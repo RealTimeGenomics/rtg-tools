@@ -31,6 +31,13 @@
 package com.rtg.vcf;
 
 
+import static com.rtg.vcf.VcfRecord.MISSING;
+import static com.rtg.vcf.VcfUtils.FILTER_PASS;
+import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE;
+import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE_QUALITY;
+import static com.rtg.vcf.VcfUtils.INFO_CIEND;
+import static com.rtg.vcf.VcfUtils.INFO_CIPOS;
+
 import java.io.File;
 import java.util.Arrays;
 
@@ -43,12 +50,12 @@ import junit.framework.TestCase;
 public class VcfUtilsTest extends TestCase {
 
   public void test() {
-    assertEquals("CIPOS", VcfUtils.CONFIDENCE_INTERVAL_POS);
-    assertEquals("CIEND", VcfUtils.CONFIDENCE_INTERVAL_END);
-    assertEquals(".", VcfRecord.MISSING);
-    assertEquals("PASS", VcfUtils.FILTER_PASS);
-    assertEquals("GT", VcfUtils.FORMAT_GENOTYPE);
-    assertEquals("GQ", VcfUtils.FORMAT_GENOTYPE_QUALITY);
+    assertEquals("CIPOS", INFO_CIPOS);
+    assertEquals("CIEND", INFO_CIEND);
+    assertEquals(".", MISSING);
+    assertEquals("PASS", FILTER_PASS);
+    assertEquals("GT", FORMAT_GENOTYPE);
+    assertEquals("GQ", FORMAT_GENOTYPE_QUALITY);
     assertTrue(VcfUtils.isVcfExtension(new File(".vcf")));
     assertTrue(VcfUtils.isVcfExtension(new File(".vcf.gz")));
     assertFalse(VcfUtils.isVcfExtension(new File(".blah")));
@@ -128,7 +135,7 @@ public class VcfUtilsTest extends TestCase {
       record.addAltCall(alt);
     }
     record.setNumberOfSamples(1);
-    record.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, gt);
+    record.addFormatAndSample(FORMAT_GENOTYPE, gt);
     return record;
   }
 
@@ -179,10 +186,10 @@ public class VcfUtilsTest extends TestCase {
 
   public void testConfidenceIntervalRetrieval() {
     final VcfRecord rec = makeRecord("1/1", "A", "T");
-    assertNull(VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS));
-    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "-10");
-    rec.addInfo(VcfUtils.CONFIDENCE_INTERVAL_POS, "42");
-    final int[] ci = VcfUtils.getConfidenceInterval(rec, VcfUtils.CONFIDENCE_INTERVAL_POS);
+    assertNull(VcfUtils.getConfidenceInterval(rec, INFO_CIPOS));
+    rec.addInfo(INFO_CIPOS, "-10");
+    rec.addInfo(INFO_CIPOS, "42");
+    final int[] ci = VcfUtils.getConfidenceInterval(rec, INFO_CIPOS);
     assertEquals(2, ci.length);
     assertEquals(-10, ci[0]);
     assertEquals(42, ci[1]);
