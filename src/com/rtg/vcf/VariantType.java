@@ -129,11 +129,14 @@ public enum VariantType {
   public static VariantType getType(VcfRecord rec, int[] gtSplit) {
     boolean allMissing = true;
     int altId = 0;
-    for (int g : gtSplit) {
-      if (g != -1) {
+    int gtPos;
+    for (gtPos = 0; gtPos < gtSplit.length; gtPos++) {
+      final int a = gtSplit[gtPos];
+      if (a != -1) {
         allMissing = false;
-        if (g != 0) {
-          altId = g;
+        if (a != 0) {
+          altId = a;
+          gtPos++;
           break;
         }
       }
@@ -146,9 +149,10 @@ public enum VariantType {
     }
     final String[] alleles = VcfUtils.getAlleleStrings(rec);
     VariantType altType = getType(alleles[0], alleles[altId]);
-    for (int i = altId + 1; i < gtSplit.length; i++) {
-      if (gtSplit[i] > 0 && gtSplit[i] != altId) {
-        altType = getPrecedence(altType, getType(alleles[0], alleles[i]));
+    for (; gtPos < gtSplit.length; gtPos++) {
+      final int a = gtSplit[gtPos];
+      if (a > 0 && a != altId) {
+        altType = getPrecedence(altType, getType(alleles[0], alleles[a]));
       }
     }
     return altType;

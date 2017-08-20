@@ -52,6 +52,14 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     assertEquals("0.33 (1/3)", VariantStatistics.divide(1L, 3L));
   }
 
+  public void testGetVariantType() {
+    final VcfRecord r = VcfReader.vcfLineToRecord("1 1300068 . TCTGCGGGGGCAGCACAGGTGAGGCCCAAGCACACCCGGTCCAGCCCCCAACATGCAGCCTGTGCTCAGGGGCAGCCCCCACGCACTCAC T,TTCAC 1959.58 . AC=27,1;AF=0.900,0.033;AN=30 GT 0/0/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/2".replaceAll(" ", "\t"));
+    final String gt = r.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0);
+    final int[] gtSplit = VcfUtils.splitGt(gt);
+    final VariantType t = VariantType.getType(r, gtSplit);
+    assertEquals(VariantType.DELETION, t);
+  }
+
   private static final String[] BASE_OUTPUT = {
     "Passed Filters               : 0" + StringUtils.LS
     , "Failed Filters               : 0" + StringUtils.LS
