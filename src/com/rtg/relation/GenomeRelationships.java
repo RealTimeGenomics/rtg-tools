@@ -307,21 +307,11 @@ public class GenomeRelationships {
   }
 
   static boolean allAccepted(String genome, GenomeFilter... filters) {
-    for (final GenomeFilter f : filters) {
-      if (!f.accept(genome)) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.stream(filters).allMatch(filter -> filter.accept(genome));
   }
 
   static boolean allAccepted(Relationship r, RelationshipFilter... filters) {
-    for (final RelationshipFilter f : filters) {
-      if (!f.accept(r)) {
-        return false;
-      }
-    }
-    return true;
+    return Arrays.stream(filters).allMatch(filter -> filter.accept(r));
   }
 
   @Override
