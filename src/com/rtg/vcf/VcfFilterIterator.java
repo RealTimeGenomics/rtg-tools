@@ -41,7 +41,7 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class VcfFilterIterator implements VcfIterator {
 
-  private final Collection<VcfFilter> mFilters;
+  private final AllMatchFilter mFilter;
   private final VcfIterator mDelegate;
   private VcfRecord mCurrent;
 
@@ -63,7 +63,8 @@ public class VcfFilterIterator implements VcfIterator {
    */
   public VcfFilterIterator(VcfIterator delegate, Collection<VcfFilter> filters) throws IOException {
     mDelegate = delegate;
-    mFilters = filters;
+    mFilter = new AllMatchFilter(filters);
+    mFilter.setHeader(delegate.getHeader());
     setNext();
   }
 
@@ -88,7 +89,7 @@ public class VcfFilterIterator implements VcfIterator {
     mCurrent = null;
     while (mDelegate.hasNext()) {
       final VcfRecord next = mDelegate.next();
-      if (mFilters.stream().allMatch(filter -> filter.accept(next))) {
+      if (mFilter.accept(next)) {
         mCurrent = next;
         return;
       }
