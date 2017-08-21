@@ -37,6 +37,7 @@ import java.util.Set;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 
 /**
  * Creates typical vcfeval output files with separate VCF files and ROC files.
@@ -76,13 +77,14 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
                         File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    mTpCalls = makeVcfWriter(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt), zip);
-    mTpBase = makeVcfWriter(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt), zip);
-    mFp = makeVcfWriter(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt), zip);
-    mFn = makeVcfWriter(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt), zip);
+    final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
+    mTpCalls = vf.make(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt));
+    mTpBase = vf.make(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt));
+    mFp = vf.make(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt));
+    mFn = vf.make(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt));
     if (twoPass) {
-      mFpCa = makeVcfWriter(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt), zip);
-      mFnCa = makeVcfWriter(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt), zip);
+      mFpCa = vf.make(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt));
+      mFnCa = vf.make(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt));
     } else {
       mFpCa = null;
       mFnCa = null;

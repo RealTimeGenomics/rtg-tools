@@ -160,7 +160,6 @@ public class VcfMerge extends AbstractCli {
       }
     }
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final VariantStatistics stats = mFlags.isSet(STATS_FLAG) ? new VariantStatistics(null) : null;
     final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
     final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
@@ -184,7 +183,7 @@ public class VcfMerge extends AbstractCli {
     final boolean stdout = FileUtils.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
     try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
-      try (VcfWriter w = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index))) {
+      try (VcfWriter w = new VcfWriterFactory(mFlags).make(header, vcfFile, out)) {
         final ZipperCallback callback = (records, headers) -> {
           assert records.length > 0;
           final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);

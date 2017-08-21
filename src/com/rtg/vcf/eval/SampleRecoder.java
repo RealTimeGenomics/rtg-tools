@@ -43,6 +43,7 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -80,8 +81,9 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       h.getSampleNames().clear();
       h.addSampleName(sampleName == null ? "SAMPLE" : sampleName);
     }
-    mSampleVcf = makeVcfWriter(h, new File(output, "sample.vcf" + zipExt), zip); // Primary output containing new representation of sample using population alleles
-    mAuxiliary = makeVcfWriter(h, new File(output, "auxiliary.vcf" + zipExt), zip);
+    final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
+    mSampleVcf = vf.make(h, new File(output, "sample.vcf" + zipExt)); // Primary output containing new representation of sample using population alleles
+    mAuxiliary = vf.make(h, new File(output, "auxiliary.vcf" + zipExt));
   }
 
   @Override

@@ -46,10 +46,10 @@ import com.rtg.util.intervals.SequenceIdLocus;
 import com.rtg.util.intervals.SequenceIdLocusComparator;
 import com.rtg.util.intervals.SequenceIdLocusSimple;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -173,7 +173,7 @@ public abstract class PopulationVariantGenerator {
     header.addReference(reference);
     header.addContigFields(reference);
     header.addInfoField(VcfUtils.INFO_ALLELE_FREQ, VcfUtils.INFO_ALLELE_FREQ_TYPE, VcfUtils.INFO_ALLELE_FREQ_NUM, VcfUtils.INFO_ALLELE_FREQ_DESC);
-    try (VcfWriter writer = new DefaultVcfWriter(header, vcfOutput, stream, vcfOutput != null && FileUtils.isGzipFilename(vcfOutput), true)) {
+    try (VcfWriter writer = new VcfWriterFactory().zip(vcfOutput != null && FileUtils.isGzipFilename(vcfOutput)).make(header, vcfOutput, stream)) {
       for (PopulationVariant var : variants) {
         final VcfRecord rec = var.toVcfRecord(reference);
         writer.write(rec);

@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.rtg.launcher.AbstractNanoTest;
+import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -55,7 +56,7 @@ public class VcfSortRefinerTest extends AbstractNanoTest {
       FileHelper.stringToGzFile(mNano.loadReference(id + ".vcf"), in);
       final File out = new File(td, "out.vcf");
       try (final VcfSortRefiner t = new VcfSortRefiner(VcfReader.openVcfReader(in))) {
-        try (final VcfWriter w = new DefaultVcfWriter(t.getHeader(), out, null, false, false)) {
+        try (final VcfWriter w = new DefaultVcfWriter(t.getHeader(), FileUtils.createOutputStream(out))) {
           while (t.hasNext()) {
             w.write(t.next());
           }

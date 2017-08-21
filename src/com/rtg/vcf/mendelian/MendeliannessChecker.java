@@ -53,14 +53,13 @@ import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.AsyncVcfWriter;
 import com.rtg.vcf.ChildPhasingVcfAnnotator;
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -157,7 +156,6 @@ public final class MendeliannessChecker extends AbstractCli {
     final boolean strictMissingPloidy = mFlags.isSet(STRICT_MISSING_FLAG);
     final boolean passOnly = !mFlags.isSet(ALL_RECORDS_FLAG);
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
-    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
     final File outputVcfFile = mFlags.isSet(OUTPUT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_FLAG)) : null;
     final File inconsistentVcfFile = mFlags.isSet(OUTPUT_INCONSISTENT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_INCONSISTENT_FLAG)) : null;
     final File consistentVcfFile = mFlags.isSet(OUTPUT_CONSISTENT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_CONSISTENT_FLAG)) : null;
@@ -195,9 +193,10 @@ public final class MendeliannessChecker extends AbstractCli {
     }
 
     int skippedRecords = 0;
-    try (VcfWriter outputVcf = outputVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, outputVcfFile, null, gzip, index)) : null) {
-      try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header2, inconsistentVcfFile, null, gzip, index)) : null) {
-        try (VcfWriter consistentVcf = consistentVcfFile != null ? new AsyncVcfWriter(new DefaultVcfWriter(header, consistentVcfFile, null, gzip, index)) : null) {
+    final VcfWriterFactory f = new VcfWriterFactory(mFlags);
+    try (VcfWriter outputVcf = outputVcfFile != null ? f.make(header2, outputVcfFile) : null) {
+      try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? f.make(header2, inconsistentVcfFile) : null) {
+        try (VcfWriter consistentVcf = consistentVcfFile != null ? f.make(header, consistentVcfFile) : null) {
           try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile)) : null) {
             while (vr.hasNext()) {
               final VcfRecord rec = vr.next();

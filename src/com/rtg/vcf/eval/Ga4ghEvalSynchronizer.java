@@ -42,6 +42,7 @@ import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfRecordMerger;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -144,7 +145,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mInHeaders[QUERY_MERGE_INDEX].addSampleName(SAMPLE_QUERY);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final VcfWriter w = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip, false);
+    final VcfWriter w = new VcfWriterFactory().zip(zip).addRunInfo(false).make(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt));
     mVcfOut = looseMatchDistance >= 0 ? new Ga4ghLooseMatchFilter(w, looseMatchDistance) : w;
   }
 

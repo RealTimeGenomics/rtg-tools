@@ -40,6 +40,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -73,10 +74,10 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     VcfHeader h = variants.baseLineHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
-    mAuxiliary = makeVcfWriter(h, new File(output, "auxiliary.vcf" + zipExt), zip); // Contains sample calls that were matched (i.e. redundant alleles)
+    mAuxiliary = new VcfWriterFactory().zip(zip).addRunInfo(true).make(h, new File(output, "auxiliary.vcf" + zipExt)); // Contains sample calls that were matched (i.e. redundant alleles)
     h = h.copy();
     h.removeAllSamples();
-    mAlleles = makeVcfWriter(h, new File(output, "alleles.vcf" + zipExt), zip); // Contains new population alleles (old + new sample alleles)
+    mAlleles = new VcfWriterFactory().zip(zip).addRunInfo(true).make(h, new File(output, "alleles.vcf" + zipExt)); // Contains new population alleles (old + new sample alleles)
   }
 
   protected void resetRecordFields(VcfRecord rec) {

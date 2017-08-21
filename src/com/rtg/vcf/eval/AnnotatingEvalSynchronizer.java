@@ -38,6 +38,7 @@ import java.util.Set;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -68,11 +69,12 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
     super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baseLineHeader().copy();
+    final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
     CombinedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);
-    mBase = makeVcfWriter(bh, new File(outdir, "baseline.vcf" + zipExt), zip);
+    mBase = vf.make(bh, new File(outdir, "baseline.vcf" + zipExt));
     final VcfHeader ch = variants.calledHeader().copy();
     CombinedEvalSynchronizer.addInfoHeaders(ch, VariantSetType.CALLS);
-    mCalls = makeVcfWriter(ch, new File(outdir, "calls.vcf" + zipExt), zip);
+    mCalls = vf.make(ch, new File(outdir, "calls.vcf" + zipExt));
   }
 
   @Override

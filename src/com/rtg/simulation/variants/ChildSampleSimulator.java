@@ -49,12 +49,12 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -228,7 +228,7 @@ public class ChildSampleSimulator {
 
     mStats = new ChildStatistics();
     mStats.onlySamples(sample);
-    try (VcfWriter vcfOut = new DefaultVcfWriter(header, vcfOutFile, null, FileUtils.isGzipFilename(vcfOutFile), true)) {
+    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, sex, mDefaultPloidy);
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));

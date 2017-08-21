@@ -66,6 +66,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfFilterStatistics.Stat;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Class inputs the variant results and filters them based on various criteria.
@@ -391,8 +392,10 @@ public final class VcfFilterCli extends AbstractCli {
     final boolean stdout = out != null && FileUtils.isStdio(out);
     Diagnostic.developerLog("Starting filter");
     try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
-      try (VcfWriter w = getVcfWriter(output, out, r)) {
-        mVcfFilterTask.filterVcf(r, w);
+      final VcfHeader header = r.getHeader();
+      mVcfFilterTask.setHeader(header);
+      try (VcfWriter w = getVcfWriter(header, output, out)) {
+        mVcfFilterTask.process(r, w);
       }
       if (!stdout && out != null) {
         mVcfFilterTask.printStatistics(output);
@@ -401,15 +404,13 @@ public final class VcfFilterCli extends AbstractCli {
     }
   }
 
-  private VcfWriter getVcfWriter(OutputStream output, File out, VcfReader r) throws IOException {
+  private VcfWriter getVcfWriter(VcfHeader header, OutputStream output, File out) throws IOException {
     if (out == null) {
-      return new NullVcfWriter(r.getHeader());
+      return new NullVcfWriter(header);
     }
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
-    final boolean writeHeader = !mFlags.isSet(NO_HEADER);
     final File outputFile = FileUtils.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-    return new AsyncVcfWriter(new DefaultVcfWriter(r.getHeader(), outputFile, output, gzip, index, writeHeader));
+    return new VcfWriterFactory(mFlags).make(header, outputFile, output);
   }
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {

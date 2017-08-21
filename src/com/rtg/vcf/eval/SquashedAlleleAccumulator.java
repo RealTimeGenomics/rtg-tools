@@ -36,10 +36,10 @@ import java.util.List;
 
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -69,8 +69,8 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader h = variants.calledHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
-    // This one can't be Async unless we adjust the methods below to take a copy of the record before writing
-    mAlternate = new DefaultVcfWriter(h, new File(output, "alternate.vcf" + zipExt), null, zip, true); // Contains sample calls after subtraction of matched alleles from double-alt cases
+    // This writer can't be Async unless we adjust the methods below to take a copy of the record before writing
+    mAlternate = new VcfWriterFactory().async(false).zip(zip).make(h, new File(output, "alternate.vcf" + zipExt), null); // Contains sample calls after subtraction of matched alleles from double-alt cases
   }
 
   @Override

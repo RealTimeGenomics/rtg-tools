@@ -45,6 +45,7 @@ import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfRecordMerger;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
@@ -101,7 +102,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mInHeaders[1] = variants.calledHeader().copy();
     mInHeaders[1].removeAllSamples();
     mInHeaders[1].addSampleName(SAMPLE_CALLS);
-    mVcfOut = makeVcfWriter(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt), zip, false);
+    mVcfOut = new VcfWriterFactory().zip(zip).addRunInfo(false).make(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt));
   }
 
   @Override

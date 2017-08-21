@@ -321,8 +321,7 @@ public class VcfSubset extends AbstractCli {
       if (formatStripper != null) {
         formatStripper.updateHeader(header);
       }
-      header.addRunInfo();
-      try (final VcfWriter writer = new AsyncVcfWriter(new DefaultVcfWriter(header, vcfFile, out, gzip, index, writeHeader))) {
+      try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {

@@ -91,14 +91,7 @@ class VcfFilterTask {
   protected String mFailFilterName = null;
 
 
-  /**
-   * Filter the VCF
-   * @param reader the input VCF records
-   * @param writer the destination for output
-   * @throws IOException if there is a problem during filtering
-   */
-  protected void filterVcf(VcfReader reader, VcfWriter writer) throws IOException {
-    final VcfHeader header = reader.getHeader();
+  void setHeader(VcfHeader header) {
     checkHeaderFieldFilters(header);
     for (final VcfFilter filter : mFilters) {
       if (filter instanceof VcfSampleFilter) {
@@ -110,7 +103,6 @@ class VcfFilterTask {
     if (mFailFilterName != null) {
       header.ensureContains(new FilterField(mFailFilterName, "RTG vcffilter user defined filter"));
     }
-    process(reader, writer);
   }
 
   protected void printStatistics(OutputStream outStream) {

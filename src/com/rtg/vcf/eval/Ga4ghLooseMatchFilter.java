@@ -35,10 +35,10 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
 
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -174,10 +174,7 @@ class Ga4ghLooseMatchFilter implements VcfWriter {
     final int distance = args.length > 0 ? Integer.parseInt(args[arg++]) : 30;
     final String file = arg < args.length ? args[arg] : "-";
     try (VcfReader reader = VcfReader.openVcfReader(new File(file))) {
-      final VcfHeader header = reader.getHeader();
-      header.addRunInfo();
-      final File vcfFile = null;
-      try (VcfWriter writer = new Ga4ghLooseMatchFilter(new DefaultVcfWriter(header, vcfFile, System.out, false, false, true), distance)) {
+      try (VcfWriter writer = new Ga4ghLooseMatchFilter(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           writer.write(rec);

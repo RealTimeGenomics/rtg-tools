@@ -40,13 +40,9 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
-import com.rtg.vcf.AsyncVcfWriter;
-import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfSortRefiner;
-import com.rtg.vcf.VcfWriter;
-import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
@@ -76,18 +72,6 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
    */
   public InterleavingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
     super(baseLineFile, callsFile, variants, ranges);
-  }
-
-  static VcfWriter makeVcfWriter(VcfHeader h, File output, boolean zip) throws IOException {
-    return makeVcfWriter(h, output, zip, true);
-  }
-
-  static VcfWriter makeVcfWriter(VcfHeader h, File output, boolean zip, boolean addRunInfo) throws IOException {
-    final VcfHeader h2 = h.copy();
-    if (addRunInfo) {
-      h2.addRunInfo();
-    }
-    return new AsyncVcfWriter(new DefaultVcfWriter(h2, output, null, zip, true));
   }
 
   private int floorSyncPos(List<Integer> syncPoints, int vPos, int sId) {
