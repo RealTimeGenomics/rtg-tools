@@ -40,11 +40,7 @@ public class RocOnlyEvalSynchronizerTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_roc_only", false, "--output-mode", "roc-only", "--sample", "sample1", "--vcf-score-field", "QUAL");
   }
 
-  public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
-    endToEnd(id, new String[] {"weighted_roc.tsv"}, expectWarn, dir -> {
-      assertEquals(0, dir.listFiles((d2, name) -> {
-        return name.contains(".vcf");
-      }).length);
-    }, args);
+  protected void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+    endToEnd(id, new String[] {"weighted_roc.tsv"}, expectWarn, dir -> assertEquals(0, dir.listFiles((d2, name) -> name.contains(".vcf")).length), args);
   }
 }

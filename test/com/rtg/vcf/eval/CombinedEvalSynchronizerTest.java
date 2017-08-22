@@ -49,7 +49,7 @@ public class CombinedEvalSynchronizerTest extends AbstractVcfEvalTest {
 //    endToEnd("vcfeval_combine2", false, "--sample", "sample1,ALT", "--ref-overlap", "--output-mode", "combine", "--squash-ploidy");
 //  }
 
-  public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+  protected void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     endToEnd(id, new String[] {"output.vcf"}, expectWarn, args);
   }
 }

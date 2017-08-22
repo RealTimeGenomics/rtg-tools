@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import com.rtg.launcher.AbstractNanoTest;
+import com.rtg.util.TestUtils;
 
 /**
  */
@@ -52,7 +53,7 @@ public class RocSlopeTest extends AbstractNanoTest {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC0.getBytes()), ps);
     }
-    mNano.check("roc-slope-0.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
+    mNano.check("roc-slope-0.txt", TestUtils.sanitizeTsvHeader(baos.toString()));
   }
 
   private static final String ROC1 = ("#ignore me I'm a header" + LS
@@ -70,7 +71,7 @@ public class RocSlopeTest extends AbstractNanoTest {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC1.getBytes()), ps);
     }
-    mNano.check("roc-slope-1.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
+    mNano.check("roc-slope-1.txt", TestUtils.sanitizeTsvHeader(baos.toString()));
   }
 
   private static final String ROC2 = ("#ignore me I'm a header" + LS
@@ -93,7 +94,7 @@ public class RocSlopeTest extends AbstractNanoTest {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC2.getBytes()), ps);
     }
-    mNano.check("roc-slope-2.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
+    mNano.check("roc-slope-2.txt", TestUtils.sanitizeTsvHeader(baos.toString()));
   }
 
   private static final String ROC3 = ("#ignore me I'm a header" + LS
@@ -111,7 +112,7 @@ public class RocSlopeTest extends AbstractNanoTest {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC3.getBytes()), ps);
     }
-    mNano.check("roc-slope-3.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
+    mNano.check("roc-slope-3.txt", TestUtils.sanitizeTsvHeader(baos.toString()));
   }
 
   private static final String ROC3_A = ("#ignore me I'm a header" + LS
@@ -125,7 +126,7 @@ public class RocSlopeTest extends AbstractNanoTest {
     try (PrintStream ps = new PrintStream(baos)) {
       RocSlope.writeSlope(new ByteArrayInputStream(ROC3_A.getBytes()), ps);
     }
-    mNano.check("roc-slope-3a.txt", AbstractVcfEvalTest.sanitizeHeader(baos.toString()));
+    mNano.check("roc-slope-3a.txt", TestUtils.sanitizeTsvHeader(baos.toString()));
   }
 
 }

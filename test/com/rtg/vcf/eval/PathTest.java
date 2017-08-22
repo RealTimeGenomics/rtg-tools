@@ -40,6 +40,7 @@ import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.launcher.OutputParams;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.tabix.TabixIndexer;
+import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -635,7 +636,7 @@ public class PathTest extends AbstractNanoTest {
       final VcfEvalParams mep = new VcfEvalParams.VcfEvalParamsBuilder().templateFile(template).baseLineFile(muts).callsFile(calls).outputParams(op).useAllRecords(true).create();
       VcfEvalTask.evaluateCalls(mep);
 
-      final String weightedroc = AbstractVcfEvalTest.sanitizeHeader(FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
+      final String weightedroc = TestUtils.sanitizeTsvHeader(FileUtils.fileToString(new File(output, "weighted_roc.tsv")));
       mNano.check("path-noinfite-roc.tsv", weightedroc);
     }
   }

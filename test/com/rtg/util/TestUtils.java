@@ -902,7 +902,7 @@ public final class TestUtils {
    * @return the sanitized VCF
    */
   public static String sanitizeVcfHeader(String vcfString) {
-    return vcfString.replace("Version", "")
+    return vcfString
       .replaceAll("##CL=.*\n", "##CL=[...]\n")
       .replaceAll("##TEMPLATE-SDF-ID=.*\n", "##TEMPLATE-SDF-ID=[...]\n")
       .replaceAll("##RUN-ID=.*\n", "##RUN-ID=[...]\n")
@@ -918,5 +918,16 @@ public final class TestUtils {
    */
   public static String stripVcfHeader(String vcfString) {
     return vcfString.replaceAll("##.*\n", "");
+  }
+
+  /**
+   * Takes a TSV string and strips out header fields that typically change from run to run.
+   * @param inString the full input string
+   * @return the sanitized string
+   */
+  public static String sanitizeTsvHeader(String inString) {
+    return inString
+      .replaceAll("#CL .*\n", "#CL [...]\n")
+      .replaceAll("#Version .*\n", "#Version [...]\n");
   }
 }

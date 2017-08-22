@@ -42,7 +42,7 @@ public class PhaseTransferEvalSynchronizerTest extends AbstractVcfEvalTest {
       "--XXcom.rtg.vcf.eval.custom-path-processor=phase-transfer");
   }
 
-  public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+  protected void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     endToEnd(id, new String[] {"baseline.vcf", "calls.vcf"}, expectWarn, args);
   }
 }

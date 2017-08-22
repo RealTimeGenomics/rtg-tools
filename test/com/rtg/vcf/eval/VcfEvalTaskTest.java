@@ -268,10 +268,12 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   }
 
   private void checkRocResults(String label, final File out, boolean checktotal, final int tpCount, final int fnCount) throws IOException {
-    final String roc = AbstractVcfEvalTest.sanitizeHeader(FileUtils.fileToString(out));
+    final String roc = TestUtils.sanitizeTsvHeader(FileUtils.fileToString(out));
     //System.err.println("ROC\n" + roc);
-    final String[] homoLines = roc.split(StringUtils.LS);
-    int line = 0;
+    mNano.check(label, roc);
+    final String[] homoLines = TestUtils.splitLines(roc);
+    assertTrue(homoLines.length > 2);
+    int line = 1;
     if (checktotal) {
       assertEquals("#total baseline variants: " + (tpCount + fnCount), homoLines[line++]);
     } else {
@@ -280,7 +282,6 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     assertTrue(homoLines[line++].startsWith("#total call variants: "));
     assertTrue(homoLines[line++].startsWith("#score field: "));
     assertTrue(homoLines[line].startsWith("#score\t"));
-    mNano.check(label, roc);
   }
 
   private static final String[] EMPTY = {};

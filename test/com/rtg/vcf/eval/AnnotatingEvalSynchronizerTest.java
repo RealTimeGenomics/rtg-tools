@@ -40,7 +40,7 @@ public class AnnotatingEvalSynchronizerTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_annotate", false, "--ref-overlap", "--output-mode", "annotate");
   }
 
-  public void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
+  protected void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     endToEnd(id, new String[] {"baseline.vcf", "calls.vcf"}, expectWarn, args);
   }
 }
