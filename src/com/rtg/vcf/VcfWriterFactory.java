@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.io.FileUtils;
@@ -41,6 +42,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Finer control over how VcfWriters are created.
  */
+@TestClass("com.rtg.vcf.VcfAnnotatorCliTest")
 public class VcfWriterFactory {
 
   private boolean mZip = true;

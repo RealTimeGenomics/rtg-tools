@@ -66,7 +66,7 @@ public class DefaultVcfWriterTest extends AbstractVcfWriterTest {
     try (final ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       final VcfHeader header = new VcfHeader();
       header.addInfoField(new InfoField("YO", MetaType.CHARACTER, VcfNumber.ONE, "testing"));
-      try (final DefaultVcfWriter defaultVcfWriter = new DefaultVcfWriter(header, out)) {
+      try (final DefaultVcfWriter defaultVcfWriter = new DefaultVcfWriter(header, null, out, false, false, false)) {
         final VcfRecord vcfRecord = new VcfRecord("foo", 2, "A");
         defaultVcfWriter.write(vcfRecord);
       }
