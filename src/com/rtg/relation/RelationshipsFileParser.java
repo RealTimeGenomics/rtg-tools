@@ -83,12 +83,12 @@ public final class RelationshipsFileParser {
         continue;
       }
       //genome lines
-      if (line.matches("^genome\\s+[-a-zA-Z0-9_]+(\\s+[-a-zA-Z0-9_]+?=[^\\s]*)*$")) {
+      if (line.matches("^genome\\s++[-a-zA-Z0-9_]++(\\s++[-a-zA-Z0-9_]++=[^\\s]*+)*+$")) {
         parseGenomeLine(ped, line);
         continue;
       }
       //relationship lines
-      if (line.matches("^[a-z]+-[a-z]+\\s+[-a-zA-Z0-9_]+\\s+[-a-zA-Z0-9_]+(\\s+[-a-zA-Z0-9_]+?=[^\\s]*)*$")) {
+      if (line.matches("^[a-z]++-[a-z]++\\s++[-a-zA-Z0-9_]++\\s++[-a-zA-Z0-9_]++(\\s++[-a-zA-Z0-9_]++=[^\\s]*+)*+$")) {
         parseRelationshipLine(ped, line);
         continue;
       }
