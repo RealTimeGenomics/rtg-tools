@@ -112,6 +112,9 @@ public final class VcfUtils {
   /** Type of structural variant */
   public static final String INFO_SVTYPE = "SVTYPE";
 
+  /** Difference in length between REF and structural variant */
+  public static final String INFO_SVLEN = "SVLEN";
+
   /** Confidence interval for POS columns. */
   public static final String INFO_CIPOS = "CIPOS";
 

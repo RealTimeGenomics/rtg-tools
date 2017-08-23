@@ -58,6 +58,25 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     final int[] gtSplit = VcfUtils.splitGt(gt);
     final VariantType t = VariantType.getType(r, gtSplit);
     assertEquals(VariantType.DELETION, t);
+
+    final VcfRecord r2 = VcfReader.vcfLineToRecord("1 1300068 . T TTCAC 1959.58 . . GT .".replaceAll(" ", "\t"));
+    assertEquals(VariantType.NO_CALL, VariantType.getType(r2, VcfUtils.splitGt(r2.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0))));
+
+    assertEquals(VariantType.UNCHANGED, VariantType.getType("C", "C"));
+    assertEquals(VariantType.SNP, VariantType.getType("C", "T"));
+    assertEquals(VariantType.MNP, VariantType.getType("CG", "TT"));
+    assertEquals(VariantType.DELETION, VariantType.getType("CG", ""));
+    assertEquals(VariantType.DELETION, VariantType.getType("CG", "C"));
+    assertEquals(VariantType.DELETION, VariantType.getType("CG", "G"));
+    assertEquals(VariantType.INSERTION, VariantType.getType("", "TT"));
+    assertEquals(VariantType.INSERTION, VariantType.getType("C", "CTT"));
+    assertEquals(VariantType.INSERTION, VariantType.getType("T", "CTT"));
+    assertEquals(VariantType.INDEL, VariantType.getType("CG", "TTA"));
+    assertEquals(VariantType.SV_SYMBOLIC, VariantType.getType("C", "C<ctg1>"));
+    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "C[2:123["));
+    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "CTAT[<ctg1>["));
+    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "]<ctg1:123>]CTAT"));
+    assertEquals(VariantType.SV_MISSING, VariantType.getType("C", "*"));
   }
 
   private static final String[] BASE_OUTPUT = {

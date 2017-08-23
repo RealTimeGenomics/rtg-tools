@@ -159,7 +159,8 @@ public enum VariantType {
   }
 
   /**
-   * Determine the type of variant given a reference allele and a called/alternative allele
+   * Determine the type of variant given a reference allele and a called/alternative allele.
+   * The alleles should generally have had any padding bases removed.
    * @param refAllele the reference allele
    * @param altAllele the alternative allele
    * @return the type of variant
