@@ -767,8 +767,10 @@ public class Flag<T> implements Comparable<Flag<T>> {
       } else if (type == IntegerOrPercentage.class) {
         return (T) IntegerOrPercentage.valueOf(stringRep);
       }
-    } catch (final MalformedURLException | NumberFormatException | ClassNotFoundException e) {
+    } catch (final MalformedURLException | ClassNotFoundException e) {
       throw new IllegalArgumentException(e);
+    } catch (final NumberFormatException e) {
+      throw new IllegalArgumentException(""); // We rely on this message being empty
     }
     throw new IllegalArgumentException("Unknown parameter type: " + type);
   }
