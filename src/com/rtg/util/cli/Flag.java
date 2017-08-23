@@ -463,7 +463,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
         try {
           parseValue(s);
         } catch (final Exception e) {
-          throw new IllegalArgumentException("Range value " + s + " could not be parsed.");
+          throw new IllegalArgumentException("Range value " + s + " could not be parsed.", e);
         }
         l.add(s);
       }
@@ -767,12 +767,8 @@ public class Flag<T> implements Comparable<Flag<T>> {
       } else if (type == IntegerOrPercentage.class) {
         return (T) IntegerOrPercentage.valueOf(stringRep);
       }
-    } catch (final MalformedURLException e) {
-      throw new IllegalArgumentException("Badly formatted URL: " + stringRep);
-    } catch (final NumberFormatException e) {
-      throw new IllegalArgumentException("");
-    } catch (final ClassNotFoundException e) {
-      throw new IllegalArgumentException("Class not found: " + stringRep);
+    } catch (final MalformedURLException | NumberFormatException | ClassNotFoundException e) {
+      throw new IllegalArgumentException(e);
     }
     throw new IllegalArgumentException("Unknown parameter type: " + type);
   }

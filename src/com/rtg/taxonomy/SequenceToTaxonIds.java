@@ -60,7 +60,7 @@ public final class SequenceToTaxonIds extends TsvParser<Map<String, Integer>> {
     try {
       taxId = Integer.parseInt(parts[0]);
     } catch (NumberFormatException e) {
-      throw new IOException("Malformed line: " + line());
+      throw new IOException("Malformed line: " + line(), e);
     }
     if (mMap.put(new String(name.toCharArray()), taxId) != null) {
       throw new IOException("Duplicate name detected: " + line());

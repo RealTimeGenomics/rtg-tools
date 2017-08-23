@@ -114,7 +114,7 @@ public class AsynchInputStream extends InputStream {
       try {
         mThread.join();
       } catch (final InterruptedException e) {
-        throw new IOException("AsynchInputStream interrupted during close");
+        throw new IOException("AsynchInputStream interrupted during close", e);
       } finally {
         super.close();
       }
@@ -145,7 +145,7 @@ public class AsynchInputStream extends InputStream {
       }
       return result;
     } catch (final InterruptedException e) {
-      throw new IOException("AsynchInputStream interrupted during read/3");
+      throw new IOException("AsynchInputStream interrupted during read/3", e);
     }
   }
   @Override

@@ -155,7 +155,7 @@ public class TaxonomyDistribution {
             }
             map.put(taxonId, p);
           } catch (final NumberFormatException e) {
-            throw new IOException("Malformed line: " + line);
+            throw new IOException("Malformed line: " + line, e);
           }
         }
       }

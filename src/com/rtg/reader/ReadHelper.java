@@ -56,7 +56,7 @@ public final class ReadHelper {
       return b;
     } catch (final IOException ex) {
       // This should not occur in MemorySequencesReader
-      throw new IllegalStateException(ex.getMessage());
+      throw new IllegalStateException(ex);
     }
   }
 
@@ -77,7 +77,7 @@ public final class ReadHelper {
       return b;
     } catch (final IOException ex) {
       // This should not occur in MemorySequencesReader
-      throw new IllegalStateException(ex.getMessage());
+      throw new IllegalStateException(ex);
     }
   }
 

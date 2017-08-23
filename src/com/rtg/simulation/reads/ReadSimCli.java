@@ -373,7 +373,7 @@ public class ReadSimCli extends LoggedCli {
             }
             map.put(species, p);
           } catch (final NumberFormatException e) {
-            throw new IOException("Malformed line: " + line);
+            throw new IOException("Malformed line: " + line, e);
           }
         }
       }
@@ -580,7 +580,7 @@ public class ReadSimCli extends LoggedCli {
           max = Math.max(max, length);
           h.add(length, count);
         } catch (NumberFormatException e) {
-          throw new IOException("Malformed number on line: " + line);
+          throw new IOException("Malformed number on line: " + line, e);
         }
       }
       if (max == Integer.MIN_VALUE) {

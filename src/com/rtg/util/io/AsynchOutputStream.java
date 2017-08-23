@@ -114,7 +114,7 @@ public class AsynchOutputStream extends OutputStream {
       try {
         mQueue.write(mBuffer, 0, mBufferCount);
       } catch (InterruptedException e) {
-        throw new IOException("GzipAsynchOutputStream interrupted during write/3");
+        throw new IOException("GzipAsynchOutputStream interrupted during write/3", e);
       }
       mBufferCount = 0;
     }
@@ -122,7 +122,7 @@ public class AsynchOutputStream extends OutputStream {
     try {
       mThread.join();
     } catch (InterruptedException e) {
-      throw new IOException("AsynchOutputStream interrupted during close");
+      throw new IOException("AsynchOutputStream interrupted during close", e);
     } finally {
       super.close();
     }
@@ -153,7 +153,7 @@ public class AsynchOutputStream extends OutputStream {
       try {
         mQueue.write(mBuffer, 0, mBufferCount);
       } catch (InterruptedException e) {
-        throw new IOException("GzipAsynchOutputStream interrupted during write/3");
+        throw new IOException("GzipAsynchOutputStream interrupted during write/3", e);
       }
       mBufferCount = 0;
     }
@@ -162,7 +162,7 @@ public class AsynchOutputStream extends OutputStream {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
-        throw new IOException("GzipAsynchOutputStream interrupted during flush");
+        throw new IOException("GzipAsynchOutputStream interrupted during flush", e);
       }
     }
     checkException();
@@ -176,7 +176,7 @@ public class AsynchOutputStream extends OutputStream {
         mQueue.write(mBuffer, 0, mBufferCount);
         mQueue.write(buf, off, len);
       } catch (InterruptedException e) {
-        throw new IOException("GzipAsynchOutputStream interrupted during write/3");
+        throw new IOException("GzipAsynchOutputStream interrupted during write/3", e);
       }
       mBufferCount = 0;
     } else {
@@ -193,7 +193,7 @@ public class AsynchOutputStream extends OutputStream {
       try {
         mQueue.write(mBuffer, 0, mBuffer.length);
       } catch (InterruptedException e) {
-        throw new IOException("GzipAsynchOutputStream interrupted during write/1");
+        throw new IOException("GzipAsynchOutputStream interrupted during write/1", e);
       }
     }
     mBuffer[mBufferCount] = (byte) b;
@@ -236,7 +236,7 @@ public class AsynchOutputStream extends OutputStream {
           mException = new IOException(e.getMessage(), e);
         }
       } catch (InterruptedException e) {
-        mException = new IOException("GzipAsynchOutputStream interrupted");
+        mException = new IOException("GzipAsynchOutputStream interrupted", e);
       } finally {
         try {
           mOutput.close();

@@ -90,7 +90,7 @@ public class MBeanStats implements MonStats {
     } catch (final IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalStateException();
+      throw new IllegalStateException(e);
     }
   }
 
@@ -101,7 +101,7 @@ public class MBeanStats implements MonStats {
     } catch (final IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalStateException();
+      throw new IllegalStateException(e);
     }
   }
 

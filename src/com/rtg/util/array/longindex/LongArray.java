@@ -118,7 +118,7 @@ public final class LongArray extends LongIndex {
     try {
       data = (long[]) ois.readObject();
     } catch (ClassNotFoundException e) {
-      throw new IOException("Unrecognized index type: " + e.getMessage());
+      throw new IOException("Unrecognized index type", e);
     }
     return new LongArray(data, length);
   }

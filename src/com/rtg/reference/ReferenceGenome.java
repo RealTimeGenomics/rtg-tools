@@ -180,7 +180,7 @@ public class ReferenceGenome {
       try {
         mReferences.put(name, new ReferenceSequence(false, parse.mLinearDefault, parse.mPloidyDefault, name, null, entry.getValue()));
       } catch (final IllegalArgumentException e) {
-        throw new NoTalkbackSlimException("Invalid reference file. " + e.getMessage());
+        throw new NoTalkbackSlimException("Invalid reference file." + e.getMessage());
       }
     }
 

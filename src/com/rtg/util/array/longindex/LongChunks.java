@@ -46,7 +46,6 @@ import com.rtg.util.integrity.Exam;
  * <br>
  * Break array into chunks to fit within java convention that indices must
  * be ints.
- *
  */
 public final class LongChunks extends LongIndex implements ExtensibleIndex {
 
@@ -328,7 +327,7 @@ public final class LongChunks extends LongIndex implements ExtensibleIndex {
     try {
       data = (long[][]) ois.readObject();
     } catch (ClassNotFoundException e) {
-      throw new IOException("Unrecognized index type: " + e.getMessage());
+      throw new IOException("Unrecognized index type", e);
     }
     return new LongChunks(length, bits, size, mask, data, totalLength);
   }

@@ -148,7 +148,7 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
           return new TableAlleleFrequencyChooser(random, cumCountsArr, altFreqsArr);
         }
       } catch (IOException e) {
-        throw new RuntimeException("Could not load allele frequency priors");
+        throw new RuntimeException("Could not load allele frequency priors", e);
       }
     }
 

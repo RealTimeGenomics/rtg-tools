@@ -189,7 +189,7 @@ public class BedReader implements IOIterator<BedRecord> {
         throw new IllegalArgumentException("Must have at least " + mMinAnnotations + " annotations");
       }
     } catch (final NumberFormatException e) {
-      throw new IOException("Invalid BED line: Could not parse coordinates, line:" + line);
+      throw new IOException("Invalid BED line: Could not parse coordinates, line:" + line, e);
     } catch (final IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
       //illegal argument == badly formed record
       throw new IOException("Invalid BED line: " + e.getMessage() + ", line:" + line, e);

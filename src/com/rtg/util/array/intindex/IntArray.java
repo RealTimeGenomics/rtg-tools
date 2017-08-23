@@ -120,7 +120,7 @@ public final class IntArray extends IntIndex {
     try {
       data = (int[]) ois.readObject();
     } catch (ClassNotFoundException e) {
-      throw new IOException("Unrecognized index type: " + e.getMessage());
+      throw new IOException("Unrecognized index type", e);
     }
     return new IntArray(data, length);
   }

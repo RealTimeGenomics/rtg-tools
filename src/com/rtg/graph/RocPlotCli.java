@@ -220,7 +220,7 @@ public class RocPlotCli extends AbstractCli {
             throw new IllegalArgumentException("Invalid zoom specifier: expected 4 numbers");
         }
       } catch (NumberFormatException nfe) {
-        throw new IllegalArgumentException("Invalid zoom specifier: " + nfe.getMessage());
+        throw new IllegalArgumentException("Invalid zoom specifier", nfe);
       }
     } else {
       return null;

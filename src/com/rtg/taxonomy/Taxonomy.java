@@ -312,10 +312,10 @@ public class Taxonomy {
         try {
           addNode(taxId, parentId, name, rank);
         } catch (final IllegalArgumentException e) {
-          throw new IOException(e.getMessage());
+          throw new IOException(e.getMessage(), e);
         }
       } catch (final NumberFormatException e) {
-        throw new IOException("Malformed taxonomy file line " + lineNumber() + ": " + line());
+        throw new IOException("Malformed taxonomy file line " + lineNumber() + ": " + line(), e);
       }
     }
   }

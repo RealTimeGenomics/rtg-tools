@@ -41,7 +41,6 @@ import com.rtg.util.integrity.Exam;
 /**
  * Break array of shorts into chunks to fit within java convention that indices must
  * be ints.
- *
  */
 public final class ShortChunks extends ShortIndex implements ExtensibleIndex {
 
@@ -307,7 +306,7 @@ public final class ShortChunks extends ShortIndex implements ExtensibleIndex {
     try {
       data = (short[][]) ois.readObject();
     } catch (ClassNotFoundException e) {
-      throw new IOException("Unrecognized index type: " + e.getMessage());
+      throw new IOException("Unrecognized index type", e);
     }
     return new ShortChunks(length, bits, size, mask, data, totalLength);
   }

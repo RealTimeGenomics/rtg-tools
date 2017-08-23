@@ -154,7 +154,7 @@ public final class Environment {
     } catch (final IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalStateException();
+      throw new IllegalStateException(e);
     }
   }
 
@@ -178,7 +178,7 @@ public final class Environment {
     } catch (final IllegalAccessException | InvocationTargetException e) {
       throw new RuntimeException(e);
     } catch (final NoSuchMethodException e) {
-      throw new IllegalStateException();
+      throw new IllegalStateException(e);
     }
   }
 
@@ -236,9 +236,7 @@ public final class Environment {
       try (BufferedReader r = new BufferedReader(new InputStreamReader(Resources.getResourceAsStream(resource)))) {
         return r.readLine();
       }
-    } catch (final IOException e) {
-      return VERSION_NOT_FOUND;
-    } catch (final NullPointerException e) {
+    } catch (final IOException | NullPointerException e) {
       return VERSION_NOT_FOUND;
     }
   }

@@ -907,7 +907,7 @@ public final class FileUtils {
       try (InputStream is = Resources.getResourceAsStream(FileUtils.class, resource)) {
         streamToStream(is, fos, FileUtils.BUFFER_SIZE);
       } catch (NullPointerException e) {
-        throw new IOException("No such resource: " + resource);
+        throw new IOException("No such resource: " + resource, e);
       }
     }
   }

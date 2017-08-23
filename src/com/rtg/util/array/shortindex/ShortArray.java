@@ -119,7 +119,7 @@ public final class ShortArray extends ShortIndex {
     try {
       data = (short[]) ois.readObject();
     } catch (ClassNotFoundException e) {
-      throw new IOException("Unrecognized index type: " + e.getMessage());
+      throw new IOException("Unrecognized index type", e);
     }
     return new ShortArray(data, length);
   }

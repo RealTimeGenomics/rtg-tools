@@ -233,7 +233,7 @@ abstract class AbstractPositionReader implements BlockCompressedPositionReader {
       return Integer.parseInt(getColumn(col));
     } catch (final IllegalArgumentException e) {
       //illegal argument == badly formed column
-      throw new IOException("Data file did not contain an integer in column " + (col + 1) + " on line: " + mCurrentLine);
+      throw new IOException("Data file did not contain an integer in column " + (col + 1) + " on line: " + mCurrentLine, e);
     }
   }
 

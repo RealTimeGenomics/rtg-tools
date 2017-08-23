@@ -47,7 +47,6 @@ import com.rtg.util.io.FileUtils;
 
 /**
  * Handles reading and writing the main index file for preread
- *
  */
 public class IndexFile implements Integrity {
   static final long VERSION = 13L;

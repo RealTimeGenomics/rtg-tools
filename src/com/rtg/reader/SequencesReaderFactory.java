@@ -62,11 +62,11 @@ public final class SequencesReaderFactory {
     } catch (final FileNotFoundException e) {
       // Slightly better I/O reporting than the default provided by AbstractCli
       if (dir.isDirectory()) {
-        throw new IOException("The specified SDF, \"" + dir.getPath() + "\", does not seem to contain a valid SDF index");
+        throw new IOException("The specified SDF, \"" + dir.getPath() + "\", does not seem to contain a valid SDF index", e);
       } else if (dir.exists()) {
-        throw new IOException("The specified file, \"" + dir.getPath() + "\", is not an SDF.");
+        throw new IOException("The specified file, \"" + dir.getPath() + "\", is not an SDF.", e);
       } else {
-        throw new IOException("The specified SDF, \"" + dir.getPath() + "\", does not exist.");
+        throw new IOException("The specified SDF, \"" + dir.getPath() + "\", does not exist.", e);
       }
     }
   }
