@@ -87,9 +87,9 @@ class ReferenceParse {
   static Boolean linear(final String linearString) {
     switch (linearString) {
       case "linear":
-        return true;
+        return Boolean.TRUE;
       case "circular":
-        return false;
+        return Boolean.FALSE;
       default:
         return null;
     }

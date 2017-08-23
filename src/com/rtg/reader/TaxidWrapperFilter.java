@@ -78,7 +78,7 @@ class TaxidWrapperFilter extends WrapperFilter {
    */
   @Override
   protected void transfer(String seqRange) throws IOException {
-    final Collection<Long> ids = mTaxToSeqId.get(Integer.parseInt(seqRange));
+    final Collection<Long> ids = mTaxToSeqId.get(Integer.valueOf(seqRange));
     if (ids != null) {
       for (Long id : ids) {
         transfer(id);

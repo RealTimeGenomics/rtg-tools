@@ -588,7 +588,7 @@ public class VcfRecord implements SequenceNameLocus {
   public Double getSampleDouble(int sampleNumber, String formatField) {
     final String valueStr = getSampleString(sampleNumber, formatField);
     if (valueStr != null && !VcfRecord.MISSING.equals(valueStr)) {
-      return Double.parseDouble(valueStr);
+      return Double.valueOf(valueStr);
     }
     return null;
   }
@@ -603,7 +603,7 @@ public class VcfRecord implements SequenceNameLocus {
   public Integer getSampleInteger(int sampleNumber, String formatField) {
     final String valueStr = getSampleString(sampleNumber, formatField);
     if (valueStr != null && !VcfRecord.MISSING.equals(valueStr)) {
-      return Integer.parseInt(valueStr);
+      return Integer.valueOf(valueStr);
     }
     return null;
   }

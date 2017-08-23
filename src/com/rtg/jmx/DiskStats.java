@@ -101,11 +101,11 @@ public class DiskStats extends ExternalCommand implements MonStats {
         //System.err.println("DISK line " + lines[i]);
         if (lines[i].contains(mDisk)) {
           final String[] res = lines[i].split("[  ]+");
-          rs = NF0.format(Double.valueOf(res[3]));
-          ws = NF0.format(Double.valueOf(res[4]));
-          rms = NF2.format(Double.valueOf(res[5]) / 1024);
-          wms = NF2.format(Double.valueOf(res[6]) / 1024);
-          util = NF2.format(Double.valueOf(res[11]));
+          rs = NF0.format(Double.parseDouble(res[3]));
+          ws = NF0.format(Double.parseDouble(res[4]));
+          rms = NF2.format(Double.parseDouble(res[5]) / 1024);
+          wms = NF2.format(Double.parseDouble(res[6]) / 1024);
+          util = NF2.format(Double.parseDouble(res[11]));
           break;
         }
       }

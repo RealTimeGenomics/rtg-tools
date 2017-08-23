@@ -62,7 +62,7 @@ public class AltAlleleQualityAnnotation extends AbstractDerivedFormatAnnotation 
       return null;
     }
     final String[] aqs = StringUtils.split(aq, ',');
-    return Double.parseDouble(aqs[vaIndex]);
+    return Double.valueOf(aqs[vaIndex]);
   }
 
   @Override

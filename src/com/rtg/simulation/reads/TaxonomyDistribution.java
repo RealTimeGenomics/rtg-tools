@@ -149,7 +149,7 @@ public class TaxonomyDistribution {
               throw new IOException("Malformed line: " + line);
             }
             sum += p;
-            final Integer taxonId = Integer.parseInt(parts[1]);
+            final Integer taxonId = Integer.valueOf(parts[1]);
             if (map.containsKey(taxonId)) {
               throw new IOException("Duplicated key: " + line);
             }

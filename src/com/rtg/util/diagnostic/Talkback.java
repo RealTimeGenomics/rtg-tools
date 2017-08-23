@@ -65,7 +65,7 @@ public final class Talkback {
   private static boolean sTalkback;
   static {
     final String talkbackValue = System.getProperty("talkback", Boolean.toString(!License.isDeveloper()));
-    sTalkback = Boolean.valueOf(talkbackValue);
+    sTalkback = Boolean.parseBoolean(talkbackValue);
     sTalkbackURL = System.getProperty("talkback.url", "https://api.realtimegenomics.com/talkback/submit.php");
   }
 

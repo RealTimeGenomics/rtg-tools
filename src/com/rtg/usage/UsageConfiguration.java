@@ -111,7 +111,7 @@ public class UsageConfiguration {
   }
 
   public boolean isEnabled() {
-    return Boolean.valueOf(mProp.getProperty(ENABLE_USAGE));
+    return Boolean.parseBoolean(mProp.getProperty(ENABLE_USAGE));
   }
 
   public String getUsageDir() {
@@ -126,20 +126,20 @@ public class UsageConfiguration {
    * @return true if usage messages should include the current user
    */
   public boolean logUsername() {
-    return Boolean.valueOf(mProp.getProperty(USAGE_LOG_USERNAME, "false"));
+    return Boolean.parseBoolean(mProp.getProperty(USAGE_LOG_USERNAME, "false"));
   }
 
   /**
    * @return true if usage messages should include the current machine name
    */
   public boolean logHostname() {
-    return Boolean.valueOf(mProp.getProperty(USAGE_LOG_HOSTNAME, "false"));
+    return Boolean.parseBoolean(mProp.getProperty(USAGE_LOG_HOSTNAME, "false"));
   }
 
   /**
    * @return true if usage messages should include the current command line
    */
   public boolean logCommandLine() {
-    return Boolean.valueOf(mProp.getProperty(USAGE_LOG_COMMANDLINE, "false"));
+    return Boolean.parseBoolean(mProp.getProperty(USAGE_LOG_COMMANDLINE, "false"));
   }
 }

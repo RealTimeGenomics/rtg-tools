@@ -63,7 +63,7 @@ public class GenotypeQualityOverDepthAnnotation extends AbstractDerivedFormatAnn
         if (dp <= 0) {
           return Double.POSITIVE_INFINITY;
         }
-        return Double.valueOf(gqVal) / dp;
+        return Double.parseDouble(gqVal) / dp;
       }
     }
     return null;

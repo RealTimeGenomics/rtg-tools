@@ -124,12 +124,12 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
               throw new RuntimeException("Malformed allele frequency priors");
             }
 
-            final double freq = Double.valueOf(parts[0]);
+            final double freq = Double.parseDouble(parts[0]);
             assert freq >= lastfreq : "Out-of-order allele frequency in priors " + freq;
             assert freq >= 0 : "Illegal allele frequency in priors " + freq;
             assert freq <= 1 : "Illegal allele frequency in priors " + freq;
 
-            double count = Double.valueOf(parts[1]);
+            double count = Double.parseDouble(parts[1]);
             count = biasFactor * count * freq + (1.0 - biasFactor) * count * (1 - freq);
             cumcount += count;
             assert count >= 0 : "Illegal negative allele frequency count in priors " + count;

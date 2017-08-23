@@ -132,9 +132,9 @@ public class VcfStatsCli extends AbstractCli {
       try (VcfReader vr = VcfReader.openVcfReader(vcffile)) {
         final VariantStatistics stats = new VariantStatistics(null);
         if (mFlags.isSet(KNOWN)) {
-          stats.onlyKnown(true);
+          stats.onlyKnown(Boolean.TRUE);
         } else if (mFlags.isSet(NOVEL)) {
-          stats.onlyKnown(false);
+          stats.onlyKnown(Boolean.FALSE);
         }
         stats.showLengthHistograms(showHistograms);
         stats.showAlleleCountHistograms(showAlleleCountHistograms);

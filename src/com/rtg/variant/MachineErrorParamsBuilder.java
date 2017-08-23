@@ -184,7 +184,7 @@ public class MachineErrorParamsBuilder {
   static double parseDouble(final String prior, final String val, final String key) {
     final double ret;
     try {
-      ret = Double.valueOf(val);
+      ret = Double.parseDouble(val);
     } catch (final NumberFormatException e) {
       throw new InvalidParamsException(ErrorType.PRIOR_KEY_VALUE_INVALID, val, key, prior);
     }

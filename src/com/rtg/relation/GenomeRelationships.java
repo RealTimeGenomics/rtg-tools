@@ -181,7 +181,7 @@ public class GenomeRelationships {
     if (p == null) {
       return false;
     }
-    return Boolean.valueOf(p.getProperty(DISEASE_PROPERTY, "false"));
+    return Boolean.parseBoolean(p.getProperty(DISEASE_PROPERTY, "false"));
   }
 
   /**
@@ -626,7 +626,7 @@ public class GenomeRelationships {
     }
     @Override
     public boolean accept(String genome) {
-      return mPed.hasGenome(genome) && Boolean.valueOf(mPed.getProperties(genome).getProperty(PRIMARY_GENOME_PROPERTY));
+      return mPed.hasGenome(genome) && Boolean.parseBoolean(mPed.getProperties(genome).getProperty(PRIMARY_GENOME_PROPERTY));
     }
   }
 

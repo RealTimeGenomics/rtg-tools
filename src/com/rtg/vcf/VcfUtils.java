@@ -617,7 +617,7 @@ public final class VcfUtils {
         if (fieldVal.equals(VcfRecord.MISSING)) {
           return null;
         }
-        return Integer.parseInt(fieldVal);
+        return Integer.valueOf(fieldVal);
       } catch (NumberFormatException ex) {
         throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }

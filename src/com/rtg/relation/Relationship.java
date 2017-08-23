@@ -120,7 +120,7 @@ public class Relationship {
 
   private Double getPropertyAsDouble(final String propName) {
     final String value = getProperty(propName);
-    return value == null ? null : Double.parseDouble(value);
+    return value == null ? null : Double.valueOf(value);
   }
 
   /**

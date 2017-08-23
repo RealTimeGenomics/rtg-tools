@@ -107,7 +107,7 @@ public class ScriptedVcfFilter implements VcfFilter {
 
   private Boolean invokeExpression(VcfRecord record) {
     if (mCompiledExpression == null) {
-      return true;
+      return Boolean.TRUE;
     }
     try {
       final Object eval = mCompiledExpression.eval();

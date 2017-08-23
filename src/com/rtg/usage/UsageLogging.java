@@ -91,7 +91,7 @@ public final class UsageLogging {
    */
   UsageLogging(Properties licenseProperties, String modulename, UUID runId, File configFileOverride, boolean suppress) throws IOException {
     final String usageValue = licenseProperties.getProperty(REQUIRE_USAGE);
-    mRequireUsage = usageValue != null && Boolean.valueOf(usageValue);
+    mRequireUsage = usageValue != null && Boolean.parseBoolean(usageValue);
     final String destinationValue = licenseProperties.getProperty(USAGE_DESTINATION);
     mUsageDestination = destinationValue == null ? UsageDestination.NONE : UsageDestination.valueOf(destinationValue.toUpperCase(Locale.ROOT));
     mUsageConfiguration = configFileOverride == null ? new UsageConfiguration() : new UsageConfiguration(configFileOverride);

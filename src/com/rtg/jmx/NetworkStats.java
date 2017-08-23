@@ -93,7 +93,7 @@ public class NetworkStats implements MonStats {
       final List<String> strings = Files.readAllLines(path);
       if (strings.size() > 0) {
         try {
-          return Long.parseLong(strings.get(0));
+          return Long.valueOf(strings.get(0));
         } catch (NumberFormatException e) {
           return null;
         }

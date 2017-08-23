@@ -92,7 +92,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   @Override
   public void registerFlags() {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
-    registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, true);
+    registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, Boolean.TRUE);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
 
     registerFlag(DEFAULT_MARKUP, DisplayHelper.MarkupType.class, DisplayHelper.MarkupType.NONE);
@@ -114,6 +114,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 50000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
-    registerFlag(VCFEVAL_EXPLICIT_HALF_CALL, Boolean.class, true);
+    registerFlag(VCFEVAL_EXPLICIT_HALF_CALL, Boolean.class, Boolean.TRUE);
   }
 }
