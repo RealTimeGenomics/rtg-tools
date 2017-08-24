@@ -29,6 +29,11 @@
  */
 package com.rtg.vcf.annotation;
 
+import static com.rtg.vcf.VcfUtils.FORMAT_ALLELIC_DEPTH;
+import static com.rtg.vcf.VcfUtils.FORMAT_DENOVO;
+import static com.rtg.vcf.VcfUtils.FORMAT_SOMATIC_STATUS;
+import static com.rtg.vcf.VcfUtils.MISSING_FIELD;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -121,8 +126,8 @@ class ContraryObservationCounter {
   }
 
   private int[] ad(final int[] res, final VcfRecord record, final int sample) {
-    final String ad = record.getSampleString(sample, VcfUtils.FORMAT_ALLELIC_DEPTH);
-    if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
+    final String ad = record.getSampleString(sample, FORMAT_ALLELIC_DEPTH);
+    if (ad != null && !MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
       for (int k = 0; k < res.length; ++k) {
         res[k] += Integer.parseInt(adSplit[k]);
@@ -175,14 +180,14 @@ class ContraryObservationCounter {
     if (antecedents.isEmpty()) {
       return null; // Not a derived or child sample
     }
-    final Integer ss = record.getSampleInteger(sampleNumber, VcfUtils.FORMAT_SOMATIC_STATUS);
+    final Integer ss = record.getSampleInteger(sampleNumber, FORMAT_SOMATIC_STATUS);
     if (ss != null) {
       if (ss != 2) {
         return null; // Not a somatic call
       }
     } else {
       // Might be a family de novo type call
-      final String deNovoStatus = record.getSampleString(sampleNumber, VcfUtils.FORMAT_DENOVO);
+      final String deNovoStatus = record.getSampleString(sampleNumber, FORMAT_DENOVO);
       if (!"Y".equals(deNovoStatus)) {
         return null; // Not a de novo
       }

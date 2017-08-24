@@ -164,6 +164,7 @@ public final class VcfUtils {
   /** Somatic status field. */
   public static final String FORMAT_SOMATIC_STATUS = "SS";
 
+  
   /** VCF FORMAT field used to indicate de novo alleles. */
   public static final String FORMAT_DENOVO = "DN";
 
@@ -175,6 +176,10 @@ public final class VcfUtils {
 
   /** VCF FORMAT field for variant allele */
   public static final String FORMAT_VARIANT_ALLELE = "VA";
+
+  /** Allelic depth, error adjusted */
+  public static final String FORMAT_ADE = "ADE";
+
 
   /** Filter status field. */
   public static final String FORMAT_FILTER = "FT";

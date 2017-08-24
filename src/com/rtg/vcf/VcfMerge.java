@@ -36,6 +36,8 @@ import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
+import static com.rtg.vcf.VcfUtils.FORMAT_ALLELIC_DEPTH;
+import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
@@ -175,8 +177,8 @@ public class VcfMerge extends AbstractCli {
     header.addRunInfo();
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 
-    String defaultFormat = VcfUtils.FORMAT_GENOTYPE;
-    if (header.getFormatField(VcfUtils.FORMAT_GENOTYPE) == null && header.getFormatLines().size() > 0) {
+    String defaultFormat = FORMAT_GENOTYPE;
+    if (header.getFormatField(FORMAT_GENOTYPE) == null && header.getFormatLines().size() > 0) {
       defaultFormat = header.getFormatLines().get(0).getId();
     }
 
@@ -216,7 +218,7 @@ public class VcfMerge extends AbstractCli {
       if (numberType == VcfNumberType.GENOTYPES
           || numberType == VcfNumberType.ALTS
           || numberType == VcfNumberType.REF_ALTS
-          || (numberType == VcfNumberType.UNKNOWN && "AD".equals(field.getId()))) { // AD (and potentially other VcfNumberType.UNKNOWN too) cannot be merged as it has one value per ref+alts
+          || (numberType == VcfNumberType.UNKNOWN && FORMAT_ALLELIC_DEPTH.equals(field.getId()))) { // AD (and potentially other VcfNumberType.UNKNOWN too) cannot be merged as it has one value per ref+alts
         alleleBasedFormats.add(field.getId());
       }
     }

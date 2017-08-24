@@ -30,10 +30,13 @@
 
 package com.rtg.vcf.annotation;
 
+import static com.rtg.vcf.VcfUtils.FORMAT_ADE;
+import static com.rtg.vcf.VcfUtils.FORMAT_VARIANT_ALLELE;
+import static com.rtg.vcf.VcfUtils.MISSING_FIELD;
+
 import com.rtg.util.StringUtils;
 import com.rtg.util.array.ArrayUtils;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -44,9 +47,6 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
-  private static final String FORMAT_ADE = "ADE";
-  private static final String FORMAT_VA = "VA";
-
   /**
    * Construct a new contrary observation fraction format annotation.
    */
@@ -56,7 +56,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
 
   private double[] ad(final double[] res, final VcfRecord record, final int sample) {
     final String ad = record.getSampleString(sample, FORMAT_ADE);
-    if (ad != null && !VcfUtils.MISSING_FIELD.equals(ad)) {
+    if (ad != null && !MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
       for (int k = 0; k < res.length; ++k) {
         res[k] += Double.parseDouble(adSplit[k]);
@@ -71,7 +71,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
 
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
-    final Integer va = record.getSampleInteger(sampleNumber, FORMAT_VA);
+    final Integer va = record.getSampleInteger(sampleNumber, FORMAT_VARIANT_ALLELE);
     if (va == null) {
       return null;
     }
@@ -91,7 +91,7 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
   @Override
   public String checkHeader(VcfHeader header) {
     // Need both VA and ADE
-    return checkHeader(header, null, new String[]{FORMAT_ADE, FORMAT_VA});
+    return checkHeader(header, null, new String[]{FORMAT_ADE, FORMAT_VARIANT_ALLELE});
   }
 
 }
