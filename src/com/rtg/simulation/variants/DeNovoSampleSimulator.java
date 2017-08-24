@@ -128,9 +128,9 @@ public class DeNovoSampleSimulator {
     boolean foundGt = false;
     boolean foundDeNovo = false;
     for (FormatField ff : header.getFormatLines()) {
-      if (ff.getId().equals(VcfUtils.FORMAT_GENOTYPE)) {
+      if (VcfUtils.FORMAT_GENOTYPE.equals(ff.getId())) {
         foundGt = true;
-      } else if (ff.getId().equals(VcfUtils.FORMAT_DENOVO)) {
+      } else if (VcfUtils.FORMAT_DENOVO.equals(ff.getId())) {
         foundDeNovo = true;
       }
     }
@@ -216,7 +216,7 @@ public class DeNovoSampleSimulator {
         v.setNumberOfSamples(sampleId + 1);
         final String gt = v.getFormat(VcfUtils.FORMAT_GENOTYPE).get(mOriginalSampleNum);
         for (String format : v.getFormats()) {
-          final String value = format.equals(VcfUtils.FORMAT_GENOTYPE) ? gt : VcfRecord.MISSING;
+          final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt : VcfRecord.MISSING;
           v.addFormatAndSample(format, value);
         }
 

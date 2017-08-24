@@ -88,7 +88,7 @@ public final class HelpCommand extends Command {
   private static int printHelp(final String[] args, final OutputStream outStream, final PrintStream errStream, CommandLookup info) {
     if (args != null && args.length > 0) {
       final String args0 = args[0].toUpperCase(Locale.getDefault());
-      if (args0.equals("--XHIDDEN") || args0.equals("--XHELP")) {
+      if ("--XHIDDEN".equals(args0) || "--XHELP".equals(args0)) {
         final PrintStream psOutStream =  new PrintStream(outStream);
         try {
           printUsage(psOutStream, true, info);

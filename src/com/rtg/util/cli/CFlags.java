@@ -671,7 +671,7 @@ public final class CFlags {
       final String nameArg = args[i];
       Flag<?> flag = null;
       String value = null;
-      if (!restAnonymous && nameArg.equals(LONG_FLAG_PREFIX)) {
+      if (!restAnonymous && LONG_FLAG_PREFIX.equals(nameArg)) {
         restAnonymous = true;
         continue;
       } else if (!restAnonymous && nameArg.startsWith(SHORT_FLAG_PREFIX) && nameArg.length() > 1) {
@@ -1206,7 +1206,7 @@ public final class CFlags {
   }
 
   void appendParseMessage(final WrappingStringBuilder wb) {
-    if (!mParseMessageString.equals("")) {
+    if (!mParseMessageString.isEmpty()) {
       wb.append(PARSE_ERROR_PREFIX);
       wb.setWrapIndent(PARSE_ERROR_PREFIX.length());
       wb.wrapTextWithNewLines(mParseMessageString).append(LS);
@@ -1308,7 +1308,7 @@ public final class CFlags {
       wb.append(StringUtils.repeat('~', subCommand.length())).append(LS).append(LS);
 
       wb.append("**Synopsis:**").append(LS).append(LS);
-      wb.wrapTextWithNewLines(mProgramDescription.equals("") ? "[TODO]" : mProgramDescription).append(LS);
+      wb.wrapTextWithNewLines(mProgramDescription.isEmpty() ? "[TODO]" : mProgramDescription).append(LS);
 
       wb.append("**Syntax:**").append(LS).append(LS);
       for (final SortedSet<Flag<?>> ops : mRequiredSets) {
@@ -1425,7 +1425,7 @@ public final class CFlags {
    * @param wb wrapping string builder
    */
   void appendProgramDescription(final WrappingStringBuilder wb) {
-    if (!mProgramDescription.equals("")) {
+    if (!mProgramDescription.isEmpty()) {
       wb.append(LS);
       wb.setWrapIndent(0);
       wb.wrapTextWithNewLines(mProgramDescription);

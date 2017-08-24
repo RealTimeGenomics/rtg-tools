@@ -370,7 +370,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
 
   private void checkHeader() {
-    if (!mHeader.getFormatLines().stream().anyMatch((FormatField t) -> t.getId().equals(VcfUtils.FORMAT_GENOTYPE))) {
+    if (!mHeader.getFormatLines().stream().anyMatch((FormatField t) -> VcfUtils.FORMAT_GENOTYPE.equals(t.getId()))) {
       throw new NoTalkbackSlimException("Supplied VCF does not contain GT FORMAT fields");
     }
     for (Family f : mFamilies) {

@@ -314,11 +314,11 @@ public class RocPlot {
       SwingUtilities.invokeLater(() -> {
         final String text = mTitleEntry.getText();
         if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-          if (text.equals(ROC)) {
+          if (ROC.equals(text)) {
             mTitleEntry.setText(PRECISION_SENSITIVITY);
           }
         } else {
-          if (text.equals(PRECISION_SENSITIVITY)) {
+          if (PRECISION_SENSITIVITY.equals(text)) {
             mTitleEntry.setText(ROC);
           }
         }

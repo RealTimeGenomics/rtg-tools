@@ -228,7 +228,7 @@ public final class BamIndexer {
     @Override
     public int getLengthOnReference() {
       final String cigar = mReader.getField(SamBamConstants.CIGAR_FIELD);
-      if (cigar.equals("*")) {
+      if ("*".equals(cigar)) {
         // For unmapped reads use length of sequence
         return mReader.getField(SamBamConstants.SEQ_FIELD).length();
       }

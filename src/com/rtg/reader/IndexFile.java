@@ -520,7 +520,7 @@ public class IndexFile implements Integrity {
    * @return the command line parameters
    */
   public String getCommandLine() {
-    if (mCommandLine == null || mCommandLine.equals("")) {
+    if (mCommandLine == null || mCommandLine.isEmpty()) {
       return null;
     }
     return mCommandLine;
@@ -534,7 +534,7 @@ public class IndexFile implements Integrity {
    * @return the comment text
    */
   public String getComment() {
-    if (mComment == null || mComment.equals("")) {
+    if (mComment == null || mComment.isEmpty()) {
       return null;
     }
     return mComment;
@@ -548,7 +548,7 @@ public class IndexFile implements Integrity {
    * @return the comment text
    */
   public String getSamReadGroup() {
-    if (mSamReadGroup == null || mSamReadGroup.equals("")) {
+    if (mSamReadGroup == null || mSamReadGroup.isEmpty()) {
       return null;
     }
     return mSamReadGroup;

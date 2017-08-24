@@ -167,8 +167,8 @@ class ReferenceParse {
     }
     if (mNonblankLines == 1) {
       //version line
-      if (split.length != 2 || !split[0].equals("version")
-          || !(split[1].equals("0") || split[1].equals("1"))) {
+      if (split.length != 2 || !"version".equals(split[0])
+          || !("0".equals(split[1]) || "1".equals(split[1]))) {
         return "Invalid version line.";
       }
       return null;

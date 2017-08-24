@@ -106,7 +106,7 @@ public class SampleSimulator {
     mStats.onlySamples(sample);
     boolean foundGt = false;
     for (FormatField ff : header.getFormatLines()) {
-      if (ff.getId().equals(VcfUtils.FORMAT_GENOTYPE)) {
+      if (VcfUtils.FORMAT_GENOTYPE.equals(ff.getId())) {
         foundGt = true;
         break;
       }
@@ -203,7 +203,7 @@ public class SampleSimulator {
         }
         v.setNumberOfSamples(v.getNumberOfSamples() + 1);
         for (String format : v.getFormats()) {
-          final String value = format.equals(VcfUtils.FORMAT_GENOTYPE) ? gt.toString() : VcfRecord.MISSING;
+          final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt.toString() : VcfRecord.MISSING;
           v.addFormatAndSample(format, value);
         }
         sequenceMutations.add(v);

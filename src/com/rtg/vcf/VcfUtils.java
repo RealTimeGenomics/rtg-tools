@@ -544,7 +544,7 @@ public final class VcfUtils {
     if (format != null) {
       final String fieldVal = format.get(sample);
       try {
-        if (fieldVal.equals(VcfRecord.MISSING)) {
+        if (VcfRecord.MISSING.equals(fieldVal)) {
           return Double.NaN;
         }
         return Double.parseDouble(fieldVal);
@@ -569,7 +569,7 @@ public final class VcfUtils {
         final int[] res = new int[info.size()];
         for (int k = 0; k < res.length; ++k) {
           final String fieldVal = info.get(k);
-          if (fieldVal.equals(VcfRecord.MISSING)) {
+          if (VcfRecord.MISSING.equals(fieldVal)) {
             return null;
           }
           res[k] = Integer.parseInt(fieldVal);
@@ -594,7 +594,7 @@ public final class VcfUtils {
     if (infoField.containsKey(field)) {
       final String fieldVal = infoField.get(field).get(0);
       try {
-        if (fieldVal.equals(VcfRecord.MISSING)) {
+        if (VcfRecord.MISSING.equals(fieldVal)) {
           return Double.NaN;
         }
         return Double.parseDouble(fieldVal);
@@ -617,7 +617,7 @@ public final class VcfUtils {
     if (infoField.containsKey(field)) {
       final String fieldVal = infoField.get(field).get(0);
       try {
-        if (fieldVal.equals(VcfRecord.MISSING)) {
+        if (VcfRecord.MISSING.equals(fieldVal)) {
           return null;
         }
         return Integer.valueOf(fieldVal);

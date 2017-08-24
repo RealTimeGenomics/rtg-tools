@@ -228,7 +228,7 @@ public final class Environment {
    */
   public static boolean is64BitVM() {
     final String bits = System.getProperty("sun.arch.data.model", "?");
-    return bits.equals("64");
+    return "64".equals(bits);
   }
 
   static String getVersion(final String resource) {

@@ -203,7 +203,7 @@ public class ChildSampleSimulator {
 
     boolean foundGt = false;
     for (FormatField ff : header.getFormatLines()) {
-      if (ff.getId().equals(VcfUtils.FORMAT_GENOTYPE)) {
+      if (VcfUtils.FORMAT_GENOTYPE.equals(ff.getId())) {
         foundGt = true;
         break;
       }
@@ -260,7 +260,7 @@ public class ChildSampleSimulator {
 
   // Convert string genotype to allele ids, promoting empty value to reference of expected ploidy
   private int[] getGt(String gtStr, int ploidy) {
-    if (gtStr.equals(VcfRecord.MISSING)) {
+    if (VcfRecord.MISSING.equals(gtStr)) {
       return REFERENCE_GENOTYPES[ploidy];
     } else {
       return VcfUtils.splitGt(gtStr);
@@ -377,7 +377,7 @@ public class ChildSampleSimulator {
         }
         v.setNumberOfSamples(v.getNumberOfSamples() + 1);
         for (String format : v.getFormats()) {
-          final String value = format.equals(VcfUtils.FORMAT_GENOTYPE) ? gt.toString() : VcfRecord.MISSING;
+          final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt.toString() : VcfRecord.MISSING;
           v.addFormatAndSample(format, value);
         }
         sequenceMutations.add(v);

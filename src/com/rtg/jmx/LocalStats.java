@@ -150,19 +150,16 @@ public final class LocalStats {
       return;
     }
     final String dest = System.getProperty(MON_DEST);
-    if ((dest == null) || dest.equals(MON_DEST_OUTDIR)) {
+    if ((dest == null) || MON_DEST_OUTDIR.equals(dest)) {
       return;
     }
-    sThread = new Thread(new Runnable() {
-        @Override
-        public void run() {
-          sStats = getLocalStats();
-          if (sStats != null) {
-            System.err.println("Starting monitoring");
-            sStats.run();
-          }
-        }
-      });
+    sThread = new Thread(() -> {
+      sStats = getLocalStats();
+      if (sStats != null) {
+        System.err.println("Starting monitoring");
+        sStats.run();
+      }
+    });
     sThread.setDaemon(true);
     sThread.start();
   }

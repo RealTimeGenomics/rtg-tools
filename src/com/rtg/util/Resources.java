@@ -128,14 +128,14 @@ public final class Resources {
     if (url == null) {
       return null;
     }
-    if (url.getProtocol().equals("file")) {
+    if ("file".equals(url.getProtocol())) {
       final ArrayList<String> strings = new ArrayList<>();
       final File dir = new File(url.toURI());
       for (final File f : FileUtils.listFiles(dir)) {
-        strings.add(StringUtils.FS.equals("/") ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
+        strings.add("/".equals(StringUtils.FS) ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
       }
       return strings.toArray(new String[strings.size()]);
-    } else if (url.getProtocol().equals("jar")) {
+    } else if (" jar ".equals(url.getProtocol())) {
       final ArrayList<String> strings = new ArrayList<>();
       assert url.getPath().startsWith("file:");
       final String jarPath = url.getPath().substring(5, url.getPath().lastIndexOf('!'));

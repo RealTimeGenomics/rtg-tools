@@ -53,7 +53,7 @@ public class AltAlleleQualityAnnotation extends AbstractDerivedFormatAnnotation 
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
     final String va = record.getFormatAndSample().get(VcfUtils.FORMAT_VARIANT_ALLELE).get(sampleNumber);
-    if (va == null || va.equals(".")) {
+    if (va == null || ".".equals(va)) {
       return null;
     }
     final int vaIndex = Integer.parseInt(va);

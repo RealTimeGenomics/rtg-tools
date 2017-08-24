@@ -65,7 +65,7 @@ public abstract class RocSortValueExtractor {
           throw new NoTalkbackSlimException("Unrecognized field type \"" + fieldTypeName + "\", must be one of " + Arrays.toString(RocScoreField.values()));
         }
         fieldName = splitScore[1];
-      } else if (scoreField.equals(VcfUtils.QUAL)) {
+      } else if (VcfUtils.QUAL.equals(scoreField)) {
         fieldType = RocScoreField.QUAL;
         fieldName = "UNUSED";
       } else {

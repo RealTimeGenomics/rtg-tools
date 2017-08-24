@@ -66,7 +66,7 @@ class SamPositionReader extends AbstractPositionReader {
       mStartPosition = 0;
     }
     final String cigar = getColumn(CIGAR_COLUMN);
-    if (cigar.equals("*")) {
+    if ("*".equals(cigar)) {
       // For unmapped reads use length of sequence
       mLengthOnReference = getColumn(SEQ_COLUMN).length();
     } else {

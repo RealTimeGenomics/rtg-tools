@@ -158,14 +158,14 @@ public final class SimpleArchive {
       printUsage();
       return;
     }
-    if (args[0].equals("c")) {
+    if ("c".equals(args[0])) {
       final File archive = new File(args[1]);
       final File[] input = new File[args.length - 2];
       for (int i = 0; i < input.length; ++i) {
         input[i] = new File(args[i + 2]);
       }
       writeArchive(archive, input);
-    } else if (args[0].equals("d")) {
+    } else if ("d".equals(args[0])) {
       final File archive = new File(args[1]);
       final File output = new File(args[2]);
       unpackArchive(archive, output);

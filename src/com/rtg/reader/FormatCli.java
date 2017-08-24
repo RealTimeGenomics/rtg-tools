@@ -323,7 +323,7 @@ public final class FormatCli extends LoggedCli {
    * @return true if quality encoding type is recognized or format other than <code>fastq</code> is chosen
    */
   public static boolean validateQualityFormatFlags(CFlags flags, String format) {
-    if (!format.equals(FASTQ_FORMAT) && !format.equals(INTERLEAVED_FASTQ_FORMAT) && flags.isSet(CommonFlags.QUALITY_FLAG)) {
+    if (!FASTQ_FORMAT.equals(format) && !INTERLEAVED_FASTQ_FORMAT.equals(format) && flags.isSet(CommonFlags.QUALITY_FLAG)) {
       flags.setParseMessage("--" + CommonFlags.QUALITY_FLAG + " is only allowed for \"fastq\" format.");
       return false;
     }

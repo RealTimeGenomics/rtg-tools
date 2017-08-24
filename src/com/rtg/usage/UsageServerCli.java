@@ -86,7 +86,7 @@ public class UsageServerCli extends AbstractCli {
     if (host != null) {
       try {
         final URI uri = new URI(host);
-        if (uri.getScheme() != null && uri.getScheme().equalsIgnoreCase("http")) {
+        if (uri.getScheme() != null && "http".equalsIgnoreCase(uri.getScheme())) {
           final int hostPort = uri.getPort();
           defaultPort = hostPort == -1 ? 80 : hostPort;
         }
@@ -114,7 +114,7 @@ public class UsageServerCli extends AbstractCli {
     if (configHost != null) {
       try {
         final URI uri = new URI(configHost);
-        if (uri.getScheme() != null && uri.getScheme().equalsIgnoreCase("http")) {
+        if (uri.getScheme() != null && "http".equalsIgnoreCase(uri.getScheme())) {
           final int configPort = uri.getPort() == -1 ? 80 : uri.getPort();
           if (configPort != port) {
             Diagnostic.warning("Specified port " + port + " does not correspond with port from usage configuration: " + configPort);

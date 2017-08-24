@@ -161,7 +161,7 @@ public class VcfRecordMerger implements AutoCloseable {
             while (field.size() <= destSampleIndex) {
               field.add(VcfRecord.MISSING);
             }
-            if (key.equals(VcfUtils.FORMAT_GENOTYPE)) {
+            if (VcfUtils.FORMAT_GENOTYPE.equals(key)) {
               final String gtStr = records[i].getFormat(key).get(sampleIndex);
               final int[] splitGt = VcfUtils.splitGt(gtStr);
               for (int gti = 0; gti < splitGt.length; ++gti) {

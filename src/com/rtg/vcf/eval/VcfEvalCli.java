@@ -197,7 +197,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   private static boolean validateModeSample(CFlags flags) {
     final String mode = (String) flags.getValue(OUTPUT_MODE);
-    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (mode.equals(VcfEvalTask.MODE_COMBINE) || mode.equals(VcfEvalTask.MODE_GA4GH))) {
+    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (VcfEvalTask.MODE_COMBINE.equals(mode) || VcfEvalTask.MODE_GA4GH.equals(mode))) {
       flags.setParseMessage("--" + OUTPUT_MODE + "=combine cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
       return false;
     }
@@ -352,7 +352,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.twoPass(false); // Makes no sense
     } else if (mFlags.isSet(TWO_PASS)) {
       builder.twoPass((Boolean) mFlags.getValue(TWO_PASS)); // Explicit override
-    } else if (!mode.equals(VcfEvalTask.MODE_SPLIT)) {
+    } else if (!VcfEvalTask.MODE_SPLIT.equals(mode)) {
       builder.twoPass(true); // Default to two passes except for split mode (backward compability)
     }
     return builder.create();
