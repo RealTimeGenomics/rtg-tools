@@ -135,7 +135,7 @@ public final class Resources {
         strings.add("/".equals(StringUtils.FS) ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
       }
       return strings.toArray(new String[strings.size()]);
-    } else if (" jar ".equals(url.getProtocol())) {
+    } else if ("jar".equals(url.getProtocol())) {
       final ArrayList<String> strings = new ArrayList<>();
       assert url.getPath().startsWith("file:");
       final String jarPath = url.getPath().substring(5, url.getPath().lastIndexOf('!'));
