@@ -32,7 +32,6 @@ package com.rtg.launcher;
 import static com.rtg.util.StringUtils.LS;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.rtg.util.ObjectParams;
 import com.rtg.util.ParamsBuilder;
@@ -93,14 +92,7 @@ public abstract class ModuleParams extends ObjectParams implements OutputDirPara
   }
 
   @Override
-  @ParamsNoField
-  public void close() throws IOException {
-    // do nothing
-  }
-
-  @Override
   public String toString() {
     return name() + LS;
   }
-
 }

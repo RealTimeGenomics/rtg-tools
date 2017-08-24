@@ -64,11 +64,6 @@ public class CgSimCli extends ReadSimCli {
   }
 
   @Override
-  public String description() {
-    return "generate simulated reads from a sequence";
-  }
-
-  @Override
   protected String getPriorsNameFlagValue() {
     if (mFlags.isSet(XMACHINE_ERROR_PRIORS)) {
       return (String) mFlags.getValue(XMACHINE_ERROR_PRIORS);

@@ -133,11 +133,6 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
   }
 
   @Override
-  public void close() {
-    // do nothing
-  }
-
-  @Override
   public String toString() {
     return "OutputParams"
         + " output directory=" + mOutputDir

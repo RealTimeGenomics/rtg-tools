@@ -67,11 +67,6 @@ public class FixedStepPopulationVariantGeneratorCli extends AbstractCli {
   }
 
   @Override
-  public String description() {
-    return null;
-  }
-
-  @Override
   protected void initFlags() {
     initFlags(mFlags);
   }

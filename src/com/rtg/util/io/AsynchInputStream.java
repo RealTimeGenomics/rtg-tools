@@ -95,15 +95,6 @@ public class AsynchInputStream extends InputStream {
   }
 
   /**
-   * @see java.io.InputStream#markSupported()
-   * @return false
-   */
-  @Override
-  public boolean markSupported() {
-    return false;
-  }
-
-  /**
    * This also IO errors that happened in the  thread.
    */
   @Override
