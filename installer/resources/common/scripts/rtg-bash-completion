@@ -141,5 +141,10 @@ _rtg_cmds=
 _rtg_help=
 _rtg_lastcmd=
 
+# Main completion hook for default executable name
 complete -o filenames -F _complete_rtg rtg
 
+# Let completion also work in the case where people have separate
+# executable names for RTG Tools and RTG Core.
+complete -o filenames -F _complete_rtg rtg-tools
+complete -o filenames -F _complete_rtg rtg-core
