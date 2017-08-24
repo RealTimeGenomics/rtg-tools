@@ -574,7 +574,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
 
         final DataFileIndex seqIndex = DataFileIndex.loadSequenceDataFileIndex(mIndex.dataIndexVersion(), mDirectory);
         final long hash = SequenceDataLoader.loadQuality(qualData, seqIndex, mStart, mEnd, mDirectory, mPositions, mQualityChecksums, mOpenerFactory, mHandler, preloaded);
-        if (mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION && mStart == 0 && mEnd == mIndex.getNumberSequences()) {
+        if (mStart == 0 && mEnd == mIndex.getNumberSequences() && mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION) {
           if (hash != mIndex.getQualityChecksum()) {
             throw new CorruptSdfException("Sequence qualities failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");
           } else {

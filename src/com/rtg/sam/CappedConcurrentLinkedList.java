@@ -92,7 +92,7 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
    * @return true as specified by Collections.add
    */
   public synchronized boolean add(E e, boolean hasNext) {
-    while (mInternalQueue.size() >= mMaxSize && !mClosed) {
+    while (!mClosed && mInternalQueue.size() >= mMaxSize) {
       notifyAll();
       try {
         wait(TIMEOUT);
@@ -127,7 +127,7 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
   //TODO : check what happens to interrupted exception before wait
   @Override
   public synchronized E peek() {
-    while (mInternalQueue.isEmpty() && mHasNext && !mClosed) {
+    while (!mClosed && mHasNext && mInternalQueue.isEmpty()) {
       try {
         wait(TIMEOUT);
       } catch (InterruptedException e) {
@@ -174,7 +174,7 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
 
   @Override
   public synchronized boolean isEmpty() {
-    return mInternalQueue.isEmpty() && !mHasNext;
+    return !mHasNext && mInternalQueue.isEmpty();
   }
 
   /**

@@ -158,7 +158,7 @@ public class AsynchOutputStream extends OutputStream {
       mBufferCount = 0;
     }
     // TODO, also wait for other thread to flush buffers.
-    while (mQueue.available() > 0 && mAsynchOutput.mException == null) {
+    while (mAsynchOutput.mException == null && mQueue.available() > 0) {
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {

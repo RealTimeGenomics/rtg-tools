@@ -908,7 +908,7 @@ public class IndexFile implements Integrity {
    * @return whether we have a separate file for full sequence names
    */
   public boolean hasSequenceNameSuffixes() {
-    return hasNames() && mHasSuffixes;
+    return mHasSuffixes && hasNames();
   }
 
   void setQSPostionAverageHistogram(final double[] posAverages) {
