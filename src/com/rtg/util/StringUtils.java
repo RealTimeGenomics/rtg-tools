@@ -215,7 +215,7 @@ public final class StringUtils {
       final Character c = arg.charAt(i);
       final String trans = REPLACE.get(c);
       if (trans != null) {
-        sb.append("\\").append(trans);
+        sb.append('\\').append(trans);
         continue;
       }
       if (c >= 32 && c < 127) {
@@ -229,11 +229,11 @@ public final class StringUtils {
       final String hexl = Integer.toHexString(c);
       final String hex = hexl.toUpperCase(Locale.getDefault());
       for (int j = hex.length(); j < 4; ++j) {
-        sb.append("0");
+        sb.append('0');
       }
       sb.append(hex);
     }
-    sb.append("\"");
+    sb.append('"');
     return sb.toString();
   }
 

@@ -221,8 +221,7 @@ final class DataBundle {
   }
 
   PointPlot2D getPlot(int lineWidth, int colour) {
-    final PointPlot2D lplot = makePlot(lineWidth, colour, mRangedPoints);
-    return lplot;
+    return makePlot(lineWidth, colour, mRangedPoints);
   }
 
   PointPlot2D getPrecisionRecallPlot(int lineWidth, int colour) {

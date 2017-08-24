@@ -181,14 +181,13 @@ public final class UsageMessage {
     if (fieldValue == null) {
       return null;
     }
-    String ret;
+    final String ret;
     if (fieldValue.length() > trimLength) {
       ret = fieldValue.substring(0, trimLength);
     } else {
       ret = fieldValue;
     }
-    ret = ret.replaceAll("\\s", " ");
-    return ret;
+    return ret.replaceAll("\\s", " ");
   }
 
   /**

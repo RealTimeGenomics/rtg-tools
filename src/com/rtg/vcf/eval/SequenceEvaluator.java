@@ -152,15 +152,14 @@ class SequenceEvaluator implements IORunnable {
     setStatus(included, VariantId.STATUS_GT_MATCH);
     setStatus(partial, VariantId.STATUS_ALLELE_MATCH);
     setStatus(excluded, VariantId.STATUS_NO_MATCH);
-    List<VariantId> merged = new ArrayList<>(included.size() + partial.size() + excluded.size());
+    final List<VariantId> merged = new ArrayList<>(included.size() + partial.size() + excluded.size());
     merged.addAll(included);
     merged.addAll(partial);
     merged.addAll(excluded);
     // Sort by ID to ensure the ordering matches what is needed for variant writing and skipped variant insertion
-    Collections.sort(merged, Variant.ID_COMPARATOR);
+    merged.sort(Variant.ID_COMPARATOR);
     // Merge any variants that were unable to be processed during path finding due to too-hard regions
-    merged = insertSkipped(merged, allVariants);
-    return merged;
+    return insertSkipped(merged, allVariants);
   }
 
   private static void setStatus(Collection<? extends VariantId> variants, byte status) {
