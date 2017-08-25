@@ -100,7 +100,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     if (!mIsClosed) {
       mIsClosed = true;
       mIterator.close();

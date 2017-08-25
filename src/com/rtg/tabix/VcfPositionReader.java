@@ -45,9 +45,8 @@ class VcfPositionReader extends AbstractPositionReader {
    * Constructor
    * @param reader source of SAM file
    * @param skip number of lines to skip at beginning of file
-   * @throws IOException if an IO error occurs.
    */
-  VcfPositionReader(BlockCompressedLineReader reader, int skip) throws IOException {
+  VcfPositionReader(BlockCompressedLineReader reader, int skip) {
     super(reader, NUM_COLUMNS, '#', skip);
   }
 

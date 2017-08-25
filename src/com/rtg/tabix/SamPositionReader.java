@@ -48,9 +48,8 @@ class SamPositionReader extends AbstractPositionReader {
    * Constructor
    * @param reader source of SAM file
    * @param skip number of lines to skip at start of file
-   * @throws IOException if an IO error occurs.
    */
-  SamPositionReader(BlockCompressedLineReader reader, int skip) throws IOException {
+  SamPositionReader(BlockCompressedLineReader reader, int skip) {
     super(reader, NUM_COLUMNS, '@', skip);
   }
 

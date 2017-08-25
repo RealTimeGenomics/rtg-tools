@@ -31,7 +31,6 @@
 package com.rtg.graph;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,7 +106,7 @@ final class DataBundle {
   }
 
   // Set an automatic name based on directory name of file and score field if no explicit name was provided
-  void setTitle(File f, String name) throws IOException {
+  void setTitle(File f, String name) {
     if (name.length() > 0) {
       setTitle(name);
     } else {

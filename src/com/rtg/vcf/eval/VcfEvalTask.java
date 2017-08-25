@@ -249,7 +249,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     return ranges;
   }
 
-  static void checkHeader(VcfHeader baseline, VcfHeader calls, SdfId referenceSdfId) throws IOException {
+  static void checkHeader(VcfHeader baseline, VcfHeader calls, SdfId referenceSdfId) {
     final SdfId baselineTemplateSdfId = getSdfId(baseline);
     final SdfId callsTemplateSdfId = getSdfId(calls);
 

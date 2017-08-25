@@ -46,9 +46,8 @@ class AlleleCountsPositionReader extends AbstractPositionReader {
    * Constructor
    * @param reader source of allele counts file
    * @param skip number of lines to skip at beginning of file
-   * @throws IOException if an IO error occurs.
    */
-  AlleleCountsPositionReader(BlockCompressedLineReader reader, int skip) throws IOException {
+  AlleleCountsPositionReader(BlockCompressedLineReader reader, int skip) {
     super(reader, NUM_COLUMNS, '#', skip);
   }
 

@@ -115,8 +115,8 @@ public final class ReverseComplementingReader extends AbstractSequencesReader {
   }
 
   @Override
-  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
-    throw new UnsupportedOperationException("Not implemented yet");
+  public byte sequenceDataChecksum(long sequenceIndex) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

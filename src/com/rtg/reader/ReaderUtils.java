@@ -152,9 +152,8 @@ public final class ReaderUtils {
    * Construct a mapping from sequence name to sequence id.
    * @param names the sequences reader to construct the map from
    * @return the map from sequence name to sequence id
-   * @throws IOException if an error occurs during reading
    */
-  public static Map<String, Long> getSequenceNameMap(final NamesInterface names) throws IOException {
+  public static Map<String, Long> getSequenceNameMap(final NamesInterface names) {
     final Map<String, Long> map = new LinkedHashMap<>((int) names.length());
     for (long i = 0; i < names.length(); ++i) {
       map.put(names.name(i), i);

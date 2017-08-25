@@ -44,9 +44,8 @@ public class GenericPositionReader extends AbstractPositionReader {
   /**
    * @param reader read positions out of this reader
    * @param options the options to use while reading positions
-   * @throws IOException when IO breaks
    */
-  public GenericPositionReader(BlockCompressedLineReader reader, TabixIndexer.TabixOptions options) throws IOException {
+  public GenericPositionReader(BlockCompressedLineReader reader, TabixIndexer.TabixOptions options) {
     super(reader, noColsNeeded(options), (char) options.mMeta, options.mSkip);
     mOneBased = !options.mZeroBased;
     mStartCol = options.mStartCol;

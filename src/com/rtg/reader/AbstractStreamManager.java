@@ -169,7 +169,7 @@ abstract class AbstractStreamManager {
     }
   }
 
-  private void seqFile(final long seqNum) throws IOException {
+  private void seqFile(final long seqNum) {
     while (!(seqNum >= mCurrentLower && seqNum < mCurrentUpper)) {
       if (seqNum < mCurrentLower) {
 
