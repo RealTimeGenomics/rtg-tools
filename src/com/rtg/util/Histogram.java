@@ -82,13 +82,27 @@ public class Histogram {
   }
 
   /**
+   * @return one greater than the maximum position with a non-zero entry in the histogram
+   */
+  public int max() {
+    return mLength;
+  }
+
+  /**
+   * @return the minimum position with a non-zero entry in the histogram.
+   */
+  public int min() {
+    return 0;
+  }
+
+  /**
    * Get the value at the given position, returning
    * 0 for values greater than the length of the histogram.
    * @param position the zero based position
    * @return the value at the given position
    */
   public long getValueUnbounded(int position) {
-    return position >= mHistogram.length ? 0 : position < 0 ? 0 : mHistogram[position];
+    return position >= max() ? 0 : position < min() ? 0 : getValue(position);
   }
 
   @Override
@@ -150,10 +164,10 @@ public class Histogram {
   public double[] toDistribution() {
     final double[] ret = new double[getLength()];
     long tot = 0;
-    for (int i = 0; i < getLength(); ++i) {
+    for (int i = min(); i < max(); ++i) {
       tot += getValue(i);
     }
-    for (int i = 0; i < getLength(); ++i) {
+    for (int i = min(); i < max(); ++i) {
       ret[i] = (double) getValue(i) / tot;
     }
     return ret;

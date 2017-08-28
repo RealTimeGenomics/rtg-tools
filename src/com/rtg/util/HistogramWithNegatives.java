@@ -57,8 +57,6 @@ public class HistogramWithNegatives {
    * @param value the value to increment by
    */
   public void increment(int position, long value) {
-    assert value > 0;
-
     if (mMin == Integer.MAX_VALUE) {
       mHistogram = new long[1];
       mMin = position;
@@ -79,7 +77,7 @@ public class HistogramWithNegatives {
   /**
    * @return the number of entries stored in the histogram.
    */
-  public int length() {
+  public int getLength() {
     return mHistogram.length;
   }
 
@@ -87,7 +85,7 @@ public class HistogramWithNegatives {
    * @return one greater than the maximum position with a non-zero entry in the histogram
    */
   public int max() {
-    return length() + min();
+    return getLength() + min();
   }
 
   /**
@@ -104,6 +102,16 @@ public class HistogramWithNegatives {
    */
   public long getValue(int position) {
     return mHistogram[position - mMin];
+  }
+
+  /**
+   * Merges the contents of another histogram into this one.
+   * @param other the other histogram
+   */
+  public void addHistogram(HistogramWithNegatives other) {
+    for (int i = other.min(); i < other.max(); ++i) {
+      increment(i, other.getValue(i));
+    }
   }
 
   @Override

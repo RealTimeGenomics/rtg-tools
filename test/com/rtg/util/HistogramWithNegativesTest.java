@@ -40,17 +40,17 @@ public class HistogramWithNegativesTest extends TestCase {
 
   public void test() {
     final HistogramWithNegatives hist = new HistogramWithNegatives();
-    assertEquals(0, hist.length());
+    assertEquals(0, hist.getLength());
     assertEquals(Integer.MAX_VALUE, hist.min());
     assertEquals("[]" + LS, hist.toString());
     hist.increment(3);
     assertEquals(3, hist.min());
-    assertEquals(1, hist.length());
+    assertEquals(1, hist.getLength());
     assertEquals("[3..3]" + LS + "1 " + LS, hist.toString());
     assertEquals(1, hist.getValue(3));
     hist.increment(2, 10);
     assertEquals(2, hist.min());
-    assertEquals(2, hist.length());
+    assertEquals(2, hist.getLength());
     assertEquals(10, hist.getValue(2));
     hist.increment(0);
     assertEquals(0, hist.min());
@@ -60,7 +60,7 @@ public class HistogramWithNegativesTest extends TestCase {
       ;
     assertEquals(exp, hist.toString());
     hist.increment(9, 9);
-    assertEquals(10, hist.length());
+    assertEquals(10, hist.getLength());
     final String exp9 = ""
       + "[0..9]" + LS
       + "1 0 10 1 0 0 0 0 0 9 " + LS
@@ -70,12 +70,12 @@ public class HistogramWithNegativesTest extends TestCase {
 
   public void testBug() {
     final HistogramWithNegatives hist = new HistogramWithNegatives();
-    assertEquals(0, hist.length());
+    assertEquals(0, hist.getLength());
     assertEquals(Integer.MAX_VALUE, hist.min());
     assertEquals("[]" + LS, hist.toString());
     hist.increment(-3); //bug seen in wild
     assertEquals(-3, hist.min());
-    assertEquals(1, hist.length());
+    assertEquals(1, hist.getLength());
     assertEquals("[-3..-3]" + LS + "1 " + LS, hist.toString());
     assertEquals(1, hist.getValue(-3));
   }
