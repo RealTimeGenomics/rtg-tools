@@ -331,6 +331,7 @@ public class Taxonomy {
       mReason = "No root node.";
       return false;
     }
+    final HashSet<TaxonNode> seen = new HashSet<>(); // to detect loops
     for (final TaxonNode node : mNodes.values()) {
       if (node.getName() == null) {
         mReason = "Node " + node.getId() + " does not have a name.";
@@ -342,7 +343,7 @@ public class Taxonomy {
       }
       // search to root of taxonomy
       TaxonNode x = node;
-      final HashSet<TaxonNode> seen = new HashSet<>(); // to detect loops
+      seen.clear();
       while (x != null && x != root && !seen.contains(x)) {
         seen.add(x);
         x = x.getParent();
