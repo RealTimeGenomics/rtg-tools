@@ -149,7 +149,7 @@ public class IntegerRange extends IntegralAbstract {
    * @return string representation of i.
    */
   public String toString(final int i) {
-    return "" + i;
+    return String.valueOf(i);
   }
 
   /**

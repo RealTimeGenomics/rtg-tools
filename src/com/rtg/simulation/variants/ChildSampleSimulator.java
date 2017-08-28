@@ -219,7 +219,7 @@ public class ChildSampleSimulator {
 
     header.addSampleName(sample);
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex.toString() + ">");
+      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + sample + ",Mother=" + mother + ",Father=" + father + ">");
 

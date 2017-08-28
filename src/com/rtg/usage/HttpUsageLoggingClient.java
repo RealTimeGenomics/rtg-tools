@@ -180,7 +180,7 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
           try (MemoryPrintStream mps = new MemoryPrintStream()) {
             mps.printStream().println(failureMessage);
             ioe.printStackTrace(mps.printStream());
-            Diagnostic.warning("DEV:" + mps.toString());
+            Diagnostic.warning("DEV:" + mps);
           }
         }
       }

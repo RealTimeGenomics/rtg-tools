@@ -922,13 +922,11 @@ public final class SamUtils {
     final SAMFileHeader header = first;
     if (readGroups.size() > 0) {
       final List<SAMReadGroupRecord> recList = new ArrayList<>();
-      for (final SAMReadGroupRecord r : readGroups.values()) {
-        recList.add(r);
-      }
+      recList.addAll(readGroups.values());
       header.setReadGroups(recList);
     }
     if (currentGuid.available() && !getReferenceGuid(header).available()) {
-      header.addComment(TEMPLATE_SDF_ATTRIBUTE + currentGuid.toString());
+      header.addComment(TEMPLATE_SDF_ATTRIBUTE + currentGuid);
     }
     return header;
   }

@@ -128,7 +128,7 @@ public class FileUsageLoggingClient implements UsageLoggingClient {
 
         if (!usageFile.setReadable(true, false)
             || !usageFile.setWritable(true, false)) {
-          throw new IOException("Failed to set permissions on usage file:" + usageFile.toString());
+          throw new IOException("Failed to set permissions on usage file:" + usageFile);
         }
         lock.release();
       }

@@ -117,7 +117,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       // Excluded, but we don't have a baseline call at this position.
       // This should not normally happen if we have accumulated all alleles
       // Output the original representation
-      mCrv.addInfo("STATUS", "C-FP=" + mCv.toString());
+      mCrv.addInfo("STATUS", "C-FP=" + mCv);
       normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     }
@@ -128,7 +128,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     if (mBv instanceof OrientedVariant) {
       // Normal status if the sample contains this variant
       // Add the appropriate GT and output the record
-      mBrv.addInfo("STATUS", "B-TP=" + mBv.toString());
+      mBrv.addInfo("STATUS", "B-TP=" + mBv);
       final OrientedVariant ov = (OrientedVariant) mBv;
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       normalize(mBrv, 0);
@@ -206,7 +206,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
 
   @Override
   protected void handleUnknownBaseline() throws IOException {
-    throw new IllegalStateException("B-NotInPath - should not happen. Record: " + mBrv.toString());
+    throw new IllegalStateException("B-NotInPath - should not happen. Record: " + mBrv);
   }
 
   @Override

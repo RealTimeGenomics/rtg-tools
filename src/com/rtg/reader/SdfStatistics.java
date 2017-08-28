@@ -282,7 +282,7 @@ public final class SdfStatistics extends AbstractCli {
       }
     }
     if (reader.getSdfId().available()) {
-      header.addComment(SamUtils.TEMPLATE_SDF_ATTRIBUTE + reader.getSdfId().toString());
+      header.addComment(SamUtils.TEMPLATE_SDF_ATTRIBUTE + reader.getSdfId());
     }
     final ByteArrayOutputStream bo = new ByteArrayOutputStream();
     new SAMFileWriterFactory().makeSAMWriter(header, true, bo).close();

@@ -260,7 +260,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
   public String toString() {
     return "HaplotypePlayback: position=" + templatePosition() + " inPosition=" + mPositionInVariant + LS
     + "current:" + nullToString(mNextVariant) + LS
-    + "future:" + mVariants.toString() + LS;
+    + "future:" + mVariants + LS;
 
   }
 

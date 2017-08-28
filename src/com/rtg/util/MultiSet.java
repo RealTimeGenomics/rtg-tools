@@ -149,10 +149,13 @@ public class MultiSet<E> extends IntegralAbstract {
         }
         sb.append(", ");
       }
-      sb.append(entry.getKey().toString()).append("->").append(entry.getValue().count());
+      sb.append(entry.getKey()).append("->").append(entry.getValue().count());
       ++count;
     }
-    sb.append(lines > 1 ? StringUtils.LS : "").append("]");
+    if (lines > 1) {
+      sb.append(StringUtils.LS);
+    }
+    sb.append(']');
     return sb.toString();
   }
 

@@ -146,7 +146,7 @@ public class DeNovoSampleSimulator {
 
     header.addSampleName(sample);
     if (originalSex == Sex.FEMALE || originalSex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex.toString() + ">");
+      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
     }
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
 

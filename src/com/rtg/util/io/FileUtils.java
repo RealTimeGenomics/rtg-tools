@@ -295,10 +295,10 @@ public final class FileUtils {
       throws IOException {
     final File dir = File.createTempFile(prefix, suffix, directory);
     if (!dir.delete()) {
-      throw new IOException("Could not create directory: " + dir.toString());
+      throw new IOException("Could not create directory: " + dir);
     }
     if (!dir.mkdir()) {
-      throw new IOException("Could not create directory: " + dir.toString());
+      throw new IOException("Could not create directory: " + dir);
     }
     return dir;
   }

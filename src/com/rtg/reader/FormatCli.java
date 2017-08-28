@@ -567,7 +567,7 @@ public final class FormatCli extends LoggedCli {
         }
         out.println("");
         out.println("Output Data");
-        out.println("SDF-ID             : " + sdfId.toString());
+        out.println("SDF-ID             : " + sdfId);
         if (paired) {
           out.println("Number of pairs    : " + (output.mSequences / 2));
         }

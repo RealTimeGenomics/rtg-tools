@@ -82,9 +82,9 @@ class FileStreamIterator implements Iterator<InputStream> {
       try {
         mNext = FileUtils.createInputStream(mNextFile, true);
         if (mMaxCount == 1) {
-          Diagnostic.info("Processing " + mProcessLabel + "\"" + mNextFile.toString() + "\"");
+          Diagnostic.info("Processing " + mProcessLabel + "\"" + mNextFile + "\"");
         } else {
-          Diagnostic.progress(String.format("Processing \"%s\" (%d of %d)", mNextFile.toString(), mCounter, mMaxCount));
+          Diagnostic.progress(String.format("Processing \"%s\" (%d of %d)", mNextFile, mCounter, mMaxCount));
         }
       } catch (final FileNotFoundException fnfe) {
         throw new NoTalkbackSlimException("The file: \"" + mNextFile.getPath() + "\" either could not be found or could not be opened. The underlying error message is: \"" + fnfe.getMessage() + "\"");

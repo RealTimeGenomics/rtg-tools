@@ -85,12 +85,12 @@ public class DataSourceDescription {
     if (isPairedEnd()) {
       sb.append("paired-end ");
     }
-    sb.append(getSourceFormat().toString());
+    sb.append(getSourceFormat());
     if (isCompleteGenomics()) {
       sb.append("-CG");
     }
     if (getQualityFormat() != null && getQualityFormat() != QualityFormat.UNKNOWN && getQualityFormat() != QualityFormat.SANGER) {
-      sb.append("-").append(getQualityFormat().toString());
+      sb.append("-").append(getQualityFormat());
     }
     return sb.toString();
   }

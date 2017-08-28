@@ -153,7 +153,7 @@ public class IndexFile implements Integrity {
       version1Load(indexStream, headerHash, dir);
 
       if (mVersion > VERSION) {
-        throw new NoTalkbackSlimException("The SDF " + dir.toString() + " has been created with a newer version of RTG tools and cannot be read with this version.");
+        throw new NoTalkbackSlimException("The SDF " + dir + " has been created with a newer version of RTG tools and cannot be read with this version.");
       }
 
       loadVersion3Fields(indexStream, headerHash);

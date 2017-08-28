@@ -144,7 +144,7 @@ class VcfFilterTask {
       userFilterTags.addAll(mRemoveFilters);
       for (final String tag : userFilterTags) {
         if (!mFilterTags.contains(tag)) {
-          throw new NoTalkbackSlimException("Invalid FIELD tag: " + tag + " : " + mFilterTags.toString());
+          throw new NoTalkbackSlimException("Invalid FIELD tag: " + tag + " : " + mFilterTags);
         }
       }
       for (final InfoField info : header.getInfoLines()) {
@@ -155,7 +155,7 @@ class VcfFilterTask {
       userInfoTags.addAll(mRemoveInfos);
       for (final String tag : userInfoTags) {
         if (!mInfoTags.contains(tag)) {
-          throw new VcfFormatException("Invalid INFO tag: " + tag + " : " + mInfoTags.toString());
+          throw new VcfFormatException("Invalid INFO tag: " + tag + " : " + mInfoTags);
         }
       }
     }
@@ -188,7 +188,7 @@ class VcfFilterTask {
   void resetSampleGts(VcfRecord record) {
     final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (sampleGts == null) {
-      throw new VcfFormatException("Record does not contain " + VcfUtils.FORMAT_GENOTYPE + " field:\n" + record.toString());
+      throw new VcfFormatException("Record does not contain " + VcfUtils.FORMAT_GENOTYPE + " field:\n" + record);
     }
     if (mNonSampleSpecificFailed) {
       if (mSampleIndexes != null) {
@@ -354,7 +354,7 @@ class VcfFilterTask {
       for (int sampleIndex = 0; sampleIndex < record.getNumberOfSamples(); ++sampleIndex) {
         final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
         if (sampleGts == null) {
-          throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());
+          throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record);
         }
         final String gt = sampleGts.get(sampleIndex);
         if (VcfUtils.isVariantGt(gt)) {
@@ -374,7 +374,7 @@ class VcfFilterTask {
     }
     final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (sampleGts == null) {
-      throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record.toString());
+      throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record);
     }
     final int[] altIndexes = VcfUtils.splitGt(sampleGts.get(sampleIndex));
     boolean refAlleleSeen = false;

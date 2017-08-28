@@ -71,7 +71,7 @@ public class EnumHelper<T extends PseudoEnum> {
   public T valueOf(final String str) {
     final T ret = mValueOf.get(str);
     if (ret == null) {
-      throw new IllegalArgumentException(str + " is not a valid enum value of type: " + mClass.toString());
+      throw new IllegalArgumentException(str + " is not a valid enum value of type: " + mClass);
     }
     return ret;
   }

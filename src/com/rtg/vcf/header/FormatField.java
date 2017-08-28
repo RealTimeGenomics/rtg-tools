@@ -126,7 +126,7 @@ public class FormatField implements TypedField<FormatField> {
 
   @Override
   public String toString() {
-    return VcfHeader.FORMAT_STRING + "=<ID=" + mId + ",Number=" + mNumber.toString() + ",Type=" + mType.toString() + ",Description=\"" + mDescription + "\">";
+    return VcfHeader.FORMAT_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType + ",Description=\"" + mDescription + "\">";
   }
 
 }

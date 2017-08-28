@@ -325,7 +325,7 @@ public final class StringUtils {
     for (final T item : items) {
       sb.append(join);
       join = delim;
-      sb.append(item.toString());
+      sb.append(item);
     }
     return sb.toString();
   }

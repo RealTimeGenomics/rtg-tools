@@ -169,7 +169,7 @@ public final class VcfPedigreeParser {
       final Sex sex = gr.getSex(derived[0].first());
       String sexStr = "";
       if (sex == Sex.FEMALE || sex == Sex.MALE) {
-        sexStr = ",Sex=" + sex.toString();
+        sexStr = ",Sex=" + sex;
       }
       vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + derived[0].first() + ",Genomes=" + derived[0].first() + ",Mixture=1.0" + sexStr + ",Description=\"Original genome\">");
       final double con = Double.parseDouble(derived[0].getProperty("contamination"));
@@ -181,7 +181,7 @@ public final class VcfPedigreeParser {
       for (final String genome : outputSamples) {
         final Sex sex = gr.getSex(genome);
         if (sex == Sex.FEMALE || sex == Sex.MALE) {
-          vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + genome + ",Sex=" + sex.toString() + ">");
+          vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + genome + ",Sex=" + sex + ">");
         }
         if (gr.isDiseased(genome)) {
           diseased.append(",").append(genome);

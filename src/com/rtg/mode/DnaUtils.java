@@ -221,7 +221,7 @@ public final class DnaUtils {
           dest[k] = 0;
           break;
         default:
-          throw new IllegalBaseException("Illegal DNA character: " + Character.valueOf((char) a[k + start]).toString());
+          throw new IllegalBaseException("Illegal DNA character: " + (char) a[k + start]);
       }
     }
     return dest;

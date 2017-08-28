@@ -83,7 +83,7 @@ public class BasicLinkedListNode<T> implements Iterable<T> {
     String join = "";
     for (final T v : this) {
       sb.append(join);
-      sb.append(v.toString());
+      sb.append(v);
       join = ", ";
     }
     sb.append("]");

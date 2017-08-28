@@ -241,7 +241,7 @@ public class SexMemo {
       for (Pair<RegionRestriction, Ploidy> parSite : parList) {
         final RegionRestriction r = parSite.getA();
         if (r.getLength() < region.getLength()) {
-          throw new RuntimeException("PAR regions smaller than chunk size (" + region.getLength() + ") are not supported: " + r.toString());
+          throw new RuntimeException("PAR regions smaller than chunk size (" + region.getLength() + ") are not supported: " + r);
         }
         if (region.contains(r.getSequenceName(), r.getStart())) {
           return r.getStart();

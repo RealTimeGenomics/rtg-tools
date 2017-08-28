@@ -139,7 +139,7 @@ public class SampleField implements IdField<SampleField> {
       sb.append(",Description=").append(StringUtils.dumbQuote(mDescription));
     }
     if (mSex != null && (mSex == Sex.MALE || mSex == Sex.FEMALE)) {
-      sb.append(",Sex=").append(mSex.toString());
+      sb.append(",Sex=").append(mSex);
     }
     sb.append(">");
     return sb.toString();

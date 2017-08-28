@@ -136,9 +136,9 @@ public abstract class MappedParams extends OutputModuleParams {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(mFilterParams.toString()).append(LS);
+    sb.append(mFilterParams).append(LS);
     if (mGenome != null) {
-      sb.append("    ").append(mGenome.toString());
+      sb.append("    ").append(mGenome);
       sb.append(LS);
     }
     sb.append(super.toString());

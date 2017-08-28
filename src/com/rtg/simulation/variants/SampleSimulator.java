@@ -115,7 +115,7 @@ public class SampleSimulator {
       header.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype");
     }
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex.toString() + ">");
+      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
     header.addRunInfo();
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());

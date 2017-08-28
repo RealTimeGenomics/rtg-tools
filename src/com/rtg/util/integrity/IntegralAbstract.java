@@ -263,7 +263,7 @@ public abstract class IntegralAbstract implements Integrity {
         final Class<?> clazz = obj.getClass();
         if (toStringDeclared(clazz)) {
           sb.append(prefix);
-          sb.append(obj.toString());
+          sb.append(obj);
           continue;
         }
         toString(obj, sb, prefix + "  ");
@@ -290,7 +290,7 @@ public abstract class IntegralAbstract implements Integrity {
       final Class<?> clazz = obj.getClass();
       if (toStringDeclared(clazz)) {
         sb.append(prefix);
-        sb.append(obj.toString());
+        sb.append(obj);
         continue;
       }
       toString(obj, sb, prefix + "  ");
@@ -313,7 +313,7 @@ public abstract class IntegralAbstract implements Integrity {
     final Class<?> clazz = obj.getClass();
     if (toStringDeclared(clazz)) {
       sb.append(prefix);
-      sb.append(obj.toString());
+      sb.append(obj);
     } else {
       toString(obj, sb, prefix + "  ");
     }

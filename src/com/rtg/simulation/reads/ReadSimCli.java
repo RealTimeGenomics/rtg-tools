@@ -445,7 +445,7 @@ public class ReadSimCli extends LoggedCli {
         m = createMachine();
       }
 
-      Diagnostic.userLog("ReadSimParams" + LS + " input=" + input + LS + " machine=" + m.prereadType() + LS + " output=" + outputDirectory() + LS + (mFlags.isSet(READS) ? " num-reads=" + mFlags.getValue(READS) + LS : "") + (mFlags.isSet(COVERAGE) ? " coverage=" + mFlags.getValue(COVERAGE) + LS : "") + (selectionProb == null ? "" : " distribution=" + Arrays.toString(selectionProb) + LS) + " allow-unknowns=" + mFlags.isSet(ALLOW_UNKNOWNS) + LS + " max-fragment=" + mFlags.getValue(MAX_FRAGMENT) + LS + " min-fragment=" + mFlags.getValue(MIN_FRAGMENT) + LS + " seed=" + seed + LS + LS + mPriors.toString() + LS);
+      Diagnostic.userLog("ReadSimParams" + LS + " input=" + input + LS + " machine=" + m.prereadType() + LS + " output=" + outputDirectory() + LS + (mFlags.isSet(READS) ? " num-reads=" + mFlags.getValue(READS) + LS : "") + (mFlags.isSet(COVERAGE) ? " coverage=" + mFlags.getValue(COVERAGE) + LS : "") + (selectionProb == null ? "" : " distribution=" + Arrays.toString(selectionProb) + LS) + " allow-unknowns=" + mFlags.isSet(ALLOW_UNKNOWNS) + LS + " max-fragment=" + mFlags.getValue(MAX_FRAGMENT) + LS + " min-fragment=" + mFlags.getValue(MIN_FRAGMENT) + LS + " seed=" + seed + LS + LS + mPriors + LS);
       final File f = (File) mFlags.getValue(OUTPUT_FLAG);
       try (ReadWriter rw = getNFilter(createReadWriter(m, f))) {
         m.setReadWriter(rw);
@@ -476,7 +476,7 @@ public class ReadSimCli extends LoggedCli {
     final double[] selectionDist = new double[numSeq];
     try (FileInputStream is = new FileInputStream(file)) {
       final Map<String, Double> selectionMap = createSelectionDistribution(is);
-      Diagnostic.userLog("Sequence distribution:" + selectionMap.toString());
+      Diagnostic.userLog("Sequence distribution:" + selectionMap);
 
       final NamesInterface names = reader.names();
       final int[] lengths = reader.sequenceLengths(0, numSeq);

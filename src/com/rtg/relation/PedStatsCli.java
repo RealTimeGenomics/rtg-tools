@@ -197,7 +197,7 @@ public class PedStatsCli extends AbstractCli {
         } else { // Output summary information
           final TextTable table = new TextTable();
           table.setAlignment(TextTable.Align.LEFT);
-          w.writeln("Pedigree file: " + pedFile.toString());
+          w.writeln("Pedigree file: " + pedFile);
           w.writeln();
           table.addRow("Total samples:", "" + pedigree.genomes().length);
           table.addRow("Primary samples:", "" + pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)).length);

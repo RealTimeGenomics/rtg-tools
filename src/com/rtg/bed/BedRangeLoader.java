@@ -135,7 +135,7 @@ public abstract class BedRangeLoader<T> {
       ++end;
       // warning - need to have a range of at least 1
       if (mExtendWarningCount < 10) {
-        Diagnostic.warning("Zero length range in BED record, extending end by 1 : " + rec.toString());
+        Diagnostic.warning("Zero length range in BED record, extending end by 1 : " + rec);
       }
       ++mExtendWarningCount;
     }

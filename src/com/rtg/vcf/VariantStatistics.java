@@ -316,11 +316,11 @@ public class VariantStatistics extends AbstractStatistics {
         try {
           splitGt = VcfUtils.splitGt(gtStr);
         } catch (VcfFormatException e) {
-          Diagnostic.warning("VCF record GT is invalid, record: " + rec.toString());
+          Diagnostic.warning("VCF record GT is invalid, record: " + rec);
           continue;
         }
         if (!VcfUtils.isValidGt(rec, splitGt)) {
-          Diagnostic.warning("VCF record GT contains allele ID out of range, record: " + rec.toString());
+          Diagnostic.warning("VCF record GT contains allele ID out of range, record: " + rec);
           continue;
         }
         final PerSampleVariantStatistics sampleStats = ensurePerSampleStats(sampleName);

@@ -161,7 +161,7 @@ public class Relationship {
 
   @Override
   public String toString() {
-    return mType.toString() + " (" + mGenome1 + "-" + mGenome2 + ")" + (!mProperties.isEmpty() ? (" :: " + mProperties.toString()) : "");
+    return mType + " (" + mGenome1 + "-" + mGenome2 + ")" + (!mProperties.isEmpty() ? (" :: " + mProperties) : "");
   }
 
 

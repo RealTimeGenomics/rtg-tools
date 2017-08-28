@@ -125,7 +125,7 @@ public class InfoField implements TypedField<InfoField> {
 
   @Override
   public String toString() {
-    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber.toString() + ",Type=" + mType.toString() + ",Description=\"" + mDescription + "\">";
+    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType + ",Description=\"" + mDescription + "\">";
   }
 
 }

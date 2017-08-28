@@ -90,22 +90,22 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
   @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
-      mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv.toString());
+      mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv);
       writeResidual((OrientedVariant) mCv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too-hard, output this variant with just the used alleles
       final GtIdVariant v = (GtIdVariant) mCv;
-      writeNonRedundant(v, "C-TooHard=" + mCv.toString());
+      writeNonRedundant(v, "C-TooHard=" + mCv);
     } else { // Excluded (novel or self-inconsistent)
       assert mCv instanceof GtIdVariant;
       final GtIdVariant v = (GtIdVariant) mCv;
-      writeNonRedundant(v, "C-FP=" + mCv.toString());
+      writeNonRedundant(v, "C-FP=" + mCv);
     }
   }
 
   @Override
   protected void handleKnownBoth() throws IOException {
     if (mCv instanceof OrientedVariant) {
-      mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv.toString());
+      mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv);
       writeResidual((OrientedVariant) mCv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too hard, merge records into b, adding any new ALT from c, flush c
       final GtIdVariant ov = (GtIdVariant) mCv;

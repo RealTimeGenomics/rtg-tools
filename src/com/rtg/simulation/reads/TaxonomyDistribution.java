@@ -74,7 +74,7 @@ public class TaxonomyDistribution {
    */
   TaxonomyDistribution(InputStream taxonomyDist, Map<String, Integer> taxonLookup, SequencesReader reader, DistributionType type) throws IOException {
     final Map<Integer, Double> taxonomyDistribution = parseTaxonDistribution(taxonomyDist);
-    Diagnostic.userLog("Taxonomy distribution:" + taxonomyDistribution.toString());
+    Diagnostic.userLog("Taxonomy distribution:" + taxonomyDistribution);
 
     // Identify the sequences corresponding to each taxon ID
     final AutoAddMap<Integer, TaxonSequences> taxon = new TaxonMap();

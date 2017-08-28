@@ -94,7 +94,7 @@ public class LogFile implements LogStream {
 
   @Override
   public String toString() {
-    return "LogFile " + mFile.toString();
+    return "LogFile " + mFile;
   }
 
 }

@@ -216,7 +216,7 @@ public final class SamRangeUtils {
           final List<? extends Interval> ranges = rs.getRangeList();
           final Interval last = ranges.get(ranges.size() - 1);
           if (last.getEnd() >  r.getSequenceLength()) {
-            throw new NoTalkbackSlimException("Specified sequence range (" + r.getSequenceName() + ":" + last.toString() + ") is outside the length of the sequence (" + r.getSequenceLength() + ")");
+            throw new NoTalkbackSlimException("Specified sequence range (" + r.getSequenceName() + ":" + last + ") is outside the length of the sequence (" + r.getSequenceLength() + ")");
           }
         }
       }
