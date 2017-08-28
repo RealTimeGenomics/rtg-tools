@@ -52,6 +52,7 @@ public class UsageConfiguration {
   static final String USAGE_LOG_USERNAME = "usage.log.username";
   static final String USAGE_LOG_HOSTNAME = "usage.log.hostname";
   static final String USAGE_LOG_COMMANDLINE = "usage.log.commandline";
+  private static final String[] USAGE_TYPES = {USAGE_DIR, USAGE_HOST, USAGE_LOG_USERNAME, USAGE_LOG_HOSTNAME, USAGE_LOG_COMMANDLINE};
 
   private final Properties mProp;
 
@@ -65,7 +66,7 @@ public class UsageConfiguration {
     mProp.setProperty(ENABLE_USAGE, enabled.toString());
     if (enabled) {
       // Pull the properties we care about out of system properties
-      for (String property : new String[] {USAGE_DIR, USAGE_HOST, USAGE_LOG_USERNAME, USAGE_LOG_HOSTNAME, USAGE_LOG_COMMANDLINE}) {
+      for (String property : USAGE_TYPES) {
         if (env.get(property) != null) {
           mProp.setProperty(property, env.get(property));
         }

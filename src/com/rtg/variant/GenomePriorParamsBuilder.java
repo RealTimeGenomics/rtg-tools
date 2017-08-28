@@ -53,6 +53,7 @@ import com.rtg.util.diagnostic.ErrorType;
 public class GenomePriorParamsBuilder {
 
   private static final char COLON = ':';
+  private static final String[] BASES = {"A", "C", "G", "T"};
 
   /** Total SNP rate is <code>mGenomeSnpRateHetero + mGenomeSnpRateHomo</code> */
   protected double mGenomeSnpRateHetero, mGenomeSnpRateHomo;
@@ -165,15 +166,14 @@ public class GenomePriorParamsBuilder {
 
   private HashMap<String, HashMap<String, Double>> load(Properties pr, String prior) {
     final HashMap<String, HashMap<String, Double>> priorMap = new HashMap<>();
-    final String[] bases = {"A", "C", "G", "T"};
-    for (String ref : bases) {
+    for (String ref : BASES) {
       //haploid
-      for (String call : bases) {
+      for (String call : BASES) {
         putGenomePrior(priorMap, ref, call, getDouble(prior, pr, ref.toLowerCase(Locale.ROOT) + "_" + call.toLowerCase(Locale.ROOT)));
       }
       //diploid
-      for (String call : bases) {
-        for (String allele2 : bases) {
+      for (String call : BASES) {
+        for (String allele2 : BASES) {
           String lookupKey = ref.toLowerCase(Locale.ROOT) + "_" + call.toLowerCase(Locale.ROOT) + "_" + allele2.toLowerCase(Locale.ROOT);
           if (!pr.containsKey(lookupKey)) {
             lookupKey = ref.toLowerCase(Locale.ROOT) + "_" + allele2.toLowerCase(Locale.ROOT) + "_" + call.toLowerCase(Locale.ROOT);

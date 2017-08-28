@@ -107,6 +107,7 @@ public final class FormatCli extends LoggedCli {
 
   private static final String XMAPPED_SAM = "Xmapped-sam";
   private static final String XDEDUP_SECONDARY = "Xdedup-secondary-alignments";
+  private static final String[] FORMATS = {FASTA_FORMAT, FASTQ_FORMAT, INTERLEAVED_FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT};
 
   static class BadFormatCombinationException extends IllegalArgumentException {
     BadFormatCombinationException(String string) {
@@ -151,7 +152,7 @@ public final class FormatCli extends LoggedCli {
     CommonFlags.initForce(mFlags);
 
     final Flag<String> formatFlag = mFlags.registerOptional('f', FORMAT_FLAG, String.class, "format", "format of input", FASTA_FORMAT).setCategory(INPUT_OUTPUT);
-    String[] formats = {FASTA_FORMAT, FASTQ_FORMAT, INTERLEAVED_FASTQ_FORMAT, SAM_SE_FORMAT, SAM_PE_FORMAT};
+    String[] formats = FORMATS;
     if (License.isDeveloper()) {
       formats = Utils.append(formats, CGFASTQ_FORMAT, CGSAM_FORMAT);
     }

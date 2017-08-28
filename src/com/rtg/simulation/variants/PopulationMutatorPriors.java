@@ -45,6 +45,7 @@ import com.rtg.variant.GenomePriorParams;
 @TestClass("com.rtg.simulation.variants.PriorPopulationVariantGeneratorTest")
 public class PopulationMutatorPriors {
 
+  // Just consider homozygous priors
   enum VariantType {
     /** SNP mutation */
     SNP,
@@ -57,6 +58,8 @@ public class PopulationMutatorPriors {
     /** deletion from ref and insertion (like MNP but different length to ref) */
     INSDEL
   }
+
+  private static final String[] CALLS = {"A", "C", "G", "T"};
 
   private final GenomePriorParams mPriors;
 
@@ -134,9 +137,8 @@ public class PopulationMutatorPriors {
     for (int i = 0; i < probabilities.length; ++i) {
       probabilities[i] = new double[4];
     }
-    final String[] calls = {"A", "C", "G", "T"}; // Just consider homozygous priors
-    for (int i = 0; i < calls.length; ++i) {
-      final double[] probs = mPriors.getPriorDistr(calls[i]);
+    for (int i = 0; i < CALLS.length; ++i) {
+      final double[] probs = mPriors.getPriorDistr(CALLS[i]);
       for (int j = 0; j < probs.length; ++j) {
         if (j != i) { // Do not allow any possibility of a base transitioning to itself
           probabilities[j][i] = probs[j];

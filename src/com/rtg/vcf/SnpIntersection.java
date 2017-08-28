@@ -101,6 +101,7 @@ public final class SnpIntersection extends LoggedCli {
   private static final String DIFFERENT_OUT = "different.vcf";
   private static final String FIRST_ONLY_OUT = "first-only.vcf";
   private static final String SECOND_ONLY_OUT = "second-only.vcf";
+  private static final String[] OUTPUT_FILES = {SAME_OUT, DIFFERENT_OUT, FIRST_ONLY_OUT, SECOND_ONLY_OUT};
 
   @Override
   protected void initFlags() {
@@ -250,8 +251,7 @@ CommonFlags.initNoGzip(flags);
     if (output.isBlockCompressed()) {
       final Timer indexing = new Timer("SnpIndex");
       indexing.start();
-      final String[] outputFiles = {SAME_OUT, DIFFERENT_OUT, FIRST_ONLY_OUT, SECOND_ONLY_OUT};
-      for (final String outputName : outputFiles) {
+      for (final String outputName : OUTPUT_FILES) {
         final File outFile = output.file(outputName + FileUtils.GZ_SUFFIX);
         final File tabixFile = output.file(outputName + FileUtils.GZ_SUFFIX + TabixIndexer.TABIX_EXTENSION);
         try {
