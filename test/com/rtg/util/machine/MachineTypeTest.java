@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class MachineTypeTest extends TestCase {
 
   public void test() {
-    TestUtils.testPseudoEnum(MachineType.class, "[illumina_se, illumina_pe, complete_genomics, complete_genomics_2, 454_pe, 454_se, iontorrent]");
+    TestUtils.testPseudoEnum(MachineType.class, "[generic, illumina_se, illumina_pe, complete_genomics, complete_genomics_2, 454_pe, 454_se, iontorrent]");
   }
 
   public void testCompatible() {

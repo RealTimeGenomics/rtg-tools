@@ -51,6 +51,9 @@ public final class MachineType implements PseudoEnum {
   /** The platform type for 454, regardless of whether it is paired or single end */
   public static final String PLAT_454 = "LS454";
 
+  /** Generic single end. */
+  public static final MachineType GENERIC = new MachineType(++sSequenceNumber, "generic", "default", null, "UNKNOWN");
+
   /** Illumina single end. */
   public static final MachineType ILLUMINA_SE = new MachineType(++sSequenceNumber, "illumina_se", "illumina", null, PLAT_ILLUMINA);
 
@@ -72,7 +75,7 @@ public final class MachineType implements PseudoEnum {
   /** Ion Torrent (single end). */
   public static final MachineType IONTORRENT = new MachineType(++sSequenceNumber, "iontorrent", "iontorrent", null, "IONTORRENT");
 
-  static final EnumHelper<MachineType> HELPER = new EnumHelper<>(MachineType.class, new MachineType[] {ILLUMINA_SE, ILLUMINA_PE, COMPLETE_GENOMICS, COMPLETE_GENOMICS_2, FOURFIVEFOUR_PE, FOURFIVEFOUR_SE, IONTORRENT});
+  static final EnumHelper<MachineType> HELPER = new EnumHelper<>(MachineType.class, new MachineType[] {GENERIC, ILLUMINA_SE, ILLUMINA_PE, COMPLETE_GENOMICS, COMPLETE_GENOMICS_2, FOURFIVEFOUR_PE, FOURFIVEFOUR_SE, IONTORRENT});
 
   /**
    * @return list of the enum names
