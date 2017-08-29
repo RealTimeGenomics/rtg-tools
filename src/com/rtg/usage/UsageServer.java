@@ -37,7 +37,7 @@ import java.io.RandomAccessFile;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -74,7 +74,6 @@ public class UsageServer {
   static final String USERNAME = "username";
   static final String HOSTNAME = "hostname";
   static final String COMMANDLINE = "cmdline";
-  private static final String UTF_8 = "UTF-8";
 
   private final File mUsageDir;
   private final int mPort;
@@ -98,16 +97,12 @@ public class UsageServer {
    * @throws IOException if it happens
    */
   public UsageServer(int port, File usageDir, int threads) throws IOException {
-    if (!Charset.isSupported(UTF_8)) {
-      //in theory this should never ever happen. UTF-8 is a standard required charset by the java platform
-      throw new IOException("UTF-8 character encoding not supported");
-    }
     //flaky stuff
     System.setProperty("sun.net.httpserver.maxReqTime", "30");
     System.setProperty("sun.net.httpserver.maxRspTime", "30");
     mUsageDir = usageDir;
     mPort = port;
-    mThreadPoolExecutor = new ThreadPoolExecutor(threads, threads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), new UsageServerThreadFactory());
+    mThreadPoolExecutor = new ThreadPoolExecutor(threads, threads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new UsageServerThreadFactory());
   }
 
   /**
@@ -123,8 +118,6 @@ public class UsageServer {
     }
     mServer.createContext("/", new UsageHandler());
     mServer.setExecutor(mThreadPoolExecutor);
-//    mLastKey = FileUsageTrackingClient.getLastKey(mRandomAccessFile);
-//    mRandomAccessFile.seek(mRandomAccessFile.length());
     mServer.start();
   }
 
@@ -210,7 +203,7 @@ public class UsageServer {
         out.write(reply.getBytes());
       }
       httpExchange.close();
-      final UsageMessage message = UsageMessage.setMessage(post.get(SERIAL), post.get(RUN_ID), post.get(VERSION), post.get(MODULE), post.containsKey(METRIC) ? post.get(METRIC) : null, post.get(TYPE));
+      final UsageMessage message = UsageMessage.setMessage(post.get(SERIAL), post.get(RUN_ID), post.get(VERSION), post.get(MODULE), post.getOrDefault(METRIC, null), post.get(TYPE));
       if (post.containsKey(USERNAME)) {
         message.setUsername(post.get(USERNAME));
       }
@@ -252,7 +245,7 @@ public class UsageServer {
         final String[] keyval = StringUtils.split(val, '=');
         if (keyval.length == 2) {
           try {
-            ret.put(URLDecoder.decode(keyval[0], UTF_8), URLDecoder.decode(keyval[1], UTF_8));
+            ret.put(URLDecoder.decode(keyval[0], StandardCharsets.UTF_8.name()), URLDecoder.decode(keyval[1], StandardCharsets.UTF_8.name()));
           } catch (IllegalArgumentException e) {
             Diagnostic.userLog("Failed to decode parameter: '" + val + "' (" + e.getMessage() + ")");
           }

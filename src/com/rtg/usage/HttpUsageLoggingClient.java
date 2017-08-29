@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -151,9 +152,9 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
             body.append("&");
           }
           first = false;
-          body.append(URLEncoder.encode(entry.getKey(), "UTF-8"));
+          body.append(URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8.name()));
           body.append("=");
-          body.append(URLEncoder.encode(entry.getValue(), "UTF-8"));
+          body.append(URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8.name()));
         }
         final int code;
         final String response;
