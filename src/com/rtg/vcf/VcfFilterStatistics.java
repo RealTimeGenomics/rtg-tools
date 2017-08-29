@@ -44,27 +44,28 @@ import com.rtg.util.MultiSet;
 class VcfFilterStatistics implements Statistics {
 
   enum Stat {
-    SAME_AS_REF_FILTERED_COUNT
-    , ALL_SAME_AS_REF_FILTERED_COUNT
-    , AMBIGOUS_FILTERED_COUNT
-    , READ_DEPTH_FILTERED_COUNT
-    , FAILED_KEEP_COUNT
-    , NOT_SNP_COUNT
-    , GENOTYPE_QUALITY_POSTERIOR_FILTERED_COUNT
-    , QUALITY_FILTERED_COUNT
-    , ALLELE_BALANCE_FILTERED_COUNT
-    , DENSITY_WINDOW_COUNT
-    , EXCLUDE_BED_COUNT
-    , INCLUDE_BED_COUNT
-    , WRITTEN_COUNT
-    , TOTAL_COUNT
-    , AVR_SCORE_FILTERED_COUNT
-    , OVERLAP_COUNT
-    , SNP_COUNT
-    , DENOVO_SCORE
-    , COMBINED_READ_DEPTH_FILTERED_COUNT
-    , HOM_FILTERED_COUNT
-    , USER_EXPRESSION_COUNT
+    SAME_AS_REF_FILTERED_COUNT,
+    ALL_SAME_AS_REF_FILTERED_COUNT,
+    ALLELE_COUNT,
+    AMBIGOUS_FILTERED_COUNT,
+    READ_DEPTH_FILTERED_COUNT,
+    FAILED_KEEP_COUNT,
+    NOT_SNP_COUNT,
+    GENOTYPE_QUALITY_POSTERIOR_FILTERED_COUNT,
+    QUALITY_FILTERED_COUNT,
+    ALLELE_BALANCE_FILTERED_COUNT,
+    DENSITY_WINDOW_COUNT,
+    EXCLUDE_BED_COUNT,
+    INCLUDE_BED_COUNT,
+    WRITTEN_COUNT,
+    TOTAL_COUNT,
+    AVR_SCORE_FILTERED_COUNT,
+    OVERLAP_COUNT,
+    SNP_COUNT,
+    DENOVO_SCORE,
+    COMBINED_READ_DEPTH_FILTERED_COUNT,
+    HOM_FILTERED_COUNT,
+    USER_EXPRESSION_COUNT,
   }
 
   private final int[] mValues = new int[Stat.values().length];
@@ -79,6 +80,7 @@ class VcfFilterStatistics implements Statistics {
       output.println();
       output.println("Total records : " + get(Stat.TOTAL_COUNT));
 
+      printCount(output, "allele count", get(Stat.ALLELE_COUNT));
       for (final String tag : mFilterTags.keySet()) {
         printCount(output, tag, mFilterTags.get(tag));
       }

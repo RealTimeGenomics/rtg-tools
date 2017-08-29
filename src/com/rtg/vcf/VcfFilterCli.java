@@ -86,6 +86,8 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String EXCLUDE_VCF = "exclude-vcf";
 
   private static final String REMOVE_SAME_AS_REF = "remove-same-as-ref";
+  private static final String MIN_ALLELES = "min-alleles";
+  private static final String MAX_ALLELES = "max-alleles";
   private static final String REMOVE_HOM = "remove-hom";
   private static final String REMOVE_ALL_SAME_AS_REF = "remove-all-same-as-ref";
 
@@ -175,8 +177,8 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(REMOVE_OVERLAPPING, "remove records that overlap with previous records").setCategory(FILTERING);
 
     // REF/ALT contents
-    mFlags.registerOptional(SNPS_ONLY, "if set, will output simple SNPs only").setCategory(FILTERING);
-    mFlags.registerOptional(NON_SNPS_ONLY, "if set, will output MNPs and INDELs only").setCategory(FILTERING);
+    mFlags.registerOptional(MIN_ALLELES, Integer.class, INT, "minimum number of alleles (REF included)").setCategory(FILTERING);
+    mFlags.registerOptional(MAX_ALLELES, Integer.class, INT, "maximum number of alleles (REF included)").setCategory(FILTERING);
 
     // Contents of FILTER
     mFlags.registerOptional('r', REMOVE_FILTER, String.class, STRING, "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
@@ -191,6 +193,8 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional(ALL_SAMPLES, "apply sample-specific criteria to all samples contained in the input VCF").setCategory(INPUT_OUTPUT);
 
     // FORMAT/GT
+    mFlags.registerOptional(SNPS_ONLY, "only keep where sample variant is a simple SNP").setCategory(FILTERING);
+    mFlags.registerOptional(NON_SNPS_ONLY, "only keep where sample variant is MNP or INDEL").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_HOM, "remove where sample is homozygous").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_SAME_AS_REF, "remove where sample is same as reference").setCategory(FILTERING);
     mFlags.registerOptional(REMOVE_ALL_SAME_AS_REF, "remove where all samples are same as reference").setCategory(FILTERING);
@@ -244,6 +248,7 @@ public final class VcfFilterCli extends AbstractCli {
         || !flags.checkMinMaxInRange(MIN_DENOVO_SCORE, MAX_DENOVO_SCORE, 0.0, Double.MAX_VALUE)
         || !flags.checkMinMaxInRange(MIN_DEPTH, MAX_DEPTH, 0, Integer.MAX_VALUE)
         || !flags.checkMinMaxInRange(MIN_COMBINED_DEPTH, MAX_COMBINED_DEPTH, 0, Integer.MAX_VALUE)
+        || !flags.checkMinMaxInRange(MIN_ALLELES, MAX_ALLELES, 1, Integer.MAX_VALUE)
         || !flags.checkInRange(MAX_AMBIGUITY_RATIO, 0.0, 1.0)
         || !flags.checkInRange(DENSITY_WINDOW, 1, Integer.MAX_VALUE)
         || !CommonFlags.validateRegions(flags)
@@ -292,6 +297,17 @@ public final class VcfFilterCli extends AbstractCli {
     mVcfFilterTask.mSnpsOnly = mFlags.isSet(SNPS_ONLY);
     mVcfFilterTask.mNonSnpsOnly = mFlags.isSet(NON_SNPS_ONLY);
 
+    if (mFlags.isSet(MIN_ALLELES) || mFlags.isSet(MAX_ALLELES)) {
+      final int minAlleles = mFlags.isSet(MIN_ALLELES) ? (Integer) mFlags.getValue(MIN_ALLELES) : 1;
+      final int maxAlleles = mFlags.isSet(MAX_ALLELES) ? (Integer) mFlags.getValue(MAX_ALLELES) : Integer.MAX_VALUE;
+      mVcfFilterTask.mFilters.add(new AbstractVcfFilter(mVcfFilterTask.mVcfFilterStatistics, Stat.ALLELE_COUNT) {
+        @Override
+        boolean acceptCondition(VcfRecord record) {
+          final int numAlleles = record.getAltCalls().size() + 1;
+          return numAlleles >= minAlleles && numAlleles <= maxAlleles;
+        }
+      });
+    }
     if (mFlags.isSet(MIN_QUALITY) || mFlags.isSet(MAX_QUALITY)) {
       final double minQuality = mFlags.isSet(MIN_QUALITY) ? (Double) mFlags.getValue(MIN_QUALITY) : 0.0;
       final double maxQuality = mFlags.isSet(MAX_QUALITY) ? (Double) mFlags.getValue(MAX_QUALITY) : Double.MAX_VALUE;

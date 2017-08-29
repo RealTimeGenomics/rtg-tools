@@ -90,8 +90,8 @@ public class VcfFilterCliTest extends AbstractCliTest {
       , "--fail=STRING", "instead of removing failed records set their filter field to the provided value"
       , "--remove-all-same-as-ref", "remove where all samples are same as reference"
       , "--remove-same-as-ref", "remove where sample is same as reference"
-      , "--snps-only", "if set, will output simple SNPs only"
-      , "--non-snps-only", "if set, will output MNPs and INDELs only"
+      , "--snps-only", "keep where sample variant is a simple SNP"
+      , "--non-snps-only", "keep where sample variant is MNP or INDEL"
       , "-Z,", "--no-gzip", "do not gzip the output"
       , "--no-index", "do not produce indexes for output files"
       , "--all-samples", "apply sample-specific criteria"
@@ -246,7 +246,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
   }
 
   // Run a test where vcffilter is expected to complete normally
-  private void runResourceTest(String[] extraArgs, String inResourceLoc, String expResourceLoc) throws IOException {
+  private void runResourceTest(String inResourceLoc, String expResourceLoc, String... extraArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
       final File in = new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName());
 
@@ -268,7 +268,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
   }
 
   // Run a test where vcffilter is expected to fail
-  private void runResourceTestError(String[] extraArgs, String inResourceLoc, String expResourceLoc) throws IOException {
+  private void runResourceTestError(String inResourceLoc, String expResourceLoc, String... extraArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
       final File in = new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName());
 
@@ -288,299 +288,107 @@ public class VcfFilterCliTest extends AbstractCliTest {
   }
 
   public void testHighCoverage() throws IOException {
-    final String[] args = {
-        "-r",
-        "OC"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest2.vcf",
-        "snpfiltertest2_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest2.vcf", "snpfiltertest2_exp.vcf", "-r", "OC");
   }
 
   public void testAmbiguous() throws IOException {
-    final String[] args = {
-        "-r",
-        "a1000.0"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest.vcf",
-        "snpfiltertest_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest.vcf", "snpfiltertest_exp.vcf", "-r", "a1000.0");
   }
 
   public void testAmbiguous2() throws IOException {
-    final String[] args = {
-        "-r",
-        "a1000.0",
-        "--clear-failed-samples"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest.vcf",
-        "snpfiltertest_exp_clear.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest.vcf", "snpfiltertest_exp_clear.vcf", "-r", "a1000.0", "--clear-failed-samples");
   }
 
   public void testSameAsRef() throws IOException {
-    final String[] args = {
-        "--remove-same-as-ref",
-        "--sample", "SAMPLE"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestSR.vcf",
-        "snpfiltertestSR_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestSR.vcf", "snpfiltertestSR_exp.vcf", "--remove-same-as-ref", "--sample", "SAMPLE");
   }
 
   public void testAllSameAsRef() throws IOException {
-    final String[] args = {
-        "--remove-all-same-as-ref"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestSR.vcf",
-        "snpfiltertestASR_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestSR.vcf", "snpfiltertestASR_exp.vcf", "--remove-all-same-as-ref");
   }
 
   public void testAvr() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--sample", "SAMPLE"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp.vcf", "--min-avr-score", "0.3", "--sample", "SAMPLE");
   }
 
   public void testAvr2() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--sample", "SAMPLE2"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp2.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp2.vcf", "--min-avr-score", "0.3", "--sample", "SAMPLE2");
   }
 
   public void testAvr3() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--sample", "SAMPLE",
-        "--sample", "SAMPLE2"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp3.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp3.vcf", "--min-avr-score", "0.3", "--sample", "SAMPLE", "--sample", "SAMPLE2");
   }
 
   public void testAvr4() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--all-samples"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp4.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp4.vcf", "--min-avr-score", "0.3", "--all-samples");
   }
 
   public void testAvr5() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--all-samples",
-        "--fail", "BLAH"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp5.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp5.vcf", "--min-avr-score", "0.3", "--all-samples", "--fail", "BLAH");
   }
 
   public void testAvr6() throws IOException {
-    final String[] args = {
-        "--min-avr-score", "0.3",
-        "--all-samples",
-        "--clear-failed-samples"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp6.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp6.vcf", "--min-avr-score", "0.3", "--all-samples", "--clear-failed-samples");
   }
 
   public void testAmbiguousMultisample() throws IOException {
-    final String[] args = {
-        "-r",
-        "a1000.0",
-        "--clear-failed-samples",
-        "--all-samples"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp7.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp7.vcf", "-r", "a1000.0", "--clear-failed-samples", "--all-samples");
   }
 
   public void testAmbiguousMultisample2() throws IOException {
-    final String[] args = {
-        "-r",
-        "a1000.0",
-        "--clear-failed-samples",
-        "--sample", "SAMPLE2"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertestAVR.vcf",
-        "snpfiltertestAVR_exp8.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp8.vcf", "-r", "a1000.0", "--clear-failed-samples", "--sample", "SAMPLE2");
   }
 
   public void testComplex() throws IOException {
-    final String[] args = {
-        "-r",
-        "RC",
-        "-r",
-        "RX",
-        "-r",
-        "a1000.0",
-        "--remove-same-as-ref"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest3.vcf",
-        "snpfiltertest3_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest3.vcf", "snpfiltertest3_exp.vcf", "-r", "RC", "-r", "RX", "-r", "a1000.0", "--remove-same-as-ref");
   }
 
   public void testKeepAll() throws IOException {
-    final String[] args = {
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest3.vcf",
-        "snpfiltertest3_exp_all.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest3.vcf", "snpfiltertest3_exp_all.vcf");
   }
 
   public void testSnpsOnly() throws IOException {
-    final String[] args = {
-        "--snps-only",
-        "-k",
-        "PASS"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest4.vcf",
-        "snpfiltertest4_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest4.vcf", "snpfiltertest4_exp.vcf", "--snps-only", "-k", "PASS");
   }
 
   public void testNonSnpsOnly() throws IOException {
-    final String[] args = {
-        "--non-snps-only",
-        "-k",
-        "PASS"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest4.vcf",
-        "snpfiltertest4_exp_nonsnps.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest4.vcf", "snpfiltertest4_exp_nonsnps.vcf", "--non-snps-only", "-k", "PASS");
   }
 
   public void testVcf() throws IOException {
-    final String[] args = {
-        "-q", "5.0",
-        "-Q", "60.0",
-        "-g", "5.0",
-        "-G", "60.0",
-        "-A", "0.1"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest5.vcf",
-        "snpfiltertest5_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_exp.vcf", "-q", "5.0", "-Q", "60.0", "-g", "5.0", "-G", "60.0", "-A", "0.1");
   }
 
   public void testVcfKeepAll() throws IOException {
-    final String[] args = {
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest5.vcf",
-        "snpfiltertest5_exp_all.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_exp_all.vcf");
   }
 
   public void testVcfFilterDotPass() throws IOException {
-    final String[] args = {
-      "--remove-filter", ".", "--remove-filter", "PASS"
-    };
-    runResourceTest(
-      args,
-      RESOURCES + "snpfiltertest5.vcf",
-      "snpfiltertest5_DotPass_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_DotPass_exp.vcf", "--remove-filter", ".", "--remove-filter", "PASS");
   }
 
   public void testVcfFilterRx() throws IOException {
-    final String[] args = {
-      "--remove-filter", "RX"
-    };
-    runResourceTest(
-      args,
-      RESOURCES + "snpfiltertest5.vcf",
-      "snpfiltertest5_rx_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_rx_exp.vcf", "--remove-filter", "RX");
+  }
+
+  public void testVcfFilterBiallelic() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_ac2_exp.vcf", "--min-alleles=2", "--max-alleles=2");
+  }
+
+  public void testVcfFilterMultiallelic() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertest5.vcf", "snpfiltertest5_ac3_exp.vcf", "--min-alleles=3");
   }
 
   public void testVcfDensityWindow() throws IOException {
-    final String[] args = {
-        "--density-window", "10"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest6.vcf",
-        "snpfiltertest6_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest6.vcf", "snpfiltertest6_exp.vcf", "--density-window", "10");
   }
 
   public void testVcfDenovoPosteriorSon() throws IOException {
-    final String[] args = {
-        "--min-denovo-score", "6", "--max-denovo-score", "30", "--sample", "SON"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest_DNP.vcf",
-        "snpfiltertest_DNP_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest_DNP.vcf", "snpfiltertest_DNP_exp.vcf", "--min-denovo-score", "6", "--max-denovo-score", "30", "--sample", "SON");
   }
 
   public void testVcfDenovoPosteriorDaughter() throws IOException {
-    final String[] args = {
-        "--min-denovo-score", "6", "--max-denovo-score", "30", "--sample", "DAUGHTER"
-    };
-    runResourceTest(
-        args,
-        RESOURCES + "snpfiltertest_DNP.vcf",
-        "snpfiltertest_DNP_sample_exp.vcf"
-    );
+    runResourceTest(RESOURCES + "snpfiltertest_DNP.vcf", "snpfiltertest_DNP_sample_exp.vcf", "--min-denovo-score", "6", "--max-denovo-score", "30", "--sample", "DAUGHTER");
   }
 
   public void testIncludeExclude() throws IOException {
@@ -590,15 +398,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
       final File include = new File(tempDirectory, "include");
       FileHelper.resourceToFile(RESOURCES + "include.bed", include);
 
-      final String[] args = {
-          "--include-bed", include.toString()
-          , "--exclude-bed", exclude.toString()
-      };
-      runResourceTest(
-          args,
-          RESOURCES + "snpfiltertest_complex.vcf",
-          "snpfiltertest_complex_inc_exc_bed.vcf"
-      );
+      runResourceTest(RESOURCES + "snpfiltertest_complex.vcf", "snpfiltertest_complex_inc_exc_bed.vcf", "--include-bed", include.toString(), "--exclude-bed", exclude.toString());
     }
   }
 
@@ -609,30 +409,22 @@ public class VcfFilterCliTest extends AbstractCliTest {
       final File include = new File(tempDirectory, "include");
       FileHelper.resourceToFile(RESOURCES + "include.vcf", include);
 
-      final String[] args = {
-          "--include-vcf", include.toString()
-          , "--exclude-vcf", exclude.toString()
-      };
-      runResourceTest(
-          args,
-          RESOURCES + "snpfiltertest_complex.vcf",
-          "snpfiltertest_complex_inc_exc_vcf.vcf"
-      );
+      runResourceTest(RESOURCES + "snpfiltertest_complex.vcf", "snpfiltertest_complex_inc_exc_vcf.vcf", "--include-vcf", include.toString(), "--exclude-vcf", exclude.toString());
     }
   }
 
   public void testVcfRCE() throws Exception {
-    runResourceTest(new String[0], RESOURCES + "snpfiltertestRCE.vcf", "snpfiltertestRCE_exp.vcf");
+    runResourceTest(RESOURCES + "snpfiltertestRCE.vcf", "snpfiltertestRCE_exp.vcf");
   }
 
   public void testDensityIndel() throws Exception {
-    runResourceTest(new String[0], RESOURCES + "vcffilterIndDens.vcf", "vcffilterIndDens_exp.vcf");
+    runResourceTest(RESOURCES + "vcffilterIndDens.vcf", "vcffilterIndDens_exp.vcf");
   }
 
   public void testNoGt() throws Exception {
-    runResourceTestError(new String[] {"--remove-same-as-ref"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt");
-    runResourceTestError(new String[] {"--remove-all-same-as-ref"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt");
-    runResourceTestError(new String[] {"--min-genotype-quality", "50", "--clear-failed-samples"}, RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp2.txt");
+    runResourceTestError(RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt", "--remove-same-as-ref");
+    runResourceTestError(RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp1.txt", "--remove-all-same-as-ref");
+    runResourceTestError(RESOURCES + "vcffilterNoGt.vcf", "vcffilterNoGt_exp2.txt", "--min-genotype-quality", "50", "--clear-failed-samples");
   }
 
   public void testJavascriptNoOutput() throws Exception {
@@ -643,10 +435,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
         final File in = new File(tempDirectory, "input");
         final String snps = FileUtils.streamToString(stream);
         FileUtils.stringToFile(snps, in);
-        final String[] args = {
-          "-i", in.getPath(), "-j", "function record() {print(POS);}"
-        };
-        final MainResult output = checkMainInit(args);
+        final MainResult output = checkMainInit("-i", in.getPath(), "-j", "function record() {print(POS);}");
         final String expected = Stream.of(41367, 41379, 41993, 44376, 44808, 45027, 45199, 45403, 45418, 45777, 45793,
           45921, 46168, 46244, 46375, 57063, 57076, 57473, 82069, 82299,
           82518, 83161, 83182, 83183, 84324, 84414, 84449)
