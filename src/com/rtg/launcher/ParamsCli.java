@@ -30,18 +30,13 @@
 package com.rtg.launcher;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.rtg.util.IORunnable;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.Params;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.io.LogStream;
 
@@ -105,24 +100,5 @@ public abstract class ParamsCli<P extends Params> extends LoggedCli {
     } finally {
       localParams.close();
     }
-  }
-
-  protected static Collection<File> checkFiles(final Collection<Object> values) throws InvalidParamsException {
-    final Set<File> set = new HashSet<>();
-    int filesNotFoundCount = 0;
-    for (final Object obj : values) {
-      final File samFile = (File) obj;
-      if (!samFile.exists()) {
-        ++filesNotFoundCount;
-        if (filesNotFoundCount <= 5) {
-          Diagnostic.error(ErrorType.FILE_NOT_FOUND, samFile.getPath());
-        }
-      }
-      set.add(samFile);
-    }
-    if (filesNotFoundCount > 0) {
-      throw new InvalidParamsException(ErrorType.INFO_ERROR, filesNotFoundCount + " specified files were not found");
-    }
-    return set;
   }
 }

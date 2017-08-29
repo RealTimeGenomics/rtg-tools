@@ -34,8 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collection;
 
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.util.IORunnable;
@@ -47,7 +45,6 @@ import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.LogRecord;
 import com.rtg.util.io.LogStream;
-import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -203,34 +200,6 @@ public class ParamsCliTest extends TestCase {
       final MainResult res2 = MainResult.run(cli);
       assertEquals(res2.err(), 1, res2.rc());
       assertFalse(dir.exists());
-    }
-  }
-
-  public void testCheckFiles() throws IOException, InvalidParamsException {
-    try (final TestDirectory dir = new TestDirectory("paramscli")) {
-      final ArrayList<Object> files = new ArrayList<>();
-      final File created = new File(dir, "exists");
-      final File fobar = new File(dir, "fobar");
-      assertTrue(created.createNewFile());
-      files.add(fobar);
-      files.add(created);
-      files.add(created);
-      final MemoryPrintStream err = new MemoryPrintStream();
-      Diagnostic.setLogStream(err.printStream());
-      try {
-        ParamsCli.checkFiles(files);
-        fail();
-      } catch (final InvalidParamsException e) {
-        assertEquals(ErrorType.INFO_ERROR, e.getErrorType());
-      } finally {
-        Diagnostic.setLogStream();
-      }
-      assertTrue(err.toString().contains("File not found"));
-//      assertTrue(err.toStringNoFlush().contains("1 specified files were not found"));
-      files.remove(fobar);
-      final Collection<File> collfiles = ParamsCli.checkFiles(files);
-      assertEquals(1, collfiles.size());
-      assertTrue(collfiles.contains(created));
     }
   }
 

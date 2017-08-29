@@ -107,6 +107,8 @@ public final class CommonFlags {
   public static final String BED_REGIONS_FLAG = "bed-regions";
   /** Repeat frequency flag. */
   public static final String REPEAT_FREQUENCY_FLAG = "repeat-freq";
+  /** Flag name for supplying pedigree */
+  public static final String PEDIGREE_FLAG = "pedigree";
   /**
    * Flag to indicate that it is OK to take a less cautious approach
    * to allow the command to proceed. For example, allow writing into

@@ -47,7 +47,7 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 public abstract class ParamsTask<P extends ModuleParams, S extends Statistics> implements IORunnable {
 
   protected P mParams;  //see bug 1447 for why this is not final
-  protected OutputStream mReportStream;
+  protected final OutputStream mReportStream;
   protected final UsageMetric mUsageMetric;
 
   /** Declared here to keep the testing boffins happy */

@@ -29,6 +29,14 @@
  */
 package com.rtg.vcf.mendelian;
 
+import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.FLOAT;
+import static com.rtg.launcher.CommonFlags.INT;
+import static com.rtg.launcher.CommonFlags.PEDIGREE_FLAG;
+import static com.rtg.launcher.CommonFlags.TEMPLATE_FLAG;
+import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
+import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -68,7 +76,7 @@ import com.rtg.vcf.header.VcfHeader;
 public final class MendeliannessChecker extends AbstractCli {
 
 
-  private static final String OUTPUT_FLAG = "output";
+  private static final String OUTPUT_FLAG = "output"; // Slightly different semantics to normal output flag
   private static final String OUTPUT_CONSISTENT_FLAG = "output-consistent";
   private static final String OUTPUT_INCONSISTENT_FLAG = "output-inconsistent";
   private static final String OUTPUT_AGGREGATE_FLAG = "Xoutput-aggregate";
@@ -80,7 +88,6 @@ public final class MendeliannessChecker extends AbstractCli {
   private static final String CONCORDANCE_MIN_VARIANTS = "Xmin-variants";
   private static final String SEGREGATION_PROBABILITY_FLAG = "Xsegregation";
   private static final String STRICT_MISSING_FLAG = "Xstrict-missing";
-  private static final String PEDIGREE_FLAG = "pedigree";
 
 
   @Override
@@ -97,22 +104,22 @@ public final class MendeliannessChecker extends AbstractCli {
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Check a multi-sample VCF for Mendelian consistency.");
-    mFlags.registerRequired('i', INPUT_FLAG, File.class, CommonFlags.FILE, "VCF file containing multi-sample variant calls or '-' to read from standard input").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing multi-sample variant calls or '-' to read from standard input").setCategory(INPUT_OUTPUT);
     CommonFlags.initReferenceTemplate(mFlags, true);
-    mFlags.registerOptional(OUTPUT_INCONSISTENT_FLAG, File.class, CommonFlags.FILE, "if set, output only non-Mendelian calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_CONSISTENT_FLAG, File.class, CommonFlags.FILE, "if set, output only consistent calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_FLAG, File.class, CommonFlags.FILE, "if set, output annotated calls to this VCF file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_AGGREGATE_FLAG, File.class, CommonFlags.FILE, "if set, output aggregate genotype proportions to this file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.registerOptional(ALL_RECORDS_FLAG, "use all records, regardless of filters (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional(PHASE_FLAG, "phase calls based on pedigree").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional(CONCORDANCE_PCT_AGREEMENT, Double.class, CommonFlags.FLOAT, "percentage concordance required for consistent parentage", 99.0).setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional(CONCORDANCE_MIN_VARIANTS, Integer.class, CommonFlags.INT, "minimum number of variants needed to check concordance", 2000).setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional(STRICT_MISSING_FLAG, "do strict checking that missing values contain expected ploidy").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional(SEGREGATION_PROBABILITY_FLAG, "add segregation probability based on pedigree (only if exactly one family is present)").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
-    mFlags.registerOptional('l', ALLOW_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    mFlags.registerOptional(OUTPUT_INCONSISTENT_FLAG, File.class, FILE, "if set, output only non-Mendelian calls to this VCF file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_CONSISTENT_FLAG, File.class, FILE, "if set, output only consistent calls to this VCF file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_FLAG, File.class, FILE, "if set, output annotated calls to this VCF file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(OUTPUT_AGGREGATE_FLAG, File.class, FILE, "if set, output aggregate genotype proportions to this file").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(ALL_RECORDS_FLAG, "use all records, regardless of filters (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(PHASE_FLAG, "phase calls based on pedigree").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(CONCORDANCE_PCT_AGREEMENT, Double.class, FLOAT, "percentage concordance required for consistent parentage", 99.0).setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(CONCORDANCE_MIN_VARIANTS, Integer.class, INT, "minimum number of variants needed to check concordance", 2000).setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(STRICT_MISSING_FLAG, "do strict checking that missing values contain expected ploidy").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(SEGREGATION_PROBABILITY_FLAG, "add segregation probability based on pedigree (only if exactly one family is present)").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional('l', ALLOW_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(SENSITIVITY_TUNING);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initNoGzip(mFlags);
-    mFlags.registerOptional(PEDIGREE_FLAG, File.class, CommonFlags.FILE, "genome relationships PED file (Default is to extract pedigree information from VCF header fields)").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    mFlags.registerOptional(PEDIGREE_FLAG, File.class, FILE, "genome relationships PED file (Default is to extract pedigree information from VCF header fields)").setCategory(SENSITIVITY_TUNING);
   }
 
 
@@ -133,7 +140,7 @@ public final class MendeliannessChecker extends AbstractCli {
 
   private SexMemo getSexMemo() throws IOException {
     final SexMemo sexMemo;
-    try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG))) {
+    try (SequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader((File) mFlags.getValue(TEMPLATE_FLAG))) {
       sexMemo = new SexMemo(reader, ReferencePloidy.AUTO);
     }
     return sexMemo;
