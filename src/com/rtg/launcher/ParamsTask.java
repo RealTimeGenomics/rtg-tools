@@ -30,14 +30,11 @@
 package com.rtg.launcher;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import com.rtg.usage.UsageMetric;
 import com.rtg.util.IORunnable;
-import com.rtg.util.diagnostic.ErrorType;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
  * Common code for those modules/tasks that can be configured via a ModuleParams.
@@ -84,15 +81,10 @@ public abstract class ParamsTask<P extends ModuleParams, S extends Statistics> i
    */
   @Override
   public void run() throws IOException {
-    final File dir = mParams.directory();
-    //System.err.println("Making directory:" + dir.getAbsolutePath());
-    if (!dir.exists() && !dir.mkdirs()) {
-      throw new NoTalkbackSlimException(ErrorType.DIRECTORY_NOT_CREATED, dir.getPath());
-    }
     try {
       exec();
-      mStatistics.printStatistics(mReportStream);
-      mStatistics.generateReport();
+      generateSummary();
+      generateReport();
     } finally {
       mParams.close();
     }
@@ -103,6 +95,22 @@ public abstract class ParamsTask<P extends ModuleParams, S extends Statistics> i
    * @throws IOException if there is a problem.
    */
   protected abstract void exec() throws IOException;
+
+  /**
+   * Default statistics output delegates to Statistics object
+   * @throws IOException if there is a problem.
+   */
+  protected void generateSummary() throws IOException {
+    mStatistics.printStatistics(mReportStream);
+  }
+
+  /**
+   * Default report generation delegates to Statistics object
+   * @throws IOException if there is a problem.
+   */
+  protected void generateReport() throws IOException {
+    mStatistics.generateReport();
+  }
 
   /**
    * @return the parameters for this task.
