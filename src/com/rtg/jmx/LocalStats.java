@@ -180,11 +180,9 @@ public final class LocalStats {
    * Test out the local stats monitoring.
    *
    * @param args ignored
-   * @exception InterruptedException if an error occurs.
    */
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) {
     final RecordStats rs = getLocalStats("err", 5, "sda", "eth0");
     rs.run();
   }
-
 }
