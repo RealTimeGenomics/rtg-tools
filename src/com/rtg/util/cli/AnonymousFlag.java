@@ -83,7 +83,7 @@ public class AnonymousFlag<T> extends Flag<T> {
 
   @Override
   public int hashCode() {
-    return super.hashCode();
+    return super.hashCode() ^ mFlagRank;
   }
 
   @Override
