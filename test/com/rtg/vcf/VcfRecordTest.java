@@ -124,7 +124,7 @@ public class VcfRecordTest extends TestCase {
       .toString()
       ;
     } catch (final IllegalStateException ex) {
-      assertEquals("not enough data for all samples, first size = 2, current key = GQ count = 1", ex.getMessage());
+      assertEquals("not enough data for all samples, FORMAT field = GQ, expected 2 entries, saw 1", ex.getMessage());
     }
   }
 

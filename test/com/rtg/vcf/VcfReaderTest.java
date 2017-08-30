@@ -105,11 +105,20 @@ public class VcfReaderTest extends TestCase {
     "chr1   123    foo  G    A    29    PASS    X=yy;DP=7    GT:GQ",             // HEADER0 says should not be any samples
     "chr1   123    foo  G    A    29    PASS    NS=3;DP=7    GT:GQ   0|0:34",    // HEADER0 says should not be any samples
   };
+  static final String[] BAD_RECORD_SAMPLE = {
+    "chr1   123    foo  A    T    100   PASS    XRX;XRX      GT:PR   1/0",       // Duplicated INFO field
+    "chr1   123    foo  A    T    100   PASS    XRX          GT:PR:PR 1/0",      // Duplicated FORMAT field
+    "chr1   123    foo  A    T    100   PASS    XRX          GT      1/0   1/0", // Too many samples
+  };
 
   public void testBadRecords() throws IOException {
     for (final String recText : BAD_RECORD) {
       final String badrec = recText.replaceAll("  *", TAB);
       checkVcfFormatException(HEADER0 + badrec + LS, "Invalid VCF record");
+    }
+    for (final String recText : BAD_RECORD_SAMPLE) {
+      final String badrec = recText.replaceAll("  *", TAB);
+      checkVcfFormatException(HEADER0_B + badrec + LS, "Invalid VCF record");
     }
   }
 
