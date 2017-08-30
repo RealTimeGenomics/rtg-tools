@@ -500,19 +500,19 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   private static int countNumberOfSamples(Map<String, ArrayList<String>> formatAndSample) {
-    int currentCount = 0;
+    int firstCount = 0;
     boolean first = true;
     for (final Entry<String, ArrayList<String>> formatField : formatAndSample.entrySet()) {
-      final int numSamples = formatField.getValue().size();
+      final int currentCount = formatField.getValue().size();
       if (first) {
-        currentCount = numSamples;
+        firstCount = currentCount;
         first = false;
       }
-      if (currentCount != numSamples) {
-        throw new IllegalStateException("not enough data for all samples, first size = " + currentCount + ", current key = " + formatField.getKey() + " count = " + numSamples);
+      if (firstCount != currentCount) {
+        throw new IllegalStateException("not enough data for all samples, FORMAT field = " + formatField.getKey() + ", expected " + firstCount + " entries, saw " + currentCount);
       }
     }
-    return currentCount;
+    return firstCount;
   }
 
   private static String getPrintableInfo(Map<String, ArrayList<String>> info) {

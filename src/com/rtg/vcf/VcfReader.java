@@ -212,13 +212,15 @@ public class VcfReader implements VcfIterator {
     if (!VcfRecord.MISSING.equals(field[INFO_FIELD])) {
       final String[] infoSplit = StringUtils.split(field[INFO_FIELD], ';');
       for (final String anInfoSplit : infoSplit) {
-        final String info = StringUtils.deepCopy(anInfoSplit);
-        final int eq = info.indexOf('=');
-        if (eq < 1) {
-          rec.addInfo(info);
+        final String[] singleInfoSplit = StringUtils.split(anInfoSplit, '=', 2);
+        final String key = singleInfoSplit[0];
+        if (rec.getInfo().containsKey(key)) {
+          throw new VcfFormatException("Duplicate INFO field: " + key);
+        }
+        if (singleInfoSplit.length == 1) {
+          rec.addInfo(key);
         } else {
-          final String key = info.substring(0, eq);
-          final String[] vals = StringUtils.split(info.substring(eq + 1), ',');
+          final String[] vals = StringUtils.split(singleInfoSplit[1], ',');
           rec.addInfo(key, vals);
         }
       }
@@ -229,27 +231,31 @@ public class VcfReader implements VcfIterator {
       if (field.length == 9) {
         throw new VcfFormatException("Format field exists without sample fields");
       }
-      final String[] genotypes = StringUtils.split(field[8], ':');
+      final String[] formatFields = StringUtils.split(field[8], ':');
       rec.setNumberOfSamples(field.length - 9);
+      for (final String key : formatFields) {
+        if (rec.hasFormat(key)) {
+          throw new VcfFormatException("Duplicate FORMAT field: " + key);
+        }
+        rec.addFormat(key);
+      }
       for (int sample = 9; sample < field.length; ++sample) {
-        final String[] svalues = StringUtils.split(field[sample], ':');
-        if (svalues.length > genotypes.length) {
+        final String[] formatValues = StringUtils.split(field[sample], ':');
+        if (formatValues.length > formatFields.length) {
           throw new VcfFormatException("Column " + (sample + 1) + " does not have the same number of values as specified in the format column. Field=" + field[sample]);
         }
-        for (int i = 0; i < svalues.length; ++i) {
-          rec.addFormatAndSample(genotypes[i], svalues[i]);
+        for (int i = 0; i < formatValues.length; ++i) {
+          rec.addFormatAndSample(formatFields[i], formatValues[i]);
         }
-        for (int i = svalues.length; i < genotypes.length; ++i) {
-          rec.addFormatAndSample(genotypes[i], VcfRecord.MISSING);
+        for (int i = formatValues.length; i < formatFields.length; ++i) {
+          rec.addFormatAndSample(formatFields[i], VcfRecord.MISSING);
         }
       }
     }
     return rec;
   }
 
-  /**
-   * @return the header
-   */
+  @Override
   public VcfHeader getHeader() {
     return mHeader;
   }
