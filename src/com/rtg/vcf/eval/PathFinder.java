@@ -202,7 +202,6 @@ public final class PathFinder {
   private boolean enqueueVariant(TreeSet<Path> paths, Path head, boolean side) {
     final Variant[] variants = side ? mCalledVariants : mBaseLineVariants;
     final HalfPath halfPath = side ? head.mCalledPath : head.mBaselinePath;
-    final Orientor orientor = side ? mCallOrientor : mBaselineOrientor;
     final int aVarIndex = nextVariant(halfPath, variants);
     if (aVarIndex != -1) {
       final Variant aVar = variants[aVarIndex];
@@ -211,6 +210,7 @@ public final class PathFinder {
       if (TRACE) {
         System.err.println("Add alternatives to " + (side ? "called " : "baseline ") + aVar);
       }
+      final Orientor orientor = side ? mCallOrientor : mBaselineOrientor;
       addIfBetter(head.addVariant(side, aVar, aVarIndex, orientor), paths);
       return true;
     }

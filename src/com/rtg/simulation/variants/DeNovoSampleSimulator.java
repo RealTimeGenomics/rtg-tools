@@ -194,8 +194,8 @@ public class DeNovoSampleSimulator {
     final int ploidyCount = getEffectivePloidy(ploidy.count());
     final int sampleId = vcfOut.getHeader().getNumberOfSamples() - 1;
 
-    final String desc = "Original=" + ploidy + " -> Derived=" + ploidy;
     if (ploidyCount > 2) {
+      final String desc = "Original=" + ploidy + " -> Derived=" + ploidy;
       throw new NoTalkbackSlimException("Sequence " + refSeq.name() + ": Unsupported ploidy" + desc);
     }
     if ((ploidyCount == 0) && (deNovo.size() > 0)) {

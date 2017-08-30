@@ -151,12 +151,12 @@ public class PerSampleVariantStatistics {
     values.add(mPartialCalls > 0 ? Long.toString(mPartialCalls) : null);
     names.add("Polyploid Genotypes");
     values.add(mPolyploidCalls > 0 ? Long.toString(mPolyploidCalls) : null);
-    final long totalNonMissingGenotypes = mTotalSnps + mTotalMnps + mTotalInsertions + mTotalDeletions + mTotalIndels + mTotalUnchanged;
     names.add("Somatic Genotypes");
     values.add(mSomatic > 0 ? Long.toString(mSomatic) : null);
     names.add("De Novo Genotypes");
     values.add(mDeNovo > 0 ? Long.toString(mDeNovo) : null);
     names.add("Phased Genotypes");
+    final long totalNonMissingGenotypes = mTotalSnps + mTotalMnps + mTotalInsertions + mTotalDeletions + mTotalIndels + mTotalUnchanged;
     values.add(mPhased > 0 ? VariantStatistics.percent(mPhased, totalNonMissingGenotypes) : null);
     names.add("SNP Transitions/Transversions");
     values.add(VariantStatistics.divide(mTransitions, mTransversions));

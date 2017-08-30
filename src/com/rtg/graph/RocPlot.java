@@ -737,14 +737,14 @@ public class RocPlot {
       final Mapping[] mapping = mZoomPP.getMapping();
       final Graph2D zoomedGraph = mZoomPP.getGraph();
       if (zoomedGraph instanceof RocGraph2D) {
-        final RocGraph2D graph = (RocGraph2D) zoomedGraph;
-        final int maxVariants = graph.getMaxVariants();
         if (mapping != null && mapping.length > 1) {
           final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
             && p.y <= mapping[1].getScreenMin() && p.y >= mapping[1].getScreenMax(); // Y screen min/max is inverted due to coordinate system
           final float fp = mapping[0].screenToWorld((float) p.getX());
           final float tp = mapping[1].screenToWorld((float) p.getY());
           if (inView && fp >= 0 && tp >= 0 && (fp + tp > 0)) {
+            final RocGraph2D graph = (RocGraph2D) zoomedGraph;
+            final int maxVariants = graph.getMaxVariants();
             mProgressBar.setString(getMetricString(tp, fp, maxVariants));
             mZoomPP.setCrossHair(new Point2D(fp, tp));
           } else {

@@ -151,8 +151,7 @@ public abstract class AbstractMachine implements Machine {
 
   // Distribute quality values for a correctly called base. Most should have high quality. N's get poor quality
   byte getCorrectCallQuality(byte base) {
-    final double p = mQualityRandom.nextDouble();
-    return base == 0 ? 0 : (byte) (mMaxQ - getPhred(p));
+    return base == 0 ? 0 : (byte) (mMaxQ - getPhred(mQualityRandom.nextDouble()));
   }
 
   protected void reseedErrorRandom(long seed) {

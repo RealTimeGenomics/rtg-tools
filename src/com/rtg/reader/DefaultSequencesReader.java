@@ -91,8 +91,8 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     mCanonicalDirectory = mDirectory.getCanonicalFile();
     mHasQualityData = mIndex.hasQuality();
     mSequenceType = SequenceType.values()[mIndex.getSequenceType()];
-    final DataFileOpenerFactory openerFactory = new DataFileOpenerFactory(mIndex.getSequenceEncoding(), mIndex.getQualityEncoding(), mSequenceType);
     if (mIndex.getNumberSequences() > 0) {
+      final DataFileOpenerFactory openerFactory = new DataFileOpenerFactory(mIndex.getSequenceEncoding(), mIndex.getQualityEncoding(), mSequenceType);
       try {
         mSequenceManager = new SequenceStreamManager(dir, mIndex.getNumberSequences(), mHasQualityData, mIndex, openerFactory);
         if (mIndex.hasNames()) {
