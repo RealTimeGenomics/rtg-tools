@@ -61,7 +61,7 @@ public abstract class AbstractIlluminaMachine extends AbstractMachine {
    * @throws InvalidParamsException if fails to construct priors
    * @throws IOException whenever
    */
-  public AbstractIlluminaMachine(long randomSeed) throws InvalidParamsException, IOException {
+  public AbstractIlluminaMachine(long randomSeed) throws IOException {
     this(new MachineErrorParamsBuilder().errors("illumina").create(), randomSeed);
   }
 

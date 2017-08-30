@@ -88,7 +88,7 @@ public class BedRecord extends SequenceNameLocusSimple {
    * @throws NumberFormatException if the start or end cannot be parsed
    * @throws ArrayIndexOutOfBoundsException if there are not enough fields
    */
-  public static BedRecord fromString(String line) throws NumberFormatException, ArrayIndexOutOfBoundsException {
+  public static BedRecord fromString(String line) {
     final String[] parts = StringUtils.split(line, '\t');
     return new BedRecord(parts[0], Integer.parseInt(parts[1]), Integer.parseInt(parts[2]), Arrays.copyOfRange(parts, 3, parts.length));
   }

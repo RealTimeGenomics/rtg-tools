@@ -264,7 +264,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
   }
 
   @Override
-  public byte[] qualityData() throws IllegalStateException, IOException {
+  public byte[] qualityData() {
     return mQualityBuffer;
   }
 

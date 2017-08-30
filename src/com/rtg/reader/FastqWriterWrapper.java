@@ -81,7 +81,7 @@ public final class FastqWriterWrapper extends FastaWriterWrapper {
   }
 
   @Override
-  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
+  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     assert reader.hasQualityData() == (qualityBuffer != null);
     if (reader.hasQualityData()) {
       reader.readQuality(seqId, qualityBuffer);

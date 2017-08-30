@@ -251,7 +251,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   }
 
   @Override
-  public String name() throws IllegalStateException, IOException {
+  public String name() throws IOException {
     assert mRecords[mRecordIndex] != null;
     return mRecords[mRecordIndex].getReadName();
   }
@@ -265,7 +265,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   }
 
   @Override
-  public byte[] sequenceData() throws IllegalStateException, IOException {
+  public byte[] sequenceData() throws IOException {
     assert mRecords[mRecordIndex] != null;
     final byte[] readBases = mRecords[mRecordIndex].getReadBases();
     failIfReferenceIdentityBases(readBases);
@@ -277,7 +277,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   }
 
   @Override
-  public byte[] qualityData() throws IllegalStateException, IOException {
+  public byte[] qualityData() throws IOException {
     assert mRecords[mRecordIndex] != null;
     byte[] quals = mRecords[mRecordIndex].getBaseQualities();
     if (quals == null || quals.length == 0) {

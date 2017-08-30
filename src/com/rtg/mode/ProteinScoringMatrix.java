@@ -85,7 +85,7 @@ public final class ProteinScoringMatrix extends ScoringMatrix {
    * @throws InvalidParamsException exception when invalid params
    * @throws IOException exception when io goes wrong
    */
-  public ProteinScoringMatrix() throws InvalidParamsException, IOException {
+  public ProteinScoringMatrix() throws IOException {
     this(DEFAULT);
   }
 
@@ -95,7 +95,7 @@ public final class ProteinScoringMatrix extends ScoringMatrix {
    * @throws InvalidParamsException exception when invalid parameters.
    * @throws IOException exception when IO goes wrong
    */
-  public ProteinScoringMatrix(String matrixName) throws InvalidParamsException, IOException {
+  public ProteinScoringMatrix(String matrixName) throws IOException {
     final String mat = matrixName.toUpperCase(Locale.getDefault());
     final int len = Protein.values().length;
     mScores = new int[len][len];

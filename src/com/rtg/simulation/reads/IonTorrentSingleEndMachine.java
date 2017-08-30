@@ -67,7 +67,7 @@ public class IonTorrentSingleEndMachine extends SingleEndRandomLengthMachine {
    * @throws InvalidParamsException If priors fail to load
    * @throws IOException whenever
    */
-  public IonTorrentSingleEndMachine(long randomSeed) throws InvalidParamsException, IOException {
+  public IonTorrentSingleEndMachine(long randomSeed) throws IOException {
     this(new MachineErrorParamsBuilder().errors("iontorrent").create(), randomSeed);
   }
 

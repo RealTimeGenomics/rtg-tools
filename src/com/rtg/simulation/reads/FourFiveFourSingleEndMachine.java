@@ -57,7 +57,7 @@ public class FourFiveFourSingleEndMachine extends SingleEndRandomLengthMachine {
    * @throws InvalidParamsException If priors fail to load
    * @throws IOException whenever
    */
-  public FourFiveFourSingleEndMachine(long randomSeed) throws InvalidParamsException, IOException {
+  public FourFiveFourSingleEndMachine(long randomSeed) throws IOException {
     this(new MachineErrorParamsBuilder().errors("ls454_se").create(), randomSeed);
   }
 

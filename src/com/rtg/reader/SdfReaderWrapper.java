@@ -148,7 +148,7 @@ public final class SdfReaderWrapper implements Closeable {
    * @throws IOException whenever
    * @throws IllegalStateException whenever
    */
-  public String name(long seqId) throws IllegalStateException, IOException {
+  public String name(long seqId) throws IOException {
     if (hasNames()) {
       if (mIsPaired) {
         return mLeft.name(seqId);

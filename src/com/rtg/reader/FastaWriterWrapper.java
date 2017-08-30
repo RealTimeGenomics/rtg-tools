@@ -125,7 +125,7 @@ public class FastaWriterWrapper implements WriterWrapper {
   }
 
   @Override
-  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalStateException, IOException {
+  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     if (mIsPaired) {
       writeSequence(mReader.left(), seqId, mLeft, dataBuffer, qualityBuffer);
       writeSequence(mReader.right(), seqId, mRight, dataBuffer, qualityBuffer);
@@ -134,7 +134,7 @@ public class FastaWriterWrapper implements WriterWrapper {
     }
   }
 
-  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
+  protected void writeSequence(SequencesReader reader, long seqId, SequenceWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     final String name = !mRename && mHasNames ? reader.fullName(seqId) : ("" + seqId);
     final int length = reader.read(seqId, dataBuffer);
     writer.write(name, dataBuffer, qualityBuffer, length);

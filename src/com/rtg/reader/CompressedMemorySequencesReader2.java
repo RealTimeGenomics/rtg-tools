@@ -164,7 +164,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
-  public int read(long sequenceIndex, byte[] dataOut) throws IllegalArgumentException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut) throws IOException {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }
@@ -172,7 +172,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
-  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IOException {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }
@@ -180,7 +180,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest) throws IOException {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }
@@ -188,7 +188,7 @@ public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }

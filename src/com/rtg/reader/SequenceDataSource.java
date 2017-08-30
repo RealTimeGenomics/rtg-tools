@@ -64,7 +64,7 @@ public interface SequenceDataSource extends Closeable {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws IOException if an IO error occurs
    */
-  int currentLength() throws IllegalStateException, IOException;
+  int currentLength() throws IOException;
 
   /**
    * Get the name of the current sequence.
@@ -75,7 +75,7 @@ public interface SequenceDataSource extends Closeable {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws IOException If in I/O error occurs
    */
-  String name() throws IllegalStateException, IOException;
+  String name() throws IOException;
 
   /**
    * Returns the sequence data for the current sequence. This returns the internal byte array of the implementor. The array will only be filled up to <code>currentLength</code>.
@@ -83,7 +83,7 @@ public interface SequenceDataSource extends Closeable {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws IOException If in I/O error occurs
    */
-  byte[] sequenceData() throws IllegalStateException, IOException;
+  byte[] sequenceData() throws IOException;
 
   /**
    * Returns the quality data for the current sequence. This returns the internal byte array of the implementor. The array will only be filled up to <code>currentLength</code>.
@@ -91,7 +91,7 @@ public interface SequenceDataSource extends Closeable {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws IOException If in I/O error occurs
    */
-  byte[] qualityData() throws IllegalStateException, IOException;
+  byte[] qualityData() throws IOException;
 
   /**
    * Closes the data source.

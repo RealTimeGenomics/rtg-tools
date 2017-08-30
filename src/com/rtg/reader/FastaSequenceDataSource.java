@@ -139,7 +139,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
   }
 
   @Override
-  public String name() throws IllegalStateException, IOException {
+  public String name() throws IOException {
     return mCurrentSequenceName;
   }
 
@@ -341,12 +341,12 @@ public class FastaSequenceDataSource implements SequenceDataSource {
 
 
   @Override
-  public byte[] qualityData() throws IllegalStateException, IOException {
+  public byte[] qualityData() throws IOException {
     return null;
   }
 
   @Override
-  public byte[] sequenceData() throws IllegalStateException, IOException {
+  public byte[] sequenceData() throws IOException {
     return mBuffer;
   }
 

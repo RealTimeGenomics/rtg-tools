@@ -48,7 +48,7 @@ public final class PackedCreate {
    * @exception NegativeArraySizeException if length negative.
    * @exception IllegalArgumentException if range is less than 2 or too big.
    */
-  public static PackedIndex createIndex(long length, long range) throws NegativeArraySizeException, IllegalArgumentException {
+  public static PackedIndex createIndex(long length, long range) {
     return new PackedIndex(length, range, BitIndex.IndexType.DEFAULT);
   }
 }

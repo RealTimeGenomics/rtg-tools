@@ -82,56 +82,56 @@ public class DefaultSequencesIterator implements SequencesIterator {
   }
 
   @Override
-  public long currentSequenceId() throws IllegalStateException {
+  public long currentSequenceId() {
     checkSequenceId();
     return mSequenceId;
   }
 
   @Override
-  public int currentLength() throws IllegalStateException, IOException {
+  public int currentLength() throws IOException {
     checkSequenceId();
     return mReader.length(mSequenceId);
   }
 
   @Override
-  public String currentName() throws IllegalStateException, IOException {
+  public String currentName() throws IOException {
     checkSequenceId();
     return mReader.name(mSequenceId);
   }
 
   @Override
-  public String currentFullName() throws IllegalStateException, IOException {
+  public String currentFullName() throws IOException {
     checkSequenceId();
     return mReader.fullName(mSequenceId);
   }
 
   @Override
-  public String currentNameSuffix() throws IllegalStateException, IOException {
+  public String currentNameSuffix() throws IOException {
     checkSequenceId();
     return mReader.nameSuffix(mSequenceId);
   }
 
 
   @Override
-  public int readCurrent(byte[] dataOut) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int readCurrent(byte[] dataOut) throws IOException {
     checkSequenceId();
     return mReader.read(mSequenceId, dataOut);
   }
 
   @Override
-  public int readCurrent(byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
+  public int readCurrent(byte[] dataOut, int start, int length) throws IOException {
     checkSequenceId();
     return mReader.read(mSequenceId, dataOut, start, length);
   }
 
   @Override
-  public int readCurrentQuality(byte[] dest) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int readCurrentQuality(byte[] dest) throws IOException {
     checkSequenceId();
     return mReader.readQuality(mSequenceId, dest);
   }
 
   @Override
-  public int readCurrentQuality(byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int readCurrentQuality(byte[] dest, int start, int length) throws IOException {
     checkSequenceId();
     return mReader.readQuality(mSequenceId, dest, start, length);
   }

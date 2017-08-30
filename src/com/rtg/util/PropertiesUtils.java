@@ -83,7 +83,7 @@ public final class PropertiesUtils {
    * @throws InvalidParamsException when the property file does not exist.
    * @throws IOException when there is an error reading the property files.
    */
-  public static Properties getPriorsResource(final String propsFile, final PropertyType propertyType) throws InvalidParamsException, IOException {
+  public static Properties getPriorsResource(final String propsFile, final PropertyType propertyType) throws IOException {
     final Properties pr = new Properties();
     InputStream props = null;
     try {

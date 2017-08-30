@@ -47,7 +47,6 @@ import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.OutputParams;
 import com.rtg.launcher.ParamsCli;
 import com.rtg.util.IORunnable;
-import com.rtg.util.InvalidParamsException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -292,7 +291,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   }
 
   @Override
-  protected VcfEvalParams makeParams() throws InvalidParamsException, IOException {
+  protected VcfEvalParams makeParams() throws IOException {
     final VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder.name(mFlags.getName());
     builder.outputParams(new OutputParams(outputDirectory(), false, !mFlags.isSet(CommonFlags.NO_GZIP)));

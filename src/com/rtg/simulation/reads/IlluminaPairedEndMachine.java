@@ -74,7 +74,7 @@ public class IlluminaPairedEndMachine extends AbstractIlluminaMachine {
    * @throws InvalidParamsException if fails to construct priors
    * @throws IOException whenever
    */
-  public IlluminaPairedEndMachine(long randomSeed) throws InvalidParamsException, IOException {
+  public IlluminaPairedEndMachine(long randomSeed) throws IOException {
     super(randomSeed);
   }
 

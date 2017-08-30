@@ -89,7 +89,7 @@ public final class MachineErrorParams extends AbstractMachineErrorParams impleme
    * @throws IOException if the resource file cannot be read.
    * @return the builder.
    */
-  public static MachineErrorParamsBuilder builder(String errors) throws IOException, InvalidParamsException {
+  public static MachineErrorParamsBuilder builder(String errors) throws IOException {
     return new MachineErrorParamsBuilder(errors);
   }
 

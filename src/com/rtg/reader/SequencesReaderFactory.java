@@ -124,7 +124,7 @@ public final class SequencesReaderFactory {
    * @throws IOException if another I/O related error occurs
    * @throws NoTalkbackSlimException if the reader has not sequences.
    */
-  public static synchronized AnnotatedSequencesReader createDefaultSequencesReaderCheckEmpty(final File dir) throws IOException, NoTalkbackSlimException {
+  public static synchronized AnnotatedSequencesReader createDefaultSequencesReaderCheckEmpty(final File dir) throws IOException {
     return createDefaultSequencesReaderCheckEmpty(dir, LongRange.NONE);
   }
 
@@ -138,7 +138,7 @@ public final class SequencesReaderFactory {
    * @throws IOException if another I/O related error occurs
    * @throws NoTalkbackSlimException if the reader has not sequences.
    */
-  public static synchronized AnnotatedSequencesReader createDefaultSequencesReaderCheckEmpty(final File dir, LongRange region) throws IOException, NoTalkbackSlimException {
+  public static synchronized AnnotatedSequencesReader createDefaultSequencesReaderCheckEmpty(final File dir, LongRange region) throws IOException {
     final AnnotatedSequencesReader result = createDefaultSequencesReader(dir, region);
     ReaderUtils.validateNotEmpty(result);
     return result;
@@ -155,7 +155,7 @@ public final class SequencesReaderFactory {
    * @throws IOException if another I/O related error occurs
    * @throws NoTalkbackSlimException if the reader has not sequences.
    */
-  public static SequencesReader createMemorySequencesReaderCheckEmpty(final File dir, final boolean loadNames, boolean loadFullNames, LongRange region) throws IOException, NoTalkbackSlimException {
+  public static SequencesReader createMemorySequencesReaderCheckEmpty(final File dir, final boolean loadNames, boolean loadFullNames, LongRange region) throws IOException {
     final SequencesReader result = createMemorySequencesReader(dir, loadNames, loadFullNames, region);
     ReaderUtils.validateNotEmpty(result);
     return result;

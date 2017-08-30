@@ -45,7 +45,7 @@ public interface WriterWrapper extends Closeable {
    * @throws IllegalStateException whenever
    * @throws IOException whenever
    */
-  void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalStateException, IOException;
+  void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IOException;
 
   @Override
   void close() throws IOException;

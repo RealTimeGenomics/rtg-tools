@@ -62,7 +62,7 @@ public interface SequencesIterator {
    * @return the identifier for the current sequence ( &gt;= 0).
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    */
-  long currentSequenceId() throws IllegalStateException;
+  long currentSequenceId();
 
   /**
    * Get the length of the current sequence.
@@ -70,7 +70,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws IOException if an IO error occurs
    */
-  int currentLength() throws IllegalStateException, IOException;
+  int currentLength() throws IOException;
 
   /**
    * Get the name of the current sequence.
@@ -81,7 +81,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  String currentName() throws IllegalStateException, IOException;
+  String currentName() throws IOException;
 
   /**
    * Get the full name of the current sequence. Formally this is the result of the current suffix appended to the current name
@@ -90,7 +90,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  String currentFullName() throws IllegalStateException, IOException;
+  String currentFullName() throws IOException;
 
   /**
    * Get the suffix of the current name, normally this will be everything after and including the first whitespace character
@@ -99,7 +99,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  String currentNameSuffix() throws IllegalStateException, IOException;
+  String currentNameSuffix() throws IOException;
 
   /**
    * Reads current sequence  into the supplied array.
@@ -109,7 +109,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  int readCurrent(byte[] dataOut) throws IllegalArgumentException, IllegalStateException, IOException;
+  int readCurrent(byte[] dataOut) throws IOException;
 
   /**
    * Reads sequence data into the supplied array.
@@ -120,7 +120,7 @@ public interface SequencesIterator {
    * @throws IllegalArgumentException If <code>dataOut</code> does not have enough length to store sequence.
    * @throws java.io.IOException If in I/O error occurs
    */
-  int readCurrent(byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException;
+  int readCurrent(byte[] dataOut, int start, int length) throws IOException;
 
   /**
    * Reads current quality into the supplied array.
@@ -130,7 +130,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  int readCurrentQuality(byte[] dest) throws IllegalArgumentException, IllegalStateException, IOException;
+  int readCurrentQuality(byte[] dest) throws IOException;
 
   /**
    * Reads current quality into the supplied array.
@@ -142,7 +142,7 @@ public interface SequencesIterator {
    * @throws IllegalStateException if <code>nextSequence()</code> returned false on its last call.
    * @throws java.io.IOException If in I/O error occurs
    */
-  int readCurrentQuality(byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException;
+  int readCurrentQuality(byte[] dest, int start, int length) throws IOException;
 
   /**
    * Reset the Sequences Reader to initial state.

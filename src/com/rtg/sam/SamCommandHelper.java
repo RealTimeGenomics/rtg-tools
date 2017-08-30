@@ -104,7 +104,7 @@ public final class SamCommandHelper {
    * @throws InvalidParamsException if there is no read group or more than one read groups in the input.
    * @throws java.io.IOException if there is an IO problem.
    */
-  public static SAMReadGroupRecord validateAndCreateSamRG(String value, ReadGroupStrictness strict) throws InvalidParamsException, IOException {
+  public static SAMReadGroupRecord validateAndCreateSamRG(String value, ReadGroupStrictness strict) throws IOException {
     final File rgFile = new File(value);
     final boolean fileMode = rgFile.exists();
     final BufferedInputStream bis;

@@ -199,17 +199,17 @@ public class AlternatingSequencesReader implements SequencesReader {
   }
 
   @Override
-  public byte[] read(long sequenceIndex) throws IllegalStateException, IOException {
+  public byte[] read(long sequenceIndex) throws IOException {
     final byte[] result = new byte[length(sequenceIndex)];
     read(sequenceIndex, result);
     return result;
   }
   @Override
-  public int read(long sequenceIndex, byte[] dataOut) throws IllegalArgumentException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut) throws IOException {
     return read(sequenceIndex, dataOut, 0, length(sequenceIndex));
   }
   @Override
-  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IOException {
     return select(sequenceIndex).read(sequenceIndex, dataOut, start, length);
   }
 
@@ -221,12 +221,12 @@ public class AlternatingSequencesReader implements SequencesReader {
     return result;
   }
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest) throws IOException {
     return readQuality(sequenceIndex, dest, 0, length(sequenceIndex));
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException {
     return select(sequenceIndex).readQuality(sequenceIndex, dest, start, length);
   }
 

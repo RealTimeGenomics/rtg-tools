@@ -939,7 +939,7 @@ public final class SamUtils {
    * @throws IOException if error occurs while reading files
    * @throws NoTalkbackSlimException if SAM header sequence dictionaries mismatch, and in strict mode
    */
-  public static void checkUberHeaderAgainstReference(SequencesReader reference, SAMFileHeader uberHeader, boolean strict) throws IOException, NoTalkbackSlimException {
+  public static void checkUberHeaderAgainstReference(SequencesReader reference, SAMFileHeader uberHeader, boolean strict) throws IOException {
     checkReferenceGuid(uberHeader, reference.getSdfId());
 
     final long numSequences = reference.numberSequences();

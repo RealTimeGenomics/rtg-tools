@@ -150,7 +150,7 @@ public final class Sdf2Quala extends AbstractCli {
   }
 
   //Calculated region for sloppy end
-  private LongRange doPrereadToQuala(File preReadDir, String basename, LongRange calculatedRegion) throws IOException, InvalidParamsException {
+  private LongRange doPrereadToQuala(File preReadDir, String basename, LongRange calculatedRegion) throws IOException {
     final long startId = mFlags.isSet(START_SEQUENCE) ? (Long) mFlags.getValue(START_SEQUENCE) : LongRange.MISSING;
     final long endId = calculatedRegion != null ? calculatedRegion.getEnd() : (mFlags.isSet(END_SEQUENCE) ? (Long) mFlags.getValue(END_SEQUENCE) : LongRange.MISSING);
     final LongRange r = SequencesReaderFactory.resolveRange(preReadDir, new LongRange(startId, endId));

@@ -82,28 +82,28 @@ public final class ReverseComplementingReader extends AbstractSequencesReader {
 
   // Direct accessor methods
   @Override
-  public int readQuality(final long sequenceIndex, final byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(final long sequenceIndex, final byte[] dest) throws IOException {
     final int r = mUnderlyingReader.readQuality(sequenceIndex, dest);
     reverse(dest, 0, r);
     return r;
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException {
     final int r = mUnderlyingReader.readQuality(sequenceIndex, dest, start, length);
     reverse(dest, 0, r);
     return r;
   }
 
   @Override
-  public int read(final long sequenceIndex, final byte[] dataOut) throws IllegalArgumentException, IOException {
+  public int read(final long sequenceIndex, final byte[] dataOut) throws IOException {
     final int r = mUnderlyingReader.read(sequenceIndex, dataOut);
     DNA.reverseComplementInPlace(dataOut, 0, r);
     return r;
   }
 
   @Override
-  public int read(final long sequenceIndex, final byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
+  public int read(final long sequenceIndex, final byte[] dataOut, int start, int length) throws IOException {
     final int r = mUnderlyingReader.read(sequenceIndex, dataOut, start, length);
     DNA.reverseComplementInPlace(dataOut, start, start + r);
     return r;

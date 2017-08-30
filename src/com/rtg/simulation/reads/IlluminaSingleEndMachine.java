@@ -59,7 +59,7 @@ public class IlluminaSingleEndMachine extends AbstractIlluminaMachine {
    * @throws InvalidParamsException if fails to construct priors
    * @throws IOException whenever
    */
-  public IlluminaSingleEndMachine(long randomSeed) throws InvalidParamsException, IOException {
+  public IlluminaSingleEndMachine(long randomSeed) throws IOException {
     super(randomSeed);
   }
 

@@ -44,7 +44,7 @@ public final class ZeroCreate {
    * @exception NegativeArraySizeException if length negative.
    * @exception IllegalArgumentException if range is less than 2 or too big.
    */
-  public static ZeroIndex createIndex(final long length) throws NegativeArraySizeException, IllegalArgumentException {
+  public static ZeroIndex createIndex(final long length) {
     return new ZeroIndex(length, 0);
   }
 }

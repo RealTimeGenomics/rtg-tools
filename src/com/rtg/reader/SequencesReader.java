@@ -260,7 +260,7 @@ public interface SequencesReader extends AutoCloseable {
    * @throws IllegalArgumentException If <code>dataOut</code> does not have enough length to store sequence.
    * @throws IOException If in I/O error occurs
    */
-  int read(long sequenceIndex, byte[] dataOut) throws IllegalArgumentException, IOException;
+  int read(long sequenceIndex, byte[] dataOut) throws IOException;
 
   /**
    * Reads sequence data into the supplied array.
@@ -272,7 +272,7 @@ public interface SequencesReader extends AutoCloseable {
    * @throws IllegalArgumentException If <code>dataOut</code> does not have enough length to store sequence.
    * @throws IOException If in I/O error occurs
    */
-  int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException;
+  int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IOException;
 
   /**
    * Reads quality data into a newly allocated array.
@@ -290,7 +290,7 @@ public interface SequencesReader extends AutoCloseable {
    * @throws IllegalArgumentException If <code>dataOut</code> does not have enough length to store quality.
    * @throws IOException If in I/O error occurs
    */
-  int readQuality(long sequenceIndex, byte[] dest) throws IllegalArgumentException, IOException;
+  int readQuality(long sequenceIndex, byte[] dest) throws IOException;
 
   /**
    * Reads quality data into the supplied array.
@@ -302,7 +302,7 @@ public interface SequencesReader extends AutoCloseable {
    * @throws IllegalArgumentException If <code>dataOut</code> does not have enough length to store quality.
    * @throws IOException If in I/O error occurs
    */
-  int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException;
+  int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException;
 
   /**
    * If appropriate ensures any backing file is closed.

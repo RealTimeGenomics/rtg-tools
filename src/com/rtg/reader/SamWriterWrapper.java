@@ -135,7 +135,7 @@ public class SamWriterWrapper implements WriterWrapper {
   }
 
   @Override
-  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalStateException, IOException {
+  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     if (mIsPaired) {
       writeSequence(mReader.left(), seqId, dataBuffer, qualityBuffer, mFlags | SamBamConstants.SAM_READ_IS_FIRST_IN_PAIR);
       writeSequence(mReader.right(), seqId, dataBuffer, qualityBuffer, mFlags | SamBamConstants.SAM_READ_IS_SECOND_IN_PAIR);
@@ -144,7 +144,7 @@ public class SamWriterWrapper implements WriterWrapper {
     }
   }
 
-  void writeSequence(SequencesReader reader, long seqId, byte[] dataBuffer, byte[] qualityBuffer, int flags) throws IllegalArgumentException, IllegalStateException, IOException {
+  void writeSequence(SequencesReader reader, long seqId, byte[] dataBuffer, byte[] qualityBuffer, int flags) throws IOException {
     final SAMRecord rec = new SAMRecord(mWriter.getFileHeader());
 
     final int length = reader.read(seqId, dataBuffer);

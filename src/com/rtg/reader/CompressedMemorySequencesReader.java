@@ -433,12 +433,12 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   }
 
   @Override
-  public int readQuality(final long sequenceIndex, final byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(final long sequenceIndex, final byte[] dest) throws IOException {
     return readQuality(sequenceIndex, dest, 0, length(sequenceIndex));
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException {
     pullInQuality();
     if (mQualityData == null) {
       return 0;

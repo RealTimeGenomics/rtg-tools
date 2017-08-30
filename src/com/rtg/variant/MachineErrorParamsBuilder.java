@@ -91,7 +91,7 @@ public class MachineErrorParamsBuilder {
    * @throws InvalidParamsException if the resource file is invalid.
    * @throws IOException if the resource file cannot be read.
    */
-  public MachineErrorParamsBuilder(String errors) throws IOException, InvalidParamsException {
+  public MachineErrorParamsBuilder(String errors) throws IOException {
     errors(errors);
   }
 
@@ -124,7 +124,7 @@ public class MachineErrorParamsBuilder {
    * @throws InvalidParamsException if the resource file is invalid.
    * @throws IOException if the resource file cannot be read.
    */
-  public MachineErrorParamsBuilder errors(final String errors) throws InvalidParamsException, IOException {
+  public MachineErrorParamsBuilder errors(final String errors) throws IOException {
     Diagnostic.developerLog("Loading machine errors for: " + errors);
     //System.out.println("Loading machine errors for: " + errors);
     final Properties pr = PropertiesUtils.getPriorsResource(errors, PropertiesUtils.PropertyType.ERROR_PROPERTY);

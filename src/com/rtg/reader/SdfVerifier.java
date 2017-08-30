@@ -212,7 +212,7 @@ public final class SdfVerifier {
     return true;
   }
 
-  private static long calcChecksumOld(final SequencesReader reader) throws IllegalStateException, IOException {
+  private static long calcChecksumOld(final SequencesReader reader) throws IOException {
     final PrereadHashFunction prf = new PrereadHashFunction();
     long totalDone = 0;
     final long totalNumberOfSeq = reader.numberSequences();

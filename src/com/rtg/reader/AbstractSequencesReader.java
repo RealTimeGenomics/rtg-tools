@@ -74,14 +74,14 @@ public abstract class AbstractSequencesReader implements AnnotatedSequencesReade
   }
 
   @Override
-  public byte[] read(long sequenceIndex) throws IllegalArgumentException, IOException {
+  public byte[] read(long sequenceIndex) throws IOException {
     final byte[] dataOut = new byte[length(sequenceIndex)];
     read(sequenceIndex, dataOut);
     return dataOut;
   }
 
   @Override
-  public byte[] readQuality(long sequenceIndex) throws IllegalArgumentException, IOException {
+  public byte[] readQuality(long sequenceIndex) throws IOException {
     final byte[] dataOut = new byte[length(sequenceIndex)];
     readQuality(sequenceIndex, dataOut);
     return dataOut;

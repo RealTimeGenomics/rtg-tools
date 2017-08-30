@@ -108,7 +108,7 @@ public final class SdfWriterWrapper implements WriterWrapper {
   }
 
   @Override
-  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalStateException, IOException {
+  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     if (mIsPaired) {
       writeSequence(mReader.left(), seqId, mLeft, dataBuffer, qualityBuffer);
       writeSequence(mReader.right(), seqId, mRight, dataBuffer, qualityBuffer);
@@ -117,7 +117,7 @@ public final class SdfWriterWrapper implements WriterWrapper {
     }
   }
 
-  private void writeSequence(SequencesReader reader, long seqId, SdfWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalArgumentException, IllegalStateException, IOException {
+  private void writeSequence(SequencesReader reader, long seqId, SdfWriter writer, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     final int length = reader.read(seqId, dataBuffer);
     if (mHasQuality) {
       reader.readQuality(seqId, qualityBuffer);

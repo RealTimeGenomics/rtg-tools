@@ -103,7 +103,7 @@ public class GenomePriorParamsBuilder {
    * @throws InvalidParamsException if the resource file is invalid.
    * @throws IOException if the resource file cannot be read.
    */
-  public GenomePriorParamsBuilder genomePriors(final String prior) throws InvalidParamsException, IOException {
+  public GenomePriorParamsBuilder genomePriors(final String prior) throws IOException {
     final Properties pr = PropertiesUtils.getPriorsResource(prior, PropertiesUtils.PropertyType.PRIOR_PROPERTY);
     mGenomeSnpRateHetero = getDouble(prior, pr, "genome_snp_rate_hetero");
     mGenomeSnpRateHomo = getDouble(prior, pr, "genome_snp_rate_homo");

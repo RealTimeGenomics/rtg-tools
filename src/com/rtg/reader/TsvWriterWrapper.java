@@ -99,7 +99,7 @@ public class TsvWriterWrapper implements WriterWrapper {
   }
 
   @Override
-  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IllegalStateException, IOException {
+  public void writeSequence(long seqId, byte[] dataBuffer, byte[] qualityBuffer) throws IOException {
     mOutput.append("5\t");
 
     writeSeq(mReader.left(), seqId, dataBuffer);

@@ -46,7 +46,7 @@ public final class BitCreate {
    * @exception NegativeArraySizeException if length negative.
    * @exception IllegalArgumentException if range is less than 2 or too big.
    */
-  public static BitIndex createIndex(final long length, final int bits) throws NegativeArraySizeException, IllegalArgumentException {
+  public static BitIndex createIndex(final long length, final int bits) {
     if (bits < 1 || bits > 64) {
       throw new IllegalArgumentException("Illegal bits value=" + bits);
     }

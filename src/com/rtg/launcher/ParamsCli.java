@@ -65,7 +65,7 @@ public abstract class ParamsCli<P extends Params> extends LoggedCli {
    * @throws InvalidParamsException if there are errors in the values of the command line flags.
    * @throws IOException If an I/O error occurs
    */
-  protected abstract P makeParams() throws InvalidParamsException, IOException;
+  protected abstract P makeParams() throws IOException;
 
   /**
    * Get parameters from command line, set up logging and execute task.

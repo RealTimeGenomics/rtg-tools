@@ -139,7 +139,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
   }
 
   @Override
-  public int readQuality(final long sequenceIndex, final byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(final long sequenceIndex, final byte[] dest) throws IOException {
     if (!mHasQualityData) {
       return 0;
     }
@@ -148,7 +148,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IOException {
     if (!mHasQualityData) {
       return 0;
     }
@@ -192,7 +192,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     //return new String(bytes);
   }
 
-  private int readDataInternal(byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
+  private int readDataInternal(byte[] dataOut, int start, int length) throws IOException {
     final int ret = mSequenceManager.readData(dataOut, start, length);
     if (mIndex.hasPerSequenceChecksums() && ret == mSequenceManager.getDataLength()) {
       checkChecksum(dataOut, start, ret, mSequenceManager.sequenceChecksum());
@@ -200,7 +200,7 @@ public final class DefaultSequencesReader extends AbstractSequencesReader implem
     return ret;
   }
 
-  private int readQualityInternal(byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException {
+  private int readQualityInternal(byte[] dest, int start, int length) throws IOException {
     if (!mHasQualityData) {
       return 0;
     }
