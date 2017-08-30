@@ -118,7 +118,7 @@ class VcfFilterTask {
         for (int i = 0; i < mSampleIndexes.length; ++i) {
           mSampleIndexes[i] = i;
         }
-      } else if (mSampleNames.size() == 0) {
+      } else if (mSampleNames.isEmpty()) {
         if (header.getNumberOfSamples() > 0) {
           mSampleIndexes = new int[1];
           mSampleIndexes[0] = VcfUtils.getSampleIndexOrDie(header, null, "input");
@@ -133,7 +133,7 @@ class VcfFilterTask {
         }
       }
     }
-    if (mKeepFilters.size() != 0 || mKeepInfos.size() != 0 || mRemoveFilters.size() != 0 || mRemoveInfos.size() != 0) {
+    if (!mKeepFilters.isEmpty() || !mKeepInfos.isEmpty() || !mRemoveFilters.isEmpty() || !mRemoveInfos.isEmpty()) {
       mFilterTags.add(VcfUtils.FILTER_PASS);
       mFilterTags.add(VcfUtils.MISSING_FIELD);
       for (final FilterField info : header.getFilterLines()) {
@@ -233,7 +233,7 @@ class VcfFilterTask {
         keep = true;
       }
     }
-    if (record.getFilters().size() == 0) {
+    if (record.getFilters().isEmpty()) {
       if (mKeepFilters.contains(VcfUtils.MISSING_FIELD)) {
         keep = true;
       }
@@ -256,7 +256,7 @@ class VcfFilterTask {
         return false;
       }
     }
-    if (record.getFilters().size() == 0) {
+    if (record.getFilters().isEmpty()) {
       if (mRemoveFilters.contains(VcfUtils.MISSING_FIELD)) {
         mVcfFilterStatistics.incrementFilterTag(VcfUtils.MISSING_FIELD);
         mNonSampleSpecificFailed = true;

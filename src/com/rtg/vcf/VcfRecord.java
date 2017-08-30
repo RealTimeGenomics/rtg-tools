@@ -493,7 +493,7 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   private static String getAltCalls(List<String> altCalls) {
-    if (altCalls.size() == 0) {
+    if (altCalls.isEmpty()) {
       return MISSING;
     }
     return StringUtils.join(ALT_CALL_INFO_SEPARATOR, altCalls);
@@ -551,14 +551,14 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   private static String getFormat(Map<String, ArrayList<String>> formatAndSample) {
-    if (formatAndSample.size() == 0) {
+    if (formatAndSample.isEmpty()) {
       return MISSING;
     }
     return StringUtils.join(FORMAT_AND_SAMPLE_SEPARATOR, formatAndSample.keySet());
   }
 
   private static String getFilter(List<String> filter) {
-    if (filter.size() == 0) {
+    if (filter.isEmpty()) {
       return MISSING;
     }
     return StringUtils.join(ID_FILTER_AND_INFO_SEPARATOR, filter);

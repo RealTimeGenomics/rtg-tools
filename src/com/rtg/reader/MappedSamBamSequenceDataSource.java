@@ -98,8 +98,7 @@ public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
           return haveNextRecords();
         }
       }
-      if (mRecordMap.size() != 0) {
-        //throw new NoTalkbackSlimException(mRecordMap.size() + " reads missing a pair when processing paired end SAM input.");
+      if (!mRecordMap.isEmpty()) {
         Diagnostic.warning(mRecordMap.size() + " reads missing a pair when processing paired end SAM input.");
       }
       if (mDuplicates > 0) {

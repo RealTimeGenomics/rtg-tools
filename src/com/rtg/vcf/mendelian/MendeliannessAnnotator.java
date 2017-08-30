@@ -104,7 +104,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
    * @param strictMissingPloidy if true, grumble when the ploidy of missing values is not what is expected. Only of interest for checking RTG output really because no-one else gets it right.
    */
   public MendeliannessAnnotator(Set<Family> families, SexMemo sexMemo, GenotypeProportions aggregate, boolean annotate, boolean lenient, boolean strictMissingPloidy) {
-    if (families == null || families.size() == 0) {
+    if (families == null || families.isEmpty()) {
       throw new IllegalArgumentException("At least one family is required");
     }
     mFamilies = families;

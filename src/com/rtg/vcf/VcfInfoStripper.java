@@ -29,12 +29,8 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -72,16 +68,10 @@ public class VcfInfoStripper implements VcfAnnotator {
     if (mRemoveAll) {
       header.getInfoLines().clear();
       return;
-    } else if (mInfos == null || mInfos.size() == 0) {
+    } else if (mInfos == null || mInfos.isEmpty()) {
       return;
     }
-    final Iterator<InfoField> it = header.getInfoLines().iterator();
-    while (it.hasNext()) {
-      final InfoField info = it.next();
-      if (mKeepMode ^ mInfos.contains(info.getId())) {
-        it.remove();
-      }
-    }
+    header.getInfoLines().removeIf(info -> mKeepMode ^ mInfos.contains(info.getId()));
   }
 
   @Override
@@ -89,15 +79,9 @@ public class VcfInfoStripper implements VcfAnnotator {
     if (mRemoveAll) {
       rec.getInfo().clear();
       return;
-    } else if (mInfos == null || mInfos.size() == 0) {
+    } else if (mInfos == null || mInfos.isEmpty()) {
       return;
     }
-    final Iterator<Map.Entry<String, ArrayList<String>>> it = rec.getInfo().entrySet().iterator();
-    while (it.hasNext()) {
-      final Map.Entry<String, ArrayList<String>> e = it.next();
-      if (mKeepMode ^ mInfos.contains(e.getKey())) {
-        it.remove();
-      }
-    }
+    rec.getInfo().entrySet().removeIf(e -> mKeepMode ^ mInfos.contains(e.getKey()));
   }
 }

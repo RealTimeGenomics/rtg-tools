@@ -85,7 +85,7 @@ public class RocPlotCli extends AbstractCli {
     @Override
     @SuppressWarnings("unchecked")
     public boolean isValid(CFlags flags) {
-      if (!(flags.getAnonymousValues(0).size() > 0 || flags.isSet(CURVE_FLAG))) {
+      if (flags.getAnonymousValues(0).isEmpty() && !flags.isSet(CURVE_FLAG)) {
         flags.setParseMessage("Must supply at least 1 ROC file");
         return false;
       }

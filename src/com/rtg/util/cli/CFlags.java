@@ -562,7 +562,7 @@ public final class CFlags {
    * @param set flags to be added to usage header
    */
   public void addRequiredSet(Flag<?>... set) {
-    if (mRequiredSets.size() == 1 && mRequiredSets.get(0).size() == 0) {
+    if (mRequiredSets.size() == 1 && mRequiredSets.get(0).isEmpty()) {
       mRequiredSets.clear();
     }
     final TreeSet<Flag<?>> tset = new TreeSet<>();

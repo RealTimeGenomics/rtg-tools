@@ -29,10 +29,8 @@
  */
 package com.rtg.vcf;
 
-import java.util.Iterator;
 import java.util.Set;
 
-import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -70,16 +68,10 @@ public class VcfFilterStripper implements VcfAnnotator {
     if (mRemoveAll) {
       header.getFilterLines().clear();
       return;
-    } else if (mFilters == null || mFilters.size() == 0) {
+    } else if (mFilters == null || mFilters.isEmpty()) {
       return;
     }
-    final Iterator<FilterField> it = header.getFilterLines().iterator();
-    while (it.hasNext()) {
-      final FilterField filter = it.next();
-      if (mKeepMode ^ mFilters.contains(filter.getId())) {
-        it.remove();
-      }
-    }
+    header.getFilterLines().removeIf(filter -> mKeepMode ^ mFilters.contains(filter.getId()));
   }
 
   @Override
@@ -87,15 +79,9 @@ public class VcfFilterStripper implements VcfAnnotator {
     if (mRemoveAll) {
       rec.getFilters().clear();
       return;
-    } else if (mFilters == null || mFilters.size() == 0) {
+    } else if (mFilters == null || mFilters.isEmpty()) {
       return;
     }
-    final Iterator<String> it = rec.getFilters().iterator();
-    while (it.hasNext()) {
-      final String e = it.next();
-      if (mKeepMode ^ mFilters.contains(e)) {
-        it.remove();
-      }
-    }
+    rec.getFilters().removeIf(e -> mKeepMode ^ mFilters.contains(e));
   }
 }

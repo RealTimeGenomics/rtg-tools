@@ -72,7 +72,7 @@ public abstract class AbstractCliEntry {
       VersionCommand.mainInit(err);
       return 1;
     }
-    if (args == null || args.length == 0 || args[0].trim().length() == 0) {
+    if (args == null || args.length == 0 || args[0].trim().isEmpty()) {
       return help(null, out, err);
     }
 

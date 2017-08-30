@@ -174,7 +174,7 @@ public interface VariantFactory {
 
     @Override
     public Variant variant(final VcfRecord rec, final int id) throws SkippedVariantException {
-      if (rec.getAltCalls().size() == 0) {
+      if (rec.getAltCalls().isEmpty()) {
         return null;
       }
 

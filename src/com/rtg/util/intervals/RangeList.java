@@ -185,7 +185,7 @@ public class RangeList<T> {
    * @param ranges the list of meta-data ranges to store for searching.
    */
   public RangeList(List<RangeData<T>> ranges) {
-    if (ranges == null || ranges.size() == 0) {
+    if (ranges == null || ranges.isEmpty()) {
       mRanges = new ArrayList<>(1);
       mRanges.add(new RangeData<T>(Integer.MIN_VALUE, Integer.MAX_VALUE));
     } else {

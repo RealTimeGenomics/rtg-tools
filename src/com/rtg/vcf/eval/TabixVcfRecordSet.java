@@ -158,7 +158,7 @@ class TabixVcfRecordSet implements VariantSet {
         }
       }
     } else {
-      if (mNames.size() == 0) {
+      if (mNames.isEmpty()) {
         throw new NoTalkbackSlimException("After applying regions there were no sequence names in common between the reference and the supplied variant sets."
           + " Check the regions supplied by --" + CommonFlags.RESTRICTION_FLAG + " or --" + CommonFlags.BED_REGIONS_FLAG + " are correct.");
       }

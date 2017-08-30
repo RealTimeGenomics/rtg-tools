@@ -221,7 +221,7 @@ public final class FormatCli extends LoggedCli {
     }
     final boolean useQuality = !flags.isSet(NO_QUALITY);
     final DataSourceDescription inputformat = getFormat(flags, useQuality);
-    if (files.size() == 0) {  //if no anonymous input files have been specified
+    if (files.isEmpty()) {  //if no anonymous input files have been specified
       if (!leftFileSet && !rightFileSet) {
         flags.setParseMessage("No input files specified.");
         return false;
@@ -712,7 +712,7 @@ public final class FormatCli extends LoggedCli {
           } else if (trimmers.size() > 1) {
             pre.setReadTrimmer(new MultiReadTrimmer(trimmers.toArray(new ReadTrimmer[0])));
           }
-          if (files.size() == 0) {
+          if (files.isEmpty()) {
             final File left = (File) mFlags.getValue(LEFT_FILE_FLAG);
             final File right = (File) mFlags.getValue(RIGHT_FILE_FLAG);
             if (InputFileUtils.checkIdenticalPaths(left, right)) {

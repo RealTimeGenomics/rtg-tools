@@ -60,7 +60,7 @@ public class ConcatSequenceDataSource<T extends SequenceDataSource> implements S
    * @param names names of sources to print to user (pass <code>null</code> to not print)
    */
   public ConcatSequenceDataSource(final List<T> sources, final List<String> names) {
-    if (sources == null || sources.size() == 0) {
+    if (sources == null || sources.isEmpty()) {
       throw new IllegalArgumentException("Cannot concatenate 0 sources");
     }
     mSources = sources;

@@ -524,7 +524,7 @@ public final class VcfUtils {
    * @return true if the record was produced by the complex caller
    */
   public static boolean isComplexScored(VcfRecord rec) {
-    return rec.getInfo().keySet().contains("XRX");
+    return rec.getInfo().containsKey("XRX");
   }
 
   /**

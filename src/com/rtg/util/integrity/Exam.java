@@ -448,7 +448,7 @@ public final class Exam {
    * @return true, as with <code>Integrity.integrity</code>.
    */
   public static boolean integrity(Object o) {
-    if ((o != null) && (o instanceof Integrity)) {
+    if (o instanceof Integrity) {
       ((Integrity) o).integrity();
     }
     return true;
@@ -462,7 +462,7 @@ public final class Exam {
    * @return true, as with <code>Integrity.integrity</code>.
    */
   public static boolean globalIntegrity(Object o) {
-    if ((o != null) && (o instanceof Integrity)) {
+    if (o instanceof Integrity) {
       ((Integrity) o).globalIntegrity();
     }
     return true;

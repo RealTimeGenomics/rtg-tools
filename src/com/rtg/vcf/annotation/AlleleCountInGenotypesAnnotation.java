@@ -55,7 +55,7 @@ public class AlleleCountInGenotypesAnnotation extends AbstractDerivedInfoAnnotat
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
     final List<String> gtList = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
-    if (gtList == null || record.getAltCalls().size() == 0) {
+    if (gtList == null || record.getAltCalls().isEmpty()) {
       return null;
     }
     final int[] ret = new int[record.getAltCalls().size()];

@@ -53,13 +53,13 @@ public enum MachineOrientation {
 
     @Override
     public PairOrientation getMateOrientation(PairOrientation pairOrientation) {
-      if (PairOrientation.F1.equals(pairOrientation)) {
+      if (PairOrientation.F1 == pairOrientation) {
         return PairOrientation.R2;
-      } else if (PairOrientation.F2.equals(pairOrientation)) {
+      } else if (PairOrientation.F2 == pairOrientation) {
         return PairOrientation.R1;
-      } else if (PairOrientation.R1.equals(pairOrientation)) {
+      } else if (PairOrientation.R1 == pairOrientation) {
         return PairOrientation.F2;
-      } else if (PairOrientation.R2.equals(pairOrientation)) {
+      } else if (PairOrientation.R2 == pairOrientation) {
         return PairOrientation.F1;
       }
       return null;
@@ -67,7 +67,7 @@ public enum MachineOrientation {
 
     @Override
     public boolean isMateUpstream(PairOrientation pairOrientation) {
-      return PairOrientation.F1.equals(pairOrientation) || PairOrientation.F2.equals(pairOrientation);
+      return PairOrientation.F1 == pairOrientation || PairOrientation.F2 == pairOrientation;
     }
   },
   /** reverse forward orientation in paired reads */
@@ -117,13 +117,13 @@ public enum MachineOrientation {
 
     @Override
     public PairOrientation getMateOrientation(PairOrientation pairOrientation) {
-      if (PairOrientation.F1.equals(pairOrientation)) {
+      if (PairOrientation.F1 == pairOrientation) {
         return PairOrientation.F2;
-      } else if (PairOrientation.F2.equals(pairOrientation)) {
+      } else if (PairOrientation.F2 == pairOrientation) {
         return PairOrientation.F1;
-      } else if (PairOrientation.R1.equals(pairOrientation)) {
+      } else if (PairOrientation.R1 == pairOrientation) {
         return PairOrientation.R2;
-      } else if (PairOrientation.R2.equals(pairOrientation)) {
+      } else if (PairOrientation.R2 == pairOrientation) {
         return PairOrientation.R1;
       }
       return null;
@@ -131,7 +131,7 @@ public enum MachineOrientation {
 
     @Override
     public boolean isMateUpstream(PairOrientation pairOrientation) {
-      return PairOrientation.F1.equals(pairOrientation) || PairOrientation.R2.equals(pairOrientation);
+      return PairOrientation.F1 == pairOrientation || PairOrientation.R2 == pairOrientation;
     }
   },
 

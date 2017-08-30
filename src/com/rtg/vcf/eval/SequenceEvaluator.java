@@ -93,10 +93,10 @@ class SequenceEvaluator implements IORunnable {
       Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
       Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
-      if (baseLineCalls.size() == 0 || calledCalls.size() == 0) {
+      if (baseLineCalls.isEmpty() || calledCalls.isEmpty()) {
         setStatus(baseLineCalls, VariantId.STATUS_NO_MATCH);
         setStatus(calledCalls, VariantId.STATUS_NO_MATCH);
-        mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.<Integer>emptyList(), Collections.<Integer>emptyList());
+        mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.emptyList(), Collections.emptyList());
       } else {
 
         //find the best path for variant calls

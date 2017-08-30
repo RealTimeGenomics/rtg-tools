@@ -708,7 +708,7 @@ public final class SamUtils {
     int count = 0;
     for (int i = 0; i < cigar.numCigarElements(); ++i) {
       final CigarElement ce = cigar.getCigarElement(i);
-      if (ce.getOperator().equals(CigarOperator.EQ) || ce.getOperator().equals(CigarOperator.X)) {
+      if (ce.getOperator() == CigarOperator.EQ || ce.getOperator() == CigarOperator.X) {
         count += ce.getLength();
       } else {
         if (count > 0) {
@@ -882,7 +882,7 @@ public final class SamUtils {
         } else if (!currentGuid.available()) {
           currentGuid = fileGuid;
         }
-        if (sfr.getFileHeader().getReadGroups().size() != 0) {
+        if (!sfr.getFileHeader().getReadGroups().isEmpty()) {
           for (final SAMReadGroupRecord r : sfr.getFileHeader().getReadGroups()) {
             final String sample = r.getSample();
             if (!readGroups.containsKey(r.getReadGroupId())) {

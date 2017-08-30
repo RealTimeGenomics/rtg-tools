@@ -151,7 +151,7 @@ public final class MendeliannessChecker extends AbstractCli {
     final VcfHeader header = vr.getHeader();
 
     final Set<Family> families = getFamilies(header);
-    if (families.size() == 0) {
+    if (families.isEmpty()) {
       err.println("No family information found, no checking done.");
       return;
     }

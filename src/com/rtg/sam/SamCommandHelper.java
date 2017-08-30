@@ -164,8 +164,7 @@ public final class SamCommandHelper {
     try (BufferedInputStream bis = FileUtils.createInputStream(rgFile, false)) {
       final SamReader sfr = SamUtils.makeSamReader(bis);
       final List<SAMReadGroupRecord> readGroups = sfr.getFileHeader().getReadGroups();
-      final int readGroupCount = readGroups.size();
-      if (readGroupCount == 0) {
+      if (readGroups.isEmpty()) {
         throw new InvalidParamsException("No read group information matching \"" + selectReadGroup + "\" present in the input file \"" + rgFile.getPath() + "\"");
       }
       for (SAMReadGroupRecord r : readGroups) {

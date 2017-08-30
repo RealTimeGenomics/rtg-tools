@@ -180,7 +180,7 @@ public class VcfRecordMerger implements AutoCloseable {
         }
       }
     }
-    if (names.size() > 0 && merged.getFormats().size() == 0) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
+    if (!names.isEmpty() && merged.getFormats().isEmpty()) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
       merged.addFormat(mDefaultFormat);
     }
     for (final String key : merged.getFormats()) {
