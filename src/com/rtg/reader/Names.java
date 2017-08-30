@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.ByteArrayIOUtils;
@@ -49,7 +50,7 @@ import com.rtg.util.io.FileUtils;
 public class Names implements NamesInterface {
 
 
-  static int loadPointers(ArrayList<int[]> pointersList, final File preread, final long start, final long end, final DataFileIndex nameIndex, boolean suffixes) throws IOException {
+  static int loadPointers(List<int[]> pointersList, final File preread, final long start, final long end, final DataFileIndex nameIndex, boolean suffixes) throws IOException {
     int startFile = 0;
     long namesSoFar = 0;
     while (startFile < nameIndex.numberEntries() && namesSoFar + nameIndex.numberSequences(startFile) <= start) {
@@ -248,7 +249,7 @@ public class Names implements NamesInterface {
     os.write(mNames.get(k), start, end - start);
   }
 
-  private static void loadNames(ArrayList<byte[]> names, ArrayList<int[]> pointers, File preread, long start, DataFileIndex nameIndex, int firstNameOffset, boolean suffixes) throws IOException {
+  private static void loadNames(List<byte[]> names, List<int[]> pointers, File preread, long start, DataFileIndex nameIndex, int firstNameOffset, boolean suffixes) throws IOException {
     int startFile = 0;
     long namesSoFar = 0;
     while (startFile < nameIndex.numberEntries() && namesSoFar + nameIndex.numberSequences(startFile) <= start) {

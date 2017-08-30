@@ -225,7 +225,7 @@ public class ReferenceGenome {
     return toString(mReferences);
   }
 
-  static String toString(final LinkedHashMap<String, ReferenceSequence> references) {
+  static String toString(final Map<String, ReferenceSequence> references) {
     final StringBuilder sb = new StringBuilder();
     for (final Map.Entry<String, ReferenceSequence> entry : references.entrySet()) {
       sb.append(entry.getValue());

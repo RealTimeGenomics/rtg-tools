@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 import com.rtg.vcf.VcfReader;
@@ -130,13 +131,13 @@ class Ga4ghLooseMatchFilter implements VcfWriter {
     mInner.write(record);
   }
 
-  private boolean truthWantsLm(ArrayList<String> mk, ArrayList<String> bd) {
+  private boolean truthWantsLm(List<String> mk, List<String> bd) {
     return mk != null && bd != null
       && Ga4ghEvalSynchronizer.DECISION_FN.equals(bd.get(Ga4ghEvalSynchronizer.TRUTH_SAMPLE_INDEX))
       && Ga4ghEvalSynchronizer.SUBTYPE_MISMATCH.equals(mk.get(Ga4ghEvalSynchronizer.TRUTH_SAMPLE_INDEX));
   }
 
-  private boolean queryWantsLm(ArrayList<String> mk, ArrayList<String> bd) {
+  private boolean queryWantsLm(List<String> mk, List<String> bd) {
     return mk != null && bd != null
       && Ga4ghEvalSynchronizer.DECISION_FP.equals(bd.get(Ga4ghEvalSynchronizer.QUERY_SAMPLE_INDEX))
       && Ga4ghEvalSynchronizer.SUBTYPE_MISMATCH.equals(mk.get(Ga4ghEvalSynchronizer.QUERY_SAMPLE_INDEX));

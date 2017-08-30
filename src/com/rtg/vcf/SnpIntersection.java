@@ -304,7 +304,7 @@ CommonFlags.initNoGzip(flags);
     return sb.toString();
   }
 
-  private int loadFirstSnps(VcfReader vorr, HashMap<String, List<LineHolder>> map) throws IOException {
+  private int loadFirstSnps(VcfReader vorr, Map<String, List<LineHolder>> map) throws IOException {
     int totalFirstCount = 0;
     Diagnostic.progress("Start loading first file...");
 

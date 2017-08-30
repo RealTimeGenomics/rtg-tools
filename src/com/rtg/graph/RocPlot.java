@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.prefs.Preferences;
@@ -509,7 +510,7 @@ public class RocPlot {
 
   @JumbleIgnore
   static class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
-    PrecisionRecallGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
+    PrecisionRecallGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
       setGrid(true);
@@ -539,7 +540,7 @@ public class RocPlot {
   @JumbleIgnore
   static class RocGraph2D extends ExternalZoomGraph2D {
     private final int mMaxVariants;
-    RocGraph2D(ArrayList<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
+    RocGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
       setGrid(true);
