@@ -45,8 +45,6 @@ public class AtomicLongChunks implements AtomicIndex {
 
   private final int mChunkBits;
 
-  private final int mChunkSize;
-
   private final int mChunkMask;
 
   private final AtomicLongArray[] mArray;
@@ -72,18 +70,18 @@ public class AtomicLongChunks implements AtomicIndex {
     mLength = length;
     assert chunkBits >= 0 && chunkBits <= 31;
     mChunkBits = chunkBits;
-    mChunkSize = 1 << mChunkBits;
-    mChunkMask = mChunkSize - 1;
+    final int chunkSize = 1 << mChunkBits;
+    mChunkMask = chunkSize - 1;
 
-    final long ch = (length + mChunkSize - 1) / mChunkSize;
+    final long ch = (length + chunkSize - 1) / chunkSize;
     if (ch > Integer.MAX_VALUE) {
-      throw new RuntimeException("length requested too long length=" + length + " mChunkSize=" + mChunkSize);
+      throw new RuntimeException("length requested too long length=" + length + " mChunkSize=" + chunkSize);
     }
     final int chunks = (int) ch;
     mArray = new AtomicLongArray[chunks];
     long left = mLength;
     for (int i = 0; i < chunks; ++i) {
-      final int assignedLength = left <= mChunkSize ? (int) left :  mChunkSize;
+      final int assignedLength = left <= chunkSize ? (int) left : chunkSize;
       assert assignedLength != 0;
       mArray[i] =  new AtomicLongArray(assignedLength);
       left -= assignedLength;

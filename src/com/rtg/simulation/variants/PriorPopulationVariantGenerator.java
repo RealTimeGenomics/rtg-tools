@@ -54,16 +54,14 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
 
   private static final class RandomPositionGenerator implements VariantPositionGenerator {
 
-    private final SequencesReader mReader;
     private final PortableRandom mRandom;
     private final int[] mSequenceLengths;
     private final long mTotalLength;
 
     private RandomPositionGenerator(SequencesReader reader, PortableRandom random) throws IOException {
-      mReader = reader;
       mRandom = random;
-      mSequenceLengths = mReader.sequenceLengths(0, (int) mReader.numberSequences());
-      mTotalLength = mReader.totalLength();
+      mSequenceLengths = reader.sequenceLengths(0, (int) reader.numberSequences());
+      mTotalLength = reader.totalLength();
     }
 
     @Override

@@ -127,19 +127,19 @@ public class Names implements NamesInterface {
   private final ArrayList<byte[]> mNames = new ArrayList<>();
   private final ArrayList<int[]> mPointers = new ArrayList<>();
 
-  private final boolean mSuffixes;
-
-  /** Constructor only for testing purposes. */
+  /**
+   * Constructor only for testing purposes.
+   */
   Names() {
-    mSuffixes = false;
   }
 
 
   /**
    * Construct from a preread.
+   *
    * @param preread preread directory
    * @param region the region of the SDF to load names for
-   * @exception IOException if an I/O error occurs.
+   * @throws IOException if an I/O error occurs.
    */
   public Names(File preread, LongRange region) throws IOException {
     this(preread, region, false);
@@ -147,13 +147,13 @@ public class Names implements NamesInterface {
 
   /**
    * Construct from a preread.
+   *
    * @param preread preread directory
    * @param region the region of the SDF to load names for
    * @param suffixes load name suffixes instead of names
-   * @exception IOException if an I/O error occurs.
+   * @throws IOException if an I/O error occurs.
    */
   public Names(final File preread, LongRange region, boolean suffixes) throws IOException {
-    mSuffixes = suffixes;
     final IndexFile id = new IndexFile(preread);
     if (!id.hasNames()) {
       throw new FileNotFoundException("Error: SDF contains no name data");
@@ -167,18 +167,18 @@ public class Names implements NamesInterface {
     if (end - start > 0) {
       //final long[] nameIndex = ArrayUtils.readLongArray(Bsd.labelIndexFile(preread));
       final DataFileIndex nameIndex;
-      if (mSuffixes) {
+      if (suffixes) {
         nameIndex = DataFileIndex.loadLabelSuffixDataFileIndex(id.dataIndexVersion(), preread);
       } else {
         nameIndex = DataFileIndex.loadLabelDataFileIndex(id.dataIndexVersion(), preread);
       }
-      final int firstNameOffset = loadPointers(mPointers, preread, start, end, nameIndex, mSuffixes);
+      final int firstNameOffset = loadPointers(mPointers, preread, start, end, nameIndex, suffixes);
 
-      loadNames(mNames, mPointers, preread, start, nameIndex, firstNameOffset, mSuffixes);
+      loadNames(mNames, mPointers, preread, start, nameIndex, firstNameOffset, suffixes);
     }
   }
 
- @Override
+  @Override
   public long calcChecksum() {
     final PrereadHashFunction namef = new PrereadHashFunction();
     for (int k = 0; k < mNames.size(); ++k) {
@@ -303,6 +303,7 @@ public class Names implements NamesInterface {
 
   /**
    * Quick print names from an SDF
+   *
    * @param args command-line arguments
    * @throws IOException all the time.
    */
