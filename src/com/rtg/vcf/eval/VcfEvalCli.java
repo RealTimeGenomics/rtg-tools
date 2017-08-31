@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -326,8 +327,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     if (!mFlags.isSet(ROC_SUBSET)) {
       rocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.SNP, RocFilter.NON_SNP));
     } else {
-      rocFilters = new HashSet<>();
-      for (Object o : mFlags.getValues(ROC_SUBSET)) {
+      final List<?> values = mFlags.getValues(ROC_SUBSET);
+      rocFilters = new HashSet<>(values.size());
+      for (Object o : values) {
         rocFilters.add(((VcfEvalRocFilter) o).filter());
       }
     }

@@ -445,8 +445,9 @@ public final class SamUtils {
    * @return a List of the sequence names
    */
   public static List<String> getSequenceNames(SAMFileHeader header) {
-    final List<String> names = new ArrayList<>();
-    for (final SAMSequenceRecord rec : header.getSequenceDictionary().getSequences()) {
+    final List<SAMSequenceRecord> sequences = header.getSequenceDictionary().getSequences();
+    final List<String> names = new ArrayList<>(sequences.size());
+    for (final SAMSequenceRecord rec : sequences) {
       names.add(rec.getSequenceName());
     }
     return names;
@@ -458,8 +459,9 @@ public final class SamUtils {
    * @return the lookup.
    */
   public static Map<String, Integer> getSequenceIdLookup(SAMSequenceDictionary dict) {
-    final Map<String, Integer> lookup = new HashMap<>();
-    for (SAMSequenceRecord rec : dict.getSequences()) {
+    final List<SAMSequenceRecord> sequences = dict.getSequences();
+    final Map<String, Integer> lookup = new HashMap<>(sequences.size());
+    for (SAMSequenceRecord rec : sequences) {
       lookup.put(rec.getSequenceName(), rec.getSequenceIndex());
     }
     return lookup;

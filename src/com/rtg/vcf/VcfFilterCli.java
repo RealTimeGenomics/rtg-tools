@@ -431,8 +431,9 @@ public final class VcfFilterCli extends AbstractCli {
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {
     final String expressionString = fileOrString(flags, KEEP_EXPRESSION_FLAG);
-    final List<String> beginnings = new ArrayList<>();
-    for (Object begin : flags.getValues(JAVASCRIPT_FLAG)) {
+    final List<?> values = flags.getValues(JAVASCRIPT_FLAG);
+    final List<String> beginnings = new ArrayList<>(values.size());
+    for (Object begin : values) {
       beginnings.add(fileIfExists((String) begin));
     }
     if (expressionString != null || beginnings.size() > 0) {

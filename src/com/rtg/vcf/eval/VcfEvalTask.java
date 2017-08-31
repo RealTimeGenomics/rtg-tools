@@ -122,8 +122,12 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
 
     final NamesInterface names = templateSequences.names();
-    final Map<String, Long> nameMap = new HashMap<>();
-    for (long i = 0; i < names.length(); ++i) {
+    final long numNames = names.length();
+    if (numNames > Integer.MAX_VALUE) {
+      throw new UnsupportedOperationException();
+    }
+    final Map<String, Long> nameMap = new HashMap<>((int) numNames);
+    for (long i = 0; i < numNames; ++i) {
       nameMap.put(names.name(i), i);
     }
 
@@ -228,8 +232,10 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final String baselineSample = params.baselineSample();
     final String callsSample = params.callsSample();
 
-    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>();
-    for (long i = 0; i < templateSequences.names().length(); ++i) {
+    final long numSequences = templateSequences.names().length();
+    assert numSequences <= Integer.MAX_VALUE;
+    final List<Pair<String, Integer>> nameOrdering = new ArrayList<>((int) numSequences);
+    for (long i = 0; i < numSequences; ++i) {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
 

@@ -458,7 +458,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
       if (range.length < 1) {
         throw new IllegalArgumentException("Must specify at least one value in parameter range.");
       }
-      final List<String> l = new ArrayList<>();
+      final List<String> l = new ArrayList<>(range.length);
       for (final String s : range) {
         try {
           parseValue(s);
@@ -552,7 +552,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
     }
     if (mRangeList) {
       final String[] valueStrs = StringUtils.split(valueStr, ',');
-      final List<T> values = new ArrayList<>();
+      final List<T> values = new ArrayList<>(valueStrs.length);
       for (final String valueStr2 : valueStrs) {
         final T value = parseValue(valueStr2);
         mParameter.add(value);

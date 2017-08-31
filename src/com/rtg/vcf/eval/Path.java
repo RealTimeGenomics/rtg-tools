@@ -287,7 +287,7 @@ public final class Path implements Comparable<Path> {
 
   // Counts the baseline and called variants between each sync point
   private static List<SyncPoint> getSyncPointsList(final List<Integer> syncpoints, final List<OrientedVariant> baseLine, final List<OrientedVariant> called) {
-    final List<SyncPoint> list = new ArrayList<>();
+    final List<SyncPoint> list = new ArrayList<>(syncpoints.size());
     int basePos = 0;
     int callPos = 0;
     for (int loc : syncpoints) {

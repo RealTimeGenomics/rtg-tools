@@ -76,7 +76,7 @@ public class BamIndexReader extends AbstractIndexReader {
       }
 
       mSequenceNames = new String[numRefs];
-      mSequenceLookup = new HashMap<>();
+      mSequenceLookup = new HashMap<>(dict.size());
       for (int i = 0; i < dict.size(); ++i) {
         mSequenceNames[i] = dict.getSequence(i).getSequenceName();
         mSequenceLookup.put(mSequenceNames[i], i);

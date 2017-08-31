@@ -581,7 +581,7 @@ public class VariantStatistics extends AbstractStatistics {
 
   Pair<List<String>, Map<String, List<String>>> perSampleMap() {
     List<String> names = new ArrayList<>();
-    final Map<String, List<String>> values = new LinkedHashMap<>();
+    final Map<String, List<String>> values = new LinkedHashMap<>(mPerSampleStats.size());
     // per sample stats
     int length = 0;
     for (final Entry<String, PerSampleVariantStatistics> e : mPerSampleStats.entrySet()) {

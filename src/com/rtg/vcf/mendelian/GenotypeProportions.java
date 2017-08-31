@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -83,7 +82,7 @@ public final class GenotypeProportions {
    * @throws IOException if an IO error occurs
    */
   public void writeResults(Appendable app) throws IOException {
-    final List<Pair<Long, StringBuilder>> results = new ArrayList<>();
+    final List<Pair<Long, StringBuilder>> results = new ArrayList<>(mAlleleSets.size());
     for (Map.Entry<Parents, MultiSet<Genotype>> e : mAlleleSets.entrySet()) {
       final StringBuilder res = new StringBuilder();
       final Parents p = e.getKey();
@@ -105,7 +104,7 @@ public final class GenotypeProportions {
       res.append(StringUtils.LS);
       results.add(new Pair<>(tot, res));
     }
-    Collections.sort(results, new CountPairComparator());
+    results.sort(new CountPairComparator());
     for (Pair<Long, StringBuilder> p : results) {
       app.append(p.getB().toString());
     }

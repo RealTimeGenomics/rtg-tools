@@ -181,8 +181,11 @@ public final class ReaderUtils {
    * @throws IOException if an error occurs during reading
    */
   public static Map<String, Integer> getSequenceLengthMap(final SequencesReader genome) throws IOException {
-    final Map<String, Integer> names = new LinkedHashMap<>();
     final long numberSequences = genome.numberSequences();
+    if (numberSequences > Integer.MAX_VALUE) {
+      throw new UnsupportedOperationException();
+    }
+    final Map<String, Integer> names = new LinkedHashMap<>((int) numberSequences);
     for (long l = 0; l < numberSequences; ++l) {
       names.put(genome.name(l), genome.length(l));
     }

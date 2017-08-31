@@ -198,7 +198,7 @@ public class TaxonomyDistribution {
      * @return <code>mDist</code> distributed amongst the underlying sequences in proportion to their lengths
      */
     Map<Integer, Double> simulationDnaFractionDist() {
-      final Map<Integer, Double> res = new HashMap<>();
+      final Map<Integer, Double> res = new HashMap<>(mSequences.size());
       final int total = totalLength();
       for (SequenceInfo s : mSequences) {
         res.put(s.mSequenceId, mDist * s.mLength / total);
@@ -209,7 +209,7 @@ public class TaxonomyDistribution {
      * @return <code>mDist</code> distributed
      */
     Map<Integer, Double> simulationAbundanceDist() {
-      final Map<Integer, Double> res = new HashMap<>();
+      final Map<Integer, Double> res = new HashMap<>(mSequences.size());
       for (SequenceInfo s : mSequences) {
         res.put(s.mSequenceId, mDist * s.mLength);
       }

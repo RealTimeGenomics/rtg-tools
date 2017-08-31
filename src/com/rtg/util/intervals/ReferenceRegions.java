@@ -235,7 +235,7 @@ public class ReferenceRegions {
    * @return a map from sequence name to number of bases covered by regions
    */
   public Map<String, Integer> coveredLengths() {
-    final Map<String, Integer> map = new HashMap<>();
+    final Map<String, Integer> map = new HashMap<>(mSequences.size());
     for (Map.Entry<String, MergedIntervals> entry : mSequences.entrySet()) {
       map.put(entry.getKey(), entry.getValue().totalLength());
     }

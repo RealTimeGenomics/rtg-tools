@@ -123,8 +123,8 @@ public final class Cg2Sdf extends LoggedCli {
 
     final SdfId sdfId = new SdfId();
 
-    final List<CgSequenceDataSource> sources = new ArrayList<>();
-    final List<String> names = new ArrayList<>();
+    final List<CgSequenceDataSource> sources = new ArrayList<>(inputFiles.size());
+    final List<String> names = new ArrayList<>(inputFiles.size());
 
     for (final File f : inputFiles) {
       final String path = getBaseInputPath(f);

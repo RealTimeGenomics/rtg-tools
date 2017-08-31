@@ -85,7 +85,7 @@ public class VcfIdAnnotator implements VcfAnnotator {
         }
       }
     }
-    final Map<String, RangeList<String>> annotationSearch = new HashMap<>();
+    final Map<String, RangeList<String>> annotationSearch = new HashMap<>(annotations.size());
     for (final Map.Entry<String, List<RangeList.RangeData<String>>> me : annotations.entrySet()) {
       annotationSearch.put(me.getKey(), new RangeList<>(me.getValue()));
     }

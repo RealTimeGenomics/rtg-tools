@@ -292,7 +292,6 @@ public class CommandLineFiles {
     * @throws NoTalkbackSlimException if too many files fail validation.
     */
   public List<File> getFileList(CFlags flags) throws IOException {
-    final List<File> files = new ArrayList<>();
     mErrorCount = 0;
 
     final Collection<?> fValues;
@@ -301,6 +300,7 @@ public class CommandLineFiles {
     } else {
       fValues = flags.getValues(mSingleInputFlag);
     }
+    final List<File> files = new ArrayList<>(fValues.size());
     for (final Object o : fValues) {
       final File f = (File) o;
       if (!validate(f)) {
