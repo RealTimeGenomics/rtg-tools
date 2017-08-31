@@ -38,66 +38,52 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 
+import com.rtg.AbstractTest;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.LogRecord;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class ParamsTaskTest extends TestCase {
+public class ParamsTaskTest extends AbstractTest {
 
-  protected File mDir;
-
-  @Override
-  public void setUp() throws IOException {
-    Diagnostic.setLogStream();
-    mDir = FileHelper.createTempDirectory();
-  }
-
-  @Override
-  public void tearDown() {
-    assertTrue(FileHelper.deleteAll(mDir));
-    mDir = null;
-  }
-
-  public void test() throws IOException, InvalidParamsException {
-    final LogRecord log = new LogRecord();
-    Diagnostic.setLogStream(log);
-    try {
-      final File subject = ReaderTestUtils.getDNADir(">s" + LS + "ACTGA" + LS, new File(mDir, "s"));
-      final String su = subject.getAbsolutePath();
-      final File query = ReaderTestUtils.getDNADir(">q" + LS + "CTGA" + LS, new File(mDir, "q"));
-      final String qu = query.getAbsolutePath();
-      final File dir = FileUtils.createTempDir("test", "outdir");
-      final String di = dir.getAbsolutePath();
-      final MockCliParams pr = getParamsStatic(new String[]{"-o", di, "-i", su, "-x", qu, "-l", "4", "-Z"});
-      final File diro = FileHelper.createTempDirectory();
-      pr.setDirectory(diro);
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-      final ParamsTask<MockCliParams, NoStatistics> pc = new DummyTask(pr, out);
-      assertEquals(pr, pc.parameters());
-
-      pc.run();
-
-      assertEquals("", out.toString());
-      assertTrue(FileHelper.deleteAll(diro));
-      assertTrue(FileHelper.deleteAll(query));
-      assertTrue(FileHelper.deleteAll(subject));
-      assertTrue(FileHelper.deleteAll(dir));
-    } finally {
-      Diagnostic.setLogStream();
+  class MockStatistics implements Statistics {
+    private boolean mStatsDone;
+    private boolean mReportDone;
+    @Override
+    public void printStatistics(OutputStream reportStream) throws IOException {
+      mStatsDone = true;
+    }
+    @Override
+    public void generateReport() throws IOException {
+      mReportDone = true;
     }
   }
 
-  private class DummyTask extends MockTask {
-    DummyTask(final MockCliParams params, final OutputStream defaultOutput) {
-      super(params, defaultOutput);
+  public void test() throws IOException, InvalidParamsException {
+    try (TestDirectory dir = new TestDirectory()) {
+      final File subject = ReaderTestUtils.getDNADir(">s" + LS + "ACTGA" + LS, new File(dir, "s"));
+      final File query = ReaderTestUtils.getDNADir(">q" + LS + "CTGA" + LS, new File(dir, "q"));
+      final File odir = FileHelper.createTempDirectory(dir);
+      final MockCliParams pr = getParamsStatic(new String[]{"-o", odir.getAbsolutePath(), "-i", subject.getAbsolutePath(), "-x", query.getAbsolutePath(), "-l", "4", "-Z"});
+      pr.setDirectory(odir);
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      final MockStatistics m = new MockStatistics();
+      final ParamsTask<MockCliParams, MockStatistics> pc = new DummyTask(pr, out, m);
+      assertEquals(pr, pc.parameters());
+      pc.run();
+      assertTrue(m.mReportDone);
+      assertTrue(m.mStatsDone);
+      assertEquals("mcp:", pc.toString());
+      assertEquals("", out.toString());
+    }
+  }
+
+  private class DummyTask extends MockTask<MockStatistics> {
+    DummyTask(final MockCliParams params, final OutputStream defaultOutput, MockStatistics m) {
+      super(params, defaultOutput, m);
     }
   }
 
@@ -105,7 +91,6 @@ public class ParamsTaskTest extends TestCase {
     final Appendable out = new StringWriter();
     final Appendable err = new StringWriter();
     final CFlags flags = new CFlags("testMockParams", out, err);
-    //MockCliParams.initFlags(flags);
     flags.setFlags(args);
     return new MockCliParams(flags);
   }

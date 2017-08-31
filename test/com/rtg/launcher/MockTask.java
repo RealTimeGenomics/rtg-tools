@@ -36,10 +36,10 @@ import com.rtg.util.diagnostic.SlimException;
 
 /**
  */
-public class MockTask extends ParamsTask<MockCliParams, NoStatistics> {
+public class MockTask<T extends Statistics> extends ParamsTask<MockCliParams, T> {
 
-  MockTask(final MockCliParams params, final OutputStream defaultOutput) {
-    super(params, defaultOutput, new NoStatistics(), null);
+  MockTask(final MockCliParams params, final OutputStream defaultOutput, T m) {
+    super(params, defaultOutput, m, null);
   }
 
   @Override

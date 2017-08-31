@@ -109,7 +109,7 @@ public class MockCliParams extends ModuleParams {
 
   @Override
   public String toString() {
-    return (mGlobalError ? " global" : "") + (mValidatorError ? " validator" : "") + (mConstructorError ? " constructor" : "");
+    return "mcp:" + (mGlobalError ? " global" : "") + (mValidatorError ? " validator" : "") + (mConstructorError ? " constructor" : "");
   }
 
   @Override
