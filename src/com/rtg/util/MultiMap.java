@@ -233,27 +233,18 @@ public class MultiMap<K, V> {
     return mMap.equals(that.mMap);
   }
 
-  /**
-   * Returns <code>toString</code> of underlying data structure.
-   *
-   * @return classic version of <code>toString</code>
-   */
-  public String classicToString() {
-    return mMap.toString();
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("{").append(StringUtils.LS);
+    sb.append('{').append(StringUtils.LS);
     for (final Map.Entry<K, Collection<V>> entry : mMap.entrySet()) {
       final K key = entry.getKey();
-      sb.append(" ").append(key).append(" -> ");
+      sb.append(' ').append(key).append(" -> ");
       final Collection<V> coll = entry.getValue();
       final String collString = Arrays.toString(coll.toArray());
       sb.append(collString).append(StringUtils.LS);
     }
-    sb.append("}").append(StringUtils.LS);
+    sb.append('}').append(StringUtils.LS);
     return sb.toString();
   }
 }
