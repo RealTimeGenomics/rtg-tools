@@ -35,6 +35,7 @@ import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
+import static com.rtg.launcher.CommonFlags.NO_HEADER;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
@@ -75,7 +76,6 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public final class VcfFilterCli extends AbstractCli {
 
-  // filter flags
   private static final String REMOVE_INFO = "remove-info";
   private static final String KEEP_INFO = "keep-info";
 
@@ -125,7 +125,6 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String EXPR_FLAG = "Xexpr";
   private static final String KEEP_EXPRESSION_FLAG = "keep-expr";
   private static final String JAVASCRIPT_FLAG = "javascript";
-  private static final String NO_HEADER = "no-header";
 
 
   private final VcfFilterTask mVcfFilterTask = new VcfFilterTask();

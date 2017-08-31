@@ -30,7 +30,10 @@
 package com.rtg.vcf;
 
 import static com.rtg.launcher.CommonFlags.FILE;
+import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
+import static com.rtg.launcher.CommonFlags.NO_HEADER;
+import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
@@ -67,12 +70,6 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class VcfSubset extends AbstractCli {
 
-  // flags
-  private static final String MODULE_NAME = "vcfsubset";
-  private static final String INPUT = "input";
-  private static final String OUTPUT = "output";
-  private static final String NO_HEADER = "no-header";
-
   private static final String REMOVE_INFO = "remove-info";
   private static final String KEEP_INFO = "keep-info";
   private static final String REMOVE_INFOS = "remove-infos";
@@ -96,7 +93,7 @@ public class VcfSubset extends AbstractCli {
 
   @Override
   public String moduleName() {
-    return MODULE_NAME;
+    return "vcfsubset";
   }
 
   @Override
@@ -109,8 +106,8 @@ public class VcfSubset extends AbstractCli {
     mFlags.setDescription("Removes columnar data from VCF records.");
     CommonFlagCategories.setCategories(mFlags);
 
-    mFlags.registerRequired('i', INPUT, File.class, FILE, "VCF file containing variants to manipulate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('o', OUTPUT, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to manipulate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
@@ -150,8 +147,8 @@ public class VcfSubset extends AbstractCli {
   private static class VcfSubsetValidator implements Validator {
     @Override
     public boolean isValid(final CFlags flags) {
-      return CommonFlags.validateInputFile(flags, INPUT)
-        && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT)))
+      return CommonFlags.validateInputFile(flags, INPUT_FLAG)
+        && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
         && flags.checkAtMostOne(REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)
         && flags.checkAtMostOne(REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)
         && flags.checkAtMostOne(REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)
@@ -205,11 +202,9 @@ public class VcfSubset extends AbstractCli {
 
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
-    final File input = (File) mFlags.getValue(INPUT);
-    final File output = (File) mFlags.getValue(OUTPUT);
+    final File input = (File) mFlags.getValue(INPUT_FLAG);
+    final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean index = !mFlags.isSet(CommonFlags.NO_INDEX);
-    final boolean writeHeader = !mFlags.isSet(NO_HEADER);
     final boolean stdout = FileUtils.isStdio(output);
 
     final List<VcfAnnotator> annotators = new ArrayList<>();

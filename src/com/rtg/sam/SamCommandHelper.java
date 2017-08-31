@@ -29,6 +29,8 @@
  */
 package com.rtg.sam;
 
+import static com.rtg.launcher.CommonFlags.STRING_OR_FILE;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -56,7 +58,6 @@ public final class SamCommandHelper {
 
   /** flag to capture SAM read group information */
   public static final String SAM_RG = "sam-rg";
-  static final String STRING_OR_FILE = "STRING|FILE";
 
   /**
    * Method adds SAM read group flag to given input
