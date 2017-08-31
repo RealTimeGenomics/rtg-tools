@@ -237,7 +237,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     }
     mPositions.set(counts.length, pos);
     mFullNamesRequested = false;
-    final StringBuilder sb = new StringBuilder(LS + "CompressedMemorySequencesReader-tests");
+    final StringBuilder sb = new StringBuilder(LS).append("CompressedMemorySequencesReader-tests");
     this.infoString(sb);
     Diagnostic.userLog(sb.toString());
   }
@@ -288,8 +288,8 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
           loadNames();
           loadNameSuffixes(loadFullNames, mIndex.hasSequenceNameSuffixes());
         }
-        final StringBuilder sb = new StringBuilder("CompressedMemorySequencesReader " + speedMB + " MB/sec, time " + timetaken + " sec" + LS);
-        this.infoString(sb);
+        final StringBuilder sb = new StringBuilder("CompressedMemorySequencesReader ").append(speedMB).append(" MB/sec, time ").append(timetaken).append(" sec").append(LS);
+        infoString(sb);
         Diagnostic.developerLog(sb.toString());
       } catch (final ArrayIndexOutOfBoundsException | IllegalArgumentException e) {
         throw new CorruptSdfException();
