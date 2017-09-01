@@ -74,7 +74,7 @@ public final class ToolsCommand {
   static final Command FORMAT = new Command(new FormatCli(), CommandCategory.FORMAT, ReleaseLevel.GA);
 
   /** For pre-processing data files and trimming reads */
-  static final Command FASTQTRIM = new Command(new FastqTrim(), CommandCategory.FORMAT, ReleaseLevel.BETA);
+  static final Command FASTQTRIM = new Command(new FastqTrim(), CommandCategory.FORMAT, ReleaseLevel.GA);
 
   /** For converting Slim's data format into FASTA format */
   static final Command SDF2FASTA = new Command(new Sdf2Fasta(), CommandCategory.FORMAT, ReleaseLevel.GA);
