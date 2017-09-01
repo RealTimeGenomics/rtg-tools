@@ -194,7 +194,7 @@ public final class FileHelper {
   public static String readerToString(final Reader fileReader) throws IOException {
     final StringBuilder sb = new StringBuilder();
     try (BufferedReader br = new BufferedReader(fileReader)) {
-      final char[] buffer = FileUtils.makeBuffer();
+      final char[] buffer = new char[FileUtils.BUFFER_SIZE];
       final int eof = -1;
       for (int len = br.read(buffer); len > eof; len = br.read(buffer)) {
         for (int i = 0; i < len; ++i) {

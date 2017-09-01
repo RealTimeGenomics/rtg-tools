@@ -579,7 +579,7 @@ public final class FileUtils {
   public static String readerToString(final Reader fileReader) throws IOException {
     final StringBuilder sb = new StringBuilder();
     try (BufferedReader br = new BufferedReader(fileReader)) {
-      final char[] buffer = FileUtils.makeBuffer();
+      final char[] buffer = new char[FileUtils.BUFFER_SIZE];
       final int eof = -1;
       for (int len = br.read(buffer); len > eof; len = br.read(buffer)) {
         for (int i = 0; i < len; ++i) {
@@ -588,13 +588,6 @@ public final class FileUtils {
       }
     }
     return sb.toString();
-  }
-
-  /**
-   * @return a buffer of suitable size for file i/o.
-   */
-  public static char[] makeBuffer() {
-    return new char[FileUtils.BUFFER_SIZE];
   }
 
   /**
@@ -610,7 +603,7 @@ public final class FileUtils {
       throw new NullPointerException("null stream given");
     }
     final StringBuilder out = new StringBuilder();
-    final byte[] b = FileUtils.makeByteBuffer();
+    final byte[] b = new byte[FileUtils.BUFFER_SIZE];
     int len = stream.read(b);
     final int eof = -1;
     while (len != eof) {
@@ -620,13 +613,6 @@ public final class FileUtils {
       len = stream.read(b);
     }
     return out.toString();
-  }
-
-  /**
-   * @return a buffer of suitable size for file i/o.
-   */
-  static byte[] makeByteBuffer() {
-    return new byte[FileUtils.BUFFER_SIZE];
   }
 
   /**

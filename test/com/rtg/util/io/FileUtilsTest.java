@@ -283,12 +283,12 @@ public class FileUtilsTest extends TestCase {
   }
 
   public void testMakeBuffer() {
-    final char[] chars = FileUtils.makeBuffer();
+    final char[] chars = new char[FileUtils.BUFFER_SIZE];
     assertTrue(chars != null && chars.length == 8192);
   }
 
   public void testMakeByteBuffer() {
-    final byte[] bytes = FileUtils.makeByteBuffer();
+    final byte[] bytes = new byte[FileUtils.BUFFER_SIZE];
     assertTrue(bytes != null && bytes.length == 8192);
   }
 
