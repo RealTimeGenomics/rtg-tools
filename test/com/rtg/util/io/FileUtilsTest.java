@@ -282,42 +282,10 @@ public class FileUtilsTest extends TestCase {
     assertTrue(pid > 0);
   }
 
-  public void testMakeBuffer() {
-    final char[] chars = new char[FileUtils.BUFFER_SIZE];
-    assertTrue(chars != null && chars.length == 8192);
-  }
-
-  public void testMakeByteBuffer() {
-    final byte[] bytes = new byte[FileUtils.BUFFER_SIZE];
-    assertTrue(bytes != null && bytes.length == 8192);
-  }
-
   public void testOutputStream() throws Exception {
     // will NPE if method fails
     FileUtils.getStdoutAsOutputStream().close();
   }
-
-  /*
-   //for showing doesn't work in .NET
-  public void testBigZip() {
-    final long fourMb = 4 * 1024 * 1024;
-    final File dir = FileUtils.createTempDir("bigziptest", "big");
-    try {
-      final File out = new File(dir, "4gb.gz");
-      final OutputStream outS = new GZIPOutputStream(new FileOutputStream(out));
-      try {
-        final byte[] buf = new byte[1024];
-        for (int i = 0; i < fourMb; ++i) {
-          outS.write(buf);
-        }
-      } finally {
-        outS.close();
-      }
-    } finally {
-      FileUtils.deleteAll(dir);
-    }
-  }
-  */
 
   public void testCattedGZipFiles() throws IOException {
     final File tmpDir = FileUtils.createTempDir("testGzipCatting", "test");
