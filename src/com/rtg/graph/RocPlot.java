@@ -839,9 +839,9 @@ public class RocPlot {
     rp.showScores(scores);
     rp.setTitle(title != null ? title : precisionRecall ? PRECISION_SENSITIVITY : ROC);
     SwingUtilities.invokeAndWait(() -> {
+      frame.pack();
       frame.setSize(1024, 768);
       frame.setLocation(50, 50);
-      frame.pack();
       frame.setVisible(true);
       rp.showCurrentGraph();
       if (hideSidePanel) {
