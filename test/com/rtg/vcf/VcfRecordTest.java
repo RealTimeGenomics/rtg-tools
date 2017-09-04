@@ -179,5 +179,21 @@ public class VcfRecordTest extends TestCase {
     assertEquals(Collections.singletonList("PASS"), rec.getFilters());
     rec.addFilter("a1.0");
     assertEquals(Collections.singletonList("a1.0"), rec.getFilters());
+
+    // Test per-sample filtering
+    rec.setNumberOfSamples(2);
+    rec.addSampleFilter("PASS", 1);
+    assertEquals("[., PASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    rec.addSampleFilter("NOPASS", 1);
+    assertEquals("[., NOPASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    rec.addSampleFilter("AVR", 1);
+    assertEquals("[., NOPASS;AVR]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    rec.addSampleFilter("NOPASS", 0);
+    assertEquals("[NOPASS, NOPASS;AVR]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    rec.addSampleFilter("PASS", 1);
+    assertEquals("[NOPASS, PASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    rec.addSampleFilter(".", 1);
+    assertEquals("[NOPASS, .]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+
   }
 }

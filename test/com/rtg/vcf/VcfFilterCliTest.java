@@ -86,8 +86,9 @@ public class VcfFilterCliTest extends AbstractCliTest {
       , "--exclude-bed=FILE", "discard all variants within the regions in this BED file"
       , "--include-vcf=FILE", "only keep variants that overlap with the ones in this file"
       , "--exclude-vcf=FILE", "discard all variants that overlap with the ones in this file"
-      , "--clear-failed-samples", "instead of removing failed records set the sample GT fields to missing"
-      , "--fail=STRING", "instead of removing failed records set their filter field to the provided value"
+      , "--clear-failed-samples", "set the sample GT field to missing"
+      , "--fail=STRING", "add the provided label to the FILTER field"
+      , "--fail-samples=STRING", "add the provided label to the sample FT field"
       , "--remove-all-same-as-ref", "remove where all samples are same as reference"
       , "--remove-same-as-ref", "remove where sample is same as reference"
       , "--snps-only", "keep where sample variant is a simple SNP"
@@ -331,12 +332,28 @@ public class VcfFilterCliTest extends AbstractCliTest {
     runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp6.vcf", "--min-avr-score", "0.3", "--all-samples", "--clear-failed-samples");
   }
 
+  public void testAvr7() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_Avr7.vcf", "--min-avr-score", "0.3", "--sample=SAMPLE", "--fail-samples=AVR_0.3");
+  }
+
   public void testAmbiguousMultisample() throws IOException {
     runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp7.vcf", "-r", "a1000.0", "--clear-failed-samples", "--all-samples");
   }
 
   public void testAmbiguousMultisample2() throws IOException {
     runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_exp8.vcf", "-r", "a1000.0", "--clear-failed-samples", "--sample", "SAMPLE2");
+  }
+
+  public void testAmbiguousMultisample3() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_AmMu3.vcf", "-r", "a1000.0", "--fail-samples=a1000.0", "--all-samples");
+  }
+
+  public void testAmbiguousMultisample4() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_AmMu4.vcf", "-r", "a1000.0", "--fail-samples=a1000.0", "--sample", "SAMPLE2");
+  }
+
+  public void testAmbiguousMultisample5() throws IOException {
+    runResourceTest(RESOURCES + "snpfiltertestAVR.vcf", "snpfiltertestAVR_AmMu5.vcf", "-k", "a1000.0", "--fail-samples=Not_a1000.0", "--sample", "SAMPLE2");
   }
 
   public void testComplex() throws IOException {

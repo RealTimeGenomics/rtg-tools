@@ -269,6 +269,33 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * Adds a sample-specific filter
+   * @param filter filter to be added
+   * @param sampleIndex index of sample, (from <code>VcfHeader</code>)
+   * @return this, for call chaining
+   */
+  public VcfRecord addSampleFilter(String filter, int sampleIndex) {
+    final List<String> filters = mFormatAndSample.computeIfAbsent(VcfUtils.FORMAT_FILTER, l -> new ArrayList<>());
+    while (filters.size() < mNumSamples) {
+      filters.add(MISSING);
+    }
+    String ft = filters.get(sampleIndex);
+
+    // VCF spec says the field is either PASS or semicolon separated list of failures.
+    // So we may need to remove any existing PASS, or other filters, depending on what comes in.
+    if (MISSING.equals(ft)
+      || MISSING.equals(filter)
+      || VcfUtils.FILTER_PASS.equals(filter)
+      || VcfUtils.FILTER_PASS.equals(ft)) {
+      ft = filter;
+    } else {
+      ft = ft + VcfUtils.VALUE_SEPARATOR + filter;
+    }
+    filters.set(sampleIndex, ft);
+    return this;
+  }
+
+  /**
    * @return info fields (should be treated as read-only).
    */
   public Map<String, ArrayList<String>> getInfo() {
@@ -282,11 +309,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addInfo(String key, String... values) {
-    ArrayList<String> val = mInfo.get(key);
-    if (val == null) {
-      val = new ArrayList<>();
-      mInfo.put(key, val);
-    }
+    final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
     if (values != null) {
       Collections.addAll(val, values);
     }
@@ -300,11 +323,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord setInfo(String key, String... values) {
-    ArrayList<String> val = mInfo.get(key);
-    if (val == null) {
-      val = new ArrayList<>();
-      mInfo.put(key, val);
-    }
+    final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
     val.clear();
     if (values != null) {
       Collections.addAll(val, values);
@@ -371,7 +390,7 @@ public class VcfRecord implements SequenceNameLocus {
    */
   public VcfRecord addFormat(String key) {
     if (!mFormatAndSample.containsKey(key)) {
-      mFormatAndSample.put(key, new ArrayList<String>());
+      mFormatAndSample.put(key, new ArrayList<>());
     }
     return this;
   }

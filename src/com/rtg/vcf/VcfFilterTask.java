@@ -43,8 +43,11 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.vcf.VcfFilterStatistics.Stat;
 import com.rtg.vcf.header.FilterField;
+import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * This is what does the business of filtering for <code>vcffilter</code>. It's been quite brutally pulled out of
@@ -89,6 +92,7 @@ class VcfFilterTask {
   protected boolean mRemoveOverlapping;
   protected boolean mResetFailedSampleGts = false;
   protected String mFailFilterName = null;
+  protected String mFailSampleFilterName = null;
 
 
   void setHeader(VcfHeader header) {
@@ -103,6 +107,10 @@ class VcfFilterTask {
     if (mFailFilterName != null) {
       header.ensureContains(new FilterField(mFailFilterName, "RTG vcffilter user defined filter"));
     }
+    if (mFailSampleFilterName != null) {
+      header.ensureContains(new FilterField(mFailSampleFilterName, "RTG vcffilter user defined filter"));
+      header.ensureContains(new FormatField(VcfUtils.FORMAT_FILTER, MetaType.STRING, VcfNumber.ONE, "Sample-specific filter status"));
+    }
   }
 
   protected void printStatistics(OutputStream outStream) {
@@ -111,7 +119,7 @@ class VcfFilterTask {
 
   // check user specified info/filter fields are valid
   protected void checkHeaderFieldFilters(VcfHeader header) {
-    if (mCheckingSample || mResetFailedSampleGts) {
+    if (mCheckingSample || mResetFailedSampleGts || mFailSampleFilterName != null) {
       mSampleFailed = new boolean[header.getNumberOfSamples()];
       if (mAllSamples) {
         mSampleIndexes = new int[header.getNumberOfSamples()];
@@ -173,8 +181,8 @@ class VcfFilterTask {
         } else if (mFailFilterName != null) {
           record.addFilter(mFailFilterName);
           write(w, record);
-        } else if (mResetFailedSampleGts) {
-          resetSampleGts(record);
+        } else if (mResetFailedSampleGts || mFailSampleFilterName != null) {
+          filterSamples(record);
           write(w, record);
         }
       }
@@ -182,26 +190,36 @@ class VcfFilterTask {
       throw new NoTalkbackSlimException(iae.getMessage());
     }
     flush(w);
-  }// Reset the GT of any samples that failed during the sample-specific filtering to missing value
+  }
 
-  // and all GT of selected samples when a non-sample specific filter is triggered
-  void resetSampleGts(VcfRecord record) {
+  // Any samples that failed during the sample-specific filtering (or those failing non-sample-specific filtering)
+  // will either have their GT set to missing value or FT field set.
+  void filterSamples(VcfRecord record) {
     final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
-    if (sampleGts == null) {
+    if (mFailSampleFilterName == null && sampleGts == null) {
       throw new VcfFormatException("Record does not contain " + VcfUtils.FORMAT_GENOTYPE + " field:\n" + record);
     }
     if (mNonSampleSpecificFailed) {
       if (mSampleIndexes != null) {
         for (final int sampleIndex : mSampleIndexes) {
-          sampleGts.set(sampleIndex, VcfRecord.MISSING);
+          if (mFailSampleFilterName != null) {
+            record.addSampleFilter(mFailSampleFilterName, sampleIndex);
+          } else {
+            sampleGts.set(sampleIndex, VcfRecord.MISSING);
+          }
         }
       } else { // When running on a multiple sample VCF we must specify a sample or samples so this is only possible on a single sample VCF
+        assert mFailSampleFilterName == null;
         sampleGts.set(0, VcfRecord.MISSING);
       }
     } else if (mCheckingSample) {
       for (final int sampleIndex : mSampleIndexes) {
         if (mSampleFailed[sampleIndex]) {
-          sampleGts.set(sampleIndex, VcfRecord.MISSING);
+          if (mFailSampleFilterName != null) {
+            record.addSampleFilter(mFailSampleFilterName, sampleIndex);
+          } else {
+            sampleGts.set(sampleIndex, VcfRecord.MISSING);
+          }
         }
       }
     }

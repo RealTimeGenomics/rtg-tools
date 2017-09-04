@@ -110,6 +110,7 @@ public final class VcfFilterCli extends AbstractCli {
   private static final String MAX_DENOVO_SCORE = "max-denovo-score";
 
   private static final String FAIL_FLAG = "fail";
+  private static final String FAIL_SAMPLES_FLAG = "fail-samples";
   private static final String CLEAR_FAILED_SAMPLES = "clear-failed-samples";
 
   private static final String SAMPLE = "sample";
@@ -152,7 +153,7 @@ public final class VcfFilterCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered.");
+    mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered. By default filtered records are removed, but see the --" + FAIL_FLAG + ", --" + CLEAR_FAILED_SAMPLES + ", and --" + FAIL_SAMPLES_FLAG + " options for alternatives.");
     CommonFlagCategories.setCategories(mFlags);
 
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
@@ -167,8 +168,9 @@ public final class VcfFilterCli extends AbstractCli {
     VcfMerge.initAddHeaderFlag(mFlags);
 
     // What to apply to, what to do with the results of filtering
-    mFlags.registerOptional(FAIL_FLAG, String.class, STRING, "instead of removing failed records set their filter field to the provided value").setCategory(REPORTING);
-    mFlags.registerOptional(CLEAR_FAILED_SAMPLES, "instead of removing failed records set the sample GT fields to missing").setCategory(REPORTING);
+    mFlags.registerOptional(CLEAR_FAILED_SAMPLES, "retain failed records, set the sample GT field to missing").setCategory(REPORTING);
+    mFlags.registerOptional('f', FAIL_FLAG, String.class, STRING, "retain failed records, add the provided label to the FILTER field").setCategory(REPORTING);
+    mFlags.registerOptional('F', FAIL_SAMPLES_FLAG, String.class, STRING, "retain failed records, add the provided label to the sample FT field").setCategory(REPORTING);
 
     // Variant position
     mFlags.registerOptional(INCLUDE_BED, File.class, FILE, "only keep variants within the regions in this BED file").setCategory(FILTERING);
@@ -292,6 +294,8 @@ public final class VcfFilterCli extends AbstractCli {
     }
 
     mVcfFilterTask.mResetFailedSampleGts = mFlags.isSet(CLEAR_FAILED_SAMPLES);
+    mVcfFilterTask.mFailFilterName = mFlags.isSet(FAIL_FLAG) ? (String) mFlags.getValue(FAIL_FLAG) : null;
+    mVcfFilterTask.mFailSampleFilterName = mFlags.isSet(FAIL_SAMPLES_FLAG) ? (String) mFlags.getValue(FAIL_SAMPLES_FLAG) : null;
 
     // These involve checking the specified sample field
     mVcfFilterTask.mRemoveHom = mFlags.isSet(REMOVE_HOM);
@@ -392,7 +396,6 @@ public final class VcfFilterCli extends AbstractCli {
       ranges = null;
     }
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
-    mVcfFilterTask.mFailFilterName = mFlags.isSet(FAIL_FLAG) ? (String) mFlags.getValue(FAIL_FLAG) : null;
     for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
       final String e = (String) expr;
       if (e.startsWith("INFO.")) {
