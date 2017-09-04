@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -192,7 +192,7 @@ class TabixVcfRecordSet implements VariantSet {
 
   @Override
   public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() throws IOException {
-    final Map<VariantSetType, List<Variant>> map = new HashMap<>();
+    final Map<VariantSetType, List<Variant>> map = new EnumMap<>(VariantSetType.class);
     final Iterator<Pair<String, Integer>> iterator = mNames.iterator();
     if (!iterator.hasNext()) {
       return null;
