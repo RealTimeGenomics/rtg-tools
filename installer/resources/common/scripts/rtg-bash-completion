@@ -32,6 +32,7 @@ function _complete_rtg() {
     prev="${COMP_WORDS[COMP_CWORD-1]}"
     if [ "$COMP_CWORD" -gt 1 ]; then
         # Scan to look for a subcommand name, skipping RTG_MEM/RTG_JAVA_OPTS being split on = by bash
+        # This is not perfect, as it looks like COMP_CWORD doesn't treat quotes in any sane manner.
         for ((cmdi=1, cmdl=0; cmdi < "$COMP_CWORD"; cmdi++, cmdl++)); do
             cmd="${COMP_WORDS[$cmdi]}"
             if [ "${cmd:0:4}" == "RTG_" ]; then
