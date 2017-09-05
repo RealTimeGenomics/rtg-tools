@@ -52,7 +52,7 @@ public enum VariantType {
   INSERTION(true, false, false),
   /** Complex indel with deletions and insertions */
   INDEL(true, false, false),
-  /** Structural variant break end */
+  /** Structural variant breakend */
   SV_BREAKEND(false, true, false),
   /** Structural variant symbolic value */
   SV_SYMBOLIC(false, true, false),

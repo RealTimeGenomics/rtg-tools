@@ -45,8 +45,8 @@ public class BreakpointAlt {
   private final String mRefSubs;
 
   /**
-   * Construct a break end from an ALT string. The caller should have already determined
-   * that the ALT represents a break end rather than a regular allele or symbolic allele.
+   * Construct a breakend from an ALT string. The caller should have already determined
+   * that the ALT represents a breakend rather than a regular allele or symbolic allele.
    * @param alt the VCF ALT string
    */
   public BreakpointAlt(String alt) {
@@ -62,31 +62,31 @@ public class BreakpointAlt {
       bracketPos = tmpPos;
       mRemoteUp = false;
     } else {
-      throw new IllegalArgumentException("Invalid break end specification: " + alt);
+      throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }
     mLocalUp = bracketPos != 0;
     final int nextBracketPos = alt.indexOf(bracket, bracketPos + 1);
     if (nextBracketPos == -1) {
-      throw new IllegalArgumentException("Invalid break end specification: " + alt);
+      throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }
     final String remoteString = alt.substring(bracketPos + 1, nextBracketPos);
     final int colonPos = remoteString.indexOf(':');
     if (colonPos == -1) {
-      throw new IllegalArgumentException("Invalid break end specification: " + alt);
+      throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }
     mRemoteChr = remoteString.substring(0, colonPos);
     if (mRemoteChr.indexOf('<') != -1) {
-      throw new IllegalArgumentException("Contig break ends are not supported: " + alt); // e.g. "C[<ctg1>:7["
+      throw new IllegalArgumentException("Contig breakends are not supported: " + alt); // e.g. "C[<ctg1>:7["
     }
     mRemotePos = Integer.parseInt(remoteString.substring(colonPos + 1)) - 1; // to 0-based
     mRefSubs = mLocalUp ? alt.substring(0, bracketPos) : alt.substring(nextBracketPos + 1);
   }
 
   /**
-   * Construct a break end directly.
+   * Construct a breakend directly.
    * @param refSubs the bases of the reference substitution
    * @param localUp true if the local end is up
-   * @param remoteChr the name of the chromosome this break end joins to
+   * @param remoteChr the name of the chromosome this breakend joins to
    * @param remotePos the position within the remote chromosome the breakpoint is at
    * @param remoteUp true if the remote end is up
    */
