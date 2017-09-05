@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Locale;
 
 import com.rtg.util.MathUtils;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -104,6 +105,16 @@ public enum RocScoreField {
         public String toString() {
           return fieldName + " (INFO)";
         }
+        @Override
+        void setHeader(VcfHeader header) {
+          if (header.getInfoLines().stream().noneMatch(f -> f.getId().equals(fieldName))) {
+            if (header.getFormatLines().stream().anyMatch(f -> f.getId().equals(fieldName))) {
+              Diagnostic.warning("VCF header does not contain an INFO field named " + fieldName + " (did you mean FORMAT." + fieldName + "?)");
+            } else {
+              Diagnostic.warning("VCF header does not contain an INFO field named " + fieldName);
+            }
+          }
+        }
       };
     }
   },
@@ -131,6 +142,16 @@ public enum RocScoreField {
         @Override
         public String toString() {
           return fieldName + " (FORMAT)";
+        }
+        @Override
+        void setHeader(VcfHeader header) {
+          if (header.getFormatLines().stream().noneMatch(f -> f.getId().equals(fieldName))) {
+            if (header.getInfoLines().stream().anyMatch(f -> f.getId().equals(fieldName))) {
+              Diagnostic.warning("VCF header does not contain a FORMAT field named " + fieldName + " (did you mean INFO." + fieldName + "?)");
+            } else {
+              Diagnostic.warning("VCF header does not contain a FORMAT field named " + fieldName);
+            }
+          }
         }
       };
     }
@@ -203,7 +224,10 @@ public enum RocScoreField {
 
     @Override
     void setHeader(VcfHeader header) {
-      mAnno.checkHeader(header);
+      final String msg = mAnno.checkHeader(header);
+      if (msg != null) {
+        Diagnostic.warning(msg);
+      }
     }
 
     @Override
