@@ -4,6 +4,40 @@ Below are the release notes for the full RTG suite, upon which
 RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
+RTG Core 3.8.4 (2017-09-08)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* vcfeval: Explicitly warn when the ROC score field does not exist in
+  the VCF header, to help in cases where the user has mixed up INFO vs
+  FORMAT field names.
+
+* vcfeval: Fix an exception that could occur when processing VCFs with
+  GT ploidy >= 3.
+
+* format: When formatting FASTA (both DNA and protein), suppress
+  warnings about "unexpected symbols" produced by genuine IUPAC
+  ambiguity codes.
+
+* misc: Detect invalid VCF records containing duplicate INFO or FORMAT
+  fields.
+
+* misc: Improved detection of invalid REF/ALT fields in input VCF files,
+  allowing clearer exception messages.
+
+* misc: Fix incorrect detection of network stats capability during local
+  run monitoring.
+
+* misc: Bash command completion now also works if rtg is symlinked as
+  rtg-tools or rtg-core, to improve convenience when both are
+  installed. (See the bash completion script if you have alternative
+  RTG executable names for which you want to enable the completion)
+
+
+Previous releases
+=================
+
 RTG Core 3.8.3 (2017-08-02)
 ---------------------------
 
@@ -33,10 +67,6 @@ This release primarily includes bugfixes and minor improvements:
 
 * misc: Prevent a unit test failure when running on newer versions of
   Ubuntu.
-
-
-Previous releases
-=================
 
 RTG Core 3.8.2 (2017-06-20)
 ---------------------------
