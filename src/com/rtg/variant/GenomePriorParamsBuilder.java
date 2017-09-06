@@ -50,7 +50,7 @@ import com.rtg.util.diagnostic.ErrorType;
  * file because it is so big.
  */
 @TestClass(value = { "com.rtg.variant.GenomePriorParamsTest" })
-public class GenomePriorParamsBuilder {
+public final class GenomePriorParamsBuilder {
 
   private static final char COLON = ':';
   private static final String[] BASES = {"A", "C", "G", "T"};

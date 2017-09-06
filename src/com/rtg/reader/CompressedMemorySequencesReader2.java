@@ -41,7 +41,7 @@ import com.rtg.util.intervals.LongRange;
 /**
  * This stores data in memory as it appears on disk. Allowing for direct load (no decompress/re-compress)
  */
-public class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
+public final class CompressedMemorySequencesReader2 extends AbstractSequencesReader {
 
   private final IndexFile mIndexFile;
 

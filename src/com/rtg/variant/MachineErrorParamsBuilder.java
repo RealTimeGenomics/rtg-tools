@@ -46,7 +46,7 @@ import com.rtg.util.machine.MachineType;
  * A builder class for <code>MachineErrorParams</code>.
  */
 @TestClass(value = { "com.rtg.variant.MachineErrorParamsTest" })
-public class MachineErrorParamsBuilder {
+public final class MachineErrorParamsBuilder {
 
   static final double[] CG_DEFAULT_OVERLAP_DIST = MathUtils.renormalize(new int[]{0, 8, 84, 8, 0});
   static final double[] CG_DEFAULT_GAP_DIST = MathUtils.renormalize(new int[]{0, 27, 64, 9, 0});

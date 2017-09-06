@@ -128,7 +128,7 @@ public class PopulationMutatorPriors {
       mSnpThresholds[i] = SimulationUtils.cumulativeDistribution(snpProbs[i]);
     }
 
-    Diagnostic.developerLog(this.toString());
+    Diagnostic.developerLog(toString());
   }
 
 
@@ -263,7 +263,7 @@ public class PopulationMutatorPriors {
    * @return string with object representation.
    */
   @Override
-  public String toString() {
+  public final String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append("PopulationMutatorPriors:").append(StringUtils.LS);
     sb.append("Rate ").append(mRate).append(StringUtils.LS);

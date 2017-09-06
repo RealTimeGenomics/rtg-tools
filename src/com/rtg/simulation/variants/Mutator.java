@@ -124,7 +124,7 @@ public class Mutator extends IntegralAbstract {
   }
 
   @Override
-  public boolean integrity() {
+  public final boolean integrity() {
     Exam.assertNotNull(mFirst);
     return true;
   }

@@ -78,7 +78,7 @@ public class MutatorResult extends IntegralAbstract {
   }
 
   @Override
-  public boolean integrity() {
+  public final boolean integrity() {
     Exam.assertTrue(mConsumed >= 0);
     Exam.assertNotNull(mFirstHaplotype);
     Exam.assertNotNull(mSecondHaplotype);

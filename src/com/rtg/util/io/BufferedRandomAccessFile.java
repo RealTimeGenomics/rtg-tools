@@ -35,20 +35,14 @@ import java.io.RandomAccessFile;
 
 /**
  * An extension of RandomAccessFile that reads and buffers large chucks of file content in order to reduce the number of disk reads/seeks.
- *
  */
-public class BufferedRandomAccessFile extends RandomAccessFile {
+public final class BufferedRandomAccessFile extends RandomAccessFile {
   private static final int DEFAULT_BUFFER_SIZE = FileUtils.BUFFERED_STREAM_SIZE;
 
   private final byte[] mBuffer;
   private int mBufferEnd;
   private int mBufferPos;
   private long mRealPos;
-
-  //private int mFillBufferCount = 0;
-  //private int mReadBufCount = 0;
-  //private int mReadCount = 0;
-  //private int mSeekCount = 0;
 
   /**
    * Creates a random access file stream to read from, and optionally to write to, the file specified by the file argument.
@@ -86,7 +80,7 @@ public class BufferedRandomAccessFile extends RandomAccessFile {
   }
 
   @Override
-  public final int read() throws IOException {
+  public int read() throws IOException {
     //mReadCount++;
     if (mBufferPos >= mBufferEnd) {
       if (fillBuffer() < 0) {

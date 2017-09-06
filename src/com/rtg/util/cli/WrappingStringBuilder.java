@@ -36,7 +36,7 @@ import com.rtg.util.StringUtils;
  * that can perform word wrapping.
  *
  */
-public class WrappingStringBuilder {
+public final class WrappingStringBuilder {
 
   private final StringBuilder mSB = new StringBuilder();
   private String mSuffix = "";

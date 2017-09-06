@@ -222,7 +222,7 @@ public class ConcurrentByteQueue implements Integrity {
   }
 
   @Override
-  public synchronized boolean globalIntegrity() {
+  public final synchronized boolean globalIntegrity() {
     integrity();
     return true;
   }

@@ -134,7 +134,7 @@ public class ObjectChunks<A> extends ObjectIndex<A> {
   }
 
   @Override
-  public boolean integrity() {
+  public final boolean integrity() {
     super.integrity();
     Exam.assertTrue(mChunkBits > 0 && mChunkBits <= 31);
     Exam.assertTrue((mChunkSize & mChunkMask) == 0);

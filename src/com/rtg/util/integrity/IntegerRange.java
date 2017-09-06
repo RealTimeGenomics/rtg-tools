@@ -174,7 +174,7 @@ public class IntegerRange extends IntegralAbstract {
   }
 
   @Override
-  public boolean integrity() {
+  public final boolean integrity() {
     Exam.assertTrue(mLo <= mHi);
     if (mHasInvalid) {
       Exam.assertTrue(mLo - 1 == mInvalid);
