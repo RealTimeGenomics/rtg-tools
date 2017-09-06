@@ -7,6 +7,7 @@
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	sample1	sample2
 chr2	100	.	A	C,G	1	FAIL	.	GT	1/1	2/2
 chr2	100	.	A	C,G	1	PASS	.	GT	1/1	2/2
+chr2	150	.	TA	T,TT	1	.	.	GT	0/0/1/2	0/0/1/2
 chr2	200	.	A	C	2	PASS	.	GT	1/1	.
 chr2	900	.	A	G	3	PASS	.	GT	.	1/1
 chr2	920	.	A	<DEL>	7	PASS	END=970	GT	1/0	.
