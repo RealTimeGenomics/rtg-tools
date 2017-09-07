@@ -31,7 +31,7 @@
 package com.rtg.vcf;
 
 /**
- * Represents a VCF break-end ALT allele.
+ * Represents a VCF breakend ALT allele.
  */
 public class BreakpointAlt {
 

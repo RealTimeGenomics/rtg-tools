@@ -469,7 +469,7 @@ public final class VcfUtils {
   /**
    * Normalize by converting any DNA characters within a VCF allele into uppercase. Annoyingly,
    * VCF specification says that DNA bases are case-insensitive, while symbolic alleles,
-   * chromosome names (which may be embedded inside break-ends) are case-sensitive.
+   * chromosome names (which may be embedded inside breakends) are case-sensitive.
    * @param allele the VCF allele
    * @return the normalized allele
    */
