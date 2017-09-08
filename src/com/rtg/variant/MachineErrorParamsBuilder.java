@@ -54,21 +54,21 @@ public final class MachineErrorParamsBuilder {
   static final double[] CG_DEFAULT_OVERLAP2_DIST = MathUtils.renormalize(new int[]{25, 47, 104, 306, 445, 70, 3, 0});
 
   /** The proportion of insertions that are homozygous */
-  protected double mErrorMnpEventRate, mErrorInsEventRate, mErrorDelEventRate;
+  double mErrorMnpEventRate, mErrorInsEventRate, mErrorDelEventRate;
 
-  protected double[] mErrorMnpDistribution, mErrorInsDistribution, mErrorDelDistribution;
+  double[] mErrorMnpDistribution, mErrorInsDistribution, mErrorDelDistribution;
 
-  protected int[] mQualityCurve;
+  int[] mQualityCurve;
 
   // CG v1
-  protected double[] mGapDistribution;
-  protected double[] mSmallGapDistribution;
-  protected double[] mOverlapDistribution;
+  double[] mGapDistribution;
+  double[] mSmallGapDistribution;
+  double[] mOverlapDistribution;
 
   // CG v2
-  protected double[] mOverlapDistribution2;
+  double[] mOverlapDistribution2;
 
-  protected MachineType mMachine;
+  MachineType mMachine;
 
 
   /**

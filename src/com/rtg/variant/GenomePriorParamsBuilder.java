@@ -56,31 +56,31 @@ public final class GenomePriorParamsBuilder {
   private static final String[] BASES = {"A", "C", "G", "T"};
 
   /** Total SNP rate is <code>mGenomeSnpRateHetero + mGenomeSnpRateHomo</code> */
-  protected double mGenomeSnpRateHetero, mGenomeSnpRateHomo;
+  double mGenomeSnpRateHetero, mGenomeSnpRateHomo;
 
   /**
    * Total MNP rate is
    * <code>mGenomeMnpBaseRateHetero + mGenomeMnpBaseRateHomo</code>
    */
-  protected double mGenomeMnpBaseRateHetero, mGenomeMnpBaseRateHomo;
+  double mGenomeMnpBaseRateHetero, mGenomeMnpBaseRateHomo;
 
-  protected double[] mGenomeMnpDistribution;
+  double[] mGenomeMnpDistribution;
 
   /** indel rate */
-  protected double mGenomeIndelEventRate;
+  double mGenomeIndelEventRate;
 
   /** The proportion of insertions that are homozygous */
-  protected double mGenomeIndelEventFraction;
+  double mGenomeIndelEventFraction;
 
-  protected double[] mGenomeIndelDistribution;
+  double[] mGenomeIndelDistribution;
 
-  protected double mGenomeIndelLengthDecay;
+  double mGenomeIndelLengthDecay;
 
-  protected HashMap<String, HashMap<String, Double>> mPriorMap = null;
-  protected double[] mAlleleProbabilityLn = new double[6]; //allow for up to 5 alleles in complex calling
-  protected double mDenovoRef;
-  protected double mDenovoNonRef;
-  protected double mContraryProbability = 0.0001;
+  HashMap<String, HashMap<String, Double>> mPriorMap = null;
+  double[] mAlleleProbabilityLn = new double[6]; //allow for up to 5 alleles in complex calling
+  double mDenovoRef;
+  double mDenovoNonRef;
+  double mContraryProbability = 0.0001;
 
   /**
    * Creates a builder with initial default values from the
