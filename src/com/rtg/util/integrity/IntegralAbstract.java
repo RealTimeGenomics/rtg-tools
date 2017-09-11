@@ -175,12 +175,9 @@ public abstract class IntegralAbstract implements Integrity {
   }
 
   private static void setAccessible(final Field field) {
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        field.setAccessible(true);
-        return null;
-      }
+    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
+      field.setAccessible(true);
+      return null;
     });
   }
 

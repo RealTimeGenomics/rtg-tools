@@ -45,7 +45,7 @@ public class EnumHelper<T extends PseudoEnum> {
 
   private final String[] mNames;
 
-  private final Map<String, T> mValueOf = new HashMap<>();
+  private final Map<String, T> mValueOf;
 
   /**
    * Constructs the helper
@@ -54,6 +54,7 @@ public class EnumHelper<T extends PseudoEnum> {
    */
   public EnumHelper(final Class<T> c, final T[] values) {
     mValues = values.clone();
+    mValueOf = new HashMap<>(mValues.length);
     mNames = new String[mValues.length];
     int i = 0;
     for (final T t : mValues) {
