@@ -48,7 +48,7 @@ public final class SequenceDataLoader {
 
   private SequenceDataLoader() { }
 
-  static long loadData(ByteArray seqData, DataFileIndex seqIndex, long start, long end, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
+  static long loadData(ByteArray seqData, DataFileIndex seqIndex, long start, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
     final ArrayList<File> dataFiles = new ArrayList<>();
     for (int i = 0; i < seqIndex.numberEntries(); ++i) {
       dataFiles.add(SdfFileUtils.sequenceDataFile(dir, i));
@@ -56,7 +56,7 @@ public final class SequenceDataLoader {
     return loadData(seqData, seqIndex, start, dir, positions, checksums, dataFiles, openFact.getSequenceOpener(), handler, checksumsLoaded);
   }
 
-  static long loadQuality(ByteArray qualData, DataFileIndex seqIndex, long start, long end, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
+  static long loadQuality(ByteArray qualData, DataFileIndex seqIndex, long start, File dir, CommonIndex positions, ByteArray checksums, DataFileOpenerFactory openFact, PointerFileHandler handler, boolean checksumsLoaded) throws IOException {
     final ArrayList<File> dataFiles = new ArrayList<>();
     for (int i = 0; i < seqIndex.numberEntries(); ++i) {
       dataFiles.add(SdfFileUtils.qualityDataFile(dir, i));

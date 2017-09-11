@@ -75,7 +75,7 @@ public class DefaultSamFilter implements SamFilter {
 
     final boolean mated = (flags & SamBamConstants.SAM_READ_IS_MAPPED_IN_PROPER_PAIR) != 0;
     final boolean unmapped = rec.getReadUnmappedFlag();
-    if (params.excludeUnmated() && !mated && !unmapped) {
+    if (!mated && !unmapped && params.excludeUnmated()) {
       return false;
     }
 

@@ -110,7 +110,7 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
    * @return true if output is to be compressed in blocked compressed format
    */
   public boolean isBlockCompressed() {
-    return mZip && GzipAsynchOutputStream.BGZIP;
+    return GzipAsynchOutputStream.BGZIP && mZip;
   }
 
   /**

@@ -272,7 +272,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
         }
         mSeqData = new BitwiseByteArray(dataSize, CompressedByteArray.minBits(range));
         if (mEnd - mStart > 0) {
-          final long hash = SequenceDataLoader.loadData(mSeqData, seqIndex, mStart, mEnd, dir, mPositions, mChecksums, openerFactory, handler, mIndex.hasPerSequenceChecksums());
+          final long hash = SequenceDataLoader.loadData(mSeqData, seqIndex, mStart, dir, mPositions, mChecksums, openerFactory, handler, mIndex.hasPerSequenceChecksums());
           if (mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION && mStart == 0 && mEnd == index.getNumberSequences()) {
             if (hash != mIndex.getDataChecksum()) {
               throw new CorruptSdfException("Sequence data failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");
@@ -573,7 +573,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
         final ByteArray qualData = new CompressedByteArray(dataSize, MAX_QUAL_VALUE, false);
 
         final DataFileIndex seqIndex = DataFileIndex.loadSequenceDataFileIndex(mIndex.dataIndexVersion(), mDirectory);
-        final long hash = SequenceDataLoader.loadQuality(qualData, seqIndex, mStart, mEnd, mDirectory, mPositions, mQualityChecksums, mOpenerFactory, mHandler, preloaded);
+        final long hash = SequenceDataLoader.loadQuality(qualData, seqIndex, mStart, mDirectory, mPositions, mQualityChecksums, mOpenerFactory, mHandler, preloaded);
         if (mStart == 0 && mEnd == mIndex.getNumberSequences() && mIndex.getVersion() >= IndexFile.SEPARATE_CHECKSUM_VERSION) {
           if (hash != mIndex.getQualityChecksum()) {
             throw new CorruptSdfException("Sequence qualities failed checksum - SDF may be corrupt: \"" + mDirectory + "\"");

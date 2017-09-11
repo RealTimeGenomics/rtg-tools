@@ -126,8 +126,7 @@ public class BaseFile {
   public int hashCode() {
     int result = mBaseFile.hashCode();
     result = 31 * result + mExtension.hashCode();
-    result = 31 * result + (mGzip ? 1 : 0);
-    return result;
+    return 31 * result + (mGzip ? 1 : 0);
   }
 
   @Override

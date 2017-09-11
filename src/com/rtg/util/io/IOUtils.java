@@ -37,9 +37,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.SlimException;
@@ -47,8 +49,7 @@ import com.rtg.util.diagnostic.SlimException;
 import htsjdk.samtools.util.RuntimeIOException;
 
 /**
- * Access to io functionality.
- *
+ * Access to input/output functionality.
  */
 public final class IOUtils {
 
@@ -241,5 +242,25 @@ public final class IOUtils {
     } else {
       throw new SlimException(cause, ErrorType.INFO_ERROR, cause.getMessage());
     }
+  }
+
+  /**
+   * Write an integer value to the specified output stream.
+   * @param os output stream
+   * @param value value to write
+   * @throws IOException if an I/O error occurs.
+   */
+  public static void writeInt(final OutputStream os, final int value) throws IOException {
+    os.write(String.valueOf(value).getBytes(StandardCharsets.US_ASCII));
+  }
+
+  /**
+   * Write a long value to the specified output stream.
+   * @param os output stream
+   * @param value value to write
+   * @throws IOException if an I/O error occurs.
+   */
+  public static void writeLong(final OutputStream os, final long value) throws IOException {
+    os.write(String.valueOf(value).getBytes(StandardCharsets.US_ASCII));
   }
 }

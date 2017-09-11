@@ -48,7 +48,7 @@ import htsjdk.samtools.util.BlockCompressedOutputStream;
 public final class GzipAsynchOutputStream extends AsynchOutputStream {
 
   /** Whether to use bgzip instead of gzip */
-  public static final boolean BGZIP = true; //Boolean.valueOf(System.getProperty("rtg.global-bgzip", "true"));
+  public static final boolean BGZIP = true;
 
   /** Modern disks have about 64 Kb blocks, so make it that size? */
   public static final int DEFAULT_GZIP_BUFFER_SIZE = 64 * 1024;

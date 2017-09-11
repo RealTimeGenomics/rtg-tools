@@ -45,7 +45,6 @@ import com.rtg.util.io.FileUtils;
 
 /**
  * In memory copy of sequence names.
- *
  */
 public class Names implements NamesInterface {
 
@@ -53,7 +52,7 @@ public class Names implements NamesInterface {
   static int loadPointers(List<int[]> pointersList, final File preread, final long start, final long end, final DataFileIndex nameIndex, boolean suffixes) throws IOException {
     int startFile = 0;
     long namesSoFar = 0;
-    while (startFile < nameIndex.numberEntries() && namesSoFar + nameIndex.numberSequences(startFile) <= start) {
+    while (namesSoFar + nameIndex.numberSequences(startFile) <= start && startFile < nameIndex.numberEntries()) {
       namesSoFar += nameIndex.numberSequences(startFile);
       ++startFile;
     }

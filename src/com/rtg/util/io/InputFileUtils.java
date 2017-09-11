@@ -52,7 +52,7 @@ public final class InputFileUtils {
    */
   public static List<File> removeRedundantPaths(List<File> files) throws IOException {
     final List<File> out = new ArrayList<>();
-    final Set<String> paths = new HashSet<>();
+    final Set<String> paths = new HashSet<>(files.size());
     for (File file : files) {
       if (paths.add(file.getCanonicalPath())) {
         out.add(file);

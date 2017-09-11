@@ -145,7 +145,7 @@ public final class CappedConcurrentLinkedList<E> implements Queue<E> {
 
   @Override
   public synchronized E poll() {
-    while (mInternalQueue.isEmpty() && mHasNext && !mClosed) {
+    while (mHasNext && !mClosed && mInternalQueue.isEmpty()) {
       try {
         wait(TIMEOUT);
       } catch (InterruptedException e) {

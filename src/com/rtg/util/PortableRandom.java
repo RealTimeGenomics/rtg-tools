@@ -73,7 +73,7 @@ public class PortableRandom {
    * Reset the state of this PortableRandom using the given seed.
    * @param seed the seed
    */
-  public void setSeed(long seed) {
+  public final void setSeed(long seed) {
     mInitialSeed = seed;
     mSeed = (mInitialSeed ^ MULTIPLIER) & MASK;
     mHaveNextNextGaussian = false;
@@ -92,13 +92,6 @@ public class PortableRandom {
   public double nextDouble() {
     return (((long) next(26) << 27) + next(27)) / (double) (1L << 53);
   }
-
-  /**
-   * @return the next random float
-   */
-  //public float nextFloat() {
-  //  return next(24) / ((float) (1 << 24));
-  //}
 
   /**
    * @return the next random integer

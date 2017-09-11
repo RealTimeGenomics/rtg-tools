@@ -91,7 +91,7 @@ public enum MachineOrientation {
 
     @Override
     public boolean isMateUpstream(PairOrientation pairOrientation) {
-      return !(PairOrientation.F1.equals(pairOrientation) || PairOrientation.F2.equals(pairOrientation));
+      return PairOrientation.F1 != pairOrientation && PairOrientation.F2 != pairOrientation;
     }
   },
   /** Forward Forward orientation in paired reads. */

@@ -79,7 +79,7 @@ public class DataSourceDescription {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    if (isInterleaved() && mSourceFormat != SourceFormat.SAM) {
+    if (mSourceFormat != SourceFormat.SAM && isInterleaved()) {
       sb.append("interleaved ");
     }
     if (isPairedEnd()) {

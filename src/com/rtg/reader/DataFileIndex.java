@@ -95,7 +95,7 @@ public abstract class DataFileIndex {
           final byte[] tempData = new byte[(int) indexRAF.length()];
           indexRAF.readFully(tempData);
           try {
-            mIndex = ByteArrayIOUtils.convertToLongArray(tempData); //new long[(int) (mIndexRAF.length() / 8)];
+            mIndex = ByteArrayIOUtils.convertToLongArray(tempData);
           } catch (final IllegalArgumentException e) {
             throw new CorruptSdfException(dataIndexFile.getParentFile());
           }

@@ -45,14 +45,13 @@ class ObjectArray<A> extends ObjectIndex<A> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public A get(final long index) {
     final int ii = (int) index;
     if (ii != index) {
       throw new IndexOutOfBoundsException(String.valueOf(index));
     }
-    @SuppressWarnings("unchecked")
-    final A ret = (A) mArray[ii];
-    return ret;
+    return (A) mArray[ii];
   }
 
   @Override

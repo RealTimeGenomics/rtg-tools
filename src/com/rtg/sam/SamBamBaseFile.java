@@ -119,8 +119,6 @@ public class SamBamBaseFile extends BaseFile {
 
   @Override
   public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + mFormat.ordinal();
-    return result;
+    return 31 * super.hashCode() + mFormat.ordinal();
   }
 }

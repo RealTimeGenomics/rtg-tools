@@ -141,8 +141,7 @@ public class IntegerOrPercentage implements Serializable, Comparable<IntegerOrPe
   public int hashCode() {
     int hash = 7;
     hash = 31 * hash + this.mValue;
-    hash = 31 * hash + (this.mIsPercentage ? 1 : 0);
-    return hash;
+    return 31 * hash + (this.mIsPercentage ? 1 : 0);
   }
 
   @Override

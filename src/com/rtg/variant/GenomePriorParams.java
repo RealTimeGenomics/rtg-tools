@@ -288,8 +288,8 @@ public class GenomePriorParams extends ObjectParams implements Integrity {
 
   @Override
   public boolean integrity() {
-    Exam.assertTrue(!Double.isNaN(mGenomeSnpRateHetero) && mGenomeSnpRateHetero >= 0.0 && mGenomeSnpRateHetero < 1.0);
-    Exam.assertTrue(!Double.isNaN(mGenomeSnpRateHomo) && mGenomeSnpRateHomo >= 0.0 && mGenomeSnpRateHomo < 1.0);
+    Exam.assertTrue(mGenomeSnpRateHetero >= 0.0 && mGenomeSnpRateHetero < 1.0 && !Double.isNaN(mGenomeSnpRateHetero));
+    Exam.assertTrue(mGenomeSnpRateHomo >= 0.0 && mGenomeSnpRateHomo < 1.0 && !Double.isNaN(mGenomeSnpRateHomo));
     Exam.assertTrue(mGenomeSnpRateHetero + mGenomeSnpRateHomo < 1.0);
     return true;
   }

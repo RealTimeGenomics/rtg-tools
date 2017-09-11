@@ -241,7 +241,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(32, CompressedByteArray.minBits(64));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    SequenceDataLoader.loadQuality(seqData, seqIndex, 3, 5, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    SequenceDataLoader.loadQuality(seqData, seqIndex, 3, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
     checkQualityRange(seqData, 0, 20, 'Y');
     checkQualityRange(seqData, 20, 32, 'D');
@@ -261,7 +261,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(90, CompressedByteArray.minBits(64));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    final long hash = SequenceDataLoader.loadQuality(seqData, seqIndex, 0, 6, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    final long hash = SequenceDataLoader.loadQuality(seqData, seqIndex, 0, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
     assertTrue(new IndexFile(mDir).getQualityChecksum() == hash);
     checkQualityRange(seqData, 0, 16, 'Z');
@@ -292,7 +292,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(32, CompressedByteArray.minBits(5));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    SequenceDataLoader.loadData(seqData, seqIndex, 3, 5, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    SequenceDataLoader.loadData(seqData, seqIndex, 3, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
 
     for (int i = 0; i < seqData.length(); ++i) {
@@ -317,7 +317,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(16, CompressedByteArray.minBits(5));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    SequenceDataLoader.loadData(seqData, new TestDataFileIndex(seqIndex), 1, 2, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    SequenceDataLoader.loadData(seqData, new TestDataFileIndex(seqIndex), 1, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
     for (int i = 0; i < seqData.length(); ++i) {
       assertEquals(i % 4 + 1, seqData.get(i));
@@ -336,7 +336,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(94, CompressedByteArray.minBits(5));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    final long hash = SequenceDataLoader.loadData(seqData, seqIndex, 0, 6, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    final long hash = SequenceDataLoader.loadData(seqData, seqIndex, 0, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
     final IndexFile indexFile = new IndexFile(mDir);
     assertTrue(hash == indexFile.getDataChecksum());
@@ -353,7 +353,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(94, CompressedByteArray.minBits(5));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    SequenceDataLoader.loadData(seqData, seqIndex, 0, 6, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    SequenceDataLoader.loadData(seqData, seqIndex, 0, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
   }
 
   public void testZeroLengthRead() throws Exception {
@@ -370,7 +370,7 @@ public class SequenceDataLoaderTest extends TestCase {
 
     final BitwiseByteArray seqData = new BitwiseByteArray(94, CompressedByteArray.minBits(5));
     final ByteArray checksums = ByteArray.allocate(index.length() - 1);
-    final long hash = SequenceDataLoader.loadData(seqData, seqIndex, 0, numberOfSequences, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
+    final long hash = SequenceDataLoader.loadData(seqData, seqIndex, 0, mDir, index, checksums, defaultOpenerFactory(), PointerFileHandler.getHandler(new IndexFile(mDir), PointerFileHandler.SEQUENCE_POINTER), false);
 
     final IndexFile idxf = new IndexFile(mDir);
     assertEquals(idxf.getDataChecksum(), hash);

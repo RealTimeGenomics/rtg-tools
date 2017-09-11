@@ -149,9 +149,7 @@ public class Relationship {
       return false;
     }
     final Relationship p = (Relationship) o;
-    final boolean propEquals;
-    propEquals = mProperties.equals(p.mProperties);
-    return mGenome1.equals(p.mGenome1) && mGenome2.equals(p.mGenome2) && mType.ordinal() == p.mType.ordinal() && propEquals;
+    return mType.ordinal() == p.mType.ordinal() && mProperties.equals(p.mProperties) && mGenome1.equals(p.mGenome1) && mGenome2.equals(p.mGenome2);
   }
 
   @Override

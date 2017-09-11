@@ -509,7 +509,7 @@ public class GenomeRelationships {
     if (sex != null) {
       final String existingSex = props.getProperty(SEX_PROPERTY);
       if (existingSex == null) {
-        props.put(SEX_PROPERTY, sex);
+        props.setProperty(SEX_PROPERTY, sex);
       } else if (!existingSex.equalsIgnoreCase(sex)) {
         throw new NoTalkbackSlimException("Conflicting sex definitions for individual " + genome);
       }
