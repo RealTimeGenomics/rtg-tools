@@ -148,7 +148,7 @@ public class SamWriterWrapper implements WriterWrapper {
     final SAMRecord rec = new SAMRecord(mWriter.getFileHeader());
 
     final int length = reader.read(seqId, dataBuffer);
-    rec.setReadName(mHasNames ? reader.name(seqId) : ("" + seqId));
+    rec.setReadName(mHasNames ? reader.name(seqId) : String.valueOf(seqId));
     rec.setReferenceName("*");
     rec.setFlags(flags);
     rec.setReadBases(DnaUtils.bytesToSequenceIncCG(dataBuffer, 0, length).getBytes());

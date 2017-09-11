@@ -70,7 +70,7 @@ public class ContraryObservationAnnotator implements VcfAnnotator {
       if (counts == null) {
         continue;
       }
-      rec.setFormatAndSample(COC_FIELD.getId(), "" + counts.getContraryCount(), i);
+      rec.setFormatAndSample(COC_FIELD.getId(), String.valueOf(counts.getContraryCount()), i);
       rec.setFormatAndSample(COF_FIELD.getId(), Utils.realFormat(counts.getContraryFraction(), 3), i);
     }
     for (FormatField f : ALL) {

@@ -131,7 +131,7 @@ public class SampleSimulator {
       Diagnostic.warning("No input variants! (is the VCF empty, or against an incorrect reference?)");
       Diagnostic.info("");
     } else if (mDefaultAfCount > 0) {
-      Diagnostic.warning("" + mDefaultAfCount + " input records had no allele frequency information.");
+      Diagnostic.warning(mDefaultAfCount + " input records had no allele frequency information.");
       Diagnostic.info("");
     }
 

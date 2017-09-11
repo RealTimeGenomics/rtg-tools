@@ -160,8 +160,8 @@ public class SkipInvalidRecordsIterator extends AbstractSamRecordIterator {
               if (valid == null) {
                 Diagnostic.warning(WarningType.SAM_BAD_FORMAT_WARNING, mPath, LS + "At data line " + mRecordCount);
               } else {
-                Diagnostic.warning(WarningType.SAM_BAD_FORMAT_WARNING, mPath, ""
-                    + LS + current.getSAMString().trim()
+                Diagnostic.warning(WarningType.SAM_BAD_FORMAT_WARNING, mPath,
+                    LS + current.getSAMString().trim()
                     + LS + valid
                     + LS + "At data line " + mRecordCount
                     );
@@ -210,7 +210,7 @@ public class SkipInvalidRecordsIterator extends AbstractSamRecordIterator {
       return;
     }
     if (!mSilent && mNumInvalidRecords > 0) {
-      Diagnostic.warning(WarningType.SAM_IGNORED_RECORDS, "" + mNumInvalidRecords, mPath);
+      Diagnostic.warning(WarningType.SAM_IGNORED_RECORDS, String.valueOf(mNumInvalidRecords), mPath);
     }
     mIsClosed = true;
     mWrapped.close();

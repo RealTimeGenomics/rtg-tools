@@ -139,7 +139,7 @@ public class ExtractCli extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final File input = (File) mFlags.getAnonymousValue(0);
     if (!TabixIndexer.isBlockCompressed(input)) {
-      throw new NoTalkbackSlimException("" + input.getPath() + " is not in bgzip format. Cannot extract records.");
+      throw new NoTalkbackSlimException(input.getPath() + " is not in bgzip format. Cannot extract records.");
     }
     final List<?> rStrings = mFlags.getAnonymousValues(1);
     final ReferenceRanges<String> regions;

@@ -57,7 +57,7 @@ public final class ReadGroupUtils {
     if (rgAtt == null) {
       rgId = UNKNOWN_RG;
     } else {
-      rgId = "" + rgAtt;
+      rgId = rgAtt;
     }
     return rgId;
   }

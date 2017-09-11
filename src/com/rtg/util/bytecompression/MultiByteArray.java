@@ -88,7 +88,7 @@ public class MultiByteArray extends ByteArray {
   public void extendTo(long newMax) {
 
     if (newMax < mCurrentLength) {
-      throw new IllegalArgumentException("" + newMax + " is less than current length of: " + mCurrentLength);
+      throw new IllegalArgumentException(newMax + " is less than current length of: " + mCurrentLength);
     }
     while (mTotalSize < newMax) {
       final long i = mTotalSize >>> mBits;

@@ -120,7 +120,7 @@ public class IntChunksTest extends AbstractIntIndexTest {
       lc.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 
@@ -226,7 +226,7 @@ public class IntChunksTest extends AbstractIntIndexTest {
       ic.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 

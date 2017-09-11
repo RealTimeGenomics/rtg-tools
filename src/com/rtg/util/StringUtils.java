@@ -309,7 +309,7 @@ public final class StringUtils {
    * @return a string containing all elements of items separated by glue
    */
   public static <T> String join(char delim, Collection<T> items) {
-    return join("" + delim, items);
+    return join(String.valueOf(delim), items);
   }
 
   /**

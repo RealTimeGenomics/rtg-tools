@@ -230,7 +230,7 @@ public class ByteChunksTest extends AbstractByteIndexTest {
       bc.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 

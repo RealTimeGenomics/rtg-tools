@@ -33,7 +33,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 /**
- * Test Chunks
+ * Test chunks.
  */
 public class LongIndexTest extends LongChunksTest {
 

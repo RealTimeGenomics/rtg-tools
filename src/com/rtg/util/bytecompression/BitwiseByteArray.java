@@ -143,7 +143,7 @@ public final class BitwiseByteArray extends ByteArray implements Integrity {
     Exam.assertTrue(0 < mBits);
     Exam.assertNotNull(mData);
     for (int i = 0; i < mData.length; ++i) {
-      Exam.assertNotNull("" + i, mData[i]);
+      Exam.assertNotNull("i=" + i, mData[i]);
     }
     //Assert.assertTrue(mData.length >= mBits * (mCapacity / BITS_PER_LONG));
     //Assert.assertTrue(mSize <= BITS_PER_LONG * mData[0].length());

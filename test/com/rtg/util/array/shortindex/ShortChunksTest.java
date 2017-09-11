@@ -37,7 +37,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 /**
- * Test Chunks
+ * Test chunks
  */
 public class ShortChunksTest extends AbstractShortIndexTest {
 
@@ -221,7 +221,7 @@ public class ShortChunksTest extends AbstractShortIndexTest {
       sc.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 

@@ -300,7 +300,7 @@ public final class Talkback {
 
   private static final String HEX_DIGITS = "0123456789ABCDEF";
   private static String hex(final char c) {
-    return "" + HEX_DIGITS.charAt((c >> 4) & 15) + HEX_DIGITS.charAt(c & 15);
+    return String.valueOf(HEX_DIGITS.charAt((c >> 4) & 15)) + String.valueOf(HEX_DIGITS.charAt(c & 15));
   }
 
   private static final Pattern[] NOT_IN_TEST_PATTERNS = new Pattern[]

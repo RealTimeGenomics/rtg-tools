@@ -205,7 +205,7 @@ public final class SdfSubseq extends AbstractCli {
       if (reader.hasNames()) {
         name = isCoordsAltered ? reader.name(sequenceId) : reader.fullName(sequenceId);
       } else {
-        name = "" + sequenceId;
+        name = String.valueOf(sequenceId);
       }
       out.write((sequenceNameIdentifier + name).getBytes());
       final String coords = isCoordsAltered ? "[" + (start + 1) + "," + (start + length) + "]" : "";

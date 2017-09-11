@@ -94,7 +94,7 @@ public final class ByteChunks extends ByteIndex implements ExtensibleIndex {
   @Override
   public long extendBy(final long length) {
     if (length < 0) {
-      throw new IllegalArgumentException("" + length);
+      throw new IllegalArgumentException("length=" + length);
     }
     final long res = mLength;
     final long target = mLength + length;
@@ -236,7 +236,7 @@ public final class ByteChunks extends ByteIndex implements ExtensibleIndex {
   @Override
   public void trim(long length) {
     if (length > mLength) {
-      throw new IllegalArgumentException("" + length);
+      throw new IllegalArgumentException("length=" + length);
     }
     final long newArraySize = (length + mChunkMask) >>> mChunkBits;
     if (newArraySize < mArray.length) {
@@ -280,7 +280,7 @@ public final class ByteChunks extends ByteIndex implements ExtensibleIndex {
     if (mArray == null) { //close call has been made.
       return true;
     }
-    Exam.assertTrue("" + mLength + ":" + mTotalLength, 0 <= mLength && mLength <= mTotalLength);
+    Exam.assertTrue(mLength + ":" + mTotalLength, 0 <= mLength && mLength <= mTotalLength);
     final long il = mTotalLength >>> mChunkBits;
     final long ml = il << mChunkBits;
     for (int i = 0; i < il; ++i) {

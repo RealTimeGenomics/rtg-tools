@@ -29,10 +29,8 @@
  */
 package com.rtg.util.array.byteindex;
 
-
-
 /**
- * Test Chunks
+ * Test chunks
  */
 public class ByteIndexTest extends ByteChunksTest {
 
@@ -40,6 +38,5 @@ public class ByteIndexTest extends ByteChunksTest {
   protected ByteIndex create(final long length) {
     return new ByteChunks(length, 5);
   }
-
 }
 

@@ -40,22 +40,16 @@ import junit.framework.TestCase;
  */
 public class DNATest extends TestCase {
 
-  /**
-   * Test method for {@link com.rtg.mode.DNA()}.
-   */
   public final void test() {
     TestUtils.testPseudoEnum(DNA.class, "[N, A, C, G, T]");
     try {
       DNA.valueOf('u');
       fail();
     } catch (IllegalArgumentException e) {
-      assertEquals("u", e.getMessage());
+      assertEquals("ch=u", e.getMessage());
     }
   }
 
-  /**
-   * Test method for {@link com.rtg.mode.DNA#ignore()}.
-   */
   public final void testIsUnknown() {
     assertTrue(DNA.N.ignore());
     assertEquals(0, DNA.N.ordinal());
@@ -72,9 +66,6 @@ public class DNATest extends TestCase {
     }
   }
 
-  /**
-   * Test method for {@link com.rtg.mode.DNA#type()}.
-   */
   public final void testType() {
     for (final DNA dna : DNA.values()) {
       assertEquals(SequenceType.DNA, dna.type());
@@ -91,9 +82,6 @@ public class DNATest extends TestCase {
     assertEquals(5, chars.length);
   }
 
-  /**
-   * Test method for {@link com.rtg.mode.DNA#complement()}.
-   */
   public final void testComplement() {
     for (final DNA dna : DNA.values()) {
       assertEquals(dna, dna.complement().complement());
@@ -107,19 +95,12 @@ public class DNATest extends TestCase {
     assertEquals(DNA.A.ordinal(), DNA.complement((byte) DNA.T.ordinal()));
   }
 
-  /**
-   * Test method for {@link com.rtg.mode.DNA}.
-   */
   public final void testCodeComplement() {
     for (final DNA dna : DNA.values()) {
       assertEquals(dna.complement().ordinal(), DNA.COMPLEMENT[dna.ordinal()]);
     }
   }
 
-
-  /**
-   * Test method for {@link com.rtg.mode.DNA#toString()}.
-   */
   public final void testToString() {
     for (final DNA dna : DNA.values()) {
       final String str = dna.toString();

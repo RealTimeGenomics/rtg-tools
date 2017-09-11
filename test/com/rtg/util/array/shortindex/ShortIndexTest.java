@@ -29,10 +29,8 @@
  */
 package com.rtg.util.array.shortindex;
 
-
-
 /**
- * Test Chunks
+ * Test chunks
  */
 public class ShortIndexTest extends ShortChunksTest {
 
@@ -40,6 +38,4 @@ public class ShortIndexTest extends ShortChunksTest {
   protected ShortIndex create(final long length) {
     return new ShortChunks(length, 5);
   }
-
 }
-

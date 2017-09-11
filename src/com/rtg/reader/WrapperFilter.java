@@ -83,7 +83,7 @@ class WrapperFilter {
    */
   protected void transfer(long seqid) throws IOException {
     if ((seqid < 0) || (seqid >= mReader.numberSequences())) {
-      warnInvalidSequence("" + seqid);
+      warnInvalidSequence(String.valueOf(seqid));
       return;
     }
     final int length = mReader.maxLength();

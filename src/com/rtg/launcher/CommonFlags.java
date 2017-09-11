@@ -375,12 +375,12 @@ public final class CommonFlags {
     if (flags.isSet(THREADS_FLAG)) {
       final int threads = (Integer) flags.getValue(THREADS_FLAG);
       if (threads <= 0) {
-        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + THREADS_FLAG, threads + "", "1");
+        Diagnostic.error(ErrorType.INVALID_MIN_INTEGER_FLAG_VALUE, "--" + THREADS_FLAG, String.valueOf(threads), "1");
         return false;
       }
       final int maxThreads = Environment.getAvailableProcessors() * 10;
       if (threads > maxThreads) {
-        Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, "--" + THREADS_FLAG, threads + "", maxThreads + "");
+        Diagnostic.error(ErrorType.INVALID_MAX_INTEGER_FLAG_VALUE, "--" + THREADS_FLAG, String.valueOf(threads), maxThreads + "");
         return false;
       }
     }

@@ -81,8 +81,8 @@ public class SplitContraryObservationAnnotator implements VcfAnnotator {
       if (counts == null) {
         continue;
       }
-      rec.setFormatAndSample(OCOC_FIELD.getId(), "" + counts.getOriginalContraryCount(), i);
-      rec.setFormatAndSample(DCOC_FIELD.getId(), "" + counts.getDerivedContraryCount(), i);
+      rec.setFormatAndSample(OCOC_FIELD.getId(), String.valueOf(counts.getOriginalContraryCount()), i);
+      rec.setFormatAndSample(DCOC_FIELD.getId(), String.valueOf(counts.getDerivedContraryCount()), i);
       rec.setFormatAndSample(OCOF_FIELD.getId(), Utils.realFormat(counts.getOriginalContraryFraction(), 3), i);
       rec.setFormatAndSample(DCOF_FIELD.getId(), Utils.realFormat(counts.getDerivedContraryFraction(), 3), i);
     }

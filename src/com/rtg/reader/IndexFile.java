@@ -749,7 +749,7 @@ public class IndexFile implements Integrity {
 
   void setSequenceEncoding(byte val) {
     if (val < 0 || val > NUMBER_SEQUENCE_ENCODINGS) {
-      throw new IllegalArgumentException("" + val);
+      throw new IllegalArgumentException("val=" + val);
     }
     mSequenceEncoding = val;
   }
@@ -760,7 +760,7 @@ public class IndexFile implements Integrity {
 
   void setQualityEncoding(byte val) {
     if (val < 0 || val > NUMBER_QUALITY_ENCODINGS) {
-      throw new IllegalArgumentException("" + val);
+      throw new IllegalArgumentException("val=" + val);
     }
     mQualityEncoding = val;
   }

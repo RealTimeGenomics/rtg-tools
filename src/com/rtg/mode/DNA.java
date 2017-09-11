@@ -200,7 +200,7 @@ public abstract class DNA implements Residue, PseudoEnum {
     case 't':
       return T;
     default:
-      throw new IllegalArgumentException(ch + "");
+      throw new IllegalArgumentException("ch=" + ch);
     }
   }
 

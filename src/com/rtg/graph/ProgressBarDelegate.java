@@ -54,16 +54,13 @@ public class ProgressBarDelegate implements ProgressDelegate {
 
   @Override
   public void setProgress(final int progress) {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        if (progress < 0) {
-          mProgressBar.setIndeterminate(false);
-        } else {
-          mProgressBar.setIndeterminate(true);
-        }
-        mProgressBar.setString("" + progress);
+    SwingUtilities.invokeLater(() -> {
+      if (progress < 0) {
+        mProgressBar.setIndeterminate(false);
+      } else {
+        mProgressBar.setIndeterminate(true);
       }
+      mProgressBar.setString(String.valueOf(progress));
     });
   }
 
@@ -75,12 +72,9 @@ public class ProgressBarDelegate implements ProgressDelegate {
 
   @Override
   public void done() {
-    SwingUtilities.invokeLater(new Runnable() {
-      @Override
-      public void run() {
-        mProgressBar.setIndeterminate(false);
-        mProgressBar.setString("Loaded " + mTotalLines + " points from " + mTotalFiles + " files.");
-      }
+    SwingUtilities.invokeLater(() -> {
+      mProgressBar.setIndeterminate(false);
+      mProgressBar.setString("Loaded " + mTotalLines + " points from " + mTotalFiles + " files.");
     });
   }
 }

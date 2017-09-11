@@ -118,7 +118,7 @@ public class LongChunksTest extends AbstractLongIndexTest {
       lc.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 
@@ -224,7 +224,7 @@ public class LongChunksTest extends AbstractLongIndexTest {
       lc.extendBy(-1);
       fail();
     } catch (final IllegalArgumentException e) {
-      assertEquals("-1", e.getMessage());
+      assertEquals("length=-1", e.getMessage());
     }
   }
 
