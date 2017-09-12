@@ -194,6 +194,7 @@ public class Relationship {
   }
 
   /** Accepts relationships of a certain type */
+  @TestClass("com.rtg.relation.GenomeRelationshipsTest")
   public static class RelationshipTypeFilter implements RelationshipFilter {
     private final RelationshipType mType;
 
