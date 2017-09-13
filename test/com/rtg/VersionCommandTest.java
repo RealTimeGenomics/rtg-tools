@@ -85,6 +85,7 @@ public class VersionCommandTest extends TestCase {
 
   public void testStrings() {
     GlobalFlags.resetAccessedStatus();
+    Environment.setCheckRelease(false);
     final MemoryPrintStream bout = new MemoryPrintStream();
     try {
       assertEquals(0, VersionCommand.mainInit(bout.printStream()));

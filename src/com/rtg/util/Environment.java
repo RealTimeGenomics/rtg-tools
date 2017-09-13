@@ -37,13 +37,21 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.IOUtils;
 
 /**
  * This class reports all the Environment variables.
@@ -53,6 +61,12 @@ public final class Environment {
 
   static {
     Locale.setDefault(Locale.US); // To ensure number formatting is consistent
+  }
+
+  // To disable checking for release update during testing
+  private static boolean sCheckRelease = true;
+  public static void setCheckRelease(final boolean enable) {
+    sCheckRelease = enable;
   }
 
   private static Class<?> getOperatingSystemMXBeanClass() {
@@ -270,6 +284,28 @@ public final class Environment {
     final String buildversion = getVersion("com/rtg/build.version");
     final String buildtime = getVersion("com/rtg/build.time");
     return buildversion + " (" + buildtime + ")";
+  }
+
+  /**
+   * Gets the most recent release version, according to github
+   * @return the most recent release version, or null if it could not be determined
+   */
+  public static String getLatestReleaseVersion() {
+    final String repo = getVersion("com/rtg/product.repo");
+    if (!sCheckRelease || VERSION_NOT_FOUND.equals(repo)) {
+      return null;
+    }
+    try {
+      final URLConnection conn = new URL("https://api.github.com/repos/" + repo + "/releases/latest").openConnection();
+      // Use short timeout so this doesn't take ages if there are network problems
+      conn.setConnectTimeout(2000);
+      conn.setReadTimeout(3000);
+      final JSONObject dict = (JSONObject) new JSONParser().parse(IOUtils.readAll(conn.getInputStream()));
+      return (String) dict.get("tag_name");
+    } catch (IOException | ParseException e) {
+      Diagnostic.developerLog(e);
+      return null;
+    }
   }
 
   /**

@@ -221,6 +221,13 @@ public final class Talkback {
           System.err.println("Please send the log file ('" + filename + "') to Real Time Genomics at " + Constants.TALKBACK_EMAIL_ADDR);
         }
       }
+      final String current = Environment.getProductVersion();
+      final String latest = Environment.getLatestReleaseVersion();
+      if (latest != null && !latest.equals(current)) {
+        System.err.println();
+        System.err.println("NOTE: You are using " + Environment.getProductName() + " version " + current + " but the latest release is " + latest + ". You may want to upgrade.");
+        System.err.println();
+      }
     }
     return status;
   }

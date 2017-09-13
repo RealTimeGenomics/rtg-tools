@@ -36,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
@@ -58,7 +59,7 @@ public class TalkbackTest extends TestCase {
     Talkback.setModuleName("TalkbackTest");
     Talkback.setTalkback(true);
     Diagnostic.setLogStream();
-
+    Environment.setCheckRelease(false);
   }
   @Override
   public void tearDown() {

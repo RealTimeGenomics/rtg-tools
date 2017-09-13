@@ -26,6 +26,7 @@
 
   <property name="product" value="RTG Tools" />
   <property name="product.version" value="3.8.4-dev" />
+  <property name="product.repo" value="RealTimeGenomics/rtg-tools" />
   <property name="resources" value="tools" />
   <property name="main.class" value="com.rtg.RtgTools" />
 
@@ -46,6 +47,7 @@
     <include name="commons-collections-3.2.1.jar" />
     <include name="commons-lang-2.4.jar" />
     <include name="commons-compress-1.4.1.jar" />
+    <include name="json-simple-1.1.1.jar" />
   </fileset>
 
   <path id="tools.runtime.classpath">
@@ -87,6 +89,7 @@
     <zipfileset src="${tools.src.lib.dir}/commons-collections-3.2.1.jar" excludes="META-INF/**" />
     <zipfileset src="${tools.src.lib.dir}/commons-lang-2.4.jar" excludes="META-INF/**" />
     <zipfileset src="${tools.src.lib.dir}/commons-compress-1.4.1.jar" excludes="META-INF/**" />
+    <zipfileset src="${tools.src.lib.dir}/json-simple-1.1.1.jar" excludes="META-INF/**" />
 
     <zipfileset src="${tools.src.lib.dir}/RPlot.jar" excludes="META-INF/**"/>
     <zipfileset src="${tools.src.lib.dir}/gzipfix.jar">
@@ -270,6 +273,7 @@
   <target name="set-rtg-build-product">
     <set-version-file file="${build.misc}/com/rtg/product.version" value="${product.version}"/>
     <set-version-file file="${build.misc}/com/rtg/product.name" value="${product}" strict="true"/>
+    <set-version-file file="${build.misc}/com/rtg/product.repo" value="${product.repo}"/>
   </target>
 
 
