@@ -55,12 +55,13 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import htsjdk.samtools.util.AbstractAsyncWriter;
+import htsjdk.samtools.util.RuntimeIOException;
+
 /**
  * Server for <code>http</code> based usage tracking
  */
 public class UsageServer {
-
-  private final Object mSync = new Object();
 
   static final String RTG_USAGE_ACCEPT = "RTG Usage Accept";
   static final String RTG_USAGE_REJECT = "RTG Usage Reject";
@@ -78,6 +79,7 @@ public class UsageServer {
   private final File mUsageDir;
   private final int mPort;
   private final ThreadPoolExecutor mThreadPoolExecutor;
+  private final AsyncUsageWriter mWriter = new AsyncUsageWriter();
 
   private HttpServer mServer = null;
   private RandomAccessFile mRandomAccessFile;
@@ -135,10 +137,8 @@ public class UsageServer {
    */
   public void end() throws IOException {
     mServer.stop(mStopTimer);
-    synchronized (mSync) {
-      closeCurrentFile();
-    }
     mThreadPoolExecutor.shutdown();
+    mWriter.close();
   }
 
   void setStopTimer(int stopTimer) {
@@ -203,22 +203,45 @@ public class UsageServer {
         out.write(reply.getBytes());
       }
       httpExchange.close();
-      final UsageMessage message = UsageMessage.setMessage(post.get(SERIAL), post.get(RUN_ID), post.get(VERSION), post.get(MODULE), post.getOrDefault(METRIC, null), post.get(TYPE));
-      if (post.containsKey(USERNAME)) {
-        message.setUsername(post.get(USERNAME));
-      }
-      if (post.containsKey(HOSTNAME)) {
-        message.setHostname(post.get(HOSTNAME));
-      }
-      if (post.containsKey(COMMANDLINE)) {
-        message.setCommandLine(post.get(COMMANDLINE));
-      }
-      synchronized (mSync) {
-        final File fileToUse = FileUsageLoggingClient.ensureUsageFile(mUsageDir, d);
-        if (!fileToUse.equals(mCurrentUsageFile)) {
-          switchToFile(fileToUse);
+      if (messageOk) {
+        final UsageMessage message = UsageMessage.setMessage(post.get(SERIAL), post.get(RUN_ID), post.get(VERSION), post.get(MODULE), post.getOrDefault(METRIC, null), post.get(TYPE));
+        if (post.containsKey(USERNAME)) {
+          message.setUsername(post.get(USERNAME));
         }
-        recordMessage(d, message);
+        if (post.containsKey(HOSTNAME)) {
+          message.setHostname(post.get(HOSTNAME));
+        }
+        if (post.containsKey(COMMANDLINE)) {
+          message.setCommandLine(post.get(COMMANDLINE));
+        }
+        message.setDate(d);
+        mWriter.write(message);
+      }
+    }
+  }
+
+  private class AsyncUsageWriter extends AbstractAsyncWriter<UsageMessage> {
+    AsyncUsageWriter() {
+      super(AbstractAsyncWriter.DEFAULT_QUEUE_SIZE);
+    }
+    @Override
+    protected String getThreadNamePrefix() {
+      return "UsageWriter";
+    }
+    @Override
+    protected void synchronouslyWrite(UsageMessage record) {
+      try {
+        recordMessage(record);
+      } catch (IOException e) {
+        throw new RuntimeIOException(e);
+      }
+    }
+    @Override
+    protected void synchronouslyClose() {
+      try {
+        closeCurrentFile();
+      } catch (IOException e) {
+        throw new RuntimeIOException(e);
       }
     }
   }
@@ -231,8 +254,11 @@ public class UsageServer {
     return new Date();
   }
 
-  private void recordMessage(Date d, UsageMessage message) throws IOException {
-    message.setDate(d);
+  private void recordMessage(UsageMessage message) throws IOException {
+    final File fileToUse = FileUsageLoggingClient.ensureUsageFile(mUsageDir, message.getDate());
+    if (!fileToUse.equals(mCurrentUsageFile)) {
+      switchToFile(fileToUse);
+    }
     mRandomAccessFile.write(message.formatLine(mLastKey).getBytes());
     mLastKey = message.getChecksum();
   }

@@ -29,7 +29,6 @@
  */
 package com.rtg.usage;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -57,7 +56,7 @@ public final class UsageMessage {
   private String mModule;
   private String mMessageType;
   private String mMetric = "N/A";
-  private String mDate;
+  private Date mDate;
 
   String mUsername = "N/A";
   String mHostname = "N/A";
@@ -132,13 +131,12 @@ public final class UsageMessage {
     mMetric = metric;
   }
 
-  /**
-   * sets the date using date format <code>yyyy-MM-dd HH:mm:ss</code>
-   * @param date value to set date to
-   */
   public void setDate(Date date) {
-    final DateFormat messageDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    mDate = messageDateFormat.format(date);
+    mDate = date;
+  }
+
+  public Date getDate() {
+    return mDate;
   }
 
   /**
@@ -205,7 +203,7 @@ public final class UsageMessage {
    */
   public String formatLine(String prevChecksum) {
     final StringBuilder messageBuilder = new StringBuilder();
-    messageBuilder.append(mDate); //Date first
+    messageBuilder.append(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(mDate)); //Date first
     final String[] fields = {mSerialNumber, mRunId, mVersion, mModule, mMessageType, mMetric, mUsername, mHostname, mCommandLine}; //rest in this order
     for (String s : fields) {
       messageBuilder.append("\t").append(s.replaceAll("\\s", " "));
