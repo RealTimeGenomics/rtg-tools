@@ -56,7 +56,7 @@ public class SamBamRecordImplTest extends TestCase {
         + "@SQ\tSN:simulatedSequence\tLN:10000\n"
         + "@PG\tID:rtg\tVN:v2.0-EAP2dev build 20721 (2009-10-01)\n";
       final String content = header
-                       + "962\t163\tsimulatedSequence\t16\t255\t5H2I3=5P2M3X5D5N6S\t=\t133\t152\tGTTTCCTCNCCGTAGTGGAATCGATGCTAATGAGAC\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tAS:A:c\tNM:i:1\tMQ:f:2.55\tIH:i:1\tHH:Z:blah\n";
+                       + "962\t163\tsimulatedSequence\t16\t255\t5H2I3=5P6M3X5D5N6S\t=\t133\t152\tGTTTCCTCNCCTAATGAGAC\taaaaaaaaaaaaaaaaaaaa\tAS:A:c\tNM:i:1\tMQ:f:2.55\tIH:i:1\tHH:Z:blah\n";
       FileUtils.stringToFile(content, samFile);
       SamUtilsTest.convertSamToBam(bamFile, bamIndex, samFile);
 
@@ -75,7 +75,7 @@ public class SamBamRecordImplTest extends TestCase {
         assertEquals('f', sbri.getAttributeType("MQ"));
         assertEquals("blah", (String) sbri.getAttributeValue("HH"));
         assertEquals(5, sbri.getNumFields());
-        assertEquals("5H2I3=5P2M3X5D5N6S", sbri.getField(SamBamConstants.CIGAR_FIELD));
+        assertEquals("5H2I3=5P6M3X5D5N6S", sbri.getField(SamBamConstants.CIGAR_FIELD));
         assertEquals(163, sbri.getIntField(1));
 
         assertEquals("[AS, NM, MQ, IH, HH]", Arrays.toString(sbri.getAttributeTags()));

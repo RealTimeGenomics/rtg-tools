@@ -130,7 +130,7 @@ public class BamReader extends SamBamReader {
    * @param input BAM file
    * @throws IOException If an IO error occurs
    */
-  public BamReader(final File input) throws IOException {
+  BamReader(final File input) throws IOException {
     this(new BgzfInputStream(input), true);
   }
 

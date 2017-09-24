@@ -122,7 +122,7 @@ public class BamReaderTest extends TestCase {
         + "@SQ\tSN:simulatedSequence\tLN:10000\n"
         + "@PG\tID:rtg\tVN:v2.0-EAP2dev build 20721 (2009-10-01)\n";
       final String content = header
-                       + "962\t163\tsimulatedSequence\t16\t255\t5H2I3=5P2M3X5D5N6S\t=\t133\t152\tGTTTCCTCNCCGTAGTGGAATCGATGCTAATGAGAC\taaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\tAS:A:c\tNM:i:1\tMQ:f:2.55\tIH:i:1\tHH:Z:blah\n";
+                       + "962\t163\tsimulatedSequence\t16\t255\t5H2I3=5P2M3X5D5N6S\t=\t133\t152\tGTTTCCTCNCCGTAGT\taaaaaaaaaaaaaaaa\tAS:A:c\tNM:i:1\tMQ:f:2.55\tIH:i:1\tHH:Z:blah\n";
       FileUtils.stringToFile(content, samFile);
       SamUtilsTest.convertSamToBam(bamFile, bamIndex, samFile);
 
@@ -154,8 +154,8 @@ public class BamReaderTest extends TestCase {
         assertEquals(0, br.getIntField(SamBamConstants.MRNM_FIELD));
         assertEquals(133, br.getIntField(SamBamConstants.MPOS_FIELD));
         assertEquals("5H2I3=5P2M3X5D5N6S", br.getField(SamBamConstants.CIGAR_FIELD));
-        assertEquals("GTTTCCTCNCCGTAGTGGAATCGATGCTAATGAGAC", br.getField(SamBamConstants.SEQ_FIELD));
-        assertEquals("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", br.getField(SamBamConstants.QUAL_FIELD));
+        assertEquals("GTTTCCTCNCCGTAGT", br.getField(SamBamConstants.SEQ_FIELD));
+        assertEquals("aaaaaaaaaaaaaaaa", br.getField(SamBamConstants.QUAL_FIELD));
         assertTrue(br.hasAttribute(SamUtils.ATTRIBUTE_NUM_MISMATCHES));
         assertFalse(br.hasAttribute("HB"));
         assertEquals(1, br.getAttributeValue(SamUtils.ATTRIBUTE_NUM_MISMATCHES));

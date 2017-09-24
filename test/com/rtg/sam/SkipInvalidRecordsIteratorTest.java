@@ -67,16 +67,16 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
     ;
 
   static final String SAM_REC_OK1 = ""
-    + "aa" + TAB + "0" + TAB + "gi0" + TAB + "2" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "AS:i:0" + TAB + "IH:i:1" + StringUtils.LS;
+    + "aa" + TAB + "0" + TAB + "gi0" + TAB + "2" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "IH:i:1" + StringUtils.LS;
 
   static final String SAM_REC_OK1_FORMAT = ""
-    + "aa" + TAB + "0" + TAB + "gi0" + TAB + "2" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "AS:i:0" + TAB + "IH:i:1";
+    + "aa" + TAB + "0" + TAB + "gi0" + TAB + "2" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "IH:i:1";
 
   static final String SAM_REC_OK2 = ""
-    + "bb" + TAB + "0" + TAB + "gi1" + TAB + "1" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "AS:i:0" + TAB + "IH:i:1\n";
+    + "bb" + TAB + "0" + TAB + "gi1" + TAB + "1" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "IH:i:1\n";
 
   static final String SAM_REC_OK3 = ""
-    + "cc" + TAB + "0" + TAB + "gi1" + TAB + "4" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "AS:i:0" + TAB + "IH:i:1\n";
+    + "cc" + TAB + "0" + TAB + "gi1" + TAB + "4" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB +  "IB7?*III<I" + TAB + "IH:i:1\n";
 
 
   public void test() throws IOException {
@@ -324,14 +324,14 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   public void testBad2First2() throws IOException {
     // "Line: badread2", "RNAME 'gi' not found in any SQ record");
     checkWarning(SAM_HEAD10 + SAM_REC_BAD2, 0, "SAM record is invalid in file ",
-      "badread2" + TAB + "16" + TAB + "gi" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" /*+ TAB + "IH:0\n" SAM bug*/,
+      "badread2" + TAB + "16" + TAB + "gi" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /*+ "AS:i:0" + TAB + "IH:0\n" SAM bug*/,
       "[ERROR: Read name badread2, Reference sequence not found in sequence dictionary.]",
       "At data line 1");
   }
 
   public void testBad2First3() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD3, 0, "SAM record is invalid in file ",
-      "badread3" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" /*+ TAB + "IH:0\n" SAM bug*/,
+      "badread3" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /* + "AS:i:0" + TAB + "IH:0\n" SAM bug*/,
       "[ERROR: Read name badread3, CIGAR should have > zero elements for mapped read.]",
       "At data line 1"); // "Line: badread3", "Empty field at position 5 (zero-based);");
   }
@@ -342,8 +342,10 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
 
   public void testBad2First5() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD4, 0, "SAM record is invalid in file ",
-      "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB + "AS:i:0" + TAB + "IH:i:0",
-      "[ERROR: Read name badread4, Not primary alignment flag should not be set for unmapped read., ERROR: Read name badread4, Supplementary alignment flag should not be set for unmapped read., ERROR: Read name badread4, MAPQ should be 0 for unmapped read.]",
+      "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /*+ "AS:i:0" + TAB + "IH:i:0"*/,
+      "ERROR: Read name badread4, Not primary alignment flag should not be set for unmapped read.",
+      "ERROR: Read name badread4, Supplementary alignment flag should not be set for unmapped read.",
+      "ERROR: Read name badread4, MAPQ should be 0 for unmapped read.]",
       "At data line 1"); //"Line: badread4", "MRNM not specified but flags indicate mate mapped;");
   }
 
@@ -359,8 +361,9 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
 
   public void testBad2First8() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD8, 0, "SAM record is invalid in file ",
-      "badread8" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=" + TAB + "AS:i:0" + TAB + "IH:i:0",
-      "[ERROR: Read name badread8, Read length does not match quals length]",
+      "badread8" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=" + TAB /*+ "AS:i:0" + TAB + "IH:i:0"*/,
+      "ERROR: Read name badread8, Read length does not match quals length",
+      "ERROR: Read name badread8, Read length is  10 bases but have 4 qualities",
       "At data line 1"); //"Line: badread8", "length(QUAL) != length(SEQ)");
   }
 
