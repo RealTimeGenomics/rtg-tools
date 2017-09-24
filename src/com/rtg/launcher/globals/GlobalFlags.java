@@ -55,22 +55,7 @@ import com.rtg.util.ClassPathScanner;
  */
 public final class GlobalFlags {
 
-
   private GlobalFlags() { }
-  //NOTE flag definitions should be placed here, to prevent circular dependencies
-  //NOTE read class note
-
-  //Map
-
-  //Species
-
-  //Edit distance factory
-
-  //Assembler
-
-  // AVR
-
-  //vcfeval
 
   private static final String GLOBAL_FLAG_PACKAGE = "com.rtg.launcher.globals";
   private static CFlags sFlags;
