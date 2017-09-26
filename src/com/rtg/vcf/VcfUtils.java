@@ -86,6 +86,9 @@ public final class VcfUtils {
   /** Character indicating field value is missing. */
   public static final char MISSING_VALUE = '.';
 
+  /** Integer value for a missing genotype. */
+  public static final int MISSING_GT = -1;
+
   /** Missing field (e.g. filter/QUAL). */
   public static final String MISSING_FIELD = "" + MISSING_VALUE;
 
@@ -188,7 +191,7 @@ public final class VcfUtils {
 
   private static int alleleId(char c) {
     if (c == VcfUtils.MISSING_VALUE) {
-      return -1;
+      return MISSING_GT;
     } else if (c >= '0' && c <= '9') {
       return c - '0';
     } else {
@@ -290,7 +293,7 @@ public final class VcfUtils {
   public static boolean isValidGt(VcfRecord rec, int[] gt) {
     final int maxId = rec.getAltCalls().size();
     for (int gtId : gt) {
-      if (gtId < -1 || gtId > maxId) {
+      if (gtId < MISSING_GT || gtId > maxId) {
         return false;
       }
     }
@@ -407,8 +410,8 @@ public final class VcfUtils {
    * @return true if gt is not entirely should be skipped, false otherwise
    */
   public static boolean isNonMissingGt(int[] gt) {
-    for (int g : gt) {
-      if (g > -1) {
+    for (final int g : gt) {
+      if (g > MISSING_GT) {
         return true;
       }
     }
