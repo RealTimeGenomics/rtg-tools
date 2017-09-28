@@ -182,7 +182,7 @@ public class RocPlotCli extends AbstractCli {
         createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG);
       } else {   //Create and set up as a stand alone app.
         if (isReallyHeadless()) {
-          Diagnostic.error("No graphics environment is available to open the rocplot GUI");
+          Diagnostic.error("No graphics environment is available to open the rocplot GUI. You can generate a static image using --" + PNG_FLAG + " or --" + SVG_FLAG);
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
