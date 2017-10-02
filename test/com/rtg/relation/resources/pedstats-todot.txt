@@ -1,5 +1,5 @@
 digraph Ped {
-  graph [fontname = "", color=""];
+  graph [fontname = "", color="", bgcolor=""];
   node [fontname = "", color="", gradientangle="270"];
   edge [fontname = "", color=""];
   ratio ="auto";

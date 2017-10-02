@@ -344,6 +344,7 @@ public class GenomeRelationships {
     final String invisNode = " " + props.getProperty("invisible.node", "[shape=point,style=filled,label=\"\",height=.001,width=.001]") + ";\n";
     final String font = props.getProperty("font", "");
     final String color = props.getProperty("color", "");
+    final String bgcolor = props.getProperty("bgcolor", "");
     final String gradientangle = props.getProperty("gradientangle", "270");
     final String maleShape = props.getProperty("male.shape", "box");
     final String femaleShape = props.getProperty("male.shape", "oval");
@@ -358,6 +359,8 @@ public class GenomeRelationships {
       .append(font)
       .append("\", color=\"")
       .append(color)
+      .append("\", bgcolor=\"")
+      .append(bgcolor)
       .append("\"];\n")
       .append("  node [fontname = \"")
       .append(font)
