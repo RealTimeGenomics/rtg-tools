@@ -47,6 +47,7 @@
     <include name="commons-collections-3.2.1.jar" />
     <include name="commons-lang-2.4.jar" />
     <include name="commons-compress-1.4.1.jar" />
+    <include name="snappy-java-1.1.4.jar" />
     <include name="json-simple-1.1.1.jar" />
   </fileset>
 
@@ -89,6 +90,7 @@
     <zipfileset src="${tools.src.lib.dir}/commons-collections-3.2.1.jar" excludes="META-INF/**" />
     <zipfileset src="${tools.src.lib.dir}/commons-lang-2.4.jar" excludes="META-INF/**" />
     <zipfileset src="${tools.src.lib.dir}/commons-compress-1.4.1.jar" excludes="META-INF/**" />
+    <zipfileset src="${tools.src.lib.dir}/snappy-java-1.1.4.jar" excludes="META-INF/**" includes="**/*.class" />
     <zipfileset src="${tools.src.lib.dir}/json-simple-1.1.1.jar" excludes="META-INF/**" />
 
     <zipfileset src="${tools.src.lib.dir}/RPlot.jar" excludes="META-INF/**"/>
