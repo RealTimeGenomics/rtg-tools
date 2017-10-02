@@ -54,7 +54,7 @@ public class PloidyAnnotation extends AbstractDerivedFormatAnnotation {
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
     final ArrayList<String> sampleValues = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
-    final Object value;
+    final String value;
     if (sampleValues == null || sampleValues.size() < (sampleNumber + 1)) {
       value = null;
     } else {
@@ -62,7 +62,17 @@ public class PloidyAnnotation extends AbstractDerivedFormatAnnotation {
       if (sValue.contains(VcfRecord.MISSING)) {
         value = null;
       } else {
-        value = VcfUtils.isDiploid(record, sampleNumber) ? "d" : "h";
+        switch (VcfUtils.getValidGt(record, sampleNumber).length) {
+          case 1:
+            value = "h";
+            break;
+          case 2:
+            value = "d";
+            break;
+          default:
+            value = "p";
+            break;
+        }
       }
     }
     return value;

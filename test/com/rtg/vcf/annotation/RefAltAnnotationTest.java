@@ -51,15 +51,17 @@ public class RefAltAnnotationTest extends TestCase {
   public void test() {
     final RefAltAnnotation ann = new RefAltAnnotation();
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
-    rec.setNumberOfSamples(3);
+    rec.setNumberOfSamples(4);
     rec.addAltCall("G");
     rec.addFormatAndSample("GT", "0/1");
     rec.addFormatAndSample("GT", ".");
     rec.addFormatAndSample("GT", "1/1");
+    rec.addFormatAndSample("GT", "./1");
     assertEquals("RA", ann.getValue(rec, 0));
     assertNull(ann.getValue(rec, 1));
     assertEquals("AA", ann.getValue(rec, 2));
-    assertNull(ann.getValue(rec, 3));
+    assertEquals("AA", ann.getValue(rec, 3));
+    assertNull(ann.getValue(rec, 4));
     assertEquals("Derived annotation RA missing required fields in VCF header (FORMAT fields: GT)", ann.checkHeader(new VcfHeader()));
   }
 
@@ -74,5 +76,7 @@ public class RefAltAnnotationTest extends TestCase {
     assertEquals("AA", RefAltAnnotation.getCode(2, 2));
 
     assertEquals("AB", RefAltAnnotation.getCode(2, 3));
+
+    assertEquals("AB", RefAltAnnotation.getCode(0, 1, 2)); // Toss up between RA and AB really, but seems more important to identify the multi-allelic nature.
   }
 }

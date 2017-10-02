@@ -51,20 +51,22 @@ public class PloidyAnnotationTest extends TestCase {
     final PloidyAnnotation pdAnn = new PloidyAnnotation();
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addAltCall("G");
-    rec.setNumberOfSamples(6);
+    rec.setNumberOfSamples(7);
     rec.addFormatAndSample("GT", "0/1");
     rec.addFormatAndSample("GT", ".");
     rec.addFormatAndSample("GT", "1/1");
     rec.addFormatAndSample("GT", "./.");
     rec.addFormatAndSample("GT", "1");
     rec.addFormatAndSample("GT", "0");
+    rec.addFormatAndSample("GT", "0/1/1");
     assertEquals("d", pdAnn.getValue(rec, 0));
     assertNull(pdAnn.getValue(rec, 1));
     assertEquals("d", pdAnn.getValue(rec, 2));
     assertNull(pdAnn.getValue(rec, 3));
     assertEquals("h", pdAnn.getValue(rec, 4));
     assertEquals("h", pdAnn.getValue(rec, 5));
-    assertNull(pdAnn.getValue(rec, 6));
+    assertEquals("p", pdAnn.getValue(rec, 6));
+    assertNull(pdAnn.getValue(rec, 7));
     assertEquals("Derived annotation PD missing required fields in VCF header (FORMAT fields: GT)", pdAnn.checkHeader(new VcfHeader()));
   }
 }

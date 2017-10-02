@@ -62,7 +62,7 @@ public class RefAltAnnotation extends AbstractDerivedFormatAnnotation {
       value = null;
     } else {
       final String sValue = sampleValues.get(sampleNumber);
-      if (sValue.contains(VcfRecord.MISSING)) {
+      if (VcfRecord.MISSING.equals(sValue)) {
         value = null;
       } else {
         final int[] gtArray = VcfUtils.getValidGt(record, sampleNumber);
@@ -78,14 +78,22 @@ public class RefAltAnnotation extends AbstractDerivedFormatAnnotation {
     for (; i < gtArray.length && first == -1; i++) {
       first = gtArray[i];
     }
-    assert first != -1;
+    if (first == -1) {
+      return null;
+    }
     boolean hasRef = first == 0;
     boolean hom = true;
+    boolean multi = false;
+    int alt = -1;
     for (; i < gtArray.length; i++) {
       final int allele = gtArray[i];
       if (allele != -1) {
         if (allele == 0) {
           hasRef = true;
+        } else if (alt == -1) {
+          alt = allele;
+        } else if (allele != alt) {
+          multi = true;
         }
         if (allele != first) {
           hom = false;
@@ -94,7 +102,7 @@ public class RefAltAnnotation extends AbstractDerivedFormatAnnotation {
     }
     return hom
       ? hasRef ? "RR" : "AA"
-      : hasRef ? "RA" : "AB";
+      : (hasRef && !multi) ? "RA" : "AB";
   }
 
   @Override
