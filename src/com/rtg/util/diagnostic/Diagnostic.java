@@ -42,12 +42,15 @@ import java.util.TreeMap;
 
 import com.rtg.util.Environment;
 import com.rtg.util.License;
+import com.rtg.util.NullStreamUtils;
 import com.rtg.util.StringUtils;
 import com.rtg.util.gzip.GzipUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogFile;
 import com.rtg.util.io.LogSimple;
 import com.rtg.util.io.LogStream;
+
+import htsjdk.samtools.util.Log;
 
 /**
  * Utility class for controlling the dispatch of diagnostic warnings, errors,
@@ -303,6 +306,7 @@ public final class Diagnostic {
       closeLog();
     }
     sLogStream = logStream;
+    Log.setGlobalPrintStream(sLogStream == null ? NullStreamUtils.getNullPrintStream() : sLogStream.stream());
     sLogClosed = false;
     sProgressClosed = false;
   }
