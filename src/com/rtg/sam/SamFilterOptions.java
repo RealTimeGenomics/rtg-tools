@@ -87,6 +87,17 @@ public final class SamFilterOptions {
     flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, CommonFlags.INT, "seed used during subsampling").setCategory(UTILITY);
   }
 
+  /** Flag name for inverting flag and attribute filter criteria. */
+  public static final String INVERT_FLAG = "invert";
+
+  /**
+   * Register flag for inverting filtering criteria
+   * @param flags flags to add into
+   */
+  public static void registerInvertCriteriaFlag(final CFlags flags) {
+    flags.registerOptional(INVERT_FLAG, "if set, invert the result of flag and attribute based filter criteria").setCategory(SENSITIVITY_TUNING);
+  }
+
   /** Flag name for filter on <code>MAPQ</code> field of SAM record. */
   public static final String MIN_MAPQ_FLAG = "min-mapq";
 
@@ -324,6 +335,7 @@ public final class SamFilterOptions {
    */
   public static SamFilterParams.SamFilterParamsBuilder makeFilterParamsBuilder(final CFlags flags) {
     final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder();
+    builder.invertFilters(flags.isSet(INVERT_FLAG));
     if (flags.isSet(MAX_HITS_FLAG)) {
       builder.maxAlignmentCount((Integer) flags.getValue(MAX_HITS_FLAG));
     }

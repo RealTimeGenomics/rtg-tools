@@ -66,6 +66,7 @@ public class SamFilterParams {
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
     protected Double mSubsampleFraction = null;
     protected long mSubsampleSeed = 42;
+    protected boolean mInvertFilters = false;
 
     protected SamRegionRestriction mRestriction = null;
     protected File mBedRegionsFile = null;
@@ -77,6 +78,16 @@ public class SamFilterParams {
      */
     public SamFilterParamsBuilder minMapQ(final int val) {
       mMinMapQ = val;
+      return this;
+    }
+
+    /**
+     * Invert flag and attribute based filter criteria
+     * @param invert true if criteria should be inverted.
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder invertFilters(boolean invert) {
+      mInvertFilters = invert;
       return this;
     }
 
@@ -281,7 +292,7 @@ public class SamFilterParams {
   private final boolean mExcludeVariantInvalid;
   private final Double mSubsampleFraction;
   private final long mSubsampleSeed;
-
+  private final boolean mInvertFilters;
 
   private final SamRegionRestriction mRestriction;
   private final File mBedRegionsFile;
@@ -297,6 +308,7 @@ public class SamFilterParams {
     mMaxASMatedValue = builder.mMaxASMatedValue;
     mMaxASUnmatedValue = builder.mMaxASUnmatedValue;
     mExcludeUnplaced = builder.mExcludeUnplaced;
+    mExcludeUnmated = builder.mExcludeUnmated; // Can't be done via requireUnset/requireSet. Needs to select reads that are !unmapped and !properpair
     mExcludeVariantInvalid = builder.mExcludeVariantInvalid;
 
     int requireUnsetFlags = builder.mRequireUnsetFlags;
@@ -317,13 +329,39 @@ public class SamFilterParams {
       throw new InvalidParamsException("Conflicting SAM FLAG criteria that no record can meet: " + badFlags);
     }
 
-    // This one is tricky - needs to hit reads that are !unmapped and !properpair
-    mExcludeUnmated = builder.mExcludeUnmated;
+    mInvertFilters = builder.mInvertFilters;
 
     mRestriction = builder.mRestriction;
     mBedRegionsFile = builder.mBedRegionsFile;
-
     mFindAndRemoveDuplicates = builder.mFindAndRemoveDuplicates;
+  }
+
+  /**
+   * @return true if current configuration results in exclusion of records
+   */
+  public boolean isFiltering() {
+    return mMinMapQ != -1
+      || mSubsampleFraction != null
+      || mMaxAlignmentCount != -1
+      || mMaxASMatedValue != null
+      || mMaxASUnmatedValue != null
+      || mExcludeUnplaced
+      || mExcludeUnmated
+      || mExcludeVariantInvalid
+      || mRequireUnsetFlags != 0
+      || mRequireSetFlags != 0
+      || mInvertFilters
+      || mRestriction != null
+      || mBedRegionsFile != null
+      || mFindAndRemoveDuplicates;
+  }
+
+
+  /**
+   * @return true if final filter status should be inverted
+   */
+  public boolean invertFilters() {
+    return mInvertFilters;
   }
 
   /**

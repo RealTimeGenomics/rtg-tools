@@ -109,7 +109,7 @@ public final class SamOutput implements Closeable {
     }
     if (type == SamBamBaseFile.SamFormat.CRAM) {
       if (!writeHeader || !terminateBlockGzip) {
-        throw new UnsupportedOperationException("Piecewise CRAM output is not supported");
+        throw new UnsupportedOperationException("Headerless/piecewise CRAM output is not supported");
       }
       final OutputStream indexOut = indexIfPossible ? FileUtils.createOutputStream(BamIndexer.indexFileName(outputFile)) : null;
       try {

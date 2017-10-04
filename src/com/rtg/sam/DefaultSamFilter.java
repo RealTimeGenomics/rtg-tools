@@ -44,6 +44,7 @@ public class DefaultSamFilter implements SamFilter {
   private static final int SUBSAMPLE_MASK = SUBSAMPLE_MAX - 1;
 
   private final SamFilterParams mFilterParams;
+  private final boolean mInvert;
 
   /**
    * Filter for SAM records.
@@ -52,16 +53,18 @@ public class DefaultSamFilter implements SamFilter {
    */
   public DefaultSamFilter(final SamFilterParams params) {
     mFilterParams = params;
+    mInvert = params.invertFilters();
   }
 
   /**
-   * Filter a SAM record based on specified filtering parameters. Does not consider position based filters.
+   * Filter a SAM record based on specified filtering parameters.
+   * Does not consider position based filters, or inversion status.
    *
    * @param params parameters
    * @param rec record
    * @return true if record should be accepted for processing
    */
-  private static boolean acceptRecord(final SamFilterParams params, final SAMRecord rec) {
+  private static boolean checkRecordProperties(final SamFilterParams params, final SAMRecord rec) {
     final int flags = rec.getFlags();
     if ((flags & params.requireUnsetFlags()) != 0) {
       return false;
@@ -125,6 +128,6 @@ public class DefaultSamFilter implements SamFilter {
 
   @Override
   public boolean acceptRecord(final SAMRecord rec) {
-    return acceptRecord(mFilterParams, rec);
+    return mInvert ^ checkRecordProperties(mFilterParams, rec);
   }
 }
