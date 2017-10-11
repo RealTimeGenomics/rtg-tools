@@ -433,7 +433,7 @@ public final class VcfFilterCli extends AbstractCli {
     }
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final File outputFile = FileUtils.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-    return new VcfWriterFactory(mFlags).make(header, outputFile, output);
+    return new VcfWriterFactory(mFlags).addRunInfo(true).make(header, outputFile, output);
   }
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {

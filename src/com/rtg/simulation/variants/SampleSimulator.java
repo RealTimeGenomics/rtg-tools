@@ -117,10 +117,9 @@ public class SampleSimulator {
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
       header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
-    header.addRunInfo();
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).make(header, vcfOutFile)) {
+    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, sex, mDefaultPloidy);
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));

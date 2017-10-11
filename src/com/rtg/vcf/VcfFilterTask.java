@@ -103,7 +103,6 @@ class VcfFilterTask {
       }
       filter.setHeader(header);
     }
-    header.addRunInfo();
     if (mFailFilterName != null) {
       header.ensureContains(new FilterField(mFailFilterName, "RTG vcffilter user defined filter"));
     }

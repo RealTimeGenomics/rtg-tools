@@ -199,7 +199,6 @@ public class VcfMerge extends AbstractCli {
     final VcfPositionZipper posZip = new VcfPositionZipper(null, forceMerge, inputs.toArray(new File[inputs.size()]));
     final VcfHeader header = posZip.getHeader();
     VcfUtils.addHeaderLines(header, extraHeaderLines);
-    header.addRunInfo();
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 
     String defaultFormat = FORMAT_GENOTYPE;
@@ -210,7 +209,7 @@ public class VcfMerge extends AbstractCli {
     final boolean stdout = FileUtils.isStdio(outFile);
     final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
     try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
-      try (VcfWriter w = new VcfWriterFactory(mFlags).make(header, vcfFile, out)) {
+      try (VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
         final ZipperCallback callback = (records, headers) -> {
           assert records.length > 0;
           final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);

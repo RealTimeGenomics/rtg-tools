@@ -149,13 +149,11 @@ public class DeNovoSampleSimulator {
       header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
     }
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
-
-    header.addRunInfo();
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
     mStats = new VariantStatistics(null);
     mStats.onlySamples(sample);
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).make(header, vcfOutFile)) {
+    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
       // Generate de novo variants (oblivious of any pre-existing variants)

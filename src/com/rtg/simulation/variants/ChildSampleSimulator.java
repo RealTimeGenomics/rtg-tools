@@ -222,8 +222,6 @@ public class ChildSampleSimulator {
       header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + sample + ",Mother=" + mother + ",Father=" + father + ">");
-
-    header.addRunInfo();
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
     mStats = new ChildStatistics();

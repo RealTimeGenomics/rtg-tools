@@ -192,7 +192,6 @@ public final class MendeliannessChecker extends AbstractCli {
 //      }
     }
 
-    header.addRunInfo(); // Ensure CL in output
     final VcfHeader header2 = header.copy();
     mendAnnot.updateHeader(header2);
     for (final VcfAnnotator annotator: annotators) {
@@ -200,7 +199,7 @@ public final class MendeliannessChecker extends AbstractCli {
     }
 
     int skippedRecords = 0;
-    final VcfWriterFactory f = new VcfWriterFactory(mFlags);
+    final VcfWriterFactory f = new VcfWriterFactory(mFlags).addRunInfo(true);
     try (VcfWriter outputVcf = outputVcfFile != null ? f.make(header2, outputVcfFile) : null) {
       try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? f.make(header2, inconsistentVcfFile) : null) {
         try (VcfWriter consistentVcf = consistentVcfFile != null ? f.make(header, consistentVcfFile) : null) {
