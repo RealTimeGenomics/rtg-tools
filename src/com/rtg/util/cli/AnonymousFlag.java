@@ -30,6 +30,7 @@
 package com.rtg.util.cli;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * <code>AnonymousFlag</code> is a flag with no name.
@@ -62,9 +63,9 @@ public class AnonymousFlag<T> extends Flag<T> {
   }
 
   @Override
-  String getFlagUsage() {
+  String getFlagUsage(DisplayHelper dh) {
     final StringBuilder sb = new StringBuilder();
-    sb.append(getParameterDescription());
+    sb.append(dh.decorateForeground(getParameterDescription(), DisplayHelper.THEME_TYPE_COLOR));
     if (getMaxCount() > 1) {
       sb.append('+');
     }
@@ -72,8 +73,8 @@ public class AnonymousFlag<T> extends Flag<T> {
   }
 
   @Override
-  String getCompactFlagUsage() {
-    return getFlagUsage();
+  String getCompactFlagUsage(DisplayHelper dh) {
+    return getFlagUsage(dh);
   }
 
   @Override

@@ -48,6 +48,7 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.IntegerOrPercentage;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
+import com.rtg.visualization.DisplayHelper;
 
 
 /**
@@ -600,26 +601,30 @@ public class Flag<T> implements Comparable<Flag<T>> {
   }
 
   /** @return a compact usage string (prefers char name if present). */
-  String getCompactFlagUsage() {
+  final String getCompactFlagUsage() {
+    return getCompactFlagUsage(new DisplayHelper());
+  }
+  String getCompactFlagUsage(DisplayHelper dh) {
     final StringBuilder sb = new StringBuilder();
-    if (getChar() != null) {
-      sb.append(CFlags.SHORT_FLAG_PREFIX).append(getChar());
-    } else {
-      sb.append(CFlags.LONG_FLAG_PREFIX).append(getName());
-    }
+    final String flagName = (getChar() != null) ? CFlags.SHORT_FLAG_PREFIX + getChar() : CFlags.LONG_FLAG_PREFIX + getName();
+    sb.append(dh.decorateForeground(flagName, DisplayHelper.THEME_LITERAL_COLOR));
     final String usage = getParameterDescription();
     if (usage.length() > 0) {
-      sb.append(' ').append(usage);
+      sb.append(' ').append(dh.decorateForeground(usage, DisplayHelper.THEME_TYPE_COLOR));
     }
     return sb.toString();
   }
 
   /** @return a usage string. */
-  String getFlagUsage() {
+  final String getFlagUsage() {
+    return getFlagUsage(new DisplayHelper());
+  }
+  String getFlagUsage(DisplayHelper dh) {
     final StringBuilder sb = new StringBuilder();
-    sb.append(CFlags.LONG_FLAG_PREFIX).append(getName());
+    final String flagName = CFlags.LONG_FLAG_PREFIX + getName();
+    sb.append(dh.decorateForeground(flagName, DisplayHelper.THEME_LITERAL_COLOR));
     if (getParameterType() != null) {
-      sb.append('=').append(getParameterDescription());
+      sb.append('=').append(dh.decorateForeground(getParameterDescription(), DisplayHelper.THEME_TYPE_COLOR));
     }
     return sb.toString();
   }
@@ -658,12 +663,15 @@ public class Flag<T> implements Comparable<Flag<T>> {
     if (getChar() == null) {
       wb.append("    ");
     } else {
-      wb.append(CFlags.SHORT_FLAG_PREFIX).append(getChar()).append(", ");
+      final String flagName = CFlags.SHORT_FLAG_PREFIX + getChar();
+      wb.append(wb.displayHelper().decorateForeground(flagName, DisplayHelper.THEME_LITERAL_COLOR)).append(", ");
     }
 
-    final String usageStr = getFlagUsage();
-    wb.append(getFlagUsage());
-    for (int i = 0; i < longestUsageLength - usageStr.length(); ++i) {
+    final int len = getFlagUsage().length();
+    //final String disp = getFlagUsage();
+    final String disp = getFlagUsage(wb.displayHelper());
+    wb.append(disp);
+    for (int i = 0; i < longestUsageLength - len; ++i) {
       wb.append(" ");
     }
     wb.append(" ");

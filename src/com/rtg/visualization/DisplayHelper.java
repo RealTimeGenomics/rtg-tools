@@ -33,6 +33,7 @@ package com.rtg.visualization;
 
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
+import com.rtg.util.Environment;
 import com.rtg.util.StringUtils;
 
 /**
@@ -49,21 +50,25 @@ public class DisplayHelper {
     ANSI,
     /** Markup with <code>HTML</code> sequences */
     HTML,
+    /** Try and auto-detect whether to use ANSI or NONE */
+    AUTO,
   }
 
   /** A default instance that can be used for text display */
   public static final DisplayHelper DEFAULT = getDefault();
 
   static DisplayHelper getDefault() {
-    switch ((MarkupType) GlobalFlags.getFlag(ToolsGlobalFlags.DEFAULT_MARKUP).getValue()) {
-      case ANSI:
-        return new AnsiDisplayHelper();
-      case HTML:
-        return new HtmlDisplayHelper();
-      case NONE:
-      default:
-        return new DisplayHelper();
-    }
+      switch ((MarkupType) GlobalFlags.getFlag(ToolsGlobalFlags.DEFAULT_MARKUP).getValue()) {
+        case ANSI:
+          return new AnsiDisplayHelper();
+        case HTML:
+          return new HtmlDisplayHelper();
+        case AUTO:
+          return System.console() != null && !Environment.OS_WINDOWS ? new AnsiDisplayHelper() : new DisplayHelper();
+        case NONE:
+        default:
+          return new DisplayHelper();
+      }
   }
 
   static final int LABEL_LENGTH = 6;
@@ -92,6 +97,15 @@ public class DisplayHelper {
   /** Color code for off-white */
   public static final int WHITE_PLUS = 8;
 
+  // Colors used for consistent "Theme"
+  /** Section headers etc */
+  public static final int THEME_SECTION_COLOR = CYAN;
+  /** Used for text the user types literally */
+  public static final int THEME_LITERAL_COLOR = GREEN;
+  /** General entry types, where the user will enter a specific value of the type */
+  public static final int THEME_TYPE_COLOR = YELLOW;
+  /** For error messages */
+  public static final int THEME_ERROR_COLOR = RED;
 
   String getSpaces(final int diff) {
     final StringBuilder sb = new StringBuilder();

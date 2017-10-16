@@ -50,6 +50,7 @@ import java.util.stream.Collectors;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.RstTable;
 import com.rtg.util.StringUtils;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * This class is a handy utility for dealing with command line flags. It allows
@@ -1151,9 +1152,9 @@ public final class CFlags {
    */
   public String getUsageHeader() {
     if (mProgramName != null) {
-      final WrappingStringBuilder ret = new WrappingStringBuilder();
-      ret.append(USAGE_SUMMARY_PREFIX);
-      ret.append(mProgramName);
+      final WrappingStringBuilder ret = new WrappingStringBuilder(DisplayHelper.DEFAULT);
+      ret.append(ret.displayHelper().decorateForeground(USAGE_SUMMARY_PREFIX, DisplayHelper.THEME_SECTION_COLOR));
+      ret.append(ret.displayHelper().decorateForeground(mProgramName, DisplayHelper.THEME_LITERAL_COLOR));
       ret.append(' ');
       ret.setWrapIndent();
       appendCompactFlagUsage(ret);
@@ -1192,22 +1193,22 @@ public final class CFlags {
   private void appendCompactFlagUsage(final WrappingStringBuilder wb, final SortedSet<Flag<?>> optionals) {
     boolean first = true;
     if (getOptional().size() > 0) {
-      wb.wrapWord("[OPTION]...");
+      wb.wrapWord("[" + wb.displayHelper().decorateForeground("OPTION", DisplayHelper.THEME_TYPE_COLOR) + "]...");
       first = false;
     }
     for (Flag<?> flag : getRequired()) {
-      wb.wrapWord((first ? "" : " ") + flag.getCompactFlagUsage());
+      wb.wrapWord((first ? "" : " ") + flag.getCompactFlagUsage(wb.displayHelper()));
       first = false;
     }
     for (final Flag<?> f : optionals) {
-      wb.wrapWord((first ? "" : " ") + f.getCompactFlagUsage());
+      wb.wrapWord((first ? "" : " ") + f.getCompactFlagUsage(wb.displayHelper()));
       first = false;
     }
   }
 
   void appendParseMessage(final WrappingStringBuilder wb) {
     if (!mParseMessageString.isEmpty()) {
-      wb.append(PARSE_ERROR_PREFIX);
+      wb.append(wb.displayHelper().decorateForeground(PARSE_ERROR_PREFIX, DisplayHelper.THEME_ERROR_COLOR));
       wb.setWrapIndent(PARSE_ERROR_PREFIX.length());
       wb.wrapTextWithNewLines(mParseMessageString).append(LS);
     }
@@ -1233,12 +1234,12 @@ public final class CFlags {
   }
 
   /**
-   * Get the usage string.
+   * Get the usage string for regular user options.
    * @param width width of output
    * @return usage wrapped to given width
    */
   private String getUsageString(final int width) {
-    final WrappingStringBuilder usage = new WrappingStringBuilder();
+    final WrappingStringBuilder usage = new WrappingStringBuilder(DisplayHelper.DEFAULT);
     usage.setWrapWidth(width);
     appendUsageHeader(usage);
     appendProgramDescription(usage);
@@ -1254,13 +1255,13 @@ public final class CFlags {
   }
 
   /**
-   * Get the usage string.
+   * Get the usage string for advanced/experimental options.
    * @param width width of output
    * @param level the level of extended help that should be output
    * @return usage wrapped to given width
    */
   private String getExtendedUsageString(final int width, Flag.Level level) {
-    final WrappingStringBuilder usage = new WrappingStringBuilder();
+    final WrappingStringBuilder usage = new WrappingStringBuilder(DisplayHelper.DEFAULT);
     usage.setWrapWidth(width);
     appendUsageHeader(usage);
     usage.append(LS);
@@ -1288,7 +1289,7 @@ public final class CFlags {
   private void appendLongFlagUsage(WrappingStringBuilder wb, int usageLength, String label, List<Flag<?>> flags) {
     if (flags.size() > 0) {
       wb.append(LS);
-      wb.append(label).append(LS);
+      wb.append(wb.displayHelper().decorateForeground(label, DisplayHelper.THEME_SECTION_COLOR)).append(LS);
       wb.setWrapIndent(usageLength + 7);
       for (final Flag<?> flag : flags) {
         flag.appendLongFlagUsage(wb, usageLength);
@@ -1432,19 +1433,16 @@ public final class CFlags {
     }
   }
 
-  /** Help argument message displayed for invalid flags */
-  public static final String TRYHELPSTRING = "Try '" + LONG_FLAG_PREFIX + HELP_FLAG + "' for more information";
-
   /**
    * Get the complete message used when there is an invalid flag.
    * @return the complete message used when there is an invalid flag.
    */
   public String getInvalidFlagMsg() {
-    final WrappingStringBuilder wb = new WrappingStringBuilder();
+    final WrappingStringBuilder wb = new WrappingStringBuilder(DisplayHelper.DEFAULT);
     wb.setWrapWidth(DEFAULT_WIDTH);
     appendParseMessage(wb);
     appendUsageHeader(wb);
-    wb.append(LS + TRYHELPSTRING);
+    wb.append(LS + "Try '" + wb.displayHelper().decorateForeground(LONG_FLAG_PREFIX + HELP_FLAG, DisplayHelper.THEME_LITERAL_COLOR) + "' for more information");
     return wb.toString();
   }
 
@@ -1502,7 +1500,7 @@ public final class CFlags {
     cli.registerRequired(String.class, "ARGS", "these are some extra required args");
     cli.registerRequired(String.class, "BARGS", "these are some extra required args");
 
-    final Flag<Integer> intFlag = cli.registerRequired('i', CommonFlags.INT, Integer.class, "my_int",
+    final Flag<Integer> intFlag = cli.registerRequired('i', "int", Integer.class, CommonFlags.INT,
     "This sets an int value.");
     intFlag.setMaxCount(5);
     // intFlag.setMaxCount(Integer.MAX_VALUE);
@@ -1512,9 +1510,9 @@ public final class CFlags {
     cli.registerOptional('b', "boolean", Boolean.class, "true/false", "this sets a boolean value.",
         Boolean.TRUE);
 
-    final Flag<Float> f = cli.registerOptional('f', CommonFlags.FLOAT, Float.class, null, "this sets a float value.", (float) 20);
+    final Flag<Float> f = cli.registerOptional('f', "float", Float.class, CommonFlags.FLOAT, "this sets a float value.", (float) 20);
     f.setParameterRange(new String[] {"0.2", "0.4", "0.6" });
-    cli.registerOptional(CommonFlags.STRING, String.class, null, "this sets a string value. and for this one I'm going to have quite a long description. Possibly long enough to need wrapping.",
+    cli.registerOptional("string", String.class, CommonFlags.STRING, "this sets a string value. and for this one I'm going to have quite a long description. Possibly long enough to need wrapping.",
     "myDefault");
     cli.setFlags(args);
 

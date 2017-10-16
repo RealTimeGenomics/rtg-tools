@@ -95,7 +95,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, Boolean.TRUE);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
 
-    registerFlag(DEFAULT_MARKUP, DisplayHelper.MarkupType.class, DisplayHelper.MarkupType.NONE);
+    registerFlag(DEFAULT_MARKUP, DisplayHelper.MarkupType.class, DisplayHelper.MarkupType.AUTO);
 
     registerFlag(TREAT_POLYPLOID_AS, Ploidy.class, Ploidy.HAPLOID);
 

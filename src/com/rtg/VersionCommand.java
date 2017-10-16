@@ -41,6 +41,7 @@ import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.diagnostic.Talkback;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * Provides version information on <code>SLIM</code>
@@ -60,22 +61,25 @@ public final class VersionCommand {
 
   static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2017";
 
-  static final String CITE_STR_1 = "Citation (variant calling):" + LS
-    + "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
+  static final String CITE_STR_1H = "Citation (variant calling):";
+  static final String CITE_STR_1 =
+    "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
     + "Sean A. Irvine, Alan Jackson, Richard Littin, Sahar Nohzadeh-Malakshah, "
     + "Mehul Rathod, David Ware, Len Trigg, and Francisco M. De La Vega. "
     + "\"Joint Variant and De Novo Mutation Identification on Pedigrees from High-Throughput Sequencing Data.\" "
     + "Journal of Computational Biology. June 2014, 21(6): 405-419. doi:10.1089/cmb.2014.0029.";
 
-  static final String CITE_STR_2 = "Citation (vcfeval):" + LS
-    + "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
+  static final String CITE_STR_2H = "Citation (vcfeval):";
+  static final String CITE_STR_2 =
+    "John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, "
     + "Sean A. Irvine, Alan Jackson, Richard Littin, Mehul Rathod, David Ware, Justin M. Zook, "
     + "Len Trigg, and Francisco M. De La Vega. "
     + "\"Comparing Variant Call Files for Performance Benchmarking of Next-Generation Sequencing Variant Calling Pipelines.\" "
     + "bioRxiv, 2015. doi:10.1101/023754.";
 
-  static final String PATENTS_STR = "Patents / Patents pending:" + LS
-    + "US: 7,640,256, 9,165,253, 13/129,329, 13/681,046, 13/681,215, 13/848,653, 13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810" + LS
+  static final String PATENTS_STRH = "Patents / Patents pending:";
+  static final String PATENTS_STR =
+    "US: 7,640,256, 9,165,253, 13/129,329, 13/681,046, 13/681,215, 13/848,653, 13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810" + LS
     + "UK: 1222923.3, 1222921.7, 1304502.6, 1311209.9, 1314888.7, 1314908.3" + LS
     + "New Zealand: 626777, 626783, 615491, 614897, 614560" + LS
     + "Australia: 2005255348, Singapore: 128254";
@@ -160,25 +164,28 @@ public final class VersionCommand {
    */
   public static String getVersion() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(PROGRAM_STR + " ").append(Environment.getProductName()).append(" ").append(Environment.getProductVersion());
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(PROGRAM_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(Environment.getProductName()).append(" ").append(Environment.getProductVersion());
     final String latest = Environment.getLatestReleaseVersion();
     if (latest != null && !latest.equals(Environment.getProductVersion())) {
-      sb.append("   (*** The latest release is ").append(latest).append(" ***)");
+      sb.append("   ").append(DisplayHelper.DEFAULT.decorateForeground("*** The latest release is " + latest + " ***)", DisplayHelper.RED));
     }
     sb.append(LS);
-    sb.append(VERSION_STR + " ").append(Environment.getCoreVersion()).append(LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(VERSION_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(Environment.getCoreVersion()).append(LS);
     if (License.checkLicense()) {
-      sb.append(RAM_STR).append(" ").append(getRamString()).append(LS);
-      sb.append(CPU_STR).append(" ").append(getCpuString()).append(LS);
-      sb.append(JAVA_VERSION_STR).append(" ").append(getJavaVersion()).append(LS);
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(RAM_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(getRamString()).append(LS);
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(CPU_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(getCpuString()).append(LS);
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(JAVA_VERSION_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(getJavaVersion()).append(LS);
     }
     sb.append(LicenseCommand.getLicenseSummary());
-    sb.append(CONTACT_STR + " " + Constants.SUPPORT_EMAIL_ADDR).append(LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(CONTACT_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" " + Constants.SUPPORT_EMAIL_ADDR).append(LS);
     sb.append(LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(PATENTS_STRH, DisplayHelper.THEME_SECTION_COLOR)).append(LS);
     sb.append(PATENTS_STR).append(LS);
     sb.append(LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(CITE_STR_1H, DisplayHelper.THEME_SECTION_COLOR)).append(LS);
     sb.append(CITE_STR_1).append(LS);
     sb.append(LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(CITE_STR_2H, DisplayHelper.THEME_SECTION_COLOR)).append(LS);
     sb.append(CITE_STR_2).append(LS);
     sb.append(LS);
     sb.append(COPYRIGHT_STR).append(LS);

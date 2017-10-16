@@ -38,6 +38,7 @@ import java.util.Locale;
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.rtg.util.License;
 import com.rtg.util.StringUtils;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * License command for RTG, provides summaries of other commands
@@ -79,14 +80,14 @@ public final class LicenseCommand extends Command {
 
   static String getLicenseSummary() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("License: ").append(License.getMessage()).append(StringUtils.LS);
+    sb.append(DisplayHelper.DEFAULT.decorateForeground("License: ", DisplayHelper.THEME_SECTION_COLOR)).append(License.getMessage()).append(StringUtils.LS);
     final String person = License.getPerson();
     if (person != null) {
-      sb.append("Licensed to: ").append(person).append(StringUtils.LS);
+      sb.append(DisplayHelper.DEFAULT.decorateForeground("Licensed to: ", DisplayHelper.THEME_SECTION_COLOR)).append(person).append(StringUtils.LS);
     }
     final String keyPath = License.getKeyPath();
     if (keyPath != null) {
-      sb.append("License location: ").append(keyPath).append(StringUtils.LS);
+      sb.append(DisplayHelper.DEFAULT.decorateForeground("License location: ", DisplayHelper.THEME_SECTION_COLOR)).append(keyPath).append(StringUtils.LS);
     }
     return sb.toString();
   }
@@ -115,7 +116,7 @@ public final class LicenseCommand extends Command {
 
     for (CommandCategory cat : categories) {
       out.println();
-      out.println(cat.getLabel() + ":");
+      out.println(DisplayHelper.DEFAULT.decorateForeground(cat.getLabel() + ":", DisplayHelper.THEME_SECTION_COLOR));
       for (Command module : info.commands()) {
         if (cat == module.getCategory() && showModule(module)) {
           outputModule(module, longestUsageLength, out);
@@ -125,7 +126,7 @@ public final class LicenseCommand extends Command {
   }
 
   static void outputModule(Command module, int longestUsageLength, PrintStream out) {
-    out.print("\t" + module.getCommandName().toLowerCase(Locale.getDefault()));
+    out.print("\t" + DisplayHelper.DEFAULT.decorateForeground(module.getCommandName().toLowerCase(Locale.getDefault()), DisplayHelper.THEME_LITERAL_COLOR));
     for (int i = 0; i < longestUsageLength - module.getCommandName().length(); ++i) {
       out.print(" ");
     }

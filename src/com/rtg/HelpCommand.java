@@ -40,6 +40,7 @@ import com.rtg.util.License;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.WrappingStringBuilder;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * Help module for Slim, provides summaries of other modules
@@ -65,12 +66,24 @@ public final class HelpCommand extends Command {
 
   private static final String APPLICATION_NAME = Constants.APPLICATION_NAME;
 
-  static final String MEM_STR = "       " + APPLICATION_NAME + " RTG_MEM=16G COMMAND [OPTION]...  (e.g. to set maximum memory use to 16 GB)" + StringUtils.LS + StringUtils.LS;
-
-  static final String USAGE_STR = "Usage: " + APPLICATION_NAME + " COMMAND [OPTION]..." + StringUtils.LS
-                                + (Environment.OS_LINUX || Environment.OS_MAC_OS_X ? MEM_STR : StringUtils.LS)
-                                + "Type '" + APPLICATION_NAME + " help COMMAND' for help on a specific command." + StringUtils.LS
-                                + "The following commands are available:" + StringUtils.LS;
+  static String getUsage() {
+    final String optStr = " "
+      + DisplayHelper.DEFAULT.decorateForeground("COMMAND", DisplayHelper.THEME_TYPE_COLOR)
+      + " ["
+      + DisplayHelper.DEFAULT.decorateForeground("OPTION", DisplayHelper.THEME_TYPE_COLOR)
+      + "]...";
+    final String memStr = "       "
+      + DisplayHelper.DEFAULT.decorateForeground(APPLICATION_NAME, DisplayHelper.THEME_LITERAL_COLOR)
+      + DisplayHelper.DEFAULT.decorateForeground(" RTG_MEM=16G", DisplayHelper.THEME_LITERAL_COLOR)
+      + optStr
+      + "  (e.g. to set maximum memory use to 16 GB)" + StringUtils.LS + StringUtils.LS;
+    return DisplayHelper.DEFAULT.decorateForeground("Usage:", DisplayHelper.THEME_SECTION_COLOR) + " "
+      + DisplayHelper.DEFAULT.decorateForeground(APPLICATION_NAME, DisplayHelper.THEME_LITERAL_COLOR)
+      + optStr + StringUtils.LS
+      + (Environment.OS_LINUX || Environment.OS_MAC_OS_X ? memStr : StringUtils.LS)
+      + "Type '" + DisplayHelper.DEFAULT.decorateForeground(APPLICATION_NAME + " help", DisplayHelper.THEME_LITERAL_COLOR) + DisplayHelper.DEFAULT.decorateForeground(" COMMAND", DisplayHelper.THEME_TYPE_COLOR) + "' for help on a specific command." + StringUtils.LS
+      + "The following commands are available:" + StringUtils.LS;
+  }
 
   /**
    * Main function, entry-point for help.
@@ -152,7 +165,7 @@ public final class HelpCommand extends Command {
 
     final StringBuilder sb = new StringBuilder();
 
-    sb.append(USAGE_STR).append(StringUtils.LS);
+    sb.append(getUsage()).append(StringUtils.LS);
     for (Command module : info.commands()) {
 
       // Show only licensed, non-hidden modules.
@@ -167,10 +180,11 @@ public final class HelpCommand extends Command {
         if (moduleTypeName != null) {
           sb.append(StringUtils.LS);
         }
-        sb.append(module.getCategory().getLabel()).append(":").append(StringUtils.LS);
+        final String catLabel = module.getCategory().getLabel() + ":";
+        sb.append(DisplayHelper.DEFAULT.decorateForeground(catLabel, DisplayHelper.THEME_SECTION_COLOR)).append(StringUtils.LS);
         moduleTypeName = module.getCategory().toString();
       }
-      sb.append("\t").append(module.getCommandName().toLowerCase(Locale.getDefault()));
+      sb.append("\t").append(DisplayHelper.DEFAULT.decorateForeground(module.getCommandName().toLowerCase(Locale.getDefault()), DisplayHelper.THEME_LITERAL_COLOR));
       if (module.getCommandName().length() > longestUsageLength) {
         sb.append(StringUtils.LS).append("\t");
         for (int i = 0; i < longestUsageLength; ++i) {
