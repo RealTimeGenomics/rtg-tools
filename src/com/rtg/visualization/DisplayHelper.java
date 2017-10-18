@@ -210,6 +210,31 @@ public class DisplayHelper {
   }
 
   /**
+   * Compute the length of a string, excluding markup
+   * @param text the text
+   * @return the string length
+   */
+  public int length(final String text) {
+    int length = 0;
+    boolean inMarkup = false;
+    for (int currpos = 0; currpos < text.length(); ++currpos) {
+      final char c = text.charAt(currpos);
+      if (inMarkup) {
+        if (isMarkupEnd(c)) {
+          inMarkup = false;
+        }
+      } else {
+        if (isMarkupStart(c)) {
+          inMarkup = true;
+        } else {
+          ++length;
+        }
+      }
+    }
+    return length;
+  }
+
+  /**
    * Mark up a section of text that contains DNA bases, coloring each base accordingly
    * @param text the text
    * @return the marked up text

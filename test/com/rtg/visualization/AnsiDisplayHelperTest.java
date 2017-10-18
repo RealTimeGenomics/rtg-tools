@@ -40,7 +40,7 @@ import org.junit.rules.ExpectedException;
 
 /**
  */
-public class AnsiDisplayHelperTest {
+public class AnsiDisplayHelperTest extends DisplayHelperTest {
 
   @Test
   public void testAnsiColors() {

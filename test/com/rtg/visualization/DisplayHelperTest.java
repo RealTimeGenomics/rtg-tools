@@ -30,16 +30,29 @@
 
 package com.rtg.visualization;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  */
-public class DisplayHelperTest extends TestCase {
+public class DisplayHelperTest {
 
+  @Test
   public void testGetSpace() {
     final DisplayHelper dh = new DisplayHelper();
     assertEquals("      ", dh.getSpaces(6));
     assertEquals("______", dh.getInserts(6));
+  }
+
+  @Test
+  public void testLength() {
+    final DisplayHelper dh = new DisplayHelper();
+    assertEquals(0, dh.length(""));
+    assertEquals(1, dh.length(" "));
+    assertEquals(5, dh.length(" 1234"));
+    assertEquals(5, dh.length(dh.decorateForeground(" 1234", DisplayHelper.RED)));
+    assertEquals(5, dh.length(dh.decorateBackground(dh.decorateForeground(" 1234", DisplayHelper.RED), DisplayHelper.GREEN)));
   }
 
 }

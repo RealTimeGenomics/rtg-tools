@@ -30,12 +30,15 @@
 
 package com.rtg.visualization;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
 
 /**
  */
-public class HtmlDisplayHelperTest extends TestCase {
+public class HtmlDisplayHelperTest extends DisplayHelperTest {
 
+  @Test
   public void testHeaderFooder() {
     final HtmlDisplayHelper dh = new HtmlDisplayHelper();
     assertTrue(dh.header().contains("html"));

@@ -30,6 +30,7 @@
 package com.rtg.util.cli;
 
 import com.rtg.util.StringUtils;
+import com.rtg.visualization.DisplayHelper;
 
 /**
  * <code>WrappingStringBuilder</code> is sort of like a StringBuilder,
@@ -43,6 +44,7 @@ public final class WrappingStringBuilder {
   private String mPrefix = "";
   private int mWrapWidth = 0;
   private int mLineStart = 0;
+  private DisplayHelper mDisplayHelper = new DisplayHelper();
 
   /**
    * A new wrapping buffer.
@@ -53,12 +55,28 @@ public final class WrappingStringBuilder {
   }
 
   /**
+   * A new wrapping buffer with display helper.
+   * @param dh the display helper for string markup
+   */
+  public WrappingStringBuilder(DisplayHelper dh) {
+    this("");
+    mDisplayHelper = dh;
+  }
+
+  /**
    * A new wrapping buffer with initial content.
    *
    * @param initial initial content
    */
   public WrappingStringBuilder(final String initial) {
     append(initial);
+  }
+
+  /**
+   * @return the helper used to mark-up text and determine lengths for wrapping
+   */
+  public DisplayHelper displayHelper() {
+    return mDisplayHelper;
   }
 
   /**
@@ -173,7 +191,7 @@ public final class WrappingStringBuilder {
   }
 
   private int lineLength() {
-    return mSB.length() - mLineStart;
+    return mDisplayHelper == null ? (mSB.length() - mLineStart) : mDisplayHelper.length(mSB.substring(mLineStart));
   }
 
   /**
