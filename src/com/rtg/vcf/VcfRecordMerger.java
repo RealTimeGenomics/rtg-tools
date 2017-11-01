@@ -83,7 +83,7 @@ public class VcfRecordMerger implements AutoCloseable {
    * @param headers the headers for each of the VCF records to be merged
    * @param destHeader the header for the resulting VCF record
    * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
-   * @param dropUnmergeable if true, any non-mergeable FORMAT fields will be dropped, allowing merge to proceed.
+   * @param dropUnmergeable if true, alow merge to proceed when encountering any non-mergeable FORMAT fields or duplicate records for the same sample, by dropping appropriate information.
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
   public VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
@@ -146,10 +146,14 @@ public class VcfRecordMerger implements AutoCloseable {
         final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
         if (sampleIndex > -1) {
           if (sampleDone) {
-            if (++mMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
-              Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
+            if (dropUnmergeable) {
+              if (++mMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
+                Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
+              }
+              continue;
+            } else {
+              return null;
             }
-            continue;
           }
           sampleDone = true;
           for (final String key : records[i].getFormats()) {

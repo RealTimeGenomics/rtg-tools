@@ -287,11 +287,38 @@ public class VcfRecordMergerTest extends AbstractTest {
       ;
       final VcfHeader h1 = new VcfHeader();
       h1.addSampleName("sample1");
+      final VcfHeader h2 = new VcfHeader();
+      h2.addSampleName("sample2");
       final VcfRecord[] recs = {rec, rec2};
-      final VcfRecord[] mergedArr = merger.mergeRecords(recs, new VcfHeader[]{h1, h1}, h1, VcfMerge.alleleBasedFormats(h1), true);
+      final VcfHeader h3 = VcfHeaderMerge.mergeHeaders(h1, h2, null);
+      final VcfRecord[] mergedArr = merger.mergeRecords(recs, new VcfHeader[]{h1, h2}, h3, VcfMerge.alleleBasedFormats(h3), true);
       assertEquals(1, mergedArr.length);
       final VcfRecord merged = mergedArr[0];
       assertEquals("b;c;a", merged.getId());
+    }
+  }
+
+  public void testPreserveDuplicateSamples() {
+    try (final VcfRecordMerger merger = new VcfRecordMerger()) {
+      final VcfHeader h1 = new VcfHeader();
+      h1.addSampleName("sample1");
+      final VcfHeader h2 = new VcfHeader();
+      h2.addSampleName("sample1");
+      final VcfHeader mh = VcfHeaderMerge.mergeHeaders(h1, h2, null);
+      final VcfHeader[] heads = {h1, h2};
+      final VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT\t1/1");
+      final VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tC\t.\tPASS\t.\tGT\t0/1");
+
+      VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), false);
+      assertEquals(1, mergedArr.length);
+      // All alleles have nucleotide case normalized
+      assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT\t1/1", mergedArr[0].toString());
+
+      mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
+      assertEquals(2, mergedArr.length);
+      // All alleles have nucleotide case normalized
+      assertEquals("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT\t1/1", mergedArr[0].toString());
+      assertEquals("chr1\t100\t.\tG\tC\t.\tPASS\t.\tGT\t0/1", mergedArr[1].toString());
     }
   }
 
