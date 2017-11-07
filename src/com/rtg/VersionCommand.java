@@ -167,7 +167,7 @@ public final class VersionCommand {
     sb.append(DisplayHelper.DEFAULT.decorateForeground(PROGRAM_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(Environment.getProductName()).append(" ").append(Environment.getProductVersion());
     final String latest = Environment.getLatestReleaseVersion();
     if (latest != null && !latest.equals(Environment.getProductVersion())) {
-      sb.append("   ").append(DisplayHelper.DEFAULT.decorateForeground("*** The latest release is " + latest + " ***)", DisplayHelper.RED));
+      sb.append("   ").append(DisplayHelper.DEFAULT.decorateForeground("(*** The latest release is " + latest + " ***)", DisplayHelper.RED));
     }
     sb.append(LS);
     sb.append(DisplayHelper.DEFAULT.decorateForeground(VERSION_STR, DisplayHelper.THEME_SECTION_COLOR)).append(" ").append(Environment.getCoreVersion()).append(LS);
