@@ -66,7 +66,7 @@ import htsjdk.samtools.util.RuntimeIOException;
  */
 public abstract class AbstractCli {
 
-  private static final String LOG_DEST = System.getProperty("com.rtg.launcher.logdest", "");
+  private static final String LOG_DEST = System.getProperty("rtg.launcher.logdest", "");
 
   /** Usage metrics */
   protected UsageMetric mUsageMetric = null;
