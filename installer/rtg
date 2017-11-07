@@ -214,8 +214,8 @@ if [[ -z "$java_path" ]] || [[ ! -x "$java_path" ]]; then
 fi
 
 RTG_MIN_MEM=-Xmx64m                  # Minimal memory just used for java version checking, log sending etc.
-version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | sed -n '/^.* version/s/.* version "\([0-9]\)\.\([0-9]*\).*/\1\2/p')
-if [[ ! "$version" ]] || [[ ! "$version" -ge 18 ]]; then
+version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | awk '/version "/ {gsub(/"/, "", $3); print $3}')
+if [[ ! "$version" =~ ^1.8 && ! "$version" =~ ^9 ]]; then
   echo "$RTG_JAVA is not Java 8 or later"
   exit 1
 fi
