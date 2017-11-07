@@ -31,8 +31,8 @@
 package com.rtg.visualization;
 
 
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
+import java.util.Locale;
+
 import com.rtg.util.Environment;
 import com.rtg.util.StringUtils;
 
@@ -42,33 +42,51 @@ import com.rtg.util.StringUtils;
  */
 public class DisplayHelper {
 
-  /** Possible markup implementations */
+  private static final String DEFAULT_MARKUP = System.getProperty("rtg.default-markup", "auto");
+
+  /** Possible user-specifiable markup implementations */
   public enum MarkupType {
     /** Perform no markup */
-    NONE,
+    NONE {
+      @Override
+      DisplayHelper create() {
+        return new DisplayHelper();
+      }
+    },
     /** Markup with <code>ANSI</code> escape sequences */
-    ANSI,
+    ANSI {
+      @Override
+      DisplayHelper create() {
+        return new AnsiDisplayHelper();
+      }
+    },
     /** Markup with <code>HTML</code> sequences */
-    HTML,
+    HTML {
+      @Override
+      DisplayHelper create() {
+        return new HtmlDisplayHelper();
+      }
+    },
     /** Try and auto-detect whether to use ANSI or NONE */
-    AUTO,
+    AUTO {
+      @Override
+      DisplayHelper create() {
+        return System.console() != null && !Environment.OS_WINDOWS ? new AnsiDisplayHelper() : new DisplayHelper();
+      }
+    };
+
+    abstract DisplayHelper create();
   }
 
   /** A default instance that can be used for text display */
   public static final DisplayHelper DEFAULT = getDefault();
 
   static DisplayHelper getDefault() {
-      switch ((MarkupType) GlobalFlags.getFlag(ToolsGlobalFlags.DEFAULT_MARKUP).getValue()) {
-        case ANSI:
-          return new AnsiDisplayHelper();
-        case HTML:
-          return new HtmlDisplayHelper();
-        case AUTO:
-          return System.console() != null && !Environment.OS_WINDOWS ? new AnsiDisplayHelper() : new DisplayHelper();
-        case NONE:
-        default:
-          return new DisplayHelper();
-      }
+    try {
+      return MarkupType.valueOf(DEFAULT_MARKUP.toUpperCase(Locale.ROOT)).create();
+    } catch (IllegalArgumentException e) {
+      return MarkupType.NONE.create();
+    }
   }
 
   static final int LABEL_LENGTH = 6;

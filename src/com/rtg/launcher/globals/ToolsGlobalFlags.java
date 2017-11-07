@@ -34,7 +34,6 @@ import java.util.List;
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.rtg.reference.Ploidy;
 import com.rtg.util.cli.Flag;
-import com.rtg.visualization.DisplayHelper;
 
 /**
  * Experimental flags for tools release
@@ -50,9 +49,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
   /** Level of gzip compression to use. */
   public static final String GZIP_LEVEL = "com.rtg.utils.gzip-level";
-
-  /** Default markup helper implementation: <code>none</code>, <code>ansi</code>, <code>html</code>. */
-  public static final String DEFAULT_MARKUP = "com.rtg.visualization.default-markup";
 
   /** When writing VCFs asynchronously, the maximum number of records to buffer (per VCF) */
   public static final String VCF_ASYNC_BUFFER_SIZE = "com.rtg.vcf.async-buffer-size";
@@ -94,8 +90,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
     registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, Boolean.TRUE);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
-
-    registerFlag(DEFAULT_MARKUP, DisplayHelper.MarkupType.class, DisplayHelper.MarkupType.AUTO);
 
     registerFlag(TREAT_POLYPLOID_AS, Ploidy.class, Ploidy.HAPLOID);
 
