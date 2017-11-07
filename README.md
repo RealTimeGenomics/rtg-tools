@@ -1,16 +1,17 @@
 # RTG Tools
 
-Copyright (c) 2017 Real Time Genomics Ltd
+Copyright (c) 2018 Real Time Genomics Ltd
 
 This software is provided under the Simplified BSD License. See
 [LICENSE.txt](LICENSE.txt)
 
 ## Introduction
 
-RTG Tools includes several useful utilities for dealing with VCF files
-and sequence data, but probably the most interesting is the `vcfeval`
-command which performs sophisticated comparison of VCF
-files.
+RTG Tools is a subset of
+[RTG Core](https://github.com/RealTimeGenomics/rtg-core)
+that includes several useful utilities for dealing with VCF files and
+sequence data.  Probably the most interesting is the `vcfeval`
+command which performs sophisticated comparison of VCF files.
 
 Conventional tools attempt comparison by directly comparing variant
 positions, alleles, and genotypes, however they are inherently unable
