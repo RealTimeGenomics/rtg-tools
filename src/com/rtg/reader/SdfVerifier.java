@@ -32,98 +32,62 @@ package com.rtg.reader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 
+import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.Validator;
-import com.rtg.util.diagnostic.CliDiagnosticListener;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
-import com.rtg.util.diagnostic.SlimException;
 import com.rtg.util.intervals.LongRange;
-import com.rtg.util.io.FileUtils;
-import com.rtg.util.io.LogFile;
-import com.rtg.util.io.LogStream;
 
 /**
  */
-public final class SdfVerifier {
+public final class SdfVerifier extends AbstractCli {
 
-  private SdfVerifier() {
+
+  @Override
+  public String moduleName() {
+    return "sdfverify";
+  }
+
+  @Override
+  protected void initFlags() {
+    mFlags.registerRequired(File.class, CommonFlags.SDF, "the SDF to be verified");
+    mFlags.setValidator(VALIDATOR);
+  }
+
+  @Override
+  protected int mainExec(OutputStream out, PrintStream err) throws IOException {
+    final PrintStream outStream = new PrintStream(out);
+    try {
+      final File input = (File) mFlags.getAnonymousValue(0);
+      //final boolean fast = flags.isSet(FAST);
+      final File inleft = new File(input, "left");
+      final File inright = new File(input, "right");
+      if (inleft.exists() && inright.exists()) {
+        if (verifyDir(inleft) && verifyDir(inright)) {
+          outStream.println("\nPaired-end SDF verified okay.");
+          return 0;
+        } else {
+          return 1;
+        }
+      } else if (verifyDir(input)) {
+        outStream.println("\nSingle-end SDF verified okay.");
+        return 0;
+      } else {
+        return 1;
+      }
+    } finally {
+      outStream.flush();
+    }
   }
 
   private static final Validator VALIDATOR = flags -> {
     final File input = (File) flags.getAnonymousValue(0);
     return CommonFlags.validateSDF(input);
   };
-
-  private static final String APPLICATION_NAME = "SDFVerify";
-
-  /**
-   * @param args command line arguments
-   */
-  public static void main(final String[] args) {
-    System.exit(mainInit(args, System.out, System.err));
-  }
-
-  /**
-   * Deal with initial log file.
-   *
-   * @param args command line arguments
-   * @param out stdout where Duster output is written.
-   * @param err where error and warning messages are written for user consumption.
-   * @return exit code - 0 if all ok - 1 if command line arguments failed.
-   */
-  static int mainInit(final String[] args, final PrintStream out, final PrintStream err) {
-    return mainExec(args, out, err, SdfVerifier.initialLog(APPLICATION_NAME));
-  }
-
-  static int mainExec(final String[] args, final PrintStream out, final PrintStream err, final LogStream initLog) {
-    CliDiagnosticListener listener = null;
-    try {
-      listener = SdfVerifier.initializeLogs(args, err, initLog);
-      final CFlags flags = getCFlags(APPLICATION_NAME, out, err);
-      if (flags.setFlags(args)) {
-        if (mainParsed(flags, out)) {
-          Diagnostic.deleteLog(); // was successful execution
-          return 0;
-        } else {
-          return 1;
-        }
-      } else {
-        Diagnostic.deleteLog(); // was command line error
-        return 1;
-      }
-    } catch (final SlimException e) {
-      throw e;
-    } catch (final Throwable t) { // catch everything except SlimException
-      throw new SlimException(t);
-    } finally { // make sure listener removed so later unit tests not compromised
-      Diagnostic.removeListener(listener);
-    }
-  }
-
-  static boolean mainParsed(final CFlags flags, final PrintStream out) throws IOException {
-    final File input = (File) flags.getAnonymousValue(0);
-    //final boolean fast = flags.isSet(FAST);
-    final File inleft = new File(input, "left");
-    final File inright = new File(input, "right");
-    if (inleft.exists() && inright.exists()) {
-      if (verifyDir(inleft) && verifyDir(inright)) {
-        out.println("\nPaired-end SDF verified okay.");
-        return true;
-      } else {
-        return false;
-      }
-    } else if (verifyDir(input)) {
-      out.println("\nSingle-end SDF verified okay.");
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   /**
    * Method to verify <code>Preread</code> directory
@@ -358,44 +322,10 @@ public final class SdfVerifier {
     return namef.getHash();
   }
 
-
-  private static CFlags getCFlags(final String name, final Appendable out, final Appendable err) {
-    final CFlags flags = new CFlags(name, out, err);
-    flags.registerRequired(File.class, CommonFlags.SDF, "the SDF to be verified");
-    flags.setValidator(VALIDATOR);
-    return flags;
-  }
-
   /**
-   * Do common tasks for initializing logs.
-   * @param args command line arguments
-   * @param err errors and warnings for user, also final last resort place to put logs if cannot create one in working directory.
-   * @param initLog where to send the inital logging.
-   * @return the listener that writes the errors and warnings for the user.
+   * @param args command arguments
    */
-  public static CliDiagnosticListener initializeLogs(final String[] args, final PrintStream err, final LogStream initLog) {
-    if (initLog != null) {
-      Diagnostic.setLogStream(initLog);
-      Diagnostic.logEnvironment();
-    } else {
-      Diagnostic.setLogStream();
-    }
-    Diagnostic.userLog("Command line arguments:" + Arrays.toString(args));
-    final CliDiagnosticListener listener = new CliDiagnosticListener(err);
-    Diagnostic.addListener(listener);
-    return listener;
-  }
-
-  /**
-   * Create the place to write the initial log before any command line arguments are parsed (and we know where to put the real logs).
-   * @param name name of application requesting logging
-   * @return the <code>LogStream</code> to use for the initial logging.
-   */
-  public static LogStream initialLog(final String name) {
-    try {
-      return new LogFile(File.createTempFile(name.replace(' ', '-'), "." + FileUtils.LOG_SUFFIX, new File(System.getProperty("user.dir"))));
-    } catch (final IOException e) {
-      return null;
-    }
+  public static void main(final String[] args) {
+    new SdfVerifier().mainExit(args);
   }
 }

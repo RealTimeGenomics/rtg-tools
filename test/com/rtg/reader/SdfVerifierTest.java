@@ -31,17 +31,17 @@ package com.rtg.reader;
 
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
-import com.rtg.AbstractTest;
+import com.rtg.launcher.AbstractCli;
+import com.rtg.launcher.AbstractCliTest;
+import com.rtg.launcher.MainResult;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.TestUtils;
@@ -49,7 +49,12 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
-public class SdfVerifierTest extends AbstractTest {
+public class SdfVerifierTest extends AbstractCliTest {
+
+  @Override
+  protected AbstractCli getCli() {
+    return new SdfVerifier();
+  }
 
   private static final String LS = System.lineSeparator();
 
@@ -245,36 +250,8 @@ public class SdfVerifierTest extends AbstractTest {
     }
   }
 
-  private static final String MSG = "Usage: SDFVerify [OPTION]... SDF";
-
   public void testFlags() {
-    final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream);
-         PrintStream err = new PrintStream(stream)) {
-      assertEquals(1, SdfVerifier.mainInit(new String[]{"-x"}, out, err));
-    }
-    assertEquals("", outstream.toString());
-    TestUtils.containsAllUnwrapped(stream.toString(), "Error: Unknown flag -x", MSG);
-  }
-
-  /*private static final String HELP_MSG = "Usage: SDFVerify [OPTION]... SDF" + LS
-      + LS
-      + "Required flags: " + LS
-      + "      SDF        the SDF to be verified" + LS
-      + LS
-      + "Optional flags: " + LS
-      + "  -h, --help     print help on command-line flag usage" + LS
-      + "  -P, --progress show progress" + LS + LS + "";*/
-
-  public void testHelpMessages() {
-    final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    try (PrintStream out = new PrintStream(outstream);
-         PrintStream err = new PrintStream(stream)) {
-      assertEquals(1, SdfVerifier.mainInit(new String[]{"-h"}, out, err));
-    }
-    assertEquals("", stream.toString());
+    TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-x"), "Error: Unknown flag -x");
   }
 
   public void testRunningFromMainInit() throws IOException {
@@ -283,16 +260,9 @@ public class SdfVerifierTest extends AbstractTest {
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
     try (TestDirectory dir = new TestDirectory()) {
       new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
-      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream)) {
-        try (final PrintStream err = new PrintStream(stream)) {
-          final int code = SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err);
-          assertEquals(stream.toString(), 0, code);
-        }
-      }
-      assertTrue(outstream.toString().contains("erified okay."));
-      assertEquals("", stream.toString());
+      final MainResult res = MainResult.run(getCli(), dir.getPath());
+      assertEquals(res.err(), 0, res.rc());
+      assertTrue(res.out().contains("erified okay."));
     }
   }
 
@@ -300,14 +270,10 @@ public class SdfVerifierTest extends AbstractTest {
     try (final TestDirectory f = new TestDirectory("prepreadverifier")) {
       final File mainIndex = new File(f, "mainindex");
       assertTrue(mainIndex.createNewFile());
-      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream);
-           PrintStream err = new PrintStream(stream)) {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
-      }
-      assertEquals("", outstream.toString());
-      assertEquals("Error: The SDF verification failed." + LS, stream.toString());
+      final MainResult res = MainResult.run(getCli(), f.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      assertEquals("", res.out());
+      assertEquals("Error: The SDF verification failed." + LS, res.err());
     } catch (final RuntimeException e) {
       //okay
     }
@@ -316,14 +282,10 @@ public class SdfVerifierTest extends AbstractTest {
   public void testInvalidFlagMessage() throws IOException {
     try (final TestDirectory tmpDir = new TestDirectory("prepreadverifier")) {
       final File f = FileHelper.createTempFile(tmpDir);
-      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream);
-           PrintStream err = new PrintStream(stream)) {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{f.getPath()}, out, err));
-      }
-      assertEquals("", outstream.toString());
-      assertTrue(stream.toString(), stream.toString().contains("The specified file, \"" + f.getPath() + "\", is not an SDF."));
+      final MainResult res = MainResult.run(getCli(), f.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      assertEquals("", res.out());
+      assertTrue(res.err(), res.err().contains("The specified file, \"" + f.getPath() + "\", is not an SDF."));
     } catch (final RuntimeException e) {
       //okay
     }
@@ -338,13 +300,9 @@ public class SdfVerifierTest extends AbstractTest {
       final IndexFile f = new IndexFile(dir);
       f.setDataChecksum(0);
       f.save(dir);
-      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream);
-           PrintStream err = new PrintStream(stream)) {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err));
-      }
-      assertEquals("", outstream.toString());
+      final MainResult res = MainResult.run(getCli(), dir.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      assertEquals("", res.out());
 
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
         assertFalse(SdfVerifier.verify(dsr, new File("data")));
@@ -362,14 +320,10 @@ public class SdfVerifierTest extends AbstractTest {
       f.setDataChecksum(123233);
       f.save(dir);
 
-      final ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-      final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-      try (PrintStream out = new PrintStream(outstream);
-           PrintStream err = new PrintStream(stream)) {
-        assertEquals(1, SdfVerifier.mainInit(new String[]{dir.getPath()}, out, err));
-      }
-      assertEquals("", outstream.toString());
-      assertTrue(stream.toString().contains("The SDF verification failed."));
+      final MainResult res = MainResult.run(getCli(), dir.getPath());
+      assertEquals(res.err(), 1, res.rc());
+      assertEquals("", res.out());
+      assertTrue(res.err().contains("The SDF verification failed."));
 
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
         assertFalse(SdfVerifier.verify(dsr, new File("data")));
@@ -377,19 +331,4 @@ public class SdfVerifierTest extends AbstractTest {
     }
   }
 
-  public void testValidator() throws IOException {
-    final ByteArrayOutputStream err = new ByteArrayOutputStream();
-    try (final TestDirectory tmp = new TestDirectory("prepreadverifier")) {
-      final File f = FileHelper.createTempFile(tmp);
-      try (PrintStream diag = new PrintStream(err)) {
-        SdfVerifier.mainInit(new String[]{f.getPath()}, null, diag);
-      } catch (final RuntimeException ex) {
-        fail();
-      }
-    } finally {
-      err.close();
-    }
-    TestUtils.containsAllUnwrapped(err.toString(), "Error: The specified file, \"", "\", is not an SDF.", MSG);
-
-  }
 }
