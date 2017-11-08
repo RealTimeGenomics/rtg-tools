@@ -100,9 +100,30 @@ public class VcfRecord implements SequenceNameLocus {
     mFormatAndSample = new LinkedHashMap<>();
   }
 
+  /**
+   * Copy constructor.  Useful when splitting a record.
+   * @param rec original record
+   */
+  public VcfRecord(final VcfRecord rec) {
+    mSequence = rec.mSequence;
+    mStart = rec.mStart;
+    mRefCall = rec.mRefCall;
+    mAltCalls = new ArrayList<>(rec.mAltCalls);
+    mFilters = new ArrayList<>(rec.mFilters);
+    mInfo = new LinkedHashMap<>(rec.mInfo);
+    mFormatAndSample = new LinkedHashMap<>(rec.mFormatAndSample);
+    mId = rec.mId;
+    mQual = rec.mQual;
+    mNumSamples = rec.mNumSamples;
+  }
+
   @Override
   public String getSequenceName() {
     return mSequence;
+  }
+
+  public void setStart(final int start) {
+    mStart = start;
   }
 
   @Override
