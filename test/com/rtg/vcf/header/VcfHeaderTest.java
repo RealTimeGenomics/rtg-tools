@@ -32,8 +32,10 @@ package com.rtg.vcf.header;
 
 import static com.rtg.util.StringUtils.TAB;
 
+import java.io.IOException;
 import java.util.HashSet;
 
+import com.rtg.reader.SdfId;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.VcfFormatException;
@@ -229,5 +231,31 @@ public class VcfHeaderTest extends TestCase {
     assertNull(head.getSampleIndex("xbox 360"));
     assertNull(head.getSampleIndex("xbox one"));
   }
+
+  private static final String HEADER_SDF_PREFIX = "##TEMPLATE-SDF-ID=";
+  public void testGetSdfId() throws IOException {
+    Diagnostic.setLogStream();
+    VcfHeader header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blahtblah");
+    try {
+      header.getSdfId();
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blahtblah", e.getMessage());
+    }
+    header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blah");
+    try {
+      header.getSdfId();
+      fail();
+    } catch (final NoTalkbackSlimException e) {
+      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blah", e.getMessage());
+    }
+    header = new VcfHeader();
+    header.addMetaInformationLine(HEADER_SDF_PREFIX + new SdfId(42).toString());
+    assertEquals(new SdfId(42), header.getSdfId());
+  }
+
+
 }
 

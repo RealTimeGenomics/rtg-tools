@@ -50,6 +50,7 @@ import com.rtg.reader.SequencesReader;
 import com.rtg.util.Environment;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommandLine;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.VcfFormatException;
 
 import htsjdk.samtools.SAMFileHeader;
@@ -132,6 +133,29 @@ public class VcfHeader {
     mSampleLines = new ArrayList<>();
     mPedigreeLines = new ArrayList<>();
     mNameToColumn = new HashMap<>();
+  }
+
+  /**
+   * Get the SDF identifier from the header.
+   * @return SDF identifier
+   */
+  public SdfId getSdfId() {
+    for (final String s : getGenericMetaInformationLines()) {
+      if (s.startsWith("##TEMPLATE-SDF-ID=")) {
+        final String[] split = s.split("=");
+        if (split.length != 2) {
+          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
+        }
+        final SdfId sdfId;
+        try {
+          sdfId = new SdfId(split[1]);
+        } catch (final NumberFormatException ex) {
+          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
+        }
+        return sdfId;
+      }
+    }
+    return new SdfId(0);
   }
 
   /**

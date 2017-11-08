@@ -121,15 +121,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       throw new IOException("Unable to create directory \"" + outdir.getPath() + "\"");
     }
 
-    final NamesInterface names = templateSequences.names();
-    final long numNames = names.length();
-    if (numNames > Integer.MAX_VALUE) {
-      throw new UnsupportedOperationException();
-    }
-    final Map<String, Long> nameMap = new HashMap<>((int) numNames);
-    for (long i = 0; i < numNames; ++i) {
-      nameMap.put(names.name(i), i);
-    }
+    final Map<String, Long> nameMap = getNameMap(templateSequences);
 
     final List<Pair<Orientor, Orientor>> o;
     if (params.twoPass() && params.squashPloidy()) {
@@ -155,6 +147,25 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
       sync.finish();
     }
+  }
+
+  /**
+   * Construct a mapping from sequence name to sequence index.
+   * @param templateSequences sequences
+   * @return mapping from name to index
+   * @throws IOException if an I/O error occurs.
+   */
+  public static Map<String, Long> getNameMap(final SequencesReader templateSequences) throws IOException {
+    final NamesInterface names = templateSequences.names();
+    final long numNames = names.length();
+    if (numNames > Integer.MAX_VALUE) {
+      throw new UnsupportedOperationException();
+    }
+    final Map<String, Long> nameMap = new HashMap<>((int) numNames);
+    for (long i = 0; i < numNames; ++i) {
+      nameMap.put(names.name(i), i);
+    }
+    return nameMap;
   }
 
   private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {
@@ -256,8 +267,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   }
 
   static void checkHeader(VcfHeader baseline, VcfHeader calls, SdfId referenceSdfId) {
-    final SdfId baselineTemplateSdfId = getSdfId(baseline);
-    final SdfId callsTemplateSdfId = getSdfId(calls);
+    final SdfId baselineTemplateSdfId = baseline.getSdfId();
+    final SdfId callsTemplateSdfId = calls.getSdfId();
 
     if (!baselineTemplateSdfId.check(referenceSdfId)) {
       Diagnostic.warning("Reference template ID mismatch, baseline variants were not created from the given reference");
@@ -270,25 +281,6 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     if (!baselineTemplateSdfId.check(callsTemplateSdfId)) {
       Diagnostic.warning("Reference template ID mismatch, baseline and called variants were created with different references");
     }
-  }
-
-  static SdfId getSdfId(VcfHeader header) {
-    for (final String s : header.getGenericMetaInformationLines()) {
-      if (s.startsWith("##TEMPLATE-SDF-ID=")) {
-        final String[] split = s.split("=");
-        if (split.length != 2) {
-          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
-        }
-        final SdfId sdfId;
-        try {
-          sdfId = new SdfId(split[1]);
-        } catch (final NumberFormatException ex) {
-          throw new NoTalkbackSlimException("Invalid VCF template SDF ID header line : " + s);
-        }
-        return sdfId;
-      }
-    }
-    return new SdfId(0);
   }
 
 }

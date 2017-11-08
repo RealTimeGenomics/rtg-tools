@@ -376,29 +376,6 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     }
   }
 
-  public void testGetSdfId() throws IOException {
-    Diagnostic.setLogStream();
-    VcfHeader header = new VcfHeader();
-    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blahtblah");
-    try {
-      VcfEvalTask.getSdfId(header);
-      fail();
-    } catch (final NoTalkbackSlimException e) {
-      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blahtblah", e.getMessage());
-    }
-    header = new VcfHeader();
-    header.addMetaInformationLine(HEADER_SDF_PREFIX + "blah");
-    try {
-      VcfEvalTask.getSdfId(header);
-      fail();
-    } catch (final NoTalkbackSlimException e) {
-      assertEquals("Invalid VCF template SDF ID header line : " + HEADER_SDF_PREFIX + "blah", e.getMessage());
-    }
-    header = new VcfHeader();
-    header.addMetaInformationLine(HEADER_SDF_PREFIX + new SdfId(42).toString());
-    assertEquals(new SdfId(42), VcfEvalTask.getSdfId(header));
-  }
-
   public void testCheckHeader() throws IOException {
     final MemoryPrintStream ps = new MemoryPrintStream();
     Diagnostic.setLogStream(ps.printStream());
