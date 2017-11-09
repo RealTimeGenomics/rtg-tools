@@ -111,7 +111,10 @@ public class VcfRecord implements SequenceNameLocus {
     mAltCalls = new ArrayList<>(rec.mAltCalls);
     mFilters = new ArrayList<>(rec.mFilters);
     mInfo = new LinkedHashMap<>(rec.mInfo);
-    mFormatAndSample = new LinkedHashMap<>(rec.mFormatAndSample);
+    mFormatAndSample = new LinkedHashMap<>(rec.mFormatAndSample.size());
+    for (Entry<String, ArrayList<String>> e : rec.mFormatAndSample.entrySet()) {
+      mFormatAndSample.put(e.getKey(), new ArrayList<>(e.getValue()));
+    }
     mId = rec.mId;
     mQual = rec.mQual;
     mNumSamples = rec.mNumSamples;
