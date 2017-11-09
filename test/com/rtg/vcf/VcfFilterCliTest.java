@@ -263,7 +263,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
 
-      final String o = StringUtils.grep(FileHelper.gzFileToString(out), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      final String o = StringUtils.grep(FileHelper.gzFileToString(out), "^[^#]").replaceAll("[\r\n]+", "\n");
       mNano.check(expResourceLoc, o, true);
     }
   }

@@ -106,7 +106,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       assertEquals("", str);
       assertTrue(outFile.isFile());
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(outFile));
-      final String actual = StringUtils.grep(FileHelper.gzFileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      final String actual = StringUtils.grep(FileHelper.gzFileToString(outFile), "^[^#]").replaceAll("[\r\n]+", "\n");
       mNano.check("snpAnnotate_small_vcf_ids_exp.vcf", actual, false);
     }
   }
@@ -126,7 +126,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       }
       assertEquals("", str);
       assertTrue(outFile.isFile());
-      final String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r|\n]+", "\n");
+      final String actual = StringUtils.grep(FileUtils.fileToString(outFile), "^[^#]").replaceAll("[\r\n]+", "\n");
       mNano.check(id + "_exp.vcf", actual, false);
     }
   }
