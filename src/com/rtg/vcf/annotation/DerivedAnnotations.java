@@ -31,8 +31,10 @@
 package com.rtg.vcf.annotation;
 
 import java.util.EnumSet;
+import java.util.stream.Collectors;
 
 import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Enumeration of the derived annotations.
@@ -95,7 +97,9 @@ public enum DerivedAnnotations {
    * @return the set of derived annotations that produce a single value.
    */
   public static EnumSet<DerivedAnnotations> singleValueAnnotations() {
-    return EnumSet.complementOf(EnumSet.of(AC));
+    return EnumSet.allOf(DerivedAnnotations.class).stream()
+      .filter(a -> a.getAnnotation().getField().getNumber() == VcfNumber.ONE)
+      .collect(Collectors.toCollection(() -> EnumSet.noneOf(DerivedAnnotations.class)));
   }
 
   /**
@@ -103,13 +107,11 @@ public enum DerivedAnnotations {
    * @return the set of derived annotations that produce a single numeric value.
    */
   public static EnumSet<DerivedAnnotations> singleValueNumericAnnotations() {
-    final EnumSet<DerivedAnnotations> ret = EnumSet.noneOf(DerivedAnnotations.class);
-    for (final DerivedAnnotations ann : singleValueAnnotations()) {
-      final MetaType t = ann.getAnnotation().getField().getType();
-      if (t == MetaType.INTEGER || t == MetaType.FLOAT) {
-        ret.add(ann);
-      }
-    }
-    return ret;
+    return singleValueAnnotations().stream()
+      .filter(a -> {
+        final MetaType aType = a.getAnnotation().getField().getType();
+        return aType == MetaType.INTEGER || aType == MetaType.FLOAT;
+      })
+      .collect(Collectors.toCollection(() -> EnumSet.noneOf(DerivedAnnotations.class)));
   }
 }

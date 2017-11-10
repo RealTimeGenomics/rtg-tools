@@ -30,6 +30,8 @@
 
 package com.rtg.vcf.annotation;
 
+import java.util.EnumSet;
+
 import com.rtg.util.TestUtils;
 
 import junit.framework.TestCase;
@@ -57,4 +59,7 @@ public class DerivedAnnotationsTest extends TestCase {
     assertTrue(DerivedAnnotations.RA.getAnnotation() instanceof RefAltAnnotation);
   }
 
+  public void testCollections() {
+    assertEquals(EnumSet.complementOf(EnumSet.of(DerivedAnnotations.AC)), DerivedAnnotations.singleValueAnnotations());
+  }
 }
