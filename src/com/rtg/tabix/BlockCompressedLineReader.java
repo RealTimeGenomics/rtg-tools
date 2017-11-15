@@ -143,11 +143,17 @@ public class BlockCompressedLineReader implements LineReader {
     mPos = 0 - mLineBufferUsed;
     mBufferFilePointer = mInit ? mStream.getFilePointer() : 0;
     mInit = true;
-    final int avail = mStream.available();
-    while (avail > mBuffer.length) {
-      resizeBuffer();
+    try {
+      final int avail = mStream.available();
+      while (avail > mBuffer.length) {
+        resizeBuffer();
+      }
+      mBufferUsed = mStream.read(mBuffer, 0, avail);
+    } catch (final NullPointerException e) {
+      // NPE can come from deep in htsjdk.samtools.util.BlockCompressedInputStream
+      // when the input file is truncated.
+      throw new IOException("Probable truncation or corruption of input file", e);
     }
-    mBufferUsed = mStream.read(mBuffer, 0, avail);
   }
 
   private void copyToLineBuffer(int startPos, int length) {
