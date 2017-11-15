@@ -352,11 +352,11 @@ public final class HalfPath implements Comparable<HalfPath> {
     }
     sb.append("v ");
     sb.append(' ');
-    sb.append(DisplayHelper.DEFAULT.decorateForeground("included:", DisplayHelper.GREEN));
-    sb.append(BasicLinkedListNode.toReversedList(mIncluded));
+    sb.append(DisplayHelper.DEFAULT.decorateForeground("included:", DisplayHelper.CYAN));
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(BasicLinkedListNode.toReversedList(mIncluded).toString(), DisplayHelper.GREEN));
     sb.append(' ');
-    sb.append(DisplayHelper.DEFAULT.decorateForeground("excluded:", DisplayHelper.RED));
-    sb.append(BasicLinkedListNode.toReversedList(mExcluded));
+    sb.append(DisplayHelper.DEFAULT.decorateForeground("excluded:", DisplayHelper.CYAN));
+    sb.append(DisplayHelper.DEFAULT.decorateForeground(BasicLinkedListNode.toReversedList(mExcluded).toString(), DisplayHelper.RED));
     return sb.toString();
   }
 
