@@ -63,7 +63,7 @@ public class GenotypeTest extends TestCase {
   }
 
   public void testComparator() {
-    final Genotype[] ordered = {new Genotype("0"), new Genotype("0/0"), new Genotype("0/1"), new Genotype("1"), new Genotype("1/1")};
+    final Genotype[] ordered = {new Genotype("0"), new Genotype("1"), new Genotype("0/0"), new Genotype("0/1"), new Genotype("1/1")};
     TestUtils.testOrder(Genotype.GENOTYPE_COMPARATOR, ordered, false);
 
   }

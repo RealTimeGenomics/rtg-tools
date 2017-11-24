@@ -211,7 +211,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     return badDiploid;
   }
 
-  // Child is haploid, must inherit its allele from exactly one parent.
+  // Child is haploid, must inherit its allele from a parent.
   // If the sequence is diploid in one parent, it should be from that parent.
   // If the sequence is none in one parent, it should come from the other parent.
   static boolean isBadHaploidChild(final Genotype fatherCall, final Genotype motherCall, final Genotype childCall) {
@@ -231,6 +231,11 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       badhaploid = true;
     }
     return badhaploid;
+  }
+
+  static boolean isBadTrioCall(Genotype fatherGt, Genotype motherGt, Genotype childGt) {
+    return ((childGt.length() == 1) && isBadHaploidChild(fatherGt, motherGt, childGt))
+      || ((childGt.length() == 2) && isBadDiploidChild(fatherGt, motherGt, childGt));
   }
 
   // Returns true if any of the calls have unexpected call ploidy
@@ -267,13 +272,12 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
   // Returns true if this trio genotype has bad mendelianness
   private boolean hasBadMendelianness(int childIndex, Genotype fatherGt, Genotype motherGt, Genotype childGt) {
+    final boolean badMendelian = isBadTrioCall(fatherGt, motherGt, childGt);
     //aggregate stuff
     if (mAggregate != null) {
       mAggregate.addRecord(fatherGt, motherGt, childGt);
     }
     mTrioCounts[childIndex].add(fatherGt, motherGt, childGt);
-    final boolean badMendelian = ((childGt.length() == 1) && isBadHaploidChild(fatherGt, motherGt, childGt))
-      || ((childGt.length() == 2) && isBadDiploidChild(fatherGt, motherGt, childGt));
     mTrioCounts[childIndex].addTrioStatus(badMendelian);
     return badMendelian;
   }

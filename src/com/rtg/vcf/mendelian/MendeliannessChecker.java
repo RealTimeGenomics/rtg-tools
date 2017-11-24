@@ -58,6 +58,7 @@ import com.rtg.relation.Family;
 import com.rtg.relation.GenomeRelationships;
 import com.rtg.relation.PedigreeException;
 import com.rtg.relation.VcfPedigreeParser;
+import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
@@ -227,6 +228,13 @@ public final class MendeliannessChecker extends AbstractCli {
               }
             }
             if (aggregateWriter != null) {
+              aggregateWriter.append("## Canonicalized, Exclude multiallelic").append(StringUtils.LS);
+              aggregate.canonicalParents().filterMultiallelic().writeResults(aggregateWriter);
+
+              aggregateWriter.append("## Canonicalized, Exclude multiallelic, Diploid Only").append(StringUtils.LS);
+              aggregate.canonicalParents().filterMultiallelic().filterNonDiploid().writeResults(aggregateWriter);
+
+              aggregateWriter.append("## Full Genotype Aggregates").append(StringUtils.LS);
               aggregate.writeResults(aggregateWriter);
             }
           }

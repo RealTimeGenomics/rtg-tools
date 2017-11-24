@@ -64,20 +64,16 @@ public class GenotypeProportionsTest extends TestCase {
   }
 
   public void test() throws IOException {
-    final String vcfResource = "gt_prop_test.vcf";
-    final String resultName = "gt_prop_results.txt";
-    check(vcfResource, resultName);
+    check("gt_prop");
   }
 
   public void test2() throws IOException {
-    final String vcfResource = "gt_prop_ploidy_test.vcf";
-    final String resultName = "gt_prop_ploidy_results.txt";
-    check(vcfResource, resultName);
+    check("gt_prop_ploidy");
   }
 
-  private void check(String vcfResource, String resultName) throws IOException {
+  private void check(String id) throws IOException {
     final GenotypeProportions prop = new GenotypeProportions();
-
+    final String vcfResource = id + "_test.vcf";
     try (VcfReader r = new VcfReader(new BufferedReader(new StringReader(mNano.loadReference(vcfResource))))) {
       while (r.hasNext()) {
         final VcfRecord rec = r.next();
@@ -85,8 +81,20 @@ public class GenotypeProportionsTest extends TestCase {
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }
-    final MemoryPrintStream mps = new MemoryPrintStream();
+    MemoryPrintStream mps = new MemoryPrintStream();
     prop.writeResults(mps.printStream());
-    mNano.check(resultName, mps.toString());
+    mNano.check(id + "_results.txt", mps.toString());
+
+    mps = new MemoryPrintStream();
+    prop.canonicalParents().writeResults(mps.printStream());
+    mNano.check(id + "_can_results.txt", mps.toString());
+
+    mps = new MemoryPrintStream();
+    prop.filterMultiallelic().writeResults(mps.printStream());
+    mNano.check(id + "_biallelic_results.txt", mps.toString());
+
+    mps = new MemoryPrintStream();
+    prop.filterNonDiploid().writeResults(mps.printStream());
+    mNano.check(id + "_diploid_results.txt", mps.toString());
   }
 }

@@ -71,21 +71,20 @@ class Genotype {
   }
 
   public boolean homozygous() {
-    return mAlleles.length > 0 && mAlleles[0] == mAlleles[mAlleles.length - 1];
+    return VcfUtils.isHomozygous(mAlleles);
+  }
+
+  public boolean multiallelic() {
+    for (int a : mAlleles) {
+      if (a > 1) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    boolean first = true;
-    for (int j : mAlleles) {
-      if (first) {
-        sb.append(Integer.toString(j));
-        first = false;
-      } else {
-        sb.append("/").append(Integer.toString(j));
-      }
-    }
-    return sb.toString();
+    return VcfUtils.joinGt(false, mAlleles);
   }
 
   public boolean equals(Object o) {
@@ -103,21 +102,20 @@ class Genotype {
     return res;
   }
 
-  // If this modified to be non-thread safe, then make sure to remove the static instance
   static class GenotypeComparator implements Comparator<Genotype>, Serializable {
     @Override
     public int compare(Genotype a, Genotype b) {
+      if (a.mAlleles.length < b.mAlleles.length) {
+        return -1;
+      } else if (a.mAlleles.length > b.mAlleles.length) {
+        return 1;
+      }
       for (int i = 0; i < a.mAlleles.length && i < b.mAlleles.length; ++i) {
         if (a.mAlleles[i] < b.mAlleles[i]) {
           return -1;
         } else if (a.mAlleles[i] > b.mAlleles[i]) {
           return 1;
         }
-      }
-      if (a.mAlleles.length < b.mAlleles.length) {
-        return -1;
-      } else if (a.mAlleles.length > b.mAlleles.length) {
-        return 1;
       }
       return 0;
     }
