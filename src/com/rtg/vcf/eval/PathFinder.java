@@ -164,7 +164,7 @@ public final class PathFinder {
       if (head.finished()) {
         // Path is done. Remember the best
         final BasicLinkedListNode<Integer> syncPoints = new BasicLinkedListNode<>(head.mCalledPath.getPosition(), head.mSyncPointList);
-        best = mConfig.mPathSelector.better(best, new Path(head, syncPoints));
+        best = best == null ? new Path(head, syncPoints) : mConfig.mPathSelector.better(best, new Path(head, syncPoints));
         continue;
       }
       if (enqueueVariant(sortedPaths, head, true)) {

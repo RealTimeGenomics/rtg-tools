@@ -40,13 +40,13 @@ import com.rtg.util.BasicLinkedListNode;
 final class MaxCallsMinBaseline implements PathPreference {
   @Override
   public Path better(Path first, Path second) {
-    BasicLinkedListNode<OrientedVariant> firstIncluded = first == null ? null : first.mCalledPath.getIncluded();
-    BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> firstIncluded = first.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> secondIncluded = second.mCalledPath.getIncluded();
     int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
     int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
     if (firstSize == secondSize) {
-      firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
-      secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
+      firstIncluded = first.mBaselinePath.getIncluded();
+      secondIncluded = second.mBaselinePath.getIncluded();
       firstSize = firstIncluded == null ? 0 : firstIncluded.size();
       secondSize = secondIncluded == null ? 0 : secondIncluded.size();
 

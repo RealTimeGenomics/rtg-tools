@@ -48,8 +48,8 @@ final class MaxSumBoth implements PathPreference {
   @Override
   public Path better(Path first, Path second) {
     // See if we have obvious no-ops we would rather drop
-    final boolean fSync = first != null && (first.inSync() || first.finished());
-    final boolean sSync = second != null && (second.inSync() || second.finished());
+    final boolean fSync = first.inSync() || first.finished();
+    final boolean sSync = second.inSync() || second.finished();
     if (fSync && sSync) { // See if we have no-ops we would rather drop
       if (hasNoOp(first)) {
         Diagnostic.developerLog("Discard no-op path with (" + first.mBSinceSync + "," + first.mCSinceSync + ") at " + first.mCalledPath.getPosition());
@@ -61,12 +61,12 @@ final class MaxSumBoth implements PathPreference {
     }
 
     // Prefer paths that maximise total number of included variants (baseline + called)
-    BasicLinkedListNode<OrientedVariant> firstIncluded = first == null ? null : first.mCalledPath.getIncluded();
-    BasicLinkedListNode<OrientedVariant> secondIncluded = second == null ? null : second.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> firstIncluded = first.mCalledPath.getIncluded();
+    BasicLinkedListNode<OrientedVariant> secondIncluded = second.mCalledPath.getIncluded();
     int firstSize = firstIncluded == null ? 0 : firstIncluded.size();
     int secondSize = secondIncluded == null ? 0 : secondIncluded.size();
-    firstIncluded = first == null ? null : first.mBaselinePath.getIncluded();
-    secondIncluded = second == null ? null : second.mBaselinePath.getIncluded();
+    firstIncluded = first.mBaselinePath.getIncluded();
+    secondIncluded = second.mBaselinePath.getIncluded();
     firstSize += firstIncluded == null ? 0 : firstIncluded.size();
     secondSize += secondIncluded == null ? 0 : secondIncluded.size();
     if (firstSize == secondSize) {
