@@ -65,6 +65,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
   /** Output the best path found along with the haplotypes */
   public static final String VCFEVAL_DUMP_BEST_PATH = "com.rtg.vcf.eval.dump-path";
+  /** Trace the path finding algorithm -- produces tons of output */
+  public static final String VCFEVAL_TRACE = "com.rtg.vcf.eval.trace";
   /** When comparing consistent paths, whether to maximize included calls, baseline, or sum of both */
   public static final String VCFEVAL_MAXIMIZE_MODE = "com.rtg.vcf.eval.maximize";
   /** Custom variant path result processor */
@@ -106,6 +108,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
     // vcfeval
     registerFlag(VCFEVAL_DUMP_BEST_PATH);
+    registerFlag(VCFEVAL_TRACE);
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");

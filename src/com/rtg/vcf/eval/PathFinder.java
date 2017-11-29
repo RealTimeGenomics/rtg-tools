@@ -45,7 +45,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 @TestClass("com.rtg.vcf.eval.PathTest")
 public final class PathFinder {
 
-  static final boolean TRACE = false;
+  static final boolean TRACE = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_TRACE);
 
   // Bundles up some configuration variables that can be re-used between runs of the path finding
   static final class Config {
