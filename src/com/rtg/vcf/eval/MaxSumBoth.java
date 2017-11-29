@@ -31,35 +31,16 @@ package com.rtg.vcf.eval;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.BasicLinkedListNode;
-import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Prefer paths that maximise total number of included variants (baseline + called).
- * Also avoids obvious no-op bubbles, and includes some other tie-breaking heuristics that
- * prefer more aesthetically pleasing matches.
+ * Includes some other tie-breaking heuristics that prefer more aesthetically pleasing matches.
  */
 @TestClass("com.rtg.vcf.eval.PathTest")
 final class MaxSumBoth implements PathPreference {
-  private static boolean hasNoOp(Path path) {
-    return (path.mBSinceSync == 0 && path.mCSinceSync > 0)
-      || (path.mCSinceSync == 0 && path.mBSinceSync > 0);
-  }
 
   @Override
   public Path better(Path first, Path second) {
-    // See if we have obvious no-ops we would rather drop
-    final boolean fSync = first.inSync() || first.finished();
-    final boolean sSync = second.inSync() || second.finished();
-    if (fSync && sSync) { // See if we have no-ops we would rather drop
-      if (hasNoOp(first)) {
-        Diagnostic.developerLog("Discard no-op path with (" + first.mBSinceSync + "," + first.mCSinceSync + ") at " + first.mCalledPath.getPosition());
-        return second;
-      } else if (hasNoOp(second)) {
-        Diagnostic.developerLog("Discard no-op path with (" + second.mBSinceSync + "," + second.mCSinceSync + ") at " + first.mCalledPath.getPosition());
-        return first;
-      }
-    }
-
     // Prefer paths that maximise total number of included variants (baseline + called)
     BasicLinkedListNode<OrientedVariant> firstIncluded = first.mCalledPath.getIncluded();
     BasicLinkedListNode<OrientedVariant> secondIncluded = second.mCalledPath.getIncluded();

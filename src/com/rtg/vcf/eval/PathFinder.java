@@ -54,6 +54,7 @@ public final class PathFinder {
     final int mMaxComplexity;
     final int mMaxIterations;
     final boolean mFlagAlternates;
+    final boolean mPruneNoOps;
 
     /**
      * Construct a default configuration
@@ -62,7 +63,8 @@ public final class PathFinder {
       this(getPathPreference(),
         GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_PATHS),
         GlobalFlags.getIntegerValue(ToolsGlobalFlags.VCFEVAL_MAX_ITERATIONS),
-        GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_FLAG_ALTERNATES));
+        GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_FLAG_ALTERNATES),
+        GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_PRUNE_NO_OPS));
     }
 
     /**
@@ -71,12 +73,14 @@ public final class PathFinder {
      * @param maxComplexity threshold on number of concurrently active paths
      * @param maxIterations threshold on number of iterations since the last sync point
      * @param flagAlternates if set, mark variants matched in alternative paths
+     * @param pruneNoOps if set, drop paths that contain obvious no-ops (where variants on one side are equivalent to zero variants on the other side)
      */
-    Config(PathPreference selector, int maxComplexity, int maxIterations, boolean flagAlternates) {
+    Config(PathPreference selector, int maxComplexity, int maxIterations, boolean flagAlternates, boolean pruneNoOps) {
       mMaxComplexity = maxComplexity;
       mMaxIterations = maxIterations;
       mPathSelector = selector;
       mFlagAlternates = flagAlternates;
+      mPruneNoOps = pruneNoOps;
     }
 
     private static PathPreference getPathPreference() {
@@ -164,8 +168,11 @@ public final class PathFinder {
         skipVariantsTo(head.mCalledPath, mCalledVariants, mCurrentMaxPos + 1);
         skipVariantsTo(head.mBaselinePath, mBaseLineVariants, mCurrentMaxPos + 1);
       }
-      if (head.finished()) {
-        // Path is done. Remember the best
+      if (head.finished()) { // Path is done. Remember it if it is the best
+        if (mConfig.mPruneNoOps && head.hasNoOp()) {
+          Diagnostic.developerLog("Discard no-op path with (" + head.mBSinceSync + "," + head.mCSinceSync + ") at " + head.mCalledPath.getPosition());
+          continue;
+        }
         if (mConfig.mFlagAlternates) {
           head.flagIncluded();
         }
@@ -187,11 +194,14 @@ public final class PathFinder {
 
       if (head.inSync()) {
         assert head.matches();
+        if (mConfig.mPruneNoOps && head.hasNoOp()) {
+          Diagnostic.developerLog("Discard no-op path with (" + head.mBSinceSync + "," + head.mCSinceSync + ") at " + head.mCalledPath.getPosition());
+          continue;
+        }
         if (mConfig.mFlagAlternates) {
           head.flagIncluded();
         }
         skipToNextVariant(head);
-        assert head.matches();
         if (TRACE) {
           System.err.println("Skipped " + head);
         }

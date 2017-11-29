@@ -210,6 +210,17 @@ public final class Path implements Comparable<Path> {
   }
 
   /**
+   * Checks whether this path could be a no-op, i.e. where variants are included on one side but not the other.
+   * This should only be called on paths that are in sync or finished.
+   * @return true if it looks like this path may be a no-op
+   */
+  boolean hasNoOp() {
+    assert inSync() || finished();
+    return (mBSinceSync == 0 && mCSinceSync > 0)
+      || (mCSinceSync == 0 && mBSinceSync > 0);
+  }
+
+  /**
    * @return the set of variants included on call side
    */
   public List<OrientedVariant> getCalledIncluded() {
