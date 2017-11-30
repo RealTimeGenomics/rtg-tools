@@ -69,8 +69,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
   }
 
   public void testValidator() throws IOException {
-    final File temp = FileUtils.createTempDir("validator", "test");
-    try {
+    try (final TestDirectory temp = new TestDirectory("validator")) {
       final File fake = new File(temp, "fake.vcf");
       assertTrue(fake.createNewFile());
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-info", "blahBed", "-i", "blahInput"), "file \"blahInput\" does not exist.");
@@ -82,8 +81,6 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", fake.getPath(), "--bed-info", fake.getPath(), "-i", fake.getPath(), "-Z"), "The file \"" + fake.getPath() + "\" already exists. Please remove it first or choose a different file");
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", "blahOutput", "--bed-ids", fake.getPath(), "--vcf-ids", fake.getPath(), "-i", fake.getPath(), "-Z"), "Cannot set both --bed-ids and --vcf-ids");
       checkHandleFlagsOut("-o", "blahOutput", "-i", fake.getPath());
-    } finally {
-      FileHelper.deleteAll(temp);
     }
   }
 
@@ -97,11 +94,10 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
 
   public void testNanoVcfIds() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
-      final File inVcf = new File(dir, "input.vcf");
-      final File idVcf = new File(dir, "id.vcf");
+      final File inVcf = FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small.vcf"), new File(dir, "input.vcf"));
+      final File idVcf = FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small_ids_vcf.vcf"), new File(dir, "id.vcf"));
       final File outFile = new File(dir, "output.vcf.gz");
-      FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small.vcf"), inVcf);
-      FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small_ids_vcf.vcf"), idVcf);
+
       final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
       assertEquals("", str);
       assertTrue(outFile.isFile());
@@ -113,11 +109,10 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
 
   private void check(String bed, String id, boolean ids) throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {
-      final File inVcf = new File(dir, "input.vcf");
-      final File inBed = new File(dir, "input.bed");
+      final File inVcf = FileUtils.stringToFile(mNano.loadReference(id + ".vcf"), new File(dir, "input.vcf"));
+      final File inBed = FileUtils.stringToFile(mNano.loadReference(bed), new File(dir, "input.bed"));
       final File outFile = new File(dir, "output.vcf");
-      FileUtils.stringToFile(mNano.loadReference(id + ".vcf"), inVcf);
-      FileUtils.stringToFile(mNano.loadReference(bed), inBed);
+
       final String str;
       if (ids) {
         str = checkMainInitOk("-i", inVcf.getPath(), "--bed-ids", inBed.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");

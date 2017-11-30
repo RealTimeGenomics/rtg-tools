@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +43,7 @@ import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.ParamsTask;
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
-import com.rtg.reader.NamesInterface;
+import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SdfId;
 import com.rtg.reader.SdfUtils;
 import com.rtg.reader.SequencesReader;
@@ -121,7 +120,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       throw new IOException("Unable to create directory \"" + outdir.getPath() + "\"");
     }
 
-    final Map<String, Long> nameMap = getNameMap(templateSequences);
+    final Map<String, Long> nameMap = ReaderUtils.getSequenceNameMap(templateSequences);
 
     final List<Pair<Orientor, Orientor>> o;
     if (params.twoPass() && params.squashPloidy()) {
@@ -147,25 +146,6 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
       sync.finish();
     }
-  }
-
-  /**
-   * Construct a mapping from sequence name to sequence index.
-   * @param templateSequences sequences
-   * @return mapping from name to index
-   * @throws IOException if an I/O error occurs.
-   */
-  public static Map<String, Long> getNameMap(final SequencesReader templateSequences) throws IOException {
-    final NamesInterface names = templateSequences.names();
-    final long numNames = names.length();
-    if (numNames > Integer.MAX_VALUE) {
-      throw new UnsupportedOperationException();
-    }
-    final Map<String, Long> nameMap = new HashMap<>((int) numNames);
-    for (long i = 0; i < numNames; ++i) {
-      nameMap.put(names.name(i), i);
-    }
-    return nameMap;
   }
 
   private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {

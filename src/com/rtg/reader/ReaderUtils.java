@@ -141,6 +141,9 @@ public final class ReaderUtils {
    * @throws IOException if an error occurs during reading
    */
   public static Map<String, Long> getSequenceNameMap(final SequencesReader sequences) throws IOException {
+    if (sequences.numberSequences() > Integer.MAX_VALUE) {
+      throw new UnsupportedOperationException();
+    }
     final Map<String, Long> map = new LinkedHashMap<>((int) sequences.numberSequences());
     for (long i = 0; i < sequences.numberSequences(); ++i) {
       map.put(sequences.name(i), i);

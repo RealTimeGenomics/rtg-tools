@@ -56,6 +56,7 @@ import com.rtg.tabix.ExtractCli;
 import com.rtg.tabix.IndexerCli;
 import com.rtg.util.License;
 import com.rtg.vcf.VcfAnnotatorCli;
+import com.rtg.vcf.VcfDecomposerCli;
 import com.rtg.vcf.VcfFilterCli;
 import com.rtg.vcf.VcfMerge;
 import com.rtg.vcf.VcfStatsCli;
@@ -70,94 +71,37 @@ public final class ToolsCommand {
 
   private ToolsCommand() { }
 
-  /** For formatting data files for use by Slim */
   static final Command FORMAT = new Command(new FormatCli(), CommandCategory.FORMAT, ReleaseLevel.GA);
-
-  /** For pre-processing data files and trimming reads */
   static final Command FASTQTRIM = new Command(new FastqTrim(), CommandCategory.FORMAT, ReleaseLevel.GA);
-
-  /** For converting Slim's data format into FASTA format */
   static final Command SDF2FASTA = new Command(new Sdf2Fasta(), CommandCategory.FORMAT, ReleaseLevel.GA);
-
-  /** For converting Slim's data format into FASTQ format */
   static final Command SDF2FASTQ = new Command(new Sdf2Fastq(), CommandCategory.FORMAT, ReleaseLevel.GA);
-
-  /** For converting SDF into SAM/BAM format */
   static final Command SDF2SAM = new Command(new Sdf2Sam(), CommandCategory.FORMAT, ReleaseLevel.GA);
 
-
-  /** Generate simulated reads */
   static final Command GENOMESIM = new Command(new GenomeSimulator(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate Complete Genomics style simulated reads */
   static final Command CGSIM = new Command(new CgSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate simulated reads */
   static final Command READSIM = new Command(new ReadSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-
-  /** Generate a VCF containing population variants for a reference */
   static final Command POPSIM = new Command(new PriorPopulationVariantGeneratorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate a VCF containing a generated genotype for a new sample according to allele frequencies */
   static final Command SAMPLESIM = new Command(new SampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate a VCF containing a generated child genotype for a new sample from two parents */
   static final Command CHILDSIM = new Command(new ChildSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate a VCF containing a derived genotype containing de novo variants */
   static final Command DENOVOSIM = new Command(new DeNovoSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-
-  /** Generate a genome SDF corresponding to a genotype contained in a VCF file */
   static final Command SAMPLEREPLAY = new Command(new SampleReplayerCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
 
-
-  /** BGZips an input file (for use with index module) */
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Indexes our various output formats that have records based on reference position */
   static final Command INDEX = new Command(new IndexerCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Extracts regions from indexed files */
   static final Command EXTRACT = new Command(new ExtractCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Print statistics about an SDF */
   static final Command SDFSTATS = new Command(new SdfStatistics(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Creates a subset of an SDF file */
   static final Command SDFSUBSET = new Command(new SdfSubset(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Creates a subset of an SDF file */
   static final Command SDFSUBSEQ = new Command(new SdfSubseq(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Runs stand alone Mendelian checking */
   static final Command MENDELIAN = new Command(new MendeliannessChecker(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** VCF stats class */
   static final Command VCFSTATS = new Command(new VcfStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** VCF merge class */
   static final Command VCFMERGE = new Command(new VcfMerge(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** VCF subset class */
   static final Command VCFSUBSET = new Command(new VcfSubset(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** SNP filter class */
   static final Command VCFFILTER = new Command(new VcfFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** SNP filter class */
   static final Command VCFANNOTATE = new Command(new VcfAnnotatorCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Evaluates variant calling accuracy on a given baseline variant set */
+  static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** PED filter class */
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** PED stats class */
   static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-
-  /** Roc plot tool */
   static final Command ROCPLOT = new Command(new RocPlotCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
 
   /** Print version */
@@ -188,7 +132,8 @@ public final class ToolsCommand {
     BGZIP, INDEX, EXTRACT,                        // General purpose
     SDFSTATS, SDFSUBSET, SDFSUBSEQ,            // SDF related
     MENDELIAN, VCFSTATS, VCFMERGE,                       // VCF related
-    VCFFILTER, VCFANNOTATE, VCFSUBSET, VCFEVAL,
+    VCFFILTER, VCFANNOTATE, VCFSUBSET,
+    VCFDECOMPOSE, VCFEVAL,
     PEDFILTER, PEDSTATS,
     ROCPLOT,
 

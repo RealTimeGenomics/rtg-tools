@@ -31,7 +31,6 @@ package com.rtg.vcf;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -137,8 +136,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testPosteriorFiltering() throws IOException {
     try (TestDirectory main = new TestDirectory()) {
-      final File in = new File(main, "input");
-      FileUtils.stringToFile(INPUT1, in);
+      final File in = FileUtils.stringToFile(INPUT1, new File(main, "input"));
       final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-Z", "-p", "5.0");
@@ -164,8 +162,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testCoverageFiltering() throws IOException {
     try (final TestDirectory main = new TestDirectory()) {
-      final File in = new File(main, "input");
-      FileUtils.stringToFile(INPUT3, in);
+      final File in = FileUtils.stringToFile(INPUT3, new File(main, "input"));
       final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-d", "9", "-Z");
@@ -180,8 +177,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testCombinedCoverageFiltering() throws IOException {
     try (final TestDirectory main = new TestDirectory()) {
-      final File in = new File(main, "input");
-      FileUtils.stringToFile(INPUT3, in);
+      final File in = FileUtils.stringToFile(INPUT3, new File(main, "input"));
       final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-c", "9", "-Z");
@@ -204,8 +200,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testCoverageFiltering2() throws IOException {
     try (final TestDirectory main = new TestDirectory()) {
-      final File in = new File(main, "input");
-      FileUtils.stringToFile(INPUT4, in);
+      final File in = FileUtils.stringToFile(INPUT4, new File(main, "input"));
       final File out = new File(main, "out.vcf");
 
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-d", "9", "-Z");
@@ -220,15 +215,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testMoreComplexCase() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final File in = new File(dir, "input");
-
-      final String res = RESOURCES + "snps_complex.vcf";
-      try (InputStream stream = Resources.getResourceAsStream(res)) {
-        assertNotNull("Can't find:" + res, stream);
-
-        final String snps = FileUtils.streamToString(stream);
-        FileUtils.stringToFile(snps, in);
-      }
+      final File in = FileHelper.resourceToFile(RESOURCES + "snps_complex.vcf", new File(dir, "input.vcf"));
       final File out = new File(dir, "out.vcf");
       final String output = checkMainInitOk("-i", in.getPath(), "-o", out.getPath(), "-Z", "-d", "4", "-D", "6", "-p", "0.49", "-P", "1.21");
 
@@ -249,14 +236,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
   // Run a test where vcffilter is expected to complete normally
   private void runResourceTest(String inResourceLoc, String expResourceLoc, String... extraArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final File in = new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName());
-
-      try (InputStream stream = Resources.getResourceAsStream(inResourceLoc)) {
-        assertNotNull("Cant find:" + inResourceLoc, stream);
-
-        final String snps = FileUtils.streamToString(stream);
-        FileUtils.stringToFile(snps, in);
-      }
+      final File in = FileHelper.resourceToFile(inResourceLoc, new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName()));
       final File out = new File(dir, "out.vcf.gz");
       final String output = checkMainInitOk(Utils.append(extraArgs, "-i", in.getPath(), "-o", out.getPath()));
       mNano.check(expResourceLoc + ".txt", output, true);
@@ -271,14 +251,7 @@ public class VcfFilterCliTest extends AbstractCliTest {
   // Run a test where vcffilter is expected to fail
   private void runResourceTestError(String inResourceLoc, String expResourceLoc, String... extraArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final File in = new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName());
-
-      try (InputStream stream = Resources.getResourceAsStream(inResourceLoc)) {
-        assertNotNull("Cant find:" + inResourceLoc, stream);
-
-        final String snps = FileUtils.streamToString(stream);
-        FileUtils.stringToFile(snps, in);
-      }
+      final File in = FileHelper.resourceToFile(inResourceLoc, new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName()));
       final File out = new File(dir, "out.vcf");
       final String[] args = {
         "-i", in.getPath(), "-o", out.getPath(), "-Z",
@@ -410,22 +383,16 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testIncludeExclude() throws IOException {
     try (TestDirectory tempDirectory = new TestDirectory()) {
-      final File exclude = new File(tempDirectory, "exclude");
-      FileHelper.resourceToFile(RESOURCES + "exclude.bed", exclude);
-      final File include = new File(tempDirectory, "include");
-      FileHelper.resourceToFile(RESOURCES + "include.bed", include);
-
+      final File exclude = FileHelper.resourceToFile(RESOURCES + "exclude.bed", new File(tempDirectory, "exclude"));
+      final File include = FileHelper.resourceToFile(RESOURCES + "include.bed", new File(tempDirectory, "include"));
       runResourceTest(RESOURCES + "snpfiltertest_complex.vcf", "snpfiltertest_complex_inc_exc_bed.vcf", "--include-bed", include.toString(), "--exclude-bed", exclude.toString());
     }
   }
 
   public void testIncludeExcludeVcf() throws IOException {
     try (TestDirectory tempDirectory = new TestDirectory()) {
-      final File exclude = new File(tempDirectory, "exclude");
-      FileHelper.resourceToFile(RESOURCES + "exclude.vcf", exclude);
-      final File include = new File(tempDirectory, "include");
-      FileHelper.resourceToFile(RESOURCES + "include.vcf", include);
-
+      final File exclude = FileHelper.resourceToFile(RESOURCES + "exclude.vcf", new File(tempDirectory, "exclude"));
+      final File include = FileHelper.resourceToFile(RESOURCES + "include.vcf", new File(tempDirectory, "include"));
       runResourceTest(RESOURCES + "snpfiltertest_complex.vcf", "snpfiltertest_complex_inc_exc_vcf.vcf", "--include-vcf", include.toString(), "--exclude-vcf", exclude.toString());
     }
   }
@@ -446,19 +413,13 @@ public class VcfFilterCliTest extends AbstractCliTest {
 
   public void testJavascriptNoOutput() throws Exception {
     try (TestDirectory tempDirectory = new TestDirectory()) {
-      final String res = RESOURCES + "snps_complex.vcf";
-      try (InputStream stream = Resources.getResourceAsStream(res)) {
-        assertNotNull("Can't find:" + res, stream);
-        final File in = new File(tempDirectory, "input");
-        final String snps = FileUtils.streamToString(stream);
-        FileUtils.stringToFile(snps, in);
-        final MainResult output = checkMainInit("-i", in.getPath(), "-j", "function record() {print(POS);}");
-        final String expected = Stream.of(41367, 41379, 41993, 44376, 44808, 45027, 45199, 45403, 45418, 45777, 45793,
-          45921, 46168, 46244, 46375, 57063, 57076, 57473, 82069, 82299,
-          82518, 83161, 83182, 83183, 84324, 84414, 84449)
-          .map(Object::toString).collect(Collectors.joining(StringUtils.LS)) + StringUtils.LS;
-        assertEquals(expected, output.out());
-      }
+      final File in = FileHelper.resourceToFile(RESOURCES + "snps_complex.vcf", new File(tempDirectory, "input"));
+      final MainResult output = checkMainInit("-i", in.getPath(), "-j", "function record() {print(POS);}");
+      final String expected = Stream.of(41367, 41379, 41993, 44376, 44808, 45027, 45199, 45403, 45418, 45777, 45793,
+        45921, 46168, 46244, 46375, 57063, 57076, 57473, 82069, 82299,
+        82518, 83161, 83182, 83183, 84324, 84414, 84449)
+        .map(Object::toString).collect(Collectors.joining(StringUtils.LS)) + StringUtils.LS;
+      assertEquals(expected, output.out());
     }
   }
 }
