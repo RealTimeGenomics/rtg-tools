@@ -136,20 +136,15 @@ public final class PathFinder {
     mCurrentMaxPos = 0;
     Path lastSyncPath = null;
     int lastSyncPos = 0;
-    String lastWarnMessage = null;
     while (sortedPaths.size() > 0) {
       currentMax = Math.max(currentMax, sortedPaths.size());
       currentMaxIterations = Math.max(currentMaxIterations, currentIterations++);
       Path head = sortedPaths.pollFirst();
       if (TRACE) {
-        System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + "\n");
+        System.err.println("Size: " + (sortedPaths.size() + 1) + " Range:" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 1) + " LocalIterations: " + currentIterations + " " + mConfig.mMaxComplexity + "\n");
         System.err.println("Head is " + head);
       }
       if (sortedPaths.size() == 0) { // Only one path currently in play
-        if (lastWarnMessage != null) { // Issue a warning if we encountered problems during the previous region
-          Diagnostic.warning(lastWarnMessage);
-          lastWarnMessage = null;
-        }
         final int currentSyncPos = head.mCalledPath.getPosition();
         if (currentMax > maxPaths) {
           maxPathsRegion = mTemplateName + ":" + (lastSyncPos + 1) + "-" + (currentSyncPos + 1);
@@ -161,24 +156,12 @@ public final class PathFinder {
         lastSyncPos = currentSyncPos;
         lastSyncPath = head;
       } else if (sortedPaths.size() > mConfig.mMaxComplexity || currentIterations > mConfig.mMaxIterations) {
-        lastWarnMessage = "Evaluation too complex (" + sortedPaths.size() + " unresolved paths, " + currentIterations + " iterations) at reference region " + mTemplateName + ":" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 2) + ". Variants in this region will not be included in results.";
+        Diagnostic.warning("Evaluation too complex (" + sortedPaths.size() + " unresolved paths, " + currentIterations + " iterations) at reference region " + mTemplateName + ":" + (lastSyncPos + 1) + "-" + (mCurrentMaxPos + 2) + ". Variants in this region will not be included in results.");
         sortedPaths.clear();    // Drop all paths currently in play
         currentIterations = 0;
         head = lastSyncPath;    // Create new head containing path up until last sync point
         skipVariantsTo(head.mCalledPath, mCalledVariants, mCurrentMaxPos + 1);
         skipVariantsTo(head.mBaselinePath, mBaseLineVariants, mCurrentMaxPos + 1);
-      }
-      if (head.finished()) { // Path is done. Remember it if it is the best
-        if (mConfig.mPruneNoOps && head.hasNoOp()) {
-          Diagnostic.developerLog("Discard no-op path with (" + head.mBSinceSync + "," + head.mCSinceSync + ") at " + head.mCalledPath.getPosition());
-          continue;
-        }
-        if (mConfig.mFlagAlternates) {
-          head.flagIncluded();
-        }
-        final BasicLinkedListNode<Integer> syncPoints = new BasicLinkedListNode<>(head.mCalledPath.getPosition(), head.mSyncPointList);
-        best = best == null ? new Path(head, syncPoints) : mConfig.mPathSelector.better(best, new Path(head, syncPoints));
-        continue;
       }
       if (enqueueVariant(sortedPaths, head, true)) {
         continue;
@@ -193,13 +176,8 @@ public final class PathFinder {
       }
 
       if (head.inSync()) {
-        assert head.matches();
-        if (mConfig.mPruneNoOps && head.hasNoOp()) {
-          Diagnostic.developerLog("Discard no-op path with (" + head.mBSinceSync + "," + head.mCSinceSync + ") at " + head.mCalledPath.getPosition());
+        if (prune(head)) {
           continue;
-        }
-        if (mConfig.mFlagAlternates) {
-          head.flagIncluded();
         }
         skipToNextVariant(head);
         if (TRACE) {
@@ -208,7 +186,18 @@ public final class PathFinder {
       }
 
       if (head.matches()) {
-        addIfBetter(head, sortedPaths);
+        if (head.finished()) {
+          if (prune(head)) {
+            continue;
+          }
+          if (TRACE) {
+            System.err.println("Finish  " + head);
+          }
+          final Path finished = new Path(head, new BasicLinkedListNode<>(head.mCalledPath.getPosition(), head.mSyncPointList));
+          best = best == null ? finished : mConfig.mPathSelector.better(best, finished);
+        } else {
+          addIfBetter(head, sortedPaths);
+        }
       } else {
         if (TRACE) {
           System.err.println("Head mismatch, discard");
@@ -218,6 +207,21 @@ public final class PathFinder {
     //System.err.println("Best: " + best);
     Diagnostic.userLog("Reference " + mTemplateName + " had maximum path complexity of " + maxPaths + " at " + maxPathsRegion);
     return best;
+  }
+
+  private boolean prune(Path head) {
+    assert head.matches();
+    if (mConfig.mPruneNoOps && head.hasNoOp()) {
+      Diagnostic.developerLog("Discard no-op path with (" + head.mBSinceSync + "," + head.mCSinceSync + ") at " + head.mCalledPath.getPosition());
+      if (TRACE) {
+        System.err.println("Pruned  " + head);
+      }
+      return true;
+    }
+    if (mConfig.mFlagAlternates) {
+      head.flagIncluded();
+    }
+    return false;
   }
 
   private boolean enqueueVariant(TreeSet<Path> paths, Path head, boolean side) {
