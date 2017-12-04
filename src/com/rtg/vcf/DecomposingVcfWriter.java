@@ -52,7 +52,7 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Decomposes variants during writing
  */
-@TestClass(value="com.rtg.vcf.VcfDecomposerCliTest")
+@TestClass(value = "com.rtg.vcf.VcfDecomposerCliTest")
 class DecomposingVcfWriter implements VcfWriter {
 
   private static final String ORP = "ORP";
