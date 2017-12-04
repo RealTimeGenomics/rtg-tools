@@ -66,7 +66,6 @@ import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Annotates a VCF file with contents of a BED file.  Annotations are appended as VCF INFO fields.
- *
  */
 public final class VcfAnnotatorCli extends AbstractCli {
 
@@ -119,10 +118,10 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlags.initForce(mFlags);
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
     mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    mFlags.setValidator(new SnpAnnotatorValidator());
+    mFlags.setValidator(new VcfAnnotatorValidator());
   }
 
-  private static class SnpAnnotatorValidator implements Validator {
+  private static class VcfAnnotatorValidator implements Validator {
     @Override
     public boolean isValid(CFlags flags) {
       return CommonFlags.validateInputFile(flags, INPUT_FLAG)
