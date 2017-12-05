@@ -75,7 +75,7 @@ public final class VcfDecomposerCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to decompose. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file name. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
-    mFlags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
@@ -97,13 +97,13 @@ public final class VcfDecomposerCli extends AbstractCli {
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean stdout = FileUtils.isStdio(output);
-    final File templateFile = (File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG);
-    SdfUtils.validateHasNames(templateFile);
-    try (final SequencesReader templateSequences = SequencesReaderFactory.createDefaultSequencesReader(templateFile, LongRange.NONE)) {
-      SdfUtils.validateNoDuplicates(templateSequences, false);
-      try (VcfReader reader = VcfReader.openVcfReader(inputFile)) {
+    try (final SequencesReader templateSequences = getReference()) {
+      try (VcfIterator reader = VcfReader.openVcfReader(inputFile)) {
         final VcfHeader header = reader.getHeader();
-        checkHeader(header, templateSequences.getSdfId());
+        if (templateSequences != null) {
+          SdfUtils.validateNoDuplicates(templateSequences, false);
+          checkHeader(header, templateSequences.getSdfId());
+        }
         final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
         try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences)) {
           while (reader.hasNext()) {
@@ -118,5 +118,13 @@ public final class VcfDecomposerCli extends AbstractCli {
     return 0;
   }
 
-
+  protected SequencesReader getReference() throws IOException {
+    if (mFlags.isSet(CommonFlags.TEMPLATE_FLAG)) {
+      final File templateFile = (File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG);
+      SdfUtils.validateHasNames(templateFile);
+      return SequencesReaderFactory.createDefaultSequencesReader(templateFile, LongRange.NONE);
+    } else {
+      return null;
+    }
+  }
 }

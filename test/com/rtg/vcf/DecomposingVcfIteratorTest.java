@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -39,52 +39,28 @@ import junit.framework.TestCase;
 /**
  * Tests the corresponding class.
  */
-public class VcfFilterIteratorTest extends TestCase {
-
-  public static class ArrayVcfIterator implements VcfIterator {
-    private final VcfHeader mHeader;
-    private final VcfRecord[] mRecords;
-    private int mPos;
-    ArrayVcfIterator(VcfHeader h, VcfRecord... recs) {
-      mHeader = h;
-      mRecords = recs;
-      mPos = 0;
-    }
-    @Override
-    public VcfHeader getHeader() {
-      return mHeader;
-    }
-    @Override
-    public boolean hasNext() throws IOException {
-      return mPos < mRecords.length;
-    }
-    @Override
-    public VcfRecord next() throws IOException {
-      return mRecords[mPos++];
-    }
-    @Override
-    public void close() throws IOException { }
-  }
+public class DecomposingVcfIteratorTest extends TestCase {
 
   public void test() throws IOException {
     final VcfHeader h = new VcfHeader();
-    final VcfRecord ra = new VcfRecord("pretend", 42, "A");
-    final VcfRecord rt = new VcfRecord("pretend", 42, "T");
-    final VcfFilterIterator r = new VcfFilterIterator(new ArrayVcfIterator(h, ra, ra, rt, ra), new VcfFilter() {
-      @Override
-      public boolean accept(VcfRecord record) {
-        return record.getRefCall().equals("A");
-      }
-      @Override
-      public void setHeader(VcfHeader header) { }
-    });
+    final VcfIterator r = new DecomposingVcfIterator(new VcfFilterIteratorTest.ArrayVcfIterator(h,
+      new VcfRecord("chr1", 10, "A").addAltCall("<DEL>"),
+      new VcfRecord("chr1", 20, "T").addAltCall("TT"),
+      new VcfRecord("chr1", 30, "TTTTT").addAltCall("TTTTA"),
+      new VcfRecord("chr1", 30, "TTGT").addAltCall("TGC")
+    ), null);
     assertEquals(h, r.getHeader());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
+    final String[] out = {
+      "chr1 11 . A <DEL> . . .",
+      "chr1 21 . T TT . . .",
+      "chr1 31 . TT T . . ORP=31;ORL=4",
+      "chr1 34 . T C . . ORP=31;ORL=4",
+      "chr1 35 . T A . . ORP=31;ORL=5",
+    };
+    for (String o : out) {
+      assertTrue(r.hasNext());
+      assertEquals(o, r.next().toString().replaceAll("\t", " "));
+    }
     assertFalse(r.hasNext());
   }
 }

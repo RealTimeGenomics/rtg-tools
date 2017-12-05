@@ -58,6 +58,31 @@ public final class DnaUtils {
   private DnaUtils() { }
 
   /**
+   * Checks whether a string contains only symbols that can be interpreted as DNA.
+   * @param seq input sequence
+   * @return true if only DNA bases are encountered.
+   */
+  public static boolean isValidDna(final String seq) {
+    for (int i = seq.length() - 1; i >= 0; --i) {
+      final char c = seq.charAt(i);
+      switch (c) {
+        case 'a':
+        case 'A':
+        case 'c':
+        case 'C':
+        case 'g':
+        case 'G':
+        case 't':
+        case 'T':
+          break;
+        default:
+          return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * Take reverse complement of a string.
    * @param seq to be reverse complemented.
    * @return the reversed sequence.

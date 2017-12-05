@@ -60,6 +60,20 @@ public class DnaUtilsTest extends TestCase {
     }
   }
 
+  public void testValidDna() {
+    assertTrue(DnaUtils.isValidDna("")); // this could go either way
+
+    assertTrue(DnaUtils.isValidDna("g"));
+    assertTrue(DnaUtils.isValidDna("atgc"));
+    assertTrue(DnaUtils.isValidDna("ATGC"));
+
+    assertFalse(DnaUtils.isValidDna("*"));
+    assertFalse(DnaUtils.isValidDna("a-tgc"));
+    assertFalse(DnaUtils.isValidDna("antgc"));
+    assertFalse(DnaUtils.isValidDna("<aaa>"));
+    assertFalse(DnaUtils.isValidDna("a[c:23["));
+  }
+
   public void testEncodeArrayCopy() {
     final String exp = "AGTGCCGCGATCGTAGACAGTNNTCAGT";
     assertEquals(exp, DnaUtils.bytesToSequenceIncCG(DnaUtils.encodeArrayCopy(exp.getBytes())));

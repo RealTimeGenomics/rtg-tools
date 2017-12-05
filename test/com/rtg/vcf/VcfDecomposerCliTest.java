@@ -38,7 +38,6 @@ import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
-import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
@@ -68,11 +67,18 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
   }
 
   // Run a test where vcfdecompose is expected to complete normally
-  private void runResourceTest(String inResourceLoc, String expResourceLoc, String... extraArgs) throws IOException {
+  private void runResourceTest(String inResourceLoc, String expResourceLoc, boolean useRef) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
+      final File sdf = ReaderTestUtils.getDNASubDir(REF, dir);
       final File in = FileHelper.resourceToFile(inResourceLoc, new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName()));
       final File out = new File(dir, "out.vcf.gz");
-      final String output = checkMainInitOk(Utils.append(extraArgs, "-i", in.getPath(), "-o", out.getPath()));
+      String[] args = {
+        "-i", in.getPath(), "-o", out.getPath()
+      };
+      if (useRef) {
+        args = Utils.append(args, "-t", sdf.getPath());
+      }
+      final String output = checkMainInitOk(args);
       mNano.check(expResourceLoc + ".txt", output, true);
 
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(out));
@@ -94,11 +100,7 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
     + "CTCGCTATCTCATTTTTCTCTCTCTCTCTTTCTCTCCTCTGTCTTTTCCCACCAAGTGAGGATGCGAAGAGAAGGTGGCT";
 
   public void testDecompose() throws IOException {
-    final File sdf = ReaderTestUtils.getDNADir(REF);
-    try {
-      runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out.vcf", "-t", sdf.getPath());
-    } finally {
-      assertTrue(FileUtils.deleteFiles(sdf));
-    }
+    runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_ref.vcf", true);
+    runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_noref.vcf", false);
   }
 }

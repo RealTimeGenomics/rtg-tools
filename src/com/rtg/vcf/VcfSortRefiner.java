@@ -44,8 +44,9 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class VcfSortRefiner implements Closeable {
 
-  private final VcfReader mIn;
+  private final VcfIterator mIn;
   private final PriorityQueue<VcfRecord> mCurrent = new PriorityQueue<>(1, IntervalComparator.SINGLETON);
+  private VcfRecord mNext;
 
   /**
    * Wraps around an existing VCF reader.
@@ -53,9 +54,12 @@ public class VcfSortRefiner implements Closeable {
    * @param in where to read from
    * @throws IOException when IO or format errors occur.
    */
-  public VcfSortRefiner(VcfReader in) throws IOException {
-    mIn = in;
-    setNext();
+  public VcfSortRefiner(VcfIterator in) throws IOException {
+    mIn = new VcfFilterIterator(in, new AssertVcfSorted());
+    if (mIn.hasNext()) {
+      mNext = mIn.next();
+      setNext();
+    }
   }
 
   /**
@@ -90,31 +94,22 @@ public class VcfSortRefiner implements Closeable {
   }
 
   /**
-   * Get the current VCF record without advancing the reader
-   *
-   * @return the current VCF record, or null if none.
-   */
-  public VcfRecord peek() {
-    if (mCurrent.size() == 0) {
-      throw new IllegalStateException("No more records");
-    }
-    return mCurrent.peek();
-  }
-
-  /**
-   * Read the next record, if any.
+   * Fill the queue for the current position if need be.
    * @throws IOException when IO or format errors occur.
    */
   private void setNext() throws IOException {
-    if (mCurrent.isEmpty() && mIn.hasNext()) {
-      final VcfRecord rec = mIn.next();
-      mCurrent.add(rec);
+    if (mCurrent.isEmpty() && mNext != null) {
+      final String chr = mNext.getSequenceName();
+      final int pos = mNext.getStart();
+      mCurrent.add(mNext);
+      mNext = null;
       while (mIn.hasNext()) { // Get additional records at same position
-        final VcfRecord next = mIn.peek();
-        if (next.getStart() != rec.getStart() || !next.getSequenceName().equals(rec.getSequenceName())) {
+        final VcfRecord rec = mIn.next();
+        if (rec.getStart() != pos || !rec.getSequenceName().equals(chr)) {
+          mNext = rec;
           break;
         }
-        mCurrent.add(mIn.next());
+        mCurrent.add(rec);
       }
     }
   }
