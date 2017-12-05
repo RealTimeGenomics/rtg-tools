@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +60,9 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.IOUtils;
+import com.rtg.vcf.VcfIterator;
+import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfSortRefiner;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.VcfHeader;
@@ -78,8 +82,12 @@ class TabixVcfRecordSet implements VariantSet {
   private final VcfHeader mCalledHeader;
   private final VariantFactory mBaselineFactory;
   private final VariantFactory mCallsFactory;
+  private final Map<String, File> mBaselinePreprocessed = new HashMap<>();
+  private final Map<String, File> mCallsPreprocessed = new HashMap<>();
   private final boolean mPassOnly;
   private final int mMaxLength;
+  private final File mPreprocessDestDir;
+  private final boolean mPreprocess;
 
   private int mBaselineSkipped;
   private int mCallsSkipped;
@@ -88,9 +96,12 @@ class TabixVcfRecordSet implements VariantSet {
                     ReferenceRanges<String> ranges, ReferenceRegions evalRegions,
                     Collection<Pair<String, Integer>> referenceNameOrdering,
                     String baselineSample, String callsSample,
-                    boolean passOnly, boolean relaxedRef, int maxLength) throws IOException {
+                    boolean passOnly, boolean relaxedRef, int maxLength, File preprocessDestDir) throws IOException {
     if (referenceNameOrdering == null) {
       throw new NullPointerException();
+    }
+    if (preprocessDestDir != null && !preprocessDestDir.isDirectory()) {
+      throw new IllegalArgumentException();
     }
     mBaselineFile = baselineFile;
     mCallsFile = calledFile;
@@ -100,6 +111,8 @@ class TabixVcfRecordSet implements VariantSet {
     mEvalRegions = evalRegions;
     mPassOnly = passOnly;
     mMaxLength = maxLength;
+    mPreprocessDestDir = preprocessDestDir;
+    mPreprocess = mPreprocessDestDir != null;
 
     final Set<String> basenames = new TreeSet<>();
     Collections.addAll(basenames, new TabixIndexReader(TabixIndexer.indexFileName(baselineFile)).sequenceNames());
@@ -204,14 +217,20 @@ class TabixVcfRecordSet implements VariantSet {
     final ExecutorService executor = Executors.newFixedThreadPool(2);
     try {
       final ReferenceRanges<String> subRanges = mRanges.forSequence(currentName);
-      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.BASELINE, mBaselineFactory, mPassOnly, mMaxLength));
-      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.CALLS, mCallsFactory, mPassOnly, mMaxLength));
+      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.BASELINE, mBaselineFactory, mPassOnly, mMaxLength, mPreprocessDestDir));
+      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.CALLS, mCallsFactory, mPassOnly, mMaxLength, mPreprocessDestDir));
       executor.execute(baseFuture);
       executor.execute(callFuture);
       final LoadedVariants baseVars = baseFuture.get();
       final LoadedVariants calledVars = callFuture.get();
       map.put(VariantSetType.BASELINE, baseVars.mVariants);
       map.put(VariantSetType.CALLS, calledVars.mVariants);
+      if (mPreprocess) {
+        Diagnostic.developerLog("Preprocessed VCF at " + baseVars.mPreprocessed);
+        Diagnostic.developerLog("Preprocessed VCF at " + calledVars.mPreprocessed);
+        mBaselinePreprocessed.put(currentName, baseVars.mPreprocessed);
+        mCallsPreprocessed.put(currentName, calledVars.mPreprocessed);
+      }
       mBaselineSkipped += baseVars.mSkippedDuringLoading;
       mCallsSkipped += calledVars.mSkippedDuringLoading;
       Diagnostic.userLog("Reference " + currentName + " baseline contains " + map.get(VariantSetType.BASELINE).size() + " variants.");
@@ -227,13 +246,23 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   @Override
-  public VcfHeader baseLineHeader() {
+  public VcfHeader baselineHeader() {
     return mBaseLineHeader;
+  }
+
+  @Override
+  public VcfIterator getBaselineVariants(String sequenceName) throws IOException {
+    return new VcfSortRefiner(mPreprocess ? VcfReader.openVcfReader(mBaselinePreprocessed.get(sequenceName)) : VcfReader.openVcfReader(mBaselineFile, mRanges.forSequence(sequenceName)));
   }
 
   @Override
   public VcfHeader calledHeader() {
     return mCalledHeader;
+  }
+
+  @Override
+  public VcfIterator getCalledVariants(String sequenceName) throws IOException {
+    return new VcfSortRefiner(mPreprocess ? VcfReader.openVcfReader(mCallsPreprocessed.get(sequenceName)) : VcfReader.openVcfReader(mCallsFile, mRanges.forSequence(sequenceName)));
   }
 
   @Override

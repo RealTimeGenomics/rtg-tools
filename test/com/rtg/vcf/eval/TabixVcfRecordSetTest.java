@@ -90,7 +90,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       }
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100);
+      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100, null);
 
       final Set<String> expected = new HashSet<>();
       for (int seq = 1; seq < 32; ++seq) {

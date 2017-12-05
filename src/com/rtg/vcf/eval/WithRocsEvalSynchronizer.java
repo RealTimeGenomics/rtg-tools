@@ -69,8 +69,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   private int mCorrectPhasings = 0;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
@@ -82,10 +80,10 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  WithRocsEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  WithRocsEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                            String callsSampleName, RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
+    super(variants, ranges);
 
     int callSampleNo;
     Set<RocFilter> filters;

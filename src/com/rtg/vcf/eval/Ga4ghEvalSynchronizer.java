@@ -103,8 +103,6 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   protected final int mCallSampleNo;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param baselineSampleName the name of the sample used in the baseline
@@ -115,18 +113,18 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param looseMatchDistance if greater than 0, apply loose matching rules with the supplied distance
    * @throws IOException if there is a problem opening output files
    */
-  Ga4ghEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  Ga4ghEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                         String baselineSampleName, String callsSampleName,
                         RocSortValueExtractor extractor,
                         File outdir, boolean zip, int looseMatchDistance) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
+    super(variants, ranges);
     mRocExtractor = extractor;
-    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
+    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baselineHeader(), baselineSampleName, "baseline");
     mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
 
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();
-    mOutHeader.addContigFields(variants.baseLineHeader());
+    mOutHeader.addContigFields(variants.baselineHeader());
     variants.calledHeader().getFilterLines().forEach(mOutHeader::addFilterField);
     mOutHeader.addInfoField(new InfoField(INFO_SUPERLOCUS_ID, MetaType.INTEGER, VcfNumber.DOT, "Benchmarking superlocus ID for these variants"));
     mOutHeader.addInfoField(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, new VcfNumber("1"), "Call weight (equivalent number of truth variants). When unspecified, assume 1.0"));
@@ -137,7 +135,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
     mOutHeader.addFormatField(new FormatField(FORMAT_ROC_SCORE, MetaType.FLOAT, new VcfNumber("1"), "Variant quality for ROC creation"));
     mOutHeader.addSampleName(SAMPLE_TRUTH);
     mOutHeader.addSampleName(SAMPLE_QUERY);
-    mInHeaders[TRUTH_MERGE_INDEX] = variants.baseLineHeader().copy();
+    mInHeaders[TRUTH_MERGE_INDEX] = variants.baselineHeader().copy();
     mInHeaders[TRUTH_MERGE_INDEX].removeAllSamples();
     mInHeaders[TRUTH_MERGE_INDEX].addSampleName(SAMPLE_TRUTH);
     mInHeaders[QUERY_MERGE_INDEX] = variants.calledHeader().copy();

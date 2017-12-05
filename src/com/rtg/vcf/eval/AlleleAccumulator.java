@@ -60,19 +60,17 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
 
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @throws IOException if there is a problem opening output files
    */
-  AlleleAccumulator(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
+  AlleleAccumulator(VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
+    super(variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    VcfHeader h = variants.baseLineHeader().copy();
+    VcfHeader h = variants.baselineHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
     mAuxiliary = new VcfWriterFactory().zip(zip).addRunInfo(true).make(h, new File(output, "auxiliary.vcf" + zipExt)); // Contains sample calls that were matched (i.e. redundant alleles)
     h = h.copy();

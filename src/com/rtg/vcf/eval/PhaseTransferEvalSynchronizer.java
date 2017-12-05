@@ -52,8 +52,6 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
   private static final String INFO_PHASE = "PHASE";
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
@@ -65,8 +63,8 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  PhaseTransferEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, String callsSampleName, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
+  PhaseTransferEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges, String callsSampleName, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
+    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     mCalls.getHeader().ensureContains(new InfoField(INFO_PHASE, MetaType.CHARACTER, VcfNumber.ONE, "Phase of match, A = matched in same phase, B = matched in opposite phase"));
     mCalls.getHeader().ensureContains(new FormatField(FORMAT_ORIGINAL_GT, MetaType.STRING, VcfNumber.ONE, "Original pre-phasing genotype value"));
   }

@@ -48,8 +48,10 @@ import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfSortRefiner;
 import com.rtg.vcf.header.VcfHeader;
 
 public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
@@ -57,10 +59,12 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
   private static class MockVariantSet implements VariantSet {
     int mSetId = 0;
     final VcfHeader mHeader;
-    MockVariantSet() {
+    final File mFile;
+    MockVariantSet(File fake) {
       mHeader = new VcfHeader();
       mHeader.addLine(VcfHeader.VERSION_LINE);
       mHeader.addSampleName("SAMPLE");
+      mFile = fake;
     }
     @Override
     public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() {
@@ -76,7 +80,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
     }
 
     @Override
-    public VcfHeader baseLineHeader() {
+    public VcfHeader baselineHeader() {
       return mHeader;
     }
 
@@ -93,6 +97,16 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
     @Override
     public int getNumberOfSkippedCalledVariants() {
       return 0;
+    }
+
+    @Override
+    public VcfIterator getBaselineVariants(String sequenceName) throws IOException {
+      return new VcfSortRefiner(VcfReader.openVcfReader(mFile, new RegionRestriction(sequenceName)));
+    }
+
+    @Override
+    public VcfIterator getCalledVariants(String sequenceName) throws IOException {
+      return new VcfSortRefiner(VcfReader.openVcfReader(mFile, new RegionRestriction(sequenceName)));
     }
   }
 
@@ -138,7 +152,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
         header.addLine(VcfHeader.VERSION_LINE);
         header.addSampleName("SAMPLE");
         final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
+        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
           final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
           final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
           assertEquals("name1", pair.getA());
@@ -176,7 +190,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -204,7 +218,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(fake, fake, new MockVariantSet(), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());

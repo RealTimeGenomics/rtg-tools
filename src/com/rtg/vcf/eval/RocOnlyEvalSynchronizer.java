@@ -42,8 +42,6 @@ import com.rtg.util.intervals.ReferenceRanges;
 class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
@@ -55,10 +53,10 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  RocOnlyEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  RocOnlyEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                           String callsSampleName, RocSortValueExtractor extractor,
                           File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
+    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
   }
 
   @Override

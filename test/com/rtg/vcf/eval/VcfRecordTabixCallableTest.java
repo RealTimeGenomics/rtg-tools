@@ -58,13 +58,13 @@ public class VcfRecordTabixCallableTest extends TestCase {
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
 
       final VariantFactory fact = TabixVcfRecordSet.getVariantFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null, false);
-      final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), highConf, "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100);
+      final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), highConf, "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100, null);
       List<Variant> set = runner.call().mVariants;
       for (Variant v : set) {
         assertTrue(v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
       }
       assertEquals(2, set.size());
-      final VcfRecordTabixCallable runner2 = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence2"), highConf, "simulatedSequence2", -1, VariantSetType.BASELINE, fact, true, 100);
+      final VcfRecordTabixCallable runner2 = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence2"), highConf, "simulatedSequence2", -1, VariantSetType.BASELINE, fact, true, 100, null);
       set = runner2.call().mVariants;
       for (Variant v : set) {
         assertFalse(v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));

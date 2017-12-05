@@ -30,7 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.PriorityQueue;
 
@@ -40,9 +39,9 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * There is no accepted sort order for variants at the same reference position. This class adjusts sort order in such cases
  * so that variants at the same reference position are locally sorted shortest first. This is primarily useful when performing
- * merge operations.
+ * merge operations. Assumes that input variants are otherwise sorted within chromosomes.
  */
-public class VcfSortRefiner implements Closeable {
+public class VcfSortRefiner implements VcfIterator {
 
   private final VcfIterator mIn;
   private final PriorityQueue<VcfRecord> mCurrent = new PriorityQueue<>(1, IntervalComparator.SINGLETON);
@@ -62,28 +61,18 @@ public class VcfSortRefiner implements Closeable {
     }
   }
 
-  /**
-   * @return the header
-   */
+  @Override
   public VcfHeader getHeader() {
     return mIn.getHeader();
   }
 
 
-  /**
-   * Check if there is another record to get.
-   * @return boolean true if there is another record to get
-   */
+  @Override
   public boolean hasNext() {
     return mCurrent.size() != 0;
   }
 
-  /**
-   * Get the current VCF record and advance the reader
-   *
-   * @return the current VCF record
-   * @throws IOException when IO or format errors occur.
-   */
+  @Override
   public VcfRecord next() throws IOException {
     if (mCurrent.size() == 0) {
       throw new IllegalStateException("No more records");

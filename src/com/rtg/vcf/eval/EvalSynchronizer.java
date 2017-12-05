@@ -30,7 +30,6 @@
 package com.rtg.vcf.eval;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -42,7 +41,7 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.Pair;
 import com.rtg.util.ProgramState;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.ReferenceRanges;
+import com.rtg.vcf.VcfIterator;
 
 /**
  * Handles vcfeval output writing, this base class ensures output is in order for each chromosome being evaluated.
@@ -50,25 +49,36 @@ import com.rtg.util.intervals.ReferenceRanges;
 @TestClass("com.rtg.vcf.eval.SplitEvalSynchronizerTest")
 public abstract class EvalSynchronizer implements Closeable {
 
-  protected final ReferenceRanges<String> mRanges;
-  protected final VariantSet mVariantSet;
-  protected final File mBaseLineFile;
-  protected final File mCallsFile;
+  private final VariantSet mVariantSet;
   private final Queue<String> mNames = new LinkedList<>();
   private final Object mPhasingLock = new Object();
 
   /**
    * Constructor
-   * @param baseLineFile file containing the baseline VCF records
-   * @param callsFile file containing the call VCF records
    * @param variants returns separate sets of variants for each chromosome being processed
-   * @param ranges the ranges that variants are being read from
    */
-  public EvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
-    mBaseLineFile = baseLineFile;
-    mCallsFile = callsFile;
-    mRanges = ranges;
+  public EvalSynchronizer(VariantSet variants) {
     mVariantSet = variants;
+  }
+
+  /**
+   * Gets the baseline variants on the specified reference sequence
+   * @param sequenceName the sequence of interest
+   * @return an iterator supplying the baseline variants on the specified sequence
+   * @throws IOException when I/O fails
+   */
+  protected VcfIterator getBaselineVariants(String sequenceName) throws IOException {
+    return mVariantSet.getBaselineVariants(sequenceName);
+  }
+
+  /**
+   * Gets the called variants on the specified reference sequence
+   * @param sequenceName the sequence of interest
+   * @return an iterator supplying the called variants on the specified sequence
+   * @throws IOException when I/O fails
+   */
+  protected VcfIterator getCalledVariants(String sequenceName) throws IOException {
+    return mVariantSet.getCalledVariants(sequenceName);
   }
 
   /**

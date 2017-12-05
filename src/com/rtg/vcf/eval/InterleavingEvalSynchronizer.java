@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf.eval;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
@@ -40,9 +39,8 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfSortRefiner;
 
 /**
  * Processes baseline and called variants in chromosome order, so they can be interleaved into a single output stream if required.
@@ -65,13 +63,11 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
 
   /**
    * Constructor
-   * @param baseLineFile file containing the baseline VCF records
-   * @param callsFile file containing the call VCF records
    * @param variants returns separate sets of variants for each chromosome being processed
    * @param ranges the ranges that variants are being read from
    */
-  public InterleavingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
-    super(baseLineFile, callsFile, variants, ranges);
+  public InterleavingEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges) {
+    super(variants);
   }
 
   private int floorSyncPos(List<Integer> syncPoints, int vPos, int sId) {
@@ -89,9 +85,8 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
 
   @Override
   void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException {
-    final ReferenceRanges<String> subRanges = mRanges.forSequence(sequenceName);
-    try (final VcfSortRefiner br = new VcfSortRefiner(VcfReader.openVcfReader(mBaseLineFile, subRanges));
-         final VcfSortRefiner cr = new VcfSortRefiner(VcfReader.openVcfReader(mCallsFile, subRanges))) {
+    try (final VcfIterator br = getBaselineVariants(sequenceName);
+         final VcfIterator cr = getCalledVariants(sequenceName)) {
       final Iterator<? extends VariantId> bit = baseline.iterator();
       final Iterator<? extends VariantId> cit = calls.iterator();
       mBv = null;

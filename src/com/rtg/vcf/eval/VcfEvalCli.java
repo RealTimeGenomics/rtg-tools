@@ -89,6 +89,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
+  private static final String DECOMPOSE = "Xdecompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
   /** Defines the RocFilters that make sense to use with vcfeval */
@@ -178,6 +179,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
     mFlags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
     mFlags.registerOptional(LOOSE_MATCH_DISTANCE, Integer.class, CommonFlags.INT, "if set, GA4GH mode will also apply distance-based loose-matching with the specified distance", 30).setCategory(FILTERING);
+    mFlags.registerOptional(DECOMPOSE, Boolean.class, "BOOL", "decompose complex variants into smaller consitituents to allow partial credit", false).setCategory(FILTERING);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
@@ -343,6 +345,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     }
     builder.rocFilters(rocFilters);
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
+    builder.decompose((Boolean) mFlags.getValue(DECOMPOSE));
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
     builder.refOverlap(mFlags.isSet(REF_OVERLAP));
     builder.outputSlopeFiles(mFlags.isSet(SLOPE_FILES));

@@ -29,6 +29,7 @@
  */
 package com.rtg.vcf.eval;
 
+import java.io.File;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
@@ -41,14 +42,17 @@ class LoadedVariants {
 
   final int mSkippedDuringLoading;
   final List<Variant> mVariants;
+  final File mPreprocessed;
 
   /**
    * Construct the holder
    * @param variants the variants that were loaded
    * @param skipped a count of the number of variants skipped during loading
+   * @param preprocessed a File containing preprocessed variants, or null if no preprocessing was done
    */
-  LoadedVariants(List<Variant> variants, int skipped) {
+  LoadedVariants(List<Variant> variants, int skipped, File preprocessed) {
     mVariants = variants;
     mSkippedDuringLoading = skipped;
+    mPreprocessed = preprocessed;
   }
 }

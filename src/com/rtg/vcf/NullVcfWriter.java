@@ -37,14 +37,14 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * VCF writer that doesn't write anywhere
  */
-class NullVcfWriter implements VcfWriter {
+public class NullVcfWriter implements VcfWriter {
   private final VcfHeader mHeader;
 
   /**
    * Simple constructor
    * @param header the header to return when {@code getHeader} is called
    */
-  NullVcfWriter(VcfHeader header) {
+  public NullVcfWriter(VcfHeader header) {
     mHeader = header;
   }
 

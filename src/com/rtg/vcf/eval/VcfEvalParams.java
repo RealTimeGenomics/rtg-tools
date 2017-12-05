@@ -77,6 +77,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     private Set<RocFilter> mRocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
     private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
     private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
+    private boolean mDecompose = false;
 
     @Override
     protected VcfEvalParamsBuilder self() {
@@ -219,6 +220,15 @@ public final class VcfEvalParams extends OutputModuleParams {
     }
 
     /**
+     * @param decompose true if input VCFs should be decomposed to allow partial credit.
+     * @return this builder, so calls can be chained
+     */
+    public VcfEvalParamsBuilder decompose(boolean decompose) {
+      mDecompose = decompose;
+      return self();
+    }
+
+    /**
      * @param maxLength the maximum length variant to consider
      * @return this builder, so calls can be chained
      */
@@ -339,6 +349,8 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final boolean mOutputSlopeFiles;
   private final Orientor mBaselinePhaseOrientor;
   private final Orientor mCallsPhaseOrientor;
+  private final boolean mDecompose;
+
 
 
   /**
@@ -368,6 +380,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
     mBaselinePhaseOrientor = builder.mBaselinePhaseOrientor;
     mCallsPhaseOrientor = builder.mCallsPhaseOrientor;
+    mDecompose = builder.mDecompose;
   }
 
   /**
@@ -486,6 +499,13 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
+   * @return true if input VCFs should be decomposed for partial credit
+   */
+  public boolean decompose() {
+    return mDecompose;
+  }
+
+  /**
    * @return the number of threads to run in
    */
   public int numberThreads() {
@@ -536,7 +556,13 @@ public final class VcfEvalParams extends OutputModuleParams {
 
   @Override
   public String toString() {
-    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath() + ", score field=" + mScoreField + ", sort order=" + mSortOrder + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample + ", num threads=" + mNumberThreads + ", use all records=" + mUseAllRecords + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass + ", max length=" + mMaxLength + ", roc filters=" + mRocFilters + ", output mode=" + mOutputMode + ", output params=" + super.toString();
+    return "Baseline file=" + mBaselineFile.getPath() + ", Calls file=" + mCallsFile.getPath() + ", Template file=" + mTemplateFile.getPath()
+      + ", score field=" + mScoreField + ", sort order=" + mSortOrder
+      + ", baseline sample name=" + mBaselineSample + ", calls sample name=" + mCallsSample
+      + ", num threads=" + mNumberThreads
+      + ", use all records=" + mUseAllRecords + ", decompose = " + mDecompose + ", max length=" + mMaxLength
+      + ", ref overlap=" + mRefOverlap + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass
+      + ", roc filters=" + mRocFilters + ", output mode=" + mOutputMode + ", output params=" + super.toString();
   }
 
 }

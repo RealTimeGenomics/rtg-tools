@@ -31,6 +31,7 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -38,9 +39,14 @@ import java.util.concurrent.Callable;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.vcf.DecomposingVcfIterator;
+import com.rtg.vcf.NullVcfWriter;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfSortRefiner;
+import com.rtg.vcf.VcfWriter;
+import com.rtg.vcf.VcfWriterFactory;
 
 /**
  * A callable which loads VcfRecords for given template
@@ -55,8 +61,9 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private final VariantFactory mFactory;
   private final boolean mPassOnly;
   private final int mMaxLength;
+  private final File mDecomposedFile;
 
-  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength) {
+  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength, File preprocessDestDir) throws IOException {
     if (!ranges.containsSequence(templateName)) {
       throw new IllegalArgumentException("Ranges supplied do not contain reference sequence " + templateName);
     }
@@ -68,6 +75,11 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     mType = type;
     mPassOnly = passOnly;
     mMaxLength = maxLength;
+    if (preprocessDestDir != null) {
+      mDecomposedFile = new File(preprocessDestDir, "decomposed_" + type.label() + "_" + templateName + ".vcf.gz");
+    } else {
+      mDecomposedFile = null;
+    }
   }
 
   @Override
@@ -75,52 +87,63 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     int skipped = 0;
     int id = 0;
     final List<Variant> list = new ArrayList<>();
-    try (VcfSortRefiner reader = new VcfSortRefiner(VcfReader.openVcfReader(mInput, mRanges))) {
-      while (reader.hasNext()) {
-        final VcfRecord rec = reader.next();
-        ++id;
+    try (VcfIterator reader = getReader()) {
+      try (VcfWriter preprocessed = mDecomposedFile == null ? new NullVcfWriter(reader.getHeader()) : new VcfWriterFactory().make(reader.getHeader(), mDecomposedFile, null)) {
+        while (reader.hasNext()) {
+          final VcfRecord rec = reader.next();
+          preprocessed.write(rec);
+          ++id;
 
-        if (mPassOnly && rec.isFiltered()) {
-          continue;
-        }
-
-        // Skip variants that are too long (these cause problems during evaluation)
-        int length = rec.getRefCall().length();
-        for (String alt : rec.getAltCalls()) {
-          length = Math.max(alt.length(), length);
-        }
-        if (mMaxLength > -1 && length > mMaxLength) {
-          Diagnostic.userLog("Variant allele in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " has length (" + length + ") exceeding maximum allele length (" + mMaxLength + "), skipping.");
-          ++skipped;
-          continue;
-        }
-        
-        // Skip variants which end outside the length of the template sequence
-        if (mTemplateLength >= 0 && rec.getEnd() > mTemplateLength) {
-          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " ends outside the length of the reference sequence (" + mTemplateLength + ").");
-          ++skipped;
-          continue;
-        }
-
-        try {
-          final Variant v = mFactory.variant(rec, id);
-          if (v == null) { // Just wasn't variant according to the factory
+          if (mPassOnly && rec.isFiltered()) {
             continue;
           }
-          if (mEvalRegions != null && !mEvalRegions.overlapped(v)) {
-            v.setStatus(VariantId.STATUS_OUTSIDE_EVAL);
+
+          // Skip variants that are too long (these cause problems during evaluation)
+          int length = rec.getRefCall().length();
+          for (String alt : rec.getAltCalls()) {
+            length = Math.max(alt.length(), length);
           }
-          list.add(v);
-        } catch (SkippedVariantException e) {
-          Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " was skipped: " + e.getMessage());
-          ++skipped;
-        } catch (RuntimeException e) {
-          Diagnostic.userLog("Got an exception processing " + mType.label() + " VCF record: " + rec);
-          throw e;
+          if (mMaxLength > -1 && length > mMaxLength) {
+            Diagnostic.userLog("Variant allele in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " has length (" + length + ") exceeding maximum allele length (" + mMaxLength + "), skipping.");
+            ++skipped;
+            continue;
+          }
+
+          // Skip variants which end outside the length of the template sequence
+          if (mTemplateLength >= 0 && rec.getEnd() > mTemplateLength) {
+            Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " ends outside the length of the reference sequence (" + mTemplateLength + ").");
+            ++skipped;
+            continue;
+          }
+
+          try {
+            final Variant v = mFactory.variant(rec, id);
+            if (v == null) { // Just wasn't variant according to the factory
+              continue;
+            }
+            if (mEvalRegions != null && !mEvalRegions.overlapped(v)) {
+              v.setStatus(VariantId.STATUS_OUTSIDE_EVAL);
+            }
+            list.add(v);
+          } catch (SkippedVariantException e) {
+            Diagnostic.userLog("Variant in " + mType.label() + " at " + rec.getSequenceName() + ":" + rec.getOneBasedStart() + " was skipped: " + e.getMessage());
+            ++skipped;
+          } catch (RuntimeException e) {
+            Diagnostic.userLog("Got an exception processing " + mType.label() + " VCF record: " + rec);
+            throw e;
+          }
         }
+        return new LoadedVariants(list, skipped, mDecomposedFile);
       }
     }
-    return new LoadedVariants(list, skipped);
+  }
+
+  private VcfIterator getReader() throws IOException {
+    VcfIterator reader = VcfReader.openVcfReader(mInput, mRanges);
+    if (mDecomposedFile != null) {
+      reader = new DecomposingVcfIterator(reader, null);
+    }
+    return new VcfSortRefiner(reader);
   }
 }
 

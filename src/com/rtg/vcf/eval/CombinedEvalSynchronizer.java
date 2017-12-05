@@ -68,8 +68,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   protected final int mBaselineSampleNo;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param baselineSampleName the name of the sample used in the baseline
@@ -82,21 +80,21 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  CombinedEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  CombinedEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                            String baselineSampleName, String callsSampleName,
                            RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
-    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baseLineHeader(), baselineSampleName, "baseline");
+    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
+    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baselineHeader(), baselineSampleName, "baseline");
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();
-    mOutHeader.addContigFields(variants.baseLineHeader());
+    mOutHeader.addContigFields(variants.baselineHeader());
     addInfoHeaders(mOutHeader, null);
     mOutHeader.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype");
     mOutHeader.addSampleName(SAMPLE_BASELINE);
     mOutHeader.addSampleName(SAMPLE_CALLS);
-    mInHeaders[0] = variants.baseLineHeader().copy();
+    mInHeaders[0] = variants.baselineHeader().copy();
     mInHeaders[0].removeAllSamples();
     mInHeaders[0].addSampleName(SAMPLE_BASELINE);
     mInHeaders[1] = variants.calledHeader().copy();

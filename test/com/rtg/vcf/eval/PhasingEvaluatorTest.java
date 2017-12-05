@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
@@ -45,8 +46,10 @@ import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -93,7 +96,7 @@ public class PhasingEvaluatorTest extends TestCase {
     }
 
     @Override
-    public VcfHeader baseLineHeader() {
+    public VcfHeader baselineHeader() {
       return mHeader;
     }
 
@@ -110,6 +113,16 @@ public class PhasingEvaluatorTest extends TestCase {
     @Override
     public int getNumberOfSkippedCalledVariants() {
       return 0;
+    }
+
+    @Override
+    public VcfIterator getBaselineVariants(String sequenceName) throws IOException {
+      return null;
+    }
+
+    @Override
+    public VcfIterator getCalledVariants(String sequenceName) throws IOException {
+      return null;
     }
   }
 
@@ -241,6 +254,27 @@ public class PhasingEvaluatorTest extends TestCase {
     checkPhasing(expectedCorrect, expectedUnphasable, expectedMisPhasings, variants);
   }
 
+  private class MockEvalSynchronizer extends EvalSynchronizer {
+    private int mMisPhasings;
+    private int mUnphasable;
+    private int mCorrectPhasings;
+    MockEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges) {
+      super(variants);
+    }
+    @Override
+    void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException {
+    }
+    @Override
+    void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
+      mMisPhasings += misPhasings;
+      mUnphasable += unphasable;
+      mCorrectPhasings += correctPhasings;
+    }
+    @Override
+    public void close() throws IOException {
+    }
+  }
+
   private void checkPhasing(int expectedCorrect, int expectedUnphasable, int expectedMisPhasings, MockVariantSet variants) throws IOException, UnindexableDataException {
     Diagnostic.setLogStream();
     try (final TestDirectory dir = new TestDirectory()) {
@@ -249,12 +283,12 @@ public class PhasingEvaluatorTest extends TestCase {
       final File baseline = FileHelper.stringToGzFile(variants.mBaselineVcf.toString(), new File(dir, "baseline.vcf.gz"));
       new TabixIndexer(baseline).saveVcfIndex();
       final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(VcfEvalTaskTest.REF);
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(baseline, calls, variants, SamRangeUtils.createFullReferenceRanges(reader), null, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, null)) {
+      try (final MockEvalSynchronizer sync = new MockEvalSynchronizer(baseline, calls, variants, SamRangeUtils.createFullReferenceRanges(reader))) {
         final SequenceEvaluator eval = new SequenceEvaluator(sync, Collections.singletonMap("10", 0L), reader);
         eval.run();
-        assertEquals("correctphasings: " + sync.getCorrectPhasings() + ", misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedCorrect, sync.getCorrectPhasings());
-        assertEquals("misphasings: " + sync.getMisPhasings() + ", unphaseable: " + sync.getUnphasable(), expectedMisPhasings, sync.getMisPhasings());
-        assertEquals(expectedUnphasable, sync.getUnphasable());
+        assertEquals("correctphasings: " + sync.mCorrectPhasings + ", misphasings: " + sync.mMisPhasings + ", unphaseable: " + sync.mUnphasable, expectedCorrect, sync.mCorrectPhasings);
+        assertEquals("misphasings: " + sync.mMisPhasings + ", unphaseable: " + sync.mUnphasable, expectedMisPhasings, sync.mMisPhasings);
+        assertEquals(expectedUnphasable, sync.mUnphasable);
       }
     }
   }

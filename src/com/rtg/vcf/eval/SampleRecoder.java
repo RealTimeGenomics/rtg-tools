@@ -61,8 +61,6 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
   protected int mCallSampleIndex;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
@@ -70,8 +68,8 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
    * @param sampleName the name of the sample being recoded
    * @throws IOException if there is a problem opening output files
    */
-  SampleRecoder(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip, String sampleName) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges);
+  SampleRecoder(VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip, String sampleName) throws IOException {
+    super(variants, ranges);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mCallSampleIndex = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), sampleName, VariantSetType.CALLS.label());

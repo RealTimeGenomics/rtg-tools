@@ -50,8 +50,6 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
   protected final VcfWriter mCalls;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
@@ -63,12 +61,12 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  AnnotatingEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  AnnotatingEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                              String callsSampleName, RocSortValueExtractor extractor,
                              File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
+    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
-    final VcfHeader bh = variants.baseLineHeader().copy();
+    final VcfHeader bh = variants.baselineHeader().copy();
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
     CombinedEvalSynchronizer.addInfoHeaders(bh, VariantSetType.BASELINE);
     mBase = vf.make(bh, new File(outdir, "baseline.vcf" + zipExt));

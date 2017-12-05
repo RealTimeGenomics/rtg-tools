@@ -59,8 +59,6 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
   private final VcfWriter mFnCa;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param callsSampleName the name of the sample used in the calls
@@ -72,19 +70,19 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  SplitEvalSynchronizer(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges,
+  SplitEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
                         String callsSampleName, RocSortValueExtractor extractor,
                         File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
+    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
     mTpCalls = vf.make(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt));
-    mTpBase = vf.make(variants.baseLineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt));
+    mTpBase = vf.make(variants.baselineHeader(), new File(outdir, TPBASE_FILE_NAME + zipExt));
     mFp = vf.make(variants.calledHeader(), new File(outdir, FP_FILE_NAME + zipExt));
-    mFn = vf.make(variants.baseLineHeader(), new File(outdir, FN_FILE_NAME + zipExt));
+    mFn = vf.make(variants.baselineHeader(), new File(outdir, FN_FILE_NAME + zipExt));
     if (twoPass) {
       mFpCa = vf.make(variants.calledHeader(), new File(outdir, FP_CA_FILE_NAME + zipExt));
-      mFnCa = vf.make(variants.baseLineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt));
+      mFnCa = vf.make(variants.baselineHeader(), new File(outdir, FN_CA_FILE_NAME + zipExt));
     } else {
       mFpCa = null;
       mFnCa = null;

@@ -157,37 +157,37 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     switch (outputMode) {
       case MODE_ALLELES:
         if (params.squashPloidy()) {
-          processor = new SquashedAlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+          processor = new SquashedAlleleAccumulator(variants, ranges, outdir, params.outputParams().isCompressed());
         } else {
-          processor = new AlleleAccumulator(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed());
+          processor = new AlleleAccumulator(variants, ranges, outdir, params.outputParams().isCompressed());
         }
         break;
       case MODE_RECODE:
         if (params.squashPloidy()) {
           throw new UnsupportedOperationException();
         }
-        processor = new SampleRecoder(params.baselineFile(), params.callsFile(), variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
+        processor = new SampleRecoder(variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
       case MODE_PHASE_TRANSFER:
         if (params.squashPloidy() || params.twoPass()) {
           throw new UnsupportedOperationException();
         }
-        processor = new PhaseTransferEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new PhaseTransferEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_ANNOTATE:
-        processor = new AnnotatingEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new AnnotatingEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_COMBINE:
-        processor = new CombinedEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new CombinedEvalSynchronizer(variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_SPLIT:
-        processor = new SplitEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new SplitEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_GA4GH:
-        processor = new Ga4ghEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
+        processor = new Ga4ghEvalSynchronizer(variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
         break;
       case MODE_ROC_ONLY:
-        processor = new RocOnlyEvalSynchronizer(params.baselineFile(), params.callsFile(), variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new RocOnlyEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);
@@ -229,8 +229,16 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     for (long i = 0; i < numSequences; ++i) {
       nameOrdering.add(new Pair<>(templateSequences.names().name(i), templateSequences.length(i)));
     }
-
-    return new TabixVcfRecordSet(baseline, calls, ranges, evalRegions, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength());
+    final File preprocessDir;
+    if (params.decompose()) {
+      preprocessDir = new File(params.outputParams().directory(), "intermediate");
+      if (!preprocessDir.exists() && !preprocessDir.mkdir()) {
+        throw new IOException("Could not create directory for intermediate files: " + preprocessDir);
+      }
+    } else {
+      preprocessDir = null;
+    }
+    return new TabixVcfRecordSet(baseline, calls, ranges, evalRegions, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength(), preprocessDir);
   }
 
   static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {

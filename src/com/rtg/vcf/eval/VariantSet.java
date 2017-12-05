@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.rtg.util.Pair;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -51,7 +52,7 @@ public interface VariantSet {
   /**
    * @return header for baseline files
    */
-  VcfHeader baseLineHeader();
+  VcfHeader baselineHeader();
 
   /**
    * @return header for called files
@@ -67,4 +68,20 @@ public interface VariantSet {
    * @return the number of called variants that were skipped during loading
    */
   int getNumberOfSkippedCalledVariants();
+
+  /**
+   * Gets the baseline variants on the specified reference sequence
+   * @param sequenceName the sequence of interest
+   * @return an iterator supplying the baseline variants on the specified sequence
+   * @throws IOException when I/O fails
+   */
+  VcfIterator getBaselineVariants(String sequenceName) throws IOException;
+
+  /**
+   * Gets the called variants on the specified reference sequence
+   * @param sequenceName the sequence of interest
+   * @return an iterator supplying the called variants on the specified sequence
+   * @throws IOException when I/O fails
+   */
+  VcfIterator getCalledVariants(String sequenceName) throws  IOException;
 }

@@ -55,16 +55,14 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
   protected final VcfWriter mAlternate;
 
   /**
-   * @param baseLineFile tabix indexed base line VCF file
-   * @param callsFile tabix indexed calls VCF file
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @throws IOException if there is a problem opening output files
    */
-  SquashedAlleleAccumulator(File baseLineFile, File callsFile, VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
-    super(baseLineFile, callsFile, variants, ranges, output, zip);
+  SquashedAlleleAccumulator(VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
+    super(variants, ranges, output, zip);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader h = variants.calledHeader().copy();
