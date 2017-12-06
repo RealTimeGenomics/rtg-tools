@@ -94,7 +94,7 @@ public class TalkbackTest extends TestCase {
             assertTrue("user not in " + got.toString(), got.containsKey("user"));
             assertTrue("not developer user in " + got.toString(), "1".equals(got.get("d")));
             TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "Talkback successfully sent.");
-            assertEquals(2, mps.toString().split(StringUtils.LS).length);
+            assertEquals(4, mps.toString().split(StringUtils.LS).length);
           }
         } finally {
           System.setErr(olderr);
@@ -125,7 +125,7 @@ public class TalkbackTest extends TestCase {
       }
       assertEquals("<no log stream set>", posted.get("log"));
       TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics...", "Talkback successfully sent.");
-      assertEquals(2, mps.toString().split(StringUtils.LS).length);
+      assertEquals(4, mps.toString().split(StringUtils.LS).length);
       mps.reset();
 
       final File logFile = File.createTempFile("talkback_test", "log");
@@ -168,7 +168,7 @@ public class TalkbackTest extends TestCase {
         assertEquals(31 + StringUtils.LS.length(), posted.get("log").length());
 
         TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "Talkback successfully sent.");
-        assertEquals(2, mps.toString().split(StringUtils.LS).length);
+        assertEquals(4, mps.toString().split(StringUtils.LS).length);
         mps.reset();
 
         final StringBuilder sb = new StringBuilder();
@@ -189,7 +189,7 @@ public class TalkbackTest extends TestCase {
         }
         assertEquals(25051 + 2 * StringUtils.LS.length(), posted.get("log").length());
         TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "Talkback successfully sent.");
-        assertEquals(2, mps.toString().split(StringUtils.LS).length);
+        assertEquals(4, mps.toString().split(StringUtils.LS).length);
         mps.reset();
 
         got.clear();
@@ -205,7 +205,7 @@ public class TalkbackTest extends TestCase {
         }
         assertEquals(40056, posted.get("log").length());
         TestUtils.containsAll(mps.toString(), "Sending talkback to Real Time Genomics (log", "The log file is oversized, sending truncated log.  Please send the full log file", "Talkback successfully sent.");
-        assertEquals(3, mps.toString().split(StringUtils.LS).length);
+        assertEquals(5, mps.toString().split(StringUtils.LS).length);
         mps.reset();
       } finally {
         logStream.close();

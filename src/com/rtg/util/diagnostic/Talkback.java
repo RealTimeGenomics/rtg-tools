@@ -227,6 +227,10 @@ public final class Talkback {
         System.err.println();
         System.err.println("NOTE: You are using " + Environment.getProductName() + " version " + current + " but the latest release is " + latest + ". You may want to upgrade.");
         System.err.println();
+      } else {
+        System.err.println();
+        System.err.println("NOTE: You are using " + Environment.getProductName() + " version " + current + ". Please check whether a newer version is available, since if this is a bug it may already be fixed.");
+        System.err.println();
       }
     }
     return status;
