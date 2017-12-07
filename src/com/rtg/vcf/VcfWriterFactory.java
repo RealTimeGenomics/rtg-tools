@@ -50,6 +50,7 @@ public class VcfWriterFactory {
   private boolean mWriteHeader = true;
   private boolean mAsync = true;
   private boolean mAddRunInfo = false;
+  private boolean mDensity = false;
 
   /**
    * Constructor using defaults to be overridden manually.
@@ -117,6 +118,16 @@ public class VcfWriterFactory {
   }
 
   /**
+   * Set whether the output records should be annotated with the density attribute.
+   * @param density true iff the density attribute should be added
+   * @return this factory, for call chaining
+   */
+  public VcfWriterFactory addDensityAttribute(final boolean density) {
+    mDensity = density;
+    return this;
+  }
+
+  /**
    * Make a writer using current configuration
    * @param header the output VCF header
    * @param output destination file
@@ -144,7 +155,11 @@ public class VcfWriterFactory {
     if (mAddRunInfo) {
       h2.addRunInfo();
     }
-    final VcfWriter w = new DefaultVcfWriter(h2, output, stdout, mZip, mIndex, mWriteHeader);
+    VcfWriter w = new DefaultVcfWriter(mDensity ? DensityAnnotator.updateHeader(h2, DensityAnnotator.DEFAULT_DISTANCE) : h2,
+      output, stdout, mZip, mIndex, mWriteHeader);
+    if (mDensity) {
+      w = new DensityAnnotator(w);
+    }
     return mAsync ? new AsyncVcfWriter(w) : w;
   }
 }

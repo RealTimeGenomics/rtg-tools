@@ -76,7 +76,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String INFO_DESCR_FLAG = "info-description";
   private static final String FILL_AN_AC_FLAG = "fill-an-ac";
   private static final String RELABEL_FLAG = "relabel";
-  private static final String X_DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
+  private static final String DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
+  private static final String DENSITY_FLAG = "Xdensity";
 
   /** All known annotators with zero-arg constructors */
   private static final Map<String, VcfAnnotator> ANNOTATORS = new TreeMap<>();
@@ -117,7 +118,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
-    mFlags.registerOptional(X_DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(DENSITY_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
     mFlags.setValidator(new VcfAnnotatorValidator());
   }
 
@@ -154,8 +156,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
 
     final Set<String> derived = new LinkedHashSet<>();
-    if (mFlags.isSet(X_DERIVED_ANNOTATIONS_FLAG)) {
-      derived.addAll(mFlags.getValues(X_DERIVED_ANNOTATIONS_FLAG).stream().map(Object::toString).collect(Collectors.toList()));
+    if (mFlags.isSet(DERIVED_ANNOTATIONS_FLAG)) {
+      derived.addAll(mFlags.getValues(DERIVED_ANNOTATIONS_FLAG).stream().map(Object::toString).collect(Collectors.toList()));
     }
     if (mFlags.isSet(FILL_AN_AC_FLAG)) { // Convenience flag
       derived.add(DerivedAnnotations.AC.getAnnotation().getName());
@@ -190,7 +192,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
         annotator.updateHeader(header);
       }
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
+      try (VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).addDensityAttribute(mFlags.isSet(DENSITY_FLAG)).make(header, vcfFile, out)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
