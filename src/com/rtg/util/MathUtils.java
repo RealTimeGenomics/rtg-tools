@@ -492,4 +492,17 @@ public final class MathUtils {
     return median;
   }
 
+  /**
+   * Test if an array is all zero.
+   * @param counts array to test
+   * @return true iff the array is all zero
+   */
+  public static boolean isZero(final int[] counts) {
+    for (final int count : counts) {
+      if (count != 0) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

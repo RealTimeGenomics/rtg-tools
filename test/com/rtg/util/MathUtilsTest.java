@@ -351,4 +351,11 @@ public class MathUtilsTest extends TestCase {
     assertEquals(42.0, MathUtils.median(new double[] {42, 42, 42}));
     assertEquals(42.0, MathUtils.median(new double[] {Double.POSITIVE_INFINITY, 8, 42, 78, 12}));
   }
+
+  public void testIsZero() {
+    assertTrue(MathUtils.isZero(new int[0]));
+    assertTrue(MathUtils.isZero(new int[42]));
+    assertFalse(MathUtils.isZero(new int[] {42}));
+    assertFalse(MathUtils.isZero(new int[] {0, 42}));
+  }
 }
