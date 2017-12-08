@@ -39,11 +39,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.alignment.Partition;
+import com.rtg.alignment.Slice;
 import com.rtg.alignment.SplitAlleles;
 import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
-import com.rtg.util.Pair;
 
 /**
  * Decomposes VCF records into smaller constituents based on alignments. This does not perform additional
@@ -146,24 +147,24 @@ class Decomposer {
       pad = 0;
       result = new SplitAlleles(rec.getRefCall(), rec.getAltCalls());
     }
-    final List<Pair<Integer, String[]>> partition = result.partition();
+    final Partition partition = result.partition();
     assert partition.size() > 0;
     if (partition.size() == 0   // Not sure this can happen
       || (pad == 0 && partition.size() == 1) // Variant without padding, already in smallest form
-      || (pad == 1 && partition.size() == 1 && partition.get(0).getA() == 0 && needsAnchorBase(partition.get(0).getB())) // Variant with anchor, already in smallest form
+      || (pad == 1 && partition.size() == 1 && partition.get(0).getOffset() == 0 && needsAnchorBase(partition.get(0).getAlleles())) // Variant with anchor, already in smallest form
       ) {
       return Collections.singletonList(rec); // Efficiency, no change in record
     }
-    final List<Pair<Integer, String[]>> split = SplitAlleles.removeAllRef(partition);
+    final Partition split = SplitAlleles.removeAllRef(partition);
     ++mTotalCallsSplit;
     final ArrayList<VcfRecord> res = new ArrayList<>(split.size());
-    for (final Pair<Integer, String[]> s : split) {
+    for (final Slice s : split) {
       final VcfRecord splitRecord = new VcfRecord(rec);
       splitRecord.addInfo(ORP, String.valueOf(rec.getStart() + 1)); // 1-based for output
       splitRecord.addInfo(ORL, String.valueOf(rec.getRefCall().length()));
-      final String[] alleles = s.getB();
+      final String[] alleles = s.getAlleles();
       final boolean needAnchor = needsAnchorBase(alleles);
-      final int offset = s.getA() + pad;
+      final int offset = s.getOffset() + pad;
       final int start = splitRecord.getStart() + offset;
 
       final boolean left;

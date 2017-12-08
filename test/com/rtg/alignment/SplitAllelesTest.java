@@ -33,8 +33,6 @@ package com.rtg.alignment;
 import java.util.Arrays;
 import java.util.List;
 
-import com.rtg.util.Pair;
-
 import junit.framework.TestCase;
 
 /**
@@ -42,10 +40,10 @@ import junit.framework.TestCase;
  */
 public class SplitAllelesTest extends TestCase {
 
-  private String toString(final List<Pair<Integer, String[]>> split) {
+  private String toString(final Partition split) {
     final StringBuilder sb = new StringBuilder();
-    for (final Pair<Integer, String[]> s : split) {
-      sb.append(s.getA()).append(' ').append(Arrays.toString(s.getB())).append('\n');
+    for (final Slice s : split) {
+      sb.append(s.getOffset()).append(' ').append(Arrays.toString(s.getAlleles())).append('\n');
     }
     return sb.toString();
   }
@@ -71,7 +69,7 @@ public class SplitAllelesTest extends TestCase {
 
   public void testSimpleMatchExtra() {
     final SplitAlleles sa = new SplitAlleles("ACGT", "ACGT");
-    final List<List<Pair<Integer, String[]>>> partition = sa.partition(new String[]{"TTTT"});
+    final List<Partition> partition = sa.partition(new String[]{"TTTT"});
     assertEquals(2, partition.size());
     assertEquals("0 [ACGT, ACGT]\n", toString(partition.get(0)));
     assertEquals(1, sa.getColumnIndex("ACGT"));

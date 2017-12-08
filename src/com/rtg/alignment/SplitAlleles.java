@@ -38,7 +38,6 @@ import java.util.List;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.MathUtils;
-import com.rtg.util.Pair;
 
 /**
  * Construct allelic primitives for alternates against a reference.
@@ -103,7 +102,7 @@ public class SplitAlleles {
     return expandedCigars;
   }
 
-  private void addSplit(byte[][] sequences, final Collection<Pair<Integer, String[]>> split, final int[] prevAltPos, final int[] altPos, final int prevRefPos, final int refPos) {
+  private void addSplit(byte[][] sequences, final Partition split, final int[] prevAltPos, final int[] altPos, final int prevRefPos, final int refPos) {
     //System.out.println("Split point at " + refPos);
     final String[] alleles = new String[sequences.length + 1]; // Position 0 is ref
     alleles[0] = getDna(mRef, prevRefPos, refPos);
@@ -111,7 +110,7 @@ public class SplitAlleles {
       alleles[k + 1] = getDna(sequences[k], prevAltPos[k], altPos[k]);
       prevAltPos[k] = altPos[k];
     }
-    split.add(new Pair<>(prevRefPos, alleles));
+    split.add(new Slice(prevRefPos, alleles));
   }
 
   private String getDna(final byte[] alt, final int start, final int end) {
@@ -128,10 +127,10 @@ public class SplitAlleles {
     return sawInsertion;
   }
 
-  private List<Pair<Integer, String[]>> getPartition(final byte[][] sequences, final String[] expandedCigars) {
+  private Partition getPartition(final byte[][] sequences, final String[] expandedCigars) {
     assert sequences.length == expandedCigars.length;
 
-    final ArrayList<Pair<Integer, String[]>> partition = new ArrayList<>();
+    final Partition partition = new Partition();
 
     // Current position in the actions array for each alternate allele
     final int[] actPos = new int[expandedCigars.length];
@@ -229,7 +228,7 @@ public class SplitAlleles {
    * Return a partition of the alleles.
    * @return position and partitioned out bases
    */
-  public List<Pair<Integer, String[]>> partition() {
+  public Partition partition() {
     return getPartition(mAlts, getCigarStrings(mAlts));
   }
 
@@ -241,7 +240,7 @@ public class SplitAlleles {
    * @param extraSequences extra sequences to be used one at a time
    * @return position and partitioned out bases
    */
-  public List<List<Pair<Integer, String[]>>> partition(final String[] extraSequences) {
+  public List<Partition> partition(final String[] extraSequences) {
     if (extraSequences.length == 0) {
       return Collections.singletonList(partition());
     }
@@ -253,7 +252,7 @@ public class SplitAlleles {
 
     final String[] expandedCigars = getCigarStrings(mAlts);
     final String[] extraCigars = getCigarStrings(extraSequences);
-    final List<List<Pair<Integer, String[]>>> res = new ArrayList<>(expandedCigars.length + 1);
+    final List<Partition> res = new ArrayList<>(expandedCigars.length + 1);
     res.add(getPartition(mAlts, expandedCigars)); // The partition without extra sequences
     final byte[][] sequences = Arrays.copyOf(mAlts, mAlts.length + 1);
     final String[] cigars = Arrays.copyOf(expandedCigars, expandedCigars.length + 1);
@@ -270,11 +269,11 @@ public class SplitAlleles {
    * @param partition initial partitioning
    * @return partition with reference pieces removed
    */
-  public static List<Pair<Integer, String[]>> removeAllRef(final List<Pair<Integer, String[]>> partition) {
-    final List<Pair<Integer, String[]>> retained = new ArrayList<>();
-    for (final Pair<Integer, String[]> pos : partition) {
+  public static Partition removeAllRef(final Partition partition) {
+    final Partition retained = new Partition();
+    for (final Slice pos : partition) {
       boolean allRef = true;
-      final String[] alleles = pos.getB();
+      final String[] alleles = pos.getAlleles();
       for (int k = 1; k < alleles.length; ++k) {
         allRef &= alleles[k].equals(alleles[0]);
       }
@@ -286,13 +285,13 @@ public class SplitAlleles {
   }
 
   /**
-   * Remove the reference only parts of the partitions.
+   * Remove the reference only parts of each partition in the supplied list.
    * @param partition initial partitionings
    * @return partitions with reference pieces removed
    */
-  public static List<List<Pair<Integer, String[]>>> removeAllRefList(final List<List<Pair<Integer, String[]>>> partition) {
-    final List<List<Pair<Integer, String[]>>> retained = new ArrayList<>(partition.size());
-    for (final List<Pair<Integer, String[]>> part : partition) {
+  public static List<Partition> removeAllRefList(final List<Partition> partition) {
+    final List<Partition> retained = new ArrayList<>(partition.size());
+    for (final Partition part : partition) {
       retained.add(removeAllRef(part));
     }
     return retained;
@@ -309,9 +308,9 @@ public class SplitAlleles {
     final String[] alts = new String[args.length - 1];
     System.arraycopy(args, 1, alts, 0, alts.length);
     final SplitAlleles pwa = new SplitAlleles(args[0], alts);
-    final List<Pair<Integer, String[]>> split = removeAllRef(pwa.partition());
-    for (final Pair<Integer, String[]> s : split) {
-      System.out.println(s.getA() + " " + Arrays.toString(s.getB()));
+    final Partition split = removeAllRef(pwa.partition());
+    for (final Slice s : split) {
+      System.out.println(s);
     }
   }
 }
