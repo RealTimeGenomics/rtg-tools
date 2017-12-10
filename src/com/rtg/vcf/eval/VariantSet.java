@@ -30,6 +30,7 @@
 
 package com.rtg.vcf.eval;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Iterate over the sequences returning sets of called and baseline variants
  */
-public interface VariantSet {
+public interface VariantSet extends Closeable {
 
   /**
    * @return the variants for the next sequence or null if there are no more.
@@ -83,5 +84,5 @@ public interface VariantSet {
    * @return an iterator supplying the called variants on the specified sequence
    * @throws IOException when I/O fails
    */
-  VcfIterator getCalledVariants(String sequenceName) throws  IOException;
+  VcfIterator getCalledVariants(String sequenceName) throws IOException;
 }

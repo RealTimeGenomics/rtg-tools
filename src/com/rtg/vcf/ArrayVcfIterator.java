@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2017. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,39 +27,49 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf;
 
 import java.io.IOException;
 
+import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
 /**
- * Tests the corresponding class.
+ * An array-backed VcfIterator
  */
-public class VcfFilterIteratorTest extends TestCase {
+@TestClass("com.rtg.vcf.VcfFilterIteratorTest")
+public class ArrayVcfIterator implements VcfIterator {
+  private final VcfHeader mHeader;
+  private final VcfRecord[] mRecords;
+  private int mPos;
 
-  public void test() throws IOException {
-    final VcfHeader h = new VcfHeader();
-    final VcfRecord ra = new VcfRecord("pretend", 42, "A");
-    final VcfRecord rt = new VcfRecord("pretend", 42, "T");
-    final VcfFilterIterator r = new VcfFilterIterator(new ArrayVcfIterator(h, ra, ra, rt, ra), new VcfFilter() {
-      @Override
-      public boolean accept(VcfRecord record) {
-        return record.getRefCall().equals("A");
-      }
-      @Override
-      public void setHeader(VcfHeader header) { }
-    });
-    assertEquals(h, r.getHeader());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
-    assertTrue(r.hasNext());
-    assertEquals(ra, r.next());
-    assertFalse(r.hasNext());
+  /**
+   * Constructor
+   * @param header the header
+   * @param records array of records
+   */
+  public ArrayVcfIterator(VcfHeader header, VcfRecord... records) {
+    mHeader = header;
+    mRecords = records;
+    mPos = 0;
+  }
+
+  @Override
+  public VcfHeader getHeader() {
+    return mHeader;
+  }
+
+  @Override
+  public boolean hasNext() throws IOException {
+    return mPos < mRecords.length;
+  }
+
+  @Override
+  public VcfRecord next() throws IOException {
+    return mRecords[mPos++];
+  }
+
+  @Override
+  public void close() throws IOException {
   }
 }

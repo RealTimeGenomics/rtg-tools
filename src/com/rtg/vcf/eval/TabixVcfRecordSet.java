@@ -47,6 +47,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.stream.Stream;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.globals.GlobalFlags;
@@ -59,7 +60,10 @@ import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.IOUtils;
+import com.rtg.vcf.ArrayVcfIterator;
+import com.rtg.vcf.DecomposingVcfIterator;
 import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfSortRefiner;
@@ -105,8 +109,8 @@ class TabixVcfRecordSet implements VariantSet {
     }
     mBaselineFile = baselineFile;
     mCallsFile = calledFile;
-    mBaseLineHeader = VcfUtils.getHeader(baselineFile);
-    mCalledHeader = VcfUtils.getHeader(calledFile);
+    final VcfHeader baselineHeader = VcfUtils.getHeader(baselineFile);
+    final VcfHeader calledHeader = VcfUtils.getHeader(calledFile);
     mRanges = ranges;
     mEvalRegions = evalRegions;
     mPassOnly = passOnly;
@@ -120,11 +124,11 @@ class TabixVcfRecordSet implements VariantSet {
     Collections.addAll(callnames, new TabixIndexReader(TabixIndexer.indexFileName(calledFile)).sequenceNames());
 
     final Set<String> basedeclarednames = new TreeSet<>(basenames);
-    for (ContigField c : mBaseLineHeader.getContigLines()) {
+    for (ContigField c : baselineHeader.getContigLines()) {
       basedeclarednames.add(c.getId());
     }
     final Set<String> calldeclarednames = new TreeSet<>(callnames);
-    for (ContigField c : mCalledHeader.getContigLines()) {
+    for (ContigField c : calledHeader.getContigLines()) {
       calldeclarednames.add(c.getId());
     }
     if (Collections.disjoint(basedeclarednames, calldeclarednames)) {
@@ -177,8 +181,15 @@ class TabixVcfRecordSet implements VariantSet {
       }
     }
 
+    mBaseLineHeader = mPreprocess ? addDecompositionHeader(baselineHeader) : baselineHeader;
+    mCalledHeader = mPreprocess ? addDecompositionHeader(calledHeader) : calledHeader;
     mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, relaxedRef);
     mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, relaxedRef);
+  }
+
+  // This is pretty ick, but needed to ensure the main vcfeval output headers contain appropriate declarations created during decomposition
+  private VcfHeader addDecompositionHeader(VcfHeader baselineHeader) throws IOException {
+    return new DecomposingVcfIterator(new ArrayVcfIterator(baselineHeader), null).getHeader();
   }
 
   static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
@@ -273,6 +284,28 @@ class TabixVcfRecordSet implements VariantSet {
   @Override
   public int getNumberOfSkippedCalledVariants() {
     return mCallsSkipped;
+  }
+
+  @Override
+  public void close() throws IOException {
+    if (mPreprocessDestDir != null) { // Delete all the intermediate files we created
+      final Collection<File> files = new HashSet<>();
+      Stream.concat(mBaselinePreprocessed.values().stream(), mCallsPreprocessed.values().stream()).forEach(vcf -> {
+        files.add(vcf);
+        files.add(TabixIndexer.indexFileName(vcf));
+      });
+      for (File todelete : files) {
+        if (todelete.exists() && !todelete.delete()) {
+          throw new IOException("Could not delete intermediate file: " + todelete);
+        }
+      }
+
+      if (FileUtils.isEmptyDir(mPreprocessDestDir)) { // Only do the directory delete if now empty
+        if (!mPreprocessDestDir.delete()) {
+          throw new IOException("Could not delete intermediate output dir: " + mPreprocessDestDir);
+        }
+      }
+    }
   }
 
 }

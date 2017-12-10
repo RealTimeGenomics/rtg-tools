@@ -43,7 +43,7 @@ public class DecomposingVcfIteratorTest extends TestCase {
 
   public void test() throws IOException {
     final VcfHeader h = new VcfHeader();
-    final VcfIterator r = new DecomposingVcfIterator(new VcfFilterIteratorTest.ArrayVcfIterator(h,
+    final VcfIterator r = new DecomposingVcfIterator(new ArrayVcfIterator(h,
       new VcfRecord("chr1", 10, "A").addAltCall("<DEL>"),
       new VcfRecord("chr1", 20, "T").addAltCall("TT"),
       new VcfRecord("chr1", 30, "TTTTT").addAltCall("TTTTA"),

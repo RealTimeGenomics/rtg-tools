@@ -196,9 +196,10 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
+    // Try-with-resources for nice closing side effects
     try (VcfWriter ignored = mVcfOut) {
-      // done for nice closing side effects
+      super.close();
+      mMerger.close();
     }
-    mMerger.close();
   }
 }

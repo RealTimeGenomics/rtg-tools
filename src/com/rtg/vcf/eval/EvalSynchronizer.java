@@ -153,4 +153,8 @@ public abstract class EvalSynchronizer implements Closeable {
     }
   }
 
+  @Override
+  public void close() throws IOException {
+    mVariantSet.close();
+  }
 }

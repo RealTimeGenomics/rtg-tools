@@ -231,9 +231,10 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
+    // Try-with-resources for nice closing side effects
     try (VcfWriter ignored = mSampleVcf;
          VcfWriter ignored2 = mAuxiliary) {
-      // done for nice closing side effects
+      super.close();
     }
   }
 }

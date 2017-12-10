@@ -45,6 +45,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.zip.GZIPInputStream;
@@ -195,6 +198,18 @@ public final class FileUtils {
    */
   public static boolean checkDir(final File f) {
     return f.exists() && f.isDirectory();
+  }
+
+  /**
+   * Determine if a directory is empty
+   * @param dir the directory
+   * @return true if the directory is empty
+   * @throws IOException if there is some problem checking the directory contents
+   */
+  public static boolean isEmptyDir(File dir) throws IOException {
+    try (final DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir.toPath())) {
+      return !dirStream.iterator().hasNext();
+    }
   }
 
   /**

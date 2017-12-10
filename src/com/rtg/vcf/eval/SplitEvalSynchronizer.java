@@ -162,13 +162,14 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
+    // Try-with-resources for nice closing side effects
     try (VcfWriter ignored = mTpBase;
          VcfWriter ignored2 = mTpCalls;
          VcfWriter ignored3 = mFn;
          VcfWriter ignored4 = mFp;
          VcfWriter ignored5 = mFnCa;
          VcfWriter ignored6 = mFpCa) {
-      // done for nice closing side effects
+      super.close();
     }
   }
 }

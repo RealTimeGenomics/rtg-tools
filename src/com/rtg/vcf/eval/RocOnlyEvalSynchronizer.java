@@ -125,5 +125,6 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   @Override
   public void close() throws IOException {
+    super.close();
   }
 }

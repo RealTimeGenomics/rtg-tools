@@ -225,10 +225,11 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   @Override
   @SuppressWarnings("try")
   public void close() throws IOException {
+    // Try-with-resources for nice closing side effects
     try (VcfWriter ignored = mVcfOut) {
-      // done for nice closing side effects
+      mMerger.close();
+      super.close();
     }
-    mMerger.close();
   }
 
   protected VcfRecord updateForCall(boolean unknown, VcfRecord outRec) {

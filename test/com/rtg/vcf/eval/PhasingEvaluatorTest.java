@@ -124,6 +124,9 @@ public class PhasingEvaluatorTest extends TestCase {
     public VcfIterator getCalledVariants(String sequenceName) throws IOException {
       return null;
     }
+
+    @Override
+    public void close() { }
   }
 
   public void testPhasing() throws IOException, UnindexableDataException {

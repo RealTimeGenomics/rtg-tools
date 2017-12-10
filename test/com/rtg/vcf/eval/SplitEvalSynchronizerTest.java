@@ -108,6 +108,9 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
     public VcfIterator getCalledVariants(String sequenceName) throws IOException {
       return new VcfSortRefiner(VcfReader.openVcfReader(mFile, new RegionRestriction(sequenceName)));
     }
+
+    @Override
+    public void close() { }
   }
 
   private static final String REC1_1 = "name1 3 . A G 0.0 PASS . GT 1/1".replaceAll(" ", "\t");
