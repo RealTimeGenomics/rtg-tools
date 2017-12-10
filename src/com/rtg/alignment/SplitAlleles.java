@@ -29,6 +29,8 @@
  */
 package com.rtg.alignment;
 
+import static com.rtg.launcher.CommonFlags.STRING;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -38,6 +40,7 @@ import java.util.List;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.MathUtils;
+import com.rtg.util.cli.CFlags;
 
 /**
  * Construct allelic primitives for alternates against a reference.
@@ -264,39 +267,6 @@ public class SplitAlleles {
     return res;
   }
 
-  /**
-   * Remove the reference only parts of the partition.
-   * @param partition initial partitioning
-   * @return partition with reference pieces removed
-   */
-  public static Partition removeAllRef(final Partition partition) {
-    final Partition retained = new Partition();
-    for (final Slice pos : partition) {
-      boolean allRef = true;
-      final String[] alleles = pos.getAlleles();
-      for (int k = 1; k < alleles.length; ++k) {
-        allRef &= alleles[k].equals(alleles[0]);
-      }
-      if (!allRef) {
-        retained.add(pos);
-      }
-    }
-    return retained;
-  }
-
-  /**
-   * Remove the reference only parts of each partition in the supplied list.
-   * @param partition initial partitionings
-   * @return partitions with reference pieces removed
-   */
-  public static List<Partition> removeAllRefList(final List<Partition> partition) {
-    final List<Partition> retained = new ArrayList<>(partition.size());
-    for (final Partition part : partition) {
-      retained.add(removeAllRef(part));
-    }
-    return retained;
-  }
-
   // Example command to run through a bunch of examples:
   // zcat snps.vcf.gz | awk '/^[^#]/{print $4,$5}' | tr ',' ' ' | while read; do echo "Testing: ${REPLY}"; java -ea com.rtg.alignment.SplitAlleles ${REPLY}; done
 
@@ -305,10 +275,20 @@ public class SplitAlleles {
    * @param args reference, alternates
    */
   public static void main(final String... args) {
-    final String[] alts = new String[args.length - 1];
-    System.arraycopy(args, 1, alts, 0, alts.length);
-    final SplitAlleles pwa = new SplitAlleles(args[0], alts);
-    final Partition split = removeAllRef(pwa.partition());
+    final CFlags flags = new CFlags();
+    flags.registerOptional("mnp", "break MNPs");
+    flags.registerRequired(String.class, STRING, "reference");
+    flags.registerRequired(String.class, STRING, "alt-allele").setMinCount(0).setMaxCount(Integer.MAX_VALUE);
+    flags.setFlags(args);
+    final String reference = (String) flags.getAnonymousValue(0);
+    @SuppressWarnings("unchecked")
+    final List<String> a = (List<String>) flags.getAnonymousValues(1);
+    final String[] alts = a.toArray(new String[a.size()]);
+    final SplitAlleles pwa = new SplitAlleles(reference, alts);
+    Partition split = Partition.removeAllRef(pwa.partition());
+    if (flags.isSet("mnp")) {
+      split = Partition.breakMnps(split);
+    }
     for (final Slice s : split) {
       System.out.println(s);
     }

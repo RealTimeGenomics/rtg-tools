@@ -105,7 +105,7 @@ public final class VcfDecomposerCli extends AbstractCli {
           checkHeader(header, templateSequences.getSdfId());
         }
         final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences)) {
+        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, false)) {
           while (reader.hasNext()) {
             writer.write(reader.next());
           }

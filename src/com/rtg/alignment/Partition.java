@@ -30,9 +30,79 @@
 package com.rtg.alignment;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A partition of a variant call.
  */
 public class Partition extends ArrayList<Slice> {
+  private static boolean isMnp(final String[] alleles) {
+    final int length = alleles[0].length();
+    if (length <= 1) {
+      return false;
+    }
+    for (int k = 1; k < alleles.length; ++k) {
+      if (alleles[k].length() != length) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Decompose MNPs into individual SNPs.
+   * @param partition original partition
+   * @return partitions with split MNPs
+   */
+  public static Partition breakMnps(final Partition partition) {
+    final Partition retained = new Partition();
+    for (final Slice slice : partition) {
+      final String[] alleles = slice.getAlleles();
+      if (isMnp(alleles)) {
+        for (int s = 0; s < alleles[0].length(); ++s) {
+          final String[] bases = new String[alleles.length];
+          for (int k = 0; k < alleles.length; ++k) {
+            bases[k] = alleles[k].substring(s, s + 1);
+          }
+          retained.add(new Slice(slice.getOffset() + s, bases));
+        }
+      } else {
+        retained.add(slice);
+      }
+    }
+    return retained;
+  }
+
+  /**
+   * Remove the reference only parts of the partition.
+   * @param partition initial partitioning
+   * @return partition with reference pieces removed
+   */
+  public static Partition removeAllRef(final Partition partition) {
+    final Partition retained = new Partition();
+    for (final Slice slice : partition) {
+      boolean allRef = true;
+      final String[] alleles = slice.getAlleles();
+      for (int k = 1; k < alleles.length; ++k) {
+        allRef &= alleles[k].equals(alleles[0]);
+      }
+      if (!allRef) {
+        retained.add(slice);
+      }
+    }
+    return retained;
+  }
+
+  /**
+   * Remove the reference only parts of each partition in the supplied list.
+   * @param partition initial partitionings
+   * @return partitions with reference pieces removed
+   */
+  public static List<Partition> removeAllRefList(final List<Partition> partition) {
+    final List<Partition> retained = new ArrayList<>(partition.size());
+    for (final Partition part : partition) {
+      retained.add(removeAllRef(part));
+    }
+    return retained;
+  }
 }

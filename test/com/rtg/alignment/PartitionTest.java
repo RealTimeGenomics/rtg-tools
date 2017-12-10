@@ -40,4 +40,14 @@ public class PartitionTest extends TestCase {
   public void test() {
     assertTrue(new Partition().isEmpty());
   }
+
+  public void testBreakMnps() {
+    final Partition partition = new Partition();
+    partition.add(new Slice(42, "CTA", "GGG", "CCC"));
+    final Partition p = Partition.breakMnps(partition);
+    assertEquals(3, p.size());
+    assertEquals("42 [C, G, C]", p.get(0).toString());
+    assertEquals("43 [T, G, C]", p.get(1).toString());
+    assertEquals("44 [A, G, C]", p.get(2).toString());
+  }
 }

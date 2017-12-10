@@ -48,7 +48,7 @@ public class DecomposingVcfIteratorTest extends TestCase {
       new VcfRecord("chr1", 20, "T").addAltCall("TT"),
       new VcfRecord("chr1", 30, "TTTTT").addAltCall("TTTTA"),
       new VcfRecord("chr1", 30, "TTGT").addAltCall("TGC")
-    ), null);
+    ), null, false);
     assertEquals(h, r.getHeader());
     final String[] out = {
       "chr1 11 . A <DEL> . . .",

@@ -58,6 +58,7 @@ class Decomposer {
 
   private final SequencesReader mTemplate;
   private final Map<String, Long> mNameMap;
+  private final boolean mBreakMnps;
 
   private long mCurrentSequenceId = -1;
   private byte[] mCurrentSequence = null;
@@ -70,11 +71,13 @@ class Decomposer {
    * the left of decomposed records. If no reference sequence is supplied, memory consumption is lower, but occasionally a
    * decomposed indel must be right-anchored (using the reference base provided in the input record). Either way the output
    * records are valid.
-   * @param template supplies reference bases, optional.
+   * @param template supplies reference bases, optional
+   * @param breakMnps true if MNPs should be decomposed into SNPs
    * @throws IOException if there is a problem reading from the reference
    */
-  Decomposer(SequencesReader template) throws IOException {
+  Decomposer(SequencesReader template, boolean breakMnps) throws IOException {
     mTemplate = template;
+    mBreakMnps = breakMnps;
     mNameMap = template == null ? null : ReaderUtils.getSequenceNameMap(mTemplate);
   }
 
@@ -155,7 +158,10 @@ class Decomposer {
       ) {
       return Collections.singletonList(rec); // Efficiency, no change in record
     }
-    final Partition split = SplitAlleles.removeAllRef(partition);
+    Partition split = Partition.removeAllRef(partition);
+    if (mBreakMnps) {
+      split = Partition.breakMnps(split);
+    }
     ++mTotalCallsSplit;
     final ArrayList<VcfRecord> res = new ArrayList<>(split.size());
     for (final Slice s : split) {
