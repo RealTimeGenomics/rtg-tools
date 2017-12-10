@@ -312,6 +312,7 @@ public class RocPlot {
     rightPanel.add(mTitleEntry, c);
     rightPanel.add(mGraphType, c);
     mGraphType.addItemListener(e -> {
+      mZoomPP.resetCrossHair();
       showCurrentGraph();
       SwingUtilities.invokeLater(() -> {
         final String text = mTitleEntry.getText();
@@ -324,8 +325,6 @@ public class RocPlot {
             mTitleEntry.setText(ROC);
           }
         }
-        mZoomPP.resetCrossHair();
-        mZoomPP.getDefaultZoomAction().actionPerformed(new ActionEvent(mGraphType, 0, "GraphTypeChanged"));
       });
     });
 
@@ -611,14 +610,18 @@ public class RocPlot {
     }
   }
 
+  private final InnerZoomPlot.ZoomConfiguration mZoomRoc = new InnerZoomPlot.ZoomConfiguration();
+  private final InnerZoomPlot.ZoomConfiguration mZoomPr = new InnerZoomPlot.ZoomConfiguration();
   void showCurrentGraph() {
     SwingUtilities.invokeLater(() -> {
       final Graph2D graph;
       final ArrayList<String> ordering = RocPlot.this.mRocLinesPanel.plotOrder();
       if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
         graph = new PrecisionRecallGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        mZoomPP.setZoomConfiguration(mZoomPr);
       } else {
         graph = new RocGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        mZoomPP.setZoomConfiguration(mZoomRoc);
       }
       if (graph.getPlots().length > 0) {
         maintainZoomBounds(graph);
