@@ -35,6 +35,7 @@ import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
+import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
@@ -59,6 +60,8 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public final class VcfDecomposerCli extends AbstractCli {
 
+  private static final String BREAK_MNPS = "break-mnps";
+
   @Override
   public String moduleName() {
     return "vcfdecompose";
@@ -76,6 +79,7 @@ public final class VcfDecomposerCli extends AbstractCli {
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to decompose. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file name. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(BREAK_MNPS, "if set, break MNPs into individual SNPs").setCategory(SENSITIVITY_TUNING);
     mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
@@ -105,7 +109,7 @@ public final class VcfDecomposerCli extends AbstractCli {
           checkHeader(header, templateSequences.getSdfId());
         }
         final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, false)) {
+        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, mFlags.isSet(BREAK_MNPS))) {
           while (reader.hasNext()) {
             writer.write(reader.next());
           }

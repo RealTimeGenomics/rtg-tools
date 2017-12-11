@@ -152,15 +152,17 @@ class Decomposer {
     }
     final Partition partition = result.partition();
     assert partition.size() > 0;
-    if (partition.size() == 0   // Not sure this can happen
-      || (pad == 0 && partition.size() == 1) // Variant without padding, already in smallest form
-      || (pad == 1 && partition.size() == 1 && partition.get(0).getOffset() == 0 && needsAnchorBase(partition.get(0).getAlleles())) // Variant with anchor, already in smallest form
-      ) {
-      return Collections.singletonList(rec); // Efficiency, no change in record
-    }
     Partition split = Partition.removeAllRef(partition);
     if (mBreakMnps) {
       split = Partition.breakMnps(split);
+    }
+    if (split.size() == 0) { // Was a ref only call
+      return Collections.singletonList(rec); // Keep original
+    }
+    if (split.size() == 1 && split.get(0).getAlleles()[0].length() == rec.getRefCall().length() - pad) {
+      if ((pad == 0) || (pad == 1 && needsAnchorBase(split.get(0).getAlleles()))) {
+        return Collections.singletonList(rec); // Keep original
+      }
     }
     ++mTotalCallsSplit;
     final ArrayList<VcfRecord> res = new ArrayList<>(split.size());

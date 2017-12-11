@@ -67,7 +67,7 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
   }
 
   // Run a test where vcfdecompose is expected to complete normally
-  private void runResourceTest(String inResourceLoc, String expResourceLoc, boolean useRef) throws IOException {
+  private void runResourceTest(String inResourceLoc, String expResourceLoc, boolean useRef, String... extrArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
       final File sdf = ReaderTestUtils.getDNASubDir(REF, dir);
       final File in = FileHelper.resourceToFile(inResourceLoc, new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName()));
@@ -78,6 +78,7 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
       if (useRef) {
         args = Utils.append(args, "-t", sdf.getPath());
       }
+      args = Utils.append(args, extrArgs);
       final String output = checkMainInitOk(args);
       mNano.check(expResourceLoc + ".txt", output, true);
 
@@ -102,5 +103,6 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
   public void testDecompose() throws IOException {
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_ref.vcf", true);
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_noref.vcf", false);
+    runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_mnps.vcf", true, "--break-mnps");
   }
 }

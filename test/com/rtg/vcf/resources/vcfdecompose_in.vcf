@@ -7,19 +7,21 @@
 ##SAMPLE=<ID=tumor,Genomes=normal;tumor,Mixture=0.20;0.80,Description="Original genome;Derived genome">
 ##SAMPLE=<ID=other,Genomes=other>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	normal	tumor	other
-1	5	.	GAA	GAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	5	.	GAAGCAA	GAAGCAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	5	.	GAA	CAT,AAT	.	PASS	.	GT:DP	./1:0	1/2:26	0/0:.
-1	8	.	G	GA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	8	.	G	<DUP>	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	8	.	G	G]2:23]	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	9	.	CAA	CATT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	10	.	A	AA	.	PASS	.	GT:DP	./0:0	0/1:26	0/0:.
-1	10	.	AA	ATT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	15	.	A	.	.	PASS	.	GT:DP	./0:0	0/0:26	0/0:.
-1	15	.	AA	.	.	PASS	.	GT:DP	./0:0	0/0:26	0/0:.
-1	15	.	AA	G--	.	PASS	.	GT:DP	./0:0	1/0:26	0/0:.
-1	15	.	AA	GNN	.	PASS	.	GT:DP	./0:0	1/0:26	0/0:.
-1	20	.	GCGCGCGCGCG	TTTGCGCGCTTGCGCGTTT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	40	.	TTTGCGCGCTTGCGCGTTT	GCGCGCGCGCG	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	860	.	GTGTCTCCCTCT	CTGTCTCC	.	PASS	.	GT:DP	1|1:0	.:26	1:4
+1	5	a	GAA	GAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	5	b	GAAGCAA	GAAGCAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	5	c	GAA	CAT,AAT	.	PASS	.	GT:DP	./1:0	1/2:26	0/0:.
+1	8	d	G	GA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	8	e	G	<DUP>	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	8	f	G	G]2:23]	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	9	g	CAA	CATT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	10	h	A	AA	.	PASS	.	GT:DP	./0:0	0/1:26	0/0:.
+1	10	i	AA	ATT	.	PASS	.	GT:DP	./1:0	1/0:27	0/0:.
+1	10	j	AA	TA	.	PASS	.	GT:DP	./0:0	0/1:28	1/0:.
+1	10	k	AA	TT	.	PASS	.	GT:DP	./0:0	0/1:29	0/0:.
+1	15	l	A	.	.	PASS	.	GT:DP	./0:0	0/0:26	0/0:.
+1	15	m	AA	.	.	PASS	.	GT:DP	./0:0	0/0:26	0/0:.
+1	15	n	AA	G--	.	PASS	.	GT:DP	./0:0	1/0:26	0/0:.
+1	15	o	AA	GNN	.	PASS	.	GT:DP	./0:0	1/0:26	0/0:.
+1	20	p	GCGCGCGCGCG	TTTGCGCGCTTGCGCGTTT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	40	q	TTTGCGCGCTTGCGCGTTT	GCGCGCGCGCG	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	860	r	GTGTCTCCCTCT	CTGTCTCC	.	PASS	.	GT:DP	1|1:0	.:26	1:4
