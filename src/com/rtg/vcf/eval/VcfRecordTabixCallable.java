@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
@@ -52,6 +54,8 @@ import com.rtg.vcf.VcfWriterFactory;
  * A callable which loads VcfRecords for given template
  */
 public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
+
+  private static final boolean DECOMPOSE_MNPS = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_DECOMPOSE_MNPS);
 
   private final File mInput;
   private final ReferenceRanges<String> mRanges;
@@ -141,7 +145,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private VcfIterator getReader() throws IOException {
     VcfIterator reader = VcfReader.openVcfReader(mInput, mRanges);
     if (mDecomposedFile != null) {
-      reader = new DecomposingVcfIterator(reader, null, false);
+      reader = new DecomposingVcfIterator(reader, null, DECOMPOSE_MNPS);
     }
     return new VcfSortRefiner(reader);
   }
