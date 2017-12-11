@@ -59,10 +59,11 @@ public class DecomposingVcfIterator extends Decomposer implements VcfIterator {
    * @param in where to read from
    * @param template supplies reference bases not directly represented in the input VCF records
    * @param breakMnps true if MNPs should be decomposed into SNPs
+   * @param breakIndels true if indels should be aggressively decomposed
    * @throws IOException when IO or format errors occur.
    */
-  public DecomposingVcfIterator(VcfIterator in, SequencesReader template, boolean breakMnps) throws IOException {
-    super(template, breakMnps);
+  public DecomposingVcfIterator(VcfIterator in, SequencesReader template, boolean breakMnps, boolean breakIndels) throws IOException {
+    super(template, breakMnps, breakIndels);
     mIn = new VcfFilterIterator(in, new AssertVcfSorted());
     mIn.getHeader().ensureContains(new InfoField(ORP, MetaType.STRING, VcfNumber.ONE, "Original variant position"));
     mIn.getHeader().ensureContains(new InfoField(ORL, MetaType.STRING, VcfNumber.ONE, "Original reference length"));

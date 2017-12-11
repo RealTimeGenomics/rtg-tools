@@ -63,6 +63,58 @@ public class Slice extends Pair<Integer, String[]> {
     return getB();
   }
 
+  private boolean isUnpeelable() {
+    int min = Integer.MAX_VALUE;
+    int max = -1;
+    for (final String a : getAlleles()) {
+      min = Math.min(min, a.length());
+      max = Math.max(max, a.length());
+    }
+    return min <= 0 || min >= max;
+  }
+
+  /**
+   * Return a score for peeling this slice on the left.  Will be -1 if no
+   * peeling makes sense, otherwise the count of the alleles matching
+   * reference.
+   * @return left-peeling score or -1
+   */
+  int peelLeftScore() {
+    if (isUnpeelable()) {
+      return -1;
+    }
+    final String[] alleles = getAlleles();
+    final char c = alleles[0].charAt(0);
+    int cnt = 0;
+    for (int k = 1; k < alleles.length; ++k) {
+      if (alleles[k].charAt(0) == c) {
+        ++cnt;
+      }
+    }
+    return cnt;
+  }
+
+  /**
+   * Return a score for peeling this slice on the right.  Will be -1 if no
+   * peeling makes sense, otherwise the count of the alleles matching
+   * reference.
+   * @return right-peeling score or -1
+   */
+  int peelRightScore() {
+    if (isUnpeelable()) {
+      return -1;
+    }
+    final String[] alleles = getAlleles();
+    final char c = alleles[0].charAt(0);
+    int cnt = 0;
+    for (int k = 1; k < alleles.length; ++k) {
+      if (alleles[k].charAt(alleles[k].length() - 1) == c) {
+        ++cnt;
+      }
+    }
+    return cnt;
+  }
+
   @Override
   public String toString() {
     return getOffset() + " " + Arrays.toString(getAlleles());

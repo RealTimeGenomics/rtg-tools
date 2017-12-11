@@ -49,8 +49,8 @@ class DecomposingVcfWriter extends Decomposer implements VcfWriter {
 
   private final VcfWriter mOut;
 
-  DecomposingVcfWriter(VcfWriter dest, SequencesReader template, boolean breakMnps) throws IOException {
-    super(template, breakMnps);
+  DecomposingVcfWriter(VcfWriter dest, SequencesReader template, boolean breakMnps, boolean breakIndels) throws IOException {
+    super(template, breakMnps, breakIndels);
     mOut = new ReorderingVcfWriter(dest); // Needed to ensure appropriate ordering of output variants
     mOut.getHeader().ensureContains(new InfoField(ORP, MetaType.STRING, VcfNumber.ONE, "Original variant position"));
     mOut.getHeader().ensureContains(new InfoField(ORL, MetaType.STRING, VcfNumber.ONE, "Original reference length"));

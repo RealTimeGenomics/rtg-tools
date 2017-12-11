@@ -189,7 +189,7 @@ class TabixVcfRecordSet implements VariantSet {
 
   // This is pretty ick, but needed to ensure the main vcfeval output headers contain appropriate declarations created during decomposition
   private VcfHeader addDecompositionHeader(VcfHeader baselineHeader) throws IOException {
-    return new DecomposingVcfIterator(new ArrayVcfIterator(baselineHeader), null, false).getHeader();
+    return new DecomposingVcfIterator(new ArrayVcfIterator(baselineHeader), null, false, false).getHeader();
   }
 
   static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {

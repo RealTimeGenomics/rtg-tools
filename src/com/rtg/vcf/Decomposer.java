@@ -59,6 +59,7 @@ class Decomposer {
   private final SequencesReader mTemplate;
   private final Map<String, Long> mNameMap;
   private final boolean mBreakMnps;
+  private final boolean mBreakIndels;
 
   private long mCurrentSequenceId = -1;
   private byte[] mCurrentSequence = null;
@@ -73,11 +74,13 @@ class Decomposer {
    * records are valid.
    * @param template supplies reference bases, optional
    * @param breakMnps true if MNPs should be decomposed into SNPs
+   * @param breakIndels true if indels should be aggressively decomposed
    * @throws IOException if there is a problem reading from the reference
    */
-  Decomposer(SequencesReader template, boolean breakMnps) throws IOException {
+  Decomposer(SequencesReader template, boolean breakMnps, boolean breakIndels) throws IOException {
     mTemplate = template;
     mBreakMnps = breakMnps;
+    mBreakIndels = breakIndels;
     mNameMap = template == null ? null : ReaderUtils.getSequenceNameMap(mTemplate);
   }
 
@@ -155,6 +158,9 @@ class Decomposer {
     Partition split = Partition.removeAllRef(partition);
     if (mBreakMnps) {
       split = Partition.breakMnps(split);
+    }
+    if (mBreakIndels) {
+      split = Partition.peelIndels(split);
     }
     if (split.size() == 0) { // Was a ref only call
       return Collections.singletonList(rec); // Keep original

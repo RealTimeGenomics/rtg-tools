@@ -105,4 +105,49 @@ public class Partition extends ArrayList<Slice> {
     }
     return retained;
   }
+
+  private static void peel(final Partition result, final Slice slice) {
+    final int left = slice.peelLeftScore();
+    final int right = slice.peelRightScore();
+    if (left == -1) {
+      // Not peelable
+      assert right == -1;
+      result.add(slice);
+    } else {
+      final String[] alleles = slice.getAlleles();
+      final String[] l = new String[alleles.length];
+      final String[] r = new String[alleles.length];
+      if (left > right) {
+        // Peel off the leftmost base as a SNP
+        for (int k = 0; k < alleles.length; ++k) {
+          l[k] = alleles[k].substring(0, 1);
+          r[k] = alleles[k].substring(1);
+        }
+        result.add(new Slice(slice.getOffset(), l));
+        peel(result, new Slice(slice.getOffset() + 1, r));
+      } else {
+        // Peel off the rightmost base as a SNP
+        for (int k = 0; k < alleles.length; ++k) {
+          l[k] = alleles[k].substring(0, alleles[k].length() - 1);
+          r[k] = alleles[k].substring(alleles[k].length() - 1);
+        }
+        peel(result, new Slice(slice.getOffset(), l));
+        result.add(new Slice(slice.getOffset() + alleles[0].length() - 1, r));
+      }
+    }
+  }
+
+  /**
+   * Aggressively decompose indels into the smallest possible indel and
+   * associated SNP events.
+   * @param partition original partition
+   * @return revised partition
+   */
+  public static Partition peelIndels(final Partition partition) {
+    final Partition retained = new Partition();
+    for (final Slice slice : partition) {
+      peel(retained, slice);
+    }
+    return retained;
+  }
 }

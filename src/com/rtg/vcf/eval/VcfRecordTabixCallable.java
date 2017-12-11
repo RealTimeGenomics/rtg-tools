@@ -145,7 +145,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private VcfIterator getReader() throws IOException {
     VcfIterator reader = VcfReader.openVcfReader(mInput, mRanges);
     if (mDecomposedFile != null) {
-      reader = new DecomposingVcfIterator(reader, null, DECOMPOSE_MNPS);
+      reader = new DecomposingVcfIterator(reader, null, DECOMPOSE_MNPS, false);
     }
     return new VcfSortRefiner(reader);
   }

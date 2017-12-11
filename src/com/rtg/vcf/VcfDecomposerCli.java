@@ -61,6 +61,7 @@ import com.rtg.vcf.header.VcfHeader;
 public final class VcfDecomposerCli extends AbstractCli {
 
   private static final String BREAK_MNPS = "break-mnps";
+  private static final String BREAK_INDELS = "break-indels";
 
   @Override
   public String moduleName() {
@@ -80,6 +81,7 @@ public final class VcfDecomposerCli extends AbstractCli {
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file name. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(BREAK_MNPS, "if set, break MNPs into individual SNPs").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional(BREAK_INDELS, "if set, peel as many SNPs off an indel as possible").setCategory(SENSITIVITY_TUNING);
     mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
@@ -109,7 +111,7 @@ public final class VcfDecomposerCli extends AbstractCli {
           checkHeader(header, templateSequences.getSdfId());
         }
         final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, mFlags.isSet(BREAK_MNPS))) {
+        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, mFlags.isSet(BREAK_MNPS), mFlags.isSet(BREAK_INDELS))) {
           while (reader.hasNext()) {
             writer.write(reader.next());
           }

@@ -50,4 +50,33 @@ public class PartitionTest extends TestCase {
     assertEquals("43 [T, G, C]", p.get(1).toString());
     assertEquals("44 [A, G, C]", p.get(2).toString());
   }
+
+  public void testPeelIndels1() {
+    final Partition partition = new Partition();
+    partition.add(new Slice(42, "AAT", "CT", "GG"));
+    final Partition p = Partition.peelIndels(partition);
+    assertEquals(3, p.size());
+    assertEquals("42 [A, , ]", p.get(0).toString());
+    assertEquals("43 [A, C, G]", p.get(1).toString());
+    assertEquals("44 [T, T, G]", p.get(2).toString());
+  }
+
+  public void testPeelIndels2() {
+    final Partition partition = new Partition();
+    partition.add(new Slice(42, "A", "CT", "CT"));
+    final Partition p = Partition.peelIndels(partition);
+    assertEquals(2, p.size());
+    assertEquals("42 [, C, C]", p.get(0).toString());
+    assertEquals("42 [A, T, T]", p.get(1).toString());
+  }
+
+  public void testPeelIndels3() {
+    final Partition partition = new Partition();
+    partition.add(new Slice(42, "AA", "CTAA", "CCGA", "ACCA", "AGGG"));
+    final Partition p = Partition.peelIndels(partition);
+    assertEquals(3, p.size());
+    assertEquals("42 [A, C, C, A, A]", p.get(0).toString());
+    assertEquals("43 [, TA, CG, CC, GG]", p.get(1).toString());
+    assertEquals("43 [A, A, A, A, G]", p.get(2).toString());
+  }
 }

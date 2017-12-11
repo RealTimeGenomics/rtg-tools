@@ -90,6 +90,8 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
   }
 
   private static final String REF = ">1\n"
+    //          1         2         3         4         5         6         7         8         9         0
+    // 12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
     + "TGGGGAAGCAAGGCGGAGTTGGGCAGCTCGTGTTCAATGGGTAGAGTTTCAGGCTGGGGTGATGGAAGGGTGCTGGAAATGAGTGGTAGTGATGGCGGCACAACAGTGTGAATCT"
     + "ACTTAATCCCACTGAACTGTATGCTGAAAAATGGTTTAGACGGTGAATTTTAGGTTATGTATGTTTTACCACAATTTTTAAAAAGCTAGTGAAAAGCTGGTAAAAAGAAAGAAAA"
     + "GAGGCTTTTTTAAAAAGTTAAATATATAAAAAGAGCATCATCAGTCCAAAGTCCAGCAGTTGTCCCTCCTGGAATCCGTTGGCTTGCCTCCGGCATTTTTGGCCCTTGCCTTTTA"
@@ -104,5 +106,6 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_ref.vcf", true);
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_noref.vcf", false);
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_mnps.vcf", true, "--break-mnps");
+    runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_indels.vcf", true, "--break-indels");
   }
 }
