@@ -708,13 +708,16 @@ public class Flag<T> implements Comparable<Flag<T>> {
 
     final Object def = getParameterDefault();
     if (def != null) {
-      final String defs;
+      String defs;
       if (def instanceof Double) {
         defs = Utils.realFormat((Double) def);
       } else if (isValidEnum(mParameterType)) {
         defs = def.toString().toLowerCase(Locale.getDefault());
       } else {
         defs = def.toString();
+      }
+      if (defs.length() == 0) {
+        defs = "\"\"";
       }
       if (description.length() > 0) {
         description.append(" ");
