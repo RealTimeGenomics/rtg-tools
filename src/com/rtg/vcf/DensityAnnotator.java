@@ -42,7 +42,7 @@ import com.rtg.vcf.header.VcfNumber;
 
 /**
  * Assigns density attribute.  Annotates variants with the number of variants within
- * a specfied distance either side of the record.  Counting and annotation is done
+ * a specified distance either side of the record.  Counting and annotation is done
  * per sample.
  */
 class DensityAnnotator implements VcfWriter {
