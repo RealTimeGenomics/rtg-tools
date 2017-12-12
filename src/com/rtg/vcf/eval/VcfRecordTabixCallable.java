@@ -56,6 +56,7 @@ import com.rtg.vcf.VcfWriterFactory;
 public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
 
   private static final boolean DECOMPOSE_MNPS = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_DECOMPOSE_MNPS);
+  private static final boolean DECOMPOSE_INDELS = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_DECOMPOSE_INDELS);
 
   private final File mInput;
   private final ReferenceRanges<String> mRanges;
@@ -145,7 +146,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private VcfIterator getReader() throws IOException {
     VcfIterator reader = VcfReader.openVcfReader(mInput, mRanges);
     if (mDecomposedFile != null) {
-      reader = new DecomposingVcfIterator(reader, null, DECOMPOSE_MNPS, false);
+      reader = new DecomposingVcfIterator(reader, null, DECOMPOSE_MNPS, DECOMPOSE_INDELS);
     }
     return new VcfSortRefiner(reader);
   }
