@@ -34,10 +34,10 @@ package com.rtg.vcf.eval;
  * Container for the ROC plot points
  */
 public final class RocPoint {
-  double mThreshold;
-  double mTruePositives;
-  double mRawTruePositives;
-  double mFalsePositives;
+  private double mThreshold;
+  private double mTruePositives;
+  private double mRawTruePositives;
+  private double mFalsePositives;
 
   /**
    * Construct a point with all 0.0
@@ -71,6 +71,10 @@ public final class RocPoint {
     mTruePositives += p.mTruePositives;
     mFalsePositives += p.mFalsePositives;
     mRawTruePositives += p.mRawTruePositives;
+  }
+
+  public void setThreshold(double threshold) {
+    mThreshold = threshold;
   }
 
   public double getThreshold() {

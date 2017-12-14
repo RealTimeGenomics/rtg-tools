@@ -172,22 +172,22 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         if (params.squashPloidy() || params.twoPass()) {
           throw new UnsupportedOperationException();
         }
-        processor = new PhaseTransferEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new PhaseTransferEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_ANNOTATE:
-        processor = new AnnotatingEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new AnnotatingEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_COMBINE:
-        processor = new CombinedEvalSynchronizer(variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new CombinedEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_SPLIT:
-        processor = new SplitEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new SplitEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_GA4GH:
         processor = new Ga4ghEvalSynchronizer(variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
         break;
       case MODE_ROC_ONLY:
-        processor = new RocOnlyEvalSynchronizer(variants, ranges, params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new RocOnlyEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);

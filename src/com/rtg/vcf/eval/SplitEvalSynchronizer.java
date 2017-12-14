@@ -61,7 +61,6 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
   /**
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
-   * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -71,9 +70,9 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @throws IOException if there is a problem opening output files
    */
   SplitEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
-                        String callsSampleName, RocSortValueExtractor extractor,
+                        RocSortValueExtractor extractor,
                         File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, twoPass, rocFilters);
+    super(variants, ranges, extractor, outdir, zip, slope, twoPass, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
     mTpCalls = vf.make(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt));

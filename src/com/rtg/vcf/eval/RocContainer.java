@@ -208,10 +208,10 @@ public class RocContainer {
    */
   void addRocLine(RocPoint point, RocFilter filter) {
     final SortedMap<Double, RocPoint> points = mRocs.get(filter);
-    if (points.containsKey(point.mThreshold)) {
-      points.get(point.mThreshold).add(point);
+    if (points.containsKey(point.getThreshold())) {
+      points.get(point.getThreshold()).add(point);
     } else {
-      points.put(point.mThreshold, new RocPoint(point));
+      points.put(point.getThreshold(), new RocPoint(point));
     }
   }
 
@@ -244,18 +244,18 @@ public class RocContainer {
         rocHeader(os, totalBaselineVariants, totalCallVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
           final RocPoint point = me.getValue();
-          final String score = Utils.realFormat(point.mThreshold, SCORE_DP);
+          final String score = Utils.realFormat(point.getThreshold(), SCORE_DP);
           if (prevScore != null && score.compareTo(prevScore) != 0) {
             writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
           }
           prevScore = score;
           cumulative.add(point);
-          cumulative.mThreshold = point.mThreshold;
+          cumulative.setThreshold(point.getThreshold());
         }
         if (prevScore != null) {
           writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
         }
-        if (extraMetrics && (Math.abs(cumulative.mTruePositives - unfiltered.mTruePositives) > 0.001 || Math.abs(cumulative.mFalsePositives - unfiltered.mFalsePositives) > 0.001)) {
+        if (extraMetrics && (Math.abs(cumulative.getTruePositives() - unfiltered.getTruePositives()) > 0.001 || Math.abs(cumulative.getFalsePositives() - unfiltered.getFalsePositives()) > 0.001)) {
           writeRocLine(os, "None", totalBaselineVariants, unfiltered, extraMetrics, false);
         }
       }
@@ -286,9 +286,9 @@ public class RocContainer {
   }
 
   private void writeRocLine(LineWriter os, String score, int totalPositives, RocPoint point, boolean extraMetrics, boolean updateBest) throws IOException {
-    final double truePositives = point.mTruePositives;
-    final double falsePositives = point.mFalsePositives;
-    final double truePositivesRaw = point.mRawTruePositives;
+    final double truePositives = point.getTruePositives();
+    final double falsePositives = point.getFalsePositives();
+    final double truePositivesRaw = point.getRawTruePositives();
     os.write(score
       + "\t" + Utils.realFormat(truePositives, COUNT_DP)
       + "\t" + Utils.realFormat(falsePositives, COUNT_DP)
@@ -351,7 +351,7 @@ public class RocContainer {
       if (best == null) {
         Diagnostic.warning("Could not maximize F-measure from ROC data, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
       } else {
-        addRow(table, Utils.realFormat(best.mThreshold, SCORE_DP), best.mTruePositives, totalPositives - best.mTruePositives, best.mRawTruePositives, best.mFalsePositives);
+        addRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
       }
       addRow(table, "None", truePositives, falseNegatives, truePositivesRaw, falsePositives);
       summary = table.toString();

@@ -65,13 +65,10 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   private final VcfHeader[] mInHeaders = new VcfHeader[2];
   private final VcfAltCleaner mAltCleaner = new VcfAltCleaner();
   private final VcfRecordMerger mMerger = new VcfRecordMerger();
-  protected final int mBaselineSampleNo;
 
   /**
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
-   * @param baselineSampleName the name of the sample used in the baseline
-   * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -81,11 +78,9 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @throws IOException if there is a problem opening output files
    */
   CombinedEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
-                           String baselineSampleName, String callsSampleName,
                            RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
-    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baselineHeader(), baselineSampleName, "baseline");
+    super(variants, ranges, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();

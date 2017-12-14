@@ -76,7 +76,6 @@ import com.rtg.vcf.header.VcfHeader;
  */
 class TabixVcfRecordSet implements VariantSet {
 
-
   private final File mBaselineFile;
   private final File mCallsFile;
   private final Collection<Pair<String, Integer>> mNames = new ArrayList<>();
@@ -84,6 +83,8 @@ class TabixVcfRecordSet implements VariantSet {
   private final ReferenceRegions mEvalRegions;
   private final VcfHeader mBaseLineHeader;
   private final VcfHeader mCalledHeader;
+  private final int mBaselineSampleNo; // Index of baseline sample within header, or -1 if not selecting a sample
+  private final int mCalledSampleNo; // Index of call sample within header, or -1 if not selecting a sample
   private final VariantFactory mBaselineFactory;
   private final VariantFactory mCallsFactory;
   private final Map<String, File> mBaselinePreprocessed = new HashMap<>();
@@ -185,6 +186,8 @@ class TabixVcfRecordSet implements VariantSet {
     mCalledHeader = mPreprocess ? addDecompositionHeader(calledHeader) : calledHeader;
     mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, relaxedRef);
     mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, relaxedRef);
+    mBaselineSampleNo = baselineSample != null ? mBaseLineHeader.getSampleNames().indexOf(baselineSample) : 0;
+    mCalledSampleNo = callsSample != null ? mCalledHeader.getSampleNames().indexOf(callsSample) : 0;
   }
 
   // This is pretty ick, but needed to ensure the main vcfeval output headers contain appropriate declarations created during decomposition
@@ -262,6 +265,11 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   @Override
+  public int baselineSample() {
+    return mBaselineSampleNo;
+  }
+
+  @Override
   public VcfIterator getBaselineVariants(String sequenceName) throws IOException {
     return new VcfSortRefiner(mPreprocess ? VcfReader.openVcfReader(mBaselinePreprocessed.get(sequenceName)) : VcfReader.openVcfReader(mBaselineFile, mRanges.forSequence(sequenceName)));
   }
@@ -269,6 +277,11 @@ class TabixVcfRecordSet implements VariantSet {
   @Override
   public VcfHeader calledHeader() {
     return mCalledHeader;
+  }
+
+  @Override
+  public int calledSample() {
+    return mCalledSampleNo;
   }
 
   @Override

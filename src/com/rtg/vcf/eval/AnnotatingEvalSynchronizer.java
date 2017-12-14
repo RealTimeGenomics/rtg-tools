@@ -52,7 +52,6 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
   /**
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
-   * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -62,9 +61,9 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @throws IOException if there is a problem opening output files
    */
   AnnotatingEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
-                             String callsSampleName, RocSortValueExtractor extractor,
+                             RocSortValueExtractor extractor,
                              File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, callsSampleName, extractor, outdir, zip, slope, dualRocs, rocFilters);
+    super(variants, ranges, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baselineHeader().copy();
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
@@ -77,25 +76,25 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   @Override
   protected void handleUnknownBaseline() throws IOException {
-    setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<String, String>()));
+    setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<>()));
     mBase.write(mBrv);
   }
 
   @Override
   protected void handleUnknownCall() throws IOException {
-    setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<String, String>()));
+    setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<>()));
     mCalls.write(mCrv);
   }
 
   @Override
   protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
     if (unknownBaseline) {
-      setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<String, String>()));
+      setNewInfoFields(mBrv, updateForBaseline(true, new LinkedHashMap<>()));
       mBase.write(mBrv);
       mBrv = null;
     }
     if (unknownCall) {
-      setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<String, String>()));
+      setNewInfoFields(mCrv, updateForCall(true, new LinkedHashMap<>()));
       mCalls.write(mCrv);
       mCrv = null;
     }
@@ -103,13 +102,13 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   @Override
   protected void handleKnownBaseline() throws IOException {
-    setNewInfoFields(mBrv, updateForBaseline(false, new LinkedHashMap<String, String>()));
+    setNewInfoFields(mBrv, updateForBaseline(false, new LinkedHashMap<>()));
     mBase.write(mBrv);
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
-    setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<String, String>()));
+    setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<>()));
     mCalls.write(mCrv);
   }
 

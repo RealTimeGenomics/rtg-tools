@@ -40,10 +40,8 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfUtils;
 
 /**
  * Support output modes that include overall statistics and ROC files.
@@ -57,6 +55,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   private final boolean mSlope;
   private final File mOutDir;
   protected final int mCallSampleNo;
+  protected final int mBaselineSampleNo;
   protected int mBaselineTruePositives = 0;
   protected int mCallTruePositives = 0;
   protected int mFalseNegatives = 0;
@@ -71,7 +70,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   /**
    * @param variants the set of variants to evaluate
    * @param ranges the regions from which variants are being loaded
-   * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -81,16 +79,17 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @throws IOException if there is a problem opening output files
    */
   WithRocsEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
-                           String callsSampleName, RocSortValueExtractor extractor,
+                           RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
     super(variants, ranges);
 
-    int callSampleNo;
-    Set<RocFilter> filters;
-    try {
-      callSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
+    mBaselineSampleNo = variants.baselineSample();
+    mCallSampleNo = variants.calledSample();
+
+    final Set<RocFilter> filters;
+    if (mCallSampleNo != -1) {
       filters = rocFilters;
-    } catch (NoTalkbackSlimException e) {
+    } else {
       filters = new HashSet<>(rocFilters);
       if (extractor.requiresSample()) {
         Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
@@ -102,9 +101,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
           Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
         }
       }
-      callSampleNo = -1;
     }
-    mCallSampleNo = callSampleNo;
     if (mCallSampleNo >= 0 || !extractor.requiresSample()) {
       mDefaultRoc = new RocContainer(extractor);
       mDefaultRoc.addFilters(filters);

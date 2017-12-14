@@ -56,9 +56,19 @@ public interface VariantSet extends Closeable {
   VcfHeader baselineHeader();
 
   /**
+   * @return index of sample within baseline or -1 if not selecting a sample
+   */
+  int baselineSample();
+
+  /**
    * @return header for called files
    */
   VcfHeader calledHeader();
+
+  /**
+   * @return index of sample within calls or -1 if not selecting a sample
+   */
+  int calledSample();
 
   /**
    * @return the number of baseline variants that were skipped during loading

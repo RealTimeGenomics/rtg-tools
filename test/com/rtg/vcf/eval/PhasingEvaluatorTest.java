@@ -101,8 +101,18 @@ public class PhasingEvaluatorTest extends TestCase {
     }
 
     @Override
+    public int baselineSample() {
+      return 0;
+    }
+
+    @Override
     public VcfHeader calledHeader() {
       return mHeader;
+    }
+
+    @Override
+    public int calledSample() {
+      return 0;
     }
 
     @Override
