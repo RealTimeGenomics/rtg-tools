@@ -34,39 +34,19 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.InvalidParamsException;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.variant.GenomePriorParams;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class PriorPopulationVariantGeneratorTest extends TestCase {
-
-  private NanoRegression mNano = null;
-
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
-    mNano = new NanoRegression(this.getClass());
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class PriorPopulationVariantGeneratorTest extends AbstractNanoTest {
 
   private static final String REF = ">ref" + StringUtils.LS
           + "cgtacattac" + "gagcgactag" + "ctagctagta" + "cgtacgtaca"

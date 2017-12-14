@@ -32,30 +32,13 @@ package com.rtg.relation;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class PedFileParserTest extends TestCase {
-
-  private NanoRegression mNano = null;
-
-  @Override
-  public void setUp() {
-    mNano = new NanoRegression(this.getClass());
-  }
-  @Override
-  public void tearDown() throws Exception {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class PedFileParserTest extends AbstractNanoTest {
 
   private GenomeRelationships makeTestPed() {
     final GenomeRelationships genomeRelationships = new GenomeRelationships();
@@ -84,5 +67,4 @@ public class PedFileParserTest extends TestCase {
       assertTrue(FileHelper.deleteAll(dir));
     }
   }
-
 }

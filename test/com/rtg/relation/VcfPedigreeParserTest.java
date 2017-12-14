@@ -32,36 +32,17 @@ package com.rtg.relation;
 import java.io.File;
 import java.io.IOException;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.header.PedigreeField;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class VcfPedigreeParserTest extends TestCase {
-
-  private NanoRegression mNano = null;
-
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    mNano = new NanoRegression(this.getClass());
-  }
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class VcfPedigreeParserTest extends AbstractNanoTest {
 
   public void testParsing() throws IOException {
     try (final TestDirectory dir = new TestDirectory()) {

@@ -31,34 +31,17 @@ package com.rtg.sam;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.tabix.IndexTestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class BamIndexMergeTest extends TestCase {
-
-  private NanoRegression mNano;
-  @Override
-  public void setUp() {
-    mNano = new NanoRegression(BamIndexMergeTest.class);
-  }
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class BamIndexMergeTest extends AbstractNanoTest {
 
   private static final String BAM_RESOURCE = "com/rtg/sam/resources";
   private static final String BAM_FILES = "indexmerge%d.bam";

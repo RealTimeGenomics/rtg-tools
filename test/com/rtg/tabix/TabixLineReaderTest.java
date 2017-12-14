@@ -36,40 +36,19 @@ import java.io.OutputStream;
 
 import com.rtg.bed.BedReader;
 import com.rtg.bed.BedRecord;
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.sam.SamRegionRestriction;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class TabixLineReaderTest extends TestCase {
-
-  protected NanoRegression mNano = null;
-
-  @Override
-  public void setUp() throws IOException {
-    Diagnostic.setLogStream();
-    mNano = new NanoRegression(this.getClass());
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    Diagnostic.setLogStream();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class TabixLineReaderTest extends AbstractNanoTest {
 
   public static String extractRecords(File input, File tabix, RegionRestriction range) throws IOException {
     try (MemoryPrintStream mps = new MemoryPrintStream()) {

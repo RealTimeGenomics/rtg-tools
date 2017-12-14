@@ -33,19 +33,16 @@ package com.rtg.simulation.reads;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.reader.SdfId;
 import com.rtg.util.ChiSquared;
 import com.rtg.util.InvalidParamsException;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.variant.AbstractMachineErrorParams;
-
-import junit.framework.TestCase;
 
 /**
  * Test class.
  */
-public abstract class AbstractMachineTest extends TestCase {
+public abstract class AbstractMachineTest extends AbstractNanoTest {
 
   // 0.9999 corresponds to expected failure of 1 in 10000 runs
   private static final double CONFIDENCE_LEVEL = 0.9999;
@@ -55,26 +52,6 @@ public abstract class AbstractMachineTest extends TestCase {
   protected abstract AbstractMachineErrorParams getPriors() throws IOException, InvalidParamsException;
 
   protected abstract Machine getMachine(long seed) throws IOException, InvalidParamsException;
-
-  protected NanoRegression mNano;
-
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    Diagnostic.setLogStream();
-    mNano = new NanoRegression(this.getClass());
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-    super.tearDown();
-  }
-
 
   private void checkIsProbabilityDistribution(final String name, final double[] p) {
     double s = 0;

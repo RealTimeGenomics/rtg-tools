@@ -32,39 +32,23 @@ package com.rtg.tabix;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
-import com.rtg.util.test.NanoRegression;
 
 import htsjdk.samtools.util.BlockCompressedInputStream;
-
-import junit.framework.TestCase;
 
 /**
  * Test class
  */
-public class TabixIndexMergeTest extends TestCase {
+public class TabixIndexMergeTest extends AbstractNanoTest {
 
   private static final String SAM_RESOURCE = "com/rtg/tabix/resources";
   private static final String SAM_FILES = "tabixmerge%d.sam.gz";
 
-  private NanoRegression mNano;
-  @Override
-  public void setUp() {
-    mNano = new NanoRegression(TabixIndexMergeTest.class);
-  }
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
   public void testSam() throws Exception {
     final File dir = FileUtils.createTempDir("indexmerge", "test");
     try {

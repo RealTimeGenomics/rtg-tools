@@ -35,31 +35,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
+import com.rtg.launcher.AbstractNanoTest;
 
 /**
  * Test the corresponding class.
  */
-public class DensityAnnotatorTest extends TestCase {
-
-  private NanoRegression mNano = null;
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    mNano = new NanoRegression(DensityAnnotatorTest.class);
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class DensityAnnotatorTest extends AbstractNanoTest {
 
   public void test() throws IOException {
     final int distance = 5;

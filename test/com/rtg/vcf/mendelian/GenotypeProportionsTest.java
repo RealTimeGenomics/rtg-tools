@@ -34,34 +34,15 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.io.MemoryPrintStream;
-import com.rtg.util.test.NanoRegression;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class GenotypeProportionsTest extends TestCase {
-
-  private NanoRegression mNano = null;
-  @Override
-  public void setUp() throws Exception {
-    super.setUp();
-    mNano = new NanoRegression(GenotypeProportionsTest.class);
-  }
-
-  @Override
-  public void tearDown() throws Exception {
-    super.tearDown();
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
+public class GenotypeProportionsTest extends AbstractNanoTest {
 
   public void test() throws IOException {
     check("gt_prop");

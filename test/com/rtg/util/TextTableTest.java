@@ -31,32 +31,13 @@ package com.rtg.util;
 
 import java.io.IOException;
 
+import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.SlimException;
-import com.rtg.util.test.NanoRegression;
-
-import junit.framework.TestCase;
 
 /**
  */
-public class TextTableTest extends TestCase {
-
-  NanoRegression mNano = null;
-
-  @Override
-  public void setUp() throws IOException {
-    mNano = new NanoRegression(this.getClass());
-  }
-
-  @Override
-  public void tearDown() throws IOException {
-    try {
-      mNano.finish();
-    } finally {
-      mNano = null;
-    }
-  }
-
+public class TextTableTest extends AbstractNanoTest {
 
   public void testDefault() throws IOException {
     final TextTable table = new TextTable();
