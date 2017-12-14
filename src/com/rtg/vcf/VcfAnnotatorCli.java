@@ -54,12 +54,17 @@ import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.reader.SdfUtils;
+import com.rtg.reader.SequencesReader;
+import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
+import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.annotation.ContraryObservationAnnotator;
 import com.rtg.vcf.annotation.DerivedAnnotations;
+import com.rtg.vcf.annotation.SimpleTandemRepeatAnnotator;
 import com.rtg.vcf.annotation.SplitContraryObservationAnnotator;
 import com.rtg.vcf.annotation.VcfAnnotation;
 import com.rtg.vcf.header.VcfHeader;
@@ -78,6 +83,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String RELABEL_FLAG = "relabel";
   private static final String DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
   private static final String DENSITY_FLAG = "Xdensity";
+  private static final String STR_FLAG = "Xstr";
 
   /** All known annotators with zero-arg constructors */
   private static final Map<String, VcfAnnotator> ANNOTATORS = new TreeMap<>();
@@ -120,6 +126,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
     mFlags.registerOptional(DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.registerOptional(DENSITY_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
+    mFlags.registerOptional(STR_FLAG, File.class, "SDF", "annotate records with simple tandem repeat indicator based on given SDF").setCategory(REPORTING);
     mFlags.setValidator(new VcfAnnotatorValidator());
   }
 
@@ -131,7 +138,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
         && flags.checkNand(BED_IDS_FLAG, VCF_IDS_FLAG)
         && checkFileList(flags, BED_INFO_FLAG)
         && checkFileList(flags, BED_IDS_FLAG)
-        && checkFileList(flags, VCF_IDS_FLAG);
+        && checkFileList(flags, VCF_IDS_FLAG)
+        && (!flags.isSet(STR_FLAG) || CommonFlags.validateSDF(flags, STR_FLAG));
     }
 
     private boolean checkFileList(CFlags flags, String flag) {
@@ -150,6 +158,11 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private Collection<File> getFiles(String flag) {
     final Collection<?> inputFiles = mFlags.getValues(flag);
     return inputFiles.stream().map(file -> (File) file).collect(Collectors.toCollection(ArrayList::new));
+  }
+
+  private SequencesReader getReference(final File templateFile) throws IOException {
+    SdfUtils.validateHasNames(templateFile);
+    return SequencesReaderFactory.createDefaultSequencesReader(templateFile, LongRange.NONE);
   }
 
   @Override
@@ -172,6 +185,10 @@ public final class VcfAnnotatorCli extends AbstractCli {
       annotators.add(new BedVcfAnnotator(null, null, getFiles(BED_IDS_FLAG)));
     } else if (mFlags.isSet(VCF_IDS_FLAG)) {
       annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG)));
+    }
+    if (mFlags.isSet(STR_FLAG)) {
+      // xxx todo close ?
+      annotators.add(new SimpleTandemRepeatAnnotator(getReference((File) mFlags.getValue(STR_FLAG)).referenceSource()));
     }
 
     annotators.addAll(derived.stream().map(ANNOTATORS::get).collect(Collectors.toList()));

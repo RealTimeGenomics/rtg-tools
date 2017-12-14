@@ -45,7 +45,7 @@ import htsjdk.samtools.util.RuntimeIOException;
 /**
  * Provides a <code>CRAMReferenceSource</code> backed by a SequencesReader.
  */
-class SequencesReaderReferenceSource implements CRAMReferenceSource {
+public class SequencesReaderReferenceSource implements CRAMReferenceSource {
 
   private final SequencesReader mReader;
   private final Map<String, WeakReference<byte[]>> mCache = new HashMap<>();
@@ -55,7 +55,7 @@ class SequencesReaderReferenceSource implements CRAMReferenceSource {
    * Construct a <code>CRAMReferenceSource</code> backed by an RTG SequencesReader
    * @param reader the backing SequencesReader
    */
-  SequencesReaderReferenceSource(SequencesReader reader) {
+  public SequencesReaderReferenceSource(SequencesReader reader) {
     mReader = reader;
   }
 
@@ -77,15 +77,20 @@ class SequencesReaderReferenceSource implements CRAMReferenceSource {
     return null;
   }
 
-  @Override
-  public synchronized byte[] getReferenceBases(final SAMSequenceRecord record, boolean tryVariants) {
-    final String name = record.getSequenceName();
+  /**
+   * Get the bases (in uppercase ASCII) for a sequence.  Implementation is cached so that
+   * repeated requests for the same (or recently retrieved) sequences are likely to be
+   * fast.
+   * @param name name of the sequence
+   * @return bases of the sequence in uppercase ASCII
+   */
+  public byte[] getReferenceBases(final String name) {
     final byte[] cached = findInCache(name);
     if (cached != null) {
       return cached;
     }
 
-    Diagnostic.developerLog("CRAM get uncached reference bases for: " + name);
+    Diagnostic.developerLog("SequencesReaderReferenceSource get uncached reference bases for: " + name);
     try {
       final Long seqId = getNames().get(name);
       if (seqId == null) {
@@ -98,10 +103,15 @@ class SequencesReaderReferenceSource implements CRAMReferenceSource {
       for (int i = 0; i < data.length; ++i) {
         data[i] = (byte) DnaUtils.getBase(data[i]);
       }
-      mCache.put(record.getSequenceName(), new WeakReference<>(data));
+      mCache.put(name, new WeakReference<>(data));
       return data;
     } catch (IOException ioe) {
       throw new RuntimeIOException(ioe);
     }
+  }
+
+  @Override
+  public synchronized byte[] getReferenceBases(final SAMSequenceRecord record, boolean tryVariants) {
+    return getReferenceBases(record.getSequenceName());
   }
 }
