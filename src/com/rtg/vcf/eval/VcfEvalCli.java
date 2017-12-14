@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -95,7 +96,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   /** Defines the RocFilters that make sense to use with vcfeval */
   public enum VcfEvalRocFilter {
     // Generic filters that should apply to any call set
-    /** All variants */
+    /** All variants (required) */
     ALL(RocFilter.ALL),
     /** Homozygous only */
     HOM(RocFilter.HOM),
@@ -325,12 +326,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
       builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
     }
-    final Set<RocFilter> rocFilters;
+    final Set<RocFilter> rocFilters = new HashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (!mFlags.isSet(ROC_SUBSET)) {
-      rocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.SNP, RocFilter.NON_SNP));
+      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
     } else {
       final List<?> values = mFlags.getValues(ROC_SUBSET);
-      rocFilters = new HashSet<>(values.size());
       for (Object o : values) {
         rocFilters.add(((VcfEvalRocFilter) o).filter());
       }

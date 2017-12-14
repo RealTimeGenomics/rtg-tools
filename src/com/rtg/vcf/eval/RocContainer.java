@@ -59,6 +59,7 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Environment;
 import com.rtg.util.MathUtils;
+import com.rtg.util.MultiSet;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TextTable;
 import com.rtg.util.Utils;
@@ -163,10 +164,9 @@ public class RocContainer {
    * @param filters filtered curves to generate
    */
   void addFilters(Set<RocFilter> filters) {
-    if (filters != null) {
-      for (RocFilter f : filters) {
-        addFilter(f);
-      }
+    assert filters != null;
+    for (RocFilter f : filters) {
+      addFilter(f);
     }
   }
 
@@ -174,10 +174,27 @@ public class RocContainer {
     return mRocs.keySet();
   }
 
+  MultiSet<RocFilter> mBaselineTotals = new MultiSet<>();
+
   /**
-   * add single result to ROC
+   * Add a baseline variant to the total baseline count
+   * @param rec the VCF record containing the baseline variant
+   * @param sampleId index of the sample column for identifying the variant classification
+   */
+  public void incrementBaselineCount(VcfRecord rec, int sampleId) {
+    final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
+    for (final RocFilter filter : filters()) {
+      if (filter.accept(rec, gt)) {
+        mBaselineTotals.add(filter);
+      }
+    }
+  }
+
+
+  /**
+   * Add single called variant result to the ROC
    * @param rec the VCF record to incorporate into the ROC curves
-   * @param sampleId the index of the sample column to use for score extraction
+   * @param sampleId the index of the sample column containing the variant (for score extraction and variant classification)
    * @param tpWeight true positive weight of the call (baseline weighting).
    * @param fpWeight false positive weight of the call.
    * @param tpRaw true positive weight of the call (unweighted).
@@ -188,15 +205,17 @@ public class RocContainer {
       score = mRocExtractor.getSortValue(rec, sampleId);
     } catch (IndexOutOfBoundsException ignored) {
     }
+    final RocPoint point;
     if (Double.isNaN(score) || Double.isInfinite(score)) {
       ++mNoScoreVariants;
+      point = new RocPoint(Double.NaN, tpWeight, fpWeight, tpRaw);
     } else {
-      final RocPoint point = new RocPoint(score, tpWeight, fpWeight, tpRaw);
-      final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
-      for (final RocFilter filter : filters()) {
-        if (filter.accept(rec, gt)) {
-          addRocLine(point, filter);
-        }
+      point = new RocPoint(score, tpWeight, fpWeight, tpRaw);
+    }
+    final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
+    for (final RocFilter filter : filters()) {
+      if (filter.accept(rec, gt)) {
+        addRocLine(point, filter);
       }
     }
   }
@@ -218,21 +237,17 @@ public class RocContainer {
   /**
    * Output ROC data to files. While scanning ROC data also keeps a record to the point with highest f-Measure.
    * @param outDir directory into which ROC files are written
-   * @param truePositives total number of baseline true positives
-   * @param falsePositives total number of false positives
-   * @param falseNegatives total number of false negatives
-   * @param truePositivesRaw total number of call true positives
    * @param zip whether output should be compressed
    * @param slope if true, write ROC slope file
    * @throws IOException if an IO error occurs
    */
-  public void writeRocs(File outDir, int truePositives, int falsePositives, int falseNegatives, int truePositivesRaw, boolean zip, boolean slope) throws IOException {
+  public void writeRocs(File outDir, boolean zip, boolean slope) throws IOException {
     Diagnostic.developerLog("Writing ROC");
     mBestFMeasure = 0;
     mBest = null;
-    final RocPoint unfiltered = new RocPoint(Double.NaN, truePositives, falsePositives, truePositivesRaw);
-    final int totalBaselineVariants = truePositives + falseNegatives;
-    final int totalCallVariants = truePositivesRaw + falsePositives;
+    final int totalBaselineVariants = mBaselineTotals.get(RocFilter.ALL);
+    final RocPoint total = getTotal(RocFilter.ALL);
+    final int totalCallVariants = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives());
     for (Map.Entry<RocFilter, SortedMap<Double, RocPoint>> entry : mRocs.entrySet()) {
       final RocFilter filter = entry.getKey();
       final SortedMap<Double, RocPoint> points = entry.getValue();
@@ -241,10 +256,10 @@ public class RocContainer {
         final RocPoint cumulative = new RocPoint();
         String prevScore = null;
         final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
-        rocHeader(os, totalBaselineVariants, totalCallVariants, extraMetrics);
+        rocHeader(os, filter, totalBaselineVariants, totalCallVariants, extraMetrics);
         for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
           final RocPoint point = me.getValue();
-          final String score = Utils.realFormat(point.getThreshold(), SCORE_DP);
+          final String score = Double.isNaN(point.getThreshold()) ? "None" : Utils.realFormat(point.getThreshold(), SCORE_DP);
           if (prevScore != null && score.compareTo(prevScore) != 0) {
             writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
           }
@@ -255,9 +270,6 @@ public class RocContainer {
         if (prevScore != null) {
           writeRocLine(os, prevScore, totalBaselineVariants, cumulative, extraMetrics, filter == RocFilter.ALL);
         }
-        if (extraMetrics && (Math.abs(cumulative.getTruePositives() - unfiltered.getTruePositives()) > 0.001 || Math.abs(cumulative.getFalsePositives() - unfiltered.getFalsePositives()) > 0.001)) {
-          writeRocLine(os, "None", totalBaselineVariants, unfiltered, extraMetrics, false);
-        }
       }
       if (slope) {
         produceSlopeFile(rocFile);
@@ -265,11 +277,12 @@ public class RocContainer {
     }
   }
 
-  private void rocHeader(LineWriter out, int totalBaselineVariants, int totalCallVariants, boolean extraMetrics) throws IOException {
+  private void rocHeader(LineWriter out, RocFilter filter, int totalBaselineVariants, int totalCallVariants, boolean extraMetrics) throws IOException {
     out.writeln("#Version " + Environment.getVersion() + ", ROC output 1.1");
     if (CommandLine.getCommandLine() != null) {
       out.writeln("#CL " + CommandLine.getCommandLine());
     }
+//    out.writeln("#selected: " + filter.name());
     out.writeln("#total baseline variants: " + totalBaselineVariants);
     out.writeln("#total call variants: " + totalCallVariants);
     if (mFieldLabel != null) {
@@ -302,7 +315,7 @@ public class RocContainer {
         + "\t" + Utils.realFormat(precision, METRICS_DP)
         + "\t" + Utils.realFormat(recall, METRICS_DP)
         + "\t" + Utils.realFormat(fMeasure, METRICS_DP));
-      if (updateBest && (mBest == null || fMeasure >= mBestFMeasure)) {
+      if (updateBest && !Double.isNaN(point.getThreshold()) && (mBest == null || fMeasure >= mBestFMeasure)) {
         mBestFMeasure = fMeasure;
         mBest = new RocPoint(point);
       }
@@ -321,10 +334,17 @@ public class RocContainer {
   }
 
   /**
+   * @return true if we are configured for generating ROC data files (rather than just aggregate statistics)
+   */
+  public boolean isRocEnabled() {
+    return mRocExtractor != RocSortValueExtractor.NULL_EXTRACTOR;
+  }
+
+  /**
    * Issue a warning if there were were variants that did not contain the score field.
    */
   public void missingScoreWarning() {
-    if (getNumberOfIgnoredVariants() > 0) {
+    if (isRocEnabled() && getNumberOfIgnoredVariants() > 0) {
       Diagnostic.warning("There were " + getNumberOfIgnoredVariants() + " variants not thresholded in ROC data files due to missing or invalid " + mFieldLabel + " values.");
     }
   }
@@ -332,16 +352,12 @@ public class RocContainer {
   /**
    * Write the summary file for the ROC data
    * @param outDir directory into which ROC files are written
-   * @param truePositives total number of baseline true positives
-   * @param falseNegatives total number of false negatives
-   * @param truePositivesRaw total number of call true positives
-   * @param falsePositives total number of false positives
    * @throws IOException if an IO error occurs
    */
-  public void writeSummary(File outDir, int truePositives, int falseNegatives, int truePositivesRaw, int falsePositives) throws IOException {
+  public void writeSummary(File outDir) throws IOException {
     final File summaryFile = new File(outDir, mFilePrefix + CommonFlags.SUMMARY_FILE);
     final String summary;
-    final int totalPositives = truePositives + falseNegatives;
+    final int totalPositives = mBaselineTotals.get(RocFilter.ALL);
     if (totalPositives > 0) {
       final TextTable table = new TextTable();
       table.addRow("Threshold", "True-pos-baseline", "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
@@ -353,7 +369,8 @@ public class RocContainer {
       } else {
         addRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
       }
-      addRow(table, "None", truePositives, falseNegatives, truePositivesRaw, falsePositives);
+      final RocPoint total = getTotal(RocFilter.ALL);
+      addRow(table, "None", total.getTruePositives(), totalPositives - total.getTruePositives(), total.getRawTruePositives(), total.getFalsePositives());
       summary = table.toString();
     } else {
       summary = "0 total baseline variants, no summary statistics available" + StringUtils.LS;
@@ -362,6 +379,14 @@ public class RocContainer {
     try (OutputStream os = FileUtils.createOutputStream(summaryFile)) {
       os.write(summary.getBytes());
     }
+  }
+
+  RocPoint getTotal(RocFilter filter) {
+    final RocPoint total = new RocPoint();
+    for (final RocPoint point : mRocs.get(filter).values()) {
+      total.add(point);
+    }
+    return total;
   }
 
   private static void addRow(final TextTable table, String threshold, double truePositive, double falseNegative, double truePositiveRaw, double falsePositive) {
@@ -378,10 +403,15 @@ public class RocContainer {
       Utils.realFormat(fMeasure, METRICS_DP));
   }
 
-
+  // Need to manually ensure that Double.NaN looks smaller than every other number, so that it comes last on the ROC
   private static class DescendingDoubleComparator implements Comparator<Double>, Serializable {
     @Override
     public int compare(Double o1, Double o2) {
+      if (Double.isNaN(o1)) {
+        return Double.isNaN(o2) ? 0 : 1;
+      } else if (Double.isNaN(o2)) {
+        return -1;
+      }
       return o2.compareTo(o1);
     }
   }

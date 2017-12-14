@@ -56,12 +56,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   private final File mOutDir;
   protected final int mCallSampleNo;
   protected final int mBaselineSampleNo;
-  protected int mBaselineTruePositives = 0;
-  protected int mCallTruePositives = 0;
-  protected int mFalseNegatives = 0;
-  protected int mFalsePositives = 0;
-  protected int mFalseNegativesCommonAllele = 0;
-  protected int mFalsePositivesCommonAllele = 0;
   protected int mCallOutside = 0;
   private int mUnphasable = 0;
   private int mMisPhasings = 0;
@@ -86,23 +80,22 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     mBaselineSampleNo = variants.baselineSample();
     mCallSampleNo = variants.calledSample();
 
-    final Set<RocFilter> filters;
-    if (mCallSampleNo != -1) {
-      filters = rocFilters;
-    } else {
-      filters = new HashSet<>(rocFilters);
-      if (extractor.requiresSample()) {
-        Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
-      } else {
-        filters.removeIf(RocFilter::requiresGt);
-        if (filters.size() != rocFilters.size()) {
-          final Set<RocFilter> excluded = new HashSet<>();
-          excluded.addAll(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
-          Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
-        }
+    final Set<RocFilter> filters = new HashSet<>(rocFilters);
+    if (mCallSampleNo == -1 && extractor.requiresSample()) {
+      Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
+    } else if (mCallSampleNo == -1 || mBaselineSampleNo == -1) {
+      filters.removeIf(RocFilter::requiresGt);
+      if (filters.size() != rocFilters.size()) {
+        final Set<RocFilter> excluded = new HashSet<>();
+        excluded.addAll(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
+        Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
       }
     }
-    if (mCallSampleNo >= 0 || !extractor.requiresSample()) {
+    if (mCallSampleNo == -1 && extractor.requiresSample()) {
+      mDefaultRoc = new RocContainer(RocSortValueExtractor.NULL_EXTRACTOR);
+      mDefaultRoc.addFilter(RocFilter.ALL);
+      mAlleleRoc = null;
+    } else {
       mDefaultRoc = new RocContainer(extractor);
       mDefaultRoc.addFilters(filters);
       if (dualRocs) {
@@ -111,9 +104,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       } else {
         mAlleleRoc = null;
       }
-    } else {
-      mDefaultRoc = null;
-      mAlleleRoc = null;
     }
     mZip = zip;
     mSlope = slope;
@@ -127,13 +117,22 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     mCorrectPhasings += correctPhasings;
   }
 
+  // Used to accumulate totals
+  protected void incrementBaselineCounts(boolean tp, boolean alleleMatch, boolean fn) {
+    if (!(tp || alleleMatch || fn)) {
+      throw new IllegalArgumentException();
+    }
+    mDefaultRoc.incrementBaselineCount(mBrv, mBaselineSampleNo);
+    if (mAlleleRoc != null) {
+      mAlleleRoc.incrementBaselineCount(mBrv, mBaselineSampleNo);
+    }
+  }
+
   protected void addToROCContainer(double tpWeight, double fpWeight, double tpqWeight, boolean alleleMatch) {
-    if (mDefaultRoc != null) {
-      if (alleleMatch) { // Consider these FP for GT ROCs
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0, 1, 0);
-      } else {
-        mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
-      }
+    if (alleleMatch) { // Consider these FP for GT ROCs
+      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, 0, 1, 0);
+    } else {
+      mDefaultRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
     }
     if (mAlleleRoc != null) {
       mAlleleRoc.addRocLine(mCrv, mCallSampleNo, tpWeight, fpWeight, tpqWeight);
@@ -156,29 +155,22 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
   @Override
   void finish() throws IOException {
     super.finish();
-    if (mDefaultRoc != null) {
-      mDefaultRoc.missingScoreWarning();
-    }
+    mDefaultRoc.missingScoreWarning();
     if (mCallOutside > 0) {
-      final int callTotal = mCallTruePositives + mFalsePositives;
+      final RocPoint total = mDefaultRoc.getTotal(RocFilter.ALL);
+      final int callTotal = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives() + mCallOutside);
       Diagnostic.userLog("Fraction of calls outside evaluation regions: " + Utils.realFormat((double) mCallOutside / callTotal, 4) + " (" + mCallOutside + "/" + callTotal + ")");
     }
     writePhasingInfo();
     if (mAlleleRoc != null) {
-      final int alleleTp = mBaselineTruePositives + mFalseNegativesCommonAllele;
-      final int alleleTpq = mCallTruePositives + mFalsePositivesCommonAllele;
-      mAlleleRoc.writeRocs(mOutDir, alleleTp, mFalsePositives, mFalseNegatives, alleleTpq, mZip, mSlope);
+      mAlleleRoc.writeRocs(mOutDir, mZip, mSlope);
       // Do we want the allele-level summary too?
       //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
     }
-    final int strictFp = mFalsePositives + mFalsePositivesCommonAllele;
-    final int strictFn = mFalseNegatives + mFalseNegativesCommonAllele;
-    if (mDefaultRoc != null) {
-      mDefaultRoc.writeRocs(mOutDir, mBaselineTruePositives, strictFp, strictFn, mCallTruePositives, mZip, mSlope);
-      mDefaultRoc.writeSummary(mOutDir, mBaselineTruePositives, strictFn, mCallTruePositives, strictFp);
-    } else {
-      new RocContainer(RocSortValueExtractor.NULL_EXTRACTOR).writeSummary(mOutDir, mBaselineTruePositives, strictFn, mCallTruePositives, strictFp);
+    if (mDefaultRoc.isRocEnabled()) {
+      mDefaultRoc.writeRocs(mOutDir, mZip, mSlope);
     }
+    mDefaultRoc.writeSummary(mOutDir);
   }
 
   private void writePhasingInfo() throws IOException {

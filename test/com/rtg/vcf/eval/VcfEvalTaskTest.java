@@ -271,17 +271,17 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     final String roc = TestUtils.sanitizeTsvHeader(FileUtils.fileToString(out));
     //System.err.println("ROC\n" + roc);
     mNano.check(label, roc);
-    final String[] homoLines = TestUtils.splitLines(roc);
-    assertTrue(homoLines.length > 2);
+    final String[] rocLines = TestUtils.splitLines(roc);
+    assertTrue(rocLines.length > 2);
     int line = 1;
     if (checktotal) {
-      assertEquals("#total baseline variants: " + (tpCount + fnCount), homoLines[line++]);
+      assertEquals("#total baseline variants: " + (tpCount + fnCount), rocLines[line++]);
     } else {
-      assertTrue(homoLines[line++].startsWith("#total baseline variants: "));
+      assertTrue(rocLines[line++].startsWith("#total baseline variants: "));
     }
-    assertTrue(homoLines[line++].startsWith("#total call variants: "));
-    assertTrue(homoLines[line++].startsWith("#score field: "));
-    assertTrue(homoLines[line].startsWith("#score\t"));
+    assertTrue(rocLines[line++].startsWith("#total call variants: "));
+    assertTrue(rocLines[line++].startsWith("#score field: "));
+    assertTrue(rocLines[line].startsWith("#score\t"));
   }
 
   private static final String[] EMPTY = {};
@@ -343,7 +343,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     "seq 20 . C A 0.0 PASS . GT 0/1"
   };
   private static final String[] FP_ROC_EMPTY = {
-      "seq 1 . A T 1 PASS . GT 1/1"  // No GQ so will be omitted from ROC
+      "seq 1 . A T 1 PASS . GT 1/1"  // No GQ so will be added as "None" entry in ROC
   };
 
   public void testROCEmpty() throws IOException, UnindexableDataException {
