@@ -1,5 +1,6 @@
 #Version [...]
 #CL [...]
+#selection: ALL
 #total baseline variants: 5
 #total call variants: 3
 #score field: QUAL

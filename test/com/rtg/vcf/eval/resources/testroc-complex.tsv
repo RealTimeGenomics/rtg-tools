@@ -1,5 +1,6 @@
 #Version [...]
-#total baseline variants: 6
-#total call variants: 6
+#selection: XRX
+#total baseline variants: 0
+#total call variants: 0
 #score field: GQ (FORMAT)
 #score	true_positives_baseline	false_positives	true_positives_call

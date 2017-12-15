@@ -1,5 +1,6 @@
 #Version [...]
 #CL [...]
+#selection: ALL
 #total baseline variants: 3
 #total call variants: 4
 #score field: GQ (FORMAT)

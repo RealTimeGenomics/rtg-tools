@@ -1,11 +1,12 @@
 #Version [...]
+#selection: NON_XRX
 #total baseline variants: 6
 #total call variants: 6
 #score field: GQ (FORMAT)
-#score	true_positives_baseline	false_positives	true_positives_call
-50.000	1.00	0.00	1.00
-40.000	1.00	1.00	1.00
-30.004	2.00	1.00	2.00
-20.043	2.00	2.00	2.00
-10.414	3.00	2.00	3.00
-None	3.00	3.00	3.00
+#score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
+50.000	1.00	0.00	1.00	5.00	1.0000	0.1667	0.2857
+40.000	1.00	1.00	1.00	5.00	0.5000	0.1667	0.2500
+30.004	2.00	1.00	2.00	4.00	0.6667	0.3333	0.4444
+20.043	2.00	2.00	2.00	4.00	0.5000	0.3333	0.4000
+10.414	3.00	2.00	3.00	3.00	0.6000	0.5000	0.5455
+None	3.00	3.00	3.00	3.00	0.5000	0.5000	0.5000

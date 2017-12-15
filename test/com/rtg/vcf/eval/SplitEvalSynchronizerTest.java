@@ -181,10 +181,6 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
             Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReader.vcfLineToRecord(REC4_1), 4)), Collections.emptyList(), Collections.emptyList()));
           simpleThreadPool.terminate();
 
-          System.err.println("XXX Don't forget to update this test");
-          // XXX assertEquals(2, sync.mCallTruePositives);
-          // XXX assertEquals(2, sync.mFalseNegatives);
-          // XXX assertEquals(2, sync.mFalsePositives);
           assertEquals(0, sync.getCorrectPhasings());
           assertEquals(0, sync.getMisPhasings());
           assertEquals(0, sync.getUnphasable());

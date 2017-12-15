@@ -247,11 +247,11 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
 
       mNano.check(label + "-summary.txt", FileUtils.fileToString(new File(out, CommonFlags.SUMMARY_FILE)));
       checkRocResults(label + "-weighted.tsv", new File(out, RocFilter.ALL.fileName()), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOM.fileName()), checktotal, tpCount, fnCount);
-      checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HET.fileName()), checktotal, tpCount, fnCount);
+      checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOM.fileName()), false, tpCount, fnCount);
+      checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HET.fileName()), false, tpCount, fnCount);
       if (rtgStats) {
-        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.NON_XRX.fileName()), checktotal, tpCount, fnCount);
-        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.XRX.fileName()), checktotal, tpCount, fnCount);
+        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.NON_XRX.fileName()), false, tpCount, fnCount);
+        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.XRX.fileName()), false, tpCount, fnCount);
       } else {
         assertFalse(new File(out, RocFilter.NON_XRX.fileName()).exists());
         assertFalse(new File(out, RocFilter.XRX.fileName()).exists());
@@ -272,8 +272,9 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     //System.err.println("ROC\n" + roc);
     mNano.check(label, roc);
     final String[] rocLines = TestUtils.splitLines(roc);
-    assertTrue(rocLines.length > 2);
+    assertTrue(rocLines.length > 3);
     int line = 1;
+    assertTrue(rocLines[line++].startsWith("#selection: "));
     if (checktotal) {
       assertEquals("#total baseline variants: " + (tpCount + fnCount), rocLines[line++]);
     } else {

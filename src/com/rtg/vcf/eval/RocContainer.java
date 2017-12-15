@@ -245,18 +245,18 @@ public class RocContainer {
     Diagnostic.developerLog("Writing ROC");
     mBestFMeasure = 0;
     mBest = null;
-    final int totalBaselineVariants = mBaselineTotals.get(RocFilter.ALL);
-    final RocPoint total = getTotal(RocFilter.ALL);
-    final int totalCallVariants = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives());
     for (Map.Entry<RocFilter, SortedMap<Double, RocPoint>> entry : mRocs.entrySet()) {
       final RocFilter filter = entry.getKey();
+      final int totalBaselineVariants = mBaselineTotals.get(filter);
+      final boolean extraMetrics = totalBaselineVariants > 0;
+      final RocPoint total = getTotal(filter);
+      final int totalCallVariants = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives());
       final SortedMap<Double, RocPoint> points = entry.getValue();
       final File rocFile = FileUtils.getZippedFileName(zip, new File(outDir, mFilePrefix + filter.fileName()));
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile)))) {
-        final RocPoint cumulative = new RocPoint();
-        String prevScore = null;
-        final boolean extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
         rocHeader(os, filter, totalBaselineVariants, totalCallVariants, extraMetrics);
+        String prevScore = null;
+        final RocPoint cumulative = new RocPoint();
         for (final Map.Entry<Double, RocPoint> me : points.entrySet()) {
           final RocPoint point = me.getValue();
           final String score = Double.isNaN(point.getThreshold()) ? "None" : Utils.realFormat(point.getThreshold(), SCORE_DP);
@@ -278,11 +278,11 @@ public class RocContainer {
   }
 
   private void rocHeader(LineWriter out, RocFilter filter, int totalBaselineVariants, int totalCallVariants, boolean extraMetrics) throws IOException {
-    out.writeln("#Version " + Environment.getVersion() + ", ROC output 1.1");
+    out.writeln("#Version " + Environment.getVersion() + ", ROC output 1.2");
     if (CommandLine.getCommandLine() != null) {
       out.writeln("#CL " + CommandLine.getCommandLine());
     }
-//    out.writeln("#selected: " + filter.name());
+    out.writeln("#selection: " + filter.name());
     out.writeln("#total baseline variants: " + totalBaselineVariants);
     out.writeln("#total call variants: " + totalCallVariants);
     if (mFieldLabel != null) {

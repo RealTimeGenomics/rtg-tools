@@ -1,6 +1,7 @@
 #Version [...]
-#total baseline variants: 7
-#total call variants: 7
+#selection: HET
+#total baseline variants: 1
+#total call variants: 1
 #score field: GQ (FORMAT)
-#score	true_positives_baseline	false_positives	true_positives_call
-100.000	1.00	0.00	1.00
+#score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
+100.000	1.00	0.00	1.00	0.00	1.0000	1.0000	1.0000
