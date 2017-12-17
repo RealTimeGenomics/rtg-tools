@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -67,7 +66,6 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -76,10 +74,10 @@ abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  WithInfoEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
+  WithInfoEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, extractor, outdir, zip, slope, dualRocs, rocFilters);
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
   }
 
   @Override

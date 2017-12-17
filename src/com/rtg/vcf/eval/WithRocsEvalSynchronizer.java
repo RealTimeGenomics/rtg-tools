@@ -40,7 +40,6 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -63,7 +62,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -72,10 +70,10 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  WithRocsEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
+  WithRocsEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges);
+    super(variants);
 
     mBaselineSampleNo = variants.baselineSample();
     mCallSampleNo = variants.calledSample();

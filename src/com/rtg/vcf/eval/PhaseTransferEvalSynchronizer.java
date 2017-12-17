@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
@@ -53,7 +52,6 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -62,15 +60,15 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  PhaseTransferEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, extractor, outdir, zip, slope, dualRocs, rocFilters);
+  PhaseTransferEvalSynchronizer(VariantSet variants, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
     mCalls.getHeader().ensureContains(new InfoField(INFO_PHASE, MetaType.CHARACTER, VcfNumber.ONE, "Phase of match, A = matched in same phase, B = matched in opposite phase"));
     mCalls.getHeader().ensureContains(new FormatField(FORMAT_ORIGINAL_GT, MetaType.STRING, VcfNumber.ONE, "Original pre-phasing genotype value"));
   }
 
   @Override
   protected void handleKnownCall() throws IOException {
-    setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<String, String>()));
+    setNewInfoFields(mCrv, updateForCall(false, new LinkedHashMap<>()));
     if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
       assert mCv instanceof OrientedVariant;
       final OrientedVariant ov = (OrientedVariant) mCv;

@@ -201,7 +201,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static boolean validateModeSample(CFlags flags) {
     final String mode = (String) flags.getValue(OUTPUT_MODE);
     if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (VcfEvalTask.MODE_COMBINE.equals(mode) || VcfEvalTask.MODE_GA4GH.equals(mode))) {
-      flags.setParseMessage("--" + OUTPUT_MODE + "=combine cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
+      flags.setParseMessage("--" + OUTPUT_MODE + "=" + mode + " cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
       return false;
     }
     return true;

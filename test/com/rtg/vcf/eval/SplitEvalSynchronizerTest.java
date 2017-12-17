@@ -166,7 +166,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
         header.addLine(VcfHeader.VERSION_LINE);
         header.addSampleName("SAMPLE");
         final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
           final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
           final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
           assertEquals("name1", pair.getA());
@@ -201,7 +201,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -229,7 +229,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("name1:1-30"), new RegionRestriction("name2:1-30"));
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), ranges, RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());

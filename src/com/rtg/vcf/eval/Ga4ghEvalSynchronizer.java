@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfAltCleaner;
 import com.rtg.vcf.VcfRecord;
@@ -104,23 +103,19 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
-   * @param baselineSampleName the name of the sample used in the baseline
-   * @param callsSampleName the name of the sample used in the calls
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @param looseMatchDistance if greater than 0, apply loose matching rules with the supplied distance
    * @throws IOException if there is a problem opening output files
    */
-  Ga4ghEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
-                        String baselineSampleName, String callsSampleName,
+  Ga4ghEvalSynchronizer(VariantSet variants,
                         RocSortValueExtractor extractor,
                         File outdir, boolean zip, int looseMatchDistance) throws IOException {
-    super(variants, ranges);
+    super(variants);
     mRocExtractor = extractor;
-    mBaselineSampleNo = VcfUtils.getSampleIndexOrDie(variants.baselineHeader(), baselineSampleName, "baseline");
-    mCallSampleNo = VcfUtils.getSampleIndexOrDie(variants.calledHeader(), callsSampleName, "calls");
+    mBaselineSampleNo = variants.baselineSample();
+    mCallSampleNo = variants.calledSample();
 
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();

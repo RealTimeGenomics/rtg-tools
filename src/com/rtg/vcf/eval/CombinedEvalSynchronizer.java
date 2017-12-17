@@ -38,7 +38,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfAltCleaner;
 import com.rtg.vcf.VcfRecord;
@@ -68,7 +67,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -77,10 +75,10 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  CombinedEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
+  CombinedEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
                            File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, extractor, outdir, zip, slope, dualRocs, rocFilters);
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     mOutHeader = new VcfHeader();
     mOutHeader.addCommonHeader();

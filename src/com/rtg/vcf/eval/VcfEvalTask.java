@@ -110,11 +110,11 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       }
       final VariantSet variants = getVariants(params, templateSequences, ranges, evalRegions);
 
-      evaluateCalls(params, ranges, templateSequences, variants);
+      evaluateCalls(params, templateSequences, variants);
     }
   }
 
-  private static void evaluateCalls(VcfEvalParams params, ReferenceRanges<String> ranges, SequencesReader templateSequences, VariantSet variants) throws IOException {
+  private static void evaluateCalls(VcfEvalParams params, SequencesReader templateSequences, VariantSet variants) throws IOException {
     final File outdir = params.directory();
     if (!outdir.exists() && !outdir.mkdirs()) {
       throw new IOException("Unable to create directory \"" + outdir.getPath() + "\"");
@@ -135,7 +135,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     } else {
       o = Collections.singletonList(new Pair<>(getOrientor(bvf, params.squashPloidy(), params.baselinePhaseOrientor()), getOrientor(cvf, params.squashPloidy(), params.callsPhaseOrientor())));
     }
-    try (final EvalSynchronizer sync = getPathProcessor(params, ranges, variants)) {
+    try (final EvalSynchronizer sync = getPathProcessor(params, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());
       for (int i = 0; i < templateSequences.numberSequences(); ++i) {
@@ -148,7 +148,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     }
   }
 
-  private static EvalSynchronizer getPathProcessor(VcfEvalParams params, ReferenceRanges<String> ranges, VariantSet variants) throws IOException {
+  private static EvalSynchronizer getPathProcessor(VcfEvalParams params, VariantSet variants) throws IOException {
     final File outdir = params.directory();
     final EvalSynchronizer processor;
     final String outputMode = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
@@ -157,37 +157,37 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     switch (outputMode) {
       case MODE_ALLELES:
         if (params.squashPloidy()) {
-          processor = new SquashedAlleleAccumulator(variants, ranges, outdir, params.outputParams().isCompressed());
+          processor = new SquashedAlleleAccumulator(variants, outdir, params.outputParams().isCompressed());
         } else {
-          processor = new AlleleAccumulator(variants, ranges, outdir, params.outputParams().isCompressed());
+          processor = new AlleleAccumulator(variants, outdir, params.outputParams().isCompressed());
         }
         break;
       case MODE_RECODE:
         if (params.squashPloidy()) {
           throw new UnsupportedOperationException();
         }
-        processor = new SampleRecoder(variants, ranges, outdir, params.outputParams().isCompressed(), params.callsSample());
+        processor = new SampleRecoder(variants, outdir, params.outputParams().isCompressed(), params.callsSample());
         break;
       case MODE_PHASE_TRANSFER:
         if (params.squashPloidy() || params.twoPass()) {
           throw new UnsupportedOperationException();
         }
-        processor = new PhaseTransferEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new PhaseTransferEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_ANNOTATE:
-        processor = new AnnotatingEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new AnnotatingEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_COMBINE:
-        processor = new CombinedEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new CombinedEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_SPLIT:
-        processor = new SplitEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new SplitEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       case MODE_GA4GH:
-        processor = new Ga4ghEvalSynchronizer(variants, ranges, params.baselineSample(), params.callsSample(), rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
+        processor = new Ga4ghEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
         break;
       case MODE_ROC_ONLY:
-        processor = new RocOnlyEvalSynchronizer(variants, ranges, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
+        processor = new RocOnlyEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
       default:
         throw new NoTalkbackSlimException("Unsupported output mode:" + outputMode);

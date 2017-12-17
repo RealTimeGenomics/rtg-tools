@@ -34,8 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Set;
 
-import com.rtg.util.intervals.ReferenceRanges;
-
 /**
  * Creates only ROC files, no VCF output.
  */
@@ -43,7 +41,6 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param extractor extractor of ROC scores
    * @param outdir the output directory into which result files are written
    * @param zip true if output files should be compressed
@@ -52,10 +49,10 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param rocFilters which ROC curves to output
    * @throws IOException if there is a problem opening output files
    */
-  RocOnlyEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges,
+  RocOnlyEvalSynchronizer(VariantSet variants,
                           RocSortValueExtractor extractor,
                           File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, ranges, extractor, outdir, zip, slope, twoPass, rocFilters);
+    super(variants, extractor, outdir, zip, slope, twoPass, rocFilters);
   }
 
   @Override

@@ -36,7 +36,6 @@ import java.util.Collections;
 import java.util.List;
 
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
@@ -61,13 +60,12 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @throws IOException if there is a problem opening output files
    */
-  AlleleAccumulator(VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
-    super(variants, ranges);
+  AlleleAccumulator(VariantSet variants, File output, boolean zip) throws IOException {
+    super(variants);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     VcfHeader h = variants.baselineHeader().copy();

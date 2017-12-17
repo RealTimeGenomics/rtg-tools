@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -56,13 +55,12 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
 
   /**
    * @param variants the set of variants to evaluate
-   * @param ranges the regions from which variants are being loaded
    * @param output the output directory into which result files are written
    * @param zip true if output files should be compressed
    * @throws IOException if there is a problem opening output files
    */
-  SquashedAlleleAccumulator(VariantSet variants, ReferenceRanges<String> ranges, File output, boolean zip) throws IOException {
-    super(variants, ranges, output, zip);
+  SquashedAlleleAccumulator(VariantSet variants, File output, boolean zip) throws IOException {
+    super(variants, output, zip);
 
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader h = variants.calledHeader().copy();

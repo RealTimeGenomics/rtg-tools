@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.vcf.VcfIterator;
@@ -64,9 +63,8 @@ public abstract class InterleavingEvalSynchronizer extends EvalSynchronizer {
   /**
    * Constructor
    * @param variants returns separate sets of variants for each chromosome being processed
-   * @param ranges the ranges that variants are being read from
    */
-  public InterleavingEvalSynchronizer(VariantSet variants, ReferenceRanges<String> ranges) {
+  public InterleavingEvalSynchronizer(VariantSet variants) {
     super(variants);
   }
 
