@@ -40,7 +40,7 @@ import junit.framework.TestCase;
 public class SimpleTandemRepeatAnnotatorTest extends TestCase {
 
   private int str(final String ref, final int pos) {
-    return SimpleTandemRepeatAnnotator.str(ref.getBytes(StandardCharsets.US_ASCII), pos);
+    return SimpleTandemRepeatAnnotator.strBidrectional(ref.getBytes(StandardCharsets.US_ASCII), pos, 0);
   }
 
   public void testStr() {
@@ -52,11 +52,11 @@ public class SimpleTandemRepeatAnnotatorTest extends TestCase {
     assertEquals(0, str("ACGT", 1));
     assertEquals(3, str("AAAA", 0));
     assertEquals(3, str("AAAAT", 0));
-    assertEquals(2, str("AAAAT", 2));
+    assertEquals(3, str("AAAAT", 2));
     assertEquals(2, str("CCAAT", 2));
     assertEquals(4, str("ACTACTACTACTACTACC", 0));
-    assertEquals(4, str("ACTACTACTACTACTACC", 15));
-    assertEquals(4, str("GACTACTACTACTACTACC", 16));
+    assertEquals(4, str("ACTACTACTACTACTACG", 15));
+    assertEquals(4, str("GACTACTACTACTACTACG", 16));
     assertEquals(10, str("CCTTTTTTGGGGGGCCC", 8));
     assertEquals(100, str("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", 0));
   }

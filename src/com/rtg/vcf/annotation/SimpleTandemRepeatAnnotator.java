@@ -33,6 +33,7 @@ package com.rtg.vcf.annotation;
 import com.rtg.reader.SequencesReaderReferenceSource;
 import com.rtg.vcf.VcfAnnotator;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -78,21 +79,28 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
     final String seq = rec.getSequenceName();
     final int pos = rec.getStart();
     final byte[] refSeq = mRefSequences.getReferenceBases(seq);
+    final int refSpan = rec.getRefCall().length() - (VcfUtils.hasRedundantFirstNucleotide(rec) ? 1 : 0);
     // todo probably only add this if non-zero, or maybe  >1
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(str(refSeq, pos)));
+    rec.addInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(strBidrectional(refSeq, pos, refSpan)));
 
     // todo temp for investigation
-    final int[] left = str(refSeq, pos - 1, -1);
-    final int[] right = str(refSeq, pos, 1);
+    final int[] left0 = str(refSeq, pos, -1);
+    final int[] left1 = str(refSeq, pos - 1, -1);
+    final int[] right0 = str(refSeq, pos + refSpan, 1);
+    final int[] right1 = str(refSeq, pos + refSpan + 1, 1);
+    final int[] left = left0[0] > left1[0] ? left0 : left1;
+    final int[] right = right0[0] > right1[0] ? right0 : right1;
     rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_INFO, String.valueOf(left[0]));
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
     rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, String.valueOf(left[1]));
+    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
     rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, String.valueOf(right[1]));
   }
 
-  static int str(final byte[] refSeq, final int pos) {
+  static int strBidrectional(final byte[] refSeq, final int pos, final int refSpan) {
     // Repeats to left + repeats to right
-    return str(refSeq, pos - 1, -1)[0] + str(refSeq, pos, 1)[0];
+    // Take the larger of off by one from current position
+    return Math.max(str(refSeq, pos - 1, -1)[0], str(refSeq, pos, -1)[0])
+      + Math.max(str(refSeq, pos + refSpan, 1)[0], str(refSeq, pos + refSpan + 1, 1)[0]);
   }
 
   private static int[] str(final byte[] refSeq, final int pos, final int direction) {
