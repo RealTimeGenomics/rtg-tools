@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -326,7 +326,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
       builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
     }
-    final Set<RocFilter> rocFilters = new HashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
+    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (!mFlags.isSet(ROC_SUBSET)) {
       rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
     } else {

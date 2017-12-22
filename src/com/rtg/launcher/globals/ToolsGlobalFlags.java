@@ -89,6 +89,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public static final String VCFEVAL_DECOMPOSE_MNPS = "com.rtg.vcf.eval.decompose.break-mnps";
   /** During vcfeval decomposition also separate remaining indels into individual SNPs plus an insertion/deletion */
   public static final String VCFEVAL_DECOMPOSE_INDELS = "com.rtg.vcf.eval.decompose.break-indels";
+  /** Whether to apply ROC sub-category baseline rescaling to adjust for representation bias */
+  public static final String VCFEVAL_ROC_SUBSET_RESCALE = "com.rtg.vcf.eval.roc-subset-rescale";
 
   ToolsGlobalFlags(List<Flag<?>> flags) {
     super(flags);
@@ -124,5 +126,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_PRUNE_NO_OPS, Boolean.class, Boolean.TRUE);
     registerFlag(VCFEVAL_DECOMPOSE_MNPS, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_DECOMPOSE_INDELS, Boolean.class, Boolean.FALSE);
+    registerFlag(VCFEVAL_ROC_SUBSET_RESCALE, Boolean.class, Boolean.TRUE);
   }
 }

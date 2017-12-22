@@ -32,7 +32,7 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,13 +78,13 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     mBaselineSampleNo = variants.baselineSample();
     mCallSampleNo = variants.calledSample();
 
-    final Set<RocFilter> filters = new HashSet<>(rocFilters);
+    final Set<RocFilter> filters = new LinkedHashSet<>(rocFilters);
     if (mCallSampleNo == -1 && extractor.requiresSample()) {
       Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
     } else if (mCallSampleNo == -1 || mBaselineSampleNo == -1) {
       filters.removeIf(RocFilter::requiresGt);
       if (filters.size() != rocFilters.size()) {
-        final Set<RocFilter> excluded = new HashSet<>();
+        final Set<RocFilter> excluded = new LinkedHashSet<>();
         excluded.addAll(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
         Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
       }
@@ -120,9 +120,9 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     if (!(tp || alleleMatch || fn)) {
       throw new IllegalArgumentException();
     }
-    mDefaultRoc.incrementBaselineCount(mBrv, mBaselineSampleNo);
+    mDefaultRoc.incrementBaselineCount(mBrv, mBaselineSampleNo, tp);
     if (mAlleleRoc != null) {
-      mAlleleRoc.incrementBaselineCount(mBrv, mBaselineSampleNo);
+      mAlleleRoc.incrementBaselineCount(mBrv, mBaselineSampleNo, tp || alleleMatch);
     }
   }
 

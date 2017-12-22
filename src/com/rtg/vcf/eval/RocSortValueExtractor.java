@@ -123,7 +123,7 @@ public abstract class RocSortValueExtractor {
 
     @Override
     public String toString() {
-      return "TEST";
+      return "NONE";
     }
   };
 }

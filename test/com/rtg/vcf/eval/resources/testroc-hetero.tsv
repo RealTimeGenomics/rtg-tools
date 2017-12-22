@@ -1,5 +1,5 @@
 #Version [...]
-#selection: HET
+#selection: HET (baseline rescaled)
 #total baseline variants: 3
 #total call variants: 4
 #score field: GQ (FORMAT)

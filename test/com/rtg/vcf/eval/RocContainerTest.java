@@ -73,6 +73,7 @@ public class RocContainerTest extends TestCase {
       roc.addRocLine(new RocPoint(0.1, 0.5, 0.0, 1.0), v);
       roc.addRocLine(new RocPoint(0.3, 1.5, 0.0, 1.0), v);
       roc.mBaselineTotals.add(v, 5);
+      roc.mBaselineTpTotal.add(v, 5);
       roc.writeRocs(dir, true, false);
       final File allFile = new File(dir, "weighted_roc.tsv.gz");
       final String all = FileHelper.gzFileToString(allFile);
