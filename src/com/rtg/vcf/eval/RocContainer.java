@@ -166,7 +166,7 @@ public class RocContainer {
    * Add ROC outputs for all the supplied filters to the container
    * @param filters filtered curves to generate
    */
-  void addFilters(Set<RocFilter> filters) {
+  public void addFilters(Set<RocFilter> filters) {
     assert filters != null;
     for (RocFilter f : filters) {
       addFilter(f);
