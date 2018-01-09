@@ -120,11 +120,11 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
   }
 
   // Check if the repeating unit is itself a homopolymer, if it is there is no point in testing this repUnitLength
-  private static boolean selfRepeat(byte[] refSeq, int pos, int direction, int repUnitLength) {
+  private static boolean selfRepeat(final byte[] refSeq, final int pos0, final int direction, final int repUnitLength) {
     if (repUnitLength <= 1) {
       return false;
     }
-    for (int k = 1, p = pos + direction; k < repUnitLength; ++k, pos += direction) {
+    for (int k = 1, pos = pos0, p = pos0 + direction; k < repUnitLength; ++k, pos += direction) {
       if (p >= 0 && p < refSeq.length && refSeq[p] != refSeq[pos]) {
         return false;
       }
