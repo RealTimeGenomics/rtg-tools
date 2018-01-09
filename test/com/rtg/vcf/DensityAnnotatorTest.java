@@ -47,7 +47,7 @@ public class DensityAnnotatorTest extends AbstractNanoTest {
     try (final ByteArrayOutputStream bos = new ByteArrayOutputStream();
          final PrintStream out = new PrintStream(bos)) {
       try (VcfReader reader = new VcfReader(new BufferedReader(new InputStreamReader(DensityAnnotatorTest.class.getClassLoader().getResourceAsStream("com/rtg/vcf/resources/vcfdensity_in.vcf"))))) {
-        try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(DensityAnnotator.updateHeader(reader.getHeader(), distance), null, out), distance)) {
+        try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, out), distance)) {
           while (reader.hasNext()) {
             final VcfRecord rec = reader.next();
             writer.write(rec);

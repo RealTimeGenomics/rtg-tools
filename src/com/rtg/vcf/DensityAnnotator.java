@@ -45,10 +45,11 @@ import com.rtg.vcf.header.VcfNumber;
  * a specified distance either side of the record.  Counting and annotation is done
  * per sample.
  */
-class DensityAnnotator implements VcfWriter {
+public class DensityAnnotator implements VcfWriter {
 
   private static final String DENSITY_ATTRIBUTE = "DENS";
-  static final int DEFAULT_DISTANCE = 5;
+  /** Default distance to look on either side of a variant. */
+  public static final int DEFAULT_DISTANCE = 5;
   final VcfWriter mInner;
   final int mDistance;
   final Queue<VcfRecord> mBuffer = new ArrayDeque<>();
@@ -57,15 +58,15 @@ class DensityAnnotator implements VcfWriter {
   DensityAnnotator(final VcfWriter w, final int distance) {
     mInner = w;
     mDistance = distance;
+    w.getHeader().ensureContains(new FormatField(DENSITY_ATTRIBUTE, MetaType.INTEGER, VcfNumber.ONE, "Number of variants within " + distance + " bases"));
   }
 
-  DensityAnnotator(final VcfWriter w) {
+  /**
+   * Default density annotator.
+   * @param w underlying writer
+   */
+  public DensityAnnotator(final VcfWriter w) {
     this(w, DEFAULT_DISTANCE);
-  }
-
-  static VcfHeader updateHeader(final VcfHeader header, final int distance) {
-    header.ensureContains(new FormatField(DENSITY_ATTRIBUTE, MetaType.INTEGER, VcfNumber.ONE, "Number of variants within " + distance + " bases"));
-    return header;
   }
 
   @Override
@@ -141,7 +142,7 @@ class DensityAnnotator implements VcfWriter {
   public static void main(String[] args) throws IOException {
     final int distance = Integer.parseInt(args[0]);
     try (VcfReader reader = VcfReader.openVcfReader(new File(args[1]))) {
-      try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(updateHeader(reader.getHeader(), distance), null, System.out), distance)) {
+      try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           writer.write(rec);
