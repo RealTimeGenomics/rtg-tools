@@ -71,12 +71,14 @@ public class BreakpointAlt {
     }
     final String remoteString = alt.substring(bracketPos + 1, nextBracketPos);
     final int colonPos = remoteString.indexOf(':');
-    if (colonPos == -1) {
+    if (colonPos == -1 || colonPos == 0) {
       throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }
     mRemoteChr = remoteString.substring(0, colonPos);
-    if (mRemoteChr.indexOf('<') != -1) {
-      throw new IllegalArgumentException("Contig breakends are not supported: " + alt); // e.g. "C[<ctg1>:7["
+    if (mRemoteChr.indexOf('<') != -1) { // Contig breakend specification e.g. "C[<ctg1>:7["
+      if ((mRemoteChr.charAt(0) != '<') || (mRemoteChr.charAt(mRemoteChr.length() - 1) != '>')) {
+        throw new IllegalArgumentException("Illegal contig breakend specification: " + alt);
+      }
     }
     mRemotePos = Integer.parseInt(remoteString.substring(colonPos + 1)) - 1; // to 0-based
     mRefSubs = mLocalUp ? alt.substring(0, bracketPos) : alt.substring(nextBracketPos + 1);

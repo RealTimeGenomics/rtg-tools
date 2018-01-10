@@ -40,6 +40,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.rtg.mode.DnaUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -881,6 +882,65 @@ public final class VcfUtils {
         throw new VcfFormatException("Additional header line '" + extraLine + "', " + e.getMessage()); // Add context information
       }
     }
+  }
+
+  /**
+   * Generate the haplotype obtained by asserting the first ALT allele in a VCF record. This is intended
+   * for small test examples rather than whole chromosomes.
+   * @param rec the record containing the variant. Breakpoint and symbolic alleles are supported
+   * @param refs a dictionary that must contain the full reference sequence for any sequences required by the variant.
+   * @return the asserted haplotype
+   */
+  public static String replayAllele(VcfRecord rec, Map<String, String> refs) {
+    return replayAllele(rec, 1, refs);
+  }
+
+  /**
+   * Generate the haplotype obtained by a given allele in a VCF record. This is intended
+   * for small test examples rather than whole chromosomes.
+   * @param rec the record containing the variant. Breakpoint and symbolic alleles are supported
+   * @param alleleId the index of the allele to replay (using GT allele numbering)
+   * @param refs a dictionary that must contain the full reference sequence for any sequences required by the variant.
+   * @return the asserted haplotype
+   */
+  public static String replayAllele(VcfRecord rec, int alleleId, Map<String, String> refs) {
+    final String alt = rec.getAllele(alleleId);
+    final VariantType sType = VariantType.getSymbolicAlleleType(alt);
+    if (sType == null) { // Non-symbolic
+      final String fulllocal = refs.get(rec.getSequenceName());
+      return fulllocal.substring(0, rec.getStart()) + alt + fulllocal.substring(rec.getStart() + rec.getRefCall().length());
+    } else {
+      switch (sType) {
+        case SV_BREAKEND:
+          return replayBreakpoint(rec.getSequenceName(), rec.getStart(), rec.getRefCall(), new BreakpointAlt(rec.getAltCalls().get(0)), refs);
+        case SV_SYMBOLIC:
+          return replaySymbolic(rec, alt, refs);
+        case SV_MISSING:
+          throw new RuntimeException("Cannot replay spanning deletion allele: " + alt);
+        default:
+          throw new RuntimeException("Unrecognized symbolic allele type: " + sType);
+      }
+    }
+  }
+
+  private static String replaySymbolic(VcfRecord rec, String alt, Map<String, String> refs) {
+    final String fulllocal = refs.get(rec.getSequenceName());
+    final int symbolStart = alt.indexOf('<');
+    if (symbolStart == -1) {
+      throw new VcfFormatException("Invalid symbolic allele: " + alt);
+    }
+    final String fullremote = refs.get(alt.substring(symbolStart));
+    return fulllocal.substring(0, rec.getStart()) + alt.substring(0, symbolStart) + fullremote + fulllocal.substring(rec.getStart() + rec.getRefCall().length());
+  }
+
+  private static String replayBreakpoint(String localChr, int pos, String ref, BreakpointAlt alt, Map<String, String> refs) {
+    final String fulllocal = refs.get(localChr);
+    final String fullremote = refs.get(alt.getRemoteChr());
+    final String localpart = alt.isLocalUp() ? fulllocal.substring(0, pos) : fulllocal.substring(pos + ref.length());
+    final String remotepart = alt.isRemoteUp() ? fullremote.substring(0, alt.getRemotePos()) : fullremote.substring(alt.getRemotePos() + 1);
+    return alt.isLocalUp()
+      ? localpart + alt.getRefSubstitution() + (alt.isRemoteUp() ? DnaUtils.reverseComplement(remotepart) : remotepart)
+      : (alt.isRemoteUp() ? remotepart : DnaUtils.reverseComplement(remotepart)) + alt.getRefSubstitution() + localpart;
   }
 
 }
