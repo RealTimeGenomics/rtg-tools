@@ -105,11 +105,17 @@ public class TabixIndexReader extends AbstractIndexReader {
       int start = 0;
       for (int i = 0; i < nameLength; ++i) {
         if (nameBuf[i] == 0) {
+          if (seqNo >= numberReferences) {
+            throw new IOException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (more sequence names provided than expected)");
+          }
           mSequenceNames[seqNo] = new String(nameBuf, start, i - start);
           mSequenceLookup.put(mSequenceNames[seqNo], seqNo);
           start = i + 1;
           ++seqNo;
         }
+      }
+      if (seqNo != numberReferences) {
+        throw new IOException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (insufficient number of sequence names provided)");
       }
       seqNo = 0;
       mBinPositions = new long[numberReferences];
