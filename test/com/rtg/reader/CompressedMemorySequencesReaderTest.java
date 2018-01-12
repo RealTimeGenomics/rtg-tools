@@ -31,10 +31,14 @@ package com.rtg.reader;
 
 import static com.rtg.util.StringUtils.LS;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -331,6 +335,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     assertEquals(0, cmsr.numberSequences());
 
   }
+
   public void testEmptyFasta() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDNA("", mDir, new SdfId(0L));
     reader.close();
@@ -344,4 +349,49 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     assertNull(msr.getReadMe());
   }
 
+  private static final String FASTQ = ""
+    + "@seq1\n"
+    + "AGAGGGTTTCAGA\n"
+    + "+\n"
+    + "@BBDFFDFHHHHH\n"
+    + "@seq2\n"
+    + "\n"
+    + "+\n"
+    + "\n"
+    + "@seq3\n"
+    + "GTTTCAAACCTGC\n"
+    + "+\n"
+    + "C@CFFFFFHHHHH\n"
+    + "@seq4\n"
+    + "\n"
+    + "+\n"
+    + "\n"
+    ;
+
+  public void testEmptySequenceInFastq() throws IOException {
+    final File fqFile = File.createTempFile("test", ".fq", mDir);
+    FileUtils.stringToFile(FASTQ, fqFile);
+
+    final FastqSequenceDataSource fqSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(FASTQ.getBytes(StandardCharsets.US_ASCII))), QualityFormat.SANGER);
+
+    final SequencesWriter sw = new SequencesWriter(fqSource, null, PrereadType.UNKNOWN, true);
+    sw.setSdfId(new SdfId(0));
+    final SequencesReader reader = sw.processSequencesInMemory(fqFile, true, new SimpleNames(), null, LongRange.NONE);
+
+    assertTrue(reader.hasQualityData());
+    assertEquals(4, reader.numberSequences());
+    assertEquals("seq1", reader.name(0));
+    assertEquals("seq2", reader.name(1));
+    assertEquals("seq3", reader.name(2));
+    assertEquals("seq4", reader.name(3));
+    assertEquals(13, reader.length(0));
+    assertEquals(0, reader.length(1));
+    assertEquals(13, reader.length(2));
+    assertEquals(0, reader.length(3));
+    assertEquals(13, reader.readQuality(0).length);
+    assertEquals(0, reader.readQuality(1).length);
+    assertEquals(13, reader.readQuality(2).length);
+    assertEquals(0, reader.readQuality(3).length);
+    assertEquals("[34, 31, 34, 37, 37, 37, 37, 37, 39, 39, 39, 39, 39]", Arrays.toString(reader.readQuality(2)));
+  }
 }

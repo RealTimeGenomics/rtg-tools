@@ -449,6 +449,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     } else if (length > dest.length) {
       throw new IllegalArgumentException("Array too small got: " + dest.length + " required: " + length);
     }
+
     mQualityData.get(dest, sequenceIndex, start, length);
 
     // check every Nth (256) read for CRC corruption w.r.t. the original file.

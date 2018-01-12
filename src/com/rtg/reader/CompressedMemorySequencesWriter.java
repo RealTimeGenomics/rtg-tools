@@ -33,16 +33,14 @@ import java.io.File;
 import java.util.zip.CRC32;
 
 import com.rtg.mode.SequenceType;
-import com.rtg.util.bytecompression.CompressedByteArray;
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.array.ExtensibleIndex;
 import com.rtg.util.array.longindex.LongCreate;
 import com.rtg.util.bytecompression.BitwiseByteArray;
 import com.rtg.util.bytecompression.ByteBaseCompression;
 import com.rtg.util.bytecompression.ByteCompression;
+import com.rtg.util.bytecompression.CompressedByteArray;
 import com.rtg.util.bytecompression.MultiByteArray;
-import com.rtg.util.diagnostic.ErrorType;
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.LongRange;
 
 /**
  *
@@ -176,26 +174,22 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
   @Override
   public void write(byte[] rs, byte[] qs, int length) {
     mHasData = true;
-    if (length > 0) {
-      if (mRestriction.isInRange(mCurrentId)) {
-        mSeqData.set(mCurrentPosition, rs, length);
-        mDataHashFunction.irvineHash(rs, length);
-        mChecksumSeq.update(rs, 0, length);
-        if (mHasQuality) {
-          if (qs[0] == -1) {
-            throw new NoTalkbackSlimException(ErrorType.INVALID_QUALITY_LENGTH, mCurrentLabel == null ? Long.toString(mCurrentId) : mCurrentLabel.toString());
-          }
-          clipQuality(qs, length);
-          mQualData.add(qs, 0, length); // This only works if this method gets one sequence at a time
-          mQualityHashFunction.irvineHash(qs, length);
-          mChecksumQual.update(qs, 0, length);
-        }
-        mCurrentPosition += length;
-      }
-      mCurrentLength += length;
-    } else {
+    if (length == 0) {
       noSequenceWarning(mCurrentLabel);
     }
+    if (mRestriction.isInRange(mCurrentId)) {
+      mSeqData.set(mCurrentPosition, rs, length);
+      mDataHashFunction.irvineHash(rs, length);
+      mChecksumSeq.update(rs, 0, length);
+      if (mHasQuality) {
+        clipQuality(qs, length);
+        mQualData.add(qs, 0, length); // This only works if this method gets one sequence at a time
+        mQualityHashFunction.irvineHash(qs, length);
+        mChecksumQual.update(qs, 0, length);
+      }
+      mCurrentPosition += length;
+    }
+    mCurrentLength += length;
     updateCountStatistics(rs, qs, length);
   }
 
