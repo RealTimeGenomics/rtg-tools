@@ -1,4 +1,4 @@
-The Simplified BSD License
+BSD 2-Clause License
 
 Copyright (c) 2015, Real Time Genomics Limited
 All rights reserved.
