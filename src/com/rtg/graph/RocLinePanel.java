@@ -163,11 +163,15 @@ class RocLinePanel extends JPanel {
 
     rangeSlider.addChangeListener(e -> {
       final JSlider slider = (JSlider) e.getSource();
-      mDataBundle.setScoreRange(0.0f, slider.getValue() / 1000.0f);
+      mDataBundle.setScoreMax(slider.getValue() / 1000.0f);
       mRocPlot.showCurrentGraph();
-      final TextPoint2D data1 = mDataBundle.getMaxRangedPoint();
-      if (data1 != null) {
-        mStatusBar.setString(RocPlot.getMetricString(mDataBundle.getTotalVariants(), data1, null) + " Threshold=" + data1.getText());
+      final TextPoint2D data1 = mDataBundle.getMaxRangedLabel();
+      if (data1 != null && data1.getX() > 0 && data1.getY() > 0) {
+        final String threshold = data1.getText();
+        final String tlabel = threshold != null ? " Threshold=" + threshold : "";
+        mStatusBar.setString(RocPlot.getMetricString(mDataBundle.getTotalVariants(), data1, null) + tlabel);
+      } else {
+        mStatusBar.setString("");
       }
     });
 

@@ -155,7 +155,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     super.finish();
     mDefaultRoc.missingScoreWarning();
     if (mCallOutside > 0) {
-      final RocPoint total = mDefaultRoc.getTotal(RocFilter.ALL);
+      final RocPoint<?> total = mDefaultRoc.getTotal(RocFilter.ALL);
       final int callTotal = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives() + mCallOutside);
       Diagnostic.userLog("Fraction of calls outside evaluation regions: " + Utils.realFormat((double) mCallOutside / callTotal, 4) + " (" + mCallOutside + "/" + callTotal + ")");
     }

@@ -37,18 +37,19 @@ import org.junit.Test;
  */
 public class RocPointTest {
   @Test
-  public void add() throws Exception {
-    final RocPoint a = new RocPoint(0.1, 0.3, 0.4, 0.5);
-    final RocPoint b = new RocPoint(0.1, 0.2, 0.9, 0.7);
+  public void add() {
+    final RocPoint<Double> a = new RocPoint<>(0.1, 0.3, 0.4, 0.5);
+    final RocPoint<Double> b = new RocPoint<>(0.1, 0.2, 0.9, 0.7);
     a.add(b);
     Assert.assertEquals(0.5, a.getTruePositives(), 1e-8);
     Assert.assertEquals(1.3, a.getFalsePositives(), 1e-8);
     Assert.assertEquals(1.2, a.getRawTruePositives(), 1e-8);
   }
+
   @Test
-  public void copyConstructor() throws Exception {
-    final RocPoint a = new RocPoint(0.1, 0.3, 0.4, 0.5);
-    final RocPoint b = new RocPoint(a);
+  public void copyConstructor() {
+    final RocPoint<Double> a = new RocPoint<>(0.1, 0.3, 0.4, 0.5);
+    final RocPoint<Double> b = new RocPoint<>(a);
     Assert.assertEquals(0.1, b.getThreshold(), 1e-8);
     Assert.assertEquals(0.3, b.getTruePositives(), 1e-8);
     Assert.assertEquals(0.4, b.getFalsePositives(), 1e-8);

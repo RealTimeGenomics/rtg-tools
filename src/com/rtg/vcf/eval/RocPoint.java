@@ -33,8 +33,8 @@ package com.rtg.vcf.eval;
 /**
  * Container for the ROC plot points
  */
-public final class RocPoint {
-  private double mThreshold;
+public final class RocPoint<T> {
+  private T mThreshold;
   private double mTruePositives;
   private double mRawTruePositives;
   private double mFalsePositives;
@@ -43,14 +43,14 @@ public final class RocPoint {
    * Construct a point with all 0.0
    */
   RocPoint() {
-    this(Double.NaN, 0, 0, 0);
+    this(null, 0, 0, 0);
   }
 
   /**
    * Construct a new point from an existing one
    * @param other the point to copy
    */
-  RocPoint(RocPoint other) {
+  RocPoint(RocPoint<T> other) {
     this(other.mThreshold, other.mTruePositives, other.mFalsePositives, other.mRawTruePositives);
   }
 
@@ -60,24 +60,24 @@ public final class RocPoint {
    * @param falsePositives number of false positives within the threshold
    * @param tpraw number of true positives within the threshold, as measured against the call set
    */
-  public RocPoint(double threshold, double truePositives, double falsePositives, double tpraw) {
+  public RocPoint(T threshold, double truePositives, double falsePositives, double tpraw) {
     mThreshold = threshold;
     mTruePositives = truePositives;
     mFalsePositives = falsePositives;
     mRawTruePositives = tpraw;
   }
 
-  void add(RocPoint p) {
+  void add(RocPoint<T> p) {
     mTruePositives += p.mTruePositives;
     mFalsePositives += p.mFalsePositives;
     mRawTruePositives += p.mRawTruePositives;
   }
 
-  public void setThreshold(double threshold) {
+  public void setThreshold(T threshold) {
     mThreshold = threshold;
   }
 
-  public double getThreshold() {
+  public T getThreshold() {
     return mThreshold;
   }
 
@@ -92,4 +92,10 @@ public final class RocPoint {
   public double getFalsePositives() {
     return mFalsePositives;
   }
+
+  @Override
+  public String toString() {
+    return "" + mThreshold + "\t" + mTruePositives + "\t" + mFalsePositives + "\t" + mRawTruePositives;
+  }
+
 }

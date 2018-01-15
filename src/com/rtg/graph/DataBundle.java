@@ -34,63 +34,144 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.reeltwo.plot.Point2D;
 import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.TextPlot2D;
 import com.reeltwo.plot.TextPoint2D;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.ContingencyTable;
+import com.rtg.util.Pair;
+import com.rtg.util.Utils;
 import com.rtg.vcf.eval.RocFilter;
 import com.rtg.vcf.eval.RocPoint;
+import com.rtg.vcf.eval.RocUtils;
 
 /**
- * Holds counts.
+ * Holds a set of graph data for plotting.
  */
 final class DataBundle {
+
+  enum GraphType { ROC, PRECISION_RECALL }
+
   private static final int TOTAL_LABELS = 10;
 
-  private final Point2D[] mPoints;
-  private final String[] mScores;
+  private static final float MIN_SENSITIVITY_INTERVAL = GlobalFlags.getIntegerValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATION_GAP);
+  private static final boolean ESTIMATION = GlobalFlags.getBooleanValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATE);
+  private static final boolean LABEL_INTERPOLATED = GlobalFlags.getBooleanValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATE_LABEL);
 
-  private final Point2D[] mPrecisionRecall;
+  private final Point2D[] mRocPoints;
+  private final String[] mRocScores;
 
-  private String mTitle;
+  private final Point2D[] mPrecisionRecallPoints;
+  private final String[] mPrecisionRecallScores;
+
   private final int mTotalVariants;
   private final float mMinPrecision;
+
+  private String mTitle;
+  private String mScoreName;
   private boolean mShow;
 
+  private GraphType mGraphType = null;
+  private float mRangeMax = 1.0f;
   private Point2D[] mRangedPoints = null;
   private String[] mRangedScores = null;
-  private TextPoint2D[] mRangedPosPoints = null;
-  private TextPoint2D[] mRangedPrecisionRecallPosPoints = null;
-  private Point2D[] mRangedPrecisionRecall;
-  private String mScoreName;
+  private TextPoint2D[] mRangedLabels = null;
 
-  DataBundle(String title, RocPoint[] points, String[] labels, int totalVariants) {
-    final List<Point2D> asPoints = Arrays.stream(points)
-      .map(point -> new Point2D((float) point.getFalsePositives(), (float) point.getTruePositives()))
-      .collect(Collectors.toList());
-    mPoints = asPoints.toArray(new Point2D[asPoints.size()]);
-    mScores = labels;
+  DataBundle(String title, List<RocPoint<String>> points, int totalVariants) {
     mTitle = title;
     mTotalVariants = totalVariants;
     mShow = true;
-    mPrecisionRecall = new Point2D[totalVariants > 0 ? points.length - 1 : 0];
-    final boolean hasRaw = Arrays.stream(points).anyMatch(x -> x.getRawTruePositives() > 0);
-    float minPrecision = 100;
-    for (int i = 0; i < mPrecisionRecall.length; ++i) {
-      final RocPoint point = points[i + 1];
-      final double truePositives = point.getTruePositives();
-      final float rawTp = (float) (hasRaw ? point.getRawTruePositives() : truePositives);
-      final float x = (float) (ContingencyTable.recall(truePositives, mTotalVariants - truePositives) * 100.0);
-      final float y = (float) (ContingencyTable.precision(rawTp, point.getFalsePositives()) * 100.0);
-      mPrecisionRecall[i] = new Point2D(x, y);
-      minPrecision = Math.min(minPrecision, y);
-    }
-    mMinPrecision = minPrecision;
 
-    resetRange();
+    final List<RocPoint<String>> interpolated;
+    final RocUtils.ThresholdInterpolator<String> iLabels = LABEL_INTERPOLATED ? new DetailedThresholdInterpolator() : new RocUtils.NullThresholdInterpolator<>();
+    if (ESTIMATION) {
+      final double tpStep = totalVariants * MIN_SENSITIVITY_INTERVAL / 100;
+      //System.err.println("Interpolation step size for sens " + MIN_SENSITIVITY_INTERVAL + "% is: " + Utils.realFormat(tpStep, 2) + " TP");
+      interpolated = RocUtils.interpolate(points, tpStep, iLabels);
+    } else {
+      interpolated = points;
+    }
+    mRocPoints = interpolated.stream()
+      .map(point -> new Point2D((float) point.getFalsePositives(), (float) point.getTruePositives()))
+      .toArray(Point2D[]::new);
+    mRocScores = interpolated.stream().map(RocPoint::getThreshold).toArray(String[]::new);
+    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(interpolated, totalVariants, ESTIMATION, iLabels);
+    mPrecisionRecallPoints = pr.getA().toArray(new Point2D[0]);
+    mPrecisionRecallScores = pr.getB().toArray(new String[0]);
+    mMinPrecision = findMinPrecision();
+  }
+
+  private float findMinPrecision() {
+    float minPrecision = 100;
+    for (int i = 0; i < mPrecisionRecallPoints.length; i++) {
+      if (mPrecisionRecallScores[i] != null) {
+        minPrecision = Math.min(minPrecision, mPrecisionRecallPoints[i].getY());
+      }
+    }
+    return minPrecision;
+  }
+
+
+  // Displays selection criteria at interpolated points.
+  // This may be confusing for most users
+  static final class DetailedThresholdInterpolator implements RocUtils.ThresholdInterpolator<String> {
+    private static final String TOP = "\u22a4";
+    private static final String BOTTOM = "\u22a5";
+
+    @Override
+    public String interpolate(String a, String b, double frac) {
+      if (frac <= 0) {
+        return getLabel(a, BOTTOM);
+      } else if (frac >= 1) {
+        return getLabel(b, TOP);
+      } else {
+        return "p>" + Utils.realFormat(frac, 2) + "?" + getLabel(a, BOTTOM) + ":" + getLabel(b, TOP);
+      }
+    }
+    private static String getLabel(Object o, String fixed) {
+      return o == null ? fixed : String.valueOf(o);
+    }
+  }
+
+  private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants, boolean extrapolate, RocUtils.ThresholdInterpolator<T> iLabels) {
+    final List<Point2D> res = new ArrayList<>();
+    final List<T> scores = new ArrayList<>();
+    if (totalVariants > 0) {
+      final boolean hasRaw = points.stream().anyMatch(x -> x.getRawTruePositives() > 0);
+      for (int i = 0; i < points.size(); ++i) {
+        final RocPoint<T> point = points.get(i);
+        if (i == 0 && point.getTruePositives() + point.getFalsePositives() <= 0) {
+          // Typically the first point corresponds to TP=0/FP=0 where precision is undefined - we can extrapolate this.
+          if (extrapolate && i + 1 < points.size()) {
+            // Via ROC interpolation we could assume precision is constant as we asymptotically approach (TP+FP) = 0
+            final Point2D pr = new Point2D(0, getPrecisionRecall(points.get(i + 1), totalVariants, hasRaw).getY());
+            res.add(pr);
+            scores.add(point.getThreshold());
+          }
+        } else {
+          final Point2D pr = getPrecisionRecall(point, totalVariants, hasRaw);
+          res.add(pr);
+          scores.add(point.getThreshold());
+        }
+      }
+      if (extrapolate && res.size() > 0) { // Add final point
+        final Point2D pen = res.get(res.size() - 1);
+        res.add(new Point2D(pen.getX(), 0));
+        scores.add(iLabels.interpolate(scores.get(scores.size() - 1), null, 1.0));
+      }
+    }
+    return new Pair<>(res, scores);
+  }
+
+  private static <T> Point2D getPrecisionRecall(RocPoint<T> point, int totalVariants, boolean hasRaw) {
+    final double truePositives = point.getTruePositives();
+    final double x = ContingencyTable.recall(truePositives, totalVariants - truePositives) * 100.0;
+    final double rawTp = hasRaw ? point.getRawTruePositives() : truePositives;
+    final double y = ContingencyTable.precision(rawTp, point.getFalsePositives()) * 100.0;
+    return new Point2D((float) x, (float) y);
   }
 
   boolean show() {
@@ -133,103 +214,125 @@ final class DataBundle {
     }
   }
 
-  void setScoreRange(float min, float max) {
-    final int smin = (int) (min * mScores.length);
-    final int smax = (int) (max * mScores.length);
-
-    final ArrayList<String> scores = new ArrayList<>();
-    final ArrayList<Point2D> points = new ArrayList<>();
-    final ArrayList<Point2D> precisionRecallPoints = new ArrayList<>();
-
-    for (int i = smin; i < smax; ++i) {
-      scores.add(mScores[i]);
-      points.add(mPoints[i]);
+  void setGraphType(GraphType graphType) {
+    if (graphType != mGraphType) {
+      mGraphType = graphType;
+      updateRangedData();
     }
-    precisionRecallPoints.addAll(Arrays.asList(mPrecisionRecall).subList(smin, Math.min(smax, mPrecisionRecall.length - 1)));
-
-    mRangedPoints = points.toArray(new Point2D[points.size()]);
-    mRangedPrecisionRecall = precisionRecallPoints.toArray(new Point2D[precisionRecallPoints.size()]);
-    mRangedScores = new String[scores.size()];
-    for (int i = 0; i < scores.size(); ++i) {
-      mRangedScores[i] = scores.get(i);
-    }
-
-    updateLabels();
   }
 
-  void resetRange() {
-    mRangedPoints = mPoints;
-    mRangedScores = mScores;
-    mRangedPrecisionRecall = mPrecisionRecall;
+  void setScoreMax(float max) {
+    mRangeMax = max;
+    updateRangedData();
+  }
+
+  void updateRangedData() {
+    // Since the roc graph and PR graph may contain slightly different numbers of points (due to extrapolation at ends)
+    // the current slider position may represent a slightly different threshold on each of the graphs.
+    // Ideally we should find the point on the PR graph that has the corresponding threshold
+    switch (mGraphType) {
+      case ROC:
+        if (mRangeMax >= 1.0f) {
+          mRangedPoints = mRocPoints;
+          mRangedScores = mRocScores;
+        } else {
+          final int smax = (int) (mRangeMax * mRocPoints.length);
+          mRangedPoints = Arrays.copyOf(mRocPoints, smax);
+          mRangedScores = Arrays.copyOf(mRocScores, smax);
+        }
+        break;
+      case PRECISION_RECALL:
+        if (mRangeMax >= 1.0f) {
+          mRangedPoints = mPrecisionRecallPoints;
+          mRangedScores = mPrecisionRecallScores;
+        } else {
+          final int pmax = (int) (mRangeMax * mPrecisionRecallPoints.length);
+          mRangedPoints = Arrays.copyOf(mPrecisionRecallPoints, pmax);
+          mRangedScores = Arrays.copyOf(mPrecisionRecallScores, pmax);
+        }
+        break;
+      default:
+        mRangedPoints = null;
+        mRangedScores = null;
+    }
     updateLabels();
   }
 
   private void updateLabels() {
-    mRangedPosPoints = updateLabels(mRangedPoints, mRangedScores);
-    mRangedPrecisionRecallPosPoints = updateLabels(mRangedPrecisionRecall, mRangedScores);
+    if (mRangedPoints != null) {
+      mRangedLabels = updateLabels(mRangedPoints, mRangedScores);
+    }
   }
   private TextPoint2D[] updateLabels(Point2D[] rangedPoints, String[] rangedScores) {
-    final ArrayList<Integer> counts = new ArrayList<>();
-    float px = 0;
-    float py = 0;
-    if (rangedPoints.length != 0) {
-      px = rangedPoints[0].getX();
-      py = rangedPoints[0].getY();
+    final ArrayList<Double> counts = new ArrayList<>();
+    Point2D pp = null;
+    int firstI = rangedPoints.length;
+    for (int i = 0; i < rangedPoints.length && pp == null; i++) { // Find first point with a label provided
+      if (rangedScores[i] == null) {
+        continue;
+      }
+      firstI = i;
+      pp = rangedPoints[i];
     }
-    int countTotal = 0;
-    for (Point2D p : rangedPoints) {
-      final int c = (int) (p.getX() - px + p.getY() - py);
+    double countTotal = 0;
+    for (int i = firstI + 1; i < rangedPoints.length; i++) { // Sum up approx distance between labelled points
+      if (rangedScores[i] == null) {
+        continue;
+      }
+      final Point2D p = rangedPoints[i];
+      final double c = Math.sqrt(Math.pow(p.getX() - pp.getX(), 2) + Math.pow(p.getY() - pp.getY(), 2));
       counts.add(c);
       countTotal += c;
-      px = p.getX();
-      py = p.getY();
-      //System.err.println(c + " px: " + p.getX() + " py: " + p.getY());
+      pp = p;
     }
 
-    final ArrayList<TextPoint2D> posPoints = new ArrayList<>();
     // set up score labels - make TOTAL_LABELS per line
+    final ArrayList<TextPoint2D> posPoints = new ArrayList<>();
+    if (firstI < rangedPoints.length) {
+      posPoints.add(new TextPoint2D(rangedPoints[firstI].getX(), rangedPoints[firstI].getY(), rangedScores[firstI]));
+    }
     if (countTotal != 0) {
       final double step = countTotal / (double) TOTAL_LABELS;
       double next = step;
-      Point2D p = rangedPoints[0];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[0]));
+      int pi = firstI;
+      int prevI = firstI;
       if (step > 0) {
-        int c = 0;
-        for (int i = 0; i < counts.size(); ++i) {
-          for (int j = 0; j < counts.get(i); ++j) {
-            ++c;
-            if (c >= next && posPoints.size() <= TOTAL_LABELS - 1) {
-              while (c >= next) {
-                next += step;
-              }
-              p = rangedPoints[i];
-              posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[i]));
+        double c = 0;
+        for (Double count : counts) {
+          do {
+            pi++;
+          } while (rangedScores[pi] == null && pi < rangedScores.length);
+          c += count;
+          if (c >= next && posPoints.size() <= TOTAL_LABELS - 1) {
+            while (next <= c) {
+              next += step;
             }
+            prevI = pi;
+            posPoints.add(new TextPoint2D(rangedPoints[prevI].getX(), rangedPoints[prevI].getY(), rangedScores[prevI]));
           }
         }
       }
-      final int end = rangedScores.length - 1;
-      p = rangedPoints[Math.min(end, rangedPoints.length - 1)];
-      posPoints.add(new TextPoint2D(p.getX(), p.getY(), rangedScores[end]));
+      // Always add a final label within range that is after lastLabel
+      for (int end = rangedScores.length - 1; end > prevI; end--) {
+        if (rangedScores[end] != null) {
+          posPoints.add(new TextPoint2D(rangedPoints[end].getX(), rangedPoints[end].getY(), rangedScores[end]));
+          break;
+        }
+      }
     }
     return posPoints.toArray(new TextPoint2D[posPoints.size()]);
   }
 
-  TextPoint2D getMaxRangedPoint() {
-    return mRangedPosPoints.length == 0 ? null : mRangedPosPoints[mRangedPosPoints.length - 1];
+  TextPoint2D getMaxRangedLabel() {
+    assert mGraphType != null : "graph type has not been set";
+    return mRangedLabels.length == 0 ? null : mRangedLabels[mRangedLabels.length - 1];
   }
 
+  // Primary line graph
   PointPlot2D getPlot(int lineWidth, int colour) {
-    return makePlot(lineWidth, colour, mRangedPoints);
-  }
-
-  PointPlot2D getPrecisionRecallPlot(int lineWidth, int colour) {
-    return makePlot(lineWidth, colour, mRangedPrecisionRecall);
-  }
-
-  private PointPlot2D makePlot(int lineWidth, int colour, Point2D[] rangedPrecisionRecall) {
+    assert mGraphType != null : "graph type has not been set";
     final PointPlot2D lplot = new PointPlot2D();
-    lplot.setData(rangedPrecisionRecall);
+    lplot.setData(mRangedPoints);
     lplot.setPoints(false);
     lplot.setLines(true);
     lplot.setLineWidth(lineWidth);
@@ -238,35 +341,23 @@ final class DataBundle {
     return lplot;
   }
 
+  // Text labels to overlay on the graph
   TextPlot2D getScoreLabels() {
-    return makeScoreLabels(mRangedPosPoints);
-  }
-
-  TextPlot2D getPrecisionRecallScoreLabels() {
-    return makeScoreLabels(mRangedPrecisionRecallPosPoints);
-  }
-
-  private TextPlot2D makeScoreLabels(Point2D[] rangedPrecisionRecall) {
+    assert mGraphType != null : "graph type has not been set";
     final TextPlot2D tplot = new TextPlot2D();
-    tplot.setData(rangedPrecisionRecall);
+    tplot.setData(mRangedLabels);
     return tplot;
   }
 
+  // Points corresponding to each text label
   PointPlot2D getScorePoints(int lineWidth, int colour) {
-    return makeScorePoints(lineWidth, colour, mRangedPosPoints);
-  }
-
-  private PointPlot2D makeScorePoints(int lineWidth, int colour, TextPoint2D[] rangedPosPoints) {
+    assert mGraphType != null : "graph type has not been set";
     final PointPlot2D pplot = new PointPlot2D();
-    pplot.setData(rangedPosPoints);
+    pplot.setData(mRangedLabels);
     pplot.setPoints(true);
     pplot.setColor(colour);
     pplot.setLineWidth(lineWidth);
     return pplot;
-  }
-
-  PointPlot2D getPrecisionRecallScorePoints(int lineWidth, int colour) {
-    return makeScorePoints(lineWidth, colour, mRangedPrecisionRecallPosPoints);
   }
 
   int getTotalVariants() {

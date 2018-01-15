@@ -92,6 +92,14 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** Whether to apply ROC sub-category baseline rescaling to adjust for representation bias */
   public static final String VCFEVAL_ROC_SUBSET_RESCALE = "com.rtg.vcf.eval.roc-subset-rescale";
 
+  /** Enable rocplot interpolation. Useful for graphs with sparse scoring, particularly precision/sensitivity graphs */
+  public static final String ROCPLOT_INTERPOLATE = "com.rtg.vcf.eval.rocplot-interpolate";
+  /** Add labels to interpolated points */
+  public static final String ROCPLOT_INTERPOLATE_LABEL = "com.rtg.vcf.eval.rocplot-interpolate-label";
+  /** Minimum sensitivity gap between points after interpolation */
+  public static final String ROCPLOT_INTERPOLATION_GAP = "com.rtg.vcf.eval.rocplot-interpolate-gap";
+
+
   ToolsGlobalFlags(List<Flag<?>> flags) {
     super(flags);
   }
@@ -127,5 +135,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_DECOMPOSE_MNPS, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_DECOMPOSE_INDELS, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_ROC_SUBSET_RESCALE, Boolean.class, Boolean.TRUE);
+
+    registerFlag(ROCPLOT_INTERPOLATE, Boolean.class, Boolean.FALSE);
+    registerFlag(ROCPLOT_INTERPOLATE_LABEL, Boolean.class, Boolean.FALSE);
+    registerFlag(ROCPLOT_INTERPOLATION_GAP, Integer.class, 1);
   }
 }

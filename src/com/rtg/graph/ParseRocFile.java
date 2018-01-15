@@ -85,8 +85,7 @@ public final class ParseRocFile {
   static DataBundle loadStream(ProgressDelegate progressBarDelegate, final BufferedInputStream is, final String shortName) throws IOException {
     int lines = 0;
     int totalVariants = -1;
-    final ArrayList<RocPoint> points = new ArrayList<>();
-    final ArrayList<String> scores = new ArrayList<>();
+    final ArrayList<RocPoint<String>> points = new ArrayList<>();
 
     String line = null;
     String scoreName = null;
@@ -100,7 +99,8 @@ public final class ParseRocFile {
       int tpCol = 1;
       int fpCol = 2;
       int tpRawCol = -1;
-      String score = String.format("%.3g", 0.0f);
+      // We create an artificial initial point corresponding to 0 TP and 0 FP.
+      points.add(new RocPoint<>(null, prevTp, prevFp, prevRawTp));
       while ((line = br.readLine()) != null) {
         if (line.startsWith("#")) {
           if (line.startsWith("#total")) {
@@ -148,15 +148,15 @@ public final class ParseRocFile {
         } else {
           rawTp = 0.0f;
         }
+        String score;
         try {
           final float numeric = Float.parseFloat(linearr[scoreCol]); // Score
           score = String.format("%.3g", numeric);
         } catch (final NumberFormatException e) {
           score = linearr[0];
         }
-        if (prevScore == null || score.compareTo(prevScore) != 0) {
-          points.add(new RocPoint(0.0, prevTp, prevFp, rawTp));
-          scores.add(score);
+        if (prevScore != null && score.compareTo(prevScore) != 0) {
+          points.add(new RocPoint<>(prevScore, prevTp, prevFp, rawTp));
         }
         prevFp = Math.max(prevFp, fp);
         prevTp = Math.max(prevTp, tp);
@@ -168,13 +168,14 @@ public final class ParseRocFile {
           progressBarDelegate.setProgress(lines);
         }
       }
-      points.add(new RocPoint(0.0, prevTp, prevFp, prevRawTp));
-      scores.add(score);
+      if (prevScore != null) {
+        points.add(new RocPoint<>(prevScore, prevTp, prevFp, prevRawTp));
+      }
     } catch (final NumberFormatException e) {
       throw new NoTalkbackSlimException("Malformed line: " + line + " in \"" + shortName + "\"");
     }
     progressBarDelegate.addFile(lines);
-    final DataBundle dataBundle = new DataBundle(shortName, points.toArray(new RocPoint[points.size()]), scores.toArray(new String[scores.size()]), totalVariants);
+    final DataBundle dataBundle = new DataBundle(shortName, points, totalVariants);
     dataBundle.setScoreName(scoreName);
     return dataBundle;
   }

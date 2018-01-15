@@ -68,6 +68,7 @@ public class ParseRocFileTest extends TestCase {
 
         assertEquals("Monkey", bundle.getTitle());
         assertEquals(3092754, bundle.getTotalVariants());
+        bundle.setGraphType(DataBundle.GraphType.ROC);
         assertEquals(1864591.0, bundle.getPlot(1, 7342).getHi(Graph2D.X), 1e-9);
         assertEquals(0.0, bundle.getPlot(1, 7342).getLo(Graph2D.X), 1e-9);
         assertEquals(2995295.0, bundle.getPlot(1, 7342).getHi(Graph2D.Y), 1e-9);
@@ -120,8 +121,9 @@ public class ParseRocFileTest extends TestCase {
         final DataBundle bundle = ParseRocFile.loadStream(progressBarDelegate, buf, "Monkey");
         assertEquals(1000, progressBarDelegate.mNumberLines);
         assertEquals(Arrays.asList(new Integer[] {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}), progressBarDelegate.mProgressLog);
-        assertEquals(2, bundle.getPlot(1, 1).getData().length);
         assertEquals(-1, bundle.getTotalVariants());
+        bundle.setGraphType(DataBundle.GraphType.ROC);
+        assertEquals(2, bundle.getPlot(1, 1).getData().length);
       }
     }
   }

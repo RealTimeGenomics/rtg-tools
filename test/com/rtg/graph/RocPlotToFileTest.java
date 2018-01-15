@@ -75,8 +75,8 @@ public class RocPlotToFileTest extends AbstractTest {
 
   private void checkSvg(final File svg, final int lines, final String... expected) throws IOException {
     final String s = FileUtils.fileToString(svg);
-    assertEquals(lines, TestUtils.splitLines(s).length);
     TestUtils.containsAll(s, expected);
+    assertEquals(lines, TestUtils.splitLines(s).length);
   }
 
   public void testSvg() throws IOException {
@@ -85,7 +85,7 @@ public class RocPlotToFileTest extends AbstractTest {
       FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
-      checkSvg(svg, 97,
+      checkSvg(svg, 95,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
@@ -104,7 +104,7 @@ public class RocPlotToFileTest extends AbstractTest {
       FileUtils.copyResource("com/rtg/graph/resources/roc-nototal.tsv", roc);
       final File svg = new File(dir, "example.svg");
       RocPlotToFile.rocFileImage(Collections.singletonList(roc), Collections.singletonList("LINE"), "a title", true, 3, svg, SVG, false, null);
-      checkSvg(svg, 99,
+      checkSvg(svg, 88,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",

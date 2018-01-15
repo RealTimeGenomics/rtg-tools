@@ -535,6 +535,7 @@ public class RocPlot {
 
   @JumbleIgnore
   static class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
+
     PrecisionRecallGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
@@ -542,16 +543,15 @@ public class RocPlot {
       setLabel(Graph2D.X, SENSITIVITY);
       setLabel(Graph2D.Y, PRECISION);
       setTitle(title);
-
       float yLow = 100;
       for (int i = 0; i < lineOrdering.size(); ++i) {
         final DataBundle db = data.get(lineOrdering.get(i));
         if (db.show()) {
-          final PointPlot2D plot = db.getPrecisionRecallPlot(lineWidth, i);
-          addPlot(plot);
+          db.setGraphType(DataBundle.GraphType.PRECISION_RECALL);
+          addPlot(db.getPlot(lineWidth, i));
           if (showScores) {
-            addPlot(db.getPrecisionRecallScorePoints(lineWidth, i));
-            addPlot(db.getPrecisionRecallScoreLabels());
+            addPlot(db.getScorePoints(lineWidth, i));
+            addPlot(db.getScoreLabels());
           }
           yLow = Math.min(yLow, db.getMinPrecision());
         }
@@ -560,6 +560,7 @@ public class RocPlot {
       setRange(Graph2D.Y, Math.max(0, yLow), 100);
       setTitle(title);
     }
+
   }
 
   @JumbleIgnore
@@ -577,15 +578,13 @@ public class RocPlot {
       for (int i = 0; i < lineOrdering.size(); ++i) {
         final DataBundle db = data.get(lineOrdering.get(i));
         if (db.show()) {
-          final PointPlot2D plot = db.getPlot(lineWidth, i);
-          addPlot(plot);
+          db.setGraphType(DataBundle.GraphType.ROC);
+          addPlot(db.getPlot(lineWidth, i));
           if (showScores) {
             addPlot(db.getScorePoints(lineWidth, i));
             addPlot(db.getScoreLabels());
           }
-          if (db.getTotalVariants() > maxVariants) {
-            maxVariants = db.getTotalVariants();
-          }
+          maxVariants = Math.max(maxVariants, db.getTotalVariants());
         }
       }
 
@@ -598,8 +597,7 @@ public class RocPlot {
         setGrid(Graph2D.Y, Graph2D.TWO, false);
         setLabel(Graph2D.Y, Graph2D.TWO, "%");
         // dummy plot to show Y2 axis
-        final PointPlot2D pp = new PointPlot2D(Graph2D.ONE, Graph2D.TWO);
-        addPlot(pp);
+        addPlot(new PointPlot2D(Graph2D.ONE, Graph2D.TWO));
       }
       mMaxVariants = maxVariants;
     }
