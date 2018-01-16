@@ -209,7 +209,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
         annotator.updateHeader(header);
       }
       final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).addDensityAttribute(mFlags.isSet(DENSITY_FLAG)).make(header, vcfFile, out)) {
+      try (VcfWriter writer = getVcfWriter(out, header, vcfFile)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
@@ -220,5 +220,11 @@ public final class VcfAnnotatorCli extends AbstractCli {
       }
     }
     return 0;
+  }
+
+  private VcfWriter getVcfWriter(final OutputStream out, final VcfHeader header, final File vcfFile) throws IOException {
+    final boolean isDensity = mFlags.isSet(DENSITY_FLAG);
+    final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out);
+    return isDensity ? new DensityAnnotator(writer) : writer;
   }
 }
