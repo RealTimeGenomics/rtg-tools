@@ -185,7 +185,7 @@ public class VcfSubset extends AbstractCli {
             final Set<String> unknownIds = new LinkedHashSet<>(ids);
             unknownIds.removeAll(getHeaderIds(header));
             if (!unknownIds.isEmpty()) {
-              throw new NoTalkbackSlimException(fieldname + " fields not contained in VCF meta-information: " + StringUtils.join(' ', unknownIds));
+              Diagnostic.warning(fieldname + " fields not contained in VCF meta-information: " + StringUtils.join(' ', unknownIds));
             }
           }
 
@@ -237,7 +237,7 @@ public class VcfSubset extends AbstractCli {
             }
           }
           if (fail) {
-            throw new NoTalkbackSlimException("Sample fields not contained in VCF header: " + sb.toString().trim());
+            throw new NoTalkbackSlimException("Samples not contained in VCF: " + sb.toString().trim());
           }
         }
       };
@@ -257,7 +257,7 @@ public class VcfSubset extends AbstractCli {
           return new VcfInfoStripper(fieldIdsSet, keep);
         }
       };
-      infoAnnAdder.processFlags(annotators, header, REMOVE_INFO, KEEP_INFO, REMOVE_INFOS, "Info", true);
+      infoAnnAdder.processFlags(annotators, header, REMOVE_INFO, KEEP_INFO, REMOVE_INFOS, "INFO", true);
 
       final AnnotatorAdder filterAnnAdder = new AnnotatorAdder() {
         @Override
@@ -281,7 +281,7 @@ public class VcfSubset extends AbstractCli {
           return new VcfFilterStripper(fieldIdsSet, keep);
         }
       };
-      filterAnnAdder.processFlags(annotators, header, REMOVE_FILTER, KEEP_FILTER, REMOVE_FILTERS, "Filter", true);
+      filterAnnAdder.processFlags(annotators, header, REMOVE_FILTER, KEEP_FILTER, REMOVE_FILTERS, "FILTER", true);
 
       final AnnotatorAdder formatAnnAdder = new AnnotatorAdder() {
         @Override
@@ -297,7 +297,7 @@ public class VcfSubset extends AbstractCli {
           return new VcfFormatStripper(fieldIdsSet, keep);
         }
       };
-      final VcfFormatStripper formatStripper = (VcfFormatStripper) formatAnnAdder.processFlags(annotators, header, REMOVE_FORMAT, KEEP_FORMAT, "Format");
+      final VcfFormatStripper formatStripper = (VcfFormatStripper) formatAnnAdder.processFlags(annotators, header, REMOVE_FORMAT, KEEP_FORMAT, "FORMAT");
 
       if (mFlags.isSet(REMOVE_UNUSED_ALTS)) {
         annotators.add(new VcfAltCleaner());
@@ -335,7 +335,7 @@ public class VcfSubset extends AbstractCli {
         }
       }
       if (skippedRecords > 0) {
-        Diagnostic.warning("Records skipped due to invalid or incompatible sample fields: " + skippedRecords);
+        Diagnostic.warning("Records skipped due to no remaining FORMAT fields: " + skippedRecords);
       }
     }
     return 0;

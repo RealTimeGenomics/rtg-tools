@@ -160,7 +160,8 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Error: Sample fields not contained in VCF header: BL RJ" + StringUtils.LS, checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-sample", "HG00097", "--keep-sample", "HG00099", "--keep-sample", "BL", "--keep-sample", "RJ", "-Z"));
+      TestUtils.containsAll(checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-sample", "HG00097", "--keep-sample", "HG00099", "--keep-sample", "BL", "--keep-sample", "RJ", "-Z"),
+        "Error: Samples not contained in VCF: BL RJ" + StringUtils.LS);
     }
   }
 
@@ -169,7 +170,8 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Error: Info fields not contained in VCF meta-information: BL RJ" + StringUtils.LS, checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-info", "BL", "--keep-info", "RJ", "-Z"));
+      TestUtils.containsAll(checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--keep-info", "BL", "--keep-info", "RJ", "-Z"),
+        "INFO fields not contained in VCF meta-information: BL RJ" + StringUtils.LS);
     }
   }
 
@@ -178,7 +180,8 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Error: Filter fields not contained in VCF meta-information: BL RJ" + StringUtils.LS, checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "BL", "--keep-filter", "RJ", "-Z"));
+        TestUtils.containsAll(checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--keep-filter", "BL", "--keep-filter", "RJ", "-Z"),
+          "FILTER fields not contained in VCF meta-information: BL RJ" + StringUtils.LS);
     }
   }
 
@@ -187,7 +190,9 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Error: Format fields not contained in VCF meta-information: BL RJ" + StringUtils.LS, checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-format", "BL", "--keep-format", "RJ", "-Z"));
+      TestUtils.containsAll(checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--keep-format", "BL", "--keep-format", "RJ", "-Z"),
+        "FORMAT fields not contained in VCF meta-information: BL RJ" + StringUtils.LS,
+        "Records skipped due to no remaining FORMAT fields: 4");
     }
   }
 
@@ -196,7 +201,8 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File f = FileHelper.resourceToGzFile("com/rtg/vcf/resources/vcfsubset.vcf", new File(td, "vcf.vcf.gz"));
       final File out = new File(td, "out.vcf");
 
-      assertEquals("Records skipped due to invalid or incompatible sample fields: 1" + StringUtils.LS, checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--remove-format", "GT", "--remove-format", "DS", "-Z"));
+      TestUtils.containsAll(checkMainInitWarn("-i", f.getPath(), "-o", out.getPath(), "--remove-format", "GT", "--remove-format", "DS", "-Z"),
+        "Records skipped due to no remaining FORMAT fields: 1");
 
       final String content = FileHelper.fileToString(out);
       final String nonheader = StringUtils.grepMinusV(content, "^#");
