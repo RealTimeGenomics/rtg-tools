@@ -78,10 +78,10 @@ public abstract class AbstractCliEntry {
 
     Talkback.setModuleName(args[0]);
     CommandLine.setCommandArgs(args);
+    // Look for common flags people might try giving without a module name
     if ("-h".equals(args[0]) || "--help".equals(args[0]) || "-help".equals(args[0])) {
-      final String[] shiftArgs = shift(args);
-      return help(shiftArgs, out, err);
-    } else if ("--version".equals(args[0])) {
+      return help(shift(args), out, err);
+    } else if ("-v".equals(args[0]) || "--version".equals(args[0]) || "-version".equals(args[0])) {
       return VersionCommand.mainInit(shift(args), out);
     }
 
