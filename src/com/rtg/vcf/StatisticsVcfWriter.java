@@ -48,6 +48,7 @@ public class StatisticsVcfWriter<S extends VariantStatistics> implements VcfWrit
    * Create a new VCF writer that keeps statistics.
    * @param writer underlying writer
    * @param statistics statistics tracker
+   * @param filters filters to apply
    */
   public StatisticsVcfWriter(final VcfWriter writer, final S statistics, final List<VcfFilter> filters) {
     mInner = writer;
