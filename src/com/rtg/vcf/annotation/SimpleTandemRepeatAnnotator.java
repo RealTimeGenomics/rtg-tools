@@ -44,16 +44,18 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
 
-  private static final String SIMPLE_TANDEM_REPEAT_INFO = "STR";
+  private static final String SIMPLE_TANDEM_REPEAT_INFO = "STRL";
+  private static final String SIMPLE_TANDEM_REPEAT_UNIT = "STRU";
   private static final int MAX_REP_UNIT = 3;
   private static final int MAX_STR = 100;
+  private static final int MIN_REPEAT = 1; // repeat must exceed this to be output
   private final SequencesReaderReferenceSource mRefSequences;
 
-  // temp stuff during investigation
-  private static final String SIMPLE_TANDEM_REPEAT_LEFT_INFO = "STRL";
-  private static final String SIMPLE_TANDEM_REPEAT_RIGHT_INFO = "STRR";
-  private static final String SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO = "STRLU";
-  private static final String SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO = "STRRU";
+  // Extra attributes used during evaluation for separate left and right
+  //  private static final String SIMPLE_TANDEM_REPEAT_LEFT_INFO = "STRLL";
+  //  private static final String SIMPLE_TANDEM_REPEAT_RIGHT_INFO = "STRLR";
+  //  private static final String SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO = "STRUL";
+  //  private static final String SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO = "STRUR";
 
   /**
    * Construct a new simple tandem repeat annotator.
@@ -66,12 +68,13 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
   @Override
   public void updateHeader(final VcfHeader header) {
     header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_INFO, MetaType.INTEGER, VcfNumber.ONE, "Number of adjacent simple tandem repeats"));
+    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_UNIT, MetaType.INTEGER, VcfNumber.ONE, "Length of repeating unit in simple tandem repeat"));
 
-    // todo temp for investigation
-    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_LEFT_INFO, MetaType.INTEGER, VcfNumber.ONE, "Number of adjacent simple tandem repeats, left"));
-    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, MetaType.INTEGER, VcfNumber.ONE, "Number of adjacent simple tandem repeats, right"));
-    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, MetaType.INTEGER, VcfNumber.ONE, "Repeat unit simple tandem repeats, left"));
-    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, MetaType.INTEGER, VcfNumber.ONE, "Repeat unit simple tandem repeats, right"));
+    // temp for investigation
+    //    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_LEFT_INFO, MetaType.INTEGER, VcfNumber.ONE, "Number of adjacent simple tandem repeats, left"));
+    //    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, MetaType.INTEGER, VcfNumber.ONE, "Number of adjacent simple tandem repeats, right"));
+    //    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, MetaType.INTEGER, VcfNumber.ONE, "Repeat unit simple tandem repeats, left"));
+    //    header.ensureContains(new InfoField(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, MetaType.INTEGER, VcfNumber.ONE, "Repeat unit simple tandem repeats, right"));
   }
 
   @Override
@@ -80,27 +83,40 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
     final int pos = rec.getStart();
     final byte[] refSeq = mRefSequences.getReferenceBases(seq);
     final int refSpan = rec.getRefCall().length() - (VcfUtils.hasRedundantFirstNucleotide(rec) ? 1 : 0);
-    // todo probably only add this if non-zero, or maybe  >1
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(strBidrectional(refSeq, pos, refSpan)));
+    final int[] str = strBidrectional(refSeq, pos, refSpan);
+    if (str[0] > MIN_REPEAT) {
+      rec.addInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(str[0]));
+      rec.addInfo(SIMPLE_TANDEM_REPEAT_UNIT, String.valueOf(str[1]));
+    }
 
-    // todo temp for investigation
-    final int[] left0 = str(refSeq, pos, -1);
-    final int[] left1 = str(refSeq, pos - 1, -1);
-    final int[] right0 = str(refSeq, pos + refSpan, 1);
-    final int[] right1 = str(refSeq, pos + refSpan + 1, 1);
-    final int[] left = left0[0] > left1[0] ? left0 : left1;
-    final int[] right = right0[0] > right1[0] ? right0 : right1;
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_INFO, String.valueOf(left[0]));
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, String.valueOf(left[1]));
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
-    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, String.valueOf(right[1]));
+    // Extra attributes used during evaluation
+//    final int[] left0 = str(refSeq, pos, -1);
+//    final int[] left1 = str(refSeq, pos - 1, -1);
+//    final int[] right0 = str(refSeq, pos + refSpan, 1);
+//    final int[] right1 = str(refSeq, pos + refSpan + 1, 1);
+//    final int[] left = left0[0] > left1[0] ? left0 : left1;
+//    final int[] right = right0[0] > right1[0] ? right0 : right1;
+//    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_INFO, String.valueOf(left[0]));
+//    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, String.valueOf(left[1]));
+//    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
+//    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, String.valueOf(right[1]));
   }
 
-  static int strBidrectional(final byte[] refSeq, final int pos, final int refSpan) {
+  static int[] strBidrectional(final byte[] refSeq, final int pos, final int refSpan) {
+    // Find the maximum number of repeats in either direction and report the
+    // number of repeats and the length of the repeating unit.
+
     // Repeats to left + repeats to right
     // Take the larger of off by one from current position
-    return Math.max(str(refSeq, pos - 1, -1)[0], str(refSeq, pos, -1)[0])
-      + Math.max(str(refSeq, pos + refSpan, 1)[0], str(refSeq, pos + refSpan + 1, 1)[0]);
+    final int[] leftA = str(refSeq, pos - 1, -1);
+    final int[] leftB = str(refSeq, pos, -1);
+    final int[] left = leftA[0] >= leftB[0] ? leftA : leftB;
+
+    final int[] rightA = str(refSeq, pos + refSpan, 1);
+    final int[] rightB = str(refSeq, pos + refSpan + 1, 1);
+    final int[] right = rightA[0] >= rightB[0] ? rightA : rightB;
+
+    return right[0] >= left[0] ? right : left;
   }
 
   private static int[] str(final byte[] refSeq, final int pos, final int direction) {
