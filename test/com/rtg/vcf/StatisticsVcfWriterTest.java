@@ -31,6 +31,7 @@
 package com.rtg.vcf;
 
 import java.io.IOException;
+import java.util.Collections;
 
 import com.rtg.vcf.header.VcfHeader;
 
@@ -45,7 +46,7 @@ public class StatisticsVcfWriterTest extends TestCase {
     final VcfRecord rec = VcfReader.vcfLineToRecord("1 1300068 . T T,TA 1959.58 . DP=2 GT 0/1".replaceAll(" ", "\t"));
     final VariantStatistics vs = new VariantStatistics(null);
     final VcfHeader header = new VcfHeader();
-    try (VcfWriter writer = new StatisticsVcfWriter<>(new NullVcfWriter(header), vs)) {
+    try (VcfWriter writer = new StatisticsVcfWriter<>(new NullVcfWriter(header), vs, Collections.emptyList())) {
       writer.write(rec);
     }
     assertEquals(1, vs.mTotalPassed);

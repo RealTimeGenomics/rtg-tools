@@ -30,6 +30,7 @@
 package com.rtg.vcf;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.rtg.vcf.header.VcfHeader;
 
@@ -40,6 +41,7 @@ public class StatisticsVcfWriter<S extends VariantStatistics> implements VcfWrit
 
   private final VcfWriter mInner;
   private final S mStatistics;
+  private final List<VcfFilter> mFilters;
   private final VcfHeader mVcfHeader;
 
   /**
@@ -47,10 +49,14 @@ public class StatisticsVcfWriter<S extends VariantStatistics> implements VcfWrit
    * @param writer underlying writer
    * @param statistics statistics tracker
    */
-  public StatisticsVcfWriter(final VcfWriter writer, final S statistics) {
+  public StatisticsVcfWriter(final VcfWriter writer, final S statistics, final List<VcfFilter> filters) {
     mInner = writer;
     mStatistics = statistics;
+    mFilters = filters;
     mVcfHeader = mInner.getHeader();
+    for (final VcfFilter filter : mFilters) {
+      filter.setHeader(mVcfHeader);
+    }
   }
 
   @Override
@@ -60,8 +66,17 @@ public class StatisticsVcfWriter<S extends VariantStatistics> implements VcfWrit
 
   @Override
   public void write(final VcfRecord record) throws IOException {
-    mStatistics.tallyVariant(mVcfHeader, record);
-    mInner.write(record);
+    boolean keep = true;
+    for (final VcfFilter filter : mFilters) {
+      if (!filter.accept(record)) {
+        keep = false;
+        break;
+      }
+    }
+    if (keep) {
+      mStatistics.tallyVariant(mVcfHeader, record);
+      mInner.write(record);
+    }
   }
 
   @Override
