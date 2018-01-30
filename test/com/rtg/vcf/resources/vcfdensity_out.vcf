@@ -3,14 +3,14 @@
 ##contig=<ID=1,length=1000,species="Homo Sapiens">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
-##FORMAT=<ID=DENS,Number=1,Type=Integer,Description="Number of variants within 5 bases">
+##FORMAT=<ID=CLUS,Number=1,Type=Integer,Description="Number of variants within 5 bases">
 ##SAMPLE=<ID=normal,Genomes=normal,Mixture=1.0,Description="Original genome">
 ##SAMPLE=<ID=tumor,Genomes=normal;tumor,Mixture=0.20;0.80,Description="Original genome;Derived genome">
 ##SAMPLE=<ID=other,Genomes=other>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	normal	tumor	other
-1	5	a	GAA	GAAA	.	PASS	.	GT:DP:DENS	./1:0:2	1/0:26:3	0/0:.:0
-1	8	d	G	GA	.	PASS	.	GT:DP:DENS	./1:0:2	1/0:26:3	0/0:.:0
-1	9	g	CAA	CATT	.	PASS	.	GT:DP:DENS	./1:0:2	1/0:26:3	0/0:.:0
-1	10	h	A	AA	.	PASS	.	GT:DP:DENS	./0:0:0	0/1:26:3	0/0:.:0
+1	5	a	GAA	GAAA	.	PASS	.	GT:DP:CLUS	./1:0:2	1/0:26:3	0/0:.:0
+1	8	d	G	GA	.	PASS	.	GT:DP:CLUS	./1:0:2	1/0:26:3	0/0:.:0
+1	9	g	CAA	CATT	.	PASS	.	GT:DP:CLUS	./1:0:2	1/0:26:3	0/0:.:0
+1	10	h	A	AA	.	PASS	.	GT:DP:CLUS	./0:0:0	0/1:26:3	0/0:.:0
 1	20	p	GCGCGCGCGCG	TTTGCGCGCTTGCGCGTTT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0
 1	40	q	TTTGCGCGCTTGCGCGTTT	GCGCGCGCGCG	.	PASS	.	GT:DP	./1:0	1/0:26	0/0

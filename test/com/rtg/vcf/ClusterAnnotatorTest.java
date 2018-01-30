@@ -40,14 +40,14 @@ import com.rtg.launcher.AbstractNanoTest;
 /**
  * Test the corresponding class.
  */
-public class DensityAnnotatorTest extends AbstractNanoTest {
+public class ClusterAnnotatorTest extends AbstractNanoTest {
 
   public void test() throws IOException {
     final int distance = 5;
     try (final ByteArrayOutputStream bos = new ByteArrayOutputStream();
          final PrintStream out = new PrintStream(bos)) {
-      try (VcfReader reader = new VcfReader(new BufferedReader(new InputStreamReader(DensityAnnotatorTest.class.getClassLoader().getResourceAsStream("com/rtg/vcf/resources/vcfdensity_in.vcf"))))) {
-        try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, out), distance)) {
+      try (VcfReader reader = new VcfReader(new BufferedReader(new InputStreamReader(ClusterAnnotatorTest.class.getClassLoader().getResourceAsStream("com/rtg/vcf/resources/vcfdensity_in.vcf"))))) {
+        try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, out), distance)) {
           while (reader.hasNext()) {
             final VcfRecord rec = reader.next();
             writer.write(rec);

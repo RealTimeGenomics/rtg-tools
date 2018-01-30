@@ -41,14 +41,14 @@ import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
 
 /**
- * Assigns density attribute.  Annotates variants with the number of variants within
+ * Assigns cluster attribute.  Annotates variants with the number of variants within
  * a specified distance either side of the record.  Counting and annotation is done
  * per sample.  Does not implement actual Annotator because needs access to multiple
  * records.
  */
-public class DensityAnnotator implements VcfWriter {
+public class ClusterAnnotator implements VcfWriter {
 
-  private static final String DENSITY_ATTRIBUTE = "DENS";
+  private static final String CLUSTER_ATTRIBUTE = "CLUS";
   /** Default distance to look on either side of a variant. */
   public static final int DEFAULT_DISTANCE = 5;
   final VcfWriter mInner;
@@ -56,17 +56,17 @@ public class DensityAnnotator implements VcfWriter {
   final Queue<VcfRecord> mBuffer = new ArrayDeque<>();
   final Queue<int[]> mCounts = new ArrayDeque<>();
 
-  DensityAnnotator(final VcfWriter w, final int distance) {
+  ClusterAnnotator(final VcfWriter w, final int distance) {
     mInner = w;
     mDistance = distance;
-    w.getHeader().ensureContains(new FormatField(DENSITY_ATTRIBUTE, MetaType.INTEGER, VcfNumber.ONE, "Number of variants within " + distance + " bases"));
+    w.getHeader().ensureContains(new FormatField(CLUSTER_ATTRIBUTE, MetaType.INTEGER, VcfNumber.ONE, "Number of variants within " + distance + " bases"));
   }
 
   /**
    * Default density annotator.
    * @param w underlying writer
    */
-  public DensityAnnotator(final VcfWriter w) {
+  public ClusterAnnotator(final VcfWriter w) {
     this(w, DEFAULT_DISTANCE);
   }
 
@@ -113,9 +113,9 @@ public class DensityAnnotator implements VcfWriter {
     updateCounts(record, counts);
     if (!MathUtils.isZero(counts)) {
       // Only annotate the record if there is a non-zero count for some sample
-      record.addFormat(DENSITY_ATTRIBUTE);
+      record.addFormat(CLUSTER_ATTRIBUTE);
       for (final int count : counts) {
-        record.addFormatAndSample(DENSITY_ATTRIBUTE, String.valueOf(count));
+        record.addFormatAndSample(CLUSTER_ATTRIBUTE, String.valueOf(count));
       }
     }
     mInner.write(record);
@@ -143,7 +143,7 @@ public class DensityAnnotator implements VcfWriter {
   public static void main(String[] args) throws IOException {
     final int distance = Integer.parseInt(args[0]);
     try (VcfReader reader = VcfReader.openVcfReader(new File(args[1]))) {
-      try (VcfWriter writer = new DensityAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
+      try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           writer.write(rec);

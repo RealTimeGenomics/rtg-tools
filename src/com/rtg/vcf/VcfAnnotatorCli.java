@@ -82,7 +82,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String FILL_AN_AC_FLAG = "fill-an-ac";
   private static final String RELABEL_FLAG = "relabel";
   private static final String DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
-  private static final String DENSITY_FLAG = "Xdensity";
+  private static final String CLUSTER_FLAG = "Xcluster";
   private static final String STR_FLAG = "Xstr";
 
   /** All known annotators with zero-arg constructors */
@@ -125,7 +125,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlags.initForce(mFlags);
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
     mFlags.registerOptional(DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    mFlags.registerOptional(DENSITY_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
+    mFlags.registerOptional(CLUSTER_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
     mFlags.registerOptional(STR_FLAG, File.class, "SDF", "annotate records with simple tandem repeat indicator based on given SDF").setCategory(REPORTING);
     mFlags.setValidator(new VcfAnnotatorValidator());
   }
@@ -223,8 +223,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
   }
 
   private VcfWriter getVcfWriter(final OutputStream out, final VcfHeader header, final File vcfFile) throws IOException {
-    final boolean isDensity = mFlags.isSet(DENSITY_FLAG);
+    final boolean isDensity = mFlags.isSet(CLUSTER_FLAG);
     final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out);
-    return isDensity ? new DensityAnnotator(writer) : writer;
+    return isDensity ? new ClusterAnnotator(writer) : writer;
   }
 }
