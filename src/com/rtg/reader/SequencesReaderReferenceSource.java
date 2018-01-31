@@ -30,6 +30,7 @@
 
 package com.rtg.reader;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
@@ -45,7 +46,7 @@ import htsjdk.samtools.util.RuntimeIOException;
 /**
  * Provides a <code>CRAMReferenceSource</code> backed by a SequencesReader.
  */
-public class SequencesReaderReferenceSource implements CRAMReferenceSource {
+public class SequencesReaderReferenceSource implements CRAMReferenceSource, Closeable {
 
   private final SequencesReader mReader;
   private final Map<String, WeakReference<byte[]>> mCache = new HashMap<>();
@@ -84,7 +85,7 @@ public class SequencesReaderReferenceSource implements CRAMReferenceSource {
    * @param name name of the sequence
    * @return bases of the sequence in uppercase ASCII
    */
-  public byte[] getReferenceBases(final String name) {
+  public synchronized byte[] getReferenceBases(final String name) {
     final byte[] cached = findInCache(name);
     if (cached != null) {
       return cached;
@@ -113,5 +114,10 @@ public class SequencesReaderReferenceSource implements CRAMReferenceSource {
   @Override
   public synchronized byte[] getReferenceBases(final SAMSequenceRecord record, boolean tryVariants) {
     return getReferenceBases(record.getSequenceName());
+  }
+
+  @Override
+  public void close() throws IOException {
+    mReader.close();
   }
 }
