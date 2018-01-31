@@ -79,6 +79,7 @@ final class DataBundle {
   private Point2D[] mRangedPoints = null;
   private String[] mRangedScores = null;
   private TextPoint2D[] mRangedLabels = null;
+  private TextPoint2D mMaxRangedPoint = null;
 
   DataBundle(String title, List<RocPoint<String>> points, int totalVariants) {
     mTitle = title;
@@ -98,7 +99,7 @@ final class DataBundle {
       .map(point -> new Point2D((float) point.getFalsePositives(), (float) point.getTruePositives()))
       .toArray(Point2D[]::new);
     mRocScores = interpolated.stream().map(RocPoint::getThreshold).toArray(String[]::new);
-    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(interpolated, totalVariants, ESTIMATION, iLabels);
+    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(interpolated, totalVariants);
     mPrecisionRecallPoints = pr.getA().toArray(new Point2D[0]);
     mPrecisionRecallScores = pr.getB().toArray(new String[0]);
     mMinPrecision = findMinPrecision();
@@ -136,7 +137,7 @@ final class DataBundle {
     }
   }
 
-  private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants, boolean extrapolate, RocUtils.ThresholdInterpolator<T> iLabels) {
+  private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants) {
     final List<Point2D> res = new ArrayList<>();
     final List<T> scores = new ArrayList<>();
     if (totalVariants > 0) {
@@ -144,9 +145,9 @@ final class DataBundle {
       for (int i = 0; i < points.size(); ++i) {
         final RocPoint<T> point = points.get(i);
         if (i == 0 && point.getTruePositives() + point.getFalsePositives() <= 0) {
-          // Typically the first point corresponds to TP=0/FP=0 where precision is undefined - we can extrapolate this.
-          if (extrapolate && i + 1 < points.size()) {
-            // Via ROC interpolation we could assume precision is constant as we asymptotically approach (TP+FP) = 0
+          if (points.size() > 1) {
+            // The first point corresponds to TP=0/FP=0 where precision is technicaly undefined, but we assume
+            // (e.g. via ROC interpolation) that precision is constant as we asymptotically approach (TP+FP) = 0
             final Point2D pr = new Point2D(0, getPrecisionRecall(points.get(i + 1), totalVariants, hasRaw).getY());
             res.add(pr);
             scores.add(point.getThreshold());
@@ -157,11 +158,7 @@ final class DataBundle {
           scores.add(point.getThreshold());
         }
       }
-      if (extrapolate && res.size() > 0) { // Add final point
-        final Point2D pen = res.get(res.size() - 1);
-        res.add(new Point2D(pen.getX(), 0));
-        scores.add(iLabels.interpolate(scores.get(scores.size() - 1), null, 1.0));
-      }
+      assert res.size() == points.size(); // Required to ensure slider thresholds are in sync when switching between graphs
     }
     return new Pair<>(res, scores);
   }
@@ -230,15 +227,16 @@ final class DataBundle {
     // Since the roc graph and PR graph may contain slightly different numbers of points (due to extrapolation at ends)
     // the current slider position may represent a slightly different threshold on each of the graphs.
     // Ideally we should find the point on the PR graph that has the corresponding threshold
+    final int rocmax = (int) (mRangeMax * mRocPoints.length);
+    final int prmax = (int) (mRangeMax * mPrecisionRecallPoints.length);
     switch (mGraphType) {
       case ROC:
         if (mRangeMax >= 1.0f) {
           mRangedPoints = mRocPoints;
           mRangedScores = mRocScores;
         } else {
-          final int smax = (int) (mRangeMax * mRocPoints.length);
-          mRangedPoints = Arrays.copyOf(mRocPoints, smax);
-          mRangedScores = Arrays.copyOf(mRocScores, smax);
+          mRangedPoints = Arrays.copyOf(mRocPoints, rocmax);
+          mRangedScores = Arrays.copyOf(mRocScores, rocmax);
         }
         break;
       case PRECISION_RECALL:
@@ -246,9 +244,8 @@ final class DataBundle {
           mRangedPoints = mPrecisionRecallPoints;
           mRangedScores = mPrecisionRecallScores;
         } else {
-          final int pmax = (int) (mRangeMax * mPrecisionRecallPoints.length);
-          mRangedPoints = Arrays.copyOf(mPrecisionRecallPoints, pmax);
-          mRangedScores = Arrays.copyOf(mPrecisionRecallScores, pmax);
+          mRangedPoints = Arrays.copyOf(mPrecisionRecallPoints, prmax);
+          mRangedScores = Arrays.copyOf(mPrecisionRecallScores, prmax);
         }
         break;
       default:
@@ -256,6 +253,16 @@ final class DataBundle {
         mRangedScores = null;
     }
     updateLabels();
+
+    mMaxRangedPoint = null;
+    for (int i = rocmax - 1; i > 0; --i) {
+      if (mRocScores[i] == null) {
+        continue;
+      }
+      mMaxRangedPoint = new TextPoint2D(mRocPoints[i].getX(), mRocPoints[i].getY(), mRocScores[i]);
+      break;
+    }
+
   }
 
   private void updateLabels() {
@@ -324,8 +331,7 @@ final class DataBundle {
   }
 
   TextPoint2D getMaxRangedLabel() {
-    assert mGraphType != null : "graph type has not been set";
-    return mRangedLabels.length == 0 ? null : mRangedLabels[mRangedLabels.length - 1];
+    return mMaxRangedPoint; // This is in ROC coordinate space, even if the current graph type is precision-sensitivity
   }
 
   // Primary line graph
