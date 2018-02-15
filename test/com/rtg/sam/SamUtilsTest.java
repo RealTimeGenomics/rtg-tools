@@ -535,7 +535,7 @@ public class SamUtilsTest extends TestCase {
     }
 
     logStream.flush();
-    final String[] exp = {file2.getPath() + " contained read group with id \"blah\" and sample \"sam2\" but"
+    final String[] exp = {file2.getPath() + " contained read group with ID \"blah\" and sample \"sam2\" but"
     };
     TestUtils.containsAll(bos.toString(), exp);
     assertTrue(FileHelper.deleteAll(alignmentsDir));

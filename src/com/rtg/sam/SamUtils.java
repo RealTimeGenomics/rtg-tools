@@ -646,6 +646,9 @@ public final class SamUtils {
     final HashMap<String, String> readGroupToSampleMap = new HashMap<>();
     for (final SAMReadGroupRecord rec : header.getReadGroups()) {
       //System.err.println("k=" + rec.getReadGroupId() + " v=" + rec.getSample());
+      if (rec.getSample() == null) {
+        throw new NoTalkbackSlimException("Read group with ID \"" + rec.getReadGroupId() + "\" does not contain a sample tag.");
+      }
       readGroupToSampleMap.put(rec.getReadGroupId(), rec.getSample());
     }
     return readGroupToSampleMap;
@@ -893,7 +896,7 @@ public final class SamUtils {
             } else {
               //check that the sample isn't different for the same read group id
               if (sample != null && !r.getSample().equals(readGroupsSampleMap.get(r.getReadGroupId()))) {
-                Diagnostic.warning(file.getPath() + " contained read group with id \"" + r.getId() + "\" and sample \"" + sample + "\" but this read group has already been associated with sample \"" + readGroupsSampleMap.get(r.getReadGroupId()) + "\"");
+                Diagnostic.warning(file.getPath() + " contained read group with ID \"" + r.getId() + "\" and sample \"" + sample + "\" but this read group has already been associated with sample \"" + readGroupsSampleMap.get(r.getReadGroupId()) + "\"");
                 if (!ignoreHeaderIncompatibility) {
                   throw new NoTalkbackSlimException(ErrorType.SAM_INCOMPATIBLE_HEADER_ERROR, "1");
                 }
