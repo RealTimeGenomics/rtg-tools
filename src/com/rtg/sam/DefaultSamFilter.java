@@ -110,8 +110,21 @@ public class DefaultSamFilter implements SamFilter {
     }
 
     if (params.subsampleFraction() != null) {
+      final double sFrac;
+      if (params.subsampleRampFraction() != null) { // Use subsample ramping
+        if (rec.getAlignmentStart() == 0) {
+          sFrac = (params.subsampleFraction() + params.subsampleRampFraction()) / 2;
+        } else {
+          final int pos = rec.getAlignmentStart();
+          final int refLength = rec.getHeader().getSequence(rec.getReferenceIndex()).getSequenceLength();
+          final double lengthFrac = Math.max(0, Math.min(1.0, (double) pos / refLength));
+          sFrac = params.subsampleFraction() + lengthFrac * (params.subsampleRampFraction() - params.subsampleFraction());
+        }
+      } else {
+        sFrac = params.subsampleFraction();
+      }
       // Subsample using hash of read name, ensures pairs are kept together
-      return (internalHash(rec.getReadName(), params.subsampleSeed()) & SUBSAMPLE_MASK) < params.subsampleFraction() * SUBSAMPLE_MAX;
+      return (internalHash(rec.getReadName(), params.subsampleSeed()) & SUBSAMPLE_MASK) < sFrac * SUBSAMPLE_MAX;
     }
 
     return true;

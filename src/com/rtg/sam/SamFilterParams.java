@@ -65,6 +65,7 @@ public class SamFilterParams {
     protected int mRequireSetFlags = 0;
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
     protected Double mSubsampleFraction = null;
+    protected Double mSubsampleRampFraction = null;
     protected long mSubsampleSeed = 42;
     protected boolean mInvertFilters = false;
 
@@ -98,6 +99,16 @@ public class SamFilterParams {
      */
     public SamFilterParamsBuilder subsampleFraction(final Double fraction) {
       mSubsampleFraction = fraction;
+      return this;
+    }
+
+    /**
+     * Set the proportion of alignments to retain during subsampling.
+     * @param fraction the proportion of alignments to retain (or null to disable subsampling)
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder subsampleRampFraction(final Double fraction) {
+      mSubsampleRampFraction = fraction;
       return this;
     }
 
@@ -291,6 +302,7 @@ public class SamFilterParams {
   private final boolean mFindAndRemoveDuplicates; //detected version
   private final boolean mExcludeVariantInvalid;
   private final Double mSubsampleFraction;
+  private final Double mSubsampleRampFraction;
   private final long mSubsampleSeed;
   private final boolean mInvertFilters;
 
@@ -303,6 +315,7 @@ public class SamFilterParams {
   public SamFilterParams(SamFilterParamsBuilder builder) {
     mMinMapQ = builder.mMinMapQ;
     mSubsampleFraction = builder.mSubsampleFraction;
+    mSubsampleRampFraction = builder.mSubsampleRampFraction;
     mSubsampleSeed = builder.mSubsampleSeed;
     mMaxAlignmentCount = builder.mMaxAlignmentCount;
     mMaxASMatedValue = builder.mMaxASMatedValue;
@@ -342,6 +355,7 @@ public class SamFilterParams {
   public boolean isFiltering() {
     return mMinMapQ != -1
       || mSubsampleFraction != null
+      || mSubsampleRampFraction != null
       || mMaxAlignmentCount != -1
       || mMaxASMatedValue != null
       || mMaxASUnmatedValue != null
@@ -371,6 +385,15 @@ public class SamFilterParams {
    */
   public Double subsampleFraction() {
     return mSubsampleFraction;
+  }
+
+  /**
+   * Gets the proportion of alignments that should be retained after subsampling, at the end of the subsample ramp.
+   * Null indicates no subsample ramping should be performed.
+   * @return the fraction of alignments to retain. E.g. 0.33 will subsample alignments to retain 1/3
+   */
+  public Double subsampleRampFraction() {
+    return mSubsampleRampFraction;
   }
 
   /**

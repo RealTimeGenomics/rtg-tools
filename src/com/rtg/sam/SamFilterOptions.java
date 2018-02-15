@@ -77,6 +77,9 @@ public final class SamFilterOptions {
   /** Flag name for specifying the seed when subsampling. */
   public static final String SUBSAMPLE_SEED_FLAG = "seed";
 
+  /** Flag name for subsample ramping. */
+  public static final String SUBSAMPLE_RAMP_FLAG = "Xsubsample-ramp";
+
   /**
    * Register flags for subsampling
    *
@@ -85,6 +88,7 @@ public final class SamFilterOptions {
   public static void registerSubsampleFlags(final CFlags flags) {
     flags.registerOptional(SUBSAMPLE_FLAG, Double.class, CommonFlags.FLOAT, "if set, subsample the input to retain this fraction of reads").setCategory(UTILITY);
     flags.registerOptional(SUBSAMPLE_SEED_FLAG, Integer.class, CommonFlags.INT, "seed used during subsampling").setCategory(UTILITY);
+    flags.registerOptional(SUBSAMPLE_RAMP_FLAG, Double.class, CommonFlags.FLOAT, "if set, subsample fraction will ramp from --" + SUBSAMPLE_FLAG + " value to this, along the length of each chromosome").setCategory(UTILITY);
   }
 
   /** Flag name for inverting flag and attribute filter criteria. */
@@ -344,6 +348,9 @@ public final class SamFilterOptions {
     }
     if (flags.isSet(SUBSAMPLE_FLAG)) {
       builder.subsampleFraction((Double) flags.getValue(SUBSAMPLE_FLAG));
+    }
+    if (flags.isSet(SUBSAMPLE_RAMP_FLAG)) {
+      builder.subsampleRampFraction((Double) flags.getValue(SUBSAMPLE_RAMP_FLAG));
     }
     if (flags.isSet(SUBSAMPLE_SEED_FLAG)) {
       builder.subsampleSeed((Integer) flags.getValue(SUBSAMPLE_SEED_FLAG));
