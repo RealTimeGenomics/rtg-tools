@@ -138,7 +138,7 @@ public final class SamCommandHelper {
       }
       final SAMReadGroupRecord samReadGroupRecord = readGroups.get(0);
       if (samReadGroupRecord.getSample() == null) {
-        Diagnostic.warning("Sample not specified in read group, it is recommended that the sample be set.");
+        throw new InvalidParamsException("Read group with ID \"" + samReadGroupRecord.getReadGroupId() + "\" does not contain a sample tag.");
       }
       return samReadGroupRecord;
     } finally {
