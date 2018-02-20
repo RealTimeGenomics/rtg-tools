@@ -100,6 +100,19 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_all_matches", new String[] {"output.vcf"}, true, "--output-mode=combine", "--sample=BASELINE,CALLS", "--all-records", "--ref-overlap", "--Xtwo-pass=false", "--XXcom.rtg.vcf.eval.flag-alternates=true");
   }
 
+  public void testNanoUpstreamDel() throws IOException, UnindexableDataException {
+    // We don't support spanning deletion calls fully by default, but we should be able to find a common-allele match with the variant being spanned
+    endToEnd("vcfeval_small_updel/updel", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
+    // But we can allow a diploid match if we treat the "*" as a skip and allow variant replay overlap
+    endToEnd("vcfeval_small_updel/updel2", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--ref-overlap", "--XXcom.rtg.vcf.eval.explicit-unknown-alleles=false");
+  }
+
+  public void testNanoTrickySquash() throws IOException, UnindexableDataException {
+    // Here diploid matching finds 3TP, but normal squash-ploidy reports 2TP/1FP (even though diploid matching finds 3TP)
+    //endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
+    endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

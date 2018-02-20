@@ -1,0 +1,9 @@
+##fileformat=VCFv4.2
+##CL=[...]
+##INFO=<ID=SYNC,Number=.,Type=Integer,Description="Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed.">
+##INFO=<ID=BASE,Number=1,Type=String,Description="Baseline genotype status">
+##INFO=<ID=BASE_ALTERNATE,Number=1,Type=Flag,Description="Baseline variant could be matched in an alternate path">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	syndip
+2-1	11	.	TG	T	.	.	SYNC=12;BASE=TP	GT	0|1
+2-1	12	.	G	C,*	.	.	SYNC=12;BASE=TP	GT	1|2

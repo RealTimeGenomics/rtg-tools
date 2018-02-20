@@ -1,0 +1,5 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##reference=file:///dsde/working/CHM/58re/37m/ref.fa
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	CHMI_CHMI3_WGS2
+2-1	12	.	G	C	.	.	.	GT	0/1

@@ -1,0 +1,10 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=AD,Number=R,Type=Integer,Description="Allelic depths for the ref and alt alleles in the order listed">
+##FILTER=<ID=HET1,Description="Heterozygous in CHM1">
+##FILTER=<ID=HET13,Description="Heterozygous in CHM13">
+##FILTER=<ID=GAP1,Description="Uncalled in CHM1">
+##FILTER=<ID=GAP13,Description="Uncalled in CHM13">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	syndip
+1-1	41	.	G	GTATA	.	.	.	GT:AD	1|1:0,2
+1-1	61	.	T	A	.	.	.	GT:AD	1|0:1,1
