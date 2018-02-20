@@ -197,12 +197,14 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
 
 
   // Look up an appropriate orientor depending on the type of comparison we're doing
-  static Orientor getOrientor(String variantFactoryName, boolean squashPloidy, Orientor phaseOrientor) {
+  static Orientor getOrientor(String variantFactoryName, boolean alleleMatching, Orientor phaseOrientor) {
+    final boolean hapAlleleMatching = alleleMatching && GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_HAPLOID_ALLELE_MATCHING);
+    final boolean dipAlleleMatching = alleleMatching && !GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_HAPLOID_ALLELE_MATCHING);
     switch (variantFactoryName) {
       case VariantFactory.SAMPLE_FACTORY:
-        return squashPloidy ? Orientor.SQUASH_GT : phaseOrientor;
+        return dipAlleleMatching ? Orientor.ALLELE_GT : hapAlleleMatching ? Orientor.SQUASH_GT : phaseOrientor;
       case VariantFactory.ALL_FACTORY:
-        return squashPloidy ? Orientor.SQUASH_POP : Orientor.RECODE_POP;
+        return hapAlleleMatching ? Orientor.HAPLOID_POP : Orientor.DIPLOID_POP;
       default:
         throw new RuntimeException("Could not determine orientor for " + variantFactoryName);
     }

@@ -119,9 +119,10 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
   }
 
   public void testNanoTrickySquash() throws IOException, UnindexableDataException {
-    // Here diploid matching finds 3TP, but normal squash-ploidy reports 2TP/1FP (even though diploid matching finds 3TP)
+    // Here diploid matching finds 3TP
     //endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
-    endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
+    // But normal squash-ploidy reports 2TP/1FP due to requiring more than one haplotype. We can do diploid allele-matching, to find all three TP
+    endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy", "--XXcom.rtg.vcf.eval.haploid-allele-matching=false");
   }
 
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

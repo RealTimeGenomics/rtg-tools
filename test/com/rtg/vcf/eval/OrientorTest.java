@@ -138,7 +138,7 @@ public class OrientorTest extends TestCase {
     final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     // Test squashing ploidy  A T,C,G -> T, C, G
-    final OrientedVariant[] pos = Orientor.SQUASH_POP.orientations(variant);
+    final OrientedVariant[] pos = Orientor.HAPLOID_POP.orientations(variant);
     assertEquals(3, pos.length);
     for (OrientedVariant ov : pos) {
       assertTrue(ov.isAlleleA());
@@ -153,7 +153,7 @@ public class OrientorTest extends TestCase {
     final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     // Test diploid combos  A T,C,G -> .:T, T:., T:T, .:C, C:., C:C, .:G, G:., G:G, T:C, C:T, T:G, G:T, C:G, G:C
-    final OrientedVariant[] pos = Orientor.RECODE_POP.orientations(variant);
+    final OrientedVariant[] pos = Orientor.DIPLOID_POP.orientations(variant);
     assertEquals(15, pos.length);
     assertEquals("chr:23-24 (.v:*:T^:C:G)", pos[0].toString()); // Het uses missing rather than REF
     assertEquals("chr:23-24 (.^:*:Tv:C:G)", pos[1].toString());

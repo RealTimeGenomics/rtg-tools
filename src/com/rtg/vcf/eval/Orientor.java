@@ -124,8 +124,10 @@ public interface Orientor {
   Orientor PHASE_INVERTED = new PhasedOrientor(true);
 
   /**
-   * Produces orientations corresponding to the possible haploid ALTs from the GT-derived variant.
-   * Path finding will match any variants where there are any non-ref allele matches.
+   * Produces orientations corresponding to the possible haploid genotypes that employ any
+   * of the ALTs from the GT-derived variant.
+   * Path finding will match any variants where there are any non-ref allele matches (as
+   * long as they can be played into a single haplotype).
    */
   Orientor SQUASH_GT = new Orientor() {
     @Override
@@ -154,10 +156,48 @@ public interface Orientor {
   };
 
   /**
-   * Produces orientations corresponding to the possible haploid ALTs from the
-   * population-allele-derived variant.
+   * Produces orientations corresponding to the possible diploid genotypes that employ any
+   * of the ALTs used by the GT-derived variant.
+   * Path finding will match any variants where there are any non-ref allele matches (as
+   * long as they can be played into two haplotypes)
    */
-  Orientor SQUASH_POP = new Orientor() {
+  Orientor ALLELE_GT = new Orientor() {
+    @Override
+    public String toString() {
+      return "allele-gt";
+    }
+    @Override
+    public OrientedVariant[] orientations(Variant variant) {
+      final GtIdVariant gv = (GtIdVariant) variant;
+      final boolean aVar = gv.alleleA() > 0 && variant.allele(gv.alleleA()) != null;
+      final boolean bVar = gv.alleleB() > 0 && variant.allele(gv.alleleB()) != null;
+      assert aVar || bVar; // Must be at least one replayable variant allele
+      final int la = aVar ? gv.alleleA() : gv.alleleB();
+      final int lb = bVar ? gv.alleleB() : gv.alleleA();
+      if (la == lb) { // { 0/1, 1/0, 1/1 }   ->   0/1 + 1/0 + 1/1
+        return new OrientedVariant[]{
+          new OrientedVariant(variant, true, 0, la),
+          new OrientedVariant(variant, true, la, 0),
+          new OrientedVariant(variant, la),
+        };
+      } else { // { 1/2, 2/1 }  ->   0/1 + 0/2 + 1/0 + 2/0 + 1/2 + 2/1
+        return new OrientedVariant[]{
+          new OrientedVariant(variant, true, 0, la),
+          new OrientedVariant(variant, true, 0, lb),
+          new OrientedVariant(variant, true, la, 0),
+          new OrientedVariant(variant, true, lb, 0),
+          new OrientedVariant(variant, true, la, lb),
+          new OrientedVariant(variant, true, lb, la),
+        };
+      }
+    }
+  };
+
+  /**
+   * Produces orientations corresponding to the possible haploid ALTs from the
+   * population-alleles-derived variant.
+   */
+  Orientor HAPLOID_POP = new Orientor() {
     @Override
     public String toString() {
       return "squash-all";
@@ -174,12 +214,13 @@ public interface Orientor {
 
   /**
    * Produces orientations corresponding to all the possible diploid genotypes allowed by the
-   * population-allele-derived variant, with twists to help with sample recoding.
+   * population-alleles-derived variant.
+   * With twists to help with sample recoding.
    */
-  Orientor RECODE_POP = new Orientor() {
+  Orientor DIPLOID_POP = new Orientor() {
     @Override
     public String toString() {
-      return "recode-all";
+      return "diploid-all";
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {

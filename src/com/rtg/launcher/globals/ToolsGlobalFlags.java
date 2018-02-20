@@ -73,6 +73,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public static final String VCFEVAL_PATH_PROCESSOR = "com.rtg.vcf.eval.custom-path-processor";
   /** Custom variant factories */
   public static final String VCFEVAL_VARIANT_FACTORY = "com.rtg.vcf.eval.custom-variant-factory";
+  /** Allele-matching (to ignore call zygosity differences) is normally haploid for speed */
+  public static final String VCFEVAL_HAPLOID_ALLELE_MATCHING = "com.rtg.vcf.eval.haploid-allele-matching";
   /** Specify the maximum number of simultaneous paths before vcfeval skips a region */
   public static final String VCFEVAL_MAX_PATHS = "com.rtg.vcf.eval.max-paths";
   /** Specify the maximum number of iterations since last sync point before vcfeval skips a region */
@@ -126,6 +128,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_MAXIMIZE_MODE, String.class, "default");
     registerFlag(VCFEVAL_PATH_PROCESSOR, String.class, "");
     registerFlag(VCFEVAL_VARIANT_FACTORY, String.class, "");
+    registerFlag(VCFEVAL_HAPLOID_ALLELE_MATCHING, Boolean.class, Boolean.TRUE);
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 50000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
