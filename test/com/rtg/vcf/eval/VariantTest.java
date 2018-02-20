@@ -161,7 +161,7 @@ public class VariantTest extends TestCase {
     variant = createVariant(SNP_LINE4);
     assertNull(variant.allele(0));
     assertEquals(1, variant.nt(-1).length);
-    assertEquals(0, variant.nt(-1)[0]);
+    assertEquals(5, variant.nt(-1)[0]);
     assertEquals(4, variant.nt(1)[0]);
   }
 

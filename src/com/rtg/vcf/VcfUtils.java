@@ -774,7 +774,7 @@ public final class VcfUtils {
     }
     final int[] gtArr = getValidGt(rec, sampleId);
     final VariantType type = VariantType.getType(rec, gtArr);
-    return !type.isNonVariant() && !type.isSvType();
+    return !type.isNonVariant() && (!type.isSvType() || type == VariantType.SV_MISSING);
   }
 
   /**

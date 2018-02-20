@@ -196,13 +196,13 @@ class TabixVcfRecordSet implements VariantSet {
   }
 
   static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, boolean relaxedRef) {
-    final boolean explicitHalf = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_EXPLICIT_HALF_CALL);
+    final boolean explicitUnknown = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_EXPLICIT_UNKNOWN_ALLELES);
     final String f = VariantFactory.getFactoryName(type, sampleName);
     switch (f) {
       case VariantFactory.SAMPLE_FACTORY:
-        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitHalf);
+        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitUnknown);
       case VariantFactory.ALL_FACTORY:
-        return new VariantFactory.AllAlts(relaxedRef, explicitHalf);
+        return new VariantFactory.AllAlts(relaxedRef, explicitUnknown);
       default:
         throw new RuntimeException("Could not determine variant factory for " + f);
     }

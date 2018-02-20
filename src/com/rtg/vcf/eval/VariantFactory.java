@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.eval;
 
+import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE;
+
 import java.util.Arrays;
 
 import com.rtg.launcher.globals.GlobalFlags;
@@ -36,6 +38,8 @@ import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.mode.IllegalBaseException;
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
+import com.rtg.vcf.VariantType;
+import com.rtg.vcf.VcfFormatException;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -94,24 +98,25 @@ public interface VariantFactory {
 
     private final int mSampleNo;
     private final boolean mTrim;
-    private final boolean mExplicitHalfCall;
+    private final boolean mExplicitUnknown;
 
     /**
      * Constructor
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      * @param trimming if true, trim all leading/trailing bases that match REF from alleles
-     * @param explicitHalfCall if true, treat half call allele as a separate token
+     * @param explicitUnknown if true, treat half call allele as a separate token
      */
-    public SampleVariants(int sampleNo, boolean trimming, boolean explicitHalfCall) {
+    public SampleVariants(int sampleNo, boolean trimming, boolean explicitUnknown) {
       mSampleNo = sampleNo;
       mTrim = trimming;
-      mExplicitHalfCall = explicitHalfCall;
+      mExplicitUnknown = explicitUnknown;
     }
 
     @Override
     public GtIdVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
       // Currently we skip both non-variant and SV
-      if (!VcfUtils.hasDefinedVariantGt(rec, mSampleNo)) {
+      // Check we have a GT that refers to a non-SV variant in at least one allele
+      if (!hasDefinedVariantGt(rec, mSampleNo)) {
         return null;
       }
 
@@ -122,7 +127,7 @@ public interface VariantFactory {
       }
       final Allele[] alleles;
       try {
-        alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitHalfCall);
+        alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitUnknown);
       } catch (IllegalBaseException e) {
         throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
       }
@@ -132,6 +137,26 @@ public interface VariantFactory {
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
 
       return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
+    }
+
+    static boolean hasDefinedVariantGt(VcfRecord rec, int sampleId) {
+      if (sampleId >= rec.getNumberOfSamples()) {
+        throw new VcfFormatException("Record did not contain enough samples: " + rec.toString());
+      }
+      if (!rec.hasFormat(FORMAT_GENOTYPE)) {
+        return false;
+      }
+      final int[] gtArr = VcfUtils.getValidGt(rec, sampleId);
+      final String[] alleles = VcfUtils.getAlleleStrings(rec);
+      for (final int a : gtArr) {
+        if (a > 0) {
+          final VariantType altType = VariantType.getType(alleles[0], alleles[a]);
+          if (!(altType.isSvType() || altType.isNonVariant())) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
   }
 
@@ -143,7 +168,7 @@ public interface VariantFactory {
   class AllAlts implements VariantFactory {
 
     private final boolean mTrim;
-    private final boolean mExplicitHalfCall;
+    private final boolean mExplicitUnknown;
 
     AllAlts() {
       this(true, false);
@@ -152,18 +177,18 @@ public interface VariantFactory {
     /**
      * Constructor
      * @param trimming if true, trim all leading/trailing bases that match REF from alleles
-     * @param explicitHalfCall if true, treat half call allele as a separate token
+     * @param explicitUnknown if true, treat half-call allele as a separate token
      */
-    public AllAlts(boolean trimming, boolean explicitHalfCall) {
+    public AllAlts(boolean trimming, boolean explicitUnknown) {
       mTrim = trimming;
-      mExplicitHalfCall = explicitHalfCall;
+      mExplicitUnknown = explicitUnknown;
     }
 
     // Remove any of the ALT entries that have not been assigned an Allele
     static Allele[] pruneEmptyAlts(Allele[] alleles) {
       int b = 2;
       for (int a = 2; a < alleles.length; a++, b++) { // Ignore positions 0 (missing) and 1 (REF)
-        if (alleles[a] == null) {
+        if (alleles[a] == null || alleles[a].unknown()) {
           b--;
         } else if (a != b) {
           alleles[b] = alleles[a];
@@ -180,7 +205,7 @@ public interface VariantFactory {
 
       final Allele[] alleles;
       try {
-        alleles = pruneEmptyAlts(Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitHalfCall));
+        alleles = pruneEmptyAlts(Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitUnknown));
       } catch (IllegalBaseException e) {
         throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
       }

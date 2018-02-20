@@ -162,7 +162,7 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
     if (a.getStart() != getStart() || a.getEnd() != getEnd()) {
       pos = "<" + (a.getStart() + 1) + "-" + (a.getEnd() + 1) + ">";
     }
-    return pos + DnaUtils.bytesToSequenceIncCG(a.nt());
+    return pos + (a.unknown() ? "?" : DnaUtils.bytesToSequenceIncCG(a.nt()));
   }
 
   int numAlleles() {

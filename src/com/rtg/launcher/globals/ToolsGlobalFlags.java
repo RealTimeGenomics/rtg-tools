@@ -77,8 +77,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public static final String VCFEVAL_MAX_PATHS = "com.rtg.vcf.eval.max-paths";
   /** Specify the maximum number of iterations since last sync point before vcfeval skips a region */
   public static final String VCFEVAL_MAX_ITERATIONS = "com.rtg.vcf.eval.max-iterations";
-  /** Specify whether to treat the missing side of a half call as an explicit token requiring a match, or just ignore */
-  public static final String VCFEVAL_EXPLICIT_HALF_CALL = "com.rtg.vcf.eval.explicit-half-call";
+  /** Specify whether to treat the alleles of unknown sequence (e.g. missing side of a half call, spanning dels, etc) as an explicit token requiring a match, or just ignore */
+  public static final String VCFEVAL_EXPLICIT_UNKNOWN_ALLELES = "com.rtg.vcf.eval.explicit-unknown-alleles";
   /** Turn on alternate ROC slope calculation */
   public static final String VCFEVAL_ALT_ROC_SLOPE_CALCULATION = "com.rtg.vcf.eval.alt-roc-slope";
   /** Mark variants matched in alternative paths */
@@ -129,7 +129,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_MAX_PATHS, Integer.class, 50000);
     registerFlag(VCFEVAL_MAX_ITERATIONS, Integer.class, 10000000);
     registerFlag(VCFEVAL_ALT_ROC_SLOPE_CALCULATION);
-    registerFlag(VCFEVAL_EXPLICIT_HALF_CALL, Boolean.class, Boolean.TRUE);
+    registerFlag(VCFEVAL_EXPLICIT_UNKNOWN_ALLELES, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_FLAG_ALTERNATES, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_PRUNE_NO_OPS, Boolean.class, Boolean.TRUE);
     registerFlag(VCFEVAL_DECOMPOSE_MNPS, Boolean.class, Boolean.FALSE);

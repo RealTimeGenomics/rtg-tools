@@ -101,10 +101,21 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
   }
 
   public void testNanoUpstreamDel() throws IOException, UnindexableDataException {
-    // We don't support spanning deletion calls fully by default, but we should be able to find a common-allele match with the variant being spanned
+    // Here the calls are missing the deletion itself. We want a partial match against the SNP.
+    // (previously this would not find any match)
     endToEnd("vcfeval_small_updel/updel", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
-    // But we can allow a diploid match if we treat the "*" as a skip and allow variant replay overlap
-    endToEnd("vcfeval_small_updel/updel2", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--ref-overlap", "--XXcom.rtg.vcf.eval.explicit-unknown-alleles=false");
+
+    // Another case. We now treat the "*" as a skip so we can make a diploid match
+    // if we allow variant replay overlap in order to deal with the fact that one of
+    // these variants asserts reference bases.
+    // Note that treating the * as skip also considers the
+    // G->C,* 1/2
+    // to exact match with:
+    // G->C   0/1
+    // G->C   ./1
+    // but not match:
+    // G->C   1/1  (which some might expected to match)
+    endToEnd("vcfeval_small_updel/updel2", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--ref-overlap");
   }
 
   public void testNanoTrickySquash() throws IOException, UnindexableDataException {

@@ -47,8 +47,8 @@ import com.rtg.visualization.DisplayHelper;
 @TestClass("com.rtg.vcf.eval.VariantTest")
 public class Allele extends SequenceNameLocusSimple {
 
-  private static final byte[] MISSING = {
-    0 // "N"
+  private static final byte[] UNKNOWN = {
+    5 // Unspecified, but different to "N" (0)
   };
 
   private final byte[] mNt;
@@ -58,7 +58,7 @@ public class Allele extends SequenceNameLocusSimple {
    * @param seq chromosome name
    * @param start start position (0-based inclusive)
    * @param end end position (0-based exclusive)
-   * @param nt the bases of the allele which substitute for the based in the reference region
+   * @param nt the bases of the allele which substitute for the bases in the reference region
    */
   public Allele(String seq, int start, int end, byte[] nt) {
     super(seq, start, end);
@@ -71,7 +71,7 @@ public class Allele extends SequenceNameLocusSimple {
   /**
    * Construct an Allele
    * @param locus the reference region occupied by the Allele
-   * @param nt the bases of the allele which substitute for the based in the reference region
+   * @param nt the bases of the allele which substitute for the bases in the reference region
    */
   public Allele(SequenceNameLocus locus, byte[] nt) {
     this(locus.getSequenceName(), locus.getStart(), locus.getEnd(), nt);
@@ -82,6 +82,13 @@ public class Allele extends SequenceNameLocusSimple {
    */
   byte[] nt() {
     return mNt;
+  }
+
+  /**
+   * @return true if this allele represents an unknown sequence
+   */
+  public boolean unknown() {
+    return mNt == UNKNOWN;
   }
 
   @Override
@@ -97,15 +104,15 @@ public class Allele extends SequenceNameLocusSimple {
    * @param rec the record
    * @param gtArray if not null, only populate alleles referenced by the GT array
    * @param trim if set, remove all leading and trailing same-as-ref bases
-   * @param explicitMissing if set, treat missing allele as an explicit 'N', otherwise treat as skip  @return the set of alleles
+   * @param explicitUnknown if set, treat allele with unknown sequence as an explicit token, otherwise treat as skip
    * @return the set of alleles, with the first element corresponding to the missing allele (i.e. index = GT + 1)
    */
-  static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray, boolean trim, boolean explicitMissing) {
+  static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray, boolean trim, boolean explicitUnknown) {
     final boolean removePaddingBase = !trim && VcfUtils.hasRedundantFirstNucleotide(rec);
     final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
     for (int i = -1; i < alleles.length - 1; ++i) {
       if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
-        alleles[i + 1] = getAllele(rec, i, trim, removePaddingBase, explicitMissing);
+        alleles[i + 1] = getAllele(rec, i, trim, removePaddingBase, explicitUnknown);
       }
     }
     return alleles;
@@ -117,16 +124,12 @@ public class Allele extends SequenceNameLocusSimple {
    * @param allele the index of the allele, 0 is ref, -1 is missing
    * @param trim if set, remove all leading and trailing same-as-ref bases
    * @param removePaddingBase if set (and not otherwise trimming), remove the single leading base
-   * @param explicitMissing if set, treat missing allele as an explicit 'N', otherwise treat as skip
+   * @param explicitUnknown if set, treat allele with unknown sequence as an explicit token, otherwise treat as skip
    * @return the allele, or null if the allele should not result in a change to the haplotype
    */
-  protected static Allele getAllele(VcfRecord rec, int allele, boolean trim, boolean removePaddingBase, boolean explicitMissing) {
+  protected static Allele getAllele(VcfRecord rec, int allele, boolean trim, boolean removePaddingBase, boolean explicitUnknown) {
     if (allele == -1) {
-      if (explicitMissing) {
-        return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), MISSING);
-      } else {
-        return null;
-      }
+      return unknownAllele(rec, removePaddingBase, explicitUnknown);
     }
     if (trim) {
       final String ref = rec.getRefCall();
@@ -135,7 +138,7 @@ public class Allele extends SequenceNameLocusSimple {
       }
       final String alt = rec.getAllele(allele);
       if (VariantType.getSymbolicAlleleType(alt) != null) {
-        return null;
+        return unknownAllele(rec, removePaddingBase, explicitUnknown);
       }
       final int stripLeading = StringUtils.longestPrefix(ref, alt);
       final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
@@ -144,10 +147,19 @@ public class Allele extends SequenceNameLocusSimple {
     } else {
       final String alt = rec.getAllele(allele);
       if (VariantType.getSymbolicAlleleType(alt) != null) {
-        return null;
+        return unknownAllele(rec, removePaddingBase, explicitUnknown);
       }
       return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(),
         DnaUtils.encodeString(removePaddingBase ? alt.substring(1) : alt));
+    }
+  }
+
+  // Return either the null allele (don't replay anything), or an explicit unknown allele
+  private static Allele unknownAllele(VcfRecord rec, boolean removePaddingBase, boolean explicitMissing) {
+    if (explicitMissing) {
+      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(), UNKNOWN);
+    } else {
+      return null;
     }
   }
 
@@ -163,6 +175,5 @@ public class Allele extends SequenceNameLocusSimple {
     }
     return new Range(start, end);
   }
-
 
 }

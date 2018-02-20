@@ -135,9 +135,11 @@ public interface Orientor {
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
-      assert gv.alleleA() > 0 || gv.alleleB() > 0;
-      final int la = gv.alleleA() > 0 ? gv.alleleA() : gv.alleleB();
-      final int lb = gv.alleleB() > 0 ? gv.alleleB() : gv.alleleA();
+      final boolean aVar = gv.alleleA() > 0 && variant.allele(gv.alleleA()) != null;
+      final boolean bVar = gv.alleleB() > 0 && variant.allele(gv.alleleB()) != null;
+      assert aVar || bVar; // Must be at least one replayable variant allele
+      final int la = aVar ? gv.alleleA() : gv.alleleB();
+      final int lb = bVar ? gv.alleleB() : gv.alleleA();
       final OrientedVariant[] pos;
       if (la == lb) {
         pos = new OrientedVariant[1];

@@ -53,7 +53,7 @@ public class SquashedAlleleAccumulatorTest extends AlleleAccumulatorTest {
       "-t", template.getPath(), "--ref-overlap", "--squash-ploidy",
       "--XXcom.rtg.vcf.eval.custom-path-processor=alleles",
       "--XXcom.rtg.vcf.eval.custom-variant-factory=all,sample",
-      "--XXcom.rtg.vcf.eval.explicit-half-call=false",
+      "--XXcom.rtg.vcf.eval.explicit-unknown-alleles=false",
       "--XXcom.rtg.vcf.eval.maximize=calls-min-base"
     };
     File alleles = initial;
