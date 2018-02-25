@@ -71,6 +71,39 @@ public class OrientorTest extends TestCase {
     assertEquals(1, pos[0].alleleId());
   }
 
+  public void testAlleleGt() throws Exception {
+    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false, true);
+
+    // Test 1/2 -> 0/1, 0/2, 1/0, 2/0, 1/2, 2/1
+    Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
+    OrientedVariant[] pos = Orientor.ALLELE_GT.orientations(variant);
+    String[] exp = {
+      "chr:23-24 (*^:Tv:C:*)",
+      "chr:23-24 (*^:T:Cv:*)",
+      "chr:23-24 (*v:T^:C:*)",
+      "chr:23-24 (*v:T:C^:*)",
+      "chr:23-24 (*:T^:Cv:*)",
+      "chr:23-24 (*:Tv:C^:*)",
+    };
+    assertEquals(exp.length, pos.length);
+    for (int i = 0; i < pos.length; i++) {
+      assertEquals(exp[i], pos[i].toString());
+    }
+
+    // Test 0/1 -> 0/1, 1/0, 1/1
+    variant = fact.variant(VariantTest.createRecord(SNP_LINE3), 0);
+    pos = Orientor.ALLELE_GT.orientations(variant);
+    exp = new String[] {
+      "chr:23-24 (A^:Tv)",
+      "chr:23-24 (Av:T^)",
+      "chr:23-24 (A:Tx)",
+    };
+    assertEquals(exp.length, pos.length);
+    for (int i = 0; i < pos.length; i++) {
+      assertEquals(exp[i], pos[i].toString());
+    }
+  }
+
   static final String SNP_LINE5 = "chr 23 . AA T,ATTA . PASS . GT 0/2";
   static final String SNP_LINE6 = "chr 23 . T A,TAAA . PASS . GT 2|1";
   static final String SNP_LINE7 = "chr 23 . T A,TAAA . PASS . GT .|2";

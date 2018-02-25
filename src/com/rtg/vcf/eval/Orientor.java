@@ -188,6 +188,9 @@ public interface Orientor {
           new OrientedVariant(variant, true, lb, 0),
           new OrientedVariant(variant, true, la, lb),
           new OrientedVariant(variant, true, lb, la),
+          // For completeness we should add: (but they may actually be superfluous in the context of other variants)
+          // new OrientedVariant(variant, la),
+          // new OrientedVariant(variant, lb),
         };
       }
     }
