@@ -88,7 +88,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             } else {
                 var ArrayList = Java.type("java.util.ArrayList");
                 var list = new ArrayList();
-                if (value != true) {
+                if (value !== true) {
                     var values = value.toString().split(',');
                     if (Array.isArray(values)) {
                         values.forEach(function (val) {
