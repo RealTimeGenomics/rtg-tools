@@ -74,6 +74,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
   static final String MODE_RECODE = "recode";
   static final String MODE_ALLELES = "alleles";
   static final String MODE_GA4GH = "ga4gh";
+  static final String MODE_TRIO = "trio";
   static final String MODE_ROC_ONLY = "roc-only";
 
   protected VcfEvalTask(VcfEvalParams params, OutputStream reportStream, NoStatistics stats) {
@@ -186,6 +187,9 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       case MODE_GA4GH:
         processor = new Ga4ghEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.looseMatchDistance());
         break;
+      case MODE_TRIO:
+        processor = new TrioEvalSynchronizer(variants, outdir, params.outputParams().isCompressed());
+        break;
       case MODE_ROC_ONLY:
         processor = new RocOnlyEvalSynchronizer(variants, rocExtractor, outdir, params.outputParams().isCompressed(), params.outputSlopeFiles(), params.twoPass(), params.rocFilters());
         break;
@@ -205,6 +209,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
         return dipAlleleMatching ? Orientor.ALLELE_GT : hapAlleleMatching ? Orientor.SQUASH_GT : phaseOrientor;
       case VariantFactory.ALL_FACTORY:
         return hapAlleleMatching ? Orientor.HAPLOID_POP : Orientor.DIPLOID_POP;
+      case ParentalVariant.Factory.NAME:
+        return hapAlleleMatching ? ParentalVariant.PARENTAL_TRANSMISSION_HAP : ParentalVariant.PARENTAL_TRANSMISSION_DIP;
       default:
         throw new RuntimeException("Could not determine orientor for " + variantFactoryName);
     }

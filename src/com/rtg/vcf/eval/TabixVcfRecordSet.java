@@ -52,6 +52,9 @@ import java.util.stream.Stream;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
+import com.rtg.relation.Family;
+import com.rtg.relation.PedigreeException;
+import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Pair;
@@ -203,6 +206,17 @@ class TabixVcfRecordSet implements VariantSet {
         return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), relaxedRef, explicitUnknown);
       case VariantFactory.ALL_FACTORY:
         return new VariantFactory.AllAlts(relaxedRef, explicitUnknown);
+      case ParentalVariant.Factory.NAME:
+        final Family family;
+        try {
+          family = Family.getFamily(VcfPedigreeParser.load(header));
+        } catch (PedigreeException e) {
+          throw new NoTalkbackSlimException(e.getMessage());
+        }
+        if (type != VariantSetType.BASELINE) {
+          throw new RuntimeException("Parents must be specified as the baseline side only");
+        }
+        return new ParentalVariant.Factory(VcfUtils.getSampleIndexOrDie(header, family.getFather(), type.label()), VcfUtils.getSampleIndexOrDie(header, family.getMother(), type.label()), relaxedRef, explicitUnknown);
       default:
         throw new RuntimeException("Could not determine variant factory for " + f);
     }
