@@ -116,15 +116,11 @@ public interface VariantFactory {
     public GtIdVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
       // Currently we skip both non-variant and SV
       // Check we have a GT that refers to a non-SV variant in at least one allele
-      if (!hasDefinedVariantGt(rec, mSampleNo)) {
+      final int[] gtArray = getDefinedVariantGt(rec, mSampleNo);
+      if (gtArray == null) {
         return null;
       }
 
-      final String gt = VcfUtils.getValidGtStr(rec, mSampleNo);
-      final int[] gtArray = VcfUtils.splitGt(gt);
-      if (gtArray.length == 0 || gtArray.length > 2) {
-        throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
-      }
       final Allele[] alleles;
       try {
         alleles = Allele.getTrimmedAlleles(rec, gtArray, mTrim, mExplicitUnknown);
@@ -136,28 +132,42 @@ public interface VariantFactory {
       final int alleleA = gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
 
-      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB, VcfUtils.isPhasedGt(gt));
+      return new GtIdVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles, alleleA, alleleB,
+        VcfUtils.isPhasedGt(VcfUtils.getValidGtStr(rec, mSampleNo))
+      );
     }
+  }
 
-    static boolean hasDefinedVariantGt(VcfRecord rec, int sampleId) {
-      if (sampleId >= rec.getNumberOfSamples()) {
-        throw new VcfFormatException("Record did not contain enough samples: " + rec.toString());
-      }
-      if (!rec.hasFormat(FORMAT_GENOTYPE)) {
-        return false;
-      }
-      final int[] gtArr = VcfUtils.getValidGt(rec, sampleId);
-      final String[] alleles = VcfUtils.getAlleleStrings(rec);
-      for (final int a : gtArr) {
-        if (a > 0) {
-          final VariantType altType = VariantType.getType(alleles[0], alleles[a]);
-          if (!(altType.isSvType() || altType.isNonVariant())) {
-            return true;
-          }
+  /**
+   * Helper method to get the genotype array for the specified sample, with checks for whether the variant is suitable for
+   * evaluation.
+   * @param rec the VCF record to extract from
+   * @param sampleId the sample index
+   * @return the genotype array, or null if the variant should be ignored due to not being variant
+   * @throws SkippedVariantException if the genotype is in some way unexpected.
+   */
+  static int[] getDefinedVariantGt(VcfRecord rec, int sampleId) throws SkippedVariantException {
+    if (sampleId >= rec.getNumberOfSamples()) {
+      throw new VcfFormatException("Record did not contain enough samples: " + rec.toString());
+    }
+    if (!rec.hasFormat(FORMAT_GENOTYPE)) {
+      return null;
+    }
+    final String gt = VcfUtils.getValidGtStr(rec, sampleId);
+    final int[] gtArr = VcfUtils.splitGt(gt);
+    if (gtArr.length == 0 || gtArr.length > 2) {
+      throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
+    }
+    final String[] alleles = VcfUtils.getAlleleStrings(rec);
+    for (final int a : gtArr) {
+      if (a > 0) {
+        final VariantType altType = VariantType.getType(alleles[0], alleles[a]);
+        if (!(altType.isSvType() || altType.isNonVariant())) {
+          return gtArr;
         }
       }
-      return false;
     }
+    return null;
   }
 
   /**
