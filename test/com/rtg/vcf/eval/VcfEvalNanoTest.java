@@ -125,6 +125,13 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_small_trickysquash/trickysquash", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy", "--XXcom.rtg.vcf.eval.haploid-allele-matching=false");
   }
 
+  public void testNanoTrickyTrim() throws IOException, UnindexableDataException {
+    // Here --ref-overlap default to left-trimming, which prevents some overlap playback that can be enabled
+    // if we trim from the right first (or other trimming)
+    // We should get 3 TP here if we do context aware trimming.
+    endToEnd("vcfeval_avoid_overlap/avoid_overlap", new String[] {"output.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode=combine", "--sample=BASE,QUERY", "--ref-overlap");
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

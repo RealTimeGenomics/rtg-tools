@@ -1,0 +1,7 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##reference=file:///dsde/working/CHM/58re/37m/ref.fa
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	BASE	QUERY
+1-1	31	.	ATCTATCATCTCTCTCTC	A	.	.	.	GT	0/1	0/1
+1-1	38	.	ATCTCTCTC	ATCTC	.	.	.	GT	0/1	0/1
+1-1	44	.	C	A	.	.	.	GT	0/1	0/1
