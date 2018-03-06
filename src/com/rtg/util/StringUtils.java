@@ -495,7 +495,7 @@ public final class StringUtils {
    * @param strings strings to test
    * @return longest common suffix
    */
-  public static int longestSuffix(final String[] strings) {
+  public static int longestSuffix(final String... strings) {
     return longestSuffix(0, strings);
   }
 
