@@ -31,7 +31,7 @@
 package com.rtg.vcf.annotation;
 
 import static com.rtg.vcf.VcfUtils.FORMAT_ADE;
-import static com.rtg.vcf.VcfUtils.FORMAT_VARIANT_ALLELE;
+import static com.rtg.vcf.VcfUtils.FORMAT_ALLELIC_DEPTH;
 import static com.rtg.vcf.VcfUtils.MISSING_FIELD;
 
 import com.rtg.util.StringUtils;
@@ -43,19 +43,22 @@ import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
 
 /**
- * The fraction of evidence that is supporting the somatic variant allele for this sample.
+ * The fraction of evidence that is supporting each alternative allele.
  */
 public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnotation {
 
   /**
-   * Construct a new contrary observation fraction format annotation.
+   * Constructor
    */
   public VariantAllelicFractionAnnotation() {
-    super(new FormatField("VAF", MetaType.FLOAT, VcfNumber.ONE, "Variant Allelic Fraction"));
+    super(new FormatField("VAF", MetaType.FLOAT, VcfNumber.ALTS, "Variant Allelic Fraction"), Formatter.DEFAULT_DOUBLE_ARR);
   }
 
   private double[] ad(final double[] res, final VcfRecord record, final int sample) {
-    final String ad = record.getSampleString(sample, FORMAT_ADE);
+    String ad = record.getSampleString(sample, FORMAT_ADE);
+    if (ad == null || MISSING_FIELD.equals(ad)) {
+      ad = record.getSampleString(sample, FORMAT_ALLELIC_DEPTH);
+    }
     if (ad != null && !MISSING_FIELD.equals(ad)) {
       final String[] adSplit = StringUtils.split(ad, ',');
       for (int k = 0; k < res.length; ++k) {
@@ -71,27 +74,23 @@ public class VariantAllelicFractionAnnotation extends AbstractDerivedFormatAnnot
 
   @Override
   public Object getValue(final VcfRecord record, final int sampleNumber) {
-    final Integer va = record.getSampleInteger(sampleNumber, FORMAT_VARIANT_ALLELE);
-    if (va == null) {
-      return null;
-    }
     final double[] ad = ad(record, sampleNumber);
     final double sum = ArrayUtils.sum(ad);
-    if (sum == 0) {
+    if (ad.length < 2 || sum == 0) {
       return null;
     }
-    assert va <= ad.length && va > 0;
-    final double vac = ad[va];
-    assert sum > 0;
-    assert vac > 0;
-    final double vaf = vac / sum;
+    final double[] vaf = new double[ad.length - 1];
+    for (int i = 0; i < vaf.length; i++) {
+      vaf[i] = ad[i + 1] / sum;
+    }
     return vaf;
   }
 
   @Override
   public String checkHeader(VcfHeader header) {
-    // Need both VA and ADE
-    return checkHeader(header, null, new String[]{FORMAT_ADE, FORMAT_VARIANT_ALLELE});
+    if (header.getFormatField(FORMAT_ADE) == null && header.getFormatField(FORMAT_ALLELIC_DEPTH) == null) {
+      return "Derived annotation " + getName() + " missing required fields in VCF header" + " (FORMAT fields: " + FORMAT_ALLELIC_DEPTH + " or " + FORMAT_ADE + ')';
+    }
+    return null;
   }
-
 }

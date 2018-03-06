@@ -60,6 +60,6 @@ public class DerivedAnnotationsTest extends TestCase {
   }
 
   public void testCollections() {
-    assertEquals(EnumSet.complementOf(EnumSet.of(DerivedAnnotations.AC)), DerivedAnnotations.singleValueAnnotations());
+    assertEquals(EnumSet.complementOf(EnumSet.of(DerivedAnnotations.AC, DerivedAnnotations.VAF)), DerivedAnnotations.singleValueAnnotations());
   }
 }

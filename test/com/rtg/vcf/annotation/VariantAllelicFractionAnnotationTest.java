@@ -49,28 +49,27 @@ public class VariantAllelicFractionAnnotationTest extends TestCase {
 
   public void test() {
     final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
-    final VcfRecord rec = new VcfRecord("seq", 0, "AAA");
-    rec.addAltCall("A");
-    rec.addFormatAndSample("ADE", "6.0,2.0");
-    rec.addFormatAndSample("VA", "1");
-    assertEquals(0.25, (Double) annotation.getValue(rec, 0), 0.0001);
-  }
-  public void testMissingPrerequisites() {
-    final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
     VcfRecord rec = new VcfRecord("seq", 0, "AAA");
     rec.addAltCall("A");
     rec.addFormatAndSample("ADE", "6.0,2.0");
-    assertNull(annotation.getValue(rec, 0));
+    assertEquals(0.25, ((double[]) annotation.getValue(rec, 0))[0], 0.0001);
 
     rec = new VcfRecord("seq", 0, "AAA");
     rec.addAltCall("A");
-    rec.addFormatAndSample("VA", "1");
+    rec.addFormatAndSample("AD", "6,2");
+    assertEquals(0.25, ((double[]) annotation.getValue(rec, 0))[0], 0.0001);
+  }
+
+  public void testMissingPrerequisites() {
+    final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
+    final VcfRecord rec = new VcfRecord("seq", 0, "AAA");
+    rec.addAltCall("A");
     assertNull(annotation.getValue(rec, 0));
   }
 
   public void testHeader() {
     final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
     final String s = annotation.checkHeader(new VcfHeader());
-    assertEquals("Derived annotation VAF missing required fields in VCF header (FORMAT fields: ADE VA)", s);
+    assertEquals("Derived annotation VAF missing required fields in VCF header (FORMAT fields: AD or ADE)", s);
   }
 }
