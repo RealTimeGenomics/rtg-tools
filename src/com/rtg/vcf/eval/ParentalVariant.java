@@ -35,7 +35,6 @@ import java.util.Objects;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.IllegalBaseException;
-import com.rtg.util.intervals.Range;
 import com.rtg.vcf.VcfRecord;
 
 /**
@@ -54,20 +53,17 @@ public class ParentalVariant extends Variant {
 
     private final int mPSampleNo;
     private final int mMSampleNo;
-    private final boolean mTrim;
     private final boolean mExplicitUnknown;
 
     /**
      * Constructor
      * @param patSample the paternal sample column number (starting from 0)
      * @param matSample the maternal sample column number (starting from 0)
-     * @param trimming if true, trim all leading/trailing bases that match REF from alleles
      * @param explicitUnknown if true, treat half call allele as a separate token
      */
-    Factory(int patSample, int matSample, boolean trimming, boolean explicitUnknown) {
+    Factory(int patSample, int matSample, boolean explicitUnknown) {
       mPSampleNo = patSample;
       mMSampleNo = matSample;
-      mTrim = trimming;
       mExplicitUnknown = explicitUnknown;
     }
 
@@ -82,18 +78,17 @@ public class ParentalVariant extends Variant {
 
       final Allele[] alleles;
       try {
-        alleles = Allele.getTrimmedAlleles(rec, null, mTrim, mExplicitUnknown);
+        alleles = Allele.getAlleles(rec, null, mExplicitUnknown);
       } catch (IllegalBaseException e) {
         throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
       }
-      final Range bounds = Allele.getAlleleBounds(alleles);
 
       final int patAlleleA = patGtArr == null ? 0 : patGtArr[0];
       final int patAlleleB = patGtArr == null ? 0 : patGtArr.length == 1 ? patAlleleA : patGtArr[1];
       final int matAlleleA = matGtArr == null ? 0 : matGtArr[0];
       final int matAlleleB = matGtArr == null ? 0 : matGtArr.length == 1 ? matAlleleA : matGtArr[1];
 
-      return new ParentalVariant(id, rec.getSequenceName(), bounds.getStart(), bounds.getEnd(), alleles,
+      return new ParentalVariant(id, rec.getSequenceName(), alleles,
         patAlleleA, patAlleleB, matAlleleA, matAlleleB);
     }
   }
@@ -182,11 +177,11 @@ public class ParentalVariant extends Variant {
   private final int mMAlleleA; // First allele in maternal GT
   private final int mMAlleleB; // Second allele in maternal GT
 
-  ParentalVariant(int id, String seq, int start, int end, Allele[] alleles,
+  ParentalVariant(int id, String seq, Allele[] alleles,
                   int patAlleleA, int patAlleleB,
                   int matAlleleA, int matAlleleB
                   ) {
-    super(id, seq, start, end, alleles, false);
+    super(id, seq, alleles, false);
     mPAlleleA = patAlleleA;
     mPAlleleB = patAlleleB;
     mMAlleleA = matAlleleA;

@@ -41,7 +41,7 @@ public class OrientorTest extends TestCase {
   static final String SNP_LINE4 = "chr 23 . A T     . PASS . GT ./1";
 
   public void testSquashGt() throws Exception {
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false, true);
+    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
 
     // Test squashing ploidy  1/2 -> 1, 2
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
@@ -72,7 +72,7 @@ public class OrientorTest extends TestCase {
   }
 
   public void testAlleleGt() throws Exception {
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false, true);
+    final VariantFactory fact = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.SampleVariants(0, true));
 
     // Test 1/2 -> 0/1, 0/2, 1/0, 2/0, 1/2, 2/1
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
@@ -94,9 +94,9 @@ public class OrientorTest extends TestCase {
     variant = fact.variant(VariantTest.createRecord(SNP_LINE3), 0);
     pos = Orientor.ALLELE_GT.orientations(variant);
     exp = new String[] {
-      "chr:23-24 (A^:Tv)",
-      "chr:23-24 (Av:T^)",
-      "chr:23-24 (A:Tx)",
+      "chr:23-24 (*^:Tv)",
+      "chr:23-24 (*v:T^)",
+      "chr:23-24 (*:Tx)",
     };
     assertEquals(exp.length, pos.length);
     for (int i = 0; i < pos.length; i++) {
@@ -110,7 +110,7 @@ public class OrientorTest extends TestCase {
 
   public void testUnphasedGt() throws Exception {
     // Test trimming ploidy  AA:ATTA -> :TT
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true, false);
+    final VariantFactory fact = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.SampleVariants(0, false));
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
     OrientedVariant[] pos = Orientor.UNPHASED.orientations(variant);
     assertEquals(2, pos.length);
@@ -128,7 +128,7 @@ public class OrientorTest extends TestCase {
 
   public void testPhasedGt() throws Exception {
     // Test trimming ploidy  AA:ATTA -> :TT
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true, false);
+    final VariantFactory fact = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.SampleVariants(0, false));
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
     OrientedVariant[] pos = Orientor.PHASED.orientations(variant);
     assertEquals(2, pos.length);
@@ -168,8 +168,7 @@ public class OrientorTest extends TestCase {
   }
 
   public void testSquashAlts() throws Exception {
-    final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
-
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
     // Test squashing ploidy  A T,C,G -> T, C, G
     final OrientedVariant[] pos = Orientor.HAPLOID_POP.orientations(variant);
     assertEquals(3, pos.length);
@@ -183,7 +182,7 @@ public class OrientorTest extends TestCase {
   }
 
   public void testRecodeAlts() throws Exception {
-    final Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     // Test diploid combos  A T,C,G -> .:T, T:., T:T, .:C, C:., C:C, .:G, G:., G:G, T:C, C:T, T:G, G:T, C:G, G:C
     final OrientedVariant[] pos = Orientor.DIPLOID_POP.orientations(variant);

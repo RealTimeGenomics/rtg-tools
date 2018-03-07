@@ -32,7 +32,10 @@ package com.rtg.vcf.eval;
 import java.util.Comparator;
 
 import com.rtg.mode.DnaUtils;
+import com.rtg.util.ByteUtils;
 import com.rtg.util.Utils;
+import com.rtg.util.intervals.Range;
+import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VcfUtils;
@@ -42,7 +45,7 @@ import com.rtg.vcf.VcfUtils;
  * Holds information about a single variant that has not yet been oriented in a haplotype.
  * A Variant can be asked for alleles using original GT-style allele IDs, including -1 for missing value.
  */
-public class Variant extends SequenceNameLocusSimple implements Comparable<Variant>, VariantId {
+public class Variant implements Comparable<Variant>, VariantId {
 
   static final SequenceNameLocusComparator NATURAL_COMPARATOR = new SequenceNameLocusComparator();
   static final Comparator<VariantId> ID_COMPARATOR = new Comparator<VariantId>() {
@@ -52,32 +55,65 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
     }
   };
 
+  private SequenceNameLocus mLocus;
   private final int mId;
   private final Allele[] mAlleles;
   private final boolean mPhased;
   private byte mStatus = 0;
 
-  Variant(int id, String seq, int start, int end) {
-    super(seq, start, end);
-    mId = id;
-    mAlleles = null;
-    mPhased = false;
+  /**
+   * Construct the variant
+   * @param id the ID of the variant when read from the original input
+   * @param seq chromosome name
+   * @param alleles array of alleles where each entry corresponds to the allele for GT ID + 1
+   * @param phased true if the variant call was phased
+   */
+  public Variant(int id, String seq, Allele[] alleles, boolean phased) {
+    this(id, seq, Allele.getAlleleBounds(alleles), alleles, phased);
   }
 
   /**
    * Construct the variant
    * @param id the ID of the variant when read from the original input
    * @param seq chromosome name
-   * @param start start position
-   * @param end end position
+   * @param bounds bounds of the alleles
    * @param alleles array of alleles where each entry corresponds to the allele for GT ID + 1
    * @param phased true if the variant call was phased
    */
-  public Variant(int id, String seq, int start, int end, Allele[] alleles, boolean phased) {
-    super(seq, start, end);
+  private Variant(int id, String seq, Range bounds, Allele[] alleles, boolean phased) {
+    //super(seq, bounds.getStart(), bounds.getEnd());
+    mLocus = new SequenceNameLocusSimple(seq, bounds.getStart(), bounds.getEnd());
     mId = id;
     mPhased = phased;
     mAlleles = alleles;
+  }
+
+  void trimAlleles() {
+    // Element 0 is missing value token
+    final byte[] ref = mAlleles[1].nt();
+    mAlleles[1] = null;
+    for (int i = 2; i < mAlleles.length; i++) {
+      final Allele a = mAlleles[i];
+      if (a != null && !a.unknown()) {
+        final byte[] alt = a.nt();
+        final int stripLeading;
+        final int stripTrailing;
+        final boolean leftFirst = true;
+        if (leftFirst) {
+          stripLeading = ByteUtils.longestPrefix(0, ref, alt);
+          stripTrailing = ByteUtils.longestSuffix(stripLeading, ref, alt);
+        } else {
+          stripTrailing = ByteUtils.longestSuffix(0, ref, alt);
+          stripLeading = ByteUtils.longestPrefix(stripTrailing, ref, alt);
+        }
+        if (stripLeading > 0 || stripTrailing > 0) {
+          mAlleles[i] = new Allele(a.getSequenceName(), a.getStart() + stripLeading, a.getEnd() - stripTrailing,
+            ByteUtils.clip(alt, stripLeading, stripTrailing));
+        }
+      }
+    }
+    final Range newBounds = Allele.getAlleleBounds(mAlleles);
+    mLocus = new SequenceNameLocusSimple(mLocus.getSequenceName(), newBounds.getStart(), newBounds.getEnd());
   }
 
   @Override
@@ -174,5 +210,35 @@ public class Variant extends SequenceNameLocusSimple implements Comparable<Varia
    */
   public boolean isPhased() {
     return mPhased;
+  }
+
+  @Override
+  public String getSequenceName() {
+    return mLocus.getSequenceName();
+  }
+
+  @Override
+  public boolean overlaps(SequenceNameLocus other) {
+    return mLocus.overlaps(other);
+  }
+
+  @Override
+  public boolean contains(String sequence, int pos) {
+    return mLocus.contains(sequence, pos);
+  }
+
+  @Override
+  public int getStart() {
+    return mLocus.getStart();
+  }
+
+  @Override
+  public int getEnd() {
+    return mLocus.getEnd();
+  }
+
+  @Override
+  public int getLength() {
+    return mLocus.getLength();
   }
 }

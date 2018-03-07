@@ -67,8 +67,9 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private final boolean mPassOnly;
   private final int mMaxLength;
   private final File mDecomposedFile;
+  private final boolean mRelaxedRef;
 
-  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength, File preprocessDestDir) throws IOException {
+  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength, File preprocessDestDir, boolean relaxedRef) {
     if (!ranges.containsSequence(templateName)) {
       throw new IllegalArgumentException("Ranges supplied do not contain reference sequence " + templateName);
     }
@@ -80,6 +81,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     mType = type;
     mPassOnly = passOnly;
     mMaxLength = maxLength;
+    mRelaxedRef = relaxedRef;
     if (preprocessDestDir != null) {
       mDecomposedFile = new File(preprocessDestDir, "decomposed_" + type.label() + "_" + templateName + ".vcf.gz");
     } else {
@@ -137,6 +139,9 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
             Diagnostic.userLog("Got an exception processing " + mType.label() + " VCF record: " + rec);
             throw e;
           }
+        }
+        if (mRelaxedRef) {
+          list.forEach(Variant::trimAlleles);
         }
         return new LoadedVariants(list, skipped, mDecomposedFile);
       }

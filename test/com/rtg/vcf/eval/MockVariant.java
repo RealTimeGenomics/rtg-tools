@@ -82,7 +82,7 @@ public class MockVariant extends Variant {
    * @param id the variant id
    */
   public MockVariant(int start, int end, byte[][] alleles, int id) {
-    super(id, "", start - 1, end - 1, toAlleles("", start - 1, end - 1, alleles), false);
+    super(id, "", toAlleles("", start - 1, end - 1, alleles), false);
   }
 
   @Override

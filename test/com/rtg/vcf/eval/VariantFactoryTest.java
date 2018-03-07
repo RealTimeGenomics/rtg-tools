@@ -33,6 +33,7 @@ package com.rtg.vcf.eval;
 import static com.rtg.mode.DNA.T;
 
 import com.rtg.mode.DnaUtils;
+import com.rtg.vcf.VcfRecord;
 
 import junit.framework.TestCase;
 
@@ -40,17 +41,32 @@ import junit.framework.TestCase;
  */
 public class VariantFactoryTest extends TestCase {
 
+  static class SimpleRefTrimmer implements VariantFactory {
+    private final VariantFactory mFactory;
+    SimpleRefTrimmer(VariantFactory f) {
+      mFactory = f;
+    }
+    @Override
+    public Variant variant(VcfRecord rec, int id) throws SkippedVariantException {
+      final Variant v = mFactory.variant(rec, id);
+      if (v != null) {
+        v.trimAlleles();
+      }
+      return v;
+    }
+  }
+
   static final String SNP_LINE2 = "chr 23 . A T,C,G . PASS . GT 1/2";
   static final String SNP_LINE3 = "chr 23 . A T     . PASS . GT 0/1";
   static final String SNP_LINE4 = "chr 23 . A T     . PASS . GT ./1";
 
   public void testUntrimmedGt() throws Exception {
     // Test 1/2 -> 1, 2
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, false, true);
+    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
     assertNull(variant.allele(-1));
-    assertNull(variant.allele(0));
+    assertNotNull(variant.allele(0)); // Ref allele just kept for potential trimming
     assertNull(variant.allele(3));
     assertEquals(1, variant.nt(1).length);
     assertEquals(1, variant.nt(2).length);
@@ -72,7 +88,7 @@ public class VariantFactoryTest extends TestCase {
     // Test ./1 -> ., 1
     variant = fact.variant(VariantTest.createRecord(SNP_LINE4), 0);
     assertNotNull(variant.allele(-1));
-    assertNull(variant.allele(0));
+    assertNotNull(variant.allele(0)); // Ref allele just kept for potential trimming
     assertEquals(1, variant.nt(1).length);
     assertEquals(T.ordinal(), variant.nt(1)[0]);
   }
@@ -83,7 +99,7 @@ public class VariantFactoryTest extends TestCase {
 
   public void testTrimmedGt() throws Exception {
     // Test  AA:ATTA -> :TT
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true, false);
+    final VariantFactory fact = new SimpleRefTrimmer(new VariantFactory.SampleVariants(0, false));
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
     assertEquals(23, variant.getStart());
     assertEquals(23, variant.getStart());
@@ -128,7 +144,8 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE10 = "chr 23 . T <DEL>,* . PASS . GT 2|.";
 
   public void testAlts() throws Exception {
-    Variant variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE2), 0);
+    final VariantFactory f = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false));
+    Variant variant = f.variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
     assertEquals(null, variant.allele(-1)); // missing allele is ignored
     assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
@@ -136,30 +153,30 @@ public class VariantFactoryTest extends TestCase {
     assertEquals("C", variant.alleleStr(2));
     assertEquals("G", variant.alleleStr(3));
 
-    variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE8), 0);
+    variant = f.variant(VariantTest.createRecord(SNP_LINE8), 0);
     assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
     assertEquals(null, variant.allele(-1)); // missing allele is ignored
     assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
     assertEquals("A", variant.alleleStr(1));
     assertEquals("<24-24>AAA", variant.alleleStr(2));
 
-    variant = new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE9), 0);
+    variant = f.variant(VariantTest.createRecord(SNP_LINE9), 0);
     assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
 
-    assertNull(new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE10), 0));
+    assertNull(f.variant(VariantTest.createRecord(SNP_LINE10), 0));
   }
 
   static final String SNP_LINE11 = "chr 23 . T G--- . PASS . GT 1|1";
 
-  public void testBadAlts() throws Exception {
+  public void testBadAlts() {
     try {
-      new VariantFactory.SampleVariants(0, true, false).variant(VariantTest.createRecord(SNP_LINE11), 0);
+      new VariantFactory.SampleVariants(0, false).variant(VariantTest.createRecord(SNP_LINE11), 0);
       fail();
     } catch (SkippedVariantException e) {
       // Expected
     }
     try {
-      new VariantFactory.AllAlts().variant(VariantTest.createRecord(SNP_LINE11), 0);
+      new VariantFactory.AllAlts(false).variant(VariantTest.createRecord(SNP_LINE11), 0);
       fail();
     } catch (SkippedVariantException e) {
       // Expected

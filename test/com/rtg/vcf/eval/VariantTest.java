@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import static com.rtg.util.StringUtils.TAB;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -57,7 +56,7 @@ public class VariantTest extends TestCase {
   }
   static Variant createVariant(VcfRecord rec, int id, int sampleNo) {
     try {
-      return new VariantFactory.SampleVariants(sampleNo, false, true).variant(rec, id);
+      return new VariantFactory.SampleVariants(sampleNo, true).variant(rec, id);
     } catch (SkippedVariantException e) {
       return null;
     }
@@ -84,7 +83,7 @@ public class VariantTest extends TestCase {
   static final String ORDER_THIRD = "someOtherKindOfName 19 . A T 12.8 PASS . GT 1/1";
   static final String ORDER_FOURTH = "someOtherKindOfName 55 . A T 12.8 PASS . GT 1/1";
 
-  public void testComparator() throws IOException {
+  public void testComparator() {
     final ArrayList<Variant> allDetections = new ArrayList<>();
     final Variant dv2 = createVariant(ORDER_SECOND);
     final Variant dv4 = createVariant(ORDER_FOURTH);
@@ -111,18 +110,19 @@ public class VariantTest extends TestCase {
     assertEquals(0, insert.compareTo(insert));
   }
 
-  public void testTriploid() throws Exception {
+  public void testTriploid() {
     final VcfRecord rec = createRecord("someKindOfName 23 . A T,G 12.8 PASS . GT:DP:RE:GQ 1/1/2:4:0.02:12.8");
     try {
-      new VariantFactory.SampleVariants(0, false, true).variant(rec, 0);
+      new VariantFactory.SampleVariants(0, true).variant(rec, 0);
       fail("Expected failure to process triploid call");
     } catch (SkippedVariantException ignored) {
     }
   }
 
   static final String SNP_LINE = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
-  public void testSnpConstruction() throws Exception {
+  public void testSnpConstruction() {
     final Variant variant = createVariant(SNP_LINE);
+    variant.trimAlleles(); // To remove unused ref allele
     assertEquals(22, variant.getStart());
     assertNull(variant.allele(-1));
     assertNull(variant.allele(0));
@@ -137,12 +137,12 @@ public class VariantTest extends TestCase {
 
   static final String SNP_LINE2 = "someKindOfName 23 . A T,C 12.8 PASS . GT:DP:RE:GQ 1/2:4:0.02:12.8";
   static final String SNP_LINE4 = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ ./1:4:0.02:12.8";
-  public void testHeterozygousSnpConstruction() throws Exception {
+  public void testHeterozygousSnpConstruction() {
     Variant variant = createVariant(SNP_LINE2);
     // Normal het call 1/2
     assertEquals(22, variant.getStart());
     assertNull(variant.allele(-1));
-    assertNull(variant.allele(0));
+    assertNotNull(variant.allele(0)); // Kept for trimming purposes
     assertEquals(1, variant.nt(1).length);
     assertEquals(4, variant.nt(1)[0]);
     assertEquals(1, variant.nt(2).length);
@@ -159,14 +159,14 @@ public class VariantTest extends TestCase {
 
     // Test half-call  ./1
     variant = createVariant(SNP_LINE4);
-    assertNull(variant.allele(0));
+    assertNotNull(variant.allele(0)); // Kept for trimming purposes
     assertEquals(1, variant.nt(-1).length);
     assertEquals(5, variant.nt(-1)[0]);
     assertEquals(4, variant.nt(1)[0]);
   }
 
   static final String INSERT_LINE = "someKindOfName 22 . A AACT 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
-  public void testInsertConstruction() throws Exception {
+  public void testInsertConstruction() {
     final Variant variant = createVariant(INSERT_LINE);
     assertEquals(22, variant.getStart());
     assertEquals(3, variant.nt(1).length);
@@ -175,12 +175,12 @@ public class VariantTest extends TestCase {
 
 
   static final String DELETION_LINE = "someKindOfName 22 . GAGT G 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
-  public void testDeletionConstructor() throws Exception {
+  public void testDeletionConstructor() {
     final Variant variant = createVariant(DELETION_LINE);
     assertEquals(22, variant.getStart());
   }
   static final String MNP_LINE = "someKindOfName 23 . AGT CTC 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
-  public void testMnpConstructor() throws Exception {
+  public void testMnpConstructor() {
     final Variant variant = createVariant(MNP_LINE);
     assertEquals(22, variant.getStart());
 
@@ -196,14 +196,14 @@ public class VariantTest extends TestCase {
   }
 
   static final String UNCHANGED_LINE = "someKindOfName 23 . A C 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
-  public void testUnchangedConstructor() throws Exception {
+  public void testUnchangedConstructor() {
     final Variant variant = createVariant(UNCHANGED_LINE);
     assertEquals(22, variant.getStart());
     assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(1)));
   }
 
   static final String SHORT_LINE = "someKindOfName 23 . A C 0.0 PASS . GT 1/1";
-  public void testShortConstructor() throws Exception {
+  public void testShortConstructor() {
     final Variant variant = createVariant(SHORT_LINE);
     assertEquals(22, variant.getStart());
     assertTrue(Arrays.equals(DnaUtils.encodeString("C"), variant.nt(1)));
@@ -211,7 +211,7 @@ public class VariantTest extends TestCase {
 
   static final String TAIL = TAB + ". A C 12.8 PASS . GT 1/1";
 
-  public void testOrdering() throws Exception {
+  public void testOrdering() {
     final Variant a1a = createVariant("a" + TAB + 1 + TAIL);
     final Variant a1b = createVariant("a" + TAB + 1 + TAIL);
     final Variant a2 = createVariant("a" + TAB + 2 + TAIL);
@@ -220,7 +220,7 @@ public class VariantTest extends TestCase {
     TestUtils.testOrder(new Variant[][]{{a1a, a1b}, {a2}, {b}, {c}}, true);
   }
 
-  public void testEquals() throws Exception {
+  public void testEquals() {
     final Variant a1a = createVariant("a" + TAB + 1 + TAIL);
     assertFalse(a1a.equals(null));
     assertFalse(a1a.equals(new Object()));
@@ -235,7 +235,7 @@ public class VariantTest extends TestCase {
     }
   }
 
-  public void testVariantInterface() throws Exception {
+  public void testVariantInterface() {
     final Variant v = createVariant("simulatedSequence1\t2180\t.\tC\tT,G\t0.0 PASS . GT 1/2");
     assertEquals(2179, v.getStart());
     assertEquals(2180, v.getEnd());
@@ -248,7 +248,7 @@ public class VariantTest extends TestCase {
     checkArray(new byte[] {4}, v2.nt(2));
   }
 
-  public void testMissingGT() throws Exception {
+  public void testMissingGT() {
     final String line = "simulatedSequence1 2180 . C A 0.0 PASS . GT .".replaceAll(" ", "\t");
     assertNull(createVariant(line)); // Current default factory skips those with missing GT
   }

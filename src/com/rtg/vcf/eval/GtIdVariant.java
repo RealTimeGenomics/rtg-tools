@@ -43,9 +43,9 @@ public class GtIdVariant extends Variant {
   private final int mAlleleA; // First allele in GT
   private final int mAlleleB; // Second allele in GT
 
-  GtIdVariant(int id, String seq, int start, int end, Allele[] alleles,
+  GtIdVariant(int id, String seq, Allele[] alleles,
               int alleleA, int alleleB, boolean phased) {
-    super(id, seq, start, end, alleles, phased);
+    super(id, seq, alleles, phased);
     mAlleleA = alleleA;
     mAlleleB = alleleB;
   }

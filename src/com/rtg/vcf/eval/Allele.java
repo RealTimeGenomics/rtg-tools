@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.DnaUtils;
-import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
@@ -99,20 +98,19 @@ public class Allele extends SequenceNameLocusSimple {
 
   /**
    * Return a full set of alleles, one per REF/ALT declared in the record and one for missing.
-   * Each allele has leading/trailing ref bases removed and position adjusted accordingly.
-   * So ref is like "skip"
+   * If there is a definite padding base (common across all alleles), it will be removed and the position
+   * adjusted accordingly.
    * @param rec the record
    * @param gtArray if not null, only populate alleles referenced by the GT array
-   * @param trim if set, remove all leading and trailing same-as-ref bases
    * @param explicitUnknown if set, treat allele with unknown sequence as an explicit token, otherwise treat as skip
    * @return the set of alleles, with the first element corresponding to the missing allele (i.e. index = GT + 1)
    */
-  static Allele[] getTrimmedAlleles(VcfRecord rec, int[] gtArray, boolean trim, boolean explicitUnknown) {
-    final boolean removePaddingBase = !trim && VcfUtils.hasRedundantFirstNucleotide(rec);
+  static Allele[] getAlleles(VcfRecord rec, int[] gtArray, boolean explicitUnknown) {
+    final boolean removePaddingBase = VcfUtils.hasRedundantFirstNucleotide(rec);
     final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
     for (int i = -1; i < alleles.length - 1; ++i) {
-      if (gtArray == null || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
-        alleles[i + 1] = getAllele(rec, i, trim, removePaddingBase, explicitUnknown);
+      if (gtArray == null || i == 0 || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
+        alleles[i + 1] = getAllele(rec, i, removePaddingBase, explicitUnknown);
       }
     }
     return alleles;
@@ -121,37 +119,21 @@ public class Allele extends SequenceNameLocusSimple {
   /**
    * Construct a single allele
    * @param rec the record
-   * @param allele the index of the allele, 0 is ref, -1 is missing
-   * @param trim if set, remove all leading and trailing same-as-ref bases
+   * @param allele the internal index of the allele, 0 is ref, -1 is missing
    * @param removePaddingBase if set (and not otherwise trimming), remove the single leading base
    * @param explicitUnknown if set, treat allele with unknown sequence as an explicit token, otherwise treat as skip
    * @return the allele, or null if the allele should not result in a change to the haplotype
    */
-  protected static Allele getAllele(VcfRecord rec, int allele, boolean trim, boolean removePaddingBase, boolean explicitUnknown) {
+  private static Allele getAllele(VcfRecord rec, int allele, boolean removePaddingBase, boolean explicitUnknown) {
     if (allele == -1) {
       return unknownAllele(rec, removePaddingBase, explicitUnknown);
     }
-    if (trim) {
-      final String ref = rec.getRefCall();
-      if (allele == 0) {
-        return null;
-      }
-      final String alt = rec.getAllele(allele);
-      if (VariantType.getSymbolicAlleleType(alt) != null) {
-        return unknownAllele(rec, removePaddingBase, explicitUnknown);
-      }
-      final int stripLeading = StringUtils.longestPrefix(ref, alt);
-      final int stripTrailing = StringUtils.longestSuffix(stripLeading, ref, alt);
-      return new Allele(rec.getSequenceName(), rec.getStart() + stripLeading, rec.getEnd() - stripTrailing,
-        DnaUtils.encodeString(StringUtils.clip(alt, stripLeading, stripTrailing)));
-    } else {
-      final String alt = rec.getAllele(allele);
-      if (VariantType.getSymbolicAlleleType(alt) != null) {
-        return unknownAllele(rec, removePaddingBase, explicitUnknown);
-      }
-      return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(),
-        DnaUtils.encodeString(removePaddingBase ? alt.substring(1) : alt));
+    final String alt = rec.getAllele(allele);
+    if (VariantType.getSymbolicAlleleType(alt) != null) {
+      return unknownAllele(rec, removePaddingBase, explicitUnknown);
     }
+    return new Allele(rec.getSequenceName(), rec.getStart() + (removePaddingBase ? 1 : 0), rec.getEnd(),
+      DnaUtils.encodeString(removePaddingBase ? alt.substring(1) : alt));
   }
 
   // Return either the null allele (don't replay anything), or an explicit unknown allele

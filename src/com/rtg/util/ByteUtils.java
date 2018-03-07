@@ -34,6 +34,7 @@ import static com.rtg.util.StringUtils.LS;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * byte and byte[] utilities.
@@ -50,6 +51,11 @@ public final class ByteUtils {
   public static final byte TAB_BYTE = (byte) '\t';
   /** System independent newline separator */
   private static final byte[] NEWLINE_BYTES = "\n".getBytes();
+
+  private static final byte[] EMPTY = {};
+
+  private ByteUtils() { }
+
 
   /**
    * Write an end of line to out.
@@ -69,6 +75,68 @@ public final class ByteUtils {
     out.write(NEWLINE_BYTES);
   }
 
-  private ByteUtils() { }
+  private static boolean equalsLeft(final byte[] a, final byte[] b, int pos, final int rightOffset) {
+    return pos < (a.length - rightOffset) && pos < (b.length - rightOffset) && a[pos] == b[pos];
+  }
 
+  private static boolean equalsRight(final byte[] a, final byte[] b, int pos, final int leftOffset) {
+    final int lpos = pos + leftOffset;
+    return lpos < a.length && lpos < b.length && a[a.length - pos - 1] == b[b.length - pos - 1];
+  }
+
+  /**
+   * Return the length of the longest common prefix of the supplied arrays.
+   * @param rightOffset effective right edge of arrays (i.e. do not find prefix going into this region)
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
+   * @return longest common prefix
+   */
+  public static int longestPrefix(final int rightOffset, final byte[]... strings) {
+    if (strings.length <= 1) {
+      return strings.length == 0 ? 0 : strings[0].length;
+    }
+    final byte[] a = strings[0];
+    int clip = -1;
+    while (true) {
+      ++clip;
+      for (int k = 1; k < strings.length; ++k) {
+        if (strings[k] != null && !equalsLeft(a, strings[k], clip, rightOffset)) {
+          return clip;
+        }
+      }
+    }
+  }
+
+  /**
+   * Return the length of the longest common suffix of the supplied arrays.
+   * @param leftOffset effective left edge of arrays (i.e. do not find suffix going into this region)
+   * @param strings strings to test. The first entry must not be null, any other null entries are ignored
+   * @return longest common suffix
+   */
+  public static int longestSuffix(final int leftOffset, final byte[]... strings) {
+    if (strings.length <= 1) {
+      return strings.length == 0 ? 0 : strings[0].length;
+    }
+    final byte[] a = strings[0];
+    int clip = -1;
+    while (true) {
+      ++clip;
+      for (int k = 1; k < strings.length; ++k) {
+        if (strings[k] != null && !equalsRight(a, strings[k], clip, leftOffset)) {
+          return clip;
+        }
+      }
+    }
+  }
+
+  /**
+   * Trims bytes off the start and end of an array
+   * @param s the byte array to trim
+   * @param leftClip the number of bytes off the left to trim
+   * @param rightClip the number of bytes off the right to trim
+   * @return the trimmed array
+   */
+  public static byte[] clip(final byte[] s, final int leftClip, final int rightClip) {
+    final int toClip = leftClip + rightClip;
+    return toClip == 0 ? s : toClip >= s.length ? EMPTY : Arrays.copyOfRange(s, leftClip, s.length - rightClip);
+  }
 }
