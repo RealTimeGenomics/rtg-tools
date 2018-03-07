@@ -86,11 +86,7 @@ public class SequenceNameLocusSimple extends Range implements SequenceNameLocus 
     if (!current.getSequenceName().equals(other.getSequenceName())) {
       return false;
     }
-    if (other.getStart() < current.getEnd()
-        && other.getEnd() > current.getStart()) {
-      return true;
-    }
-    return false;
+    return Interval.overlaps(current, other);
   }
 
 

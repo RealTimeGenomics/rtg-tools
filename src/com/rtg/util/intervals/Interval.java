@@ -52,5 +52,19 @@ public interface Interval {
    * @return length
    */
   int getLength();
+
+  /**
+   * Test whether the supplied intervals overlap each other
+   * @param current the first interval
+   * @param other the other interval
+   * @return true if the intervals overlap
+   */
+  static boolean overlaps(Interval current, Interval other) {
+    if (other.getStart() < current.getEnd()
+      && other.getEnd() > current.getStart()) {
+      return true;
+    }
+    return false;
+  }
 }
 
