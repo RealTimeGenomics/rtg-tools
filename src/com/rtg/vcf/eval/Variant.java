@@ -30,10 +30,12 @@
 package com.rtg.vcf.eval;
 
 import java.util.Comparator;
+import java.util.List;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.ByteUtils;
 import com.rtg.util.Utils;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
@@ -89,6 +91,10 @@ public class Variant implements Comparable<Variant>, VariantId {
   }
 
   void trimAlleles() {
+    trimAlleles(true);
+  }
+
+  void trimAlleles(boolean leftFirst) {
     // Element 0 is missing value token
     final byte[] ref = mAlleles[1].nt();
     mAlleles[1] = null;
@@ -98,7 +104,6 @@ public class Variant implements Comparable<Variant>, VariantId {
         final byte[] alt = a.nt();
         final int stripLeading;
         final int stripTrailing;
-        final boolean leftFirst = true;
         if (leftFirst) {
           stripLeading = ByteUtils.longestPrefix(0, ref, alt);
           stripTrailing = ByteUtils.longestSuffix(stripLeading, ref, alt);
@@ -114,6 +119,74 @@ public class Variant implements Comparable<Variant>, VariantId {
     }
     final Range newBounds = Allele.getAlleleBounds(mAlleles);
     mLocus = new SequenceNameLocusSimple(mLocus.getSequenceName(), newBounds.getStart(), newBounds.getEnd());
+  }
+
+  static void trimAlleles(List<Variant> vars) {
+    int firstOverlap = 0;
+    int lastOverlap = 0;
+    for (int v = 0; v < vars.size(); v++) {
+      final Variant current = vars.get(v);
+
+      while (lastOverlap < vars.size() && (lastOverlap <= v || current.overlaps(vars.get(lastOverlap)))) {
+        lastOverlap++;
+      }
+      while (firstOverlap < v && !current.overlaps(vars.get(firstOverlap))) {
+        firstOverlap++;
+      }
+      if (firstOverlap == v && lastOverlap == v + 1) { // No other variant overlaps with us
+        current.trimAlleles();
+        continue;
+      }
+
+      // Determine whether this variant has flexibility in the trimming
+      int stripLeading = 0;
+      int stripTrailing = 0;
+      final byte[] ref = current.mAlleles[1].nt();
+      for (int i = 2; i < current.mAlleles.length; i++) {
+        final Allele a = current.mAlleles[i];
+        if (a != null && !a.unknown()) {
+          final byte[] alt = a.nt();
+          stripLeading = Math.max(stripLeading, ByteUtils.longestPrefix(0, ref, alt));
+          stripTrailing = Math.max(stripTrailing, ByteUtils.longestSuffix(0, ref, alt));
+        }
+      }
+      if (stripLeading == 0 || stripTrailing == 0) { // No ability to choose which side
+        current.trimAlleles(); // Still need to call when both are 0 in order to trim the ref allele
+        continue;
+      }
+
+      Diagnostic.developerLog("Overlap between " + current + " (trimmable " + stripLeading + "," + stripTrailing + ") and " + (lastOverlap - firstOverlap - 1) + " variants. At " + v + ", [" + firstOverlap + "," + lastOverlap + ") " + vars.size());
+
+      // Simple heuristic, prefer trimming on the side that resolves the most overlaps.
+      int lCount = 0;
+      int rCount = 0;
+      int overlapped = 0;
+      for (int i = firstOverlap; i < lastOverlap; i++) {
+        if (i == v) {
+          continue;
+        }
+        final int leftOverlap = vars.get(i).getEnd() - current.getStart();
+        final int rightOverlap = current.getEnd() - vars.get(i).getStart();
+        if (leftOverlap <= 0 && rightOverlap <= 0) {
+          Diagnostic.developerLog("No overlap between " + current + " and " + vars.get(i));
+          continue;
+        }
+        overlapped++;
+        if (leftOverlap > 0 && leftOverlap <= stripLeading) {
+          Diagnostic.developerLog("Overlap between " + current + " and " + vars.get(i) + " can be avoided by left trim");
+          lCount++;
+        }
+        if (rightOverlap > 0 && rightOverlap < stripTrailing) {
+          Diagnostic.developerLog("Overlap between " + current + " and " + vars.get(i) + " can be avoided by right trim");
+          rCount++;
+        }
+      }
+      current.trimAlleles(lCount > rCount);
+      final int remaining = overlapped - Math.max(lCount, rCount);
+      if (remaining > 0) {
+        Diagnostic.developerLog("After overlap trimming " + current + ", " + remaining + " remains (" + Math.max(lCount, rCount) + " resolved)");
+      }
+    }
   }
 
   @Override

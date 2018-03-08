@@ -141,7 +141,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           }
         }
         if (mRelaxedRef) {
-          list.forEach(Variant::trimAlleles);
+          Variant.trimAlleles(list);
         }
         return new LoadedVariants(list, skipped, mDecomposedFile);
       }
