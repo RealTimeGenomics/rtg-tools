@@ -337,7 +337,9 @@ public class TabixLineReader implements LineReader {
     @Override
     public void close() throws IOException {
       mReader.close();
-      Diagnostic.developerLog("There were " + mDoubleFetched + " tabixed records double-fetched due to overlapping blocks");
+      if (mDoubleFetched > 0) {
+        Diagnostic.developerLog("There were " + mDoubleFetched + " tabixed records double-fetched due to overlapping blocks");
+      }
     }
   }
 }

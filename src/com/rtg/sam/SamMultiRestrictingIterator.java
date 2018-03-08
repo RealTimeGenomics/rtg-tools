@@ -198,7 +198,9 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
   @Override
   public void close() {
     closeCurrent();
-    Diagnostic.developerLog("There were " + mDoubleFetched + " SAM records double-fetched due to overlapping blocks");
+    if (mDoubleFetched > 0) {
+      Diagnostic.developerLog("There were " + mDoubleFetched + " SAM records double-fetched due to overlapping blocks");
+    }
   }
 
   private void closeCurrent() {
