@@ -48,4 +48,43 @@ public class ByteUtilsTest extends TestCase {
     out.write(ByteUtils.TAB_BYTE);
     assertEquals(StringUtils.LS + StringUtils.FS + "\t", out.toString());
   }
+
+  private byte[][] convert(String... strings) {
+    final byte[][] result = new byte[strings.length][];
+    int i = 0;
+    for (String s : strings) {
+      result[i++] = s.getBytes();
+    }
+    return result;
+  }
+
+  public void testLeftClip() {
+    assertEquals(0, ByteUtils.longestPrefix(0, new byte[0]));
+    assertEquals(2, ByteUtils.longestPrefix(0, convert("hi")));
+    assertEquals(2, ByteUtils.longestPrefix(0, convert("hi", "hi")));
+    assertEquals(2, ByteUtils.longestPrefix(0, convert("hi", "his")));
+    assertEquals(2, ByteUtils.longestPrefix(0, convert("hit", "his")));
+    assertEquals(3, ByteUtils.longestPrefix(0, convert("hit", "hittter", "hits")));
+    assertEquals(2, ByteUtils.longestPrefix(1, convert("hit", "hittter", "hits")));
+    assertEquals(1, ByteUtils.longestPrefix(2, convert("hit", "hittter", "hits")));
+    assertEquals(0, ByteUtils.longestPrefix(3, convert("hit", "hittter", "hits")));
+    assertEquals(0, ByteUtils.longestPrefix(4, convert("hit", "hittter", "hits")));
+  }
+
+  public void testRightClip() {
+    assertEquals(0, ByteUtils.longestSuffix(0, new byte[0]));
+    assertEquals(2, ByteUtils.longestSuffix(0, convert("hi")));
+    assertEquals(2, ByteUtils.longestSuffix(0, convert("hi", "hi")));
+    assertEquals(2, ByteUtils.longestSuffix(0, convert("hi", "shi")));
+    assertEquals(2, ByteUtils.longestSuffix(0, convert("thi", "shi")));
+    assertEquals(3, ByteUtils.longestSuffix(0, convert("rethit", "hit", "rhit")));
+    assertEquals(2, ByteUtils.longestSuffix(1, convert("rethit", "hit", "rhit")));
+    assertEquals(1, ByteUtils.longestSuffix(2, convert("rethit", "hit", "rhit")));
+    assertEquals(0, ByteUtils.longestSuffix(3, convert("rethit", "hit", "rhit")));
+    assertEquals(0, ByteUtils.longestSuffix(4, convert("rethit", "hit", "rhit")));
+
+    assertEquals(6, ByteUtils.longestSuffix(0, convert("acacacac", "acacac")));
+    assertEquals(0, ByteUtils.longestPrefix(6, convert("acacacac", "acacac")));
+  }
+
 }
