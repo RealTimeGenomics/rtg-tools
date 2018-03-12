@@ -49,7 +49,7 @@ public class DuplicateSamFilter implements SamFilter {
     if (rec == null || rec.getReadName() == null) {
       return false;
     }
-    if (!rec.getNotPrimaryAlignmentFlag()) {
+    if (!rec.isSecondaryAlignment()) {
       return true;
     }
     final long hash = internalHash(rec.getReadName(), !rec.getReadPairedFlag() || rec.getFirstOfPairFlag());

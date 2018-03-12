@@ -101,7 +101,7 @@ public class SamSequence {
     if (record.getReadNegativeStrandFlag()) {
       flags ^= READ_STRAND_FLAG;
     }
-    if (record.getNotPrimaryAlignmentFlag()) {
+    if (record.isSecondaryAlignment()) {
       flags ^= NOT_PRIMARY_ALIGNMENT_FLAG;
     }
     return flags;

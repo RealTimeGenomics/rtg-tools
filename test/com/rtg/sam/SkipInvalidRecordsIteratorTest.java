@@ -343,7 +343,7 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   public void testBad2First5() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD4, 0, "SAM record is invalid in file ",
       "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /*+ "AS:i:0" + TAB + "IH:i:0"*/,
-      "ERROR: Read name badread4, Not primary alignment flag should not be set for unmapped read.",
+      "ERROR: Read name badread4, Secondary alignment flag should not be set for unmapped read.",
       "ERROR: Read name badread4, Supplementary alignment flag should not be set for unmapped read.",
       "ERROR: Read name badread4, MAPQ should be 0 for unmapped read.]",
       "At data line 1"); //"Line: badread4", "MRNM not specified but flags indicate mate mapped;");

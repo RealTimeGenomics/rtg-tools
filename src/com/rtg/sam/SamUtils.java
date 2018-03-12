@@ -631,7 +631,7 @@ public final class SamUtils {
    */
   public static boolean uniquelyMapped(SAMRecord record) {
     assert !record.getReadUnmappedFlag();
-    if (record.getMappingQuality() == 0 || record.getNotPrimaryAlignmentFlag()) {
+    if (record.getMappingQuality() == 0 || record.isSecondaryAlignment()) {
       return false;
     }
     final Integer nh = SamUtils.getNHOrIH(record);
