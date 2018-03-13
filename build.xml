@@ -1,5 +1,9 @@
 <project name="public-tools" default="zip-nojre">
 
+  <property name="min.ant.version" value="1.9.0" />
+  <antversion property="this.ant.version" atleast="${min.ant.version}" />
+  <fail message="The required minimum version of ant is ${min.ant.version}, you have ${ant.version}" unless="this.ant.version" />
+
   <dirname property="public.tools.basedir" file="${ant.file.public-tools}"/>
   <property name="tools.src.dir" location="${public.tools.basedir}/src"/>
   <property name="tools.src.lib.dir" location="${public.tools.basedir}/lib"/>
