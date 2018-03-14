@@ -59,10 +59,6 @@ public enum DerivedAnnotations {
   AN(new NumberAllelesInGenotypesAnnotation()),
   /** GQ / DP for a single sample */
   GQD(new GenotypeQualityOverDepthAnnotation()),
-  /** Allelic count of contrary observations */
-  COC(new ContraryObservationCountAnnotation()),
-  /** Allelic fraction of contrary observations */
-  COF(new ContraryObservationFractionAnnotation()),
   /** Allelic fraction of contrary observations */
   VAF(new VariantAllelicFractionAnnotation()),
   /** Zygosity */

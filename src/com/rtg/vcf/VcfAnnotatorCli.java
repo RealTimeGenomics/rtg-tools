@@ -63,7 +63,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.annotation.ContraryObservationAnnotator;
 import com.rtg.vcf.annotation.DerivedAnnotations;
 import com.rtg.vcf.annotation.SimpleTandemRepeatAnnotator;
 import com.rtg.vcf.annotation.SplitContraryObservationAnnotator;
@@ -93,7 +92,6 @@ public final class VcfAnnotatorCli extends AbstractCli {
       final VcfAnnotation<?> annotator = anno.getAnnotation();
       ANNOTATORS.put(annotator.getName(), annotator);
     }
-    ANNOTATORS.put("CONT", new ContraryObservationAnnotator());
     ANNOTATORS.put("SCONT", new SplitContraryObservationAnnotator());
   }
 
