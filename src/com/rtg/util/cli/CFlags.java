@@ -1536,7 +1536,7 @@ public final class CFlags {
    * @param helpCategory the category that help flags will appear under
    * @param categories the categories to use
    */
-  public void setCategories(String helpCategory, String[] categories) {
+  public void setCategories(String helpCategory, String... categories) {
     boolean helpOK = false;
     for (final String cat : categories) {
       if (cat.equals(helpCategory)) {

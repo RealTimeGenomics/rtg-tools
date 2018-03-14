@@ -39,7 +39,6 @@ import static com.rtg.launcher.CommonFlags.NO_HEADER;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
-import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
@@ -60,7 +59,6 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.cli.CFlags;
-import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -75,6 +73,9 @@ import com.rtg.vcf.header.VcfHeader;
  *
  */
 public final class VcfFilterCli extends AbstractCli {
+
+  private static final String FILTERING_REC = "Filtering (Record based)";
+  private static final String FILTERING_SAMPLE = "Filtering (Sample based)";
 
   private static final String REMOVE_INFO = "remove-info";
   private static final String KEEP_INFO = "keep-info";
@@ -154,7 +155,7 @@ public final class VcfFilterCli extends AbstractCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription("Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be filtered. By default filtered records are removed, but see the --" + FAIL_FLAG + ", --" + CLEAR_FAILED_SAMPLES + ", and --" + FAIL_SAMPLES_FLAG + " options for alternatives.");
-    CommonFlagCategories.setCategories(mFlags);
+    mFlags.setCategories(UTILITY, INPUT_OUTPUT, FILTERING_REC, FILTERING_SAMPLE, REPORTING, UTILITY);
 
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to be filtered. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     final Flag<File> output = mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output. This option is required, unless \"--javascript\" is being used").setCategory(INPUT_OUTPUT);
@@ -173,61 +174,61 @@ public final class VcfFilterCli extends AbstractCli {
     mFlags.registerOptional('F', FAIL_SAMPLES_FLAG, String.class, STRING, "retain failed records, add the provided label to the sample FT field").setCategory(REPORTING);
 
     // Variant position
-    mFlags.registerOptional(INCLUDE_BED, File.class, FILE, "only keep variants within the regions in this BED file").setCategory(FILTERING);
-    mFlags.registerOptional(EXCLUDE_BED, File.class, FILE, "discard all variants within the regions in this BED file").setCategory(FILTERING);
-    mFlags.registerOptional(INCLUDE_VCF, File.class, FILE, "only keep variants that overlap with the ones in this file").setCategory(FILTERING);
-    mFlags.registerOptional(EXCLUDE_VCF, File.class, FILE, "discard all variants that overlap with the ones in this file").setCategory(FILTERING);
-    mFlags.registerOptional('w', DENSITY_WINDOW, Integer.class, INT, "window within which multiple variants are discarded").setCategory(FILTERING);
-    mFlags.registerOptional(REMOVE_OVERLAPPING, "remove records that overlap with previous records").setCategory(FILTERING);
+    mFlags.registerOptional(INCLUDE_BED, File.class, FILE, "only keep variants within the regions in this BED file").setCategory(FILTERING_REC);
+    mFlags.registerOptional(EXCLUDE_BED, File.class, FILE, "discard all variants within the regions in this BED file").setCategory(FILTERING_REC);
+    mFlags.registerOptional(INCLUDE_VCF, File.class, FILE, "only keep variants that overlap with the ones in this file").setCategory(FILTERING_REC);
+    mFlags.registerOptional(EXCLUDE_VCF, File.class, FILE, "discard all variants that overlap with the ones in this file").setCategory(FILTERING_REC);
+    mFlags.registerOptional('w', DENSITY_WINDOW, Integer.class, INT, "window within which multiple variants are discarded").setCategory(FILTERING_REC);
+    mFlags.registerOptional(REMOVE_OVERLAPPING, "remove records that overlap with previous records").setCategory(FILTERING_REC);
 
     // REF/ALT contents
-    mFlags.registerOptional(MIN_ALLELES, Integer.class, INT, "minimum number of alleles (REF included)").setCategory(FILTERING);
-    mFlags.registerOptional(MAX_ALLELES, Integer.class, INT, "maximum number of alleles (REF included)").setCategory(FILTERING);
+    mFlags.registerOptional(MIN_ALLELES, Integer.class, INT, "minimum number of alleles (REF included)").setCategory(FILTERING_REC);
+    mFlags.registerOptional(MAX_ALLELES, Integer.class, INT, "maximum number of alleles (REF included)").setCategory(FILTERING_REC);
 
     // Contents of FILTER
-    mFlags.registerOptional('r', REMOVE_FILTER, String.class, STRING, "remove variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional('k', KEEP_FILTER, String.class, STRING, "only keep variants with this FILTER tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('r', REMOVE_FILTER, String.class, STRING, "remove variants with this FILTER tag").setCategory(FILTERING_REC).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('k', KEEP_FILTER, String.class, STRING, "only keep variants with this FILTER tag").setCategory(FILTERING_REC).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Contents of INFO
-    mFlags.registerOptional('R', REMOVE_INFO, String.class, STRING, "remove variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional('K', KEEP_INFO, String.class, STRING, "only keep variants with this INFO tag").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('R', REMOVE_INFO, String.class, STRING, "remove variants with this INFO tag").setCategory(FILTERING_REC).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional('K', KEEP_INFO, String.class, STRING, "only keep variants with this INFO tag").setCategory(FILTERING_REC).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
 
     // Which FORMAT columns do we look at
     mFlags.registerOptional(SAMPLE, String.class, STRING, "apply sample-specific criteria to the named sample contained in the input VCF").setCategory(INPUT_OUTPUT).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(ALL_SAMPLES, "apply sample-specific criteria to all samples contained in the input VCF").setCategory(INPUT_OUTPUT);
 
     // FORMAT/GT
-    mFlags.registerOptional(SNPS_ONLY, "only keep where sample variant is a simple SNP").setCategory(FILTERING);
-    mFlags.registerOptional(NON_SNPS_ONLY, "only keep where sample variant is MNP or INDEL").setCategory(FILTERING);
-    mFlags.registerOptional(REMOVE_HOM, "remove where sample is homozygous").setCategory(FILTERING);
-    mFlags.registerOptional(REMOVE_SAME_AS_REF, "remove where sample is same as reference").setCategory(FILTERING);
-    mFlags.registerOptional(REMOVE_ALL_SAME_AS_REF, "remove where all samples are same as reference").setCategory(FILTERING);
+    mFlags.registerOptional(SNPS_ONLY, "only keep where sample variant is a simple SNP").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(NON_SNPS_ONLY, "only keep where sample variant is MNP or INDEL").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(REMOVE_HOM, "remove where sample is homozygous").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(REMOVE_SAME_AS_REF, "remove where sample is same as reference").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(REMOVE_ALL_SAME_AS_REF, "remove where all samples are same as reference").setCategory(FILTERING_SAMPLE);
 
     // Other INFO fields
-    mFlags.registerOptional('c', MIN_COMBINED_DEPTH, Integer.class, INT, "minimum allowed combined read depth").setCategory(FILTERING);
-    mFlags.registerOptional('C', MAX_COMBINED_DEPTH, Integer.class, INT, "maximum allowed combined read depth").setCategory(FILTERING);
+    mFlags.registerOptional('c', MIN_COMBINED_DEPTH, Integer.class, INT, "minimum allowed combined read depth").setCategory(FILTERING_REC);
+    mFlags.registerOptional('C', MAX_COMBINED_DEPTH, Integer.class, INT, "maximum allowed combined read depth").setCategory(FILTERING_REC);
 
     // Other FORMAT fields
-    mFlags.registerOptional('d', MIN_DEPTH, Integer.class, INT, "minimum allowed sample read depth").setCategory(FILTERING);
-    mFlags.registerOptional('D', MAX_DEPTH, Integer.class, INT, "maximum allowed sample read depth").setCategory(FILTERING);
-    mFlags.registerOptional('g', MIN_GENOTYPE_QUALITY, Double.class, FLOAT, "minimum allowed genotype quality").setCategory(FILTERING);
-    mFlags.registerOptional('G', MAX_GENOTYPE_QUALITY, Double.class, FLOAT, "maximum allowed genotype quality").setCategory(FILTERING);
-    mFlags.registerOptional('q', MIN_QUALITY, Double.class, FLOAT, "minimum allowed quality").setCategory(FILTERING);
-    mFlags.registerOptional('Q', MAX_QUALITY, Double.class, FLOAT, "maximum allowed quality").setCategory(FILTERING);
-    mFlags.registerOptional('A', MAX_AMBIGUITY_RATIO, Double.class, FLOAT, "maximum allowed ambiguity ratio").setCategory(FILTERING);
-    mFlags.registerOptional(MIN_AVR_SCORE, Double.class, FLOAT, "minimum allowed AVR score").setCategory(FILTERING);
-    mFlags.registerOptional(MAX_AVR_SCORE, Double.class, FLOAT, "maximum allowed AVR score").setCategory(FILTERING);
-    mFlags.registerOptional(MIN_DENOVO_SCORE, Double.class, FLOAT, "minimum de novo score threshold").setCategory(FILTERING);
-    mFlags.registerOptional(MAX_DENOVO_SCORE, Double.class, FLOAT, "maximum de novo score threshold").setCategory(FILTERING);
+    mFlags.registerOptional('d', MIN_DEPTH, Integer.class, INT, "minimum allowed sample read depth").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional('D', MAX_DEPTH, Integer.class, INT, "maximum allowed sample read depth").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional('g', MIN_GENOTYPE_QUALITY, Double.class, FLOAT, "minimum allowed genotype quality").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional('G', MAX_GENOTYPE_QUALITY, Double.class, FLOAT, "maximum allowed genotype quality").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional('q', MIN_QUALITY, Double.class, FLOAT, "minimum allowed quality").setCategory(FILTERING_REC);
+    mFlags.registerOptional('Q', MAX_QUALITY, Double.class, FLOAT, "maximum allowed quality").setCategory(FILTERING_REC);
+    mFlags.registerOptional('A', MAX_AMBIGUITY_RATIO, Double.class, FLOAT, "maximum allowed ambiguity ratio").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(MIN_AVR_SCORE, Double.class, FLOAT, "minimum allowed AVR score").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(MAX_AVR_SCORE, Double.class, FLOAT, "maximum allowed AVR score").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(MIN_DENOVO_SCORE, Double.class, FLOAT, "minimum de novo score threshold").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional(MAX_DENOVO_SCORE, Double.class, FLOAT, "maximum de novo score threshold").setCategory(FILTERING_SAMPLE);
 
     // Xflags
-    mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, FLOAT, "minimum allowed posterior score").setCategory(FILTERING);
-    mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, FLOAT, "maximum allowed posterior score").setCategory(FILTERING);
-    final Flag<String> expr = mFlags.registerOptional(EXPR_FLAG, String.class, STRING, "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING);
+    mFlags.registerOptional('p', MIN_POSTERIOR_SCORE, Double.class, FLOAT, "minimum allowed posterior score").setCategory(FILTERING_SAMPLE);
+    mFlags.registerOptional('P', MAX_POSTERIOR_SCORE, Double.class, FLOAT, "maximum allowed posterior score").setCategory(FILTERING_SAMPLE);
+    final Flag<String> expr = mFlags.registerOptional(EXPR_FLAG, String.class, STRING, "keep variants where this sample expression is true (e.g. GQ>0.5)").setCategory(FILTERING_SAMPLE);
     expr.setMaxCount(Integer.MAX_VALUE);
-    mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, STRING, "records for which this expression evaluates to true will be retained").setCategory(FILTERING);
+    mFlags.registerOptional('e', KEEP_EXPRESSION_FLAG, String.class, STRING, "records for which this expression evaluates to true will be retained").setCategory(FILTERING_REC);
     final Flag<String> javascript = mFlags.registerOptional('j', JAVASCRIPT_FLAG, String.class, STRING, "javascript filtering functions for determining whether to keep record. May be either an expression or a file name");
-    javascript.setCategory(FILTERING);
+    javascript.setCategory(FILTERING_REC);
     javascript.setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     mFlags.addRequiredSet(output);

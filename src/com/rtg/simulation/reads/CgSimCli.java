@@ -88,7 +88,7 @@ public class CgSimCli extends ReadSimCli {
   protected void initFlags() {
     super.initFlags();
     mFlags.setDescription("Simulate Complete Genomics Inc sequencing reads. Supports the original 35 bp read structure (5-10-10-10), and the newer 29 bp read structure (10-9-10).");
-    mFlags.setCategories(UTILITY, new String[]{INPUT_OUTPUT, CAT_FRAGMENTS, CAT_CG, UTILITY});
+    mFlags.setCategories(UTILITY, INPUT_OUTPUT, CAT_FRAGMENTS, CAT_CG, UTILITY);
     mFlags.setValidator(new CgSimValidator());
   }
 

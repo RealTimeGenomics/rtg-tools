@@ -177,7 +177,7 @@ public class ReadSimCli extends LoggedCli {
   @Override
   protected void initFlags() {
     mFlags.setDescription("Generates reads from a reference genome.");
-    mFlags.setCategories(UTILITY, new String[]{INPUT_OUTPUT, CAT_FRAGMENTS, CAT_ILLUMINA_PE, CAT_ILLUMINA_SE, CAT_454_PE, CAT_ION_SE, CAT_CG, UTILITY});
+    mFlags.setCategories(UTILITY, INPUT_OUTPUT, CAT_FRAGMENTS, CAT_ILLUMINA_PE, CAT_ILLUMINA_SE, CAT_454_PE, CAT_ION_SE, CAT_CG, UTILITY);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for reads output SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('t', INPUT, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
     final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, CommonFlags.FLOAT, "coverage, must be positive").setCategory(CAT_FRAGMENTS);
