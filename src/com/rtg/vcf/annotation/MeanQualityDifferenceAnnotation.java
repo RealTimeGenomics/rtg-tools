@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.annotation;
 
+import java.util.ArrayList;
+
 import com.rtg.util.StringUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -56,8 +58,13 @@ public class MeanQualityDifferenceAnnotation extends AbstractDerivedFormatAnnota
     if (gts.length < 2 || gts[0] == gts[1] || gts[0] == -1 || gts[1] == -1) {
       return null;
     }
-    final String[] dps = StringUtils.split(record.getFormat(VcfUtils.FORMAT_ALLELIC_DEPTH).get(sampleNumber), ',');
-    final String[] aqs = StringUtils.split(record.getFormat(VcfUtils.FORMAT_ALLELE_QUALITY).get(sampleNumber), ',');
+    final ArrayList<String> adList = record.getFormat(VcfUtils.FORMAT_ALLELIC_DEPTH);
+    final ArrayList<String> aqList = record.getFormat(VcfUtils.FORMAT_ALLELE_QUALITY);
+    if (adList == null || aqList == null) {
+      return null;
+    }
+    final String[] dps = StringUtils.split(adList.get(sampleNumber), ',');
+    final String[] aqs = StringUtils.split(aqList.get(sampleNumber), ',');
     final int allele1;
     final int allele2;
     if (gts[0] > gts[1]) {
