@@ -78,16 +78,19 @@ public class DisplayHelper {
     abstract DisplayHelper create();
   }
 
-  /** A default instance that can be used for text display */
-  public static final DisplayHelper DEFAULT = getDefault();
-
-  static DisplayHelper getDefault() {
+  /** Indicates the default markup type */
+  public static final MarkupType DEFAULT_MARKUP_TYPE = getDefaultMarkup();
+  static MarkupType getDefaultMarkup() {
     try {
-      return MarkupType.valueOf(DEFAULT_MARKUP.toUpperCase(Locale.ROOT)).create();
+      return MarkupType.valueOf(DEFAULT_MARKUP.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException e) {
-      return MarkupType.NONE.create();
+      return MarkupType.NONE;
     }
   }
+
+
+  /** A default instance that can be used for text display */
+  public static final DisplayHelper DEFAULT = DEFAULT_MARKUP_TYPE.create();
 
   static final int LABEL_LENGTH = 6;
 
