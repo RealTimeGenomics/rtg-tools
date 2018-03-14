@@ -57,6 +57,7 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SdfUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
+import com.rtg.reader.SequencesReaderReferenceSource;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -81,7 +82,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String INFO_DESCR_FLAG = "info-description";
   private static final String FILL_AN_AC_FLAG = "fill-an-ac";
   private static final String RELABEL_FLAG = "relabel";
-  private static final String DERIVED_ANNOTATIONS_FLAG = "Xderived-annotations";
+  private static final String DERIVED_ANNOTATIONS_FLAG = "annotation";
   private static final String CLUSTER_FLAG = "Xcluster";
   private static final String STR_FLAG = "Xstr";
 
@@ -95,6 +96,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
     ANNOTATORS.put("CONT", new ContraryObservationAnnotator());
     ANNOTATORS.put("SCONT", new SplitContraryObservationAnnotator());
   }
+
+  private SequencesReaderReferenceSource mRefSequencesSource = null;
 
   @Override
   public String moduleName() {
@@ -124,7 +127,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
-    mFlags.registerOptional(DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "derived fields to add to VCF file").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional('A', DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "add computed annotation to VCF records").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.registerOptional(CLUSTER_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
     mFlags.registerOptional(STR_FLAG, File.class, "SDF", "annotate records with simple tandem repeat indicator based on given SDF").setCategory(REPORTING);
     mFlags.setValidator(new VcfAnnotatorValidator());
@@ -187,8 +190,8 @@ public final class VcfAnnotatorCli extends AbstractCli {
       annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG)));
     }
     if (mFlags.isSet(STR_FLAG)) {
-      // xxx todo close ?
-      annotators.add(new SimpleTandemRepeatAnnotator(getReference((File) mFlags.getValue(STR_FLAG)).referenceSource()));
+      mRefSequencesSource = getReference((File) mFlags.getValue(STR_FLAG)).referenceSource();
+      annotators.add(new SimpleTandemRepeatAnnotator(mRefSequencesSource));
     }
 
     annotators.addAll(derived.stream().map(ANNOTATORS::get).collect(Collectors.toList()));
@@ -218,6 +221,9 @@ public final class VcfAnnotatorCli extends AbstractCli {
           writer.write(rec);
         }
       }
+    }
+    if (mRefSequencesSource != null) {
+      mRefSequencesSource.close();
     }
     return 0;
   }

@@ -53,19 +53,20 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
 
   public void testFlags() {
     checkHelp("rtg vcfannotate"
-        , "Adds annotations to a VCF file"
-        , "-i,", "--input=FILE", "VCF file containing variants"
-        , "-o,", "--output=FILE", "output VCF file"
-        , "--bed-ids=FILE", "add variant IDs"
-        , "--bed-info=FILE", "add INFO annotations"
-        , "--vcf-ids=FILE"
-        , "--fill-an-ac", "add or update the AN and AC INFO fields"
-        , "-Z,", "--no-gzip", "do not gzip the output"
-        , "--no-index", "do not produce indexes for output files"
-        );
+      , "Adds annotations to a VCF file"
+      , "-i,", "--input=FILE", "VCF file containing variants"
+      , "-o,", "--output=FILE", "output VCF file"
+      , "--bed-ids=FILE", "add variant IDs"
+      , "--bed-info=FILE", "add INFO annotations"
+      , "--vcf-ids=FILE"
+      , "--fill-an-ac", "add or update the AN and AC INFO fields"
+      , "-Z,", "--no-gzip", "do not gzip the output"
+      , "--no-index", "do not produce indexes for output files"
+      , "-A", "--annotation=STRING", "add computed annotation to VCF records"
+    );
     checkExtendedHelp("rtg vcfannotate"
-        , "--Xderived-annotations=STRING", "derived fields to add to VCF file. Allowed values are "
-        );
+      , "--Xstr=SDF", "annotate records with simple tandem repeat indicator based on given SDF"
+    );
   }
 
   public void testValidator() throws IOException {
@@ -98,7 +99,7 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       final File idVcf = FileUtils.stringToFile(mNano.loadReference("snpAnnotate_small_ids_vcf.vcf"), new File(dir, "id.vcf"));
       final File outFile = new File(dir, "output.vcf.gz");
 
-      final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
+      final String str = checkMainInitOk("-i", inVcf.getPath(), "--vcf-ids", idVcf.getPath(), "-o", outFile.getPath(), "--fill-an-ac", "--annotation", "NAA,ZY,PD");
       assertEquals("", str);
       assertTrue(outFile.isFile());
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(outFile));
@@ -115,9 +116,9 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
 
       final String str;
       if (ids) {
-        str = checkMainInitOk("-i", inVcf.getPath(), "--bed-ids", inBed.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
+        str = checkMainInitOk("-i", inVcf.getPath(), "--bed-ids", inBed.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--annotation", "NAA,ZY", "--annotation", "PD");
       } else {
-        str = checkMainInitOk("-i", inVcf.getPath(), "--bed-info", inBed.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--Xderived-annotations", "NAA,ZY,PD");
+        str = checkMainInitOk("-i", inVcf.getPath(), "--bed-info", inBed.getPath(), "-o", outFile.getPath(), "-Z", "--fill-an-ac", "--annotation", "NAA,ZY,PD");
       }
       assertEquals("", str);
       assertTrue(outFile.isFile());
