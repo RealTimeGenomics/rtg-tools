@@ -90,7 +90,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     checkHelp("rtg sdfsubseq"
             , "Prints a subsequence of a given sequence in an SDF."
             , "-i,", "--input=SDF", "input SDF"
-            , "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length"
+            , "the range to display. "
             , "-r,", "--reverse-complement", "if set, output in reverse complement"
             , "-f,", "--fasta", "if set, output in FASTA format"
             , "-q,", "--fastq", "if set, output in FASTQ format"

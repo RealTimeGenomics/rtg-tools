@@ -116,6 +116,15 @@ public final class CommonFlags {
    */
   public static final String FORCE = "Xforce";
 
+  /** Text describing region syntax */
+
+  public static final String REGION_SPEC = "The format is one of <sequence_name>, <sequence_name>:<start>-<end>, <sequence_name>:<pos>+<length> or <sequence_name>:<pos>~<padding>";
+
+//  public static final String REGION_SPEC = "The format is one of "
+//    + DisplayHelper.DEFAULT.decorateForeground("sequence_name", DisplayHelper.THEME_TYPE_COLOR) + ", "
+//    + DisplayHelper.DEFAULT.decorateForeground("sequence_name", DisplayHelper.THEME_TYPE_COLOR) + ":" + DisplayHelper.DEFAULT.decorateForeground("start", DisplayHelper.THEME_TYPE_COLOR) + "-" + DisplayHelper.DEFAULT.decorateForeground("end", DisplayHelper.THEME_TYPE_COLOR) + ", "
+//    + DisplayHelper.DEFAULT.decorateForeground("sequence_name", DisplayHelper.THEME_TYPE_COLOR) + ":" + DisplayHelper.DEFAULT.decorateForeground("start", DisplayHelper.THEME_TYPE_COLOR) + "+" + DisplayHelper.DEFAULT.decorateForeground("length", DisplayHelper.THEME_TYPE_COLOR) + " or "
+//    + DisplayHelper.DEFAULT.decorateForeground("sequence_name", DisplayHelper.THEME_TYPE_COLOR) + ":" + DisplayHelper.DEFAULT.decorateForeground("pos", DisplayHelper.THEME_TYPE_COLOR) + "~" + DisplayHelper.DEFAULT.decorateForeground("padding", DisplayHelper.THEME_TYPE_COLOR);
 
   /** input sequence quality type flag */
   public static final String QUALITY_FLAG = "quality-format";
@@ -145,6 +154,8 @@ public final class CommonFlags {
   public static final String FILE = "FILE";
   /** STRING */
   public static final String STRING = "STRING";
+  /** REGION */
+  public static final String REGION = "REGION";
   /** FILE OR SDF */
   public static final String SDF_OR_FILE = "SDF|FILE";
   /** FILE OR STRING */

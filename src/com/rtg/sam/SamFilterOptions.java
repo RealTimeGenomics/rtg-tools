@@ -29,6 +29,7 @@
  */
 package com.rtg.sam;
 
+import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
@@ -245,7 +246,7 @@ public final class SamFilterOptions {
     return flags.registerOptional(KEEP_DUPLICATES_FLAG, KEEP_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
   }
 
-  private static final String RESTRICTION_DESC = "if set, only process SAM records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length";
+  private static final String SAM_RESTRICTION_DESC = "if set, only process SAM records within the specified range. " + REGION_SPEC;
 
   /**
    * Register flag for restricting records to be processed.
@@ -254,7 +255,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<String> registerRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.STRING, RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
+    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.REGION, SAM_RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
   }
 
   /**

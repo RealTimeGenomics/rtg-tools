@@ -29,6 +29,8 @@
  */
 package com.rtg.tabix;
 
+import static com.rtg.launcher.CommonFlags.REGION_SPEC;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -126,7 +128,7 @@ public class ExtractCli extends AbstractCli {
       }
     });
     flags.registerRequired(File.class, CommonFlags.FILE, "the indexed block compressed genome position data file to extract").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    final Flag<String> region = flags.registerRequired(String.class, CommonFlags.STRING, "the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.FILTERING);
+    final Flag<String> region = flags.registerRequired(String.class, CommonFlags.REGION, "the range to display. " + REGION_SPEC).setCategory(CommonFlagCategories.FILTERING);
     region.setMinCount(0);
     region.setMaxCount(Integer.MAX_VALUE);
     flags.registerOptional(HEADER_FLAG, "print out header also").setCategory(CommonFlagCategories.REPORTING);

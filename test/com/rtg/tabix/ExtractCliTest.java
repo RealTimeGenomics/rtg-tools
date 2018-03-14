@@ -55,7 +55,7 @@ public class ExtractCliTest extends AbstractCliTest {
     checkHelp("rtg extract"
         , "Extract records from an indexed genomic position data file."
         , "FILE the indexed block compressed genome position data file to extract"
-        , "STRING+ the range to display. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length. May be specified 0 or more times Reporting"
+        , "REGION+ the range to display"
         , "--header", "print out header also"
         , "-h,", "--help", "print help on command-line flag usage"
         );

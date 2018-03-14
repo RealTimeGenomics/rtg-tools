@@ -72,6 +72,7 @@ public final class TestCFlags {
     PDESC.add("MODEL");
     PDESC.add("NAME");
     PDESC.add("STRING");
+    PDESC.add("REGION");
     PDESC.add("PERCENTAGE");
     PDESC.add("SDF");
     PDESC.add("SDF|FILE");

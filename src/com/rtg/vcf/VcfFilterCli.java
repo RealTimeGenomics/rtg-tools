@@ -37,6 +37,8 @@ import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.NO_HEADER;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.REGION;
+import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
@@ -163,7 +165,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
 
-    mFlags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only read VCF records within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional(RESTRICTION_FLAG, String.class, REGION, "if set, only read VCF records within the specified range. " + REGION_SPEC).setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
 
     VcfMerge.initAddHeaderFlag(mFlags);

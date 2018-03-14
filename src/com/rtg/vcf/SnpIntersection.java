@@ -31,6 +31,8 @@ package com.rtg.vcf;
 
 import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
+import static com.rtg.launcher.CommonFlags.REGION;
+import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 
@@ -118,7 +120,7 @@ CommonFlags.initNoGzip(flags);
     final Flag<String> forceMerge = flags.registerOptional(FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when not compatible").setCategory(CommonFlagCategories.UTILITY);
     forceMerge.setMinCount(0);
     forceMerge.setMaxCount(Integer.MAX_VALUE);
-    flags.registerOptional(RESTRICTION_FLAG, String.class, STRING, "if set, only process the SNPs within the specified range. The format is one of <sequence_name>, <sequence_name>:start-end or <sequence_name>:start+length").setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
+    flags.registerOptional(RESTRICTION_FLAG, String.class, REGION, "if set, only process the SNPs within the specified range. " + REGION_SPEC).setCategory(CommonFlagCategories.SENSITIVITY_TUNING);
     flags.setDescription("Produces intersection information between two SNP files.");
     flags.setValidator(new SnpIntersectionFlagValidator());
   }

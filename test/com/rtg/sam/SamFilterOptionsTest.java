@@ -145,7 +145,7 @@ public class SamFilterOptionsTest extends TestCase {
     assertNotNull(f);
     assertEquals(f, flags.getFlag(CommonFlags.RESTRICTION_FLAG));
     assertEquals(String.class, f.getParameterType());
-    assertEquals("STRING", f.getParameterDescription());
+    assertEquals("REGION", f.getParameterDescription());
     assertTrue(f.getDescription().contains("SAM"));
     assertTrue(f.getDescription().contains("range"));
   }
