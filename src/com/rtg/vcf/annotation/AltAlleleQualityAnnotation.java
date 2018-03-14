@@ -30,6 +30,8 @@
 
 package com.rtg.vcf.annotation;
 
+import java.util.ArrayList;
+
 import com.rtg.util.StringUtils;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -52,7 +54,11 @@ public class AltAlleleQualityAnnotation extends AbstractDerivedFormatAnnotation 
 
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
-    final String va = record.getFormatAndSample().get(VcfUtils.FORMAT_VARIANT_ALLELE).get(sampleNumber);
+    final ArrayList<String> vaList = record.getFormatAndSample().get(VcfUtils.FORMAT_VARIANT_ALLELE);
+    if (vaList == null) {
+      return null;
+    }
+    final String va = vaList.get(sampleNumber);
     if (va == null || ".".equals(va)) {
       return null;
     }

@@ -30,16 +30,14 @@
 
 package com.rtg.vcf.annotation;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import com.rtg.vcf.VcfRecord;
+
+import junit.framework.TestCase;
 
 /**
  */
-public class AltAlleleQualityAnnotationTest {
-  @Test
+public class AltAlleleQualityAnnotationTest extends TestCase {
+
   public void test() {
     check("1", "60,50", 50.0);
     check("2", "70,50,60", 60.0);
@@ -52,6 +50,10 @@ public class AltAlleleQualityAnnotationTest {
     rec.addFormatAndSample("VA", va);
     rec.addFormatAndSample("AQ", aq);
     assertEquals(expQa, new AltAlleleQualityAnnotation().getValue(rec, 0));
+  }
+
+  public void testNoVaOnRecord() {
+    assertNull(new AltAlleleQualityAnnotation().getValue(new VcfRecord("seq", 0, "A"), 0));
   }
 
 }
