@@ -29,6 +29,10 @@
  */
 package com.rtg.vcf.mendelian;
 
+import static com.rtg.vcf.mendelian.Genotype.TriState.FALSE;
+import static com.rtg.vcf.mendelian.Genotype.TriState.MAYBE;
+import static com.rtg.vcf.mendelian.Genotype.TriState.TRUE;
+
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +56,7 @@ import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfNumber;
+import com.rtg.vcf.mendelian.Genotype.TriState;
 
 /**
  * Check calls in a VCF obey rules of Mendelian inheritance.
@@ -59,9 +64,22 @@ import com.rtg.vcf.header.VcfNumber;
 @TestClass("com.rtg.vcf.mendelian.MendeliannessCheckerTest")
 public final class MendeliannessAnnotator implements VcfAnnotator {
 
+  enum Consistency {
+    /** Call is complete and consistent with inheritance */
+    CONSISTENT,
+    /** Call is complete and inconsistent with inheritance */
+    INCONSISTENT,
+    /** Call is missing some values, but regardless of what they are, the call would be consistent with inheritance */
+    INCOMPLETE_CONSISTENT,
+    /** Call is missing some values, but regardless of what they are, the call would be inconsistent with inheritance */
+    INCOMPLETE_INCONSISTENT,
+    /** Call is missing some values, and we cannot decide on consistency without knowing the missing values */
+    INCOMPLETE_UNKNOWN
+  }
 
   private static final String FORMAT_PLOIDY = "MCP";
   private static final String INFO_VIOLATION = "MCV";
+  private static final String INFO_UNKNOWN = "MCU";
 
   private static final String[] REFERENCE_GENOTYPES = {VcfRecord.MISSING, "0", "0/0", "0/0/0", "0/0/0/0"};
 
@@ -80,11 +98,11 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   private TrioConcordance[] mTrioCounts;
 
   private String mTemplateName = "";
-  private boolean mLastWasInconsistent = false;
+  private Consistency mLastWasInconsistent = Consistency.INCOMPLETE_UNKNOWN;
 
   private long mTotalRecords;
-  private long mNoGtRecords;
   private long mStrangeChildPloidyRecords;
+  private long mUnknownConsistencyRecords;
   private long mNonRefFamilyRecords;
   private long mBadMendelianRecords;
   private long mBadPloidyRecords;
@@ -192,50 +210,92 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   // Child is diploid
   // If it is homozygous, both father and mother must contain a copy of the allele
   // If it is heterozygous, it must be possible to assign one allele to each parent
-  static boolean isBadDiploidChild(final Genotype fatherCall, final Genotype motherCall, final Genotype childCall) {
+  static Consistency checkDiploidChild(final Genotype fatherCall, final Genotype motherCall, final Genotype childCall) {
     assert childCall.length() == 2;
-    boolean badDiploid = false;
-    final int childAllele1 = childCall.get(0);
-    final int childAllele2 = childCall.get(1);
-    if (childAllele1 == childAllele2) {
-      if (!fatherCall.contains(childAllele1) || !motherCall.contains(childAllele1)) {
-        badDiploid = true;
-      }
-    } else {
-      // Two possible paths, one allele must be from each parent
-      if (!((fatherCall.contains(childAllele1) && motherCall.contains(childAllele2))
-         || (motherCall.contains(childAllele1) && fatherCall.contains(childAllele2)))) {
-        badDiploid = true;
+    if (childCall.incomplete()) {
+      if (childCall.homozygous()) {
+        return Consistency.INCOMPLETE_UNKNOWN; // These situations actually get skipped earlier in the process
       }
     }
-    return badDiploid;
+    final int childAllele1 = childCall.get(0);
+    final int childAllele2 = childCall.get(1);
+    final TriState f1 = fatherCall.contains(childAllele1);
+    final TriState m1 = motherCall.contains(childAllele1);
+    final Consistency status;
+    if (childCall.homozygous()) {
+      if (f1 == MAYBE && m1 == MAYBE) {
+        status = Consistency.INCOMPLETE_UNKNOWN;
+      } else if (f1 == MAYBE) {
+        status = m1 == FALSE ? Consistency.INCOMPLETE_INCONSISTENT : Consistency.INCOMPLETE_UNKNOWN;
+      } else if (m1 == MAYBE) {
+        status = f1 == FALSE ? Consistency.INCOMPLETE_INCONSISTENT : Consistency.INCOMPLETE_UNKNOWN;
+      } else if (fatherCall.incomplete() || motherCall.incomplete()) {
+        status = f1 == TRUE && m1 == TRUE ? Consistency.INCOMPLETE_CONSISTENT : Consistency.INCOMPLETE_INCONSISTENT;
+      } else {
+        status = f1 == TRUE && m1 == TRUE ? Consistency.CONSISTENT : Consistency.INCONSISTENT;
+      }
+    } else { // One allele must be from each parent
+      final TriState f2 = fatherCall.contains(childAllele2);
+      final TriState m2 = motherCall.contains(childAllele2);
+      if (f1 != MAYBE && f2 != MAYBE && m1 != MAYBE && m2 != MAYBE) {
+        status = (f1 == TRUE && m2 == TRUE) || (m1 == TRUE && f2 == TRUE) ? Consistency.CONSISTENT : Consistency.INCONSISTENT;
+      } else {
+        status = f1 == FALSE && f2 == FALSE // Father definitely couldn't contribute either allele
+          || m1 == FALSE && m2 == FALSE // Mother definitely couldn't contribute either allele
+          || f1 == FALSE && m1 == FALSE // Child allele 1 definitely couldn't be obtained from either parent
+          || f2 == FALSE && m2 == FALSE // Child allele 2 definitely couldn't be obtained from either parent
+          ? Consistency.INCOMPLETE_INCONSISTENT
+          : (f1 == TRUE && m2 == TRUE) || (m1 == TRUE && f2 == TRUE)
+          ? Consistency.INCOMPLETE_CONSISTENT
+          : Consistency.INCOMPLETE_UNKNOWN;
+      }
+    }
+    return status;
   }
 
   // Child is haploid, must inherit its allele from a parent.
   // If the sequence is diploid in one parent, it should be from that parent.
   // If the sequence is none in one parent, it should come from the other parent.
-  static boolean isBadHaploidChild(final Genotype fatherCall, final Genotype motherCall, final Genotype childCall) {
+  static Consistency checkHaploidChild(final Genotype fatherCall, final Genotype motherCall, final Genotype childCall) {
     assert childCall.length() == 1;
-    boolean badhaploid = false;
-    final int childAllele = childCall.get(0);
-    if (motherCall.length() > 1) {
-      if (!motherCall.contains(childAllele)) {
-        badhaploid = true;
-      }
-    } else if (fatherCall.length() > 1) {
-      if (!fatherCall.contains(childAllele)) {
-        badhaploid = true;
-      }
-    } else if (!fatherCall.contains(childAllele) && !motherCall.contains(childAllele)) {
-      // Neither parent is diploid
-      badhaploid = true;
+    if (childCall.incomplete()) {
+      return Consistency.INCOMPLETE_UNKNOWN;  // These situations actually get skipped earlier in the process
     }
-    return badhaploid;
+    final int childAllele = childCall.get(0);
+    final TriState m = motherCall.contains(childAllele);
+    final TriState f = fatherCall.contains(childAllele);
+    final Consistency status;
+    if (motherCall.length() > 1) {
+      status = (m == MAYBE)
+        ? Consistency.INCOMPLETE_UNKNOWN
+        : m == FALSE
+        ? Consistency.INCONSISTENT
+        : motherCall.incomplete()
+        ? Consistency.INCOMPLETE_CONSISTENT
+        : Consistency.CONSISTENT;
+    } else if (fatherCall.length() > 1) {
+      status = (f == MAYBE)
+        ? Consistency.INCOMPLETE_UNKNOWN
+        : f == FALSE
+        ? Consistency.INCONSISTENT
+        : fatherCall.incomplete()
+        ? Consistency.INCOMPLETE_CONSISTENT
+        : Consistency.CONSISTENT;
+    } else if (m == MAYBE) { // Mother is missing, e.g. Y chr
+      status = f == MAYBE ? Consistency.INCOMPLETE_UNKNOWN : f == TRUE ? Consistency.CONSISTENT : Consistency.INCONSISTENT;
+    } else if (f == MAYBE) { // Father is missing, Mother is missing, e.g. Y chr
+      status = m == MAYBE ? Consistency.INCOMPLETE_UNKNOWN : Consistency.INCONSISTENT;
+    } else {
+      status = (f == FALSE && m == FALSE) ? Consistency.INCONSISTENT : Consistency.CONSISTENT;
+    }
+    return status;
   }
 
-  static boolean isBadTrioCall(Genotype fatherGt, Genotype motherGt, Genotype childGt) {
-    return ((childGt.length() == 1) && isBadHaploidChild(fatherGt, motherGt, childGt))
-      || ((childGt.length() == 2) && isBadDiploidChild(fatherGt, motherGt, childGt));
+  static Consistency checkTrioCall(Genotype fatherGt, Genotype motherGt, Genotype childGt) {
+    assert childGt.length() == 1 || childGt.length() == 2;
+    return (childGt.length() == 1)
+      ? checkHaploidChild(fatherGt, motherGt, childGt)
+      : checkDiploidChild(fatherGt, motherGt, childGt);
   }
 
   // Returns true if any of the calls have unexpected call ploidy
@@ -271,23 +331,24 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   }
 
   // Returns true if this trio genotype has bad mendelianness
-  private boolean hasBadMendelianness(int childIndex, Genotype fatherGt, Genotype motherGt, Genotype childGt) {
-    final boolean badMendelian = isBadTrioCall(fatherGt, motherGt, childGt);
+  private Consistency checkMendelianness(int childIndex, Genotype fatherGt, Genotype motherGt, Genotype childGt) {
+    final Consistency status = checkTrioCall(fatherGt, motherGt, childGt);
     //aggregate stuff
     if (mAggregate != null) {
       mAggregate.addRecord(fatherGt, motherGt, childGt);
     }
     mTrioCounts[childIndex].add(fatherGt, motherGt, childGt);
-    mTrioCounts[childIndex].addTrioStatus(badMendelian);
-    return badMendelian;
+    mTrioCounts[childIndex].addTrioStatus(status);
+    return status;
   }
 
   // Returns true if any of the testable trio genotypes has bad mendelianness
-  private boolean hasBadMendelianness(VcfRecord rec) {
+  private Consistency checkMendelianness(VcfRecord rec) {
     final List<String> calls = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     boolean nonMendelian = false;
     boolean nonRef = false;
     boolean strangePloidy = false;
+    boolean unknown = false;
 
     for (Family f : mFamilies) { // Check all families, but violation counts are recorded at a per-record level
 
@@ -316,17 +377,29 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
         final Genotype motherGt = new Genotype(VcfUtils.splitGt(motherCall));
         final Genotype childGt = new Genotype(VcfUtils.splitGt(childCall));
 
-        // Cases of incorrect ploidy in calls have already been removed by hasBadCallPloidy.
         if (childGt.length() == 0 || childGt.length() > 2) {
           if (mAnnotate) {
             rec.addInfo(INFO_VIOLATION, child + ":" + fatherCall + "+" + motherCall + "->" + childCall);
           }
           strangePloidy = true;
-        } else if (hasBadMendelianness(childIndex, fatherGt, motherGt, childGt)) {
-          if (mAnnotate) {
-            rec.addInfo(INFO_VIOLATION, child + ":" + fatherCall + "+" + motherCall + "->" + childCall);
+        } else {
+          switch (checkMendelianness(childIndex, fatherGt, motherGt, childGt)) {
+            case INCONSISTENT:
+            case INCOMPLETE_INCONSISTENT:
+              if (mAnnotate) {
+                rec.addInfo(INFO_VIOLATION, child + ":" + fatherCall + "+" + motherCall + "->" + childCall);
+              }
+              nonMendelian = true;
+              break;
+            case INCOMPLETE_UNKNOWN:
+              if (mAnnotate) {
+                rec.addInfo(INFO_UNKNOWN, child + ":" + fatherCall + "+" + motherCall + "->" + childCall);
+              }
+              unknown = true;
+              break;
+            default:
+              break;
           }
-          nonMendelian = true;
         }
       }
     }
@@ -337,10 +410,13 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
     if (strangePloidy) {
       ++mStrangeChildPloidyRecords;
     }
+    if (unknown) {
+      ++mUnknownConsistencyRecords;
+    }
     if (nonMendelian) {
       ++mBadMendelianRecords;
     }
-    return nonMendelian;
+    return nonMendelian || strangePloidy ? Consistency.INCONSISTENT : unknown ? Consistency.INCOMPLETE_UNKNOWN : Consistency.CONSISTENT;
   }
 
 
@@ -374,7 +450,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
 
   private void checkHeader() {
-    if (!mHeader.getFormatLines().stream().anyMatch((FormatField t) -> VcfUtils.FORMAT_GENOTYPE.equals(t.getId()))) {
+    if (mHeader.getFormatLines().stream().noneMatch((FormatField t) -> VcfUtils.FORMAT_GENOTYPE.equals(t.getId()))) {
       throw new NoTalkbackSlimException("Supplied VCF does not contain GT FORMAT fields");
     }
     for (Family f : mFamilies) {
@@ -395,6 +471,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
 
     if (mAnnotate) {
       header.ensureContains(new InfoField(INFO_VIOLATION, MetaType.STRING, new VcfNumber("."), "Variant violates mendelian inheritance constraints"));
+      header.ensureContains(new InfoField(INFO_UNKNOWN, MetaType.STRING, new VcfNumber("."), "Mendelian consistency status can not be determined"));
       header.ensureContains(new FormatField(FORMAT_PLOIDY, MetaType.STRING, new VcfNumber("."), "Describes the expected genotype ploidy in cases where the given genotype does not match the expected ploidy"));
     }
   }
@@ -409,13 +486,15 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       throw new NoTalkbackSlimException("Record does not contain GT field: " + rec);
     }
     ++mTotalRecords;
-    mLastWasInconsistent = hasBadCallPloidy(rec) | hasBadMendelianness(rec);
+    final boolean badPloidy = hasBadCallPloidy(rec);
+    final Consistency mendelianness = checkMendelianness(rec);
+    mLastWasInconsistent = badPloidy ? Consistency.INCONSISTENT : mendelianness;
   }
 
   /**
-   * @return true if the last record to pass through <code>annotate()</code> was inconsistent
+   * @return overall consistency status of the last record.
    */
-  public boolean wasLastInconsistent() {
+  public Consistency lastConsistency() {
     return mLastWasInconsistent;
   }
 
@@ -452,15 +531,16 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
       if (mNonRefFamilyRecords < mTotalRecords) {
         out.println(mNonRefFamilyRecords + "/" + mTotalRecords + " (" + Utils.realFormat(100.0 * mNonRefFamilyRecords / mTotalRecords, 2) + "%) records were variant in at least 1 family member and checked for Mendelian constraints");
       }
-      if (mNonRefFamilyRecords > 0) {
-        out.println(mBadMendelianRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mBadMendelianRecords / mNonRefFamilyRecords, 2) + "%) records contained a violation of Mendelian constraints");
+      if (mUnknownConsistencyRecords > 0) {
+        out.println(mUnknownConsistencyRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mUnknownConsistencyRecords / mNonRefFamilyRecords, 2) + "%) records had indeterminate consistency status due to incomplete calls");
       }
       if (mStrangeChildPloidyRecords > 0) {
         out.println(mStrangeChildPloidyRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mStrangeChildPloidyRecords / mNonRefFamilyRecords, 2) + "%) records were not adequately checked due to a child call that was neither haploid nor diploid");
       }
+      if (mNonRefFamilyRecords > 0) {
+        out.println(mBadMendelianRecords + "/" + mNonRefFamilyRecords + " (" + Utils.realFormat(100.0 * mBadMendelianRecords / mNonRefFamilyRecords, 2) + "%) records contained a violation of Mendelian constraints");
+      }
     }
   }
-
-
 
 }

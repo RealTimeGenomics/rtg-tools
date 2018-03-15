@@ -65,11 +65,16 @@ class TrioConcordance {
   }
 
   // Increment the status of a three-way mendelian genotype test
-  public void addTrioStatus(boolean nonMendelian) {
-    if (nonMendelian) {
-      ++mTrioInconsistent;
-    } else {
-      ++mTrioConsistent;
+  public void addTrioStatus(MendeliannessAnnotator.Consistency nonMendelian) {
+    switch (nonMendelian) {
+      case CONSISTENT:
+        ++mTrioConsistent;
+        break;
+      case INCONSISTENT:
+        ++mTrioInconsistent;
+        break;
+      default: // Ignore incomplete statuses
+        break;
     }
   }
 
@@ -130,14 +135,14 @@ class TrioConcordance {
 
     // Only consider genotypes where both are diploid with no missing values
     void add(Genotype parent, Genotype child) {
-      if (parent.length() != 2 || child.length() != 2 || parent.get(0) < 0 || child.get(0) < 0) {
+      if (parent.length() != 2 || child.length() != 2 || parent.incomplete() || child.incomplete()) {
         mCounts[IGNORED]++;
       } else {
         ++mInformative;
         if (parent.equals(child)) {
           mCounts[SAME]++;
         } else {
-          if (parent.contains(child.get(0)) || parent.contains(child.get(1))) {
+          if (parent.contains(child.get(0)) == Genotype.TriState.TRUE || parent.contains(child.get(1)) == Genotype.TriState.TRUE) {
             mCounts[PARENT]++;
           } else {
             mCounts[UNRELATED]++;

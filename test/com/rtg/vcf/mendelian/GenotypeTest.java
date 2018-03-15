@@ -29,7 +29,8 @@
  */
 package com.rtg.vcf.mendelian;
 
-import java.io.IOException;
+import static com.rtg.vcf.mendelian.Genotype.TriState.FALSE;
+import static com.rtg.vcf.mendelian.Genotype.TriState.TRUE;
 
 import com.rtg.util.TestUtils;
 
@@ -39,27 +40,27 @@ import junit.framework.TestCase;
  */
 public class GenotypeTest extends TestCase {
 
-  public void testDip() throws IOException {
+  public void testDip() {
     final Genotype gt = new Genotype(new int[] {1, 0});
     assertEquals(2, gt.length());
     assertEquals(0, gt.get(0));
     assertEquals(1, gt.get(1));
     assertEquals("0/1", gt.toString());
 
-    assertTrue(gt.contains(0));
-    assertTrue(gt.contains(1));
-    assertFalse(gt.contains(2));
+    assertEquals(TRUE, gt.contains(0));
+    assertEquals(TRUE, gt.contains(1));
+    assertEquals(FALSE, gt.contains(2));
   }
 
-  public void testHap() throws IOException {
+  public void testHap() {
     final Genotype gt = new Genotype(new int[]{2});
     assertEquals(1, gt.length());
     assertEquals(2, gt.get(0));
     assertEquals("2", gt.toString());
 
-    assertFalse(gt.contains(0));
-    assertFalse(gt.contains(1));
-    assertTrue(gt.contains(2));
+    assertEquals(FALSE, gt.contains(0));
+    assertEquals(FALSE, gt.contains(1));
+    assertEquals(TRUE, gt.contains(2));
   }
 
   public void testComparator() {

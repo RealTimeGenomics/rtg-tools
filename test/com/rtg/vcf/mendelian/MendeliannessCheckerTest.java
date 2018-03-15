@@ -29,6 +29,12 @@
  */
 package com.rtg.vcf.mendelian;
 
+import static com.rtg.vcf.mendelian.MendeliannessAnnotator.Consistency.CONSISTENT;
+import static com.rtg.vcf.mendelian.MendeliannessAnnotator.Consistency.INCOMPLETE_CONSISTENT;
+import static com.rtg.vcf.mendelian.MendeliannessAnnotator.Consistency.INCOMPLETE_INCONSISTENT;
+import static com.rtg.vcf.mendelian.MendeliannessAnnotator.Consistency.INCOMPLETE_UNKNOWN;
+import static com.rtg.vcf.mendelian.MendeliannessAnnotator.Consistency.INCONSISTENT;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -61,15 +67,15 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
         );
   }
 
-  static boolean isBadHaploidChild(final String fatherCall, final String motherCall, final String childCall) {
-    return MendeliannessAnnotator.isBadHaploidChild(new Genotype(fatherCall), new Genotype(motherCall), new Genotype(childCall));
+  static MendeliannessAnnotator.Consistency checkHaploidChild(final String fatherCall, final String motherCall, final String childCall) {
+    return MendeliannessAnnotator.checkHaploidChild(new Genotype(fatherCall), new Genotype(motherCall), new Genotype(childCall));
   }
 
-  static boolean isBadDiploidChild(final String fatherCall, final String motherCall, final String childCall) {
-    return MendeliannessAnnotator.isBadDiploidChild(new Genotype(fatherCall), new Genotype(motherCall), new Genotype(childCall));
+  static MendeliannessAnnotator.Consistency checkDiploidChild(final String fatherCall, final String motherCall, final String childCall) {
+    return MendeliannessAnnotator.checkDiploidChild(new Genotype(fatherCall), new Genotype(motherCall), new Genotype(childCall));
   }
 
-  public void testBadHaploidChild() {
+  public void testHaploidChild() {
     final String ref = "0";
     final String var = "1";
     final String missing = ".";
@@ -77,34 +83,83 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
     final String homref = "0/0";
     final String homvar = "1/1";
     final String hetvar = "0/1";
+    final String missingref = "./0";
+    final String missingvar = "./1";
 
-    assertFalse(isBadHaploidChild(ref, hetvar, var));  // E.g. Chr X
-    assertFalse(isBadHaploidChild(homvar, ref, var));  // Just for symmetry
-    assertFalse(isBadHaploidChild(hetvar, var, ref));  // Just for symmetry
-    assertFalse(isBadHaploidChild(var, missing, var)); // E.g. Chr Y
-    assertFalse(isBadHaploidChild(missing, var, var)); // Just for symmetry
+    assertEquals(CONSISTENT, checkHaploidChild(ref, hetvar, var));  // E.g. Chr X
 
-    assertTrue(isBadHaploidChild(ref, homvar, ref));  // E.g. Chr X
-    assertTrue(isBadHaploidChild(var, var, ref)); // E.g. Chr Y
-    assertTrue(isBadHaploidChild(var, missing, ref));  // E.g. Chr Y
+    assertEquals(CONSISTENT,            checkHaploidChild(var, missing, var)); // E.g. Chr Y
+    assertEquals(INCOMPLETE_UNKNOWN,    checkHaploidChild(var, missing2, var)); // E.g. Chr X
+    assertEquals(INCOMPLETE_CONSISTENT, checkHaploidChild(var, missingvar, var)); // E.g. Chr X
 
-    // It would be acceptable to change the outcomes of these ones:
-    assertTrue(isBadHaploidChild(homvar, homref, var));  // Edge case, both parents are diploid, but we prioritize mother
-    assertTrue(isBadHaploidChild(homref, homref, var)); // Edge case, both parents are diploid
-    assertTrue(isBadHaploidChild(homref, missing2, var)); // Edge case, both parents are diploid
+    assertEquals(INCOMPLETE_UNKNOWN, checkHaploidChild(missing, missing, var)); // E.g. Chr Y, missing father
+
+    assertEquals(INCOMPLETE_UNKNOWN, checkHaploidChild(var, missing, missing)); // E.g. Chr Y, missing child
+    assertEquals(INCOMPLETE_UNKNOWN, checkHaploidChild(ref, missingref, var)); // E.g. Chr X, partial mother
+
+    assertEquals(INCONSISTENT, checkHaploidChild(ref, homvar, ref));   // E.g. Chr X
+    assertEquals(INCONSISTENT, checkHaploidChild(var, var, ref));      // E.g. Chr Y
+    assertEquals(INCONSISTENT, checkHaploidChild(var, missing, ref));  // E.g. Chr Y
+
+    // Not valid ploidy combinations. It would be acceptable to change the outcomes of these ones:
+    assertEquals(CONSISTENT, checkHaploidChild(homvar, ref, var));  // Mother and father switched.
+    assertEquals(CONSISTENT, checkHaploidChild(hetvar, var, ref));  // Mother and father switched.
+    assertEquals(INCONSISTENT, checkHaploidChild(missing, var, var)); // Mother and father switched.
+    assertEquals(INCONSISTENT, checkHaploidChild(homref, homref, var)); // Both parents are diploid, neither have the allele
+    assertEquals(INCONSISTENT, checkHaploidChild(homvar, homref, var)); // Both parents are diploid, but we expect inheritance from mother
+    assertEquals(INCOMPLETE_UNKNOWN, checkHaploidChild(homref, missing2, var)); // Edge case, both parents are diploid
   }
 
-  public void testBadDiploidChild() {
+  public void testDiploidChild() {
+    final String ref = "0";
+    final String var = "1";
+    final String missing = ".";
+    final String missing2 = "./.";
+    final String missingref = "./0";
+    final String missingvar = "./1";
     final String homref = "0/0";
     final String homvar = "1/1";
     final String hetvar = "0/1";
-    assertFalse(isBadDiploidChild(hetvar, homref, hetvar));
-    assertFalse(isBadDiploidChild(hetvar, hetvar, hetvar));
-    assertFalse(isBadDiploidChild(hetvar, hetvar, homvar));
+    final String hetalt = "2/1";
 
-    assertTrue(isBadDiploidChild(homref, homref, hetvar));
-    assertTrue(isBadDiploidChild(homref, homvar, homvar));
-    assertTrue(isBadDiploidChild(homref, homvar, homref));
+    // E.g. Daughter on X (Father haploid)
+    assertEquals(CONSISTENT, checkDiploidChild(var, hetvar, hetvar));
+    assertEquals(INCONSISTENT, checkDiploidChild(var, homvar, hetvar));
+    assertEquals(INCONSISTENT, checkDiploidChild(ref, homref, hetvar));
+    assertEquals(INCONSISTENT, checkDiploidChild(ref, homvar, homvar));
+    assertEquals(CONSISTENT, checkDiploidChild(var, hetvar, homvar));
+
+    // Both parents diploid
+    assertEquals(CONSISTENT, checkDiploidChild(hetvar, homref, hetvar));
+    assertEquals(CONSISTENT, checkDiploidChild(hetvar, hetvar, hetvar));
+    assertEquals(CONSISTENT, checkDiploidChild(hetvar, hetvar, homvar));
+
+    assertEquals(INCONSISTENT, checkDiploidChild(homref, homref, hetvar));
+    assertEquals(INCONSISTENT, checkDiploidChild(homref, homvar, homvar));
+    assertEquals(INCONSISTENT, checkDiploidChild(homref, homvar, homref));
+
+    // Missing values, homozygous child
+    assertEquals(INCOMPLETE_INCONSISTENT, checkDiploidChild(homref, missing2, homvar));
+    assertEquals(INCOMPLETE_INCONSISTENT, checkDiploidChild(missing2, homref, homvar));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(homref, homref, missing2));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(homref, missing2, homref));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, homref, homref));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, missing2, homvar));
+    assertEquals(INCOMPLETE_CONSISTENT, checkDiploidChild(missingvar, missingvar, homvar));
+
+
+    // Missing values, heterozygous child
+    assertEquals(INCOMPLETE_CONSISTENT, checkDiploidChild(missingref, missingvar, hetvar));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(homref, missing2, hetvar));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, homref, hetvar));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, missing2, homvar));
+    assertEquals(INCOMPLETE_INCONSISTENT, checkDiploidChild(homref, missing2, hetalt));
+    assertEquals(INCOMPLETE_INCONSISTENT, checkDiploidChild(missing2, homref, hetalt));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, hetvar, hetalt));
+
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missing2, hetvar, missingvar));
+    assertEquals(INCOMPLETE_INCONSISTENT, checkDiploidChild(homref, homref, missingvar));
+    assertEquals(INCOMPLETE_UNKNOWN, checkDiploidChild(missingvar, hetvar, missingvar));
   }
 
   public void testOptions() throws IOException {
@@ -113,17 +168,14 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       final File file1 = FileHelper.resourceToFile("com/rtg/vcf/mendelian/resources/merge.vcf", new File(dir, "merge.vcf"));
       final File inconsistent = new File(dir, "failed.vcf.gz");
       final File consistent = new File(dir, "nonfailed.vcf.gz");
-      final MainResult res = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath(), "--all-records", "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath());
-      assertEquals(0, res.rc());
+      final File annot = new File(dir, "checked.vcf.gz");
+      final MainResult res = MainResult.run(getCli(), "-t", sdf.getPath(), "-i", file1.getPath(), "--all-records", "--output", annot.getPath(), "--output-inconsistent", inconsistent.getPath(), "--output-consistent", consistent.getPath());
+      assertEquals(res.err(), 0, res.rc());
       final String s = res.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
-      //System.err.println(s);
-      mNano.check("mendelian1", s);
-      final String s2 = TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(inconsistent));
-      //System.err.println(s2);
-      mNano.check("mendelian2", s2);
-      final String s2b = TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(consistent));
-      //System.err.println(s2);
-      mNano.check("mendelian2b", s2b);
+      mNano.check("mendelian.out.txt", s);
+      mNano.check("mendelian.annotated.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(annot)));
+      mNano.check("mendelian.inconsistent.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(inconsistent)));
+      mNano.check("mendelian.consistent.vcf", TestUtils.sanitizeVcfHeader(FileHelper.gzFileToString(consistent)));
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(inconsistent));
       assertEquals(BlockCompressedInputStream.FileTermination.HAS_TERMINATOR_BLOCK, BlockCompressedInputStream.checkTermination(consistent));
 
@@ -131,7 +183,7 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
       assertEquals(0, res2.rc());
       final String s3 = res2.out().replaceAll("Checking: [^\n]*\n", "Checking: \n");
       //System.err.println(s3);
-      mNano.check("mendelian3", s3);
+      mNano.check("mendelian2.out.txt", s3);
     }
 
   }

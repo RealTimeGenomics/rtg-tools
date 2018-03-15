@@ -158,8 +158,9 @@ public final class GenotypeProportions {
 
       for (Genotype i : counts.keySet()) {
         res.append(String.format(Locale.ROOT, "%10s %6s %10d  %6.2f%% %6.2f%%", parentLabel, i.toString(), counts.get(i), (double) counts.get(i) * 100.0d / tot, (double) counts.get(i) * 100.0d / grandTotal));
-        if (MendeliannessAnnotator.isBadTrioCall(p.mParents[0], p.mParents[1], i)) {
-          res.append(" MIE");
+        final MendeliannessAnnotator.Consistency status = MendeliannessAnnotator.checkTrioCall(p.mParents[0], p.mParents[1], i);
+        if (status != MendeliannessAnnotator.Consistency.CONSISTENT) {
+          res.append(" ").append(status.name());
         }
         res.append(StringUtils.LS);
       }

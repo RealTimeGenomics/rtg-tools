@@ -40,6 +40,12 @@ import com.rtg.vcf.VcfUtils;
  */
 class Genotype {
 
+  enum TriState {
+    TRUE,
+    FALSE,
+    MAYBE
+  }
+
   static final GenotypeComparator GENOTYPE_COMPARATOR = new GenotypeComparator();
 
   private final int[] mAlleles;
@@ -61,13 +67,19 @@ class Genotype {
     return mAlleles[index];
   }
 
-  public boolean contains(int allele) {
+  public TriState contains(int allele) {
+    if (allele == -1) {
+      return TriState.MAYBE;
+    }
+    TriState result = TriState.FALSE;
     for (int a : mAlleles) {
       if (a == allele) {
-        return true;
+        return TriState.TRUE;
+      } else if (a == -1) {
+        result = TriState.MAYBE;
       }
     }
-    return false;
+    return result;
   }
 
   public boolean homozygous() {
@@ -77,6 +89,15 @@ class Genotype {
   public boolean multiallelic() {
     for (int a : mAlleles) {
       if (a > 1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public boolean incomplete() {
+    for (int a : mAlleles) {
+      if (a == -1) {
         return true;
       }
     }
@@ -120,4 +141,5 @@ class Genotype {
       return 0;
     }
   }
+
 }

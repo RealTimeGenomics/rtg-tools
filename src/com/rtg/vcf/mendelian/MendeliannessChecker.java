@@ -216,11 +216,11 @@ public final class MendeliannessChecker extends AbstractCli {
                 annotator.annotate(rec);
               }
 
-              final boolean inconsistent = mendAnnot.wasLastInconsistent();
-              if (inconsistent && (inconsistentVcf != null)) {
+              final MendeliannessAnnotator.Consistency status = mendAnnot.lastConsistency();
+              if (status == MendeliannessAnnotator.Consistency.INCONSISTENT && (inconsistentVcf != null)) {
                 inconsistentVcf.write(rec);
               }
-              if (!inconsistent && (consistentVcf != null)) {
+              if (status == MendeliannessAnnotator.Consistency.CONSISTENT && (consistentVcf != null)) {
                 consistentVcf.write(rec);
               }
               if (outputVcf != null) {
