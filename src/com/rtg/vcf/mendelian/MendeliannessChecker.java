@@ -59,7 +59,9 @@ import com.rtg.relation.GenomeRelationships;
 import com.rtg.relation.PedigreeException;
 import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.util.StringUtils;
+import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.ChildPhasingVcfAnnotator;
@@ -83,7 +85,7 @@ public final class MendeliannessChecker extends AbstractCli {
   private static final String OUTPUT_AGGREGATE_FLAG = "Xoutput-aggregate";
   private static final String INPUT_FLAG = "input";
   private static final String ALL_RECORDS_FLAG = "all-records";
-  private static final String ALLOW_FLAG = "lenient";
+  private static final String LENIENT_FLAG = "lenient";
   private static final String PHASE_FLAG = "Xphase";
   private static final String CONCORDANCE_PCT_AGREEMENT = "min-concordance";
   private static final String CONCORDANCE_MIN_VARIANTS = "Xmin-variants";
@@ -105,11 +107,11 @@ public final class MendeliannessChecker extends AbstractCli {
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Check a multi-sample VCF for Mendelian consistency.");
-    mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing multi-sample variant calls or '-' to read from standard input").setCategory(INPUT_OUTPUT);
+    mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing multi-sample variant calls. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     CommonFlags.initReferenceTemplate(mFlags, true);
+    mFlags.registerOptional('o', OUTPUT_FLAG, File.class, FILE, "if set, output annotated calls to this VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_INCONSISTENT_FLAG, File.class, FILE, "if set, output only non-Mendelian calls to this VCF file").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_CONSISTENT_FLAG, File.class, FILE, "if set, output only consistent calls to this VCF file").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(OUTPUT_FLAG, File.class, FILE, "if set, output annotated calls to this VCF file").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_AGGREGATE_FLAG, File.class, FILE, "if set, output aggregate genotype proportions to this file").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional(ALL_RECORDS_FLAG, "use all records, regardless of filters (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(SENSITIVITY_TUNING);
     mFlags.registerOptional(PHASE_FLAG, "phase calls based on pedigree").setCategory(SENSITIVITY_TUNING);
@@ -117,10 +119,29 @@ public final class MendeliannessChecker extends AbstractCli {
     mFlags.registerOptional(CONCORDANCE_MIN_VARIANTS, Integer.class, INT, "minimum number of variants needed to check concordance", 2000).setCategory(SENSITIVITY_TUNING);
     mFlags.registerOptional(STRICT_MISSING_FLAG, "do strict checking that missing values contain expected ploidy").setCategory(SENSITIVITY_TUNING);
     mFlags.registerOptional(SEGREGATION_PROBABILITY_FLAG, "add segregation probability based on pedigree (only if exactly one family is present)").setCategory(SENSITIVITY_TUNING);
-    mFlags.registerOptional('l', ALLOW_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(SENSITIVITY_TUNING);
+    mFlags.registerOptional('l', LENIENT_FLAG, "allow homozygous diploid calls in place of haploid calls and assume missing values are equal to the reference").setCategory(SENSITIVITY_TUNING);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initNoGzip(mFlags);
     mFlags.registerOptional(PEDIGREE_FLAG, File.class, FILE, "genome relationships PED file (Default is to extract pedigree information from VCF header fields)").setCategory(SENSITIVITY_TUNING);
+    mFlags.setValidator(new Validator() {
+      @Override
+      public boolean isValid(CFlags flags) {
+        return CommonFlags.validateInputFile(flags, INPUT_FLAG)
+          && flags.checkInRange(CONCORDANCE_PCT_AGREEMENT, 0.0, false, 100.0, true)
+          && flags.checkInRange(CONCORDANCE_MIN_VARIANTS, 0, Integer.MAX_VALUE)
+          && validateNotStdio(flags, OUTPUT_AGGREGATE_FLAG, OUTPUT_CONSISTENT_FLAG, OUTPUT_INCONSISTENT_FLAG);
+      }
+
+      private boolean validateNotStdio(CFlags cflags, String... flags) {
+        for (String f : flags) {
+          if (cflags.isSet(f) && FileUtils.isStdio((File) cflags.getValue(f))) {
+            cflags.setParseMessage("stdout is not supported for --" + f);
+            return false;
+          }
+        }
+        return true;
+      }
+    });
   }
 
 
@@ -148,23 +169,13 @@ public final class MendeliannessChecker extends AbstractCli {
   }
 
 
-  private void check(final VcfReader vr, final PrintStream out, final PrintStream err) throws IOException {
-    final VcfHeader header = vr.getHeader();
-
-    final Set<Family> families = getFamilies(header);
-    if (families.isEmpty()) {
-      err.println("No family information found, no checking done.");
-      return;
-    }
-    for (Family f : families) {
-      out.println("Family: [" + f.getFather() + " + " + f.getMother() + "]" + " -> " + Arrays.toString(f.getChildren()));
-    }
-
-    final boolean lenient = mFlags.isSet(ALLOW_FLAG);
+  private void check(final PrintStream out, final PrintStream err) throws IOException {
+    final boolean lenient = mFlags.isSet(LENIENT_FLAG);
     final boolean strictMissingPloidy = mFlags.isSet(STRICT_MISSING_FLAG);
     final boolean passOnly = !mFlags.isSet(ALL_RECORDS_FLAG);
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
     final File outputVcfFile = mFlags.isSet(OUTPUT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_FLAG)) : null;
+    final boolean stdout = FileUtils.isStdio(outputVcfFile);
     final File inconsistentVcfFile = mFlags.isSet(OUTPUT_INCONSISTENT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_INCONSISTENT_FLAG)) : null;
     final File consistentVcfFile = mFlags.isSet(OUTPUT_CONSISTENT_FLAG) ? VcfUtils.getZippedVcfFileName(gzip, (File) mFlags.getValue(OUTPUT_CONSISTENT_FLAG)) : null;
     final boolean annotate = outputVcfFile != null || inconsistentVcfFile != null || consistentVcfFile != null;
@@ -177,88 +188,99 @@ public final class MendeliannessChecker extends AbstractCli {
       aggregateOutputFile = null;
       aggregate = null;
     }
+    final Object file = mFlags.getValue(INPUT_FLAG);
+    try (VcfReader vr = VcfReader.openVcfReader((File) file)) {
 
-    final List<VcfAnnotator> annotators = new ArrayList<>();
-
-    final MendeliannessAnnotator mendAnnot = new MendeliannessAnnotator(families, getSexMemo(), aggregate, annotate, lenient, strictMissingPloidy);
-    annotators.add(mendAnnot);
-
-    if (annotate) { // All these other annotators do is annotate, so don't bother if no VCF files are being output
-      if (mFlags.isSet(PHASE_FLAG)) {
-        annotators.add(new ChildPhasingVcfAnnotator(families));
+      final VcfHeader header = vr.getHeader();
+      final Set<Family> families = getFamilies(header);
+      if (families.isEmpty()) {
+        err.println("No family information found, no checking done.");
+        return;
       }
+      if (!stdout) {
+        out.println("Checking: " + file);
+        for (Family f : families) {
+          out.println("Family: [" + f.getFather() + " + " + f.getMother() + "]" + " -> " + Arrays.toString(f.getChildren()));
+        }
+      }
+
+      final List<VcfAnnotator> annotators = new ArrayList<>();
+      final MendeliannessAnnotator mendAnnot = new MendeliannessAnnotator(families, getSexMemo(), aggregate, annotate, lenient, strictMissingPloidy);
+      annotators.add(mendAnnot);
+
+      if (annotate) { // All these other annotators do is annotate, so don't bother if no VCF files are being output
+        if (mFlags.isSet(PHASE_FLAG)) {
+          annotators.add(new ChildPhasingVcfAnnotator(families));
+        }
 // TODO, Tidy up the SegregationVcfAnnotator so it can be moved to tools
 //      if (mFlags.isSet(SEGREGATION_PROBABILITY_FLAG) && families.size() == 1) {
 //        annotators.add(new SegregationVcfAnnotator(families.iterator().next()));
 //      }
-    }
+      }
 
-    final VcfHeader header2 = header.copy();
-    mendAnnot.updateHeader(header2);
-    for (final VcfAnnotator annotator: annotators) {
-      annotator.updateHeader(header2);
-    }
+      final VcfHeader header2 = header.copy();
+      mendAnnot.updateHeader(header2);
+      for (final VcfAnnotator annotator : annotators) {
+        annotator.updateHeader(header2);
+      }
 
-    int skippedRecords = 0;
-    final VcfWriterFactory f = new VcfWriterFactory(mFlags).addRunInfo(true);
-    try (VcfWriter outputVcf = outputVcfFile != null ? f.make(header2, outputVcfFile) : null) {
-      try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? f.make(header2, inconsistentVcfFile) : null) {
-        try (VcfWriter consistentVcf = consistentVcfFile != null ? f.make(header, consistentVcfFile) : null) {
-          try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile)) : null) {
-            while (vr.hasNext()) {
-              final VcfRecord rec = vr.next();
-              if (passOnly && rec.isFiltered()) {
-                ++skippedRecords;
-                continue;
+      int skippedRecords = 0;
+      final VcfWriterFactory f = new VcfWriterFactory(mFlags).addRunInfo(true);
+      try (VcfWriter outputVcf = outputVcfFile != null ? f.make(header2, stdout ? null : outputVcfFile, out) : null) {
+        try (VcfWriter inconsistentVcf = inconsistentVcfFile != null ? f.make(header2, inconsistentVcfFile) : null) {
+          try (VcfWriter consistentVcf = consistentVcfFile != null ? f.make(header, consistentVcfFile) : null) {
+            try (OutputStreamWriter aggregateWriter = aggregateOutputFile != null ? new OutputStreamWriter(FileUtils.createOutputStream(aggregateOutputFile)) : null) {
+              while (vr.hasNext()) {
+                final VcfRecord rec = vr.next();
+                if (passOnly && rec.isFiltered()) {
+                  ++skippedRecords;
+                  continue;
+                }
+
+                for (final VcfAnnotator annotator : annotators) {
+                  annotator.annotate(rec);
+                }
+
+                final MendeliannessAnnotator.Consistency status = mendAnnot.lastConsistency();
+                if (status == MendeliannessAnnotator.Consistency.INCONSISTENT && (inconsistentVcf != null)) {
+                  inconsistentVcf.write(rec);
+                }
+                if (status == MendeliannessAnnotator.Consistency.CONSISTENT && (consistentVcf != null)) {
+                  consistentVcf.write(rec);
+                }
+                if (outputVcf != null) {
+                  outputVcf.write(rec);
+                }
               }
+              if (aggregateWriter != null) {
+                aggregateWriter.append("## Canonicalized, Exclude multiallelic").append(StringUtils.LS);
+                aggregate.canonicalParents().filterMultiallelic().writeResults(aggregateWriter);
 
-              for (final VcfAnnotator annotator : annotators) {
-                annotator.annotate(rec);
-              }
+                aggregateWriter.append("## Canonicalized, Exclude multiallelic, Diploid Only").append(StringUtils.LS);
+                aggregate.canonicalParents().filterMultiallelic().filterNonDiploid().writeResults(aggregateWriter);
 
-              final MendeliannessAnnotator.Consistency status = mendAnnot.lastConsistency();
-              if (status == MendeliannessAnnotator.Consistency.INCONSISTENT && (inconsistentVcf != null)) {
-                inconsistentVcf.write(rec);
+                aggregateWriter.append("## Full Genotype Aggregates").append(StringUtils.LS);
+                aggregate.writeResults(aggregateWriter);
               }
-              if (status == MendeliannessAnnotator.Consistency.CONSISTENT && (consistentVcf != null)) {
-                consistentVcf.write(rec);
-              }
-              if (outputVcf != null) {
-                outputVcf.write(rec);
-              }
-            }
-            if (aggregateWriter != null) {
-              aggregateWriter.append("## Canonicalized, Exclude multiallelic").append(StringUtils.LS);
-              aggregate.canonicalParents().filterMultiallelic().writeResults(aggregateWriter);
-
-              aggregateWriter.append("## Canonicalized, Exclude multiallelic, Diploid Only").append(StringUtils.LS);
-              aggregate.canonicalParents().filterMultiallelic().filterNonDiploid().writeResults(aggregateWriter);
-
-              aggregateWriter.append("## Full Genotype Aggregates").append(StringUtils.LS);
-              aggregate.writeResults(aggregateWriter);
             }
           }
         }
       }
+
+      if (!stdout) {
+        if (skippedRecords > 0) {
+          out.println(skippedRecords + " non-pass records were skipped");
+        }
+        mendAnnot.printInconsistentSamples(out, (Integer) mFlags.getValue(CONCORDANCE_MIN_VARIANTS), (Double) mFlags.getValue(CONCORDANCE_PCT_AGREEMENT));
+        mendAnnot.printSummary(out);
+      }
     }
-
-    if (skippedRecords > 0) {
-      out.println(skippedRecords + " non-pass records were skipped");
-    }
-
-    mendAnnot.printInconsistentSamples(out, (Integer) mFlags.getValue(CONCORDANCE_MIN_VARIANTS), (Double) mFlags.getValue(CONCORDANCE_PCT_AGREEMENT));
-
-    mendAnnot.printSummary(out);
   }
 
   @Override
   protected int mainExec(final OutputStream out, final PrintStream err) throws IOException {
     try (PrintStream os = new PrintStream(out)) {
-      final Object file = mFlags.getValue(INPUT_FLAG);
-      os.println("Checking: " + file);
-      try (VcfReader vr = VcfReader.openVcfReader((File) file)) {
-        check(vr, os, err);
-      }
+      check(os, err);
     }
     return 0;
   }

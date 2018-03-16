@@ -769,7 +769,7 @@ public final class FileUtils {
    * @return true if the file indicates stdin/stdout should be used
    */
   public static boolean isStdio(File file) {
-    return isStdio(file.toString());
+    return file != null && isStdio(file.toString());
   }
 
   /**
@@ -778,7 +778,7 @@ public final class FileUtils {
    * @return true if the file indicates stdin/stdout should be used
    */
   public static boolean isStdio(String filename) {
-    return STDIO_NAME.equals(filename);
+    return filename != null && STDIO_NAME.equals(filename);
   }
 
   /**
