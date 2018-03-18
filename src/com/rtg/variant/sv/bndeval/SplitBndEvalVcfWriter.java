@@ -44,7 +44,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Writes out split files for correct and incorrect variants
  */
-@TestClass("com.rtg.variant.sv.discord.BndEvalCliTest")
+@TestClass("com.rtg.variant.sv.bndeval.BndEvalCliTest")
 class SplitBndEvalVcfWriter implements BndEvalVcfWriter {
 
   private final VcfWriter mCorrectWriter;

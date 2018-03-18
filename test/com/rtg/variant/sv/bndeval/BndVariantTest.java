@@ -27,56 +27,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.variant.sv.bndeval;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import com.rtg.util.intervals.Range;
+import junit.framework.TestCase;
 
 /**
- * Holds a breakend geometry for evaluation along with match status.
  */
-class BndVariant extends Range {
+public class BndVariantTest extends TestCase {
 
-  private final BreakpointGeometry mBreakpoint;
-  private final int mId;
-  private final List<BndVariant> mMatches = new ArrayList<>();
-  private boolean mCorrect;
-  private double mWeight;
-
-  BndVariant(BreakpointGeometry breakpoint, int id) {
-    super(Math.min(breakpoint.getXLo(), breakpoint.getXHi()), Math.max(breakpoint.getXLo(), breakpoint.getXHi()));
-    mBreakpoint = breakpoint;
-    mId = id;
-  }
-
-  public BreakpointGeometry getBreakpoint() {
-    return mBreakpoint;
-  }
-
-  public int getId() {
-    return mId;
-  }
-
-  public void setCorrect(boolean correct) {
-    mCorrect = correct;
-  }
-
-  public boolean isCorrect() {
-    return mCorrect;
-  }
-
-  public Collection<BndVariant> matches() {
-    return mMatches;
-  }
-
-  public void addWeight(double weight) {
-    mWeight += weight;
-  }
-
-  public double weight() {
-    return mWeight;
+  public void test() {
+    final BndVariant var = new BndVariant(new BreakpointGeometry(Orientation.UU, "x", "y", 1, 2, 3, 4, 1, 2), 42);
+    assertEquals(42, var.getId());
+    assertFalse(var.isCorrect());
+    var.setCorrect(true);
+    assertTrue(var.isCorrect());
+    assertEquals(0.0, var.weight());
+    var.addWeight(12.0);
+    assertEquals(12.0, var.weight());
   }
 }

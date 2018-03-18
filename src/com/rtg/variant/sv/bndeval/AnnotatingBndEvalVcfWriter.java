@@ -49,7 +49,7 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Adds match status annotations to existing VCF records.
  */
-@TestClass("com.rtg.variant.sv.discord.BndEvalCliTest")
+@TestClass("com.rtg.variant.sv.bndeval.BndEvalCliTest")
 class AnnotatingBndEvalVcfWriter implements BndEvalVcfWriter {
 
   private static final String INFO_BASE = "BASE";
