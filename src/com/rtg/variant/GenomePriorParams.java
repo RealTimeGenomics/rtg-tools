@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *

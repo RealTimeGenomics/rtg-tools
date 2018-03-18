@@ -1,0 +1,6 @@
+##fileformat=VCFv4.1
+##fileDate=[...]
+##reference=[...]
+##CL=[...]
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+10	43609947	.	G	[10:61638615[G	999	.	.

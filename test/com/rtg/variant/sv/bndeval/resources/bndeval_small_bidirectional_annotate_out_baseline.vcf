@@ -1,0 +1,9 @@
+##fileformat=VCFv4.1
+##fileDate=[...]
+##reference=[...]
+##CL=[...]
+##INFO=<ID=BASE,Number=1,Type=String,Description="Baseline variant status">
+##INFO=<ID=MATCH_COUNT,Number=1,Type=Integer,Description="For multi-matches, the number of variants matched">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+10	43609947	.	G	[10:61638615[G	999	.	BASE=TP
+10	61638615	.	N	[10:43609947[N	999	.	BASE=TP

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -55,6 +55,7 @@ import com.rtg.tabix.BgZip;
 import com.rtg.tabix.ExtractCli;
 import com.rtg.tabix.IndexerCli;
 import com.rtg.util.License;
+import com.rtg.variant.sv.bndeval.BndEvalCli;
 import com.rtg.vcf.VcfAnnotatorCli;
 import com.rtg.vcf.VcfDecomposerCli;
 import com.rtg.vcf.VcfFilterCli;
@@ -100,6 +101,7 @@ public final class ToolsCommand {
   static final Command VCFANNOTATE = new Command(new VcfAnnotatorCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
+  static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command ROCPLOT = new Command(new RocPlotCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
