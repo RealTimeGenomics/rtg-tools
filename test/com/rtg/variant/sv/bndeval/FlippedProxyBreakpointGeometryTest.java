@@ -39,5 +39,11 @@ public class FlippedProxyBreakpointGeometryTest extends TestCase {
   public void test() {
     final FlippedProxyBreakpointGeometry flippedGeometry = new FlippedProxyBreakpointGeometry(new BreakpointGeometry(Orientation.UD, "x", "y", 1, 2, 3, 4, 5, 6));
     assertEquals(Orientation.DU, flippedGeometry.getOrientation());
+    assertEquals("y", flippedGeometry.getXName());
+    assertEquals("x", flippedGeometry.getYName());
+    assertEquals(3, flippedGeometry.getXLo());
+    assertEquals(4, flippedGeometry.getXHi());
+    assertEquals(1, flippedGeometry.getYLo());
+    assertEquals(2, flippedGeometry.getYHi());
   }
 }
