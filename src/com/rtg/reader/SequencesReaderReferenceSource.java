@@ -32,7 +32,7 @@ package com.rtg.reader;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.ref.WeakReference;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +49,7 @@ import htsjdk.samtools.util.RuntimeIOException;
 public class SequencesReaderReferenceSource implements CRAMReferenceSource, Closeable {
 
   private final SequencesReader mReader;
-  private final Map<String, WeakReference<byte[]>> mCache = new HashMap<>();
+  private final Map<String, SoftReference<byte[]>> mCache = new HashMap<>();
   private Map<String, Long> mNames = null;
 
   /**
@@ -68,9 +68,9 @@ public class SequencesReaderReferenceSource implements CRAMReferenceSource, Clos
   }
 
   private byte[] findInCache(final String name) {
-    final WeakReference<byte[]> weakReference = mCache.get(name);
-    if (weakReference != null) {
-      final byte[] bytes = weakReference.get();
+    final SoftReference<byte[]> softReference = mCache.get(name);
+    if (softReference != null) {
+      final byte[] bytes = softReference.get();
       if (bytes != null) {
         return bytes;
       }
@@ -104,7 +104,7 @@ public class SequencesReaderReferenceSource implements CRAMReferenceSource, Clos
       for (int i = 0; i < data.length; ++i) {
         data[i] = (byte) DnaUtils.getBase(data[i]);
       }
-      mCache.put(name, new WeakReference<>(data));
+      mCache.put(name, new SoftReference<>(data));
       return data;
     } catch (IOException ioe) {
       throw new RuntimeIOException(ioe);
