@@ -52,7 +52,6 @@ import java.util.Map;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.sam.SamRangeUtils;
-import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -103,7 +102,7 @@ public class BndEvalCli extends LoggedCli {
 
   @Override
   public String description() {
-    return "evaluate called breakends for agreement with a baseline breakend set. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called breakends not matched in the baseline), false negatives (baseline breakends not matched in the call set), and true positives (breakends that match between the baseline and calls).";
+    return "evaluate called breakends for agreement with a baseline breakend set";
   }
 
   @Override
@@ -114,7 +113,7 @@ public class BndEvalCli extends LoggedCli {
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
-    mFlags.setDescription(StringUtils.sentencify(description()));
+    mFlags.setDescription("Evaluate called breakends for agreement with a baseline breakend set. Outputs a weighted ROC file which can be viewed with rtg rocplot and VCF files containing false positives (called breakends not matched in the baseline), false negatives (baseline breakends not matched in the call set), and true positives (breakends that match between the baseline and calls).");
     CommonFlags.initOutputDirFlag(mFlags);
     mFlags.registerRequired('b', VcfEvalCli.BASELINE, File.class, FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('c', VcfEvalCli.CALLS, File.class, FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
