@@ -136,6 +136,7 @@ public final class ToolsCommand {
     MENDELIAN, VCFSTATS, VCFMERGE,                       // VCF related
     VCFFILTER, VCFANNOTATE, VCFSUBSET,
     VCFDECOMPOSE, VCFEVAL,
+    BNDEVAL,
     PEDFILTER, PEDSTATS,
     ROCPLOT,
 
