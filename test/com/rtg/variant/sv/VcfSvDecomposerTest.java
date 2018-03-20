@@ -228,4 +228,24 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
       "VCF file"
     );
   }
+
+  public void testDecWithinLength() {
+    final VcfSvDecomposer.SvDecomposer dec = new VcfSvDecomposer.SvDecomposer(20);
+    VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("GAAAAAAAAAAAAAAAAAAAA");
+    rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
+    final VcfRecord[] out = dec.decompose(rec);
+    assertEquals(2, out.length);
+    final Iterator<VcfRecord> it = Arrays.stream(out).sorted(new ReorderingVcfWriter.VcfPositionalComparator()).iterator();
+    rec = it.next();
+    assertEquals("1\t7\t.\tG\tG[<INS_1>:7[\t.\t.\tSVTYPE=BND;CIPOS=0,0\tGT\t1/1", rec.toString());
+    rec = it.next();
+    assertEquals("1\t7\t.\tG\t]<INS_1>:27]A\t.\t.\tSVTYPE=BND;CIPOS=0,0\tGT\t1/1", rec.toString());
+  }
+
+  public void testDecTooShort() {
+    final VcfSvDecomposer.SvDecomposer dec = new VcfSvDecomposer.SvDecomposer(21);
+    final VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("GAAAAAAAAAAAAAAAAAAAA");
+    rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
+    assertNull(dec.decompose(rec));
+  }
 }

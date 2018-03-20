@@ -102,7 +102,7 @@ public final class ToolsCommand {
   static final Command VCFANNOTATE = new Command(new VcfAnnotatorCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-  static final Command SVDECOMPOSER = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -138,7 +138,7 @@ public final class ToolsCommand {
     MENDELIAN, VCFSTATS, VCFMERGE,                       // VCF related
     VCFFILTER, VCFANNOTATE, VCFSUBSET,
     VCFDECOMPOSE, VCFEVAL,
-    SVDECOMPOSER, BNDEVAL,
+    SVDECOMPOSE, BNDEVAL,
     PEDFILTER, PEDSTATS,
     ROCPLOT,
 
