@@ -930,7 +930,9 @@ public final class VcfUtils {
       throw new VcfFormatException("Invalid symbolic allele: " + alt);
     }
     final String fullremote = refs.get(alt.substring(symbolStart));
-    return fulllocal.substring(0, rec.getStart()) + alt.substring(0, symbolStart) + fullremote + fulllocal.substring(rec.getStart() + rec.getRefCall().length());
+    final Integer endSymbolic = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
+    final int end = endSymbolic != null ? endSymbolic - 1 : rec.getStart() + rec.getRefCall().length();
+    return fulllocal.substring(0, rec.getStart()) + alt.substring(0, symbolStart) + fullremote + fulllocal.substring(end);
   }
 
   private static String replayBreakpoint(String localChr, int pos, String ref, BreakpointAlt alt, Map<String, String> refs) {
