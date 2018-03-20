@@ -143,6 +143,7 @@ public class RocPlot {
   private final JButton mCommandButton;
   private final JTextField mTitleEntry;
   private final JComboBox<String> mGraphType;
+  private final boolean mInterpolate;
   private JSplitPane mSplitPane;
   private final JLabel mStatusLabel;
 
@@ -194,8 +195,10 @@ public class RocPlot {
   /**
    * Creates a new swing plot.
    * @param precisionRecall true defaults to precision recall graph
+   * @param interpolate if true, enable curve interpolation
    */
-  RocPlot(boolean precisionRecall) {
+  RocPlot(boolean precisionRecall, boolean interpolate) {
+    mInterpolate = interpolate;
     mMainPanel = new JPanel();
     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
     mFileChooser = new JFileChooser();
@@ -741,7 +744,7 @@ public class RocPlot {
     if (mRocLinesPanel.plotOrder().contains(path)) {
       mProgressBar.setString("This file has already been loaded");
     } else {
-      final DataBundle data = ParseRocFile.loadStream(progress, FileUtils.createInputStream(f, false), f.getAbsolutePath());
+      final DataBundle data = ParseRocFile.loadStream(progress, FileUtils.createInputStream(f, false), f.getAbsolutePath(), mInterpolate);
       data.setTitle(f, name);
       addLine(path, data);
     }
@@ -855,14 +858,14 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom) throws InterruptedException, InvocationTargetException, IOException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate) throws InterruptedException, InvocationTargetException, IOException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot(precisionRecall) {
+    final RocPlot rp = new RocPlot(precisionRecall, interpolate) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);

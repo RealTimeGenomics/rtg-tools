@@ -49,8 +49,9 @@ public class DataBundleTest extends TestCase {
     final List<RocPoint<String>> points = new ArrayList<>();
     points.add(new RocPoint<>("5.0", 5.0f, 4.0f, 0));
     points.add(new RocPoint<>("9.0", 200.0f, 100.0f, 0));
-    final DataBundle db = new DataBundle("Monkey", points, 300);
+    final DataBundle db = new DataBundle(300, points);
     db.setGraphType(DataBundle.GraphType.ROC);
+    db.setTitle("Monkey");
     db.setScoreName("age");
     assertEquals(300, db.getTotalVariants());
     assertEquals(100.0, db.getPlot(1, 1).getHi(Graph2D.X), 1e-9);
@@ -75,7 +76,8 @@ public class DataBundleTest extends TestCase {
       final String label = i == 99 ? "None" : String.format("%.3g", (float) (100 - i));
       points.add(new RocPoint<>(label, i, i, 0));
     }
-    final DataBundle db = new DataBundle("Monkey", points, 300);
+    final DataBundle db = new DataBundle(300, points);
+    db.setTitle("Monkey");
     db.setGraphType(DataBundle.GraphType.ROC);
     db.setScoreMax(1.0f);
     final PointPlot2D scorePoints = db.getScorePoints(1, 1);

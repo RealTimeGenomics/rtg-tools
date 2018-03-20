@@ -43,13 +43,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.eval.RocPoint;
+import com.rtg.vcf.eval.RocUtils;
 
 /**
  */
 public final class ParseRocFile {
+
+  private static final float MIN_SENSITIVITY_INTERVAL = GlobalFlags.getIntegerValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATION_GAP);
+  private static final boolean LABEL_INTERPOLATED = GlobalFlags.getBooleanValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATE_LABEL);
 
   /** These headings are used when there might be an additional call space true positives column */
   private static final List<String> WITH_RAW_HEADINGS = Arrays.asList(SCORE, TRUE_POSITIVES_BASELINE, FALSE_POSITIVES);
@@ -79,10 +85,11 @@ public final class ParseRocFile {
    * @param progressBarDelegate called every 100 lines with progress, and at end with file stats
    * @param is input data. this stream is closed by this method.
    * @param shortName name for line
+   * @param interpolate true if curve should be interpolated at regular sensitivity intervals
    * @return the data bundle
    * @throws IOException if an IO error occurs
    */
-  static DataBundle loadStream(ProgressDelegate progressBarDelegate, final BufferedInputStream is, final String shortName) throws IOException {
+  static DataBundle loadStream(ProgressDelegate progressBarDelegate, final BufferedInputStream is, final String shortName, boolean interpolate) throws IOException {
     int lines = 0;
     int totalVariants = -1;
     final ArrayList<RocPoint<String>> points = new ArrayList<>();
@@ -175,7 +182,11 @@ public final class ParseRocFile {
       throw new NoTalkbackSlimException("Malformed line: " + line + " in \"" + shortName + "\"");
     }
     progressBarDelegate.addFile(lines);
-    final DataBundle dataBundle = new DataBundle(shortName, points, totalVariants);
+    final List<RocPoint<String>> finalPoints = interpolate
+      ? RocUtils.interpolate(points, (double) (totalVariants * MIN_SENSITIVITY_INTERVAL / 100), LABEL_INTERPOLATED)
+      : points;
+    final DataBundle dataBundle = new DataBundle(totalVariants, finalPoints);
+    dataBundle.setTitle(shortName);
     dataBundle.setScoreName(scoreName);
     return dataBundle;
   }

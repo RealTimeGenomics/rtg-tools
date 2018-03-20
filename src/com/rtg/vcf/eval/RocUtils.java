@@ -33,6 +33,8 @@ package com.rtg.vcf.eval;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.rtg.util.Utils;
+
 /**
  * Utilities for dealing with ROC curves
  */
@@ -64,6 +66,44 @@ public final class RocUtils {
     public T interpolate(T a, T b, double frac) {
       return null;
     }
+  }
+
+  // Displays selection criteria at interpolated points.
+  // This notation may be confusing for most users, so it isn't on by default
+  static final class DetailedThresholdInterpolator implements ThresholdInterpolator<String> {
+    private static final String TOP = "\u22a4";
+    private static final String BOTTOM = "\u22a5";
+
+    @Override
+    public String interpolate(String a, String b, double frac) {
+      if (frac <= 0) {
+        return getLabel(a, BOTTOM);
+      } else if (frac >= 1) {
+        return getLabel(b, TOP);
+      } else {
+        return "p>" + Utils.realFormat(frac, 2) + "?" + getLabel(a, BOTTOM) + ":" + getLabel(b, TOP);
+      }
+    }
+    private static String getLabel(Object o, String fixed) {
+      return o == null ? fixed : String.valueOf(o);
+    }
+  }
+
+  /**
+   * Interpolates an ROC curve to ensure that there are no true positive jumps greater than the specified increment
+   * between points. Interpolated points have no threshold value.
+   *
+   * Accuracy corresponding to this interpolated point is obtainable in practise by employing
+   * <code>point.getThreshold()</code> with probability f (and <code>lastPoint.getThreshold()</code> with probability 1 - f).
+   *
+   * @param points input ROC data points. These must be sorted by increasing true positives
+   * @param tpStep the minimum desired true positive increment between points
+   * @param labelInterpolated if true, add labels to interpolated points.
+   * @return ROC curve containing additional interpolated points where needed.
+   */
+  public static List<RocPoint<String>> interpolate(List<RocPoint<String>> points, double tpStep, boolean labelInterpolated) {
+    final ThresholdInterpolator<String> interp = labelInterpolated ? new DetailedThresholdInterpolator() : new NullThresholdInterpolator<>();
+    return interpolate(points, tpStep, interp);
   }
 
   /**
@@ -106,17 +146,15 @@ public final class RocUtils {
         assert point.getTruePositives() >= lastPoint.getTruePositives() : "ROC Points are not sorted by increasing TP";
         if (point.getTruePositives() - lastPoint.getTruePositives() > tpStep) {
           final double fStep = tpStep / (point.getTruePositives() - lastPoint.getTruePositives());
-          //System.err.println("Interpolating between\n" + lastPoint + "\nand\n" + point + "\nwith fStep: "  +fStep);
           for (double f = fStep; f < 1.0; f += fStep) {
             final double iTp = lastPoint.getTruePositives() + f * (point.getTruePositives() - lastPoint.getTruePositives());
             final double iFp = lastPoint.getFalsePositives() + f * (point.getFalsePositives() - lastPoint.getFalsePositives());
             final double iRawTp = hasRaw ? (lastPoint.getRawTruePositives() + f * (point.getRawTruePositives() - lastPoint.getRawTruePositives())) : 0;
             final RocPoint<T> interpolated = new RocPoint<>(interp.interpolate(lastPoint.getThreshold(), point.getThreshold(), f), iTp, iFp, iRawTp);
             res.add(interpolated);
-            //System.err.println("RocPoint: " + interpolated);
           }
-          lastPoint = point;
         }
+        lastPoint = point;
         res.add(point);
       }
       return res;

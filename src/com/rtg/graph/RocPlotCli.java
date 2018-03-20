@@ -69,6 +69,7 @@ public class RocPlotCli extends AbstractCli {
   private static final String SVG_FLAG = "svg";
   static final String TITLE_FLAG = "title";
   static final String SCORES_FLAG = "scores";
+  static final String INTERPOLATE_FLAG = "interpolate";
   static final String LINE_WIDTH_FLAG = "line-width";
   static final String CURVE_FLAG = "curve";
   static final String PRECISION_SENSITIVITY_FLAG = "precision-sensitivity";
@@ -136,6 +137,7 @@ public class RocPlotCli extends AbstractCli {
     CommonFlags.initForce(flags);
     flags.registerOptional('t', TITLE_FLAG, String.class, CommonFlags.STRING, "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
+    flags.registerOptional(INTERPOLATE_FLAG, "if set, interpolate curves at regular intervals").setCategory(REPORTING);
     flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the side pane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class, CommonFlags.INT, "sets the plot line width", 2).setCategory(REPORTING);
@@ -186,7 +188,7 @@ public class RocPlotCli extends AbstractCli {
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime
@@ -230,7 +232,14 @@ public class RocPlotCli extends AbstractCli {
   private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat svg) throws IOException {
     if (mFlags.isSet(flagName)) {
       final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
-      RocPlotToFile.rocFileImage(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), file, svg, mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags));
+      new RocPlotToFile()
+        .setImageFormat(svg)
+        .setShowScores(mFlags.isSet(SCORES_FLAG))
+        .setInterpolate(mFlags.isSet(INTERPOLATE_FLAG))
+        .setLineWidth((Integer) mFlags.getValue(LINE_WIDTH_FLAG))
+        .setPrecisionRecall(mFlags.isSet(PRECISION_SENSITIVITY_FLAG))
+        .setInitialZoom(initialZoom(mFlags))
+        .writeRocPlot(file, fileList, nameList, (String) mFlags.getValue(TITLE_FLAG));
     }
   }
 

@@ -48,10 +48,6 @@ import com.rtg.util.io.FileUtils;
  */
 public final class RocPlotToFile {
 
-  private RocPlotToFile() {
-
-  }
-
   /**
    * Supported image formats.
    */
@@ -62,12 +58,46 @@ public final class RocPlotToFile {
     PNG
   }
 
-  static void rocFileImage(List<File> fileList, List<String> nameList, String title, boolean scores, int lineWidth, File pngFile, ImageFormat type, boolean precisionRecall, Box2D initialZoom) throws IOException {
+  private ImageFormat mImageFormat = ImageFormat.PNG;
+  private boolean mShowScores = true;
+  private int mLineWidth = 2;
+  private boolean mPrecisionRecall = false;
+  private Box2D mInitialZoom = null;
+  private boolean mInterpolate = false;
+
+  RocPlotToFile() {
+  }
+
+  RocPlotToFile setShowScores(boolean show) {
+    mShowScores = show;
+    return this;
+  }
+  RocPlotToFile setLineWidth(int width) {
+    mLineWidth = width;
+    return this;
+  }
+  RocPlotToFile setInterpolate(boolean interpolate) {
+    mInterpolate = interpolate;
+    return this;
+  }
+  RocPlotToFile setPrecisionRecall(boolean precisionRecall) {
+    mPrecisionRecall = precisionRecall;
+    return this;
+  }
+  RocPlotToFile setImageFormat(ImageFormat format) {
+    mImageFormat = format;
+    return this;
+  }
+  RocPlotToFile setInitialZoom(Box2D initialZoom) {
+    mInitialZoom = initialZoom;
+    return this;
+  }
+  void writeRocPlot(File outFile, List<File> fileList, List<String> nameList, String title) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>(fileList.size());
     for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
-      final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath());
+      final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), mInterpolate);
       db.setTitle(f, name);
       data.put(db.getTitle(), db);
     }
@@ -79,20 +109,20 @@ public final class RocPlotToFile {
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
     final RocPlot.ExternalZoomGraph2D graph;
-    if (precisionRecall) {
-      graph = new RocPlot.PrecisionRecallGraph2D(paths, lineWidth, scores, data, title != null ? title : "Precision/Recall");
+    if (mPrecisionRecall) {
+      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, title != null ? title : "Precision/Recall");
     } else {
-      graph = new RocPlot.RocGraph2D(paths, lineWidth, scores, data, title != null ? title : "ROC");
+      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, title != null ? title : "ROC");
     }
-    if (initialZoom != null) {
-      graph.setZoom(initialZoom);
+    if (mInitialZoom != null) {
+      graph.setZoom(mInitialZoom);
     }
-    if (type == SVG) {
-      try (final FileOutputStream os = new FileOutputStream(pngFile)) {
+    if (mImageFormat == SVG) {
+      try (final FileOutputStream os = new FileOutputStream(outFile)) {
         iw.toSVG(os, graph, 800, 600, null);
       }
     } else {
-      iw.toPNG(pngFile, graph, 800, 600, null);
+      iw.toPNG(outFile, graph, 800, 600, null);
     }
   }
 }

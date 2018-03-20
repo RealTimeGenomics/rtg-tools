@@ -39,14 +39,10 @@ import com.reeltwo.plot.Point2D;
 import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.TextPlot2D;
 import com.reeltwo.plot.TextPoint2D;
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Pair;
-import com.rtg.util.Utils;
 import com.rtg.vcf.eval.RocFilter;
 import com.rtg.vcf.eval.RocPoint;
-import com.rtg.vcf.eval.RocUtils;
 
 /**
  * Holds a set of graph data for plotting.
@@ -57,10 +53,6 @@ final class DataBundle {
 
   private static final int TOTAL_LABELS = 10;
 
-  private static final float MIN_SENSITIVITY_INTERVAL = GlobalFlags.getIntegerValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATION_GAP);
-  private static final boolean ESTIMATION = GlobalFlags.getBooleanValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATE);
-  private static final boolean LABEL_INTERPOLATED = GlobalFlags.getBooleanValue(ToolsGlobalFlags.ROCPLOT_INTERPOLATE_LABEL);
-
   private final Point2D[] mRocPoints;
   private final String[] mRocScores;
 
@@ -70,7 +62,7 @@ final class DataBundle {
   private final int mTotalVariants;
   private final float mMinPrecision;
 
-  private String mTitle;
+  private String mTitle = "";
   private String mScoreName;
   private boolean mShow;
 
@@ -81,25 +73,15 @@ final class DataBundle {
   private TextPoint2D[] mRangedLabels = null;
   private TextPoint2D mMaxRangedPoint = null;
 
-  DataBundle(String title, List<RocPoint<String>> points, int totalVariants) {
-    mTitle = title;
+  DataBundle(int totalVariants, List<RocPoint<String>> points) {
     mTotalVariants = totalVariants;
     mShow = true;
 
-    final List<RocPoint<String>> interpolated;
-    final RocUtils.ThresholdInterpolator<String> iLabels = LABEL_INTERPOLATED ? new DetailedThresholdInterpolator() : new RocUtils.NullThresholdInterpolator<>();
-    if (ESTIMATION) {
-      final double tpStep = totalVariants * MIN_SENSITIVITY_INTERVAL / 100;
-      //System.err.println("Interpolation step size for sens " + MIN_SENSITIVITY_INTERVAL + "% is: " + Utils.realFormat(tpStep, 2) + " TP");
-      interpolated = RocUtils.interpolate(points, tpStep, iLabels);
-    } else {
-      interpolated = points;
-    }
-    mRocPoints = interpolated.stream()
+    mRocPoints = points.stream()
       .map(point -> new Point2D((float) point.getFalsePositives(), (float) point.getTruePositives()))
       .toArray(Point2D[]::new);
-    mRocScores = interpolated.stream().map(RocPoint::getThreshold).toArray(String[]::new);
-    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(interpolated, totalVariants);
+    mRocScores = points.stream().map(RocPoint::getThreshold).toArray(String[]::new);
+    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(points, totalVariants);
     mPrecisionRecallPoints = pr.getA().toArray(new Point2D[0]);
     mPrecisionRecallScores = pr.getB().toArray(new String[0]);
     mMinPrecision = findMinPrecision();
@@ -115,27 +97,6 @@ final class DataBundle {
     return minPrecision;
   }
 
-
-  // Displays selection criteria at interpolated points.
-  // This may be confusing for most users
-  static final class DetailedThresholdInterpolator implements RocUtils.ThresholdInterpolator<String> {
-    private static final String TOP = "\u22a4";
-    private static final String BOTTOM = "\u22a5";
-
-    @Override
-    public String interpolate(String a, String b, double frac) {
-      if (frac <= 0) {
-        return getLabel(a, BOTTOM);
-      } else if (frac >= 1) {
-        return getLabel(b, TOP);
-      } else {
-        return "p>" + Utils.realFormat(frac, 2) + "?" + getLabel(a, BOTTOM) + ":" + getLabel(b, TOP);
-      }
-    }
-    private static String getLabel(Object o, String fixed) {
-      return o == null ? fixed : String.valueOf(o);
-    }
-  }
 
   private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants) {
     final List<Point2D> res = new ArrayList<>();
