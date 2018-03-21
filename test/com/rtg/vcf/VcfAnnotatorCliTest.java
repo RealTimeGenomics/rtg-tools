@@ -61,7 +61,6 @@ public class VcfAnnotatorCliTest extends AbstractCliTest {
       , "--vcf-ids=FILE"
       , "--fill-an-ac", "add or update the AN and AC INFO fields"
       , "-Z,", "--no-gzip", "do not gzip the output"
-      , "--no-index", "do not produce indexes for output files"
       , "-A", "--annotation=STRING", "add computed annotation to VCF records"
     );
     checkExtendedHelp("rtg vcfannotate"

@@ -98,7 +98,7 @@ public final class CommonFlags {
   /** list of input files */
   public static final String INPUT_LIST_FLAG = "input-list-file";
   /** flag for suppressing TABIX and BAM index creation */
-  public static final String NO_INDEX = "no-index";
+  public static final String NO_INDEX = "Xno-index";
   /** Do not write a header on the respective output files */
   public static final String NO_HEADER = "no-header";
   /** Flag name for restricting operation to within a single region. */

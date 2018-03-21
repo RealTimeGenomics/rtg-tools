@@ -62,7 +62,6 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
       , "-t", "--template=SDF"
       , "--no-gzip"
       , "--no-header"
-      , "--no-index"
     );
   }
 

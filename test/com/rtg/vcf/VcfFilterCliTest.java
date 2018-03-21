@@ -93,7 +93,6 @@ public class VcfFilterCliTest extends AbstractCliTest {
       , "--snps-only", "keep where sample variant is a simple SNP"
       , "--non-snps-only", "keep where sample variant is MNP or INDEL"
       , "-Z,", "--no-gzip", "do not gzip the output"
-      , "--no-index", "do not produce indexes for output files"
       , "--all-samples", "apply sample-specific criteria"
       , "--bed-regions", "only read VCF records that overlap"
       , "--region", "within the specified range"
