@@ -124,7 +124,7 @@ public class BndEvalCli extends LoggedCli {
     mFlags.registerOptional(TOLERANCE, Integer.class, INT, "positional tolerance for breakend matching", 100).setCategory(FILTERING);
     mFlags.registerOptional(BIDIRECTIONAL, "if set, allow matches between flipped breakends").setCategory(FILTERING);
 
-    mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", "INFO.DP").setCategory(REPORTING);
+    mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", "INFO.DP").setCategory(REPORTING);
     mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{MODE_SPLIT, MODE_ANNOTATE});
