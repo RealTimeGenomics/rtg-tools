@@ -30,6 +30,8 @@
 
 package com.rtg.variant.sv;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,6 +39,7 @@ import java.util.Map;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.ReorderingVcfWriter;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -224,7 +227,9 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
   public void testHelp() {
     checkHelp("rtg svdecompose",
       "Split composite structural variants into a breakend representation",
-      "minimum length for converting precise insertions and deletions to breakend",
+      "--min-indel-length=INT", "minimum length for converting precise insertions and deletions to breakend",
+      "-Z", "do not gzip the output",
+      "--no-header", "prevent VCF header from being written",
       "VCF file"
     );
   }
@@ -247,5 +252,17 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     final VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("GAAAAAAAAAAAAAAAAAAAA");
     rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
     assertNull(dec.decompose(rec));
+  }
+
+  public void testIllegalArgs() throws IOException {
+    checkHandleFlagsErr("-i", "input", "-o", "output");
+    final File testDir = FileHelper.createTempDirectory();
+    try {
+      final File input = new File(testDir, "input.vcf");
+      assertTrue(input.createNewFile());
+      checkHandleFlagsErr("-i", input.getPath(), "-o", "x", "--min-indel-length", "0");
+    } finally {
+      assertTrue(FileHelper.deleteAll(testDir));
+    }
   }
 }
