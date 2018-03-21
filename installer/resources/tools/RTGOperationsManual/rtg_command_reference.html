@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.8</title>
+    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.9</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.8',
+        VERSION:     '3.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -48,7 +48,7 @@
         <li class="right" >
           <a href="overview.html" title="Overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -94,7 +94,10 @@
 <li><a class="reference internal" href="#vcffilter">vcffilter</a></li>
 <li><a class="reference internal" href="#vcfannotate">vcfannotate</a></li>
 <li><a class="reference internal" href="#vcfsubset">vcfsubset</a></li>
+<li><a class="reference internal" href="#vcfdecompose">vcfdecompose</a></li>
 <li><a class="reference internal" href="#vcfeval">vcfeval</a></li>
+<li><a class="reference internal" href="#svdecompose">svdecompose</a></li>
+<li><a class="reference internal" href="#bndeval">bndeval</a></li>
 <li><a class="reference internal" href="#pedfilter">pedfilter</a></li>
 <li><a class="reference internal" href="#pedstats">pedstats</a></li>
 <li><a class="reference internal" href="#rocplot">rocplot</a></li>
@@ -196,8 +199,27 @@ types, as shown in the following:</p>
 <tr class="row-even"><td>STRING</td>
 <td>A sequence of characters for comments, filenames, or labels</td>
 </tr>
+<tr class="row-odd"><td>REGION</td>
+<td>A genomic region specification (see below)</td>
+</tr>
 </tbody>
 </table>
+<p>Genomic region parameters take one of the following forms:</p>
+<ul class="simple">
+<li>sequence_name (e.g.: <code class="docutils literal"><span class="pre">chr21</span></code>) corresponds to the entirety of the
+named sequence.</li>
+<li>sequence_name:start (e.g.: <code class="docutils literal"><span class="pre">chr21:100000</span></code>) corresponds to a single
+position on the named sequence.</li>
+<li>sequence_name:start-end (e.g.: <code class="docutils literal"><span class="pre">chr21:100000-110000</span></code>) corresponds to a
+range that extends from the specified start position to the specified
+end position (inclusive). The positions are 1-based.</li>
+<li>sequence_name:position+length (e.g.: <code class="docutils literal"><span class="pre">chr21:100000+10000</span></code>) corresponds
+to a range that extends from the specified start position that
+includes the specified number of nucleotides.</li>
+<li>sequence_name:position~padding (e.g.: <code class="docutils literal"><span class="pre">chr21:100000~10000</span></code>)
+corresponds to a range that spans the specified position by the
+specified amount of padding on either side.</li>
+</ul>
 <p>To display all parameters and syntax associated with an RTG command,
 enter the command and type <code class="docutils literal"><span class="pre">--help</span></code>. For example: all parameters
 available for the RTG <code class="docutils literal"><span class="pre">format</span></code> command are displayed when <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">format</span>
@@ -1887,7 +1909,7 @@ sequence will have a lower depth of coverage than a short sequence.</p>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal"><span class="pre">popsim</span></code> command to generate a VCF containing simulated
 population variants. Each variant allele generated has an associated
-frequency INFO field describing how frequent in the population that
+frequency <code class="docutils literal"><span class="pre">INFO</span></code> field describing how frequent in the population that
 allele is.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg popsim [OPTION]... -o FILE -t SDF
@@ -2441,7 +2463,7 @@ data file.</p>
 </pre></div>
 </div>
 <p><strong>Example:</strong></p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg extract alignments.bam &#39;chr1:10000+10&#39;
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg extract alignments.bam &#39;chr1:2500000~1000&#39;
 </pre></div>
 </div>
 <p><strong>Parameters:</strong></p>
@@ -2464,9 +2486,9 @@ data file.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="2%" />
-<col width="8%" />
-<col width="90%" />
+<col width="4%" />
+<col width="10%" />
+<col width="86%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
@@ -2474,8 +2496,9 @@ data file.</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
-<td>Specifies the region to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length. May be specified 0 or more times.</td>
+<td><code class="docutils literal"><span class="pre">REGION+</span></code></td>
+<td>The range to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or &lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;.
+May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
@@ -2588,9 +2611,9 @@ with output as ASCII to the terminal, or HTML.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="5%" />
-<col width="18%" />
-<col width="77%" />
+<col width="4%" />
+<col width="16%" />
+<col width="80%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
@@ -2602,8 +2625,9 @@ with output as ASCII to the terminal, or HTML.</p>
 <td>Padding around region of interest (Default is to automatically determine padding to avoid read truncation)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
-<td>The region of interest to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length.</td>
+<td><code class="docutils literal"><span class="pre">--region=REGION</span></code></td>
+<td>The region of interest to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or
+&lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
@@ -2663,20 +2687,28 @@ with output as ASCII to the terminal, or HTML.</p>
 <td>Print reference line every N lines (Default is 0)</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--print-sample</span></code></td>
+<td>Print sample id for each alignment.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--print-soft-clipped-bases</span></code></td>
 <td>Print soft clipped bases.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--project-track=INT</span></code></td>
 <td>If set, project highlighting for the specified track down through reads (Default projects the union of tracks)</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sort-readgroup</span></code></td>
 <td>Sort reads first on read group and then on start position.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sort-reads</span></code></td>
 <td>Sort reads on start position.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sort-sample</span></code></td>
+<td>Sort reads first on sample id and then on start position.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--unflatten</span></code></td>
@@ -2974,9 +3006,9 @@ zero and are the same as the ids that <code class="docutils literal"><span class
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="5%" />
-<col width="10%" />
-<col width="85%" />
+<col width="4%" />
+<col width="13%" />
+<col width="83%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
@@ -2985,11 +3017,12 @@ zero and are the same as the ids that <code class="docutils literal"><span class
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code></td>
 <td><code class="docutils literal"><span class="pre">--sequence-id</span></code></td>
-<td>Set to use sequence id instead of sequence name in region flag (0-based).</td>
+<td>If set, use sequence id instead of sequence name in region (0-based)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">STRING+</span></code></td>
-<td>Specifies the region to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length. Must be specified 1 or more times</td>
+<td><code class="docutils literal"><span class="pre">REGION+</span></code></td>
+<td>The range to display. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or &lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;.
+Must be specified 1 or more times.</td>
 </tr>
 </tbody>
 </table>
@@ -3054,8 +3087,8 @@ concordance.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="6%" />
-<col width="23%" />
-<col width="72%" />
+<col width="25%" />
+<col width="69%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -3064,11 +3097,11 @@ concordance.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
 <td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>VCF file containing multi-sample variant calls or &#8216;-&#8216; to read from standard input.</td>
+<td>VCF file containing multi-sample variant calls. Use &#8216;-&#8216; to read from standard input.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>If set, output annotated calls to this VCF file.</td>
+<td>If set, output annotated calls to this VCF file. Use &#8216;-&#8216; to write to standard output.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--output-consistent=FILE</span></code></td>
@@ -3132,10 +3165,6 @@ concordance.</p>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
 <td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Do not produce indexes for output files.</td>
-</tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
@@ -3159,19 +3188,33 @@ sample is supplied as part of the pedigree information. While it is best
 to give the reference SDF used in the creation of the VCF, for checking
 third-party outputs any reference SDF containing the same chromosome
 names and an appropriate <code class="docutils literal"><span class="pre">reference.txt</span></code> file will work. For more
-information, see <a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>.</p>
+information, see <a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>. Variants calls where
+the call ploidy does not match what is expected are annotated in the
+output VCF with an <code class="docutils literal"><span class="pre">MCP</span></code> FORMAT annotation.</p>
 <p>Particularly when evaluating VCF files that have been produced by third
 party tools or when the VCF is the result of combining independent
-per-sample calling, you can end up with situations where calls are not
-available for every member of the family. Under normal circumstances
-these will be reported as an allele count constraint violation. It is
-possible to treat missing values as equal to the reference by using the
-<code class="docutils literal"><span class="pre">--lenient</span></code> parameter. Note that while this approach will be correct in
-most cases, it will give inaccurate results where the calling between
-different samples has reported the variant in an equivalent but slightly
-different position or representation (e.g. positioning of indels within
-homopolymer regions, differences of representation such as splitting
-MNPs into multiple SNPs etc).</p>
+per-sample calling, it is common to end up with situations where calls
+are not available for every member of the family. Under normal
+circumstances <code class="docutils literal"><span class="pre">mendelian</span></code> will attempt to determine Mendelian
+consistency on the basis of the values that have been provided. Records
+where the presence of missing values makes the Mendelian consistency
+undecidable contain <code class="docutils literal"><span class="pre">MCU</span></code> INFO annotations in the annotated output
+VCF. The following examples illustrate some consistent, undecidable, and
+inconsistent calls in the presence of missing values:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>CHROM  FATHER_GT  MOTHER_GT  SON_GT  STATUS
+chrX   .          0/1        1       OK
+chr1   ./.        1/1        1/2     MCU
+chr1   ./.        1/1        2/2     MCV
+</pre></div>
+</div>
+<p>Since the number of calls where one sample is missing can be quite high,
+an alternative option is to treat missing values as equal to the
+reference by using the <code class="docutils literal"><span class="pre">--lenient</span></code> parameter. Note that while this
+approach will be correct in most cases, it will give inaccurate results
+where the calling between different samples has reported the variant in
+an equivalent but slightly different position or representation
+(e.g. positioning of indels within homopolymer regions, differences of
+representation such as splitting MNPs into multiple SNPs etc).</p>
 <p>The <code class="docutils literal"><span class="pre">mendelian</span></code> command computes overall concordance between related
 samples to assist detecting cases where pedigree has been incorrectly
 recorded or samples have been mislabelled. For each child in the
@@ -3182,7 +3225,7 @@ parent may indicate that the parent is the source of the problem,
 whereas low pairwise concordance with both parents may indicate that the
 child is the source of the problem. A stricter three-way concordance is
 also recorded.</p>
-<p>By default, only VCF records with the FILTER field set to PASS or
+<p>By default, only VCF records with the <code class="docutils literal"><span class="pre">FILTER</span></code> field set to PASS or
 missing are processed. All variant records can be examined by specifying
 the <code class="docutils literal"><span class="pre">--all-records</span></code> parameter.</p>
 <div class="admonition seealso">
@@ -3291,6 +3334,43 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 <p>Use the <code class="docutils literal"><span class="pre">vcfstats</span></code> command to display summary statistics for a set of
 VCF files. If a VCF file contains multiple sample columns, the
 statistics for each sample are shown individually.</p>
+<p>When determining the categorization of a REF to ALT transformation, some
+normalization is carried out to ignore same as reference bases at the
+start and end of the alleles. Thus the following REF to ALT
+transformations are categorized as <code class="docutils literal"><span class="pre">SNPs</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>A    -&gt; G      (simple case)
+ATGC -&gt; ATGG   (leading bases match)
+ATGC -&gt; ACGC   (leading and trailing bases match)
+</pre></div>
+</div>
+<p>Cases where multiple bases change, but the lengths of the two alleles do
+not are considered to be <code class="docutils literal"><span class="pre">MNPs</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>ATGC -&gt; TTGG   (two bases change)
+ATGC -&gt; GTCT   (three bases change)
+</pre></div>
+</div>
+<p>Cases where there is pure addition or removal of bases are classified as
+<code class="docutils literal"><span class="pre">Insertions</span></code> or <code class="docutils literal"><span class="pre">Deletions</span></code> respectively:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>A     -&gt; AT      (one base insertion)
+ATT   -&gt; ATTTT   (two base insertion)
+AT    -&gt; A       (one base deletion)
+ATTTT -&gt; ATT     (two base deletion)
+</pre></div>
+</div>
+<p>The remaining case is there there is a length change between the REF and
+ALT, but it is not pure. These are called <code class="docutils literal"><span class="pre">Indels</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>ATT   -&gt; CTTT    (one base changed, one base inserted)
+CTTT  -&gt; ATT     (one base changed, one base deleted)
+</pre></div>
+</div>
+<p>In the per-sample summary output of <code class="docutils literal"><span class="pre">vcfstats</span></code>, each genotype is
+classified as a whole into one of the above categories, preferring the
+more complex of the transformations when ploidy is greater than one.</p>
+<p>When computing the per-sample variant length histograms, note that the
+histograms are incremented for each called allele (thus a diploid
+homozygous call will increment the appropriate cell by two), and the
+length of an indel is taken as the change in length rather than the
+overall length.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
@@ -3320,17 +3400,17 @@ multiple samples to form a multi-sample VCF file.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="7%" />
-<col width="22%" />
-<col width="71%" />
+<col width="25%" />
+<col width="68%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-a</span></code></td>
-<td><code class="docutils literal"><span class="pre">--add-header=STRING</span></code></td>
-<td>Add the supplied text to the output VCF header. May be specified 0 or more times.</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-I</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input-list-file=FILE</span></code></td>
+<td>File containing a list of VCF format files (1 per line) to be merged.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
@@ -3338,40 +3418,40 @@ multiple samples to form a multi-sample VCF file.</p>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">FILE+</span></code></td>
-<td>Input VCF files to merge. Must be specified 1 or more times.</td>
+<td>Input VCF files to merge. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="4%" />
-<col width="13%" />
-<col width="83%" />
+<col width="15%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-a</span></code></td>
+<td><code class="docutils literal"><span class="pre">--add-header=STRING|FILE</span></code></td>
+<td>File containing VCF header lines to add, or a literal header line. May be specified 0 or more times.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--force-merge=STRING</span></code></td>
 <td>Allow merging of specified header ID even when descriptions do not match. May be specified 0 or more times.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-F</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-F</span></code></td>
 <td><code class="docutils literal"><span class="pre">--force-merge-all</span></code></td>
 <td>Attempt merging of all non-matching header declarations.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Print help on command-line flag usage.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
 <td>Do not gzip the output.</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Do not produce indexes for output files.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--preserve-formats</span></code></td>
@@ -3405,9 +3485,15 @@ kept.</p>
 reference is the same, the records will be merged into a single record.
 If the merge results in a change in the set of ALT alleles, any VCF
 <code class="docutils literal"><span class="pre">FORMAT</span></code> fields declared to be of type <code class="docutils literal"><span class="pre">A</span></code>, <code class="docutils literal"><span class="pre">G</span></code>, or <code class="docutils literal"><span class="pre">R</span></code> will be
-set to the missing value (<code class="docutils literal"><span class="pre">.</span></code>), as they cannot be meaningfully updated.
-The <code class="docutils literal"><span class="pre">--preserve-formats</span></code> flag prevents this loss of information by
-refusing to merge the records (separate records will be output).</p>
+set to the missing value (<code class="docutils literal"><span class="pre">.</span></code>), as they cannot be meaningfully
+updated. Similarly, if multiple input records with the same position and
+length on the reference contain information for the same sample, only
+that information from the first record will be retained.  The
+<code class="docutils literal"><span class="pre">--preserve-formats</span></code> flag prevents this loss of information by
+refusing to merge the records when these conditions occur (separate
+records will be output).</p>
+<p>The <code class="docutils literal"><span class="pre">--add-header</span></code> option allows inserting arbitrary VCF header lines
+into the output VCF. For more information, see <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
@@ -3415,6 +3501,7 @@ refusing to merge the records (separate records will be output).</p>
 <a class="reference internal" href="#population"><span class="std std-ref">population</span></a>,
 <a class="reference internal" href="#somatic"><span class="std std-ref">somatic</span></a>,
 <a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
+<a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a>,
 <a class="reference internal" href="#index"><span class="std std-ref">index</span></a></p>
@@ -3424,21 +3511,26 @@ refusing to merge the records (separate records will be output).</p>
 <h3>vcffilter<a class="headerlink" href="#vcffilter" title="Permalink to this headline">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be
-filtered.</p>
+filtered. By default filtered records are removed, but see the &#8211;fail, &#8211;clear-failed-samples, and &#8211;fail-samples options for alternatives.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter [OPTION]... -i FILE -o FILE
 </pre></div>
 </div>
-<p><strong>Example:</strong></p>
+<p><strong>Examples:</strong></p>
+<p>Keep only records where the sample has depth of coverage at least 5:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i snps.vcf.gz -o snps_cov5.vcf.gz -d 5
+</pre></div>
+</div>
+<p>Keep only biallelic records:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i snps.vcf.gz -o snps_biallelic.vcf.gz --max-alleles 2
 </pre></div>
 </div>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="4%" />
-<col width="18%" />
-<col width="78%" />
+<col width="17%" />
+<col width="79%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -3462,8 +3554,9 @@ filtered.</p>
 <td>Output VCF file. Use &#8216;-&#8216; to write to standard output. This option is required, unless <code class="docutils literal"><span class="pre">--javascript</span></code> is being used.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
-<td>If set, only read VCF records within the specified range. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:start-end or &lt;sequence_name&gt;:start+length.</td>
+<td><code class="docutils literal"><span class="pre">--region=REGION</span></code></td>
+<td>If set, only read VCF records within the specified range. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or
+&lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
@@ -3473,9 +3566,9 @@ filtered.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
-<col width="28%" />
-<col width="64%" />
+<col width="4%" />
+<col width="18%" />
+<col width="78%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering (Record based)</th>
@@ -3484,90 +3577,85 @@ filtered.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-w</span></code></td>
 <td><code class="docutils literal"><span class="pre">--density-window=INT</span></code></td>
-<td>Set a window length in which multiple called variants are discarded.</td>
+<td>Window within which multiple variants are discarded.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--exclude-bed=FILE</span></code></td>
-<td>Set to discard all variants within the regions contained in the BED file.</td>
+<td>Discard all variants within the regions in this BED file.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--exclude-vcf=FILE</span></code></td>
-<td>Set to discard all variants that overlap with the ones in this VCF file.</td>
+<td>Discard all variants that overlap with the ones in this file.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--include-bed=FILE</span></code></td>
-<td>Set to only keep variants within the regions contained in the BED file.</td>
+<td>Only keep variants within the regions in this BED file.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--include-vcf=FILE</span></code></td>
-<td>Set to only keep variants that overlap with the ones in this VCF file.</td>
+<td>Only keep variants that overlap with the ones in this file.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-j</span></code></td>
 <td><code class="docutils literal"><span class="pre">--javascript=STRING</span></code></td>
-<td>Specify filtering functions in javascript. May be either an expression
-or a file name. May be specified 0 or more times.
+<td>Javascript filtering functions for determining whether to keep record. May be either an expression or a file name. May be specified 0 or more times.
 <a class="reference internal" href="#javascript-examples"><span class="std std-ref">See Examples</span></a></td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-e</span></code></td>
 <td><code class="docutils literal"><span class="pre">--keep-expr=STRING</span></code></td>
-<td>Set to only keep variants for which this expression evaluates to true.
-<a class="reference internal" href="#expression-examples"><span class="std std-ref">See Examples</span></a></td>
+<td>Records for which this expression evaluates to true will be retained.
+<a class="reference internal" href="#javascript-examples"><span class="std std-ref">See Examples</span></a></td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-k</span></code></td>
 <td><code class="docutils literal"><span class="pre">--keep-filter=STRING</span></code></td>
-<td>Set to only keep variants with this FILTER tag. May be specified 0 or more times,
-or as a comma separated list.</td>
+<td>Only keep variants with this FILTER tag. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-K</span></code></td>
 <td><code class="docutils literal"><span class="pre">--keep-info=STRING</span></code></td>
-<td>Set to only keep variants with this INFO tag. May be specified 0 or more times,
-or as a comma separated list.</td>
+<td>Only keep variants with this INFO tag. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-C</span></code></td>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--max-alleles=INT</span></code></td>
+<td>Maximum number of alleles (REF included)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-C</span></code></td>
 <td><code class="docutils literal"><span class="pre">--max-combined-read-depth=INT</span></code></td>
-<td>Set the maximum allowed combined read depth.</td>
+<td>Maximum allowed combined read depth.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Q</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Q</span></code></td>
 <td><code class="docutils literal"><span class="pre">--max-quality=FLOAT</span></code></td>
-<td>Set the maximum allowed quality.</td>
+<td>Maximum allowed quality.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--min-alleles=INT</span></code></td>
+<td>Minimum number of alleles (REF included)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
 <td><code class="docutils literal"><span class="pre">--min-combined-read-depth=INT</span></code></td>
-<td>Set the minimum allowed combined read depth.</td>
+<td>Minimum allowed combined read depth.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code></td>
 <td><code class="docutils literal"><span class="pre">--min-quality=FLOAT</span></code></td>
-<td>Set the minimum allowed quality.</td>
+<td>Minimum allowed quality.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--non-snps-only</span></code></td>
-<td>Set to output MNPs and INDELs only.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
 <td><code class="docutils literal"><span class="pre">--remove-filter=STRING</span></code></td>
-<td>Set to remove variants with this FILTER tag. May be specified 0 or more times,
-or as a comma separated list.</td>
+<td>Remove variants with this FILTER tag. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-R</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-R</span></code></td>
 <td><code class="docutils literal"><span class="pre">--remove-info=STRING</span></code></td>
-<td>Set to remove variants with this INFO tag. May be specified 0 or more times,
-or as a comma separated list.</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--remove-overlapping</span></code></td>
-<td>Set to remove records that overlap with previous records.</td>
+<td>Remove variants with this INFO tag. May be specified 0 or more times, or as a comma separated list.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--snps-only</span></code></td>
-<td>Set to output simple SNPs only.</td>
+<td><code class="docutils literal"><span class="pre">--remove-overlapping</span></code></td>
+<td>Remove records that overlap with previous records.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="8%" />
+<col width="6%" />
 <col width="28%" />
-<col width="64%" />
+<col width="66%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering (Sample based)</th>
@@ -3576,51 +3664,59 @@ or as a comma separated list.</td>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-A</span></code></td>
 <td><code class="docutils literal"><span class="pre">--max-ambiguity-ratio=FLOAT</span></code></td>
-<td>Set the maximum allowed ambiguity ratio.</td>
+<td>Maximum allowed ambiguity ratio.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--max-avr-score=FLOAT</span></code></td>
-<td>Set the maximum allowed AVR score.</td>
+<td>Maximum allowed AVR score.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--max-denovo-score=FLOAT</span></code></td>
-<td>Set the maximum allowed de novo score.</td>
+<td>Maximum de novo score threshold.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-G</span></code></td>
 <td><code class="docutils literal"><span class="pre">--max-genotype-quality=FLOAT</span></code></td>
-<td>Set the maximum allowed genotype quality.</td>
+<td>Maximum allowed genotype quality.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-D</span></code></td>
 <td><code class="docutils literal"><span class="pre">--max-read-depth=INT</span></code></td>
-<td>Set the maximum allowed sample read depth.</td>
+<td>Maximum allowed sample read depth.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--min-avr-score=FLOAT</span></code></td>
-<td>Set the minimum allowed AVR score.</td>
+<td>Minimum allowed AVR score.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--min-denovo-score=FLOAT</span></code></td>
-<td>Set the minimum allowed de novo score.</td>
+<td>Minimum de novo score threshold.</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-g</span></code></td>
 <td><code class="docutils literal"><span class="pre">--min-genotype-quality=FLOAT</span></code></td>
-<td>Set the minimum allowed genotype quality.</td>
+<td>Minimum allowed genotype quality.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-d</span></code></td>
 <td><code class="docutils literal"><span class="pre">--min-read-depth=INT</span></code></td>
-<td>Set the minimum allowed sample read depth.</td>
+<td>Minimum allowed sample read depth.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--remove-all-same-as-ref</span></code></td>
-<td>Set to remove records where all the samples are same as the reference.</td>
+<td><code class="docutils literal"><span class="pre">--non-snps-only</span></code></td>
+<td>Only keep where sample variant is MNP or INDEL.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-all-same-as-ref</span></code></td>
+<td>Remove where all samples are same as reference.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-hom</span></code></td>
 <td>Remove where sample is homozygous.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--remove-same-as-ref</span></code></td>
-<td>Set to remove variants where the sample is the same as reference.</td>
+<td>Remove where sample is same as reference.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--snps-only</span></code></td>
+<td>Only keep where sample variant is a simple SNP.</td>
 </tr>
 </tbody>
 </table>
@@ -3637,54 +3733,62 @@ or as a comma separated list.</td>
 <tbody valign="top">
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--clear-failed-samples</span></code></td>
-<td>Instead of removing failed records set the sample GT fields to missing.</td>
+<td>Retain failed records, set the sample GT field to missing.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--fail=STRING</span></code></td>
-<td>Instead of removing failed records set their filter field to the provided value.</td>
+<td>Retain failed records, add the provided label to the FILTER field.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-F</span></code></td>
+<td><code class="docutils literal"><span class="pre">--fail-samples=STRING</span></code></td>
+<td>Retain failed records, add the provided label to the sample FT field.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
 <col width="6%" />
-<col width="28%" />
-<col width="66%" />
+<col width="24%" />
+<col width="70%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-a</span></code></td>
+<td><code class="docutils literal"><span class="pre">--add-header=STRING|FILE</span></code></td>
+<td>File containing VCF header lines to add, or a literal header line. May be specified 0 or more times.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Print help on command-line flag usage.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
 <td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
 <td>Prevent VCF header from being written.</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
 <p>Use <code class="docutils literal"><span class="pre">vcffilter</span></code> to get a subset of the results from variant calling
-based on the filtering criteria supplied by the filter flags. When
-filtering on multiple samples, if any of the specified samples fail the
-criteria, the record will be filtered. The default behavior is for
+based on the filtering criteria supplied by the filter flags. Multiple
+criteria can be specified at once, and advanced processing can be
+specified via JavaScript scripting.</p>
+<p>When filtering on multiple samples, if any of the specified samples fail
+the criteria, the record will be filtered. The default behavior is for
 filtered records to be excluded from output altogether, but
 alternatively the records can be retained but with an additional
-user-specified VCF FILTER status set via <code class="docutils literal"><span class="pre">--fail</span></code> option, or if
+user-specified VCF <code class="docutils literal"><span class="pre">FILTER</span></code> status set via <code class="docutils literal"><span class="pre">--fail</span></code> option, or if
 sample-specific filtering criteria is being applied, only those samples
-can be filtered by setting their GT field to missing by using the
-<code class="docutils literal"><span class="pre">--clear-failed-samples</span></code> option.</p>
+can be filtered either by setting their <code class="docutils literal"><span class="pre">GT</span></code> field to missing by using
+the <code class="docutils literal"><span class="pre">--clear-failed-samples</span></code> option, or by setting the <code class="docutils literal"><span class="pre">FORMAT</span></code>
+<code class="docutils literal"><span class="pre">FT</span></code> field with a user-specified status via the <code class="docutils literal"><span class="pre">--fail-samples</span></code>
+option.</p>
 <p>The <code class="docutils literal"><span class="pre">--bed-regions</span></code> option makes use of tabix indexes to avoid loading
 VCF records outside the supplied regions, which can give faster
 filtering performance. If the input VCF is not indexed or being read
@@ -3696,6 +3800,8 @@ flagged as a <em>de novo</em> variant and the score is within the range
 specified by the flags. It will also only be kept if none of the other
 samples for the record are also flagged as a <em>de novo</em> variant within
 the specified score range.</p>
+<p>The <code class="docutils literal"><span class="pre">--add-header</span></code> option allows inserting arbitrary VCF header lines
+into the output VCF. For more information, see <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a>.</p>
 <p>A powerful general-purpose filtering capability has been included that
 permits the specification of filter criteria as simple JavaScript
 expressions (<code class="docutils literal"><span class="pre">--keep-expr</span></code>) or more comprehensive JavaScript processing
@@ -3729,8 +3835,8 @@ numerical strings when comparing a string with a number, so calls to <code class
 <p>If the field of interest may contain the missing value (&#8216;.&#8217;) or may be
 entirely missing on a per-record basis, the <code class="docutils literal"><span class="pre">has()</span></code> function can be
 used to control whether such records are kept vs filtered. For example,
-to keep records with depth greater than 20, and remove any without a DP
-annotation:</p>
+to keep records with depth greater than 20, and remove any without a
+<code class="docutils literal"><span class="pre">DP</span></code> annotation:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
 --keep-expr &quot;has(INFO.DP) &amp;&amp; INFO.DP &gt; 20&quot;
 </pre></div>
@@ -3746,6 +3852,26 @@ standard JavaScript array methods <code class="docutils literal"><span class="pr
 apply a condition on every sample column.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
   --keep-expr &quot;SAMPLES.every(function(s) {return s.DP &gt; 10})&quot;
+</pre></div>
+</div>
+<p>Similarly, the following example retains records where the <code class="docutils literal"><span class="pre">FILTER</span></code>
+field is unset, or if set must be either <code class="docutils literal"><span class="pre">PASS</span></code> or <code class="docutils literal"><span class="pre">MED_QUAL</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
+  --keep-expr &quot;FILTER.every(function(f) {return f == &#39;PASS&#39; || f == &#39;MED_QUAL&#39;})&quot;
+</pre></div>
+</div>
+<p>Note that multi-valued <code class="docutils literal"><span class="pre">INFO</span></code> and <code class="docutils literal"><span class="pre">FORMAT</span></code> fields are not split into
+sub-values, so in some cases correct filtering may require splitting the
+values first. For example, to select bi-allelic records with <code class="docutils literal"><span class="pre">AF</span></code>
+greater than 0.1, the following simple selection will work:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
+  --keep-expr &quot;INFO.AF&gt;=0.1&quot;
+</pre></div>
+</div>
+<p>However, in the presence of multi-allelic records, something like the
+following is required:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz \
+  --keep-expr &quot;INFO.AF.split(&#39;,&#39;).some(function(af) {return af &gt;= 0.1})&quot;
 </pre></div>
 </div>
 </div>
@@ -3792,10 +3918,10 @@ named <code class="docutils literal"><span class="pre">find-indels.js</span></co
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcffilter -i in.vcf.gz -o out.vcf.gz --javascript find-indels.js
 </pre></div>
 </div>
-<p>The following example derives a new FORMAT column containing variant
-allelic fraction based on the values in the AD and DP FORMAT
-annotations, for every sample contained in the VCF. Save the following
-to a file named <code class="docutils literal"><span class="pre">add-vaf.js</span></code>:</p>
+<p>The following example derives a new <code class="docutils literal"><span class="pre">FORMAT</span></code> column containing variant
+allelic fraction to two decimal places based on the values in the <code class="docutils literal"><span class="pre">AD</span></code>
+and <code class="docutils literal"><span class="pre">DP</span></code> <code class="docutils literal"><span class="pre">FORMAT</span></code> annotations, for every sample contained in the
+VCF. Save the following to a file named <code class="docutils literal"><span class="pre">add-vaf.js</span></code>:</p>
 <div class="highlight-javascript"><div class="highlight"><pre><span></span><span class="c1">// Derive new VAF FORMAT field for each sample</span>
 <span class="nx">ensureFormatHeader</span><span class="p">(</span><span class="s1">&#39;##FORMAT=&lt;ID=VAF,Number=1,Type=Float,&#39;</span> <span class="o">+</span>
   <span class="s1">&#39;Description=&quot;Variant Allelic Fraction&quot;&gt;&#39;</span><span class="p">);</span>
@@ -3807,7 +3933,7 @@ to a file named <code class="docutils literal"><span class="pre">add-vaf.js</spa
     <span class="c1">// Find the max</span>
     <span class="kd">var</span> <span class="nx">maxAltDepth</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">altDepths</span><span class="p">);</span>
     <span class="k">if</span> <span class="p">(</span><span class="nx">maxAltDepth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">sample</span><span class="p">.</span><span class="nx">VAF</span> <span class="o">=</span> <span class="nx">sample</span><span class="p">.</span><span class="nx">DP</span> <span class="o">/</span> <span class="nx">maxAltDepth</span><span class="p">;</span>
+      <span class="nx">sample</span><span class="p">.</span><span class="nx">VAF</span> <span class="o">=</span> <span class="p">(</span><span class="nx">maxAltDepth</span> <span class="o">/</span> <span class="nx">sample</span><span class="p">.</span><span class="nx">DP</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
     <span class="p">}</span>
   <span class="p">});</span>
 <span class="p">}</span>
@@ -3877,6 +4003,7 @@ of the VCF via:</p>
 <a class="reference internal" href="#somatic"><span class="std std-ref">somatic</span></a>,
 <a class="reference internal" href="#population"><span class="std std-ref">population</span></a>,
 <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a>,
+<a class="reference internal" href="#vcfmerge"><span class="std std-ref">vcfmerge</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
 </div>
@@ -3885,8 +4012,8 @@ of the VCF via:</p>
 <div class="section" id="vcfannotate">
 <h3>vcfannotate<a class="headerlink" href="#vcfannotate" title="Permalink to this headline">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
-<p>Used to add annotations to a VCF file, either to the VCF <code class="docutils literal"><span class="pre">ID</span></code> field, or
-as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub-field.</p>
+<p>Used to add annotations to a VCF file, either to the VCF <code class="docutils literal"><span class="pre">ID</span></code> field,
+as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub-field, or as a VCF <code class="docutils literal"><span class="pre">FORMAT</span></code> sub-field.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfannotate [OPTION]... -b FILE -i FILE -o FILE
 </pre></div>
@@ -3919,82 +4046,86 @@ as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="3%" />
-<col width="21%" />
-<col width="76%" />
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-A</span></code></td>
+<td><code class="docutils literal"><span class="pre">--annotation=STRING</span></code></td>
+<td>Add computed annotation to VCF records. Allowed values are [AC, AN, EP, GQD, IC, LAL, MEANQAD, NAA, PD, QA, QD, RA, SCONT, VAF, ZY]. May be
+specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-ids=FILE</span></code></td>
-<td>Specifies a file in BED format containing variant ids in the name column to be added to the VCF id field. May be
-specified 0 or more times.</td>
+<td>Add variant IDs from BED file. May be specified 0 or more times.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-info=FILE</span></code></td>
-<td>Specifies a file in BED format containing annotations in the name column to be added to the VCF info field. May be
-specified 0 or more times.</td>
+<td>Add INFO annotations from BED file. May be specified 0 or more times.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--fill-an-ac</span></code></td>
-<td>Set to add or update the AN and AC info fields to the VCF.</td>
+<td>Add or update the AN and AC INFO fields.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--info-description=STRING</span></code></td>
-<td>If the BED INFO field is not already declared, use this description in the header. (Default is &#8216;Annotation&#8217;).</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--info-id=STRING</span></code></td>
-<td>The INFO ID for BED INFO annotations. (Default is &#8216;ANN&#8217;)</td>
+<td>If the BED INFO field is not already declared, use this description in the header (Default is Annotation)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--relabel</span></code></td>
-<td>Relabel samples according to <code class="docutils literal"><span class="pre">old-name&nbsp;new-name</span></code> pairs in specified file. If only a single sample needs to be
-relabelled then a construct like <code class="docutils literal"><span class="pre">&lt;(echo</span> <span class="pre">old-name</span> <span class="pre">new-name)</span></code> can be used.</td>
+<td><code class="docutils literal"><span class="pre">--info-id=STRING</span></code></td>
+<td>The INFO ID for BED INFO annotations (Default is ANN)</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--relabel=FILE</span></code></td>
+<td>Relabel samples according to <code class="docutils literal"><span class="pre">old-name</span> <span class="pre">new-name</span></code> pairs in specified file.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--vcf-ids=FILE</span></code></td>
-<td>Specifies a file in VCF format containing variant ids to be added to the VCF id field. May be specified 0 or more
-times.</td>
+<td>Add variant IDs from VCF file. May be specified 0 or more times.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="7%" />
-<col width="26%" />
-<col width="68%" />
+<col width="6%" />
+<col width="22%" />
+<col width="72%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-a</span></code></td>
+<td><code class="docutils literal"><span class="pre">--add-header=STRING|FILE</span></code></td>
+<td>File containing VCF header lines to add, or a literal header line. May be specified 0 or more times.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Print help on command-line flag usage.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
 <td>Do not gzip the output.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
 <td>Prevent VCF header from being written.</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Do not produce indexes for output files.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>Use <code class="docutils literal"><span class="pre">vcfannotate</span></code> to add text annotations to variants that fall within
-ranges specified in a BED or VCF file. The annotations from the BED file are
-added as an <code class="docutils literal"><span class="pre">INFO</span></code> field in the output VCF file.</p>
+<p>Use <code class="docutils literal"><span class="pre">vcfannotate</span></code> to add text annotations to variants.</p>
+<p>A common use case is to add annotations to only those variants that fall
+within ranges specified in a BED or VCF file, supplied via <code class="docutils literal"><span class="pre">--bed-ids</span></code>
+or <code class="docutils literal"><span class="pre">--vcf-ids</span></code> respectively.  The annotations from the BED file are
+added as an <code class="docutils literal"><span class="pre">INFO</span></code> field in the output VCF file. It can also be used to
+compute or fill in certain additional annotations from the existing content.</p>
 <p>If the <code class="docutils literal"><span class="pre">--bed-ids</span></code> flag is used, instead of adding the annotation to the
 <code class="docutils literal"><span class="pre">INFO</span></code> fields, it is added to the <code class="docutils literal"><span class="pre">ID</span></code> column of the VCF file instead.
 If the <code class="docutils literal"><span class="pre">--vcf-ids</span></code> flag is used, the <code class="docutils literal"><span class="pre">ID</span></code> column of the input VCF file
@@ -4002,6 +4133,30 @@ is used to update the <code class="docutils literal"><span class="pre">ID</span>
 <p>If the <code class="docutils literal"><span class="pre">--fill-an-ac</span></code> flag is set, the output VCF will have the <code class="docutils literal"><span class="pre">AN</span></code> and
 <code class="docutils literal"><span class="pre">AC</span></code> info fields (as defined in the VCF 4.1 specification) created or
 updated.</p>
+<p>It is also possible to use <code class="docutils literal"><span class="pre">vcfannotate</span></code> to insert additional VCF
+header lines into the VCF header. These are supplied using the
+<code class="docutils literal"><span class="pre">--add-header</span></code> flag which may either be a literal VCF header line
+(useful for adding one or two header lines), or from a file.</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfannotate -i in.vcf.gz -o out.vcf.gz \
+--add-header &quot;##SAMPLE=&lt;ID=NA24385,Sex=MALE&gt;&quot; \
+--add-header &quot;##SAMPLE=&lt;ID=NA24143,Sex=FEMALE&gt;&quot; \
+--add-header &quot;##SAMPLE=&lt;ID=NA24149,Sex=MALE&gt;&quot; \
+--add-header &quot;##PEDIGREE=&lt;Child=NA24385,Mother=NA24143,Father=NA24149&gt;&quot;
+</pre></div>
+</div>
+<p>or alternatively:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfannotate -i in.vcf.gz -o out.vcf.gz --add-header ped_vcf_headers.txt
+</pre></div>
+</div>
+<p>Care should be taken that the lines being inserted are valid VCF header lines.</p>
+<p>If the <code class="docutils literal"><span class="pre">--annotation</span></code> flag is set, <code class="docutils literal"><span class="pre">vcfannotate</span></code> attempts to compute
+the specified annotation(s) and add them as <code class="docutils literal"><span class="pre">FORMAT</span></code> fields in the
+corresponding records.  Records for which particular annotations cannot be
+computed, due to a lack of pre-requisite fields, will not be modified.</p>
+<p>For a description of the meaning of fields available for annotation,
+see <a class="reference internal" href="appendix.html#small-variant-vcf-output-file-description"><span class="std std-ref">Small-variant VCF output file description</span></a>. The <code class="docutils literal"><span class="pre">SCONT</span></code>
+annotation is a convenience to annotate with all of the contrary
+evidence annotations: <code class="docutils literal"><span class="pre">DCOC</span></code>, <code class="docutils literal"><span class="pre">DCOF</span></code>, <code class="docutils literal"><span class="pre">OCOC</span></code>, <code class="docutils literal"><span class="pre">OCOF</span></code>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
@@ -4134,10 +4289,6 @@ updated.</p>
 <td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
 <td>Prevent VCF header from being written.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--no-index</span></code></td>
-<td>Do not produce indexes for output files.</td>
-</tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
@@ -4158,11 +4309,149 @@ specified multiple times or with comma separated lists, for example,
 <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a></p>
 </div>
 </div>
+<div class="section" id="vcfdecompose">
+<h3>vcfdecompose<a class="headerlink" href="#vcfdecompose" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Decomposes complex variants within a VCF file into smaller components.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfdecompose [OPTION]... -i FILE -o FILE
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="18%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>VCF file containing variants to decompose. Use &#8216;-&#8216; to read from standard input.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output VCF file name. Use &#8216;-&#8216; to write to standard output.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--template=SDF</span></code></td>
+<td>SDF of the reference genome the variants are called against.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="18%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Sensitivity Tuning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--break-indels</span></code></td>
+<td>If set, peel as many SNPs off an indel as possible.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--break-mnps</span></code></td>
+<td>If set, break MNPs into individual SNPs.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="18%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
+<td>Prevent VCF header from being written.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">vcfdecompose</span></code> command decomposes and trims variants based on
+a multiple sequence alignment between the alleles in each VCF
+record. Only records where every ALT allele is an ordinary allele
+(i.e. consisting of nucleotides) will undergo decomposition. In
+addition, if there are redundant same-as-reference bases in the alleles,
+these will be trimmed off.</p>
+<p>The default behaviour is to break the variant at positions where there
+is at least one base aligned to the reference across all ALT alleles, so
+the output may contain MNPs or impure indels. If desired, MNPs can be
+split into individual SNPs via <code class="docutils literal"><span class="pre">--break-mnps</span></code>. Similarly, impure
+indels can be split into a combination of SNPs and pure indels via
+<code class="docutils literal"><span class="pre">--break-indels</span></code>.</p>
+<p>Although decomposed variants carry through the original <code class="docutils literal"><span class="pre">INFO</span></code> and
+<code class="docutils literal"><span class="pre">FORMAT</span></code> annotations, the decomposition may mean that some annotations
+are no longer semantically correct.  In particular, any VCF <code class="docutils literal"><span class="pre">FORMAT</span></code>
+fields declared to be of type <code class="docutils literal"><span class="pre">A</span></code>, <code class="docutils literal"><span class="pre">G</span></code>, or <code class="docutils literal"><span class="pre">R</span></code> will no longer be
+valid if the set of alleles has changed.</p>
+<p>Note that the reference genome is an optional parameter. When variants
+are decomposed and trimmed, the resulting variant may require a padding
+base to be added, as required by the VCF specification. The VCF
+specification suggests that the padding base should be the base before
+the variant (i.e. padding on the left), but sometimes this requires
+knowledge of reference bases not present in the original record.  When
+the reference genome is supplied, <code class="docutils literal"><span class="pre">vcfdecompose</span></code> will ensure that any
+padding bases are added on the left of the variant. If the reference
+genome is not supplied, padding bases may sometimes be on the right hand
+side of the variant. For example:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>1  20  .  GCGCGCGCGCG  TTTGCGCGCTTGCGCGTTT  .  PASS  .              GT  1/0
+</pre></div>
+</div>
+<p>will decompose without a reference genome as:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>1  20  .  G            TTTG                 .  PASS  ORP=20;ORL=11  GT  1/0
+1  25  .  C            CTT                  .  PASS  ORP=20;ORL=11  GT  1/0
+</pre></div>
+</div>
+<p>and with a reference genome (where the reference base at position 19 can
+be determined to be a <code class="docutils literal"><span class="pre">T</span></code>) as:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>1  19  .  T            TTTT                 .  PASS  ORP=20;ORL=11  GT  1/0
+1  25  .  C            CTT                  .  PASS  ORP=20;ORL=11  GT  1/0
+</pre></div>
+</div>
+<p>The variants that are left vs right-padded are equivalent and identified
+as such by haplotype-aware comparison tools such as <code class="docutils literal"><span class="pre">vcfeval</span></code>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
+<a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a></p>
+</div>
+</div>
 <div class="section" id="vcfeval">
 <h3>vcfeval<a class="headerlink" href="#vcfeval" title="Permalink to this headline">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
-<p>Use the <code class="docutils literal"><span class="pre">vcfeval</span></code> command to evaluate called variants for agreement with
-a known baseline variant set.</p>
+<p>Evaluates called variants for agreement with a baseline variant set
+irrespective of representational differences. Outputs a weighted ROC
+file which can be viewed with <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">rocplot</span></code> and VCF files containing false
+positives (called variants not matched in the baseline), false negatives
+(baseline variants not matched in the call set), and true positives
+(variants that match between the baseline and calls).</p>
+<p>The baseline variants might be the variants that were used to generate a
+synthetic simulated sample (such as via <code class="docutils literal"><span class="pre">popsim</span></code>, <code class="docutils literal"><span class="pre">samplesim</span></code>, etc),
+a gold-standard VCF corresponding to a reference sample such as NA12878,
+or simply an alternative call-set being used as a basis for comparison.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfeval [OPTION]... -b FILE -c FILE -o DIR -t SDF
 </pre></div>
@@ -4175,9 +4464,9 @@ a known baseline variant set.</p>
 <p><strong>Parameters:</strong></p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="19%" />
-<col width="75%" />
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
@@ -4186,43 +4475,41 @@ a known baseline variant set.</p>
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-b</span></code></td>
 <td><code class="docutils literal"><span class="pre">--baseline=FILE</span></code></td>
-<td>The VCF file containing baseline variants. For example, these may be the variants that were used to generate a synthetic
-sample, a gold-standard VCF corresponding to a reference sample such as NA12878, or simply an alternative call-set being used
-as a basis for comparison.</td>
+<td>VCF file containing baseline variants.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-regions=FILE</span></code></td>
 <td>If set, only read VCF records that overlap the ranges contained in the specified BED file.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--evaluation-regions=FILE</span></code></td>
-<td>If set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set
-high-confidence regions or other regions of interest where region boundary effects should be minimized.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
 <td><code class="docutils literal"><span class="pre">--calls=FILE</span></code></td>
-<td>The VCF file containing called variants.</td>
+<td>VCF file containing called variants.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-e</span></code></td>
+<td><code class="docutils literal"><span class="pre">--evaluation-regions=FILE</span></code></td>
+<td>If set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set high-confidence regions or other
+regions of interest where region boundary effects should be minimized.</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
 <td><code class="docutils literal"><span class="pre">--output=DIR</span></code></td>
-<td>The name of the output directory.</td>
+<td>Directory for output.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--region=STRING</span></code></td>
-<td>If set, only read VCF records that overlap the specified region. The format is one of &lt;template_name&gt;,
-&lt;template_name&gt;:start-end or &lt;template_name&gt;:start+length</td>
+<td><code class="docutils literal"><span class="pre">--region=REGION</span></code></td>
+<td>If set, only read VCF records within the specified range. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or
+&lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
 <td><code class="docutils literal"><span class="pre">--template=SDF</span></code></td>
-<td>The reference SDF on which the variants were called.</td>
+<td>SDF of the reference genome the variants are called against.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="2%" />
-<col width="14%" />
-<col width="84%" />
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
@@ -4231,47 +4518,49 @@ high-confidence regions or other regions of interest where region boundary effec
 <tbody valign="top">
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--all-records</span></code></td>
-<td>Set to use all records regardless of filters. Default is to only process records where FILTER is . or PASS.</td>
+<td>Use all records regardless of FILTER status (Default is to only process records where FILTER is <code class="docutils literal"><span class="pre">.</span></code> or <code class="docutils literal"><span class="pre">PASS</span></code>)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--ref-overlap</span></code></td>
-<td>Allow alleles to overlap where bases of either allele are same-as-ref. (Default is to only allow VCF anchor base overlap).</td>
+<td><code class="docutils literal"><span class="pre">--decompose</span></code></td>
+<td>Decompose complex variants into smaller constituents to allow partial credit.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
-<td>Set the name of the sample to select. Use the form &lt;baseline_sample&gt;,&lt;calls_sample&gt; to select different sample names for baseline and
-calls. (Required when using multi-sample VCF files).</td>
+<td><code class="docutils literal"><span class="pre">--ref-overlap</span></code></td>
+<td>Allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>The name of the sample to select. Use &lt;baseline_sample&gt;,&lt;calls_sample&gt; to select different sample names for baseline and calls. (Required when using
+multi-sample VCF files)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--squash-ploidy</span></code></td>
-<td>Treat heterozygous variants as homozygous ALT in both baseline and calls.</td>
+<td>Treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences.</td>
 </tr>
 </tbody>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="18%" />
-<col width="76%" />
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--output-mode</span></code></td>
-<td>Output reporting mode (Must be one of [split, annotate, combine, ga4gh, roc-only]). (Default is split).</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output-mode=STRING</span></code></td>
+<td>Output reporting mode. Allowed values are [split, annotate, combine, ga4gh, roc-only] (Default is split)</td>
 </tr>
 <tr class="row-odd"><td><code class="docutils literal"><span class="pre">-O</span></code></td>
 <td><code class="docutils literal"><span class="pre">--sort-order=STRING</span></code></td>
-<td>Set the order in which to sort the ROC scores so that &#8220;good&#8221; scores come before &#8220;bad&#8221; scores. (Must be one of [ascending,
-descending]). (Default is descending).</td>
+<td>The order in which to sort the ROC scores so that <code class="docutils literal"><span class="pre">good</span></code> scores come before <code class="docutils literal"><span class="pre">bad</span></code> scores. Allowed values are [ascending, descending] (Default is descending)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--vcf-score-field=STRING</span></code></td>
-<td>Set the VCF format field to sort the ROC using. Also valid are &#8220;QUAL&#8221; or &#8220;INFO.&lt;name&gt;&#8221; to select the named VCF INFO field. (Default
-is GQ).</td>
+<td>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal"><span class="pre">QUAL</span></code> or <code class="docutils literal"><span class="pre">INFO.&lt;name&gt;</span></code> to select the named VCF INFO field (Default is GQ)</td>
 </tr>
 </tbody>
 </table>
@@ -4361,7 +4650,11 @@ would be considered a match:</p>
 </div>
 <p>Thus <code class="docutils literal"><span class="pre">--squash-ploidy</span></code> matches any case where the baseline and calls
 share a common allele.  This is most often used to run matching that
-does not penalize for genotyping errors.</p>
+does not penalize for genotyping errors. For example, it is recommended
+to use this option when matching somatic variant calls, as since somatic
+variation is usually associated with variable allelic fractions and
+heterogeneity that mean strict diploid genotype comparisons are not
+appropriate.</p>
 </div>
 <div class="section" id="comparing-with-a-vcf-that-has-no-sample-column">
 <h4>Comparing with a VCF that has no sample column<a class="headerlink" href="#comparing-with-a-vcf-that-has-no-sample-column" title="Permalink to this headline">¶</a></h4>
@@ -4503,26 +4796,15 @@ call variants, regardless of their representation. Columns include
 the score field, and standard accuracy metrics such as true
 positives, false positives, false negatives, precision, sensitivity,
 and f-measure corresponding to each score threshold.</li>
-<li><code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> – contains ROC data derived from only those call
-variants which were represented as SNPs. This file includes a subset
-of accuracy metrics, as the computation of some metrics is not
-meaningful on a subset of the data where representation may differ
-between the baseline and the call.</li>
-<li><code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> – contains ROC data derived from only those call
+<li><code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> – contains ROC data derived from only those variants
+which were represented as SNPs. Since the representation conventions
+can differ between the baseline and calls, there are some subtleties
+to be aware of when interpreting metrics such as precision,
+sensitivity, etc, described below.</li>
+<li><code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> – contains ROC data derived from those
 variants which were not represented as SNPs. As above, not all
 metrics are computed for this file.</li>
 </ul>
-<p>A common desire is to perform analysis separately for SNPs vs
-indels. However, it is important to note that due the representation
-ambiguity problem, it is not always trivial to decide in a global sense
-whether a variant is a SNP or an indel or other complex variant. A group
-of variants that may be represented as single SNPs in one call-set may
-be represented as a single complex variant in another call-set. In the
-<code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> and <code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> files above, the representation
-used by the called variants is used to classify the variant type, as it
-is the called variants which contain the scores which are used to
-determine the ranking for ROC curves. Thus the type-specific ROC data
-files should not be considered portable from one caller to another.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">In addition, <code class="docutils literal"><span class="pre">vcfeval</span></code> has an output mode
@@ -4534,6 +4816,10 @@ inside the <code class="docutils literal"><span class="pre">hap.py</span></code>
 <a class="reference external" href="https://github.com/ga4gh/benchmarking-tools">https://github.com/ga4gh/benchmarking-tools</a> and
 <a class="reference external" href="https://github.com/Illumina/hap.py">https://github.com/Illumina/hap.py</a></p>
 </div>
+</div>
+</div>
+<div class="section" id="benchmarking-comparisons-using-roc-and-precision-sensitivity-curves">
+<h4>Benchmarking comparisons using ROC and precision/sensitivity curves<a class="headerlink" href="#benchmarking-comparisons-using-roc-and-precision-sensitivity-curves" title="Permalink to this headline">¶</a></h4>
 <p>Multiple ROC data files (from a single or several <code class="docutils literal"><span class="pre">vcfeval</span></code> runs) can
 be plotted with the <code class="docutils literal"><span class="pre">rocplot</span></code> command, which allows output to a PNG or
 SVG image or analysis in an interactive GUI that provides zooming and
@@ -4558,11 +4844,11 @@ a general difference in representational conventions used between the
 two call sets. Since false negatives can only be measured in terms of
 the baseline representation, sensitivity is defined as:</p>
 <div class="math">
-<p><img src="_images/math/ca6bde58f63a209ce866a8c7c057013ac32a96f8.png" alt="\text{Sensitivity} = \text{TP}_\text{baseline} / (\text{TP}_\text{baseline} + \text{FN})"/></p>
+<p><img src="_images/math/3d714ca7cb77ae0a59a33942b07a97523eb2ede6.png" alt="\text{Sensitivity} = \text{TP}_\text{baseline} / (\text{TP}_\text{baseline} + \text{FN})."/></p>
 </div><p>Conversely since false positives can only be measured in terms of the
 call representation, precision is defined as:</p>
 <div class="math">
-<p><img src="_images/math/af345ac831a9384b6a73d461690c4e06b557f21c.png" alt="\text{Precision} = \text{TP}_\text{call} / (\text{TP}_\text{call} + \text{FP})"/></p>
+<p><img src="_images/math/276ab2f76e62085e8ec1a3fb0c5fff842c0b98e4.png" alt="\text{Precision} = \text{TP}_\text{call} / (\text{TP}_\text{call} + \text{FP})."/></p>
 </div><div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">For definitions of the terminology used when evaluating caller
@@ -4570,14 +4856,353 @@ accuracy, see:
 <a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">https://en.wikipedia.org/wiki/Receiver_operating_characteristic</a>
 and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
 </div>
+</div>
+<div class="section" id="benchmarking-performance-for-snps-vs-indels">
+<h4>Benchmarking performance for SNPs vs indels<a class="headerlink" href="#benchmarking-performance-for-snps-vs-indels" title="Permalink to this headline">¶</a></h4>
+<p>A common desire is to perform analysis separately for SNPs vs
+indels. However, it is important to note that due the representation
+ambiguity problem, it is not always trivial to decide in a global sense
+whether a variant is a SNP or an indel or other complex variant. A group
+of variants that may be represented as single SNPs in one call-set may
+be represented as a single complex variant in another call-set. Consider
+the following example reference and alternate haplotypes:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>     12345678901234567
+REF: ATCGTAAATAAAATGCA
+ALT: ATCGTAAAATAAATGCA
+</pre></div>
+</div>
+<p>One variant caller might represent the haplotypes as the following VCF records:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>chr1 5 . T TA . . . GT 1/1
+chr1 9 . TA T . . . GT 1/1
+</pre></div>
+</div>
+<p>While another variant caller could represent the same haplotypes as:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>chr1 9 . T A . . . GT 1/1
+chr1 10 . A T . . . GT 1/1
+</pre></div>
+</div>
+<p>The decision as to which representation to use is essentially arbitrary,
+yet one caller has used indels (and no SNPs), and the other has used
+SNPs (and no indels). For this reason it is certainly a poor idea to
+attempt to divide baseline and called variants into separate SNP and
+indel datasets up front and perform evaluation on each set separately,
+as any variants that use different representation categories will not be
+matched across the independent comparisons. Any variant-type specific
+metrics should be computed after matching is carried out on the full
+variant sets.</p>
+<p>Note that when there are different representational conventions between
+the baseline and calls (or between calls from one variant caller and
+another), then at some level there is really a semantic difference
+between a &#8220;baseline indel&#8221; and a &#8220;call-set indel&#8221; (or &#8220;variant-caller-A
+indel&#8221; and &#8220;variant-caller-B indel&#8221;), so caution should be applied when
+making conclusions related to SNP vs indel accuracy.</p>
+<p>In the <code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> and <code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> output files, <code class="docutils literal"><span class="pre">vcfeval</span></code>
+notes the number of baseline and call variants of each variant
+type. When considering benchmarking metrics in the absence of any
+thresholding with respect to a score field, it is straight-forward to
+use the previous formulae (i.e. sensitivity is computed using the counts
+from baseline variants, and precision is computed using the counts from
+called variants). When computing threshold-specific metrics for ROC data
+points, the computation is more involved. Since only the call variants
+contain the score field used to rank variants, the number of (say) TP
+baseline indels that exceed threshold <img class="math" src="_images/math/a59f68a4202623bb859a7093f0316bf466e6f75d.png" alt="x"/> is not
+defined. <code class="docutils literal"><span class="pre">vcfeval</span></code> computes a scaled count as:</p>
+<div class="math">
+<p><img src="_images/math/3a8b75e5acf08db588e4dceb7fb37bd6e45954e5.png" alt="\text{TP}_\text{baseline\_indel}(x) = \text{TP}_\text{call\_indel}(x) \times \text{TP}_\text{baseline\_indel} / \text{TP}_\text{call\_indel}"/></p>
+</div><p>and thus threshold-specific sensitivity is computed as</p>
+<div class="math">
+<p><img src="_images/math/5163a30eacf7ec6ef0a4bacd6f37adc97e59a22e.png" alt="\text{Sensitivity}_\text{indel}(x) = \text{TP}_\text{baseline\_indel}(x) / (\text{TP}_\text{baseline\_indel} + \text{FN}_\text{indel})"/></p>
+</div><p>This scaling ensures that the end point of the variant type specific ROC
+or precision/sensitivity curve ends at the same point that is obtained
+when computing metrics without any threshold.</p>
+</div>
+<div class="section" id="variant-decomposition-and-benchmarking">
+<h4>Variant decomposition and benchmarking<a class="headerlink" href="#variant-decomposition-and-benchmarking" title="Permalink to this headline">¶</a></h4>
+<p>In general, it is not necessary to run any variant decomposition and/or
+normalization on variant call sets prior to evaluation with <code class="docutils literal"><span class="pre">vcfeval</span></code>,
+as the haplotype aware matching process can account for representation
+differences. However, since matching is at the granularity of entire
+variants, a single long complex call will be categorized as either
+correct or incorrect, even if part of the call may match. If partial
+credit in the case of long calls is of interest, <code class="docutils literal"><span class="pre">vcfeval</span></code> includes an
+option to internally decompose variants prior to matching, using the
+<code class="docutils literal"><span class="pre">--decompose</span></code> flag. This decomposition is applied to both baseline and
+call variants, and any output VCFs will contain the decomposed
+representation. External VCF decomposition (with more control over
+decomposition options) is also available via <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">vcfdecompose</span></code>.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a>,
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
-<a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a></p>
+<a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a>,
+<a class="reference internal" href="#vcfdecompose"><span class="std std-ref">vcfdecompose</span></a></p>
 </div>
+</div>
+</div>
+<div class="section" id="svdecompose">
+<h3>svdecompose<a class="headerlink" href="#svdecompose" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Split composite structural variants into a breakend representation.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg svdecompose [OPTION]... -i FILE -o FILE
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="17%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>VCF file containing variants to filter. Use &#8216;-&#8216; to read from standard input.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output VCF file name. Use &#8216;-&#8216; to write to standard output.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="17%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--no-header</span></code></td>
+<td>Prevent VCF header from being written.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">svdecompose</span></code> command is applied to a VCF containing structural
+variants and converts deletion, inversion, and tandem duplications with
+<code class="docutils literal"><span class="pre">SVTYPE</span></code> of <code class="docutils literal"><span class="pre">DEL</span></code>, <code class="docutils literal"><span class="pre">INV</span></code>, and <code class="docutils literal"><span class="pre">DUP</span></code>, respectively, into
+corresponding breakend events with <code class="docutils literal"><span class="pre">SVTYPE=BND</span></code>.  <code class="docutils literal"><span class="pre">svdecompose</span></code> will
+also decompose sequence-resolved insertions and deletions greater than
+<code class="docutils literal"><span class="pre">--min-indel-length</span></code> into breakend representation. Records of others
+types are passed through without modification.</p>
+<p>This operation can be useful for the purposes of reducing output from
+various structural variant callers to a common representation to
+better facilitate comparison with the <code class="docutils literal"><span class="pre">bndeval</span></code> command.</p>
+<p>For insertions, <code class="docutils literal"><span class="pre">svdecompose</span></code> will represent the insertion as
+breakends between the reference and a &#8220;virtual haplotype&#8221;, where for
+example, contig &#8220;&lt;INS_A&gt;&#8221; represents the destination of all insertions
+made on chromosome A. So if another caller produced a similar insertion
+event (in position and/or length), the break end versions will also be
+nearby on the virtual contig. For the following insertions:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>1  54712   .     T  TTTTTTTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTCTTTC  .  .  .
+1  934144  I_7   C  CGGAGGGGAGGGCGCGGAGCGGAGG                               .  .  .
+1  934144  I_22  C  CGGAGGGGAGGGCGCGGAGCGGAGGGGAGGGCGCGGAGCGGAGG            .  .  .
+</pre></div>
+</div>
+<p>each insertion gets two breakends like this:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>1  54712   .     T  T[&lt;INS_1&gt;:54712[   .  .  SVTYPE=BND;CIPOS=0,0
+1  54712   .     T  ]&lt;INS_1&gt;:54765]C   .  .  SVTYPE=BND;CIPOS=0,0
+1  934144  I_7   C  C[&lt;INS_1&gt;:934144[  .  .  SVTYPE=BND;CIPOS=0,0
+1  934144  I_22  C  C[&lt;INS_1&gt;:934144[  .  .  SVTYPE=BND;CIPOS=0,0
+1  934144  I_7   C  ]&lt;INS_1&gt;:934168]G  .  .  SVTYPE=BND;CIPOS=0,0
+1  934144  I_22  C  ]&lt;INS_1&gt;:934187]G  .  .  SVTYPE=BND;CIPOS=0,0
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a></p>
+</div>
+</div>
+<div class="section" id="bndeval">
+<h3>bndeval<a class="headerlink" href="#bndeval" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Evaluate called breakends for agreement with a baseline breakend set.
+Outputs a weighted ROC file which can be viewed with <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">rocplot</span></code>
+and VCF files containing false positives (called breakends not matched
+in the baseline), false negatives (baseline breakends not matched in
+the call set), and true positives (breakends that match between the
+baseline and calls).</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg bndeval [OPTION]... -b FILE -c FILE -o DIR
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-b</span></code></td>
+<td><code class="docutils literal"><span class="pre">--baseline=FILE</span></code></td>
+<td>VCF file containing baseline variants.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--bed-regions=FILE</span></code></td>
+<td>If set, only read VCF records that overlap the ranges contained in the specified BED file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-c</span></code></td>
+<td><code class="docutils literal"><span class="pre">--calls=FILE</span></code></td>
+<td>VCF file containing called variants.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=DIR</span></code></td>
+<td>Directory for output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--region=REGION</span></code></td>
+<td>If set, only read VCF records within the specified range. The format is one of &lt;sequence_name&gt;, &lt;sequence_name&gt;:&lt;start&gt;-&lt;end&gt;, &lt;sequence_name&gt;:&lt;pos&gt;+&lt;length&gt; or
+&lt;sequence_name&gt;:&lt;pos&gt;~&lt;padding&gt;</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="19%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Filtering</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--all-records</span></code></td>
+<td>Use all records regardless of FILTER status (Default is to only process records where FILTER is &#8221;.&#8221; or &#8220;PASS&#8221;)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--bidirectional</span></code></td>
+<td>If set, allow matches between flipped breakends.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--tolerance=INT</span></code></td>
+<td>Positional tolerance for breakend matching (Default is 100)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="15%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Reporting</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output-mode=STRING</span></code></td>
+<td>Output reporting mode. Allowed values are [split, annotate] (Default is split)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-O</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sort-order=STRING</span></code></td>
+<td>The order in which to sort the ROC scores so that &#8220;good&#8221; scores come before &#8220;bad&#8221; scores. Allowed values are [ascending, descending] (Default is descending)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
+<td><code class="docutils literal"><span class="pre">--vcf-score-field=STRING</span></code></td>
+<td>The name of the VCF field to use as the ROC score. Also valid are &#8220;QUAL&#8221; or &#8220;INFO.&lt;name&gt;&#8221; to select the named VCF INFO field (Default is INFO.DP)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="25%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">bndeval</span></code> command operates on VCF files containing breakends such
+as those produced by the <code class="docutils literal"><span class="pre">discord</span></code> command.  In particular, it
+considers records having the breakend structural variant type
+(<code class="docutils literal"><span class="pre">SVTYPE=BND</span></code>) as defined in the VCF specification.  Other types of
+record are ignored, but the <code class="docutils literal"><span class="pre">svdecompose</span></code> command can be applied
+beforehand to split certain other structural variants (e.g., <code class="docutils literal"><span class="pre">INV</span></code> and
+<code class="docutils literal"><span class="pre">DEL</span></code>) or sequence-resolved insertions and deletions into constituent
+breakend events.</p>
+<p>The input and output requirements of <code class="docutils literal"><span class="pre">bndeval</span></code> are broadly similar
+to the <code class="docutils literal"><span class="pre">vcfeval</span></code> command.  The primary inputs to <code class="docutils literal"><span class="pre">bndeval</span></code> are a
+truth/baseline VCF containing expected breakends, and a query/call VCF
+containing the called breakends.  Evaluation can be restricted to
+particular regions by specifying a BED file.</p>
+<p>The regions contained in the evaluation regions BED file are intersected
+with the breakend records contained in the truth VCF in order to obtain a
+list of <em>truth breakend regions</em>. An evaluation region is included if there
+is any overlapping truth VCF record (no attempt is made to look at the
+degree of overlap).  Thus by supplying either evaluation regions
+corresponding to targeted regions or larger gene-level regions
+<code class="docutils literal"><span class="pre">bndeval</span></code> can be used to evaluate at different levels of granularity.</p>
+<p>Similarly, the evaluation regions are intersected with the breakend records
+records contained in the calls VCF to obtain <em>called breakend regions</em>.</p>
+<p>The <em>truth breakend regions</em> are then intersected with the <em>called breakend
+regions</em> to obtain TP/FP/FN metrics.  The intersection supports a
+user-selectable tolerance in position.  Further, be default, a breakend
+must occur in the same orientation to be considered a match, but this
+constraint can be relaxed by supplying the <code class="docutils literal"><span class="pre">--bidirectional</span></code> command
+line option.</p>
+<div class="section" id="bndeval-outputs">
+<h4>bndeval outputs<a class="headerlink" href="#bndeval-outputs" title="Permalink to this headline">¶</a></h4>
+<p>Once complete, <code class="docutils literal"><span class="pre">bndeval</span></code> command produces summary statistics and the
+following primary result files in the output directory:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">weighted_roc.tsv.gz</span></code> - contains ROC data that can be plotted
+with <code class="docutils literal"><span class="pre">rocplot</span></code></li>
+<li><code class="docutils literal"><span class="pre">baseline.bed.gz</span></code> contains the <em>truth breakend regions</em>, where each BED
+record contains the region status as <code class="docutils literal"><span class="pre">TP</span></code> or <code class="docutils literal"><span class="pre">FN</span></code>, the <code class="docutils literal"><span class="pre">SVTYPE</span></code>,
+and the span of the original truth VCF record.</li>
+<li><code class="docutils literal"><span class="pre">calls.bed.gz</span></code> contains the <em>called breakend regions</em>, where each BED
+record contains the region status as <code class="docutils literal"><span class="pre">TP</span></code> or <code class="docutils literal"><span class="pre">FP</span></code>, the <code class="docutils literal"><span class="pre">SVTYPE</span></code>,
+the span of the original calls VCF record, and the score value used
+for ranking in the ROC plot.</li>
+<li><code class="docutils literal"><span class="pre">summary.txt</span></code> contains the same summary statistics printed to
+standard output.</li>
+</ul>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#discord"><span class="std std-ref">discord</span></a>,
+<a class="reference internal" href="#svdecompose"><span class="std std-ref">svdecompose</span></a>,
+<a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a>,
+<a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a></p>
 </div>
 </div>
 </div>
@@ -4613,15 +5238,23 @@ and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivit
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="18%" />
-<col width="76%" />
+<col width="5%" />
+<col width="17%" />
+<col width="77%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Filtering</th>
 </tr>
 </thead>
 <tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-family=STRING</span></code></td>
+<td>Keep only individuals with the specified family ID. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--keep-ids=STRING</span></code></td>
+<td>Keep only individuals with the specified ID. May be specified 0 or more times, or as a comma separated list.</td>
+</tr>
 <tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--keep-primary</span></code></td>
 <td>Keep only primary individuals (those with a PED individual line / VCF sample column)</td>
@@ -4914,18 +5547,22 @@ to an image, or using an interactive GUI.</p>
 <td>If set, hide the side pane from the GUI on startup.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--interpolate</span></code></td>
+<td>If set, interpolate curves at regular intervals.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--line-width=INT</span></code></td>
 <td>Sets the plot line width (Default is 2)</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-P</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-P</span></code></td>
 <td><code class="docutils literal"><span class="pre">--precision-sensitivity</span></code></td>
 <td>If set, plot precision vs sensitivity rather than ROC.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--scores</span></code></td>
 <td>If set, show scores on the plot.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
 <td><code class="docutils literal"><span class="pre">--title=STRING</span></code></td>
 <td>Title for the plot.</td>
 </tr>
@@ -4949,10 +5586,16 @@ to an image, or using an interactive GUI.</p>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>Used to produce ROC plots from the ROC files produced by <code class="docutils literal"><span class="pre">readsimeval</span></code>
-and <code class="docutils literal"><span class="pre">vcfeval</span></code>. By default this opens the ROC plots in an interactive
-viewer. On a system with only console access the plot can be saved
-directly to an image file using the either the <code class="docutils literal"><span class="pre">--png</span></code> or <code class="docutils literal"><span class="pre">--svg</span></code> parameter.</p>
+<p>Used to produce ROC plots from the ROC files produced by
+<code class="docutils literal"><span class="pre">readsimeval</span></code>, <code class="docutils literal"><span class="pre">bndeval</span></code> and <code class="docutils literal"><span class="pre">vcfeval</span></code>. By default this opens the
+ROC plots in an interactive viewer. On a system with only console access
+the plot can be saved directly to an image file using the either the
+<code class="docutils literal"><span class="pre">--png</span></code> or <code class="docutils literal"><span class="pre">--svg</span></code> parameter.</p>
+<p>ROC data files may be specified either as direct file arguments to the
+command, or via the <code class="docutils literal"><span class="pre">--curve</span></code> flag. The former method is useful when
+selecting files using shell wild card globbing, and the latter method
+allows specifying a custom title for each curve, so use whichever method
+is most convenient.</p>
 <p>Strictly speaking, a true ROC curve should use <em>rates</em> rather than
 absolute numbers on the X and Y axes (e.g. True Positive / Total
 Positives rather than True Positives on the Y, and False Positive /
@@ -4968,35 +5611,74 @@ reference bases, or even (in the case of insertions) zero reference
 bases. It is conceptually even possible to have a call-set contain more
 false positives than there are reference bases. For this reason the ROC
 curves are plotted using the absolute counts.</p>
+<p>Precision/sensitivity (also known as precision/recall) curves are
+another popular means of visualizing call-set accuracy, and these
+metrics also do not require a count of Total Negatives and so cause no
+particular difficulty to plot. Precision/sensitivity graphs can be
+selected from the command line via the <code class="docutils literal"><span class="pre">--precision-sensitivity</span></code> flag,
+or may be interactively selected in the GUI.</p>
+<p>An interesting result of ROC analysis is that although there may be few
+data points on an ROC graph, it is possible to construct a filtered
+dataset corresponding to any point that lies on a straight line between
+two points on the graph. (For example, using threshold A for 25% of the
+variants and threshold B for 75% of the variants would result in
+accuracy that is 75% of the way between the points corresponding to
+thresholds A and B on the ROC plot). So in a sense it is meaningful to
+connect points on an ROC graph with straight lines. However, for
+precision/sensitivity graphs, it&#8217;s incorrect to connect adjacent points
+with a straight line, as this does not correspond to achievable accuracy
+on the ROC convex hull and can over-estimate the accuracy. Instead, we
+can plot appropriately interpolated values with the <code class="docutils literal"><span class="pre">--interpolate</span></code>
+option.</p>
+<div class="section" id="interactive-gui">
+<h4>Interactive GUI<a class="headerlink" href="#interactive-gui" title="Permalink to this headline">¶</a></h4>
+<p>The following image shows the <code class="docutils literal"><span class="pre">rocplot</span></code> GUI with an example ROC plot :</p>
+<img alt="_images/rocplot_roc.png" src="_images/rocplot_roc.png" />
+<p>Similarly, here is an example precision/sensitivity plot:</p>
+<img alt="_images/rocplot_ps.png" src="_images/rocplot_ps.png" />
 <p>Some quick tips for the interactive GUI:</p>
 <ul class="simple">
-<li>Select regions within the graph to zoom in. Right click to bring up a
-context menu that allows resetting the zoom.</li>
+<li>Select regions within the graph to zoom in. Right click within the
+graph area to bring up a context menu that allows undoing the zoom one
+level at a time, or resetting the zoom to the default.</li>
+<li>The graph right click menu also allows exporting the image as PNG or
+SVG. (The saved image does not include the RTG banner or background
+gradient).</li>
 <li>Click on a spot in the graph to show the equivalent accuracy metrics
-for that location in the status bar. Clicking to the left or below
-the axes will clear the cross-hair. Note that sensitivity depends on
-the baseline total number of variants being correct. If for example
-the ROC curve corresponds to evaluating an exome call-set against a
+for that location in the status bar. Clicking to the left or below the
+axes will remove the cross-hair. Note that sensitivity depends on the
+baseline total number of variants being correct. If for example the
+ROC curve corresponds to evaluating an exome call-set against a
 whole-genome baseline, this number will be inaccurate.</li>
+<li>A secondary cross-hair is also available by holding down shift when
+placing (or removing) the cross-hair. When two cross-hairs are placed
+or moved, metrics in the status bar indicate the difference between
+the two positions.</li>
 <li>Additional ROC data files can be loaded by clicking on the &#8220;Open...&#8221;
 button, and multiple ROC data files within a directory can be loaded
 at once using multi-select.</li>
-<li>Each ROC curve can be shown/hidden, renamed, and reordered in it&#8217;s
-widget area on the right hand side of the UI.</li>
-<li>Right-clicking within the ROC widget area allows permanently removing
-that ROC curve.</li>
-<li>Each ROC curve has a slider to simulate the effect of applying a
-threshold on the scoring attribute. If the &#8220;show scores&#8221; option is
-set, this provides an easy way to select appropriate filter threshold
-values, which you might apply to variant sets using <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">vcffilter</span></code>
-or similar VCF filtering tools.</li>
 <li>The &#8216;Cmd&#8217; button will open a message window that contains a
-command-line equivalent to the currently displayed set of
-ROC curves. This command-line may be copy-pasted, providing an easy
-way to replicate the current set of curves in another session,
-generate a curve in a script, or share with a colleague.</li>
+command-line equivalent to the currently displayed set of curves. This
+command-line may be copy-pasted, providing an easy way to replicate
+the current set of curves in another session, generate a curve in a
+script, or share with a colleague.</li>
 <li>There is a drop down that allows for switching between ROC and
 precision/sensitivity graph types.</li>
+</ul>
+<p>Each curve in the GUI has a customization widget on the right hand
+side of the UI that allows several operations:</p>
+<ul class="simple">
+<li>Rename the title used for the curve via the editable text.</li>
+<li>Temporarily hide/show the curve via selection checkbox.</li>
+<li>Reorder curves via drag and drop using the colored handle on the left.</li>
+<li>Right click within the ROC widget area to bring up a context menu that
+allows permanently removing that curve, or customizing the color used
+for the curve</li>
+<li>Each curve has a slider to simulate the effect of applying a threshold
+on the scoring attribute. If the &#8220;show scores&#8221; option is set, this
+provides an easy way to select appropriate filter threshold values,
+which you might apply to variant sets using <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">vcffilter</span></code> or
+similar VCF filtering tools.</li>
 </ul>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -5005,10 +5687,19 @@ accuracy, see:
 <a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">https://en.wikipedia.org/wiki/Receiver_operating_characteristic</a>
 and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
 </div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For a description of the precision/sensitivity interpolation,
+see: &#8220;The relationship between Precision-Recall and ROC
+curves&#8221;, Davis, J., (2006),
+<a class="reference external" href="https://dx.doi.org/10.1145/1143844.1143874">https://dx.doi.org/10.1145/1143844.1143874</a></p>
+</div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#readsimeval"><span class="std std-ref">readsimeval</span></a>,
+<a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a>,
 <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a></p>
+</div>
 </div>
 </div>
 <div class="section" id="version">
@@ -5126,7 +5817,7 @@ licensed status, and command release level.</p>
         <li class="right" >
           <a href="overview.html" title="Overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

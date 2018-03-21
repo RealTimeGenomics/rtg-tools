@@ -70,6 +70,28 @@ types, as shown in the following:
 +-------------+---------------------------------------------------------------+
 | STRING      | A sequence of characters for comments, filenames, or labels   |
 +-------------+---------------------------------------------------------------+
+| REGION      | A genomic region specification (see below)                    |
++-------------+---------------------------------------------------------------+
+
+Genomic region parameters take one of the following forms:
+
+* sequence_name (e.g.: ``chr21``) corresponds to the entirety of the
+  named sequence.
+
+* sequence_name:start (e.g.: ``chr21:100000``) corresponds to a single
+  position on the named sequence.
+
+* sequence_name:start-end (e.g.: ``chr21:100000-110000``) corresponds to a
+  range that extends from the specified start position to the specified
+  end position (inclusive). The positions are 1-based.
+
+* sequence_name:position+length (e.g.: ``chr21:100000+10000``) corresponds
+  to a range that extends from the specified start position that
+  includes the specified number of nucleotides.
+
+* sequence_name:position~padding (e.g.: ``chr21:100000~10000``)
+  corresponds to a range that spans the specified position by the
+  specified amount of padding on either side.
 
 To display all parameters and syntax associated with an RTG command,
 enter the command and type ``--help``. For example: all parameters

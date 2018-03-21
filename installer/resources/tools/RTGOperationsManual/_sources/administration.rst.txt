@@ -228,8 +228,8 @@ a text file named after the date of the current month, in the form
 ``YYYY-MM.txt``. A new file will be created each month. This text file can
 be manually sent to Real Time Genomics when requested.
 
-Advanced configuration
-~~~~~~~~~~~~~~~~~~~~~~~
+Advanced usage configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you wish to augment usage information with any of the optional
 fields, edit the ``rtg.cfg`` file (or ``rtg.bat`` file on Windows) and set
@@ -248,3 +248,30 @@ For example:
 
   RTG_USAGE_OPTIONAL=username,hostname,commandline
 
+Command-line color highlighting
+-------------------------------
+
+Some RTG commands make use of ANSI colors to visually enhance terminal
+output, and the decision as to whether to colorize the output is
+automatically determined, although some commands also contain additional
+flags to control colorization.
+
+The default behaviour of output colorization can be configured by
+defining a Java system property named ``rtg.default-markup`` with an
+appropriate value and supplying it via RTG_JAVA_OPTS. For example, to
+disable output colorization, use:
+
+.. code-block:: text
+
+  RTG_JAVA_OPTS="-Drtg.default-markup=none"
+
+The possible values for ``rtg.default-markup`` are:
+
+* ``auto`` - automatically enable ANSI markup when running on
+  non-Windows OS and when I/O is detected to be a console.
+
+* ``none`` - disable ANSI markup.
+
+* ``ansi`` - enable ANSI markup. This may be useful if you are using
+  Windows OS and have installed an ANSI-capable terminal such as
+  ANSICON, ConEmu or Console 2.

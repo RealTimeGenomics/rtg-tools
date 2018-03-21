@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Administration &amp; Capacity Planning &#8212; RTG Tools Operations Manual v3.8</title>
+    <title>Administration &amp; Capacity Planning &#8212; RTG Tools Operations Manual v3.9</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.8',
+        VERSION:     '3.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -48,7 +48,7 @@
         <li class="right" >
           <a href="product_usage.html" title="RTG product usage - baseline progressions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -66,9 +66,10 @@
 <li><a class="reference internal" href="#usage-logging">Usage logging</a><ul>
 <li><a class="reference internal" href="#single-user-single-machine">Single-user, single machine</a></li>
 <li><a class="reference internal" href="#multi-user-or-multiple-machines">Multi-user or multiple machines</a></li>
-<li><a class="reference internal" href="#advanced-configuration">Advanced configuration</a></li>
+<li><a class="reference internal" href="#advanced-usage-configuration">Advanced usage configuration</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#command-line-color-highlighting">Command-line color highlighting</a></li>
 </ul>
 </li>
 </ul>
@@ -314,8 +315,8 @@ a text file named after the date of the current month, in the form
 <code class="docutils literal"><span class="pre">YYYY-MM.txt</span></code>. A new file will be created each month. This text file can
 be manually sent to Real Time Genomics when requested.</p>
 </div>
-<div class="section" id="advanced-configuration">
-<h3>Advanced configuration<a class="headerlink" href="#advanced-configuration" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="advanced-usage-configuration">
+<h3>Advanced usage configuration<a class="headerlink" href="#advanced-usage-configuration" title="Permalink to this headline">¶</a></h3>
 <p>If you wish to augment usage information with any of the optional
 fields, edit the <code class="docutils literal"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal"><span class="pre">rtg.bat</span></code> file on Windows) and set
 the <code class="docutils literal"><span class="pre">RTG_USAGE_OPTIONAL</span></code> to a comma separated list containing any of
@@ -332,6 +333,29 @@ characters).</li>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="command-line-color-highlighting">
+<h2>Command-line color highlighting<a class="headerlink" href="#command-line-color-highlighting" title="Permalink to this headline">¶</a></h2>
+<p>Some RTG commands make use of ANSI colors to visually enhance terminal
+output, and the decision as to whether to colorize the output is
+automatically determined, although some commands also contain additional
+flags to control colorization.</p>
+<p>The default behaviour of output colorization can be configured by
+defining a Java system property named <code class="docutils literal"><span class="pre">rtg.default-markup</span></code> with an
+appropriate value and supplying it via RTG_JAVA_OPTS. For example, to
+disable output colorization, use:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>RTG_JAVA_OPTS=&quot;-Drtg.default-markup=none&quot;
+</pre></div>
+</div>
+<p>The possible values for <code class="docutils literal"><span class="pre">rtg.default-markup</span></code> are:</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">auto</span></code> - automatically enable ANSI markup when running on
+non-Windows OS and when I/O is detected to be a console.</li>
+<li><code class="docutils literal"><span class="pre">none</span></code> - disable ANSI markup.</li>
+<li><code class="docutils literal"><span class="pre">ansi</span></code> - enable ANSI markup. This may be useful if you are using
+Windows OS and have installed an ANSI-capable terminal such as
+ANSICON, ConEmu or Console 2.</li>
+</ul>
 </div>
 </div>
 
@@ -353,7 +377,7 @@ characters).</li>
         <li class="right" >
           <a href="product_usage.html" title="RTG product usage - baseline progressions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.8</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
