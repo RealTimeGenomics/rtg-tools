@@ -55,6 +55,8 @@ information on new features, see the RTG Operations Manual.
 * format: In addition to minimum and maximum length of input and output
   sequences, now outputs the mean length of the sequences.
 
+* petrim: This command is now available in RTG Tools.
+
 * petrim: New flag --mismatch-adjustment allows updating bases within
   reads when non-matching bases are encountered in the overlap.
 

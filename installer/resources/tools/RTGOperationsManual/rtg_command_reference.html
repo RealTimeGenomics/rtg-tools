@@ -67,6 +67,7 @@
 <li><a class="reference internal" href="#sdf2fastq">sdf2fastq</a></li>
 <li><a class="reference internal" href="#sdf2sam">sdf2sam</a></li>
 <li><a class="reference internal" href="#fastqtrim">fastqtrim</a></li>
+<li><a class="reference internal" href="#petrim">petrim</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simulation-commands">Simulation Commands</a><ul>
@@ -1233,6 +1234,266 @@ formatting to SDF:</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#format"><span class="std std-ref">format</span></a></p>
+</div>
+</div>
+</div>
+<div class="section" id="petrim">
+<h3>petrim<a class="headerlink" href="#petrim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Trim paired-end read FASTQ files based on read arm alignment overlap.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg petrim [OPTION]... -l FILE -o FILE -r FILE
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="17%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-l</span></code></td>
+<td><code class="docutils literal"><span class="pre">--left=FILE</span></code></td>
+<td>Left input FASTQ file (AKA R1)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>Output filename prefix. Use &#8216;-&#8216; to write to standard output.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-q</span></code></td>
+<td><code class="docutils literal"><span class="pre">--quality-format=FORMAT</span></code></td>
+<td>Quality data encoding method used in FASTQ input files (Illumina 1.8+ uses sanger). Allowed values are [sanger, solexa, illumina] (Default is sanger)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-r</span></code></td>
+<td><code class="docutils literal"><span class="pre">--right=FILE</span></code></td>
+<td>Right input FASTQ file (AKA R2)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="22%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Sensitivity Tuning</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--aligner-band-width=FLOAT</span></code></td>
+<td>Aligner indel band width scaling factor, fraction of read length allowed as an indel (Default is 0.5)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--gap-extend-penalty=INT</span></code></td>
+<td>Penalty for a gap extension during alignment (Default is 1)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--gap-open-penalty=INT</span></code></td>
+<td>Penalty for a gap open during alignment (Default is 19)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-P</span></code></td>
+<td><code class="docutils literal"><span class="pre">--min-identity=INT</span></code></td>
+<td>Minimum percent identity in overlap to trigger overlap trimming (Default is 90)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-L</span></code></td>
+<td><code class="docutils literal"><span class="pre">--min-overlap-length=INT</span></code></td>
+<td>Minimum number of bases in overlap to trigger overlap trimming (Default is 25)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--mismatch-penalty=INT</span></code></td>
+<td>Penalty for a mismatch during alignment (Default is 9)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--soft-clip-distance=INT</span></code></td>
+<td>Soft clip alignments if indels occur INT bp from either end (Default is 5)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--unknowns-penalty=INT</span></code></td>
+<td>Penalty for unknown nucleotides during alignment (Default is 5)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="18%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Filtering</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--discard-empty-pairs</span></code></td>
+<td>If set, discard pairs where both reads have zero length (after any trimming)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--discard-empty-reads</span></code></td>
+<td>If set, discard pairs where either read has zero length (after any trimming)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--left-probe-length=INT</span></code></td>
+<td>Assume R1 starts with probes this long, and trim R2 bases that overlap into this (Default is 0)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-M</span></code></td>
+<td><code class="docutils literal"><span class="pre">--midpoint-merge</span></code></td>
+<td>If set, merge overlapping reads at midpoint of overlap region. Result is in R1 (R2 will be empty)</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td><code class="docutils literal"><span class="pre">--midpoint-trim</span></code></td>
+<td>If set, trim overlapping reads to midpoint of overlap region.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--min-read-length=INT</span></code></td>
+<td>If a read ends up shorter than this threshold it will be trimmed to zero length (Default is 0)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--mismatch-adjustment=STRING</span></code></td>
+<td>Method used to alter bases/qualities at mismatches within overlap region. Allowed values are [none, zero-phred, pick-best] (Default is none)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--right-probe-length=INT</span></code></td>
+<td>Assume R2 starts with probes this long, and trim R1 bases that overlap into this (Default is 0)</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="6%" />
+<col width="23%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--interleave</span></code></td>
+<td>Interleave paired data into a single output file. Default is to split to separate output files.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed used during subsampling.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--subsample=FLOAT</span></code></td>
+<td>If set, subsample the input to retain this fraction of reads.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-T</span></code></td>
+<td><code class="docutils literal"><span class="pre">--threads=INT</span></code></td>
+<td>Number of threads (Default is the number of available cores)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>Paired-end read sequencing with read lengths that are long relative to
+the typical library fragment size can often result in the same bases
+being sequenced by both arms. This repeated sequencing of bases within
+the same fragment can skew variant calling, and so it can be advantageous
+to remove such read overlap.</p>
+<p>In some cases, complete read-through can occur, resulting in additional
+adaptor or non-genomic bases being present at the ends of reads.</p>
+<p>In addition, some library preparation methods rely on the ligation of
+synthetic probe sequence to attract target DNA, which is subsequently
+sequenced.  Since these probe bases do not represent genomic material,
+they must be removed at some point during the analytic pipeline prior to
+variant calling, otherwise they could act as a reference bias when
+calling variants. Removal from the primary arm where the probe is
+attached is typically easy enough (e.g. via <code class="docutils literal"><span class="pre">fastqtrim</span></code>), however in
+cases of high read overlap, probe sequence can also be present in the
+other read arm.</p>
+<p><code class="docutils literal"><span class="pre">petrim</span></code> aligns each read arm against it&#8217;s mate with high stringency
+in order to identify cases of read overlap. The sensitivity of read
+overlap detection is primarily controlled through the use of
+<code class="docutils literal"><span class="pre">--min-identity</span></code> and <code class="docutils literal"><span class="pre">--min-overlap-length</span></code>, although it is also
+possible to adjust the penalties used during alignment.</p>
+<p>The following types of trimming or merging may be applied.</p>
+<ul class="simple">
+<li>Removal of non-genomic bases due to complete read-through. This
+removal is always applied.</li>
+<li>Removal of overlap bases impinging into regions occupied by probe
+bases. For example, if the left arms contain 11-mer probes, using
+<code class="docutils literal"><span class="pre">--left-probe-length=11</span></code> will result in the removal of any right arm
+bases that overlap into the first 11 bases of the left arm. Similar
+trimming is available for situations where probes are ligated to the
+right arm by using <code class="docutils literal"><span class="pre">--right-probe-length</span></code>.</li>
+<li>Adjustment of mismatching read bases inside areas of overlap. Such
+mismatches indicate that one or other of the bases has been
+incorrectly sequenced. Alteration of these bases is selected by
+supplying the <code class="docutils literal"><span class="pre">--mismatch-adjustment</span></code> flag with a value of
+<code class="docutils literal"><span class="pre">zero-phred</span></code> to alter the phred quality score of both bases to zero,
+or <code class="docutils literal"><span class="pre">pick-best</span></code> to choose whichever base had the higher reported
+quality score.</li>
+<li>Removal of overlap regions by trimming both arms back to a point where
+no overlap is present. An equal number of bases are removed from each
+arm. This trimming is enabled by specifying <code class="docutils literal"><span class="pre">--midpoint-trim</span></code> and
+takes place after any read-through or probe related trimming.</li>
+<li>Merging non-redundant sequence from both reads to create a single
+read, enabled via <code class="docutils literal"><span class="pre">--midpoint-merge</span></code>. This is like
+<code class="docutils literal"><span class="pre">--midpoint-trim</span></code> with a subsequent moving of the R2 read onto the
+end of the the R1 read (thus the R2 read becomes empty).</li>
+</ul>
+<p>After trimming or merging it is possible that one or both of the arms of
+the pair have no bases remaining, and a strategy is needed to handle
+these pairs. The default is to retain such pairs in the output, even if
+one or both are zero-length.  When both arms are zero-length, the pair
+can be dropped from output with the use of <code class="docutils literal"><span class="pre">--discard-empty-pairs</span></code>. If
+downstream processing cannot handle zero-length reads,
+<code class="docutils literal"><span class="pre">--discard-empty-reads</span></code> will drop a read pair if either of the arms is
+zero-length.</p>
+<p><code class="docutils literal"><span class="pre">petrim</span></code> also provides the ability to down-sample a read set by using
+the <code class="docutils literal"><span class="pre">--subsample</span></code> option. This will produce a different sampling each time,
+unless an explicit randomization seed is specified via <code class="docutils literal"><span class="pre">--seed</span></code>.</p>
+<div class="section" id="formatting-with-paired-end-trimming-on-the-fly">
+<h4>Formatting with paired-end trimming on the fly<a class="headerlink" href="#formatting-with-paired-end-trimming-on-the-fly" title="Permalink to this headline">¶</a></h4>
+<p>Running custom filtering with <code class="docutils literal"><span class="pre">petrim</span></code> can be done in standard Unix
+sheels without incurring the use of additional disk space or unduly
+slowing down the formatting of reads. The following example demonstrates
+how to apply paired-end trimming while formatting to SDF:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -f fastq-interleaved -o S12_trimmed.sdf \
+    &lt;(rtg petrim -l S12_R1.fastq.gz -r S12_R2.fastq.gz -m -o - --interleaved)
+</pre></div>
+</div>
+<p>This can even be combined with <code class="docutils literal"><span class="pre">fastqtrim</span></code> to provide extremely
+flexible trimming:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -f fastq-interleaved -o S12_trimmed.sdf \
+    &lt;(rtg petrim -m -o - --interleave \
+         -l &lt;(rtg fastqtrim -s 12 -E 18 -i S12_R1.fastq.gz -o -) \
+         -r &lt;(rtg fastqtrim -E 18 -i S12_R2.fastq.gz -o -) \
+     )
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">petrim</span></code> currently assumes Illumina paired-end sequencing,
+and aligns the reads in FR orientation. Sequencing methods which
+produce arms in a different orientation can be processed by first
+converting the input files using <code class="docutils literal"><span class="pre">fastqtrim</span> <span class="pre">--reverse-complement</span></code>,
+running <code class="docutils literal"><span class="pre">petrim</span></code>, followed by another <code class="docutils literal"><span class="pre">fastqtrim</span>
+<span class="pre">--reverse-complement</span></code> to restore the reads to their original
+orientation.</p>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#fastqtrim"><span class="std std-ref">fastqtrim</span></a>,
+<a class="reference internal" href="#format"><span class="std std-ref">format</span></a></p>
 </div>
 </div>
 </div>
@@ -4857,9 +5118,9 @@ accuracy, see:
 and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
 </div>
 </div>
-<div class="section" id="benchmarking-performance-for-snps-vs-indels">
-<h4>Benchmarking performance for SNPs vs indels<a class="headerlink" href="#benchmarking-performance-for-snps-vs-indels" title="Permalink to this headline">¶</a></h4>
-<p>A common desire is to perform analysis separately for SNPs vs
+<div class="section" id="benchmarking-performance-for-snps-versus-indels">
+<h4>Benchmarking performance for SNPs versus indels<a class="headerlink" href="#benchmarking-performance-for-snps-versus-indels" title="Permalink to this headline">¶</a></h4>
+<p>A common desire is to perform analysis separately for SNPs versus
 indels. However, it is important to note that due the representation
 ambiguity problem, it is not always trivial to decide in a global sense
 whether a variant is a SNP or an indel or other complex variant. A group
@@ -4895,7 +5156,7 @@ the baseline and calls (or between calls from one variant caller and
 another), then at some level there is really a semantic difference
 between a &#8220;baseline indel&#8221; and a &#8220;call-set indel&#8221; (or &#8220;variant-caller-A
 indel&#8221; and &#8220;variant-caller-B indel&#8221;), so caution should be applied when
-making conclusions related to SNP vs indel accuracy.</p>
+making conclusions related to SNP versus indel accuracy.</p>
 <p>In the <code class="docutils literal"><span class="pre">snp_roc.tsv</span></code> and <code class="docutils literal"><span class="pre">non_snp_roc.tsv</span></code> output files, <code class="docutils literal"><span class="pre">vcfeval</span></code>
 notes the number of baseline and call variants of each variant
 type. When considering benchmarking metrics in the absence of any
@@ -4998,12 +5259,13 @@ decomposition options) is also available via <code class="docutils literal"><spa
 </table>
 <p><strong>Usage:</strong></p>
 <p>The <code class="docutils literal"><span class="pre">svdecompose</span></code> command is applied to a VCF containing structural
-variants and converts deletion, inversion, and tandem duplications with
-<code class="docutils literal"><span class="pre">SVTYPE</span></code> of <code class="docutils literal"><span class="pre">DEL</span></code>, <code class="docutils literal"><span class="pre">INV</span></code>, and <code class="docutils literal"><span class="pre">DUP</span></code>, respectively, into
-corresponding breakend events with <code class="docutils literal"><span class="pre">SVTYPE=BND</span></code>.  <code class="docutils literal"><span class="pre">svdecompose</span></code> will
-also decompose sequence-resolved insertions and deletions greater than
-<code class="docutils literal"><span class="pre">--min-indel-length</span></code> into breakend representation. Records of others
-types are passed through without modification.</p>
+variants and converts deletion, insertion, inversion, and tandem
+duplications with <code class="docutils literal"><span class="pre">SVTYPE</span></code> of <code class="docutils literal"><span class="pre">DEL</span></code>, <code class="docutils literal"><span class="pre">INS</span></code>, <code class="docutils literal"><span class="pre">INV</span></code>, and
+<code class="docutils literal"><span class="pre">DUP</span></code>, respectively, into corresponding breakend events with
+<code class="docutils literal"><span class="pre">SVTYPE=BND</span></code>.  <code class="docutils literal"><span class="pre">svdecompose</span></code> will also decompose sequence-resolved
+insertions and deletions greater than <code class="docutils literal"><span class="pre">--min-indel-length</span></code> into
+breakend representation. Records of others types are passed through
+without modification.</p>
 <p>This operation can be useful for the purposes of reducing output from
 various structural variant callers to a common representation to
 better facilitate comparison with the <code class="docutils literal"><span class="pre">bndeval</span></code> command.</p>
@@ -5657,7 +5919,7 @@ the two positions.</li>
 <li>Additional ROC data files can be loaded by clicking on the &#8220;Open...&#8221;
 button, and multiple ROC data files within a directory can be loaded
 at once using multi-select.</li>
-<li>The &#8216;Cmd&#8217; button will open a message window that contains a
+<li>The &#8220;Cmd&#8221; button will open a message window that contains a
 command-line equivalent to the currently displayed set of curves. This
 command-line may be copy-pasted, providing an easy way to replicate
 the current set of curves in another session, generate a curve in a
@@ -5666,7 +5928,7 @@ script, or share with a colleague.</li>
 precision/sensitivity graph types.</li>
 </ul>
 <p>Each curve in the GUI has a customization widget on the right hand
-side of the UI that allows several operations:</p>
+side of the window that allows several operations:</p>
 <ul class="simple">
 <li>Rename the title used for the curve via the editable text.</li>
 <li>Temporarily hide/show the curve via selection checkbox.</li>
