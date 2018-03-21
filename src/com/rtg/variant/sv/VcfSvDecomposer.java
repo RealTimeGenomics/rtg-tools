@@ -211,6 +211,9 @@ public class VcfSvDecomposer extends AbstractCli {
             case "DEL":
               return new SvDelDecomposer().decompose(rec);
 
+            case "INS":
+              return new SvInsDecomposer().decompose(rec);
+
             case "INV":
               return new SvInvDecomposer().decompose(rec);
 
@@ -225,7 +228,6 @@ public class VcfSvDecomposer extends AbstractCli {
             case "TRA":
               return new SvTraDecomposer().decompose(rec);
 
-            // case "INS":  // For long ones we can't create appropriate breakends without providing the inserted sequence. Small indels handled separately
             // case "CNV":  // Treat the same as DUP/DEL?
             default:
               break;
@@ -319,6 +321,26 @@ public class VcfSvDecomposer extends AbstractCli {
       return new VcfRecord[] {
         makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end, false), rec, rec.getInfo().get(INFO_CIPOS)),
         makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(ref, false, sequenceName, start, true), rec, rec.getInfo().get(INFO_CIEND)),
+      };
+    }
+  }
+
+  // Make breakends going to a novel sequence
+  // We use a symbolic contig which notionally corresponds to the sample chromosome with indels
+  // Thus truth / query insertion calls that are nearby will have novel sequence coordinates that are also nearby,
+  // facilitating breakend comparisons
+  static class SvInsDecomposer extends SvRecordDecomposer {
+    @Override
+    public VcfRecord[] decompose(VcfRecord rec) {
+      final String sequenceName = rec.getSequenceName();
+      final String novel = "<INS_" + rec.getSequenceName() + ">";
+      final String ref = rec.getAllele(0);
+      final int start = rec.getStart();
+      final int insLength = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_SVLEN);
+      final int remoteEnd = rec.getStart() + insLength;
+      return new VcfRecord[] {
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, novel, start, false), rec, rec.getInfo().get(INFO_CIPOS)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(NEXT_BASE, false, novel, remoteEnd, true), rec, rec.getInfo().get(INFO_CIEND)),
       };
     }
   }

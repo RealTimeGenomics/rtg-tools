@@ -165,6 +165,35 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     assertEquals(hap, VcfUtils.replayAllele(rec, refs));
   }
 
+  public void testInsShortInsRep() {
+    final Map<String, String> refs = new HashMap<>();
+    //                   123456 7 8 -- 1-based
+    refs.put("1",       "CCCCCC G N".replaceAll(" ", ""));
+    //                   123456 789012345678901234567 8 -- 1-based
+    refs.put("<INS_1>", "CCCCCC GAAAAAAAAAAAAAAAAAAAA N".replaceAll(" ", ""));
+    VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("<INS>");
+    rec.addInfo("SVTYPE", "INS");
+    rec.addInfo("END", "7");
+    rec.addInfo("SVLEN", "20");
+    rec.addInfo("CIPOS", "0,0");
+    rec.addInfo("CIEND", "0,0");
+    rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
+    assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;SVLEN=20;CIPOS=0,0;CIEND=0,0\tGT\t1/1", rec.toString());
+    final String hap = refs.get("<INS_1>"); // Expected post-replay haplotype
+    //assertEquals(hap, VcfUtils.replayAllele(rec, refs));
+
+    final VcfRecord[] out = new VcfSvDecomposer.SvInsDecomposer().decompose(rec);
+    assertEquals(2, out.length);
+    final Iterator<VcfRecord> it = Arrays.stream(out).sorted(new ReorderingVcfWriter.VcfPositionalComparator()).iterator();
+    rec = it.next();
+    assertEquals("1\t7\t.\tG\tG[<INS_1>:7[\t.\t.\tSVTYPE=BND;CIPOS=0,0\tGT\t1/1", rec.toString());
+    assertEquals(hap, VcfUtils.replayAllele(rec, refs));
+
+    rec = it.next();
+    assertEquals("1\t7\t.\tG\t]<INS_1>:27]N\t.\t.\tSVTYPE=BND;CIPOS=0,0\tGT\t1/1", rec.toString());
+    //assertEquals(hap, VcfUtils.replayAllele(rec, refs));
+  }
+
   public void testImpureInsShort() {
     final Map<String, String> refs = new HashMap<>();
     //                   123456 789 0 -- 1-based
