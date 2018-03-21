@@ -156,14 +156,13 @@ public final class MathUtils {
    * @return integer which is a power of 2 &gt; x.
    */
   public static long ceilPowerOf2(final long x) {
-    if (x >= (1L << 62) || x < 0) {
+    if (x <= 0 || x >= (1L << 62)) {
+      if (x == 0) {
+        return 1;
+      }
       throw new IllegalArgumentException("Number out of range:" + x);
     }
-    long i = 1L;
-    while (i <= x) {
-      i = i << 1;
-    }
-    return i;
+    return Long.highestOneBit(x) << 1;
   }
 
   /**
