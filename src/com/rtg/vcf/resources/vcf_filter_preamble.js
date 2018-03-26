@@ -79,7 +79,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         }
     }
     /**
-     * Returns a function which will fetch the info field with the given name from the current record
+     * Returns a function which will set the info field with the given name from the current record
      */
     function infoSet(field) {
         return function (value) {
