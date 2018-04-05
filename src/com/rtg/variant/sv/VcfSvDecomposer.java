@@ -316,11 +316,11 @@ public class VcfSvDecomposer extends AbstractCli {
     public VcfRecord[] decompose(VcfRecord rec) {
       final String sequenceName = rec.getSequenceName();
       final int start = rec.getStart();
-      final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END) - 1;
+      final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end, false), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(ref, false, sequenceName, start, true), rec, rec.getInfo().get(INFO_CIEND)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end - 1, false), rec, rec.getInfo().get(INFO_CIPOS)),
+        makeRecord(sequenceName, end - 1, NEXT_BASE, new BreakpointAlt(ref, false, sequenceName, start, true), rec, rec.getInfo().get(INFO_CIEND)),
       };
     }
   }

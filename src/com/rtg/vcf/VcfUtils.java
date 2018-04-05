@@ -126,7 +126,7 @@ public final class VcfUtils {
   /** Confidence interval for END columns. */
   public static final String INFO_CIEND = "CIEND";
 
-  /** End position of structural variant */
+  /** End position of structural variant. One-based inclusive (same as zero-based exclusive). */
   public static final String INFO_END = "END";
 
   /** Imprecise structural variant */
