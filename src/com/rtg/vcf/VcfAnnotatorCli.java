@@ -83,6 +83,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
   private static final String RELABEL_FLAG = "relabel";
   private static final String DERIVED_ANNOTATIONS_FLAG = "annotation";
   private static final String CLUSTER_FLAG = "Xcluster";
+  private static final String OLD_RANGE_OVERLAP = "Xold-id-overlap";
   private static final String STR_FLAG = "Xstr";
 
   /** All known annotators with zero-arg constructors */
@@ -127,6 +128,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     mFlags.registerOptional(FILL_AN_AC_FLAG, "add or update the AN and AC INFO fields").setCategory(REPORTING);
     mFlags.registerOptional('A', DERIVED_ANNOTATIONS_FLAG, String.class, STRING, "add computed annotation to VCF records").setParameterRange(ANNOTATORS.keySet()).setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.registerOptional(CLUSTER_FLAG, "annotate records with number of nearby variants").setCategory(REPORTING);
+    mFlags.registerOptional(OLD_RANGE_OVERLAP, "when annotating IDs from BED/VCF, use old method for determining record overlap (record start position only)").setCategory(REPORTING);
     mFlags.registerOptional(STR_FLAG, File.class, "SDF", "annotate records with simple tandem repeat indicator based on given SDF").setCategory(REPORTING);
     mFlags.setValidator(new VcfAnnotatorValidator());
   }
@@ -178,14 +180,15 @@ public final class VcfAnnotatorCli extends AbstractCli {
       derived.add(DerivedAnnotations.AN.getAnnotation().getName());
     }
 
+    final boolean fullSpan = !mFlags.isSet(OLD_RANGE_OVERLAP);
     final List<VcfAnnotator> annotators = new ArrayList<>();
     if (mFlags.isSet(BED_INFO_FLAG)) {
-      annotators.add(new BedVcfAnnotator((String) mFlags.getValue(INFO_ID_FLAG), (String) mFlags.getValue(INFO_DESCR_FLAG), getFiles(BED_INFO_FLAG)));
+      annotators.add(new BedVcfAnnotator((String) mFlags.getValue(INFO_ID_FLAG), (String) mFlags.getValue(INFO_DESCR_FLAG), getFiles(BED_INFO_FLAG), fullSpan));
     }
     if (mFlags.isSet(BED_IDS_FLAG)) {
-      annotators.add(new BedVcfAnnotator(null, null, getFiles(BED_IDS_FLAG)));
+      annotators.add(new BedVcfAnnotator(null, null, getFiles(BED_IDS_FLAG), fullSpan));
     } else if (mFlags.isSet(VCF_IDS_FLAG)) {
-      annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG)));
+      annotators.add(new VcfIdAnnotator(getFiles(VCF_IDS_FLAG), fullSpan));
     }
     if (mFlags.isSet(STR_FLAG)) {
       mRefSequencesSource = getReference((File) mFlags.getValue(STR_FLAG)).referenceSource();

@@ -33,73 +33,33 @@ package com.rtg.vcf;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.bed.NamedBedRangeLoader;
-import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.vcf.header.InfoField;
-import com.rtg.vcf.header.MetaType;
-import com.rtg.vcf.header.VcfHeader;
-import com.rtg.vcf.header.VcfNumber;
 
 /**
- * Annotates a VCF records that match BED regions with the text from the matching BED region.
+ * Annotates VCF records that overlap BED regions with the text from the matching BED region.
  * Note: Only uses the values from the name BED column (column 4).
  */
 @TestClass("com.rtg.vcf.VcfAnnotatorCliTest")
-public class BedVcfAnnotator implements VcfAnnotator {
-
-
-  /** Per chromosome annotations. */
-  private final ReferenceRanges<String> mAnnotations;
-
-  private final String mInfoId;
-  private final String mInfoDescription;
+public class BedVcfAnnotator extends NamedRangesVcfAnnotator {
 
   /**
    * Constructor
    * @param infoId if non-null, BED annotations will be added as an INFO field with this ID, otherwise add to VCF id column.
    * @param description if non-null, use this description for the INFO field header, if it doesn't already exist.
    * @param bedFiles BED files containing annotations
+   * @param fullSpan if true, full reference span each VCF record will be considered, otherwise just the start position.
    * @throws IOException if the BED file could not be loaded.
    */
-  public BedVcfAnnotator(String infoId, String description, Collection<File> bedFiles) throws IOException {
-    mInfoId = infoId;
-    mInfoDescription = description;
+  public BedVcfAnnotator(String infoId, String description, Collection<File> bedFiles, boolean fullSpan) throws IOException {
+    super(infoId, description, loadBedIdRanges(bedFiles), fullSpan);
+  }
+
+  private static ReferenceRanges<String> loadBedIdRanges(Collection<File> bedFiles) throws IOException {
     final NamedBedRangeLoader bedLoader = new NamedBedRangeLoader();
     bedLoader.loadRanges(bedFiles);
-    mAnnotations = bedLoader.getReferenceRanges();
-  }
-
-  private List<String> annotate(String chr, int loc) {
-    List<String> anno = null;
-    final RangeList<String> chrRanges = mAnnotations.get(chr);
-    if (chrRanges != null) {
-      anno = chrRanges.find(loc);
-    }
-    return anno;
-  }
-
-  @Override
-  public void updateHeader(VcfHeader header) {
-    if (mInfoId != null) {
-      header.ensureContains(new InfoField(mInfoId, MetaType.STRING, new VcfNumber("."), mInfoDescription));
-    }
-  }
-
-  @Override
-  public void annotate(VcfRecord rec) {
-    final List<String> annotation = annotate(rec.getSequenceName(), rec.getStart());
-    if (annotation != null) {
-      if (annotation.size() > 0) {
-        if (mInfoId == null) {
-          rec.setId(annotation.toArray(new String[annotation.size()]));
-        } else {
-          rec.addInfo(mInfoId, annotation.toArray(new String[annotation.size()]));
-        }
-      }
-    }
+    return bedLoader.getReferenceRanges();
   }
 }
