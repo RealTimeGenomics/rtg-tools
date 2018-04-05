@@ -42,4 +42,17 @@ public class RangeTest extends TestCase {
     assertEquals(24, ls.getEnd());
     assertEquals(19, ls.getLength());
   }
+
+
+  public void testOverlaps() {
+    assertFalse(Interval.overlaps(new Range(42, 48), new Range(48, 49)));
+
+    assertTrue(Interval.overlaps(new Range(42, 48), new Range(47, 47)));
+    assertTrue(Interval.overlaps(new Range(42, 48), new Range(47, 48)));
+    assertTrue(Interval.overlaps(new Range(42, 48), new Range(47, 49)));
+
+    assertTrue(Interval.overlaps(new Range(47, 48), new Range(47, 48)));
+
+    assertFalse(Interval.overlaps(new Range(47, 47), new Range(47, 47)));
+  }
 }
