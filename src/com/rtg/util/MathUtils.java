@@ -472,23 +472,43 @@ public final class MathUtils {
     return x == null ? -1 : x;
   }
 
+  private static double median(final double[] values, int start, int end) {
+    final int length = end - start;
+    if (length == 0) {
+      return Double.NaN;
+    }
+    final double median;
+    if (length % 2 == 0) {
+      median = (values[start + length / 2] + values[start + length / 2 - 1]) / 2;
+    } else {
+      median = values[start + length / 2];
+    }
+    return median;
+  }
+
   /**
    * Compute the median of a set of values. Warning: this procedure will sort the array.
    * @param values array of values
    * @return median
    */
   public static double median(final double[] values) {
-    if (values.length == 0) {
-      return Double.NaN;
-    }
     Arrays.sort(values);
-    final double median;
-    if (values.length % 2 == 0) {
-      median = (values[values.length / 2] + values[values.length / 2 - 1]) / 2;
-    } else {
-      median = values[values.length / 2];
-    }
-    return median;
+    return median(values, 0, values.length);
+  }
+
+  /**
+   * Compute the quartiles of a set of values. Warning: this procedure will sort the array.
+   * @param values array of values
+   * @return array of three elements: first, second, and third quartiles
+   */
+  public static double[] quartiles(final double[] values) {
+    Arrays.sort(values);
+    final int qlength = values.length / 2;
+    final double[] result = new double[3];
+    result[0] = median(values, 0, qlength);
+    result[1] = median(values, 0, values.length);
+    result[2] = median(values, values.length - qlength, values.length);
+    return result;
   }
 
   /**
