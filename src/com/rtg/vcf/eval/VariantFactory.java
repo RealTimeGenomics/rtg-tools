@@ -153,6 +153,9 @@ public interface VariantFactory {
     if (gtArr.length == 0 || gtArr.length > 2) {
       throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
     }
+    if (!VcfUtils.isValidGt(rec, gtArr)) {
+      throw new VcfFormatException("VCF record GT contains allele ID out of range, record: " + rec.toString());
+    }
     final String[] alleles = VcfUtils.getAlleleStrings(rec);
     for (final int a : gtArr) {
       if (a > 0) {
