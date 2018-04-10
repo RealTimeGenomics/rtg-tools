@@ -37,19 +37,19 @@ import junit.framework.TestCase;
 public class MultiSetTest extends TestCase {
   public void test() {
     final MultiSet<Integer> set = new MultiSet<>();
-    assertEquals("[ ]", set.toString());
+    assertEquals("[]", set.toString());
     assertEquals(0, set.get(0));
     assertEquals(0, set.totalCount());
     set.globalIntegrity();
 
     assertEquals(1, set.add(0));
-    assertEquals("[ 0->1]", set.toString());
+    assertEquals("[0->1]", set.toString());
     assertEquals(1, set.get(0));
     assertEquals(1, set.totalCount());
     set.globalIntegrity();
 
     assertEquals(2, set.add(0));
-    assertEquals("[ 0->2]", set.toString());
+    assertEquals("[0->2]", set.toString());
     assertEquals(2, set.get(0));
     assertEquals(2, set.totalCount());
     set.globalIntegrity();
@@ -57,7 +57,7 @@ public class MultiSetTest extends TestCase {
     for (int i = 1; i < 10; ++i) {
       set.add(i);
     }
-    final String exp10 = "[ 0->2, 1->1, 2->1, 3->1, 4->1, 5->1, 6->1, 7->1, 8->1, 9->1";
+    final String exp10 = "[0->2, 1->1, 2->1, 3->1, 4->1, 5->1, 6->1, 7->1, 8->1, 9->1";
     assertEquals(exp10 + "]", set.toString());
     assertEquals(2, set.get(0));
     for (int i = 1; i < 10; ++i) {
@@ -81,19 +81,19 @@ public class MultiSetTest extends TestCase {
 
   public void testAdd2() {
     final MultiSet<Integer> set = new MultiSet<>();
-    assertEquals("[ ]", set.toString());
+    assertEquals("[]", set.toString());
     assertEquals(0, set.get(0));
     assertEquals(0, set.totalCount());
     set.globalIntegrity();
 
     set.add(0, 1);
-    assertEquals("[ 0->1]", set.toString());
+    assertEquals("[0->1]", set.toString());
     assertEquals(1, set.get(0));
     assertEquals(1, set.totalCount());
     set.globalIntegrity();
 
     set.add(0, 1);
-    assertEquals("[ 0->2]", set.toString());
+    assertEquals("[0->2]", set.toString());
     assertEquals(2, set.get(0));
     assertEquals(2, set.totalCount());
     set.globalIntegrity();
@@ -101,7 +101,7 @@ public class MultiSetTest extends TestCase {
     for (int i = 1; i < 10; ++i) {
       set.add(i, 1);
     }
-    final String exp10 = "[ 0->2, 1->1, 2->1, 3->1, 4->1, 5->1, 6->1, 7->1, 8->1, 9->1";
+    final String exp10 = "[0->2, 1->1, 2->1, 3->1, 4->1, 5->1, 6->1, 7->1, 8->1, 9->1";
     assertEquals(exp10 + "]", set.toString());
     assertEquals(2, set.get(0));
     for (int i = 1; i < 10; ++i) {

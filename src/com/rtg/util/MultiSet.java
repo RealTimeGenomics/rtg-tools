@@ -83,6 +83,14 @@ public class MultiSet<E> extends IntegralAbstract {
   }
 
   /**
+   * Removes all of the entries this multi-set.
+   */
+  public void clear() {
+    mMap.clear();
+    mTotalCount = 0;
+  }
+
+  /**
    * Add a new element to the multi-set and increment its count.
    * @param element to be added.
    * @param count to increment by.
@@ -138,7 +146,7 @@ public class MultiSet<E> extends IntegralAbstract {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append("[ ");
+    sb.append("[");
     int count = 0;
     int lines = 1;
     for (final Entry<E, Counter> entry : mMap.entrySet()) {
