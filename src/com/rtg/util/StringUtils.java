@@ -42,7 +42,6 @@ import java.util.NavigableSet;
 
 /**
  * String utilities.
- *
  */
 public final class StringUtils {
 
@@ -74,27 +73,6 @@ public final class StringUtils {
    * @return converted string
    */
   public static String convertLineEndings(final String input) {
-    //    final char[] inChar = input.toCharArray();
-    //    final StringBuilder ret = new StringBuilder(input.length());
-    //    char temp = '\0';
-    //    int last = 0;
-    //    for (int i = 0; i < inChar.length; ++i) {
-    //      if (inChar[i] == '\n' || inChar[i] == '\r') {
-    //        if (temp == '\0' || temp == inChar[i]) {
-    //          ret.append(new String(inChar, last, i - last));
-    //          ret.append(LS);
-    //          temp = inChar[i];
-    //        } else {
-    //          temp = '\0';
-    //        }
-    //        last = i + 1;
-    //      }
-    //    }
-    //    if (last < inChar.length) {
-    //      ret.append(inChar, last, inChar.length - last);
-    //    }
-    //    return ret.toString();
-    //Is this too slow?
     return input.replaceAll("(\r\n)|\r|\n", LS);
   }
 

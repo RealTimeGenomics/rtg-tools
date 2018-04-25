@@ -260,32 +260,32 @@ public class StringUtilsTest extends TestCase {
   }
 
   public void testLeftClip() {
-    assertEquals(0, StringUtils.longestPrefix(new String[0]));
-    assertEquals(2, StringUtils.longestPrefix(new String[] {"hi"}));
-    assertEquals(2, StringUtils.longestPrefix(new String[] {"hi", "hi"}));
-    assertEquals(2, StringUtils.longestPrefix(new String[] {"hi", "his"}));
-    assertEquals(2, StringUtils.longestPrefix(new String[] {"hit", "his"}));
-    assertEquals(3, StringUtils.longestPrefix(new String[] {"hit", "hittter", "hits"}));
-    assertEquals(2, StringUtils.longestPrefix(1, new String[] {"hit", "hittter", "hits"}));
-    assertEquals(1, StringUtils.longestPrefix(2, new String[] {"hit", "hittter", "hits"}));
-    assertEquals(0, StringUtils.longestPrefix(3, new String[] {"hit", "hittter", "hits"}));
-    assertEquals(0, StringUtils.longestPrefix(4, new String[] {"hit", "hittter", "hits"}));
+    assertEquals(0, StringUtils.longestPrefix());
+    assertEquals(2, StringUtils.longestPrefix("hi"));
+    assertEquals(2, StringUtils.longestPrefix("hi", "hi"));
+    assertEquals(2, StringUtils.longestPrefix("hi", "his"));
+    assertEquals(2, StringUtils.longestPrefix("hit", "his"));
+    assertEquals(3, StringUtils.longestPrefix("hit", "hittter", "hits"));
+    assertEquals(2, StringUtils.longestPrefix(1, "hit", "hittter", "hits"));
+    assertEquals(1, StringUtils.longestPrefix(2, "hit", "hittter", "hits"));
+    assertEquals(0, StringUtils.longestPrefix(3, "hit", "hittter", "hits"));
+    assertEquals(0, StringUtils.longestPrefix(4, "hit", "hittter", "hits"));
   }
 
   public void testRightClip() {
-    assertEquals(0, StringUtils.longestSuffix(new String[0]));
-    assertEquals(2, StringUtils.longestSuffix(new String[] {"hi"}));
-    assertEquals(2, StringUtils.longestSuffix(new String[] {"hi", "hi"}));
-    assertEquals(2, StringUtils.longestSuffix(new String[] {"hi", "shi"}));
-    assertEquals(2, StringUtils.longestSuffix(new String[] {"thi", "shi"}));
-    assertEquals(3, StringUtils.longestSuffix(new String[] {"rethit", "hit", "rhit"}));
-    assertEquals(2, StringUtils.longestSuffix(1, new String[] {"rethit", "hit", "rhit"}));
-    assertEquals(1, StringUtils.longestSuffix(2, new String[] {"rethit", "hit", "rhit"}));
-    assertEquals(0, StringUtils.longestSuffix(3, new String[] {"rethit", "hit", "rhit"}));
-    assertEquals(0, StringUtils.longestSuffix(4, new String[] {"rethit", "hit", "rhit"}));
+    assertEquals(0, StringUtils.longestSuffix());
+    assertEquals(2, StringUtils.longestSuffix("hi"));
+    assertEquals(2, StringUtils.longestSuffix("hi", "hi"));
+    assertEquals(2, StringUtils.longestSuffix("hi", "shi"));
+    assertEquals(2, StringUtils.longestSuffix("thi", "shi"));
+    assertEquals(3, StringUtils.longestSuffix("rethit", "hit", "rhit"));
+    assertEquals(2, StringUtils.longestSuffix(1, "rethit", "hit", "rhit"));
+    assertEquals(1, StringUtils.longestSuffix(2, "rethit", "hit", "rhit"));
+    assertEquals(0, StringUtils.longestSuffix(3, "rethit", "hit", "rhit"));
+    assertEquals(0, StringUtils.longestSuffix(4, "rethit", "hit", "rhit"));
 
-    assertEquals(6, StringUtils.longestSuffix(new String[] {"acacacac", "acacac"}));
-    assertEquals(0, StringUtils.longestPrefix(6, new String[] {"acacacac", "acacac"}));
+    assertEquals(6, StringUtils.longestSuffix("acacacac", "acacac"));
+    assertEquals(0, StringUtils.longestPrefix(6, "acacacac", "acacac"));
   }
 
   public void testBackslash() {
