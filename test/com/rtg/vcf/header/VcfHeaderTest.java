@@ -32,7 +32,6 @@ package com.rtg.vcf.header;
 
 import static com.rtg.util.StringUtils.TAB;
 
-import java.io.IOException;
 import java.util.HashSet;
 
 import com.rtg.reader.SdfId;
@@ -233,7 +232,8 @@ public class VcfHeaderTest extends TestCase {
   }
 
   private static final String HEADER_SDF_PREFIX = "##TEMPLATE-SDF-ID=";
-  public void testGetSdfId() throws IOException {
+
+  public void testGetSdfId() {
     Diagnostic.setLogStream();
     VcfHeader header = new VcfHeader();
     header.addMetaInformationLine(HEADER_SDF_PREFIX + "blahtblah");
@@ -255,7 +255,5 @@ public class VcfHeaderTest extends TestCase {
     header.addMetaInformationLine(HEADER_SDF_PREFIX + new SdfId(42).toString());
     assertEquals(new SdfId(42), header.getSdfId());
   }
-
-
 }
 
