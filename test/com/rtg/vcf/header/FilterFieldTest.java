@@ -52,4 +52,10 @@ public class FilterFieldTest extends TestCase {
     assertNull(f.superSet(f2));
     assertNull(f2.superSet(f));
   }
+
+  public void testEscapeOnOutput() {
+    final String line = "##FILTER=<ID=SNP_QD_filter,Description=\"Set if true: TYPE=\\\"snp\\\" & QD < 2.0\">";
+    final FilterField f = VcfHeader.parseFilterLine(line);
+    assertEquals(line, f.toString());
+  }
 }

@@ -32,6 +32,7 @@ package com.rtg.vcf.header;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 
 /**
@@ -125,7 +126,7 @@ public class InfoField implements TypedField<InfoField> {
 
   @Override
   public String toString() {
-    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType + ",Description=\"" + mDescription + "\">";
+    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType + ",Description=" + StringUtils.dumbQuote(mDescription) + ">";
   }
 
 }

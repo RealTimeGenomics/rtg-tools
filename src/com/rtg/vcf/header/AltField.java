@@ -32,6 +32,7 @@ package com.rtg.vcf.header;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
+import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
 
 /**
@@ -100,7 +101,7 @@ public class AltField implements IdField<AltField> {
 
   @Override
   public String toString() {
-    return VcfHeader.ALT_STRING + "=<ID=" + mId + ",Description=\"" + mDescription + "\">";
+    return VcfHeader.ALT_STRING + "=<ID=" + mId + ",Description=" + StringUtils.dumbQuote(mDescription) + ">";
   }
 
 }
