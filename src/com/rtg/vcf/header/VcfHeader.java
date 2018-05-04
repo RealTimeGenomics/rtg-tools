@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -246,14 +245,17 @@ public class VcfHeader {
     }
   }
 
+  private <T extends IdField<T>> T findIdField(List<T> src, String id) {
+    return src.stream().filter(f -> f.getId().equals(id)).findFirst().orElse(null);
+  }
+
   private <T extends IdField<T>> void addIdField(List<T> dest, T field) {
-    for (T f : dest) {
-      if (f.getId().equals(field.getId())) {
-        if (!f.equals(field)) {
-          throw new VcfFormatException("VCF header contains multiple field declarations with the same ID=" + field.getId() + StringUtils.LS
-            + f.toString() + StringUtils.LS
-            + field.toString());
-        }
+    final T f = findIdField(dest, field.getId());
+    if (f != null) {
+      if (!f.equals(field)) {
+        throw new VcfFormatException("VCF header contains multiple field declarations with the same ID=" + field.getId() + StringUtils.LS
+          + f.toString() + StringUtils.LS
+          + field.toString());
       }
     }
     dest.add(field);
@@ -331,14 +333,23 @@ public class VcfHeader {
   }
 
   /**
+   * Ensure that the header contains the specified ALT field (or one that is compatible)
+   * @param field the new ALT field
+   */
+  public void ensureContains(AltField field) {
+    if (findIdField(getAltLines(), field.getId()) != null) {
+      return; // Field already present
+    }
+    addAltField(field);
+  }
+
+  /**
    * Ensure that the header contains the specified info field (or one that is compatible)
    * @param field the new format field
    */
   public void ensureContains(FilterField field) {
-    for (FilterField f : getFilterLines()) {
-      if (f.getId().equals(field.getId())) {
-        return; // Field already present
-      }
+    if (getFilterField(field.getId()) != null) {
+      return; // Field already present
     }
     addFilterField(field);
   }
@@ -348,13 +359,12 @@ public class VcfHeader {
    * @param field the new format field
    */
   public void ensureContains(InfoField field) {
-    for (InfoField f : getInfoLines()) {
-      if (f.getId().equals(field.getId())) {
-        if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
-          return; // Field already present
-        } else {
-          throw new VcfFormatException("A VCF INFO field " + field.getId() + " which is incompatible is already present in the VCF header.");
-        }
+    final InfoField f = getInfoField(field.getId());
+    if (f != null) {
+      if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
+        return; // Field already present
+      } else {
+        throw new VcfFormatException("A VCF INFO field " + field.getId() + " which is incompatible is already present in the VCF header.");
       }
     }
     addInfoField(field);
@@ -365,29 +375,15 @@ public class VcfHeader {
    * @param field the new format field
    */
   public void ensureContains(FormatField field) {
-    for (FormatField f : getFormatLines()) {
-      if (f.getId().equals(field.getId())) {
-        if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
-          return; // Field already present
-        } else {
-          throw new VcfFormatException("A VCF FORMAT field " + field.getId() + " which is incompatible is already present in the VCF header.");
-        }
+    final FormatField f = getFormatField(field.getId());
+    if (f != null) {
+      if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
+        return; // Field already present
+      } else {
+        throw new VcfFormatException("A VCF FORMAT field " + field.getId() + " which is incompatible is already present in the VCF header.");
       }
     }
     addFormatField(field);
-  }
-
-  /**
-   * Ensure that the header contains the specified ALT field (or one that is compatible)
-   * @param field the new ALT field
-   */
-  public void ensureContains(AltField field) {
-    for (AltField f : getAltLines()) {
-      if (f.getId().equals(field.getId())) {
-        return; // ALT already present
-      }
-    }
-    addAltField(field);
   }
 
   /**
@@ -447,17 +443,30 @@ public class VcfHeader {
   }
 
   /**
+   * Gets the FilterField corresponding to an ID
+   * @param id the ID to retrieve
+   * @return the corresponding filter field, or null if no field with that ID exists
+   */
+  public FilterField getFilterField(String id) {
+    return findIdField(mFilterLines, id);
+  }
+
+  /**
+   * Gets the InfoField corresponding to an ID
+   * @param id the ID to retrieve
+   * @return the corresponding info field, or null if no field with that ID exists
+   */
+  public InfoField getInfoField(String id) {
+    return findIdField(mInfoLines, id);
+  }
+
+  /**
    * Gets the FormatField corresponding to an ID
    * @param id the ID to retrieve
    * @return the corresponding format field, or null if no field with that ID exists
    */
   public FormatField getFormatField(String id) {
-    for (FormatField f : mFormatLines) {
-      if (f.getId().equals(id)) {
-        return f;
-      }
-    }
-    return null;
+    return findIdField(mFormatLines, id);
   }
 
   /**
@@ -687,24 +696,12 @@ public class VcfHeader {
    * @param names hash set of names to remove
    */
   public void removeSamples(HashSet<String> names) {
-    final ArrayList<String> samplesclone = new ArrayList<>(mSampleNames);
-    for (final String sampleName : samplesclone) {
-      if (names.contains(sampleName)) {
-        mSampleNames.remove(sampleName);
-      }
-    }
+    mSampleNames.removeIf(names::contains);
+    mSampleLines.removeIf(sample -> names.contains(sample.getId()));
     //now reindex the mNameToColumn thing.
     mNameToColumn.clear();
     for (int i = 0; i < mSampleNames.size(); ++i) {
       mNameToColumn.put(mSampleNames.get(i), i);
-    }
-    //and clear out any sample lines
-    final Iterator<SampleField> iterator = mSampleLines.iterator();
-    while (iterator.hasNext()) {
-      final SampleField sample = iterator.next();
-      if (names.contains(sample.getId())) {
-        iterator.remove();
-      }
     }
   }
 
