@@ -32,6 +32,7 @@ package com.rtg.vcf;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -44,6 +45,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.vcf.header.FilterField;
+import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -145,7 +148,7 @@ public class ScriptedVcfFilterTest {
   }
   @Test
   public void testOrder() {
-    VcfHeader header = getVcfHeader();
+    final VcfHeader header = getVcfHeader();
     header.addFormatField("DP", MetaType.INTEGER, VcfNumber.ONE, "FOO");
     final ScriptedVcfFilter filter = getScriptedVcfFilter("SAMPLES[0].DP >= 10", header, "function record() {SAMPLES[0].DP *= 4; return true;}");
     final VcfRecord recordA = new VcfRecord("blah", 2, "A");
@@ -156,6 +159,22 @@ public class ScriptedVcfFilterTest {
     recordB.addFormatAndSample("DP", "9");
     assertTrue(filter.accept(recordA));
     assertFalse(filter.accept(recordB));
+  }
+
+  @Test
+  public void testAddHeaders() {
+    final VcfHeader header = getVcfHeader();
+    final FilterField filterField = new FilterField("newFilter", "FOO");
+    final InfoField infoField = new InfoField("newInfo", MetaType.INTEGER, VcfNumber.ONE, "FOO");
+    final FormatField formatField = new FormatField("newFormat", MetaType.INTEGER, VcfNumber.ONE, "FOO");
+    final ScriptedVcfFilter filter = getScriptedVcfFilter("true", header,
+      "ensureFilterHeader('" + filterField.toString() + "');",
+      "ensureInfoHeader('" + infoField.toString() + "');",
+      "ensureFormatHeader('" + formatField.toString() + "');"
+      );
+    assertNotNull(header.getFilterField(filterField.getId()));
+    assertNotNull(header.getInfoField(infoField.getId()));
+    assertNotNull(header.getFormatField(formatField.getId()));
   }
 
   @Test

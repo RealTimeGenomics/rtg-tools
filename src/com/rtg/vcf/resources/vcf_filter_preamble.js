@@ -180,14 +180,10 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     });
     global.SAMPLES = sampleNames;
 
-    global.ensureFormatHeader = function (format) {
-        var formatField = new FormatField(format);
-        RTG_VCF_HEADER.ensureContains(formatField);
-        var id = formatField.getId();
-        if (!(id in String.prototype)) {
-            stringProps[id] = {get: stringGetFunction(id), set: stringSetFunction(id)};
-            Object.defineProperties(String.prototype, stringProps);
-        }
+    // Declaring/ensuring filter headers is good behaviour, it's not a requirement for filter value setting.
+    global.ensureFilterHeader = function (filter) {
+        var filterField = new FilterField(filter);
+        RTG_VCF_HEADER.ensureContains(filterField);
     };
     global.ensureInfoHeader = function (info) {
         var infoField = new InfoField(info);
@@ -195,6 +191,15 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         var id = infoField.getId();
         if (!(id in global.INFO)) {
             Object.defineProperty(global.INFO, id, {get: infoGet(id), set: infoSet(id)});
+        }
+    };
+    global.ensureFormatHeader = function (format) {
+        var formatField = new FormatField(format);
+        RTG_VCF_HEADER.ensureContains(formatField);
+        var id = formatField.getId();
+        if (!(id in String.prototype)) {
+            stringProps[id] = {get: stringGetFunction(id), set: stringSetFunction(id)};
+            Object.defineProperties(String.prototype, stringProps);
         }
     };
 })(this);
