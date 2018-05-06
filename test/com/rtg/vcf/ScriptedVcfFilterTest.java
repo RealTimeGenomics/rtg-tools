@@ -180,6 +180,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testQual() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
+    assertTrue(getScriptedVcfFilter("QUAL == '.'").accept(record));
     record.setQuality("100");
     assertFalse(getScriptedVcfFilter("QUAL == 10").accept(record));
     assertTrue(getScriptedVcfFilter("QUAL == 100").accept(record));
@@ -187,6 +188,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testId() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
+    assertTrue(getScriptedVcfFilter("ID == '.'").accept(record));
     record.setId("VAR1");
     assertFalse(getScriptedVcfFilter("ID == 'VAR2'").accept(record));
     assertTrue(getScriptedVcfFilter("ID == 'VAR1'").accept(record));
@@ -259,6 +261,68 @@ public class ScriptedVcfFilterTest {
     record.addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("'BOB'.GT = '0/0'; true").accept(record));
     assertEquals("0/0", record.getFormatAndSample().get("GT").get(0));
+  }
+
+  @Test
+  public void testUpdateId() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    assertEquals(VcfRecord.MISSING, record.getId());
+    // Set via string
+    assertTrue(getScriptedVcfFilter("ID = 'BAZ;BANG'; true").accept(record));
+    assertEquals("BAZ;BANG", record.getId());
+    assertTrue(getScriptedVcfFilter("ID = '.'; true").accept(record));
+    assertEquals(VcfRecord.MISSING, record.getId());
+    // Set via array
+    assertTrue(getScriptedVcfFilter("ID = ['BAZ', 'BANG']; true").accept(record));
+    assertEquals("BAZ;BANG", record.getId());
+    assertTrue(getScriptedVcfFilter("ID = ''; true").accept(record));
+    assertEquals(VcfRecord.MISSING, record.getId());
+  }
+
+  @Test
+  public void testUpdateQual() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.setQuality("0.5");
+    assertEquals("0.5", record.getQuality());
+    assertTrue(getScriptedVcfFilter("QUAL = '0.9'; true").accept(record));
+    assertEquals("0.9", record.getQuality());
+  }
+
+  @Test
+  public void testUpdateFilter() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.addFilter("PASS");
+    assertFalse(record.isFiltered());
+    // Set via string
+    assertTrue(getScriptedVcfFilter("FILTER = 'BAZ;BANG'; true").accept(record));
+    assertTrue(record.isFiltered());
+    assertTrue(record.getFilters().contains("BAZ"));
+    assertTrue(record.getFilters().contains("BANG"));
+    // Set via array
+    assertTrue(getScriptedVcfFilter("FILTER = 'BAZ;BANG;BOING'.split(';'); true").accept(record));
+    // Append via string (ugly)
+    assertTrue(getScriptedVcfFilter("FILTER = FILTER.join(';') + ';BOUNCE'; true").accept(record));
+    // Append via array append through var (ugly)
+    assertTrue(getScriptedVcfFilter("f = FILTER; f.push('BOINK'); FILTER = f; true").accept(record));
+    // Append via special mutator (not as ugly)
+    assertTrue(getScriptedVcfFilter("FILTER.add('NOINK').add('DOINK'); true").accept(record));
+    assertTrue(record.isFiltered());
+    //System.err.println(record.getFilters());
+    assertTrue(record.getFilters().contains("BAZ"));
+    assertTrue(record.getFilters().contains("BANG"));
+    assertTrue(record.getFilters().contains("BOING"));
+    assertTrue(record.getFilters().contains("BOUNCE"));
+    assertTrue(record.getFilters().contains("BOINK"));
+    assertTrue(record.getFilters().contains("NOINK"));
+    assertTrue(record.getFilters().contains("DOINK"));
+    assertTrue(getScriptedVcfFilter("FILTER = '.'; true").accept(record));
+    assertFalse(record.isFiltered());
+    assertTrue(getScriptedVcfFilter("FILTER = ['BAZ', 'BANG']; true").accept(record));
+    assertTrue(record.isFiltered());
+    assertTrue(record.getFilters().contains("BAZ"));
+    assertTrue(record.getFilters().contains("BANG"));
+    assertTrue(getScriptedVcfFilter("FILTER = ''; true").accept(record));
+    assertFalse(record.isFiltered());
   }
 
   @Test

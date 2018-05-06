@@ -124,6 +124,30 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     }
 
     /**
+     * Fetch the ID from the current record.
+     * This should really return an array, for consistency with FILTER
+     */
+    function getId() {
+        return RTG_VCF_RECORD.getId();
+    }
+
+    /**
+     * Set the ID for the current record, as string or array
+     */
+    function setId(value) {
+        if (value == null || value == "." || value == false) {
+            RTG_VCF_RECORD.setId();
+        } else {
+            if (!Array.isArray(value)) {
+                value = value.toString().split(';');
+            }
+            if (Array.isArray(value)) {
+                RTG_VCF_RECORD.setId(value);
+            }
+        }
+    }
+
+    /**
      * Fetch the REF from the current record
      */
     function ref() {
@@ -140,32 +164,72 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     /**
      * Fetch the QUAL from the current record
      */
-    function qual() {
+    function getQual() {
         return RTG_VCF_RECORD.getQuality();
+    }
+
+    /**
+     * Set the QUAL for the current record
+     */
+    function setQual(val) {
+        return RTG_VCF_RECORD.setQuality(val);
     }
 
     /**
      * Fetch the FILTER from the current record
      */
-    function filter() {
-        return listToArray(RTG_VCF_RECORD.getFilters());
+    function getFilter() {
+        var filters = listToArray(RTG_VCF_RECORD.getFilters());
+        filters.add = addFilter;
+        return filters;
     }
 
+    function addFilter(val) {
+        RTG_VCF_RECORD.addFilter(val);
+    }
     /**
-     * Fetch the ID from the current record
+     * Set the FILTER for the current record, as string or array
      */
-    function id() {
-        return RTG_VCF_RECORD.getId();
+    function setFilter(value) {
+        if (value == null || value == "." || value == false) {
+            RTG_VCF_RECORD.getFilters().clear();
+        } else {
+            RTG_VCF_RECORD.getFilters().clear();
+            if (!Array.isArray(value)) {
+                value = value.toString().split(';');
+            }
+            if (Array.isArray(value)) {
+                value.forEach(addFilter);
+            }
+        }
+    }
+    /**
+     * Add a FILTER for the current record, as string or array
+     */
+    function addFilter(value) {
+        if (value == null || value == "." || value == false) {
+            RTG_VCF_RECORD.getFilters().clear();
+        } else {
+            if (!Array.isArray(value)) {
+                value = value.toString().split(';');
+            }
+            if (Array.isArray(value)) {
+                value.forEach(function (val) {
+                    RTG_VCF_RECORD.addFilter(val);
+                });
+            }
+        }
+        return getFilter();
     }
 
     var props = {
         CHROM: {get: chrom},
         POS: {get: pos},
-        ID: {get: id},
+        ID: {get: getId, set: setId},
         REF: {get: ref},
         ALT: {get: alt},
-        QUAL: {get: qual},
-        FILTER: {get: filter},
+        QUAL: {get: getQual, set: setQual},
+        FILTER: {get: getFilter, set: setFilter},
     };
     // Expose an API on the global scope
     global.has = function (thing) {
