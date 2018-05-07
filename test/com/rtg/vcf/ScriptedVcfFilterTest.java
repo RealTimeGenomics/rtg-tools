@@ -167,11 +167,11 @@ public class ScriptedVcfFilterTest {
     final FilterField filterField = new FilterField("newFilter", "FOO");
     final InfoField infoField = new InfoField("newInfo", MetaType.INTEGER, VcfNumber.ONE, "FOO");
     final FormatField formatField = new FormatField("newFormat", MetaType.INTEGER, VcfNumber.ONE, "FOO");
-    final ScriptedVcfFilter filter = getScriptedVcfFilter("true", header,
+    getScriptedVcfFilter("true", header,
       "ensureFilterHeader('" + filterField.toString() + "');",
       "ensureInfoHeader('" + infoField.toString() + "');",
       "ensureFormatHeader('" + formatField.toString() + "');"
-      );
+    );
     assertNotNull(header.getFilterField(filterField.getId()));
     assertNotNull(header.getInfoField(infoField.getId()));
     assertNotNull(header.getFormatField(formatField.getId()));
