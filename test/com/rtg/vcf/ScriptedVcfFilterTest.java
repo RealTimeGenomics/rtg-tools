@@ -80,6 +80,41 @@ public class ScriptedVcfFilterTest {
   }
 
   @Test
+  public void testVersionExists() {
+    final VcfRecord record = new VcfRecord("blah", 1, "A");
+    assertTrue(getScriptedVcfFilter("typeof NO_RTG_VERSION == 'undefined'").accept(record));
+    assertTrue(getScriptedVcfFilter("typeof RTG_VERSION != 'undefined'").accept(record));
+  }
+
+  private void expectThrows(String expr) {
+    try {
+      getScriptedVcfFilter("true;", expr);
+      fail();
+    } catch (NoTalkbackSlimException e) {
+      // Expected
+      //System.err.println(e.getMessage());
+    }
+  }
+
+  @Test
+  public void testMinVersion() {
+    expectThrows("preMinVersionExistence('3.9.2');");
+    expectThrows("RTG_VERSION = '3.9.1'; checkMinVersion('3.9.2')");
+    expectThrows("RTG_VERSION = '3.9-dev'; checkMinVersion('3.9.2')");
+    expectThrows("RTG_VERSION = '4.0.1'; checkMinVersion('2017-10-23')");
+    expectThrows("RTG_VERSION = '4.0.1'; checkMinVersion('a.b.c')");
+    expectThrows("RTG_VERSION = '4.0.1'; checkMinVersion('foo')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '3.9.2'; checkMinVersion('3.9')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '3.9-dev'; checkMinVersion('3.9')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '3.9.2'; checkMinVersion('3.9.2')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '3.10'; checkMinVersion('3.9.2')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '3.10.1'; checkMinVersion('3.9.2')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '4.0'; checkMinVersion('3.9.2')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '4.0.1'; checkMinVersion('3.9.2')");
+    getScriptedVcfFilter("true;", "RTG_VERSION = '2017-11-12'; checkMinVersion('3.9.2')");
+  }
+
+  @Test
   public void testPreambleRef() {
     final ScriptedVcfFilter filter = getScriptedVcfFilter("REF == 'A'");
     assertTrue(filter.accept(new VcfRecord("blah", 1, "A")));

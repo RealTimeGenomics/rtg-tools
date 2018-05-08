@@ -41,6 +41,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import com.rtg.util.Environment;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -58,6 +59,7 @@ public class ScriptedVcfFilter implements VcfFilter {
   private static final String RECORD = "record";
   private static final String RECORD_VARIABLE = "RTG_VCF_RECORD";
   private static final String HEADER_VARIABLE = "RTG_VCF_HEADER";
+  private static final String VERSION_VARIABLE = "RTG_VERSION";
 
   private final ScriptEngine mEngine;
   private final CompiledScript mCompiledExpression;
@@ -77,6 +79,7 @@ public class ScriptedVcfFilter implements VcfFilter {
       throw new NoTalkbackSlimException("No compatible javascript engine available");
     }
     mEngine.getContext().setWriter(new OutputStreamWriter(output));
+    mEngine.put(VERSION_VARIABLE, Environment.getProductVersion());
     final Compilable compileable = (Compilable) mEngine;
     if (expression == null) {
       mCompiledExpression = null;

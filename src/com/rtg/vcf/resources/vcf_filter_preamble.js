@@ -266,4 +266,34 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             Object.defineProperties(String.prototype, stringProps);
         }
     };
+
+    global.checkMinVersion = function (minVersion) {
+        var cVersion = RTG_VERSION;
+        var minparts = minVersion.split('.').map(function(v) { return parseInt(v); });
+        var cparts = cVersion.split('-')[0].split('.').map(function(v) { return parseInt(v); });
+        //print("");
+        //print("Testing current version " + cVersion + " against required minimum " + minVersion + " : " + cparts + " " + minparts);
+        var cmaj = cparts[0];
+        var mmaj = minparts[0];
+        if (cmaj > mmaj) {
+            //print("major version OK");
+            return;
+        } else if (cmaj == mmaj) {
+            var cmin = cparts[1];
+            var mmin = minparts[1];
+            if (cmin > mmin) {
+                //print("major same, minor version OK");
+                return;
+            } else if (cmin == mmin) {
+                if (minparts.length < 3 ) {
+                    //print("major same, minor same, patch version irrelevant");
+                    return;
+                } else if ((cparts.length >= 3) && (cparts[2] >= minparts[2])) {
+                    //print("patch version OK");
+                    return;
+                }
+            }
+        }
+        throw "This script requires an RTG version of " + minVersion + " or higher!\n";
+    }
 })(this);
