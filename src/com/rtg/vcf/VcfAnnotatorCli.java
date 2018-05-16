@@ -62,7 +62,6 @@ import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.annotation.DerivedAnnotations;
 import com.rtg.vcf.annotation.SimpleTandemRepeatAnnotator;
 import com.rtg.vcf.annotation.SplitContraryObservationAnnotator;
@@ -205,15 +204,14 @@ public final class VcfAnnotatorCli extends AbstractCli {
     final File inputFile = (File) mFlags.getValue(INPUT_FLAG);
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean stdout = FileUtils.isStdio(output);
     try (VcfReader reader = VcfReader.openVcfReader(inputFile)) {
       final VcfHeader header = reader.getHeader();
       VcfUtils.addHeaderLines(header, extraHeaderLines);
       for (final VcfAnnotator annotator : annotators) {
         annotator.updateHeader(header);
       }
-      final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (VcfWriter writer = getVcfWriter(out, header, vcfFile)) {
+      final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
+      try (VcfWriter writer = getVcfWriter(header, vcfFile)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {
@@ -229,9 +227,9 @@ public final class VcfAnnotatorCli extends AbstractCli {
     return 0;
   }
 
-  private VcfWriter getVcfWriter(final OutputStream out, final VcfHeader header, final File vcfFile) throws IOException {
+  private VcfWriter getVcfWriter(final VcfHeader header, final File vcfFile) throws IOException {
     final boolean isDensity = mFlags.isSet(CLUSTER_FLAG);
-    final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out);
+    final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile);
     return isDensity ? new ClusterAnnotator(writer) : writer;
   }
 }

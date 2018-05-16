@@ -119,25 +119,38 @@ public class VcfWriterFactory {
   /**
    * Make a writer using current configuration
    * @param header the output VCF header
-   * @param output destination file
+   * @param output destination file, or '-' for standard out
    * @return the VcfWriter
    * @throws IOException if there was a problem creating the writer
    */
   public VcfWriter make(VcfHeader header, File output) throws IOException {
     assert output != null;
-    return make(header, output, null);
+    final boolean stdout = FileUtils.isStdio(output);
+    return make(header, stdout ? null : output, stdout ? FileUtils.getStdoutAsOutputStream() : null);
+  }
+
+  /**
+   * Make a writer using the given output stream. The writer produced by this method is
+   * always uncompressed and non-indexed, so should generally only be used by tests.
+   * @param header the output VCF header
+   * @param output destination stream
+   * @return the VcfWriter
+   * @throws IOException if there was a problem creating the writer
+   */
+  public VcfWriter make(VcfHeader header, OutputStream output) throws IOException {
+    assert output != null;
+    return make(header, null, output);
   }
 
   /**
    * Make a writer using current configuration.
-   * XXX This should probably be refactored to use the <code>FileUtils.isStdio</code> approach
    * @param header the output VCF header
    * @param output the output file to be written to
    * @param stdout the output stream of stdout (will only be used if output file is null)
    * @return the VcfWriter
    * @throws IOException if there was a problem creating the writer
    */
-  public VcfWriter make(VcfHeader header, File output, OutputStream stdout) throws IOException {
+  private VcfWriter make(VcfHeader header, File output, OutputStream stdout) throws IOException {
     assert stdout != null || output != null;
     assert output == null || !FileUtils.isStdio(output); // If you're using file-as-stdio, you shouldn't also supply an output stream
     final VcfHeader h2 = header.copy();

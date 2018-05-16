@@ -66,7 +66,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
     final VcfHeader h = variants.calledHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Allele accumulation status"));
     // This writer can't be Async unless we adjust the methods below to take a copy of the record before writing
-    mAlternate = new VcfWriterFactory().async(false).zip(zip).make(h, new File(output, "alternate.vcf" + zipExt), null); // Contains sample calls after subtraction of matched alleles from double-alt cases
+    mAlternate = new VcfWriterFactory().async(false).zip(zip).make(h, new File(output, "alternate.vcf" + zipExt)); // Contains sample calls after subtraction of matched alleles from double-alt cases
   }
 
   @Override

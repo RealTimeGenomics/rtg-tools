@@ -29,17 +29,14 @@
  */
 package com.rtg.vcf.eval;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfWriter;
-import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -169,18 +166,4 @@ class Ga4ghLooseMatchFilter implements VcfWriter {
     }
   }
 
-  // Test main first arg must be match distance, second is VCF file name (stdin if omitted)
-  public static void main(String[] args) throws IOException {
-    int arg = 0;
-    final int distance = args.length > 0 ? Integer.parseInt(args[arg++]) : 30;
-    final String file = arg < args.length ? args[arg] : "-";
-    try (VcfReader reader = VcfReader.openVcfReader(new File(file))) {
-      try (VcfWriter writer = new Ga4ghLooseMatchFilter(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
-        while (reader.hasNext()) {
-          final VcfRecord rec = reader.next();
-          writer.write(rec);
-        }
-      }
-    }
-  }
 }

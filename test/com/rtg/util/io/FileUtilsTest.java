@@ -148,6 +148,15 @@ public class FileUtilsTest extends TestCase {
     }
   }
 
+  public void testIsStdio() {
+    assertTrue(FileUtils.isStdio(FileUtils.STDIO_FILE));
+    assertTrue(FileUtils.isStdio(FileUtils.STDIO_NAME));
+    assertFalse(FileUtils.isStdio((String) null));
+    assertFalse(FileUtils.isStdio((File) null));
+    assertFalse(FileUtils.isStdio(""));
+    assertFalse(FileUtils.isStdio("foo.vcf"));
+  }
+
   public void testStringToFile() throws Exception {
     final String test = "A test string...";
     File f = FileHelper.createTempFile();

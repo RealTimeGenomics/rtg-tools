@@ -184,6 +184,8 @@ public class VcfUtilsTest extends TestCase {
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf")).getName());
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test.vcf.gz")).getName());
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test.vcf.gz")).getName());
+    assertEquals("-", VcfUtils.getZippedVcfFileName(false, new File("-")).getName());
+    assertEquals("-", VcfUtils.getZippedVcfFileName(true, new File("-")).getName());
   }
 
   public void testConfidenceIntervalRetrieval() {

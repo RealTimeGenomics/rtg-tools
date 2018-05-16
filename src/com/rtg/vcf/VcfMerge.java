@@ -207,9 +207,9 @@ public class VcfMerge extends AbstractCli {
     }
 
     final boolean stdout = FileUtils.isStdio(outFile);
-    final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, outFile);
+    final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, outFile);
     try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
-      try (VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
+      try (final VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
         final ZipperCallback callback = (records, headers) -> {
           assert records.length > 0;
           final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);

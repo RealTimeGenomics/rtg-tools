@@ -47,7 +47,7 @@ public class ClusterAnnotatorTest extends AbstractNanoTest {
     try (final ByteArrayOutputStream bos = new ByteArrayOutputStream();
          final PrintStream out = new PrintStream(bos)) {
       try (VcfReader reader = new VcfReader(new BufferedReader(new InputStreamReader(ClusterAnnotatorTest.class.getClassLoader().getResourceAsStream("com/rtg/vcf/resources/vcfdensity_in.vcf"))))) {
-        try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, out), distance)) {
+        try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), out), distance)) {
           while (reader.hasNext()) {
             final VcfRecord rec = reader.next();
             writer.write(rec);

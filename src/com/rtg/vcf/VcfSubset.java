@@ -58,7 +58,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.IdField;
@@ -205,11 +204,10 @@ public class VcfSubset extends AbstractCli {
     final File input = (File) mFlags.getValue(INPUT_FLAG);
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final boolean stdout = FileUtils.isStdio(output);
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
-    final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
+    final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
     try (final VcfReader reader = VcfReader.openVcfReader(input)) {
       final VcfHeader header = reader.getHeader();
 
@@ -316,7 +314,7 @@ public class VcfSubset extends AbstractCli {
       if (formatStripper != null) {
         formatStripper.updateHeader(header);
       }
-      try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
+      try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           for (final VcfAnnotator annotator : annotators) {

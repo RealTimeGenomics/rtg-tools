@@ -106,7 +106,7 @@ public class FixedStepPopulationVariantGeneratorCli extends AbstractCli {
     final double af = (Double) flags.getValue(FREQUENCY);
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReader(input, true, LongRange.NONE)) {
       final FixedStepPopulationVariantGenerator fs = new FixedStepPopulationVariantGenerator(dsr, distance, mutator, random, af);
-      PopulationVariantGenerator.writeAsVcf(outputVcf, null, fs.generatePopulation(), dsr, seed);
+      PopulationVariantGenerator.writeAsVcf(outputVcf, fs.generatePopulation(), dsr, seed);
       return 0;
     }
   }

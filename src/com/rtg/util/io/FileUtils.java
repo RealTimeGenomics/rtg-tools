@@ -102,6 +102,9 @@ public final class FileUtils {
   /** File name argument used to indicate read from stdin or write to stdout */
   public static final String STDIO_NAME = "-";
 
+  /** File argument used to indicate read from stdin or write to stdout */
+  public static final File STDIO_FILE = new File(STDIO_NAME);
+
   private FileUtils() {
   }
 

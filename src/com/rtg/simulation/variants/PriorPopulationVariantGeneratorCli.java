@@ -47,7 +47,6 @@ import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.intervals.LongRange;
-import com.rtg.util.io.FileUtils;
 import com.rtg.variant.GenomePriorParams;
 import com.rtg.vcf.VcfUtils;
 
@@ -115,8 +114,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File out = (File) flags.getValue(OUTPUT_VCF);
     final boolean gzip = !flags.isSet(CommonFlags.NO_GZIP);
-    final boolean stdout = FileUtils.isStdio(out);
-    final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, out);
+    final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, out);
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final int targetVariants;
       if (flags.isSet(RATE_FLAG)) {
@@ -125,7 +123,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
         targetVariants = (int) (dsr.totalLength() * priors.rate());
       }
       final PriorPopulationVariantGenerator fs = new PriorPopulationVariantGenerator(dsr, priors, random, (Double) flags.getValue(BIAS_FLAG), targetVariants);
-      PopulationVariantGenerator.writeAsVcf(vcfFile, output, fs.generatePopulation(), dsr, seed);
+      PopulationVariantGenerator.writeAsVcf(vcfFile, fs.generatePopulation(), dsr, seed);
     }
     return 0;
   }

@@ -420,7 +420,7 @@ public final class VcfFilterCli extends AbstractCli {
       final VcfHeader header = r.getHeader();
       VcfUtils.addHeaderLines(header, extraHeaderLines);
       mVcfFilterTask.setHeader(header);
-      try (VcfWriter w = getVcfWriter(header, output, out)) {
+      try (VcfWriter w = getVcfWriter(header, out)) {
         mVcfFilterTask.process(r, w);
       }
       if (!stdout && out != null) {
@@ -430,13 +430,13 @@ public final class VcfFilterCli extends AbstractCli {
     }
   }
 
-  private VcfWriter getVcfWriter(VcfHeader header, OutputStream output, File out) throws IOException {
+  private VcfWriter getVcfWriter(VcfHeader header, File out) throws IOException {
     if (out == null) {
       return new NullVcfWriter(header);
     }
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    final File outputFile = FileUtils.isStdio(out) ? null : VcfUtils.getZippedVcfFileName(gzip, out);
-    return new VcfWriterFactory(mFlags).addRunInfo(true).make(header, outputFile, output);
+    final File outputFile = VcfUtils.getZippedVcfFileName(gzip, out);
+    return new VcfWriterFactory(mFlags).addRunInfo(true).make(header, outputFile);
   }
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {

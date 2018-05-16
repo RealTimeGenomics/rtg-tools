@@ -95,7 +95,7 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     int id = 0;
     final List<Variant> list = new ArrayList<>();
     try (VcfIterator reader = getReader()) {
-      try (VcfWriter preprocessed = mDecomposedFile == null ? new NullVcfWriter(reader.getHeader()) : new VcfWriterFactory().make(reader.getHeader(), mDecomposedFile, null)) {
+      try (VcfWriter preprocessed = mDecomposedFile == null ? new NullVcfWriter(reader.getHeader()) : new VcfWriterFactory().make(reader.getHeader(), mDecomposedFile)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           preprocessed.write(rec);

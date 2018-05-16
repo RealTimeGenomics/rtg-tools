@@ -110,8 +110,8 @@ public final class VcfDecomposerCli extends AbstractCli {
           SdfUtils.validateNoDuplicates(templateSequences, false);
           checkHeader(header, templateSequences.getSdfId());
         }
-        final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out), templateSequences, mFlags.isSet(BREAK_MNPS), mFlags.isSet(BREAK_INDELS))) {
+        final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
+        try (DecomposingVcfWriter writer = new DecomposingVcfWriter(new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile), templateSequences, mFlags.isSet(BREAK_MNPS), mFlags.isSet(BREAK_INDELS))) {
           while (reader.hasNext()) {
             writer.write(reader.next());
           }

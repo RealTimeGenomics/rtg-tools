@@ -35,6 +35,7 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 
 import com.rtg.util.MathUtils;
+import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -143,7 +144,7 @@ public class ClusterAnnotator implements VcfWriter {
   public static void main(String[] args) throws IOException {
     final int distance = Integer.parseInt(args[0]);
     try (VcfReader reader = VcfReader.openVcfReader(new File(args[1]))) {
-      try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), null, System.out), distance)) {
+      try (VcfWriter writer = new ClusterAnnotator(new VcfWriterFactory().addRunInfo(true).make(reader.getHeader(), FileUtils.STDIO_FILE), distance)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           writer.write(rec);

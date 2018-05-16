@@ -77,7 +77,7 @@ public class SampleSimulatorTest extends TestCase {
       final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(seed), 0.5);
       final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
       final File popVcf = new File(dir, "popVcf.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(popVcf, null, variants, sr, seed);
+      PopulationVariantGenerator.writeAsVcf(popVcf, variants, sr, seed);
       final String popVarStr = FileHelper.gzFileToString(popVcf);
       //System.out.println("-- Population Variants --");
       //System.out.println(popVarStr);

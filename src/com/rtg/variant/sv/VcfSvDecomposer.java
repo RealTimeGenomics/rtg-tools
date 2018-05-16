@@ -62,7 +62,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.mode.DNA;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.BreakpointAlt;
 import com.rtg.vcf.ReorderingVcfWriter;
 import com.rtg.vcf.SymbolicAlt;
@@ -135,7 +134,6 @@ public class VcfSvDecomposer extends AbstractCli {
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final boolean retainOriginal = mFlags.isSet(RETAIN_ORIGINAL);
-    final boolean stdout = FileUtils.isStdio(output);
     final SvDecomposer d = new SvDecomposer((Integer) mFlags.getValue(INDEL_LENGTH));
     final Map<String, ArrayList<VcfRecord>> records = new LinkedHashMap<>();
     try (final VcfIterator reader = VcfReader.openVcfReader(inputFile)) {
@@ -154,8 +152,8 @@ public class VcfSvDecomposer extends AbstractCli {
 
       records.values().forEach(v -> v.sort(new ReorderingVcfWriter.VcfPositionalComparator()));
 
-      final File vcfFile = stdout ? null : VcfUtils.getZippedVcfFileName(gzip, output);
-      try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile, out)) {
+      final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
+      try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
         for (ArrayList<VcfRecord> recs : records.values()) {
           for (final VcfRecord rec : recs) {
             writer.write(rec);

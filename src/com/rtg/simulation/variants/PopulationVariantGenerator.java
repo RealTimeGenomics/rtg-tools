@@ -32,7 +32,6 @@ package com.rtg.simulation.variants;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -160,20 +159,19 @@ public abstract class PopulationVariantGenerator {
   /**
    * Writes out variants to VCF file
    * @param vcfOutput output file (should have gzip extension)
-   * @param stream output stream (will be used if output file is null)
    * @param variants variants to output
    * @param reference reference sequences reader
    * @param seed the seed used during generation
    * @throws java.io.IOException if there is a problem during writing
    */
-  public static void writeAsVcf(File vcfOutput, OutputStream stream, List<PopulationVariant> variants, SequencesReader reference, long seed) throws IOException {
+  public static void writeAsVcf(File vcfOutput, List<PopulationVariant> variants, SequencesReader reference, long seed) throws IOException {
     final VcfHeader header = new VcfHeader();
     header.addCommonHeader();
     header.addLine(VcfHeader.META_STRING + "SEED=" + seed);
     header.addReference(reference);
     header.addContigFields(reference);
     header.addInfoField(VcfUtils.INFO_ALLELE_FREQ, VcfUtils.INFO_ALLELE_FREQ_TYPE, VcfUtils.INFO_ALLELE_FREQ_NUM, VcfUtils.INFO_ALLELE_FREQ_DESC);
-    try (VcfWriter writer = new VcfWriterFactory().zip(vcfOutput != null && FileUtils.isGzipFilename(vcfOutput)).make(header, vcfOutput, stream)) {
+    try (VcfWriter writer = new VcfWriterFactory().zip(vcfOutput != null && FileUtils.isGzipFilename(vcfOutput)).make(header, vcfOutput)) {
       for (PopulationVariant var : variants) {
         final VcfRecord rec = var.toVcfRecord(reference);
         writer.write(rec);
