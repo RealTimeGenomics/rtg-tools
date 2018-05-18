@@ -342,10 +342,6 @@ public class GenomeRelationships {
    */
   String toGraphViz(Properties props, final String title, boolean simpleLayout) {
     final String invisNode = " " + props.getProperty("invisible.node", "[shape=point,style=filled,label=\"\",height=.001,width=.001]") + ";\n";
-    final String font = props.getProperty("font", "");
-    final String color = props.getProperty("color", "");
-    final String bgcolor = props.getProperty("bgcolor", "");
-    final String gradientangle = props.getProperty("gradientangle", "270");
     final String maleShape = props.getProperty("male.shape", "box");
     final String femaleShape = props.getProperty("male.shape", "oval");
     final String unknownShape = props.getProperty("male.shape", "diamond");
@@ -353,28 +349,8 @@ public class GenomeRelationships {
     final String femaleFill = props.getProperty("female.fill", "pink");
     final String unknownFill = props.getProperty("unknown.fill", "none");
     final String diseaseFill = props.getProperty("disease.fill", "grey");
-
     final StringBuilder sb = new StringBuilder();
-    sb.append("digraph Ped {\n  graph [fontname = \"")
-      .append(font)
-      .append("\", color=\"")
-      .append(color)
-      .append("\", bgcolor=\"")
-      .append(bgcolor)
-      .append("\"];\n")
-      .append("  node [fontname = \"")
-      .append(font)
-      .append("\", color=\"")
-      .append(color)
-      .append("\", gradientangle=\"")
-      .append(gradientangle)
-      .append("\"];\n  edge [fontname = \"")
-      .append(font)
-      .append("\", color=\"")
-      .append(color)
-      .append("\"];\n  ratio =\"auto\";\n  mincross = 2.0;\n  labelloc = \"t\";\n  label=\"")
-      .append(title)
-      .append("\";\n\n");
+    sb.append(initGraph(props, "Ped", title));
 
     final HashSet<Relationship> seen = new HashSet<>();
     final Map<String, String> nodeIds = new HashMap<>();
@@ -470,6 +446,43 @@ public class GenomeRelationships {
     }
 
     sb.append("}\n");
+    return sb.toString();
+  }
+
+  /**
+   * Create a <code>graphviz</code> compatible graph initialization. This is fairly usable
+   * across different graphs, and should eventually be pulled out somewhere common.
+   * @param props May contain properties used to set the font, color, etc
+   * @param graphName The name of the graph
+   * @param graphTitle The title of the graph
+   * @return the graph initialization string
+   */
+  public static String initGraph(Properties props, String graphName, String graphTitle) {
+    final StringBuilder sb = new StringBuilder();
+    final String font = props.getProperty("font", "");
+    final String color = props.getProperty("color", "");
+    final String bgcolor = props.getProperty("bgcolor", "");
+    final String gradientangle = props.getProperty("gradientangle", "270");
+    sb.append("digraph ").append(graphName).append(" {\n  graph [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\", bgcolor=\"")
+      .append(bgcolor)
+      .append("\"];\n")
+      .append("  node [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\", gradientangle=\"")
+      .append(gradientangle)
+      .append("\"];\n  edge [fontname = \"")
+      .append(font)
+      .append("\", color=\"")
+      .append(color)
+      .append("\"];\n  ratio =\"auto\";\n  mincross = 2.0;\n  labelloc = \"t\";\n  label=\"")
+      .append(graphTitle)
+      .append("\";\n\n");
     return sb.toString();
   }
 
