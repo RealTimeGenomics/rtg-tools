@@ -4,6 +4,31 @@ Below are the release notes for the full RTG suite, upon which
 RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
+RTG Core 3.9.1 (2018-05-29)
+---------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* map: Fix a rare circumstance where mapping using a reference based
+  hash blacklist would use significantly more memory than required.
+
+* vcffilter: JavaScript functions can test for the version of RTG they
+  are running under (for checking minimum required version for feature
+  compatibility) via a call of the form: "checkMinVersion('3.9.2')"
+
+* vcffilter: JavaScript now supports writing of ID, QUAL, and FILTER
+  fields. Added function "ensureFilterHeader" that works the same way as
+  ensureInfoHeader and ensureFormatHeader for defining new FILTERs.
+
+* coverage: Improve binning when reporting coverage levels for very deep
+  (e.g. >10000X) sequencing datasets.
+
+* vcfeval: More graceful handling of a malformed GT in an input VCF.
+
+* many: Fix escaping of description fields when writing VCF header
+  lines.
+
+
 RTG Core 3.9 (2018-03-22)
 -------------------------
 
