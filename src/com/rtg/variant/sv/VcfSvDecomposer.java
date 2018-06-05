@@ -66,6 +66,7 @@ import com.rtg.vcf.BreakpointAlt;
 import com.rtg.vcf.ReorderingVcfWriter;
 import com.rtg.vcf.SymbolicAlt;
 import com.rtg.vcf.VariantType;
+import com.rtg.vcf.VcfFormatException;
 import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -141,12 +142,16 @@ public class VcfSvDecomposer extends AbstractCli {
       header.getContigLines().stream().map(ContigField::getId).forEach(chr -> records.computeIfAbsent(chr, k -> new ArrayList<>())); // Ensure same sort order as header if possible
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
-        final VcfRecord[] decomposed = d.decompose(rec);
-        if (decomposed != null) {
-          add(records, decomposed);
-        }
-        if (decomposed == null || retainOriginal) {
-          add(records, rec);
+        try {
+          final VcfRecord[] decomposed = d.decompose(rec);
+          if (decomposed != null) {
+            add(records, decomposed);
+          }
+          if (decomposed == null || retainOriginal) {
+            add(records, rec);
+          }
+        } catch (VcfFormatException e) {
+          throw new VcfFormatException(e.getMessage() + "\n" + rec.toString());
         }
       }
 
@@ -315,6 +320,7 @@ public class VcfSvDecomposer extends AbstractCli {
       final String sequenceName = rec.getSequenceName();
       final int start = rec.getStart();
       final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
+      assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
         makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end - 1, false), rec, rec.getInfo().get(INFO_CIPOS)),
@@ -334,7 +340,10 @@ public class VcfSvDecomposer extends AbstractCli {
       final String novel = "<INS_" + rec.getSequenceName() + ">";
       final String ref = rec.getAllele(0);
       final int start = rec.getStart();
-      final int insLength = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_SVLEN);
+      final Integer insLength = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_SVLEN);
+      if (insLength == null) {
+        throw new VcfFormatException("VCF record with SVTYPE=INS did not have an SVLEN annotation (required to compute insertion length)");
+      }
       final int remoteEnd = rec.getStart() + insLength;
       return new VcfRecord[] {
         makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, novel, start, false), rec, rec.getInfo().get(INFO_CIPOS)),
@@ -350,6 +359,7 @@ public class VcfSvDecomposer extends AbstractCli {
       final String sequenceName = rec.getSequenceName();
       final int start = rec.getStart();
       final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
+      assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
         makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, false), rec, rec.getInfo().get(INFO_CIPOS)),
@@ -366,6 +376,7 @@ public class VcfSvDecomposer extends AbstractCli {
       final String sequenceName = rec.getSequenceName();
       final int start = rec.getStart();
       final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
+      assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
         makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, true), rec, rec.getInfo().get(INFO_CIPOS)),
@@ -381,6 +392,7 @@ public class VcfSvDecomposer extends AbstractCli {
       final String sequenceName = rec.getSequenceName();
       final int start = rec.getStart();
       final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
+      assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       final BreakpointAlt a2 = makeBreakendFromTra(rec, ref, end);
       return a2 == null ? null : new VcfRecord[] {

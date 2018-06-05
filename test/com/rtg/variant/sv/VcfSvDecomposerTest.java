@@ -41,6 +41,7 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.ReorderingVcfWriter;
+import com.rtg.vcf.VcfFormatException;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -174,11 +175,18 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("<INS>");
     rec.addInfo("SVTYPE", "INS");
     rec.addInfo("END", "7");
-    rec.addInfo("SVLEN", "20");
     rec.addInfo("CIPOS", "0,0");
     rec.addInfo("CIEND", "0,0");
     rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
-    assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;SVLEN=20;CIPOS=0,0;CIEND=0,0\tGT\t1/1", rec.toString());
+    assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;CIPOS=0,0;CIEND=0,0\tGT\t1/1", rec.toString());
+    try {
+      new VcfSvDecomposer.SvInsDecomposer().decompose(rec);
+      fail("Should have complained about lack of SVLEN");
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+    rec.addInfo("SVLEN", "20");
+    assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;CIPOS=0,0;CIEND=0,0;SVLEN=20\tGT\t1/1", rec.toString());
     final String hap = refs.get("<INS_1>"); // Expected post-replay haplotype
     //assertEquals(hap, VcfUtils.replayAllele(rec, refs));
 
