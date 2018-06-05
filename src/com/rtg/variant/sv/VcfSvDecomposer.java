@@ -62,6 +62,7 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.mode.DNA;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.vcf.BreakpointAlt;
 import com.rtg.vcf.ReorderingVcfWriter;
 import com.rtg.vcf.SymbolicAlt;
@@ -142,16 +143,12 @@ public class VcfSvDecomposer extends AbstractCli {
       header.getContigLines().stream().map(ContigField::getId).forEach(chr -> records.computeIfAbsent(chr, k -> new ArrayList<>())); // Ensure same sort order as header if possible
       while (reader.hasNext()) {
         final VcfRecord rec = reader.next();
-        try {
-          final VcfRecord[] decomposed = d.decompose(rec);
-          if (decomposed != null) {
-            add(records, decomposed);
-          }
-          if (decomposed == null || retainOriginal) {
-            add(records, rec);
-          }
-        } catch (VcfFormatException e) {
-          throw new VcfFormatException(e.getMessage() + "\n" + rec.toString());
+        final VcfRecord[] decomposed = d.decompose(rec);
+        if (decomposed != null) {
+          add(records, decomposed);
+        }
+        if (decomposed == null || retainOriginal) {
+          add(records, rec);
         }
       }
 
@@ -186,10 +183,14 @@ public class VcfSvDecomposer extends AbstractCli {
       final String alt = rec.getAllele(1);
       final VariantType vt = VariantType.getType(ref, alt);
       VcfRecord[] decomposed = null;
-      if (vt == VariantType.SV_SYMBOLIC) {
-        decomposed = decomposeSymbolic(rec, new SymbolicAlt(alt));
-      } else if (vt.isIndelType() && Math.abs(ref.length() - alt.length()) >= mMinIndelLength) {
-        decomposed = decomposeNonSymbolic(rec, ref, alt);
+      try {
+        if (vt == VariantType.SV_SYMBOLIC) {
+          decomposed = decomposeSymbolic(rec, new SymbolicAlt(alt));
+        } else if (vt.isIndelType() && Math.abs(ref.length() - alt.length()) >= mMinIndelLength) {
+          decomposed = decomposeNonSymbolic(rec, ref, alt);
+        }
+      } catch (VcfFormatException e) {
+        Diagnostic.userLog(e.getMessage() + "\n" + rec.toString());
       }
       return decomposed;
     }
