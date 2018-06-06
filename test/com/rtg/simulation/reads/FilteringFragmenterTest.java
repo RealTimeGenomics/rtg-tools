@@ -53,7 +53,7 @@ public class FilteringFragmenterTest extends TestCase {
   public void test() throws IOException {
     final ReferenceRegions bed = new ReferenceRegions();
     bed.add("foo", 20, 29);
-    final DistributionSampler[] dist = {new DistributionSampler(new double[] {1.0})};
+    final DistributionSampler[] dist = {new DistributionSampler(1.0)};
     final SequencesReader[] readers = {ReaderTestUtils.getReaderDnaMemory(">foo" + StringUtils.LS + "ACGTACCCACAGAGATAGACACACGTAGATGACACAGCCATGTCCCGCCATAT")};
     final MockMachine m = new MockMachine();
     final FilteringFragmenter fragmenter = new FilteringFragmenter(bed, 23, dist, readers);

@@ -142,9 +142,7 @@ public abstract class PopulationVariantGenerator {
         ret.add(variant);
       }
     } while (variant != null && needMoreVariants());
-    final ArrayList<PopulationVariant> fin = new ArrayList<>();
-    fin.addAll(ret);
-    return fin;
+    return new ArrayList<>(ret);
   }
 
   /**

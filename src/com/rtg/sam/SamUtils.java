@@ -926,8 +926,7 @@ public final class SamUtils {
 
     final SAMFileHeader header = first;
     if (readGroups.size() > 0) {
-      final List<SAMReadGroupRecord> recList = new ArrayList<>();
-      recList.addAll(readGroups.values());
+      final List<SAMReadGroupRecord> recList = new ArrayList<>(readGroups.values());
       header.setReadGroups(recList);
     }
     if (currentGuid.available() && !getReferenceGuid(header).available()) {

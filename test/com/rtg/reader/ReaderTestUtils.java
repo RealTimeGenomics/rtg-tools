@@ -311,7 +311,7 @@ public final class ReaderTestUtils {
    * @throws IOException if data is invalid
    */
   public static SequencesReader getReaderProteinMemory(String sequence) throws IOException {
-    final SequencesWriter sw = new SequencesWriter(new FastaSequenceDataSource(Collections.singletonList((InputStream) new ByteArrayInputStream(sequence.getBytes())), new ProteinFastaSymbolTable()), null, PrereadType.UNKNOWN, true);
+    final SequencesWriter sw = new SequencesWriter(new FastaSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(sequence.getBytes())), new ProteinFastaSymbolTable()), null, PrereadType.UNKNOWN, true);
     sw.setSdfId(DUMMY_TEST_ID);
     return sw.processSequencesInMemory(null, true, new SimpleNames(), new SimpleNames(), LongRange.NONE);
   }

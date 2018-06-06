@@ -131,9 +131,9 @@ public class GenerateReferenceManifest extends AbstractCli {
               if (sequence.isSpecified()) {
                 final long seqId = names.get(sequence.name());
                 writer.write(sequence.name());
-                for (int i = 0; i < getters.length; ++i) {
+                for (final GetCheckValue getter : getters) {
                   writer.write("\t");
-                  writer.write(getters[i].getValue(reader, seqId));
+                  writer.write(getter.getValue(reader, seqId));
                 }
                 writer.write("\n");
               }

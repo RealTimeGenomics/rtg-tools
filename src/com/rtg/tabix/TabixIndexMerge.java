@@ -90,7 +90,6 @@ public final class TabixIndexMerge {
    * @return a list
    */
   public static List<SequenceIndex> collapseIndexes(SequenceIndex[][] indexesSquared, String[][] sequenceNames) {
-    final ArrayList<SequenceIndex> ret = new ArrayList<>();
     assert indexesSquared.length > 0 && sequenceNames.length == indexesSquared.length;
     SequenceIndex[] mergeMaster = indexesSquared[0];
     String[] nameMaster = sequenceNames[0];
@@ -99,7 +98,7 @@ public final class TabixIndexMerge {
       mergeMaster = collapse(mergeMaster, indexesSquared[i], mergeName, nameMaster, sequenceNames[i]);
       nameMaster = mergeName;
     }
-    ret.addAll(Arrays.asList(mergeMaster));
+    final ArrayList<SequenceIndex> ret = new ArrayList<>(Arrays.asList(mergeMaster));
     return ret;
   }
 

@@ -83,7 +83,7 @@ public class RangeList<T> {
      * @param meta the meta-data to store.
      */
     public RangeData(int start, int end, T meta) {
-      this(start, end, new ArrayList<T>());
+      this(start, end, new ArrayList<>());
       mMeta.add(meta);
     }
 
@@ -187,7 +187,7 @@ public class RangeList<T> {
   public RangeList(List<RangeData<T>> ranges) {
     if (ranges == null || ranges.isEmpty()) {
       mRanges = new ArrayList<>(1);
-      mRanges.add(new RangeData<T>(Integer.MIN_VALUE, Integer.MAX_VALUE));
+      mRanges.add(new RangeData<>(Integer.MIN_VALUE, Integer.MAX_VALUE));
     } else {
       // get list of range boundaries
       final HashSet<Integer> pivots = new HashSet<>();
@@ -209,13 +209,13 @@ public class RangeList<T> {
       // set up continuous non-overlapping ranges for -inf to +inf
       mRanges = new ArrayList<>(pivots2.length + 1);
       if (pivots2[0] != Integer.MIN_VALUE) {
-        mRanges.add(new RangeData<T>(Integer.MIN_VALUE, pivots2[0]));
+        mRanges.add(new RangeData<>(Integer.MIN_VALUE, pivots2[0]));
       }
       for (int i = 1; i < pivots2.length; ++i) {
-        mRanges.add(new RangeData<T>(pivots2[i - 1], pivots2[i]));
+        mRanges.add(new RangeData<>(pivots2[i - 1], pivots2[i]));
       }
       if (pivots2[pivots2.length - 1] != Integer.MAX_VALUE) {
-        mRanges.add(new RangeData<T>(pivots2[pivots2.length - 1], Integer.MAX_VALUE));
+        mRanges.add(new RangeData<>(pivots2[pivots2.length - 1], Integer.MAX_VALUE));
       }
 
       // load original meta into non-overlapping range structure

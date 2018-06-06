@@ -29,7 +29,6 @@
  */
 package com.rtg.sam;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import com.rtg.sam.SingleMappedParams.SingleMappedParamsBuilder;
@@ -59,7 +58,7 @@ public class SingleMappedParamsTest extends TestCase {
   }
 
   public void testSingleMappedParamsBuilder() {
-    final MockSingleMappedParams dummy = new MockSingleMappedParams(new MockSingleMappedParamsBuilder().mapped(new ArrayList<File>()).ioThreads(2).execThreads(3));
+    final MockSingleMappedParams dummy = new MockSingleMappedParams(new MockSingleMappedParamsBuilder().mapped(new ArrayList<>()).ioThreads(2).execThreads(3));
     assertEquals(2, dummy.ioThreads());
     assertEquals(3, dummy.execThreads());
     assertEquals(0, dummy.mapped().size());

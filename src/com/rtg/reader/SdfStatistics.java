@@ -414,8 +414,7 @@ public final class SdfStatistics extends AbstractCli {
     out.append(StringUtils.LS);
 
     final Map<String, Integer> sequenceToId = TaxonomyUtils.loadTaxonomyMapping(reader);
-    final Set<Integer> uniqTaxIds = new HashSet<>();
-    uniqTaxIds.addAll(sequenceToId.values());
+    final Set<Integer> uniqTaxIds = new HashSet<>(sequenceToId.values());
     out.append("Sequence nodes     : ");
     out.append(Integer.toString(uniqTaxIds.size()));
     out.append(StringUtils.LS);

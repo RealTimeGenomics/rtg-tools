@@ -46,7 +46,7 @@ public class DoubleMultiSet<E> {
    * Constructor
    */
   public DoubleMultiSet() {
-    this(new HashMap<E, DoubleCounter>());
+    this(new HashMap<>());
   }
 
   protected DoubleMultiSet(Map<E, DoubleCounter> map) {

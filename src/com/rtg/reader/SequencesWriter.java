@@ -118,7 +118,7 @@ public class SequencesWriter {
     }
     mOutputDir = null;
     mSizeLimit = 0;
-    mNamesToExclude = namesToExclude == null ? new ArrayList<String>() : namesToExclude;
+    mNamesToExclude = namesToExclude == null ? new ArrayList<>() : namesToExclude;
     mCompressed = compressed;
   }
 
@@ -339,7 +339,7 @@ public class SequencesWriter {
   public static void main(String[] args) throws Exception {
     final long start = System.currentTimeMillis();
     final SequenceDataSource leftds = new FastaSequenceDataSource(Collections.singletonList(new File(args[0])), new DNAFastaSymbolTable(), PrereadArm.UNKNOWN);
-    final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<String>(), PrereadType.UNKNOWN, true);
+    final SequencesWriter writer = new SequencesWriter(leftds, new File(args[1]), Constants.MAX_FILE_SIZE, new ArrayList<>(), PrereadType.UNKNOWN, true);
     // perform the actual work
     writer.processSequences();
     System.err.println("time " + ((System.currentTimeMillis() - start) / 1000) + "s");

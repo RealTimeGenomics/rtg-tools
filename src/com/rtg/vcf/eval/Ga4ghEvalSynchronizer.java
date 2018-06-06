@@ -195,7 +195,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private VcfRecord makeCombinedRecord() {
     mInRecs[TRUTH_MERGE_INDEX] = makeSimpleRecord(mBrv, mBaselineSampleNo, -1, false);
     mInRecs[QUERY_MERGE_INDEX] = makeSimpleRecord(mCrv, mCallSampleNo, -1, true);
-    return mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false); // Takes care of updating ALTs and GTs.
+    return mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.emptySet(), false); // Takes care of updating ALTs and GTs.
   }
 
   // Produce a (minimal) record with sample in correct location for easier merging / output

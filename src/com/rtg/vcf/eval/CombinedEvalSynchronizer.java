@@ -163,7 +163,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     resetRecordFields(mCrv, mCallSampleNo, -1);
     mInRecs[0] = mBrv;
     mInRecs[1] = mCrv;
-    final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.<String>emptySet(), false);
+    final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.emptySet(), false);
     setNewInfoFields(rec, newInfo);
     mAltCleaner.annotate(rec);
     mVcfOut.write(rec);

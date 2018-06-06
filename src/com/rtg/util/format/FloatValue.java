@@ -70,15 +70,7 @@ public class FloatValue implements FormattedValue, Comparable<FormattedValue> {
     if (obj instanceof NullValue) {
       return +1;
     }
-    final FloatValue fv = (FloatValue) obj;
-    final float v = fv.mValue;
-    if (mValue < v) {
-      return -1;
-    } else if (mValue > v) {
-      return +1;
-    } else {
-      return 0;
-    }
+    return Float.compare(mValue, ((FloatValue) obj).mValue);
   }
 
   @Override

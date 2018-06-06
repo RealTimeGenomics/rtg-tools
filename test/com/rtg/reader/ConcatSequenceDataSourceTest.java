@@ -62,7 +62,7 @@ public class ConcatSequenceDataSourceTest extends TestCase {
     }
 
     try {
-      assertNotNull(new ConcatSequenceDataSource<>(new ArrayList<SequenceDataSource>(), null));
+      assertNotNull(new ConcatSequenceDataSource<>(new ArrayList<>(), null));
       fail();
     } catch (final IllegalArgumentException e) {
       assertEquals("Cannot concatenate 0 sources", e.getMessage());

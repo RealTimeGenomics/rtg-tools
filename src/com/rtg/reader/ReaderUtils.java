@@ -217,9 +217,8 @@ public final class ReaderUtils {
    * @throws IOException if an IO error occurs
    */
   public static void validateRegions(SequencesReader reader, ReferenceRegions regions) throws IOException {
-    final List<String> missingChromosomes = new ArrayList<>();
     final Map<String, Long> nameMap = getSequenceNameMap(reader);
-    missingChromosomes.addAll(regions.sequenceNames().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList()));
+    final List<String> missingChromosomes = new ArrayList<>(regions.sequenceNames().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList()));
     if (missingChromosomes.size() > 0) {
       throw new InvalidParamsException("The following sequences specified in the regions list are not present in the template: " + StringUtils.join(", ", missingChromosomes));
     }

@@ -86,11 +86,11 @@ public class ArrayUtilsTest extends TestCase {
     assertEquals(0, ArrayUtils.sum(new long[0]));
     assertEquals(0, ArrayUtils.sum(new long[10]));
     assertEquals(5, ArrayUtils.sum(new long[] {1, 2, 2}));
-    assertEquals(0, ArrayUtils.sum(new int[0]));
+    assertEquals(0, ArrayUtils.sum());
     assertEquals(0, ArrayUtils.sum(new int[10]));
-    assertEquals(5, ArrayUtils.sum(new int[] {1, 2, 2}));
+    assertEquals(5, ArrayUtils.sum(1, 2, 2));
 
-    assertEquals(2L * Integer.MAX_VALUE, ArrayUtils.sum(new int[] {Integer.MAX_VALUE, Integer.MAX_VALUE}));
+    assertEquals(2L * Integer.MAX_VALUE, ArrayUtils.sum(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
   }
 

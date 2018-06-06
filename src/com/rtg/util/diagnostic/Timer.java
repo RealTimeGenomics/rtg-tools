@@ -178,7 +178,7 @@ public class Timer extends AbstractTimer implements Integrity {
   /**
    * @param sb where to write output.
    * @param id to be appended to the name to indicate the context the timer is being used in.
-   * @throws IllegalStateException
+   * @throws IllegalStateException if running.
    */
   private void localToString(final StringBuilder sb, final String id) {
     if (mState == State.RUNNING) {

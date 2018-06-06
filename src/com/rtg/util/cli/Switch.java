@@ -85,7 +85,7 @@ public class Switch extends Flag<Boolean> {
     if (isSet()) {
       return super.getValues();
     } else {
-      final List<Boolean> result = new ArrayList<Boolean>();
+      final List<Boolean> result = new ArrayList<>();
       result.add(Boolean.FALSE);
       return result;
     }

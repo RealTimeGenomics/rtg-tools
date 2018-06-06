@@ -168,7 +168,7 @@ public class VcfHeaderMergeTest extends TestCase {
     b.addMetaInformationLine(FORMAT_META_LINE_1X);
     b.addMetaInformationLine(INFO_META_LINE_1X);
     try {
-      VcfHeaderMerge.mergeHeaders(a, b, Collections.<String>emptySet());
+      VcfHeaderMerge.mergeHeaders(a, b, Collections.emptySet());
       fail();
     } catch (NoTalkbackSlimException e) {
       TestUtils.containsAll(e.getMessage(), "Header line", "incompatible", "format_1", "info_1");
@@ -180,7 +180,7 @@ public class VcfHeaderMergeTest extends TestCase {
     b.addMetaInformationLine(VERSION_LINE);
     b.addMetaInformationLine(INFO_META_LINE_1B);
     try {
-      VcfHeaderMerge.mergeHeaders(a, b, Collections.<String>emptySet());
+      VcfHeaderMerge.mergeHeaders(a, b, Collections.emptySet());
       fail();
     } catch (NoTalkbackSlimException e) {
       TestUtils.containsAll(e.getMessage(), "Header line", "incompatible", "info_1");
@@ -192,7 +192,7 @@ public class VcfHeaderMergeTest extends TestCase {
     b.addMetaInformationLine(VERSION_LINE);
     b.addMetaInformationLine(FILTER_META_LINE_1X);
     try {
-      VcfHeaderMerge.mergeHeaders(a, b, Collections.<String>emptySet());
+      VcfHeaderMerge.mergeHeaders(a, b, Collections.emptySet());
       fail();
     } catch (NoTalkbackSlimException e) {
       TestUtils.containsAll(e.getMessage(), "Header line", "incompatible", "filter_1");

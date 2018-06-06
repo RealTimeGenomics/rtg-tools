@@ -50,13 +50,7 @@ public final class Partition {
       if (f1 == f2) {
         return 0;
       }
-      if (f1.length() > f2.length()) {
-        return -1;
-      } else if (f1.length() < f2.length()) {
-        return 1;
-      } else {
-        return 0;
-      }
+      return Long.compare(f2.length(), f1.length());
     }
   }
 
@@ -67,7 +61,7 @@ public final class Partition {
     Arrays.sort(files, FILE_COMPARATOR);
     final ArrayList<List<File>> bins = new ArrayList<>();
     for (int k = 0; k < binCount; ++k) {
-      bins.add(new ArrayList<File>());
+      bins.add(new ArrayList<>());
     }
     final long[] usage = new long[binCount];
 

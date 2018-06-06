@@ -52,7 +52,7 @@ public class MultiSet<E> extends IntegralAbstract {
    * Constructor
    */
   public MultiSet() {
-    this(new HashMap<E, Counter>());
+    this(new HashMap<>());
   }
 
   /**

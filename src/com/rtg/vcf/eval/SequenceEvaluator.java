@@ -143,7 +143,7 @@ class SequenceEvaluator implements IORunnable {
         final List<VariantId> baseline = mergeVariants(baseLineCalls, baselineTruePositives, baselineHalfPositives, falseNegatives);
         final List<VariantId> calls = mergeVariants(calledCalls, truePositives, halfPositives, falsePositives);
 
-        mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.<Integer>emptyList());
+        mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.emptyList());
       }
     }
   }

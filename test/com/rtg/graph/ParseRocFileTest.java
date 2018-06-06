@@ -120,7 +120,7 @@ public class ParseRocFileTest extends TestCase {
         final MyProgressDelegate progressBarDelegate = new MyProgressDelegate();
         final DataBundle bundle = ParseRocFile.loadStream(progressBarDelegate, buf, "Monkey", false);
         assertEquals(1000, progressBarDelegate.mNumberLines);
-        assertEquals(Arrays.asList(new Integer[] {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000}), progressBarDelegate.mProgressLog);
+        assertEquals(Arrays.asList(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000), progressBarDelegate.mProgressLog);
         assertEquals(-1, bundle.getTotalVariants());
         bundle.setGraphType(DataBundle.GraphType.ROC);
         assertEquals(2, bundle.getPlot(1, 1).getData().length);

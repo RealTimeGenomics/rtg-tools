@@ -52,7 +52,7 @@ public class ComposeIteratorsTest extends TestCase {
     final ArrayList<List<Integer>> lists = new ArrayList<>();
     lists.add(Arrays.asList(0, 1, 2, 3, 4));
     lists.add(Arrays.asList(5));
-    lists.add(new ArrayList<Integer>());
+    lists.add(new ArrayList<>());
     lists.add(Arrays.asList(6, 7));
     //final Iterator<Integer> iterator = new ComposeIterators<>(lists.iterator(), trans);
     final Iterator<Integer> iterator = Transform.flatten(lists.iterator());
@@ -68,7 +68,7 @@ public class ComposeIteratorsTest extends TestCase {
     final ArrayList<List<Integer>> lists = new ArrayList<>();
     lists.add(Arrays.asList(0, 1, 2, 3, 4));
     lists.add(Arrays.asList(5));
-    lists.add(new ArrayList<Integer>());
+    lists.add(new ArrayList<>());
     lists.add(Arrays.asList(6, 7));
     //final Iterator<Integer> iterator = new ComposeIterators<>(lists.iterator(), trans);
     final Iterator<Integer> iterator = Transform.flatten(lists.iterator(), new Trans());
@@ -87,15 +87,15 @@ public class ComposeIteratorsTest extends TestCase {
 
   public void testEmptyInternals() {
     final ArrayList<List<Integer>> lists = new ArrayList<>();
-    lists.add(new ArrayList<Integer>());
-    lists.add(new ArrayList<Integer>());
+    lists.add(new ArrayList<>());
+    lists.add(new ArrayList<>());
     final Iterator<Integer> iterator = Transform.flatten(lists.iterator(), new Trans());
     assertFalse(iterator.hasNext());
   }
 
   public void testEmptyFirst() {
     final ArrayList<List<Integer>> lists = new ArrayList<>();
-    lists.add(new ArrayList<Integer>());
+    lists.add(new ArrayList<>());
     lists.add(Arrays.asList(0, 1, 2));
     final Iterator<Integer> iterator = Transform.flatten(lists.iterator(), new Trans());
     for (int i = 0; i < 3; ++i) {
