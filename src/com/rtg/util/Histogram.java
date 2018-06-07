@@ -96,6 +96,17 @@ public class Histogram {
   }
 
   /**
+   * @return the sum of all values
+   */
+  public long sum() {
+    long tot = 0;
+    for (int i = min(); i < max(); ++i) {
+      tot += getValue(i);
+    }
+    return tot;
+  }
+
+  /**
    * Get the value at the given position, returning
    * 0 for values greater than the length of the histogram.
    * @param position the zero based position
@@ -116,12 +127,17 @@ public class Histogram {
   }
 
   /**
-   * Output the table as basic tab separated
+   * Output the table as basic tab separated values, one line per entry.
    * @param includeZeros if true, include rows containing zero counts.
+   * @param columnTitles optional titles for each column. If omitted, no header line is produced.
    * @return the <code>TSV</code> representation
    */
-  public String getAsTsv(boolean includeZeros) {
+  public String getAsTsv(boolean includeZeros, String... columnTitles) {
+    assert columnTitles.length <= 2;
     final StringBuilder sb = new StringBuilder();
+    if (columnTitles.length > 0) {
+      sb.append("#").append(columnTitles[0]).append('\t').append(columnTitles.length > 1 ? columnTitles[1] : "count").append(LS);
+    }
     for (int i = 0; i < getLength(); ++i) {
       final long count = mHistogram[i];
       if (includeZeros || count > 0) {
@@ -132,7 +148,7 @@ public class Histogram {
   }
 
   /**
-   * Parse a zero based histogram from tab separated string.
+   * Parse a zero based histogram from tab separated single-line string.
    * @param histStr string to parse and add
    */
   public void addHistogram(String histStr) {
@@ -163,13 +179,11 @@ public class Histogram {
    */
   public double[] toDistribution() {
     final double[] ret = new double[getLength()];
-    long tot = 0;
-    for (int i = min(); i < max(); ++i) {
-      tot += getValue(i);
-    }
+    final long tot = sum();
     for (int i = min(); i < max(); ++i) {
       ret[i] = (double) getValue(i) / tot;
     }
     return ret;
   }
+
 }
