@@ -141,11 +141,7 @@ public class Family {
         final String p1 = parents[0].first();
         final String p2 = parents[1].first();
         final Pair<String, String> parentkey = (p1.compareTo(p2) < 0) ? new Pair<>(p1, p2) : new Pair<>(p2, p1);
-        Set<String> chidlins = partials.get(parentkey);
-        if (chidlins == null) {
-          chidlins = new HashSet<>();
-          partials.put(parentkey, chidlins);
-        }
+        final Set<String> chidlins = partials.computeIfAbsent(parentkey, k -> new HashSet<>());
         chidlins.add(child);
       }
     }

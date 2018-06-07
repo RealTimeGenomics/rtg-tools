@@ -84,12 +84,7 @@ public class ReferenceRegions {
   }
 
   private MergedIntervals getOrAdd(String name) {
-    MergedIntervals regions = mSequences.get(name);
-    if (regions == null) {
-      regions = new MergedIntervals();
-      mSequences.put(name, regions);
-    }
-    return regions;
+    return mSequences.computeIfAbsent(name, k -> new MergedIntervals());
   }
 
   /**

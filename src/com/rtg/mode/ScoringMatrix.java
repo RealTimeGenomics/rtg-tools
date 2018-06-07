@@ -85,13 +85,7 @@ public abstract class ScoringMatrix implements Serializable, Integrity {
   }
 
   protected int codeIndex(final ProteinFastaSymbolTable table, final String x) {
-    //final int y;
     final Protein pr = (Protein) table.scanResidue(x.charAt(0));
-//    if (pr.ignore() && !x.equals("X") && !x.equals("*")) {
-//      y = -1;
-//    } else {
-//      y = pr.ordinal();
-//    }
     return pr.ordinal();
   }
 

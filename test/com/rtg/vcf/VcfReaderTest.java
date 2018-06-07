@@ -113,11 +113,11 @@ public class VcfReaderTest extends TestCase {
 
   public void testBadRecords() throws IOException {
     for (final String recText : BAD_RECORD) {
-      final String badrec = recText.replaceAll("  *", TAB);
+      final String badrec = recText.replaceAll(" +", TAB);
       checkVcfFormatException(HEADER0 + badrec + LS, "Invalid VCF record");
     }
     for (final String recText : BAD_RECORD_SAMPLE) {
-      final String badrec = recText.replaceAll("  *", TAB);
+      final String badrec = recText.replaceAll(" +", TAB);
       checkVcfFormatException(HEADER0_B + badrec + LS, "Invalid VCF record");
     }
   }

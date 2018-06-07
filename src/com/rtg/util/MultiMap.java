@@ -101,12 +101,7 @@ public class MultiMap<K, V> {
   }
 
   private Collection<V> putBase(final K key) {
-    Collection<V> c = mMap.get(key);
-    if (c == null) {
-      c = mFactory.createCollection();
-      mMap.put(key, c);
-    }
-    return c;
+    return mMap.computeIfAbsent(key, k -> mFactory.createCollection());
   }
 
   /**

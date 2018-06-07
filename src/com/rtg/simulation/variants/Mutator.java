@@ -61,7 +61,7 @@ public class Mutator extends IntegralAbstract {
    * @param specification single class docs
    */
   public Mutator(final String specification) {
-    final String[] split = specification.split("_|:");
+    final String[] split = specification.split("[_:]");
     switch (split.length) {
       case 1:
         mFirst = new MutatorSingle(split[0]);

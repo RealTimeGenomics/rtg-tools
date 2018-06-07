@@ -41,9 +41,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.rtg.util.StringUtils;
-
 import org.junit.Assert;
+
+import com.rtg.util.StringUtils;
 
 /**
  */
@@ -161,20 +161,20 @@ public final class TestParams {
     final Set<String> methodSet = methodsParams.keySet();
     methodsBuilder();
 
-    for (final String fieldName : fieldParamsSet) {
-      final boolean containsMethod = methodSet.contains(fieldName);
-      error(containsMethod, "Params Field:" + fieldName + " does not have an associated method");
-      final boolean containsBuilderField = fieldBuilderSet.contains(fieldName);
-      error(containsBuilderField, "Params Field:" + fieldName + " does not have a corresponding field in Builder");
-      final Class<?> fieldClass = fieldsParams.get(fieldName);
+    for (final Map.Entry<String, Class<?>> stringClassEntry : fieldsParams.entrySet()) {
+      final boolean containsMethod = methodSet.contains(stringClassEntry.getKey());
+      error(containsMethod, "Params Field:" + stringClassEntry.getKey() + " does not have an associated method");
+      final boolean containsBuilderField = fieldBuilderSet.contains(stringClassEntry.getKey());
+      error(containsBuilderField, "Params Field:" + stringClassEntry.getKey() + " does not have a corresponding field in Builder");
+      final Class<?> fieldClass = stringClassEntry.getValue();
       if (containsMethod) {
-        final Class<?> methodReturnClass = methodsParams.get(fieldName);
-        error(fieldClass.equals(methodReturnClass), "Params: " + fieldName + " return type of method:" + methodReturnClass.getCanonicalName() + " does not equal type of field:" + fieldClass.getCanonicalName());
+        final Class<?> methodReturnClass = methodsParams.get(stringClassEntry.getKey());
+        error(fieldClass.equals(methodReturnClass), "Params: " + stringClassEntry.getKey() + " return type of method:" + methodReturnClass.getCanonicalName() + " does not equal type of field:" + fieldClass.getCanonicalName());
       }
       if (containsBuilderField) {
-        if (!mExcludeTypeCheck.contains(fieldName)) {
-          final Class<?> fieldBuilderClass = fieldsBuilder.get(fieldName);
-          error(fieldClass.equals(fieldBuilderClass), "Both: " + fieldName + " type of params field:" + fieldClass.getCanonicalName() + " does not equal type of builder field:" + fieldBuilderClass.getCanonicalName());
+        if (!mExcludeTypeCheck.contains(stringClassEntry.getKey())) {
+          final Class<?> fieldBuilderClass = fieldsBuilder.get(stringClassEntry.getKey());
+          error(fieldClass.equals(fieldBuilderClass), "Both: " + stringClassEntry.getKey() + " type of params field:" + fieldClass.getCanonicalName() + " does not equal type of builder field:" + fieldBuilderClass.getCanonicalName());
         }
       }
     }

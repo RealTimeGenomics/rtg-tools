@@ -106,11 +106,7 @@ public class Taxonomy {
       mNodes.put(id, node);
     }
     if (parentId > -1 && parentId != id) {
-      TaxonNode parent = mNodes.get(parentId);
-      if (parent == null) {
-        parent = new TaxonNode(parentId);
-        mNodes.put(parentId, parent);
-      }
+      final TaxonNode parent = mNodes.computeIfAbsent(parentId, TaxonNode::new);
       parent.addChild(node);
     }
     mReason = null;

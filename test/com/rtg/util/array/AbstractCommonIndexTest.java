@@ -56,20 +56,20 @@ public abstract class AbstractCommonIndexTest extends TestCase {
     assertEquals(6, index.get(9));
 
     // test toString()
-    String str = index.toString().replaceAll("  *", " ");
+    String str = index.toString().replaceAll(" +", " ");
     assertEquals("Index [10]" + LS + "[0] 0, 0, 0, 5, 0, 0, 0, 0, 0, 6" + LS, str);
     assertTrue(index.globalIntegrity());
 
     // test toString with a range
     StringBuilder buf = new StringBuilder();
     index.toString(buf, 7, index.length());
-    str = buf.toString().replaceAll("  *", " ");
+    str = buf.toString().replaceAll(" +", " ");
     assertEquals("[7] 0, 0, 6" + LS, str);
 
     // test dumpString with a range
     buf = new StringBuilder();
     index.dumpString(buf, 7, index.length());
-    str = buf.toString().replaceAll("  *", " ");
+    str = buf.toString().replaceAll(" +", " ");
     assertEquals("[7]"
         + " 00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000"
         + " 00000000:00000000:00000000:00000000:00000000:00000000:00000000:00000000"
