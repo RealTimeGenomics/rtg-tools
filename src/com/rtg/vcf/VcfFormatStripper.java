@@ -29,12 +29,8 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
-import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -62,13 +58,7 @@ public class VcfFormatStripper implements VcfAnnotator {
     if (mFormats == null || mFormats.size() == 0) {
       return;
     }
-    final Iterator<FormatField> it = header.getFormatLines().iterator();
-    while (it.hasNext()) {
-      final FormatField format = it.next();
-      if (mKeepMode ^ mFormats.contains(format.getId())) {
-        it.remove();
-      }
-    }
+    header.getFormatLines().removeIf(format -> mKeepMode ^ mFormats.contains(format.getId()));
   }
 
   @Override
@@ -77,13 +67,7 @@ public class VcfFormatStripper implements VcfAnnotator {
     if (mFormats == null || mFormats.size() == 0) {
       return;
     }
-    final Iterator<Map.Entry<String, ArrayList<String>>> it = rec.getFormatAndSample().entrySet().iterator();
-    while (it.hasNext()) {
-      final Map.Entry<String, ArrayList<String>> e = it.next();
-      if (mKeepMode ^ mFormats.contains(e.getKey())) {
-        it.remove();
-      }
-    }
+    rec.getFormatAndSample().entrySet().removeIf(e -> mKeepMode ^ mFormats.contains(e.getKey()));
     if (rec.getFormats().size() == 0) {
       mKeepRecord = false;
     }

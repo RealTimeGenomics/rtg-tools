@@ -34,7 +34,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -85,7 +84,7 @@ public class ClassPathScanner {
           scanZipFile(testClasses, acceptor, root);
         }
       }
-      Collections.sort(testClasses, Comparator.comparing(Class::getName));
+      testClasses.sort(Comparator.comparing(Class::getName));
     } catch (Throwable t) {
       t.printStackTrace();
       throw t;
