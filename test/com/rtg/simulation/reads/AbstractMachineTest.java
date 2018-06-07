@@ -170,18 +170,18 @@ public abstract class AbstractMachineTest extends AbstractNanoTest {
     }
 
     @Override
-    public void writeRead(final String name, final byte[] data, final byte[] qual, final int length) throws IOException {
+    public void writeRead(final String name, final byte[] data, final byte[] qual, final int length) {
       augment(name, data, qual, length);
     }
 
     @Override
-    public void writeLeftRead(final String name, final byte[] data, final byte[] qual, final int length) throws IOException {
+    public void writeLeftRead(final String name, final byte[] data, final byte[] qual, final int length) {
       ++mLeft;
       augment(name, data, qual, length);
     }
 
     @Override
-    public void writeRightRead(final String name, final byte[] data, final byte[] qual, final int length) throws IOException {
+    public void writeRightRead(final String name, final byte[] data, final byte[] qual, final int length) {
       ++mRight;
       augment(name, data, qual, length);
     }
@@ -221,7 +221,7 @@ public abstract class AbstractMachineTest extends AbstractNanoTest {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
     }
 
     @Override

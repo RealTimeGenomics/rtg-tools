@@ -56,17 +56,17 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
   }
 
   @Override
-  protected void handleUnknownBaseline() throws IOException {
+  protected void handleUnknownBaseline() {
     // No-op
   }
 
   @Override
-  protected void handleUnknownCall() throws IOException {
+  protected void handleUnknownCall() {
     // No-op
   }
 
   @Override
-  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
+  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) {
     // Drop both the unknown records
     if (unknownBaseline) {
       mBrv = null;
@@ -77,7 +77,7 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
   }
 
   @Override
-  protected void handleKnownCall() throws IOException {
+  protected void handleKnownCall() {
     if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
       final double tpWeight = ((OrientedVariant) mCv).getWeight();
       if (tpWeight > 0) {
@@ -98,7 +98,7 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
   }
 
   @Override
-  protected void handleKnownBaseline() throws IOException {
+  protected void handleKnownBaseline() {
     if (!mBv.hasStatus(VariantId.STATUS_OUTSIDE_EVAL)) {
       if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         incrementBaselineCounts(true, false, false);

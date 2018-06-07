@@ -214,7 +214,7 @@ public class Sdf2FastaTest extends AbstractCliTest {
     }
   }
 
-  public void testLineFlag() throws IOException {
+  public void testLineFlag() {
     final String err = checkHandleFlagsErr("-o", "testFile", "-i", "pf2", "-l", "-5");
     assertTrue(err.contains("Error: Expected a nonnegative integer for parameter \"line-length\"."));
   }

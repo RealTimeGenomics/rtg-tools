@@ -108,7 +108,7 @@ public class TaxonomyTest extends TestCase {
     assertTrue(tax.isConsistent());
   }
 
-  public void testSubTree() throws IOException {
+  public void testSubTree() {
     final Taxonomy tax = makeTaxonomy();
     final Taxonomy subtree = new Taxonomy();
 

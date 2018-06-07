@@ -713,7 +713,7 @@ public class RocPlot {
     mStatusLabel.setText(message);
   }
 
-  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom) throws IOException {
+  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom) {
     final StringBuilder sb = new StringBuilder();
     final ProgressBarDelegate progress = new ProgressBarDelegate(mProgressBar);
     for (int i = 0; i < files.size(); ++i) {

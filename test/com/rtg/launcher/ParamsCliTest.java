@@ -95,7 +95,7 @@ public class ParamsCliTest extends TestCase {
   }
 
   //error in validator
-  public final void testErrV() throws IOException, InvalidParamsException {
+  public final void testErrV() throws InvalidParamsException {
     final LogStream log = new LogRecord();
     Diagnostic.setLogStream(log);
     final ByteArrayOutputStream berr = new ByteArrayOutputStream();
@@ -224,7 +224,7 @@ public class ParamsCliTest extends TestCase {
       return mRan;
     }
     @Override
-    protected BogusParams makeParams() throws InvalidParamsException, IOException {
+    protected BogusParams makeParams() throws InvalidParamsException {
       if (mThrowException) {
         if (mNoTalkback) {
           throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Test error");

@@ -30,8 +30,6 @@
 
 package com.rtg.util.io;
 
-import java.io.IOException;
-
 import com.rtg.util.StringUtils;
 
 import junit.framework.TestCase;
@@ -41,7 +39,7 @@ import junit.framework.TestCase;
  */
 public class MemoryPrintStreamTest extends TestCase {
 
-  public void testWriting() throws IOException {
+  public void testWriting() {
     try (final MemoryPrintStream mps = new MemoryPrintStream()) {
       new Throwable().printStackTrace(mps.printStream());
       final String result = mps.toString();

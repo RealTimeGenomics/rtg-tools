@@ -140,7 +140,7 @@ public class AsynchInputStream extends InputStream {
     }
   }
   @Override
-  public int read() throws IOException {
+  public int read() {
     throw new UnsupportedOperationException();
   }
 

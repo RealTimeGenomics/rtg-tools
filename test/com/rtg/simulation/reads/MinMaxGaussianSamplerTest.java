@@ -43,7 +43,7 @@ public class MinMaxGaussianSamplerTest extends TestCase {
   // 0.999 corresponds to expected failure of 1 in 1000 runs
   private static final double CONFIDENCE_LEVEL = 0.999;
 
-  public void testBogusParameters() throws Exception {
+  public void testBogusParameters() {
     try {
       new MinMaxGaussianSampler(20, 10);
       fail(); // should not get here
@@ -52,7 +52,7 @@ public class MinMaxGaussianSamplerTest extends TestCase {
     }
   }
 
-  public void checkNormalityOfLengths(final int min, final int max) throws Exception {
+  public void checkNormalityOfLengths(final int min, final int max) {
     final int testSize = 1000;
     final int[] counts0 = new int[max + 1];
     final IntSampler s = new MinMaxGaussianSampler(min, max);

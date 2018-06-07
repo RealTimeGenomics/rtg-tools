@@ -167,7 +167,7 @@ public class SamWriterWrapper implements WriterWrapper {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     if (mWriter != null) {
       mWriter.close();
     }

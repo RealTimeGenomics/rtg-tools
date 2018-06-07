@@ -29,8 +29,6 @@
  */
 package com.rtg.util.diagnostic;
 
-import java.io.ObjectStreamException;
-
 import com.rtg.util.TestUtils;
 
 import junit.framework.TestCase;
@@ -132,7 +130,7 @@ public class ErrorTypeTest extends TestCase {
     assertEquals(0, ErrorType.INVALID_MASK_PARAMS.getNumberOfParameters());
   }
 
-  public void testReadResolve() throws ObjectStreamException {
+  public void testReadResolve() {
     for (ErrorType et : ErrorType.values()) {
       assertEquals(et, et.readResolve());
     }

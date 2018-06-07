@@ -87,17 +87,17 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
   }
 
   @Override
-  protected void handleUnknownBaseline() throws IOException {
+  protected void handleUnknownBaseline() {
     // No-op
   }
 
   @Override
-  protected void handleUnknownCall() throws IOException {
+  protected void handleUnknownCall() {
     // No-op
   }
 
   @Override
-  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) throws IOException {
+  protected void handleUnknownBoth(boolean unknownBaseline, boolean unknownCall) {
     // Drop both the unknown records
     if (unknownBaseline) {
       mBrv = null;

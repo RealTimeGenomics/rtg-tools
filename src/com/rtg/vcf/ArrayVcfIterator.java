@@ -29,8 +29,6 @@
  */
 package com.rtg.vcf;
 
-import java.io.IOException;
-
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -60,16 +58,16 @@ public class ArrayVcfIterator implements VcfIterator {
   }
 
   @Override
-  public boolean hasNext() throws IOException {
+  public boolean hasNext() {
     return mPos < mRecords.length;
   }
 
   @Override
-  public VcfRecord next() throws IOException {
+  public VcfRecord next() {
     return mRecords[mPos++];
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
   }
 }

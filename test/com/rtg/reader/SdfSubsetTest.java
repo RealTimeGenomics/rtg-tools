@@ -58,7 +58,7 @@ public class SdfSubsetTest extends AbstractCliTest {
               "file containing sequence ids, or sequence names if --names flag is set, one per line");
   }
 
-  public void testValidator() throws Exception {
+  public void testValidator() {
     final String err = checkHandleFlagsErr("-i", "genome", "-o", "no-such-dir");
     TestUtils.containsAll(err, "Sequences to extract must be specified");
   }

@@ -29,15 +29,13 @@
  */
 package com.rtg.vcf.mendelian;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
 
 /**
  */
 public class TrioConcordanceTest extends TestCase {
 
-  public void testConcordance() throws IOException {
+  public void testConcordance() {
     final TrioConcordance tc = new TrioConcordance("child", "father", "mother");
 
     for (int i = 0; i < 25; ++i) {

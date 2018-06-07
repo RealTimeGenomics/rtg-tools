@@ -30,7 +30,6 @@
 package com.rtg.graph;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +44,7 @@ import junit.framework.TestCase;
 /**
  */
 public class DataBundleTest extends TestCase {
-  public void test() throws IOException {
+  public void test() {
     final List<RocPoint<String>> points = new ArrayList<>();
     points.add(new RocPoint<>("5.0", 5.0f, 4.0f, 0));
     points.add(new RocPoint<>("9.0", 200.0f, 100.0f, 0));

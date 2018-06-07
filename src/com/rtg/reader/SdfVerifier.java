@@ -90,12 +90,11 @@ public final class SdfVerifier extends AbstractCli {
   };
 
   /**
-   * Method to verify <code>Preread</code> directory
+   * Method to verify <code>Preread</code> directory.
    * @param f file
    * @return true if all okay
-   * @throws IOException if an IO error occurs
    */
-  public static boolean verifyDir(final File f) throws IOException {
+  public static boolean verifyDir(final File f) {
     try (SequencesReader reader = SequencesReaderFactory.createMemorySequencesReader(f, true, true, LongRange.NONE)) {
       //reader = SequencesReaderFactory.createDefaultSequencesReader(f);
       //reader.globalIntegrity();

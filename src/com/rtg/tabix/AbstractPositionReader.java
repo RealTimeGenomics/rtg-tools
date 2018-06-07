@@ -187,7 +187,7 @@ abstract class AbstractPositionReader implements BlockCompressedPositionReader {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     mReader.close();
   }
 

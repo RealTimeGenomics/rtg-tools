@@ -29,8 +29,6 @@
  */
 package com.rtg.util.diagnostic;
 
-import java.io.ObjectStreamException;
-
 import com.rtg.util.TestUtils;
 
 import junit.framework.TestCase;
@@ -47,7 +45,7 @@ public class InformationTypeTest extends TestCase {
     assertEquals(4, InformationType.PROCESSING_ITEM_N_OF_N.getNumberOfParameters());
   }
 
-  public void testReadResolve() throws ObjectStreamException {
+  public void testReadResolve() {
     assertEquals(InformationType.INFO_USER, InformationType.INFO_USER.readResolve());
   }
 

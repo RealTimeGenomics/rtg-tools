@@ -45,16 +45,14 @@ public interface SequencesIterator {
   /**
    * Position the reader at the specified sequence.
    * @param sequenceId the sequence to seek to.
-   * @throws java.io.IOException If in I/O error occurs
    */
-  void seek(long sequenceId) throws IOException;
+  void seek(long sequenceId);
 
   /**
    * Move to the next sequence.
    * @return true if there is a valid next sequence.
-   * @throws java.io.IOException If in I/O error occurs
    */
-  boolean nextSequence() throws IOException;
+  boolean nextSequence();
 
   /**
    * Get the identifier for the current sequence.

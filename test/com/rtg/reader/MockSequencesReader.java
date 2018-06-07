@@ -29,7 +29,6 @@
  */
 package com.rtg.reader;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import com.rtg.mode.SequenceType;
@@ -186,7 +185,7 @@ public class MockSequencesReader extends DummySequencesReader {
   }
 
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 

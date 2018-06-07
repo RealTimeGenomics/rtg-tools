@@ -29,8 +29,6 @@
  */
 package com.rtg.variant;
 
-import java.io.IOException;
-
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.reader.Arm;
 import com.rtg.reader.FastaUtils;
@@ -188,6 +186,6 @@ public abstract class AbstractMachineErrorParams implements Params, PhredScaler 
   public abstract double errorSnpRate();
 
   @Override
-  public void close() throws IOException { }
+  public void close() { }
 
 }

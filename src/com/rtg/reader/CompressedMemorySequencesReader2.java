@@ -149,7 +149,7 @@ public final class CompressedMemorySequencesReader2 extends AbstractSequencesRea
   }
 
   @Override
-  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+  public byte sequenceDataChecksum(long sequenceIndex) {
     return mData.sequenceChecksum((int) sequenceIndex);
   }
 
@@ -164,7 +164,7 @@ public final class CompressedMemorySequencesReader2 extends AbstractSequencesRea
   }
 
   @Override
-  public int read(long sequenceIndex, byte[] dataOut) throws IOException {
+  public int read(long sequenceIndex, byte[] dataOut) {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }
@@ -172,7 +172,7 @@ public final class CompressedMemorySequencesReader2 extends AbstractSequencesRea
   }
 
   @Override
-  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IOException {
+  public int read(long sequenceIndex, byte[] dataOut, int start, int length) {
     if (sequenceIndex >= mNumberSequences) {
       throw new IllegalArgumentException("Invalid sequence index: " + sequenceIndex + ", maximum is: " + mNumberSequences);
     }

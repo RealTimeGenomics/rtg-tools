@@ -29,7 +29,6 @@
  */
 package com.rtg.util.array.longindex;
 
-import java.io.IOException;
 import java.io.ObjectOutputStream;
 
 /**
@@ -61,7 +60,7 @@ public class LongIndexTest extends LongChunksTest {
         }
 
         @Override
-        public void save(ObjectOutputStream dos) throws IOException {
+        public void save(ObjectOutputStream dos) {
           throw new UnsupportedOperationException("Not implemented yet");
         }
       };
@@ -84,7 +83,7 @@ public class LongIndexTest extends LongChunksTest {
       }
 
       @Override
-      public void save(ObjectOutputStream dos) throws IOException {
+      public void save(ObjectOutputStream dos) {
         throw new UnsupportedOperationException("Not implemented yet");
       }
     };

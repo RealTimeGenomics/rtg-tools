@@ -47,7 +47,7 @@ public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
   }
 
 
-  public void testBrokenPipe() throws IOException {
+  public void testBrokenPipe() {
     final VcfHeader head = new VcfHeader();
     head.setVersionValue(VcfHeader.VERSION_VALUE);
     head.addMetaInformationLine("##test1212121");

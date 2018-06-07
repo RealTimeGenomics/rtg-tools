@@ -378,7 +378,7 @@ public class FormatCliTest extends AbstractCliTest {
     }
   }
 
-  public void testBadUse() throws Exception {
+  public void testBadUse() {
     final String e = checkMainInitBadFlags("--no-such-option");
     assertTrue(e.contains("Error: Unknown flag --no-such-option"));
   }

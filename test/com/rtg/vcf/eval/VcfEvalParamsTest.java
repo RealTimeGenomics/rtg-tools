@@ -30,7 +30,6 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.rtg.launcher.OutputParams;
 import com.rtg.util.test.params.TestParams;
@@ -55,7 +54,7 @@ public class VcfEvalParamsTest extends TestCase {
     assertFalse(params.useAllRecords());
   }
 
-  public void testBuilder() throws IOException {
+  public void testBuilder() {
     VcfEvalParams.VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder = builder.name("blah").outputParams(new OutputParams(new File("out"), false, false)).baseLineFile(new File("mutations")).callsFile(new File("calls")).templateFile(new File("template")).maxLength(199);
     builder = builder.scoreField(VcfUtils.QUAL).sortOrder(RocSortOrder.ASCENDING).baselineSample("name").callsSample("name2");

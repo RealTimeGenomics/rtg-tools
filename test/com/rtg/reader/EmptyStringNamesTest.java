@@ -30,7 +30,6 @@
 package com.rtg.reader;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -39,7 +38,7 @@ import junit.framework.TestCase;
  */
 public class EmptyStringNamesTest extends TestCase {
 
-  public void testSomeMethod() throws IOException {
+  public void testSomeMethod() {
     final EmptyStringNames thing = new EmptyStringNames(5);
     assertEquals(5, thing.length());
     assertEquals("", thing.name(3));

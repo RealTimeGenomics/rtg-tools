@@ -116,7 +116,7 @@ public class AsynchInputStreamTest extends TestCase {
   }
 
   //Testing the Self-suppression problem
-  public void testExceptionHandling() throws InterruptedException {
+  public void testExceptionHandling() {
     final byte[] buff = new byte[3];
     try {
       try (final AsynchInputStream stream = new AsynchInputStream(new InputStream() {

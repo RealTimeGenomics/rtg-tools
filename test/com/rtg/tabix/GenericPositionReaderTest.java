@@ -77,7 +77,7 @@ public class GenericPositionReaderTest extends TestCase {
     }
   }
 
-  public void testNiceException() throws IOException {
+  public void testNiceException() {
     try (GenericPositionReader gpr = makeGpr(SNP_FILE + INVALID)) {
       while (gpr.hasNext()) {
         gpr.next();

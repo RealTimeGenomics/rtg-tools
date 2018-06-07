@@ -35,7 +35,6 @@ import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -296,7 +295,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   }
 
   @Override
-  protected VcfEvalParams makeParams() throws IOException {
+  protected VcfEvalParams makeParams() {
     final VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder.name(mFlags.getName());
     builder.outputParams(new OutputParams(outputDirectory(), false, !mFlags.isSet(CommonFlags.NO_GZIP)));

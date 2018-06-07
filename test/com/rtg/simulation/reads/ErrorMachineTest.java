@@ -30,8 +30,6 @@
 
 package com.rtg.simulation.reads;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
 
 /**
@@ -44,7 +42,7 @@ public class ErrorMachineTest extends TestCase {
 
     final Machine testMachine = new DummyMachineTest.MockMachine() {
       @Override
-      public void processFragment(String id, int fragmentStart, byte[] data, int length) throws IOException {
+      public void processFragment(String id, int fragmentStart, byte[] data, int length) {
         assertEquals((counts[0] > 0 ? "dupe-" /*+ (counts[0] + 1))*/ : "") + "blah1", id);
         counts[0]++;
       }
@@ -65,7 +63,7 @@ public class ErrorMachineTest extends TestCase {
 
     final Machine testMachine = new DummyMachineTest.MockMachine() {
       @Override
-      public void processFragment(String id, int fragmentStart, byte[] data, int length) throws IOException {
+      public void processFragment(String id, int fragmentStart, byte[] data, int length) {
         assertEquals("chimera" + counts[0] + "/", id);
         assertEquals(Integer.MIN_VALUE, fragmentStart);
         assertEquals(3, length);

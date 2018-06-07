@@ -81,7 +81,7 @@ public class AsynchOutputStreamTest extends TestCase {
     }
   }
 
-  public void testDiskFailure() throws IOException {
+  public void testDiskFailure() {
     final AsynchOutputStream out = new AsynchOutputStream(new DiskFullStream(80));
     try {
       out.write(new byte[3201]);

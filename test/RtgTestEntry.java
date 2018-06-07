@@ -77,13 +77,13 @@ public final class RtgTestEntry {
     private long mStart;
     private String mTestName = null;
     @Override
-    public void testStarted(Description description) throws Exception {
+    public void testStarted(Description description) {
       mStart = System.currentTimeMillis();
       mTestName = testName(description);
     }
 
     @Override
-    public void testFinished(Description description) throws Exception {
+    public void testFinished(Description description) {
       final long end = System.currentTimeMillis();
       if (mTestName.equals(testName(description))) {
         mTimings.put(testName(description), end - mStart);
@@ -116,14 +116,14 @@ public final class RtgTestEntry {
   private static class FailureListener extends RunListener {
     private final PrintStream mOut = System.out;
     @Override
-    public void testFailure(Failure failure) throws Exception {
+    public void testFailure(Failure failure) {
       mOut.println(com.rtg.util.StringUtils.LS + "FAILING TEST: " + testName(failure.getDescription()));
     }
   }
   private static class NameListener extends RunListener {
     private final PrintStream mOut = System.out;
     @Override
-    public void testStarted(Description description) throws Exception {
+    public void testStarted(Description description) {
       mOut.println(testName(description));
     }
   }
@@ -131,7 +131,7 @@ public final class RtgTestEntry {
     private final PrintStream mOut = System.out;
     int mTestCount = 0;
     @Override
-    public void testFinished(Description description) throws Exception {
+    public void testFinished(Description description) {
       ++mTestCount;
       if (mTestCount % TESTS_PER_ROW == 0) {
         mOut.println();

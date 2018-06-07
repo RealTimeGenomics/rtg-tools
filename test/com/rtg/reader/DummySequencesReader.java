@@ -30,7 +30,6 @@
 package com.rtg.reader;
 
 import java.io.File;
-import java.io.IOException;
 
 import com.rtg.mode.SequenceType;
 
@@ -101,7 +100,7 @@ public abstract class DummySequencesReader implements SequencesReader {
   }
 
   @Override
-  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+  public byte sequenceDataChecksum(long sequenceIndex) {
     return 0;
   }
 
@@ -159,11 +158,11 @@ public abstract class DummySequencesReader implements SequencesReader {
     return null;
   }
   @Override
-  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IllegalArgumentException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut, int start, int length) throws IllegalArgumentException {
     return 0;
   }
   @Override
-  public int read(long sequenceIndex, byte[] dataOut) throws IllegalArgumentException, IOException {
+  public int read(long sequenceIndex, byte[] dataOut) throws IllegalArgumentException {
     return 0;
   }
   @Override
@@ -171,11 +170,11 @@ public abstract class DummySequencesReader implements SequencesReader {
     return null;
   }
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest) throws IllegalArgumentException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest) throws IllegalArgumentException {
     return 0;
   }
   @Override
-  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException, IOException {
+  public int readQuality(long sequenceIndex, byte[] dest, int start, int length) throws IllegalArgumentException, IllegalStateException {
     return 0;
   }
   @Override

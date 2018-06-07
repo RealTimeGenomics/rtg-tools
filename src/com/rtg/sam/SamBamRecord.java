@@ -130,7 +130,7 @@ public interface SamBamRecord {
    */
   String getField(int fieldNum);
 
-  /**
+  /*
    * Get the length of a field in the current alignment record.
    * Pre: <code>fieldNum</code> is at least 0 and is less than <code>getNumFields()</code>.
    *

@@ -42,7 +42,7 @@ public class GaussianSamplerTest extends TestCase {
 
   private static final double CONFIDENCE_LEVEL = 0.999;
 
-  public void checkNormalityOfLengths(final int min, final int max) throws Exception {
+  public void checkNormalityOfLengths(final int min, final int max) {
     final int testSize = 1000;
     final double mean = (max + min) * 0.5;
     final double variance = (max - min) / 4.0;

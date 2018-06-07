@@ -54,7 +54,7 @@ public class ReadHelperTest extends TestCase {
     super(name);
   }
 
-  public void testHandling() throws Exception {
+  public void testHandling() {
     final String seqString = "acgtcacgtcacgtcacgtcacgtcacgtcacgtc";
     Diagnostic.setLogStream();
     assertNull(ReadHelper.getRead(null, 0));

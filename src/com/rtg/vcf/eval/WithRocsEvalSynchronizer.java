@@ -68,11 +68,10 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @param rocFilters which ROC curves to output
-   * @throws IOException if there is a problem opening output files
    */
   WithRocsEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) {
     super(variants);
 
     mBaselineSampleNo = variants.baselineSample();

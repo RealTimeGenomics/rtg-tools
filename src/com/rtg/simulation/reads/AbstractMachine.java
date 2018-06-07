@@ -162,7 +162,6 @@ public abstract class AbstractMachine implements Machine {
   }
 
   enum SimErrorType {
-    /** SNP mutation */
     //SNP,
     /** multiple SNP mutation */
     MNP,

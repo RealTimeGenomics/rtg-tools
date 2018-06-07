@@ -126,12 +126,12 @@ public class PhasingEvaluatorTest extends TestCase {
     }
 
     @Override
-    public VcfIterator getBaselineVariants(String sequenceName) throws IOException {
+    public VcfIterator getBaselineVariants(String sequenceName) {
       return null;
     }
 
     @Override
-    public VcfIterator getCalledVariants(String sequenceName) throws IOException {
+    public VcfIterator getCalledVariants(String sequenceName) {
       return null;
     }
 
@@ -275,7 +275,7 @@ public class PhasingEvaluatorTest extends TestCase {
       super(variants);
     }
     @Override
-    void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) throws IOException {
+    void writeInternal(String sequenceName, Collection<? extends VariantId> baseline, Collection<? extends VariantId> calls, List<Integer> syncPoints, List<Integer> syncPoints2) {
     }
     @Override
     void addPhasingCountsInternal(int misPhasings, int correctPhasings, int unphasable) {
@@ -284,7 +284,7 @@ public class PhasingEvaluatorTest extends TestCase {
       mCorrectPhasings += correctPhasings;
     }
     @Override
-    public void close() throws IOException {
+    public void close() {
     }
   }
 

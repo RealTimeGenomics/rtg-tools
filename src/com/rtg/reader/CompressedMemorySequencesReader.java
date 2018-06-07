@@ -404,7 +404,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
   }
 
   @Override
-  public byte sequenceDataChecksum(long sequenceIndex) throws IOException {
+  public byte sequenceDataChecksum(long sequenceIndex) {
     return mChecksums.get(sequenceIndex);
   }
 

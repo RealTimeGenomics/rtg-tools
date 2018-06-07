@@ -186,10 +186,10 @@ public final class SamCommandHelper {
    */
   public enum ReadGroupStrictness {
     /** A single read group must be present */
-    REQUIRED
+    REQUIRED,
     /** Either a single read group will be present or null will be returned */
-    , OPTIONAL
+    OPTIONAL,
     /** Null if none, the read group if single, an exception on more than one */
-    , AT_MOST_ONE
+    AT_MOST_ONE
   }
 }

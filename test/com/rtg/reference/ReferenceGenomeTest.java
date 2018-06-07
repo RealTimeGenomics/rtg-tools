@@ -62,7 +62,7 @@ public class ReferenceGenomeTest extends TestCase {
 
 
   @Override
-  protected void tearDown() throws Exception {
+  protected void tearDown() {
     Diagnostic.setLogStream();
   }
 

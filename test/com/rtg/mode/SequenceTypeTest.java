@@ -46,7 +46,7 @@ public class SequenceTypeTest extends TestCase {
    * Test method for {@link com.rtg.mode.SequenceType}.
    * @throws ObjectStreamException
    */
-  public final void test() throws ObjectStreamException {
+  public final void test() {
     TestUtils.testPseudoEnum(SequenceType.class, "[DNA, PROTEIN]");
     assertEquals(DNA, DNA.readResolve());
     assertEquals(PROTEIN, PROTEIN.readResolve());

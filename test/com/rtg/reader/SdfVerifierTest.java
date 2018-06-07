@@ -127,7 +127,7 @@ public class SdfVerifierTest extends AbstractCliTest {
     }
   }
 
-  long hashChar(int c) throws UnsupportedEncodingException {
+  long hashChar(int c) {
     final PrereadHashFunction h = new PrereadHashFunction();
     h.irvineHash(new String(new byte[] {(byte) c}));
     //h.irvineHash(new String(new byte[] {(byte) c}, "cp1252"));

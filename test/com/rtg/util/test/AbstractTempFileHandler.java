@@ -48,7 +48,7 @@ public abstract class AbstractTempFileHandler extends TestCase {
   }
 
   @Override
-  public void tearDown() throws Exception {
+  public void tearDown() {
     assertTrue(FileHelper.deleteAll(mTempDir));
     mTempDir = null;
   }

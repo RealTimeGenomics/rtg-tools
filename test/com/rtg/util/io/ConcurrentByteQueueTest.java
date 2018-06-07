@@ -29,7 +29,6 @@
  */
 package com.rtg.util.io;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,7 +59,7 @@ public class ConcurrentByteQueueTest extends TestCase {
     assertEquals(10, mQueue.maxSize());
   }
 
-  public void testAvailable() throws IOException, InterruptedException {
+  public void testAvailable() throws InterruptedException {
     assertEquals(0, mQueue.available());
     mQueue.write(DATA, 0, 3);
     assertEquals(3, mQueue.available());
@@ -69,7 +68,7 @@ public class ConcurrentByteQueueTest extends TestCase {
     assertEquals(0, mQueue.available());
   }
 
-  public void testWrapAround() throws IOException, InterruptedException {
+  public void testWrapAround() throws InterruptedException {
     assertEquals(0, mQueue.available());
     mQueue.write(DATA, 0, 3);
     assertEquals(3, mQueue.available());

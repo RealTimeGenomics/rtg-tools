@@ -63,7 +63,7 @@ public class DefaultSequencesIterator implements SequencesIterator {
   }
 
   @Override
-  public void seek(long sequenceId) throws IOException {
+  public void seek(long sequenceId) {
     mSequenceId = sequenceId;
     if (mSequenceId >= mNumberSequences || mSequenceId < 0) {
       throw new IllegalArgumentException("Failed to seek to sequence: " + sequenceId + " numberOfSequences: " + mNumberSequences);
@@ -71,7 +71,7 @@ public class DefaultSequencesIterator implements SequencesIterator {
   }
 
   @Override
-  public boolean nextSequence() throws IOException {
+  public boolean nextSequence() {
     return ++mSequenceId < mNumberSequences;
   }
 

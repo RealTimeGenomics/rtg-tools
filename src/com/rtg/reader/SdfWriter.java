@@ -421,9 +421,6 @@ public class SdfWriter extends AbstractSdfWriter {
   }
 
   @Override
-  /**
-   * @return the number Of Sequences
-   */
   long getNumberOfSequences() {
     return mNumberOfSequences;
   }

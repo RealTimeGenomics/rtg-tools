@@ -32,7 +32,6 @@ package com.rtg.reader;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -66,7 +65,7 @@ public class DummyAsyncChunkWriterTest {
   }
 
   @Test
-  public void testAccept() throws IOException {
+  public void testAccept() {
     final List<Integer> ints = new ArrayList<>();
     try (AbstractAsyncChunkWriter<Integer> writer = new MockAbstractAsyncChunkWriter(10, ints)) {
       writer.accept(Arrays.asList(1, 2, 3, 4));

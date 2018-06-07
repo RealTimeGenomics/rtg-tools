@@ -37,7 +37,7 @@ public abstract class AbstractUnidirectionalEditDistanceTest extends AbstractNan
 
   protected abstract UnidirectionalEditDistance getEditDistanceInstance(int gapOpenPenalty, int gapExtendPenalty, int substitutionPenalty, int unknownsPenalty);
 
-  public void testStartPositionSet() throws Exception {
+  public void testStartPositionSet() {
     final byte[] read = DnaUtils.encodeString("acgta");
     final byte[] template = DnaUtils.encodeString("tttttacgtatc");
 
@@ -57,7 +57,7 @@ public abstract class AbstractUnidirectionalEditDistanceTest extends AbstractNan
     }
   }
 
-  public void testSoftClip() throws Exception {
+  public void testSoftClip() {
 
     final byte[] t = DnaUtils.encodeString("tttaaaaaaaaaaa");
     final byte[] s1 = DnaUtils.encodeString("tttaaaaaaaaaaaa");

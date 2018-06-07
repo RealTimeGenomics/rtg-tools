@@ -94,7 +94,7 @@ public class VcfPedigreeParserTest extends AbstractNanoTest {
     }
   }
 
-  public void testNoInformationWarning() throws IOException {
+  public void testNoInformationWarning() {
     final GenomeRelationships ped = new GenomeRelationships();
     final PedigreeField f = new PedigreeField("##PEDIGREE=<Sibling=>");
     final MemoryPrintStream mps = new MemoryPrintStream();

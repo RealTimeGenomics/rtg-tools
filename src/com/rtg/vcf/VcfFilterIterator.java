@@ -74,7 +74,7 @@ public class VcfFilterIterator implements VcfIterator {
   }
 
   @Override
-  public boolean hasNext() throws IOException {
+  public boolean hasNext() {
     return mCurrent != null;
   }
 

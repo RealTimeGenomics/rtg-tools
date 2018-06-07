@@ -51,8 +51,6 @@ public final class BitIndex extends AbstractIndex implements ExtensibleIndex {
   /** The main array, in which all values are stored. */
   private final LongChunks mArray;
 
-  /** <code>mLength</code> field is inherited from LongIndex */
-
   /** Width of each bit-field */
   private final int mBits;
 

@@ -579,7 +579,7 @@ public class ActionsHelperTest extends TestCase {
 //    assertEquals(Integer.MAX_VALUE, workspace[ActionsHelper.ALIGNMENT_SCORE_INDEX]);
 //  }
 
-  public void testLengthOnReference() throws Exception {
+  public void testLengthOnReference() {
     assertEquals(5, ActionsHelper.zeroBasedTemplateEndPos(ActionsHelper.build("=====", 0, 0)));
     assertEquals(5, ActionsHelper.zeroBasedTemplateEndPos(ActionsHelper.build("==X==", 0, 0)));
     assertEquals(6, ActionsHelper.zeroBasedTemplateEndPos(ActionsHelper.build("==X==", 1, 0)));

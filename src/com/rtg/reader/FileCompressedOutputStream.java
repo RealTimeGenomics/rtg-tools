@@ -44,9 +44,6 @@ import com.rtg.util.io.FileUtils;
  */
 public class FileCompressedOutputStream extends OutputStream {
 
-
-  /** The total number of values stored. */
-
   /** How many values we compress into each bit-field (via multiplication). */
   private final int mPerBitfield;
 

@@ -29,8 +29,6 @@
  */
 package com.rtg.util.diagnostic;
 
-import java.io.ObjectStreamException;
-
 import com.rtg.util.TestUtils;
 
 import junit.framework.TestCase;
@@ -73,7 +71,7 @@ public class WarningTypeTest extends TestCase {
     assertEquals(1, WarningType.NOT_FASTQ_FILE.getNumberOfParameters());
   }
 
-  public void testReadResolve() throws ObjectStreamException {
+  public void testReadResolve() {
     for (WarningType t : WarningType.values()) {
       assertEquals(t, t.readResolve());
     }

@@ -58,8 +58,6 @@ public final class PackedIndex extends AbstractIndex {
 
   private static final int MODULO_64 = 63;
 
-  /** <code>mLength</code> field is inherited from LongIndex */
-
   /** Number of values that can be stored in each bit-field. */
   private final long mRange;
 

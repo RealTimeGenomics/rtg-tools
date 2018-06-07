@@ -345,7 +345,7 @@ public class CBZip2InputStream extends InputStream {
             this.mStoredBlockCrc = bsGetInt();
             this.mBlockRandomised = bsR(1) == 1;
 
-            /**
+            /*
              * Allocate data here instead in constructor, so we do not
              * allocate it if the input file is empty.
              */

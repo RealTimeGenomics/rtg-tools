@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.io.IOException;
-
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -54,11 +52,11 @@ public class NullVcfWriter implements VcfWriter {
   }
 
   @Override
-  public void write(VcfRecord record) throws IOException {
+  public void write(VcfRecord record) {
   }
 
   @Override
-  public void close() throws IOException {
+  public void close() {
     // NOP
   }
 }

@@ -53,11 +53,11 @@ public class ParamsTaskTest extends AbstractTest {
     private boolean mStatsDone;
     private boolean mReportDone;
     @Override
-    public void printStatistics(OutputStream reportStream) throws IOException {
+    public void printStatistics(OutputStream reportStream) {
       mStatsDone = true;
     }
     @Override
-    public void generateReport() throws IOException {
+    public void generateReport() {
       mReportDone = true;
     }
   }
@@ -87,7 +87,7 @@ public class ParamsTaskTest extends AbstractTest {
     }
   }
 
-  static MockCliParams getParamsStatic(final String[] args) throws InvalidParamsException, IOException {
+  static MockCliParams getParamsStatic(final String[] args) throws InvalidParamsException {
     final Appendable out = new StringWriter();
     final Appendable err = new StringWriter();
     final CFlags flags = new CFlags("testMockParams", out, err);

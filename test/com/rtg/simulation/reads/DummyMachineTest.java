@@ -143,7 +143,7 @@ public class DummyMachineTest extends TestCase {
     assertEquals("3.1I6.", m.getCigar(false));
   }
 
-  public void testNameFormat() throws Exception {
+  public void testNameFormat() {
     assertEquals("34/9/F/33.", AbstractMachine.formatReadName("34/", 'F', "33.", 5, 3));
     assertEquals("blah/F/33.", AbstractMachine.formatReadName("blah/", 'F', "33.", -1, 3));
   }

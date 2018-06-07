@@ -34,8 +34,6 @@ import static com.rtg.mode.SequenceMode.PROTEIN;
 import static com.rtg.mode.SequenceMode.TRANSLATED;
 import static com.rtg.mode.SequenceMode.UNIDIRECTIONAL;
 
-import java.io.ObjectStreamException;
-
 import com.rtg.util.TestUtils;
 
 import junit.framework.TestCase;
@@ -51,7 +49,7 @@ public class SequenceModeTest extends TestCase {
     TestUtils.testPseudoEnum(SequenceMode.class, "[PROTEIN, BIDIRECTIONAL, UNIDIRECTIONAL, TRANSLATED]");
   }
 
-  public void testReadResolve() throws ObjectStreamException {
+  public void testReadResolve() {
     for (SequenceMode t : SequenceMode.values()) {
       assertEquals(t, t.readResolve());
     }

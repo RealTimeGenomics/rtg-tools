@@ -61,7 +61,7 @@ public class DummyCliEntryTest extends TestCase {
         }
 
         @Override
-        protected int mainExec(OutputStream out, PrintStream err) throws IOException {
+        protected int mainExec(OutputStream out, PrintStream err) {
           return 0;
         }
       }, CommandCategory.ASSEMBLY, ReleaseLevel.ALPHA);

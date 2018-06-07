@@ -201,7 +201,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
   }
 
   @Override
-  protected void handleUnknownBaseline() throws IOException {
+  protected void handleUnknownBaseline() {
     throw new IllegalStateException("B-NotInPath - should not happen. Record: " + mBrv);
   }
 

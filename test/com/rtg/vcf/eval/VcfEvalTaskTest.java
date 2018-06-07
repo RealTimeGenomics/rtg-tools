@@ -377,7 +377,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
     }
   }
 
-  public void testCheckHeader() throws IOException {
+  public void testCheckHeader() {
     final MemoryPrintStream ps = new MemoryPrintStream();
     Diagnostic.setLogStream(ps.printStream());
     final SdfId idA = new SdfId();

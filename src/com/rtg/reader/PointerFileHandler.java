@@ -209,7 +209,7 @@ abstract class PointerFileHandler {
     }
 
     @Override
-    void readChecksums(SeekableStream stream) throws IOException {
+    void readChecksums(SeekableStream stream) {
     }
 
     @Override
@@ -231,7 +231,7 @@ abstract class PointerFileHandler {
       return ArrayUtils.readInts(f, fileOffset, fileEnd, a, offset, addend);
     }
     @Override
-    void readChecksums(File f, long index, ByteArray checksums, ByteArray qualityChecksums, int offset) throws IOException {
+    void readChecksums(File f, long index, ByteArray checksums, ByteArray qualityChecksums, int offset) {
     }
 
   }

@@ -574,9 +574,8 @@ public final class TabixIndexer {
     /**
      * @param is underlying input stream
      * @return the reader capable of returning genomic positions for each entry
-     * @throws IOException if an IO error occurs
      */
-    public abstract BlockCompressedPositionReader getReader(InputStream is) throws IOException;
+    public abstract BlockCompressedPositionReader getReader(InputStream is);
   }
 
   static class BedIndexerFactory extends IndexerFactory {
@@ -591,7 +590,7 @@ public final class TabixIndexer {
     }
 
     @Override
-    public BlockCompressedPositionReader getReader(InputStream is) throws IOException {
+    public BlockCompressedPositionReader getReader(InputStream is) {
       return new GenericPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), getOptions());
     }
   }
@@ -606,7 +605,7 @@ public final class TabixIndexer {
     }
 
     @Override
-    public BlockCompressedPositionReader getReader(InputStream is) throws IOException {
+    public BlockCompressedPositionReader getReader(InputStream is) {
       return new GenericPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), getOptions());
     }
   }
@@ -623,7 +622,7 @@ public final class TabixIndexer {
     }
 
     @Override
-    public BlockCompressedPositionReader getReader(InputStream is) throws IOException {
+    public BlockCompressedPositionReader getReader(InputStream is) {
       return new VcfPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), mSkip);
     }
   }
@@ -640,7 +639,7 @@ public final class TabixIndexer {
     }
 
     @Override
-    public BlockCompressedPositionReader getReader(InputStream is) throws IOException {
+    public BlockCompressedPositionReader getReader(InputStream is) {
       return new SamPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), mSkip);
     }
   }
@@ -655,7 +654,7 @@ public final class TabixIndexer {
     }
 
     @Override
-    public BlockCompressedPositionReader getReader(InputStream is) throws IOException {
+    public BlockCompressedPositionReader getReader(InputStream is) {
       return new AlleleCountsPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), mSkip);
     }
   }

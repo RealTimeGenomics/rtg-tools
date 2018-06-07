@@ -80,7 +80,7 @@ class OutputListener extends RunListener {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
       mClosed = true;
     }
 
@@ -90,7 +90,7 @@ class OutputListener extends RunListener {
   }
 
   @Override
-  public void testStarted(Description description) throws Exception {
+  public void testStarted(Description description) {
     mOriginalOut = System.out;
     mOriginalError = System.err;
     // It would be nice to close the print streams later, but we want to try and handle the case of

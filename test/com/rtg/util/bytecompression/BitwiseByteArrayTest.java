@@ -114,10 +114,6 @@ public class BitwiseByteArrayTest extends ByteArrayTest {
     }
   }
 
-  /**
-   * A benchmark method.
-   * @param args "bitwise", "compressed" or "normal".
-   */
   /*
   public static void main(final String[] args) {
     final long length = 100 * 1024 * 1024;

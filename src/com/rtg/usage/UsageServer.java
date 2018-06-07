@@ -96,9 +96,8 @@ public class UsageServer {
    * @param port port to use for connections
    * @param usageDir directory to write usage file to
    * @param threads number of concurrent connections
-   * @throws IOException if it happens
    */
-  public UsageServer(int port, File usageDir, int threads) throws IOException {
+  public UsageServer(int port, File usageDir, int threads) {
     //flaky stuff
     System.setProperty("sun.net.httpserver.maxReqTime", "30");
     System.setProperty("sun.net.httpserver.maxRspTime", "30");
@@ -108,8 +107,8 @@ public class UsageServer {
   }
 
   /**
-   * start the server
-   * @throws IOException if it happens
+   * Start the server.
+   * @throws IOException if an I/O error occurs.
    */
   public void start() throws IOException {
     switchToFile(FileUsageLoggingClient.ensureUsageFile(mUsageDir, getDate()));
@@ -132,10 +131,9 @@ public class UsageServer {
   }
 
   /**
-   * stop the server and release any file locks
-   * @throws IOException if it happens
+   * Stop the server and release any file locks.
    */
-  public void end() throws IOException {
+  public void end() {
     mServer.stop(mStopTimer);
     mThreadPoolExecutor.shutdown();
     mWriter.close();
