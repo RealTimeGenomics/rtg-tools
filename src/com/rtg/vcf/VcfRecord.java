@@ -60,7 +60,7 @@ public class VcfRecord implements SequenceNameLocus {
   /** The character used to delimit ALT alleles and multi-valued subfield values */
   public static final String ALT_CALL_INFO_SEPARATOR = ",";
 
-  private String mSequence;
+  private final String mSequence;
   private int mStart = -1;
   private String mId; // These are stored in VCF representation (users may need to perform splitting)
   private String mRefCall;
