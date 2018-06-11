@@ -29,6 +29,7 @@
  */
 package com.rtg.sam;
 
+import static com.rtg.launcher.CommonFlags.MIN_READ_LENGTH;
 import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
@@ -103,10 +104,16 @@ public final class SamFilterOptions {
     flags.registerOptional(INVERT_FLAG, "if set, invert the result of flag and attribute based filter criteria").setCategory(SENSITIVITY_TUNING);
   }
 
+  /**
+   * Register flag for minimum read length
+   * @param flags shared flags
+   */
+  public static void registerMinReadLength(CFlags flags) {
+    flags.registerOptional(MIN_READ_LENGTH, Integer.class, CommonFlags.INT, "if set, ignore SAM reads with read length less than this value").setCategory(SENSITIVITY_TUNING);
+  }
+
   /** Flag name for filter on <code>MAPQ</code> field of SAM record. */
   public static final String MIN_MAPQ_FLAG = "min-mapq";
-
-  private static final String MAPQ_DESC = "if set, ignore SAM records with MAPQ less than this value";
 
   /**
    * Register flag for filtering on the MAPQ
@@ -115,7 +122,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Integer> registerMinMapQFlag(final CFlags flags) {
-    return flags.registerOptional(MIN_MAPQ_FLAG, Integer.class, CommonFlags.INT, MAPQ_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(MIN_MAPQ_FLAG, Integer.class, CommonFlags.INT, "if set, ignore SAM records with MAPQ less than this value").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name for filter of <code>AS</code> attribute of mated SAM records. */
@@ -159,8 +166,6 @@ public final class SamFilterOptions {
   /** Flag name for filtering out mated results. */
   public static final String EXCLUDE_MATED_FLAG = "exclude-mated";
 
-  private static final String EXCLUDE_MATED_DESC = "exclude all mated SAM records";
-
   /**
    * Register flag for excluding mated results.
    *
@@ -168,13 +173,11 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerExcludeMatedFlag(final CFlags flags) {
-    return flags.registerOptional(EXCLUDE_MATED_FLAG, EXCLUDE_MATED_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(EXCLUDE_MATED_FLAG, "exclude all mated SAM records").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name for filtering out unmated results. */
   public static final String EXCLUDE_UNMATED_FLAG = "exclude-unmated";
-
-  private static final String EXCLUDE_UNMATED_DESC = "exclude all unmated SAM records";
 
   /**
    * Register flag for excluding unmated results.
@@ -183,13 +186,11 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerExcludeUnmatedFlag(final CFlags flags) {
-    return flags.registerOptional(EXCLUDE_UNMATED_FLAG, EXCLUDE_UNMATED_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(EXCLUDE_UNMATED_FLAG, "exclude all unmated SAM records").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name to enable filtering out unmapped results. */
   public static final String EXCLUDE_UNMAPPED_FLAG = "exclude-unmapped";
-
-  private static final String EXCLUDE_UNMAPPED_DESC = "exclude all unmapped SAM records";
 
   /**
    * Register flag for excluding unmapped results.
@@ -198,13 +199,11 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerExcludeUnmappedFlag(final CFlags flags) {
-    return flags.registerOptional(EXCLUDE_UNMAPPED_FLAG, EXCLUDE_UNMAPPED_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(EXCLUDE_UNMAPPED_FLAG, "exclude all unmapped SAM records").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name to enable filtering out unplaced results. */
   public static final String EXCLUDE_UNPLACED_FLAG = "exclude-unplaced";
-
-  private static final String EXCLUDE_UNPLACED_DESC = "exclude all SAM records with no alignment position";
 
   /**
    * Register flag for excluding unmapped results.
@@ -213,13 +212,11 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerExcludeUnplacedFlag(final CFlags flags) {
-    return flags.registerOptional(EXCLUDE_UNPLACED_FLAG, EXCLUDE_UNPLACED_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(EXCLUDE_UNPLACED_FLAG, "exclude all SAM records with no alignment position").setCategory(SENSITIVITY_TUNING);
   }
 
   /** Flag name to enable filtering out duplicate results. */
   public static final String EXCLUDE_DUPLICATES_FLAG = "exclude-duplicates";
-
-  private static final String EXCLUDE_DUPLICATES_DESC = "exclude all SAM records flagged as a PCR or optical duplicate";
 
   /**
    * Register flag for excluding duplicate results.
@@ -228,14 +225,12 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerExcludeDuplicatesFlag(final CFlags flags) {
-    return flags.registerOptional(EXCLUDE_DUPLICATES_FLAG, EXCLUDE_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(EXCLUDE_DUPLICATES_FLAG, "exclude all SAM records flagged as a PCR or optical duplicate").setCategory(SENSITIVITY_TUNING);
   }
 
   // this options differs from the above as it refers to the mechanism of detecting and removing duplicates on the fly, as well as looking at the SAM records FLAG field
   /** keep duplicates flag constant */
   public static final String KEEP_DUPLICATES_FLAG = "keep-duplicates";
-
-  private static final String KEEP_DUPLICATES_DESC = "don't detect and filter duplicate reads based on mapping position";
 
   /**
    * Register flag for keeping duplicate results.
@@ -243,10 +238,8 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<Boolean> registerKeepDuplicatesFlag(final CFlags flags) {
-    return flags.registerOptional(KEEP_DUPLICATES_FLAG, KEEP_DUPLICATES_DESC).setCategory(SENSITIVITY_TUNING);
+    return flags.registerOptional(KEEP_DUPLICATES_FLAG, "don't detect and filter duplicate reads based on mapping position").setCategory(SENSITIVITY_TUNING);
   }
-
-  private static final String SAM_RESTRICTION_DESC = "if set, only process SAM records within the specified range. " + REGION_SPEC;
 
   /**
    * Register flag for restricting records to be processed.
@@ -255,7 +248,7 @@ public final class SamFilterOptions {
    * @return the flag
    */
   public static Flag<String> registerRestrictionFlag(final CFlags flags) {
-    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.REGION, SAM_RESTRICTION_DESC).setCategory(INPUT_OUTPUT);
+    return flags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.REGION, "if set, only process SAM records within the specified range. " + REGION_SPEC).setCategory(INPUT_OUTPUT);
   }
 
   /**
@@ -326,7 +319,7 @@ public final class SamFilterOptions {
       return false;
     }
 
-    if (flags.getFlag(KEEP_DUPLICATES_DESC) != null
+    if (flags.getFlag("don't detect and filter duplicate reads based on mapping position") != null
         && flags.getFlag(EXCLUDE_DUPLICATES_FLAG) != null) {
       throw new RuntimeException("Cannot have registered flags for both include and exclude duplicates");
     }
@@ -346,6 +339,9 @@ public final class SamFilterOptions {
     }
     if (flags.isSet(MIN_MAPQ_FLAG)) {
       builder.minMapQ((Integer) flags.getValue(MIN_MAPQ_FLAG));
+    }
+    if (flags.isSet(MIN_READ_LENGTH)) {
+      builder.minLength((Integer) flags.getValue(MIN_READ_LENGTH));
     }
     if (flags.isSet(SUBSAMPLE_FLAG)) {
       builder.subsampleFraction((Double) flags.getValue(SUBSAMPLE_FLAG));

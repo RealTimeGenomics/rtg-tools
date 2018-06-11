@@ -53,6 +53,7 @@ public class SamFilterParams {
 
     protected int mMaxAlignmentCount = -1;
     protected int mMinMapQ = -1;
+    protected int mMinReadLength = -1;
     protected IntegerOrPercentage mMaxASMatedValue = null;
     protected IntegerOrPercentage mMaxASUnmatedValue = null;
     protected boolean mExcludeMated = false;
@@ -79,6 +80,16 @@ public class SamFilterParams {
      */
     public SamFilterParamsBuilder minMapQ(final int val) {
       mMinMapQ = val;
+      return this;
+    }
+
+    /**
+     * Do no return SAM records where the read is shorter than this many bases.
+     * @param value the minimum number of bases
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder minLength(int value) {
+      mMinReadLength = value;
       return this;
     }
 
@@ -293,6 +304,7 @@ public class SamFilterParams {
 
   private final int mMaxAlignmentCount;
   private final int mMinMapQ;
+  private final int mMinReadLength;
   private final IntegerOrPercentage mMaxASMatedValue;
   private final IntegerOrPercentage mMaxASUnmatedValue;
   private final int mRequireUnsetFlags;
@@ -314,6 +326,7 @@ public class SamFilterParams {
    */
   public SamFilterParams(SamFilterParamsBuilder builder) {
     mMinMapQ = builder.mMinMapQ;
+    mMinReadLength = builder.mMinReadLength;
     mSubsampleFraction = builder.mSubsampleFraction;
     mSubsampleRampFraction = builder.mSubsampleRampFraction;
     mSubsampleSeed = builder.mSubsampleSeed;
@@ -354,6 +367,7 @@ public class SamFilterParams {
    */
   public boolean isFiltering() {
     return mMinMapQ != -1
+      || mMinReadLength != -1
       || mSubsampleFraction != null
       || mSubsampleRampFraction != null
       || mMaxAlignmentCount != -1
@@ -426,6 +440,14 @@ public class SamFilterParams {
    */
   public int minMapQ() {
     return mMinMapQ;
+  }
+
+  /**
+   * SAM records having shorter reads than this value will be filtered.
+   * @return the minimum read length permitted or -1 for no filtering
+   */
+  public int minReadLength() {
+    return mMinReadLength;
   }
 
   /**

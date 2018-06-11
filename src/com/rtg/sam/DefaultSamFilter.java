@@ -108,6 +108,10 @@ public class DefaultSamFilter implements SamFilter {
         return false;
       }
     }
+    final int minReadLength = params.minReadLength();
+    if (minReadLength >= 0 && rec.getReadLength() < minReadLength) {
+      return false;
+    }
 
     if (params.subsampleFraction() != null) {
       final double sFrac;

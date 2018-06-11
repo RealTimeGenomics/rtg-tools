@@ -78,6 +78,18 @@ public class DefaultSamFilterTest extends TestCase {
     assertFalse(f.acceptRecord(rec) == notf.acceptRecord(rec));
   }
 
+  public void testFilterReadLength() {
+    final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder().minLength(10);
+    final DefaultSamFilter f = new DefaultSamFilter(builder.create());
+    final DefaultSamFilter notf = new DefaultSamFilter(builder.invertFilters(true).create());
+    final SAMRecord rec = new SAMRecord(new SAMFileHeader());
+    assertFalse(f.acceptRecord(rec));
+    assertTrue(notf.acceptRecord(rec));
+    rec.setReadString("atgcatgcatgcatgcatgcatgcatgc");
+    assertTrue(f.acceptRecord(rec));
+    assertFalse(notf.acceptRecord(rec));
+  }
+
   public void testVariantInvalids() {
     final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder().excludeVariantInvalid(true);
     final DefaultSamFilter f = new DefaultSamFilter(builder.create());
