@@ -164,16 +164,13 @@ public final class SpawnJvmTest extends TestCase {
     final Process p = SpawnJvm.spawn(Interactive.class.getName());
     try {
       try (OutputStreamWriter out = new OutputStreamWriter(p.getOutputStream())) {
-        final BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        try {
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
           out.write(LS);
           out.flush();
           assertEquals("0", in.readLine());
           out.write("abcdef" + LS);
           out.flush();
           assertEquals("6", in.readLine());
-        } finally {
-          in.close();
         }
       }
       try {

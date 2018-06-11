@@ -48,154 +48,109 @@ public class FalseSeekableStreamTest extends TestCase {
   }
 
   public void testGetPosition() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.getPosition();
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testLength() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.length();
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testSeek() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.seek(5);
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testRead0args() throws Exception {
-    final InputStream basic = getStream();
-    try {
-      final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-      try {
+    try (InputStream basic = getStream()) {
+      try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
         assertEquals(basic.read(), fss.read());
 
-      } finally {
-        fss.close();
       }
-    } finally {
-      basic.close();
     }
   }
 
   public void testAvailable() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.available();
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testClose() throws Exception {
-    final InputStream basic = getStream();
-    try {
+    try (InputStream basic = getStream()) {
       final FalseSeekableStream fss = new FalseSeekableStream(getStream());
       fss.close();
-    } finally {
-      basic.close();
     }
   }
 
   public void testMark() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.mark(500);
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testMarkSupported() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.markSupported();
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testReadbyteArr() throws Exception {
-    final InputStream basic = getStream();
-    try {
-      final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-      try {
+    try (InputStream basic = getStream()) {
+      try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
         final byte[] first = new byte[10];
         final byte[] second = new byte[10];
         final int len1 = basic.read(first);
         final int len2 = fss.read(second);
         assertEquals(len1, len2);
         assertTrue(Arrays.equals(first, second));
-      } finally {
-        fss.close();
       }
-    } finally {
-      basic.close();
     }
   }
 
   public void testRead3args() throws Exception {
-    final InputStream basic = getStream();
-    try {
-      final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-      try {
+    try (InputStream basic = getStream()) {
+      try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
         final byte[] first = new byte[10];
         final byte[] second = new byte[10];
         final int len1 = basic.read(first, 2, 8);
         final int len2 = fss.read(second, 2, 8);
         assertEquals(len1, len2);
         assertTrue(Arrays.equals(first, second));
-      } finally {
-        fss.close();
       }
-    } finally {
-      basic.close();
     }
   }
 
   public void testReset() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       fss.reset();
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 
   public void testSkip() throws IOException {
-    final FalseSeekableStream fss = new FalseSeekableStream(getStream());
-    try {
+    try (FalseSeekableStream fss = new FalseSeekableStream(getStream())) {
       final long len = fss.skip(3);
       assertEquals(3, (int) len);
       fail();
     } catch (UnsupportedOperationException e) {
-    } finally {
-      fss.close();
     }
   }
 

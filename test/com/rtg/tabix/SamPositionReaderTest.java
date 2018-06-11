@@ -82,8 +82,7 @@ public class SamPositionReaderTest extends TestCase {
 
   public void testSomeMethod() throws IOException {
     try (InputStream is = Resources.getResourceAsStream("com/rtg/sam/resources/mixed.sam.gz")) {
-      final SamPositionReader spr = new SamPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), 0);
-      try {
+      try (SamPositionReader spr = new SamPositionReader(new BlockCompressedLineReader(new BlockCompressedInputStream(is)), 0)) {
         int ref = 0;
         int i = 0;
         while (spr.hasNext()) {
@@ -104,8 +103,6 @@ public class SamPositionReaderTest extends TestCase {
           assertFalse(spr.isUnmapped());
           ++i;
         }
-      } finally {
-        spr.close();
       }
     }
   }

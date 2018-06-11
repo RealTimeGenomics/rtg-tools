@@ -53,8 +53,7 @@ public class BlockCompressedLineReaderTest extends TestCase {
     final File dir = FileUtils.createTempDir("bclr", "test");
     try {
       final File sam = FileHelper.resourceToFile("com/rtg/sam/resources/readerWindow1.sam.gz", new File(dir, "readerWindow1.sam.gz"));
-      final BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(sam));
-      try {
+      try (BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(sam))) {
         final long firstSeekPos = (44947L << 16) | 22870;
         bclr.seek(firstSeekPos);
         assertEquals(firstSeekPos, bclr.getFilePointer());
@@ -68,8 +67,6 @@ public class BlockCompressedLineReaderTest extends TestCase {
         final String line3 = bclr.readLine();
         assertTrue(line3.startsWith("91\t163\tsimulatedSequence2\t33238"));
         assertEquals(3, bclr.getLineNumber());
-      } finally {
-        bclr.close();
       }
     } finally {
       assertTrue(FileHelper.deleteAll(dir));
@@ -80,8 +77,7 @@ public class BlockCompressedLineReaderTest extends TestCase {
     final File dir = FileUtils.createTempDir("bclr", "test");
     try {
       final File sam = FileHelper.resourceToFile("com/rtg/sam/resources/readerWindow1.sam.gz", new File(dir, "readerWindow1.sam.gz"));
-      final BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(sam));
-      try {
+      try (BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(sam))) {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(GzipUtils.createGzipInputStream(new FileInputStream(sam))))) {
           String lineA;
           String lineB;
@@ -96,8 +92,6 @@ public class BlockCompressedLineReaderTest extends TestCase {
           assertNull(lineA);
           assertNull(lineB);
         }
-      } finally {
-        bclr.close();
       }
     } finally {
       assertTrue(FileHelper.deleteAll(dir));

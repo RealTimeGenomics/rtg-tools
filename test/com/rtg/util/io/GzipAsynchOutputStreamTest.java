@@ -41,11 +41,8 @@ public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
 
   public void testNullFile() throws IOException {
     try {
-      final GzipAsynchOutputStream out = new GzipAsynchOutputStream(null);
-      try {
+      try (GzipAsynchOutputStream out = new GzipAsynchOutputStream(null)) {
         fail("IllegalArgumentException expected");
-      } finally {
-        out.close();
       }
     } catch (IllegalArgumentException e) {
       assertEquals("File cannot be null", e.getMessage());
@@ -56,16 +53,13 @@ public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
   public void testFlush() throws IOException {
     final File file = File.createTempFile("test", "gzipasynch");
     try {
-      final GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024);
-      try {
+      try (GzipAsynchOutputStream out = new GzipAsynchOutputStream(file, 1024, 1024)) {
         for (int i = 0; i < 1028; ++i) {
           out.write((int) 'a');
         }
         out.flush();
         assertEquals(0, out.mQueue.available());
         out.write((int) 'b');
-      } finally {
-        out.close();
       }
       final String contents = FileHelper.gzFileToString(file);
       assertTrue(contents.startsWith("aaaaaaa"));

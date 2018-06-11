@@ -145,11 +145,8 @@ public class AsynchOutputStreamTest extends TestCase {
   public void testThreadName() throws IOException {
     final File file = File.createTempFile("test", "gzipasynch");
     try (FileOutputStream os = new FileOutputStream(file)) {
-      final AsynchOutputStream out = new AsynchOutputStream(os);
-      try {
+      try (AsynchOutputStream out = new AsynchOutputStream(os)) {
         assertEquals("AsynchOutputStream", out.mThread.getName());
-      } finally {
-        out.close();
       }
 
     } finally {

@@ -183,14 +183,11 @@ public class ExtractCli extends AbstractCli {
   }
 
   private void extractHeader(File input, char metaChar, OutputStream out) throws IOException {
-    final BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(input));
-    try {
+    try (BlockCompressedLineReader bclr = new BlockCompressedLineReader(new BlockCompressedInputStream(input))) {
       String line;
       while ((line = bclr.readLine()) != null && (line.length() == 0 || line.charAt(0) == metaChar)) {
         out.write((line + StringUtils.LS).getBytes());
       }
-    } finally {
-      bclr.close();
     }
   }
 
