@@ -39,9 +39,10 @@ import com.rtg.util.test.FileHelper;
  */
 public class GzipAsynchOutputStreamTest extends AsynchOutputStreamTest {
 
+  @SuppressWarnings("try")
   public void testNullFile() throws IOException {
     try {
-      try (GzipAsynchOutputStream out = new GzipAsynchOutputStream(null)) {
+      try (GzipAsynchOutputStream ignored = new GzipAsynchOutputStream(null)) {
         fail("IllegalArgumentException expected");
       }
     } catch (IllegalArgumentException e) {

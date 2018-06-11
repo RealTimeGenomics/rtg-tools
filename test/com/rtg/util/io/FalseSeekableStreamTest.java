@@ -90,7 +90,7 @@ public class FalseSeekableStreamTest extends TestCase {
 
   public void testClose() throws Exception {
     try (InputStream basic = getStream()) {
-      final FalseSeekableStream fss = new FalseSeekableStream(getStream());
+      final FalseSeekableStream fss = new FalseSeekableStream(basic);
       fss.close();
     }
   }
