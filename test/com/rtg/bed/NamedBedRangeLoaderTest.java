@@ -39,12 +39,12 @@ import junit.framework.TestCase;
 public class NamedBedRangeLoaderTest extends TestCase {
 
   public void testBedRecord() {
-    BedRecord rec = new BedRecord("chr1", 2, 80, "anno1", "anno2");
-    NamedBedRangeLoader l = new NamedBedRangeLoader();
+    final BedRecord rec = new BedRecord("chr1", 2, 80, "anno1", "anno2");
+    final NamedBedRangeLoader l = new NamedBedRangeLoader();
 
     assertEquals("anno1", l.getMeta(rec));
 
-    RangeList.RangeData<String> r = l.getRangeData(rec);
+    final RangeList.RangeData<String> r = l.getRangeData(rec);
     assertEquals(2, r.getStart());
     assertEquals(80, r.getEnd());
     assertEquals(1, r.getMeta().size());

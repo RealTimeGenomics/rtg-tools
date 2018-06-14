@@ -40,7 +40,7 @@ public class SimpleBedRangeLoaderTest extends TestCase {
 
   public void testBedRecord() {
     BedRecord rec = new BedRecord("chr1", 2, 80, "anno1", "anno2");
-    BedRangeLoader<String> l = new SimpleBedRangeLoader();
+    final BedRangeLoader<String> l = new SimpleBedRangeLoader();
 
     assertEquals("anno1", l.getMeta(rec));
 
@@ -49,7 +49,7 @@ public class SimpleBedRangeLoaderTest extends TestCase {
 
     rec = new BedRecord("chr1", 2, 2); // End is exclusive, so this is an odd record, being "before" the start
     assertEquals("chr1:3-2", l.getMeta(rec));
-    RangeList.RangeData<String> r = l.getRangeData(rec);
+    final RangeList.RangeData<String> r = l.getRangeData(rec);
     assertEquals(2, r.getStart());
     assertEquals(3, r.getEnd());
     assertEquals(1, r.getMeta().size());

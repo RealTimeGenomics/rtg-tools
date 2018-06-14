@@ -32,7 +32,6 @@ package com.rtg.reader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -218,7 +217,7 @@ public final class ReaderUtils {
    */
   public static void validateRegions(SequencesReader reader, ReferenceRegions regions) throws IOException {
     final Map<String, Long> nameMap = getSequenceNameMap(reader);
-    final List<String> missingChromosomes = new ArrayList<>(regions.sequenceNames().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList()));
+    final List<String> missingChromosomes = regions.sequenceNames().stream().filter(chr -> !nameMap.containsKey(chr)).collect(Collectors.toList());
     if (missingChromosomes.size() > 0) {
       throw new InvalidParamsException("The following sequences specified in the regions list are not present in the template: " + StringUtils.join(", ", missingChromosomes));
     }
