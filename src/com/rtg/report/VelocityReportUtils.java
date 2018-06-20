@@ -71,7 +71,7 @@ public final class VelocityReportUtils {
     data.put("body", bodyText);
     data.put("title", title);
     data.put("resourceDir", hrh.getResourcesDirName());
-    hrh.copyResources(TEMPLATE_DIR + "/rtg.css", TEMPLATE_DIR + "/rtg_logo.png", TEMPLATE_DIR + "/table.css");
+    hrh.copyResources(TEMPLATE_DIR + "/rtg.css", TEMPLATE_DIR + "/table.css");
     return processTemplate(DEFAULT_TEMPLATE, data);
   }
 

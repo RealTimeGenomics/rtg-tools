@@ -612,7 +612,7 @@ public class VariantStatistics extends AbstractStatistics {
   @Override
   public void generateReport() throws IOException {
     final HtmlReportHelper helper = getReportHelper();
-    helper.copyResources(ReportUtils.TEMPLATE_DIR + "/rtg_logo.png", ReportUtils.TEMPLATE_DIR + "/rtg.css"); //copy resources up here to create the report files sub dir as well
+    helper.copyResources(ReportUtils.TEMPLATE_DIR + "/rtg.css"); //copy resources up here to create the report files sub dir as well
     // write html
     final HashMap<String, Object> replBody = new HashMap<>();
     final Pair<List<String>, List<String>> outputStatistics = statisticsMap();
