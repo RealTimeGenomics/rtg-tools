@@ -541,7 +541,7 @@ public class RocPlot {
 
     PrecisionRecallGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
-      setKeyHorizontalPosition(KeyPosition.RIGHT);
+      setKeyHorizontalPosition(KeyPosition.LEFT);
       setGrid(true);
       setLabel(Graph2D.X, SENSITIVITY);
       setLabel(Graph2D.Y, PRECISION);
