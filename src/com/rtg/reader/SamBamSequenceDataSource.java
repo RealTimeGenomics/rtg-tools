@@ -280,7 +280,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   public byte[] qualityData() {
     assert mRecords[mRecordIndex] != null;
     byte[] quals = mRecords[mRecordIndex].getBaseQualities();
-    if (quals == null || quals.length == 0) {
+    if (quals == null || quals.length == 0 && quals.length != mRecords[mRecordIndex].getReadBases().length) {
       throw new NoTalkbackSlimException("SAM or BAM input must have qualities.");
     }
     if (mRecords[mRecordIndex].getReadNegativeStrandFlag()) {
