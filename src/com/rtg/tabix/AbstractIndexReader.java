@@ -130,7 +130,7 @@ public abstract class AbstractIndexReader implements LocusIndex {
    * @param results storage space for offset information
    * @throws java.io.IOException if an IO exception occurs
    */
-  public static void getFilePointers(String seqName, List<? extends Interval> intervals, InputStream indexStream, long binsPosition, int binsSize, VirtualOffsets results) throws IOException {
+  public void getFilePointers(String seqName, List<? extends Interval> intervals, InputStream indexStream, long binsPosition, int binsSize, VirtualOffsets results) throws IOException {
 
     //seek to sequence
     FileUtils.skip(indexStream, binsPosition);
@@ -142,7 +142,10 @@ public abstract class AbstractIndexReader implements LocusIndex {
     final byte[] tinyBuf = new byte[4];
     IOUtils.readFully(indexStream, tinyBuf, 0, 4);
     final int linearIndexSize = ByteArrayIOUtils.bytesToIntLittleEndian(tinyBuf, 0);
-    final byte[] linIndexBuf = new byte[linearIndexSize * 8]; //TODO check for overflow
+    if (linearIndexSize * 8 < 0) {
+      throw new IllegalArgumentException("File: " + mIndexFile.getPath() + " is not a valid index. (linearIndexSize = " + linearIndexSize + ")");
+    }
+    final byte[] linIndexBuf = new byte[linearIndexSize * 8];
     IOUtils.readFully(indexStream, linIndexBuf, 0, linearIndexSize * 8);
     final long[] linearIndex = new long[linearIndexSize];
     //create linear index
@@ -163,7 +166,10 @@ public abstract class AbstractIndexReader implements LocusIndex {
       binIdIndex[binNum[i]] = i;
       final int numChunks = binNumChunks[i] = ByteArrayIOUtils.bytesToIntLittleEndian(binsBuf, binStart + 4);
       final int chunkStart = binStart + 8;
-      final int chunkSize = numChunks * 16; //check for overflow
+      final int chunkSize = numChunks * 16;
+      if (chunkSize < 0 || numChunks * 2 < 0) {
+        throw new IllegalArgumentException("File: " + mIndexFile.getPath() + " is not a valid index. (numChunks = " + numChunks + ")");
+      }
       final long[] chunkBounds = binChunkBounds[i] = new long[numChunks * 2];
       for (int k = 0, j = 0; k < numChunks; ++k) {
         chunkBounds[j++] = ByteArrayIOUtils.bytesToLongLittleEndian(binsBuf, chunkStart + k * 16);
