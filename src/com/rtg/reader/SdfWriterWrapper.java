@@ -57,8 +57,9 @@ public final class SdfWriterWrapper implements WriterWrapper {
    * @param baseDir base directory.
    * @param reader the reader that this writer is writing from.
    * @param forceCompression Force SDF to be compressed
+   * @throws IOException if there are problems writing to the output SDFs
    */
-  public SdfWriterWrapper(File baseDir, SdfReaderWrapper reader, boolean forceCompression) {
+  public SdfWriterWrapper(File baseDir, SdfReaderWrapper reader, boolean forceCompression) throws IOException {
     assert reader != null;
     mReader = reader;
     mIsPaired = reader.isPaired();
@@ -69,20 +70,28 @@ public final class SdfWriterWrapper implements WriterWrapper {
       FileUtils.ensureOutputDirectory(baseDir);
       mSingle = null;
       mLeft = new SdfWriter(new File(baseDir, "left"), Constants.MAX_FILE_SIZE, reader.getPrereadType(), mHasQuality, mHasNames, forceCompression || reader.left().compressed(), reader.type());
-      mLeft.setPrereadArm(reader.left().getArm());
-      mLeft.setCommandLine(CommandLine.getCommandLine());
+      copyMetadata(reader.left(), mLeft);
       mRight = new SdfWriter(new File(baseDir, "right"), Constants.MAX_FILE_SIZE, reader.getPrereadType(), mHasQuality, mHasNames, forceCompression || reader.right().compressed(), reader.type());
-      mRight.setPrereadArm(reader.right().getArm());
-      mRight.setCommandLine(CommandLine.getCommandLine());
+      copyMetadata(reader.right(), mRight);
       mRight.setSdfId(mLeft.getSdfId());
     } else {
       mLeft = null;
       mRight = null;
-      mSingle = new SdfWriter(baseDir, Constants.MAX_FILE_SIZE, reader.getPrereadType(), mHasQuality, mHasNames, forceCompression || reader.single().compressed(), reader.type());
-      mSingle.setPrereadArm(reader.single().getArm());
-      mSingle.setCommandLine(CommandLine.getCommandLine());
+      final SequencesReader single = reader.single();
+      mSingle = new SdfWriter(baseDir, Constants.MAX_FILE_SIZE, reader.getPrereadType(), mHasQuality, mHasNames, forceCompression || single.compressed(), reader.type());
+      copyMetadata(single, mSingle);
     }
     setSdfId(new SdfId());
+  }
+
+  private static void copyMetadata(SequencesReader src, SdfWriter dest) throws IOException {
+    dest.setPrereadArm(src.getArm());
+    dest.setCommandLine(CommandLine.getCommandLine());
+    dest.setReadGroup(src.index().getSamReadGroup());
+
+    // Preserve record of which genome this SDF was derived from during simulation
+    SourceTemplateReadWriter.writeTemplateMappingFile(dest.directory(), SourceTemplateReadWriter.readTemplateMap(src.path()));
+    SourceTemplateReadWriter.copyMutationMappingFile(src.path(), dest.directory());
   }
 
   /**
@@ -125,24 +134,6 @@ public final class SdfWriterWrapper implements WriterWrapper {
     writer.startSequence(mHasNames ? reader.fullName(seqId) : null);
     writer.write(dataBuffer, mHasQuality ? qualityBuffer : null, length);
     writer.endSequence();
-  }
-
-  /**
-   * Function to copy the source templates file into the resulting SDF files
-   * if it exists in the original SDF file.
-   * @param reader the reader to get the original list from.
-   * @throws IOException if an I/O error occurs during reading or writing.
-   */
-  public void copySourceTemplatesFile(SdfReaderWrapper reader) throws IOException {
-    if (mIsPaired) {
-      SourceTemplateReadWriter.writeTemplateMappingFile(mLeft.directory(), SourceTemplateReadWriter.readTemplateMap(reader.left().path()));
-      SourceTemplateReadWriter.writeTemplateMappingFile(mRight.directory(), SourceTemplateReadWriter.readTemplateMap(reader.right().path()));
-      SourceTemplateReadWriter.copyMutationMappingFile(reader.left().path(), mLeft.directory());
-      SourceTemplateReadWriter.copyMutationMappingFile(reader.right().path(), mRight.directory());
-    } else {
-      SourceTemplateReadWriter.writeTemplateMappingFile(mSingle.directory(), SourceTemplateReadWriter.readTemplateMap(reader.single().path()));
-      SourceTemplateReadWriter.copyMutationMappingFile(reader.single().path(), mSingle.directory());
-    }
   }
 
   @Override

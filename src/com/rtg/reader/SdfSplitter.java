@@ -193,9 +193,6 @@ public final class SdfSplitter extends LoggedCli {
             fname = String.format("%06d", numOutputs);
             writer = new SdfWriterWrapper(new File(outDir, fname), reader, forceCompression);
             ++numOutputs;
-            if (inDirs.size() == 1) {
-              writer.copySourceTemplatesFile(reader);
-            }
           }
           dupDetector.addPair(reader.name(seq), (int) seq, readerNumber);
           writer.writeSequence(seq, data, quality);
@@ -229,9 +226,7 @@ public final class SdfSplitter extends LoggedCli {
         } finally {
           for (final SdfReaderWrapper r : readerWrappers) {
             if (r != null) {
-              try {
-                r.close();
-              } finally { }
+              r.close();
             }
           }
         }

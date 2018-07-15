@@ -45,7 +45,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.LogStream;
@@ -56,29 +55,25 @@ import com.rtg.util.io.LogStream;
  */
 public final class SdfSubset extends LoggedCli {
 
-  private static final Validator VALIDATOR = new Validator() {
-
-    @Override
-    public boolean isValid(CFlags flags) {
-      if (!CommonFlags.validateOutputDirectory(flags)) {
-        return false;
-      }
-      if (!flags.isSet(ID_FILE_FLAG) && !flags.getAnonymousFlag(0).isSet() && !(flags.isSet(START_SEQUENCE) || flags.isSet(END_SEQUENCE))) {
-        flags.setParseMessage("Sequences to extract must be specified, either explicitly, or using --" + ID_FILE_FLAG + ", or via --" + START_SEQUENCE + "/--" + END_SEQUENCE);
-        return false;
-      }
-      return Sdf2Fasta.validateExtractorFlags(flags);
+  private static boolean checkSequenceIds(CFlags flags) {
+    if (!flags.isSet(ID_FILE_FLAG) && !flags.getAnonymousFlag(0).isSet() && !(flags.isSet(START_SEQUENCE) || flags.isSet(END_SEQUENCE))) {
+      flags.setParseMessage("Sequences to extract must be specified, either explicitly, or using --" + ID_FILE_FLAG + ", or via --" + START_SEQUENCE + "/--" + END_SEQUENCE);
+      return false;
     }
-  };
+    return true;
+  }
 
   @Override
   protected void initFlags() {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription("Extracts a subset of sequences from one SDF and outputs them to another SDF.");
+    CommonFlags.initForce(mFlags);
     Sdf2Fasta.registerExtractorFlags(mFlags);
     mFlags.registerRequired('o', CommonFlags.OUTPUT_FLAG, File.class, CommonFlags.SDF, "output SDF").setCategory(INPUT_OUTPUT);
 
-    mFlags.setValidator(VALIDATOR);
+    mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
+      && checkSequenceIds(flags)
+      && Sdf2Fasta.validateExtractorFlags(flags));
   }
 
   @Override
@@ -101,8 +96,6 @@ public final class SdfSubset extends LoggedCli {
   protected int mainExec(OutputStream out, LogStream log) throws IOException {
     try (final SdfReaderWrapper reader = new SdfReaderWrapper((File) mFlags.getValue(INPUT), false, false)) {
       try (final SdfWriterWrapper writer = new SdfWriterWrapper((File) mFlags.getValue(CommonFlags.OUTPUT_FLAG), reader, false)) {
-        writer.copySourceTemplatesFile(reader);
-
         final WrapperFilter filter;
         if (mFlags.isSet(NAMES_FLAG)) {
           filter = new NameWrapperFilter(reader, writer);
