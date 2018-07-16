@@ -140,7 +140,18 @@ public class ReferenceGenome {
    * @throws IOException when actual I/O error or problems in file definition.
    */
   public ReferenceGenome(final SequencesReader genome, final Reader reference, final Sex sex) throws IOException {
-    parse(ReaderUtils.getSequenceLengthMap(genome), reference, sex);
+    this(ReaderUtils.getSequenceLengthMap(genome), reference, sex);
+  }
+
+  /**
+   * Constructor for testing.
+   * @param nameToLengths map containing the length of each reference genome.
+   * @param reference contents of description of reference genome.
+   * @param sex for this instance.
+   * @throws IOException when actual I/O error or problems in file definition.
+   */
+  public ReferenceGenome(Map<String, Integer> nameToLengths, final Reader reference, final Sex sex) throws IOException {
+    parse(nameToLengths, reference, sex);
   }
 
   private void parse(Map<String, Integer> names, final Reader reference, final Sex sex) throws IOException {
