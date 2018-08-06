@@ -32,7 +32,6 @@ package com.rtg.sam;
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
-import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.reader.SequencesReader;
 import com.rtg.tabix.VirtualOffsets;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -49,7 +48,6 @@ import htsjdk.samtools.util.RuntimeIOException;
 /**
  * Like SamRestrictingIterator but uses VirtualOffsets to perform separate region retrievals.
  */
-@TestClass("com.rtg.sam.SamClosedFileReaderTest")
 final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> {
 
   private final BlockCompressedInputStream mStream;
@@ -159,7 +157,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
 
   private void recordPreviousAndAdvance(SAMRecord previousRecord, SAMRecord rec) throws IOException {
     if (previousRecord != null && previousRecord.getReferenceIndex() == mCurrentTemplate) {
-      mPreviousAlignmentStart = previousRecord.getAlignmentStart();
+      mPreviousAlignmentStart = previousRecord.getAlignmentStart() - 1; // Potentially need to recheck previousRecord at next region
     } else {
       mPreviousAlignmentStart = Integer.MIN_VALUE;
     }
