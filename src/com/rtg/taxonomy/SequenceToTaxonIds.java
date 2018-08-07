@@ -46,7 +46,7 @@ public final class SequenceToTaxonIds extends TsvParser<Map<String, Integer>> {
   @Override
   protected void parseLine(String... parts) throws IOException {
     if (parts.length != 2) {
-      throw new IOException("Malformed line: " + line());
+      throw new IOException("Malformed line (expected two tab-separated fields): " + line());
     }
     final String name;
     final int indexOfSpace = parts[1].indexOf(' ');
@@ -60,7 +60,7 @@ public final class SequenceToTaxonIds extends TsvParser<Map<String, Integer>> {
     try {
       taxId = Integer.parseInt(parts[0]);
     } catch (NumberFormatException e) {
-      throw new IOException("Malformed line: " + line(), e);
+      throw new IOException("Malformed line (expected a number in the first field): " + line(), e);
     }
     if (mMap.put(new String(name.toCharArray()), taxId) != null) {
       throw new IOException("Duplicate name detected: " + line());
