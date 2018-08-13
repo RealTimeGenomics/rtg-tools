@@ -39,7 +39,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.util.zip.GZIPOutputStream;
 
 import com.rtg.util.Resources;
 import com.rtg.util.gzip.GzipUtils;
@@ -267,7 +266,7 @@ public final class FileHelper {
     if (file == null) {
       throw new NullPointerException("null file given");
     }
-    try (OutputStream out = new GZIPOutputStream(new FileOutputStream(file))) {
+    try (OutputStream out = FileUtils.createOutputStream(file, true)) {
       final byte[] b = new byte[FileUtils.BUFFER_SIZE];
       int len = stream.read(b);
       while (len > 0) {
