@@ -157,7 +157,7 @@ final class SamMultiRestrictingIterator implements CloseableIterator<SAMRecord> 
 
   private void recordPreviousAndAdvance(SAMRecord previousRecord, SAMRecord rec) throws IOException {
     if (previousRecord != null && previousRecord.getReferenceIndex() == mCurrentTemplate) {
-      mPreviousAlignmentStart = previousRecord.getAlignmentStart() - 1; // Potentially need to recheck previousRecord at next region
+      mPreviousAlignmentStart = previousRecord.getAlignmentStart() - 1; // to 0-based
     } else {
       mPreviousAlignmentStart = Integer.MIN_VALUE;
     }

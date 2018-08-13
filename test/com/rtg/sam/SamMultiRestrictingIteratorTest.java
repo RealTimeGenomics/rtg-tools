@@ -31,15 +31,16 @@ package com.rtg.sam;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
+import com.rtg.tabix.TabixIndexer;
+import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
+import com.rtg.util.test.FileHelper;
 
 import htsjdk.samtools.SAMFileHeader;
 import htsjdk.samtools.SAMRecord;
-import htsjdk.samtools.SamReader;
 import junit.framework.TestCase;
 
 /**
@@ -52,26 +53,17 @@ public class SamMultiRestrictingIteratorTest extends TestCase {
     Diagnostic.setLogStream();
   }
 
-  private SAMFileHeader getHeader() throws IOException {
-    try (final InputStream is = getClass().getClassLoader().getResourceAsStream("com/rtg/sam/resources/test-multiregion.sam.gz");
-         final SamReader reader = SamUtils.makeSamReader(is)) {
-      return reader.getFileHeader();
-    }
-  }
-
-  public void testIterator() throws IOException {
+  public void testIterator() throws IOException, UnindexableDataException {
     // Test a situation where previously we had a bug that was skipping over some records
-    // that should have been included in a subsequent region.  This does involve an
-    // placed unmapped records, possibly some interaction with the tabix index.
+    // that should have been included in a subsequent region.
     final File testDir = FileUtils.createTempDir("multiregion", "test");
     try {
       final File samFile = new File(testDir, "test-multiregion.sam.gz");
-      final File samFileIndex = new File(testDir, "test-multiregion.sam.gz.tbi");
-      FileUtils.copyResource("com/rtg/sam/resources/test-multiregion.sam.gz", samFile);
-      FileUtils.copyResource("com/rtg/sam/resources/test-multiregion.sam.gz.tbi", samFileIndex);
+      FileHelper.resourceToGzFile("com/rtg/sam/resources/test-multiregion.sam", samFile);
+      new TabixIndexer(samFile).saveSamIndex();
       final SamRegionRestriction region1 = new SamRegionRestriction("17", 37866468, 37866469);
       final SamRegionRestriction region2 = new SamRegionRestriction("17", 37866577, 37866578);
-      final SAMFileHeader header = getHeader();
+      final SAMFileHeader header = SamUtils.getSingleHeader(samFile);
       final ReferenceRanges<String> ranges = SamRangeUtils.createExplicitReferenceRange(header, region1, region2);
       try (final SamClosedFileReader reader = new SamClosedFileReader(samFile, ranges, null, header)) {
         final int[] expectedLocs = {37866469, 37866470, 37866470};
