@@ -261,7 +261,7 @@ public class HalfPathTest extends TestCase {
     , "seq 10 . CGT AGA 3 PASS . GT 1/1"
     , "seq 14 . C A 8 PASS . GT 1/1"
     , "seq 16 . T A 4 PASS . GT 1/1"
-    , "seq 20 . C A 10 PASS . GT 1/1 "
+    , "seq 20 . C A 10 PASS . GT 1/1"
   };
   private static final String[] MUTATIONS_TRICKY = {
       "seq 5 . TC T 0.0 PASS . GT 1/1"

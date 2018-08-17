@@ -181,6 +181,12 @@ public class VcfReader implements VcfIterator {
     if (field.length < 8) {
       throw new VcfFormatException("Expected at least 8 fields");
     }
+    for (int i = 0; i < field.length; i++) {
+      if (field[i].trim().length() == 0) {
+        throw new VcfFormatException("Field in column " + (i + 1) + " is empty");
+      }
+    }
+
     final int pos;
     try {
       pos = Integer.parseInt(field[POS_FIELD]) - 1;
