@@ -33,6 +33,7 @@ package com.rtg.simulation.variants;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.rtg.reader.SequencesReader;
@@ -269,6 +270,19 @@ public class ChildSampleSimulator {
     return point > min && point <= max;
   }
 
+  // Get the (sorted) parent recombination points for this (diploid) chromosome. There must be at least one and there may be extra
+  private int[] getCrossoverPositions(ReferenceSequence refSeq, Sex sex, int seqLength) {
+    final int[] crossoverPoints = new int[1 + (mRandom.nextDouble() < mExtraCrossoverFreq ? 1 : 0)];
+    for (int i = 0; i < crossoverPoints.length; i++) {
+      crossoverPoints[i] = mRandom.nextInt(seqLength);
+    }
+    Arrays.sort(crossoverPoints);
+    if (mVerbose) {
+      Diagnostic.info("Chose " + crossoverPoints.length + " recombination points for " + sex + " parent on chromosome " + refSeq.name());
+    }
+    return crossoverPoints;
+  }
+
   //writes sample to given writer, returns records as list
   private List<VcfRecord> mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, int seqLength) throws IOException {
     final Ploidy fatherPloidy = mFatherRefg.sequence(refSeq.name()).ploidy();
@@ -277,9 +291,10 @@ public class ChildSampleSimulator {
     final int fatherCount = getEffectivePloidy(fatherPloidy.count());
     final int motherCount = getEffectivePloidy(motherPloidy.count());
     final int childCount = childPloidy.count();
-    final int motherRequiredCrossover = mRandom.nextInt(seqLength);  // Position of the one required crossover per (diploid) chromosome. There may be extra
-    final int fatherRequiredCrossover = mRandom.nextInt(seqLength);  // Position of the one required crossover per (diploid) chromosome. There may be extra
-    final double crossoverPerBase = mExtraCrossoverFreq / seqLength; // Chance of getting an additional crossover per base
+    final int[] motherCrossovers = getCrossoverPositions(refSeq, Sex.FEMALE, seqLength);
+    final int[] fatherCrossovers = getCrossoverPositions(refSeq, Sex.MALE, seqLength);
+    int motherCurrentCrossover = 0;
+    int fatherCurrentCrossover = 0;
 
     final String desc = "Father=" + fatherPloidy + " + Mother=" + motherPloidy + " -> Child=" + childPloidy;
     if (childCount == 1 && fatherCount == 0 && motherCount == 0) {
@@ -319,16 +334,18 @@ public class ChildSampleSimulator {
         if (baseDelta < 0) {
           warnOutOfOrder();
         } else {
-          if (fatherCount > 1 && (between(fatherRequiredCrossover, lastPos, v.getStart()) || mRandom.nextDouble() <= baseDelta * crossoverPerBase)) {
+          while (fatherCount > 1 && (fatherCurrentCrossover < fatherCrossovers.length) && between(fatherCrossovers[fatherCurrentCrossover], lastPos, v.getStart())) {
             fatherHap = (fatherHap + 1) % fatherCount;
             mStats.mFatherCrossovers++;
+            fatherCurrentCrossover++;
             if (mVerbose) {
               Diagnostic.info("Crossover on father in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + fatherHap);
             }
           }
-          if (motherCount > 1 && (between(motherRequiredCrossover, lastPos, v.getStart()) || mRandom.nextDouble() <= baseDelta * crossoverPerBase)) {
+          while (motherCount > 1 && (motherCurrentCrossover < motherCrossovers.length) && between(motherCrossovers[motherCurrentCrossover], lastPos, v.getStart())) {
             motherHap = (motherHap + 1) % motherCount;
             mStats.mMotherCrossovers++;
+            motherCurrentCrossover++;
             if (mVerbose) {
               Diagnostic.info("Crossover on mother in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + motherHap);
             }
