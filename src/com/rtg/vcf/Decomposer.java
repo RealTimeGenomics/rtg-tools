@@ -200,13 +200,18 @@ class Decomposer {
       final int[] alleleMap = updateAlts(splitRecord.getAltCalls(), alleles, needAnchor, anchor, left);
       // Go through samples and update genotypes
       final List<String> oldGenotypes = splitRecord.getFormat(VcfUtils.FORMAT_GENOTYPE);
-      for (int sample = 0; sample < splitRecord.getNumberOfSamples(); ++sample) {
-        final String oldGt = oldGenotypes.get(sample);
-        final int[] gt = VcfUtils.splitGt(oldGt);
-        for (int k = 0; k < gt.length; ++k) {
-          gt[k] = gt[k] == VcfUtils.MISSING_GT ? VcfUtils.MISSING_GT : alleleMap[gt[k]];
+      if (oldGenotypes != null) {
+        for (int sample = 0; sample < splitRecord.getNumberOfSamples(); ++sample) {
+          final String oldGt = oldGenotypes.get(sample);
+          final int[] gt = VcfUtils.splitGt(oldGt);
+          if (!VcfUtils.isValidGt(rec, gt)) {
+            throw new VcfFormatException("VCF record GT contains allele ID out of range, record: " + rec.toString());
+          }
+          for (int k = 0; k < gt.length; ++k) {
+            gt[k] = gt[k] == VcfUtils.MISSING_GT ? VcfUtils.MISSING_GT : alleleMap[gt[k]];
+          }
+          splitRecord.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(VcfUtils.isPhasedGt(oldGt), gt), sample);
         }
-        splitRecord.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(VcfUtils.isPhasedGt(oldGt), gt), sample);
       }
       ++mTotalPieces;
       res.add(splitRecord);

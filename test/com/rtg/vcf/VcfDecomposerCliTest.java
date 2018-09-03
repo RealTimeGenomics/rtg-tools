@@ -37,6 +37,7 @@ import com.rtg.launcher.AbstractCliTest;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
+import com.rtg.util.TestUtils;
 import com.rtg.util.Utils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -68,13 +69,13 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
   // Run a test where vcfdecompose is expected to complete normally
   private void runResourceTest(String inResourceLoc, String expResourceLoc, boolean useRef, String... extrArgs) throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      final File sdf = ReaderTestUtils.getDNASubDir(REF, dir);
       final File in = FileHelper.resourceToFile(inResourceLoc, new File(dir, new File(Resources.getResource(inResourceLoc).getFile()).getName()));
       final File out = new File(dir, "out.vcf.gz");
       String[] args = {
         "-i", in.getPath(), "-o", out.getPath()
       };
       if (useRef) {
+        final File sdf = ReaderTestUtils.getDNASubDir(REF, dir);
         args = Utils.append(args, "-t", sdf.getPath());
       }
       args = Utils.append(args, extrArgs);
@@ -106,5 +107,14 @@ public class VcfDecomposerCliTest extends AbstractCliTest {
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_noref.vcf", false);
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_mnps.vcf", true, "--break-mnps");
     runResourceTest(RESOURCES + "vcfdecompose_in.vcf", "vcfdecompose_out_indels.vcf", true, "--break-indels");
+  }
+
+  public void testSplode() throws IOException {
+    try (TestDirectory dir = new TestDirectory()) {
+      final File in = FileHelper.resourceToFile(RESOURCES + "vcfdecompose_splode1.vcf", new File(dir, "in.vcf"));
+      final File out = new File(dir, "out.vcf.gz");
+      final String result = checkMainInitBadFlags("-i", in.getPath(), "-o", out.getPath());
+      TestUtils.containsAll(result, "allele ID out of range");
+    }
   }
 }
