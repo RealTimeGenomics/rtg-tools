@@ -37,6 +37,7 @@ import static com.rtg.vcf.eval.RocContainer.RocColumns.TRUE_POSITIVES_CALL;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.eval.RocPoint;
 import com.rtg.vcf.eval.RocUtils;
 
@@ -189,5 +191,18 @@ public final class ParseRocFile {
     dataBundle.setTitle(shortName);
     dataBundle.setScoreName(scoreName);
     return dataBundle;
+  }
+
+  /**
+   * Compute area under PR curve.
+   * @param args command line containing roc data files
+   * @throws IOException if a ROC file can not be parsed
+   */
+  public static void main(String[] args) throws IOException {
+    for (final String fname : args) {
+      final File f = new File(fname);
+      final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), true);
+      System.err.println(fname + "\t" + db.computeAuPR());
+    }
   }
 }

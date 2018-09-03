@@ -97,6 +97,20 @@ final class DataBundle {
     return minPrecision;
   }
 
+  public float computeAuPR() {
+    double aupr = 0;
+    if (mPrecisionRecallPoints.length > 1) {
+      Point2D lastPoint = null;
+      for (Point2D p : mPrecisionRecallPoints) {
+        if (lastPoint != null) {
+          aupr += (p.getX() - lastPoint.getX()) * (p.getY() + lastPoint.getY()) / 2 / 10000;
+        }
+        lastPoint = p;
+      }
+    }
+    return (float) aupr;
+  }
+
 
   private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants) {
     final List<Point2D> res = new ArrayList<>();
