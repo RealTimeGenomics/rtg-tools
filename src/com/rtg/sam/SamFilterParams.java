@@ -30,6 +30,7 @@
 package com.rtg.sam;
 
 import java.io.File;
+import java.util.Set;
 
 import com.rtg.util.IntegerOrPercentage;
 import com.rtg.util.InvalidParamsException;
@@ -72,6 +73,7 @@ public class SamFilterParams {
 
     protected SamRegionRestriction mRestriction = null;
     protected File mBedRegionsFile = null;
+    protected Set<String> mSelectReadGroups = null;
 
     /**
      * SAM records having MAPQ less than this value will be filtered.
@@ -224,6 +226,17 @@ public class SamFilterParams {
     }
 
     /**
+     * Include only records from the supplied read groups. Any record without a read group,
+     * or with a non-matching read group, will be rejected.
+     * @param ids the set of read group ids, or null to remove read group criteria altogether.
+     * @return this builder, so calls can be chained.
+     */
+    public SamFilterParamsBuilder selectReadGroups(Set<String> ids) {
+      mSelectReadGroups = ids;
+      return this;
+    }
+
+    /**
      * Specify mask indicating SAM flags that must be unset. Any record with any
      * of these flags set will be excluded. Default is not checking any of these flags.
      * @param flags mask indicating flags that must be unset.
@@ -313,6 +326,7 @@ public class SamFilterParams {
   private final boolean mExcludeUnplaced;
   private final boolean mFindAndRemoveDuplicates; //detected version
   private final boolean mExcludeVariantInvalid;
+  private final Set<String> mSelectReadGroups;
   private final Double mSubsampleFraction;
   private final Double mSubsampleRampFraction;
   private final long mSubsampleSeed;
@@ -336,6 +350,7 @@ public class SamFilterParams {
     mExcludeUnplaced = builder.mExcludeUnplaced;
     mExcludeUnmated = builder.mExcludeUnmated; // Can't be done via requireUnset/requireSet. Needs to select reads that are !unmapped and !properpair
     mExcludeVariantInvalid = builder.mExcludeVariantInvalid;
+    mSelectReadGroups = builder.mSelectReadGroups;
 
     int requireUnsetFlags = builder.mRequireUnsetFlags;
     if (builder.mExcludeDuplicates) {
@@ -376,6 +391,7 @@ public class SamFilterParams {
       || mExcludeUnplaced
       || mExcludeUnmated
       || mExcludeVariantInvalid
+      || mSelectReadGroups != null
       || mRequireUnsetFlags != 0
       || mRequireSetFlags != 0
       || mInvertFilters
@@ -456,6 +472,14 @@ public class SamFilterParams {
    */
   public int maxAlignmentCount() {
     return mMaxAlignmentCount;
+  }
+
+  /**
+   * The set of read group IDs to be selected, or null to include all records.
+   * @return ids the set of read group ids to select, or null if no read group criteria should be applied.
+   */
+  public Set<String> selectReadGroups() {
+    return mSelectReadGroups;
   }
 
   /**

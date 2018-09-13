@@ -36,6 +36,9 @@ import static com.rtg.util.cli.CommonFlagCategories.SENSITIVITY_TUNING;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.IntegerOrPercentage;
@@ -72,7 +75,19 @@ public final class SamFilterOptions {
       return flags.registerOptional(MAX_HITS_FLAG, Integer.class, CommonFlags.INT, HITS_DESC).setCategory(SENSITIVITY_TUNING);
     }
   }
-  
+
+  /** Flag name for selecting specific read groups */
+  public static final String SELECT_READ_GROUP = "select-read-group";
+
+  /**
+   * Register flag for filtering on the read group ID.
+   * @param flags flags to add into
+   * @param singleLetter single letter code for option
+   */
+  public static void registerSelectReadGroup(final CFlags flags, char singleLetter) {
+    flags.registerOptional(singleLetter, SELECT_READ_GROUP, String.class, "String", "select only SAM records with this read group ID").setCategory(SENSITIVITY_TUNING).setMaxCount(Integer.MAX_VALUE).enableCsv();
+  }
+
   /** Flag name for enabling subsampling records. */
   public static final String SUBSAMPLE_FLAG = "subsample";
 
@@ -376,6 +391,10 @@ public final class SamFilterOptions {
     }
     if (flags.isSet(REQUIRE_FLAGS)) {
       builder.requireSetFlags((Integer) flags.getValue(REQUIRE_FLAGS));
+    }
+    if (flags.isSet(SELECT_READ_GROUP)) {
+      final Set<String> ids = flags.getValues(SELECT_READ_GROUP).stream().map(f -> (String) f).collect(Collectors.toCollection(LinkedHashSet::new));
+      builder.selectReadGroups(ids);
     }
 
     // Some tools want inclusion by default and some want exclusion by default

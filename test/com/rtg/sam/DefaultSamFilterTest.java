@@ -29,7 +29,10 @@
  */
 package com.rtg.sam;
 
+import java.util.Collections;
+
 import htsjdk.samtools.SAMFileHeader;
+import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 import junit.framework.TestCase;
 
@@ -104,6 +107,26 @@ public class DefaultSamFilterTest extends TestCase {
     rec.setAttribute("NH", 0);
     assertFalse(f.acceptRecord(rec));
     assertFalse(f.acceptRecord(rec) == notf.acceptRecord(rec));
+  }
+
+  public void testFilterReadGroup() {
+    final SamFilterParams.SamFilterParamsBuilder builder = SamFilterParams.builder().selectReadGroups(Collections.singleton("rg1"));
+    final DefaultSamFilter f = new DefaultSamFilter(builder.create());
+    final DefaultSamFilter notf = new DefaultSamFilter(builder.invertFilters(true).create());
+    final SAMFileHeader h = new SAMFileHeader();
+    final SAMReadGroupRecord r1 = new SAMReadGroupRecord("rg1");
+    final SAMReadGroupRecord r2 = new SAMReadGroupRecord("rg2");
+    h.addReadGroup(r1);
+    h.addReadGroup(r2);
+    final SAMRecord rec = new SAMRecord(h); // Not unmapped but alignment position == 0
+    assertFalse(f.acceptRecord(rec));
+    assertTrue(notf.acceptRecord(rec));
+    rec.setAttribute(ReadGroupUtils.RG_ATTRIBUTE, r1.getReadGroupId());
+    assertTrue(f.acceptRecord(rec));
+    assertFalse(notf.acceptRecord(rec));
+    rec.setAttribute(ReadGroupUtils.RG_ATTRIBUTE, r2.getReadGroupId());
+    assertFalse(f.acceptRecord(rec));
+    assertTrue(notf.acceptRecord(rec));
   }
 
 }

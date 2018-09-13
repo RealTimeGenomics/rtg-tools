@@ -31,6 +31,7 @@ package com.rtg.sam;
 
 import com.rtg.util.IntegerOrPercentage;
 
+import htsjdk.samtools.SAMReadGroupRecord;
 import htsjdk.samtools.SAMRecord;
 
 /**
@@ -129,6 +130,13 @@ public class DefaultSamFilter implements SamFilter {
       }
       // Subsample using hash of read name, ensures pairs are kept together
       return (internalHash(rec.getReadName(), params.subsampleSeed()) & SUBSAMPLE_MASK) < sFrac * SUBSAMPLE_MAX;
+    }
+
+    if (params.selectReadGroups() != null) {
+      final SAMReadGroupRecord srg = rec.getReadGroup();
+      if (srg == null || !params.selectReadGroups().contains(srg.getReadGroupId())) {
+        return false;
+      }
     }
 
     return true;
