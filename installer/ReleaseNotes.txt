@@ -4,6 +4,184 @@ Below are the release notes for the full RTG suite, upon which
 RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
+
+RTG Core 3.10 (2018-10-29)
+--------------------------
+
+This release primarily contains smaller improvements and bugfixes.
+Several of these result in command line arguments or changes to program
+outputs, so check existing scripts for compatibility before
+upgrading. Larger features of note:
+
+* Several improvements to simulation tools. In particular, a new command
+  pedsamplesim has been included that makes it very easy to simulate
+  multiple samples at once, given a pedigree file. pedsamplesim
+  automatically simulates founder individuals, inheritance by children,
+  and de novo mutations.
+
+* Java 11 compatibility testing. RTG is compatible with Java 11,
+  although currently we recommend Java 8 for performance reasons. Also
+  note that due to differences in Java Math library implementation after
+  Java 8, in rare situations minor output differences may be observed
+  when comparing results obtained using Java 8 with later Java versions.
+  Builds that include a bundled JRE have been updated to the latest JRE
+  8u181.
+
+There have been many other minor improvements and feature
+additions. Detailed changes are listed below by area.  For more
+information on new features, see the RTG Operations Manual.
+
+## Basic Formatting and Mapping
+
+* petrim: Now outputs read length distribution statistics.
+
+* petrim: Fixed an incorrect filename extension being used for fragment
+  and overlap length distribution output files.
+
+* map: Now allows the use of both --repeat-freq and
+  --blacklist-threshold at the same time.
+
+* map: Unmapped but placed reads have had minor adjustments made to
+  their expected mapping position.  As well as causing changes to BAM
+  annotations, this can cause subsequent changes to variant calling
+  annotations (such as AVR scores).
+
+* map: Fix a rare crash that could occur when mapping a male sample. The
+  fix for this can similarly have some changes to subsequent variant calling.
+
+* sammerge: New flag --min-read-length to permit filtering out
+  alignments where the read length is below the specified threshold.
+
+* sammerge: New flag --select-read-group to include only alignments from
+  the specified read groups.
+
+* sammerge: New flag --remove-duplicates to detect and remove duplicate
+  reads based on mapping position. This is like the duplicate detection
+  that the analysis tools such as variant callers normally perform on
+  the fly.
+
+* sammerge: Supports --Xforce to allow overwriting existing output
+  files.
+
+* sdfsubset/sdfsplit: These commands now pass SAM read group information
+  from the input SDF to the output SDF.
+
+
+### Variant Calling
+
+* variant callers: The GT fields for unphased calls are now in a
+  normalized (numerically increasing) format. Previously the choice of
+  allele ordering for alleles within a GT field was somewhat arbitrary,
+  giving the impression of some significance where there was none.
+
+* variant callers: Population variants loaded via --population-priors
+  are only used to refine complex call regions when the non-reference
+  allele fractions for the variant are higher than 1%. Previously the
+  use of a population priors source such as gnomAD that includes many
+  rare variants could lead to reduced sensitivity.
+
+* variant callers: Improved the ability to identify candidate local
+  haplotypes when jointly calling a large number of samples or where
+  there is wide variation in coverage between samples. The effect of
+  this is greater sensitivity to rare variants such as singletons and de
+  novo variants.
+
+* variant callers: Ignore SAM records where the reads have zero length.
+
+* many: Region based SAM/BAM record retrieval could sometimes skip
+  records in the case of a small inter-region gap.
+
+* segment: The --min-panel-coverage option has been renamed to
+  --min-norm-control-coverage (with extended functionality).
+
+* avrbuild: New flag --annotated that allows supplying positive/negative
+  labels via annotations on each VCF record, as an alternative to
+  supplying separate positive and negative VCFs. The supported
+  annotation is the same as produced by vcfeval --output-mode=annotate
+  format.
+
+* avrbuild: New flag --bed-regions to only read those training instances
+  that overlap the specified regions. This is a convenience method that
+  can be used to train on a specific subset of the data.
+
+
+### Variant Processing and Analysis
+
+* svdecompose: Fixed a crash caused by records where SVTYPE=INS but
+  where the record did not also contain an SVLEN annotation. These
+  records are now ignored.
+
+* vcfdecompose: Fixed a crash on records that did not contain a GT
+  format field. This also affected vcfeval when using --decompose. In
+  addition, the error reporting for records with invalid GT fields has
+  been improved.
+
+* many: Clearer error handling for VCF records that are invalid due to
+  extra TABs
+
+* rocplot: Move the legend for precision/sensitivity graphs to the left
+  hand side, where it is less likely to obstruct the curves themselves.
+
+* vcfannotate: Change in matching semantics when annotating with
+  IDs. Now uses the span of the record rather than just the start
+  position.
+
+* many: New derived annotation VAF1 that contains the VAF of the most
+  frequent alt allele. Being a single value annotation, it can be easily
+  used during AVR model building.
+
+* vcfmerge: Fix a crash that could occur when trying to merge a record
+  containing duplicated alleles.
+
+
+### Other
+
+* samplesim: Changed the behaviour when simulating from VCF records
+  without an AF annotation. Now these variants are ignored (i.e. never
+  selected for use by the sample), previously samplesim would treat all
+  alleles as equally likely. The old behaviour is available via new flag
+  --allow-missing-af.
+
+* childsim: The misleadingly named flag --num-crossovers has been
+  renamed to --extra-crossovers.
+
+* denovosim: Now allows the original and derived sample names to be the
+  same, in which case the sample in the output VCF is updated rather
+  than creating a new sample column.
+
+* denovosim: No longer sets the DN flag to "N" for samples not receiving
+  the de novo mutation, as in multi-sample simulation scenarios this is
+  not a reliable indicator.
+
+* denovosim: Fix bug when determining if a putative de novo site would
+  overlap with pre-existing variants.
+
+* pedsamplesim: New command that allows simulating several samples in
+  one run according to a pedigree. This uses the methods of samplesim,
+  denovosim, and childsim to greatly ease the simulation of multiple
+  samples.
+
+* pedstats: New flag --delimiter that can be used to output sample
+  identifiers with an alternative delimiter. For example, use comma as a
+  delimiter when directly supplying a sample list to vcfsubset
+  --keep-samples.
+
+* simulation tools: Most commands now support --Xforce to overwrite
+  existing files.
+
+* simulation tools: Improvements have been made to parameter validation.
+
+* misc: Updates for compatibility with Java 11. However, for performance
+  reasons we recommend using Java 8 for computationally intensive
+  analysis such as mapping and variant calling.
+
+* misc: Update bundled JRE to 1.8.0_181.
+
+* misc: Improved percentage memory allocation behaviour when total
+  system memory can not be determined. Will now fall back to Java
+  default memory allocation.
+
+
 RTG Core 3.9.1 (2018-05-29)
 ---------------------------
 
@@ -434,7 +612,7 @@ Major features of this release:
   simulation of population-level variants (popsim), individual sample
   genomes using population variants (samplesim), simulation of samples
   as member of a pedigree obeying inheritance rules (childsim),
-  simulation of de-novo variants (denovosom), generation of a genome
+  simulation of de-novo variants (denovosim), generation of a genome
   given a VCF of sample variants (samplereplay), and read simulation
   according to a range of sequencer parameters (readsim/cgsim).
 
