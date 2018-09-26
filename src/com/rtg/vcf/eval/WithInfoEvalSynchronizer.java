@@ -47,20 +47,30 @@ import com.rtg.vcf.header.VcfNumber;
  * Support output files with INFO field annotations containing variant status.
  */
 @TestClass("com.rtg.vcf.eval.CombinedEvalSynchronizerTest")
-abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
+public abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer {
 
-  static final String INFO_BASE = "BASE";
-  static final String INFO_CALL = "CALL";
+  /** Name of INFO field used to store baseline variant status */
+  public static final String INFO_BASE = "BASE";
+  /** Name of INFO field used to store called variant status */
+  public static final String INFO_CALL = "CALL";
+
   static final String INFO_SYNCPOS = "SYNC";
   static final String INFO_CALL_WEIGHT = "CALL_WEIGHT";
   static final String STATUS_OUTSIDE = "OUT";
   static final String STATUS_IGNORED = "IGN";
   static final String STATUS_HARD = "HARD";
-  static final String STATUS_TP = "TP";
-  static final String STATUS_FN = "FN";
-  static final String STATUS_FP = "FP";
-  static final String STATUS_FN_CA = "FN_CA";
-  static final String STATUS_FP_CA = "FP_CA";
+
+  /** Status used for matched variants */
+  public static final String STATUS_TP = "TP";
+  /** Status used for unmatched baseline variants */
+  public static final String STATUS_FN = "FN";
+  /** Status used for unmatched called variants */
+  public static final String STATUS_FP = "FP";
+  /** Status used for partially matched baseline variants */
+  public static final String STATUS_FN_CA = "FN_CA";
+  /** Status used for partially matched called variants */
+  public static final String STATUS_FP_CA = "FP_CA";
+
   static final String INFO_BASE_ALTERNATE = "BASE_ALTERNATE";
   static final String INFO_CALL_ALTERNATE = "CALL_ALTERNATE";
 
