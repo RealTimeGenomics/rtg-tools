@@ -40,6 +40,9 @@ import com.rtg.vcf.header.VcfNumber;
  * Enumeration of the derived annotations.
  */
 public enum DerivedAnnotations {
+
+  // INFO annotations
+
   /** Inbreeding Coefficient */
   IC(new InbreedingCoefficientAnnotation()),
   /** Hardy-Weinberg Equilibrium Probability */
@@ -57,10 +60,15 @@ public enum DerivedAnnotations {
   AC(new AlleleCountInGenotypesAnnotation()),
   /** Total number of alleles in called genotypes */
   AN(new NumberAllelesInGenotypesAnnotation()),
+
+  // FORMAT annotations
+
   /** GQ / DP for a single sample */
   GQD(new GenotypeQualityOverDepthAnnotation()),
-  /** Allelic fraction of contrary observations */
+  /** Allelic fraction of each ALT allele */
   VAF(new VariantAllelicFractionAnnotation()),
+  /** Allelic fraction of most frequent ALT allele */
+  VAF1(new VariantMinorAllelicFractionAnnotation()),
   /** Zygosity */
   ZY(new ZygosityAnnotation()),
   /** Ploidy */

@@ -41,7 +41,7 @@ import junit.framework.TestCase;
 public class DerivedAnnotationsTest extends TestCase {
 
   public void testEnum() {
-    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, VAF, ZY, PD, MEANQAD, QA, RA]");
+    TestUtils.testEnum(DerivedAnnotations.class, "[IC, EP, LAL, QD, NAA, AC, AN, GQD, VAF, VAF1, ZY, PD, MEANQAD, QA, RA]");
     assertTrue(DerivedAnnotations.IC.getAnnotation() instanceof InbreedingCoefficientAnnotation);
     assertTrue(DerivedAnnotations.EP.getAnnotation() instanceof EquilibriumProbabilityAnnotation);
     assertTrue(DerivedAnnotations.LAL.getAnnotation() instanceof LongestAlleleAnnotation);
@@ -50,6 +50,8 @@ public class DerivedAnnotationsTest extends TestCase {
     assertTrue(DerivedAnnotations.AC.getAnnotation() instanceof AlleleCountInGenotypesAnnotation);
     assertTrue(DerivedAnnotations.AN.getAnnotation() instanceof NumberAllelesInGenotypesAnnotation);
     assertTrue(DerivedAnnotations.GQD.getAnnotation() instanceof GenotypeQualityOverDepthAnnotation);
+    assertTrue(DerivedAnnotations.VAF.getAnnotation() instanceof VariantAllelicFractionAnnotation);
+    assertTrue(DerivedAnnotations.VAF1.getAnnotation() instanceof VariantMinorAllelicFractionAnnotation);
     assertTrue(DerivedAnnotations.ZY.getAnnotation() instanceof ZygosityAnnotation);
     assertTrue(DerivedAnnotations.PD.getAnnotation() instanceof PloidyAnnotation);
     assertTrue(DerivedAnnotations.MEANQAD.getAnnotation() instanceof MeanQualityDifferenceAnnotation);
