@@ -74,11 +74,11 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
   private static final String EXTRA_TOO_HARD = "too-hard";
   private static final String EXTRA_NON_CONF = "non-confident";
 
-  private static final String FORMAT_ROC_SCORE = "QQ";
+  static final String FORMAT_ROC_SCORE = "QQ";
 
   private static final String OUTPUT_FILE_NAME = "output.vcf";
-  private static final String SAMPLE_TRUTH = "TRUTH";
-  private static final String SAMPLE_QUERY = "QUERY";
+  static final String SAMPLE_TRUTH = "TRUTH";
+  static final String SAMPLE_QUERY = "QUERY";
 
   // Order of sample columns in the output VCF
   static final int TRUTH_SAMPLE_INDEX = 0;

@@ -55,8 +55,8 @@ import com.rtg.vcf.header.VcfNumber;
 class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   private static final String OUTPUT_FILE_NAME = "output.vcf";
-  private static final String SAMPLE_BASELINE = "BASELINE";
-  private static final String SAMPLE_CALLS = "CALLS";
+  static final String SAMPLE_BASELINE = "BASELINE";
+  static final String SAMPLE_CALLS = "CALLS";
 
   private final VcfWriter mVcfOut;
   private final VcfHeader mOutHeader;
