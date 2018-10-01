@@ -105,31 +105,37 @@ public class VcfRecordMerger implements AutoCloseable {
     merged.setId(StringUtils.join(VcfUtils.VALUE_SEPARATOR, uniqueIds));
 
     boolean altsChanged = false;
-    final int[][] gtMap = new int[records.length][];
     final List<String> mergedAltCalls = merged.getAltCalls();
-    for (int i = 0; i < records.length; ++i) {
-      final VcfRecord vcf = records[i];
-      final int numAlts = vcf.getAltCalls().size();
-      gtMap[i] = new int[numAlts + 1];
-      for (int j = 0; j < numAlts; ++j) {
-        final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
-        if (alt.equals(refCall)) {
-          gtMap[i][j + 1] = 0;
-          altsChanged = true;
-        } else {
-          int altIndex = mergedAltCalls.indexOf(alt);
-          if (altIndex == -1) {
-            altIndex = mergedAltCalls.size();
-            mergedAltCalls.add(alt);
-          }
-          gtMap[i][j + 1] = altIndex + 1;
-          if (j != altIndex) {
+    final int[][] gtMap;
+    if (records.length == 1) {
+      gtMap = null;
+      mergedAltCalls.addAll(records[0].getAltCalls());
+    } else {
+      gtMap = new int[records.length][];
+      for (int i = 0; i < records.length; ++i) {
+        final VcfRecord vcf = records[i];
+        final int numAlts = vcf.getAltCalls().size();
+        gtMap[i] = new int[numAlts + 1];
+        for (int j = 0; j < numAlts; ++j) {
+          final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
+          if (alt.equals(refCall)) {
+            gtMap[i][j + 1] = 0;
             altsChanged = true;
+          } else {
+            int altIndex = mergedAltCalls.indexOf(alt);
+            if (altIndex == -1) {
+              altIndex = mergedAltCalls.size();
+              mergedAltCalls.add(alt);
+            }
+            gtMap[i][j + 1] = altIndex + 1;
+            if (j != altIndex) {
+              altsChanged = true;
+            }
           }
         }
-      }
-      if (numAlts != mergedAltCalls.size()) {
-        altsChanged = true;
+        if (numAlts != mergedAltCalls.size()) {
+          altsChanged = true;
+        }
       }
     }
     merged.setQuality(records[0].getQuality());
@@ -165,7 +171,7 @@ public class VcfRecordMerger implements AutoCloseable {
             while (field.size() <= destSampleIndex) {
               field.add(VcfRecord.MISSING);
             }
-            if (VcfUtils.FORMAT_GENOTYPE.equals(key)) {
+            if (gtMap != null && VcfUtils.FORMAT_GENOTYPE.equals(key)) {
               final String gtStr = records[i].getFormat(key).get(sampleIndex);
               final int[] splitGt = VcfUtils.splitGt(gtStr);
               for (int gti = 0; gti < splitGt.length; ++gti) {
@@ -241,7 +247,11 @@ public class VcfRecordMerger implements AutoCloseable {
         for (int i = 0; i < recsArray.length; ++i) {
           recHolder[0] = recsArray[i];
           headHolder[0] = headsArray[i];
-          ret.add(mergeRecordsWithSameRef(recHolder, headHolder, destHeader, unmergeableFormatFields, !preserveFormats));
+          final VcfRecord r = mergeRecordsWithSameRef(recHolder, headHolder, destHeader, unmergeableFormatFields, !preserveFormats);
+          if (r == null) {
+            throw new IllegalArgumentException("VCF record could not be converted to destination structure:\n" + recHolder[0]);
+          }
+          ret.add(r);
         }
       }
     }

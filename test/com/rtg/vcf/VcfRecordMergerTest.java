@@ -107,20 +107,20 @@ public class VcfRecordMergerTest extends AbstractTest {
 
       // Outputs separate records due to different REF
       r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-      r2 = createRecord("chr1", 50, "AC", 1, 1, "AC"); //this tests the repair of a buggy case
+      r2 = createRecord("chr1", 50, "AC", 1, 1, "AC"); //this tests the preservation of a buggy case
       mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, new VcfHeader[]{h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
       assertEquals(2, mergedArr.length);
       VcfRecordTest.checkRecord(mergedArr[0], r1, new String[]{"0/1", "."});
-      VcfRecordTest.checkRecord(mergedArr[1], r2, new String[0], new String[]{".", "0/0"});
+      VcfRecordTest.checkRecord(mergedArr[1], r2, new String[0], new String[]{".", "1/1"});
 
       //test blank filling
       mh.addSampleName("sample3");
       r1 = createRecord("chr1", 50, "A", 0, 1, "C");
-      r2 = createRecord("chr1", 50, "AC", 1, 1, "AC");
+      r2 = createRecord("chr1", 50, "AC", 1, 1, "AG");
       mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, new VcfHeader[]{h1, h2}, mh, VcfMerge.alleleBasedFormats(mh), true);
       assertEquals(2, mergedArr.length);
       VcfRecordTest.checkRecord(mergedArr[0], r1, new String[]{"0/1", "."});
-      VcfRecordTest.checkRecord(mergedArr[1], r2, new String[0], new String[]{".", "0/0"});
+      VcfRecordTest.checkRecord(mergedArr[1], r2, new String[0], new String[]{".", "1/1"});
 
       //test reading of GT containing missing values
       r1 = createRecord("chr1", 50, "A", 0, 1, "C");
@@ -210,6 +210,24 @@ public class VcfRecordMergerTest extends AbstractTest {
       mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, new VcfHeader[]{h1, h2}, mh, hardSet, false);
       assertEquals(1, mergedArr.length);
       assertFalse(mergedArr[0].hasFormat(unmergeable.getId()));
+
+      // Single record edge cases.
+      // These are kind of dodgy records since they have redundant alleles, so allele normalization on these can cause problems
+      // We just pass them through after reordering the samples into the order expected in the destination.
+      for (String rr : new String[]{"chr1\t100\t.\tg\ta,C,a\t.\tPASS\t.", "chr1\t100\t.\tg\ta,G\t.\tPASS\t.", "chr1\t100\t.\tg\tg\t.\tPASS\t.", "chr1\t100\t.\tg\ta,C,A\t.\tPASS\t."}) {
+        r2 = VcfReader.vcfLineToRecord(rr);
+        r2.setNumberOfSamples(1);
+        r2.addFormatAndSample(unmergeable.getId(), "1.0");
+        mergedArr = merger.mergeRecords(new VcfRecord[]{r2}, new VcfHeader[] {h2}, mh, hardSet, true);
+        assertEquals(1, mergedArr.length);
+        final VcfRecord mr = mergedArr[0];
+        assertNotNull(mr);
+        assertTrue(mr.hasFormat(unmergeable.getId()));
+        assertEquals(2, mr.getNumberOfSamples());
+        assertEquals(2, mr.getFormat(unmergeable.getId()).size());
+        assertEquals(".", mr.getFormat(unmergeable.getId()).get(0));
+        assertEquals("1.0", mr.getFormat(unmergeable.getId()).get(1));
+      }
     }
   }
 
