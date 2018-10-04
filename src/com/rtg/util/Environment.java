@@ -61,6 +61,10 @@ public final class Environment {
 
   static {
     Locale.setDefault(Locale.US); // To ensure number formatting is consistent
+
+    // Ughhh, on JDK-11 any time you use the default js engine it spits out a warning to stderr.
+    // This disables it.
+    System.setProperty("nashorn.option.no.deprecation.warning", "true");
   }
 
   // To disable checking for release update during testing
