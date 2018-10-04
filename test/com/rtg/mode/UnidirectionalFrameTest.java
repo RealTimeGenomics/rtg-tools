@@ -87,20 +87,17 @@ public class UnidirectionalFrameTest extends TestCase {
    * Test method for {@link com.rtg.mode.UnidirectionalFrame#frameFromCode(int)}.
    */
   public final void testFrameFromCodeBad() {
-    final String vmName = System.getProperty("java.vm.name", "");
     try {
       UnidirectionalFrame.frameFromCode(-1);
       fail("RuntimeException expected");
     } catch (final RuntimeException e) {
-      final String expected = vmName.startsWith("IBM J9") ? "Array index out of range: -1" : "-1";
-      assertEquals(expected, e.getMessage());
+      // Expected
     }
     try {
       UnidirectionalFrame.frameFromCode(1);
       fail("RuntimeException expected");
     } catch (final RuntimeException e) {
-      final String expected = vmName.startsWith("IBM J9") ? "Array index out of range: 1" : "1";
-      assertEquals(expected, e.getMessage());
+      // Expected
     }
   }
 
