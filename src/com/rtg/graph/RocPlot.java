@@ -767,7 +767,7 @@ public class RocPlot {
       final Point p = e.getPoint();
       final Mapping[] mapping = mZoomPP.getMapping();
       final Graph2D zoomedGraph = mZoomPP.getGraph();
-      final boolean alternate = (e.getModifiers() & InputEvent.SHIFT_MASK) != 0;
+      final boolean alternate = (e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0;
       if (zoomedGraph instanceof RocGraph2D) {
         if (mapping != null && mapping.length > 1) {
           final boolean inView = p.x >= mapping[0].getScreenMin() && p.x <= mapping[0].getScreenMax()
