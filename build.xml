@@ -355,8 +355,6 @@
     </condition>
 
     <property name="zipfile.base" location="${build.dir}/${zipversion}-base.zip" />
-    <property name="zipfile.linux" location="${dist.dir}/${zipversion}-linux-x64.zip" />
-    <property name="zipfile.windows" location="${dist.dir}/${zipversion}-windows-x64.zip" />
     <property name="zipfile.nojre" location="${dist.dir}/${zipversion}-nojre.zip" />
     <property name="zipfile" value="${zipfile.nojre}" /> <!-- Default when running smoketest -->
     <property name="rtg-jar-for-zip" value="rtg-${resources}.jar"/>
