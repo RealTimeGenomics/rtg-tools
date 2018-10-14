@@ -255,9 +255,8 @@ CommonFlags.initNoGzip(flags);
       indexing.start();
       for (final String outputName : OUTPUT_FILES) {
         final File outFile = output.file(outputName + FileUtils.GZ_SUFFIX);
-        final File tabixFile = output.file(outputName + FileUtils.GZ_SUFFIX + TabixIndexer.TABIX_EXTENSION);
         try {
-          new TabixIndexer(outFile, tabixFile).saveVcfIndex();
+          new TabixIndexer(outFile).saveVcfIndex();
         } catch (UnindexableDataException e) {
           Diagnostic.warning("Cannot produce TABIX index for: " + outFile.getPath() + ": " + e.getMessage());
         }

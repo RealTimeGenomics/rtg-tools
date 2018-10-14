@@ -67,12 +67,11 @@ public final class TabixIndexer {
 
   private final IndexerInputHandler mInputHandler;
 
-
   /**
    * @param input file to index must be a BGZIP compressed file
    */
   public TabixIndexer(File input) {
-    this(input, new File(input.getParentFile(), input.getName() + TABIX_EXTENSION));
+    this(input, indexFileName(input));
   }
 
   /**

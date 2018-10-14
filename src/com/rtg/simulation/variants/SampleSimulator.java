@@ -82,12 +82,6 @@ public class SampleSimulator {
     mDefaultPloidy = ploidy;
   }
 
-  private static VcfHeader getVcfHeader(File vcfFile) throws IOException {
-    try (VcfReader reader = VcfReader.openVcfReader(vcfFile)) {
-      return reader.getHeader();
-    }
-  }
-
   /**
    * Create a genotyped sample using population variants defined in file.
    * @param vcfPopFile input population data. requires allele frequencies
@@ -97,7 +91,7 @@ public class SampleSimulator {
    * @throws java.io.IOException if an IO error occurs
    */
   public void mutateIndividual(File vcfPopFile, File vcfOutFile, String sample, Sex sex) throws IOException {
-    final VcfHeader header = getVcfHeader(vcfPopFile);
+    final VcfHeader header = VcfUtils.getHeader(vcfPopFile);
     if (header.getSampleNames().contains(sample)) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
     }

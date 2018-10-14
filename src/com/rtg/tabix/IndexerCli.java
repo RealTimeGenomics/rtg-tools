@@ -178,9 +178,9 @@ public class IndexerCli extends AbstractCli {
 
       final File indexFile;
       if (format == IndexFormat.BAM || format == IndexFormat.CRAM) {
-        indexFile = new File(f.getParentFile(), f.getName() + BamIndexer.BAM_INDEX_EXTENSION);
+        indexFile = BamIndexer.indexFileName(f);
       } else {
-        indexFile = new File(f.getParentFile(), f.getName() + TabixIndexer.TABIX_EXTENSION);
+        indexFile = TabixIndexer.indexFileName(f);
       }
       final boolean indexExisted = indexFile.exists();
       try {

@@ -158,8 +158,7 @@ public class CommandLineFiles {
   public static final FileConstraint TABIX = new FileConstraint() {
     @Override
     public boolean validate(File f, CommandLineFiles files) {
-      final File tabix = new File(f.getPath() + TabixIndexer.TABIX_EXTENSION);
-      if (!tabix.exists()) {
+      if (!TabixIndexer.indexFileName(f).exists()) {
         files.error(ErrorType.INFO_ERROR, "The file \"" + f.getPath() + "\" does not have a tabix index");
         return false;
       }

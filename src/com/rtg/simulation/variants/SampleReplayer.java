@@ -76,12 +76,6 @@ public class SampleReplayer {
     mReference = reference;
   }
 
-  private static VcfHeader getVcfHeader(File vcfFile) throws IOException {
-    try (VcfReader reader = VcfReader.openVcfReader(vcfFile)) {
-      return reader.getHeader();
-    }
-  }
-
   /**
    * create a genome for a sample using the genotype specified for that sample
    * in the supplied VCF file.
@@ -91,7 +85,7 @@ public class SampleReplayer {
    * @throws java.io.IOException if an IO error occurs
    */
   public void replaySample(File sampleVcf, File outputDir, String sample) throws IOException {
-    final VcfHeader header = getVcfHeader(sampleVcf);
+    final VcfHeader header = VcfUtils.getHeader(sampleVcf);
     final int sampleNum = header.getSampleNames().indexOf(sample);
     if (sampleNum == -1) {
       throw new NoTalkbackSlimException("sample '" + sample + "' not found");
