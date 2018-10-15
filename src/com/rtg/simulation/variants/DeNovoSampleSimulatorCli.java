@@ -99,7 +99,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     mFlags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the mutation priors. Either a file name or one of [human]", "human").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerRequired(ORIGINAL_FLAG, String.class, CommonFlags.STRING, "name of the existing sample to use as the original genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of mutations per genome", DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of de novo mutations per genome", DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SHOW_MUTATIONS, "if set, display information regarding de novo mutation points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);

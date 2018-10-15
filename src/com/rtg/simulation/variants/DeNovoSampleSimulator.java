@@ -73,12 +73,14 @@ public class DeNovoSampleSimulator {
   private final int mTargetMutations;
   private final PopulationMutatorPriors mPriors;
   private final boolean mVerbose;
-  private VariantStatistics mStats = null;
-  private int mOriginalSampleNum = -1;
   private Sex[] mOriginalSexes = null;
   private ReferenceGenome mOriginalRefg = null;
   private ReferenceGenome mMaleGenome = null;
   private ReferenceGenome mFemaleGenome = null;
+  private int mNumSamples;
+  private int mOriginalSampleId;
+  private int mDerivedSampleId;
+  private VariantStatistics mStats = null;
   private boolean mSeenVariants = false;
 
   /**
@@ -102,18 +104,18 @@ public class DeNovoSampleSimulator {
    * Create a genotyped sample using population variants defined in file.
    * @param vcfInFile input population data. requires allele frequencies
    * @param vcfOutFile destination of sample genotype
-   * @param origSample name of the father sample
-   * @param sample name to give the generated sample
+   * @param origSample name of the original sample to which de novo mutations are added
+   * @param sample name to give the generated sample (may be the same as the original sample)
    * @throws java.io.IOException if an IO error occurs
    */
   public void mutateIndividual(File vcfInFile, File vcfOutFile, String origSample, String sample) throws IOException {
     final PriorPopulationVariantGenerator generator = new PriorPopulationVariantGenerator(mReference, mPriors, mRandom, new PriorPopulationVariantGenerator.FixedAlleleFrequencyChooser(1.0), mTargetMutations);
     final VcfHeader header = VcfUtils.getHeader(vcfInFile);
-    if (header.getSampleNames().contains(sample)) {
+    if (!origSample.equalsIgnoreCase(sample) && header.getSampleNames().contains(sample)) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
     }
-    mOriginalSampleNum = header.getSampleNames().indexOf(origSample);
-    if (mOriginalSampleNum == -1) {
+    mOriginalSampleId = header.getSampleNames().indexOf(origSample);
+    if (mOriginalSampleId == -1) {
       throw new NoTalkbackSlimException("original sample '" + origSample + "' does not exist");
     }
 
@@ -146,11 +148,18 @@ public class DeNovoSampleSimulator {
       Diagnostic.info("Original ID=" + origSample + " Sex=" + originalSex);
     }
 
-    header.addSampleName(sample);
-    if (originalSex == Sex.FEMALE || originalSex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
+    if (origSample.equals(sample)) {
+      mDerivedSampleId = mOriginalSampleId;
+    } else {
+      header.addSampleName(sample);
+      if (originalSex == Sex.FEMALE || originalSex == Sex.MALE) {
+        header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
+      }
+      header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
+      mDerivedSampleId = header.getNumberOfSamples() - 1;
     }
-    header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
+    mNumSamples = header.getNumberOfSamples();
+
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
     mStats = new VariantStatistics(null);
@@ -192,7 +201,6 @@ public class DeNovoSampleSimulator {
   private List<VcfRecord> outputSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo) throws IOException {
     final Ploidy ploidy = mOriginalRefg.sequence(refSeq.name()).ploidy();
     final int ploidyCount = getEffectivePloidy(ploidy.count());
-    final int sampleId = vcfOut.getHeader().getNumberOfSamples() - 1;
 
     if (ploidyCount > 2) {
       final String desc = "Original=" + ploidy + " -> Derived=" + ploidy;
@@ -210,14 +218,17 @@ public class DeNovoSampleSimulator {
         final VcfRecord v = reader.next();
         final int nextVariantPos = v.getStart();
 
-        outputDeNovo(refSeq, deNovo, nextVariantPos, ploidyCount, sampleId, vcfOut, sequenceVariants);
+        outputDeNovo(refSeq, deNovo, nextVariantPos, ploidyCount, vcfOut, sequenceVariants);
 
-        // For non de-novo, append sample genotype from original genotype
-        v.setNumberOfSamples(sampleId + 1);
-        final String gt = v.getFormat(VcfUtils.FORMAT_GENOTYPE).get(mOriginalSampleNum);
-        for (String format : v.getFormats()) {
-          final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt : VcfRecord.MISSING;
-          v.addFormatAndSample(format, value);
+        // For non de-novo, copy sample genotype from original genotype
+        if (mOriginalSampleId != mDerivedSampleId) {
+          v.setNumberOfSamples(mNumSamples);
+          assert mDerivedSampleId == mNumSamples - 1;
+          final String gt = v.getFormat(VcfUtils.FORMAT_GENOTYPE).get(mOriginalSampleId);
+          for (String format : v.getFormats()) {
+            final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt : VcfRecord.MISSING;
+            v.addFormatAndSample(format, value);
+          }
         }
 
         sequenceVariants.add(v);
@@ -226,13 +237,13 @@ public class DeNovoSampleSimulator {
       }
 
       // Output any remaining de novo variants
-      outputDeNovo(refSeq, deNovo, Integer.MAX_VALUE, ploidyCount, sampleId, vcfOut, sequenceVariants);
+      outputDeNovo(refSeq, deNovo, Integer.MAX_VALUE, ploidyCount, vcfOut, sequenceVariants);
 
     }
     return sequenceVariants;
   }
 
-  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final int endPos, final int ploidyCount, final int sampleId, VcfWriter vcfOut, final ArrayList<VcfRecord> sequenceVariants) throws IOException {
+  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final int endPos, final int ploidyCount, VcfWriter vcfOut, final ArrayList<VcfRecord> sequenceVariants) throws IOException {
     // Merge input and de novo, requires records to be sorted
     while (!deNovo.isEmpty() && (deNovo.get(0).getStart() <= endPos)) {
       final PopulationVariantGenerator.PopulationVariant pv = deNovo.remove(0);
@@ -246,7 +257,8 @@ public class DeNovoSampleSimulator {
       if (mVerbose) {
         Diagnostic.info("De novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart());
       }
-      addSamplesForDeNovo(dv, sampleId, ploidyCount, refSeq.name());
+      dv.setNumberOfSamples(mNumSamples);
+      addSamplesForDeNovo(dv, ploidyCount, refSeq.name());
 
       sequenceVariants.add(dv);
       vcfOut.write(dv);
@@ -255,12 +267,11 @@ public class DeNovoSampleSimulator {
   }
 
 
-  private String addSamplesForDeNovo(final VcfRecord v, final int sampleId, final int ploidyCount, String refName) {
+  private String addSamplesForDeNovo(final VcfRecord v, final int ploidyCount, String refName) {
     final String sampleGt = ploidyCount == 1 ? "1" : mRandom.nextBoolean() ? "0|1" : "1|0";
-    v.setNumberOfSamples(sampleId + 1);
-    for (int id = 0; id <= sampleId; ++id) {
+    for (int id = 0; id < v.getNumberOfSamples(); ++id) {
       final String gt;
-      if (id != sampleId) {
+      if (id != mDerivedSampleId) {
         final ReferenceGenome sampleGenome = mOriginalSexes[id] == Sex.MALE ? mMaleGenome : mFemaleGenome;
         final Ploidy ploidy = sampleGenome.sequence(refName).ploidy();
         switch (ploidy) {
@@ -279,7 +290,7 @@ public class DeNovoSampleSimulator {
       }
 
       v.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, gt);
-      v.addFormatAndSample(VcfUtils.FORMAT_DENOVO, (id == sampleId) ? "Y" : "N");
+      v.addFormatAndSample(VcfUtils.FORMAT_DENOVO, (id == mDerivedSampleId) ? "Y" : VcfUtils.MISSING_FIELD);
     }
     return sampleGt;
   }
