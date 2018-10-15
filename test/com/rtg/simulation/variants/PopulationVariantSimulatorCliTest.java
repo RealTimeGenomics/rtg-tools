@@ -45,11 +45,11 @@ import com.rtg.util.test.RandomDna;
 /**
  * Test the corresponding class
  */
-public class PriorPopulationVariantGeneratorCliTest extends AbstractCliTest {
+public class PopulationVariantSimulatorCliTest extends AbstractCliTest {
 
   @Override
   protected AbstractCli getCli() {
-    return new PriorPopulationVariantGeneratorCli();
+    return new PopulationVariantSimulatorCli();
   }
 
   public void testInitParams() {

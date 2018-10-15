@@ -48,7 +48,7 @@ import com.rtg.simulation.reads.CgSimCli;
 import com.rtg.simulation.reads.ReadSimCli;
 import com.rtg.simulation.variants.ChildSampleSimulatorCli;
 import com.rtg.simulation.variants.DeNovoSampleSimulatorCli;
-import com.rtg.simulation.variants.PriorPopulationVariantGeneratorCli;
+import com.rtg.simulation.variants.PopulationVariantSimulatorCli;
 import com.rtg.simulation.variants.SampleReplayerCli;
 import com.rtg.simulation.variants.SampleSimulatorCli;
 import com.rtg.tabix.BgZip;
@@ -82,7 +82,7 @@ public final class ToolsCommand {
   static final Command GENOMESIM = new Command(new GenomeSimulator(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command CGSIM = new Command(new CgSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command READSIM = new Command(new ReadSimCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-  static final Command POPSIM = new Command(new PriorPopulationVariantGeneratorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+  static final Command POPSIM = new Command(new PopulationVariantSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command SAMPLESIM = new Command(new SampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command CHILDSIM = new Command(new ChildSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command DENOVOSIM = new Command(new DeNovoSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);

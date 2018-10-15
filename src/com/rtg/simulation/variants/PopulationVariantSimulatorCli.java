@@ -53,9 +53,8 @@ import com.rtg.vcf.VcfUtils;
 /**
  * Command line wrapper for prior-based population variant creation
  */
-public class PriorPopulationVariantGeneratorCli extends AbstractCli {
+public class PopulationVariantSimulatorCli extends AbstractCli {
 
-  private static final String MODULE_NAME = "popsim";
   private static final String OUTPUT_VCF = "output";
   private static final String REFERENCE_SDF = "reference";
   private static final String SEED = "seed";
@@ -65,7 +64,7 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
 
   @Override
   public String moduleName() {
-    return MODULE_NAME;
+    return "popsim";
   }
 
   @Override
@@ -75,24 +74,15 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    initFlags(mFlags);
-  }
-
-  /**
-   * set up a flags object for this module
-   *
-   * @param flags the flags to set up
-   */
-  public void initFlags(CFlags flags) {
-    flags.setDescription("Generates a VCF containing simulated population variants.");
-    CommonFlagCategories.setCategories(flags);
+    mFlags.setDescription("Generates a VCF containing simulated population variants.");
+    CommonFlagCategories.setCategories(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
-    flags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);
-    flags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
-    flags.registerOptional(BIAS_FLAG, Double.class, CommonFlags.FLOAT, "bias frequency of variants towards alt alleles.", 0.0).setCategory(UTILITY);
-    flags.registerOptional(RATE_FLAG, Double.class, CommonFlags.FLOAT, "per base rate of variant generation (overrides that loaded from priors).").setCategory(UTILITY);
-    flags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(UTILITY);
-    CommonFlags.initNoGzip(flags);
+    mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);
+    mFlags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
+    mFlags.registerOptional(BIAS_FLAG, Double.class, CommonFlags.FLOAT, "bias frequency of variants towards alt alleles.", 0.0).setCategory(UTILITY);
+    mFlags.registerOptional(RATE_FLAG, Double.class, CommonFlags.FLOAT, "per base rate of variant generation (overrides that loaded from priors).").setCategory(UTILITY);
+    mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(UTILITY);
+    CommonFlags.initNoGzip(mFlags);
   }
 
   @Override
@@ -127,14 +117,4 @@ public class PriorPopulationVariantGeneratorCli extends AbstractCli {
     }
     return 0;
   }
-
-  /**
-   * Main method
-   *
-   * @param args command line arguments
-   */
-  public static void main(final String[] args) {
-    new PriorPopulationVariantGeneratorCli().mainExit(args);
-  }
-
 }
