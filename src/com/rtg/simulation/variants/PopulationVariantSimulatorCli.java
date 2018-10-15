@@ -30,6 +30,7 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
@@ -76,6 +77,7 @@ public class PopulationVariantSimulatorCli extends AbstractCli {
   protected void initFlags() {
     mFlags.setDescription("Generates a VCF containing simulated population variants.");
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initForce(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('p', PRIORS_FLAG, String.class, CommonFlags.STRING, "selects a properties file specifying the priors. Either a file name or one of [human]", "human").setCategory(UTILITY);
@@ -83,6 +85,9 @@ public class PopulationVariantSimulatorCli extends AbstractCli {
     mFlags.registerOptional(RATE_FLAG, Double.class, CommonFlags.FLOAT, "per base rate of variant generation (overrides that loaded from priors).").setCategory(UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(UTILITY);
     CommonFlags.initNoGzip(mFlags);
+    mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
+      && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF)))
+    );
   }
 
   @Override
@@ -103,7 +108,7 @@ public class PopulationVariantSimulatorCli extends AbstractCli {
     }
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File out = (File) flags.getValue(OUTPUT_VCF);
-    final boolean gzip = !flags.isSet(CommonFlags.NO_GZIP);
+    final boolean gzip = !flags.isSet(NO_GZIP);
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, out);
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final int targetVariants;

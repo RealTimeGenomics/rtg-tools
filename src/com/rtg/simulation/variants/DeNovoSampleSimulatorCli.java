@@ -30,6 +30,8 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.launcher.CommonFlags.NO_GZIP;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,7 +47,6 @@ import com.rtg.util.InvalidParamsException;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.variant.GenomePriorParams;
 import com.rtg.vcf.VcfUtils;
@@ -89,6 +90,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
   protected void initFlags() {
     mFlags.setDescription("Generates a VCF containing a derived genotype containing de novo variants.");
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initForce(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output an SDF containing the sample genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
@@ -102,17 +104,14 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     mFlags.registerOptional(SHOW_MUTATIONS, "if set, display information regarding de novo mutation points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
-    mFlags.setValidator(new DeNovoSampleSimulatorFlagValidator());
-  }
-
-  private static class DeNovoSampleSimulatorFlagValidator implements Validator {
-
-    @Override
-    public boolean isValid(final CFlags cflags) {
-      return cflags.checkNand(OUTPUT_SDF, CommonFlags.NO_GZIP)
-        && CommonFlags.validateNotStdout((File) cflags.getValue(OUTPUT_VCF))
-        && (!cflags.isSet(OUTPUT_SDF) || CommonFlags.validateOutputDirectory(cflags, OUTPUT_SDF));
-    }
+    mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
+      && CommonFlags.validateTabixedInputFile(flags, INPUT_VCF)
+      && flags.checkNand(OUTPUT_SDF, NO_GZIP)
+      && (!flags.isSet(OUTPUT_SDF) || CommonFlags.validateOutputDirectory(flags, OUTPUT_SDF))
+      && CommonFlags.validateNotStdout((File) flags.getValue(OUTPUT_VCF))
+      && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF)))
+      && flags.checkInRange(EXPECTED_MUTATIONS, 1, Integer.MAX_VALUE)
+    );
   }
 
   @Override
@@ -127,7 +126,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
 
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File popVcf = (File) flags.getValue(INPUT_VCF);
-    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
+    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
     final String sample = (String) flags.getValue(SAMPLE_FLAG);
     final String original = (String) flags.getValue(ORIGINAL_FLAG);
     final ReferencePloidy ploidy = (ReferencePloidy) flags.getValue(PLOIDY);

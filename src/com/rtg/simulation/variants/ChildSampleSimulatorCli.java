@@ -30,6 +30,8 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.launcher.CommonFlags.NO_GZIP;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,7 +47,6 @@ import com.rtg.reference.Sex;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.vcf.VcfUtils;
 
@@ -89,6 +90,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
   protected void initFlags() {
     mFlags.setDescription("Generates a VCF containing a genotype simulated as a child of two parents.");
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initForce(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output an SDF containing the sample genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
@@ -103,21 +105,13 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     mFlags.registerOptional(SHOW_CROSSOVERS, "if set, display information regarding haplotype selection and crossover points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
-    mFlags.setValidator(new ChildSampleSimulatorValidator());
-  }
-
-  private static class ChildSampleSimulatorValidator implements Validator {
-
-    @Override
-    public boolean isValid(final CFlags cflags) {
-      if (!cflags.checkNand(OUTPUT_SDF, CommonFlags.NO_GZIP)) {
-        return false;
-      }
-      if (!CommonFlags.validateNotStdout((File) cflags.getValue(OUTPUT_VCF))) {
-        return false;
-      }
-      return !(cflags.isSet(OUTPUT_SDF) && !CommonFlags.validateOutputDirectory(cflags, OUTPUT_SDF));
-    }
+    mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
+      && CommonFlags.validateTabixedInputFile(flags, INPUT_VCF)
+      && flags.checkNand(OUTPUT_SDF, NO_GZIP)
+      && (!flags.isSet(OUTPUT_SDF) || CommonFlags.validateOutputDirectory(flags, OUTPUT_SDF))
+      && CommonFlags.validateNotStdout((File) flags.getValue(OUTPUT_VCF))
+      && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF)))
+      && flags.checkInRange(EXTRA_CROSSOVERS, 0.0, 1.0));
   }
 
   @Override
@@ -132,7 +126,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
 
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File popVcf = (File) flags.getValue(INPUT_VCF);
-    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
+    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
     final String sample = (String) flags.getValue(SAMPLE_FLAG);
     final String father = (String) flags.getValue(FATHER_FLAG);
     final String mother = (String) flags.getValue(MOTHER_FLAG);

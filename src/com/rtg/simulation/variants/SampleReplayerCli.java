@@ -42,7 +42,6 @@ import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.LogStream;
 import com.rtg.vcf.VcfUtils;
@@ -73,17 +72,15 @@ public class SampleReplayerCli extends LoggedCli {
   protected void initFlags() {
     mFlags.setDescription("Generates the genome corresponding to a sample genotype.");
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initForce(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for output SDF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('i', SAMPLE_VCF, File.class, CommonFlags.FILE, "input VCF containing the sample genotype").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerRequired('s', SAMPLE_NAME, String.class, CommonFlags.STRING, "name of the sample to select from the VCF").setCategory(CommonFlagCategories.INPUT_OUTPUT);
-    mFlags.setValidator(new Validator() {
-      @Override
-      public boolean isValid(CFlags flags) {
-        return CommonFlags.validateOutputDirectory(flags);
-      }
-    });
-
+    mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
+      && CommonFlags.validateTabixedInputFile(flags, SAMPLE_VCF)
+      && CommonFlags.validateOutputDirectory(flags)
+    );
   }
 
   @Override

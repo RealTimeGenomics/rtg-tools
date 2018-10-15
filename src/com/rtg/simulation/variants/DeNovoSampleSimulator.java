@@ -199,7 +199,7 @@ public class DeNovoSampleSimulator {
       throw new NoTalkbackSlimException("Sequence " + refSeq.name() + ": Unsupported ploidy" + desc);
     }
     if ((ploidyCount == 0) && (deNovo.size() > 0)) {
-      Diagnostic.developerLog("Ignoring " + deNovo.size() + " deNovo variants generated for chromosome " + refSeq.name() + " with ploidy NONE");
+      Diagnostic.developerLog("Ignoring " + deNovo.size() + " de novo variants proposed for chromosome " + refSeq.name() + " with ploidy NONE");
       deNovo.clear();
     }
     //System.err.println("Sequence " + refSeq.name() + " has ploidy " + desc);
@@ -239,12 +239,12 @@ public class DeNovoSampleSimulator {
       final VcfRecord dv = pv.toVcfRecord(mReference);
       if (dv.getStart() == endPos) {
         // We could be smarter and merge the records, but this will be so infrequent (assuming we're not re-using the same seed as a previous run) let's just warn.
-        Diagnostic.warning("Skipping De Novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart() + " to avoid collision with existing variant (consider a new RNG seed)");
+        Diagnostic.warning("Skipping de novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart() + " to avoid collision with existing variant (consider a new RNG seed)");
         continue;
       }
       dv.getInfo().clear(); // To remove AF chosen by the population variant generator
       if (mVerbose) {
-        Diagnostic.info("De Novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart());
+        Diagnostic.info("De novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart());
       }
       addSamplesForDeNovo(dv, sampleId, ploidyCount, refSeq.name());
 

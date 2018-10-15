@@ -30,6 +30,8 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.launcher.CommonFlags.NO_GZIP;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -45,7 +47,6 @@ import com.rtg.reference.Sex;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
-import com.rtg.util.cli.Validator;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.vcf.VcfUtils;
 
@@ -83,6 +84,7 @@ public class SampleSimulatorCli extends AbstractCli {
   protected void initFlags() {
     mFlags.setDescription("Generates a VCF containing a genotype simulated from population variants according to allele frequency.");
     CommonFlagCategories.setCategories(mFlags);
+    CommonFlags.initForce(mFlags);
     CommonFlags.initReferenceTemplate(mFlags, REFERENCE_SDF, true, "");
     mFlags.registerRequired('o', OUTPUT_VCF, File.class, CommonFlags.FILE, "output VCF file name").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(OUTPUT_SDF, File.class, CommonFlags.SDF, "if set, output an SDF containing the sample genome").setCategory(CommonFlagCategories.INPUT_OUTPUT);
@@ -93,21 +95,13 @@ public class SampleSimulatorCli extends AbstractCli {
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
-    mFlags.setValidator(new SampleSimulatorFlagValidator());
-  }
-
-  private static class SampleSimulatorFlagValidator implements Validator {
-
-    @Override
-    public boolean isValid(final CFlags cflags) {
-      if (cflags.isSet(OUTPUT_SDF) && !CommonFlags.validateOutputDirectory(cflags, OUTPUT_SDF)) {
-        return false;
-      }
-      if (!cflags.checkNand(OUTPUT_SDF, CommonFlags.NO_GZIP)) {
-        return false;
-      }
-      return CommonFlags.validateNotStdout((File) cflags.getValue(OUTPUT_VCF));
-    }
+    mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
+      && CommonFlags.validateTabixedInputFile(flags, POPULATION_VCF)
+      && flags.checkNand(OUTPUT_SDF, NO_GZIP)
+      && (!flags.isSet(OUTPUT_SDF) || CommonFlags.validateOutputDirectory(flags, OUTPUT_SDF))
+      && CommonFlags.validateNotStdout((File) flags.getValue(OUTPUT_VCF))
+      && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF)))
+    );
   }
 
 
@@ -123,7 +117,7 @@ public class SampleSimulatorCli extends AbstractCli {
 
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File popVcf = (File) flags.getValue(POPULATION_VCF);
-    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(CommonFlags.NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
+    final File outputVcf = VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_VCF));
     final String sample = (String) flags.getValue(SAMPLE_NAME);
     final Sex sex = (Sex) flags.getValue(SEX);
     final ReferencePloidy ploidy = (ReferencePloidy) flags.getValue(PLOIDY);
