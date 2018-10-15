@@ -70,14 +70,15 @@ public class DeNovoSampleSimulator {
   private final SequencesReader mReference;
   private final PortableRandom mRandom;
   private final ReferencePloidy mDefaultPloidy;
-  private final PriorPopulationVariantGenerator mGenerator;
+  private final int mTargetMutations;
+  private final PopulationMutatorPriors mPriors;
+  private final boolean mVerbose;
   private VariantStatistics mStats = null;
   private int mOriginalSampleNum = -1;
   private Sex[] mOriginalSexes = null;
   private ReferenceGenome mOriginalRefg = null;
   private ReferenceGenome mMaleGenome = null;
   private ReferenceGenome mFemaleGenome = null;
-  private boolean mVerbose = true;
   private boolean mSeenVariants = false;
 
   /**
@@ -87,14 +88,14 @@ public class DeNovoSampleSimulator {
    * @param ploidy the default ploidy to use if no reference specification is present
    * @param targetMutations expected number of mutations per genome
    * @param verbose if true output extra information on crossover points
-   * @throws IOException if an I/O error occurs.
    */
-  public DeNovoSampleSimulator(SequencesReader reference, GenomePriorParams params, PortableRandom rand, ReferencePloidy ploidy, final int targetMutations, boolean verbose) throws IOException {
+  public DeNovoSampleSimulator(SequencesReader reference, GenomePriorParams params, PortableRandom rand, ReferencePloidy ploidy, final int targetMutations, boolean verbose) {
     mReference = reference;
     mRandom = rand;
     mDefaultPloidy = ploidy;
     mVerbose = verbose;
-    mGenerator = new PriorPopulationVariantGenerator(reference, new PopulationMutatorPriors(params), rand, new PriorPopulationVariantGenerator.FixedAlleleFrequencyChooser(1.0), targetMutations);
+    mTargetMutations = targetMutations;
+    mPriors = new PopulationMutatorPriors(params);
   }
 
   /**
@@ -106,6 +107,7 @@ public class DeNovoSampleSimulator {
    * @throws java.io.IOException if an IO error occurs
    */
   public void mutateIndividual(File vcfInFile, File vcfOutFile, String origSample, String sample) throws IOException {
+    final PriorPopulationVariantGenerator generator = new PriorPopulationVariantGenerator(mReference, mPriors, mRandom, new PriorPopulationVariantGenerator.FixedAlleleFrequencyChooser(1.0), mTargetMutations);
     final VcfHeader header = VcfUtils.getHeader(vcfInFile);
     if (header.getSampleNames().contains(sample)) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
@@ -157,7 +159,7 @@ public class DeNovoSampleSimulator {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
       // Generate de novo variants (oblivious of any pre-existing variants)
-      final List<PopulationVariantGenerator.PopulationVariant> deNovo = mGenerator.generatePopulation();
+      final List<PopulationVariantGenerator.PopulationVariant> deNovo = generator.generatePopulation();
 
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));
