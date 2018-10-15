@@ -297,21 +297,24 @@ public class FileUtilsTest extends TestCase {
   }
 
   public void testCattedGZipFiles() throws IOException {
-    final File tmpDir = FileUtils.createTempDir("testGzipCatting", "test");
-    try {
-      final File zip1 = new File(tmpDir, "1");
-      final File zip2 = new File(tmpDir, "2");
-      final File zip3 = new File(tmpDir, "3");
-      final File joined = new File(tmpDir, "joined");
+    try (final TestDirectory tmpDir = new TestDirectory("testGzipCatting")) {
+      final File zip1 = new File(tmpDir, "1.gz");
+      final File zip2 = new File(tmpDir, "2.gz");
+      final File zip3 = new File(tmpDir, "3.gz");
+      final File joinedzip = new File(tmpDir, "joined.gz");
       FileHelper.stringToGzFile("this is\n", zip1);
       FileHelper.stringToGzFile("a multi part\n", zip2);
       FileHelper.stringToGzFile("gzipped file\n", zip3);
-      FileUtils.catInSync(joined, false, zip1, zip2, zip3);
-      assertEquals("this is\na multi part\ngzipped file\n", FileHelper.gzFileToString(joined));
-    } finally {
-      FileHelper.deleteAll(tmpDir);
-    }
+      FileUtils.copyRaw(joinedzip, false, zip1, zip2, zip3);
+      assertEquals("this is\na multi part\ngzipped file\n", FileHelper.gzFileToString(joinedzip));
 
+      FileUtils.copy(joinedzip, false, zip1, zip2, zip3);
+      assertEquals("this is\na multi part\ngzipped file\n", FileHelper.gzFileToString(joinedzip));
+
+      final File joined = new File(tmpDir, "joined");
+      FileUtils.copy(joined, false, zip1, zip2, zip3);
+      assertEquals("this is\na multi part\ngzipped file\n", FileHelper.fileToString(joined));
+    }
   }
 
   private static class NonSkippingStream extends InputStream {

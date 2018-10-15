@@ -216,51 +216,55 @@ public final class FileUtils {
   }
 
   /**
-   * Concatenates multiple files together, no frills.
+   * Concatenates multiple files together, no frills. See <code>copy</code> if
+   * you need to decompress/recompress.
    *
-   * @param filename destination for cat
-   * @param deleteIntermediate delete intermediate files as you are done with them
-   * @param inputFiles files to merge, in order
+   * @param dest destination for cat
+   * @param sourceFiles files to concatenate, in order
    * @throws IOException if an I/O error occurs
    */
-  public static void catInSync(final File filename, boolean deleteIntermediate, final File... inputFiles) throws IOException {
+  public static void copyRaw(final File dest, final File... sourceFiles) throws IOException {
+    copyRaw(dest, false, sourceFiles);
+  }
+
+  /**
+   * Concatenates multiple files together, no frills. See <code>copy</code> if
+   * you need to decompress/recompress.
+   *
+   * @param dest destination for cat
+   * @param delete delete source files as you are done with them
+   * @param sourceFiles files to concatenate, in order
+   * @throws IOException if an I/O error occurs
+   */
+  public static void copyRaw(final File dest, boolean delete, final File... sourceFiles) throws IOException {
     final byte[] buff = new byte[100 * 1024]; //100k for our buffer, as we sync on the FileOutputStream.
     final OneShotTimer timer = new OneShotTimer("catInSync");
-    try (FileOutputStream destination = new FileOutputStream(filename)) {
-      for (File inputFile : inputFiles) {
+    try (FileOutputStream os = new FileOutputStream(dest)) {
+      for (File source : sourceFiles) {
         long t0 = System.nanoTime();
         final long start = System.nanoTime();
-        final long length = inputFile.length();
-        Diagnostic.developerLog("start catInSync file=" + inputFile.getAbsolutePath() + " bytes=" + length);
+        final long length = source.length();
+        Diagnostic.developerLog("start catInSync file=" + source.getAbsolutePath() + " bytes=" + length);
         if (length > 0) {
-          try (InputStream input = new AsynchInputStream(FileUtils.createFileInputStream(inputFile, true))) {
+          try (InputStream input = new AsynchInputStream(FileUtils.createFileInputStream(source, true))) {
             int len;
-            //          double last = System.nanoTime() / 1000000000.0; // current time since start
             while ((len = input.read(buff)) > 0) {
-              destination.write(buff, 0, len);
+              os.write(buff, 0, len);
               if (System.nanoTime() - t0 > 5000000000L) {
                 // sync every 5 seconds
-                destination.getFD().sync(); // we are doing this at the moment so that the disk is completely flushed to disk between buffer
-                // writes. We are really guessing, but it appears to have made a differences in manky drives.
+                os.getFD().sync();
                 t0 = System.nanoTime();
               }
-              //            final double cur = System.nanoTime() / 1000000000.0; // current time since start
-              // log if less than 1MB / second
-              //            if (len / (cur - last) < 1000000) {
-              //              Diagnostic.developerLog("[ " + last + " ] last time " + len);
-              //              Diagnostic.developerLog("[ " + cur + " ] finished read/write " + len + " speed= " + (len / (cur - last)));
-              //            }
-              //           last = cur;
             }
           }
         }
         final long diff = System.nanoTime() - start;
-        Diagnostic.developerLog("end catInSync file=" + inputFile.getAbsolutePath() + " bytes=" + length
+        Diagnostic.developerLog("end catInSync file=" + source.getAbsolutePath() + " bytes=" + length
           + " time=" + (diff / 1000000) + "ms"
           + " bytes/sec=" + Utils.realFormat(length * 1.0e9 / diff, 2));
-        if (deleteIntermediate) {
-          if (!inputFile.delete()) {
-            Diagnostic.userLog("Failed to delete intermediate file: " + inputFile.getPath());
+        if (delete) {
+          if (!source.delete()) {
+            throw new IOException("Failed to delete file: " + source.getPath());
           }
         }
       }
@@ -268,6 +272,56 @@ public final class FileUtils {
     timer.stopLog();
   }
 
+  /**
+   * Copy content from multiple files, decompressing / compressing as required. See <code>copyRaw</code>
+   * if you want straight data concatenation.
+   *
+   * @param dest destination for content. Compression will be automatically determined. Stdout is supported (as uncompressed output)
+   * @param sourceFiles files to concatenate, in order. Content will automatically decompressed if need be. Stdin is supported (for uncompressed input)
+   * @throws IOException if an I/O error occurs
+   */
+  public static void copy(final File dest, final File... sourceFiles) throws IOException {
+    copy(dest, false, sourceFiles);
+  }
+
+  /**
+   * Copy content from multiple files, decompressing / compressing as required. See <code>copyRaw</code>
+   * if you want straight data concatenation.
+   *
+   * @param dest destination for content. Compression will be automatically determined. Stdout is supported (as uncompressed output)
+   * @param deleteSource delete source files as you are done with them
+   * @param sourceFiles files to concatenate, in order. Content will automatically decompressed if need be. Stdin is supported (for uncompressed input)
+   * @throws IOException if an I/O error occurs
+   */
+  public static void copy(final File dest, boolean deleteSource, final File... sourceFiles) throws IOException {
+    final byte[] buff = new byte[BUFFER_SIZE];
+    final OneShotTimer timer = new OneShotTimer("copyToFile");
+    try (final OutputStream os = createOutputStream(dest)) {
+      for (File source : sourceFiles) {
+        final long start = System.nanoTime();
+        final long length = source.length();
+        Diagnostic.developerLog("start copyToFile file=" + source.getAbsolutePath() + " bytes=" + length);
+        if (length > 0) {
+          try (final InputStream input = createInputStream(source, true)) {
+            int len;
+            while ((len = input.read(buff)) > 0) {
+              os.write(buff, 0, len);
+            }
+          }
+        }
+        final long diff = System.nanoTime() - start;
+        Diagnostic.developerLog("end copyToFile file=" + source.getAbsolutePath() + " bytes=" + length
+          + " time=" + (diff / 1000000) + "ms"
+          + " bytes/sec=" + Utils.realFormat(length * 1.0e9 / diff, 2));
+        if (deleteSource) {
+          if (!source.delete()) {
+            throw new IOException("Failed to delete file: " + source.getPath());
+          }
+        }
+      }
+    }
+    timer.stopLog();
+  }
 
 
   /**
