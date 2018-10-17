@@ -88,11 +88,10 @@ public final class IndexingStreamCreator implements Closeable {
   }
 
   @Override
+  @SuppressWarnings("try")
   public void close() throws IOException {
-    try {
-      if (mOutputStream != null) {
-        mOutputStream.close();
-      }
+    try (Closeable ignored = mOutputStream) {
+      // Try-with-resources for nice closing side effects
     } finally {
       if (mIndexThread != null) {
         try {
@@ -185,8 +184,9 @@ public final class IndexingStreamCreator implements Closeable {
     }
 
     @Override
+    @SuppressWarnings("try")
     public void run() throws IOException {
-      try {
+      try (InputStream ignored = mStreamToIndex; OutputStream ignored2 = mIndexOut) {
         if (mBam) {
           BamIndexer.saveBamIndexNoHeader(mStreamToIndex, mIndexOut, mExpectHeader, mNumReferences);
         } else {
@@ -194,9 +194,6 @@ public final class IndexingStreamCreator implements Closeable {
         }
       } catch (final UnindexableDataException e) {
         throw new IOException("Cannot produce index for: " + mFilename + " (try disabling indexing)", e);
-      } finally {
-        mStreamToIndex.close();
-        mIndexOut.close();
       }
     }
 

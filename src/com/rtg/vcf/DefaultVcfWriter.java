@@ -30,6 +30,7 @@
 
 package com.rtg.vcf;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -118,14 +119,20 @@ public class DefaultVcfWriter implements VcfWriter {
   }
 
   @Override
+  @SuppressWarnings("try")
   public void close() throws IOException {
     if (!mHeaderWritten) {
       mHeaderWritten = true;
       writeHeader();
     }
-    mOut.close();
-    if (mIndexer != null) {
-      mIndexer.close();
+    try (Closeable ignored = mOut) {
+      // Just using nice try-with-resources side effects.
+    } finally {
+      // We're explicitly allowing an exception thrown by mIndexer.close to shadow one thrown by mOut.close
+      // Since it was probably the mIndexer exception that caused mOut to have a subsequent boggle
+      try (Closeable ignored2 = mIndexer) {
+        // Just using nice try-with-resources side effects.
+      }
     }
   }
 
