@@ -48,6 +48,7 @@ import com.rtg.simulation.reads.CgSimCli;
 import com.rtg.simulation.reads.ReadSimCli;
 import com.rtg.simulation.variants.ChildSampleSimulatorCli;
 import com.rtg.simulation.variants.DeNovoSampleSimulatorCli;
+import com.rtg.simulation.variants.PedSampleSimulatorCli;
 import com.rtg.simulation.variants.PopulationVariantSimulatorCli;
 import com.rtg.simulation.variants.SampleReplayerCli;
 import com.rtg.simulation.variants.SampleSimulatorCli;
@@ -86,6 +87,7 @@ public final class ToolsCommand {
   static final Command SAMPLESIM = new Command(new SampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command CHILDSIM = new Command(new ChildSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command DENOVOSIM = new Command(new DeNovoSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
+  static final Command PEDSAMPLESIM = new Command(new PedSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.BETA);
   static final Command SAMPLEREPLAY = new Command(new SampleReplayerCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
 
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -130,7 +132,8 @@ public final class ToolsCommand {
     // Simulation
     GENOMESIM,                                           // Reference simulation
     CGSIM, READSIM,                                      // Read simulation
-    POPSIM, SAMPLESIM, CHILDSIM, DENOVOSIM, SAMPLEREPLAY, // Variant simulation
+    POPSIM, SAMPLESIM, CHILDSIM, DENOVOSIM, PEDSAMPLESIM, // Variant simulation
+    SAMPLEREPLAY,   // Variant simulation
 
     // Utility
     BGZIP, INDEX, EXTRACT,                        // General purpose
