@@ -47,7 +47,7 @@ public class AssertVcfSorted implements VcfFilter {
   @Override
   public boolean accept(VcfRecord rec) {
     if (rec.getSequenceName().equals(mLastSeq) && rec.getStart() < mLastStart) {
-      throw new VcfFormatException("VCF file is not sorted, at record: " + rec);
+      throw new VcfFormatException("VCF is not sorted (previous start = " + (mLastStart + 1) + "), at record: " + rec);
     }
     mLastSeq = rec.getSequenceName();
     mLastStart = rec.getStart();
