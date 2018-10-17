@@ -27,46 +27,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+
+import com.rtg.util.Counter;
+import com.rtg.vcf.header.VcfHeader;
+
+import junit.framework.TestCase;
 
 /**
- * Gather statistics on records passing through.
+ * Tests the corresponding class.
  */
-public class StatisticsVcfWriter<S extends VariantStatistics> extends FilterVcfWriter {
+public class FilterVcfWriterTest extends TestCase {
 
-  private final S mStatistics;
+  public void test() throws IOException {
+    final VcfHeader h = new VcfHeader();
+    final VcfRecord ra = new VcfRecord("pretend", 42, "A");
+    final VcfRecord rt = new VcfRecord("pretend", 42, "T");
+    Counter c = new Counter();
+    final FilterVcfWriter w = new FilterVcfWriter(new VcfWriter() {
+      @Override
+      public void close() { }
 
-  /**
-   * Constructor
-   * @param writer underlying writer
-   * @param statistics statistics tracker
-   * @param filters filters to apply
-   */
-  public StatisticsVcfWriter(VcfWriter writer, final S statistics, final VcfFilter... filters) {
-    this(writer, statistics, Arrays.asList(filters));
+      @Override
+      public VcfHeader getHeader() {
+        return h;
+      }
+      @Override
+      public void write(VcfRecord record) {
+        c.increment();
+      }
+    },
+      new VcfFilter() {
+      @Override
+      public boolean accept(VcfRecord record) {
+        return record.getRefCall().equals("A");
+      }
+      @Override
+      public void setHeader(VcfHeader header) { }
+    });
+
+    assertEquals(h, w.getHeader());
+    assertEquals(0, c.count());
+    w.write(ra);
+    assertEquals(1, c.count());
+    w.write(ra);
+    assertEquals(2, c.count());
+    w.write(rt);
+    assertEquals(2, c.count());
+    w.write(rt);
+    assertEquals(2, c.count());
+    w.write(ra);
+    assertEquals(3, c.count());
   }
-
-  /**
-   * Create a new VCF writer that keeps statistics.
-   * @param writer underlying writer
-   * @param statistics statistics tracker
-   * @param filters filters to apply
-   */
-  public StatisticsVcfWriter(final VcfWriter writer, final S statistics, final List<VcfFilter> filters) {
-    super(writer, filters);
-    mStatistics = statistics;
-  }
-
-  @Override
-  public void write(final VcfRecord record) throws IOException {
-    if (mFilter.accept(record)) {
-      mStatistics.tallyVariant(getHeader(), record);
-      mInner.write(record);
-    }
-  }
-
 }

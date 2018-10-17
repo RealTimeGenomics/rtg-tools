@@ -27,46 +27,58 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package com.rtg.vcf;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+
+import com.rtg.vcf.header.VcfHeader;
 
 /**
- * Gather statistics on records passing through.
+ * Convenience wrapper for filtering records going to a VcfWriter
  */
-public class StatisticsVcfWriter<S extends VariantStatistics> extends FilterVcfWriter {
+public class FilterVcfWriter implements VcfWriter {
 
-  private final S mStatistics;
+  protected final AllMatchFilter mFilter;
+  protected final VcfWriter mInner;
 
   /**
    * Constructor
-   * @param writer underlying writer
-   * @param statistics statistics tracker
-   * @param filters filters to apply
+   * @param inner the underlying destination for records
+   * @param filters filters to apply to the record stream
    */
-  public StatisticsVcfWriter(VcfWriter writer, final S statistics, final VcfFilter... filters) {
-    this(writer, statistics, Arrays.asList(filters));
+  public FilterVcfWriter(VcfWriter inner, VcfFilter... filters) {
+    this(inner, Arrays.asList(filters));
   }
 
   /**
-   * Create a new VCF writer that keeps statistics.
-   * @param writer underlying writer
-   * @param statistics statistics tracker
-   * @param filters filters to apply
+   * Constructor
+   * @param inner the underlying destination for records
+   * @param filters filters to apply to the record stream
    */
-  public StatisticsVcfWriter(final VcfWriter writer, final S statistics, final List<VcfFilter> filters) {
-    super(writer, filters);
-    mStatistics = statistics;
+  public FilterVcfWriter(VcfWriter inner, Collection<VcfFilter> filters) {
+    mInner = inner;
+    mFilter = new AllMatchFilter(filters);
+    mFilter.setHeader(inner.getHeader());
+  }
+
+  @Override
+  public VcfHeader getHeader() {
+    return mInner.getHeader();
   }
 
   @Override
   public void write(final VcfRecord record) throws IOException {
     if (mFilter.accept(record)) {
-      mStatistics.tallyVariant(getHeader(), record);
       mInner.write(record);
     }
   }
 
+  @Override
+  @SuppressWarnings("try")
+  public void close() throws IOException {
+    try (VcfWriter ignore = mInner) { }
+  }
 }
