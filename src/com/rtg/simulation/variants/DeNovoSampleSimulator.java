@@ -48,8 +48,11 @@ import com.rtg.util.PortableRandom;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.SequenceNameLocus;
+import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.util.io.FileUtils;
 import com.rtg.variant.GenomePriorParams;
+import com.rtg.vcf.StatisticsVcfWriter;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
@@ -80,7 +83,6 @@ public class DeNovoSampleSimulator {
   private int mNumSamples;
   private int mOriginalSampleId;
   private int mDerivedSampleId;
-  private VariantStatistics mStats = null;
   private boolean mSeenVariants = false;
 
   /**
@@ -162,9 +164,9 @@ public class DeNovoSampleSimulator {
 
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
-    mStats = new VariantStatistics(null);
-    mStats.onlySamples(sample);
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
+    final VariantStatistics stats = new VariantStatistics(null);
+    stats.onlySamples(sample);
+    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile), stats)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
       // Generate de novo variants (oblivious of any pre-existing variants)
@@ -189,7 +191,7 @@ public class DeNovoSampleSimulator {
     if (mVerbose) {
       Diagnostic.info(""); // Just to separate the statistics
     }
-    Diagnostic.info(mStats.getStatistics());
+    Diagnostic.info(stats.getStatistics());
   }
 
   // Treat polyploid as haploid
@@ -213,12 +215,12 @@ public class DeNovoSampleSimulator {
     //System.err.println("Sequence " + refSeq.name() + " has ploidy " + desc);
     final ArrayList<VcfRecord> sequenceVariants = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {
+      VcfRecord pv = null;
       while (reader.hasNext()) {
         mSeenVariants = true;
         final VcfRecord v = reader.next();
-        final int nextVariantPos = v.getStart();
 
-        outputDeNovo(refSeq, deNovo, nextVariantPos, ploidyCount, vcfOut, sequenceVariants);
+        outputDeNovo(refSeq, deNovo, pv, v, ploidyCount, vcfOut, sequenceVariants);
 
         // For non de-novo, copy sample genotype from original genotype
         if (mOriginalSampleId != mDerivedSampleId) {
@@ -233,24 +235,25 @@ public class DeNovoSampleSimulator {
 
         sequenceVariants.add(v);
         vcfOut.write(v);
-        mStats.tallyVariant(vcfOut.getHeader(), v);
+        pv = v;
       }
-
       // Output any remaining de novo variants
-      outputDeNovo(refSeq, deNovo, Integer.MAX_VALUE, ploidyCount, vcfOut, sequenceVariants);
-
+      outputDeNovo(refSeq, deNovo, pv, null, ploidyCount, vcfOut, sequenceVariants);
     }
     return sequenceVariants;
   }
 
-  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final int endPos, final int ploidyCount, VcfWriter vcfOut, final ArrayList<VcfRecord> sequenceVariants) throws IOException {
+  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final SequenceNameLocus prev,  final SequenceNameLocus next, final int ploidyCount, VcfWriter vcfOut, final ArrayList<VcfRecord> sequenceVariants) throws IOException {
     // Merge input and de novo, requires records to be sorted
-    while (!deNovo.isEmpty() && (deNovo.get(0).getStart() <= endPos)) {
+    while (!deNovo.isEmpty() && (next == null || deNovo.get(0).getStart() < next.getEnd())) {
       final PopulationVariantGenerator.PopulationVariant pv = deNovo.remove(0);
       final VcfRecord dv = pv.toVcfRecord(mReference);
-      if (dv.getStart() == endPos) {
+        if ((prev != null && dv.overlaps(prev)) || (next != null && dv.overlaps(next))) {
         // We could be smarter and merge the records, but this will be so infrequent (assuming we're not re-using the same seed as a previous run) let's just warn.
-        Diagnostic.warning("Skipping de novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart() + " to avoid collision with existing variant (consider a new RNG seed)");
+        Diagnostic.warning("Skipping de novo mutation at " + new SequenceNameLocusSimple(dv) + " to avoid collision with neighboring variants at "
+          + (prev == null ? "<none>" : new SequenceNameLocusSimple(prev))
+          + " and "
+          + (next == null ? "<none>" : new SequenceNameLocusSimple(next)));
         continue;
       }
       dv.getInfo().clear(); // To remove AF chosen by the population variant generator
@@ -262,7 +265,6 @@ public class DeNovoSampleSimulator {
 
       sequenceVariants.add(dv);
       vcfOut.write(dv);
-      mStats.tallyVariant(vcfOut.getHeader(), dv);
     }
   }
 
