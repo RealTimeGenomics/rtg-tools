@@ -139,6 +139,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final DeNovoSampleSimulator ss = new DeNovoSampleSimulator(dsr, priors, random, ploidy, (Integer) flags.getValue(EXPECTED_MUTATIONS), flags.isSet(SHOW_MUTATIONS));
       ss.mutateIndividual(popVcf, outputVcf, original, sample);
+      ss.printStatistics(out);
       if (flags.isSet(OUTPUT_SDF)) {
         final SampleReplayer vr = new SampleReplayer(dsr);
         vr.replaySample(outputVcf, (File) flags.getValue(OUTPUT_SDF), sample);

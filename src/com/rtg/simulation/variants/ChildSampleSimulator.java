@@ -32,6 +32,7 @@ package com.rtg.simulation.variants;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -234,7 +235,10 @@ public class ChildSampleSimulator {
     if (mVerbose) {
       Diagnostic.info(""); // Just to separate the statistics
     }
-    Diagnostic.info(mStats.getStatistics());
+  }
+
+  protected void printStatistics(OutputStream outStream) throws IOException {
+    mStats.printStatistics(outStream);
   }
 
   private void warnOutOfOrder() {

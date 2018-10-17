@@ -124,6 +124,7 @@ public class SampleSimulatorCli extends AbstractCli {
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final SampleSimulator ss = new SampleSimulator(dsr, random, ploidy);
       ss.mutateIndividual(popVcf, outputVcf, sample, sex);
+      ss.printStatistics(out);
       if (flags.isSet(OUTPUT_SDF)) {
         final SampleReplayer vr = new SampleReplayer(dsr);
         vr.replaySample(outputVcf, (File) flags.getValue(OUTPUT_SDF), sample);

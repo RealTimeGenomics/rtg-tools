@@ -32,6 +32,7 @@ package com.rtg.simulation.variants;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -83,7 +84,8 @@ public class DeNovoSampleSimulator {
   private int mNumSamples;
   private int mOriginalSampleId;
   private int mDerivedSampleId;
-  private boolean mSeenVariants = false;
+  private VariantStatistics mStats;
+  private boolean mSeenVariants;
 
   /**
    * @param reference input reference data
@@ -112,6 +114,7 @@ public class DeNovoSampleSimulator {
    */
   public void mutateIndividual(File vcfInFile, File vcfOutFile, String origSample, String sample) throws IOException {
     final PriorPopulationVariantGenerator generator = new PriorPopulationVariantGenerator(mReference, mPriors, mRandom, new PriorPopulationVariantGenerator.FixedAlleleFrequencyChooser(1.0), mTargetMutations);
+    mSeenVariants = false;
     final VcfHeader header = VcfUtils.getHeader(vcfInFile);
     if (!origSample.equalsIgnoreCase(sample) && header.getSampleNames().contains(sample)) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
@@ -164,9 +167,9 @@ public class DeNovoSampleSimulator {
 
     header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
 
-    final VariantStatistics stats = new VariantStatistics(null);
-    stats.onlySamples(sample);
-    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile), stats)) {
+    mStats = new VariantStatistics(null);
+    mStats.onlySamples(sample);
+    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile), mStats)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
       // Generate de novo variants (oblivious of any pre-existing variants)
@@ -191,7 +194,10 @@ public class DeNovoSampleSimulator {
     if (mVerbose) {
       Diagnostic.info(""); // Just to separate the statistics
     }
-    Diagnostic.info(stats.getStatistics());
+  }
+
+  protected void printStatistics(OutputStream outStream) throws IOException {
+    mStats.printStatistics(outStream);
   }
 
   // Treat polyploid as haploid
@@ -250,7 +256,7 @@ public class DeNovoSampleSimulator {
       final VcfRecord dv = pv.toVcfRecord(mReference);
         if ((prev != null && dv.overlaps(prev)) || (next != null && dv.overlaps(next))) {
         // We could be smarter and merge the records, but this will be so infrequent (assuming we're not re-using the same seed as a previous run) let's just warn.
-        Diagnostic.warning("Skipping de novo mutation at " + new SequenceNameLocusSimple(dv) + " to avoid collision with neighboring variants at "
+        Diagnostic.userLog("Skipping de novo mutation at " + new SequenceNameLocusSimple(dv) + " to avoid collision with neighboring variants at "
           + (prev == null ? "<none>" : new SequenceNameLocusSimple(prev))
           + " and "
           + (next == null ? "<none>" : new SequenceNameLocusSimple(next)));

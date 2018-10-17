@@ -32,6 +32,7 @@ package com.rtg.simulation.variants;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,10 +126,11 @@ public class SampleSimulator {
       Diagnostic.info("");
     } else if (mDefaultAfCount > 0) {
       Diagnostic.warning(mDefaultAfCount + " input records had no allele frequency information.");
-      Diagnostic.info("");
     }
+  }
 
-    Diagnostic.info(mStats.getStatistics());
+  protected void printStatistics(OutputStream outStream) throws IOException {
+    mStats.printStatistics(outStream);
   }
 
   //writes sample to given writer, returns records as list

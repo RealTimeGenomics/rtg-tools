@@ -135,6 +135,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final ChildSampleSimulator ss = new ChildSampleSimulator(dsr, random, ploidy, (Double) flags.getValue(EXTRA_CROSSOVERS), flags.isSet(SHOW_CROSSOVERS));
       ss.mutateIndividual(popVcf, outputVcf, sample, sex, father, mother);
+      ss.printStatistics(out);
       if (flags.isSet(OUTPUT_SDF)) {
         final SampleReplayer vr = new SampleReplayer(dsr);
         vr.replaySample(outputVcf, (File) flags.getValue(OUTPUT_SDF), sample);
