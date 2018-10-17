@@ -110,10 +110,10 @@ public class DeNovoSampleSimulatorTest extends TestCase {
       //System.out.println(popVarStr);
 
       // Generate a couple of samples w.r.t variants
-      final SampleSimulator dadsim = new SampleSimulator(sr, new PortableRandom(42), ReferencePloidy.AUTO);
+      final SampleSimulator dadsim = new SampleSimulator(sr, new PortableRandom(42), ReferencePloidy.AUTO, false);
       final File dadVcf = new File(dir, "sample_dad.vcf.gz");
       dadsim.mutateIndividual(popVcf, dadVcf, "dad", Sex.MALE);
-      final SampleSimulator momsim = new SampleSimulator(sr, new PortableRandom(43), ReferencePloidy.AUTO);
+      final SampleSimulator momsim = new SampleSimulator(sr, new PortableRandom(43), ReferencePloidy.AUTO, false);
       final File momVcf = new File(dir, "sample_mom.vcf.gz");
       momsim.mutateIndividual(dadVcf, momVcf, "mom", Sex.FEMALE);
 

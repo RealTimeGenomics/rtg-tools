@@ -50,6 +50,7 @@ import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VariantType;
+import com.rtg.vcf.VcfFormatException;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -68,19 +69,23 @@ public class SampleSimulator {
   protected final SequencesReader mReference;
   private final PortableRandom mRandom;
   private final ReferencePloidy mDefaultPloidy;
+  private final boolean mAllowMissingAf;
   private VariantStatistics mStats = null;
   private boolean mSeenVariants = false;
-  private int mDefaultAfCount = 0;
+  private int mMissingAfCount;
+  private int mWithAfCount;
 
   /**
    * @param reference input reference data
    * @param rand random number generator
    * @param ploidy the default ploidy to use if no reference specification is present
+   * @param allowMissingAf if set, treat variants without frequency annotation as having equally likely alleles
    */
-  public SampleSimulator(SequencesReader reference, PortableRandom rand, ReferencePloidy ploidy) {
+  SampleSimulator(SequencesReader reference, PortableRandom rand, ReferencePloidy ploidy, boolean allowMissingAf) {
     mReference = reference;
     mRandom = rand;
     mDefaultPloidy = ploidy;
+    mAllowMissingAf = allowMissingAf;
   }
 
   /**
@@ -97,6 +102,9 @@ public class SampleSimulator {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
     }
     header.addSampleName(sample);
+    mSeenVariants = false;
+    mMissingAfCount = 0;
+    mWithAfCount = 0;
     mStats = new VariantStatistics(null);
     mStats.onlySamples(sample);
     boolean foundGt = false;
@@ -122,10 +130,14 @@ public class SampleSimulator {
       }
     }
     if (!mSeenVariants) {
-      Diagnostic.warning("No input variants! (is the VCF empty, or against an incorrect reference?)");
-      Diagnostic.info("");
-    } else if (mDefaultAfCount > 0) {
-      Diagnostic.warning(mDefaultAfCount + " input records had no allele frequency information.");
+      Diagnostic.warning("No input variants (is the VCF empty, or against an incorrect reference?)");
+    } else {
+      if (mWithAfCount == 0 && !mAllowMissingAf) {
+        Diagnostic.warning("No input variants contained allele frequency information.");
+      }
+      if (mMissingAfCount > 0) {
+        Diagnostic.userLog(mMissingAfCount + " input records had no allele frequency information.");
+      }
     }
   }
 
@@ -146,26 +158,7 @@ public class SampleSimulator {
         v.addFormat(VcfUtils.FORMAT_GENOTYPE); // Ensure the record has a notion of genotype if it doesn't already - values will be filled in below
         final StringBuilder gt = new StringBuilder();
         if (refSeq.ploidy().count() != 0) {
-          final List<String> allFreqStr = v.getInfo().get(VcfUtils.INFO_ALLELE_FREQ);
-          final double[] dist;
-          if (allFreqStr == null) {
-            ++mDefaultAfCount;
-            final double[] defaultDist = new double[v.getAltCalls().size() + 1];
-            Arrays.fill(defaultDist, 1.0); // All alleles are equally likely
-            dist = SimulationUtils.cumulativeDistribution(defaultDist);
-          } else {
-            dist = new double[allFreqStr.size() + 1];
-            double ac = 0.0;
-            for (int i = 0; i < allFreqStr.size(); ++i) {
-              ac += Double.parseDouble(allFreqStr.get(i));
-              dist[i] = ac;
-            }
-            if (ac > 1.0) {
-              throw new NoTalkbackSlimException("Sum of AF probabilities exceeds 1.0 for record " + v);
-            }
-          }
-          dist[dist.length - 1] = 1.0; //the reference consumes the rest of the distribution
-
+          final double[] dist = getAlleleDistribution(v);
           int variantEnd = lastVariantEnd; // Need to use separate variable while going through the ploidy loop, otherwise we won't make hom variants.
           for (int i = 0; i < ploidyCount; ++i) {
             if (gt.length() != 0) {
@@ -176,7 +169,7 @@ public class SampleSimulator {
               alleleId = 0;
             } else {
               final double d = mRandom.nextDouble();
-              alleleId = chooseAllele(dist, d, v.getAltCalls().size());
+              alleleId = chooseAllele(dist, d);
             }
             final VariantType svType = alleleId == 0 ? null : VariantType.getSymbolicAlleleType(v.getAltCalls().get(alleleId - 1));
             if (svType != null) {
@@ -209,16 +202,43 @@ public class SampleSimulator {
     return sequenceMutations;
   }
 
-  private static int chooseAllele(double[] dist, double d, int size) {
-    for (int j = 0; j < dist.length; ++j) {
-      if (d < dist[j]) {
-        if (j < size) {
-          return j + 1;
-        } else {
-          return 0;
-        }
+  // Get a cumulative allele distribution, ref allele is last position
+  double[] getAlleleDistribution(VcfRecord v) {
+    final double[] dist;
+    final List<String> allFreqStr = v.getInfo().get(VcfUtils.INFO_ALLELE_FREQ);
+    if (allFreqStr == null) {
+      ++mMissingAfCount;
+      if (mAllowMissingAf) {
+        // Uniform probability for each allele
+        final double[] defaultDist = new double[v.getAltCalls().size() + 1];
+        Arrays.fill(defaultDist, 1.0); // All alleles are equally likely
+        dist = SimulationUtils.cumulativeDistribution(defaultDist);
+      } else {
+        // Zero probability for the alt alleles
+        dist = new double[v.getAltCalls().size() + 1];
+      }
+    } else {
+      ++mWithAfCount;
+      if (allFreqStr.size() != v.getAltCalls().size()) {
+        throw new VcfFormatException("Incorrect number of AF entries for record " + v);
+      }
+      dist = new double[allFreqStr.size() + 1];
+      double ac = 0.0;
+      for (int i = 0; i < allFreqStr.size(); ++i) {
+        ac += Double.parseDouble(allFreqStr.get(i));
+        dist[i] = ac;
+      }
+      if (ac > 1.0) {
+        throw new NoTalkbackSlimException("Sum of AF probabilities exceeds 1.0 for record " + v);
       }
     }
-    throw new RuntimeException("d: " + d + " should be less than dist[length - 1]:" +  dist[dist.length - 1]);
+    dist[dist.length - 1] = 1.0; //the reference consumes the rest of the distribution
+    return dist;
+  }
+
+  // Choose from cumulative distribution where ref is last position
+  private static int chooseAllele(double[] dist, double d) {
+    final int a = SimulationUtils.chooseFromCumulative(dist, d);
+    return a == dist.length - 1 ? 0 : (a + 1);
   }
 }

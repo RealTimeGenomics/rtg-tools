@@ -110,11 +110,11 @@ public class ChildSampleSimulatorTest extends AbstractCliTest {
       //System.out.println(popVarStr);
 
       // Generate sample w.r.t variants
-      final SampleSimulator dadsim = new SampleSimulator(sr, new PortableRandom(15), ReferencePloidy.AUTO);
+      final SampleSimulator dadsim = new SampleSimulator(sr, new PortableRandom(15), ReferencePloidy.AUTO, false);
       final File dadVcf = new File(dir, "sample_dad.vcf.gz");
       dadsim.mutateIndividual(popVcf, dadVcf, "dad", Sex.MALE);
 
-      final SampleSimulator momsim = new SampleSimulator(sr, new PortableRandom(65), ReferencePloidy.AUTO);
+      final SampleSimulator momsim = new SampleSimulator(sr, new PortableRandom(65), ReferencePloidy.AUTO, false);
       final File momVcf = new File(dir, "sample_mom.vcf.gz");
       momsim.mutateIndividual(dadVcf, momVcf, "mom", Sex.FEMALE);
 

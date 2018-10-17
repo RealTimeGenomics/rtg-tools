@@ -34,34 +34,30 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import com.rtg.AbstractTest;
 import com.rtg.launcher.MainResult;
 import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
+import com.rtg.reference.ReferenceGenome;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
-import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
-
-import junit.framework.TestCase;
+import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 
 /**
  */
-public class SampleSimulatorTest extends TestCase {
-
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
-  }
+public class SampleSimulatorTest extends AbstractTest {
 
   private static final String REF = ">ref" + StringUtils.LS
-          + "cgtacattac" + "gagcgactag" + "ctagctagta" + "cgtacgtaca"
-          + "atggcagcgt" + "attagcggca" + "aattgcgcat" + "tgcgtagcac"
-          + "gcgcgattca" + "ttatgcgcgc" + "atcgatcgat" + "cgatcgatca";
+    + "cgtacattac" + "gagcgactag" + "ctagctagta" + "cgtacgtaca"
+    + "atggcagcgt" + "attagcggca" + "aattgcgcat" + "tgcgtagcac"
+    + "gcgcgattca" + "ttatgcgcgc" + "atcgatcgat" + "cgatcgatca";
 
   public void testSampleSimulator() throws IOException {
     try (final TestDirectory dir = new TestDirectory("samplesim")) {
@@ -133,6 +129,42 @@ public class SampleSimulatorTest extends TestCase {
       assertFalse(sref.equals(s2));
       assertFalse(s1.equals(s2));
 
+    }
+  }
+
+  public void testGetDistribution() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("samplesim")) {
+      final File sdf = new File(dir, "sdf");
+      ReaderTestUtils.getDNADir(REF, sdf);
+      final SequencesReader sr = SequencesReaderFactory.createMemorySequencesReader(sdf, true, LongRange.NONE);
+      SampleSimulator ss = new SampleSimulator(sr, new PortableRandom(32), ReferenceGenome.ReferencePloidy.AUTO, false);
+      VcfRecord r = new VcfRecord("ref", 10, "a");
+      double[] d = ss.getAlleleDistribution(r);
+      assertEquals(1, d.length);
+      assertEquals(1.0, d[0]);
+
+      r.addAltCall("t");
+      d = ss.getAlleleDistribution(r);
+      assertEquals(2, d.length);
+      assertEquals(0.0, d[0]);
+      assertEquals(1.0, d[1]);
+
+      ss = new SampleSimulator(sr, new PortableRandom(32), ReferenceGenome.ReferencePloidy.AUTO, true);
+      d = ss.getAlleleDistribution(r);
+      assertEquals(0.5, d[0]);
+      assertEquals(1.0, d[1]);
+
+      r.addInfo(VcfUtils.INFO_ALLELE_FREQ, "0.2");
+      d = ss.getAlleleDistribution(r);
+      assertEquals(0.2, d[0]);
+      assertEquals(1.0, d[1]);
+
+      r.addAltCall("c").addInfo(VcfUtils.INFO_ALLELE_FREQ, "0.3");
+      d = ss.getAlleleDistribution(r);
+      assertEquals(3, d.length);
+      assertEquals(0.2, d[0]);
+      assertEquals(0.5, d[1]);
+      assertEquals(1.0, d[2]);
     }
   }
 }

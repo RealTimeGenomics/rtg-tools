@@ -68,6 +68,7 @@ public class SampleSimulatorCli extends AbstractCli {
   private static final String REFERENCE_SDF = "reference";
   private static final String SEED = "seed";
   private static final String PLOIDY = "ploidy";
+  private static final String ALLOW_MISSING = "allow-missing-af";
 
 
   @Override
@@ -92,6 +93,7 @@ public class SampleSimulatorCli extends AbstractCli {
     mFlags.registerRequired('s', SAMPLE_NAME, String.class, CommonFlags.STRING, "name for sample").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(SEX, Sex.class, "SEX", "sex of individual", Sex.EITHER).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(ALLOW_MISSING, "if set, treat variants without allele frequency annotation as uniformly likely").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
@@ -122,7 +124,7 @@ public class SampleSimulatorCli extends AbstractCli {
     final Sex sex = (Sex) flags.getValue(SEX);
     final ReferencePloidy ploidy = (ReferencePloidy) flags.getValue(PLOIDY);
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
-      final SampleSimulator ss = new SampleSimulator(dsr, random, ploidy);
+      final SampleSimulator ss = new SampleSimulator(dsr, random, ploidy, flags.isSet(ALLOW_MISSING));
       ss.mutateIndividual(popVcf, outputVcf, sample, sex);
       ss.printStatistics(out);
       if (flags.isSet(OUTPUT_SDF)) {
