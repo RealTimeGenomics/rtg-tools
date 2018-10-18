@@ -50,6 +50,7 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VcfReader;
@@ -129,6 +130,7 @@ public class ChildSampleSimulator {
   private ReferenceGenome mFatherRefg = null;
   private boolean mHasWarnedOutOfOrder = false;
   private boolean mSeenVariants = false;
+  private String mSample;
 
   private static final class ChildStatistics extends VariantStatistics {
 
@@ -183,6 +185,7 @@ public class ChildSampleSimulator {
     if (header.getSampleNames().contains(sample)) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
     }
+    mSample = sample;
     mFatherSampleNum = header.getSampleNames().indexOf(father);
     if (mFatherSampleNum == -1) {
       throw new NoTalkbackSlimException("father sample '" + father + "' does not exist");
@@ -209,10 +212,9 @@ public class ChildSampleSimulator {
       throw new NoTalkbackSlimException("input VCF does not contain GT information");
     }
 
-    if (mVerbose) {
-      Diagnostic.info("Father ID=" + father + " Sex=" + fatherSex);
-      Diagnostic.info("Mother ID=" + mother + " Sex=" + motherSex);
-    }
+    log("Father ID=" + father + " Sex=" + fatherSex);
+    log("Mother ID=" + mother + " Sex=" + motherSex);
+    log("Child ID=" + sample + " Sex=" + sex);
 
     header.addSampleName(sample);
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
@@ -242,6 +244,14 @@ public class ChildSampleSimulator {
 
   protected void printStatistics(OutputStream outStream) throws IOException {
     mStats.printStatistics(outStream);
+  }
+
+  private void log(String message) {
+    if (mVerbose) {
+      Diagnostic.info(message);
+    } else {
+      Diagnostic.userLog(message);
+    }
   }
 
   private void warnOutOfOrder() {
@@ -278,11 +288,10 @@ public class ChildSampleSimulator {
       crossoverPoints[i] = mRandom.nextInt(seqLength);
     }
     Arrays.sort(crossoverPoints);
-    if (mVerbose) {
-      Diagnostic.info("Chose " + crossoverPoints.length + " recombination points for " + sex + " parent on chromosome " + refSeq.name());
-    }
+    log("Chose " + crossoverPoints.length + " recombination points for " + sex + " parent on chromosome " + refSeq.name());
     return crossoverPoints;
   }
+
 
   //writes sample to given writer, returns records as list
   private List<VcfRecord> mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, int seqLength) throws IOException {
@@ -292,8 +301,8 @@ public class ChildSampleSimulator {
     final int fatherCount = getEffectivePloidy(fatherPloidy.count());
     final int motherCount = getEffectivePloidy(motherPloidy.count());
     final int childCount = childPloidy.count();
-    final int[] motherCrossovers = getCrossoverPositions(refSeq, Sex.FEMALE, seqLength);
-    final int[] fatherCrossovers = getCrossoverPositions(refSeq, Sex.MALE, seqLength);
+    final int[] motherCrossovers = motherCount > 1 ? getCrossoverPositions(refSeq, Sex.FEMALE, seqLength) : new int[] {};
+    final int[] fatherCrossovers = fatherCount > 1 ? getCrossoverPositions(refSeq, Sex.MALE, seqLength) : new int[] {};
     int motherCurrentCrossover = 0;
     int fatherCurrentCrossover = 0;
 
@@ -308,24 +317,22 @@ public class ChildSampleSimulator {
       throw new NoTalkbackSlimException("Sequence " + refSeq.name() + ": Unsupported ploidy combination" + desc);
     }
     //System.err.println("Sequence " + refSeq.name() + " has ploidy " + desc);
-    int fatherHap = 0;
-    int motherHap = 0;
+    int fatherHap = -1;
+    int motherHap = -1;
     if (childCount > 0) {
-      if (motherCount > 1) {
+      if (motherCount > 0) {
         motherHap = mRandom.nextInt(motherCount);
-        if (mVerbose) {
-          Diagnostic.info("Sequence " + refSeq.name() + " chose initial mother haplotype " + motherHap);
-        }
+        log("Sequence " + refSeq.name() + " chose initial mother haplotype " + motherHap);
       }
-      if (fatherCount > 1) {
+      if (fatherCount > 0) {
         fatherHap = mRandom.nextInt(fatherCount);
-        if (mVerbose) {
-          Diagnostic.info("Sequence " + refSeq.name() + " chose initial father haplotype " + fatherHap);
-        }
+        log("Sequence " + refSeq.name() + " chose initial father haplotype " + fatherHap);
       }
     }
     final ArrayList<VcfRecord> sequenceMutations = new ArrayList<>();
     int lastPos = 0;
+    int regionStart = 0;
+    String regionType = "N";
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {
       while (reader.hasNext()) {
         mSeenVariants = true;
@@ -336,20 +343,22 @@ public class ChildSampleSimulator {
           warnOutOfOrder();
         } else {
           while (fatherCount > 1 && (fatherCurrentCrossover < fatherCrossovers.length) && between(fatherCrossovers[fatherCurrentCrossover], lastPos, v.getStart())) {
+            logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
             fatherHap = (fatherHap + 1) % fatherCount;
             mStats.mFatherCrossovers++;
             fatherCurrentCrossover++;
-            if (mVerbose) {
-              Diagnostic.info("Crossover on father in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + fatherHap);
-            }
+            log("Crossover on father in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + fatherHap);
+            regionStart = v.getStart();
+            regionType = "X";
           }
           while (motherCount > 1 && (motherCurrentCrossover < motherCrossovers.length) && between(motherCrossovers[motherCurrentCrossover], lastPos, v.getStart())) {
+            logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
             motherHap = (motherHap + 1) % motherCount;
             mStats.mMotherCrossovers++;
             motherCurrentCrossover++;
-            if (mVerbose) {
-              Diagnostic.info("Crossover on mother in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + motherHap);
-            }
+            log("Crossover on mother in " + refSeq.name() + "[" + (lastPos + 1) + "-" + v.getOneBasedStart() + "], now haplotype " + motherHap);
+            regionStart = v.getStart();
+            regionType = "X";
           }
         }
         lastPos = v.getStart();
@@ -402,7 +411,14 @@ public class ChildSampleSimulator {
 
       }
     }
+    logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
     return sequenceMutations;
+  }
+
+  private void logHaplotypes(String type, SequenceNameLocusSimple location, int fatherHap, int motherHap) {
+    Diagnostic.userLog("ChildSim\t" + type + "\t" + mSample + "\t"
+      + location.getSequenceName() + "\t" + location.getStart() + "\t" + location.getEnd()
+      + "\t" + (fatherHap == -1 ? "." : fatherHap) + "\t" + (motherHap == -1 ? "." : motherHap));
   }
 
   private void appendAllele(final StringBuilder gt, final int aid) {
