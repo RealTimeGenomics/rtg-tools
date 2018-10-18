@@ -66,7 +66,7 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public class SampleSimulator {
 
-  protected final SequencesReader mReference;
+  private final SequencesReader mReference;
   private final PortableRandom mRandom;
   private final ReferencePloidy mDefaultPloidy;
   private final boolean mAllowMissingAf;
@@ -74,6 +74,7 @@ public class SampleSimulator {
   private boolean mSeenVariants = false;
   private int mMissingAfCount;
   private int mWithAfCount;
+  protected boolean mAddRunInfo = true;
 
   /**
    * @param reference input reference data
@@ -120,9 +121,11 @@ public class SampleSimulator {
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
       header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
-    header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    if (mAddRunInfo) {
+      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    }
 
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
+    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, sex, mDefaultPloidy);
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));
@@ -147,7 +150,7 @@ public class SampleSimulator {
 
   //writes sample to given writer, returns records as list
   private List<VcfRecord> mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq) throws IOException {
-    Diagnostic.userLog("Simulating mutations on sequence: " + refSeq.name());
+    Diagnostic.userLog("Selecting genotypes on sequence: " + refSeq.name());
     final ArrayList<VcfRecord> sequenceMutations = new ArrayList<>();
     final int ploidyCount = refSeq.ploidy().count() >= 0 ? refSeq.ploidy().count() : 1; //effectively treats polyploid as haploid
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {

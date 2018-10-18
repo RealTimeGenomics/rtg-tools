@@ -119,14 +119,15 @@ public class ChildSampleSimulator {
   private final SequencesReader mReference;
   private final PortableRandom mRandom;
   private final ReferencePloidy mDefaultPloidy;
+  private final double mExtraCrossoverFreq;
+  private final boolean mVerbose;
+  protected boolean mAddRunInfo = true;
   private ChildStatistics mStats = null;
   private int mFatherSampleNum = -1;
   private int mMotherSampleNum = -1;
   private ReferenceGenome mMotherRefg = null;
   private ReferenceGenome mFatherRefg = null;
   private boolean mHasWarnedOutOfOrder = false;
-  private double mExtraCrossoverFreq = 0;
-  private boolean mVerbose = true;
   private boolean mSeenVariants = false;
 
   private static final class ChildStatistics extends VariantStatistics {
@@ -218,11 +219,13 @@ public class ChildSampleSimulator {
       header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
     header.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + sample + ",Mother=" + mother + ",Father=" + father + ">");
-    header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    if (mAddRunInfo) {
+      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    }
 
     mStats = new ChildStatistics();
     mStats.onlySamples(sample);
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile)) {
+    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, sex, mDefaultPloidy);
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));

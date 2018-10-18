@@ -77,6 +77,7 @@ public class DeNovoSampleSimulator {
   private final int mTargetMutations;
   private final PopulationMutatorPriors mPriors;
   private final boolean mVerbose;
+  protected boolean mAddRunInfo;
   private Sex[] mOriginalSexes = null;
   private ReferenceGenome mOriginalRefg = null;
   private ReferenceGenome mMaleGenome = null;
@@ -149,10 +150,7 @@ public class DeNovoSampleSimulator {
     if (!foundDeNovo) {
       header.addFormatField(VcfUtils.FORMAT_DENOVO, MetaType.STRING, VcfNumber.ONE, "De novo allele");
     }
-    if (mVerbose) {
-      Diagnostic.info("Original ID=" + origSample + " Sex=" + originalSex);
-    }
-
+    log("Original ID=" + origSample + " Derived ID=" + sample + " Sex=" + originalSex);
     if (origSample.equals(sample)) {
       mDerivedSampleId = mOriginalSampleId;
     } else {
@@ -165,11 +163,13 @@ public class DeNovoSampleSimulator {
     }
     mNumSamples = header.getNumberOfSamples();
 
-    header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    if (mAddRunInfo) {
+      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+    }
 
     mStats = new VariantStatistics(null);
     mStats.onlySamples(sample);
-    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(true).make(header, vcfOutFile), mStats)) {
+    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile), mStats)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
       // Generate de novo variants (oblivious of any pre-existing variants)
@@ -179,9 +179,11 @@ public class DeNovoSampleSimulator {
         final ReferenceSequence refSeq = refG.sequence(mReference.name(i));
 
         final List<PopulationVariantGenerator.PopulationVariant> seqDeNovo = new LinkedList<>();
-        for (PopulationVariantGenerator.PopulationVariant v : deNovo) {
-          if (v.getSequenceId() == i) {
-            seqDeNovo.add(v);
+        if (getEffectivePloidy(mOriginalRefg.sequence(refSeq.name()).ploidy().count()) > 0) {
+          for (PopulationVariantGenerator.PopulationVariant v : deNovo) {
+            if (v.getSequenceId() == i) {
+              seqDeNovo.add(v);
+            }
           }
         }
 
@@ -200,6 +202,14 @@ public class DeNovoSampleSimulator {
     mStats.printStatistics(outStream);
   }
 
+  private void log(String message) {
+    if (mVerbose) {
+      Diagnostic.info(message);
+    } else {
+      Diagnostic.userLog(message);
+    }
+  }
+
   // Treat polyploid as haploid
   private int getEffectivePloidy(int ploidy) {
     return ploidy == -1 ? 1 : ploidy;
@@ -209,16 +219,10 @@ public class DeNovoSampleSimulator {
   private List<VcfRecord> outputSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo) throws IOException {
     final Ploidy ploidy = mOriginalRefg.sequence(refSeq.name()).ploidy();
     final int ploidyCount = getEffectivePloidy(ploidy.count());
-
     if (ploidyCount > 2) {
       final String desc = "Original=" + ploidy + " -> Derived=" + ploidy;
       throw new NoTalkbackSlimException("Sequence " + refSeq.name() + ": Unsupported ploidy" + desc);
     }
-    if ((ploidyCount == 0) && (deNovo.size() > 0)) {
-      Diagnostic.developerLog("Ignoring " + deNovo.size() + " de novo variants proposed for chromosome " + refSeq.name() + " with ploidy NONE");
-      deNovo.clear();
-    }
-    //System.err.println("Sequence " + refSeq.name() + " has ploidy " + desc);
     final ArrayList<VcfRecord> sequenceVariants = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {
       VcfRecord pv = null;
@@ -264,7 +268,7 @@ public class DeNovoSampleSimulator {
       }
       dv.getInfo().clear(); // To remove AF chosen by the population variant generator
       if (mVerbose) {
-        Diagnostic.info("De novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart());
+        Diagnostic.info("De novo mutation at " + refSeq.name() + ":" + dv.getOneBasedStart()); // Seems redundant since it's in the VCF
       }
       dv.setNumberOfSamples(mNumSamples);
       addSamplesForDeNovo(dv, ploidyCount, refSeq.name());
@@ -276,6 +280,7 @@ public class DeNovoSampleSimulator {
 
 
   private String addSamplesForDeNovo(final VcfRecord v, final int ploidyCount, String refName) {
+    assert ploidyCount > 0;
     final String sampleGt = ploidyCount == 1 ? "1" : mRandom.nextBoolean() ? "0|1" : "1|0";
     for (int id = 0; id < v.getNumberOfSamples(); ++id) {
       final String gt;
