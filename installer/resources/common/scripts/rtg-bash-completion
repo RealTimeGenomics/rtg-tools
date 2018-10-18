@@ -45,7 +45,6 @@ function _complete_rtg() {
             break;
         done
     fi
-
     if [[ "${prev}" == "$rtg" ]] || [[ "$cmdi" -ge "$COMP_CWORD" ]]; then
         _complete_rtgcommands "$rtg"
         COMPREPLY=($(compgen -W "${_rtg_cmds// /$'\n'}" -- "${cur}"))
@@ -54,19 +53,19 @@ function _complete_rtg() {
         case "${cur}" in
             --XX*)
                 _complete_rtghelp "$rtg" "$cmd" --XXhelp
-                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--XX[^= ][^= ]*\)[= ].*/\1/p')"
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/^ *\(-., \)\{0,1\}\(--XX[^= ][^= ]*\)[= ].*/\2/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
                 return 0
                 ;;
             --X*)
                 _complete_rtghelp "$rtg" "$cmd" --Xhelp
-                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--X[^= ][^= ]*\)[= ].*/\1/p')"
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/^ *\(-., \)\{0,1\}\(--X[^= ][^= ]*\)[= ].*/\2/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
                 return 0
                 ;;
             -*)
                 _complete_rtghelp "$rtg" "$cmd" --help
-                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/.*\(--[^= ][^= ]*\)[= ].*/\1/p')"
+                opts="$(echo "$_rtg_help" | sed -n '/^  *-/s/^ *\(-., \)\{0,1\}\(--[^= ][^= ]*\)[= ].*/\2/p')"
                 COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
                 return 0
                 ;;
