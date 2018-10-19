@@ -73,7 +73,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
   private static final String PLOIDY = "ploidy";
 
   // We require one crossover, but there is a small probability of an extra crossover.
-  private static final double EXTRA_CROSSOVERS_PER_CHROMOSOME = 0.01;
+  static final double EXTRA_CROSSOVERS_PER_CHROMOSOME = 0.01;
 
 
   @Override

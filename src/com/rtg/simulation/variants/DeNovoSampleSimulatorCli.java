@@ -72,8 +72,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
   private static final String PRIORS_FLAG = "Xpriors";
   private static final String PLOIDY = "ploidy";
 
-  // We inject one mutation per chromosome, but there is a small probability of an extra mutation.
-  private static final int DEFAULT_MUTATIONS_PER_GENOME = 70;
+  static final int DEFAULT_MUTATIONS_PER_GENOME = 70;
 
 
   @Override
