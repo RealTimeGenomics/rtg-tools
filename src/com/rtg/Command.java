@@ -143,17 +143,13 @@ public class Command {
    * @return true if current license may run this module
    */
   public boolean isLicensed() {
-    return License.isPropertyLicensed(mLicenceProperty)
-        || (mAltLicenceProperty != null && License.isPropertyLicensed(mAltLicenceProperty));
+    return true;
   }
 
   /**
    * @return string representation of license status
    */
   public String licenseStatus() {
-    return mAltLicenceProperty != null && License.isPropertyLicensed(mAltLicenceProperty)
-        ? License.getExpiryStatus(mAltLicenceProperty)
-        : License.getExpiryStatus(mLicenceProperty);
+    return "Licensed";
   }
-
 }

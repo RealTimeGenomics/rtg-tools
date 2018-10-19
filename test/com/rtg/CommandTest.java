@@ -45,6 +45,5 @@ public class CommandTest extends TestCase {
     assertFalse(c.isHidden());
     assertTrue(c.isLicensed());
     assertEquals(ReleaseLevel.GA, c.getReleaseLevel());
-    assertEquals("enable_format", c.getLicenceKeyName());
   }
 }
