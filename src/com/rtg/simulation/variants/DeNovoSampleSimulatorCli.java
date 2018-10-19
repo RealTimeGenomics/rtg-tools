@@ -65,7 +65,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
   private static final String ORIGINAL_FLAG = "original";
   private static final String OUTPUT_VCF = "output";
   private static final String OUTPUT_SDF = "output-sdf";
-  private static final String EXPECTED_MUTATIONS = "num-mutations";
+  static final String EXPECTED_MUTATIONS = "num-mutations";
   private static final String SHOW_MUTATIONS = "show-mutations";
   private static final String REFERENCE_SDF = "reference";
   private static final String SEED = "seed";
