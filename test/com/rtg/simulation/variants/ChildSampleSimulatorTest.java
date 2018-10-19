@@ -128,7 +128,7 @@ public class ChildSampleSimulatorTest extends AbstractCliTest {
       final File daughterSdf = new File(dir, "sample_daughter.sdf");
       final MainResult r = MainResult.run(new ChildSampleSimulatorCli(), "-t", sdf.getPath(),
         "-i", sonVcf.getPath(), "-o", daughterVcf.getPath(), "--output-sdf", daughterSdf.getPath(),
-        "--seed", "13", "--num-crossovers", "0", "--sex", "female",
+        "--seed", "13", "--extra-crossovers", "0", "--sex", "female",
         "--mother", "mom", "--father", "dad", "--sample", "daughter");
       assertEquals(r.err(), 0, r.rc());
       assertTrue(daughterSdf.exists());

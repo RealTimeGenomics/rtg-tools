@@ -66,7 +66,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
   private static final String SEX = "sex";
   private static final String OUTPUT_VCF = "output";
   private static final String OUTPUT_SDF = "output-sdf";
-  private static final String EXTRA_CROSSOVERS = "num-crossovers";
+  static final String EXTRA_CROSSOVERS = "extra-crossovers";
   private static final String SHOW_CROSSOVERS = "show-crossovers";
   private static final String REFERENCE_SDF = "reference";
   private static final String SEED = "seed";
@@ -100,7 +100,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     mFlags.registerRequired(MOTHER_FLAG, String.class, CommonFlags.STRING, "name of the existing sample to use as the mother").setCategory(CommonFlagCategories.INPUT_OUTPUT);
     mFlags.registerOptional(SEX, Sex.class, "SEX", "sex of individual", Sex.EITHER).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(PLOIDY, ReferencePloidy.class, CommonFlags.STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(EXTRA_CROSSOVERS, Double.class, CommonFlags.FLOAT, "likelihood of extra crossovers per chromosome", EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(EXTRA_CROSSOVERS, Double.class, CommonFlags.FLOAT, "probability of extra crossovers per chromosome", EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SHOW_CROSSOVERS, "if set, display information regarding haplotype selection and crossover points").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
