@@ -148,7 +148,7 @@ public final class Environment {
 
       env.put(OS_FREEMEM, freeMemory);
       env.put(OS_TOTALMEM, totalMemory);
-    } catch (final IllegalStateException e) {
+    } catch (final RuntimeException e) {
       // ignore
     }
     env.put("lang.version", props.get("java.version").toString());
