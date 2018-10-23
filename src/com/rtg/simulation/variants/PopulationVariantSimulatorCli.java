@@ -43,7 +43,6 @@ import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
-import com.rtg.util.InvalidParamsException;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -100,12 +99,7 @@ public class PopulationVariantSimulatorCli extends AbstractCli {
       random = new PortableRandom();
     }
     final long seed = random.getSeed();
-    final PopulationMutatorPriors priors;
-    try {
-      priors = new PopulationMutatorPriors(GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create());
-    } catch (final InvalidParamsException e) {
-      return 1;
-    }
+    final PopulationMutatorPriors priors = new PopulationMutatorPriors(GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create());
     final File reference = (File) flags.getValue(REFERENCE_SDF);
     final File out = (File) flags.getValue(OUTPUT_VCF);
     final boolean gzip = !flags.isSet(NO_GZIP);

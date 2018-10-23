@@ -342,8 +342,12 @@ public class ChildSampleSimulator {
         if (baseDelta < 0) {
           warnOutOfOrder();
         } else {
+          boolean logged = false;
           while (fatherCount > 1 && (fatherCurrentCrossover < fatherCrossovers.length) && between(fatherCrossovers[fatherCurrentCrossover], lastPos, v.getStart())) {
-            logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
+            if (!logged) {
+              logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
+              logged = true;
+            }
             fatherHap = (fatherHap + 1) % fatherCount;
             mStats.mFatherCrossovers++;
             fatherCurrentCrossover++;
@@ -352,7 +356,10 @@ public class ChildSampleSimulator {
             regionType = "X";
           }
           while (motherCount > 1 && (motherCurrentCrossover < motherCrossovers.length) && between(motherCrossovers[motherCurrentCrossover], lastPos, v.getStart())) {
-            logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
+            if (!logged) {
+              logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
+              logged = true;
+            }
             motherHap = (motherHap + 1) % motherCount;
             mStats.mMotherCrossovers++;
             motherCurrentCrossover++;

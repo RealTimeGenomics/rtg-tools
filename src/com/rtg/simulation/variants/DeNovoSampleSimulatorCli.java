@@ -43,7 +43,6 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.reference.ReferenceGenome.ReferencePloidy;
-import com.rtg.util.InvalidParamsException;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -129,12 +128,7 @@ public class DeNovoSampleSimulatorCli extends AbstractCli {
     final String sample = (String) flags.getValue(SAMPLE_FLAG);
     final String original = (String) flags.getValue(ORIGINAL_FLAG);
     final ReferencePloidy ploidy = (ReferencePloidy) flags.getValue(PLOIDY);
-    final GenomePriorParams priors;
-    try {
-      priors = GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create();
-    } catch (final InvalidParamsException e) {
-      return 1;
-    }
+    final GenomePriorParams priors = GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create();
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       final DeNovoSampleSimulator ss = new DeNovoSampleSimulator(dsr, priors, random, ploidy, (Integer) flags.getValue(EXPECTED_MUTATIONS), flags.isSet(SHOW_MUTATIONS));
       ss.mutateIndividual(popVcf, outputVcf, original, sample);

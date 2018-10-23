@@ -62,7 +62,6 @@ import com.rtg.relation.MultiFamilyOrdering;
 import com.rtg.relation.PedigreeException;
 import com.rtg.relation.Relationship;
 import com.rtg.tabix.TabixIndexer;
-import com.rtg.util.InvalidParamsException;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -157,12 +156,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
     } else {
       random = new PortableRandom();
     }
-    final GenomePriorParams priors;
-    try {
-      priors = GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create();
-    } catch (final InvalidParamsException e) {
-      return 1;
-    }
+    final GenomePriorParams priors = GenomePriorParams.builder().genomePriors((String) mFlags.getValue(PRIORS_FLAG)).create();
     final GenomeRelationships pedigree = GenomeRelationships.loadGenomeRelationships((File) mFlags.getValue(PEDIGREE_FLAG));
     final List<Family> families;
     try {
