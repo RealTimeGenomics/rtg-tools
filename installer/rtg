@@ -266,8 +266,16 @@ if [[ ! -z "$RTG_TALKBACK" ]]; then
     fi
 fi
 
+RTG_MEM_ARRAY=()
 if [[ -z "$RTG_MEM" ]]; then
-  RTG_MEM=$("$RTG_JAVA" $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.ChooseMemory $RTG_MEM_PCT)
+    RTG_MEM=$("$RTG_JAVA" $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.ChooseMemory $RTG_MEM_PCT)
+    if [[ -z "$RTG_MEM" ]]; then
+        echo "Could not automatically choose percentage based memory allocation, check configuration. Using Java default." >&2
+    else
+        RTG_MEM_ARRAY+=("-Xmx$RTG_MEM")
+    fi
+else
+    RTG_MEM_ARRAY+=("-Xmx$RTG_MEM")
 fi
 
 if [[ ! -z "$RTG_REFERENCES_DIR" ]]; then
@@ -288,7 +296,7 @@ fi
 
 # Now run the primary RTG command
 HSLOG=./hs_err_pid$$.log
-"$RTG_JAVA" -Djava.library.path="$THIS_DIR" -XX:ErrorFile=$HSLOG "${RTG_JAVA_OPTS_ARRAY[@]}" "$RTG_REFERENCES_DIR" "$RTG_MODELS_DIR" "${RTG_USAGE_ARRAY[@]}" "${RTG_PROXY_ARRAY[@]}" "${RTG_DEFAULT_THREADS_ARRAY[@]}" $RTG_TALKBACK "-Xmx$RTG_MEM" -jar "$RTG_JAR" "$@"
+"$RTG_JAVA" -Djava.library.path="$THIS_DIR" -XX:ErrorFile=$HSLOG "${RTG_JAVA_OPTS_ARRAY[@]}" "$RTG_REFERENCES_DIR" "$RTG_MODELS_DIR" "${RTG_USAGE_ARRAY[@]}" "${RTG_PROXY_ARRAY[@]}" "${RTG_DEFAULT_THREADS_ARRAY[@]}" $RTG_TALKBACK "${RTG_MEM_ARRAY[@]}" -jar "$RTG_JAR" "$@"
 ECODE=$?
 if [[ -f "$HSLOG" ]]; then
     if grep -q "insufficient memory" "$HSLOG"; then

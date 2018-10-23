@@ -61,9 +61,14 @@ public final class ChooseMemory {
     if (!flags.setFlags(args)) {
       return;
     }
-
     final double percentage = (Integer) flags.getAnonymousValue(0) / 100.0;
-    final int megs = (int) (Environment.getTotalMemory() * percentage / 1024.0 / 1024.0);
+    final int megs;
+    try {
+      megs = (int) (Environment.getTotalMemory() * percentage / 1024.0 / 1024.0);
+    } catch (RuntimeException e) {
+      System.err.println("Cannot determine system memory!");
+      return;
+    }
     System.out.println((megs < 1024 ? 1024 : megs) + "m");
   }
 }
