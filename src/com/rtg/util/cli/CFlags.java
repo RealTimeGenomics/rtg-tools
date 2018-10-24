@@ -841,6 +841,24 @@ public final class CFlags {
   }
 
   /**
+   * Returns true if any of the specified flags was provided in the arguments.
+   * @param flag the names of the options.
+   * @return true if any of the options were provided in the arguments.
+   */
+  public boolean isAnySet(final String... flag) {
+    return Arrays.stream(flag).anyMatch(this::isSet);
+  }
+
+  /**
+   * Returns true if all of the specified flags was provided in the arguments.
+   * @param flag the names of the options.
+   * @return true if all of the options were provided in the arguments.
+   */
+  public boolean isAllSet(final String... flag) {
+    return Arrays.stream(flag).allMatch(this::isSet);
+  }
+
+  /**
    * Checks whether all the supplied flags have been set, and sets the parse message if a flag has not been set.
    * @param flags the name of the required options.
    * @return true if all the options were provided in the arguments.

@@ -520,8 +520,13 @@ public class CFlagsTest extends TestCase {
 
     mFlags.setFlags("--a", "--b");
 
+    assertFalse(mFlags.isAnySet("c", "d"));
     assertTrue(mFlags.isSet("a"));
+    assertTrue(mFlags.isAnySet("a", "b"));
     assertTrue(mFlags.isSet("b"));
+    assertTrue(mFlags.isAnySet("a", "b"));
+    assertTrue(mFlags.isAllSet("a", "b"));
+    assertFalse(mFlags.isAllSet("a", "b", "c"));
 
     // True if any one is set
     assertTrue(mFlags.checkOr("a", "b"));
