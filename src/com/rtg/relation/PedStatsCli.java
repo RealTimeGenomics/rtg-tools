@@ -36,13 +36,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.Reader;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.reference.Sex;
+import com.rtg.util.StringUtils;
 import com.rtg.util.TextTable;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -58,6 +62,7 @@ public class PedStatsCli extends AbstractCli {
   private static final String PATERNAL_IDS = "paternal-ids";
   private static final String MATERNAL_IDS = "maternal-ids";
   private static final String FOUNDER_IDS = "founder-ids";
+  private static final String ID_DELIM = "delimiter";
   private static final String FAMILIES_OUT = "families";
   private static final String DOT_OUT = "dot";
   private static final String DOT_SIMPLE = "simple-dot";
@@ -92,6 +97,7 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(PATERNAL_IDS, "output ids of paternal individuals").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(MATERNAL_IDS, "output ids of maternal individuals").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FOUNDER_IDS, "output ids of all founders").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional('d', ID_DELIM, String.class, CommonFlags.STRING, "output id lists using this separator", "\\n").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILIES_OUT, "output information about family structures").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(DOT_OUT, String.class, CommonFlags.STRING, "output pedigree in GraphViz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(DOT_SIMPLE, "when outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees").setCategory(CommonFlagCategories.REPORTING);
@@ -100,14 +106,10 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(FAMILY_FLAGS, "output command-line flags for family caller").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(ORDERING, "output family processing order for use during forward backward algorithm").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(DOT_PROPERTIES, File.class, CommonFlags.FILE, "properties file containing overrides for GraphViz attributes").setCategory(CommonFlagCategories.REPORTING);
-
-    mFlags.checkAtMostOne(PRIMARY_IDS, MALE_IDS, FEMALE_IDS, PATERNAL_IDS, MATERNAL_IDS, FAMILIES_OUT, DOT_OUT, DUMP, ORDERING, FAMILY_FLAGS);
-  }
-
-  private static void writeIds(LineWriter w, String... genomes) throws IOException {
-    for (String genome : genomes) {
-      w.writeln(genome);
-    }
+    mFlags.setValidator(flags ->
+      mFlags.checkAtMostOne(FAMILIES_OUT, DOT_OUT, DUMP, FAMILY_FLAGS, ORDERING)
+        && (!mFlags.isAnySet(PRIMARY_IDS, MALE_IDS, FEMALE_IDS, MATERNAL_IDS, PATERNAL_IDS, FOUNDER_IDS) || mFlags.checkBanned(FAMILIES_OUT, DOT_OUT, ORDERING, FAMILY_FLAGS))
+    );
   }
 
   private Properties loadProperties() throws IOException {
@@ -130,23 +132,6 @@ public class PedStatsCli extends AbstractCli {
 
         if (mFlags.isSet(DOT_OUT)) {      // Output dotty stuff
           w.writeln(pedigree.toGraphViz(loadProperties(), (String) mFlags.getValue(DOT_OUT), mFlags.isSet(DOT_SIMPLE)));
-        } else if (mFlags.isSet(PRIMARY_IDS)) {
-          writeIds(w, pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree)));
-        } else if (mFlags.isSet(MALE_IDS)) {
-          writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE)));
-        } else if (mFlags.isSet(FEMALE_IDS)) {
-          writeIds(w, pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE)));
-        } else if (mFlags.isSet(MATERNAL_IDS)) {
-          final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
-            new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE));
-          writeIds(w, genomes);
-        } else if (mFlags.isSet(PATERNAL_IDS)) {
-          final String[] genomes = pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
-            new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE));
-          writeIds(w, genomes);
-        } else if (mFlags.isSet(FOUNDER_IDS)) {
-          final String[] genomes = pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false));
-          writeIds(w, genomes);
         } else if (mFlags.isSet(FAMILIES_OUT)) { // Output list of families identified in the ped file:
           final Set<Family> families = Family.getFamilies(pedigree, false, null);
           for (final Family f : families) {
@@ -194,6 +179,30 @@ public class PedStatsCli extends AbstractCli {
             }
             w.writeln("rtg family " + familycmd);
           }
+        } else if (mFlags.isAnySet(PRIMARY_IDS, MALE_IDS, FEMALE_IDS, MATERNAL_IDS, PATERNAL_IDS, FOUNDER_IDS)) {
+          final Collection<String> genomes = new TreeSet<>();
+          if (mFlags.isSet(PRIMARY_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.PrimaryGenomeFilter(pedigree))));
+          }
+          if (mFlags.isSet(MALE_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE))));
+          }
+          if (mFlags.isSet(FEMALE_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE))));
+          }
+          if (mFlags.isSet(MATERNAL_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
+              new GenomeRelationships.GenomeSexFilter(pedigree, Sex.FEMALE))));
+          }
+          if (mFlags.isSet(PATERNAL_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.HasRelationshipGenomeFilter(pedigree, Relationship.RelationshipType.PARENT_CHILD, true),
+            new GenomeRelationships.GenomeSexFilter(pedigree, Sex.MALE))));
+          }
+          if (mFlags.isSet(FOUNDER_IDS)) {
+            genomes.addAll(Arrays.asList(pedigree.genomes(new GenomeRelationships.FounderGenomeFilter(pedigree, false))));
+          }
+          final String delim = (String) mFlags.getValue(ID_DELIM);
+          w.writeln(StringUtils.join(StringUtils.removeBackslashEscapes(delim), genomes));
         } else { // Output summary information
           final TextTable table = new TextTable();
           table.setAlignment(TextTable.Align.LEFT);

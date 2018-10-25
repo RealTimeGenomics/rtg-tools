@@ -87,11 +87,17 @@ public class PedStatsCliTest extends AbstractCliTest {
     try (final TestDirectory dir = new TestDirectory("pedstats")) {
       final File relationFile = new File(dir, "octet.ped");
       FileUtils.copyResource(RESOURCE_DIR + "octet.ped", relationFile);
+      checkHandleFlagsErr("--families", "--dot=foo", relationFile.toString());
+      checkHandleFlagsErr("--families", "--male-ids", relationFile.toString());
 
       for (String arg : new String[]{"primary-ids", "male-ids", "female-ids", "paternal-ids", "maternal-ids", "founder-ids"}) {
         final String output = checkMainInitOk("--" + arg, relationFile.toString());
         mNano.check("pedstats-" + arg + ".txt", output);
       }
+      String output = checkMainInitOk("--primary-ids", "-d", ",", relationFile.toString());
+      mNano.check("pedstats-delim-c.txt", output);
+      output = checkMainInitOk("--primary-ids", "-d", "\\t", relationFile.toString());
+      mNano.check("pedstats-delim-tab.txt", output);
     }
   }
 
