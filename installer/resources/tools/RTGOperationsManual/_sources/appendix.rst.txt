@@ -351,7 +351,9 @@ column of the same name.
 
   CHROM; // "1"
   POS; // "11259340"
+  ID; // "."
   REF; // "G"
+  QUAL; // "."
 
 ALT, FILTER
 ```````````
@@ -378,8 +380,6 @@ declared in the header.
   INFO.DP; // "795"
   INFO.ABC; // "4,5"
 
-  INFO.DPR = "0.01"; // Will change the value of the DPR info field
-
 
 {SAMPLE\_NAME}.{FORMAT\_FIELD}
 ``````````````````````````````
@@ -387,23 +387,79 @@ declared in the header.
 The JavaScript String prototype has been extended to allow access to the
 format fields for each sample. The string representation of values in
 the sample column are accessible as properties on the string matching
-the sample name named after the ``FORMAT`` field ``ID`` These properties can
-be assigned in order to make modifications. This will be undefined for fields
-not declared in the header.
+the sample name named after the ``FORMAT`` field ``ID``.
 
 .. code-block:: text
 
   'NA12877'.GT; // "1/2"
   'NA12878'.GT; // "1/0"
+
+Note that these properties are only defined for fields that are declared
+in the VCF header (any that are not declared in the header will be
+undefined). See below for how to add new ``INFO`` or ``FORMAT`` field
+declarations.
+
+
+VCF record modification
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Most components of VCF records can be written or updated in a fairly
+natural manner by direct assignment in order to make modifications. For
+example:
+
+.. code-block:: text
+
+  ID = "rs23987382"; // Will change the ID value
+  QUAL = "50"; // Will change the QUAL value
+  FILTER = "FAIL"; // Will set the FILTER value
+  INFO.DPR = "0.01"; // Will change the value of the DPR info field
   'NA12877'.DP = "10"; // Will change the DP field of the NA12877 sample
+
+Other components of the VCF record (such as ``CHROM``, ``POS``, ``REF``,
+and ``ALT``) are considered immutable and can not currently be altered.
+
+Direct assignment to ``ID`` and ``FILTER`` fields accept either a string
+containing semicolon separated values, or a list of values. For example:
+
+.. code-block:: text
+
+    ID = 'rs23987382;COSM3805';
+    ID = ['rs23987382', 'COSM3805'];
+    FILTER = 'BAZ;BANG';
+    FILTER = ['BAZ', 'BANG'];
+
+
+Note that although the ``FILTER`` field returns an array when read, any
+changes made to this array directly are not reflected back into the VCF
+record.
+
+Adding a filter to existing filters is a common operation and can be
+accomplished by the above assignment methods, for example by adding a
+value to the existing list and then setting the result:
+
+.. code-block:: text
+
+    var f = FILTER;
+    f.push('BOING');
+    FILTER = f;
+
+However, since this is a little unwieldy, a convenience function called
+`add()` can be used (and may be chained):
+
+.. code-block:: text
+
+    FILTER.add('BOING');
+    FILTER.add(['BOING', 'DOING');
+    FILTER.add('BOING').add('DOING');
+
 
 VCF header modification
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Functions are provided that allow the addition of new ``INFO`` or ``FORMAT``
-fields to the header and records. It is recommended that the following
-functions only be used within the run-once portion of ``--javascript``.
-They may be called on every record, but this will be slow.
+Functions are provided that allow the addition of new ``FILTER``,
+``INFO`` and ``FORMAT`` fields to the header and records. It is
+recommended that the following functions only be used within the
+run-once portion of ``--javascript``.
 
 ensureFormatHeader(FORMAT\_HEADER\_STRING)
 ``````````````````````````````````````````
@@ -429,6 +485,17 @@ corresponding accessor methods for use in record processing.
   ensureInfoHeader('##INFO=<ID=CT,Number=1,Type=Integer,' +
     'Description="Coverage threshold that was applied">');
 
+ensureFilterHeader(FILTER\_HEADER\_STRING)
+``````````````````````````````````````````
+
+Add a new ``FILTER`` field to the VCF header if it is not already
+present. This will add an ``FILTER`` declaration line to the header.
+
+.. code-block:: text
+
+  ensureFilterHeader('##INFO=<ID=FAIL_VAL,' +
+    'Description="Failed validation">');
+
 Additional information and functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -449,6 +516,19 @@ Writes the provided string to standard output.
 .. code-block:: text
 
   print('The samples are: ' + SAMPLES);
+
+checkMinVersion(RTG_MINIMUM_VERSION)
+````````````````````````````````````
+
+Checks the version of RTG that the script is running under, and exits
+with an error message if the version of RTG does not meet the minimum
+required version. This is useful when distributing scripts that make use
+of features that are not present in earlier versions of RTG.
+
+.. code-block:: text
+
+  checkMinVersion('3.9.2');
+
 
 .. seealso::
   For javascript filtering usage and examples see :ref:`vcffilter`

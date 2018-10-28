@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.9</title>
+    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.10</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.9',
+        VERSION:     '3.10',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -48,7 +48,7 @@
         <li class="right" >
           <a href="overview.html" title="Overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -73,11 +73,12 @@
 <li><a class="reference internal" href="#simulation-commands">Simulation Commands</a><ul>
 <li><a class="reference internal" href="#genomesim">genomesim</a></li>
 <li><a class="reference internal" href="#cgsim">cgsim</a></li>
-<li><a class="reference internal" href="#denovosim">denovosim</a></li>
 <li><a class="reference internal" href="#readsim">readsim</a></li>
 <li><a class="reference internal" href="#popsim">popsim</a></li>
 <li><a class="reference internal" href="#samplesim">samplesim</a></li>
+<li><a class="reference internal" href="#denovosim">denovosim</a></li>
 <li><a class="reference internal" href="#childsim">childsim</a></li>
+<li><a class="reference internal" href="#pedsamplesim">pedsamplesim</a></li>
 <li><a class="reference internal" href="#samplereplay">samplereplay</a></li>
 </ul>
 </li>
@@ -1195,7 +1196,7 @@ need to be applied to the various input files. For example, for
 paired-end data, different trimming may need to be applied for the left
 read files compared to the right read files. In these cases,
 <code class="docutils literal"><span class="pre">fastqtrim</span></code> should be used to process the FASTQ files first.</p>
-<p>The <code class="docutils literal"><span class="pre">--end-trim-threshold</span></code> flag can be used to trim poor quality bases
+<p>The <code class="docutils literal"><span class="pre">--end-quality-threshold</span></code> flag can be used to trim poor quality bases
 from the ends of the input reads by inspecting base qualities from FASTQ
 input. If and only if the quality of the final base of the read is less
 than the threshold given, a new read length is found which maximizes the
@@ -1464,7 +1465,7 @@ unless an explicit randomization seed is specified via <code class="docutils lit
 <div class="section" id="formatting-with-paired-end-trimming-on-the-fly">
 <h4>Formatting with paired-end trimming on the fly<a class="headerlink" href="#formatting-with-paired-end-trimming-on-the-fly" title="Permalink to this headline">¶</a></h4>
 <p>Running custom filtering with <code class="docutils literal"><span class="pre">petrim</span></code> can be done in standard Unix
-sheels without incurring the use of additional disk space or unduly
+shells without incurring the use of additional disk space or unduly
 slowing down the formatting of reads. The following example demonstrates
 how to apply paired-end trimming while formatting to SDF:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg format -f fastq-interleaved -o S12_trimmed.sdf \
@@ -1791,112 +1792,6 @@ and must sum to one in the file.</p>
 <a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
-</div>
-</div>
-<div class="section" id="denovosim">
-<h3>denovosim<a class="headerlink" href="#denovosim" title="Permalink to this headline">¶</a></h3>
-<p><strong>Synopsis:</strong></p>
-<p>Use the <code class="docutils literal"><span class="pre">denovosim</span></code> command to generate a VCF containing a derived
-genotype containing <em>de novo</em> variants.</p>
-<p><strong>Syntax:</strong></p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim [OPTION]... -i FILE --original STRING -o FILE -t SDF -s STRING
-</pre></div>
-</div>
-<p><strong>Example:</strong></p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim -i sample.vcf --original personA -o 2samples.vcf \
-  -t HUMAN_reference -s personB
-</pre></div>
-</div>
-<p><strong>Parameters:</strong></p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="10%" />
-<col width="24%" />
-<col width="66%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
-<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
-<td>The input VCF containing parent variants.</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--original=STRING</span></code></td>
-<td>The name of the existing sample to use as the original genotype.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
-<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
-<td>The output VCF file name.</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--output-sdf=FILE</span></code></td>
-<td>Set to output an SDF of the genome generated.</td>
-</tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
-<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
-<td>The SDF containing the reference genome.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
-<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
-<td>The name for the new derived sample.</td>
-</tr>
-</tbody>
-</table>
-<table border="1" class="docutils">
-<colgroup>
-<col width="5%" />
-<col width="15%" />
-<col width="80%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head" colspan="3">Utility</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
-<td><code class="docutils literal"><span class="pre">--help</span></code></td>
-<td>Prints help on command-line flag usage.</td>
-</tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
-<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
-<td>Set this flag to create the VCF output file without compression.</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--num-mutations=INT</span></code></td>
-<td>Set the expected number of mutations per genome. (Default is 70).</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
-<td>The ploidy to use when the reference genome does not contain a reference text file. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
-<td>Set the seed for the random number generator.</td>
-</tr>
-<tr class="row-odd"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--show-mutations</span></code></td>
-<td>Set this flag to display information regarding de novo mutation points.</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Usage:</strong></p>
-<p>The <code class="docutils literal"><span class="pre">denovosim</span></code> command is used to simulate a derived genotype
-containing <em>de novo</em> variants from a VCF containing an existing
-genotype. The new output VCF will contain all the existing variants and
-samples with a new column for the new sample.</p>
-<p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
-derived genome which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
-simulate a read set for the new genome.</p>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
-<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
-<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
-<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
-<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
 </div>
 <div class="section" id="readsim">
@@ -2298,9 +2193,130 @@ simulated from population variants according to allele frequency.</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="6%" />
-<col width="13%" />
-<col width="82%" />
+<col width="7%" />
+<col width="21%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--allow-missing-af</span></code></td>
+<td>If set, treat variants without allele frequency annotation as uniformly likely.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
+<td>Ploidy to use. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for the random number generator.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--sex=SEX</span></code></td>
+<td>Sex of individual. Allowed values are [male, female, either] (Default is either)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">samplesim</span></code> command is used to simulate an individuals genotype
+information from a population variant frequency VCF generated by the
+<code class="docutils literal"><span class="pre">popsim</span></code> command or by previous <code class="docutils literal"><span class="pre">samplesim</span></code> or <code class="docutils literal"><span class="pre">childsim</span></code> commands. The
+new output VCF will contain all the existing variants and samples with a
+new column for the new sample. The genotype at each record of the VCF
+will be chosen randomly according to the allele frequency specified in
+the <code class="docutils literal"><span class="pre">AF</span></code> field.</p>
+<p>If input VCF records do not contain an <code class="docutils literal"><span class="pre">AF</span></code> annotation, by default any
+ALT allele in that record will not be selected and so the sample will be
+genotyped as 0/0. Alternatively for simple simulations the
+<code class="docutils literal"><span class="pre">--allow-missing-af</span></code> flag will treat each allele in such records as
+being equally likely (i.e.: effectively equivalent to <code class="docutils literal"><span class="pre">AF=0.5</span></code> for a
+biallelic variant, <code class="docutils literal"><span class="pre">AF=0.33,0.33</span></code> for a triallelic variant, etc).</p>
+<p>The ploidy for each genotype is automatically determined according to
+the ploidy of that chromosome for the specified sex of the individual,
+as defined in the reference genome <code class="docutils literal"><span class="pre">reference.txt</span></code> file. For more
+information see <a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>. If the reference SDF
+does not contain chromosome configuration information, a default ploidy
+can be specified using the <code class="docutils literal"><span class="pre">--ploidy</span></code> flag.</p>
+<p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
+individuals genotype which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
+simulate a read set for the individual.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
+<a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="denovosim">
+<h3>denovosim<a class="headerlink" href="#denovosim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Use the <code class="docutils literal"><span class="pre">denovosim</span></code> command to generate a VCF containing a derived
+genotype containing <em>de novo</em> variants.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim [OPTION]... -i FILE --original STRING -o FILE -t SDF -s STRING
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg denovosim -i sample.vcf --original personA -o 2samples.vcf \
+  -t HUMAN_reference -s personB
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="24%" />
+<col width="66%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>The input VCF containing parent variants.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--original=STRING</span></code></td>
+<td>The name of the existing sample to use as the original genotype.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=FILE</span></code></td>
+<td>The output VCF file name.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--output-sdf=FILE</span></code></td>
+<td>Set to output an SDF of the genome generated.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>The SDF containing the reference genome.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-s</span></code></td>
+<td><code class="docutils literal"><span class="pre">--sample=STRING</span></code></td>
+<td>The name for the new derived sample.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="15%" />
+<col width="80%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
@@ -2316,40 +2332,51 @@ simulated from population variants according to allele frequency.</p>
 <td>Set this flag to create the VCF output file without compression.</td>
 </tr>
 <tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--num-mutations=INT</span></code></td>
+<td>Set the expected number of de novo mutations per genome (Default is 70).</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
 <td>The ploidy to use when the reference genome does not contain a reference text file. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
 <td>Set the seed for the random number generator.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--sex=SEX</span></code></td>
-<td>Specifies the sex of the individual. Allowed values are [male, female, either] (Default is either).</td>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--show-mutations</span></code></td>
+<td>Set this flag to display information regarding de novo mutation points.</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>The <code class="docutils literal"><span class="pre">samplesim</span></code> command is used to simulate an individuals genotype
-information from a population variant frequency VCF generated by the
-<code class="docutils literal"><span class="pre">popsim</span></code> command or by previous <code class="docutils literal"><span class="pre">samplesim</span></code> or <code class="docutils literal"><span class="pre">childsim</span></code> commands. The
-new output VCF will contain all the existing variants and samples with a
-new column for the new sample. The genotype at each record of the VCF
-will be chosen randomly according to the allele frequency specified in
-the <code class="docutils literal"><span class="pre">AF</span></code> field.</p>
-<p>The ploidy for each genotype is generated according to the ploidy of
-that chromosome for the specified sex of the individual, as defined in
-the reference genome <code class="docutils literal"><span class="pre">reference.txt</span></code> file. For more information see
-<a class="reference internal" href="appendix.html#rtg-reference-file-format"><span class="std std-ref">RTG reference file format</span></a>.</p>
+<p>The <code class="docutils literal"><span class="pre">denovosim</span></code> command is used to simulate a derived genotype
+containing <em>de novo</em> variants from a VCF containing an existing
+genotype.</p>
+<p>The output VCF will contain all the existing variants and samples, along
+with additional <em>de novo</em> variants.  If the original and derived sample
+names are different, the output will contain a new column for the
+mutated sample. If the original and derived sample names are the same,
+the sample in the output VCF is updated rather than creating an entirely
+new sample column. When a sample receives a <em>de novo</em> mutation, the
+sample <code class="docutils literal"><span class="pre">DN</span></code> field is set to &#8220;Y&#8221;.</p>
+<p>If <em>de novo</em> variants were introduced without regard to neighboring
+variants, a situation could arise where it is not possible to
+unambiguously determine the haplotype of the simulated sample. To
+prevent this, <code class="docutils literal"><span class="pre">denovosim</span></code> will not output a <em>de novo</em> variant that
+overlaps existing variants. Since <code class="docutils literal"><span class="pre">denovosim</span></code> chooses candidate <em>de
+novo</em> locations before reading the input VCF, this occasionally mandates
+skipping a candidate <em>de novo</em> so the target number of mutations may not
+always be reached.</p>
 <p>The <code class="docutils literal"><span class="pre">--output-sdf</span></code> flag can be used to optionally generate an SDF of the
-individuals genotype which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
-simulate a read set for the individual.</p>
+derived genome which can then be used by the <code class="docutils literal"><span class="pre">readsim</span></code> command to
+simulate a read set for the new genome.</p>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a>,
 <a class="reference internal" href="#genomesim"><span class="std std-ref">genomesim</span></a>,
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
-<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
 </div>
@@ -2413,25 +2440,25 @@ simulated as a child of two parents.</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="7%" />
-<col width="24%" />
-<col width="69%" />
+<col width="25%" />
+<col width="68%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Utility</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--extra-crossovers=FLOAT</span></code></td>
+<td>Probability of extra crossovers per chromosome (Default is 0.01)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
 <td><code class="docutils literal"><span class="pre">--help</span></code></td>
 <td>Print help on command-line flag usage.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
 <td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
 <td>Do not gzip the output.</td>
-</tr>
-<tr class="row-even"><td>&#160;</td>
-<td><code class="docutils literal"><span class="pre">--num-crossovers=FLOAT</span></code></td>
-<td>Likelihood of extra crossovers per chromosome (Default is 0.01)</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
@@ -2473,6 +2500,138 @@ simulate a read set for the child.</p>
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
+</div>
+</div>
+<div class="section" id="pedsamplesim">
+<h3>pedsamplesim<a class="headerlink" href="#pedsamplesim" title="Permalink to this headline">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Generates simulated genotypes for all members of a
+pedigree. <code class="docutils literal"><span class="pre">pedsamplesim</span></code> automatically simulates founder individuals,
+inheritance by children, and de novo mutations.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg pedsamplesim [OPTION]... -i FILE -o DIR -p FILE -t SDF
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg pedsamplesim -t reference.sdf -p family.ped -i popvars.vcf \
+  -o family_sim --remove-unused
+</pre></div>
+</div>
+<p><strong>Parameters:</strong></p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="25%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">File Input/Output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-i</span></code></td>
+<td><code class="docutils literal"><span class="pre">--input=FILE</span></code></td>
+<td>Input VCF containing parent variants.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-o</span></code></td>
+<td><code class="docutils literal"><span class="pre">--output=DIR</span></code></td>
+<td>Directory for output.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--output-sdf</span></code></td>
+<td>If set, output an SDF for the genome of each simulated sample.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-p</span></code></td>
+<td><code class="docutils literal"><span class="pre">--pedigree=FILE</span></code></td>
+<td>Genome relationships PED file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-t</span></code></td>
+<td><code class="docutils literal"><span class="pre">--reference=SDF</span></code></td>
+<td>SDF containing the reference genome.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils">
+<colgroup>
+<col width="7%" />
+<col width="25%" />
+<col width="68%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head" colspan="3">Utility</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--extra-crossovers=FLOAT</span></code></td>
+<td>Probability of extra crossovers per chromosome (Default is 0.01)</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">-h</span></code></td>
+<td><code class="docutils literal"><span class="pre">--help</span></code></td>
+<td>Print help on command-line flag usage.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-Z</span></code></td>
+<td><code class="docutils literal"><span class="pre">--no-gzip</span></code></td>
+<td>Do not gzip the output.</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--num-mutations=INT</span></code></td>
+<td>Expected number of mutations per genome (Default is 70)</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--ploidy=STRING</span></code></td>
+<td>Ploidy to use. Allowed values are [auto, diploid, haploid] (Default is auto)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--remove-unused</span></code></td>
+<td>If set, output only variants used by at least one sample.</td>
+</tr>
+<tr class="row-even"><td>&#160;</td>
+<td><code class="docutils literal"><span class="pre">--seed=INT</span></code></td>
+<td>Seed for the random number generator.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal"><span class="pre">pedsamplesim</span></code> uses the methods of <code class="docutils literal"><span class="pre">samplesim</span></code>, <code class="docutils literal"><span class="pre">denovosim</span></code>,
+and <code class="docutils literal"><span class="pre">childsim</span></code> to greatly ease the simulation of multiple samples. The
+input VCF should contain standard allele frequency INFO annotations that
+will be used to simulate genotypes for any sample identified as a
+founder. Any samples present in the pedigree that are already present in
+the input VCF will not be regenerated. To simulate genotypes for a
+subset of the members of the pedigree, use <code class="docutils literal"><span class="pre">pedfilter</span></code> to create a
+filtered pedigree file that includes only the subset required.</p>
+<p>The supplied pedigree file is first examined to identify any individuals
+that cannot be simulated according to inheritance from other samples in
+the pedigree. Note that simulation according to inheritance requires
+both parents to be present in the pedigree.  These samples in the
+pedigree are treated as founder individuals.</p>
+<p>Founder individuals are simulated using <code class="docutils literal"><span class="pre">samplesim</span></code>, where the
+genotypes are chosen according to the allele frequency annotation in the
+input VCF.</p>
+<p>All newly generated samples may have <em>de novo</em> mutations introduced
+according to the <code class="docutils literal"><span class="pre">--num-mutations</span></code> setting. As with the <code class="docutils literal"><span class="pre">denovosim</span></code>
+command, any <em>de novo</em> mutations introduced in a sample will be
+genotyped as homozygous reference in other pre-existing samples, and
+introduced variants will not overlap any pre-existing variant loci.</p>
+<p>Samples that can be simulated according to Mendelian inheritance are
+then generated, using <code class="docutils literal"><span class="pre">childsim</span></code>. As expected, as well as inheriting
+<em>de novo</em> variants from parents, each child may obtain new <em>de novo</em>
+mutations of their own.</p>
+<p>If the simulated samples will be used for subsequent simulated
+sequencing, such as via <code class="docutils literal"><span class="pre">readsim</span></code>, it is possible to automatically
+output an SDF containing the simulated genome for each sample by
+specifying the <code class="docutils literal"><span class="pre">--output-sdf</span></code> option, obviating the need to separately
+use <code class="docutils literal"><span class="pre">samplereplay</span></code>.</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pedfilter"><span class="std std-ref">pedfilter</span></a>,
+<a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
+<a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
+<a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
+<a class="reference internal" href="#denovosim"><span class="std std-ref">denovosim</span></a>,
+<a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a>,
+<a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a></p>
 </div>
 </div>
 <div class="section" id="samplereplay">
@@ -4318,8 +4477,8 @@ as a VCF <code class="docutils literal"><span class="pre">INFO</span></code> sub
 <tbody valign="top">
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-A</span></code></td>
 <td><code class="docutils literal"><span class="pre">--annotation=STRING</span></code></td>
-<td>Add computed annotation to VCF records. Allowed values are [AC, AN, EP, GQD, IC, LAL, MEANQAD, NAA, PD, QA, QD, RA, SCONT, VAF, ZY]. May be
-specified 0 or more times, or as a comma separated list.</td>
+<td>Add computed annotation to VCF records. Allowed values are [AC, AN, EP, GQD, IC, LAL, MEANQAD, NAA, PD, QA, QD, RA, SCONT, VAF, VAF1, ZY]. May be specified 0 or
+more times, or as a comma separated list.</td>
 </tr>
 <tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--bed-ids=FILE</span></code></td>
@@ -4385,8 +4544,10 @@ specified 0 or more times, or as a comma separated list.</td>
 <p>A common use case is to add annotations to only those variants that fall
 within ranges specified in a BED or VCF file, supplied via <code class="docutils literal"><span class="pre">--bed-ids</span></code>
 or <code class="docutils literal"><span class="pre">--vcf-ids</span></code> respectively.  The annotations from the BED file are
-added as an <code class="docutils literal"><span class="pre">INFO</span></code> field in the output VCF file. It can also be used to
-compute or fill in certain additional annotations from the existing content.</p>
+added as an <code class="docutils literal"><span class="pre">INFO</span></code> field in the output VCF file. It can also be used
+to compute or fill in certain additional annotations from the existing
+content. Note that this annotation method is solely based on the
+position and span of the variant, ignoring actual alleles and genotypes.</p>
 <p>If the <code class="docutils literal"><span class="pre">--bed-ids</span></code> flag is used, instead of adding the annotation to the
 <code class="docutils literal"><span class="pre">INFO</span></code> fields, it is added to the <code class="docutils literal"><span class="pre">ID</span></code> column of the VCF file instead.
 If the <code class="docutils literal"><span class="pre">--vcf-ids</span></code> flag is used, the <code class="docutils literal"><span class="pre">ID</span></code> column of the input VCF file
@@ -4821,7 +4982,8 @@ multi-sample VCF files)</td>
 </tr>
 <tr class="row-even"><td><code class="docutils literal"><span class="pre">-f</span></code></td>
 <td><code class="docutils literal"><span class="pre">--vcf-score-field=STRING</span></code></td>
-<td>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal"><span class="pre">QUAL</span></code> or <code class="docutils literal"><span class="pre">INFO.&lt;name&gt;</span></code> to select the named VCF INFO field (Default is GQ)</td>
+<td>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal"><span class="pre">QUAL</span></code>, <code class="docutils literal"><span class="pre">INFO.&lt;name&gt;</span></code> or <code class="docutils literal"><span class="pre">FORMAT.&lt;name&gt;</span></code> to select the named VCF FORMAT or INFO
+field (Default is GQ)</td>
 </tr>
 </tbody>
 </table>
@@ -5637,48 +5799,52 @@ command-line such as:</p>
 </table>
 <table border="1" class="docutils">
 <colgroup>
-<col width="5%" />
-<col width="11%" />
-<col width="84%" />
+<col width="4%" />
+<col width="13%" />
+<col width="82%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head" colspan="3">Reporting</th>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">-d</span></code></td>
+<td><code class="docutils literal"><span class="pre">--delimiter=STRING</span></code></td>
+<td>Output id lists using this separator (Default is \n)</td>
+</tr>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--dot=STRING</span></code></td>
 <td>Output pedigree in GraphViz format, using the supplied text as a title.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--families</span></code></td>
 <td>Output information about family structures.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--female-ids</span></code></td>
 <td>Output ids of all females.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--founder-ids</span></code></td>
 <td>Output ids of all founders.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--male-ids</span></code></td>
 <td>Output ids of all males.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--maternal-ids</span></code></td>
 <td>Output ids of maternal individuals.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--paternal-ids</span></code></td>
 <td>Output ids of paternal individuals.</td>
 </tr>
-<tr class="row-odd"><td>&#160;</td>
+<tr class="row-even"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--primary-ids</span></code></td>
 <td>Output ids of all primary individuals.</td>
 </tr>
-<tr class="row-even"><td>&#160;</td>
+<tr class="row-odd"><td>&#160;</td>
 <td><code class="docutils literal"><span class="pre">--simple-dot</span></code></td>
 <td>When outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees.</td>
 </tr>
@@ -5703,9 +5869,20 @@ command-line such as:</p>
 </table>
 <p><strong>Usage:</strong></p>
 <p>This command is used to show pedigree summary statistics or select
-groups of individual Ids. In addition, it is possible to generate a
-simple pedigree visualization, using GraphViz, which can be saved to PNG
-or PDF.  For example, with the following <code class="docutils literal"><span class="pre">chinese-trio.ped</span></code>:</p>
+groups of individual IDs.</p>
+<p>When using <code class="docutils literal"><span class="pre">pedstats</span></code> to output a list of sample IDs, the default is
+to print one ID per line. Depending on subsequent use, it may be
+convenient to use a different separator between output IDs. For example,
+with comma separated output it is possible to directly use the results
+as an argument to <code class="docutils literal"><span class="pre">vcfsubset</span></code>:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg vcfsubset -i pedigree-calls.vcf.gz -o family1.vcf.gz \
+    --keep-samples &lt;(rtg pedstats -d , --founder-ids ceph_pedigree.ped)
+</pre></div>
+</div>
+<p>In addition, <code class="docutils literal"><span class="pre">pedstats</span></code> can be used to generate a simple pedigree
+visualization, using the well-known GraphViz graphics drawing package,
+which can be saved to PNG or PDF.  For example, with the following
+<code class="docutils literal"><span class="pre">chinese-trio.ped</span></code>:</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>#PED format pedigree
 #
 #fam-id/ind-id/pat-id/mat-id: 0=unknown
@@ -5736,11 +5913,18 @@ CEPH-1463 pedigree:</p>
 </div>
 <p>Would produce the following pedigree directly from the VCF:</p>
 <img alt="_images/ceph-1463.png" src="_images/ceph-1463.png" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">GraphViz is provided directly via many operating system
+package managers, and can also be downloaded from their web site:
+<a class="reference external" href="https://www.graphviz.org/">https://www.graphviz.org/</a></p>
+</div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#family"><span class="std std-ref">family</span></a>,
 <a class="reference internal" href="#population"><span class="std std-ref">population</span></a>,
-<a class="reference internal" href="#pedfilter"><span class="std std-ref">pedfilter</span></a></p>
+<a class="reference internal" href="#pedfilter"><span class="std std-ref">pedfilter</span></a>,
+<a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
 </div>
 <div class="section" id="rocplot">
@@ -5975,25 +6159,27 @@ curves&#8221;, Davis, J., (2006),
 <p><strong>Example:</strong></p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg version
 
-Product: RTG Core 3.5
-Core Version: 4586490 2015-12-04
-RAM: 3.5GB of 3.8GB RAM can be used by RTG (91%)
+Product: RTG Core 3.9
+Core Version: 718f8317b7 (2018-05-29)
+RAM: 25.0GB of 31.3GB RAM can be used by rtg (79%)
 CPU: Defaulting to 4 of 4 available processors (100%)
-License: Expires on 2016-03-30
+JVM: Java HotSpot(TM) 64-Bit Server VM 1.8.0_161
+License: Expires on 2019-05-20
 Contact: support@realtimegenomics.com
 
 Patents / Patents pending:
-US: 7,640,256, 13/129,329, 13/681,046, 13/681,215, 13/848,653,
-13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810
+US: 7,640,256, 9,165,253, 13/129,329, 13/681,046, 13/681,215, 13/848,653, 13/925,704, 14/015,295, 13/971,654, 13/971,630, 14/564,810
 UK: 1222923.3, 1222921.7, 1304502.6, 1311209.9, 1314888.7, 1314908.3
 New Zealand: 626777, 626783, 615491, 614897, 614560
 Australia: 2005255348, Singapore: 128254
 
-Citation:
+Citation (variant calling):
+John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, Sean A. Irvine, Alan Jackson, Richard Littin, Sahar Nohzadeh-Malakshah, Mehul Rathod, David Ware, Len Trigg, and Francisco M. De La Vega. &quot;Joint Variant and De Novo Mutation Identification on Pedigrees from High-Throughput Sequencing Data.&quot; Journal of Computational Biology. June 2014, 21(6): 405-419. doi:10.1089/cmb.2014.0029.
 
-John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, Sean A. Irvine, Alan Jackson, Richard Littin, Sahar Nohzadeh-Malakshah, Mehul Rathod, David Ware, Len Trigg, and Francisco M. De La Vega. &quot;Joint Variant and De Novo Mutation Identification on Pedigrees from High-Throughput Sequencing Data.&quot; Journal of Computational Biology. June 2014, 21(6): 405-419.  doi:10.1089/cmb.2014.0029.
+Citation (vcfeval):
+John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, Sean A. Irvine, Alan Jackson, Richard Littin, Mehul Rathod, David Ware, Justin M. Zook, Len Trigg, and Francisco M. De La Vega. &quot;Comparing Variant Call Files for Performance Benchmarking of Next-Generation Sequencing Variant Calling Pipelines.&quot; bioRxiv, 2015. doi:10.1101/023754.
 
-(c) Real Time Genomics, 2014
+(c) Real Time Genomics, 2017
 </pre></div>
 </div>
 <p><strong>Parameters:</strong></p>
@@ -6079,7 +6265,7 @@ licensed status, and command release level.</p>
         <li class="right" >
           <a href="overview.html" title="Overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

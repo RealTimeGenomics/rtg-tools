@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Appendix &#8212; RTG Tools Operations Manual v3.9</title>
+    <title>Appendix &#8212; RTG Tools Operations Manual v3.10</title>
     
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '3.9',
+        VERSION:     '3.10',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -44,7 +44,7 @@
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -66,14 +66,17 @@
 <li><a class="reference internal" href="#sample-name-format-field">{SAMPLE_NAME}.{FORMAT_FIELD}</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#vcf-record-modification">VCF record modification</a></li>
 <li><a class="reference internal" href="#vcf-header-modification">VCF header modification</a><ul>
 <li><a class="reference internal" href="#ensureformatheader-format-header-string">ensureFormatHeader(FORMAT_HEADER_STRING)</a></li>
 <li><a class="reference internal" href="#ensureinfoheader-info-header-string">ensureInfoHeader(INFO_HEADER_STRING)</a></li>
+<li><a class="reference internal" href="#ensurefilterheader-filter-header-string">ensureFilterHeader(FILTER_HEADER_STRING)</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#additional-information-and-functions">Additional information and functions</a><ul>
 <li><a class="reference internal" href="#samples">SAMPLES</a></li>
 <li><a class="reference internal" href="#print-string">print({STRING})</a></li>
+<li><a class="reference internal" href="#checkminversion-rtg-minimum-version">checkMinVersion(RTG_MINIMUM_VERSION)</a></li>
 </ul>
 </li>
 </ul>
@@ -411,7 +414,9 @@ variables will provide access to the String representation of the VCF
 column of the same name.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>CHROM; // &quot;1&quot;
 POS; // &quot;11259340&quot;
+ID; // &quot;.&quot;
 REF; // &quot;G&quot;
+QUAL; // &quot;.&quot;
 </pre></div>
 </div>
 </div>
@@ -433,8 +438,6 @@ properties will update the VCF record. This will be undefined for fields not
 declared in the header.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>INFO.DP; // &quot;795&quot;
 INFO.ABC; // &quot;4,5&quot;
-
-INFO.DPR = &quot;0.01&quot;; // Will change the value of the DPR info field
 </pre></div>
 </div>
 </div>
@@ -443,22 +446,64 @@ INFO.DPR = &quot;0.01&quot;; // Will change the value of the DPR info field
 <p>The JavaScript String prototype has been extended to allow access to the
 format fields for each sample. The string representation of values in
 the sample column are accessible as properties on the string matching
-the sample name named after the <code class="docutils literal"><span class="pre">FORMAT</span></code> field <code class="docutils literal"><span class="pre">ID</span></code> These properties can
-be assigned in order to make modifications. This will be undefined for fields
-not declared in the header.</p>
+the sample name named after the <code class="docutils literal"><span class="pre">FORMAT</span></code> field <code class="docutils literal"><span class="pre">ID</span></code>.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>&#39;NA12877&#39;.GT; // &quot;1/2&quot;
 &#39;NA12878&#39;.GT; // &quot;1/0&quot;
+</pre></div>
+</div>
+<p>Note that these properties are only defined for fields that are declared
+in the VCF header (any that are not declared in the header will be
+undefined). See below for how to add new <code class="docutils literal"><span class="pre">INFO</span></code> or <code class="docutils literal"><span class="pre">FORMAT</span></code> field
+declarations.</p>
+</div>
+</div>
+<div class="section" id="vcf-record-modification">
+<h3>VCF record modification<a class="headerlink" href="#vcf-record-modification" title="Permalink to this headline">¶</a></h3>
+<p>Most components of VCF records can be written or updated in a fairly
+natural manner by direct assignment in order to make modifications. For
+example:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>ID = &quot;rs23987382&quot;; // Will change the ID value
+QUAL = &quot;50&quot;; // Will change the QUAL value
+FILTER = &quot;FAIL&quot;; // Will set the FILTER value
+INFO.DPR = &quot;0.01&quot;; // Will change the value of the DPR info field
 &#39;NA12877&#39;.DP = &quot;10&quot;; // Will change the DP field of the NA12877 sample
 </pre></div>
 </div>
+<p>Other components of the VCF record (such as <code class="docutils literal"><span class="pre">CHROM</span></code>, <code class="docutils literal"><span class="pre">POS</span></code>, <code class="docutils literal"><span class="pre">REF</span></code>,
+and <code class="docutils literal"><span class="pre">ALT</span></code>) are considered immutable and can not currently be altered.</p>
+<p>Direct assignment to <code class="docutils literal"><span class="pre">ID</span></code> and <code class="docutils literal"><span class="pre">FILTER</span></code> fields accept either a string
+containing semicolon separated values, or a list of values. For example:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>ID = &#39;rs23987382;COSM3805&#39;;
+ID = [&#39;rs23987382&#39;, &#39;COSM3805&#39;];
+FILTER = &#39;BAZ;BANG&#39;;
+FILTER = [&#39;BAZ&#39;, &#39;BANG&#39;];
+</pre></div>
+</div>
+<p>Note that although the <code class="docutils literal"><span class="pre">FILTER</span></code> field returns an array when read, any
+changes made to this array directly are not reflected back into the VCF
+record.</p>
+<p>Adding a filter to existing filters is a common operation and can be
+accomplished by the above assignment methods, for example by adding a
+value to the existing list and then setting the result:</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>var f = FILTER;
+f.push(&#39;BOING&#39;);
+FILTER = f;
+</pre></div>
+</div>
+<p>However, since this is a little unwieldy, a convenience function called
+<cite>add()</cite> can be used (and may be chained):</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>FILTER.add(&#39;BOING&#39;);
+FILTER.add([&#39;BOING&#39;, &#39;DOING&#39;);
+FILTER.add(&#39;BOING&#39;).add(&#39;DOING&#39;);
+</pre></div>
 </div>
 </div>
 <div class="section" id="vcf-header-modification">
 <h3>VCF header modification<a class="headerlink" href="#vcf-header-modification" title="Permalink to this headline">¶</a></h3>
-<p>Functions are provided that allow the addition of new <code class="docutils literal"><span class="pre">INFO</span></code> or <code class="docutils literal"><span class="pre">FORMAT</span></code>
-fields to the header and records. It is recommended that the following
-functions only be used within the run-once portion of <code class="docutils literal"><span class="pre">--javascript</span></code>.
-They may be called on every record, but this will be slow.</p>
+<p>Functions are provided that allow the addition of new <code class="docutils literal"><span class="pre">FILTER</span></code>,
+<code class="docutils literal"><span class="pre">INFO</span></code> and <code class="docutils literal"><span class="pre">FORMAT</span></code> fields to the header and records. It is
+recommended that the following functions only be used within the
+run-once portion of <code class="docutils literal"><span class="pre">--javascript</span></code>.</p>
 <div class="section" id="ensureformatheader-format-header-string">
 <h4>ensureFormatHeader(FORMAT_HEADER_STRING)<a class="headerlink" href="#ensureformatheader-format-header-string" title="Permalink to this headline">¶</a></h4>
 <p>Add a new <code class="docutils literal"><span class="pre">FORMAT</span></code> field to the VCF if it is not already present. This
@@ -479,6 +524,15 @@ corresponding accessor methods for use in record processing.</p>
 </pre></div>
 </div>
 </div>
+<div class="section" id="ensurefilterheader-filter-header-string">
+<h4>ensureFilterHeader(FILTER_HEADER_STRING)<a class="headerlink" href="#ensurefilterheader-filter-header-string" title="Permalink to this headline">¶</a></h4>
+<p>Add a new <code class="docutils literal"><span class="pre">FILTER</span></code> field to the VCF header if it is not already
+present. This will add an <code class="docutils literal"><span class="pre">FILTER</span></code> declaration line to the header.</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>ensureFilterHeader(&#39;##INFO=&lt;ID=FAIL_VAL,&#39; +
+  &#39;Description=&quot;Failed validation&quot;&gt;&#39;);
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="additional-information-and-functions">
 <h3>Additional information and functions<a class="headerlink" href="#additional-information-and-functions" title="Permalink to this headline">¶</a></h3>
@@ -493,6 +547,16 @@ corresponding accessor methods for use in record processing.</p>
 <h4>print({STRING})<a class="headerlink" href="#print-string" title="Permalink to this headline">¶</a></h4>
 <p>Writes the provided string to standard output.</p>
 <div class="highlight-text"><div class="highlight"><pre><span></span>print(&#39;The samples are: &#39; + SAMPLES);
+</pre></div>
+</div>
+</div>
+<div class="section" id="checkminversion-rtg-minimum-version">
+<h4>checkMinVersion(RTG_MINIMUM_VERSION)<a class="headerlink" href="#checkminversion-rtg-minimum-version" title="Permalink to this headline">¶</a></h4>
+<p>Checks the version of RTG that the script is running under, and exits
+with an error message if the version of RTG does not meet the minimum
+required version. This is useful when distributing scripts that make use
+of features that are not present in earlier versions of RTG.</p>
+<div class="highlight-text"><div class="highlight"><pre><span></span>checkMinVersion(&#39;3.9.2&#39;);
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -813,7 +877,7 @@ referenced in this document are the property of their respective owners.</p>
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.9</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
