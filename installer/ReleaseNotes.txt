@@ -31,7 +31,7 @@ There have been many other minor improvements and feature
 additions. Detailed changes are listed below by area.  For more
 information on new features, see the RTG Operations Manual.
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * petrim: Now outputs read length distribution statistics.
 
@@ -253,7 +253,7 @@ There have been many other minor improvements and feature
 additions. Detailed changes are listed below by area.  For more
 information on new features, see the RTG Operations Manual.
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * format: In addition to minimum and maximum length of input and output
   sequences, now outputs the mean length of the sequences.
@@ -634,7 +634,7 @@ Major features of this release:
 Detailed changes are listed below by area.  For more information on
 new features, see the RTG Operations Manual.
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * fastqtrim: This new command allows trimming of FASTQ files with much
   more flexibility and control than is available directly from
@@ -901,7 +901,7 @@ installed.
 Detailed changes are listed below by area.  For more information on
 new features, see the RTG Operations Manual.
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * format: Automatically installs reference genome configuration
   information when a recognized reference genome is being formatted to
@@ -1182,7 +1182,7 @@ fully, as some command-line flags have changed, so updates to your
 pipeline scripts may be required.  For more information on new
 features, see the RTG Operations Manual.
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * cg2sdf: Add support for formatting CGI TSV reads files containing
   their version 2 reads.  These reads are typically represented as 30
@@ -2047,7 +2047,7 @@ fully, as some command-line flags have changed, so updates to your
 pipeline scripts may be required.
 
 
-## Basic Formatting and Mapping
+### Basic Formatting and Mapping
 
 * cg2sdf: New flag --sam-rg allows the specification of a SAM read
   group to be stored in the resulting SDF.  Note that this means the
