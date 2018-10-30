@@ -135,6 +135,14 @@ public class SplitAlleles {
 
     final Partition partition = new Partition();
 
+    // If any of the alignments failed (as evidenced by an empty CIGAR), then return
+    // an empty partition as an indication that partitioning was not possible or too hard.
+    for (int k = 0; k < sequences.length; ++k) {
+      if (expandedCigars[k].isEmpty() && sequences[k].length > 0) {
+        return partition;
+      }
+    }
+
     // Current position in the actions array for each alternate allele
     final int[] actPos = new int[expandedCigars.length];
     // Current position in the allele for each alternate allele

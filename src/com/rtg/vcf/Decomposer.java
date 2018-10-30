@@ -154,7 +154,10 @@ class Decomposer {
       result = new SplitAlleles(rec.getRefCall(), rec.getAltCalls());
     }
     final Partition partition = result.partition();
-    assert partition.size() > 0;
+    if (partition.isEmpty()) {
+      // If partitioning failed, then simply return the original record
+      return Collections.singletonList(rec);
+    }
     Partition split = Partition.removeAllRef(partition);
     if (mBreakMnps) {
       split = Partition.breakMnps(split);
