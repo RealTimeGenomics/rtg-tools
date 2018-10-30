@@ -500,6 +500,10 @@ public class GotohEditDistance implements UnidirectionalEditDistance {
       }
       if (minCost == diagCost && refPos > 0 && mustIndel == 0) {
         final int realReadPos = readPos - 1 + mReadStartPos;
+        if (realReadPos < 0) {
+          failure();
+          return false;
+        }
         if (0 <= realRefPos && realRefPos < template.length && realReadPos < read.length && isSame(read[realReadPos], template[realRefPos])) {
           command = ActionsHelper.SAME;
         } else {

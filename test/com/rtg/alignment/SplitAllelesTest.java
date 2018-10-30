@@ -33,6 +33,9 @@ package com.rtg.alignment;
 import java.util.Arrays;
 import java.util.List;
 
+import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.Diagnostic;
+
 import junit.framework.TestCase;
 
 /**
@@ -173,6 +176,19 @@ public class SplitAllelesTest extends TestCase {
                + "3 [T, T, T]\n"
                + "4 [, , CC]\n"
                + "4 [CTGTGT, CTGTGT, CTGTGT]\n" , toString(sa.partition()));
+  }
+
+  public void testBug1665StupidlyLongInsert() {
+    Diagnostic.setLogStream();
+    final SplitAlleles sa = new SplitAlleles("C", StringUtils.repeat("A", 100000));
+    assertEquals("", toString(sa.partition()));
+  }
+
+  public void testBug1665StupidlyLongDelete() {
+    Diagnostic.setLogStream();
+    // Apparently need a lot to make the deletion case fail, 100000 is not enough
+    final SplitAlleles sa = new SplitAlleles(StringUtils.repeat("A", 1000000), "C");
+    assertEquals("", toString(sa.partition()));
   }
 
 }
