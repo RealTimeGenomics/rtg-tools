@@ -32,7 +32,7 @@ package com.rtg.reader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,16 +44,20 @@ import com.rtg.util.diagnostic.Diagnostic;
  */
 public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
 
+  private static final byte[] EMPTY = {};
+
+  private final boolean mKeepSingletons;
   private final Map<String, SamSequence> mRecordMap;
   private long mDuplicates = 0;
 
-  MappedSamBamSequenceDataSource(FileStreamIterator inputs, boolean paired, boolean flattenPaired, SamFilter filter) {
+  MappedSamBamSequenceDataSource(FileStreamIterator inputs, boolean paired, boolean flattenPaired, boolean keepSingletons, SamFilter filter) {
     super(inputs, paired, flattenPaired, filter);
     if (paired) {
-      mRecordMap = new HashMap<>();
+      mRecordMap = new LinkedHashMap<>();
     } else {
       mRecordMap = null;
     }
+    mKeepSingletons = keepSingletons;
   }
 
   /**
@@ -61,11 +65,12 @@ public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
    * @param files list of the SAM or BAM file to use as a sequence data source
    * @param paired true if input will be paired, false otherwise
    * @param flattenPaired if <code>paired</code> is false then this will load both arms into a single SDF
+   * @param keepSingletons if true, then arms without a mate will be output with an empty mate, otherwise such singletons will be dropped
    * @param filter this filter will be applied to the sam records
    * @return SamBamSequenceDataSource the sequence data source for the inputs
    */
-  public static MappedSamBamSequenceDataSource fromInputFiles(List<File> files, boolean paired, boolean flattenPaired, SamFilter filter) {
-    return new MappedSamBamSequenceDataSource(new FileStreamIterator(files), paired, flattenPaired, filter);
+  public static MappedSamBamSequenceDataSource fromInputFiles(List<File> files, boolean paired, boolean flattenPaired, boolean keepSingletons, SamFilter filter) {
+    return new MappedSamBamSequenceDataSource(new FileStreamIterator(files), paired, flattenPaired, keepSingletons, filter);
   }
 
   @Override
@@ -95,10 +100,20 @@ public class MappedSamBamSequenceDataSource extends SamBamSequenceDataSource {
 
           placePairedRecord(rec);
           placePairedRecord(pair);
-          return haveNextRecords();
+          assert haveNextRecords();
+          return true;
         }
       }
       if (!mRecordMap.isEmpty()) {
+        if (mKeepSingletons) {
+          // Grab any one out of the map and return it with a dummy. Eventually we'll empty the whole map.
+          final SamSequence singleton = mRecordMap.remove(mRecordMap.keySet().iterator().next());
+          final SamSequence dummy = new SamSequence(singleton.getReadName(), EMPTY, EMPTY, (byte) (SamSequence.READ_PAIRED_FLAG | (singleton.getFirstOfPairFlag() ? 0 : SamSequence.FIRST_OF_PAIR_FLAG)), 0);
+          placePairedRecord(singleton);
+          placePairedRecord(dummy);
+          assert haveNextRecords();
+          return true;
+        }
         Diagnostic.warning(mRecordMap.size() + " reads missing a pair when processing paired end SAM input.");
       }
       if (mDuplicates > 0) {

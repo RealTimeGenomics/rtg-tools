@@ -49,7 +49,7 @@ import com.rtg.util.test.FileHelper;
 public class MappedSamBamSequenceDataSourceTest extends SamBamSequenceDataSourceTest {
 
   protected SamBamSequenceDataSource getSourceFromFiles(List<File> files, boolean paired) {
-    return MappedSamBamSequenceDataSource.fromInputFiles(files, paired, false, null);
+    return MappedSamBamSequenceDataSource.fromInputFiles(files, paired, false, false, null);
   }
 
   @Override

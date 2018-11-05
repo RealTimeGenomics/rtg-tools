@@ -48,6 +48,8 @@ import java.util.Map;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.ProteinFastaSymbolTable;
 import com.rtg.reference.ReferenceDetector;
@@ -293,6 +295,7 @@ public final class FormatCli extends LoggedCli {
     } else if (desc.getSourceFormat() == SourceFormat.FASTQ) {
       return new FastqSequenceDataSource(files, desc.getQualityFormat(), arm);
     } else if (desc.getSourceFormat() == SourceFormat.SAM) {
+      final boolean keepSingletons = GlobalFlags.getBooleanValue(ToolsGlobalFlags.FORMAT_SAMPE_KEEP_SINGLETONS);
       final List<SamFilter> filters = new ArrayList<>();
       int filterFlags = SamBamConstants.SAM_SUPPLEMENTARY_ALIGNMENT; // Always ignore supplementary alignments
       if (!dedupSecondary) {
@@ -306,9 +309,9 @@ public final class FormatCli extends LoggedCli {
         filters.add(new DuplicateSamFilter());
       }
       if (desc.isCompleteGenomics()) {
-        return CgSamBamSequenceDataSource.fromInputFiles(files, flattenPaired, new SamFilterChain(filters));
+        return CgSamBamSequenceDataSource.fromInputFiles(files, flattenPaired, keepSingletons, new SamFilterChain(filters));
       } else if (mappedSam) {
-        return MappedSamBamSequenceDataSource.fromInputFiles(files, desc.isInterleaved(), flattenPaired, new SamFilterChain(filters));
+        return MappedSamBamSequenceDataSource.fromInputFiles(files, desc.isInterleaved(), flattenPaired, keepSingletons, new SamFilterChain(filters));
       } else {
         return SamBamSequenceDataSource.fromInputFiles(files, desc.isInterleaved(), flattenPaired, new SamFilterChain(filters));
       }

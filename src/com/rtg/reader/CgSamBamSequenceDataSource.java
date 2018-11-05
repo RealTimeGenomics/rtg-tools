@@ -49,15 +49,16 @@ public final class CgSamBamSequenceDataSource extends MappedSamBamSequenceDataSo
    * Construct a pre-mapped SAM or BAM sequence data source from list of SAM or BAM files
    * @param files list of the SAM or BAM file to use as a sequence data source
    * @param flattenPaired if <code>paired</code> is false then this will load both arms into a single SDF
+   * @param keepSingletons if true, then arms without a mate will be output with an empty mate, otherwise such singletons will be dropped
    * @param filter this filter will be applied to the sam records
    * @return SamBamSequenceDataSource the sequence data source for the inputs
    */
-  public static CgSamBamSequenceDataSource fromInputFiles(List<File> files, boolean flattenPaired, SamFilter filter) {
-    return new CgSamBamSequenceDataSource(new FileStreamIterator(files), flattenPaired, filter);
+  public static CgSamBamSequenceDataSource fromInputFiles(List<File> files, boolean flattenPaired, boolean keepSingletons, SamFilter filter) {
+    return new CgSamBamSequenceDataSource(new FileStreamIterator(files), flattenPaired, keepSingletons, filter);
   }
 
-  private CgSamBamSequenceDataSource(FileStreamIterator inputs, boolean flattenPaired, SamFilter filter) {
-    super(inputs, true, flattenPaired, filter);
+  private CgSamBamSequenceDataSource(FileStreamIterator inputs, boolean flattenPaired, boolean keepSingletons, SamFilter filter) {
+    super(inputs, true, flattenPaired, keepSingletons, filter);
   }
 
   @Override

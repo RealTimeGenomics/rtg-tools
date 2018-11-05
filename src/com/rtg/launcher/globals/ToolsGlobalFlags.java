@@ -56,6 +56,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** When looking at chromosomes declared as polyploid, treat as though they were actually the given ploidy */
   public static final String TREAT_POLYPLOID_AS = "com.rtg.reference.polyploid-as";
 
+  /** When formatting SDF from mapped paired-end SAM, should we drop or keep alignments without a mate */
+  public static final String FORMAT_SAMPE_KEEP_SINGLETONS = "com.rtg.format.sampe-keep-singletons";
+
   /** Which strand simulated reads are sequenced from: 0 = random, -1 = reverse, 1 = forward */
   public static final String READ_STRAND = "com.rtg.simulation.reads.read-strand";
   /** Supply explicit sequence used for fragment read-through */
@@ -109,6 +112,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   public void registerFlags() {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
     registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, Boolean.TRUE);
+    registerFlag(FORMAT_SAMPE_KEEP_SINGLETONS, Boolean.class, Boolean.FALSE);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
 
     registerFlag(TREAT_POLYPLOID_AS, Ploidy.class, Ploidy.HAPLOID);

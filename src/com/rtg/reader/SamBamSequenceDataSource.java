@@ -112,11 +112,6 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
 
   @Override
   public boolean nextSequence() throws IOException {
-    if (mSamReader == null) {
-      if (!nextSource()) {
-        return false;
-      }
-    }
     mRecords[mRecordIndex] = null;
     mRecordIndex = mIndexChanger - mRecordIndex;
     if (mRecords[mRecordIndex] == null && !nextRecords()) {
@@ -178,7 +173,7 @@ public class SamBamSequenceDataSource implements SequenceDataSource {
   }
 
   protected SamSequence nextRecord() throws IOException {
-    if (!mSamIterator.hasNext()) {
+    if (mSamReader == null || !mSamIterator.hasNext()) {
       if (nextSource()) {
         return nextRecord();
       } else {

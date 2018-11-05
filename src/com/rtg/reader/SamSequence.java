@@ -42,8 +42,8 @@ import htsjdk.samtools.SAMRecord;
 @TestClass("com.rtg.reader.MappedSamBamSequenceDataSourceTest")
 public class SamSequence {
 
-  private static final byte READ_PAIRED_FLAG = 0x01;
-  private static final byte FIRST_OF_PAIR_FLAG = 0x02;
+  static final byte READ_PAIRED_FLAG = 0x01;
+  static final byte FIRST_OF_PAIR_FLAG = 0x02;
   private static final byte READ_STRAND_FLAG = 0x04;
   private static final byte NOT_PRIMARY_ALIGNMENT_FLAG = 0x08;
 
