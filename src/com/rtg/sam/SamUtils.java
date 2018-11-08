@@ -639,6 +639,17 @@ public final class SamUtils {
   }
 
   /**
+   * Convert an aligned record to being unmapped
+   * @param record the record to adjust
+   */
+  public static void convertToUnmapped(SAMRecord record) {
+    record.setReadUnmappedFlag(true);
+    record.setMappingQuality(0);
+    record.setCigarString("*");
+    record.setAttribute(ATTRIBUTE_NUM_MISMATCHES, null);
+  }
+
+  /**
    * @param header combined sam header
    * @return creates a map of read group to sample id
    */
