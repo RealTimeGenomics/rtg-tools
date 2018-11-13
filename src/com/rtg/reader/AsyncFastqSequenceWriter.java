@@ -54,7 +54,7 @@ class AsyncFastqSequenceWriter extends AbstractAsyncChunkWriter<FastqSequence> {
   @Override
   protected void synchronouslyWrite(FastqSequence read) {
     try {
-      mWriter.write(read.getName(), read.getBases(), read.getQualities(), read.getBases().length);
+      mWriter.write(read);
     } catch (IOException e) {
       throw new RuntimeIOException(e);
     }

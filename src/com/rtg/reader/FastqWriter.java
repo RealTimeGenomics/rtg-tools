@@ -82,6 +82,15 @@ public class FastqWriter implements SequenceWriter {
     mRedundantName = redundantName;
   }
 
+  /**
+   * Write a FASTQ sequence
+   * @param read the FASTQ sequence to write
+   * @throws IOException if there is a problem writing the sequence
+   */
+  public void write(FastqSequence read) throws IOException {
+    write(read.getName(), read.getBases(), read.getQualities(), read.getBases().length);
+  }
+
   @Override
   public void write(String name, byte[] data, byte[] quality, int length) throws IOException {
     if (mBuff.length < length) {
