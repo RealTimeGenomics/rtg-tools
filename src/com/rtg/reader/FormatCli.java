@@ -93,7 +93,7 @@ public final class FormatCli extends LoggedCli {
   /** FASTQ input format. */
   public static final String FASTQ_FORMAT = "fastq";
   /** Interleaved FASTQ input format. */
-  private static final String INTERLEAVED_FASTQ_FORMAT = "fastq-interleaved";
+  public static final String INTERLEAVED_FASTQ_FORMAT = "fastq-interleaved";
   /** SAM / BAM paired end input format. */
   public static final String SAM_PE_FORMAT = "sam-pe";
   /** SAM / BAM single end input format. */
