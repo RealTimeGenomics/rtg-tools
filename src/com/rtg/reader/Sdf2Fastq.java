@@ -80,7 +80,8 @@ public final class Sdf2Fastq extends AbstractCli {
     mFlags.setDescription("Converts SDF data into FASTQ file(s).");
     CommonFlagCategories.setCategories(mFlags);
 
-    Sdf2Fasta.registerTextExtractorFlags(mFlags);
+    Sdf2Fasta.registerExtractorFlags(mFlags);
+    Sdf2Fasta.registerTextOutputFlags(mFlags);
 
     mFlags.registerOptional('q', DEFAULT_QUALITY, Integer.class, CommonFlags.INT, "default quality value to use if the SDF does not contain quality data (0-63)").setCategory(UTILITY);
     mFlags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
@@ -101,7 +102,7 @@ public final class Sdf2Fastq extends AbstractCli {
       }
     }
 
-    return Sdf2Fasta.validateTextExtractorFlags(flags);
+    return Sdf2Fasta.validateTextOutputFlags(flags) && Sdf2Fasta.validateExtractorFlags(flags);
   };
 
 

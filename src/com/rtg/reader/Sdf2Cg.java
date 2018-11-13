@@ -72,7 +72,8 @@ public final class Sdf2Cg extends AbstractCli {
     mFlags.setDescription("Converts SDF formatted data into Complete Genomics TSV file(s).");
     CommonFlagCategories.setCategories(mFlags);
 
-    Sdf2Fasta.registerTextExtractorFlags(mFlags);
+    Sdf2Fasta.registerExtractorFlags(mFlags);
+    Sdf2Fasta.registerTextOutputFlags(mFlags);
 
     mFlags.setValidator(VALIDATOR);
   }
@@ -80,7 +81,7 @@ public final class Sdf2Cg extends AbstractCli {
   private static final Validator VALIDATOR = new Validator() {
     @Override
     public boolean isValid(final CFlags flags) {
-      return Sdf2Fasta.validateTextExtractorFlags(flags);
+      return Sdf2Fasta.validateTextOutputFlags(flags) && Sdf2Fasta.validateExtractorFlags(flags);
     }
   };
 

@@ -84,7 +84,8 @@ public class Sdf2Fasta extends AbstractCli {
     mFlags.setDescription("Converts SDF data into FASTA file(s).");
     CommonFlagCategories.setCategories(mFlags);
 
-    registerTextExtractorFlags(mFlags);
+    registerExtractorFlags(mFlags);
+    registerTextOutputFlags(mFlags);
     mFlags.registerOptional(TAXID_FLAG, "interpret supplied sequence as taxon ids instead of numeric sequence ids").setCategory(FILTERING);
     mFlags.registerOptional(INTERLEAVE, "interleave paired data into a single output file. Default is to split to separate output files").setCategory(UTILITY);
 
@@ -101,14 +102,12 @@ public class Sdf2Fasta extends AbstractCli {
         flags.setParseMessage("When using --" + TAXID_FLAG + ", sequences to extract must be specified, either explicitly, or using --" + ID_FILE_FLAG);
         return false;
       }
-      return validateTextExtractorFlags(flags);
+      return validateTextOutputFlags(flags) && validateExtractorFlags(flags);
     }
   };
 
 
-  // FASTA/FASTQ
-  static void registerTextExtractorFlags(CFlags flags) {
-    registerExtractorFlags(flags);
+  static void registerTextOutputFlags(CFlags flags) {
     flags.registerRequired('o', OUTPUT, File.class, CommonFlags.FILE, "output filename (extension added if not present). Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     flags.registerOptional('l', LINE_LENGTH, Integer.class, CommonFlags.INT, "maximum number of nucleotides to print on a line of output. A value of 0 indicates no limit", 0).setCategory(UTILITY);
     flags.registerOptional('R', RENAME, "rename the reads to their consecutive number; name of first read in file is '0'").setCategory(UTILITY);
@@ -128,12 +127,12 @@ public class Sdf2Fasta extends AbstractCli {
     flags.addRequiredSet(startFlag, endFlag);
   }
 
-  static boolean validateTextExtractorFlags(CFlags flags) {
+  static boolean validateTextOutputFlags(CFlags flags) {
     if ((Integer) flags.getValue(LINE_LENGTH) < 0) {
       Diagnostic.error(ErrorType.EXPECTED_NONNEGATIVE, LINE_LENGTH);
       return false;
     }
-    return validateExtractorFlags(flags);
+    return true;
   }
 
   static boolean validateExtractorFlags(CFlags flags) {
