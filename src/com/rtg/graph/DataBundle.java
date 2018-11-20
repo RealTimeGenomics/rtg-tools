@@ -105,19 +105,20 @@ final class DataBundle {
       final boolean hasRaw = points.stream().anyMatch(x -> x.getRawTruePositives() > 0);
       for (int i = 0; i < points.size(); ++i) {
         final RocPoint<T> point = points.get(i);
-        if (i == 0 && point.getTruePositives() + point.getFalsePositives() <= 0) {
-          if (points.size() > 1) {
-            // The first point corresponds to TP=0/FP=0 where precision is technicaly undefined, but we assume
-            // (e.g. via ROC interpolation) that precision is constant as we asymptotically approach (TP+FP) = 0
-            final Point2D pr = new Point2D(0, getPrecisionRecall(points.get(i + 1), totalVariants, hasRaw).getY());
-            res.add(pr);
-            scores.add(point.getThreshold());
-          }
-        } else {
-          final Point2D pr = getPrecisionRecall(point, totalVariants, hasRaw);
-          res.add(pr);
-          scores.add(point.getThreshold());
+        if (res.size() == 0 && point.getTruePositives() + point.getFalsePositives() <= 0) {
+          continue; // Skip and add these later
         }
+        while (res.size() < i) { // Add any missed initial points
+          final RocPoint<T> prev = points.get(res.size());
+          // The earlier point with TP=0/FP=0 is where precision is technicaly undefined, but we assume
+          // (e.g. via ROC interpolation) that precision is constant as we asymptotically approach (TP+FP) = 0
+          final Point2D pr = new Point2D(0, getPrecisionRecall(point, totalVariants, hasRaw).getY());
+          res.add(pr);
+          scores.add(prev.getThreshold());
+        }
+        final Point2D pr = getPrecisionRecall(point, totalVariants, hasRaw);
+        res.add(pr);
+        scores.add(point.getThreshold());
       }
       assert res.size() == points.size(); // Required to ensure slider thresholds are in sync when switching between graphs
     }
