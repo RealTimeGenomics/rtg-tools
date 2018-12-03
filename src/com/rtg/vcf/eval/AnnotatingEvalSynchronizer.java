@@ -56,12 +56,13 @@ class AnnotatingEvalSynchronizer extends WithInfoEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @param rocFilters which ROC curves to output
+   * @param rocCriteria criteria for selecting a favoured ROC point
    * @throws IOException if there is a problem opening output files
    */
   AnnotatingEvalSynchronizer(VariantSet variants,
                              RocSortValueExtractor extractor,
-                             File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
+                             File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) throws IOException {
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters, rocCriteria);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfHeader bh = variants.baselineHeader().copy();
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);

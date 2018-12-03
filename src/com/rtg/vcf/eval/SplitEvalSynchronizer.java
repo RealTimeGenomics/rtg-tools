@@ -65,12 +65,13 @@ class SplitEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param twoPass true to output additional ROC curves for allele-matches
    * @param rocFilters which ROC curves to output
+   * @param rocCriteria criteria for selecting a favoured ROC point
    * @throws IOException if there is a problem opening output files
    */
   SplitEvalSynchronizer(VariantSet variants,
                         RocSortValueExtractor extractor,
-                        File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, extractor, outdir, zip, slope, twoPass, rocFilters);
+                        File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) throws IOException {
+    super(variants, extractor, outdir, zip, slope, twoPass, rocFilters, rocCriteria);
     final String zipExt = zip ? FileUtils.GZ_SUFFIX : "";
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);
     mTpCalls = vf.make(variants.calledHeader(), new File(outdir, TP_FILE_NAME + zipExt));

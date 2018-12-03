@@ -112,10 +112,9 @@ public class RocContainer {
   private final Comparator<Double> mComparator;
   private final RocSortValueExtractor mRocExtractor;
   private final String mFilePrefix;
+  private RocPointCriteria mBestCutpoint = new FMeasureThreshold();
   private int mNoScoreVariants = 0;
   private boolean mRequiresGt = false;
-  private RocPoint<Double> mBest = null;
-  private double mBestFMeasure = 0;
 
   /**
    * Constructor
@@ -131,7 +130,6 @@ public class RocContainer {
    * @param filePrefix prefix attached to ROC output file names
    */
   public RocContainer(RocSortValueExtractor extractor, String filePrefix) {
-
     switch (extractor.getSortOrder()) {
       case ASCENDING:
         mComparator = new AscendingDoubleComparator();
@@ -144,6 +142,14 @@ public class RocContainer {
     mFieldLabel = extractor.toString();
     mFilePrefix = filePrefix;
     mRocExtractor = extractor;
+  }
+
+  /**
+   * Sets the criteria for selecting a particular point on the ROC curve
+   * @param criteria criteria implementation
+   */
+  public void setRocPointCriteria(RocPointCriteria criteria) {
+    mBestCutpoint = criteria;
   }
 
   /**
@@ -251,8 +257,7 @@ public class RocContainer {
    */
   public void writeRocs(File outDir, boolean zip, boolean slope) throws IOException {
     Diagnostic.developerLog("Writing ROC");
-    mBestFMeasure = 0;
-    mBest = null;
+    mBestCutpoint.init();
     for (final Map.Entry<RocFilter, SortedMap<Double, RocPoint<Double>>> entry : mRocs.entrySet()) {
       final RocFilter filter = entry.getKey();
       // Compute adjustment factor for sub-categorized calls when call representation is systematically
@@ -339,9 +344,8 @@ public class RocContainer {
         + "\t" + Utils.realFormat(precision, METRICS_DP)
         + "\t" + Utils.realFormat(recall, METRICS_DP)
         + "\t" + Utils.realFormat(fMeasure, METRICS_DP));
-      if ((filter == RocFilter.ALL) && !Double.isNaN(point.getThreshold()) && (mBest == null || fMeasure >= mBestFMeasure)) {
-        mBestFMeasure = fMeasure;
-        mBest = new RocPoint<>(point);
+      if ((filter == RocFilter.ALL) && !Double.isNaN(point.getThreshold())) {
+        mBestCutpoint.considerRocPoint(point, precision, recall, fMeasure);
       }
     }
     os.newLine();
@@ -375,10 +379,11 @@ public class RocContainer {
       table.addRow("Threshold", "True-pos-baseline", "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
       table.addSeparator();
 
-      final RocPoint<Double> best = mBest;
+      final RocPoint<Double> best = mBestCutpoint.cutpoint();
       if (best == null) {
-        Diagnostic.warning("Could not maximize F-measure from ROC data, only un-thresholded statistics will be computed. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
+        Diagnostic.warning("Could not select " + mBestCutpoint.name() + " threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
       } else {
+        Diagnostic.info("Selected score threshold using: " + mBestCutpoint.name());
         addSummaryRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
       }
       final RocPoint<Double> total = getTotal(RocFilter.ALL);

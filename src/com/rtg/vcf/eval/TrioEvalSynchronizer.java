@@ -91,7 +91,7 @@ class TrioEvalSynchronizer extends WithInfoEvalSynchronizer {
    */
   TrioEvalSynchronizer(VariantSet variants,
                        File outdir, boolean zip) throws IOException {
-    super(variants, RocSortValueExtractor.NULL_EXTRACTOR, outdir, zip, false, false, Collections.emptySet());
+    super(variants, RocSortValueExtractor.NULL_EXTRACTOR, outdir, zip, false, false, Collections.emptySet(), null);
     final Family family;
     try {
       family = Family.getFamily(VcfPedigreeParser.load(variants.baselineHeader()));

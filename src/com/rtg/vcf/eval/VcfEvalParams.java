@@ -75,6 +75,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     private File mBedRegionsFile = null;
     private File mEvalRegionsFile = null;
     private Set<RocFilter> mRocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
+    private RocPointCriteria mRocCriteria = new FMeasureThreshold();
     private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
     private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
     private boolean mDecompose = false;
@@ -246,13 +247,21 @@ public final class VcfEvalParams extends OutputModuleParams {
       return self();
     }
 
-
     /**
      * @param filters the set of ROC outputs to produce
      * @return this builder, so calls can be chained
      */
     public VcfEvalParamsBuilder rocFilters(Set<RocFilter> filters) {
       mRocFilters = filters;
+      return self();
+    }
+
+    /**
+     * @param criteria the criteria for selecting a favoured ROC point
+     * @return this builder, so calls can be chained
+     */
+    public VcfEvalParamsBuilder rocCriteria(RocPointCriteria criteria) {
+      mRocCriteria = criteria;
       return self();
     }
 
@@ -346,6 +355,7 @@ public final class VcfEvalParams extends OutputModuleParams {
   private final int mMaxLength;
   private final int mLooseMatchDistance;
   private final Set<RocFilter> mRocFilters;
+  private final RocPointCriteria mRocCriteria;
   private final boolean mOutputSlopeFiles;
   private final Orientor mBaselinePhaseOrientor;
   private final Orientor mCallsPhaseOrientor;
@@ -377,6 +387,7 @@ public final class VcfEvalParams extends OutputModuleParams {
     mMaxLength = builder.mMaxLength;
     mLooseMatchDistance = builder.mLooseMatchDistance;
     mRocFilters = builder.mRocFilters;
+    mRocCriteria = builder.mRocCriteria;
     mOutputSlopeFiles = builder.mOutputSlopeFiles;
     mBaselinePhaseOrientor = builder.mBaselinePhaseOrientor;
     mCallsPhaseOrientor = builder.mCallsPhaseOrientor;
@@ -534,6 +545,13 @@ public final class VcfEvalParams extends OutputModuleParams {
   }
 
   /**
+   * @return the criteria for selecting a favoured ROC point
+   */
+  public RocPointCriteria rocCriteria() {
+    return mRocCriteria;
+  }
+
+  /**
    * @return the Orientor to use for the baseline during diploid GT comparisons.
    */
   public Orientor baselinePhaseOrientor() {
@@ -562,7 +580,7 @@ public final class VcfEvalParams extends OutputModuleParams {
       + ", num threads=" + mNumberThreads
       + ", use all records=" + mUseAllRecords + ", decompose = " + mDecompose + ", max length=" + mMaxLength
       + ", ref overlap=" + mRefOverlap + ", squash ploidy=" + mSquashPloidy + ", two pass=" + mTwoPass
-      + ", roc filters=" + mRocFilters + ", output mode=" + mOutputMode + ", output params=" + super.toString();
+      + ", roc filters=" + mRocFilters + ", roc criteria=" + mRocCriteria.name() + ", output mode=" + mOutputMode + ", output params=" + super.toString();
   }
 
 }

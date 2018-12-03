@@ -29,6 +29,7 @@
  */
 package com.rtg.vcf.eval;
 
+import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
@@ -90,6 +91,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
+  private static final String CRITERIA_SENSITIVITY = "Xat-sensitivity";
+  private static final String CRITERIA_PRECISION = "Xat-precision";
   private static final String DECOMPOSE = "decompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
@@ -173,6 +176,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
     mFlags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(CRITERIA_PRECISION, Double.class, FLOAT, "output summary statistics where precision >= supplied value").setCategory(REPORTING);
+    mFlags.registerOptional(CRITERIA_SENSITIVITY, Double.class, FLOAT, "output summary statistics where sensitivity >= supplied value").setCategory(REPORTING);
 
     mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
@@ -191,6 +196,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && CommonFlags.validateTemplate(flags)
       && CommonFlags.validateRegions(flags)
       && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
+      && flags.checkNand(CRITERIA_PRECISION, CRITERIA_SENSITIVITY)
       && validateScoreField(flags)
       && validatePairedFlag(flags, SAMPLE, "sample name")
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
@@ -334,6 +340,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       for (Object o : values) {
         rocFilters.add(((VcfEvalRocFilter) o).filter());
       }
+    }
+    if (mFlags.isSet(CRITERIA_PRECISION)) {
+      builder.rocCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
+    } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
+      builder.rocCriteria(new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY)));
     }
     if (mFlags.isSet(RTG_STATS)) {
       rocFilters.add(RocFilter.NON_XRX);

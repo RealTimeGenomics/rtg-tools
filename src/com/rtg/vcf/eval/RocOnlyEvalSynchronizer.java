@@ -47,12 +47,12 @@ class RocOnlyEvalSynchronizer extends WithRocsEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param twoPass true to output additional ROC curves for allele-matches
    * @param rocFilters which ROC curves to output
-   * @throws IOException if there is a problem opening output files
+   * @param rocCriteria criteria for selecting a favoured ROC point
    */
   RocOnlyEvalSynchronizer(VariantSet variants,
                           RocSortValueExtractor extractor,
-                          File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, extractor, outdir, zip, slope, twoPass, rocFilters);
+                          File outdir, boolean zip, boolean slope, boolean twoPass, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) {
+    super(variants, extractor, outdir, zip, slope, twoPass, rocFilters, rocCriteria);
   }
 
   @Override

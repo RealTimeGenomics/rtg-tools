@@ -58,10 +58,11 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @param rocFilters which ROC curves to output
+   * @param rocCriteria criteria for selecting a favoured ROC point
    * @throws IOException if there is a problem opening output files
    */
-  PhaseTransferEvalSynchronizer(VariantSet variants, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
+  PhaseTransferEvalSynchronizer(VariantSet variants, RocSortValueExtractor extractor, File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) throws IOException {
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters, rocCriteria);
     mCalls.getHeader().ensureContains(new InfoField(INFO_PHASE, MetaType.CHARACTER, VcfNumber.ONE, "Phase of match, A = matched in same phase, B = matched in opposite phase"));
     mCalls.getHeader().ensureContains(new FormatField(FORMAT_ORIGINAL_GT, MetaType.STRING, VcfNumber.ONE, "Original pre-phasing genotype value"));
   }

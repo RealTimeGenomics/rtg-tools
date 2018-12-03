@@ -68,10 +68,11 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
    * @param slope true to output ROC slope files
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @param rocFilters which ROC curves to output
+   * @param rocCriteria criteria for selecting a favoured ROC point
    */
   WithRocsEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) {
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) {
     super(variants);
 
     mBaselineSampleNo = variants.baselineSample();
@@ -90,13 +91,16 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
     if (mCallSampleNo == -1 && extractor.requiresSample()) {
       mDefaultRoc = new RocContainer(RocSortValueExtractor.NULL_EXTRACTOR);
       mDefaultRoc.addFilter(RocFilter.ALL);
+      mDefaultRoc.setRocPointCriteria(rocCriteria);
       mAlleleRoc = null;
     } else {
       mDefaultRoc = new RocContainer(extractor);
       mDefaultRoc.addFilters(filters);
+      mDefaultRoc.setRocPointCriteria(rocCriteria);
       if (dualRocs) {
         mAlleleRoc = new RocContainer(extractor, "allele_");
         mAlleleRoc.addFilters(filters);
+        mAlleleRoc.setRocPointCriteria(rocCriteria);
       } else {
         mAlleleRoc = null;
       }

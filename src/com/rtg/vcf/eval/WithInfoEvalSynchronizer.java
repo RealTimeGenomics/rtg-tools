@@ -31,7 +31,6 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -82,12 +81,12 @@ public abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer 
    * @param slope true to output ROC slope files
    * @param dualRocs true to output additional ROC curves for allele-matches found in two-pass mode
    * @param rocFilters which ROC curves to output
-   * @throws IOException if there is a problem opening output files
+   * @param rocCriteria criteria for selecting a favoured ROC point
    */
   WithInfoEvalSynchronizer(VariantSet variants,
                            RocSortValueExtractor extractor,
-                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters) throws IOException {
-    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters);
+                           File outdir, boolean zip, boolean slope, boolean dualRocs, Set<RocFilter> rocFilters, RocPointCriteria rocCriteria) {
+    super(variants, extractor, outdir, zip, slope, dualRocs, rocFilters, rocCriteria);
   }
 
   @Override

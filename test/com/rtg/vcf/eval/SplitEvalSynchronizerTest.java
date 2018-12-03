@@ -163,7 +163,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
         final VcfHeader header = new VcfHeader();
         header.addLine(VcfHeader.VERSION_LINE);
         header.addSampleName("SAMPLE");
-        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+        try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>(), null)) {
           final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
           final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
           assertEquals("name1", pair.getA());
@@ -197,7 +197,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>(), null)) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
@@ -224,7 +224,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
     try (final TestDirectory dir = new TestDirectory()) {
       final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
       new TabixIndexer(fake).saveVcfIndex();
-      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>())) {
+      try (final SplitEvalSynchronizer sync = new SplitEvalSynchronizer(new MockVariantSet(fake), RocSortValueExtractor.NULL_EXTRACTOR, dir, false, false, false, new HashSet<>(), null)) {
         final Pair<String, Map<VariantSetType, List<Variant>>> pair = sync.nextSet();
         final Pair<String, Map<VariantSetType, List<Variant>>> pair2 = sync.nextSet();
         assertEquals("name1", pair.getA());
