@@ -29,10 +29,13 @@
  */
 package com.rtg.vcf.eval;
 
+import com.reeltwo.jumble.annotations.TestClass;
+
 /**
  * Visit RocPoints and choose one based on criteria.
  * Points must be supplied in order of increasing recall.
  */
+@TestClass("com.rtg.vcf.eval.FMeasureThresholdTest")
 abstract class RocPointCriteria {
   protected RocPoint<Double> mCutpoint = null;
 
