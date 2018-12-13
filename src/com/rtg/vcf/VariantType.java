@@ -111,7 +111,9 @@ public enum VariantType {
       final char last = allele.charAt(allele.length() - 1);
       if (first == '<' || last == '>') { // Includes "C<ctg1>"
         return VariantType.SV_SYMBOLIC;
-      } else if (first == VcfUtils.ALT_SPANNING_DELETION && allele.length() == 1) {
+      } else if (first == VcfUtils.ALT_SPANNING_DELETION || last == VcfUtils.ALT_SPANNING_DELETION) {
+        // This also covers "partial spanning deletion", e.g. *G  or ACTG*
+        // At this stage we don't differentiate between this and a full spanning deletion.
         return VariantType.SV_MISSING;
       } else if ((first == '[') || (first == ']') || (last == '[') || (last == ']')) {
         return VariantType.SV_BREAKEND;

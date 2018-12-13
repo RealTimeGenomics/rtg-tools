@@ -116,6 +116,13 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     // but not match:
     // G->C   1/1  (which some might expected to match)
     endToEnd("vcfeval_small_updel/updel2", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--ref-overlap");
+    // As above, but the upstream deletion use no-call rather than incorrectly asserting reference bases
+    endToEnd("vcfeval_small_updel/updel3", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
+  }
+
+  public void testPartialSpanningDeletion() throws IOException, UnindexableDataException {
+    // A case sent by Dan Cooke where Octopus uses a "partial spanning deletion" notation.
+    endToEnd("vcfeval_small_updel/updel4", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
   }
 
   public void testNanoTrickySquash() throws IOException, UnindexableDataException {
