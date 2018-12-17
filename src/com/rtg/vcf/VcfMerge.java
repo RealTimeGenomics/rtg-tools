@@ -107,15 +107,10 @@ public class VcfMerge extends AbstractCli {
     mFlags.setDescription("Merge a set of VCF files.");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     initAddHeaderFlag(mFlags);
-    final Flag<File> inFlag = mFlags.registerRequired(File.class, FILE, "input VCF files to merge")
-      .setMinCount(0)
-      .setMaxCount(Integer.MAX_VALUE)
-      .setCategory(INPUT_OUTPUT);
+    final Flag<File> inFlag = mFlags.registerRequired(File.class, FILE, "input VCF files to merge").setCategory(INPUT_OUTPUT).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
     final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, FILE, "file containing a list of VCF format files (1 per line) to be merged").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('F', FORCE_MERGE_ALL, "attempt merging of all non-matching header declarations").setCategory(UTILITY);
-    final Flag<String> forceMerge = mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY);
-    forceMerge.setMinCount(0);
-    forceMerge.setMaxCount(Integer.MAX_VALUE);
+    mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(PRESERVE_FORMATS, "if set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
     mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
