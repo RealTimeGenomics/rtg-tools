@@ -786,7 +786,7 @@ public final class VcfUtils {
     final String ref = rec.getRefCall();
     final Character c = ref.length() == 0 ? VcfUtils.MISSING_VALUE : ref.charAt(0);
     for (final String alt : rec.getAltCalls()) {
-      if (!c.equals(alt.charAt(0))) {
+      if (!c.equals(alt.charAt(0)) && (alt.charAt(0) != VcfUtils.ALT_SPANNING_DELETION)) {
         return false;
       }
     }

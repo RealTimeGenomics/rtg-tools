@@ -123,6 +123,7 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
   public void testPartialSpanningDeletion() throws IOException, UnindexableDataException {
     // A case sent by Dan Cooke where Octopus uses a "partial spanning deletion" notation.
     endToEnd("vcfeval_small_updel/updel4", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
+    endToEnd("vcfeval_small_updel/updel5", new String[] {"baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
   }
 
   public void testNanoTrickySquash() throws IOException, UnindexableDataException {

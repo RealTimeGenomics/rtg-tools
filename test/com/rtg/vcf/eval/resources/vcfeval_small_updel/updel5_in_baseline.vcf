@@ -1,0 +1,6 @@
+##fileformat=VCFv4.2
+##fileDate=20160824
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Consensus Genotype across all datasets with called genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	HG001
+1-1	32	.	CTTA	C	.	.	.	GT	0|1
+1-1	35	.	AT	A	.	.	.	GT	1|0
