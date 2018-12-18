@@ -1,0 +1,7 @@
+##fileformat=VCFv4.3
+##reference=human_g1k_v37
+##octopus_version=0.5.2-beta
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878
+1-1	32	.	CTTA	C	.	.	.	GT	0|1
+1-1	35	.	AT	A,*T	.	.	.	GT	1|2

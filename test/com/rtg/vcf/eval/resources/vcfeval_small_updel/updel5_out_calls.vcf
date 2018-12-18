@@ -8,6 +8,5 @@
 ##INFO=<ID=CALL_ALTERNATE,Number=1,Type=Flag,Description="Call variant could be matched in an alternate path">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878
-1-1	16	.	CGG	C,*	.	.	SYNC=17;CALL_WEIGHT=0.667;CALL=TP	GT	1|2
-1-1	16	.	CGGA	C	.	.	SYNC=17;CALL_WEIGHT=0.667;CALL=TP	GT	.|1
-1-1	19	.	AG	A,*G	.	.	SYNC=17;CALL_WEIGHT=0.667;CALL=TP	GT	1|2
+1-1	32	.	CTTA	C	.	.	SYNC=33;CALL=TP	GT	0|1
+1-1	35	.	AT	A,*T	.	.	SYNC=33;CALL=TP	GT	1|2
