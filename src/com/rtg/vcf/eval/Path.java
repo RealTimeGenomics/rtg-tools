@@ -175,14 +175,14 @@ public final class Path implements Comparable<Path> {
   }
 
   /**
-   * @return true if the path has finished
+   * @return true if the path has finished (i.e. both half paths have reached the end of the template)
    */
   boolean finished() {
     return mCalledPath.finished() && mBaselinePath.finished();
   }
 
   /**
-   * @return true if all positions are the same
+   * @return true if all positions are the same and there are no unplayed variants.
    */
   boolean inSync() {
     if (mCalledPath.compareHaplotypePositions() != 0) {
@@ -330,6 +330,9 @@ public final class Path implements Comparable<Path> {
     }
   }
 
+  /**
+   * @return if both half-paths have produced the same haplotypes so far
+   */
   boolean matches() {
     return mCalledPath.matches(mBaselinePath);
   }

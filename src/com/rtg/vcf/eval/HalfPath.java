@@ -294,13 +294,8 @@ public final class HalfPath implements Comparable<HalfPath> {
   }
 
   boolean matches(HalfPath other) {
-    if (!finishedHaplotypeA() && !other.finishedHaplotypeA() && nextHaplotypeABase() != other.nextHaplotypeABase()) {
-      return false;
-    }
-    if (!finishedHaplotypeB() && !other.finishedHaplotypeB() && nextHaplotypeBBase() != other.nextHaplotypeBBase()) {
-      return false;
-    }
-    return true;
+    return (finishedHaplotypeA() || other.finishedHaplotypeA() || nextHaplotypeABase() == other.nextHaplotypeABase())
+      && (finishedHaplotypeB() || other.finishedHaplotypeB() || nextHaplotypeBBase() == other.nextHaplotypeBBase());
   }
 
   @Override
