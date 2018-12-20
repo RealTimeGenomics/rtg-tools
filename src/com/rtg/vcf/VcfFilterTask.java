@@ -348,19 +348,17 @@ class VcfFilterTask {
 
   void write(VcfWriter w, VcfRecord record) throws IOException {
     // if all good write the line out
-    if (mDensityWindow == null && mPrevRecord != null) {
-      writeCount(w, mPrevRecord);
-    } else {
-      if (mPrevRecord != null) {
-        final boolean dontWritePrev = mPrevDense;
-        mPrevDense = record.getSequenceName().equals(mPrevRecord.getSequenceName()) && (getCorrectedPos(record) - getCorrectedPos(mPrevRecord)) <= mDensityWindow;
-        if (!dontWritePrev && !mPrevDense) { //the previous record was already too dense, or this record makes the previous record too dense.
-          writeCount(w, mPrevRecord);
-        } else {
-          mVcfFilterStatistics.increment(Stat.DENSITY_WINDOW_COUNT);
-        }
+    if (mPrevRecord != null) {
+      if (mDensityWindow == null) {
+        writeCount(w, mPrevRecord);
       } else {
-        mPrevDense = false;
+        final boolean currentDense = record.getSequenceName().equals(mPrevRecord.getSequenceName()) && (getCorrectedPos(record) - getCorrectedPos(mPrevRecord)) <= mDensityWindow;
+        if (mPrevDense || currentDense) {  //the previous record was already too dense, or this record makes the previous record too dense.
+          mVcfFilterStatistics.increment(Stat.DENSITY_WINDOW_COUNT);
+        } else {
+          writeCount(w, mPrevRecord);
+        }
+        mPrevDense = currentDense;
       }
     }
     mPrevRecord = record;
