@@ -160,7 +160,7 @@ public interface VariantFactory {
     for (final int a : gtArr) {
       if (a > 0) {
         final VariantType altType = VariantType.getType(alleles[0], alleles[a]);
-        if (!(altType.isSvType() || altType.isNonVariant())) {
+        if (altType.isVariant() && !altType.isSvType()) {
           return gtArr;
         }
       }

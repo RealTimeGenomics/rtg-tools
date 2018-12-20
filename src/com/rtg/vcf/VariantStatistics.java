@@ -441,7 +441,7 @@ public class VariantStatistics extends AbstractStatistics {
   }
 
   private void tallyLength(VariantType alleleType, String ref, String pred, PerSampleVariantStatistics sampleStats) {
-    if (!alleleType.isNonVariant() && !alleleType.isSvType()) {
+    if (alleleType.isVariant() && !alleleType.isSvType()) {
       final int alleleLength;
       switch (alleleType) {
         case UNCHANGED:

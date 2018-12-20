@@ -56,7 +56,7 @@ public enum VariantType {
   SV_BREAKEND(false, true, false),
   /** Structural variant symbolic value */
   SV_SYMBOLIC(false, true, false),
-  /** Structural variant missing allele */
+  /** Structural variant spanning deletion */
   SV_MISSING(false, true, false);
 
   private final boolean mIsIndelType;
@@ -69,8 +69,8 @@ public enum VariantType {
     mIsNonVariant = isNonVariant;
   }
 
-  public boolean isNonVariant() {
-    return mIsNonVariant;
+  public boolean isVariant() {
+    return !mIsNonVariant;
   }
 
   public boolean isIndelType() {
