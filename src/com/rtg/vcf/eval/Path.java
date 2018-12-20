@@ -363,8 +363,10 @@ public final class Path implements Comparable<Path> {
     if (mBaselinePath.getPosition() != -1) {
       final boolean match = matches();
       final boolean insync = inSync();
-      sb.append(DisplayHelper.DEFAULT.decorateForeground(match  ? "   match" : " mismatch", match ? DisplayHelper.GREEN : DisplayHelper.RED));
-      sb.append(DisplayHelper.DEFAULT.decorateForeground(insync ? " in-sync" : " no-sync", insync ? DisplayHelper.GREEN : DisplayHelper.RED));
+      final boolean finish = finished();
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(match  ? "    match" : " mismatch", match ? DisplayHelper.GREEN : DisplayHelper.RED));
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(insync ? "  in-sync" : "  no-sync", insync ? DisplayHelper.GREEN : DisplayHelper.RED));
+      sb.append(DisplayHelper.DEFAULT.decorateForeground(finish ? " finished" : "  playing", finish ? DisplayHelper.GREEN : DisplayHelper.RED));
     }
     return sb.toString();
   }
