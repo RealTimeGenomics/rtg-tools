@@ -142,6 +142,8 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE8 = "chr 23 . T A,*,TAAA . PASS . GT 2|.";
   static final String SNP_LINE9 = "chr 23 . T A,TAAA,* . PASS . GT 2|.";
   static final String SNP_LINE10 = "chr 23 . T <DEL>,* . PASS . GT 2|.";
+  static final String SNP_LINE11 = "chr 23 . T * . PASS . GT 0|1";
+  static final String SNP_LINE12 = "chr 23 . TAAAA TA,*AAAA . PASS . GT 2|1";
 
   public void testAlts() throws Exception {
     final VariantFactory f = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false));
@@ -154,29 +156,35 @@ public class VariantFactoryTest extends TestCase {
     assertEquals("G", variant.alleleStr(3));
 
     variant = f.variant(VariantTest.createRecord(SNP_LINE8), 0);
-    assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
+    assertEquals(3, variant.numAlleles()); // spanning deletion allele is not included in allele set
     assertEquals(null, variant.allele(-1)); // missing allele is ignored
     assertEquals(null, variant.allele(0)); // REF allele is trimmed away entirely
     assertEquals("A", variant.alleleStr(1));
     assertEquals("<24-24>AAA", variant.alleleStr(2));
 
     variant = f.variant(VariantTest.createRecord(SNP_LINE9), 0);
-    assertEquals(3, variant.numAlleles()); // SV allele is not included in allele set
+    assertEquals(3, variant.numAlleles()); // spanning deletion allele is not included in allele set
 
-    assertNull(f.variant(VariantTest.createRecord(SNP_LINE10), 0));
+    assertNull(f.variant(VariantTest.createRecord(SNP_LINE10), 0)); // No alleles remaining
+
+    assertNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE11), 0));
+    assertNull(f.variant(VariantTest.createRecord(SNP_LINE11), 0)); // No alleles remaining
+    assertNotNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE12), 0));
+    variant = f.variant(VariantTest.createRecord(SNP_LINE12), 0);
+    assertEquals(2, variant.numAlleles()); // partial spanning deletion allele is not included in allele set
   }
 
-  static final String SNP_LINE11 = "chr 23 . T G--- . PASS . GT 1|1";
+  static final String BADALT_LINE1 = "chr 23 . T G--- . PASS . GT 1|1";
 
   public void testBadAlts() {
     try {
-      new VariantFactory.SampleVariants(0, false).variant(VariantTest.createRecord(SNP_LINE11), 0);
+      new VariantFactory.SampleVariants(0, false).variant(VariantTest.createRecord(BADALT_LINE1), 0);
       fail();
     } catch (SkippedVariantException e) {
       // Expected
     }
     try {
-      new VariantFactory.AllAlts(false).variant(VariantTest.createRecord(SNP_LINE11), 0);
+      new VariantFactory.AllAlts(false).variant(VariantTest.createRecord(BADALT_LINE1), 0);
       fail();
     } catch (SkippedVariantException e) {
       // Expected
