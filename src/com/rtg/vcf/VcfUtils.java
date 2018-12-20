@@ -778,19 +778,25 @@ public final class VcfUtils {
   }
 
   /**
-   * Determines if this record has a redundant leading base (e.g. for indels).
+   * Determines if this record contains a redundant leading base (e.g. for indels).
+   * This assumes that the record does not contain symbolic alleles.
+   * A record without a regular ALT allele (e.g. REF only) is not considered to have a redundant leading base.
    * @param rec the record to examine
-   * @return true if the leading base of the variant is redundant.
+   * @return true if the record contains ALT alleles where the leading base of the variant is redundant.
    */
   public static boolean hasRedundantFirstNucleotide(final VcfRecord rec) {
     final String ref = rec.getRefCall();
     final Character c = ref.length() == 0 ? VcfUtils.MISSING_VALUE : ref.charAt(0);
+    boolean hasAlt = false;
     for (final String alt : rec.getAltCalls()) {
-      if (!c.equals(alt.charAt(0)) && (alt.charAt(0) != VcfUtils.ALT_SPANNING_DELETION)) {
-        return false;
+      if (alt.charAt(0) != VcfUtils.ALT_SPANNING_DELETION) {
+        hasAlt = true;
+        if (!c.equals(alt.charAt(0))) {
+          return false;
+        }
       }
     }
-    return !rec.getAltCalls().isEmpty();
+    return hasAlt;
   }
 
   /**
@@ -815,7 +821,7 @@ public final class VcfUtils {
     alleles[0] = prevNt ? rec.getRefCall().substring(1) : rec.getRefCall();
     for (int i = 1; i < alleles.length; ++i) {
       final String allele = alts.get(i - 1);
-      alleles[i] = prevNt ? allele.substring(1) : allele;
+      alleles[i] = prevNt && allele.charAt(0) != VcfUtils.ALT_SPANNING_DELETION ? allele.substring(1) : allele;
     }
     return alleles;
   }

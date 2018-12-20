@@ -147,6 +147,8 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/0", "A")));
     assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/0", "", "T")));
     assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/0", "")));
+    assertTrue(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/1", "A", "AT", "*")));
+    assertFalse(VcfUtils.hasRedundantFirstNucleotide(makeRecord("0/1", "A", "*")));
   }
 
   public void testGtProperties() {
