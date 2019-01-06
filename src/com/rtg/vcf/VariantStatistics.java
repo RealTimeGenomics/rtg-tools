@@ -400,26 +400,30 @@ public class VariantStatistics extends AbstractStatistics {
     //   Kind of variant: SNP, MNP, INS, DEL, INDEL, COMPLEX
     //   Transition (A <-> G) (C <-> T) vs Transversion (all others) for SNP's only
 
-    final boolean heterozygous;
+    final PerSampleVariantStatistics.VariantTypeCounts pstats;
     if (ploidy == Ploidy.HAPLOID) {
-      sampleStats.mHaploid++;
-      heterozygous = false;
+      pstats = sampleStats.mHaploid;
     } else {
-      heterozygous = !predA.equals(predB);
-      if (heterozygous) {
-        sampleStats.mHeterozygous++;
+      if (!predA.equals(predB)) {
+        pstats = sampleStats.mHeterozygous;
       } else {
-        sampleStats.mHomozygous++;
+        pstats = sampleStats.mHomozygous;
       }
     }
+    pstats.incrementTotal();
     final VariantType precedence = VariantType.getPrecedence(typeA, typeB);
-    if (precedence == VariantType.SNP) {
-      tallyTransitionTransversionRatio(refA, predA, typeA, sampleStats);
-      if (ploidy != Ploidy.HAPLOID) {
-        tallyTransitionTransversionRatio(refB, predB, typeB, sampleStats);
+    if (precedence == VariantType.SV_MISSING) {
+      sampleStats.mPartialCalls++;
+    } else {
+      if (precedence == VariantType.SNP) {
+        tallyTransitionTransversionRatio(refA, predA, typeA, sampleStats);
+        if (ploidy != Ploidy.HAPLOID) {
+          tallyTransitionTransversionRatio(refB, predB, typeB, sampleStats);
+        }
       }
+      pstats.increment(precedence);
+      sampleStats.mAll.increment(precedence);
     }
-    tally(precedence, heterozygous, ploidy, sampleStats);
 
     if (mShowLengthHistograms) {
       tallyLength(typeA, refA, predA, sampleStats);
@@ -449,8 +453,13 @@ public class VariantStatistics extends AbstractStatistics {
         case MNP:
           alleleLength = pred.length();
           break;
-        default:
+        case INDEL:
+        case INSERTION:
+        case DELETION:
           alleleLength = Math.abs(pred.length() - ref.length());
+          break;
+        default:
+          alleleLength = 0;
           break;
       }
       sampleStats.mAlleleLengths[alleleType.ordinal()].increment(alleleLength);
@@ -474,109 +483,6 @@ public class VariantStatistics extends AbstractStatistics {
       --diffEnd;
     }
     return new Range(diffStart, diffEnd + 1);
-  }
-
-  private void tally(VariantType type, boolean heterozygous, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
-    if (ploidy == Ploidy.HAPLOID) {
-      switch (type) {
-        case SNP:
-          sampleStats.mHaploidSnps++;
-          sampleStats.mTotalSnps++;
-          break;
-        case MNP:
-          sampleStats.mHaploidMnps++;
-          sampleStats.mTotalMnps++;
-          break;
-        case INSERTION:
-          sampleStats.mHaploidInsertions++;
-          sampleStats.mTotalInsertions++;
-          break;
-        case DELETION:
-          sampleStats.mHaploidDeletions++;
-          sampleStats.mTotalDeletions++;
-          break;
-        case INDEL:
-          sampleStats.mHaploidIndels++;
-          sampleStats.mTotalIndels++;
-          break;
-        case SV_BREAKEND:
-          sampleStats.mHaploidBreakends++;
-          sampleStats.mTotalBreakends++;
-          break;
-        case SV_SYMBOLIC:
-          sampleStats.mHaploidSymbolicSvs++;
-          sampleStats.mTotalSymbolicSvs++;
-          break;
-        default:
-          break;
-      }
-    } else if (heterozygous) {
-      switch (type) {
-        case SNP:
-          sampleStats.mHeterozygousSnps++;
-          sampleStats.mTotalSnps++;
-          break;
-        case MNP:
-          sampleStats.mHeterozygousMnps++;
-          sampleStats.mTotalMnps++;
-          break;
-        case INSERTION:
-          sampleStats.mHeterozygousInsertions++;
-          sampleStats.mTotalInsertions++;
-          break;
-        case DELETION:
-          sampleStats.mHeterozygousDeletions++;
-          sampleStats.mTotalDeletions++;
-          break;
-        case INDEL:
-          sampleStats.mHeterozygousIndels++;
-          sampleStats.mTotalIndels++;
-          break;
-        case SV_BREAKEND:
-          sampleStats.mHeterozygousBreakends++;
-          sampleStats.mTotalBreakends++;
-          break;
-        case SV_SYMBOLIC:
-          sampleStats.mHeterozygousSymbolicSvs++;
-          sampleStats.mTotalSymbolicSvs++;
-          break;
-        default:
-          break;
-      }
-    } else {
-      switch (type) {
-        case SNP:
-          sampleStats.mHomozygousSnps++;
-          sampleStats.mTotalSnps++;
-          break;
-        case MNP:
-          sampleStats.mHomozygousMnps++;
-          sampleStats.mTotalMnps++;
-          break;
-        case INSERTION:
-          sampleStats.mHomozygousInsertions++;
-          sampleStats.mTotalInsertions++;
-          break;
-        case DELETION:
-          sampleStats.mHomozygousDeletions++;
-          sampleStats.mTotalDeletions++;
-          break;
-        case INDEL:
-          sampleStats.mHomozygousIndels++;
-          sampleStats.mTotalIndels++;
-          break;
-        case SV_BREAKEND:
-          sampleStats.mHomozygousBreakends++;
-          sampleStats.mTotalBreakends++;
-          break;
-        case SV_SYMBOLIC:
-          sampleStats.mHomozygousSymbolicSvs++;
-          sampleStats.mTotalSymbolicSvs++;
-          break;
-        default:
-          break;
-      }
-    }
   }
 
   Pair<List<String>, Map<String, List<String>>> perSampleMap() {

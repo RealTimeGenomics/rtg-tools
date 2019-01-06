@@ -50,49 +50,35 @@ public class PerSampleVariantStatistics {
       "No-call", "Reference", "SNP", "MNP", "Delete", "Insert", "Indel", "Breakend", "Symbolic"
   };
 
+  static final class VariantTypeCounts {
+    private long mTotal = 0;
+    private final long[] mCounts = new long[VariantType.values().length];
+    void incrementTotal() {
+      mTotal++;
+    }
+    long total() {
+      return mTotal;
+    }
+    void increment(VariantType type) {
+      mCounts[type.ordinal()]++;
+    }
+    long count(VariantType type) {
+      return mCounts[type.ordinal()];
+    }
+  }
+
   protected long mTotalUnchanged = 0;
-  protected long mHeterozygous = 0;
-  protected long mHomozygous = 0;
-  protected long mHaploid = 0;
   protected long mDeNovo = 0;
   protected long mPhased = 0;
   protected long mSomatic = 0;
 
-  protected long mTotalSnps = 0;
   protected long mTransitions = 0;
   protected long mTransversions = 0;
-  protected long mHeterozygousSnps = 0;
-  protected long mHomozygousSnps = 0;
-  protected long mHaploidSnps = 0;
 
-  protected long mTotalMnps = 0;
-  protected long mHeterozygousMnps = 0;
-  protected long mHomozygousMnps = 0;
-  protected long mHaploidMnps = 0;
-
-  protected long mTotalInsertions = 0;
-  protected long mHeterozygousInsertions = 0;
-  protected long mHomozygousInsertions = 0;
-  protected long mHaploidInsertions = 0;
-  protected long mTotalDeletions = 0;
-  protected long mHeterozygousDeletions = 0;
-  protected long mHomozygousDeletions = 0;
-  protected long mHaploidDeletions = 0;
-
-  protected long mTotalIndels = 0;
-  protected long mHeterozygousIndels = 0;
-  protected long mHomozygousIndels = 0;
-  protected long mHaploidIndels = 0;
-
-  protected long mTotalBreakends = 0;
-  protected long mHeterozygousBreakends = 0;
-  protected long mHomozygousBreakends = 0;
-  protected long mHaploidBreakends = 0;
-
-  protected long mTotalSymbolicSvs = 0;
-  protected long mHeterozygousSymbolicSvs = 0;
-  protected long mHomozygousSymbolicSvs = 0;
-  protected long mHaploidSymbolicSvs = 0;
+  protected final VariantTypeCounts mAll = new VariantTypeCounts();
+  protected final VariantTypeCounts mHeterozygous = new VariantTypeCounts();
+  protected final VariantTypeCounts mHomozygous = new VariantTypeCounts();
+  protected final VariantTypeCounts mHaploid = new VariantTypeCounts();
 
   protected long mMissingGenotype = 0;
   protected long mPartialCalls = 0;
@@ -102,8 +88,7 @@ public class PerSampleVariantStatistics {
 
   PerSampleVariantStatistics() {
     mAlleleLengths = new Histogram[VariantType.values().length];
-    for (int i = VariantType.SNP.ordinal(); i < mAlleleLengths.length; ++i) {
-      // i from SNP as we don't care about NO_CALL/UNCHANGED
+    for (int i = 0; i < mAlleleLengths.length; ++i) {
       mAlleleLengths[i] = new Histogram();
     }
   }
@@ -130,19 +115,19 @@ public class PerSampleVariantStatistics {
     final List<String> names = new ArrayList<>();
     final List<String> values = new ArrayList<>();
     names.add("SNPs");
-    values.add(Long.toString(mTotalSnps));
+    values.add(Long.toString(mAll.count(VariantType.SNP)));
     names.add("MNPs");
-    values.add(Long.toString(mTotalMnps));
+    values.add(Long.toString(mAll.count(VariantType.MNP)));
     names.add("Insertions");
-    values.add(Long.toString(mTotalInsertions));
+    values.add(Long.toString(mAll.count(VariantType.INSERTION)));
     names.add("Deletions");
-    values.add(Long.toString(mTotalDeletions));
+    values.add(Long.toString(mAll.count(VariantType.DELETION)));
     names.add("Indels");
-    values.add(Long.toString(mTotalIndels));
+    values.add(Long.toString(mAll.count(VariantType.INDEL)));
     names.add("Structural variant breakends");
-    values.add(mTotalBreakends > 0 ? Long.toString(mTotalBreakends) : null);
+    values.add(mAll.count(VariantType.SV_BREAKEND) > 0 ? Long.toString(mAll.count(VariantType.SV_BREAKEND)) : null);
     names.add("Symbolic structural variants");
-    values.add(mTotalSymbolicSvs > 0 ? Long.toString(mTotalSymbolicSvs) : null);
+    values.add(mAll.count(VariantType.SV_SYMBOLIC) > 0 ? Long.toString(mAll.count(VariantType.SV_SYMBOLIC)) : null);
     names.add("Same as reference");
     values.add(Long.toString(mTotalUnchanged));
     names.add("Missing Genotype");
@@ -156,53 +141,53 @@ public class PerSampleVariantStatistics {
     names.add("De Novo Genotypes");
     values.add(mDeNovo > 0 ? Long.toString(mDeNovo) : null);
     names.add("Phased Genotypes");
-    final long totalNonMissingGenotypes = mTotalSnps + mTotalMnps + mTotalInsertions + mTotalDeletions + mTotalIndels + mTotalUnchanged + mPartialCalls;
+    final long totalNonMissingGenotypes = mAll.count(VariantType.SNP) + mAll.count(VariantType.MNP) + mAll.count(VariantType.INSERTION) + mAll.count(VariantType.DELETION) + mAll.count(VariantType.INDEL) + mTotalUnchanged + mPartialCalls;
     values.add(mPhased > 0 ? VariantStatistics.percent(mPhased, totalNonMissingGenotypes) : null);
     names.add("SNP Transitions/Transversions");
     values.add(VariantStatistics.divide(mTransitions, mTransversions));
 
     //haploid stats
-    final Maybe haploid = maybe(mHaploid > 0);
+    final Maybe haploid = maybe(mHaploid.total() > 0);
     names.add("Total Haploid");
-    values.add(haploid.val(Long.toString(mHaploid)));
+    values.add(haploid.val(Long.toString(mHaploid.total())));
     names.add("Haploid SNPs");
-    values.add(haploid.val(Long.toString(mHaploidSnps)));
+    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.SNP))));
     names.add("Haploid MNPs");
-    values.add(haploid.val(Long.toString(mHaploidMnps)));
+    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.MNP))));
     names.add("Haploid Insertions");
-    values.add(haploid.val(Long.toString(mHaploidInsertions)));
+    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.INSERTION))));
     names.add("Haploid Deletions");
-    values.add(haploid.val(Long.toString(mHaploidDeletions)));
+    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.DELETION))));
     names.add("Haploid Indels");
-    values.add(haploid.val(Long.toString(mHaploidIndels)));
+    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.INDEL))));
     names.add("Haploid Breakends");
-    values.add(haploid.val(mHaploidBreakends > 0 ? Long.toString(mHaploidBreakends) : null));
+    values.add(haploid.val(mHaploid.count(VariantType.SV_BREAKEND) > 0 ? Long.toString(mHaploid.count(VariantType.SV_BREAKEND)) : null));
     names.add("Haploid Symbolic SVs");
-    values.add(haploid.val(mHaploidSymbolicSvs > 0 ? Long.toString(mHaploidSymbolicSvs) : null));
+    values.add(haploid.val(mHaploid.count(VariantType.SV_SYMBOLIC) > 0 ? Long.toString(mHaploid.count(VariantType.SV_SYMBOLIC)) : null));
 
     //not if haploid
-    final Maybe notHaploid = maybe(mHeterozygous > 0 || mHomozygous > 0);
+    final Maybe notHaploid = maybe(mHeterozygous.total() > 0 || mHomozygous.total() > 0);
     names.add("Total Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous, mHomozygous)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.total(), mHomozygous.total())));
     names.add("SNP Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygousSnps, mHomozygousSnps)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.count(VariantType.SNP), mHomozygous.count(VariantType.SNP))));
     names.add("MNP Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygousMnps, mHomozygousMnps)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.count(VariantType.MNP), mHomozygous.count(VariantType.MNP))));
     names.add("Insertion Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygousInsertions, mHomozygousInsertions)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.count(VariantType.INSERTION), mHomozygous.count(VariantType.INSERTION))));
     names.add("Deletion Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygousDeletions, mHomozygousDeletions)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.count(VariantType.DELETION), mHomozygous.count(VariantType.DELETION))));
     names.add("Indel Het/Hom ratio");
-    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygousIndels, mHomozygousIndels)));
+    values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.count(VariantType.INDEL), mHomozygous.count(VariantType.INDEL))));
     names.add("Breakend Het/Hom ratio");
-    values.add(notHaploid.val(mTotalBreakends - mHaploidBreakends > 0 ? VariantStatistics.divide(mHeterozygousBreakends, mHomozygousBreakends) : null));
+    values.add(notHaploid.val(mAll.count(VariantType.SV_BREAKEND) - mHaploid.count(VariantType.SV_BREAKEND) > 0 ? VariantStatistics.divide(mHeterozygous.count(VariantType.SV_BREAKEND), mHomozygous.count(VariantType.SV_BREAKEND)) : null));
     names.add("Symbolic SV Het/Hom ratio");
-    values.add(notHaploid.val(mTotalSymbolicSvs - mHaploidSymbolicSvs > 0 ? VariantStatistics.divide(mHeterozygousSymbolicSvs, mHomozygousSymbolicSvs) : null));
+    values.add(notHaploid.val(mAll.count(VariantType.SV_SYMBOLIC) - mHaploid.count(VariantType.SV_SYMBOLIC) > 0 ? VariantStatistics.divide(mHeterozygous.count(VariantType.SV_SYMBOLIC), mHomozygous.count(VariantType.SV_SYMBOLIC)) : null));
 
     names.add("Insertion/Deletion ratio");
-    values.add(VariantStatistics.divide(mTotalInsertions, mTotalDeletions));
+    values.add(VariantStatistics.divide(mAll.count(VariantType.INSERTION), mAll.count(VariantType.DELETION)));
     names.add("Indel/SNP+MNP ratio");
-    values.add(VariantStatistics.divide(mTotalIndels + mTotalInsertions + mTotalDeletions, mTotalSnps + mTotalMnps));
+    values.add(VariantStatistics.divide(mAll.count(VariantType.INDEL) + mAll.count(VariantType.INSERTION) + mAll.count(VariantType.DELETION), mAll.count(VariantType.SNP) + mAll.count(VariantType.MNP)));
     return Pair.create(names, values);
 
   }
