@@ -32,16 +32,13 @@ package com.rtg.launcher;
 import java.io.File;
 import java.io.IOException;
 
-import com.rtg.mode.SequenceMode;
+import com.rtg.mode.SequenceType;
 import com.rtg.reader.MockSequencesReader;
 import com.rtg.reader.SequencesReader;
-import com.rtg.util.Utils;
 
 /**
  */
 public class MockReaderParams extends ReaderParams {
-
-  private final SequenceMode mMode;
 
   private final long mMaxLength;
 
@@ -51,18 +48,17 @@ public class MockReaderParams extends ReaderParams {
    * Create a new {@link MockReaderParams}
    * @param length mock length for the mock reader.
    * @param numberSequences number of sequences.
-   * @param mode {@link SequenceMode}
+   * @param codeType {@link SequenceType}
    */
-  public MockReaderParams(final long length, final long numberSequences, final SequenceMode mode) {
-    this(new MockSequencesReader(mode.codeType(), numberSequences, length), mode);
+  public MockReaderParams(final long length, final long numberSequences, final SequenceType codeType) {
+    this(new MockSequencesReader(codeType, numberSequences, length));
   }
 
   /**
    * Create a new {@link MockReaderParams}
    * @param reader MockReader
-   * @param mode {@link SequenceMode}
    */
-  public MockReaderParams(final SequencesReader reader, final SequenceMode mode) {
+  public MockReaderParams(final SequencesReader reader) {
     mReader = reader;
     long mx;
     try {
@@ -71,7 +67,6 @@ public class MockReaderParams extends ReaderParams {
       mx = -1;
     }
     mMaxLength = mx;
-    mMode = mode;
   }
 
   /**
@@ -102,14 +97,6 @@ public class MockReaderParams extends ReaderParams {
   }
 
   /**
-   * @see ReaderParams#mode()
-   */
-  @Override
-  public SequenceMode mode() {
-    return mMode;
-  }
-
-  /**
    * @see ReaderParams#reader()
    */
   @Override
@@ -128,12 +115,12 @@ public class MockReaderParams extends ReaderParams {
   }
 
   void toString(final String prefix, final StringBuilder sb) {
-    sb.append(prefix).append("SequenceParams mode=").append(mMode).append(" directory=").append(directory());
+    sb.append(prefix).append("ReaderParams directory=").append(directory());
   }
 
   @Override
   public int hashCode() {
-    return Utils.pairHash(mMode.hashCode(), directory().hashCode());
+    return directory().hashCode();
   }
 
   @Override
@@ -145,7 +132,7 @@ public class MockReaderParams extends ReaderParams {
       return false;
     }
     final MockReaderParams that = (MockReaderParams) obj;
-    return this.mMode.equals(that.mMode) && this.directory().equals(that.directory());
+    return this.directory().equals(that.directory());
   }
 
 }

@@ -83,7 +83,7 @@ public class MappedParamsTest extends TestCase {
       assertNotNull(def.filterParams());
       assertNull(def.genome());
       def.close();
-      def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, false, true)).genome(new MockReaderParams(1, 1, SequenceMode.BIDIRECTIONAL)).create();
+      def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, false, true)).genome(new MockReaderParams(1, 1, SequenceMode.BIDIRECTIONAL.codeType())).create();
       assertNotNull(def.genome());
       def.close();
     } finally {

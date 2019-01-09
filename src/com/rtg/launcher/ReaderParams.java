@@ -34,30 +34,25 @@ import java.io.File;
 import java.io.IOException;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
-import com.rtg.mode.SequenceMode;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.Params;
 
 
 /**
+ * Encapsulates the desired SequencesReader to be opened.
  */
 @JumbleIgnore
 public abstract class ReaderParams implements Params, Closeable {
 
   /**
-   * Get the mode.
-   * @return the mode.
-   */
-  public abstract SequenceMode mode();
-
-  /**
-   * Get a SequencesReader for this sequence.
-   * @return a SequencesReader for this sequence. A single reader is returned on succesive calls.
+   * Open or return the SequencesReader.
+   * @return the SequencesReader. The same reader instance is returned on succesive calls.
    */
   public abstract SequencesReader reader();
 
   /**
    * Get the lengths of the sequences in the reader.
+   * This will result in the reader being opened if not already.
    * @return the lengths.
    * @throws IOException if an I/O Error occurs
    */
@@ -65,6 +60,7 @@ public abstract class ReaderParams implements Params, Closeable {
 
   /**
    * Get the length of the longest sequence.
+   * This will result in the reader being opened if not already.
    * @return the length of the longest sequence.
    */
   public abstract long maxLength();
@@ -77,8 +73,8 @@ public abstract class ReaderParams implements Params, Closeable {
   public abstract void close() throws IOException;
 
   /**
-   * Returns a directory
-   * @return directory
+   * Returns the directory corresponding to the SequencesReader source.
+   * @return directory, which may be null if the reader is not obtained from disk.
    */
   public abstract File directory();
 
