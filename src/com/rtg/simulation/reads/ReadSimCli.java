@@ -140,6 +140,8 @@ public class ReadSimCli extends LoggedCli {
   static final String DEL_EVENT_RATE = "Xdelete-event-rate";
   static final String BED_FILE = "Xbed-file";
 
+  private static final String IN_MEMORY_TEMPLATE = "Xin-memory-template";
+
   private static final String PCR_DUP_RATE = "Xpcr-duplicate-rate";
   private static final String CHIMERA_RATE = "Xchimera-rate";
 
@@ -180,6 +182,7 @@ public class ReadSimCli extends LoggedCli {
     mFlags.setCategories(UTILITY, INPUT_OUTPUT, CAT_FRAGMENTS, CAT_ILLUMINA_PE, CAT_ILLUMINA_SE, CAT_454_PE, CAT_ION_SE, CAT_CG, UTILITY);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, CommonFlags.SDF, "name for reads output SDF").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('t', INPUT, File.class, CommonFlags.SDF, "SDF containing input genome").setCategory(INPUT_OUTPUT);
+    CommonFlags.initForce(mFlags);
     final Flag<Double> covFlag = mFlags.registerOptional('c', COVERAGE, Double.class, CommonFlags.FLOAT, "coverage, must be positive").setCategory(CAT_FRAGMENTS);
     final Flag<Integer> nFlag = mFlags.registerOptional('n', READS, Integer.class, CommonFlags.INT, "number of reads to be generated").setCategory(CAT_FRAGMENTS);
 
@@ -213,6 +216,8 @@ public class ReadSimCli extends LoggedCli {
 
     mFlags.registerOptional(PCR_DUP_RATE, Double.class, CommonFlags.FLOAT, "set the PCR duplication error rate", 0.0).setCategory(UTILITY);
     mFlags.registerOptional(CHIMERA_RATE, Double.class, CommonFlags.FLOAT, "set the chimeric fragment error rate", 0.0).setCategory(UTILITY);
+
+    mFlags.registerOptional(IN_MEMORY_TEMPLATE, Boolean.class, "BOOL", "whether to load the template into memory", Boolean.TRUE).setCategory(UTILITY);
 
     mFlags.setValidator(new ReadSimCliValidator());
     initMachineFlags();
@@ -403,7 +408,7 @@ public class ReadSimCli extends LoggedCli {
   @Override
   protected int mainExec(OutputStream out, LogStream log) throws IOException {
     final File input = (File) mFlags.getValue(INPUT);
-    try (final SequencesReader reader = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(input, true, false, LongRange.NONE)) {
+    try (final SequencesReader reader = getReader(input)) {
       if (reader.numberSequences() > Integer.MAX_VALUE) {
         throw new NoTalkbackSlimException("Too many sequences");
       }
@@ -460,7 +465,6 @@ public class ReadSimCli extends LoggedCli {
         if (selectionProb != null) {
           FileUtils.stringToFile(gf.fractionStatistics(), new File(outputDirectory(), "fractions.tsv"));
         }
-        //writeTemplateMappingFile(getTemplateMapping(reader, twinReader));
         if (!FileUtils.isStdio(f)) {
           Diagnostic.info("Generated " + rw.readsWritten() + " reads, effective coverage " + Utils.realFormat(effectiveCoverage, 2));
           Diagnostic.info(m.formatActionsHistogram());
@@ -468,6 +472,12 @@ public class ReadSimCli extends LoggedCli {
       }
     }
     return 0;
+  }
+
+  private SequencesReader getReader(File input) throws IOException {
+    return (Boolean) mFlags.getValue(IN_MEMORY_TEMPLATE)
+      ? SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(input, true, false, LongRange.NONE)
+      : SequencesReaderFactory.createDefaultSequencesReaderCheckEmpty(input);
   }
 
   private double[] loadDistribution(SequencesReader reader, File file, boolean byDnaFraction) throws IOException {
