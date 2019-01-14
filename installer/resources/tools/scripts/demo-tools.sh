@@ -1,4 +1,4 @@
-#!/bin/bash -i
+#!/bin/bash
 
 # This script runs a complete demonstration of RTG simulation and
 # variant processing tools, using data simulated on the fly.  When
