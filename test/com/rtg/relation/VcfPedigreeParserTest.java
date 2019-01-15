@@ -57,7 +57,7 @@ public class VcfPedigreeParserTest extends AbstractNanoTest {
       final File pedFile = FileHelper.resourceToFile("com/rtg/relation/resources/pop.ped", new File(dir, "pop.ped"));
       final GenomeRelationships ped = PedFileParser.loadFile(pedFile);
       final VcfHeader header = new VcfHeader();
-      header.addLine(VcfHeader.VERSION_LINE);
+      header.addMetaInformationLine(VcfHeader.VERSION_LINE);
       VcfPedigreeParser.addPedigreeFields(header, ped);
       for (String sample : ped.filterByGenomes(new GenomeRelationships.PrimaryGenomeFilter(ped)).genomes()) {
         header.addSampleName(sample);
@@ -71,7 +71,7 @@ public class VcfPedigreeParserTest extends AbstractNanoTest {
       final File vcfFile = FileHelper.resourceToFile("com/rtg/relation/resources/vcffromped.vcf", new File(dir, "pop.vcf"));
       final GenomeRelationships ped = VcfPedigreeParser.loadFile(vcfFile);
       final VcfHeader header = new VcfHeader();
-      header.addLine(VcfHeader.VERSION_LINE);
+      header.addMetaInformationLine(VcfHeader.VERSION_LINE);
       VcfPedigreeParser.addPedigreeFields(header, ped);
       for (String sample : ped.filterByGenomes(new GenomeRelationships.PrimaryGenomeFilter(ped)).genomes()) {
         header.addSampleName(sample);
@@ -85,7 +85,7 @@ public class VcfPedigreeParserTest extends AbstractNanoTest {
       final File vcfFile = FileHelper.resourceToFile("com/rtg/relation/resources/derived.vcf", new File(dir, "pop.vcf"));
       final GenomeRelationships ped = VcfPedigreeParser.loadFile(vcfFile);
       final VcfHeader header = new VcfHeader();
-      header.addLine(VcfHeader.VERSION_LINE);
+      header.addMetaInformationLine(VcfHeader.VERSION_LINE);
       VcfPedigreeParser.addPedigreeFields(header, ped);
       for (String sample : ped.filterByGenomes(new GenomeRelationships.PrimaryGenomeFilter(ped)).genomes()) {
         header.addSampleName(sample);

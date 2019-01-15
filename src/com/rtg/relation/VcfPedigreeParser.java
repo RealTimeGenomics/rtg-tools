@@ -171,24 +171,24 @@ public final class VcfPedigreeParser {
       if (sex == Sex.FEMALE || sex == Sex.MALE) {
         sexStr = ",Sex=" + sex;
       }
-      vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + derived[0].first() + ",Genomes=" + derived[0].first() + ",Mixture=1.0" + sexStr + ",Description=\"Original genome\">");
+      vcf.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + derived[0].first() + ",Genomes=" + derived[0].first() + ",Mixture=1.0" + sexStr + ",Description=\"Original genome\">");
       final double con = Double.parseDouble(derived[0].getProperty("contamination"));
       final String mixture = Utils.realFormat(con, 2) + VcfUtils.VALUE_SEPARATOR + Utils.realFormat(1 - con, 2);
-      vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + derived[0].second() + ",Genomes=" + derived[0].first() + VcfUtils.VALUE_SEPARATOR + derived[0].second() + ",Mixture=" + mixture + sexStr + ",Description=\"Original genome;Derived genome\">");
-      vcf.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + derived[0].second() + ",Original=" + derived[0].first() + ">");
+      vcf.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + derived[0].second() + ",Genomes=" + derived[0].first() + VcfUtils.VALUE_SEPARATOR + derived[0].second() + ",Mixture=" + mixture + sexStr + ",Description=\"Original genome;Derived genome\">");
+      vcf.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + derived[0].second() + ",Original=" + derived[0].first() + ">");
     } else {
       final StringBuilder diseased = new StringBuilder();
       for (final String genome : outputSamples) {
         final Sex sex = gr.getSex(genome);
         if (sex == Sex.FEMALE || sex == Sex.MALE) {
-          vcf.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + genome + ",Sex=" + sex + ">");
+          vcf.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + genome + ",Sex=" + sex + ">");
         }
         if (gr.isDiseased(genome)) {
           diseased.append(",").append(genome);
         }
       }
       if (diseased.length() > 0) {
-        vcf.addLine(VcfHeader.META_STRING + "diseased=" + diseased.substring(1));
+        vcf.addMetaInformationLine(VcfHeader.META_STRING + "diseased=" + diseased.substring(1));
       }
       if (gr.relationships(Relationship.RelationshipType.PARENT_CHILD).length > 0) {
         // Do nuclear families
@@ -201,7 +201,7 @@ public final class VcfPedigreeParser {
         for (final Family f : families) {
           for (final String child : f.getChildren()) {
             if (isOutputGenome(outputSamples, child) || isOutputGenome(outputSamples, f.getMother()) || isOutputGenome(outputSamples, f.getFather())) {
-              vcf.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Mother=" + f.getMother() + ",Father=" + f.getFather() + ">");
+              vcf.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Mother=" + f.getMother() + ",Father=" + f.getFather() + ">");
             }
           }
         }
@@ -212,9 +212,9 @@ public final class VcfPedigreeParser {
             final String parent = relations[0].first();
             if (isOutputGenome(outputSamples, child) || isOutputGenome(outputSamples, parent)) {
               if (gr.getSex(parent) == Sex.FEMALE) {
-                vcf.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Mother=" + parent + ">");
+                vcf.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Mother=" + parent + ">");
               } else { // Arbitrarily make father if sex is not known? (Consistent with sloppy get families call)
-                vcf.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Father=" + parent + ">");
+                vcf.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + child + ",Father=" + parent + ">");
               }
             }
           }
@@ -222,7 +222,7 @@ public final class VcfPedigreeParser {
       }
       for (Relationship od : derived) {
         if (isOutputGenome(outputSamples, od.first()) || isOutputGenome(outputSamples, od.second())) {
-          vcf.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + od.second() + ",Original=" + od.first() + ">");
+          vcf.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + od.second() + ",Original=" + od.first() + ">");
         }
       }
     }

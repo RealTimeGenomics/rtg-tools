@@ -68,6 +68,11 @@ public class SampleField implements IdField<SampleField> {
     }
   }
 
+  @Override
+  public String fieldName() {
+    return "SAMPLE";
+  }
+
   /**
    * @return the ID field
    */

@@ -53,4 +53,8 @@ public interface IdField<T extends IdField<T>> {
    */
   String toString();
 
+  /**
+   * @return the header name used to differentiate this TypedField
+   */
+  String fieldName();
 }

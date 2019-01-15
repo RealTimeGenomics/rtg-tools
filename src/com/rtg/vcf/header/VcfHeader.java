@@ -181,11 +181,11 @@ public class VcfHeader {
    * Add the common header fields used in typical new VCF files
    */
   public void addCommonHeader() {
-    addLine(VERSION_LINE);
+    addMetaInformationLine(VERSION_LINE);
     final Calendar cal = Calendar.getInstance();
     final SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-    addLine(META_STRING + "fileDate=" + sdf.format(cal.getTime()));
-    addLine(META_STRING + "source=" + Environment.getVersion());
+    addMetaInformationLine(META_STRING + "fileDate=" + sdf.format(cal.getTime()));
+    addMetaInformationLine(META_STRING + "source=" + Environment.getVersion());
     addRunInfo();
   }
 
@@ -194,7 +194,7 @@ public class VcfHeader {
    */
   public void addRunInfo() {
     if (CommandLine.getCommandLine() != null) {
-      addLine(META_STRING + "CL=" + CommandLine.getCommandLine());
+      addMetaInformationLine(META_STRING + "CL=" + CommandLine.getCommandLine());
     }
   }
 
@@ -205,9 +205,9 @@ public class VcfHeader {
   public void addReference(SequencesReader reference) {
     final SdfId sdfId = reference.getSdfId();
     if (sdfId != null && sdfId.available()) {
-      addLine(VcfHeader.META_STRING + "TEMPLATE-SDF-ID=" + sdfId);
+      addMetaInformationLine(VcfHeader.META_STRING + "TEMPLATE-SDF-ID=" + sdfId);
     }
-    addLine(VcfHeader.META_STRING + "reference=" + reference.path());
+    addMetaInformationLine(VcfHeader.META_STRING + "reference=" + reference.path());
   }
 
   /**
@@ -217,10 +217,17 @@ public class VcfHeader {
   public void addContigFields(SAMFileHeader header) {
     final SAMSequenceDictionary dic =  header.getSequenceDictionary();
     for (final SAMSequenceRecord seq : dic.getSequences()) {
-      final String astag = (seq.getAttribute(SAMSequenceRecord.ASSEMBLY_TAG) == null) ? "" : (",as=" + seq.getAttribute(SAMSequenceRecord.ASSEMBLY_TAG));
-      final String md5tag = (seq.getAttribute(SAMSequenceRecord.MD5_TAG) == null) ? "" : (",md5=" + seq.getAttribute(SAMSequenceRecord.MD5_TAG));
-      final String speciestag = (seq.getAttribute(SAMSequenceRecord.SPECIES_TAG) == null) ? "" : (",species=\"" + seq.getAttribute(SAMSequenceRecord.SPECIES_TAG) + "\"");
-      addLine(META_STRING + "contig=<ID=\"" + seq.getSequenceName() + "\",length=" + seq.getSequenceLength() + astag + md5tag + speciestag + ">");
+      final ContigField f = new ContigField(seq.getSequenceName(), seq.getSequenceLength());
+      if (seq.getAttribute(SAMSequenceRecord.ASSEMBLY_TAG) != null) {
+        f.put("as", seq.getAttribute(SAMSequenceRecord.ASSEMBLY_TAG));
+      }
+      if (seq.getAttribute(SAMSequenceRecord.MD5_TAG) != null) {
+        f.put("md5", seq.getAttribute(SAMSequenceRecord.MD5_TAG));
+      }
+      if (seq.getAttribute(SAMSequenceRecord.SPECIES_TAG) != null) {
+        f.put("species", seq.getAttribute(SAMSequenceRecord.SPECIES_TAG));
+      }
+      addContigField(f);
     }
   }
 
@@ -241,7 +248,7 @@ public class VcfHeader {
    */
   public void addContigFields(SequencesReader reader) throws IOException {
     for (long i = 0; i < reader.numberSequences(); ++i) {
-      addLine(META_STRING + "contig=<ID=\"" + reader.name(i) + "\",length=" + reader.length(i) + ">");
+      addContigField(new ContigField(reader.name(i), reader.length(i)));
     }
   }
 
@@ -249,14 +256,34 @@ public class VcfHeader {
     return src.stream().filter(f -> f.getId().equals(id)).findFirst().orElse(null);
   }
 
+  private <T extends TypedField<T>> void ensureContainsTypedField(List<T> dest, T field) {
+    final T f = findIdField(dest, field.getId());
+    if (f != null) {
+      if (f.getType() != field.getType() || !f.getNumber().equals(field.getNumber())) {
+        throw new VcfFormatException("A VCF " + f.fieldName() + " field " + field.getId() + " which is incompatible is already present in the VCF header.");
+      }
+      return; // Field already present
+    }
+    dest.add(field);
+  }
+
+  private <T extends IdField<T>> void ensureContainsIdField(List<T> dest, T field) {
+    final T f = findIdField(dest, field.getId());
+    if (f != null) {
+      return; // Field already present
+    }
+    dest.add(field);
+  }
+
   private <T extends IdField<T>> void addIdField(List<T> dest, T field) {
     final T f = findIdField(dest, field.getId());
     if (f != null) {
       if (!f.equals(field)) {
-        throw new VcfFormatException("VCF header contains multiple field declarations with the same ID=" + field.getId() + StringUtils.LS
+        throw new VcfFormatException("VCF header contains multiple " + f.fieldName() + " field declarations with the same ID=" + field.getId() + StringUtils.LS
           + f.toString() + StringUtils.LS
           + field.toString());
       }
+      return; // Equivalent field already present
     }
     dest.add(field);
   }
@@ -337,10 +364,7 @@ public class VcfHeader {
    * @param field the new ALT field
    */
   public void ensureContains(AltField field) {
-    if (findIdField(getAltLines(), field.getId()) != null) {
-      return; // Field already present
-    }
-    addAltField(field);
+    ensureContainsIdField(mAltLines, field);
   }
 
   /**
@@ -348,10 +372,7 @@ public class VcfHeader {
    * @param field the new format field
    */
   public void ensureContains(FilterField field) {
-    if (getFilterField(field.getId()) != null) {
-      return; // Field already present
-    }
-    addFilterField(field);
+    ensureContainsIdField(mFilterLines, field);
   }
 
   /**
@@ -359,15 +380,7 @@ public class VcfHeader {
    * @param field the new format field
    */
   public void ensureContains(InfoField field) {
-    final InfoField f = getInfoField(field.getId());
-    if (f != null) {
-      if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
-        return; // Field already present
-      } else {
-        throw new VcfFormatException("A VCF INFO field " + field.getId() + " which is incompatible is already present in the VCF header.");
-      }
-    }
-    addInfoField(field);
+    ensureContainsTypedField(mInfoLines, field);
   }
 
   /**
@@ -375,15 +388,7 @@ public class VcfHeader {
    * @param field the new format field
    */
   public void ensureContains(FormatField field) {
-    final FormatField f = getFormatField(field.getId());
-    if (f != null) {
-      if (f.getType() == field.getType() && f.getNumber().equals(field.getNumber())) {
-        return; // Field already present
-      } else {
-        throw new VcfFormatException("A VCF FORMAT field " + field.getId() + " which is incompatible is already present in the VCF header.");
-      }
-    }
-    addFormatField(field);
+    ensureContainsTypedField(mFormatLines, field);
   }
 
   /**
@@ -470,6 +475,7 @@ public class VcfHeader {
   }
 
   /**
+   * Parse and add a header meta information line.
    * @param line meta information line
    * @return this, for call chaining
    */
@@ -503,21 +509,6 @@ public class VcfHeader {
       throw new VcfFormatException("Not a VCF meta information line");
     }
     return this;
-  }
-
-  /**
-   * Parse and add an arbitrary header/meta line.
-   * @param line line to add
-   * @return this for chaining
-   */
-  public VcfHeader addLine(String line) {
-    if (isMetaLine(line)) {
-      return addMetaInformationLine(line);
-    } else if (line.startsWith("#")) {
-      return addColumnHeaderLine(line);
-    } else {
-      throw new VcfFormatException("Unrecognized VCF header line");
-    }
   }
 
   /**

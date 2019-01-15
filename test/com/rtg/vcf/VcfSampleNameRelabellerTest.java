@@ -52,8 +52,9 @@ public class VcfSampleNameRelabellerTest extends TestCase {
     header.addSampleName("foo1");
     header.addSampleName("fooX");
     header.addSampleName("foo2");
-    header.addLine("##PEDIGREE=<Child=fooX,Mother=foo1,Father=foo2>");
-    header.addLine("##SAMPLE=<ID=foo1,Description=\"foo1\">"); // note description should not change
+    header.addMetaInformationLine("##PEDIGREE=<Child=fooX,Mother=foo1,Father=foo2>");
+    // note description should not change
+    header.addMetaInformationLine("##SAMPLE=<ID=foo1,Description=\"foo1\">");
     r.updateHeader(header);
     //System.out.println(header.toString());
     assertEquals(0, (int) header.getSampleIndex("bar1"));

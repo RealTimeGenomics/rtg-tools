@@ -218,11 +218,11 @@ public class ChildSampleSimulator {
 
     header.addSampleName(sample);
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
+      header.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
-    header.addLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + sample + ",Mother=" + mother + ",Father=" + father + ">");
+    header.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Child=" + sample + ",Mother=" + mother + ",Father=" + father + ">");
     if (mAddRunInfo) {
-      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+      header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
     }
 
     mStats = new ChildStatistics();

@@ -165,7 +165,7 @@ public abstract class PopulationVariantGenerator {
   public static void writeAsVcf(File vcfOutput, List<PopulationVariant> variants, SequencesReader reference, long seed) throws IOException {
     final VcfHeader header = new VcfHeader();
     header.addCommonHeader();
-    header.addLine(VcfHeader.META_STRING + "SEED=" + seed);
+    header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + seed);
     header.addReference(reference);
     header.addContigFields(reference);
     header.addInfoField(VcfUtils.INFO_ALLELE_FREQ, VcfUtils.INFO_ALLELE_FREQ_TYPE, VcfUtils.INFO_ALLELE_FREQ_NUM, VcfUtils.INFO_ALLELE_FREQ_DESC);

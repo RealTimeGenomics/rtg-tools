@@ -156,15 +156,15 @@ public class DeNovoSampleSimulator {
     } else {
       header.addSampleName(sample);
       if (originalSex == Sex.FEMALE || originalSex == Sex.MALE) {
-        header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
+        header.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + originalSex + ">");
       }
-      header.addLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
+      header.addMetaInformationLine(VcfHeader.PEDIGREE_STRING + "=<Derived=" + sample + ",Original=" + origSample + ">");
       mDerivedSampleId = header.getNumberOfSamples() - 1;
     }
     mNumSamples = header.getNumberOfSamples();
 
     if (mAddRunInfo) {
-      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+      header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
     }
 
     mStats = new VariantStatistics(null);

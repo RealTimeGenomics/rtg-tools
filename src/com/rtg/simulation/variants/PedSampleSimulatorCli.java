@@ -236,7 +236,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
       stats.onlySamples(mCreated.toArray(new String[mCreated.size()]));
       try (VcfReader reader = VcfReader.openVcfReader(results);
            VcfWriter writer = new StatisticsVcfWriter<>(new VcfWriterFactory(mFlags).addRunInfo(true).make(reader.getHeader(), outputVcf), stats)) {
-        writer.getHeader().addLine(VcfHeader.META_STRING + "SEED=" + random.getSeed());
+        writer.getHeader().addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + random.getSeed());
         while (reader.hasNext()) {
           writer.write(reader.next());
         }

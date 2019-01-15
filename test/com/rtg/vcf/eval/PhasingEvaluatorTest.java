@@ -80,7 +80,7 @@ public class PhasingEvaluatorTest extends TestCase {
       mMap.put(VariantSetType.BASELINE, makeVariantList(base, mBaselineVcf));
       mMap.put(VariantSetType.CALLS, makeVariantList(calls, mCallsVcf));
       mHeader = new VcfHeader();
-      mHeader.addLine(VcfHeader.VERSION_LINE);
+      mHeader.addMetaInformationLine(VcfHeader.VERSION_LINE);
       mHeader.addSampleName("SAMPLE");
     }
     @Override

@@ -84,6 +84,11 @@ public class FilterField implements IdField<FilterField> {
     return equals(other) ? this : null;
   }
 
+  @Override
+  public String fieldName() {
+    return "FILTER";
+  }
+
   /**
    * @return the ID field
    */

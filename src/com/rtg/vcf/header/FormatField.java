@@ -89,7 +89,7 @@ public class FormatField implements TypedField<FormatField> {
 
   @Override
   public int hashCode() {
-    return Utils.pairHash(Utils.pairHash(Utils.pairHash(mId.hashCode(), mNumber.hashCode()), mType.ordinal()), mDescription.hashCode());
+    return Utils.pairHash(mId.hashCode(), mNumber.hashCode(), mType.ordinal(), mDescription.hashCode());
   }
 
   @Override
@@ -103,6 +103,11 @@ public class FormatField implements TypedField<FormatField> {
       return other;
     }
     return null;
+  }
+
+  @Override
+  public String fieldName() {
+    return "FORMAT";
   }
 
   @Override

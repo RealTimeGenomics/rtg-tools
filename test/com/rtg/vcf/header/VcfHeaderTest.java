@@ -48,8 +48,7 @@ public class VcfHeaderTest extends TestCase {
   public void testVcfHeader() {
     final VcfHeader head = new VcfHeader();
     head.addMetaInformationLine("##test1212121")
-    .addMetaInformationLine("##test12")
-    .addLine("##PEDIGREE=<Child=NA19240,Mother=NA19239,Father=NA19238>");
+  .addMetaInformationLine("##test12").addMetaInformationLine("##PEDIGREE=<Child=NA19240,Mother=NA19239,Father=NA19238>");
     head.addSampleName("sample1")
       .addSampleName("sample2");
 

@@ -84,6 +84,11 @@ public class AltField implements IdField<AltField> {
     return equals(other) ? this : null;
   }
 
+  @Override
+  public String fieldName() {
+    return "ALT";
+  }
+
   /**
    * @return the ID field
    */

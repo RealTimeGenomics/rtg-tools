@@ -65,19 +65,19 @@ public class VcfMergeTest extends AbstractCliTest {
     MINIMAL_HEADER = new VcfHeader();
     MINIMAL_HEADER.setVersionValue("VCFv4.1");
     MINIMAL_HEADER.addFormatField("GT", MetaType.STRING, VcfNumber.ONE, "Genotype");
-    MINIMAL_HEADER.addLine(VcfHeader.META_STRING + "contig=<ID=\"chr2\",length=10000>");
-    MINIMAL_HEADER.addLine(VcfHeader.META_STRING + "contig=<ID=\"chr3\",length=10000>");
-    MINIMAL_HEADER.addLine(VcfHeader.META_STRING + "contig=<ID=\"1\",length=10000000>");
+    MINIMAL_HEADER.addMetaInformationLine(VcfHeader.META_STRING + "contig=<ID=\"chr2\",length=10000>");
+    MINIMAL_HEADER.addMetaInformationLine(VcfHeader.META_STRING + "contig=<ID=\"chr3\",length=10000>");
+    MINIMAL_HEADER.addMetaInformationLine(VcfHeader.META_STRING + "contig=<ID=\"1\",length=10000000>");
     MINIMAL_HEADER.addSampleName("%1$s");
 
     HEADER2 = new VcfHeader();
     HEADER2.setVersionValue("VCFv4.1");
     HEADER2.addFormatField("GT", MetaType.STRING, VcfNumber.ONE, "Genotype");
-    HEADER2.addLine(VcfHeader.META_STRING + "INFO=<ID=XRX,Number=0,Type=Flag,Description=\"RTG variant was called using complex caller\">");
-    HEADER2.addLine(VcfHeader.META_STRING + "INFO=<ID=RCE,Number=0,Type=Flag,Description=\"RTG variant is equivalent to the previous variant\">");
-    HEADER2.addLine(VcfHeader.META_STRING + "INFO=<ID=CT,Number=1,Type=Integer,Description=\"Coverage threshold that was applied\">");
-    HEADER2.addLine(VcfHeader.META_STRING + "contig=<ID=\"chr2\",length=10000>");
-    HEADER2.addLine(VcfHeader.META_STRING + "contig=<ID=\"chr3\",length=10000>");
+    HEADER2.addMetaInformationLine(VcfHeader.META_STRING + "INFO=<ID=XRX,Number=0,Type=Flag,Description=\"RTG variant was called using complex caller\">");
+    HEADER2.addMetaInformationLine(VcfHeader.META_STRING + "INFO=<ID=RCE,Number=0,Type=Flag,Description=\"RTG variant is equivalent to the previous variant\">");
+    HEADER2.addMetaInformationLine(VcfHeader.META_STRING + "INFO=<ID=CT,Number=1,Type=Integer,Description=\"Coverage threshold that was applied\">");
+    HEADER2.addMetaInformationLine(VcfHeader.META_STRING + "contig=<ID=\"chr2\",length=10000>");
+    HEADER2.addMetaInformationLine(VcfHeader.META_STRING + "contig=<ID=\"chr3\",length=10000>");
     HEADER2.addSampleName("%1$s");
   }
 

@@ -80,7 +80,7 @@ public class PedigreeField {
   public int hashCode() {
     int h = 0;
     for (final Map.Entry<String, String> e : mSamples.entrySet()) {
-      h = Utils.pairHash(h, Utils.pairHash(e.getKey().hashCode(), e.getValue().hashCode()));
+      h = Utils.pairHash(h, e.getKey().hashCode(), e.getValue().hashCode());
     }
     return h;
   }

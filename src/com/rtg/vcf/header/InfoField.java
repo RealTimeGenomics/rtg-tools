@@ -80,7 +80,10 @@ public class InfoField implements TypedField<InfoField> {
 
   @Override
   public boolean equals(Object obj) {
-    return mostlyEquals(obj) && mType == ((InfoField) obj).mType;
+    return mostlyEquals(obj)
+      && mType == ((InfoField) obj).mType
+      && Utils.equals(mSource, ((InfoField) obj).mSource)
+      && Utils.equals(mVersion, ((InfoField) obj).mVersion);
   }
 
   // True if no field conflicts preventing merge
@@ -89,7 +92,8 @@ public class InfoField implements TypedField<InfoField> {
       return false;
     }
     final InfoField other = (InfoField) obj;
-    return mId.equals(other.mId) && mNumber.equals(other.mNumber) && mDescription.equals(other.mDescription);
+    return mId.equals(other.mId) && mNumber.equals(other.mNumber)
+      && mDescription.equals(other.mDescription);
   }
 
   @Override
@@ -107,7 +111,12 @@ public class InfoField implements TypedField<InfoField> {
 
   @Override
   public int hashCode() {
-    return Utils.pairHash(Utils.pairHash(Utils.pairHash(mId.hashCode(), mNumber.hashCode()), mType.ordinal()), mDescription.hashCode());
+    return Utils.pairHashContinuous(mId.hashCode(), mNumber.hashCode(), mType.ordinal(), mDescription.hashCode(), mSource == null ? 0 : mSource.hashCode(), mVersion == null ? 0 : mVersion.hashCode());
+  }
+
+  @Override
+  public String fieldName() {
+    return "INFO";
   }
 
   @Override

@@ -119,10 +119,10 @@ public class SampleSimulator {
       header.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype");
     }
     if (sex == Sex.FEMALE || sex == Sex.MALE) {
-      header.addLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
+      header.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + sample + ",Sex=" + sex + ">");
     }
     if (mAddRunInfo) {
-      header.addLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
+      header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
     }
 
     try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile)) {

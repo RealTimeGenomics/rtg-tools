@@ -75,6 +75,15 @@ public class ContigField implements IdField<ContigField> {
     mValues = new LinkedHashMap<>();
   }
 
+  /**
+   * Put an additional pair into the header field
+   * @param key the key
+   * @param value the value
+   */
+  public void put(String key, String value) {
+    mValues.put(key, value);
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof ContigField)) {
@@ -82,8 +91,7 @@ public class ContigField implements IdField<ContigField> {
     }
     final ContigField other = (ContigField) obj;
     return mostlyEquals(other)
-      && ((mLength == null) == (other.mLength == null))
-      && (mLength == null || mLength.equals(other.mLength))
+      && Utils.equals(mLength, other.mLength)
       && mValues.equals(other.mValues);
   }
 
@@ -92,7 +100,8 @@ public class ContigField implements IdField<ContigField> {
     if (!mId.equals(other.mId)) {
       return false;
     }
-    if (mLength != null && other.mLength != null && !mLength.equals(other.mLength)) {
+    // A null length in either side doesn't break the mostlyEquals
+    if (!(mLength == null || other.mLength == null || mLength.equals(other.mLength))) {
       return false;
     }
     for (Map.Entry<String, String> entry : mValues.entrySet()) {
@@ -106,7 +115,7 @@ public class ContigField implements IdField<ContigField> {
 
   @Override
   public int hashCode() {
-    return Utils.pairHash(Utils.pairHash(mId.hashCode(), mValues.hashCode()), mLength != null ? mLength : 0);
+    return Utils.pairHash(mId.hashCode(), mValues.hashCode(), mLength != null ? mLength : 0);
   }
 
   @Override
@@ -121,6 +130,11 @@ public class ContigField implements IdField<ContigField> {
     result.mValues.putAll(mValues);
     result.mValues.putAll(other.mValues);
     return result;
+  }
+
+  @Override
+  public String fieldName() {
+    return "contig";
   }
 
   /**
