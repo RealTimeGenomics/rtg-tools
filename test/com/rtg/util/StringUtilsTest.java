@@ -293,6 +293,12 @@ public class StringUtilsTest extends TestCase {
     assertEquals("hello\t\n\r#there\\", StringUtils.removeBackslashEscapes("hello\\t\\n\\r\\#there\\\\"));
     assertEquals("foo", StringUtils.removeBackslashEscapes("foo#bar"));
   }
+  public void testDumbQuote() {
+    assertEquals("", StringUtils.dumbUnQuote(""));
+    assertEquals("", StringUtils.dumbUnQuote("\"\""));
+    assertEquals("hello\\t\\n\\r#there\\", StringUtils.dumbUnQuote("hello\\t\\n\\r#there\\\\"));
+    assertEquals("hello\\t\\n\\r#there\\", StringUtils.dumbUnQuote(StringUtils.dumbQuote("hello\\t\\n\\r#there\\")));
+  }
 
   public void testDeepCopy() {
     final String s = "foo";

@@ -820,7 +820,7 @@ public class VcfHeader {
         final String key = keyValMatcher.group(1).trim();
         String val = keyValMatcher.group(2);
         if (val != null) {
-          val = StringUtils.removeBackslashEscapes(val.trim());
+          val = StringUtils.dumbUnQuote(val.trim());
         }
         ret.put(key, val);
       } else {

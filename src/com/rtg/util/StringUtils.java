@@ -489,6 +489,15 @@ public final class StringUtils {
   }
 
   /**
+   * Does an deep copy of the input string and returns so <code>input != (return value)</code>
+   * @param s input string
+   * @return deep copy
+   */
+  public static String deepCopy(final String s) {
+    return new String(s);
+  }
+
+  /**
    * Remove backslash escape sequences from a string.
    * @param s string to remove escapes from
    * @return string without backslash escapes
@@ -526,12 +535,15 @@ public final class StringUtils {
   }
 
   /**
-   * Does an deep copy of the input string and returns so <code>input != (return value)</code>
-   * @param s input string
-   * @return deep copy
+   * Unquotes a VCF header style string, converting backslash escaped backslash and double quotes.
+   * @param s string to unquote
+   * @return unquoted string
    */
-  public static String deepCopy(final String s) {
-    return new String(s);
+  public static String dumbUnQuote(String s) {
+    final String s1 = (s.length() > 0 && s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"')
+      ? s.substring(1, s.length() - 1)
+      : s;
+    return s1.replaceAll("\\\\\\\\", "\\\\").replaceAll("\\\\\"", "\"");
   }
 
   /**
