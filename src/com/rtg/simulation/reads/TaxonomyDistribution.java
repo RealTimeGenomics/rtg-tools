@@ -36,8 +36,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
@@ -92,6 +94,14 @@ public class TaxonomyDistribution {
           sequences.mDist = dist;
         }
       }
+    }
+
+    // Get a list of all the user supplied taxon ids that were not found
+    final Set<Integer> supplied = new HashSet<>(taxonomyDistribution.keySet());
+    supplied.removeAll(taxon.keySet());
+    if (!supplied.isEmpty()) {
+      Diagnostic.warning("Ignored " + supplied.size() + " taxon ids that were not in the reference SDF with associated sequence data.");
+      Diagnostic.userLog("Taxon ids: " + supplied);
     }
 
     // Compute non-normalized distribution over selected sequences
