@@ -29,6 +29,8 @@
  */
 package com.rtg.vcf.header;
 
+import com.rtg.util.TestUtils;
+
 import junit.framework.TestCase;
 
 /**
@@ -65,5 +67,10 @@ public class InfoFieldTest extends TestCase {
     assertEquals(f2, f2.superSet(f2));
     assertNull(f2.superSet(f));
     assertNull(f.superSet(f2));
+
+    final String io3 = "##INFO=<ID=foo,Number=A,Type=Flag,Description=\"oh \\\"something quoted\\\" followed by backslash \\\\ and not tab \\t the end\", Source=\"dbsnp\",Version=\"138\">";
+    final InfoField f3 = new InfoField(io3);
+    assertEquals("oh \"something quoted\" followed by backslash \\ and not tab \\t the end", f3.getDescription());
+    TestUtils.containsAll(f3.toString(), "Source=\"dbsnp\"", "Version=\"138\"");
   }
 }

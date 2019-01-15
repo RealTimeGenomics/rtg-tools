@@ -45,6 +45,8 @@ public class InfoField implements TypedField<InfoField> {
   private final MetaType mType;
   private final VcfNumber mNumber;
   private final String mDescription;
+  private final String mSource;
+  private final String mVersion;
 
   /**
    * @param line info line from <code>VCF</code> file
@@ -56,6 +58,8 @@ public class InfoField implements TypedField<InfoField> {
     mType = MetaType.parseValue(temp.get("Type"));
     mNumber = new VcfNumber(temp.get("Number"));
     mDescription = temp.get("Description");
+    mSource = temp.getOrDefault("Source", null);
+    mVersion = temp.getOrDefault("Version", null);
   }
 
   /**
@@ -70,6 +74,8 @@ public class InfoField implements TypedField<InfoField> {
     mType = type;
     mNumber = number;
     mDescription = description;
+    mSource = null;
+    mVersion = null;
   }
 
   @Override
@@ -126,7 +132,11 @@ public class InfoField implements TypedField<InfoField> {
 
   @Override
   public String toString() {
-    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType + ",Description=" + StringUtils.dumbQuote(mDescription) + ">";
+    return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType
+      + ",Description=" + StringUtils.dumbQuote(mDescription)
+      + (mSource == null ? "" : ",Source=" + StringUtils.dumbQuote(mSource))
+      + (mVersion == null ? "" : ",Version=" + StringUtils.dumbQuote(mVersion))
+      + ">";
   }
 
 }

@@ -167,7 +167,7 @@ public class VcfHeaderTest extends TestCase {
     assertEquals(5, f.getNumber().getNumber());
     assertEquals(VcfNumberType.INTEGER, f.getNumber().getNumberType());
     assertEquals(MetaType.FLOAT, f.getType());
-    assertEquals("have some  \\ kinda \" stuff yeah.", f.getDescription());
+    assertEquals("have some \\ \\ kinda \" stuff yeah.", f.getDescription());
   }
 
   public void testSampleRemovalAll() {
