@@ -56,6 +56,7 @@ import com.rtg.tabix.BgZip;
 import com.rtg.tabix.ExtractCli;
 import com.rtg.tabix.IndexerCli;
 import com.rtg.util.License;
+import com.rtg.variant.cnv.cnveval.CnvEvalCli;
 import com.rtg.variant.sv.VcfSvDecomposer;
 import com.rtg.variant.sv.bndeval.BndEvalCli;
 import com.rtg.vcf.VcfAnnotatorCli;
@@ -106,6 +107,7 @@ public final class ToolsCommand {
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command CNVEVAL = new Command(new CnvEvalCli(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command ROCPLOT = new Command(new RocPlotCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -141,7 +143,7 @@ public final class ToolsCommand {
     MENDELIAN, VCFSTATS, VCFMERGE,                       // VCF related
     VCFFILTER, VCFANNOTATE, VCFSUBSET,
     VCFDECOMPOSE, VCFEVAL,
-    SVDECOMPOSE, BNDEVAL,
+    SVDECOMPOSE, BNDEVAL, CNVEVAL,
     PEDFILTER, PEDSTATS,
     ROCPLOT,
 
