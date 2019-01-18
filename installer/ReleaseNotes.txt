@@ -5,6 +5,44 @@ RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
 
+RTG Core 3.10.1 (2019-01-21)
+----------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* vcfdecompose: Fix a case where extremely long indels could cause an
+  exception during call decomposition. This also affected vcfeval when
+  using --decompose.
+
+* demo scripts: Fix the demo script not pausing for the user under newer
+  versions of bash.
+
+* map: Fix an exception that could be triggered during report generation
+  when using --all-hits.
+
+* rocplot: (gui) Fix the status bar metrics not showing when the curve
+  hugs an axis.
+
+* rocplot: Fix a rare exception that would occur during
+  precision/sensitivity plotting if the input data file contained
+  redundant initial points.
+
+* vcveval: Initial support for "partial spanning deletion" notation that
+  octopus uses in some calls.
+
+* vcfmerge: Now allows -f to be a comma-separated list.
+
+* vcfstats: The percent phased genotypes statistic was incorrectly
+  calculated for call sets using partial genotypes (e.g. ".|1")
+
+* many: VCF header parsing of the INFO/FORMAT Description component was
+  incorrectly de-escaping additional backslash sequences, which could
+  result in invalid VCF output.
+
+* readsim: Warn if the user supplied taxonomic distribution make
+  reference to unusable taxon ids.
+
+
 RTG Core 3.10 (2018-10-29)
 --------------------------
 
