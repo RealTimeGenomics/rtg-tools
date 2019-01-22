@@ -83,7 +83,8 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      */
     function infoSet(field) {
         return function (value) {
-            if (value == null || value == "." || value == false) {
+            //if (value == null || value == "." || value == "" || value === false) {
+            if (value == null || value === "." || value === "" || value === false) {
                 RTG_VCF_RECORD.removeInfo(field);
             } else {
                 var ArrayList = Java.type("java.util.ArrayList");
@@ -135,7 +136,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      * Set the ID for the current record, as string or array
      */
     function setId(value) {
-        if (value == null || value == "." || value == false) {
+        if (value == null || value === "." || value === "" || value === false) {
             RTG_VCF_RECORD.setId();
         } else {
             if (!Array.isArray(value)) {
@@ -191,7 +192,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      * Set the FILTER for the current record, as string or array
      */
     function setFilter(value) {
-        if (value == null || value == "." || value == false) {
+        if (value == null || value === "." || value === "" || value === false) {
             RTG_VCF_RECORD.getFilters().clear();
         } else {
             RTG_VCF_RECORD.getFilters().clear();
@@ -207,7 +208,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      * Add a FILTER for the current record, as string or array
      */
     function addFilter(value) {
-        if (value == null || value == "." || value == false) {
+        if (value == null || value === "." || value === "" || value === false) {
             RTG_VCF_RECORD.getFilters().clear();
         } else {
             if (!Array.isArray(value)) {
