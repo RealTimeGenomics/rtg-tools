@@ -103,7 +103,7 @@ public class TaxonomyDistributionTest extends TestCase {
       TaxonomyDistribution.parseTaxonDistribution(new ByteArrayInputStream(malformed.getBytes()));
       fail();
     } catch (IOException e) {
-      assertEquals("Malformed line: " + malformedLine, e.getMessage());
+      TestUtils.containsAll(e.getMessage(), malformedLine);
     }
   }
   public void testParserNotDouble() {
@@ -116,7 +116,7 @@ public class TaxonomyDistributionTest extends TestCase {
       TaxonomyDistribution.parseTaxonDistribution(new ByteArrayInputStream(malformed.getBytes()));
       fail();
     } catch (IOException e) {
-      assertEquals("Malformed line: " + malformedLine, e.getMessage());
+      TestUtils.containsAll(e.getMessage(), malformedLine);
     }
   }
   public void testParserNotIntegral() {
@@ -129,7 +129,7 @@ public class TaxonomyDistributionTest extends TestCase {
       TaxonomyDistribution.parseTaxonDistribution(new ByteArrayInputStream(malformed.getBytes()));
       fail();
     } catch (IOException e) {
-      assertEquals("Malformed line: " + malformedLine, e.getMessage());
+      TestUtils.containsAll(e.getMessage(), malformedLine);
     }
   }
   public void testParserDuplicateId() {
@@ -142,7 +142,7 @@ public class TaxonomyDistributionTest extends TestCase {
       TaxonomyDistribution.parseTaxonDistribution(new ByteArrayInputStream(malformed.getBytes()));
       fail();
     } catch (IOException e) {
-      assertEquals("Duplicated key: " + malformedLine, e.getMessage());
+      TestUtils.containsAll(e.getMessage(), malformedLine);
     }
   }
 

@@ -52,6 +52,7 @@ import com.rtg.bed.BedUtils;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.mode.SequenceType;
+import com.rtg.reader.CachingSequencesReader;
 import com.rtg.reader.FastqUtils;
 import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
@@ -475,9 +476,10 @@ public class ReadSimCli extends LoggedCli {
   }
 
   private SequencesReader getReader(File input) throws IOException {
+    // For non-in-memory reader, use a cache since we'll be doing a lot of random access to relatively few sequences
     return (Boolean) mFlags.getValue(IN_MEMORY_TEMPLATE)
       ? SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(input, true, false, LongRange.NONE)
-      : SequencesReaderFactory.createDefaultSequencesReaderCheckEmpty(input);
+      : new CachingSequencesReader(SequencesReaderFactory.createDefaultSequencesReaderCheckEmpty(input));
   }
 
   private double[] loadDistribution(SequencesReader reader, File file, boolean byDnaFraction) throws IOException {
@@ -500,6 +502,9 @@ public class ReadSimCli extends LoggedCli {
       }
       if (Math.abs(sum - 1) > 0.00001) {
         throw new NoTalkbackSlimException("Some sequences not seen in supplied template, sum:" + String.format("%1.5g", sum));
+      }
+      if (sum <= 0) {
+        throw new NoTalkbackSlimException("After intersection of supplied distribution with reference SDF, distribution was empty!");
       }
     }
     Diagnostic.userLog("Distribution complete");

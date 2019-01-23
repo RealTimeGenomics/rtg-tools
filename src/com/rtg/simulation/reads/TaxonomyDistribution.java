@@ -45,6 +45,7 @@ import com.rtg.reader.NamesInterface;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.AutoAddMap;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
  * We want to simulate meta-genomic communities
@@ -76,7 +77,7 @@ public class TaxonomyDistribution {
    */
   TaxonomyDistribution(InputStream taxonomyDist, Map<String, Integer> taxonLookup, SequencesReader reader, DistributionType type) throws IOException {
     final Map<Integer, Double> taxonomyDistribution = parseTaxonDistribution(taxonomyDist);
-    Diagnostic.userLog("Taxonomy distribution:" + taxonomyDistribution);
+    Diagnostic.userLog("Read taxonomy distribution (" + taxonomyDistribution.size() + " entries):" + taxonomyDistribution);
 
     // Identify the sequences corresponding to each taxon ID
     final AutoAddMap<Integer, TaxonSequences> taxon = new TaxonMap();
@@ -127,6 +128,9 @@ public class TaxonomyDistribution {
       mDistribution[i] =  val == null ? 0 : val;
       sum += mDistribution[i];
     }
+    if (sum <= 0) {
+      throw new NoTalkbackSlimException("After intersection of supplied taxonomy distribution with reference SDF, distribution was empty!");
+    }
     for (int i = 0; i < mDistribution.length; ++i) {
       mDistribution[i] = mDistribution[i] / sum;
     }
@@ -151,21 +155,21 @@ public class TaxonomyDistribution {
         if (line.length() > 0 && line.charAt(0) != '#') {
           final String[] parts = line.trim().split("\\s+");
           if (parts.length != 2) {
-            throw new IOException("Malformed line: " + line);
+            throw new IOException("Malformed line in taxon distribution: " + line);
           }
           try {
             final double p = Double.parseDouble(parts[0]);
             if (p < 0 || p > 1) {
-              throw new IOException("Malformed line: " + line);
+              throw new IOException("Malformed line in taxon distribution: " + line);
             }
             sum += p;
             final Integer taxonId = Integer.valueOf(parts[1]);
             if (map.containsKey(taxonId)) {
-              throw new IOException("Duplicated key: " + line);
+              throw new IOException("Duplicated key in taxon distribution: " + line);
             }
             map.put(taxonId, p);
           } catch (final NumberFormatException e) {
-            throw new IOException("Malformed line: " + line, e);
+            throw new IOException("Malformed line in taxon distribution: " + line, e);
           }
         }
       }
