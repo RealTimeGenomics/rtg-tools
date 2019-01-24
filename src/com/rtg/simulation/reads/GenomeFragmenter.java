@@ -185,20 +185,19 @@ public class GenomeFragmenter {
             return;
           }
         } else if (!mRefGenome[readerId].sequence(seqName).isLinear()) {
-          final int seqLen = mReaders[readerId].length(seqId);
           int remaining = fragLength;
           int soFar = 0;
           int cPos = fragStart;
           // sequence is circular and can even be shorter than the fragment size, hence ...
           while (remaining > 0) {
-            final int readLen = Math.min(remaining, seqLen - cPos);
+            final int readLen = Math.min(remaining, sequenceLength - cPos);
             assert readLen > 0;
             mReaders[readerId].read(seqId, mWorkspace, cPos, readLen);
             System.arraycopy(mWorkspace, 0, mByteBuffer, soFar, readLen);
             soFar += readLen;
             remaining -= readLen;
             cPos += readLen;
-            cPos %= seqLen;
+            cPos %= sequenceLength;
           }
           assert soFar == fragLength;
           if (checkNs(fragLength) && emitFragment(fragLength, seqId, readerId, seqName, fragStart)) {
