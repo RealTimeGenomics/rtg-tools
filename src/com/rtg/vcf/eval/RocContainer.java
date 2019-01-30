@@ -106,12 +106,13 @@ public class RocContainer {
 
   private static final String SLOPE_EXT = "_slope.tsv";
 
-  private final boolean mRescaleCategories = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_ROC_SUBSET_RESCALE);
+  private final boolean mRescaleCategories;
   private final String mFieldLabel;
   private final Map<RocFilter, SortedMap<Double, RocPoint<Double>>> mRocs = new LinkedHashMap<>();
   private final Comparator<Double> mComparator;
   private final RocSortValueExtractor mRocExtractor;
   private final String mFilePrefix;
+  private final RocFilter mDefaultRocFilter;
   private RocPointCriteria mBestCutpoint = new FMeasureThreshold();
   private int mNoScoreVariants = 0;
   private boolean mRequiresGt = false;
@@ -130,6 +131,17 @@ public class RocContainer {
    * @param filePrefix prefix attached to ROC output file names
    */
   public RocContainer(RocSortValueExtractor extractor, String filePrefix) {
+    this(extractor, filePrefix, RocFilter.ALL, GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_ROC_SUBSET_RESCALE));
+  }
+
+  /**
+   * Constructor
+   * @param extractor responsible for extracting ROC scores from VCF records.
+   * @param filePrefix prefix attached to ROC output file names
+   * @param filter the RocFilter to regard as the default for summary reporting
+   * @param rescale true if rescaling is permitted
+   */
+  public RocContainer(RocSortValueExtractor extractor, String filePrefix, RocFilter filter, boolean rescale) {
     switch (extractor.getSortOrder()) {
       case ASCENDING:
         mComparator = new AscendingDoubleComparator();
@@ -142,6 +154,8 @@ public class RocContainer {
     mFieldLabel = extractor.toString();
     mFilePrefix = filePrefix;
     mRocExtractor = extractor;
+    mDefaultRocFilter = filter;
+    mRescaleCategories = rescale;
   }
 
   /**
@@ -265,9 +279,9 @@ public class RocContainer {
       // For example, if the baseline atomizes all variants to SNPs but the called variants keep MNPs and complex variants as a
       // unit, many of the TP baseline SNPs end up getting their correctness associated with the non_snp ROC. To
       // adjust for this, we scale each categorized baseline TP metric so that the endpoints are the same.
-      final boolean rescale = mRescaleCategories && filter != RocFilter.ALL;
-      final int totalBaselineVariants = mBaselineTotals.get(rescale ? filter : RocFilter.ALL);
-      final RocPoint<Double> total = getTotal(rescale ? filter : RocFilter.ALL); // Get totals according to call-representation categorization
+      final boolean rescale = mRescaleCategories && filter != mDefaultRocFilter;
+      final int totalBaselineVariants = mBaselineTotals.get(rescale ? filter : mDefaultRocFilter);
+      final RocPoint<Double> total = getTotal(rescale ? filter : mDefaultRocFilter); // Get totals according to call-representation categorization
       final int totalCallVariants = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives());
 
       final double scale;
@@ -278,7 +292,7 @@ public class RocContainer {
         scale = total.getTruePositives() > 0 ? totalBaselineTp / total.getTruePositives() : 1;
         Diagnostic.userLog("Representation bias correction factor for " + filter + " " + totalBaselineTp + "/" + total.getTruePositives() + " = " + scale);
       } else {
-        extraMetrics = filter == RocFilter.ALL && totalBaselineVariants > 0;
+        extraMetrics = filter == mDefaultRocFilter && totalBaselineVariants > 0;
         scale = 1.0;
       }
 
@@ -344,7 +358,7 @@ public class RocContainer {
         + "\t" + Utils.realFormat(precision, METRICS_DP)
         + "\t" + Utils.realFormat(recall, METRICS_DP)
         + "\t" + Utils.realFormat(fMeasure, METRICS_DP));
-      if ((filter == RocFilter.ALL) && !Double.isNaN(point.getThreshold())) {
+      if ((filter == mDefaultRocFilter) && !Double.isNaN(point.getThreshold())) {
         mBestCutpoint.considerRocPoint(point, precision, recall, fMeasure);
       }
     }
@@ -373,7 +387,7 @@ public class RocContainer {
   public void writeSummary(File outDir) throws IOException {
     final File summaryFile = new File(outDir, mFilePrefix + CommonFlags.SUMMARY_FILE);
     final String summary;
-    final int totalPositives = mBaselineTotals.get(RocFilter.ALL);
+    final int totalPositives = mBaselineTotals.get(mDefaultRocFilter);
     if (totalPositives > 0) {
       final TextTable table = new TextTable();
       table.addRow("Threshold", "True-pos-baseline", "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
@@ -386,7 +400,7 @@ public class RocContainer {
         Diagnostic.info("Selected score threshold using: " + mBestCutpoint.name());
         addSummaryRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
       }
-      final RocPoint<Double> total = getTotal(RocFilter.ALL);
+      final RocPoint<Double> total = getTotal(mDefaultRocFilter);
       addSummaryRow(table, "None", total.getTruePositives(), totalPositives - total.getTruePositives(), total.getRawTruePositives(), total.getFalsePositives());
       summary = table.toString();
     } else {
