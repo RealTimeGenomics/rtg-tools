@@ -1,7 +1,12 @@
 AVR
 BLASTX
+NCBI
+taxdump
+Graphviz
 CNV
 TSV
+PNG
+SVG
 BED
 BEDGRAPH
 gzip
@@ -35,4 +40,9 @@ SNP
 QNAME
 rocplot
 svprep
+vcfeval
 pos~padding
+xmax
+xmin
+ymax
+ymin

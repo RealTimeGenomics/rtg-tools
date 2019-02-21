@@ -83,7 +83,7 @@ public class PedStatsCli extends AbstractCli {
 
   @Override
   protected void initFlags() {
-    mFlags.setDescription("Output information from pedigree files of various formats. For quick pedigree visualization using graphviz, try:\n\n"
+    mFlags.setDescription("Output information from pedigree files of various formats. For quick pedigree visualization using Graphviz, try:\n\n"
       + "  dot -Tpng <(rtg pedstats --dot \"A Title\" PEDFILE) | display -\n"
       + "\nor for a larger pedigree:\n\n"
       + "  dot -Tpdf -o mypedigree.pdf <(rtg pedstats --dot \"A Title\" PEDFILE)\n"
@@ -99,13 +99,13 @@ public class PedStatsCli extends AbstractCli {
     mFlags.registerOptional(FOUNDER_IDS, "output ids of all founders").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional('d', ID_DELIM, String.class, CommonFlags.STRING, "output id lists using this separator", "\\n").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILIES_OUT, "output information about family structures").setCategory(CommonFlagCategories.REPORTING);
-    mFlags.registerOptional(DOT_OUT, String.class, CommonFlags.STRING, "output pedigree in GraphViz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
-    mFlags.registerOptional(DOT_SIMPLE, "when outputting GraphViz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_OUT, String.class, CommonFlags.STRING, "output pedigree in Graphviz format, using the supplied text as a title").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_SIMPLE, "when outputting Graphviz format, use a layout that looks less like a traditional pedigree diagram but works better with large complex pedigrees").setCategory(CommonFlagCategories.REPORTING);
 
     mFlags.registerOptional(DUMP, "dump full relationships structure").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(FAMILY_FLAGS, "output command-line flags for family caller").setCategory(CommonFlagCategories.REPORTING);
     mFlags.registerOptional(ORDERING, "output family processing order for use during forward backward algorithm").setCategory(CommonFlagCategories.REPORTING);
-    mFlags.registerOptional(DOT_PROPERTIES, File.class, CommonFlags.FILE, "properties file containing overrides for GraphViz attributes").setCategory(CommonFlagCategories.REPORTING);
+    mFlags.registerOptional(DOT_PROPERTIES, File.class, CommonFlags.FILE, "properties file containing overrides for Graphviz attributes").setCategory(CommonFlagCategories.REPORTING);
     mFlags.setValidator(flags ->
       mFlags.checkAtMostOne(FAMILIES_OUT, DOT_OUT, DUMP, FAMILY_FLAGS, ORDERING)
         && (!mFlags.isAnySet(PRIMARY_IDS, MALE_IDS, FEMALE_IDS, MATERNAL_IDS, PATERNAL_IDS, FOUNDER_IDS) || mFlags.checkBanned(FAMILIES_OUT, DOT_OUT, ORDERING, FAMILY_FLAGS))

@@ -46,16 +46,16 @@ EOF
     exit 1
 fi
 
-echo "Checking if graphviz is installed" >&2
+echo "Checking if Graphviz is installed" >&2
 
 if dot -V >/dev/null 2>&1; then
     HAVEDOT=1
 else
     cat<<EOF >&2
 
-Could not execute "dot" from graphviz.  The demo will still work, but
+Could not execute "dot" from Graphviz.  The demo will still work, but
 will skip displaying pedigree diagrams. (You might want to run this demo
-again after installing graphviz).
+again after installing Graphviz).
 
 EOF
     HAVEDOT=
@@ -389,7 +389,7 @@ docommand cat family.ped
 if [ "$HAVEDOT" ]; then
     cat<<EOF
 
-Here is the graphviz representation of the new pedigree.
+Here is the Graphviz representation of the new pedigree.
 
 EOF
 

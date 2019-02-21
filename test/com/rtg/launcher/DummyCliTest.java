@@ -65,7 +65,7 @@ public class DummyCliTest extends AbstractCliTest {
     @Override
     protected void initFlags() {
       // we assume createFlags has been called.
-      mFlags.registerRequired("foo", Integer.class, "usage", "description");
+      mFlags.registerRequired("foo", Integer.class, "INT", "description");
     }
 
     @Override
