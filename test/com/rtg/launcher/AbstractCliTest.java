@@ -81,15 +81,20 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
     }
   }
 
+  public final void testBasicHelp() {
+    mCli.createRegisterFlags(TestUtils.getNullPrintStream(), null);
+    TestCFlags.check(mCli.getCFlags());
+  }
+
   /**
-   * Checks the help output of the CLI class for consistency and that
+   * Checks the help output of the CLI class to verify that
    * it contains the specified strings.
    *
    * @param expected a <code>String</code> value
    */
   protected void checkHelp(String... expected) {
     mCli.createRegisterFlags(TestUtils.getNullPrintStream(), null);
-    TestCFlags.check(mCli.getCFlags(), expected);
+    TestCFlags.checkUsage(mCli.getCFlags(), expected);
   }
 
   protected void checkExtendedHelp(String... expected) {

@@ -88,8 +88,20 @@ public final class TestCFlags {
     }
     Assert.assertTrue(flags.getName() + ": Program description is too short: " + desc, desc.length() > 8);
     Assert.assertTrue(flags.getName() + ": Program description must start with uppercase: " + desc, Character.isUpperCase(desc.charAt(0)));
-    Assert.assertTrue(flags.getName() + ": Program description should end with \".\": " + desc, desc.endsWith("."));
-    CheckSpelling.check(flags.getName(), desc);
+    final String[] lines = TestUtils.splitLines(desc);
+    for (final String line : lines) {
+      if (!isIndented(line)) {
+        CheckSpelling.check(flags.getName(), line);
+      }
+    }
+    final String lastline = lines[lines.length - 1];
+    if (!isIndented(lastline)) {
+      Assert.assertTrue(flags.getName() + ": Program description should end with \".\": " + desc, desc.endsWith("."));
+    }
+  }
+
+  private static boolean isIndented(String line) {
+    return line.startsWith("  ");
   }
 
   private static void checkFlagDescriptionConstraints(final Flag<?> f) {
@@ -105,6 +117,7 @@ public final class TestCFlags {
     Assert.assertTrue("Flag description is too short: --" + name + " desc: " + desc, desc.length() > 8);
     Assert.assertTrue("Flag description should start with lowercase: --" + name + " desc: " + desc, Character.isLowerCase(desc.charAt(0)) || Character.isUpperCase(desc.charAt(1)));
     Assert.assertTrue("Flag description should start with lowercase: --" + name + " desc: " + desc, Character.isLetterOrDigit(desc.charAt(0)));
+    Assert.assertFalse("Flag description should not end with whitespace: --" + name + " desc: " + desc, Character.isWhitespace(desc.charAt(desc.length() - 1)));
     Assert.assertFalse("Flag description should not end with \".\": --" + name + " desc: " + desc, desc.endsWith("."));
     final String[] parts = desc.split("\\s.,;:\"!?");
     for (final String o : OUTLAWS) {
@@ -162,11 +175,7 @@ public final class TestCFlags {
       Assert.fail(e.getMessage());
     }
     //System.err.println("Usage TestCFlags.java\n" + flags.getUsageString());
-    final String usage = flags.getUsageString().replaceAll("    --", "\\\\0, --").replaceAll("\\s+", " ");
-    Assert.assertNotNull(usage);
-    if (contains != null) {
-      TestUtils.containsAll(usage, contains);
-    }
+    checkUsage(flags, contains);
   }
 
   private static void checkFlagCategory(Set<String> categories, Flag<?> f) {
@@ -177,15 +186,27 @@ public final class TestCFlags {
   }
 
   /**
-   * Check various syntactic properties of a <code>CFlags</code> description.
+   * Check for expected content in regular help output
+   *
+   * @param flags the flags
+   * @param contains strings required to be present
+   */
+  public static void checkUsage(CFlags flags, String... contains) {
+    checkExpected(flags.getUsageString().replaceAll("    --", "\\\\0, --"), contains);
+  }
+
+  /**
+   * Check for expected content in extended help output
    *
    * @param flags the flags
    * @param contains strings required to be present
    */
   public static void checkExtendedUsage(final CFlags flags, final String... contains) {
-    Assert.assertNotNull(flags);
-    //System.err.println("Usage TestCFlags.java\n" + flags.getUsageString());
-    final String usage = flags.getExtendedUsageString(Flag.Level.EXTENDED).replaceAll("\\s+", " ");
+    checkExpected(flags.getExtendedUsageString(Flag.Level.EXTENDED), contains);
+  }
+
+  private static void checkExpected(String raw, String[] contains) {
+    final String usage = raw.replaceAll("\\s+", " ");
     Assert.assertNotNull(usage);
     if (contains != null) {
       TestUtils.containsAll(usage, contains);
