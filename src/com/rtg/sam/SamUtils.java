@@ -644,6 +644,8 @@ public final class SamUtils {
    */
   public static void convertToUnmapped(SAMRecord record) {
     record.setReadUnmappedFlag(true);
+    record.setProperPairFlag(false);
+    record.setReadNegativeStrandFlag(false);
     record.setMappingQuality(0);
     record.setCigarString("*");
     record.setAttribute(ATTRIBUTE_NUM_MISMATCHES, null);
