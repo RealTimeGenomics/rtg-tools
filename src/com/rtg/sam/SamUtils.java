@@ -647,6 +647,7 @@ public final class SamUtils {
     record.setProperPairFlag(false);
     record.setReadNegativeStrandFlag(false);
     record.setMappingQuality(0);
+    record.setInferredInsertSize(0);
     record.setCigarString("*");
     record.setAttribute(ATTRIBUTE_NUM_MISMATCHES, null);
   }
