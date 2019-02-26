@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.rtg.launcher.globals.GlobalFlags;
@@ -286,53 +285,61 @@ public class ChildSampleSimulator {
 
   static final String GENETIC_MAP_DIR = GlobalFlags.getStringValue(ToolsGlobalFlags.CHILDSIM_GENETIC_MAP_DIR);
 
+  static class GeneticMap {
+    final double[] mCdf;
+    final int[] mPos;
+    GeneticMap(File mapFile) throws IOException {
+      if (mapFile.exists()) {
+        throw new IOException("Expected genetic map file " + mapFile + " does not exist");
+      }
+      try (BufferedReader br = new BufferedReader(new FileReader(mapFile))) {
+        double[] cdfList = new double[10];
+        int[] posList = new int[10];
+        int size = 0;
+        String line = br.readLine(); // Skip first line
+        assert line.startsWith("chr");
+        while ((line = br.readLine()) != null) {
+          final String[] words = line.split("\t");
+          if (size == cdfList.length) {
+            cdfList = Arrays.copyOf(cdfList, cdfList.length * 2);
+            posList = Arrays.copyOf(posList, posList.length * 2);
+          }
+          posList[size] = Integer.parseInt(words[1]);
+          cdfList[size] = Double.parseDouble(words[3]);
+          size++;
+        }
+        mCdf = Arrays.copyOf(cdfList, size);
+        mPos = Arrays.copyOf(posList, size);
+      }
+    }
+    //find the position in the CDF is that random number
+    int findPos(double prob) {
+      for (int j = 0; j < mCdf.length - 1 ; j++) {
+        if (prob >= mCdf[j] && prob < mCdf[j + 1]) {
+          return mPos[j];
+        }
+      }
+      return 0;
+    }
+  }
+
+  private GeneticMap getGeneticMap(ReferenceSequence refSeq, Sex sex) throws IOException {
+    return new GeneticMap(new File(GENETIC_MAP_DIR, StringUtils.titleCase(sex.name()) + refSeq.name() + "CDF.txt"));
+  }
+
   // Get the (sorted) parent recombination points for this (diploid) chromosome. There must be at least one and there may be extra
   private int[] getCrossoverPositions(ReferenceSequence refSeq, Sex sex, int seqLength) throws IOException {
     final int[] crossoverPoints = new int[1 + (mRandom.nextDouble() < mExtraCrossoverFreq ? 1 : 0)];
     if (GENETIC_MAP_DIR.isEmpty()) {
-
       // Uniform selection selection
       for (int i = 0; i < crossoverPoints.length; i++) {
         crossoverPoints[i] = mRandom.nextInt(seqLength);
       }
-
     } else {
-
       // Use genetic map to choose location
-      Integer position = 0;
-      File fileName = null;
-      Double p;
-
-      //open the genetic map associated with chromosome
-      if (sex == Sex.FEMALE){
-        fileName = new File(GENETIC_MAP_DIR, "Female" + refSeq.name() + "CDF.txt");
-      }
-      else if (sex == Sex.MALE){
-        fileName = new File(GENETIC_MAP_DIR, "Male" + refSeq.name() + "CDF.txt");
-      }
-      ArrayList<Double> cdf_list = new ArrayList<>();
-      ArrayList<Integer> pos_list = new ArrayList<>();
-
-      try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
-        String line = br.readLine(); // Skip first line
-        while ((line = br.readLine()) != null){
-          String[] words = line.split("\t");
-          pos_list.add(Integer.parseInt(words[1]));
-          cdf_list.add(Double.parseDouble(words[3]));
-        }
-      }
-      // go through the crossoverPoints -choose any number between 0 and 1-
+      final GeneticMap gmap = getGeneticMap(refSeq, sex);
       for (int i = 0; i < crossoverPoints.length; i++) {
-        p = mRandom.nextDouble();
-        for (int j = 0 ; j < pos_list.size()-1 ; j++) {
-          //find the area where is the CDF is that randome number
-          if (p >= cdf_list.get(j) && p < cdf_list.get(j+1)){
-            position = pos_list.get(j);
-            break;
-          }
-        }
-        //Add to the position list the pos corresponding to CDF
-        crossoverPoints[i] = position;
+        crossoverPoints[i] = gmap.findPos(mRandom.nextDouble());
       }
     }
 
