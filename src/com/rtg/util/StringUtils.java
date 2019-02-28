@@ -135,6 +135,35 @@ public final class StringUtils {
   }
 
   /**
+   * Like <code>String.indexOf</code> but specifying the furthest allowed position
+   * @param src the input string
+   * @param delim the delimiter character
+   * @param end the end position
+   * @return the position where the delimiter is found, or -1
+   */
+  public static int indexOf(CharSequence src, char delim, int end) {
+    return indexOf(src, delim, 0, end);
+  }
+
+  /**
+   * Like <code>String.indexOf</code> but specifying the furthest allowed position
+   * @param src the input string
+   * @param delim the delimiter character
+   * @param start the start position
+   * @param end the end position
+   * @return the position where the delimiter is found, or -1
+   */
+  public static int indexOf(CharSequence src, char delim, int start, int end) {
+    for (int i = start; i < end && i < src.length(); ++i) {
+      if (src.charAt(i) == delim) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+
+  /**
    * Format a number with commas.
    * @param n number to be formatted.
    * @return string with the formatted number.

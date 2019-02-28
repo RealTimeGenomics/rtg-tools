@@ -201,6 +201,17 @@ public class StringUtilsTest extends TestCase {
     assertTrue(Arrays.equals(new String[] {"a", "b", "c", ""}, StringUtils.split("a\tb\tc\t", '\t', 4)));
   }
 
+  public void testIndexOf() {
+    assertEquals(0, StringUtils.indexOf("abc", 'a', 0, 3));
+    assertEquals(1, StringUtils.indexOf("abc", 'b', 0, 3));
+    assertEquals(1, StringUtils.indexOf("abc", 'b', 1, 2));
+    assertEquals(2, StringUtils.indexOf("abc", 'c', 0, 3));
+    assertEquals(-1, StringUtils.indexOf("abc", 'd', 0, 3));
+    assertEquals(-1, StringUtils.indexOf("abc", 'a', 1, 3));
+    assertEquals(-1, StringUtils.indexOf("abc", 'c', 0, 2));
+    assertEquals(-1, StringUtils.indexOf("abc", 'b', 0, 1));
+  }
+
   public void testProtect() {
     assertEquals(null, StringUtils.xmlProtect(null));
     assertEquals("", StringUtils.xmlProtect(""));
