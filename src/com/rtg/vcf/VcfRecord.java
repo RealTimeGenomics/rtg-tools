@@ -91,6 +91,9 @@ public class VcfRecord implements SequenceNameLocus {
    * @param ref the ref allele
    */
   public VcfRecord(String sequence, int start, String ref) {
+    if (ref.length() == 0) {  /// VCF spec implies (but is not specific) that we could also reject if VcfRecord.MISSING.equals(ref)
+      throw new VcfFormatException("REF field cannot be missing");
+    }
     mSequence = sequence;
     mStart = start;
     mRefCall = ref;
@@ -213,6 +216,9 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addAltCall(String altCall) {
+    if (altCall.length() == 0) {
+      throw new VcfFormatException("An empty ALT allele is not permitted");
+    }
     if (MISSING.equals(altCall)) {
       throw new VcfFormatException("Attempt to add missing value '.' as explicit ALT allele");
     } else {
