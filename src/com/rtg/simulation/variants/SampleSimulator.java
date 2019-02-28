@@ -33,7 +33,6 @@ package com.rtg.simulation.variants;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -149,9 +148,8 @@ public class SampleSimulator {
   }
 
   //writes sample to given writer, returns records as list
-  private List<VcfRecord> mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq) throws IOException {
+  private void mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq) throws IOException {
     Diagnostic.userLog("Selecting genotypes on sequence: " + refSeq.name());
-    final ArrayList<VcfRecord> sequenceMutations = new ArrayList<>();
     final int ploidyCount = refSeq.ploidy().count() >= 0 ? refSeq.ploidy().count() : 1; //effectively treats polyploid as haploid
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {
       int lastVariantEnd = -1;
@@ -197,12 +195,10 @@ public class SampleSimulator {
           final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt.toString() : VcfRecord.MISSING;
           v.addFormatAndSample(format, value);
         }
-        sequenceMutations.add(v);
         vcfOut.write(v);
         mStats.tallyVariant(vcfOut.getHeader(), v);
       }
     }
-    return sequenceMutations;
   }
 
   // Get a cumulative allele distribution, ref allele is last position

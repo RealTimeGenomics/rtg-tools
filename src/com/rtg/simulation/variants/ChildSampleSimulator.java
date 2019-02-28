@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import com.rtg.reader.SequencesReader;
 import com.rtg.reference.Ploidy;
@@ -294,7 +293,7 @@ public class ChildSampleSimulator {
 
 
   //writes sample to given writer, returns records as list
-  private List<VcfRecord> mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, int seqLength) throws IOException {
+  private void mutateSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, int seqLength) throws IOException {
     final Ploidy fatherPloidy = mFatherRefg.sequence(refSeq.name()).ploidy();
     final Ploidy motherPloidy = mMotherRefg.sequence(refSeq.name()).ploidy();
     final Ploidy childPloidy = refSeq.ploidy();
@@ -329,7 +328,6 @@ public class ChildSampleSimulator {
         log("Sequence " + refSeq.name() + " chose initial father haplotype " + fatherHap);
       }
     }
-    final ArrayList<VcfRecord> sequenceMutations = new ArrayList<>();
     int lastPos = 0;
     int regionStart = 0;
     String regionType = "N";
@@ -412,14 +410,12 @@ public class ChildSampleSimulator {
           final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt.toString() : VcfRecord.MISSING;
           v.addFormatAndSample(format, value);
         }
-        sequenceMutations.add(v);
         vcfOut.write(v);
         mStats.tallyVariant(vcfOut.getHeader(), v);
 
       }
     }
     logHaplotypes(regionType, new SequenceNameLocusSimple(refSeq.name(), regionStart, lastPos), fatherHap, motherHap);
-    return sequenceMutations;
   }
 
   private void logHaplotypes(String type, SequenceNameLocusSimple location, int fatherHap, int motherHap) {

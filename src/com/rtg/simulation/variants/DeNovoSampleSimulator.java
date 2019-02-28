@@ -33,7 +33,6 @@ package com.rtg.simulation.variants;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -215,22 +214,20 @@ public class DeNovoSampleSimulator {
     return ploidy == -1 ? 1 : ploidy;
   }
 
-  //writes sample to given writer, returns records as list
-  private List<VcfRecord> outputSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo) throws IOException {
+  private void outputSequence(File vcfPopFile, VcfWriter vcfOut, ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo) throws IOException {
     final Ploidy ploidy = mOriginalRefg.sequence(refSeq.name()).ploidy();
     final int ploidyCount = getEffectivePloidy(ploidy.count());
     if (ploidyCount > 2) {
       final String desc = "Original=" + ploidy + " -> Derived=" + ploidy;
       throw new NoTalkbackSlimException("Sequence " + refSeq.name() + ": Unsupported ploidy" + desc);
     }
-    final ArrayList<VcfRecord> sequenceVariants = new ArrayList<>();
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refSeq.name()))) {
       VcfRecord pv = null;
       while (reader.hasNext()) {
         mSeenVariants = true;
         final VcfRecord v = reader.next();
 
-        outputDeNovo(refSeq, deNovo, pv, v, ploidyCount, vcfOut, sequenceVariants);
+        outputDeNovo(refSeq, deNovo, pv, v, ploidyCount, vcfOut);
 
         // For non de-novo, copy sample genotype from original genotype
         if (mOriginalSampleId != mDerivedSampleId) {
@@ -243,17 +240,15 @@ public class DeNovoSampleSimulator {
           }
         }
 
-        sequenceVariants.add(v);
         vcfOut.write(v);
         pv = v;
       }
       // Output any remaining de novo variants
-      outputDeNovo(refSeq, deNovo, pv, null, ploidyCount, vcfOut, sequenceVariants);
+      outputDeNovo(refSeq, deNovo, pv, null, ploidyCount, vcfOut);
     }
-    return sequenceVariants;
   }
 
-  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final SequenceNameLocus prev,  final SequenceNameLocus next, final int ploidyCount, VcfWriter vcfOut, final ArrayList<VcfRecord> sequenceVariants) throws IOException {
+  private void outputDeNovo(ReferenceSequence refSeq, List<PopulationVariantGenerator.PopulationVariant> deNovo, final SequenceNameLocus prev, final SequenceNameLocus next, final int ploidyCount, VcfWriter vcfOut) throws IOException {
     // Merge input and de novo, requires records to be sorted
     while (!deNovo.isEmpty() && (next == null || deNovo.get(0).getStart() < next.getEnd())) {
       final PopulationVariantGenerator.PopulationVariant pv = deNovo.remove(0);
@@ -273,7 +268,6 @@ public class DeNovoSampleSimulator {
       dv.setNumberOfSamples(mNumSamples);
       addSamplesForDeNovo(dv, ploidyCount, refSeq.name());
 
-      sequenceVariants.add(dv);
       vcfOut.write(dv);
     }
   }
