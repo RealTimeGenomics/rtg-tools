@@ -30,6 +30,7 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.launcher.CommonFlags.BOOL;
 import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
@@ -56,6 +57,7 @@ import com.rtg.launcher.LoggedCli;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.reference.ReferenceGenome.ReferencePloidy;
+import com.rtg.reference.Sex;
 import com.rtg.relation.Family;
 import com.rtg.relation.GenomeRelationships;
 import com.rtg.relation.MultiFamilyOrdering;
@@ -93,6 +95,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
   private static final String OUTPUT_SDF = "output-sdf";
   private static final String PLOIDY = "ploidy";
   private static final String PRIORS_FLAG = "Xpriors";
+  private static final String TEMP_COMPRESSED_FLAG = "Xtemp-files-gzipped";
 
   private SampleSimulator mSampleSim;
   private ChildSampleSimulator mChildSim;
@@ -130,6 +133,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
     mFlags.registerOptional(PRIORS_FLAG, String.class, STRING, "selects a properties file specifying the mutation priors. Either a file name or one of [human]", "human").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(PLOIDY, ReferencePloidy.class, STRING, "ploidy to use", ReferencePloidy.AUTO).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(ChildSampleSimulatorCli.EXTRA_CROSSOVERS, Double.class, FLOAT, "probability of extra crossovers per chromosome", ChildSampleSimulatorCli.EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(TEMP_COMPRESSED_FLAG, Boolean.class, BOOL, "gzip temporary VCF files", true).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(REMOVE_UNUSED, "if set, output only variants used by at least one sample").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(DeNovoSampleSimulatorCli.EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of mutations per genome", DeNovoSampleSimulatorCli.DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
@@ -205,11 +209,16 @@ public class PedSampleSimulatorCli extends LoggedCli {
 
       final Collection<String> toCreate = Stream.concat(independents.stream(), children.stream()).collect(Collectors.toCollection(TreeSet::new));
       Diagnostic.userLog("Need to simulate " + toCreate.size() + " samples: " + toCreate);
-      final int m = 1 + (mDenovoSim == null ? 0 : 1) + (mSampleReplayer == null ? 0 : 1);
-      mTotalJobs = toCreate.size() * m + (mFlags.isSet(REMOVE_UNUSED) ? 1 : 0);
+      final int m = (mDenovoSim == null ? 0 : 1) + (mSampleReplayer == null ? 0 : 1);
+      mTotalJobs = (independents.isEmpty() ? 0 : 1) // samplesim
+        + (toCreate.size() - independents.size())  // childsim
+        + toCreate.size() * m  // denovosim and samplereplay
+        + (mFlags.isSet(REMOVE_UNUSED) ? 1 : 0); // cleanup
       mJobs = 0;
 
-      simulateIndependents(pedigree, independents);
+      if (!independents.isEmpty()) {
+        simulateIndependents(pedigree, independents);
+      }
 
       simulateChildren(families);
 
@@ -241,7 +250,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
           writer.write(reader.next());
         }
       }
-      if (cleanup && !resultsIndex.delete()) {
+      if (cleanup && resultsIndex.exists() && !resultsIndex.delete()) {
         throw new IOException("Could not delete intermediate file: " + resultsIndex);
       }
       if (cleanup && !results.delete()) {
@@ -285,6 +294,9 @@ public class PedSampleSimulatorCli extends LoggedCli {
   }
 
   private void simulateIndependents(GenomeRelationships pedigree, Collection<String> independents) throws IOException {
+    final String[] samples = new String[independents.size()];
+    final Sex[] sexes = new Sex[independents.size()];
+    int j = 0;
     for (String sample : independents) {
       Diagnostic.userLog("Simulating variants for sample: " + sample);
       // Warn about cases where one parent was missing (these aren't selected as families above, so the child(ren) aren't using inheritance
@@ -293,10 +305,13 @@ public class PedSampleSimulatorCli extends LoggedCli {
         assert rel.length != 2; // Should have already been generated above
         Diagnostic.warning("Sample " + sample + " is a child of non-complete family, generating as independent individual.");
       }
-      doJob(sample, (i, o) -> mSampleSim.mutateIndividual(i, o, sample, pedigree.getSex(sample)));
       mSamples.add(sample);
       mCreated.add(sample);
+      samples[j] = sample;
+      sexes[j] = pedigree.getSex(sample);
+      j++;
     }
+    doJob("independents", (i, o) -> mSampleSim.mutateIndividual(i, o, samples, sexes));
 
     // Clear out unused population variants before starting to add de novo mutations to reduce site conflicts
     if (mFlags.isSet(REMOVE_UNUSED)) {
@@ -337,12 +352,12 @@ public class PedSampleSimulatorCli extends LoggedCli {
 
   protected void doJob(String label, final Job job) throws IOException {
     final File inVcf = mCurrentVcf == null ? mPopVcf : mCurrentVcf;
-    final File nextVcf = File.createTempFile(moduleName() + "-" + label + ".", VcfUtils.VCF_SUFFIX  + FileUtils.GZ_SUFFIX, mOutputDir);
+    final File nextVcf = File.createTempFile(moduleName() + "-" + label + ".", VcfUtils.VCF_SUFFIX + ((Boolean) mFlags.getValue(TEMP_COMPRESSED_FLAG) ? FileUtils.GZ_SUFFIX : ""), mOutputDir);
     job.simulate(inVcf, nextVcf);
     if (CLEANUP && mCurrentVcf != null) {
       // We have an intermediate file that now needs to be deleted
       final File indexFile = TabixIndexer.indexFileName(mCurrentVcf);
-      if (!indexFile.delete()) {
+      if (indexFile.exists() && !indexFile.delete()) {
         throw new IOException("Could not delete intermediate file: " + indexFile);
       }
       if (!mCurrentVcf.delete()) {
