@@ -86,7 +86,7 @@ public class PerSampleVariantStatistics {
 
   protected final Histogram[] mAlleleLengths;
 
-  PerSampleVariantStatistics() {
+  protected PerSampleVariantStatistics() {
     mAlleleLengths = new Histogram[VariantType.values().length];
     for (int i = 0; i < mAlleleLengths.length; ++i) {
       mAlleleLengths[i] = new Histogram();
@@ -111,7 +111,7 @@ public class PerSampleVariantStatistics {
       return null;
     }
   }
-  Pair<List<String>, List<String>> getStatistics() {
+  protected Pair<List<String>, List<String>> getStatistics() {
     final List<String> names = new ArrayList<>();
     final List<String> values = new ArrayList<>();
     names.add("SNPs");

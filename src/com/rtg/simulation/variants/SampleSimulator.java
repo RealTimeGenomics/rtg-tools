@@ -50,6 +50,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
+import com.rtg.vcf.StatisticsVcfWriter;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfFormatException;
@@ -77,6 +78,7 @@ public class SampleSimulator {
   private int mWithAfCount;
   private final Map<Sex, ReferenceGenome> mSexRef = new HashMap<>();
   protected boolean mAddRunInfo = true;
+  protected boolean mDoStatistics = true;
 
   /**
    * @param reference input reference data
@@ -128,8 +130,10 @@ public class SampleSimulator {
     mSeenVariants = false;
     mMissingAfCount = 0;
     mWithAfCount = 0;
-    mStats = new VariantStatistics(null);
-    mStats.onlySamples(samples);
+    if (mDoStatistics) {
+      mStats = new VariantStatistics(null);
+      mStats.onlySamples(samples);
+    }
     boolean foundGt = false;
     for (FormatField ff : header.getFormatLines()) {
       if (VcfUtils.FORMAT_GENOTYPE.equals(ff.getId())) {
@@ -151,7 +155,7 @@ public class SampleSimulator {
       header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
     }
 
-    try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile)) {
+    try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile), mStats)) {
       for (long i = 0; i < mReference.numberSequences(); ++i) {
         mutateSequence(vcfPopFile, vcfOut, mReference.name(i), sexes);
       }
@@ -169,7 +173,9 @@ public class SampleSimulator {
   }
 
   protected void printStatistics(OutputStream outStream) throws IOException {
-    mStats.printStatistics(outStream);
+    if (mDoStatistics) {
+      mStats.printStatistics(outStream);
+    }
   }
 
   //writes sample to given writer, returns records as list
@@ -227,7 +233,6 @@ public class SampleSimulator {
           }
         }
         vcfOut.write(v);
-        mStats.tallyVariant(vcfOut.getHeader(), v);
       }
     }
   }

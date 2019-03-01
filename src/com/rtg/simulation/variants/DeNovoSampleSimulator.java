@@ -77,6 +77,7 @@ public class DeNovoSampleSimulator {
   private final PopulationMutatorPriors mPriors;
   private final boolean mVerbose;
   protected boolean mAddRunInfo;
+  protected boolean mDoStatistics;
   private Sex[] mOriginalSexes = null;
   private ReferenceGenome mOriginalRefg = null;
   private ReferenceGenome mMaleGenome = null;
@@ -166,8 +167,10 @@ public class DeNovoSampleSimulator {
       header.addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + mRandom.getSeed());
     }
 
-    mStats = new VariantStatistics(null);
-    mStats.onlySamples(sample);
+    if (mDoStatistics) {
+      mStats = new VariantStatistics(null);
+      mStats.onlySamples(sample);
+    }
     try (VcfWriter vcfOut = new StatisticsVcfWriter<>(new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile), mStats)) {
       final ReferenceGenome refG = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);
 
@@ -198,7 +201,9 @@ public class DeNovoSampleSimulator {
   }
 
   protected void printStatistics(OutputStream outStream) throws IOException {
-    mStats.printStatistics(outStream);
+    if (mDoStatistics) {
+      mStats.printStatistics(outStream);
+    }
   }
 
   private void log(String message) {

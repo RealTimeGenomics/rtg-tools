@@ -64,7 +64,9 @@ public class StatisticsVcfWriter<S extends VariantStatistics> extends FilterVcfW
   @Override
   public void write(final VcfRecord record) throws IOException {
     if (mFilter.accept(record)) {
-      mStatistics.tallyVariant(getHeader(), record);
+      if (mStatistics != null) {
+        mStatistics.tallyVariant(getHeader(), record);
+      }
       mInner.write(record);
     }
   }

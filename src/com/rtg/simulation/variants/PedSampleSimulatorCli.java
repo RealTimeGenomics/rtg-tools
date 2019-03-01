@@ -64,6 +64,7 @@ import com.rtg.relation.MultiFamilyOrdering;
 import com.rtg.relation.PedigreeException;
 import com.rtg.relation.Relationship;
 import com.rtg.tabix.TabixIndexer;
+import com.rtg.util.Pair;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
@@ -107,7 +108,8 @@ public class PedSampleSimulatorCli extends LoggedCli {
   private Set<String> mSamples; // All samples present at the current point in time.
   private Collection<String> mCreated; // The samples created by us
   private static final boolean CLEANUP = true;
-  private int mJobs;
+  private final List<Pair<String, Job>> mJobs = new ArrayList<>();
+  private int mJob;
   private int mTotalJobs;
 
   @Override
@@ -175,12 +177,15 @@ public class PedSampleSimulatorCli extends LoggedCli {
     try (final SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
       mSampleSim = new SampleSimulator(dsr, new PortableRandom(random.nextInt()), ploidy, false);
       mSampleSim.mAddRunInfo = false;
+      mSampleSim.mDoStatistics = false;
       mChildSim = new ChildSampleSimulator(dsr, new PortableRandom(random.nextInt()), ploidy, (Double) flags.getValue(ChildSampleSimulatorCli.EXTRA_CROSSOVERS), false);
       mChildSim.mAddRunInfo = false;
+      mChildSim.mDoStatistics = false;
       final int deNovoMutations = (Integer) flags.getValue(DeNovoSampleSimulatorCli.EXPECTED_MUTATIONS);
       if (deNovoMutations > 0) {
         mDenovoSim = new DeNovoSampleSimulator(dsr, priors, new PortableRandom(random.nextInt()), ploidy, deNovoMutations, false);
         mDenovoSim.mAddRunInfo = false;
+        mDenovoSim.mDoStatistics = false;
       } else {
         mDenovoSim = null;
       }
@@ -193,7 +198,6 @@ public class PedSampleSimulatorCli extends LoggedCli {
         Diagnostic.info("Input VCF already contains samples: " + mSamples);
       }
       mPopVcf = popVcf;
-      mCurrentVcf = null;
       mOutputDir = outputDirectory();
 
       // Get the names of all samples we can generate as children using family information
@@ -209,24 +213,26 @@ public class PedSampleSimulatorCli extends LoggedCli {
 
       final Collection<String> toCreate = Stream.concat(independents.stream(), children.stream()).collect(Collectors.toCollection(TreeSet::new));
       Diagnostic.userLog("Need to simulate " + toCreate.size() + " samples: " + toCreate);
-      final int m = (mDenovoSim == null ? 0 : 1) + (mSampleReplayer == null ? 0 : 1);
-      mTotalJobs = (independents.isEmpty() ? 0 : 1) // samplesim
-        + (toCreate.size() - independents.size())  // childsim
-        + toCreate.size() * m  // denovosim and samplereplay
-        + (mFlags.isSet(REMOVE_UNUSED) ? 1 : 0); // cleanup
-      mJobs = 0;
-
       if (!independents.isEmpty()) {
         simulateIndependents(pedigree, independents);
       }
-
       simulateChildren(families);
+
+      mTotalJobs = mJobs.size()
+        + (!independents.isEmpty() && mFlags.isSet(REMOVE_UNUSED) ? 1 : 0)
+        + (mSampleReplayer == null ? 0 : toCreate.size())
+        + 1;
+
+      Diagnostic.progress("Simulation: 0/" + mTotalJobs + " Finished");
+      mJob = 0;
+      mCurrentVcf = null;
+      doJobs();
 
       if (mSampleReplayer != null) {
         for (String sample : mCreated) {
           Diagnostic.userLog("Generating genome for sample: " + sample);
           mSampleReplayer.replaySample(mCurrentVcf, new File(mOutputDir, sample + ".sdf"), sample);
-          Diagnostic.progress("Simulation: " + ++mJobs + "/" + mTotalJobs + " Finished");
+          Diagnostic.progress("Simulation: " + ++mJob + "/" + mTotalJobs + " Finished");
         }
       }
 
@@ -256,6 +262,8 @@ public class PedSampleSimulatorCli extends LoggedCli {
       if (cleanup && !results.delete()) {
         throw new IOException("Could not delete intermediate file: " + results);
       }
+      Diagnostic.progress("Simulation: " + ++mJob + "/" + mTotalJobs + " Finished");
+
       if (mCreated.size() > 0) {
         stats.printStatistics(out);
       }
@@ -263,9 +271,9 @@ public class PedSampleSimulatorCli extends LoggedCli {
     return 0;
   }
 
-  private void removeUnusedVariants() throws IOException {
-    Diagnostic.userLog("Removing variants not selected by any sample");
-    doJob("remove-unused", (i, o) -> {
+  private void removeUnusedVariants() {
+    addJob("remove-unused", (i, o) -> {
+      Diagnostic.userLog("Removing variants not selected by any sample");
       try (VcfReader reader = VcfReader.openVcfReader(i);
            VcfWriter writer = new FilterVcfWriter(new VcfWriterFactory().zip(true).make(reader.getHeader(), o), new VcfFilter() {
              @Override
@@ -293,12 +301,11 @@ public class PedSampleSimulatorCli extends LoggedCli {
     });
   }
 
-  private void simulateIndependents(GenomeRelationships pedigree, Collection<String> independents) throws IOException {
+  private void simulateIndependents(GenomeRelationships pedigree, Collection<String> independents) {
     final String[] samples = new String[independents.size()];
     final Sex[] sexes = new Sex[independents.size()];
     int j = 0;
     for (String sample : independents) {
-      Diagnostic.userLog("Simulating variants for sample: " + sample);
       // Warn about cases where one parent was missing (these aren't selected as families above, so the child(ren) aren't using inheritance
       final Relationship[] rel = pedigree.relationships(sample, new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD), new Relationship.SecondInRelationshipFilter(sample));
       if (rel.length != 0) {
@@ -311,7 +318,12 @@ public class PedSampleSimulatorCli extends LoggedCli {
       sexes[j] = pedigree.getSex(sample);
       j++;
     }
-    doJob("independents", (i, o) -> mSampleSim.mutateIndividual(i, o, samples, sexes));
+    addJob("independents", (i, o) -> {
+      for (String sample : samples) {
+        Diagnostic.userLog("Simulating variants for sample: " + sample);
+      }
+      mSampleSim.mutateIndividual(i, o, samples, sexes);
+    });
 
     // Clear out unused population variants before starting to add de novo mutations to reduce site conflicts
     if (mFlags.isSet(REMOVE_UNUSED)) {
@@ -319,37 +331,77 @@ public class PedSampleSimulatorCli extends LoggedCli {
     }
 
     if (mDenovoSim != null) {
-      for (String sample : independents) {
-        Diagnostic.userLog("Simulating de novo mutations for sample: " + sample);
-        doJob(sample, (i, o) -> mDenovoSim.mutateIndividual(i, o, sample, sample));
+      for (final String sample : independents) {
+        addJob(sample, (i, o) -> {
+          Diagnostic.userLog("Simulating de novo mutations for sample: " + sample);
+          mDenovoSim.mutateIndividual(i, o, sample, sample);
+        });
       }
     }
   }
 
-  // Work through the known pedigree members
+  // Work through the known pedigree members. Do them in batches of as many children as possible
+  // until we find one that requires a parent that hasn't yet been generated as a child. This is
+  // to ensure that the de novo mutation generation for the parents has happened before they
+  // generate the child.
   private void simulateChildren(List<Family> families) throws IOException {
+    final ArrayList<ChildSampleSimulator.Trio> batch = new ArrayList<>();
+    final HashSet<String> batchchildren = new HashSet<>();
     for (Family family : families) {
       final String mother = family.getMother();
       final String father = family.getFather();
+      if (batchchildren.contains(mother) || batchchildren.contains(father)) {
+        simulateChildrenBatch(batch, batchchildren);
+      }
       for (String child : family.getChildren()) {
         if (!mSamples.contains(child)) {
-          Diagnostic.userLog("Simulating variant inheritance for sample: " + child);
-          doJob(child, (i, o) -> mChildSim.mutateIndividual(i, o, child, family.pedigree().getSex(child), father, mother));
-          if (mDenovoSim != null) {
-            Diagnostic.userLog("Simulating de novo mutations for sample: " + child);
-            doJob(child, (i, o) -> mDenovoSim.mutateIndividual(i, o, child, child));
-          }
+          batch.add(new ChildSampleSimulator.Trio(father, mother, child, family.pedigree().getSex(child)));
+          batchchildren.add(child);
           mSamples.add(child);
           mCreated.add(child);
         }
       }
     }
+    if (!batch.isEmpty()) {
+      simulateChildrenBatch(batch, batchchildren);
+    }
+  }
+
+  private void simulateChildrenBatch(ArrayList<ChildSampleSimulator.Trio> batch, HashSet<String> batchchildren) {
+    final ChildSampleSimulator.Trio[] trios = batch.toArray(new ChildSampleSimulator.Trio[batch.size()]);
+    addJob("children", (i, o) -> {
+      Diagnostic.userLog("Generating a batch of " + trios.length + " children");
+      for (ChildSampleSimulator.Trio trio : trios) {
+        Diagnostic.userLog("Simulating variant inheritance for sample: " + trio.child());
+      }
+      mChildSim.mutateIndividual(i, o, trios);
+    });
+    if (mDenovoSim != null) {
+      for (ChildSampleSimulator.Trio trio : batch) {
+        final String child = trio.child();
+        addJob(child, (i, o) -> {
+          Diagnostic.userLog("Simulating de novo mutations for sample: " + child);
+          mDenovoSim.mutateIndividual(i, o, child, child);
+        });
+      }
+    }
+    batch.clear();
+    batchchildren.clear();
   }
 
   private interface Job {
     void simulate(File inVcf, File outVcf) throws IOException;
   }
 
+  protected void addJob(String label, final Job job) {
+    mJobs.add(new Pair<>(label, job));
+  }
+  protected void doJobs() throws IOException {
+    for (Pair<String, Job> p : mJobs) {
+      doJob(p.getA(), p.getB());
+    }
+    mJobs.clear();
+  }
   protected void doJob(String label, final Job job) throws IOException {
     final File inVcf = mCurrentVcf == null ? mPopVcf : mCurrentVcf;
     final File nextVcf = File.createTempFile(moduleName() + "-" + label + ".", VcfUtils.VCF_SUFFIX + ((Boolean) mFlags.getValue(TEMP_COMPRESSED_FLAG) ? FileUtils.GZ_SUFFIX : ""), mOutputDir);
@@ -364,7 +416,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
         throw new IOException("Could not delete intermediate file: " + mCurrentVcf);
       }
     }
-    Diagnostic.progress("Simulation: " + ++mJobs + "/" + mTotalJobs + " Finished");
+    Diagnostic.progress("Simulation: " + ++mJob + "/" + mTotalJobs + " Finished");
     mCurrentVcf = nextVcf;
   }
 

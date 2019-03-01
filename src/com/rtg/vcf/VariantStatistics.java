@@ -106,7 +106,7 @@ public class VariantStatistics extends AbstractStatistics {
     mOnlyKnown = known;
   }
 
-  PerSampleVariantStatistics ensurePerSampleStats(String sampleName) {
+  protected PerSampleVariantStatistics ensurePerSampleStats(String sampleName) {
     if (!mPerSampleStats.containsKey(sampleName)) {
       mPerSampleStats.put(sampleName, new PerSampleVariantStatistics());
     }
