@@ -59,9 +59,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** When formatting SDF from mapped paired-end SAM, should we drop or keep alignments without a mate */
   public static final String FORMAT_SAMPE_KEEP_SINGLETONS = "com.rtg.format.sampe-keep-singletons";
 
-  /** Optional directory where childsim should look for genetic maps */
-  public static final String CHILDSIM_GENETIC_MAP_DIR = "com.rtg.simulation.variants.genetic-map-dir";
-
   /** Which strand simulated reads are sequenced from: 0 = random, -1 = reverse, 1 = forward */
   public static final String READ_STRAND = "com.rtg.simulation.reads.read-strand";
   /** Supply explicit sequence used for fragment read-through */
@@ -123,7 +120,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
 
     // Simulation
-    registerFlag(CHILDSIM_GENETIC_MAP_DIR, String.class, "");
     registerFlag(READ_THROUGH, String.class, "default");
     registerFlag(READ_STRAND, Integer.class, 0);
     registerFlag(OS_SEQ_FRAGMENTS, Integer.class, 0);

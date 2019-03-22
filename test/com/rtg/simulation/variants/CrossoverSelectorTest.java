@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -30,38 +30,25 @@
 
 package com.rtg.simulation.variants;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.util.List;
+import java.util.ArrayList;
 
-import com.rtg.launcher.AbstractCli;
-import com.rtg.launcher.AbstractCliTest;
-import com.rtg.launcher.MainResult;
+import com.rtg.AbstractTest;
 import com.rtg.reader.ReaderTestUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reader.SequencesReaderFactory;
 import com.rtg.reference.ReferenceGenome;
-import com.rtg.reference.ReferenceGenome.ReferencePloidy;
 import com.rtg.reference.Sex;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.StringUtils;
-import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
-import com.rtg.util.test.FileHelper;
-import com.rtg.vcf.mendelian.MendeliannessChecker;
 
 /**
  */
-public class ChildSampleSimulatorTest extends AbstractCliTest {
-
-  @Override
-  protected AbstractCli getCli() {
-    return new ChildSampleSimulatorCli();
-  }
+public class CrossoverSelectorTest extends AbstractTest {
 
   private static final String REF =
       ">ref1" + StringUtils.LS
@@ -92,67 +79,54 @@ public class ChildSampleSimulatorTest extends AbstractCliTest {
       + "female  seq     ref2    none    linear" + StringUtils.LS
       + "either  seq     ref3    polyploid       circular" + StringUtils.LS;
 
-  public void testSampleSimulator() throws IOException {
-    try (final TestDirectory dir = new TestDirectory("childsim")) {
+  private static final String REF2MAPTXT =
+    CrossoverSelector.FileGeneticMap.GENETIC_MAP_HEADER + StringUtils.LS
+      + "ref2\t50\t0\t0" + StringUtils.LS
+      + "ref2\t60\t1.0\t1.0" + StringUtils.LS
+      + "ref2\t61\t0.0\t1.0" + StringUtils.LS
+      + "ref2\t119\t0.0\t1.0" + StringUtils.LS;
+
+
+  public void testSelection() throws IOException {
+    try (final TestDirectory dir = new TestDirectory("crossoverselector")) {
       final File sdf = new File(dir, "sdf");
       ReaderTestUtils.getDNADir(REF, sdf);
       final SequencesReader sr = SequencesReaderFactory.createMemorySequencesReader(sdf, true, LongRange.NONE);
       FileUtils.stringToFile(REFTXT, new File(sdf, ReferenceGenome.REFERENCE_FILE));
+      ReferenceGenome g = new ReferenceGenome(sr, Sex.FEMALE);
+      FileUtils.stringToFile(REF2MAPTXT, new File(dir, CrossoverSelector.mapName(g.sequence("ref2"), Sex.FEMALE)));
 
       // Generate variants
-      final int seed = 10;
-      final FixedStepPopulationVariantGenerator fixed = new FixedStepPopulationVariantGenerator(sr, 10, new Mutator("X"), new PortableRandom(seed), 0.5);
-      final List<PopulationVariantGenerator.PopulationVariant> variants = fixed.generatePopulation();
-      final File popVcf = new File(dir, "popVcf.vcf.gz");
-      PopulationVariantGenerator.writeAsVcf(popVcf, variants, sr, seed);
-      //String popVarStr = FileHelper.gzFileToString(popVcf);
-      //System.out.println("-- Population Variants --");
-      //System.out.println(popVarStr);
+      final int seed = 103;
+      PortableRandom random = new PortableRandom(seed);
+      CrossoverSelector cs = new CrossoverSelector(dir, 1.0, true);
 
-      // Generate sample w.r.t variants
-      final SampleSimulator dadsim = new SampleSimulator(sr, new PortableRandom(15), ReferencePloidy.AUTO, false);
-      final File dadVcf = new File(dir, "sample_dad.vcf.gz");
-      dadsim.mutateIndividual(popVcf, dadVcf, "dad", Sex.MALE);
+      CrossoverSelector.GeneticMap m = cs.getGeneticMap(g.sequence("ref1"), Sex.FEMALE);
+      assertEquals("Uniform:120", m.toString());
+      m = cs.getGeneticMap(g.sequence("ref2"), Sex.FEMALE);
+      assertEquals("Map:female.ref2.CDF.txt", m.toString());
 
-      final SampleSimulator momsim = new SampleSimulator(sr, new PortableRandom(65), ReferencePloidy.AUTO, false);
-      final File momVcf = new File(dir, "sample_mom.vcf.gz");
-      momsim.mutateIndividual(dadVcf, momVcf, "mom", Sex.FEMALE);
-
-      // Generate children w.r.t variants
-      final ChildSampleSimulator sonsim = new ChildSampleSimulator(sr, new PortableRandom(76), ReferencePloidy.AUTO, new CrossoverSelector(null, 0, false), false);
-      final File sonVcf = new File(dir, "sample_son.vcf.gz");
-      sonsim.mutateIndividual(momVcf, sonVcf, "son", Sex.MALE, "dad", "mom");
-
-      // Using CLI for extra mutation testing
-      final File daughterVcf = new File(dir, "sample_daughter.vcf.gz");
-      final File daughterSdf = new File(dir, "sample_daughter.sdf");
-      final MainResult r = MainResult.run(new ChildSampleSimulatorCli(), "-t", sdf.getPath(),
-        "-i", sonVcf.getPath(), "-o", daughterVcf.getPath(), "--output-sdf", daughterSdf.getPath(),
-        "--seed", "13", "--extra-crossovers", "0", "--sex", "female",
-        "--mother", "mom", "--father", "dad", "--sample", "daughter");
-      assertEquals(r.err(), 0, r.rc());
-      assertTrue(daughterSdf.exists());
-
-      final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-      try {
-        final MendeliannessChecker chk = new MendeliannessChecker();
-
-        chk.mainInit(new String[] {"-t", sdf.getPath(), "-i", daughterVcf.getPath()}, bos, new PrintStream(bos));
-      } finally {
-        bos.close();
+      int[] positions;
+      for (int i = 0; i < 50; i++) {
+        positions = cs.getCrossoverPositions(random, g.sequence("ref1"), Sex.FEMALE);
+        assertEquals(2, positions.length);
+        for (int pos : positions) {
+          //System.err.println("Uniform: " + pos);
+          assertTrue(pos >= 0 && pos < 120);
+        }
       }
-      final String s = bos.toString().replaceAll("Checking: [^\n]*\n", "Checking: \n");
-      TestUtils.containsAll(s,
-          "Family: [dad + mom] -> [daughter, son]",
-          "(0.00%) records did not conform to expected call ploidy",
-          "(0.00%) records contained a violation of Mendelian constraints"
-          );
+      final ArrayList<Integer> sample = new ArrayList<>();
+      for (int i = 0; i < 50; i++) {
+        positions = cs.getCrossoverPositions(random, g.sequence("ref2"), Sex.FEMALE);
+        assertEquals(2, positions.length);
+        for (int pos : positions) {
+          //System.err.println("Map: " + pos);
+          sample.add(pos);
+          assertTrue(pos >= 50 && pos < 60);
+        }
+      }
+      assertEquals("[58, 59, 55, 58, 52, 56, 54, 58, 58, 58, 53, 59, 50, 55, 52, 54, 58, 59, 53, 54, 50, 53, 56, 57, 59, 59, 51, 54, 52, 57, 51, 51, 54, 56, 50, 50, 50, 59, 51, 54, 56, 58, 55, 59, 53, 54, 55, 59, 51, 56, 53, 54, 51, 54, 54, 57, 52, 53, 56, 58, 53, 58, 57, 58, 50, 52, 50, 51, 50, 54, 53, 58, 57, 58, 52, 53, 51, 54, 50, 52, 56, 57, 57, 59, 50, 59, 54, 57, 51, 52, 57, 59, 51, 57, 51, 59, 56, 57, 53, 59]", sample.toString());
 
-      String sampleVcf = FileHelper.gzFileToString(daughterVcf);
-      //System.out.println("-- Including sample foo --");
-      //System.out.println(sampleVcf);
-      sampleVcf = StringUtils.grepMinusV(sampleVcf, "^#");
-      mNano.check("childsim", sampleVcf);
     }
   }
 }

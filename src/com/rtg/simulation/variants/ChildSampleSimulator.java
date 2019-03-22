@@ -30,19 +30,14 @@
 
 package com.rtg.simulation.variants;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reference.Ploidy;
 import com.rtg.reference.ReferenceGenome;
@@ -53,7 +48,6 @@ import com.rtg.relation.GenomeRelationships;
 import com.rtg.relation.VcfPedigreeParser;
 import com.rtg.util.Pair;
 import com.rtg.util.PortableRandom;
-import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RegionRestriction;
@@ -126,12 +120,12 @@ public class ChildSampleSimulator {
 
   private final SequencesReader mReference;
   private final PortableRandom mRandom;
-  private final double mExtraCrossoverFreq;
   private final boolean mVerbose;
+  private final CrossoverSelector mGeneticMaps;
+  private final Map<Sex, ReferenceGenome> mSexRef = new HashMap<>();
   protected boolean mAddRunInfo = true;
   protected boolean mDoStatistics = true;
   private ChildsimStatistics mStats = null;
-  private final Map<Sex, ReferenceGenome> mSexRef = new HashMap<>();
   private boolean mHasWarnedOutOfOrder = false;
   private boolean mSeenVariants = false;
 
@@ -167,18 +161,18 @@ public class ChildSampleSimulator {
    * @param reference input reference data
    * @param rand random number generator
    * @param ploidy the default ploidy to use if no reference specification is present
-   * @param extraCrossovers expected number of extra crossovers per chromosome
+   * @param crossovers crossover point selector implementation
    * @param verbose if true output extra information on crossover points
    * @throws IOException if there is an error reading reference genome configuration
    */
-  public ChildSampleSimulator(SequencesReader reference, PortableRandom rand, ReferencePloidy ploidy, double extraCrossovers, boolean verbose) throws IOException {
+  public ChildSampleSimulator(SequencesReader reference, PortableRandom rand, ReferencePloidy ploidy, CrossoverSelector crossovers, boolean verbose) throws IOException {
     mReference = reference;
     mRandom = rand;
-    mExtraCrossoverFreq = extraCrossovers;
     mVerbose = verbose;
     for (Sex sex : EnumSet.allOf(Sex.class)) {
       mSexRef.put(sex, new ReferenceGenome(mReference, sex, ploidy));
     }
+    mGeneticMaps = crossovers;
   }
 
   /**
@@ -235,7 +229,7 @@ public class ChildSampleSimulator {
 
     try (VcfWriter vcfOut = new VcfWriterFactory().zip(FileUtils.isGzipFilename(vcfOutFile)).addRunInfo(mAddRunInfo).make(header, vcfOutFile)) {
       for (long i = 0; i < mReference.numberSequences(); ++i) {
-        mutateSequence(vcfPopFile, vcfOut, mReference.name(i), mReference.length(i), trios);
+        mutateSequence(vcfPopFile, vcfOut, mReference.name(i), trios);
       }
     }
     if (!mSeenVariants) {
@@ -267,77 +261,20 @@ public class ChildSampleSimulator {
     }
   }
 
-  static final String GENETIC_MAP_DIR = GlobalFlags.getStringValue(ToolsGlobalFlags.CHILDSIM_GENETIC_MAP_DIR);
-
-  static class GeneticMap {
-    final double[] mCdf;
-    final int[] mPos;
-    GeneticMap(File mapFile) throws IOException {
-      if (mapFile.exists()) {
-        throw new IOException("Expected genetic map file " + mapFile + " does not exist");
-      }
-      try (BufferedReader br = new BufferedReader(new FileReader(mapFile))) {
-        double[] cdfList = new double[10];
-        int[] posList = new int[10];
-        int size = 0;
-        String line = br.readLine(); // Skip first line
-        assert line.startsWith("chr");
-        while ((line = br.readLine()) != null) {
-          final String[] words = line.split("\t");
-          if (size == cdfList.length) {
-            cdfList = Arrays.copyOf(cdfList, cdfList.length * 2);
-            posList = Arrays.copyOf(posList, posList.length * 2);
-          }
-          posList[size] = Integer.parseInt(words[1]);
-          cdfList[size] = Double.parseDouble(words[3]);
-          size++;
-        }
-        mCdf = Arrays.copyOf(cdfList, size);
-        mPos = Arrays.copyOf(posList, size);
-      }
-    }
-    //find the position in the CDF is that random number
-    int findPos(double prob) {
-      for (int j = 0; j < mCdf.length - 1 ; j++) {
-        if (prob >= mCdf[j] && prob < mCdf[j + 1]) {
-          return mPos[j];
-        }
-      }
-      return 0;
-    }
-  }
-
-  private GeneticMap getGeneticMap(ReferenceSequence refSeq, Sex sex) throws IOException {
-    return new GeneticMap(new File(GENETIC_MAP_DIR, StringUtils.titleCase(sex.name()) + refSeq.name() + "CDF.txt"));
-  }
 
   // Get the (sorted) parent recombination points for this (diploid) chromosome. There must be at least one and there may be extra
-  private int[] getCrossoverPositions(ReferenceSequence refSeq, Sex sex, int seqLength) throws IOException {
-    final int[] crossoverPoints = new int[1 + (mRandom.nextDouble() < mExtraCrossoverFreq ? 1 : 0)];
-    if (GENETIC_MAP_DIR.isEmpty()) {
-      // Uniform selection selection
-      for (int i = 0; i < crossoverPoints.length; i++) {
-        crossoverPoints[i] = mRandom.nextInt(seqLength);
-      }
-    } else {
-      // Use genetic map to choose location
-      final GeneticMap gmap = getGeneticMap(refSeq, sex);
-      for (int i = 0; i < crossoverPoints.length; i++) {
-        crossoverPoints[i] = gmap.findPos(mRandom.nextDouble());
-      }
-    }
-
-    Arrays.sort(crossoverPoints);
+  private int[] getCrossoverPositions(ReferenceSequence refSeq, Sex sex) throws IOException {
+    final int[] crossoverPoints = mGeneticMaps.getCrossoverPositions(mRandom, refSeq, sex);
     log("Chose " + crossoverPoints.length + " recombination points for " + sex + " parent on chromosome " + refSeq.name());
     return crossoverPoints;
   }
 
 
   //writes sample to given writer, returns records as list
-  private void mutateSequence(File vcfPopFile, VcfWriter vcfOut, String refName, int seqLength, Trio... trios) throws IOException {
+  private void mutateSequence(File vcfPopFile, VcfWriter vcfOut, String refName, Trio... trios) throws IOException {
     final TrioSequenceState[] trioStates = new TrioSequenceState[trios.length];
     for (int i = 0; i < trios.length; i++) {
-      trioStates[i] = new TrioSequenceState(trios[i], refName, seqLength).invoke();
+      trioStates[i] = new TrioSequenceState(trios[i], refName).invoke();
     }
     int lastPos = 0;
     try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refName))) {
@@ -402,7 +339,9 @@ public class ChildSampleSimulator {
       mChildSampleName = sample;
       mChildSex = sex;
     }
-    public String child() { return mChildSampleName; }
+    public String child() {
+      return mChildSampleName;
+    }
     private void prepareTrio(VcfHeader header, Map<Sex, ReferenceGenome> sexRef, GenomeRelationships ped) {
       if (header.getSampleNames().contains(mChildSampleName)) {
         throw new NoTalkbackSlimException("sample '" + mChildSampleName + "' already exists");
@@ -441,7 +380,6 @@ public class ChildSampleSimulator {
   private class TrioSequenceState {
     private final Trio mTrio;
     private final String mRefName;
-    private final int mSeqLength;
     private final ReferenceSequence mChildRefSeq;
     private final ReferenceSequence mFatherRefSeq;
     private final ReferenceSequence mMotherRefSeq;
@@ -457,10 +395,9 @@ public class ChildSampleSimulator {
     private int mRegionStart = 0;
     private String mRegionType = "N";
 
-    TrioSequenceState(Trio trio, String refName, int seqLength) {
+    TrioSequenceState(Trio trio, String refName) {
       mTrio = trio;
       mRefName = refName;
-      mSeqLength = seqLength;
       mChildRefSeq = trio.mChildRefg.sequence(refName);
       mFatherRefSeq = trio.mFatherRefg.sequence(refName);
       mMotherRefSeq = trio.mMotherRefg.sequence(refName);
@@ -484,8 +421,8 @@ public class ChildSampleSimulator {
     }
 
     public TrioSequenceState invoke() throws IOException {
-      mMotherCrossovers = mMotherCount > 1 ? getCrossoverPositions(mChildRefSeq, Sex.FEMALE, mSeqLength) : new int[]{};
-      mFatherCrossovers = mFatherCount > 1 ? getCrossoverPositions(mChildRefSeq, Sex.MALE, mSeqLength) : new int[]{};
+      mMotherCrossovers = mMotherCount > 1 ? getCrossoverPositions(mChildRefSeq, Sex.FEMALE) : new int[]{};
+      mFatherCrossovers = mFatherCount > 1 ? getCrossoverPositions(mChildRefSeq, Sex.MALE) : new int[]{};
       mFatherHap = -1;
       mMotherHap = -1;
       if (mChildPloidy.count() > 0) {

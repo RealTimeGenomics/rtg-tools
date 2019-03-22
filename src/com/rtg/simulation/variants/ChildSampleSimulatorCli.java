@@ -71,6 +71,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
   private static final String REFERENCE_SDF = "reference";
   private static final String SEED = "seed";
   private static final String PLOIDY = "ploidy";
+  static final String GENETIC_MAP_DIR = "Xgenetic-map-dir";
 
   // We require one crossover, but there is a small probability of an extra crossover.
   static final double EXTRA_CROSSOVERS_PER_CHROMOSOME = 0.01;
@@ -103,6 +104,7 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     mFlags.registerOptional(EXTRA_CROSSOVERS, Double.class, CommonFlags.FLOAT, "probability of extra crossovers per chromosome", EXTRA_CROSSOVERS_PER_CHROMOSOME).setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(SHOW_CROSSOVERS, "if set, display information regarding haplotype selection and crossover points").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(GENETIC_MAP_DIR, File.class, CommonFlags.FILE, "if set, load genetic maps from this directory for recombination point selection").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
     mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
@@ -133,7 +135,8 @@ public class ChildSampleSimulatorCli extends AbstractCli {
     final Sex sex = (Sex) flags.getValue(SEX);
     final ReferencePloidy ploidy = (ReferencePloidy) flags.getValue(PLOIDY);
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReaderCheckEmpty(reference, true, false, LongRange.NONE)) {
-      final ChildSampleSimulator ss = new ChildSampleSimulator(dsr, random, ploidy, (Double) flags.getValue(EXTRA_CROSSOVERS), flags.isSet(SHOW_CROSSOVERS));
+      final CrossoverSelector csel = new CrossoverSelector((File) flags.getValue(GENETIC_MAP_DIR), (Double) flags.getValue(EXTRA_CROSSOVERS), false);
+      final ChildSampleSimulator ss = new ChildSampleSimulator(dsr, random, ploidy, csel, flags.isSet(SHOW_CROSSOVERS));
       ss.mutateIndividual(popVcf, outputVcf, sample, sex, father, mother);
       ss.printStatistics(out);
       if (flags.isSet(OUTPUT_SDF)) {

@@ -37,6 +37,7 @@ import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.PEDIGREE_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
+import static com.rtg.simulation.variants.ChildSampleSimulatorCli.GENETIC_MAP_DIR;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 
 import java.io.File;
@@ -139,6 +140,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(REMOVE_UNUSED, "if set, output only variants used by at least one sample").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(DeNovoSampleSimulatorCli.EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of mutations per genome", DeNovoSampleSimulatorCli.DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(GENETIC_MAP_DIR, File.class, FILE, "if set, load genetic maps from this directory for recombination point selection").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
     mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
@@ -178,7 +180,8 @@ public class PedSampleSimulatorCli extends LoggedCli {
       mSampleSim = new SampleSimulator(dsr, new PortableRandom(random.nextInt()), ploidy, false);
       mSampleSim.mAddRunInfo = false;
       mSampleSim.mDoStatistics = false;
-      mChildSim = new ChildSampleSimulator(dsr, new PortableRandom(random.nextInt()), ploidy, (Double) flags.getValue(ChildSampleSimulatorCli.EXTRA_CROSSOVERS), false);
+      final CrossoverSelector csel = new CrossoverSelector((File) flags.getValue(GENETIC_MAP_DIR), (Double) flags.getValue(ChildSampleSimulatorCli.EXTRA_CROSSOVERS), false);
+      mChildSim = new ChildSampleSimulator(dsr, new PortableRandom(random.nextInt()), ploidy, csel, false);
       mChildSim.mAddRunInfo = false;
       mChildSim.mDoStatistics = false;
       final int deNovoMutations = (Integer) flags.getValue(DeNovoSampleSimulatorCli.EXPECTED_MUTATIONS);
