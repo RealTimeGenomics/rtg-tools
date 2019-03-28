@@ -207,7 +207,7 @@ if [[ -z "$RTG_JAR" ]]; then
 fi
 
 # Check that the config is suitable
-java_path=$(which "$RTG_JAVA" 2> /dev/null)
+java_path=$(command -v "$RTG_JAVA")
 if [[ -z "$java_path" ]] || [[ ! -x "$java_path" ]]; then
   echo "Unable to execute $RTG_JAVA"
   exit 1
@@ -226,7 +226,7 @@ if [[ ! -r "$RTG_JAR" ]]; then
 fi
 
 RTG_PROXY_ARRAY=()
-if [[ ! -z "$RTG_PROXY" ]]; then
+if [[ -n "$RTG_PROXY" ]]; then
   proxy_host=${RTG_PROXY%%:*}
   proxy_port=${RTG_PROXY#*:}
   if [[ -z "$proxy_port" ]]; then
@@ -236,12 +236,12 @@ if [[ ! -z "$RTG_PROXY" ]]; then
 fi
 
 RTG_USAGE_ARRAY=()
-if [[ ! -z "$RTG_USAGE" ]]; then
+if [[ -n "$RTG_USAGE" ]]; then
     RTG_USAGE_ARRAY+=("-Dusage=$RTG_USAGE")
-    if [[ ! -z "$RTG_USAGE_HOST" ]]; then
+    if [[ -n "$RTG_USAGE_HOST" ]]; then
         RTG_USAGE_ARRAY+=("-Dusage.host=$RTG_USAGE_HOST")
     fi
-    if [[ ! -z "$RTG_USAGE_DIR" ]]; then
+    if [[ -n "$RTG_USAGE_DIR" ]]; then
         RTG_USAGE_ARRAY+=("-Dusage.dir=$RTG_USAGE_DIR")
     fi
     if [[ "$RTG_USAGE_OPTIONAL" == *username* ]]; then
@@ -255,7 +255,7 @@ if [[ ! -z "$RTG_USAGE" ]]; then
     fi
 fi
 
-if [[ ! -z "$RTG_TALKBACK" ]]; then
+if [[ -n "$RTG_TALKBACK" ]]; then
     RTG_TALKBACK="-Dtalkback=$RTG_TALKBACK"
     if [[ "$TEST_TALKBACK" == "y" ]]; then  # First run only, perform test of crash reporting
         if ! "$RTG_JAVA" "${RTG_USAGE_ARRAY[@]}" "${RTG_PROXY_ARRAY[@]}" $RTG_TALKBACK $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "Post-install talkback test"; then
@@ -278,19 +278,19 @@ else
     RTG_MEM_ARRAY+=("-Xmx$RTG_MEM")
 fi
 
-if [[ ! -z "$RTG_REFERENCES_DIR" ]]; then
+if [[ -n "$RTG_REFERENCES_DIR" ]]; then
     RTG_REFERENCES_DIR="-Dreferences.dir=$RTG_REFERENCES_DIR"
 else
     RTG_REFERENCES_DIR="-Dreferences.dir=$THIS_DIR/references"
 fi
-if [[ ! -z "$RTG_MODELS_DIR" ]]; then
+if [[ -n "$RTG_MODELS_DIR" ]]; then
     RTG_MODELS_DIR="-Dmodels.dir=$RTG_MODELS_DIR"
 else
     RTG_MODELS_DIR="-Dmodels.dir=$THIS_DIR/models"
 fi
 
 RTG_DEFAULT_THREADS_ARRAY=()
-if [[ ! -z "$RTG_DEFAULT_THREADS" ]]; then
+if [[ -n "$RTG_DEFAULT_THREADS" ]]; then
     RTG_DEFAULT_THREADS_ARRAY=("-Druntime.defaultThreads=$RTG_DEFAULT_THREADS")
 fi
 
@@ -300,8 +300,9 @@ HSLOG=./hs_err_pid$$.log
 ECODE=$?
 if [[ -f "$HSLOG" ]]; then
     if grep -q "insufficient memory" "$HSLOG"; then
-        echo "The operating system did not make requested memory available to the JVM.  Try removing other jobs on this machine, adjusting allocated memory appropriate to currently available memory, or adjusting command parameters to reduce memory requirements. More information is contained in the file: $HSLOG" >&2
+        echo "The operating system did not make requested memory available to the JVM.  Try removing other jobs on this machine, adjusting allocated memory appropriate to currently available memory, or adjusting command parameters to reduce memory requirements.  More information is contained in the file: $HSLOG" >&2
     else
+        echo "The JVM has crashed (this does not indicate a bug in RTG).  Try running with a different JVM version.  More information is contained in the file: $HSLOG" >&2
         "$RTG_JAVA" "${RTG_PROXY_ARRAY[@]}" $RTG_TALKBACK $RTG_MIN_MEM -cp "$RTG_JAR" com.rtg.util.diagnostic.SimpleTalkback "$HSLOG" "$@"
     fi
 fi
