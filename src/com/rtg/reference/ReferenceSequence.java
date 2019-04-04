@@ -55,7 +55,7 @@ public class ReferenceSequence {
 
   private final String mHaploidComplementName;
 
-  private final long mSequenceLength;
+  private final int mSequenceLength;
 
   /**
    * @param specified true iff this is an explicitly specified sequence
@@ -127,6 +127,13 @@ public class ReferenceSequence {
    */
   public String name() {
     return mName;
+  }
+
+  /**
+   * @return the length of the sequence in nucleotides.
+   */
+  public int length() {
+    return mSequenceLength;
   }
 
   /**
