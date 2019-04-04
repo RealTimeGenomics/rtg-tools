@@ -32,15 +32,15 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
@@ -81,7 +81,7 @@ class TabixVcfRecordSet implements VariantSet {
 
   private final File mBaselineFile;
   private final File mCallsFile;
-  private final Collection<Pair<String, Integer>> mNames = new ArrayList<>();
+  private final Queue<Pair<String, Integer>> mNames = new LinkedList<>();
   private final ReferenceRanges<String> mRanges;
   private final ReferenceRegions mEvalRegions;
   private final VcfHeader mBaseLineHeader;
@@ -235,15 +235,13 @@ class TabixVcfRecordSet implements VariantSet {
 
   @Override
   public Pair<String, Map<VariantSetType, List<Variant>>> nextSet() throws IOException {
-    final Map<VariantSetType, List<Variant>> map = new EnumMap<>(VariantSetType.class);
-    final Iterator<Pair<String, Integer>> iterator = mNames.iterator();
-    if (!iterator.hasNext()) {
+    if (mNames.isEmpty()) {
       return null;
     }
-    final Pair<String, Integer> nameLength = iterator.next();
-    mNames.remove(nameLength);
+    final Pair<String, Integer> nameLength = mNames.remove();
     final String currentName = nameLength.getA();
     final int currentLength = nameLength.getB();
+    final Map<VariantSetType, List<Variant>> map = new EnumMap<>(VariantSetType.class);
     final ExecutorService executor = Executors.newFixedThreadPool(2);
     try {
       final ReferenceRanges<String> subRanges = mRanges.forSequence(currentName);
