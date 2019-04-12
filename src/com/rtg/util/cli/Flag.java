@@ -123,6 +123,10 @@ public class Flag<T> implements Comparable<Flag<T>> {
       if (paramType == null) {
         throw new IllegalArgumentException();
       }
+    } else if (flagName.length() == 0) {
+      throw new IllegalArgumentException("Flag name cannot be empty");
+    } else if (flagName.chars().anyMatch(Character::isWhitespace)) {
+      throw new IllegalArgumentException("Flag name cannot contain whitespace: " + flagName);
     } else {
       if (flagName.startsWith("-")) {
         throw new IllegalArgumentException("Long flag names cannot start with '-'");
