@@ -56,7 +56,7 @@ public class Vcf2RocplotTest extends AbstractEndToEndTest {
 
   @Override
   protected void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException, UnindexableDataException {
-    try (TestDirectory dir = new TestDirectory("vcf2rocplot-nano***")) {
+    try (TestDirectory dir = new TestDirectory("vcf2rocplot-nano")) {
       final File first = new File(dir, "first.vcf.gz");
       FileHelper.stringToGzFile(mNano.loadReference(harnessId + "_in_first.vcf"), first);
       new TabixIndexer(first).saveVcfIndex();
