@@ -359,6 +359,25 @@ public class VcfHeader {
     addIdField(mFormatLines, field);
   }
 
+
+  /**
+   * Add a format field
+   * @param field the new format field
+   */
+  public void addSampleField(SampleField field) {
+    addIdField(mSampleLines, field);
+  }
+
+  /**
+   * Add a pedigree field
+   * @param field the new pedigree field
+   */
+  public void addPedigreeField(PedigreeField field) {
+    if (!mPedigreeLines.contains(field)){
+      mPedigreeLines.add(field);
+    }
+  }
+
   /**
    * Ensure that the header contains the specified ALT field (or one that is compatible)
    * @param field the new ALT field
@@ -492,9 +511,9 @@ public class VcfHeader {
       } else if (isFormatLine(line)) {
         addFormatField(parseFormatLine(line));
       } else if (isSampleLine(line)) {
-        addIdField(mSampleLines, parseSampleLine(line));
+        addSampleField(parseSampleLine(line));
       } else if (isPedigreeLine(line)) {
-        mPedigreeLines.add(parsePedigreeLine(line));
+        addPedigreeField(parsePedigreeLine(line));
       } else {
         if (isVersionLine(line)) {
           if (mVersionLine != null) {

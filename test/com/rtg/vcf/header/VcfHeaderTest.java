@@ -151,6 +151,11 @@ public class VcfHeaderTest extends TestCase {
     } catch (VcfFormatException e) {
       // expected
     }
+    assertEquals(0, head.getPedigreeLines().size());
+    head.addMetaInformationLine("##PEDIGREE=<Child=daughter1,Mother=mother,Father=father>");
+    assertEquals(1, head.getPedigreeLines().size());
+    head.addMetaInformationLine("##PEDIGREE=<Child=daughter1,Mother=mother,Father=father>");
+    assertEquals(1, head.getPedigreeLines().size());
   }
 
   public void testEscapedInfoParse() {
