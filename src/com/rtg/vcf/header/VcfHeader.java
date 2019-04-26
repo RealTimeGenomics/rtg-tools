@@ -373,7 +373,7 @@ public class VcfHeader {
    * @param field the new pedigree field
    */
   public void addPedigreeField(PedigreeField field) {
-    if (!mPedigreeLines.contains(field)){
+    if (!mPedigreeLines.contains(field)) {
       mPedigreeLines.add(field);
     }
   }
