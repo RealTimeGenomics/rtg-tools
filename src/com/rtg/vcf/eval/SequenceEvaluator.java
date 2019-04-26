@@ -104,6 +104,17 @@ class SequenceEvaluator implements IORunnable {
         final PathFinder f = new PathFinder(template, currentName, baseLineCalls, calledCalls, op.getA(), op.getB(), mPathFinderConfig);
 
         final Path best = f.bestPath();
+        if (best == null) {
+          // Add some more info to the message so we can try to track this one down.
+          final StringBuilder msg = new StringBuilder("After path finding on " + currentName + ", the best path was null!");
+          if (baseLineCalls.size() < 50) {
+            msg.append("\nb: ").append(baseLineCalls.toString());
+          }
+          if (calledCalls.size() < 50) {
+            msg.append("\nc: ").append(calledCalls.toString());
+          }
+          throw new NullPointerException(msg.toString());
+        }
 
         if (DUMP_BEST_PATH) {
           System.out.println("#### " + best);
