@@ -620,7 +620,7 @@ public final class VcfUtils {
    * If field contains multiple values will get the first value.
    * @param rec VCF record
    * @param field string ID of field to extract
-   * @return the value converted into a double, or {@code Double.NaN} if missing
+   * @return the value converted into a double, or null if missing
    */
   public static Integer getIntegerInfoFieldFromRecord(VcfRecord rec, String field) {
     final Map<String, ArrayList<String>> infoField = rec.getInfo();
@@ -929,6 +929,19 @@ public final class VcfUtils {
     }
   }
 
+  /**
+   * Return the zero-based end position (exclusive) of this record accounting for the end point of a
+   * symbolic allele (if present).
+   * @param record VCF record
+   * @return end position
+   */
+  public static int getEnd(final VcfRecord record) {
+    // From VCF spec
+    // For precise variants, END is POS + length of REF allele - 1, and the for imprecise variants the corresponding best estimate
+    final Integer endSymbolic = VcfUtils.getIntegerInfoFieldFromRecord(record, VcfUtils.INFO_END);
+    return endSymbolic == null ? record.getEnd() : endSymbolic;
+  }
+
   private static String replaySymbolic(VcfRecord rec, String alt, Map<String, String> refs) {
     final String fulllocal = refs.get(rec.getSequenceName());
     final int symbolStart = alt.indexOf('<');
@@ -936,9 +949,7 @@ public final class VcfUtils {
       throw new VcfFormatException("Invalid symbolic allele: " + alt);
     }
     final String fullremote = refs.get(alt.substring(symbolStart));
-    final Integer endSymbolic = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
-    final int end = endSymbolic != null ? endSymbolic - 1 : rec.getStart() + rec.getRefCall().length();
-    return fulllocal.substring(0, rec.getStart()) + alt.substring(0, symbolStart) + fullremote + fulllocal.substring(end);
+    return fulllocal.substring(0, rec.getStart()) + alt.substring(0, symbolStart) + fullremote + fulllocal.substring(getEnd(rec));
   }
 
   private static String replayBreakpoint(String localChr, int pos, String ref, BreakpointAlt alt, Map<String, String> refs) {

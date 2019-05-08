@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import static com.rtg.vcf.VcfUtils.INFO_END;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -120,9 +118,7 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
     if (!mFullSpan) {
       annotation = getAnnotations(rec.getSequenceName(), rec.getStart());
     } else {
-      final Integer svend = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
-      final int end = svend != null ? svend - 1 : rec.getEnd();
-      annotation = getAnnotations(rec.getSequenceName(), rec.getStart(), end);
+      annotation = getAnnotations(rec.getSequenceName(), rec.getStart(), VcfUtils.getEnd(rec));
     }
     if (annotation != null) {
       if (annotation.size() > 0) {

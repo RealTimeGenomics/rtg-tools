@@ -313,7 +313,7 @@ class VcfFilterTask {
       mNonSampleSpecificFailed = true;
       return false;
     }
-    if (mIncludeBed != null && !mIncludeBed.overlapped(record)) {
+    if (mIncludeBed != null && !mIncludeBed.overlapped(record.getSequenceName(), record.getStart(), VcfUtils.getEnd(record))) {
       mVcfFilterStatistics.increment(Stat.INCLUDE_BED_COUNT);
       mNonSampleSpecificFailed = true;
       return false;

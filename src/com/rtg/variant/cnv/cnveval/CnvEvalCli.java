@@ -253,8 +253,7 @@ public class CnvEvalCli extends LoggedCli {
             default:
               throw new RuntimeException("Unknown variant set type: " + setType);
           }
-          final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(v.record(), VcfUtils.INFO_END);
-          final SequenceNameLocusSimple originalSpan = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), end);
+          final SequenceNameLocusSimple originalSpan = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
           if (extractor != null) {
             w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), status, v.cnaType().name(), v.spanType().name(), originalSpan.toString(), Utils.realFormat(extractor.getSortValue(v.record(), sampleCol), 4)));
           } else {
@@ -360,7 +359,7 @@ public class CnvEvalCli extends LoggedCli {
       final CnaVariantSet variants = new CnaVariantSet(vr.getHeader(), setType);
       while (vr.hasNext()) {
         final VcfRecord rec = vr.next();
-        final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, VcfUtils.INFO_END);
+        final int end = VcfUtils.getEnd(rec);
 
         // Grab all the evaluation regions that it intersects with
         Diagnostic.userLog("Got a variant record: " + rec);

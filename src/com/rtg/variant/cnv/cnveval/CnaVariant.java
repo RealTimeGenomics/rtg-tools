@@ -56,9 +56,8 @@ class CnaVariant extends Range {
     mRec = rec;
     mCnaType = CnaType.valueOf(rec);
     assert mCnaType != null;
-    final int rend = VcfUtils.getIntegerInfoFieldFromRecord(rec, VcfUtils.INFO_END) - 1;
-    assert Interval.overlaps(new Range(start, end), new Range(rec.getStart(), rend));
-    mSpan = rec.getStart() > start || rend < end ? SpanType.PARTIAL : SpanType.FULL;
+    assert Interval.overlaps(new Range(start, end), new Range(rec.getStart(), VcfUtils.getEnd(rec) - 1));
+    mSpan = rec.getStart() > start || VcfUtils.getEnd(rec) < end ? SpanType.PARTIAL : SpanType.FULL;
   }
 
   CnaType cnaType() {
