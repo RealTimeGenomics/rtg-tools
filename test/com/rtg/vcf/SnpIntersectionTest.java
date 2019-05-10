@@ -159,8 +159,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
   }
 
   public void testRegion() throws Exception {
-    final File topLevel = FileUtils.createTempDir("snpintersection", "regiontest");
-    try {
+    try (TestDirectory topLevel = new TestDirectory("snpintersection")) {
       final File first = new File(topLevel, "first.txt.gz");
       FileHelper.stringToGzFile(INPUT_STR_FIRST, first);
       new TabixIndexer(first, new File(topLevel, "first.txt.gz.tbi")).saveTsvIndex();
@@ -173,7 +172,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
           "-I", second.getPath(),
           "-o", outDir.getPath(),
           "-c",
-          "--region", "chr1:148-254"
+          "--region", "chr1:147-254"
       };
       final String output = checkMainInitOk(args);
       TestUtils.containsAll(output
@@ -187,14 +186,11 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       TestUtils.containsAll(FileHelper.gzFileToString(new File(outDir, "first-only.vcf.gz")), String.format(FIRST_ONLY1, "SF=0"));
       TestUtils.containsAll(FileHelper.gzFileToString(new File(outDir, "same.vcf.gz")), String.format(SAME, "SF=0"), String.format(SAME, "SF=1"));
       TestUtils.containsAll(FileHelper.gzFileToString(new File(outDir, "different.vcf.gz")), String.format(DIFFERENT1, "SF=0"), String.format(DIFFERENT2, "SF=1"));
-    } finally {
-      assertTrue(FileHelper.deleteAll(topLevel));
     }
   }
 
   public void testMainExec() throws IOException {
-    final File topLevel = FileUtils.createTempDir("snpintersection", "test");
-    try {
+    try (TestDirectory topLevel = new TestDirectory("snpintersection")) {
       final File first = new File(topLevel, "first");
       FileUtils.stringToFile(INPUT_STR_FIRST, first);
 
@@ -202,14 +198,11 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       FileUtils.stringToFile(INPUT_STR_SECOND, second);
 
       run(topLevel, first, second, false);
-    } finally {
-      assertTrue(FileHelper.deleteAll(topLevel));
     }
   }
 
   public void testMainExecGzipped() throws IOException {
-    final File topLevel = FileUtils.createTempDir("snpintersection", "test");
-    try {
+    try (TestDirectory topLevel = new TestDirectory("snpintersection")) {
       final File first = new File(topLevel, "first.gz");
       FileHelper.stringToGzFile(INPUT_STR_FIRST, first);
 
@@ -217,8 +210,6 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       FileHelper.stringToGzFile(INPUT_STR_SECOND, second);
 
       run(topLevel, first, second, true);
-    } finally {
-      assertTrue(FileHelper.deleteAll(topLevel));
     }
   }
 

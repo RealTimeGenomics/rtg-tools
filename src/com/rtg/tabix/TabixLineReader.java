@@ -166,7 +166,7 @@ public class TabixLineReader implements LineReader {
         mBCPositionReader.next();
         if ((mSequence == null || mSequence.equals(mBCPositionReader.getReferenceName()))
           && (mEnd == -1 || mBCPositionReader.getStartPosition() < mEnd)
-          && (mBeg <= -1 || mBCPositionReader.getStartPosition() + mBCPositionReader.getLengthOnReference() >= mBeg)) {
+          && (mBeg <= -1 || mBCPositionReader.getStartPosition() + mBCPositionReader.getLengthOnReference() > mBeg)) {
           mCurrent = mBCPositionReader.getRecord();
           return true;
         } else if (mEnd != -1 && mBCPositionReader.getStartPosition() >= mEnd) {
