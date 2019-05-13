@@ -71,6 +71,82 @@ public class VcfRecordMerger implements AutoCloseable {
     mPaddingAware = paddingAware;
   }
 
+  // Builds the union of alt alleles plus a map converting allele indices from input
+  // records to the union indices.
+  static class AlleleMap {
+    boolean mAltsChanged = false;
+    final int[][] mGtMap;
+    AlleleMap(String refCall, List<String> alts, VcfRecord[] records) {
+      if (records.length == 1) {
+        mGtMap = null;
+        alts.addAll(records[0].getAltCalls());
+      } else {
+        mGtMap = new int[records.length][];
+        for (int i = 0; i < records.length; ++i) {
+          final VcfRecord vcf = records[i];
+          final int numAlts = vcf.getAltCalls().size();
+          mGtMap[i] = new int[numAlts + 1];
+          for (int j = 0; j < numAlts; ++j) {
+            final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
+            if (alt.equals(refCall)) {
+              mGtMap[i][j + 1] = 0;
+              mAltsChanged = true;
+            } else {
+              int altIndex = alts.indexOf(alt);
+              if (altIndex == -1) {
+                altIndex = alts.size();
+                alts.add(alt);
+              }
+              mGtMap[i][j + 1] = altIndex + 1;
+              if (j != altIndex) {
+                mAltsChanged = true;
+              }
+            }
+          }
+          if (numAlts != alts.size()) {
+            mAltsChanged = true;
+          }
+        }
+      }
+    }
+
+    // If true, it means that GT indices require remapping
+    boolean altsChanged() {
+      return mAltsChanged;
+    }
+
+    String remapGt(VcfRecord[] records, int recordIndex, int sampleIndex) {
+      assert mGtMap != null || recordIndex == 0 && records.length == 1;
+      final VcfRecord record = records[recordIndex];
+      final String gtStr = record.getFormat(VcfUtils.FORMAT_GENOTYPE).get(sampleIndex);
+      if (mGtMap == null) { // Shortcut
+        return gtStr;
+      }
+      final int[] splitGt = splitRemapGt(gtStr, record, recordIndex);
+      return VcfUtils.joinGt(VcfUtils.isPhasedGt(gtStr), splitGt);
+    }
+
+    // Split a GT string into remapped allele indices
+    int[] splitRemapGt(String gtStr, VcfRecord record, int recordIndex) {
+      final int[] splitGt = VcfUtils.splitGt(gtStr);
+      return remapGt(splitGt, record, recordIndex);
+    }
+
+    int[] remapGt(int[] splitGt, VcfRecord record, int recordIndex) {
+      if (mGtMap != null) {
+        for (int gti = 0; gti < splitGt.length; ++gti) {
+          if (splitGt[gti] != -1) {
+            if (splitGt[gti] >= mGtMap[recordIndex].length) {
+              throw new VcfFormatException("Invalid GT allele index " + splitGt[gti] + " in input record: " + record);
+            }
+            splitGt[gti] = mGtMap[recordIndex][splitGt[gti]];
+          }
+        }
+      }
+      return splitGt;
+    }
+  }
+
   /**
    * Merges multiple VCF records into one VCF record
    *
@@ -88,63 +164,31 @@ public class VcfRecordMerger implements AutoCloseable {
    */
   public VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
     final String refCall = VcfUtils.normalizeAllele(records[0].getRefCall());
-    final int pos = records[0].getStart();
-    final int length = records[0].getLength();
-    final Set<String> uniqueIds = new LinkedHashSet<>();
-    for (final VcfRecord vcf : records) {
-      if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
-        throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
-      } else if (!refCall.equalsIgnoreCase(vcf.getRefCall())) {
-        throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
-      }
-      final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
-      Collections.addAll(uniqueIds, ids);
-    }
+    checkConsistentRefAllele(refCall, records);
+
     final VcfRecord merged = new VcfRecord(records[0].getSequenceName(), records[0].getStart(), refCall);
 
-    merged.setId(StringUtils.join(VcfUtils.VALUE_SEPARATOR, uniqueIds));
+    mergeIds(merged, records);
 
-    boolean altsChanged = false;
-    final List<String> mergedAltCalls = merged.getAltCalls();
-    final int[][] gtMap;
-    if (records.length == 1) {
-      gtMap = null;
-      mergedAltCalls.addAll(records[0].getAltCalls());
-    } else {
-      gtMap = new int[records.length][];
-      for (int i = 0; i < records.length; ++i) {
-        final VcfRecord vcf = records[i];
-        final int numAlts = vcf.getAltCalls().size();
-        gtMap[i] = new int[numAlts + 1];
-        for (int j = 0; j < numAlts; ++j) {
-          final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
-          if (alt.equals(refCall)) {
-            gtMap[i][j + 1] = 0;
-            altsChanged = true;
-          } else {
-            int altIndex = mergedAltCalls.indexOf(alt);
-            if (altIndex == -1) {
-              altIndex = mergedAltCalls.size();
-              mergedAltCalls.add(alt);
-            }
-            gtMap[i][j + 1] = altIndex + 1;
-            if (j != altIndex) {
-              altsChanged = true;
-            }
-          }
-        }
-        if (numAlts != mergedAltCalls.size()) {
-          altsChanged = true;
-        }
-      }
-    }
+    // Merge ALTs and create mapping for use in GT translation
+    final AlleleMap map = new AlleleMap(refCall, merged.getAltCalls(), records);
+
     merged.setQuality(records[0].getQuality());
     merged.getFilters().addAll(records[0].getFilters());
-    merged.setNumberOfSamples(destHeader.getNumberOfSamples());
+
+    // Copy INFO from first record into destination (INFO from other records are ignored)
     for (final Map.Entry<String, ArrayList<String>> entry : records[0].getInfo().entrySet()) {
       merged.getInfo().computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).addAll(entry.getValue());
     }
 
+    if (!mergeSamples(records, headers, merged, destHeader, map, unmergeableFormatFields, dropUnmergeable)) {
+      return null;
+    }
+    return merged;
+  }
+
+  protected boolean mergeSamples(VcfRecord[] records, VcfHeader[] headers, VcfRecord dest, VcfHeader destHeader, AlleleMap map, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
+    dest.setNumberOfSamples(destHeader.getNumberOfSamples());
     final List<String> names = destHeader.getSampleNames();
     for (int destSampleIndex = 0; destSampleIndex < names.size(); ++destSampleIndex) {
       boolean sampleDone = false;
@@ -154,35 +198,25 @@ public class VcfRecordMerger implements AutoCloseable {
           if (sampleDone) {
             if (dropUnmergeable) {
               if (++mMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
-                Diagnostic.warning("Multiple records found at position: " + merged.getSequenceName() + ":" + merged.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
+                Diagnostic.warning("Multiple records found at position: " + dest.getSequenceName() + ":" + dest.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
               }
               continue;
             } else {
-              return null;
+              return false;
             }
           }
           sampleDone = true;
           for (final String key : records[i].getFormats()) {
-            ArrayList<String> field = merged.getFormat(key);
+            ArrayList<String> field = dest.getFormat(key);
             if (field == null) {
               field = new ArrayList<>();
-              merged.getFormatAndSample().put(key, field);
+              dest.getFormatAndSample().put(key, field);
             }
             while (field.size() <= destSampleIndex) {
               field.add(VcfRecord.MISSING);
             }
-            if (gtMap != null && VcfUtils.FORMAT_GENOTYPE.equals(key)) {
-              final String gtStr = records[i].getFormat(key).get(sampleIndex);
-              final int[] splitGt = VcfUtils.splitGt(gtStr);
-              for (int gti = 0; gti < splitGt.length; ++gti) {
-                if (splitGt[gti] != -1) {
-                  if (splitGt[gti] >= gtMap[i].length) {
-                    throw new VcfFormatException("Invalid GT " + gtStr + " in input record: " + records[i]);
-                  }
-                  splitGt[gti] = gtMap[i][splitGt[gti]];
-                }
-              }
-              field.set(destSampleIndex, VcfUtils.joinGt(VcfUtils.isPhasedGt(gtStr), splitGt));
+            if (VcfUtils.FORMAT_GENOTYPE.equals(key)) {
+              field.set(destSampleIndex, map.remapGt(records, i, sampleIndex));
             } else {
               field.set(destSampleIndex, records[i].getFormat(key).get(sampleIndex));
             }
@@ -190,28 +224,54 @@ public class VcfRecordMerger implements AutoCloseable {
         }
       }
     }
-    if (!names.isEmpty() && merged.getFormats().isEmpty()) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
-      merged.addFormat(mDefaultFormat);
-    }
-    for (final String key : merged.getFormats()) {
-      final ArrayList<String> field = merged.getFormat(key);
-      while (field.size() < destHeader.getNumberOfSamples()) {
-        field.add(VcfRecord.MISSING);
-      }
-    }
-    if (altsChanged) {
-      final Set<String> formats = merged.getFormats();
+    if (map.altsChanged()) {
+      final Set<String> formats = dest.getFormats();
       for (String field : unmergeableFormatFields) {
         if (formats.contains(field)) {
           if (dropUnmergeable) {
-            merged.getFormatAndSample().remove(field);
+            dest.getFormatAndSample().remove(field);
           } else {
-            return null;
+            return false;
           }
         }
       }
     }
-    return merged;
+    padSamples(dest, destHeader);
+    return true;
+  }
+
+  // Ensure format fields of samples in record are appropriately padded
+  protected void padSamples(VcfRecord dest, VcfHeader destHeader) {
+    if (destHeader.getNumberOfSamples() > 0 && dest.getFormats().isEmpty()) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
+      dest.addFormat(mDefaultFormat);
+    }
+    for (final String key : dest.getFormats()) {
+      final ArrayList<String> field = dest.getFormat(key);
+      while (field.size() < destHeader.getNumberOfSamples()) {
+        field.add(VcfRecord.MISSING);
+      }
+    }
+  }
+
+  protected void mergeIds(VcfRecord dest, VcfRecord[] records) {
+    final Set<String> uniqueIds = new LinkedHashSet<>();
+    for (final VcfRecord vcf : records) {
+      final String[] ids = StringUtils.split(vcf.getId(), VcfUtils.VALUE_SEPARATOR);
+      Collections.addAll(uniqueIds, ids);
+    }
+    dest.setId(StringUtils.join(VcfUtils.VALUE_SEPARATOR, uniqueIds));
+  }
+
+  private void checkConsistentRefAllele(String refCall, VcfRecord[] records) {
+    final int pos = records[0].getStart();
+    final int length = records[0].getLength();
+    for (final VcfRecord vcf : records) {
+      if (pos != vcf.getStart() || length != vcf.getLength()) { // TODO: Handle gVCF merging
+        throw new RuntimeException("Attempt to merge records with different reference span at: " + new SequenceNameLocusSimple(records[0]));
+      } else if (!refCall.equalsIgnoreCase(vcf.getRefCall())) {
+        throw new VcfFormatException("Records at " + new SequenceNameLocusSimple(records[0]) + " disagree on what the reference bases should be! (" + refCall + " != " + vcf.getRefCall() + ")");
+      }
+    }
   }
 
   /**
