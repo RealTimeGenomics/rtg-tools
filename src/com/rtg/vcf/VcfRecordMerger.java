@@ -46,7 +46,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Provides routines for merging VCF records.
  */
-public class VcfRecordMerger implements AutoCloseable {
+public class VcfRecordMerger {
 
   /** Maximum number of duplicate warnings to explicitly print. */
   public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
@@ -327,8 +327,10 @@ public class VcfRecordMerger implements AutoCloseable {
     return ret.toArray(new VcfRecord[ret.size()]);
   }
 
-  @Override
-  public void close() {
+  /**
+   * Output a summary of the number of samples that had duplicate entries, if any.
+   */
+  public void printWarningSummary() {
     if (mMultipleRecordsForSampleCount > VcfRecordMerger.DUPLICATE_WARNINGS_TO_PRINT) {
       Diagnostic.warning("A total of " + mMultipleRecordsForSampleCount + " loci had multiple records for a sample.");
     }

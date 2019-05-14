@@ -193,7 +193,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     // Try-with-resources for nice closing side effects
     try (VcfWriter ignored = mVcfOut) {
       super.close();
-      mMerger.close();
     }
   }
 }

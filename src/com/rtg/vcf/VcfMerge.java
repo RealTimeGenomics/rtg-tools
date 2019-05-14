@@ -201,25 +201,25 @@ public class VcfMerge extends AbstractCli {
 
     final boolean stdout = FileUtils.isStdio(outFile);
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, outFile);
-    try (final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware)) {
-      try (final VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
-        final ZipperCallback callback = (records, headers) -> {
-          assert records.length > 0;
-          final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
-          for (VcfRecord merged : mergedArr) {
-            if (stats != null) {
-              stats.tallyVariant(header, merged);
-            }
-            w.write(merged);
+    final VcfRecordMerger merger = new VcfRecordMerger(defaultFormat, paddingAware);
+    try (final VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
+      final ZipperCallback callback = (records, headers) -> {
+        assert records.length > 0;
+        final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
+        for (VcfRecord merged : mergedArr) {
+          if (stats != null) {
+            stats.tallyVariant(header, merged);
           }
-        };
-        while (posZip.hasNextPosition()) {
-          posZip.nextPosition(callback);
+          w.write(merged);
         }
-      } catch (final VcfFormatException iae) {
-        throw new NoTalkbackSlimException("Problem in VCF: " + iae.getMessage());
+      };
+      while (posZip.hasNextPosition()) {
+        posZip.nextPosition(callback);
       }
+    } catch (final VcfFormatException iae) {
+      throw new NoTalkbackSlimException("Problem in VCF: " + iae.getMessage());
     }
+    merger.printWarningSummary();
     if (!stdout) {
       if (stats != null) {
         stats.printStatistics(out);
