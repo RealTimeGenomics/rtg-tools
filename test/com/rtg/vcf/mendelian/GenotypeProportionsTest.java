@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderFactory;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 
@@ -55,7 +56,7 @@ public class GenotypeProportionsTest extends AbstractNanoTest {
   private void check(String id) throws IOException {
     final GenotypeProportions prop = new GenotypeProportions();
     final String vcfResource = id + "_test.vcf";
-    try (VcfReader r = new VcfReader(new BufferedReader(new StringReader(mNano.loadReference(vcfResource))))) {
+    try (VcfReader r = new VcfReaderFactory().make(new BufferedReader(new StringReader(mNano.loadReference(vcfResource))))) {
       while (r.hasNext()) {
         final VcfRecord rec = r.next();
         final ArrayList<String> sampleGts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);

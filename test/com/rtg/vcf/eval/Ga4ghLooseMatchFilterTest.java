@@ -39,13 +39,14 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.vcf.DefaultVcfWriter;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderFactory;
 import com.rtg.vcf.VcfWriter;
 
 public class Ga4ghLooseMatchFilterTest extends AbstractNanoTest {
 
   protected void checkFiltering(int looseMatchDistance) throws IOException {
     final MemoryPrintStream p = new MemoryPrintStream();
-    try (VcfReader r = new VcfReader(new BufferedReader(new StringReader(mNano.loadReference("ga4gh-loose-match_in.vcf"))))) {
+    try (VcfReader r = new VcfReaderFactory().make(new BufferedReader(new StringReader(mNano.loadReference("ga4gh-loose-match_in.vcf"))))) {
       try (VcfWriter w = new Ga4ghLooseMatchFilter(new DefaultVcfWriter(r.getHeader(), p.outputStream()), looseMatchDistance)) {
         while (r.hasNext()) {
           w.write(r.next());

@@ -43,6 +43,7 @@ import com.rtg.bed.BedUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderFactory;
 
 import junit.framework.TestCase;
 
@@ -71,7 +72,7 @@ public class ReferenceRegionsTest extends TestCase {
     checkRegions(regions);
   }
   public void testVcfRegions() throws IOException {
-    final VcfReader reader = new VcfReader(new BufferedReader(new StringReader(VCF)));
+    final VcfReader reader = new VcfReaderFactory().make(new BufferedReader(new StringReader(VCF)));
     final ReferenceRegions regions = ReferenceRegions.regions(reader);
     checkRegions(regions);
   }

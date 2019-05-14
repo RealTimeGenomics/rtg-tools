@@ -67,7 +67,7 @@ public class VcfReaderTest extends TestCase {
         + VcfHeader.VERSION_LINE + LS
         + h + LS);
       try {
-        new VcfReader(new BufferedReader(in)).hasNext();
+        new VcfParser().parseHeader(in);
         fail();
       } catch (final NoTalkbackSlimException ex) {
         TestUtils.containsAll(ex.getMessage(), "VCF", "header");
@@ -78,7 +78,7 @@ public class VcfReaderTest extends TestCase {
   protected void checkVcfFormatException(String header, String... contains) throws IOException {
     final Reader in = new StringReader(header);
     try {
-      new VcfReader(new BufferedReader(in)).hasNext();
+      new VcfParser().parseHeader(in);
       fail("VcfFormatException expected from .vcf file: " + header);
     } catch (final VcfFormatException ex) {
       TestUtils.containsAll(ex.getMessage(), contains);
@@ -136,7 +136,7 @@ public class VcfReaderTest extends TestCase {
     ;
   public void testHeader0() throws IOException {
     final Reader in = new StringReader(HEADER0);
-    final VcfReader reader = new VcfReader(new BufferedReader(in));
+    final VcfReader reader = new VcfReaderFactory().make(new BufferedReader(in));
     final VcfHeader hdr = reader.getHeader();
     assertNotNull(hdr);
     assertEquals(0, hdr.getGenericMetaInformationLines().size());
@@ -153,7 +153,7 @@ public class VcfReaderTest extends TestCase {
     ;
   public void testNext() throws IOException {
     final Reader in = new StringReader(HEADER1);
-    final VcfReader reader = new VcfReader(new BufferedReader(in));
+    final VcfReader reader = new VcfReaderFactory().make(new BufferedReader(in));
     final VcfHeader hdr = reader.getHeader();
     assertNotNull(hdr);
     assertEquals(2, hdr.getGenericMetaInformationLines().size() + hdr.getInfoLines().size() + hdr.getFormatLines().size() + hdr.getFilterLines().size());

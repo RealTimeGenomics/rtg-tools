@@ -30,22 +30,14 @@
 
 package com.rtg.vcf;
 
-import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 
-import com.rtg.launcher.CommonFlags;
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
-import com.rtg.tabix.TabixIndexer;
-import com.rtg.tabix.TabixLineReader;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
-import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -60,20 +52,6 @@ public class VcfReader implements VcfIterator {
   private VcfRecord mCurrent;
 
   /**
-   * Create a new VCF reader. In general you should use <code>VcfReader.openVcfReader</code> instead.
-   *
-   * @param in where to read from
-   * @throws IOException when IO or format errors occur.
-   */
-  public VcfReader(BufferedReader in) throws IOException {
-    this(new VcfParser(), new BrLineReader(in));
-  }
-  
-  private VcfReader(VcfParser parser, BrLineReader in) throws IOException {
-    this(parser, in, parser.parseHeader(in));
-  }
-
-  /**
    * Read VcfRecords from a region of a block-compressed file, pre-parsed header
    * @param reader source of record lines
    * @param header header for file currently being read (callers responsibility)
@@ -83,13 +61,17 @@ public class VcfReader implements VcfIterator {
     this(new VcfParser(), reader, header);
   }
 
+  VcfReader(VcfParser parser, BrLineReader in) throws IOException {
+    this(parser, in, parser.parseHeader(in));
+  }
+
   /**
    * Read VcfRecords from a region of a block-compressed file
    * @param reader source of record lines
    * @param header header for file currently being read (callers responsibility)
    * @throws IOException if an IO error occurs
    */
-  private VcfReader(VcfParser parser, LineReader reader, VcfHeader header) throws IOException {
+  VcfReader(VcfParser parser, LineReader reader, VcfHeader header) throws IOException {
     mParser = parser;
     mIn = reader;
     mHeader = header;
@@ -104,8 +86,7 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs
    */
   static VcfReader openVcfReader(CFlags flags) throws IOException {
-    final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(flags);
-    return openVcfReader((File) flags.getValue(INPUT_FLAG), regions);
+    return new VcfReaderFactory(flags).make(flags);
   }
 
   /**
@@ -115,7 +96,7 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs
    */
   public static VcfReader openVcfReader(File f) throws IOException {
-    return new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
+    return new VcfReaderFactory().make(f);
   }
 
   /**
@@ -126,16 +107,7 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, ReferenceRanges<String> ranges) throws IOException {
-    final VcfReader vcfr;
-    if (ranges == null || ranges.allAvailable()) {
-      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
-    } else {
-      if (FileUtils.isStdio(f)) {
-        throw new IOException("Cannot apply region restrictions when reading VCF from stdin");
-      }
-      vcfr = new VcfReader(new VcfParser(), new TabixLineReader(f, TabixIndexer.indexFileName(f), ranges), VcfUtils.getHeader(f));
-    }
-    return vcfr;
+    return new VcfReaderFactory().regions(ranges).make(f);
   }
 
   /**
@@ -146,16 +118,7 @@ public class VcfReader implements VcfIterator {
    * @throws IOException if an IO Error occurs or if trying to apply a region restriction when reading from System.in
    */
   public static VcfReader openVcfReader(File f, RegionRestriction region) throws IOException {
-    final VcfReader vcfr;
-    if (region == null) {
-      vcfr = new VcfReader(new BufferedReader(new InputStreamReader(FileUtils.createInputStream(f, true))));
-    } else {
-      if (FileUtils.isStdio(f)) {
-        throw new IOException("Cannot apply region restriction when reading VCF from stdin");
-      }
-      vcfr = new VcfReader(new VcfParser(), new TabixLineReader(f, TabixIndexer.indexFileName(f), region), VcfUtils.getHeader(f));
-    }
-    return vcfr;
+    return new VcfReaderFactory().region(region).make(f);
   }
 
   /**
