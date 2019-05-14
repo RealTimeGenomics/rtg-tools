@@ -36,6 +36,7 @@ import java.util.Collection;
 import java.util.List;
 
 import com.rtg.reference.ReferenceGenome;
+import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
@@ -46,6 +47,7 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.ErrorType;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 
@@ -677,6 +679,15 @@ public final class CommonFlags {
   }
 
   /**
+   * Initialize flags for specifying a region or regions for VCF reading
+   * @param flags flags to initialize
+   */
+  public static void initRegionOrBedRegionsFlags(CFlags flags) {
+    flags.registerOptional(RESTRICTION_FLAG, String.class, REGION, "if set, only read VCF records within the specified range. " + REGION_SPEC).setCategory(CommonFlagCategories.INPUT_OUTPUT);
+    flags.registerOptional(BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(CommonFlagCategories.INPUT_OUTPUT);
+  }
+
+  /**
    * Check that the region and bed-regions flags are appropriate, if set.
    * @param flags the flags to check
    * @return <code>true</code> if all okay <code>false</code> otherwise
@@ -701,5 +712,24 @@ public final class CommonFlags {
       }
     }
     return true;
+  }
+
+  /**
+   * Convert BED regions or single region flag into a set of reference ranges
+   * @param flags flags with parameters set
+   * @return The parsed regions, or null if no regions were specified
+   * @throws IOException if the specified BED file is malformed
+   */
+  public static ReferenceRanges<String> parseRegionOrBedRegions(CFlags flags) throws IOException {
+    final ReferenceRanges<String> regions;
+    if (flags.isSet(BED_REGIONS_FLAG)) {
+      Diagnostic.developerLog("Loading BED regions");
+      regions = SamRangeUtils.createBedReferenceRanges((File) flags.getValue(BED_REGIONS_FLAG));
+    } else if (flags.isSet(RESTRICTION_FLAG)) {
+      regions = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction((String) flags.getValue(RESTRICTION_FLAG)));
+    } else {
+      regions = null;
+    }
+    return regions;
   }
 }

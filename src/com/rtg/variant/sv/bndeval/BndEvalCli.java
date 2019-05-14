@@ -33,7 +33,6 @@ import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
-import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -51,7 +50,6 @@ import java.util.Map;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
-import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -59,7 +57,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.LogStream;
 import com.rtg.vcf.AllMatchFilter;
 import com.rtg.vcf.AltVariantTypeFilter;
@@ -117,8 +114,7 @@ public class BndEvalCli extends LoggedCli {
     CommonFlags.initOutputDirFlag(mFlags);
     mFlags.registerRequired('b', VcfEvalCli.BASELINE, File.class, FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('c', VcfEvalCli.CALLS, File.class, FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.REGION, "if set, only read VCF records within the specified range. " + REGION_SPEC).setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
 
     mFlags.registerOptional(VcfEvalCli.ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
     mFlags.registerOptional(TOLERANCE, Integer.class, INT, "positional tolerance for breakend matching", 100).setCategory(FILTERING);
@@ -168,19 +164,9 @@ public class BndEvalCli extends LoggedCli {
     mTolerance = (Integer) mFlags.getValue(TOLERANCE);
     mBidirectional = mFlags.isSet(BIDIRECTIONAL);
 
-    final ReferenceRanges<String> regions;
-    if (mFlags.isSet(CommonFlags.BED_REGIONS_FLAG)) {
-      Diagnostic.developerLog("Loading BED regions");
-      regions = SamRangeUtils.createBedReferenceRanges((File) mFlags.getValue(CommonFlags.BED_REGIONS_FLAG));
-    } else if (mFlags.isSet(CommonFlags.RESTRICTION_FLAG)) {
-      regions = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction((String) mFlags.getValue(CommonFlags.RESTRICTION_FLAG)));
-    } else {
-      regions = null;
-    }
-
+    final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(mFlags);
     final GenomeBndVariants baseline = loadVariantSet(VariantSetType.BASELINE, (File) mFlags.getValue(VcfEvalCli.BASELINE), passOnly, regions);
     final GenomeBndVariants calls = loadVariantSet(VariantSetType.CALLS, (File) mFlags.getValue(VcfEvalCli.CALLS), passOnly, regions);
-
 
     findMatches(baseline, calls);
     weightMatches(baseline);

@@ -30,7 +30,6 @@
 package com.rtg.vcf.eval;
 
 import static com.rtg.launcher.CommonFlags.FLOAT;
-import static com.rtg.launcher.CommonFlags.REGION_SPEC;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -160,9 +159,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerRequired('b', BASELINE, File.class, CommonFlags.FILE, "VCF file containing baseline variants").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('c', CALLS, File.class, CommonFlags.FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('t', CommonFlags.TEMPLATE_FLAG, File.class, CommonFlags.SDF, "SDF of the reference genome the variants are called against").setCategory(INPUT_OUTPUT);
-
-    mFlags.registerOptional(CommonFlags.RESTRICTION_FLAG, String.class, CommonFlags.REGION, "if set, only read VCF records within the specified range. " + REGION_SPEC).setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(CommonFlags.BED_REGIONS_FLAG, File.class, "File", "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
 
     mFlags.registerOptional('e', EVAL_REGIONS_FLAG, File.class, "File", "if set, evaluate within regions contained in the supplied BED file, allowing transborder matches. To be used for truth-set high-confidence regions or other regions of interest where region boundary effects should be minimized").setCategory(INPUT_OUTPUT);
 

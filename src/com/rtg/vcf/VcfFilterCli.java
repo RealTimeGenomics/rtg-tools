@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf;
 
-import static com.rtg.launcher.CommonFlags.BED_REGIONS_FLAG;
 import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
@@ -37,9 +36,6 @@ import static com.rtg.launcher.CommonFlags.INT;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.NO_HEADER;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
-import static com.rtg.launcher.CommonFlags.REGION;
-import static com.rtg.launcher.CommonFlags.REGION_SPEC;
-import static com.rtg.launcher.CommonFlags.RESTRICTION_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -59,13 +55,10 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.bed.BedUtils;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.ReferenceRanges;
-import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.VcfFilterStatistics.Stat;
 import com.rtg.vcf.header.VcfHeader;
@@ -164,9 +157,7 @@ public final class VcfFilterCli extends AbstractCli {
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
-
-    mFlags.registerOptional(RESTRICTION_FLAG, String.class, REGION, "if set, only read VCF records within the specified range. " + REGION_SPEC).setCategory(INPUT_OUTPUT);
-    mFlags.registerOptional(BED_REGIONS_FLAG, File.class, FILE, "if set, only read VCF records that overlap the ranges contained in the specified BED file").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
 
     VcfMerge.initAddHeaderFlag(mFlags);
 
@@ -385,19 +376,6 @@ public final class VcfFilterCli extends AbstractCli {
     } else if (mFlags.isSet(EXCLUDE_VCF)) {
       mVcfFilterTask.mExcludeBed = VcfUtils.regionsVcf((File) mFlags.getValue(EXCLUDE_VCF));
     }
-    final RegionRestriction region;
-    if (mFlags.isSet(RESTRICTION_FLAG)) {
-      region = new RegionRestriction((String) mFlags.getValue(RESTRICTION_FLAG));
-    } else {
-      region = null;
-    }
-    final ReferenceRanges<String> ranges;
-    if (mFlags.isSet(BED_REGIONS_FLAG)) {
-      Diagnostic.developerLog("Loading BED regions");
-      ranges = SamRangeUtils.createBedReferenceRanges((File) mFlags.getValue(BED_REGIONS_FLAG));
-    } else {
-      ranges = null;
-    }
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
     for (final Object expr : mFlags.getValues(EXPR_FLAG)) {
       final String e = (String) expr;
@@ -412,11 +390,10 @@ public final class VcfFilterCli extends AbstractCli {
     scriptFilter.ifPresent(mVcfFilterTask.mFilters::add);
 
     final Collection<String> extraHeaderLines = VcfMerge.getHeaderLines(mFlags);
-    final File in = (File) mFlags.getValue(INPUT_FLAG);
     final File out = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean stdout = out != null && FileUtils.isStdio(out);
     Diagnostic.developerLog("Starting filter");
-    try (VcfReader r = ranges != null ? VcfReader.openVcfReader(in, ranges) : VcfReader.openVcfReader(in, region)) {
+    try (VcfReader r = VcfReader.openVcfReader(mFlags)) {
       final VcfHeader header = r.getHeader();
       VcfUtils.addHeaderLines(header, extraHeaderLines);
       mVcfFilterTask.setHeader(header);

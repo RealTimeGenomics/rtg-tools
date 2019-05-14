@@ -107,6 +107,7 @@ public class VcfSubset extends AbstractCli {
 
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to manipulate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
@@ -148,6 +149,7 @@ public class VcfSubset extends AbstractCli {
     public boolean isValid(final CFlags flags) {
       return CommonFlags.validateInputFile(flags, INPUT_FLAG)
         && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
+        && CommonFlags.validateRegions(flags)
         && flags.checkAtMostOne(REMOVE_INFOS, REMOVE_INFO, KEEP_INFO)
         && flags.checkAtMostOne(REMOVE_FILTERS, REMOVE_FILTER, KEEP_FILTER)
         && flags.checkAtMostOne(REMOVE_SAMPLES, REMOVE_SAMPLE, KEEP_SAMPLE)
@@ -201,14 +203,13 @@ public class VcfSubset extends AbstractCli {
 
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
-    final File input = (File) mFlags.getValue(INPUT_FLAG);
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
 
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
-    try (final VcfReader reader = VcfReader.openVcfReader(input)) {
+    try (final VcfReader reader = VcfReader.openVcfReader(mFlags)) {
       final VcfHeader header = reader.getHeader();
 
       final AnnotatorAdder sampleAnnAdder = new AnnotatorAdder() {

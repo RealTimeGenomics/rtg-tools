@@ -113,6 +113,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.registerRequired('i', INPUT_FLAG, File.class, FILE, "VCF file containing variants to annotate. Use '-' to read from standard input").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file name. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
     mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     mFlags.registerOptional(BED_IDS_FLAG, File.class, FILE, "add variant IDs from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
     mFlags.registerOptional(BED_INFO_FLAG, File.class, FILE, "add INFO annotations from BED file").setCategory(REPORTING).setMaxCount(Integer.MAX_VALUE);
@@ -137,6 +138,7 @@ public final class VcfAnnotatorCli extends AbstractCli {
     public boolean isValid(CFlags flags) {
       return CommonFlags.validateInputFile(flags, INPUT_FLAG)
         && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
+        && CommonFlags.validateRegions(flags)
         && flags.checkNand(BED_IDS_FLAG, VCF_IDS_FLAG)
         && checkFileList(flags, BED_INFO_FLAG)
         && checkFileList(flags, BED_IDS_FLAG)
@@ -201,10 +203,9 @@ public final class VcfAnnotatorCli extends AbstractCli {
     }
 
     final Collection<String> extraHeaderLines = VcfMerge.getHeaderLines(mFlags);
-    final File inputFile = (File) mFlags.getValue(INPUT_FLAG);
     final File output = (File) mFlags.getValue(OUTPUT_FLAG);
     final boolean gzip = !mFlags.isSet(NO_GZIP);
-    try (VcfReader reader = VcfReader.openVcfReader(inputFile)) {
+    try (VcfReader reader = VcfReader.openVcfReader(mFlags)) {
       final VcfHeader header = reader.getHeader();
       VcfUtils.addHeaderLines(header, extraHeaderLines);
       for (final VcfAnnotator annotator : annotators) {

@@ -30,16 +30,20 @@
 
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.INPUT_FLAG;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.rtg.launcher.CommonFlags;
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.TabixLineReader;
 import com.rtg.util.StringUtils;
+import com.rtg.util.cli.CFlags;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
@@ -93,6 +97,17 @@ public class VcfReader implements VcfIterator {
     mHeader = header;
     mNumSamples = mHeader.getNumberOfSamples();
     setNext();
+  }
+
+  /**
+   * Open a <code>VCF</code> reader from commonly used flag arguments
+   * @param flags the flags parser with all arguments set
+   * @return the reader
+   * @throws IOException if an IO Error occurs
+   */
+  static VcfReader openVcfReader(CFlags flags) throws IOException {
+    final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(flags);
+    return openVcfReader((File) flags.getValue(INPUT_FLAG), regions);
   }
 
   /**
