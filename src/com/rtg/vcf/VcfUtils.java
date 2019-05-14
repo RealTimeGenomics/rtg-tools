@@ -465,9 +465,7 @@ public final class VcfUtils {
    * @throws IOException if an I/O error occurs
    */
   public static VcfHeader getHeader(final File input) throws IOException {
-    try (VcfReader reader = VcfReader.openVcfReader(input)) {
-      return reader.getHeader();
-    }
+    return new VcfParser().parseHeader(input);
   }
 
   /**

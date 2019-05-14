@@ -52,11 +52,13 @@ import com.rtg.relation.Relationship.RelationshipFilter;
 import com.rtg.relation.Relationship.RelationshipType;
 import com.rtg.relation.Relationship.RelationshipTypeFilter;
 import com.rtg.relation.Relationship.SecondInRelationshipFilter;
+import com.rtg.tabix.BrLineReader;
+import com.rtg.tabix.LineReader;
 import com.rtg.util.MultiMap;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfParser;
 import com.rtg.vcf.VcfUtils;
 
 /**
@@ -136,8 +138,8 @@ public class GenomeRelationships {
   public static GenomeRelationships loadGenomeRelationships(Reader input) throws IOException {
     final String pedTxt = FileUtils.readerToString(input);
     if (pedTxt.startsWith("##fileformat=VCF")) {
-      try (VcfReader r = new VcfReader(new BufferedReader(new StringReader(pedTxt)))) {
-        return VcfPedigreeParser.load(r.getHeader());
+      try (LineReader r = new BrLineReader(new BufferedReader(new StringReader(pedTxt)))) {
+        return VcfPedigreeParser.load(new VcfParser().parseHeader(r));
       }
     } else {
       try (BufferedReader r = new BufferedReader(new StringReader(pedTxt))) {
