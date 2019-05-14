@@ -30,6 +30,7 @@
 
 package com.rtg.vcf;
 
+import java.util.ArrayList;
 import java.util.Set;
 
 import com.rtg.AbstractTest;
@@ -56,6 +57,24 @@ public class VcfRecordMergerTest extends AbstractTest {
 
   static VcfRecord createRecord(String chrom, int pos, String ref) {
     return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT_MISSING, chrom, pos, ref));
+  }
+
+  public void testAllelesChanged() {
+    VcfRecord r1 = createRecord("chr1", 50, "A", 0, 1, "C");
+    VcfRecord r2 = createRecord("chr1", 50, "A", 1, 2, "C", "G");
+    VcfRecord r3 = createRecord("chr1", 50, "A", 1, 2, "G", "C");
+
+    VcfRecordMerger.AlleleMap map = new VcfRecordMerger.AlleleMap("A", new ArrayList<>(), new VcfRecord[]{r2, r2});
+    assertFalse(map.altsChanged());
+
+    map = new VcfRecordMerger.AlleleMap("A", new ArrayList<>(), new VcfRecord[]{r2, r1});
+    assertTrue(map.altsChanged());
+
+    map = new VcfRecordMerger.AlleleMap("A", new ArrayList<>(), new VcfRecord[]{r1, r2});
+    assertTrue(map.altsChanged());
+
+    map = new VcfRecordMerger.AlleleMap("A", new ArrayList<>(), new VcfRecord[]{r1, r3});
+    assertTrue(map.altsChanged());
   }
 
   public void testMerge() {

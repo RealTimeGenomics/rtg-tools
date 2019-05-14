@@ -74,12 +74,13 @@ public class VcfRecordMerger implements AutoCloseable {
   // Builds the union of alt alleles plus a map converting allele indices from input
   // records to the union indices.
   static class AlleleMap {
-    boolean mAltsChanged = false;
+    final boolean mAltsChanged;
     final int[][] mGtMap;
     AlleleMap(String refCall, List<String> alts, VcfRecord[] records) {
       if (records.length == 1) {
         mGtMap = null;
         alts.addAll(records[0].getAltCalls());
+        mAltsChanged = false;
       } else {
         mGtMap = new int[records.length][];
         for (int i = 0; i < records.length; ++i) {
@@ -90,7 +91,6 @@ public class VcfRecordMerger implements AutoCloseable {
             final String alt = VcfUtils.normalizeAllele(vcf.getAltCalls().get(j));
             if (alt.equals(refCall)) {
               mGtMap[i][j + 1] = 0;
-              mAltsChanged = true;
             } else {
               int altIndex = alts.indexOf(alt);
               if (altIndex == -1) {
@@ -98,16 +98,25 @@ public class VcfRecordMerger implements AutoCloseable {
                 alts.add(alt);
               }
               mGtMap[i][j + 1] = altIndex + 1;
-              if (j != altIndex) {
-                mAltsChanged = true;
-              }
             }
           }
-          if (numAlts != alts.size()) {
-            mAltsChanged = true;
+        }
+        mAltsChanged = altsChanged(alts.size() + 1);
+      }
+    }
+
+    private boolean altsChanged(int numAlleles) {
+      for (int[] map : mGtMap) {
+        if (map.length != numAlleles) {
+          return true;
+        }
+        for (int j = 0; j < map.length; ++j) {
+          if (map[j] != j) {
+            return true;
           }
         }
       }
+      return false;
     }
 
     // If true, it means that GT indices require remapping
