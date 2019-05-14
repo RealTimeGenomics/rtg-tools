@@ -43,7 +43,6 @@ import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE;
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -67,7 +66,6 @@ import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.gzip.GzipUtils;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.ContigField;
@@ -271,19 +269,17 @@ public class VcfMerge extends AbstractCli {
       int numSamples = 0;
       boolean warnNumSamples = true;
       for (int i = 0; i < mFiles.length; ++i) {
-        final File file = mFiles[i];
-        try (VcfReader vr = new VcfReader(new BufferedReader(new InputStreamReader(GzipUtils.createGzipInputStream(new FileInputStream(file)))))) {
-          mHeaders[i] = vr.getHeader();
-          if (current != null) {
-            current = VcfHeaderMerge.mergeHeaders(current, vr.getHeader(), forceMerge);
-            if (current.getNumberOfSamples() != numSamples && warnNumSamples) {
-              Diagnostic.warning("When merging multiple samples the QUAL, FILTER, and INFO fields are taken from the first record at each position.");
-              warnNumSamples = false;
-            }
-          } else {
-            current = vr.getHeader();
-            numSamples = current.getNumberOfSamples();
+        final VcfHeader header = VcfUtils.getHeader(mFiles[i]);
+        mHeaders[i] = header;
+        if (current != null) {
+          current = VcfHeaderMerge.mergeHeaders(current, header, forceMerge);
+          if (current.getNumberOfSamples() != numSamples && warnNumSamples) {
+            Diagnostic.warning("When merging multiple samples the QUAL, FILTER, and INFO fields are taken from the first record at each position.");
+            warnNumSamples = false;
           }
+        } else {
+          current = header;
+          numSamples = current.getNumberOfSamples();
         }
       }
       mMergedHeader = current;
