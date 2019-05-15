@@ -38,7 +38,7 @@ import com.rtg.mode.DnaUtils;
 import com.rtg.util.BasicLinkedListNode;
 import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.Range;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderTest;
 
 import junit.framework.TestCase;
 
@@ -281,7 +281,7 @@ public class HalfPathTest extends TestCase {
     int varIndex = 0;
     for (final String var : CALLS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(vartab), 0), true), varIndex++);
     }
     StringBuilder sb = new StringBuilder();
     path.step();
@@ -295,7 +295,7 @@ public class HalfPathTest extends TestCase {
     varIndex = 0;
     for (final String var : MUTATIONS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
-      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), 0), true), varIndex++);
+      path.include(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(vartab), 0), true), varIndex++);
     }
     sb = new StringBuilder();
     path.step();

@@ -39,8 +39,8 @@ import junit.framework.TestCase;
 public class VcfInfoFilterTest extends TestCase {
 
   public void testMinMaxIntFilter() {
-    final VcfRecord withDepth = VcfReader.vcfLineToRecord("g1\t8\t.\tAAAAA\tG\t.\tPASS\tDP=50\tGT\t1/1\t0/0");
-    final VcfRecord withoutDepth = VcfReader.vcfLineToRecord("g1\t8\t.\tAAAAA\tG\t.\tPASS\t.\tGT\t1/1\t0/0");
+    final VcfRecord withDepth = VcfReaderTest.vcfLineToRecord("g1\t8\t.\tAAAAA\tG\t.\tPASS\tDP=50\tGT\t1/1\t0/0");
+    final VcfRecord withoutDepth = VcfReaderTest.vcfLineToRecord("g1\t8\t.\tAAAAA\tG\t.\tPASS\t.\tGT\t1/1\t0/0");
     check(withDepth, 5, 100, true);
     check(withDepth, 50, 100, true);
     check(withDepth, 5, 50, true);

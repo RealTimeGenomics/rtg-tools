@@ -52,11 +52,11 @@ public class VcfRecordMergerTest extends AbstractTest {
 
   static VcfRecord createRecord(String chrom, int pos, String ref, int gt1, int gt2, String... alts) {
     final String altsStr = StringUtils.join(",", alts, false);
-    return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT, chrom, pos, ref, altsStr, gt1, gt2));
+    return VcfReaderTest.vcfLineToRecord(String.format(VCF_RECORD_FORMAT, chrom, pos, ref, altsStr, gt1, gt2));
   }
 
   static VcfRecord createRecord(String chrom, int pos, String ref) {
-    return VcfReader.vcfLineToRecord(String.format(VCF_RECORD_FORMAT_MISSING, chrom, pos, ref));
+    return VcfReaderTest.vcfLineToRecord(String.format(VCF_RECORD_FORMAT_MISSING, chrom, pos, ref));
   }
 
   public void testAllelesChanged() {
@@ -233,7 +233,7 @@ public class VcfRecordMergerTest extends AbstractTest {
     // These are kind of dodgy records since they have redundant alleles, so allele normalization on these can cause problems
     // We just pass them through after reordering the samples into the order expected in the destination.
     for (String rr : new String[]{"chr1\t100\t.\tg\ta,C,a\t.\tPASS\t.", "chr1\t100\t.\tg\ta,G\t.\tPASS\t.", "chr1\t100\t.\tg\tg\t.\tPASS\t.", "chr1\t100\t.\tg\ta,C,A\t.\tPASS\t."}) {
-      r2 = VcfReader.vcfLineToRecord(rr);
+      r2 = VcfReaderTest.vcfLineToRecord(rr);
       r2.setNumberOfSamples(1);
       r2.addFormatAndSample(unmergeable.getId(), "1.0");
       mergedArr = merger.mergeRecords(new VcfRecord[]{r2}, new VcfHeader[] {h2}, mh, hardSet, true);
@@ -266,26 +266,26 @@ public class VcfRecordMergerTest extends AbstractTest {
     mh.addFormatField("ZZ", MetaType.INTEGER, new VcfNumber("A"), "Number on Alt Allele");
     mh.addFormatField("ZX", MetaType.INTEGER, new VcfNumber("G"), "Number on Genotype");
 
-    VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2");
-    VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
+    VcfRecord r1 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2");
+    VcfRecord r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
     VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(1, mergedArr.length);
     assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ:ZX\t1/2:1,2\t1/2:.:3,4,5", mergedArr[0].toString());
 
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
+    r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
     mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(2, mergedArr.length);
     assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2\t.", mergedArr[0].toString());
     assertEquals("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t.\t1/2:3,4,5", mergedArr[1].toString());
 
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT:ZZ\t1/1:3");
+    r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT:ZZ\t1/1:3");
     mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(2, mergedArr.length);
     assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ\t1/2:1,2\t.", mergedArr[0].toString());
     assertEquals("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT:ZZ\t.\t1/1:3", mergedArr[1].toString());
 
-    r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tGGG\tAAA\t.\tPASS\t.\tGT:ZX\t0/1:1,2,3");
-    r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tGGG\tCCC\t.\tPASS\t.\tGT:ZX\t0/1:4,5,6");
+    r1 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tGGG\tAAA\t.\tPASS\t.\tGT:ZX\t0/1:1,2,3");
+    r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tGGG\tCCC\t.\tPASS\t.\tGT:ZX\t0/1:4,5,6");
     mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(2, mergedArr.length);
     assertEquals("chr1\t100\t.\tGGG\tAAA\t.\tPASS\t.\tGT:ZX\t0/1:1,2,3\t.", mergedArr[0].toString());
@@ -339,8 +339,8 @@ public class VcfRecordMergerTest extends AbstractTest {
     h2.addSampleName("sample1");
     final VcfHeader mh = VcfHeaderMerge.mergeHeaders(h1, h2, null);
     final VcfHeader[] heads = {h1, h2};
-    final VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT\t1/1");
-    final VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tC\t.\tPASS\t.\tGT\t0/1");
+    final VcfRecord r1 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA\t.\tPASS\t.\tGT\t1/1");
+    final VcfRecord r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tC\t.\tPASS\t.\tGT\t0/1");
 
     VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads, mh, VcfMerge.alleleBasedFormats(mh), false);
     assertEquals(1, mergedArr.length);
@@ -362,9 +362,9 @@ public class VcfRecordMergerTest extends AbstractTest {
     VcfHeader mh = VcfHeaderMerge.mergeHeaders(h1, h2, null);
     mh = VcfHeaderMerge.mergeHeaders(mh, h3, null);
     final VcfHeader[] heads = {h1, h2, h3};
-    final VcfRecord r1 = VcfReader.vcfLineToRecord("chr1\t100\t.\tg\ta,C\t.\tPASS\t.");
-    final VcfRecord r2 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tc,t\t.\tPASS\t.");
-    final VcfRecord r3 = VcfReader.vcfLineToRecord("chr1\t100\t.\tG\tc]Chr1:123]g\t.\tPASS\t.");
+    final VcfRecord r1 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tg\ta,C\t.\tPASS\t.");
+    final VcfRecord r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tc,t\t.\tPASS\t.");
+    final VcfRecord r3 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tc]Chr1:123]g\t.\tPASS\t.");
     final VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2, r3}, heads, mh, VcfMerge.alleleBasedFormats(mh), true);
     assertEquals(1, mergedArr.length);
     // All alleles have nucleotide case normalized

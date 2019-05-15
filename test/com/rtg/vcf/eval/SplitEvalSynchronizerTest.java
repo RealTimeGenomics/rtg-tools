@@ -49,6 +49,7 @@ import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderTest;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfSortRefiner;
 import com.rtg.vcf.header.VcfHeader;
@@ -171,11 +172,11 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
 
           final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
           simpleThreadPool.execute(() -> sync.write("name2",
-            Collections.singletonList(createVariant(VcfReader.vcfLineToRecord(REC5_2), 5)),
-            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 1, 0), true), createVariant(VcfReader.vcfLineToRecord(REC3_2), 3)), Collections.emptyList(), Collections.emptyList()));
+            Collections.singletonList(createVariant(VcfReaderTest.vcfLineToRecord(REC5_2), 5)),
+            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(REC1_2), 1, 0), true), createVariant(VcfReaderTest.vcfLineToRecord(REC3_2), 3)), Collections.emptyList(), Collections.emptyList()));
           simpleThreadPool.execute(() -> sync.write("name1",
-            Collections.singletonList(createVariant(VcfReader.vcfLineToRecord(REC6_1), 6)),
-            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReader.vcfLineToRecord(REC4_1), 4)), Collections.emptyList(), Collections.emptyList()));
+            Collections.singletonList(createVariant(VcfReaderTest.vcfLineToRecord(REC6_1), 6)),
+            Arrays.asList(createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(REC2_1), 2, 0), true), createVariant(VcfReaderTest.vcfLineToRecord(REC4_1), 4)), Collections.emptyList(), Collections.emptyList()));
           simpleThreadPool.terminate();
 
           assertEquals(0, sync.getCorrectPhasings());
@@ -205,7 +206,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
 
         final SimpleThreadPool simpleThreadPool = new SimpleThreadPool(3, "pool", true);
         simpleThreadPool.execute(() -> {
-          sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
+          sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
           fail("Should have aborted in thread");
         });
         simpleThreadPool.execute(() -> {
@@ -233,7 +234,7 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
         final Exception[] internalException = new Exception[1];
         final Thread t = new Thread(() -> {
           try {
-            sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReader.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
+            sync.write("name2", null, Collections.singletonList(OrientedVariantTest.createOrientedVariant(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(REC1_2), 0), true)), Collections.emptyList(), Collections.emptyList());
           } catch (final IllegalStateException e) {
             internalException[0] = e;
           } catch (final IOException e) {

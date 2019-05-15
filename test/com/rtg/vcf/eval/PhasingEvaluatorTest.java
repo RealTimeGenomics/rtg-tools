@@ -50,7 +50,7 @@ import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfIterator;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderTest;
 import com.rtg.vcf.header.VcfHeader;
 
 import junit.framework.TestCase;
@@ -63,7 +63,7 @@ public class PhasingEvaluatorTest extends TestCase {
     for (String s : variants) {
       final String vartab = s.replaceAll(" ", "\t");
       ++id;
-      callList.add(VariantTest.createVariant(VcfReader.vcfLineToRecord(vartab), id, 0));
+      callList.add(VariantTest.createVariant(VcfReaderTest.vcfLineToRecord(vartab), id, 0));
       sb.append(vartab).append("\n");
     }
     return callList;

@@ -336,7 +336,7 @@ public class VcfMerge extends AbstractCli {
 
         for (int i = 0; i < mReaders.length; ++i) {
           if (mReaders[i] == null) {
-            mReaders[i] = new VcfReader(new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mHeaders[i]);
+            mReaders[i] = new VcfReader(new VcfParser(), new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mHeaders[i]);
           }
           if (mReaders[i].hasNext()) {
             final int pos = mReaders[i].peek().getStart();

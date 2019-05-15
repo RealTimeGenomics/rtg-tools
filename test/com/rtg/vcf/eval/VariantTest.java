@@ -38,7 +38,7 @@ import java.util.Arrays;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.intervals.SequenceNameLocusComparator;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderTest;
 import com.rtg.vcf.VcfRecord;
 
 import junit.framework.TestCase;
@@ -48,7 +48,7 @@ import junit.framework.TestCase;
 public class VariantTest extends TestCase {
 
   static VcfRecord createRecord(String var) {
-    return VcfReader.vcfLineToRecord(var.replaceAll(" +", TAB));
+    return VcfReaderTest.vcfLineToRecord(var.replaceAll(" +", TAB));
   }
 
   static Variant createVariant(VcfRecord rec, int sampleNo) {

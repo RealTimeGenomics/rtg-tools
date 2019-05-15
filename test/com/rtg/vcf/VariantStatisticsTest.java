@@ -53,13 +53,13 @@ public class VariantStatisticsTest extends AbstractNanoTest {
   }
 
   public void testGetVariantType() {
-    final VcfRecord r = VcfReader.vcfLineToRecord("1 1300068 . TCTGCGGGGGCAGCACAGGTGAGGCCCAAGCACACCCGGTCCAGCCCCCAACATGCAGCCTGTGCTCAGGGGCAGCCCCCACGCACTCAC T,TTCAC 1959.58 . AC=27,1;AF=0.900,0.033;AN=30 GT 0/0/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/2".replaceAll(" ", "\t"));
+    final VcfRecord r = VcfReaderTest.vcfLineToRecord("1 1300068 . TCTGCGGGGGCAGCACAGGTGAGGCCCAAGCACACCCGGTCCAGCCCCCAACATGCAGCCTGTGCTCAGGGGCAGCCCCCACGCACTCAC T,TTCAC 1959.58 . AC=27,1;AF=0.900,0.033;AN=30 GT 0/0/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/2".replaceAll(" ", "\t"));
     final String gt = r.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0);
     final int[] gtSplit = VcfUtils.splitGt(gt);
     final VariantType t = VariantType.getType(r, gtSplit);
     assertEquals(VariantType.DELETION, t);
 
-    final VcfRecord r2 = VcfReader.vcfLineToRecord("1 1300068 . T TTCAC 1959.58 . . GT .".replaceAll(" ", "\t"));
+    final VcfRecord r2 = VcfReaderTest.vcfLineToRecord("1 1300068 . T TTCAC 1959.58 . . GT .".replaceAll(" ", "\t"));
     assertEquals(VariantType.NO_CALL, VariantType.getType(r2, VcfUtils.splitGt(r2.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0))));
 
     assertEquals(VariantType.UNCHANGED, VariantType.getType("C", "C"));
@@ -148,14 +148,14 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     h.addSampleName("SAMPLE");
     final VariantStatistics stats = new VariantStatistics(null);
     for (final String variant : VARIANTS) {
-      final VcfRecord r = VcfReader.vcfLineToRecord(variant);
+      final VcfRecord r = VcfReaderTest.vcfLineToRecord(variant);
       r.addFilter("RX");
       stats.tallyVariant(h, r);
     }
-    final VcfRecord missingGT = VcfReader.vcfLineToRecord("seq\t0\t.\tGGG\tGGAG" + "\t.\tPASS\t.\tGT\t.");
+    final VcfRecord missingGT = VcfReaderTest.vcfLineToRecord("seq\t0\t.\tGGG\tGGAG" + "\t.\tPASS\t.\tGT\t.");
     stats.tallyVariant(h, missingGT);
     for (final String variant : VARIANTS) {
-      final VcfRecord r = VcfReader.vcfLineToRecord(variant);
+      final VcfRecord r = VcfReaderTest.vcfLineToRecord(variant);
       stats.tallyVariant(h, r);
       stats.tallyVariant(h, r);
       stats.tallyVariant(h, r);
@@ -191,14 +191,14 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     h.addCommonHeader();
     h.addSampleName("SAMPLE");
     for (final String variant : VARIANTS) {
-      final VcfRecord r = VcfReader.vcfLineToRecord(variant);
+      final VcfRecord r = VcfReaderTest.vcfLineToRecord(variant);
       r.addFilter("RX");
       stats.tallyVariant(h, r);
     }
-    final VcfRecord missingGT = VcfReader.vcfLineToRecord("seq\t0\t.\tGGG\tGGAG" + "\t.\tPASS\t.\tGT\t.");
+    final VcfRecord missingGT = VcfReaderTest.vcfLineToRecord("seq\t0\t.\tGGG\tGGAG" + "\t.\tPASS\t.\tGT\t.");
     stats.tallyVariant(h, missingGT);
     for (final String variant : VARIANTS) {
-      final VcfRecord r = VcfReader.vcfLineToRecord(variant);
+      final VcfRecord r = VcfReaderTest.vcfLineToRecord(variant);
       stats.tallyVariant(h, r);
       stats.tallyVariant(h, r);
       stats.tallyVariant(h, r);
@@ -239,7 +239,7 @@ public class VariantStatisticsTest extends AbstractNanoTest {
   public void testMultiVariantStatistics() {
     final VariantStatistics stats = new VariantStatistics(null);
     final String[] sampleNames = {"sam1", "sam2", "sam3"};
-    final VcfRecord rec = VcfReader.vcfLineToRecord("test\t5\t.\tA\tG,CT,T\t.\tPASS\tDP=12\tGT:DP:RE:GQ:RS\t1/1:4:0.020:13:G,4,0.020\t2:4:0.020:13:CT,4,0.020\t3/1:4:0.020:13:T,4,0.020,G,4,0.020");
+    final VcfRecord rec = VcfReaderTest.vcfLineToRecord("test\t5\t.\tA\tG,CT,T\t.\tPASS\tDP=12\tGT:DP:RE:GQ:RS\t1/1:4:0.020:13:G,4,0.020\t2:4:0.020:13:CT,4,0.020\t3/1:4:0.020:13:T,4,0.020,G,4,0.020");
     stats.tallyVariant(rec, Arrays.asList(sampleNames));
     assertEquals(""
     + "Failed Filters               : 0" + StringUtils.LS
@@ -300,7 +300,7 @@ public class VariantStatisticsTest extends AbstractNanoTest {
   public void testMultiVariantStatisticsNulls() {
     final VariantStatistics stats = new VariantStatistics(null);
     final String[] sampleNames = {"sam1", "sam2", "sam3"};
-    final VcfRecord rec = VcfReader.vcfLineToRecord("test\t5\t.\tA\tG\t.\tPASS\tDP=4\tGT:DP:RE:GQ:RS\t1:4:0.020:13:G,4,0.020\t.\t.");
+    final VcfRecord rec = VcfReaderTest.vcfLineToRecord("test\t5\t.\tA\tG\t.\tPASS\tDP=4\tGT:DP:RE:GQ:RS\t1:4:0.020:13:G,4,0.020\t.\t.");
     stats.tallyVariant(rec, Arrays.asList(sampleNames));
     assertEquals(""
     + "Failed Filters               : 0" + StringUtils.LS

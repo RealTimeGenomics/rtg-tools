@@ -51,22 +51,14 @@ public class VcfReader implements VcfIterator {
   private final int mNumSamples;
   private VcfRecord mCurrent;
 
-  /**
-   * Read VcfRecords from a region of a block-compressed file, pre-parsed header
-   * @param reader source of record lines
-   * @param header header for file currently being read (callers responsibility)
-   * @throws IOException if an IO error occurs
-   */
-  VcfReader(LineReader reader, VcfHeader header) throws IOException {
-    this(new VcfParser(), reader, header);
-  }
-
+  // Constructor for use by VcfReaderFactory
   VcfReader(VcfParser parser, BrLineReader in) throws IOException {
     this(parser, in, parser.parseHeader(in));
   }
 
   /**
-   * Read VcfRecords from a region of a block-compressed file
+   * Read VcfRecords from a region of a block-compressed file, pre-parsed header
+   * @param parser used to parse each record line
    * @param reader source of record lines
    * @param header header for file currently being read (callers responsibility)
    * @throws IOException if an IO error occurs
@@ -119,16 +111,6 @@ public class VcfReader implements VcfIterator {
    */
   public static VcfReader openVcfReader(File f, RegionRestriction region) throws IOException {
     return new VcfReaderFactory().region(region).make(f);
-  }
-
-  /**
-   * Turn a line of <code>VCF</code> output into a {@link VcfRecord}.
-   * XXX This is method is now for use in tests, and should be moved
-   * @param line line of file
-   * @return the corresponding record
-   */
-  public static VcfRecord vcfLineToRecord(String line) {
-    return new VcfParser().parseLine(line);
   }
 
   @Override
