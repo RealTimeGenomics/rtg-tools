@@ -276,10 +276,10 @@ public class VcfSubset extends AbstractCli {
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
-    try (final VcfReader reader = new VcfReaderFactory(mFlags).make(mFlags)) {
+    final VcfSampleStripperFactory sampleStripperFact = new VcfSampleStripperFactory(mFlags);
+    try (final VcfReader reader = new VcfReaderFactory(mFlags).parser(new VcfSubsetParser(sampleStripperFact)).make(mFlags)) {
       final VcfHeader header = reader.getHeader();
 
-      addAnnotatorFromFlags(annotators, new VcfSampleStripperFactory(mFlags), header);
       addAnnotatorFromFlags(annotators, new VcfInfoStripperFactory(mFlags), header);
       addAnnotatorFromFlags(annotators, new VcfFilterStripperFactory(mFlags), header);
       final VcfFormatStripper formatStripper = addAnnotatorFromFlags(annotators, new VcfFormatStripperFactory(mFlags), header);
