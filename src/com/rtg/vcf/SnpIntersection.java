@@ -60,7 +60,6 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.diagnostic.Timer;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.BufferedOutputStreamFix;
 import com.rtg.util.io.FileUtils;
@@ -251,8 +250,6 @@ CommonFlags.initNoGzip(flags);
       }
     }
     if (output.isBlockCompressed()) {
-      final Timer indexing = new Timer("SnpIndex");
-      indexing.start();
       for (final String outputName : OUTPUT_FILES) {
         final File outFile = output.file(outputName + FileUtils.GZ_SUFFIX);
         try {
@@ -261,8 +258,6 @@ CommonFlags.initNoGzip(flags);
           Diagnostic.warning("Cannot produce TABIX index for: " + outFile.getPath() + ": " + e.getMessage());
         }
       }
-      indexing.stop();
-      indexing.log();
     }
     if (firstOnlyCount + sameCount + differentCount != totalFirstCount) {
       Diagnostic.warning("Counts not adding up for first file, probably due to complex calls/region");

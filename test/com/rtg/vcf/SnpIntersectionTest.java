@@ -293,7 +293,7 @@ public final class SnpIntersectionTest extends AbstractCliTest {
       assertTrue(new File(sameReverse.getPath() + TabixIndexer.TABIX_EXTENSION).exists());
       assertTrue(new File(differentReverse.getPath() + TabixIndexer.TABIX_EXTENSION).exists());
     }
-    TestUtils.containsAll(FileUtils.fileToString(new File(outDirSecondFirst, "snpintersect.log")), "progress=" + false, gzip ? "SnpIndex" : "");
+    TestUtils.containsAll(FileUtils.fileToString(new File(outDirSecondFirst, "snpintersect.log")), "progress=" + false);
   }
 
   public void testComparator() {
