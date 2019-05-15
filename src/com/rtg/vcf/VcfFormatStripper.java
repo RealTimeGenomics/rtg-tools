@@ -73,6 +73,9 @@ public class VcfFormatStripper implements VcfAnnotator {
     }
   }
 
+  /**
+   * @return true if any FORMAT fields were remaining after the previous record was annotated
+   */
   boolean keepRecord() {
     return mKeepRecord;
   }
