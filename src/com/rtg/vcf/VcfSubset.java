@@ -45,14 +45,11 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
-import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -60,7 +57,6 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
-import com.rtg.vcf.header.IdField;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.SampleField;
 import com.rtg.vcf.header.VcfHeader;
@@ -157,48 +153,119 @@ public class VcfSubset extends AbstractCli {
     }
   }
 
-  private abstract class AnnotatorAdder {
-
-    abstract List<? extends IdField<?>> getHeaderFields(VcfHeader header);
-    @SuppressWarnings("rawtypes")
-    Collection<String> getHeaderIds(VcfHeader header) {
-      return getHeaderFields(header).stream().map(IdField::getId).collect(Collectors.toSet());
+  static class VcfSampleStripperFactory extends VcfAnnotatorFactory<VcfSampleStripper> {
+    VcfSampleStripperFactory(CFlags flags) {
+      super(flags);
     }
-    void additionalChecks(Set<String> flagValues, VcfHeader header) { }
-    abstract VcfAnnotator makeAnnotator(boolean removeAll);
-    abstract VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep);
-
-    private VcfAnnotator processFlags(List<VcfAnnotator> annotators, VcfHeader header, String removeFlag, String keepFlag, String fieldname) {
-      return processFlags(annotators, header, removeFlag, keepFlag, null, fieldname, true);
+    @Override
+    protected List<SampleField> getHeaderFields(VcfHeader header) {
+      return header.getSampleLines();
     }
-
-    private VcfAnnotator processFlags(List<VcfAnnotator> annotators, VcfHeader header, String removeFlag, String keepFlag, String removeAllFlag, String fieldname, boolean checkHeader) {
-      if (removeAllFlag != null && mFlags.isSet(removeAllFlag)) {
-        final VcfAnnotator annotator = makeAnnotator(true);
-        annotators.add(annotator);
-        return annotator;
-      } else {
-        if (mFlags.isSet(removeFlag) || mFlags.isSet(keepFlag)) {
-          final boolean keep = !mFlags.isSet(removeFlag);
-          final Set<String> ids = mFlags.getValues(mFlags.isSet(removeFlag) ? removeFlag : keepFlag).stream().map(f -> (String) f).collect(Collectors.toCollection(LinkedHashSet::new));
-
-          if (checkHeader) {
-            final Set<String> unknownIds = new LinkedHashSet<>(ids);
-            unknownIds.removeAll(getHeaderIds(header));
-            if (!unknownIds.isEmpty()) {
-              Diagnostic.warning(fieldname + " fields not contained in VCF meta-information: " + StringUtils.join(' ', unknownIds));
-            }
-          }
-
-          additionalChecks(ids, header);
-
-          final VcfAnnotator annotator = makeAnnotator(ids, keep);
-          annotators.add(annotator);
-          return annotator;
+    @Override
+    protected VcfSampleStripper makeRemoveAllAnnotator() {
+      return new VcfSampleStripper(true);
+    }
+    @Override
+    protected VcfSampleStripper makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
+      return new VcfSampleStripper(fieldIdsSet, keep);
+    }
+    @Override
+    protected void additionalChecks(String fieldname, Set<String> flagValues, VcfHeader header) {
+      boolean fail = false;
+      final StringBuilder sb = new StringBuilder();
+      for (final String value : flagValues) {
+        if (!header.getSampleNames().contains(value)) {
+          fail = true;
+          sb.append(value).append(' ');
         }
       }
-      return null;
+      if (fail) {
+        throw new NoTalkbackSlimException("Samples not contained in VCF: " + sb.toString().trim());
+      }
     }
+    @Override
+    public VcfSampleStripper make(VcfHeader header) {
+      return processFlags(header, REMOVE_SAMPLE, KEEP_SAMPLE, REMOVE_SAMPLES, "Sample");
+    }
+  }
+  static class VcfInfoStripperFactory extends VcfAnnotatorFactory<VcfInfoStripper> {
+    VcfInfoStripperFactory(CFlags flags) {
+      super(flags);
+    }
+    @Override
+    protected List<InfoField> getHeaderFields(VcfHeader header) {
+      return header.getInfoLines();
+    }
+    @Override
+    protected VcfInfoStripper makeRemoveAllAnnotator() {
+      return new VcfInfoStripper(true);
+    }
+    @Override
+    protected VcfInfoStripper makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
+      return new VcfInfoStripper(fieldIdsSet, keep);
+    }
+    @Override
+    public VcfInfoStripper make(VcfHeader header) {
+      return processFlags(header, REMOVE_INFO, KEEP_INFO, REMOVE_INFOS, "INFO");
+    }
+  }
+  static class VcfFilterStripperFactory extends VcfAnnotatorFactory<VcfFilterStripper> {
+    VcfFilterStripperFactory(CFlags flags) {
+      super(flags);
+    }
+    @Override
+    protected List<FilterField> getHeaderFields(VcfHeader header) {
+      return header.getFilterLines();
+    }
+    @Override
+    protected Collection<String> getHeaderIds(VcfHeader header) {
+      final Collection<String> res = super.getHeaderIds(header);
+      if (!res.contains(VcfUtils.FILTER_PASS)) {
+        res.add(VcfUtils.FILTER_PASS);
+      }
+      return res;
+    }
+    @Override
+    protected VcfFilterStripper makeRemoveAllAnnotator() {
+      return new VcfFilterStripper(true);
+    }
+    @Override
+    protected VcfFilterStripper makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
+      return new VcfFilterStripper(fieldIdsSet, keep);
+    }
+    @Override
+    public VcfFilterStripper make(VcfHeader header) {
+      return processFlags(header, REMOVE_FILTER, KEEP_FILTER, REMOVE_FILTERS, "FILTER");
+    }
+  }
+  static class VcfFormatStripperFactory extends VcfAnnotatorFactory<VcfFormatStripper> {
+    VcfFormatStripperFactory(CFlags flags) {
+      super(flags);
+    }
+    @Override
+    protected List<FormatField> getHeaderFields(VcfHeader header) {
+      return header.getFormatLines();
+    }
+    @Override
+    protected VcfFormatStripper makeRemoveAllAnnotator() {
+      throw new UnsupportedOperationException("Cannot remove all formats.");
+    }
+    @Override
+    protected VcfFormatStripper makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
+      return new VcfFormatStripper(fieldIdsSet, keep);
+    }
+    @Override
+    public VcfFormatStripper make(VcfHeader header) {
+      return processFlags(header, REMOVE_FORMAT, KEEP_FORMAT, null, "FORMAT");
+    }
+  }
+
+  private <T extends VcfAnnotator> T addAnnotatorFromFlags(List<VcfAnnotator> annotators, VcfAnnotatorFactory<T> factory, VcfHeader header) {
+    final T ann = factory.make(header);
+    if (ann != null) {
+      annotators.add(ann);
+    }
+    return ann;
   }
 
   @Override
@@ -209,95 +276,13 @@ public class VcfSubset extends AbstractCli {
     final List<VcfAnnotator> annotators = new ArrayList<>();
 
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, output);
-    try (final VcfReader reader = VcfReader.openVcfReader(mFlags)) {
+    try (final VcfReader reader = new VcfReaderFactory(mFlags).make(mFlags)) {
       final VcfHeader header = reader.getHeader();
 
-      final AnnotatorAdder sampleAnnAdder = new AnnotatorAdder() {
-        @Override
-        List<SampleField> getHeaderFields(VcfHeader header) {
-          return header.getSampleLines();
-        }
-        @Override
-        VcfAnnotator makeAnnotator(boolean removeAll) {
-          return new VcfSampleStripper(removeAll);
-        }
-        @Override
-        VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
-          return new VcfSampleStripper(fieldIdsSet, keep);
-        }
-        @Override
-        void additionalChecks(Set<String> flagValues, VcfHeader header) {
-          boolean fail = false;
-          final StringBuilder sb = new StringBuilder();
-          for (final String value : flagValues) {
-            if (!header.getSampleNames().contains(value)) {
-              fail = true;
-              sb.append(value).append(' ');
-            }
-          }
-          if (fail) {
-            throw new NoTalkbackSlimException("Samples not contained in VCF: " + sb.toString().trim());
-          }
-        }
-      };
-      sampleAnnAdder.processFlags(annotators, header, REMOVE_SAMPLE, KEEP_SAMPLE, REMOVE_SAMPLES, "Sample", false);
-
-      final AnnotatorAdder infoAnnAdder = new AnnotatorAdder() {
-        @Override
-        List<InfoField> getHeaderFields(VcfHeader header) {
-          return header.getInfoLines();
-        }
-        @Override
-        VcfAnnotator makeAnnotator(boolean removeAll) {
-          return new VcfInfoStripper(removeAll);
-        }
-        @Override
-        VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
-          return new VcfInfoStripper(fieldIdsSet, keep);
-        }
-      };
-      infoAnnAdder.processFlags(annotators, header, REMOVE_INFO, KEEP_INFO, REMOVE_INFOS, "INFO", true);
-
-      final AnnotatorAdder filterAnnAdder = new AnnotatorAdder() {
-        @Override
-        List<FilterField> getHeaderFields(VcfHeader header) {
-          return header.getFilterLines();
-        }
-        @Override
-        Collection<String> getHeaderIds(VcfHeader header) {
-          final Collection<String> res = super.getHeaderIds(header);
-          if (!res.contains(VcfUtils.FILTER_PASS)) {
-            res.add(VcfUtils.FILTER_PASS);
-          }
-          return res;
-        }
-        @Override
-        VcfAnnotator makeAnnotator(boolean removeAll) {
-          return new VcfFilterStripper(removeAll);
-        }
-        @Override
-        VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
-          return new VcfFilterStripper(fieldIdsSet, keep);
-        }
-      };
-      filterAnnAdder.processFlags(annotators, header, REMOVE_FILTER, KEEP_FILTER, REMOVE_FILTERS, "FILTER", true);
-
-      final AnnotatorAdder formatAnnAdder = new AnnotatorAdder() {
-        @Override
-        List<FormatField> getHeaderFields(VcfHeader header) {
-          return header.getFormatLines();
-        }
-        @Override
-        VcfAnnotator makeAnnotator(boolean removeAll) {
-          throw new UnsupportedOperationException("Cannot remove all formats.");
-        }
-        @Override
-        VcfAnnotator makeAnnotator(Set<String> fieldIdsSet, boolean keep) {
-          return new VcfFormatStripper(fieldIdsSet, keep);
-        }
-      };
-      final VcfFormatStripper formatStripper = (VcfFormatStripper) formatAnnAdder.processFlags(annotators, header, REMOVE_FORMAT, KEEP_FORMAT, "FORMAT");
-
+      addAnnotatorFromFlags(annotators, new VcfSampleStripperFactory(mFlags), header);
+      addAnnotatorFromFlags(annotators, new VcfInfoStripperFactory(mFlags), header);
+      addAnnotatorFromFlags(annotators, new VcfFilterStripperFactory(mFlags), header);
+      final VcfFormatStripper formatStripper = addAnnotatorFromFlags(annotators, new VcfFormatStripperFactory(mFlags), header);
       if (mFlags.isSet(REMOVE_UNUSED_ALTS)) {
         annotators.add(new VcfAltCleaner());
       }
@@ -312,9 +297,6 @@ public class VcfSubset extends AbstractCli {
       for (final VcfAnnotator annotator : annotators) {
         annotator.updateHeader(header);
       }
-      if (formatStripper != null) {
-        formatStripper.updateHeader(header);
-      }
       try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
@@ -322,7 +304,6 @@ public class VcfSubset extends AbstractCli {
             annotator.annotate(rec);
           }
           if (formatStripper != null) {
-            formatStripper.annotate(rec);
             if (formatStripper.keepRecord()) {
               writer.write(rec);
             } else {
