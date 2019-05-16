@@ -503,13 +503,13 @@ public class VcfHeader {
       if (isContigLine(line)) {
         addContigField(parseContigLine(line));
       } else if (isAltLine(line)) {
-        addAltField(parseAltLine(line));
+        ensureContains(parseAltLine(line));
       } else if (isFilterLine(line)) {
-        addFilterField(parseFilterLine(line));
+        ensureContains(parseFilterLine(line));
       } else if (isInfoLine(line)) {
-        addInfoField(parseInfoLine(line));
+        ensureContains(parseInfoLine(line));
       } else if (isFormatLine(line)) {
-        addFormatField(parseFormatLine(line));
+        ensureContains(parseFormatLine(line));
       } else if (isSampleLine(line)) {
         addSampleField(parseSampleLine(line));
       } else if (isPedigreeLine(line)) {

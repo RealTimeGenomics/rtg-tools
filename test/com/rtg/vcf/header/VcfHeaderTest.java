@@ -109,41 +109,38 @@ public class VcfHeaderTest extends TestCase {
 
   public void testDuplicateIds() {
     final VcfHeader head = new VcfHeader();
-    head.addMetaInformationLine("##contig=<ID=xbox,Description=\"the original\">");
+    head.addMetaInformationLine("##contig=<ID=xbox,length=122323>");
     try {
-      head.addMetaInformationLine("##contig=<ID=xbox,Description=\"the sequel to the 360\">");
+      head.addMetaInformationLine("##contig=<ID=xbox,length=234253>");
       fail();
     } catch (VcfFormatException e) {
       // expected
     }
-    head.addMetaInformationLine("##FILTER=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
-    try {
-      head.addMetaInformationLine("##FILTER=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
-      fail();
-    } catch (VcfFormatException e) {
-      // expected
-    }
+
+    head.addMetaInformationLine("##FILTER=<ID=xbox,Description=\"the original\">");
+    head.addMetaInformationLine("##FILTER=<ID=xbox,Description=\"the sequel to the 360\">"); // Permitted, ignored
+
     head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
+    head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">"); // Permitted, ignored
     try {
-      head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
+      head.addMetaInformationLine("##INFO=<ID=xbox,Number=1,Type=Integer,Description=\"the sequel to the 360\">");
       fail();
     } catch (VcfFormatException e) {
       // expected
     }
+
     head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Float,Description=\"the original\">");
+    head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">"); // Permitted, ignored
     try {
-      head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Float,Description=\"the sequel to the 360\">");
+      head.addMetaInformationLine("##FORMAT=<ID=xbox,Number=1,Type=Integer,Description=\"the sequel to the 360\">");
       fail();
     } catch (VcfFormatException e) {
       // expected
     }
+
     head.addMetaInformationLine("##ALT=<ID=xbox,Description=\"the original\">");
-    try {
-      head.addMetaInformationLine("##ALT=<ID=xbox,Description=\"the sequel to the 360\">");
-      fail();
-    } catch (VcfFormatException e) {
-      // expected
-    }
+    head.addMetaInformationLine("##ALT=<ID=xbox,Description=\"the sequel to the 360\">"); // Permitted, ignored
+
     head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the original\">");
     try {
       head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the sequel to the 360\">");
