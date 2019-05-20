@@ -161,7 +161,7 @@ public class VcfSubsetTest extends AbstractCliTest {
       final File out = new File(td, "out.vcf");
 
       TestUtils.containsAll(checkMainInitBadFlags("-i", f.getPath(), "-o", out.getPath(), "--keep-sample", "HG00097", "--keep-sample", "HG00099", "--keep-sample", "BL", "--keep-sample", "RJ", "-Z"),
-        "Error: Samples not contained in VCF: BL RJ" + StringUtils.LS);
+        "Error: 2 samples not contained in VCF: BL RJ" + StringUtils.LS);
     }
   }
 

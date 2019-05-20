@@ -35,6 +35,7 @@ import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.NO_HEADER;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.launcher.CommonFlags.STRING;
+import static com.rtg.launcher.CommonFlags.STRING_OR_FILE;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
@@ -45,11 +46,14 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.util.TsvParser;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Validator;
@@ -60,6 +64,8 @@ import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.SampleField;
 import com.rtg.vcf.header.VcfHeader;
+
+import htsjdk.samtools.util.RuntimeIOException;
 
 /**
  */
@@ -120,8 +126,8 @@ public class VcfSubset extends AbstractCli {
     mFlags.registerOptional(REMOVE_INFOS, "remove all INFO tags").setCategory(FILTERING);
 
     // Contents of SAMPLE
-    mFlags.registerOptional(REMOVE_SAMPLE, String.class, STRING, "remove the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(KEEP_SAMPLE, String.class, STRING, "keep the specified sample").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(REMOVE_SAMPLE, String.class, STRING_OR_FILE, "file containing sample IDs to remove, or a literal sample name").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
+    mFlags.registerOptional(KEEP_SAMPLE, String.class, STRING_OR_FILE, "file containing sample IDs to keep, or a literal sample name").setCategory(FILTERING).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(REMOVE_SAMPLES, "remove all samples").setCategory(FILTERING);
 
     // Contents of FORMAT
@@ -154,6 +160,8 @@ public class VcfSubset extends AbstractCli {
   }
 
   static class VcfSampleStripperFactory extends VcfAnnotatorFactory<VcfSampleStripper> {
+    private static final int BAD_SAMPLE_MSG_LIMIT = 50;
+
     VcfSampleStripperFactory(CFlags flags) {
       super(flags);
     }
@@ -171,17 +179,48 @@ public class VcfSubset extends AbstractCli {
     }
     @Override
     protected void additionalChecks(String fieldname, Set<String> flagValues, VcfHeader header) {
-      boolean fail = false;
-      final StringBuilder sb = new StringBuilder();
-      for (final String value : flagValues) {
-        if (!header.getSampleNames().contains(value)) {
-          fail = true;
-          sb.append(value).append(' ');
+      final Set<String> notFound = new LinkedHashSet<>(flagValues);
+      notFound.removeAll(new HashSet<>(header.getSampleNames()));
+      if (!notFound.isEmpty()) {
+        final StringBuilder sb = new StringBuilder();
+        int badCount = 0;
+        for (final String value : notFound) {
+          badCount++;
+          if (badCount <= BAD_SAMPLE_MSG_LIMIT) {
+            sb.append(' ').append(value);
+          }
+        }
+        if (badCount > BAD_SAMPLE_MSG_LIMIT) {
+          sb.append(" ...");
+        }
+        throw new NoTalkbackSlimException("" + badCount + " samples not contained in VCF:" + sb.toString());
+      }
+    }
+    @Override
+    protected Set<String> collectIds(String flag) {
+      final Set<String> result = new LinkedHashSet<>();
+      final TsvParser<Set<String>> p = new TsvParser<Set<String>>() {
+        @Override
+        protected void parseLine(String... parts) {
+          result.add(parts[0]);
+        }
+      };
+      for (final Object o : mFlags.getValues(flag)) {
+        String sampleOrFile = (String) o;
+        if (sampleOrFile.length() > 0) {
+          if (new File(sampleOrFile).exists()) {
+            try {
+              p.parse(new File(sampleOrFile));
+            } catch (IOException e) {
+              e.printStackTrace();
+              throw new RuntimeIOException(e);
+            }
+          } else {
+            result.add(sampleOrFile);
+          }
         }
       }
-      if (fail) {
-        throw new NoTalkbackSlimException("Samples not contained in VCF: " + sb.toString().trim());
-      }
+      return result;
     }
     @Override
     public VcfSampleStripper make(VcfHeader header) {

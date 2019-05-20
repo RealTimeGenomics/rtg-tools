@@ -49,7 +49,7 @@ import com.rtg.vcf.header.VcfHeader;
 @TestClass("com.rtg.vcf.VcfSubsetTest")
 abstract class VcfAnnotatorFactory<T extends VcfAnnotator> {
 
-  private final CFlags mFlags;
+  protected final CFlags mFlags;
 
   protected VcfAnnotatorFactory(CFlags flags) {
     mFlags = flags;
@@ -77,6 +77,10 @@ abstract class VcfAnnotatorFactory<T extends VcfAnnotator> {
     }
   }
 
+  protected Set<String> collectIds(String flag) {
+    return mFlags.getValues(flag).stream().map(f -> (String) f).collect(Collectors.toCollection(LinkedHashSet::new));
+  }
+
   protected abstract T makeAnnotator(Set<String> fieldIdsSet, boolean keep);
 
   protected abstract T makeRemoveAllAnnotator();
@@ -86,8 +90,9 @@ abstract class VcfAnnotatorFactory<T extends VcfAnnotator> {
       return makeRemoveAllAnnotator();
     } else {
       if (mFlags.isSet(removeFlag) || mFlags.isSet(keepFlag)) {
-        final boolean keep = !mFlags.isSet(removeFlag);
-        final Set<String> ids = mFlags.getValues(mFlags.isSet(removeFlag) ? removeFlag : keepFlag).stream().map(f -> (String) f).collect(Collectors.toCollection(LinkedHashSet::new));
+        assert !(mFlags.isSet(removeFlag) && mFlags.isSet(keepFlag));
+        final boolean keep = mFlags.isSet(keepFlag);
+        final Set<String> ids = collectIds(keep ? keepFlag : removeFlag);
 
         additionalChecks(fieldname, ids, header);
 
