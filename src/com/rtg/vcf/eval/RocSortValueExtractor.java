@@ -56,6 +56,9 @@ public abstract class RocSortValueExtractor {
     final RocScoreField fieldType;
     final String fieldName;
     if (scoreField != null) {
+      if (scoreField.equals(VcfRecord.MISSING)) {
+        return RocSortValueExtractor.NULL_EXTRACTOR;
+      }
       final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
       if (splitScore.length > 1) {
         final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());

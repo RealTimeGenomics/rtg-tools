@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.rtg.util.io.FileUtils;
+import com.rtg.vcf.AnnotatingVcfWriter;
 import com.rtg.vcf.VcfAltCleaner;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfRecordMerger;
@@ -62,7 +63,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   private final VcfHeader mOutHeader;
   private final VcfRecord[] mInRecs = new VcfRecord[2];
   private final VcfHeader[] mInHeaders = new VcfHeader[2];
-  private final VcfAltCleaner mAltCleaner = new VcfAltCleaner();
   private final VcfRecordMerger mMerger = new VcfRecordMerger();
 
   /**
@@ -94,7 +94,11 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mInHeaders[1] = variants.calledHeader().copy();
     mInHeaders[1].removeAllSamples();
     mInHeaders[1].addSampleName(SAMPLE_CALLS);
-    mVcfOut = new VcfWriterFactory().zip(zip).addRunInfo(false).make(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt));
+    VcfWriter w = new VcfWriterFactory().zip(zip).addRunInfo(false).make(mOutHeader, new File(outdir, OUTPUT_FILE_NAME + zipExt));
+    if (mBaselineSampleNo != -1 && mCallSampleNo != -1) {
+      w = new AnnotatingVcfWriter(w, new VcfAltCleaner());
+    }
+    mVcfOut = w;
   }
 
   @Override
@@ -148,14 +152,12 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
   protected void writeCall(Map<String, String> newInfo) throws IOException {
     resetRecordFields(mCrv, mCallSampleNo, 1);
     setNewInfoFields(mCrv, newInfo);
-    mAltCleaner.annotate(mCrv);
     mVcfOut.write(mCrv);
   }
 
   protected void writeBaseline(Map<String, String> newInfo) throws IOException {
     resetRecordFields(mBrv, mBaselineSampleNo, 0);
     setNewInfoFields(mBrv, newInfo);
-    mAltCleaner.annotate(mBrv);
     mVcfOut.write(mBrv);
   }
 
@@ -166,7 +168,6 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mInRecs[1] = mCrv;
     final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.emptySet(), false);
     setNewInfoFields(rec, newInfo);
-    mAltCleaner.annotate(rec);
     mVcfOut.write(rec);
   }
 
@@ -175,7 +176,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     rec.setQuality(null);
     rec.getFilters().clear();
     rec.getInfo().clear();
-    final String gtStr = VcfUtils.getValidGtStr(rec, sampleIndex);
+    final String gtStr = sampleIndex != -1 ? VcfUtils.getValidGtStr(rec, sampleIndex) : VcfRecord.MISSING;
     rec.removeSamples();
     if (destPos == -1) {
       rec.setNumberOfSamples(1);

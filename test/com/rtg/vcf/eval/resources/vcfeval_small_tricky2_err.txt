@@ -1,2 +1,3 @@
+During ALT comparison some ROC data files will not be produced: [SNP, NON_SNP], producing ROC data for: [ALL]
 There were 4 variants not thresholded in ROC data files due to missing or invalid QUAL values.
 Could not select maximized F-measure threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --vcf-score-field

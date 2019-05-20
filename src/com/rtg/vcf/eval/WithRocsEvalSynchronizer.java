@@ -80,12 +80,12 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
 
     final Set<RocFilter> filters = new LinkedHashSet<>(rocFilters);
     if (mCallSampleNo == -1 && extractor.requiresSample()) {
-      Diagnostic.info("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
+      Diagnostic.warning("During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: " + extractor);
     } else if (mCallSampleNo == -1 || mBaselineSampleNo == -1) {
       filters.removeIf(RocFilter::requiresGt);
-      if (filters.size() != rocFilters.size()) {
+      if (extractor != RocSortValueExtractor.NULL_EXTRACTOR && filters.size() != rocFilters.size()) {
         final Set<RocFilter> excluded = new LinkedHashSet<>(rocFilters.stream().filter(RocFilter::requiresGt).collect(Collectors.toList()));
-        Diagnostic.info("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
+        Diagnostic.warning("During ALT comparison some ROC data files will not be produced: " + excluded + ", producing ROC data for: " + filters);
       }
     }
     if (mCallSampleNo == -1 && extractor.requiresSample()) {

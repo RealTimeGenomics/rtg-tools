@@ -1,2 +1,2 @@
 VCF header does not contain a FORMAT field named GQ
-Could not select maximized F-measure threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --vcf-score-field
+During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: GQ (FORMAT)

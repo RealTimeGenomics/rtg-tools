@@ -393,12 +393,14 @@ public class RocContainer {
       table.addRow("Threshold", "True-pos-baseline", "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure");
       table.addSeparator();
 
-      final RocPoint<Double> best = mBestCutpoint.cutpoint();
-      if (best == null) {
-        Diagnostic.warning("Could not select " + mBestCutpoint.name() + " threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
-      } else {
-        Diagnostic.info("Selected score threshold using: " + mBestCutpoint.name());
-        addSummaryRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
+      if (isRocEnabled()) {
+        final RocPoint<Double> best = mBestCutpoint.cutpoint();
+        if (best == null) {
+          Diagnostic.warning("Could not select " + mBestCutpoint.name() + " threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
+        } else {
+          Diagnostic.info("Selected score threshold using: " + mBestCutpoint.name());
+          addSummaryRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
+        }
       }
       final RocPoint<Double> total = getTotal(mDefaultRocFilter);
       addSummaryRow(table, "None", total.getTruePositives(), totalPositives - total.getTruePositives(), total.getRawTruePositives(), total.getFalsePositives());
