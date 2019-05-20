@@ -45,6 +45,7 @@ import com.rtg.alignment.SplitAlleles;
 import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
+import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Decomposes VCF records into smaller constituents based on alignments. This does not perform additional
@@ -153,7 +154,16 @@ class Decomposer {
       pad = 0;
       result = new SplitAlleles(rec.getRefCall(), rec.getAltCalls());
     }
-    final Partition partition = result.partition();
+    final Partition partition;
+    try {
+      partition = result.partition();
+    } catch (final RuntimeException e) {
+      // Added by SAI to collect more information regarding Bug#1665
+      // Most likely a StringIndexOutOfBoundsException from deep down in the allele splitting
+      Diagnostic.userLog("Following record caused an exception during decomposition:");
+      Diagnostic.userLog(rec.toString());
+      throw e;
+    }
     if (partition.isEmpty()) {
       // If partitioning failed, then simply return the original record
       return Collections.singletonList(rec);
