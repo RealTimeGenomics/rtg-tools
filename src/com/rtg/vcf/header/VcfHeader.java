@@ -684,7 +684,7 @@ public class VcfHeader {
    * @return this, for call chaining
    */
   public VcfHeader addSampleName(String name) {
-    if (mSampleNames.contains(name)) {
+    if (mNameToColumn.containsKey(name)) {
       throw new VcfFormatException("Duplicate sample name \"" + name + "\" in VCF header");
     }
     mNameToColumn.put(name, mSampleNames.size());
