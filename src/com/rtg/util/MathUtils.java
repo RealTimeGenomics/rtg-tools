@@ -524,4 +524,19 @@ public final class MathUtils {
     }
     return true;
   }
+
+  /**
+   * Return the largest integer in an array.
+   * @param s array
+   * @return maximum
+   */
+  public static int max(final int... s) {
+    int max = s[0];
+    for (final int v : s) {
+      if (v > max) {
+        max = v;
+      }
+    }
+    return max;
+  }
 }
