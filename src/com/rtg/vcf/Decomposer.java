@@ -61,13 +61,13 @@ class Decomposer {
   private final Map<String, Long> mNameMap;
   private final boolean mBreakMnps;
   private final boolean mBreakIndels;
+  private final Adjuster mAdjuster = new Adjuster();
 
   private long mCurrentSequenceId = -1;
   private byte[] mCurrentSequence = null;
   protected long mTotalCallsSplit = 0;
   protected long mTotalPieces = 0;
   protected long mTotalRecords = 0;
-  private Adjuster mAdjuster = new Adjuster();
 
   /**
    * Construct the decomposer. If a reference sequence is supplied, any anchor bases required will consistently be added to
@@ -228,7 +228,6 @@ class Decomposer {
         }
       }
       ++mTotalPieces;
-      // todo no need to make new Adjuster every time
       mAdjuster.adjust(rec, splitRecord, alleleMap);
       res.add(splitRecord);
     }

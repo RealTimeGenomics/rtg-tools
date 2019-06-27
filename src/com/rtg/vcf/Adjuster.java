@@ -40,15 +40,25 @@ import com.rtg.util.MathUtils;
  */
 public class Adjuster {
 
+  /** Type of action to take for a particular attribute. */
   public enum Policy {
-    DROP, SUM
+    /** Attribute should be dropped. */
+    DROP,
+    /** Corresponding values should be summed (reference + ALTs). */
+    SUM,
+    /** Corresponding values should be summed (but two values per allele, reference + ALTs). */
+    PAIR_SUM
   }
 
   private final Map<String, Policy> mPolicyMap = new HashMap<>();
 
+  /**
+   * Construct an adjuster.
+   */
   public Adjuster() {
     // todo temporary defaults
     mPolicyMap.put(VcfUtils.FORMAT_ALLELIC_DEPTH, Policy.SUM);
+    mPolicyMap.put("SBC", Policy.PAIR_SUM); // todo make this SBC a constant (can't refer to VcfFormatField)
     mPolicyMap.put("ABP", Policy.DROP); // todo xxx temporary just testing functionality
   }
 
@@ -79,27 +89,31 @@ public class Adjuster {
       for (final Map.Entry<String, Policy> entry : mPolicyMap.entrySet()) {
         final String field = entry.getKey();
         final Policy policy = entry.getValue();
-
-        switch (policy) {
-          case DROP:
-            replacement.removeFormat(field);
-            break;
-          case SUM:
-            final ArrayList<String> originalFieldValues = original.getFormat(field);
-            final ArrayList<String> replacementFieldValues = sum(originalFieldValues, alleleMap);
-            // If possible use existing field to hold the result, this helps ensure attributes come
-            // out in the order the are defined in the replacement (and hence probably the original).
-            final ArrayList<String> existing = replacement.getFormat(field);
-            if (existing == null) {
-              replacement.addFormat(field);
-              replacement.getFormat(field).addAll(replacementFieldValues);
-            } else {
-              existing.clear();
-              existing.addAll(replacementFieldValues);
-            }
-            break;
-          default:
-            throw new RuntimeException();
+        if (policy == Policy.DROP) {
+          replacement.removeFormat(field);
+        } else if (original.hasFormat(field)) {
+          final ArrayList<String> originalFieldValues = original.getFormat(field);
+          final ArrayList<String> replacementFieldValues;
+          switch (policy) {
+            case SUM:
+              replacementFieldValues = sum(originalFieldValues, alleleMap);
+              break;
+            case PAIR_SUM:
+              replacementFieldValues = pairSum(originalFieldValues, alleleMap);
+              break;
+            default:
+              throw new RuntimeException();
+          }
+          // If possible use existing field to hold the result, this helps ensure attributes come
+          // out in the order the are defined in the replacement (and hence probably the original).
+          final ArrayList<String> existing = replacement.getFormat(field);
+          if (existing == null) {
+            replacement.addFormat(field);
+            replacement.getFormat(field).addAll(replacementFieldValues);
+          } else {
+            existing.clear();
+            existing.addAll(replacementFieldValues);
+          }
         }
       }
     } catch (final RuntimeException e) {
@@ -141,6 +155,40 @@ public class Adjuster {
           final int newAllele = alleleMap[k];
           if (newAllele != VcfUtils.MISSING_GT) {
             sums[newAllele] += Long.parseLong(parts[k]);
+          }
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (final long v : sums) {
+          if (sb.length() > 0) {
+            sb.append(',');
+          }
+          sb.append(v);
+        }
+        res.add(sb.toString());
+      }
+    }
+    return res;
+  }
+
+  // Like sum but expects two values per allele (including ref allele)
+  private ArrayList<String> pairSum(final ArrayList<String> values, final int[] alleleMap) {
+    if (values == null || values.isEmpty()) {
+      return values;
+    }
+    final int newMaxAllele = MathUtils.max(alleleMap);
+    final ArrayList<String> res = new ArrayList<>(values.size());
+    for (final String fieldForsample : values) {
+      if (VcfUtils.MISSING_FIELD.equals(fieldForsample)) {
+        res.add(VcfUtils.MISSING_FIELD);
+      } else {
+        final String[] parts = fieldForsample.split(",");
+        final long[] sums = new long[2 * newMaxAllele + 1];
+        for (int k = 0; k < parts.length; ++k) {
+          for (int j = 0; j < 2; ++j) {
+            final int newAllele = alleleMap[k / 2];
+            if (newAllele != VcfUtils.MISSING_GT) {
+              sums[newAllele + j] += Long.parseLong(parts[k + j]);
+            }
           }
         }
         final StringBuilder sb = new StringBuilder();
