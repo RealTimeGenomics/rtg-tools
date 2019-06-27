@@ -598,9 +598,9 @@ public final class VcfUtils {
    * @return the value converted into a double, or {@code Double.NaN} if missing
    */
   public static double getDoubleInfoFieldFromRecord(VcfRecord rec, String field) {
-    final Map<String, ArrayList<String>> infoField = rec.getInfo();
-    if (infoField.containsKey(field)) {
-      final String fieldVal = infoField.get(field).get(0);
+    final ArrayList<String> info = rec.getInfo().get(field);
+    if (info != null) {
+      final String fieldVal = info.size() == 0 ? "" : info.get(0);
       try {
         if (VcfRecord.MISSING.equals(fieldVal)) {
           return Double.NaN;
@@ -621,9 +621,9 @@ public final class VcfUtils {
    * @return the value converted into a double, or null if missing
    */
   public static Integer getIntegerInfoFieldFromRecord(VcfRecord rec, String field) {
-    final Map<String, ArrayList<String>> infoField = rec.getInfo();
-    if (infoField.containsKey(field)) {
-      final String fieldVal = infoField.get(field).get(0);
+    final ArrayList<String> info = rec.getInfo().get(field);
+    if (info != null) {
+      final String fieldVal = info.size() == 0 ? "" : info.get(0);
       try {
         if (VcfRecord.MISSING.equals(fieldVal)) {
           return null;

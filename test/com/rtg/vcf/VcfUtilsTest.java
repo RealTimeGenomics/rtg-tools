@@ -177,6 +177,34 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "T]bar:198982]"), 0));
   }
 
+  public void testGetInfoValues() {
+    VcfRecord r = makeRecord("0/1", "A", "T").addInfo("DP", "14").addInfo("DPR", "1.2").addInfo("IMP");
+
+    assertTrue(Double.isNaN(VcfUtils.getDoubleInfoFieldFromRecord(r, "DPX")));
+    assertNull(VcfUtils.getIntegerInfoFieldFromRecord(r, "DPX"));
+
+    assertEquals(14.0, VcfUtils.getDoubleInfoFieldFromRecord(r, "DP"));
+    assertEquals(14, VcfUtils.getIntegerInfoFieldFromRecord(r, "DP").intValue());
+
+    assertEquals(1.2, VcfUtils.getDoubleInfoFieldFromRecord(r, "DPR"));
+    try {
+      VcfUtils.getIntegerInfoFieldFromRecord(r, "DPR");
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+
+    try {
+      VcfUtils.getIntegerInfoFieldFromRecord(r, "IMP");
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+    try {
+      VcfUtils.getDoubleInfoFieldFromRecord(r, "IMP");
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+  }
+
   public void testZippedVcfFileName() {
     assertEquals("test.vcf.gz", VcfUtils.getZippedVcfFileName(true, new File("test")).getName());
     assertEquals("test.vcf", VcfUtils.getZippedVcfFileName(false, new File("test")).getName());
