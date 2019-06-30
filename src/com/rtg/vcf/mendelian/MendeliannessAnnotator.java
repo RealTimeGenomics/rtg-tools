@@ -440,7 +440,7 @@ public final class MendeliannessAnnotator implements VcfAnnotator {
   }
 
   private void checkSampleOk(final String sample, final String label) {
-    if (!mHeader.getSampleNames().contains(sample)) {
+    if (mHeader.getSampleIndex(sample) == -1) {
       throw new NoTalkbackSlimException("Pedigree " + label + " specification '" + sample + "' not contained in samples");
     }
     if (mSampleToSex[mHeader.getSampleIndex(sample)] == null) {

@@ -74,7 +74,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     final VcfHeader h = variants.calledHeader().copy();
     h.ensureContains(new InfoField("STATUS", MetaType.STRING, VcfNumber.DOT, "Recoding variant status"));
     if (h.getNumberOfSamples() != 1) {
-      h.getSampleNames().clear();
+      h.removeAllSamples();
       h.addSampleName(sampleName == null ? "SAMPLE" : sampleName);
     }
     final VcfWriterFactory vf = new VcfWriterFactory().zip(zip).addRunInfo(true);

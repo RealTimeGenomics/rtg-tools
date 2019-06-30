@@ -122,7 +122,7 @@ public class SampleSimulator {
     }
     final VcfHeader header = VcfUtils.getHeader(vcfPopFile);
     for (final String sample : samples) {
-      if (header.getSampleNames().contains(sample)) {
+      if (header.getSampleIndex(sample) != -1) {
         throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
       }
       header.addSampleName(sample);

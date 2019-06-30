@@ -695,10 +695,10 @@ public class VcfHeader {
   /**
    * Get the column index of the specified sample
    * @param name the sample name
-   * @return the index of the specified sample, or null if the sample is unknown
+   * @return the index of the specified sample, or -1 if the sample is unknown
    */
-  public Integer getSampleIndex(String name) {
-    return mNameToColumn.get(name);
+  public int getSampleIndex(String name) {
+    return mNameToColumn.getOrDefault(name, -1);
   }
 
   /**
@@ -744,8 +744,8 @@ public class VcfHeader {
    * @param newName new sample name
    */
   public void relabelSample(final String originalName, final String newName) {
-    final Integer index = getSampleIndex(originalName);
-    if (index != null) {
+    final int index = getSampleIndex(originalName);
+    if (index != -1) {
       mSampleNames.set(index, newName);
       mNameToColumn.remove(originalName);
       mNameToColumn.put(newName, index);

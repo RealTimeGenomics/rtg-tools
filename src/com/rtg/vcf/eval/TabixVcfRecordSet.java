@@ -191,8 +191,8 @@ class TabixVcfRecordSet implements VariantSet {
     mCalledHeader = mPreprocess ? addDecompositionHeader(calledHeader) : calledHeader;
     mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample);
     mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample);
-    mBaselineSampleNo = baselineSample != null ? mBaseLineHeader.getSampleNames().indexOf(baselineSample) : 0;
-    mCalledSampleNo = callsSample != null ? mCalledHeader.getSampleNames().indexOf(callsSample) : 0;
+    mBaselineSampleNo = baselineSample != null ? mBaseLineHeader.getSampleIndex(baselineSample) : 0;
+    mCalledSampleNo = callsSample != null ? mCalledHeader.getSampleIndex(callsSample) : 0;
   }
 
   // This is pretty ick, but needed to ensure the main vcfeval output headers contain appropriate declarations created during decomposition

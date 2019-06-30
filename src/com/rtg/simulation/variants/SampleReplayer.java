@@ -86,7 +86,7 @@ public class SampleReplayer {
    */
   public void replaySample(File sampleVcf, File outputDir, String sample) throws IOException {
     final VcfHeader header = VcfUtils.getHeader(sampleVcf);
-    final int sampleNum = header.getSampleNames().indexOf(sample);
+    final int sampleNum = header.getSampleIndex(sample);
     if (sampleNum == -1) {
       throw new NoTalkbackSlimException("sample '" + sample + "' not found");
     }

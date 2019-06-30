@@ -83,8 +83,8 @@ public class VcfSampleStripper implements VcfAnnotator {
       mSampleIdsToRemove = new int[samplesToRemove.size()];
       int i = 0;
       for (String sample : samplesToRemove) {
-        final Integer sampleId = header.getSampleIndex(sample);
-        if (sampleId == null) {
+        final int sampleId = header.getSampleIndex(sample);
+        if (sampleId == -1) {
           throw new NoTalkbackSlimException("Could not find sample name: " + sample + " in VCF header");
         }
         mSampleIdsToRemove[i] = sampleId;

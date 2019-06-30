@@ -333,7 +333,7 @@ public final class VcfUtils {
   public static int getSampleIndexOrDie(VcfHeader header, final String sampleName, final String label) {
     int sampleIndex = 0;
     if (sampleName != null) {
-      sampleIndex = header.getSampleNames().indexOf(sampleName);
+      sampleIndex = header.getSampleIndex(sampleName);
       if (sampleIndex == -1) {
         throw new NoTalkbackSlimException("Sample \"" + sampleName + "\" not found in " + label + " VCF.");
       }

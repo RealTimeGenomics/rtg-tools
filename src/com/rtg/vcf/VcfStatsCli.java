@@ -142,7 +142,7 @@ public class VcfStatsCli extends AbstractCli {
         if (samples != null) {
           stats.onlySamples(samples);
           for (String sample : samples) {
-            if (!header.getSampleNames().contains(sample)) {
+            if (header.getSampleIndex(sample) == -1) {
               Diagnostic.warning("Specified sample '" + sample + "' is not contained in file: " + vcffile);
             }
           }

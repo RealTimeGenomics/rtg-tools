@@ -343,14 +343,14 @@ public class ChildSampleSimulator {
       return mChildSampleName;
     }
     private void prepareTrio(VcfHeader header, Map<Sex, ReferenceGenome> sexRef, GenomeRelationships ped) {
-      if (header.getSampleNames().contains(mChildSampleName)) {
+      if (header.getSampleIndex(mChildSampleName) != -1) {
         throw new NoTalkbackSlimException("sample '" + mChildSampleName + "' already exists");
       }
-      final int fatherSampleNum = header.getSampleNames().indexOf(mFatherSampleName);
+      final int fatherSampleNum = header.getSampleIndex(mFatherSampleName);
       if (fatherSampleNum == -1) {
         throw new NoTalkbackSlimException("father sample '" + mFatherSampleName + "' does not exist");
       }
-      final int motherSampleNum = header.getSampleNames().indexOf(mMotherSampleName);
+      final int motherSampleNum = header.getSampleIndex(mMotherSampleName);
       if (motherSampleNum == -1) {
         throw new NoTalkbackSlimException("mother sample '" + mMotherSampleName + "' does not exist");
       }

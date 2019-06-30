@@ -217,8 +217,8 @@ public class Vcf2Rocplot extends LoggedCli {
 
   // Find the named sample or 0 otherwise
   private int getSampleIndex(VcfHeader header, String sample) {
-    final Integer index = header.getSampleIndex(sample);
-    return index == null ? 0 : index;
+    final int index = header.getSampleIndex(sample);
+    return index == -1 ? 0 : index;
   }
 
 }

@@ -72,7 +72,7 @@ public class VcfGtMajorityMerger extends VcfRecordMerger {
       final MultiSet<String> counts = new MultiSet<>();
       // Count the genotypes from the input records
       for (int i = 0; i < headers.length; ++i) {
-        final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
+        final int sampleIndex = headers[i].getSampleIndex(names.get(destSampleIndex));
         if (sampleIndex > -1 && records[i].hasFormat(VcfUtils.FORMAT_GENOTYPE)) {
 
           // Get the GT, remap alleles, and normalize allele ordering

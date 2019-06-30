@@ -76,13 +76,13 @@ public class ChildPhasingVcfAnnotator implements VcfAnnotator {
     final List<String> calls = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
     final String[] phased = new String[calls.size()];
     for (Family f : mFamilies) { // The families should have at least two members with generated calls, but there may be other members missing
-      final Integer fatherIndex = mHeader.getSampleIndex(f.getFather());
-      final String fatherCall = (fatherIndex == null) ? VcfRecord.MISSING : calls.get(fatherIndex);
-      final Integer motherIndex = mHeader.getSampleIndex(f.getMother());
-      final String motherCall = (motherIndex == null) ? VcfRecord.MISSING : calls.get(motherIndex);
+      final int fatherIndex = mHeader.getSampleIndex(f.getFather());
+      final String fatherCall = (fatherIndex == -1) ? VcfRecord.MISSING : calls.get(fatherIndex);
+      final int motherIndex = mHeader.getSampleIndex(f.getMother());
+      final String motherCall = (motherIndex == -1) ? VcfRecord.MISSING : calls.get(motherIndex);
       for (String child : f.getChildren()) {
-        final Integer childIndex = mHeader.getSampleIndex(child);
-        if (childIndex != null) {
+        final int childIndex = mHeader.getSampleIndex(child);
+        if (childIndex != -1) {
           phased[childIndex] = phaseDiploidCall(fatherCall, motherCall, calls.get(childIndex));
         }
       }

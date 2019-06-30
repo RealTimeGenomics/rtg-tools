@@ -57,10 +57,10 @@ public class VcfSampleNameRelabellerTest extends TestCase {
     header.addMetaInformationLine("##SAMPLE=<ID=foo1,Description=\"foo1\">");
     r.updateHeader(header);
     //System.out.println(header.toString());
-    assertEquals(0, (int) header.getSampleIndex("bar1"));
-    assertEquals(1, (int) header.getSampleIndex("fooX"));
-    assertEquals(2, (int) header.getSampleIndex("bar2"));
-    assertNull(header.getSampleIndex("foo2"));
+    assertEquals(0, header.getSampleIndex("bar1"));
+    assertEquals(1, header.getSampleIndex("fooX"));
+    assertEquals(2, header.getSampleIndex("bar2"));
+    assertEquals(-1, header.getSampleIndex("foo2"));
     TestUtils.containsAll(header.toString(),
       "##SAMPLE=<ID=bar1,Description=\"foo1\">",
       "##PEDIGREE=<Child=fooX,Mother=bar1,Father=bar2>"

@@ -104,19 +104,19 @@ class ContraryObservationCounter {
       }
       final String child = pedLine.getChild();
       if (child != null) {
-        final Integer childIndex = header.getSampleIndex(child);
-        if (childIndex != null) {
+        final int childIndex = header.getSampleIndex(child);
+        if (childIndex != -1) {
           final String father = pedLine.getFather();
           if (father != null) {
-            final Integer fatherIndex = header.getSampleIndex(father);
-            if (fatherIndex != null) {
+            final int fatherIndex = header.getSampleIndex(father);
+            if (fatherIndex != -1) {
               mSampleToAntecedents.get(childIndex).add(fatherIndex);
             }
           }
           final String mother = pedLine.getMother();
           if (mother != null) {
-            final Integer motherIndex = header.getSampleIndex(mother);
-            if (motherIndex != null) {
+            final int motherIndex = header.getSampleIndex(mother);
+            if (motherIndex != -1) {
               mSampleToAntecedents.get(childIndex).add(motherIndex);
             }
           }

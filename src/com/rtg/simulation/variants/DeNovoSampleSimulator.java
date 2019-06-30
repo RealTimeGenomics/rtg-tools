@@ -117,10 +117,10 @@ public class DeNovoSampleSimulator {
     final PriorPopulationVariantGenerator generator = new PriorPopulationVariantGenerator(mReference, mPriors, mRandom, new PriorPopulationVariantGenerator.FixedAlleleFrequencyChooser(1.0), mTargetMutations);
     mSeenVariants = false;
     final VcfHeader header = VcfUtils.getHeader(vcfInFile);
-    if (!origSample.equalsIgnoreCase(sample) && header.getSampleNames().contains(sample)) {
+    if (!origSample.equalsIgnoreCase(sample) && header.getSampleIndex(sample) != -1) {
       throw new NoTalkbackSlimException("sample '" + sample + "' already exists");
     }
-    mOriginalSampleId = header.getSampleNames().indexOf(origSample);
+    mOriginalSampleId = header.getSampleIndex(origSample);
     if (mOriginalSampleId == -1) {
       throw new NoTalkbackSlimException("original sample '" + origSample + "' does not exist");
     }
@@ -128,7 +128,7 @@ public class DeNovoSampleSimulator {
     final GenomeRelationships ped = VcfPedigreeParser.load(header);
     mOriginalSexes = new Sex[ped.genomes().length];
     for (String genome : header.getSampleNames()) {
-      mOriginalSexes[header.getSampleNames().indexOf(genome)] = ped.getSex(genome);
+      mOriginalSexes[header.getSampleIndex(genome)] = ped.getSex(genome);
     }
     final Sex originalSex = ped.getSex(origSample);
     mOriginalRefg = new ReferenceGenome(mReference, originalSex, mDefaultPloidy);

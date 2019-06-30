@@ -202,7 +202,7 @@ public class VcfRecordMerger {
     for (int destSampleIndex = 0; destSampleIndex < names.size(); ++destSampleIndex) {
       boolean sampleDone = false;
       for (int i = 0; i < headers.length; ++i) {
-        final int sampleIndex = headers[i].getSampleNames().indexOf(names.get(destSampleIndex));
+        final int sampleIndex = headers[i].getSampleIndex(names.get(destSampleIndex));
         if (sampleIndex > -1) {
           if (sampleDone) {
             if (dropUnmergeable) {

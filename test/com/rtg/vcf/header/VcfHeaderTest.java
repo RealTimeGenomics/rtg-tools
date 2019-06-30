@@ -179,9 +179,9 @@ public class VcfHeaderTest extends TestCase {
     head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the original\">");
     head.addMetaInformationLine("##SAMPLE=<ID=xbox one,Description=\"the sequel to the 360\">");
 
-    assertNotNull(head.getSampleIndex("xbox"));
-    assertNotNull(head.getSampleIndex("xbox 360"));
-    assertNotNull(head.getSampleIndex("xbox one"));
+    assertEquals(0, head.getSampleIndex("xbox"));
+    assertEquals(1, head.getSampleIndex("xbox 360"));
+    assertEquals(2, head.getSampleIndex("xbox one"));
 
     head.removeAllSamples();
 
@@ -193,9 +193,9 @@ public class VcfHeaderTest extends TestCase {
     assertNotNull(head.getSampleLines());
     assertEquals(0, head.getSampleLines().size());
 
-    assertNull(head.getSampleIndex("xbox"));
-    assertNull(head.getSampleIndex("xbox 360"));
-    assertNull(head.getSampleIndex("xbox one"));
+    assertEquals(-1, head.getSampleIndex("xbox"));
+    assertEquals(-1, head.getSampleIndex("xbox 360"));
+    assertEquals(-1, head.getSampleIndex("xbox one"));
   }
 
   public void testSampleRemoval() {
@@ -206,9 +206,9 @@ public class VcfHeaderTest extends TestCase {
     head.addMetaInformationLine("##SAMPLE=<ID=xbox,Description=\"the original\">");
     head.addMetaInformationLine("##SAMPLE=<ID=xbox one,Description=\"the sequel to the 360\">");
 
-    assertNotNull(head.getSampleIndex("xbox"));
-    assertNotNull(head.getSampleIndex("xbox 360"));
-    assertNotNull(head.getSampleIndex("xbox one"));
+    assertEquals(0, head.getSampleIndex("xbox"));
+    assertEquals(1, head.getSampleIndex("xbox 360"));
+    assertEquals(2, head.getSampleIndex("xbox one"));
 
     final HashSet<String> removes = new HashSet<>();
     removes.add("xbox 360");
@@ -226,10 +226,9 @@ public class VcfHeaderTest extends TestCase {
     assertEquals(1, head.getSampleLines().size());
     assertEquals("xbox", head.getSampleLines().get(0).getId());
 
-    assertNotNull(head.getSampleIndex("xbox"));
-    assertEquals(Integer.valueOf(0), head.getSampleIndex("xbox"));
-    assertNull(head.getSampleIndex("xbox 360"));
-    assertNull(head.getSampleIndex("xbox one"));
+    assertEquals(0, head.getSampleIndex("xbox"));
+    assertEquals(-1, head.getSampleIndex("xbox 360"));
+    assertEquals(-1, head.getSampleIndex("xbox one"));
   }
 
   private static final String HEADER_SDF_PREFIX = "##TEMPLATE-SDF-ID=";
