@@ -206,7 +206,7 @@ public class VcfSubset extends AbstractCli {
         }
       };
       for (final Object o : mFlags.getValues(flag)) {
-        String sampleOrFile = (String) o;
+        final String sampleOrFile = (String) o;
         if (sampleOrFile.length() > 0) {
           if (new File(sampleOrFile).exists()) {
             try {

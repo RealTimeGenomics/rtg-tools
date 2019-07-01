@@ -78,7 +78,7 @@ public class VcfGtMajorityMerger extends VcfRecordMerger {
           // Get the GT, remap alleles, and normalize allele ordering
           final VcfRecord record = records[i];
           final String gtStr = record.getFormat(VcfUtils.FORMAT_GENOTYPE).get(sampleIndex);
-          int[] splitGt = map.splitRemapGt(gtStr, record, i);
+          final int[] splitGt = map.splitRemapGt(gtStr, record, i);
 
           if (!VcfUtils.isMissingGt(splitGt)) {
             Arrays.sort(splitGt); //  Ensure that het 0/1 vs 1/0 don't cause apparent discordance
@@ -90,12 +90,13 @@ public class VcfGtMajorityMerger extends VcfRecordMerger {
         sampleGts.add(DIP_MISSING);
       } else {
         if (counts.keySet().size() > 1) {
-          Diagnostic.developerLog("Discordant genotypes found at " + new SequenceNameLocusSimple(dest) + " for sample " + names.get(destSampleIndex) + " " + counts);// Log the distribution?
+          Diagnostic.developerLog("Discordant genotypes found at " + new SequenceNameLocusSimple(dest)
+            + " for sample " + names.get(destSampleIndex) + " " + counts); // Log the distribution?
         }
         String maxElement = null;
         int maxCount = -1;
         for (String genotype : counts.keySet()) {
-          int c = counts.get(genotype);
+          final int c = counts.get(genotype);
           if (c > maxCount) {
             maxElement = genotype;
             maxCount = c;
