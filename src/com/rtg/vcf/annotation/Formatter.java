@@ -34,7 +34,7 @@ import com.rtg.util.Utils;
 import com.rtg.vcf.header.TypedField;
 
 /**
- * Simple single-value annotation formatters
+ * Simple single-value annotation formatters.
  */
 class Formatter {
 

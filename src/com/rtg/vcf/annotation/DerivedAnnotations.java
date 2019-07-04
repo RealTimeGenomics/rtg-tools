@@ -79,6 +79,10 @@ public enum DerivedAnnotations {
   QA(new AltAlleleQualityAnnotation()),
   /** Ref-Alt type */
   RA(new RefAltAnnotation()),
+  /** Forward allele depth */
+  ADF(new AlleleDepthForwardAnnotation()),
+  /** Reverse allele depth */
+  ADR(new AlleleDepthReverseAnnotation()),
   ;
 
   private final transient AbstractDerivedAnnotation<?> mAnnotation;
