@@ -201,7 +201,7 @@ public final class TabixIndexer {
     final ArrayList<SequenceIndex> indexs = new ArrayList<>();
     populateIndex(indexs, in, false);
     mergeChunks(indexs);
-    try (BlockCompressedOutputStream indexOut = new BlockCompressedOutputStream(samIndex, null)) {
+    try (BlockCompressedOutputStream indexOut = new BlockCompressedOutputStream(samIndex, (File) null)) {
       writeIndex(indexs, ops, in.getSequenceNames(), indexOut);
     }
   }

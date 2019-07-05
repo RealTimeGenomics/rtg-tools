@@ -40,6 +40,9 @@ import com.rtg.util.TestUtils;
 public final class SharedSamConstants {
   private SharedSamConstants() { }
 
+  /** The SAM version number we currently produce **/
+  public static final String OUT_SAM_VERSION = "VN:1.6";
+
   /** Output Sam File Name **/
   public static final String OUT_SAM = "alignments.sam";
 

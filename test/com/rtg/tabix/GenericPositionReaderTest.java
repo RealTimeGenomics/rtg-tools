@@ -32,13 +32,13 @@ package com.rtg.tabix;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 
 import com.rtg.util.StringUtils;
 
 import htsjdk.samtools.util.BlockCompressedInputStream;
 import htsjdk.samtools.util.BlockCompressedOutputStream;
-
 import junit.framework.TestCase;
 
 /**
@@ -54,7 +54,7 @@ public class GenericPositionReaderTest extends TestCase {
 
   private static GenericPositionReader makeGpr(String contents) throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    try (final BlockCompressedOutputStream out = new BlockCompressedOutputStream(baos, null)) {
+    try (final BlockCompressedOutputStream out = new BlockCompressedOutputStream(baos, (File) null)) {
       out.write(contents.getBytes());
     }
     final ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());

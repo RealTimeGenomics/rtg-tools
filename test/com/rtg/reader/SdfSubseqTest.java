@@ -195,19 +195,19 @@ public class SdfSubseqTest extends AbstractCliTest {
       assertEquals("GACGACTA" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "TEST:1+5", "-q");
-      assertEquals("@TEST[1,5]" + StringUtils.LS + "ACATG" + StringUtils.LS + "+" + StringUtils.LS + "ACATG" + StringUtils.LS, out);
+      assertEquals("@TEST:1-5" + StringUtils.LS + "ACATG" + StringUtils.LS + "+" + StringUtils.LS + "ACATG" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "-I", "0:90+5", "-q");
-      assertEquals("@TEST[90,94]" + StringUtils.LS + "ATGCA" + StringUtils.LS + "+" + StringUtils.LS + "ATGCA" + StringUtils.LS, out);
+      assertEquals("@TEST:90-94" + StringUtils.LS + "ATGCA" + StringUtils.LS + "+" + StringUtils.LS + "ATGCA" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "TEst2:1+6", "-r", "-q");
-      assertEquals("@TEst2[1,6]-rc" + StringUtils.LS + "CAGTCA" + StringUtils.LS + "+" + StringUtils.LS + "GTCAGT" + StringUtils.LS, out);
+      assertEquals("@TEst2:1-6-rc" + StringUtils.LS + "CAGTCA" + StringUtils.LS + "+" + StringUtils.LS + "GTCAGT" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "TEst2:91+8", "-r", "-q");
-      assertEquals("@TEst2[91,98]-rc" + StringUtils.LS + "GACGACTA" + StringUtils.LS + "+" + StringUtils.LS + "CTGCTGAT" + StringUtils.LS, out);
+      assertEquals("@TEst2:91-98-rc" + StringUtils.LS + "GACGACTA" + StringUtils.LS + "+" + StringUtils.LS + "CTGCTGAT" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "TEst2:91+8", "-r", "-f");
-      assertEquals(">TEst2[91,98]-rc" + StringUtils.LS + "GACGACTA" + StringUtils.LS, out);
+      assertEquals(">TEst2:91-98-rc" + StringUtils.LS + "GACGACTA" + StringUtils.LS, out);
 
       out = checkMainInitOk("-i", normal.toString(), "TEst2:91+8", "--Xpreserve-coordinates", "-f");
       assertEquals(">TEst2 extra information" + StringUtils.LS + "NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNTAGTCGTC" + StringUtils.LS, out);

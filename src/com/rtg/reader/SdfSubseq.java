@@ -208,7 +208,7 @@ public final class SdfSubseq extends AbstractCli {
         name = String.valueOf(sequenceId);
       }
       out.write((sequenceNameIdentifier + name).getBytes());
-      final String coords = isCoordsAltered ? "[" + (start + 1) + "," + (start + length) + "]" : "";
+      final String coords = isCoordsAltered ? ":" + (start + 1) + "-" + (start + length) : "";
       out.write(coords.getBytes());
       if (reverseComplement) {
         out.write("-rc".getBytes());

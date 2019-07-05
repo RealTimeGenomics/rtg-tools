@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.rtg.launcher.MainResult;
+import com.rtg.sam.SharedSamConstants;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -47,7 +48,7 @@ import junit.framework.TestCase;
 public class IndexUtilsTest extends TestCase {
 
   private static final String SAM_HEADER_CLIP = ""
-    + "@HD" + TAB + "VN:1.5" + TAB + "SO:coordinate\n"
+    + "@HD" + TAB + SharedSamConstants.OUT_SAM_VERSION + TAB + "SO:coordinate\n"
     + "@SQ" + TAB + "SN:t" + TAB + "LN:84\n"
     ;
   private static final String SAM_CLIP = SAM_HEADER_CLIP
