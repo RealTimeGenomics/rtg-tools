@@ -54,10 +54,10 @@ import java.io.InputStream;
  *
  * <p>The decompression requires large amounts of memory. Thus you
  * should call the {@link #close() close()} method as soon as
- * possible, to force <tt>CBZip2InputStream</tt> to release the
+ * possible, to force <code>CBZip2InputStream</code> to release the
  * allocated memory. </p>
  *
- * <p><tt>CBZip2InputStream</tt> reads bytes from the compressed
+ * <p><code>CBZip2InputStream</code> reads bytes from the compressed
  * source stream via the single byte {@link java.io.InputStream#read()
  * read()} method exclusively. Thus you should consider to use a
  * buffered source stream.</p>
@@ -154,7 +154,7 @@ public class CBZip2InputStream extends InputStream {
      * @throws IOException
      *  if the stream content is malformed or an I/O error occurs.
      * @throws NullPointerException
-     *  if <tt>in == null</tt>
+     *  if <code>in == null</code>
      */
     public CBZip2InputStream(final InputStream in) throws IOException {
         super();
