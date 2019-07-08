@@ -33,7 +33,7 @@ import com.rtg.mode.DnaUtils;
 import com.rtg.util.StringUtils;
 
 /**
- * Provides validation methods for the packed actions arrays returned by EditDistance classes.
+ * Provides validation methods for the packed actions arrays returned by edit distance classes.
  *
  */
 public class ActionsValidator {
