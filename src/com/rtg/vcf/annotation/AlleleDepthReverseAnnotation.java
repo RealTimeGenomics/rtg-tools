@@ -47,7 +47,7 @@ public class AlleleDepthReverseAnnotation extends AbstractDerivedFormatAnnotatio
    * Constructor.
    */
   public AlleleDepthReverseAnnotation() {
-    super(new FormatField("ADR", MetaType.INTEGER, VcfNumber.REF_ALTS, "Total allelic depths on the reverse strand"), Formatter.DEFAULT);
+    super(new FormatField("ADR", MetaType.INTEGER, VcfNumber.DOT, "Total allelic depths on the reverse strand"), Formatter.DEFAULT);
   }
 
   @Override

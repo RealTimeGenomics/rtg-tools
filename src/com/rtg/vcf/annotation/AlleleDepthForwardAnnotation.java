@@ -50,7 +50,7 @@ public class AlleleDepthForwardAnnotation extends AbstractDerivedFormatAnnotatio
    * Constructor.
    */
   public AlleleDepthForwardAnnotation() {
-    super(new FormatField("ADF", MetaType.INTEGER, VcfNumber.REF_ALTS, "Total allelic depths on the forward strand"), Formatter.DEFAULT);
+    super(new FormatField("ADF", MetaType.INTEGER, VcfNumber.DOT, "Total allelic depths on the forward strand"), Formatter.DEFAULT);
   }
 
   @Override
