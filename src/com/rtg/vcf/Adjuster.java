@@ -34,6 +34,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.rtg.util.MathUtils;
+import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Mechanism for adjusting fields in VCF records in accordance with a change in allele mapping.
@@ -54,9 +56,13 @@ public class Adjuster {
    * Construct an adjuster.
    */
   public Adjuster() {
-    // todo temporary defaults
     mPolicyMap.put(VcfUtils.FORMAT_ALLELIC_DEPTH, Policy.SUM);
-    mPolicyMap.put("ABP", Policy.DROP); // todo xxx temporary just testing functionality
+    mPolicyMap.put("ADF", Policy.SUM);
+    mPolicyMap.put("ADR", Policy.SUM);
+    mPolicyMap.put("ADF1", Policy.SUM);
+    mPolicyMap.put("ADF2", Policy.SUM);
+    mPolicyMap.put("ADR1", Policy.SUM);
+    mPolicyMap.put("ADR2", Policy.SUM);
   }
 
   /**
@@ -93,7 +99,7 @@ public class Adjuster {
           final ArrayList<String> replacementFieldValues;
           switch (policy) {
             case SUM:
-              replacementFieldValues = sum(originalFieldValues, alleleMap);
+              replacementFieldValues = sumRefAlleleType(originalFieldValues, alleleMap);
               break;
             default:
               throw new RuntimeException();
@@ -111,14 +117,12 @@ public class Adjuster {
         }
       }
     } catch (final RuntimeException e) {
-      // todo remove this catch -- only here for testing bogosity
-      // todo or perhaps retain but log failing records
-      System.err.println(original.toString());
+      // Log any records that lead to exceptions during adjustment
+      Diagnostic.userLog("Problem adjusting: " + original.toString());
       throw e;
     }
   }
 
-  // todo is the following needed or useful?
   /**
    * Potentially change, delete, or insert VCF FORMAT and INFO fields in accordance with
    * a change of alleles from the original record to the replacement.  This version does
@@ -131,9 +135,8 @@ public class Adjuster {
   }
 
 
-  private ArrayList<String> sum(final ArrayList<String> values, final int[] alleleMap) {
+  private ArrayList<String> sumRefAlleleType(final ArrayList<String> values, final int[] alleleMap) {
     // Implicit assumption is that values are numeric and "R" type
-    // todo "A" type might also be needed
     if (values == null || values.isEmpty()) {
       return values;
     }
@@ -143,7 +146,7 @@ public class Adjuster {
       if (VcfUtils.MISSING_FIELD.equals(fieldForsample)) {
         res.add(VcfUtils.MISSING_FIELD);
       } else {
-        final String[] parts = fieldForsample.split(",");
+        final String[] parts = StringUtils.split(fieldForsample, ',');
         final long[] sums = new long[newMaxAllele + 1];
         for (int k = 0; k < parts.length; ++k) {
           final int newAllele = alleleMap[k];
