@@ -208,7 +208,7 @@ fi
 
 # Check that the config is suitable
 java_path=$(command -v "$RTG_JAVA")
-if [[ -z "$java_path" ]] || [[ ! -x "$java_path" ]]; then
+if [[ -z "$java_path" ]]; then
   echo "Unable to execute $RTG_JAVA"
   exit 1
 fi
