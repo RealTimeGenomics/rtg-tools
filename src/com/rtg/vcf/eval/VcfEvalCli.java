@@ -78,6 +78,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   public static final String SCORE_FIELD = "vcf-score-field";
   /** Flag used to specify a "good" score is high vs low */
   public static final String SORT_ORDER = "sort-order";
+  /** Flag used to indicate that ROCs are not required */
+  public static final String NO_ROC = "no-roc";
 
   private static final String SAMPLE = "sample";
   private static final String SQUASH_PLOIDY = "squash-ploidy";
@@ -169,6 +171,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)").setCategory(FILTERING);
 
     mFlags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
+    mFlags.registerOptional(NO_ROC, "do not produce ROCs").setCategory(REPORTING);
     mFlags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
@@ -192,6 +195,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateTemplate(flags)
       && CommonFlags.validateRegions(flags)
+      && flags.checkNand(SCORE_FIELD, NO_ROC)
       && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
       && flags.checkNand(CRITERIA_PRECISION, CRITERIA_SENSITIVITY)
       && validateScoreField(flags)
@@ -307,7 +311,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final File calls = (File) mFlags.getValue(CALLS);
     builder.baseLineFile(baseline).callsFile(calls);
     builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
-    builder.scoreField((String) mFlags.getValue(SCORE_FIELD));
+    final String scoreField = mFlags.isSet(VcfEvalCli.NO_ROC) ? null : (String) mFlags.getValue(VcfEvalCli.SCORE_FIELD);
+    builder.scoreField(scoreField);
     builder.maxLength((Integer) mFlags.getValue(MAX_LENGTH));
     builder.looseMatchDistance((Integer) mFlags.getValue(LOOSE_MATCH_DISTANCE));
     if (mFlags.isSet(CommonFlags.RESTRICTION_FLAG)) {

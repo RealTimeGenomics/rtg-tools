@@ -137,7 +137,7 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     // Here --ref-overlap default to left-trimming, which prevents some overlap playback that can be enabled
     // if we trim from the right first (or other trimming)
     // We should get 3 TP here if we do context aware trimming.
-    endToEnd("vcfeval_avoid_overlap/avoid_overlap", new String[] {"output.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode=combine", "--sample=BASE,QUERY", "--ref-overlap");
+    endToEnd("vcfeval_avoid_overlap/avoid_overlap", new String[] {"summary.txt", "output.vcf"}, false, "--no-roc", "--output-mode=combine", "--sample=BASE,QUERY", "--ref-overlap");
   }
 
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

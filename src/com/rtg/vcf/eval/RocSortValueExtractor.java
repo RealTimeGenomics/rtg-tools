@@ -55,10 +55,9 @@ public abstract class RocSortValueExtractor {
   public static RocSortValueExtractor getRocSortValueExtractor(String scoreField, RocSortOrder sortOrder) {
     final RocScoreField fieldType;
     final String fieldName;
-    if (scoreField != null) {
-      if (scoreField.equals(VcfRecord.MISSING)) {
-        return RocSortValueExtractor.NULL_EXTRACTOR;
-      }
+    if (scoreField == null) {
+      return RocSortValueExtractor.NULL_EXTRACTOR;
+    } else {
       final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
       if (splitScore.length > 1) {
         final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());
@@ -75,9 +74,6 @@ public abstract class RocSortValueExtractor {
         fieldType = RocScoreField.FORMAT;
         fieldName = scoreField;
       }
-    } else {
-      fieldType = RocScoreField.FORMAT;
-      fieldName = VcfUtils.FORMAT_GENOTYPE_QUALITY;
     }
     return fieldType.getExtractor(fieldName, sortOrder);
   }

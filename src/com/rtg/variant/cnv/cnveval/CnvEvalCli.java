@@ -160,6 +160,7 @@ public class CnvEvalCli extends LoggedCli {
 
     mFlags.registerOptional(VcfEvalCli.ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
     mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", FORMAT_SQS).setCategory(REPORTING);
+    mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
     mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
 
     mFlags.registerOptional('R', ROC_SUBSET, CnvRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
@@ -171,6 +172,7 @@ public class CnvEvalCli extends LoggedCli {
       && CommonFlags.validateInputFile(flags, VcfEvalCli.BASELINE, VcfEvalCli.CALLS, VcfEvalCli.EVAL_REGIONS_FLAG)
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateRegions(flags)
+      && flags.checkNand(VcfEvalCli.SCORE_FIELD, VcfEvalCli.NO_ROC)
       && VcfEvalCli.validateScoreField(flags));
   }
 
@@ -189,7 +191,8 @@ public class CnvEvalCli extends LoggedCli {
 
     // Create ROC container / extractor
     final int sampleCol = 0; // Only used if extracting FORMAT sort fields, we may want to flagify it.
-    final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(VcfEvalCli.SCORE_FIELD), (RocSortOrder) mFlags.getValue(VcfEvalCli.SORT_ORDER));
+    final String scoreField = mFlags.isSet(VcfEvalCli.NO_ROC) ? null : (String) mFlags.getValue(VcfEvalCli.SCORE_FIELD);
+    final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor(scoreField, (RocSortOrder) mFlags.getValue(VcfEvalCli.SORT_ORDER));
     if (rocExtractor.requiresSample()) {
       Diagnostic.warning("Specified score field " + rocExtractor + " requires a sample column, using first");
     }
@@ -235,8 +238,8 @@ public class CnvEvalCli extends LoggedCli {
     final File bedFile = FileUtils.getZippedFileName(gzip, new File(outputDirectory(), setType == VariantSetType.BASELINE ? "baseline.bed" : "calls.bed"));
     Diagnostic.userLog("Writing " + setType.label() + " region results to " + bedFile);
     try (final BedWriter w = new BedWriter(FileUtils.createOutputStream(bedFile))) {
-      if (extractor != null) {
-        w.writeComment("chrom\tstart\tend\tstatus\tsvtype\tspan\toriginal_pos\t" + mFlags.getValue(VcfEvalCli.SCORE_FIELD));
+      if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
+        w.writeComment("chrom\tstart\tend\tstatus\tsvtype\tspan\toriginal_pos\t" + extractor.toString());
       } else {
         w.writeComment("chrom\tstart\tend\tstatus\tsvtype\tspan\toriginal_pos");
       }
@@ -254,7 +257,7 @@ public class CnvEvalCli extends LoggedCli {
               throw new RuntimeException("Unknown variant set type: " + setType);
           }
           final SequenceNameLocusSimple originalSpan = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
-          if (extractor != null) {
+          if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
             w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), status, v.cnaType().name(), v.spanType().name(), originalSpan.toString(), Utils.realFormat(extractor.getSortValue(v.record(), sampleCol), 4)));
           } else {
             w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), status, v.cnaType().name(), v.spanType().name(), originalSpan.toString()));

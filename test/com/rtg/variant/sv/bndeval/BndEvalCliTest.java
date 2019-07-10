@@ -92,7 +92,7 @@ public class BndEvalCliTest extends AbstractBndEvalTest {
   }
 
   public void testNanoSmallAnnotate() throws IOException, UnindexableDataException {
-    endToEnd("bndeval_small", "bndeval_small_annotate", new String[] {"summary.txt", "baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "QUAL", "--output-mode", "annotate");
+    endToEnd("bndeval_small", "bndeval_small_annotate", new String[] {"summary.txt", "baseline.vcf", "calls.vcf"}, false, "--no-roc", "--output-mode", "annotate");
   }
 
   public void testNanoSmallAll() throws IOException, UnindexableDataException {

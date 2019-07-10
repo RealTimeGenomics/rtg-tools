@@ -86,4 +86,8 @@ public class CnvEvalCliTest extends AbstractCnvEvalTest {
   public void testNanoSmallAnnotate() throws IOException, UnindexableDataException {
     endToEnd("cnveval_small", "cnveval_small", new String[] {"summary.txt", "baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "INFO.SQS");
   }
+
+  public void testNanoSmallAnnotateNoRoc() throws IOException, UnindexableDataException {
+    endToEnd("cnveval_small", "cnveval_small_noroc", new String[] {"summary.txt", "baseline.vcf", "calls.vcf"}, false, "--no-roc");
+  }
 }
