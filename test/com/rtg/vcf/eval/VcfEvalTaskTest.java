@@ -118,7 +118,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final String tpResults = fileToString(tpFile, zip);
       final String fpResults = fileToString(new File(out, "fp.vcf" + zipSuffix), zip);
       final String fnResults = fileToString(new File(out, "fn.vcf" + zipSuffix), zip);
-      final String header = "##fileformat=VCFv4.1\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
+      final String header = "##fileformat=VCFv4.2\n" + "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT\tRTG";
       if (zip) {
         assertTrue(new File(out, "tp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());
         assertTrue(new File(out, "fp.vcf" + zipSuffix + TabixIndexer.TABIX_EXTENSION).exists());

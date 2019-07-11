@@ -93,7 +93,7 @@ public abstract class AbstractVcfWriterTest extends AbstractTest {
       + "GT:GQ" + TAB
       + "0/0:100" + TAB
       + "0/1:95" + LS;
-    final String exp = "##fileformat=VCFv4.1" + LS
+    final String exp = "##fileformat=VCFv4.2" + LS
       + "##test1212121" + LS
       + "##test12" + LS
       + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB + "INFO" + TAB + "FORMAT" + TAB + "sample1" + TAB + "sample2" + LS

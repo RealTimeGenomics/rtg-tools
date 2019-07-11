@@ -1,4 +1,4 @@
-##fileformat=VCFv4.1
+##fileformat=VCFv4.2
 ##diseased=child,child2,father
 ##SAMPLE=<ID=child,Sex=MALE>
 ##SAMPLE=<ID=child2,Sex=FEMALE>

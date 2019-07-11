@@ -62,7 +62,7 @@ import htsjdk.samtools.SAMSequenceRecord;
 public class VcfHeader {
 
   /** Current VCF version */
-  public static final String VERSION = "4.1";
+  public static final String VERSION = "4.2";
   /** Current VCF version */
   public static final String VERSION_VALUE = "VCFv" + VERSION;
   /** Comment character for VCF files */

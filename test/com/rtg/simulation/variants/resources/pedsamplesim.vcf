@@ -1,4 +1,4 @@
-##fileformat=VCFv4.1
+##fileformat=VCFv4.2
 ##CL=[...]
 ##SEED=32
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">

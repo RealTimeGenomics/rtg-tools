@@ -46,7 +46,6 @@ public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
     return new AsyncVcfWriter(new DefaultVcfWriter(head, out));
   }
 
-
   public void testBrokenPipe() {
     final VcfHeader head = new VcfHeader();
     head.setVersionValue(VcfHeader.VERSION_VALUE);

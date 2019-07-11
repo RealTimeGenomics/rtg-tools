@@ -35,7 +35,7 @@ import java.io.IOException;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
- *
+ * Methods for writing VCF records.
  */
 public interface VcfWriter extends Closeable {
 

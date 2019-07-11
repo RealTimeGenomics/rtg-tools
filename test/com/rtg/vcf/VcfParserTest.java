@@ -131,8 +131,22 @@ public class VcfParserTest extends TestCase {
     + "##fileformat=VCFv4.1" + LS
     + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB
     + "INFO" + LS;
+
   public void testHeader0() throws IOException {
     final Reader in = new StringReader(HEADER0);
+    final VcfHeader hdr = new VcfParser().parseHeader(new BufferedReader(in));
+    assertNotNull(hdr);
+    assertEquals(0, hdr.getGenericMetaInformationLines().size());
+    assertEquals(0, hdr.getNumberOfSamples());
+  }
+
+  // Also test we can parse a 4.2 header line
+  private static final String HEADER4_2 = ""
+    + "##fileformat=VCFv4.2" + LS
+    + "#CHROM" + TAB + "POS" + TAB + "ID" + TAB + "REF" + TAB + "ALT" + TAB + "QUAL" + TAB + "FILTER" + TAB + "INFO" + LS;
+
+  public void testHeader4v2() throws IOException {
+    final Reader in = new StringReader(HEADER4_2);
     final VcfHeader hdr = new VcfParser().parseHeader(new BufferedReader(in));
     assertNotNull(hdr);
     assertEquals(0, hdr.getGenericMetaInformationLines().size());
