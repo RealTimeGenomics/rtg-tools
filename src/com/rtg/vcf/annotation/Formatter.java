@@ -31,6 +31,7 @@ package com.rtg.vcf.annotation;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.TypedField;
 
 /**
@@ -48,12 +49,7 @@ class Formatter {
   static final Formatter DEFAULT_DOUBLE_ARR = new Formatter() {
     @Override
     String toString(Object val) {
-      final double[] vals = (double[]) val;
-      final String[] svals = new String[vals.length];
-      for (int i = 0; i < vals.length; i++) {
-        svals[i] = Utils.realFormat(vals[i], 3);
-      }
-      return StringUtils.join(",", svals);
+      return StringUtils.join(",", VcfUtils.formatFloatArray((double[]) val));
     }
   };
 

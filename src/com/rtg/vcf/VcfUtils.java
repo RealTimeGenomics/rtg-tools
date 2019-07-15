@@ -43,6 +43,7 @@ import java.util.Map;
 import com.rtg.mode.DnaUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
+import com.rtg.util.Utils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRegions;
@@ -822,6 +823,33 @@ public final class VcfUtils {
       alleles[i] = prevNt && allele.charAt(0) != VcfUtils.ALT_SPANNING_DELETION ? allele.substring(1) : allele;
     }
     return alleles;
+  }
+
+  /**
+   * Format an array of double values intended for output as MetaType=Float. Currently there is no
+   * control over the number of decimal places.
+   * @param vals the values to format
+   * @return an array with the values converted to strings
+   */
+  public static String[] formatFloatArray(double[] vals) {
+    final String[] svals = new String[vals.length];
+    for (int i = 0; i < vals.length; i++) {
+      svals[i] = Utils.realFormat(vals[i], 3);
+    }
+    return svals;
+  }
+
+  /**
+   * Format an array of double values intended for output as MetaType=Integer
+   * @param vals the values to format
+   * @return an array with the values converted to strings
+   */
+  public static String[] formatIntArray(long[] vals) {
+    final String[] svals = new String[vals.length];
+    for (int i = 0; i < vals.length; i++) {
+      svals[i] = Long.toString(vals[i]);
+    }
+    return svals;
   }
 
   /**
