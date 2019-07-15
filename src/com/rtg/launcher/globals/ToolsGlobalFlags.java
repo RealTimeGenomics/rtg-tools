@@ -53,6 +53,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** When writing VCFs asynchronously, the maximum number of records to buffer (per VCF) */
   public static final String VCF_ASYNC_BUFFER_SIZE = "com.rtg.vcf.async-buffer-size";
 
+  /** Specify properties file to configure allele-based format field adjustment behaviour */
+  public static final String VCF_FIELD_ADJUSTMENT_CONFIG = "com.rtg.vcf.field-adjustment";
+
   /** When looking at chromosomes declared as polyploid, treat as though they were actually the given ploidy */
   public static final String TREAT_POLYPLOID_AS = "com.rtg.reference.polyploid-as";
 
@@ -118,6 +121,8 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(TREAT_POLYPLOID_AS, Ploidy.class, Ploidy.HAPLOID);
 
     registerFlag(VCF_ASYNC_BUFFER_SIZE, Integer.class, 2000);
+
+    registerFlag(VCF_FIELD_ADJUSTMENT_CONFIG, String.class, "");
 
     // Simulation
     registerFlag(READ_THROUGH, String.class, "default");

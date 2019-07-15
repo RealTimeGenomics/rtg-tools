@@ -46,6 +46,7 @@ import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Decomposes VCF records into smaller constituents based on alignments. This does not perform additional
@@ -61,7 +62,7 @@ class Decomposer {
   private final Map<String, Long> mNameMap;
   private final boolean mBreakMnps;
   private final boolean mBreakIndels;
-  private final Adjuster mAdjuster = new Adjuster();
+  private final Adjuster mAdjuster;
 
   private long mCurrentSequenceId = -1;
   private byte[] mCurrentSequence = null;
@@ -75,15 +76,17 @@ class Decomposer {
    * decomposed indel must be right-anchored (using the reference base provided in the input record). Either way the output
    * records are valid.
    * @param template supplies reference bases, optional
+   * @param header the header corresponding to input records that are being decomposed
    * @param breakMnps true if MNPs should be decomposed into SNPs
    * @param breakIndels true if indels should be aggressively decomposed
    * @throws IOException if there is a problem reading from the reference
    */
-  Decomposer(SequencesReader template, boolean breakMnps, boolean breakIndels) throws IOException {
+  Decomposer(SequencesReader template, VcfHeader header, boolean breakMnps, boolean breakIndels) throws IOException {
     mTemplate = template;
     mBreakMnps = breakMnps;
     mBreakIndels = breakIndels;
     mNameMap = template == null ? null : ReaderUtils.getSequenceNameMap(mTemplate);
+    mAdjuster = new Adjuster(header);
   }
 
   /**

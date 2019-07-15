@@ -29,53 +29,124 @@
  */
 package com.rtg.vcf;
 
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.MathUtils;
+import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.InfoField;
+import com.rtg.vcf.header.MetaType;
+import com.rtg.vcf.header.TypedField;
+import com.rtg.vcf.header.VcfHeader;
+import com.rtg.vcf.header.VcfNumber;
+
+import htsjdk.samtools.util.StringUtil;
 
 /**
  * Mechanism for adjusting fields in VCF records in accordance with a change in allele mapping.
  */
 public class Adjuster {
 
+  private static final String DEFAULT_CONFIG = "com/rtg/vcf/field_adjustment.properties";
+
   /** Type of action to take for a particular attribute. */
   public enum Policy {
+    /** Attribute should be retained without adjustment. */
+    RETAIN,
     /** Attribute should be dropped. */
     DROP,
     /** Corresponding values should be summed (reference + ALTs). */
     SUM,
+    ;
   }
 
-  private final Map<String, Policy> mPolicyMap = new HashMap<>();
+  private final Map<String, Policy> mInfoPolicies = new HashMap<>();
+  private final Map<String, Policy> mFormatPolicies = new HashMap<>();
+
+  private final VcfHeader mHeader;
+
+  static Properties getConfig() throws IOException {
+    final Properties props = new Properties();
+    try (Reader r = GlobalFlags.isSet(ToolsGlobalFlags.VCF_FIELD_ADJUSTMENT_CONFIG)
+      ? new FileReader(GlobalFlags.getStringValue(ToolsGlobalFlags.VCF_FIELD_ADJUSTMENT_CONFIG))
+      : new InputStreamReader(Resources.getResourceAsStream(DEFAULT_CONFIG))) {
+      props.load(r);
+    }
+    return props;
+  }
 
   /**
    * Construct an adjuster.
+   * @param header corresponding to input VCF records.
+   * @throws IOException if the adjustment configuration is invalid or cannot be read
    */
-  public Adjuster() {
-    mPolicyMap.put(VcfUtils.FORMAT_ALLELIC_DEPTH, Policy.SUM);
-    mPolicyMap.put("ADF", Policy.SUM);
-    mPolicyMap.put("ADR", Policy.SUM);
-    mPolicyMap.put("ADF1", Policy.SUM);
-    mPolicyMap.put("ADF2", Policy.SUM);
-    mPolicyMap.put("ADR1", Policy.SUM);
-    mPolicyMap.put("ADR2", Policy.SUM);
+  public Adjuster(VcfHeader header) throws IOException {
+    this(header, getConfig());
+  }
+
+  /**
+   * Construct an adjuster.
+   * @param header corresponding to input VCF records.
+   * @param config contains adjustment policy configuration.
+   * @throws IOException if the adjustment configuration is invalid or cannot be read
+   */
+  private Adjuster(VcfHeader header, Properties config) throws IOException {
+    mHeader = header;
+    for (String annot : config.stringPropertyNames()) {
+      final String pname = config.getProperty(annot);
+      final Policy p;
+      try {
+        p = Policy.valueOf(pname);
+      } catch (RuntimeException e) {
+        throw new IOException("Adjustment policy for " + annot + " uses invalid policy name: " + pname);
+      }
+      setPolicy(annot, p);
+    }
   }
 
   /**
    * Set the policy for handling a particular format field.
-   * @param formatField name of format field
+   * @param fieldName name of format field
    * @param policy policy (null removes handling)
    */
-  public void setPolicy(final String formatField, final Policy policy) {
-    if (policy == null) {
-      mPolicyMap.remove(formatField);
+  void setPolicy(final String fieldName, final Policy policy) {
+    final Map<String, Policy> m;
+    final String f;
+    if (fieldName.startsWith("INFO.")) {
+      m = mInfoPolicies;
+      f = fieldName.substring("INFO.".length());
+    } else if (fieldName.startsWith("FORMAT.")) {
+      m = mFormatPolicies;
+      f = fieldName.substring("FORMAT.".length());
     } else {
-      mPolicyMap.put(formatField, policy);
+      throw new IllegalArgumentException("Invalid annotation specifier: " + fieldName);
     }
+    if (policy == null) {
+      m.remove(f);
+    } else {
+      m.put(f, policy);
+    }
+  }
+
+  boolean hasPolicy(FormatField f) {
+    return mFormatPolicies.containsKey(f.getId());
+  }
+
+  boolean hasPolicy(InfoField f) {
+    return mInfoPolicies.containsKey(f.getId());
   }
 
   /**
@@ -89,33 +160,21 @@ public class Adjuster {
    */
   public void adjust(final VcfRecord original, final VcfRecord replacement, final int[] alleleMap) {
     try {
-      for (final Map.Entry<String, Policy> entry : mPolicyMap.entrySet()) {
-        final String field = entry.getKey();
-        final Policy policy = entry.getValue();
-        if (policy == Policy.DROP) {
-          replacement.removeFormat(field);
-        } else if (original.hasFormat(field)) {
-          final ArrayList<String> originalFieldValues = original.getFormat(field);
-          final ArrayList<String> replacementFieldValues;
-          switch (policy) {
-            case SUM:
-              replacementFieldValues = sumRefAlleleType(originalFieldValues, alleleMap);
-              break;
-            default:
-              throw new RuntimeException();
-          }
-          // If possible use existing field to hold the result, this helps ensure attributes come
-          // out in the order the are defined in the replacement (and hence probably the original).
-          final ArrayList<String> existing = replacement.getFormat(field);
-          if (existing == null) {
-            replacement.addFormat(field);
-            replacement.getFormat(field).addAll(replacementFieldValues);
-          } else {
-            existing.clear();
-            existing.addAll(replacementFieldValues);
-          }
+      final int numAlleles = MathUtils.max(alleleMap) + 1;
+      assert numAlleles == replacement.getAltCalls().size() + 1;
+
+      for (String field : original.getInfo().keySet()) {
+        if (mInfoPolicies.containsKey(field)) {
+          adjustInfoField(original, replacement, alleleMap, numAlleles, field, mInfoPolicies.get(field));
         }
       }
+      for (String field : original.getFormats()) {
+        if (mFormatPolicies.containsKey(field)) {
+          adjustFormatField(original, replacement, alleleMap, numAlleles, field, mFormatPolicies.get(field));
+        }
+      }
+    } catch (final VcfFormatException e) {
+      throw e;
     } catch (final RuntimeException e) {
       // Log any records that lead to exceptions during adjustment
       Diagnostic.userLog("Problem adjusting: " + original.toString());
@@ -123,47 +182,123 @@ public class Adjuster {
     }
   }
 
-  /**
-   * Potentially change, delete, or insert VCF FORMAT and INFO fields in accordance with
-   * a change of alleles from the original record to the replacement.  This version does
-   * in situ replacement.
-   * @param record original VCF record
-   * @param alleleMap mapping from alleles in original record into replacement record
-   */
-  public void adjust(final VcfRecord record, final int[] alleleMap) {
-    adjust(record, record, alleleMap);
+  private void validateTypedField(TypedField<?> f) {
+    final VcfNumber n = f.getNumber();
+    if (n != VcfNumber.REF_ALTS && n != VcfNumber.DOT) {
+      throw new VcfFormatException("Cannot derive new values for " + f.fieldName() + " " + f.getId() + " declared as Number=" + n);
+    }
+    final MetaType type = f.getType();
+    if (type != MetaType.FLOAT && type != MetaType.INTEGER) {
+      throw new VcfFormatException("Cannot derive new values for " + f.fieldName() + " " + f.getId() + " of non-numeric type " + type);
+    }
+  }
+
+  private void adjustInfoField(VcfRecord original, VcfRecord replacement, int[] alleleMap, int numAlleles, String field, Policy policy) {
+    if (original.getInfo().containsKey(field)) {
+      switch (policy) {
+        case RETAIN:
+          replacement.setInfo(field, original.getInfo(field));
+          break;
+        case DROP:
+          replacement.removeInfo(field);
+          break;
+        case SUM:
+          final InfoField f = mHeader.getInfoField(field);
+          validateTypedField(f);
+          final String[] parts = original.getInfoSplit(field);
+          if (parts.length != alleleMap.length) {
+            throw new VcfFormatException("INFO field " + field + " was expected to contain " + alleleMap.length + " values");
+          }
+          try {
+            replacement.setInfo(field, sumAdjustField(alleleMap, numAlleles, f.getType(), parts));
+          } catch (NumberFormatException e) {
+            throw new VcfFormatException(e.getMessage());
+          }
+          break;
+        default:
+          throw new RuntimeException();
+      }
+    }
+  }
+
+  private void adjustFormatField(VcfRecord original, VcfRecord replacement, int[] alleleMap, int numAlleles, String field, Policy policy) {
+    if (original.hasFormat(field)) {
+      switch (policy) {
+        case RETAIN:
+          replacement.setFormat(field, original.getFormat(field));
+          break;
+        case DROP:
+          replacement.removeFormat(field);
+          break;
+        case SUM:
+          final FormatField f = mHeader.getFormatField(field);
+          validateTypedField(f);
+          final List<String> replacementFieldValues = sumAdjustFormatSamples(original.getFormat(field), alleleMap, numAlleles, f.getType());
+          replacement.setFormat(field, replacementFieldValues);
+          break;
+        default:
+          throw new RuntimeException();
+      }
+    }
   }
 
 
-  private ArrayList<String> sumRefAlleleType(final ArrayList<String> values, final int[] alleleMap) {
+  private List<String> sumAdjustFormatSamples(final List<String> values, final int[] alleleMap, int numAlleles, MetaType type) {
     // Implicit assumption is that values are numeric and "R" type
     if (values == null || values.isEmpty()) {
       return values;
     }
-    final int newMaxAllele = MathUtils.max(alleleMap);
-    final ArrayList<String> res = new ArrayList<>(values.size());
-    for (final String fieldForsample : values) {
-      if (VcfUtils.MISSING_FIELD.equals(fieldForsample)) {
-        res.add(VcfUtils.MISSING_FIELD);
-      } else {
-        final String[] parts = StringUtils.split(fieldForsample, ',');
-        final long[] sums = new long[newMaxAllele + 1];
-        for (int k = 0; k < parts.length; ++k) {
-          final int newAllele = alleleMap[k];
-          if (newAllele != VcfUtils.MISSING_GT) {
-            sums[newAllele] += Long.parseLong(parts[k]);
-          }
-        }
-        final StringBuilder sb = new StringBuilder();
-        for (final long v : sums) {
-          if (sb.length() > 0) {
-            sb.append(',');
-          }
-          sb.append(v);
-        }
-        res.add(sb.toString());
+    try {
+      return values.stream()
+        .map(f -> sumAdjustFormatField(f, alleleMap, numAlleles, type))
+        .collect(Collectors.toCollection(ArrayList::new));
+    } catch (NumberFormatException e) {
+      throw new VcfFormatException(e.getMessage());
+    }
+  }
+
+  private String sumAdjustFormatField(String fieldValue, int[] alleleMap, int numAlleles, MetaType type) {
+    final String newFieldForsample;
+    if (VcfUtils.MISSING_FIELD.equals(fieldValue)) {
+      newFieldForsample = VcfUtils.MISSING_FIELD;
+    } else {
+      final String[] parts = StringUtils.split(fieldValue, ',');
+      if (parts.length != alleleMap.length) {
+        throw new VcfFormatException("FORMAT field value " + fieldValue + " was expected to contain " + alleleMap.length + " values");
+      }
+      try {
+        newFieldForsample = StringUtil.join(",", sumAdjustField(alleleMap, numAlleles, type, parts));
+      } catch (NumberFormatException e) {
+        throw new VcfFormatException(e.getMessage());
       }
     }
-    return res;
+    return newFieldForsample;
+  }
+
+  private String[] sumAdjustField(int[] alleleMap, int numAlleles, MetaType type, String[] parts) {
+    final String[] adjusted;
+    if (type == MetaType.INTEGER) {
+      final long[] sums = new long[numAlleles];
+      for (int k = 0; k < parts.length; ++k) {
+        final int newAllele = alleleMap[k];
+        if (newAllele != VcfUtils.MISSING_GT) {
+          sums[newAllele] += Long.parseLong(parts[k]);
+        }
+      }
+      adjusted = VcfUtils.formatIntArray(sums);
+    } else if (type == MetaType.FLOAT) {
+      final double[] sums = new double[numAlleles];
+      for (int k = 0; k < parts.length; ++k) {
+        final int newAllele = alleleMap[k];
+        if (newAllele != VcfUtils.MISSING_GT) {
+          sums[newAllele] += Double.parseDouble(parts[k]);
+        }
+      }
+      // We don't currently have a way to specify number of DP.
+      adjusted = VcfUtils.formatFloatArray(sums);
+    } else {
+      throw new RuntimeException();
+    }
+    return adjusted;
   }
 }

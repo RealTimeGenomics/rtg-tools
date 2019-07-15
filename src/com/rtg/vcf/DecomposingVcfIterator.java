@@ -63,7 +63,7 @@ public class DecomposingVcfIterator extends Decomposer implements VcfIterator {
    * @throws IOException when IO or format errors occur.
    */
   public DecomposingVcfIterator(VcfIterator in, SequencesReader template, boolean breakMnps, boolean breakIndels) throws IOException {
-    super(template, breakMnps, breakIndels);
+    super(template, in.getHeader(), breakMnps, breakIndels);
     mIn = new VcfFilterIterator(in, new AssertVcfSorted());
     mIn.getHeader().ensureContains(new InfoField(ORP, MetaType.STRING, VcfNumber.ONE, "Original variant position"));
     mIn.getHeader().ensureContains(new InfoField(ORL, MetaType.STRING, VcfNumber.ONE, "Original reference length"));
