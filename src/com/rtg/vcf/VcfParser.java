@@ -166,14 +166,13 @@ public class VcfParser {
       for (final String anInfoSplit : infoSplit) {
         final String[] singleInfoSplit = StringUtils.split(anInfoSplit, '=', 2);
         final String key = singleInfoSplit[0];
-        if (rec.getInfo().containsKey(key)) {
+        if (rec.hasInfo(key)) {
           throw new VcfFormatException("Duplicate INFO field: " + key);
         }
         if (singleInfoSplit.length == 1) {
           rec.setInfo(key);
         } else {
-          final String[] vals = StringUtils.split(singleInfoSplit[1], ',');
-          rec.setInfo(key, vals);
+          rec.setInfo(key, singleInfoSplit[1]);
         }
       }
     }

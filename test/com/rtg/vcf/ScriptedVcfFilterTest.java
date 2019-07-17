@@ -37,7 +37,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 import org.hamcrest.core.StringContains;
 import org.junit.Rule;
@@ -372,7 +371,7 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ,BANG'; true").accept(record));
-    assertEquals(Arrays.asList("BAZ", "BANG"), record.getInfo().get("IN"));
+    assertEquals(Arrays.asList("BAZ", "BANG"), Arrays.asList(record.getInfoSplit("IN")));
   }
 
   @Test
@@ -380,9 +379,9 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = '12,-99'; true").accept(record));
-    assertEquals(Arrays.asList("12", "-99"), record.getInfo().get("IN"));
+    assertEquals(Arrays.asList("12", "-99"), Arrays.asList(record.getInfoSplit("IN")));
     assertTrue(getScriptedVcfFilter("INFO.IN = '0,1'; true").accept(record));
-    assertEquals(Arrays.asList("0", "1"), record.getInfo().get("IN"));
+    assertEquals(Arrays.asList("0", "1"), Arrays.asList(record.getInfoSplit("IN")));
   }
 
   @Test
@@ -390,7 +389,7 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ'; true").accept(record));
-    assertEquals(Collections.singletonList("BAZ"), record.getInfo().get("IN"));
+    assertEquals("BAZ", record.getInfo("IN"));
   }
 
   @Test
@@ -398,22 +397,22 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = -99; true").accept(record));
-    assertEquals(Collections.singletonList("-99"), record.getInfo().get("IN"));
+    assertEquals("-99", record.getInfo("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = 1; true").accept(record));
-    assertEquals(Collections.singletonList("1"), record.getInfo().get("IN"));
+    assertEquals("1", record.getInfo("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = 0; true").accept(record));
-    assertEquals(Collections.singletonList("0"), record.getInfo().get("IN"));
+    assertEquals("0", record.getInfo("IN"));
   }
 
   @Test
   public void testUpdateInfoFlag() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setInfo("IN");
-    assertTrue(record.getInfo().containsKey("IN"));
+    assertTrue(record.hasInfo("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = false; true").accept(record));
-    assertFalse(record.getInfo().containsKey("IN"));
+    assertFalse(record.hasInfo("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = true; true").accept(record));
-    assertTrue(record.getInfo().containsKey("IN"));
+    assertTrue(record.hasInfo("IN"));
   }
 
   @Test
@@ -422,15 +421,15 @@ public class ScriptedVcfFilterTest {
 
     record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = null; true").accept(record));
-    assertFalse(record.getInfo().containsKey("IN"));
+    assertFalse(record.hasInfo("IN"));
 
     record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = '.'; true").accept(record));
-    assertFalse(record.getInfo().containsKey("IN"));
+    assertFalse(record.hasInfo("IN"));
 
     record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = ''; true").accept(record));
-    assertFalse(record.getInfo().containsKey("IN"));
+    assertFalse(record.hasInfo("IN"));
   }
 
   @Test

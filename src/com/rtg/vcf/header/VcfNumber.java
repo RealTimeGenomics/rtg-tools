@@ -39,6 +39,8 @@ public class VcfNumber {
   private final int mNumber;
   private final VcfNumberType mType;
 
+  /** Singleton for flag-valued field types */
+  public static final VcfNumber FLAG = new VcfNumber("0");
   /** Singleton for variable numbered variant types */
   public static final VcfNumber DOT = new VcfNumber(".");
   /** Singleton for alt allele valued variant types */

@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.util.ArrayList;
-
 import com.rtg.vcf.VcfFilterStatistics.Stat;
 
 /**
@@ -68,10 +66,10 @@ public abstract class VcfInfoFilter extends AbstractVcfFilter {
 
     @Override
     boolean acceptCondition(VcfRecord record) {
-      final ArrayList<String> values = record.getInfo().get(mField);
-      if (values != null && values.size() == 1) {
+      final String[] values = record.getInfoSplit(mField);
+      if (values != null && values.length == 1) {
         try {
-          final Integer value = Integer.valueOf(values.get(0));
+          final Integer value = Integer.valueOf(values[0]);
           return !(value < mMin || value > mMax);
         } catch (NumberFormatException e) {
           throw new VcfFormatException("Expected numeric value in INFO " + mField + " at record: " + record);

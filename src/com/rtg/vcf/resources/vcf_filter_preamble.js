@@ -71,11 +71,16 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      */
     function infoGet(field) {
         return function () {
-            var infoList = listToArray(RTG_VCF_RECORD.getInfo().get(field));
-            if (infoList == null) {
+            var value = RTG_VCF_RECORD.getInfo(field);
+            if (value == null) {
                 return ".";
             }
-            return infoList.join(",");
+            var arr = [];
+            var values = value.toString().split(',');
+            values.forEach(function (val) {
+                arr.push(val);
+            });
+            return arr;
         }
     }
     /**
@@ -90,14 +95,10 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
                 var ArrayList = Java.type("java.util.ArrayList");
                 var list = new ArrayList();
                 if (value !== true) {
-                    var values = value.toString().split(',');
-                    if (Array.isArray(values)) {
-                        values.forEach(function (val) {
-                            list.add(val.toString());
-                        });
-                    }
+                    RTG_VCF_RECORD.setInfo(field, value.toString());
+                } else {
+                    RTG_VCF_RECORD.setInfo(field);
                 }
-                RTG_VCF_RECORD.getInfo().put(field, list);
             }
         }
     }

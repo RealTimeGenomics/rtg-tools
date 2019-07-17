@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.util.List;
-
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
@@ -75,7 +73,7 @@ public class ExpressionInfoFilter extends VcfInfoFilter {
 
   @Override
   boolean acceptCondition(VcfRecord record) {
-    final List<String> vals = record.getInfo().get(mField);
+    final String[] vals = record.getInfoSplit(mField);
     if (vals != null) {
       for (final String val : vals) {
         if (mValue instanceof Double) {

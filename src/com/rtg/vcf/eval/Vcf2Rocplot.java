@@ -152,9 +152,9 @@ public class Vcf2Rocplot extends LoggedCli {
     while (vr.hasNext()) {
       final VcfRecord rec = vr.next();
 
-      final List<String> base = rec.getInfo().get(WithInfoEvalSynchronizer.INFO_BASE);
+      final String base = rec.getInfo(WithInfoEvalSynchronizer.INFO_BASE);
       if (base != null) {
-        switch (base.get(0)) {
+        switch (base) {
           case WithInfoEvalSynchronizer.STATUS_TP:
             mRoc.incrementBaselineCount(rec, bSample, true);
             break;
@@ -165,9 +165,9 @@ public class Vcf2Rocplot extends LoggedCli {
             // ignore
         }
       }
-      final List<String> call = rec.getInfo().get(WithInfoEvalSynchronizer.INFO_CALL);
+      final String call = rec.getInfo(WithInfoEvalSynchronizer.INFO_CALL);
       if (call != null) {
-        switch (call.get(0)) {
+        switch (call) {
           case WithInfoEvalSynchronizer.STATUS_TP:
             final double weight = VcfUtils.getDoubleInfoFieldFromRecord(rec, WithInfoEvalSynchronizer.INFO_CALL_WEIGHT);
             mRoc.addRocLine(rec, cSample, Double.isNaN(weight) ? 1 : weight, 0, 1);

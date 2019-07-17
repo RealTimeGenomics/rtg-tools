@@ -178,7 +178,8 @@ public class VcfUtilsTest extends TestCase {
   }
 
   public void testGetInfoValues() {
-    VcfRecord r = makeRecord("0/1", "A", "T").setInfo("DP", "14").setInfo("DPR", "1.2").setInfo("IMP");
+    VcfRecord r = makeRecord("0/1", "A", "T").setInfo("DP", "14").setInfo("DPR", "1.2")
+      .setInfo("IMP").setInfo("DPD", "2", "3");
 
     assertTrue(Double.isNaN(VcfUtils.getDoubleInfoFieldFromRecord(r, "DPX")));
     assertNull(VcfUtils.getIntegerInfoFieldFromRecord(r, "DPX"));
@@ -189,17 +190,26 @@ public class VcfUtilsTest extends TestCase {
     assertEquals(1.2, VcfUtils.getDoubleInfoFieldFromRecord(r, "DPR"));
     try {
       VcfUtils.getIntegerInfoFieldFromRecord(r, "DPR");
+      fail();
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+    try {
+      VcfUtils.getIntegerInfoFieldFromRecord(r, "DPD");
+      fail();
     } catch (VcfFormatException e) {
       // Expected
     }
 
     try {
       VcfUtils.getIntegerInfoFieldFromRecord(r, "IMP");
+      fail();
     } catch (VcfFormatException e) {
       // Expected
     }
     try {
       VcfUtils.getDoubleInfoFieldFromRecord(r, "IMP");
+      fail();
     } catch (VcfFormatException e) {
       // Expected
     }

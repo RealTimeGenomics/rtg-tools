@@ -31,8 +31,6 @@ package com.rtg.variant.cnv;
 
 import static com.rtg.vcf.VcfUtils.INFO_SVTYPE;
 
-import java.util.ArrayList;
-
 import com.rtg.vcf.VcfRecord;
 
 /** Simple classification of copy number alteration types */
@@ -51,11 +49,11 @@ public enum CnaType {
    * @return the determined copy number alteration type
    */
   public static CnaType valueOf(final VcfRecord rec) {
-    final ArrayList<String> svTypes = rec.getInfo().get(INFO_SVTYPE);
-    if (svTypes == null || svTypes.size() != 1) {
+    final String svType = rec.getInfo(INFO_SVTYPE);
+    if (svType == null) {
       return CnaType.NONE;
     }
-    switch (svTypes.get(0)) {
+    switch (svType) {
       case "DUP":
         return CnaType.DUP;
       case "DEL":

@@ -173,8 +173,8 @@ public class VcfParserTest extends TestCase {
     assertEquals("c", rec.getFilters().get(2));
 
     assertEquals(2, rec.getInfo().size());
-    assertEquals("yy", rec.getInfo().get("X").iterator().next());
-    assertEquals("7", rec.getInfo().get("DP").iterator().next());
+    assertEquals("yy", rec.getInfo("X"));
+    assertEquals("7", rec.getInfo("DP"));
 
     assertEquals(2, rec.getFormats().size());
     assertEquals(Collections.singletonList("0|0"), rec.getFormat("GT"));

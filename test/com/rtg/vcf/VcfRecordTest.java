@@ -32,6 +32,7 @@ package com.rtg.vcf;
 
 import static com.rtg.util.StringUtils.TAB;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -72,8 +73,8 @@ public class VcfRecordTest extends TestCase {
     assertEquals("TEST1", rec.getFilters().get(0));
     assertEquals("TEST2", rec.getFilters().get(1));
     assertEquals("12.8", rec.getQuality());
-    assertEquals("23", rec.getInfo().get("DP").iterator().next());
-    final Iterator<String> iter = rec.getInfo().get("TEST").iterator();
+    assertEquals("23", rec.getInfo("DP"));
+    final Iterator<String> iter = Arrays.asList(rec.getInfoSplit("TEST")).iterator();
     assertEquals("45", iter.next());
     assertEquals("46", iter.next());
     assertEquals("47", iter.next());
@@ -153,14 +154,14 @@ public class VcfRecordTest extends TestCase {
     rec.setFormatAndSample("PAD", "DAPDAP", 1);
     assertEquals("DAPDAP", rec.getFormat("PAD").get(1));
     rec.setInfo("INF", "VAL1", "VAL2");
-    assertEquals(2, rec.getInfo().get("INF").size());
-    assertEquals("VAL1", rec.getInfo().get("INF").get(0));
-    assertEquals("VAL2", rec.getInfo().get("INF").get(1));
-    rec.setInfo("INF", "VAL3", "VAL2", "VAL1");
-    assertEquals(3, rec.getInfo().get("INF").size());
-    assertEquals("VAL3", rec.getInfo().get("INF").get(0));
-    assertEquals("VAL2", rec.getInfo().get("INF").get(1));
-    assertEquals("VAL1", rec.getInfo().get("INF").get(2));
+    assertEquals(2, rec.getInfoSplit("INF").length);
+    assertEquals("VAL1", rec.getInfoSplit("INF")[0]);
+    assertEquals("VAL2", rec.getInfoSplit("INF")[1]);
+    rec.setInfo("INF", "VAL3,VAL2", "VAL1");
+    assertEquals(3, rec.getInfoSplit("INF").length);
+    assertEquals("VAL3", rec.getInfoSplit("INF")[0]);
+    assertEquals("VAL2", rec.getInfoSplit("INF")[1]);
+    assertEquals("VAL1", rec.getInfoSplit("INF")[2]);
   }
 
   public void testFilterHackery() {

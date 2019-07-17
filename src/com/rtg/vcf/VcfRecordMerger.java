@@ -34,7 +34,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import com.rtg.util.MultiMap;
@@ -186,8 +185,8 @@ public class VcfRecordMerger {
     merged.getFilters().addAll(records[0].getFilters());
 
     // Copy INFO from first record into destination (INFO from other records are ignored)
-    for (final Map.Entry<String, ArrayList<String>> entry : records[0].getInfo().entrySet()) {
-      merged.getInfo().computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).addAll(entry.getValue());
+    for (final String key : records[0].getInfo().keySet()) {
+      merged.setInfo(key, records[0].getInfoSplit(key));
     }
 
     if (!mergeSamples(records, headers, merged, destHeader, map, unmergeableFormatFields, dropUnmergeable)) {

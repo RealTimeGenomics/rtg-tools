@@ -51,10 +51,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.rtg.launcher.AbstractCli;
@@ -94,7 +92,7 @@ public class VcfSvDecomposer extends AbstractCli {
 
   private static final Collection<String> IGNORE_INFOS = new HashSet<>(Arrays.asList(INFO_SVTYPE, INFO_SVLEN, INFO_END, INFO_CIPOS, INFO_CIEND));
 
-  private static final List<String> PRECISE_CIPOS = Collections.unmodifiableList(Arrays.asList("0", "0"));
+  private static final String PRECISE_CIPOS = "0,0";
 
   private static final String INDEL_LENGTH = "min-indel-length";
   private static final String RETAIN_ORIGINAL = "Xretain-original";
@@ -205,12 +203,12 @@ public class VcfSvDecomposer extends AbstractCli {
     }
 
     private VcfRecord[] decomposeSymbolic(final VcfRecord rec, SymbolicAlt alt) {
-      final ArrayList<String> svTypes = rec.getInfo().get(INFO_SVTYPE);
-      if (svTypes != null && svTypes.size() == 1) { // We require (a single) SVTYPE in order to decompose symbolic alts
+      final String svType = rec.getInfo(INFO_SVTYPE);
+      if (svType != null) { // We require (a single) SVTYPE in order to decompose symbolic alts
         final Integer end = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_END);
         if (end != null) { // We also require an END position
           // TODO: better handling of ref at remote ends and adjacent bases, currently just uses "N". Need to load reference
-          switch (svTypes.get(0)) {
+          switch (svType) {
 
             case "DEL":
               return new SvDelDecomposer().decompose(rec);
@@ -243,7 +241,7 @@ public class VcfSvDecomposer extends AbstractCli {
   }
 
   abstract static class SvRecordDecomposer implements VcfRecordDecomposer {
-    protected VcfRecord makeRecord(final String sequenceName, final int start, final String ref, final BreakpointAlt end, final VcfRecord rec, List<String> cipos) {
+    protected VcfRecord makeRecord(final String sequenceName, final int start, final String ref, final BreakpointAlt end, final VcfRecord rec, String cipos) {
       // Copy across most of the content of the original record.
       final VcfRecord res = new VcfRecord(sequenceName, start, ref);
       res.setId(rec.getId());
@@ -255,14 +253,13 @@ public class VcfSvDecomposer extends AbstractCli {
       // Set SVTYPE to BND to reflect new record type, set CIPOS if needed, and copy INFO values except those in IGNORE_INFOS, copy all FORMAT values
       res.setInfo(INFO_SVTYPE, VcfUtils.SvType.BND.name());
       if (cipos != null) {
-        res.setInfo(INFO_CIPOS, cipos.toArray(new String[0]));
+        res.setInfo(INFO_CIPOS, cipos);
       }
-      for (final Map.Entry<String, ArrayList<String>> info : rec.getInfo().entrySet()) {
-        final String key = info.getKey();
+      for (final String key : rec.getInfo().keySet()) {
         if (IGNORE_INFOS.contains(key)) {
           continue;
         }
-        info.getValue().forEach(v -> res.addInfo(key, v));
+        res.setInfo(key, rec.getInfo(key));
       }
       res.setNumberOfSamples(rec.getNumberOfSamples());
       for (final Map.Entry<String, ArrayList<String>> format : rec.getFormatAndSample().entrySet()) {
@@ -324,8 +321,8 @@ public class VcfSvDecomposer extends AbstractCli {
       assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end - 1, false), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, end - 1, NEXT_BASE, new BreakpointAlt(ref, false, sequenceName, start, true), rec, rec.getInfo().get(INFO_CIEND)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, sequenceName, end - 1, false), rec, rec.getInfo(INFO_CIPOS)),
+        makeRecord(sequenceName, end - 1, NEXT_BASE, new BreakpointAlt(ref, false, sequenceName, start, true), rec, rec.getInfo(INFO_CIEND)),
       };
     }
   }
@@ -347,8 +344,8 @@ public class VcfSvDecomposer extends AbstractCli {
       }
       final int remoteEnd = rec.getStart() + insLength;
       return new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, novel, start, false), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(NEXT_BASE, false, novel, remoteEnd, true), rec, rec.getInfo().get(INFO_CIEND)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, true, novel, start, false), rec, rec.getInfo(INFO_CIPOS)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(NEXT_BASE, false, novel, remoteEnd, true), rec, rec.getInfo(INFO_CIEND)),
       };
     }
   }
@@ -363,10 +360,10 @@ public class VcfSvDecomposer extends AbstractCli {
       assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, false), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(NEXT_BASE, false, sequenceName, start, false), rec, rec.getInfo().get(INFO_CIEND)),
-        makeRecord(sequenceName, start - 1, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, end - 1, true), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, end - 1, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, start - 1, true), rec, rec.getInfo().get(INFO_CIEND)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, false), rec, rec.getInfo(INFO_CIPOS)),
+        makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(NEXT_BASE, false, sequenceName, start, false), rec, rec.getInfo(INFO_CIEND)),
+        makeRecord(sequenceName, start - 1, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, end - 1, true), rec, rec.getInfo(INFO_CIPOS)),
+        makeRecord(sequenceName, end - 1, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, start - 1, true), rec, rec.getInfo(INFO_CIEND)),
       };
     }
   }
@@ -380,8 +377,8 @@ public class VcfSvDecomposer extends AbstractCli {
       assert end != null : "Caller should have checked that END wasn't null";
       final String ref = rec.getRefCall();
       return new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, true), rec, rec.getInfo().get(INFO_CIPOS)),
-        makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, start, false), rec, rec.getInfo().get(INFO_CIEND)),
+        makeRecord(sequenceName, start, ref, new BreakpointAlt(ref, false, sequenceName, end, true), rec, rec.getInfo(INFO_CIPOS)),
+        makeRecord(sequenceName, end, NEXT_BASE, new BreakpointAlt(NEXT_BASE, true, sequenceName, start, false), rec, rec.getInfo(INFO_CIEND)),
       };
     }
   }
@@ -397,7 +394,7 @@ public class VcfSvDecomposer extends AbstractCli {
       final String ref = rec.getRefCall();
       final BreakpointAlt a2 = makeBreakendFromTra(rec, ref, end);
       return a2 == null ? null : new VcfRecord[] {
-        makeRecord(sequenceName, start, ref, a2, rec, rec.getInfo().get(INFO_CIPOS))
+        makeRecord(sequenceName, start, ref, a2, rec, rec.getInfo(INFO_CIPOS))
       };
     }
 

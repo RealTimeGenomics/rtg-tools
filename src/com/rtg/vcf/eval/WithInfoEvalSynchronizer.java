@@ -31,7 +31,6 @@
 package com.rtg.vcf.eval;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -101,11 +100,9 @@ public abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer 
 
   // Remove any pre-existing annotations for VCFs that have already been through vcfeval
   private void resetOurAnnotations(VcfRecord rec) {
-    final Map<String, ArrayList<String>> info = rec.getInfo();
-    info.remove(INFO_SYNCPOS);
-    info.remove(INFO_BASE);
-    info.remove(INFO_CALL);
-    info.remove(INFO_CALL_WEIGHT);
+    for (String a : new String[] {INFO_SYNCPOS, INFO_BASE, INFO_CALL, INFO_CALL_WEIGHT}) {
+      rec.removeInfo(a);
+    }
   }
 
   static void addInfoHeaders(VcfHeader header, VariantSetType type) {

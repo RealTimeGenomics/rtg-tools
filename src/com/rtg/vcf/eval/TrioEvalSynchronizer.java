@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import com.rtg.relation.Family;
@@ -256,8 +255,8 @@ class TrioEvalSynchronizer extends WithInfoEvalSynchronizer {
 
   private void setSyncId(VcfRecord outRec, String sync) {
     if (sync != null) {
-      final ArrayList<String> oldSync = outRec.getInfo().get(INFO_SYNCPOS);
-      if (oldSync == null || oldSync.size() == 0 || !oldSync.get(0).equals(sync)) {
+      final String[] oldSync = outRec.getInfoSplit(INFO_SYNCPOS);
+      if (oldSync == null || oldSync.length == 0 || !oldSync[oldSync.length - 1].equals(sync)) {
         outRec.addInfo(INFO_SYNCPOS, sync);
       }
     }

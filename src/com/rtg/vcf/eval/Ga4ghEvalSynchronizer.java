@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 
 import com.rtg.util.io.FileUtils;
@@ -321,8 +320,8 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
 
   private void setSyncId(VcfRecord outRec, String sync) {
     if (sync != null) {
-      final ArrayList<String> oldSync = outRec.getInfo().get(INFO_SUPERLOCUS_ID);
-      if (oldSync == null || oldSync.size() == 0 || !oldSync.get(0).equals(sync)) {
+      final String[] oldSync = outRec.getInfoSplit(INFO_SUPERLOCUS_ID);
+      if (oldSync == null || oldSync.length == 0 || !oldSync[oldSync.length - 1].equals(sync)) {
         outRec.addInfo(INFO_SUPERLOCUS_ID, sync);
       }
     }

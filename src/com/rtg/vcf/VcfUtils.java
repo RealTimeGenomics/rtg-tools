@@ -527,7 +527,7 @@ public final class VcfUtils {
    * @return true if the record was produced by the complex caller
    */
   public static boolean isComplexScored(VcfRecord rec) {
-    return rec.getInfo().containsKey("XRX");
+    return rec.hasInfo("XRX");
   }
 
   /**
@@ -571,12 +571,12 @@ public final class VcfUtils {
    * @return the value or null if missing
    */
   public static int[] getConfidenceInterval(final VcfRecord rec, final String field) {
-    final ArrayList<String> info = rec.getInfo().get(field);
+    final String[] info = rec.getInfoSplit(field);
     if (info != null) {
       try {
-        final int[] res = new int[info.size()];
+        final int[] res = new int[info.length];
         for (int k = 0; k < res.length; ++k) {
-          final String fieldVal = info.get(k);
+          final String fieldVal = info[k];
           if (VcfRecord.MISSING.equals(fieldVal)) {
             return null;
           }
@@ -584,7 +584,7 @@ public final class VcfUtils {
         }
         return res;
       } catch (final NumberFormatException ex) {
-        throw new VcfFormatException("Invalid value \"" + info + "\" in \"" + field + "\" for VCF record :" + rec);
+        throw new VcfFormatException("Invalid integer value \"" + rec.getInfo(field) + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return null;
@@ -592,22 +592,22 @@ public final class VcfUtils {
   }
 
   /**
-   * If field contains multiple values will get the first value.
+   * Get and INFO field as a double.
    * @param rec VCF record
    * @param field string ID of field to extract
    * @return the value converted into a double, or {@code Double.NaN} if missing
+   * @throws VcfFormatException if the field value is not missing and is not a single floating point number
    */
   public static double getDoubleInfoFieldFromRecord(VcfRecord rec, String field) {
-    final ArrayList<String> info = rec.getInfo().get(field);
-    if (info != null) {
-      final String fieldVal = info.size() == 0 ? "" : info.get(0);
+    final String fieldVal = rec.getInfo(field);
+    if (fieldVal != null) {
       try {
         if (VcfRecord.MISSING.equals(fieldVal)) {
           return Double.NaN;
         }
         return Double.parseDouble(fieldVal);
       } catch (NumberFormatException ex) {
-        throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
+        throw new VcfFormatException("Invalid float value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return Double.NaN;
@@ -615,22 +615,22 @@ public final class VcfUtils {
   }
 
   /**
-   * If field contains multiple values will get the first value.
+   * Get an INFO field as an integer.
    * @param rec VCF record
    * @param field string ID of field to extract
    * @return the value converted into a double, or null if missing
+   * @throws VcfFormatException if the field value is not missing and is not a single integer
    */
   public static Integer getIntegerInfoFieldFromRecord(VcfRecord rec, String field) {
-    final ArrayList<String> info = rec.getInfo().get(field);
-    if (info != null) {
-      final String fieldVal = info.size() == 0 ? "" : info.get(0);
+    final String fieldVal = rec.getInfo(field);
+    if (fieldVal != null) {
       try {
         if (VcfRecord.MISSING.equals(fieldVal)) {
           return null;
         }
         return Integer.valueOf(fieldVal);
       } catch (NumberFormatException ex) {
-        throw new VcfFormatException("Invalid numeric value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
+        throw new VcfFormatException("Invalid integer value \"" + fieldVal + "\" in \"" + field + "\" for VCF record :" + rec);
       }
     } else {
       return null;

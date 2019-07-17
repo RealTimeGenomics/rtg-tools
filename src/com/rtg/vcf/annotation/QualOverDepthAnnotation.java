@@ -55,10 +55,10 @@ public class QualOverDepthAnnotation extends AbstractDerivedInfoAnnotation {
   public Double getValue(VcfRecord record, int sampleNumber) {
     final String squal = record.getQuality();
     if (!VcfRecord.MISSING.equals(squal)) {
-      if (record.getInfo().containsKey(VcfUtils.INFO_COMBINED_DEPTH)) {
+      if (record.hasInfo(VcfUtils.INFO_COMBINED_DEPTH)) {
         // get dp from info DP field
-        final String sdp = record.getInfo().get(VcfUtils.INFO_COMBINED_DEPTH).get(0);
-        if (sdp != null && !VcfRecord.MISSING.equals(sdp)) {
+        final String sdp = record.getInfo(VcfUtils.INFO_COMBINED_DEPTH);
+        if (sdp != null) {
           final int dp = Integer.parseInt(sdp);
           if (dp <= 0) {
             return Double.POSITIVE_INFINITY;

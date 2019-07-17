@@ -36,7 +36,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.rtg.reader.SequencesReader;
@@ -240,7 +239,7 @@ public class SampleSimulator {
   // Get a cumulative allele distribution, ref allele is last position
   double[] getAlleleDistribution(VcfRecord v) {
     final double[] dist;
-    final List<String> allFreqStr = v.getInfo().get(VcfUtils.INFO_ALLELE_FREQ);
+    final String[] allFreqStr = v.getInfoSplit(VcfUtils.INFO_ALLELE_FREQ);
     if (allFreqStr == null) {
       ++mMissingAfCount;
       if (mAllowMissingAf) {
@@ -254,13 +253,13 @@ public class SampleSimulator {
       }
     } else {
       ++mWithAfCount;
-      if (allFreqStr.size() != v.getAltCalls().size()) {
+      if (allFreqStr.length != v.getAltCalls().size()) {
         throw new VcfFormatException("Incorrect number of AF entries for record " + v);
       }
-      dist = new double[allFreqStr.size() + 1];
+      dist = new double[allFreqStr.length + 1];
       double ac = 0.0;
-      for (int i = 0; i < allFreqStr.size(); ++i) {
-        ac += Double.parseDouble(allFreqStr.get(i));
+      for (int i = 0; i < allFreqStr.length; ++i) {
+        ac += Double.parseDouble(allFreqStr[i]);
         dist[i] = ac;
       }
       if (ac > 1.0) {
