@@ -43,8 +43,8 @@ public class CnaVariantTest extends TestCase {
     final VcfRecord record = new VcfRecord(chr, start, "A");
     record.addAltCall("<" + svtype + ">");
     record.setNumberOfSamples(0);
-    record.addInfo(VcfUtils.INFO_SVTYPE, svtype);
-    record.addInfo(VcfUtils.INFO_END, String.valueOf(end + 1));
+    record.setInfo(VcfUtils.INFO_SVTYPE, svtype);
+    record.setInfo(VcfUtils.INFO_END, String.valueOf(end + 1));
     return record;
   }
 

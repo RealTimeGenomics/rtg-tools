@@ -232,9 +232,9 @@ public abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer 
   protected void setNewInfoFields(VcfRecord rec, Map<String, String> newInfo) {
     for (Map.Entry<String, String> e : newInfo.entrySet()) {
       if (e.getValue() == null) {
-        rec.addInfo(e.getKey());
+        rec.setInfo(e.getKey());
       } else {
-        rec.addInfo(e.getKey(), e.getValue());
+        rec.setInfo(e.getKey(), e.getValue());
       }
     }
   }

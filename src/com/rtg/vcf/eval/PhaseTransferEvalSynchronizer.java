@@ -81,7 +81,7 @@ public class PhaseTransferEvalSynchronizer extends AnnotatingEvalSynchronizer {
       final String ngt = VcfUtils.joinGt(true, gtArr);
       mCrv.setFormatAndSample(FORMAT_ORIGINAL_GT, ogt, mCallSampleNo);
       mCrv.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, ngt, mCallSampleNo);
-      mCrv.addInfo(INFO_PHASE, ov.isAlleleA() ? "A" : "B");
+      mCrv.setInfo(INFO_PHASE, ov.isAlleleA() ? "A" : "B");
     }
     mCalls.write(mCrv);
   }

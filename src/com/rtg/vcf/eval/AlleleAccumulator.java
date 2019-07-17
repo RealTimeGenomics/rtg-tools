@@ -124,7 +124,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
   @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
-      mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv);
+      mCrv.setInfo("STATUS", "C-TP-BDiff=" + mCv);
       mAuxiliary.write(mCrv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too-hard, output this variant with just the used alleles
       final GtIdVariant v = (GtIdVariant) mCv;
@@ -141,14 +141,14 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     final String status = (mBv instanceof OrientedVariant)
       ? "B-TP=" + mBv
       : (mBv.hasStatus(VariantId.STATUS_SKIPPED)) ? "B-TooHard" : "B-FN";
-    mBrv.addInfo("STATUS", status);
+    mBrv.setInfo("STATUS", status);
     mAlleles.write(mBrv);
   }
 
   @Override
   protected void handleKnownBoth() throws IOException {
     if (mCv instanceof OrientedVariant) {
-      mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv);
+      mCrv.setInfo("STATUS", "C-TP-BSame=" + mCv);
       mAuxiliary.write(mCrv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too hard, merge records into b, adding any new ALT from c, flush c
       final GtIdVariant ov = (GtIdVariant) mCv;
@@ -161,7 +161,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
   }
 
   protected void writeNonRedundant(GtIdVariant v, String status) throws IOException {
-    mCrv.addInfo("STATUS", status);
+    mCrv.setInfo("STATUS", status);
     final List<String> newAlts = new ArrayList<>();
     addCallAllele(newAlts, v.alleleA());
     if (v.alleleA() != v.alleleB()) {
@@ -181,7 +181,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
     if (merged) {
       Collections.sort(mBrv.getAltCalls());
     }
-    mCrv.addInfo("STATUS", status + (merged ? "-Merged" : "-BSame")); // If merged, interesting, we added a new allele from this sample to existing site
+    mCrv.setInfo("STATUS", status + (merged ? "-Merged" : "-BSame")); // If merged, interesting, we added a new allele from this sample to existing site
     mAuxiliary.write(mCrv);
   }
 
@@ -190,7 +190,7 @@ public class AlleleAccumulator extends InterleavingEvalSynchronizer {
       final String alt = mCrv.getAltCalls().get(gtId - 1);
       if (!mBrv.getAltCalls().contains(alt)) {
         mBrv.addAltCall(alt);
-        mBrv.addInfo("STATUS", "B-Merged-" + alt); // Baseline counterpart to C-FP-Merged
+        mBrv.setInfo("STATUS", "B-Merged-" + alt); // Baseline counterpart to C-FP-Merged
         return true;
       }
     }

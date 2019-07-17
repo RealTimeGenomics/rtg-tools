@@ -188,8 +188,8 @@ class Decomposer {
     final ArrayList<VcfRecord> res = new ArrayList<>(split.size());
     for (final Slice s : split) {
       final VcfRecord splitRecord = new VcfRecord(rec);
-      splitRecord.addInfo(ORP, String.valueOf(rec.getStart() + 1)); // 1-based for output
-      splitRecord.addInfo(ORL, String.valueOf(rec.getRefCall().length()));
+      splitRecord.setInfo(ORP, String.valueOf(rec.getStart() + 1)); // 1-based for output
+      splitRecord.setInfo(ORL, String.valueOf(rec.getRefCall().length()));
       final String[] alleles = s.getAlleles();
       final boolean needAnchor = needsAnchorBase(alleles);
       final int offset = s.getOffset() + pad;

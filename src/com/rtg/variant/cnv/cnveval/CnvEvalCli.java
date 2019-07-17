@@ -283,9 +283,9 @@ public class CnvEvalCli extends LoggedCli {
     try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
       for (final CnaRecordStats stats : variants.records()) {
         final VcfRecord rec = stats.record();
-        rec.addInfo(infoFrac, String.format("%.3g", stats.hitFraction()));
-        rec.addInfo(infoHit, Integer.toString(stats.hit()));
-        rec.addInfo(infoMiss, Integer.toString(stats.miss()));
+        rec.setInfo(infoFrac, String.format("%.3g", stats.hitFraction()));
+        rec.setInfo(infoHit, Integer.toString(stats.hit()));
+        rec.setInfo(infoMiss, Integer.toString(stats.miss()));
         writer.write(rec);
       }
     }

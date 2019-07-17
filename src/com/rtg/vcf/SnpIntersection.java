@@ -205,7 +205,7 @@ CommonFlags.initNoGzip(flags);
           while (secondReader.hasNext()) {
             ++totalSecondCount;
             final VcfRecord vc = secondReader.next();
-            vc.addInfo("SF", "1");
+            vc.setInfo("SF", "1");
             final String key = vc.getSequenceName() + "_" + vc.getOneBasedStart();
             //System.err.println("key2" + key);
             if (map.containsKey(key)) {
@@ -213,7 +213,7 @@ CommonFlags.initNoGzip(flags);
               for (LineHolder lh : list) {
                 lh.mMatched = true;
                 final VcfRecord vcFirst = lh.mLine;
-                vcFirst.addInfo("SF", "0");
+                vcFirst.setInfo("SF", "0");
                 if (!compareAlts || comparePredictions(vcfRecordToPrediction(vcFirst), vcfRecordToPrediction(vc))) {
                   //System.err.println("same " + key);
                   ++sameCount;
@@ -244,7 +244,7 @@ CommonFlags.initNoGzip(flags);
         if (!lh.mMatched) {
           ++firstOnlyCount;
           final VcfRecord rec = lh.mLine;
-          rec.addInfo("SF", "0");
+          rec.setInfo("SF", "0");
           write(firstOnlyWriter, lh.mLine);
         }
       }

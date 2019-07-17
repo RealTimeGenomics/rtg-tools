@@ -52,11 +52,11 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
 
   public void testDelSv() {
     final VcfRecord rec = new VcfRecord("1", 2943856, "G").addAltCall("<DEL>");
-    rec.addInfo("SVTYPE", "DEL");
-    rec.addInfo("END", "39672880");
-    rec.addInfo("SVLEN", "-240800");
-    rec.addInfo("CIPOS", "-10,15");
-    rec.addInfo("CIEND", "-20,25");
+    rec.setInfo("SVTYPE", "DEL");
+    rec.setInfo("END", "39672880");
+    rec.setInfo("SVLEN", "-240800");
+    rec.setInfo("CIPOS", "-10,15");
+    rec.setInfo("CIEND", "-20,25");
     rec.setNumberOfSamples(1);
     rec.addFormatAndSample("GT", "1/1");
     assertEquals("1\t2943857\t.\tG\t<DEL>\t.\t.\tSVTYPE=DEL;END=39672880;SVLEN=-240800;CIPOS=-10,15;CIEND=-20,25\tGT\t1/1", rec.toString());
@@ -70,11 +70,11 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
   // Example based on VCF 4.2 spec
   public void testInvSv() {
     final VcfRecord rec = new VcfRecord("2", 321681, "T").addAltCall("<INV>");
-    rec.addInfo("SVTYPE", "INV");
-    rec.addInfo("END", "421681");
-    rec.addInfo("SVLEN", "18028667");
-    rec.addInfo("CIPOS", "-10,15");
-    rec.addInfo("CIEND", "-20,25");
+    rec.setInfo("SVTYPE", "INV");
+    rec.setInfo("END", "421681");
+    rec.setInfo("SVLEN", "18028667");
+    rec.setInfo("CIPOS", "-10,15");
+    rec.setInfo("CIEND", "-20,25");
     assertEquals("2\t321682\t.\tT\t<INV>\t.\t.\tSVTYPE=INV;END=421681;SVLEN=18028667;CIPOS=-10,15;CIEND=-20,25", rec.toString());
     final VcfRecord[] out = new VcfSvDecomposer.SvInvDecomposer().decompose(rec);
     assertEquals(4, out.length);
@@ -121,11 +121,11 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     refs.put("1", "CCCCCC GAAAAAAAAAAAAAAAAAAAA T".replaceAll(" ", ""));
     refs.put("<DEL>", "");
     VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("<DEL>");
-    rec.addInfo("SVTYPE", "DEL");
-    rec.addInfo("END", "27");
-    rec.addInfo("SVLEN", "-20");
-    rec.addInfo("CIPOS", "0,0");
-    rec.addInfo("CIEND", "0,0");
+    rec.setInfo("SVTYPE", "DEL");
+    rec.setInfo("END", "27");
+    rec.setInfo("SVLEN", "-20");
+    rec.setInfo("CIPOS", "0,0");
+    rec.setInfo("CIEND", "0,0");
     rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
     assertEquals("1\t7\t.\tG\t<DEL>\t.\t.\tSVTYPE=DEL;END=27;SVLEN=-20;CIPOS=0,0;CIEND=0,0\tGT\t1/1", rec.toString());
     final String hap = "CCCCCC G T".replaceAll(" ", ""); // Expected post-replay haplotype
@@ -173,10 +173,10 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     //                   123456 789012345678901234567 8 -- 1-based
     refs.put("<INS_1>", "CCCCCC GAAAAAAAAAAAAAAAAAAAA N".replaceAll(" ", ""));
     VcfRecord rec = new VcfRecord("1", 6, "G").addAltCall("<INS>");
-    rec.addInfo("SVTYPE", "INS");
-    rec.addInfo("END", "7");
-    rec.addInfo("CIPOS", "0,0");
-    rec.addInfo("CIEND", "0,0");
+    rec.setInfo("SVTYPE", "INS");
+    rec.setInfo("END", "7");
+    rec.setInfo("CIPOS", "0,0");
+    rec.setInfo("CIEND", "0,0");
     rec.setNumberOfSamples(1).addFormatAndSample("GT", "1/1");
     assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;CIPOS=0,0;CIEND=0,0\tGT\t1/1", rec.toString());
     try {
@@ -185,7 +185,7 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     } catch (VcfFormatException e) {
       // Expected
     }
-    rec.addInfo("SVLEN", "20");
+    rec.setInfo("SVLEN", "20");
     assertEquals("1\t7\t.\tG\t<INS>\t.\t.\tSVTYPE=INS;END=7;CIPOS=0,0;CIEND=0,0;SVLEN=20\tGT\t1/1", rec.toString());
     final String hap = refs.get("<INS_1>"); // Expected post-replay haplotype
     //assertEquals(hap, VcfUtils.replayAllele(rec, refs));

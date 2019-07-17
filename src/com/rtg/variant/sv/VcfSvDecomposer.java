@@ -253,9 +253,9 @@ public class VcfSvDecomposer extends AbstractCli {
         res.addFilter(filter);
       }
       // Set SVTYPE to BND to reflect new record type, set CIPOS if needed, and copy INFO values except those in IGNORE_INFOS, copy all FORMAT values
-      res.addInfo(INFO_SVTYPE, VcfUtils.SvType.BND.name());
+      res.setInfo(INFO_SVTYPE, VcfUtils.SvType.BND.name());
       if (cipos != null) {
-        cipos.forEach(v -> res.addInfo(INFO_CIPOS, v));
+        res.setInfo(INFO_CIPOS, cipos.toArray(new String[0]));
       }
       for (final Map.Entry<String, ArrayList<String>> info : rec.getInfo().entrySet()) {
         final String key = info.getKey();

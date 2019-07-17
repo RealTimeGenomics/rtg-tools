@@ -240,7 +240,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testInfo() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertFalse(getScriptedVcfFilter("INFO.IN == 'BAR'").accept(record));
     assertTrue(getScriptedVcfFilter("INFO.IN == 'FOO'").accept(record));
   }
@@ -272,7 +272,7 @@ public class ScriptedVcfFilterTest {
   public void testComplexExpression() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     record.setNumberOfSamples(1);
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     record.addFormatAndSample("GT", "0/1");
     // Check multiple js expressions variable assignment etc
     assertTrue(getScriptedVcfFilter("gt = 'BOB'.GT; foo = INFO.IN == 'FOO'; foo && REF == 'A' && gt == '0/1'").accept(record));
@@ -370,7 +370,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testUpdateInfo() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ,BANG'; true").accept(record));
     assertEquals(Arrays.asList("BAZ", "BANG"), record.getInfo().get("IN"));
   }
@@ -378,7 +378,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testUpdateInfoNumerics() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = '12,-99'; true").accept(record));
     assertEquals(Arrays.asList("12", "-99"), record.getInfo().get("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = '0,1'; true").accept(record));
@@ -388,7 +388,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testUpdateInfoSingle() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = 'BAZ'; true").accept(record));
     assertEquals(Collections.singletonList("BAZ"), record.getInfo().get("IN"));
   }
@@ -396,7 +396,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testUpdateInfoSingleNumeric() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter("INFO.IN = -99; true").accept(record));
     assertEquals(Collections.singletonList("-99"), record.getInfo().get("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = 1; true").accept(record));
@@ -408,7 +408,7 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testUpdateInfoFlag() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN");
+    record.setInfo("IN");
     assertTrue(record.getInfo().containsKey("IN"));
     assertTrue(getScriptedVcfFilter("INFO.IN = false; true").accept(record));
     assertFalse(record.getInfo().containsKey("IN"));
@@ -420,15 +420,15 @@ public class ScriptedVcfFilterTest {
   public void testClearInfo() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
 
-    record.addInfo("IN");
+    record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = null; true").accept(record));
     assertFalse(record.getInfo().containsKey("IN"));
 
-    record.addInfo("IN");
+    record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = '.'; true").accept(record));
     assertFalse(record.getInfo().containsKey("IN"));
 
-    record.addInfo("IN");
+    record.setInfo("IN");
     assertTrue(getScriptedVcfFilter("INFO.IN = ''; true").accept(record));
     assertFalse(record.getInfo().containsKey("IN"));
   }
@@ -436,14 +436,14 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testRecordFunctionNoReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter(null, "function record() {}").accept(record));
   }
 
   @Test
   public void testRecordFunctionInvalidReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     mExpectedException.expect(NoTalkbackSlimException.class);
     mExpectedException.expectMessage(StringContains.containsString("The return value of the record function was not a boolean."));
     assertTrue(getScriptedVcfFilter(null, "function record() {return 'false';}").accept(record));
@@ -452,21 +452,21 @@ public class ScriptedVcfFilterTest {
   @Test
   public void testRecordFunctionAcceptingReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter(null, "function record() {return true;}").accept(record));
   }
 
   @Test
   public void testRecordFunctionRejectingReturn() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertFalse(getScriptedVcfFilter(null, "function record() {return false;}").accept(record));
   }
 
   @Test
   public void testMultipleBegins() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addInfo("IN", "FOO");
+    record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter(null, "var expected = 'A'", "function record() {return REF == expected;}").accept(record));
   }
 }

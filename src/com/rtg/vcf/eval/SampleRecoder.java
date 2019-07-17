@@ -101,19 +101,19 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     if (mCv instanceof OrientedVariant) {
       // Included but the baseline was at a different position.
       // Good, evidence that we are recoding to new representation when needed
-      mCrv.addInfo("STATUS", "C-TP-BDiff");
+      mCrv.setInfo("STATUS", "C-TP-BDiff");
       mAuxiliary.write(mCrv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // We don't have a baseline record at this position -- during allele accumulation this record was determined to be redundant / equivalent to other variants.
       // We have a good indication that it should have been possible to simplify this if the region were not too hard
-      mCrv.addInfo("STATUS", "C-TooHard-BDiff");
+      mCrv.setInfo("STATUS", "C-TooHard-BDiff");
       normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     } else {
       // Excluded, but we don't have a baseline call at this position.
       // This should not normally happen if we have accumulated all alleles
       // Output the original representation
-      mCrv.addInfo("STATUS", "C-FP=" + mCv);
+      mCrv.setInfo("STATUS", "C-FP=" + mCv);
       normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     }
@@ -124,19 +124,19 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
     if (mBv instanceof OrientedVariant) {
       // Normal status if the sample contains this variant
       // Add the appropriate GT and output the record
-      mBrv.addInfo("STATUS", "B-TP=" + mBv);
+      mBrv.setInfo("STATUS", "B-TP=" + mBv);
       final OrientedVariant ov = (OrientedVariant) mBv;
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
       normalize(mBrv, 0);
       mSampleVcf.write(mBrv);
     } else if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // Expected sometimes, do nothing here (a relevant call will already have been output if needed during processBoth using its allele representation).
-      mBrv.addInfo("STATUS", "B-TooHard");
+      mBrv.setInfo("STATUS", "B-TooHard");
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.MISSING_FIELD);
       mAuxiliary.write(mBrv);
     } else {
       // Excluded, this population variant is not in this sample, no need to output to primary.
-      mBrv.addInfo("STATUS", "B-NotInSample");
+      mBrv.setInfo("STATUS", "B-NotInSample");
       mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.MISSING_FIELD);
       mAuxiliary.write(mBrv);
     }
@@ -174,18 +174,18 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       // Elsewhere we'll output the baseline version, but make a note here.
       // We expect many of these, probably fine to silently drop, but interesting to see the status
       final String status = (mBv instanceof OrientedVariant) ? "C-TP-BSame" : (mBv.hasStatus(VariantId.STATUS_SKIPPED)) ? "C-TP-BSkipped" : "C-TP-BSwitched";
-      mCrv.addInfo("STATUS", status);
+      mCrv.setInfo("STATUS", status);
       mAuxiliary.write(mCrv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) {
       // Happens in TooHard regions.
       // Output the original representation
-      mCrv.addInfo("STATUS", "C-TooHard");
+      mCrv.setInfo("STATUS", "C-TooHard");
       normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     } else {
       // Excluded. This shouldn't happen except where the sample is self-inconsistent or perhaps the population allele accumulation had to drop the site.
       // Output the original representation
-      mCrv.addInfo("STATUS", "C-Inconsistent");
+      mCrv.setInfo("STATUS", "C-Inconsistent");
       normalize(mCrv, mCallSampleIndex);
       mSampleVcf.write(mCrv);
     }

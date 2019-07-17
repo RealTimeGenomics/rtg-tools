@@ -57,7 +57,7 @@ public class AsyncVcfWriterTest extends AbstractVcfWriterTest {
     .setQuality("12.8")
     .addAltCall("c")
     .addFilter("TEST1")
-    .addInfo("DP", "23")
+    .setInfo("DP", "23")
     .setNumberOfSamples(2)
     .addFormatAndSample("GT", "0/0")
     .addFormatAndSample("GT", "0/1")

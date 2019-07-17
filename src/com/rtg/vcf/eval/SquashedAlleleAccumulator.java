@@ -86,7 +86,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
   @Override
   protected void handleKnownCall() throws IOException {
     if (mCv instanceof OrientedVariant) { // Included but the baseline was at a different position. This is interesting
-      mCrv.addInfo("STATUS", "C-TP-BDiff=" + mCv);
+      mCrv.setInfo("STATUS", "C-TP-BDiff=" + mCv);
       writeResidual((OrientedVariant) mCv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too-hard, output this variant with just the used alleles
       final GtIdVariant v = (GtIdVariant) mCv;
@@ -101,7 +101,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
   @Override
   protected void handleKnownBoth() throws IOException {
     if (mCv instanceof OrientedVariant) {
-      mCrv.addInfo("STATUS", "C-TP-BSame=" + mCv);
+      mCrv.setInfo("STATUS", "C-TP-BSame=" + mCv);
       writeResidual((OrientedVariant) mCv);
     } else if (mCv.hasStatus(VariantId.STATUS_SKIPPED)) { // Too hard, merge records into b, adding any new ALT from c, flush c
       final GtIdVariant ov = (GtIdVariant) mCv;
@@ -148,7 +148,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
 
   @Override
   protected void writeNonRedundant(GtIdVariant v, String status) throws IOException {
-    mCrv.addInfo("STATUS", status);
+    mCrv.setInfo("STATUS", status);
     mAlternate.write(mCrv); // Write as-is to the alternate
     // Prepare for usual incorporation
     mCrv.removeSamples();

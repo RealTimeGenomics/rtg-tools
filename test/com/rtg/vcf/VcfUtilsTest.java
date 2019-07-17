@@ -178,7 +178,7 @@ public class VcfUtilsTest extends TestCase {
   }
 
   public void testGetInfoValues() {
-    VcfRecord r = makeRecord("0/1", "A", "T").addInfo("DP", "14").addInfo("DPR", "1.2").addInfo("IMP");
+    VcfRecord r = makeRecord("0/1", "A", "T").setInfo("DP", "14").setInfo("DPR", "1.2").setInfo("IMP");
 
     assertTrue(Double.isNaN(VcfUtils.getDoubleInfoFieldFromRecord(r, "DPX")));
     assertNull(VcfUtils.getIntegerInfoFieldFromRecord(r, "DPX"));
@@ -219,8 +219,7 @@ public class VcfUtilsTest extends TestCase {
   public void testConfidenceIntervalRetrieval() {
     final VcfRecord rec = makeRecord("1/1", "A", "T");
     assertNull(VcfUtils.getConfidenceInterval(rec, INFO_CIPOS));
-    rec.addInfo(INFO_CIPOS, "-10");
-    rec.addInfo(INFO_CIPOS, "42");
+    rec.setInfo(INFO_CIPOS, "-10", "42");
     final int[] ci = VcfUtils.getConfidenceInterval(rec, INFO_CIPOS);
     assertEquals(2, ci.length);
     assertEquals(-10, ci[0]);

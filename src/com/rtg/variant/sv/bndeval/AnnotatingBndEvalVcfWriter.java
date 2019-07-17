@@ -74,9 +74,9 @@ class AnnotatingBndEvalVcfWriter implements BndEvalVcfWriter {
   @Override
   public void writeVariant(VariantSetType setType, VcfRecord rec, BndVariant v) throws IOException {
     resetOurAnnotations(rec);
-    rec.addInfo(mStatusLabel, getInfoStatus(setType, v));
+    rec.setInfo(mStatusLabel, getInfoStatus(setType, v));
     if (v != null && v.matches().size() > 1) {
-      rec.addInfo(INFO_MATCH_COUNT, Integer.toString(v.matches().size()));
+      rec.setInfo(INFO_MATCH_COUNT, Integer.toString(v.matches().size()));
     }
     mWriter.write(rec);
   }

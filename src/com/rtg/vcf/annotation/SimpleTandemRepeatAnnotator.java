@@ -85,8 +85,8 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
     final int refSpan = rec.getRefCall().length() - (VcfUtils.hasRedundantFirstNucleotide(rec) ? 1 : 0);
     final int[] str = strBidrectional(refSeq, pos, refSpan);
     if (str[0] > MIN_REPEAT) {
-      rec.addInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(str[0]));
-      rec.addInfo(SIMPLE_TANDEM_REPEAT_UNIT, String.valueOf(str[1]));
+      rec.setInfo(SIMPLE_TANDEM_REPEAT_INFO, String.valueOf(str[0]));
+      rec.setInfo(SIMPLE_TANDEM_REPEAT_UNIT, String.valueOf(str[1]));
     }
 
     // Extra attributes used during evaluation
@@ -96,10 +96,10 @@ public class SimpleTandemRepeatAnnotator implements VcfAnnotator {
 //    final int[] right1 = str(refSeq, pos + refSpan + 1, 1);
 //    final int[] left = left0[0] > left1[0] ? left0 : left1;
 //    final int[] right = right0[0] > right1[0] ? right0 : right1;
-//    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_INFO, String.valueOf(left[0]));
-//    rec.addInfo(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, String.valueOf(left[1]));
-//    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
-//    rec.addInfo(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, String.valueOf(right[1]));
+//    rec.setInfo(SIMPLE_TANDEM_REPEAT_LEFT_INFO, String.valueOf(left[0]));
+//    rec.setInfo(SIMPLE_TANDEM_REPEAT_LEFT_RU_INFO, String.valueOf(left[1]));
+//    rec.setInfo(SIMPLE_TANDEM_REPEAT_RIGHT_INFO, String.valueOf(right[0]));
+//    rec.setInfo(SIMPLE_TANDEM_REPEAT_RIGHT_RU_INFO, String.valueOf(right[1]));
   }
 
   static int[] strBidrectional(final byte[] refSeq, final int pos, final int refSpan) {

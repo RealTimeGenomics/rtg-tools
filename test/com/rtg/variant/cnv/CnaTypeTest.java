@@ -49,13 +49,13 @@ public class CnaTypeTest extends TestCase {
   public void testFromVcf() {
     final VcfRecord rec = new VcfRecord("seq1", 42, "A");
     assertEquals(CnaType.NONE, CnaType.valueOf(rec));
-    rec.addInfo("SVTYPE", "DUP");
+    rec.setInfo("SVTYPE", "DUP");
     assertEquals(CnaType.DUP, CnaType.valueOf(rec));
     final VcfRecord rec2 = new VcfRecord("seq1", 42, "A");
-    rec2.addInfo("SVTYPE", "DEL");
+    rec2.setInfo("SVTYPE", "DEL");
     assertEquals(CnaType.DEL, CnaType.valueOf(rec2));
     final VcfRecord rec3 = new VcfRecord("seq1", 42, "A");
-    rec3.addInfo("SVTYPE", "FOO");
+    rec3.setInfo("SVTYPE", "FOO");
     assertEquals(CnaType.NONE, CnaType.valueOf(rec3));
   }
 }

@@ -105,7 +105,7 @@ public abstract class PopulationVariantGenerator {
       for (int i = 0; i < mDistribution.length; ++i) {
         mAFStr[i] = f.format(mDistribution[i]);
       }
-      rec.addInfo(VcfUtils.INFO_ALLELE_FREQ, mAFStr);
+      rec.setInfo(VcfUtils.INFO_ALLELE_FREQ, mAFStr);
       return rec;
     }
 

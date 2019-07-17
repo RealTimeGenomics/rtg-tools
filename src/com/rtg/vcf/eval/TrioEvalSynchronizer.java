@@ -186,7 +186,7 @@ class TrioEvalSynchronizer extends WithInfoEvalSynchronizer {
     if (preserveFilters) {
       inRec.getFilters().forEach(outRec::addFilter);
     }
-    outRec.addInfo(INFO_BASE).addInfo(INFO_CALL); // Just to ensure info field ordering.
+    outRec.setInfo(INFO_BASE).setInfo(INFO_CALL); // Just to ensure info field ordering.
     outRec.setNumberOfSamples(numSamples);
     outRec.padFormatAndSample(VcfUtils.FORMAT_GENOTYPE);
     int d = dest;

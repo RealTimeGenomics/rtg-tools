@@ -170,10 +170,10 @@ public class VcfParser {
           throw new VcfFormatException("Duplicate INFO field: " + key);
         }
         if (singleInfoSplit.length == 1) {
-          rec.addInfo(key);
+          rec.setInfo(key);
         } else {
           final String[] vals = StringUtils.split(singleInfoSplit[1], ',');
-          rec.addInfo(key, vals);
+          rec.setInfo(key, vals);
         }
       }
     }

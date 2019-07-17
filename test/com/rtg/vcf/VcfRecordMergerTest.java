@@ -302,8 +302,8 @@ public class VcfRecordMergerTest extends AbstractTest {
       .addAltCall("t")
       .addFilter("TEST1")
       .addFilter("TEST2")
-      .addInfo("DP", "23")
-      .addInfo("TEST", "45", "46", "47", "48")
+      .setInfo("DP", "23")
+      .setInfo("TEST", "45", "46", "47", "48")
       .addFormatAndSample("GT", "0/0")
       .addFormatAndSample("GQ", "100")
     ;
@@ -314,8 +314,8 @@ public class VcfRecordMergerTest extends AbstractTest {
       .addAltCall("t")
       .addFilter("TEST1")
       .addFilter("TEST2")
-      .addInfo("DP", "23")
-      .addInfo("TEST", "45", "46", "47", "48")
+      .setInfo("DP", "23")
+      .setInfo("TEST", "45", "46", "47", "48")
       .addFormatAndSample("GT", "0/1")
       .addFormatAndSample("GQ", "95")
     ;

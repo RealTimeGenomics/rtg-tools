@@ -54,8 +54,8 @@ public class VcfRecordTest extends TestCase {
       .addAltCall("t")
       .addFilter("TEST1")
       .addFilter("TEST2")
-      .addInfo("DP", "23")
-      .addInfo("TEST", "45", "46", "47", "48")
+      .setInfo("DP", "23")
+      .setInfo("TEST", "45", "46", "47", "48")
       .setNumberOfSamples(2)
       .addFormatAndSample("GT", "0/0")
       .addFormatAndSample("GT", "0/1")
@@ -97,15 +97,6 @@ public class VcfRecordTest extends TestCase {
     assertEquals(line, rec.toString());
   }
 
-  public void testErrors() {
-    try {
-      new VcfRecord("chr1", 0, "a").addInfo("x", "1").addInfo("x", "2");
-    } catch (final IllegalArgumentException ex) {
-      assertEquals("key already present in the map key = x", ex.getMessage());
-    }
-  }
-
-
   public void testError2() {
     try {
       final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
@@ -116,8 +107,8 @@ public class VcfRecordTest extends TestCase {
       .addAltCall("t")
       .addFilter("TEST1")
       .addFilter("TEST2")
-      .addInfo("DP", "23")
-      .addInfo("TEST", "45,46,47,48")
+      .setInfo("DP", "23")
+      .setInfo("TEST", "45", "46", "47", "48")
       .addFormatAndSample("GT", "0/0")
       .addFormatAndSample("GT", "0/1")
       .addFormatAndSample("GQ", "100")

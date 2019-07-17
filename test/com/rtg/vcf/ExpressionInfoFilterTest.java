@@ -42,7 +42,7 @@ public class ExpressionInfoFilterTest extends TestCase {
     final ExpressionInfoFilter f = new ExpressionInfoFilter(stats, "ATTR=1");
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     assertFalse(f.acceptCondition(rec));
-    rec.addInfo("ATTR", "1");
+    rec.setInfo("ATTR", "1");
     assertTrue(f.acceptCondition(rec));
   }
 
@@ -51,7 +51,7 @@ public class ExpressionInfoFilterTest extends TestCase {
     final ExpressionInfoFilter f = new ExpressionInfoFilter(stats, "ATTR=1");
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     assertFalse(f.acceptCondition(rec));
-    rec.addInfo("ATTR", "5", "1");
+    rec.setInfo("ATTR", "5", "1");
     assertTrue(f.acceptCondition(rec));
   }
 
@@ -60,7 +60,7 @@ public class ExpressionInfoFilterTest extends TestCase {
     final ExpressionInfoFilter f = new ExpressionInfoFilter(stats, "ATTR=foo");
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     assertFalse(f.acceptCondition(rec));
-    rec.addInfo("ATTR", "5", "foo");
+    rec.setInfo("ATTR", "5", "foo");
     assertTrue(f.acceptCondition(rec));
   }
 
