@@ -33,13 +33,13 @@ package com.rtg.vcf;
 import static com.rtg.util.StringUtils.TAB;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -326,6 +326,15 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * Returns true if the record contains the specified info field
+   * @param key info value
+   * @return true if the info field is contained in this record
+   */
+  public boolean hasInfo(String key) {
+    return mInfo.containsKey(key);
+  }
+
+  /**
    * @return info fields (should be treated as read-only).
    */
   public Map<String, ArrayList<String>> getInfo() {
@@ -333,15 +342,35 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * Retrieves an info field value, not split
+   * @param key key for field
+   * @return null if the key is not present, otherwise the value associated with the key.
+   */
+  public String getInfo(String key) {
+    final ArrayList<String> r = mInfo.get(key);
+    return r == null ? null : StringUtils.join(ALT_CALL_INFO_SEPARATOR, r);
+  }
+
+  /**
+   * Retrieves an info field value, split
+   * @param key key for field
+   * @return null if the key is not present, otherwise the values associated with the key.
+   */
+  public String[] getInfoSplit(String key) {
+    final ArrayList<String> r = mInfo.get(key);
+    return r == null ? null : r.toArray(new String[0]);
+  }
+
+  /**
    * Adds an info field
    * @param key key for field
-   * @param values values for the field
+   * @param values values for the field. Any individual value containing a comma will be split.
    * @return this, for call chaining
    */
   public VcfRecord addInfo(String key, String... values) {
     final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
     if (values != null) {
-      Collections.addAll(val, values);
+      val.addAll(Arrays.stream(values).flatMap(v -> Arrays.stream(StringUtils.split(v, ','))).collect(Collectors.toList()));
     }
     return this;
   }
@@ -349,14 +378,14 @@ public class VcfRecord implements SequenceNameLocus {
   /**
    * Adds or resets an info field
    * @param key key for field
-   * @param values values for the field
+   * @param values values for the field. Any individual value containing a comma will be split.
    * @return this, for call chaining
    */
   public VcfRecord setInfo(String key, String... values) {
     final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
     val.clear();
     if (values != null) {
-      Collections.addAll(val, values);
+      val.addAll(Arrays.stream(values).flatMap(v -> Arrays.stream(StringUtils.split(v, ','))).collect(Collectors.toList()));
     }
     return this;
   }
@@ -514,7 +543,7 @@ public class VcfRecord implements SequenceNameLocus {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName());
     sb.append(TAB);
-    sb.append(String.valueOf(getOneBasedStart()));
+    sb.append(getOneBasedStart());
     sb.append(TAB);
     sb.append(getId());
     sb.append(TAB);
@@ -526,7 +555,7 @@ public class VcfRecord implements SequenceNameLocus {
     sb.append(TAB);
     sb.append(getFilter(mFilters));
     sb.append(TAB);
-    sb.append(getPrintableInfo(getInfo()));
+    sb.append(getPrintableInfo());
     if (countNumberOfSamples(mFormatAndSample) != mNumSamples) {
       throw new IllegalStateException("Number of samples (" + mNumSamples + ") disagrees with contents of VCF record (" + countNumberOfSamples(mFormatAndSample) + ") at: " + getSequenceName() + ":" + getOneBasedStart());
     }
@@ -564,14 +593,14 @@ public class VcfRecord implements SequenceNameLocus {
     return firstCount;
   }
 
-  private static String getPrintableInfo(Map<String, ArrayList<String>> info) {
+  private String getPrintableInfo() {
     final StringBuilder sb = new StringBuilder();
-    for (final Entry<String, ArrayList<String>> e : info.entrySet()) {
-      sb.append(e.getKey());
-      final Collection<String> values = e.getValue();
-      if (values != null && values.size() > 0) {
+    for (final String key : mInfo.keySet()) {
+      sb.append(key);
+      final String value = getInfo(key);
+      if (value.length() > 0) {
         sb.append("=")
-        .append(StringUtils.join(ALT_CALL_INFO_SEPARATOR, values));
+          .append(value);
       }
       sb.append(ID_FILTER_AND_INFO_SEPARATOR);
     }
