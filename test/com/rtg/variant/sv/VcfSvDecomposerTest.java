@@ -55,16 +55,17 @@ public class VcfSvDecomposerTest extends AbstractCliTest {
     rec.setInfo("SVTYPE", "DEL");
     rec.setInfo("END", "39672880");
     rec.setInfo("SVLEN", "-240800");
+    rec.setInfo("IMPRECISE");
     rec.setInfo("CIPOS", "-10,15");
     rec.setInfo("CIEND", "-20,25");
     rec.setNumberOfSamples(1);
     rec.addFormatAndSample("GT", "1/1");
-    assertEquals("1\t2943857\t.\tG\t<DEL>\t.\t.\tSVTYPE=DEL;END=39672880;SVLEN=-240800;CIPOS=-10,15;CIEND=-20,25\tGT\t1/1", rec.toString());
+    assertEquals("1\t2943857\t.\tG\t<DEL>\t.\t.\tSVTYPE=DEL;END=39672880;SVLEN=-240800;IMPRECISE;CIPOS=-10,15;CIEND=-20,25\tGT\t1/1", rec.toString());
     final VcfRecord[] out = new VcfSvDecomposer.SvDelDecomposer().decompose(rec);
     assertEquals(2, out.length);
     final Iterator<VcfRecord> it = Arrays.stream(out).sorted(new ReorderingVcfWriter.VcfPositionalComparator()).iterator();
-    assertEquals("1\t2943857\t.\tG\tG[1:39672880[\t.\t.\tSVTYPE=BND;CIPOS=-10,15\tGT\t1/1", it.next().toString());
-    assertEquals("1\t39672880\t.\tN\t]1:2943857]G\t.\t.\tSVTYPE=BND;CIPOS=-20,25\tGT\t1/1", it.next().toString());
+    assertEquals("1\t2943857\t.\tG\tG[1:39672880[\t.\t.\tSVTYPE=BND;CIPOS=-10,15;IMPRECISE\tGT\t1/1", it.next().toString());
+    assertEquals("1\t39672880\t.\tN\t]1:2943857]G\t.\t.\tSVTYPE=BND;CIPOS=-20,25;IMPRECISE\tGT\t1/1", it.next().toString());
   }
 
   // Example based on VCF 4.2 spec

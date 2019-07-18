@@ -33,13 +33,11 @@ package com.rtg.vcf;
 import static com.rtg.util.StringUtils.TAB;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -60,6 +58,8 @@ public class VcfRecord implements SequenceNameLocus {
   /** The character used to delimit ALT alleles and multi-valued subfield values */
   public static final String ALT_CALL_INFO_SEPARATOR = ",";
 
+  private static final String[] EMPTY = {};
+
   private final String mSequence;
   private int mStart = -1;
   private String mId; // These are stored in VCF representation (users may need to perform splitting)
@@ -74,7 +74,7 @@ public class VcfRecord implements SequenceNameLocus {
    * Each <code>Key=Value;</code> entry in the <code>INFO</code> field becomes
    * one (Key,Value) entry in this map.
    */
-  private final Map<String, ArrayList<String>> mInfo;
+  private final Map<String, String> mInfo;
 
   /**
    * Maps from each format key to all the values of that key for each sample.
@@ -337,7 +337,7 @@ public class VcfRecord implements SequenceNameLocus {
   /**
    * @return info fields (should be treated as read-only).
    */
-  public Map<String, ArrayList<String>> getInfo() {
+  public Map<String, String> getInfo() {
     return mInfo;
   }
 
@@ -347,8 +347,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return null if the key is not present, otherwise the value associated with the key.
    */
   public String getInfo(String key) {
-    final ArrayList<String> r = mInfo.get(key);
-    return r == null ? null : StringUtils.join(ALT_CALL_INFO_SEPARATOR, r);
+    return mInfo.get(key);
   }
 
   /**
@@ -357,8 +356,8 @@ public class VcfRecord implements SequenceNameLocus {
    * @return null if the key is not present, otherwise the values associated with the key.
    */
   public String[] getInfoSplit(String key) {
-    final ArrayList<String> r = mInfo.get(key);
-    return r == null ? null : r.toArray(new String[0]);
+    final String r = mInfo.get(key);
+    return r == null ? null : r.length() == 0 ? EMPTY : StringUtils.split(r, ',');
   }
 
   /**
@@ -368,9 +367,12 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addInfo(String key, String... values) {
-    final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
-    if (values != null) {
-      val.addAll(Arrays.stream(values).flatMap(v -> Arrays.stream(StringUtils.split(v, ','))).collect(Collectors.toList()));
+    final String old = mInfo.get(key);
+    if (values == null) {
+      mInfo.put(key, old == null ? "" : old);
+    } else {
+      final String joined = StringUtils.join(ALT_CALL_INFO_SEPARATOR, values);
+      mInfo.put(key, old == null || old.length() == 0 ? joined : StringUtils.join(ALT_CALL_INFO_SEPARATOR, old, joined));
     }
     return this;
   }
@@ -382,11 +384,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord setInfo(String key, String... values) {
-    final ArrayList<String> val = mInfo.computeIfAbsent(key, k -> new ArrayList<>());
-    val.clear();
-    if (values != null) {
-      val.addAll(Arrays.stream(values).flatMap(v -> Arrays.stream(StringUtils.split(v, ','))).collect(Collectors.toList()));
-    }
+    mInfo.put(key, values == null ? "" : StringUtils.join(ALT_CALL_INFO_SEPARATOR, values));
     return this;
   }
 

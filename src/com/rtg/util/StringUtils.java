@@ -304,7 +304,7 @@ public final class StringUtils {
    * @param array the array to join
    * @return the string elements joined by the delimiter
    */
-  public static String join(final String delim, final String[] array) {
+  public static String join(final String delim, final String... array) {
     return join(delim, array, false);
   }
 

@@ -31,8 +31,6 @@ package com.rtg.variant.sv.bndeval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -108,9 +106,8 @@ class AnnotatingBndEvalVcfWriter implements BndEvalVcfWriter {
 
   // Remove any pre-existing annotations for VCFs that have already been through evaluation
   private void resetOurAnnotations(VcfRecord rec) {
-    final Map<String, ArrayList<String>> info = rec.getInfo();
-    info.remove(INFO_BASE);
-    info.remove(INFO_CALL);
+    rec.removeInfo(INFO_BASE);
+    rec.removeInfo(INFO_CALL);
   }
 
   private void addInfoHeaders(VcfHeader header, VariantSetType type) {

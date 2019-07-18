@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -84,7 +83,7 @@ public class VcfInfoStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> infoMap = rec.getInfo();
+    final Map<String, String> infoMap = rec.getInfo();
     assertNotNull(infoMap);
     assertEquals(2, infoMap.size());
 
@@ -112,7 +111,7 @@ public class VcfInfoStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> infoMap = rec.getInfo();
+    final Map<String, String> infoMap = rec.getInfo();
     assertNotNull(infoMap);
     assertEquals(2, infoMap.size());
 
@@ -137,7 +136,7 @@ public class VcfInfoStripperTest extends TestCase {
     final VcfRecord rec = createTestRecord();
     ann.annotate(rec);
 
-    final Map<String, ArrayList<String>> infoMap = rec.getInfo();
+    final Map<String, String> infoMap = rec.getInfo();
     assertNotNull(infoMap);
     assertEquals(0, infoMap.size());
 

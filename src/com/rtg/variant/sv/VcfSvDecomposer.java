@@ -399,11 +399,11 @@ public class VcfSvDecomposer extends AbstractCli {
     }
 
     static BreakpointAlt makeBreakendFromTra(VcfRecord rec, String ref, int end) {
-      String seq2 = getStringInfoFieldFromRecord(rec, "CHR2");
+      String seq2 = rec.getInfo("CHR2");
       if (seq2 == null) {
         seq2 = rec.getSequenceName();
       }
-      final String ct = getStringInfoFieldFromRecord(rec, "CT");
+      final String ct = rec.getInfo("CT");
       return getBreakpointAlt(ref, seq2, end, ct);
     }
 
@@ -419,19 +419,6 @@ public class VcfSvDecomposer extends AbstractCli {
           return new BreakpointAlt(ref, true, seq2, end, true);
         default:
           return null;
-      }
-    }
-
-    private static String getStringInfoFieldFromRecord(VcfRecord rec, String field) {
-      final Map<String, ArrayList<String>> infoField = rec.getInfo();
-      if (infoField.containsKey(field)) {
-        final String fieldVal = infoField.get(field).get(0);
-        if (VcfRecord.MISSING.equals(fieldVal)) {
-          return null;
-        }
-        return fieldVal;
-      } else {
-        return null;
       }
     }
   }
