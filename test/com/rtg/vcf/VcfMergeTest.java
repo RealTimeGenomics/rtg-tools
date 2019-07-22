@@ -34,10 +34,12 @@ import java.util.Arrays;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
+import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.Utils;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.TestDirectory;
@@ -109,7 +111,8 @@ public class VcfMergeTest extends AbstractCliTest {
       } finally {
         zipper.close();
       }
-      zipper = new VcfMerge.VcfPositionZipper(new RegionRestriction("chr3:300-500"), f1, f2);
+      final ReferenceRanges<String> r = SamRangeUtils.createExplicitReferenceRange(new RegionRestriction("chr3:300-500"));
+      zipper = new VcfMerge.VcfPositionZipper(r, f1, f2);
       try {
         final VcfMerge.ZipperCallback callback = new ZipperCallbackTester(
                 Arrays.copyOfRange(positions, 4, 6),
@@ -266,6 +269,11 @@ public class VcfMergeTest extends AbstractCliTest {
     checkMerge("preserve", "vcfmerge-na12889.vcf", "vcfmerge-na12880.vcf",
       "-a", "##extraline=foo",
       "-a", "##extraline2=bar", "--preserve-formats");
+  }
+
+  public void testMergeRegion() throws Exception {
+    checkMerge("region5", "vcfmerge-na12889.vcf", "vcfmerge-na12880.vcf",
+      "--region", "5");
   }
 
   public void testForce1() throws Exception {

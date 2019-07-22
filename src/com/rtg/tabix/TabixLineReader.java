@@ -49,22 +49,22 @@ import htsjdk.samtools.util.RuntimeIOException;
  */
 public class TabixLineReader implements LineReader {
 
-  private static LineReader getDelegate(File input, File tabix, RegionRestriction region) throws IOException {
+  private static LineReader getDelegate(File input, TabixIndexReader tir, RegionRestriction region) throws IOException {
     final LineReader reader;
     if (region == null) {
-      reader = new SingleRestrictionLineReader(input, new TabixIndexReader(tabix));
+      reader = new SingleRestrictionLineReader(input, tir);
     } else {
-      reader = new SingleRestrictionLineReader(input, new TabixIndexReader(tabix), region);
+      reader = new SingleRestrictionLineReader(input, tir, region);
     }
     return reader;
   }
 
-  private static LineReader getDelegate(File input, File tabix, ReferenceRanges<String> ranges) throws IOException {
+  private static LineReader getDelegate(File input, TabixIndexReader tir, ReferenceRanges<String> ranges) throws IOException {
     final LineReader reader;
     if (ranges == null || ranges.allAvailable()) {
-      reader = new SingleRestrictionLineReader(input, new TabixIndexReader(tabix));
+      reader = new SingleRestrictionLineReader(input, tir);
     } else {
-      reader = new MultiRestrictionLineReader(input, new TabixIndexReader(tabix), ranges);
+      reader = new MultiRestrictionLineReader(input, tir, ranges);
     }
     return reader;
   }
@@ -80,7 +80,7 @@ public class TabixLineReader implements LineReader {
    * @throws IOException if an IO error occurs
    */
   public TabixLineReader(File input, File tabix, RegionRestriction region) throws IOException {
-    this(getDelegate(input, tabix, region));
+    this(getDelegate(input, new TabixIndexReader(tabix), region));
   }
 
   /**
@@ -91,7 +91,7 @@ public class TabixLineReader implements LineReader {
    * @throws IOException if an IO error occurs
    */
   public TabixLineReader(File input, File tabix, ReferenceRanges<String> ranges) throws IOException {
-    this(getDelegate(input, tabix, ranges));
+    this(getDelegate(input, new TabixIndexReader(tabix), ranges));
   }
 
   /**
@@ -101,8 +101,8 @@ public class TabixLineReader implements LineReader {
    * @param region the region restriction, may be null for no restriction
    * @throws IOException if an IO error occurs
    */
-  public TabixLineReader(File input, TabixIndexReader tir, RegionRestriction region) throws IOException {
-    this(new SingleRestrictionLineReader(input, tir, region));
+  public TabixLineReader(File input, TabixIndexReader tir, ReferenceRanges<String> region) throws IOException {
+    this(getDelegate(input, tir, region));
   }
 
   private TabixLineReader(LineReader delegate) {

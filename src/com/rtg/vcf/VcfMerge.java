@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
+import com.rtg.sam.SamRangeUtils;
 import com.rtg.tabix.TabixIndexReader;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.TabixLineReader;
@@ -66,7 +67,7 @@ import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
-import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.FormatField;
@@ -104,6 +105,8 @@ public class VcfMerge extends AbstractCli {
     CommonFlags.initForce(mFlags);
     mFlags.setDescription("Merge a set of VCF files.");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
+    mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
     initAddHeaderFlag(mFlags);
     final Flag<File> inFlag = mFlags.registerRequired(File.class, FILE, "input VCF files to merge").setCategory(INPUT_OUTPUT).setMinCount(0).setMaxCount(Integer.MAX_VALUE);
     final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, FILE, "file containing a list of VCF format files (1 per line) to be merged").setCategory(INPUT_OUTPUT);
@@ -190,7 +193,8 @@ public class VcfMerge extends AbstractCli {
     final VariantStatistics stats = mFlags.isSet(STATS_FLAG) ? new VariantStatistics(null) : null;
     final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
     final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
-    final VcfPositionZipper posZip = new VcfPositionZipper(null, forceMerge, inputs.toArray(new File[inputs.size()]));
+    final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(mFlags);
+    final VcfPositionZipper posZip = new VcfPositionZipper(regions, forceMerge, inputs.toArray(new File[inputs.size()]));
     final VcfHeader header = posZip.getHeader();
     VcfUtils.addHeaderLines(header, extraHeaderLines);
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
@@ -243,16 +247,16 @@ public class VcfMerge extends AbstractCli {
     final File[] mFiles;
     final VcfHeader[] mHeaders;
     final TabixIndexReader[] mIndexes;
-    final RegionRestriction[] mRegions;
+    final List<ReferenceRanges<String>> mRegions;
     final VcfReader[] mReaders;
     private final VcfHeader mMergedHeader;
     private int mCurrentRegion = 0;
     private final Set<Integer> mCurrentRecords = new HashSet<>();
 
-    VcfPositionZipper(RegionRestriction rr, File... vcfFiles) throws IOException {
+    VcfPositionZipper(ReferenceRanges<String> rr, File... vcfFiles) throws IOException {
       this(rr, null, vcfFiles);
     }
-    VcfPositionZipper(RegionRestriction rr, Set<String> forceMerge, File... vcfFiles) throws IOException {
+    VcfPositionZipper(ReferenceRanges<String> rr, Set<String> forceMerge, File... vcfFiles) throws IOException {
       mFiles = vcfFiles;
       mReaders = new VcfReader[mFiles.length];
       mHeaders = new VcfHeader[mFiles.length];
@@ -261,7 +265,8 @@ public class VcfMerge extends AbstractCli {
       int numSamples = 0;
       boolean warnNumSamples = true;
       for (int i = 0; i < mFiles.length; ++i) {
-        final VcfHeader header = VcfUtils.getHeader(mFiles[i]);
+        final File vcfFile = mFiles[i];
+        final VcfHeader header = VcfUtils.getHeader(vcfFile);
         mHeaders[i] = header;
         if (current != null) {
           current = VcfHeaderMerge.mergeHeaders(current, header, forceMerge);
@@ -273,16 +278,6 @@ public class VcfMerge extends AbstractCli {
           current = header;
           numSamples = current.getNumberOfSamples();
         }
-      }
-      mMergedHeader = current;
-      final LinkedHashSet<String> chroms = new LinkedHashSet<>();
-      if (!mMergedHeader.getContigLines().isEmpty()) {
-        for (final ContigField cf : mMergedHeader.getContigLines()) {
-          chroms.add(cf.getId());
-        }
-      }
-      for (int i = 0; i < vcfFiles.length; ++i) {
-        final File vcfFile = vcfFiles[i];
         final File index = TabixIndexer.indexFileName(vcfFile);
         if (!TabixIndexer.isBlockCompressed(vcfFile)) {
           throw new NoTalkbackSlimException(vcfFile + " is not in bgzip format");
@@ -290,19 +285,23 @@ public class VcfMerge extends AbstractCli {
           throw new NoTalkbackSlimException("Index not found for file: " + index.getPath() + " expected index called: " + index.getPath());
         }
         mIndexes[i] = new TabixIndexReader(TabixIndexer.indexFileName(vcfFile));
-        if (rr == null) { //don't care if doing single region
-          chroms.addAll(Arrays.asList(mIndexes[i].sequenceNames()));
-        }
       }
+      mMergedHeader = current;
 
       if (rr == null) {
-        mRegions = new RegionRestriction[chroms.size()];
-        int i = 0;
-        for (final String chrom : chroms) {
-          mRegions[i++] = new RegionRestriction(chrom, RegionRestriction.MISSING, RegionRestriction.MISSING);
+        final LinkedHashSet<String> chroms = new LinkedHashSet<>();
+        if (!mMergedHeader.getContigLines().isEmpty()) {
+          for (final ContigField cf : mMergedHeader.getContigLines()) {
+            chroms.add(cf.getId());
+          }
         }
+        for (int i = 0; i < vcfFiles.length; ++i) {
+          chroms.addAll(Arrays.asList(mIndexes[i].sequenceNames()));
+        }
+        final ReferenceRanges<String> rrr = SamRangeUtils.createExplicitReferenceRange(chroms);
+        mRegions = chroms.stream().map(rrr::forSequence).collect(Collectors.toList());
       } else {
-        mRegions = new RegionRestriction[] {rr};
+        mRegions = rr.sequenceNames().stream().map(rr::forSequence).collect(Collectors.toList());
       }
       populateNext();
     }
@@ -323,12 +322,12 @@ public class VcfMerge extends AbstractCli {
 
     private void populateNext() throws IOException {
       boolean recordActive = false;
-      while (!recordActive && mCurrentRegion < mRegions.length) {
+      while (!recordActive && mCurrentRegion < mRegions.size()) {
         int minPos = Integer.MAX_VALUE;
 
         for (int i = 0; i < mReaders.length; ++i) {
           if (mReaders[i] == null) {
-            mReaders[i] = new VcfReader(new VcfParser(), new TabixLineReader(mFiles[i], mIndexes[i], mRegions[mCurrentRegion]), mHeaders[i]);
+            mReaders[i] = new VcfReader(new VcfParser(), new TabixLineReader(mFiles[i], mIndexes[i], mRegions.get(mCurrentRegion)), mHeaders[i]);
           }
           if (mReaders[i].hasNext()) {
             final int pos = mReaders[i].peek().getStart();

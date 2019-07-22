@@ -31,6 +31,7 @@ package com.rtg.sam;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,6 +202,20 @@ public final class SamRangeUtils {
     return acc.getReferenceRanges();
   }
 
+  /**
+   * This is a somewhat dodgy method of making a ReferenceRanges corresponding to set of whole chromosomes.
+   * Note that this has not had the sequence id mapping information supplied either.
+   * @param chroms the chromosome names
+   * @return the ReferenceRanges
+   */
+  public static ReferenceRanges<String> createExplicitReferenceRange(Collection<String> chroms) {
+    final ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
+    for (String chrom : chroms) {
+      final Range wideRange = new Range(Integer.MIN_VALUE, Integer.MAX_VALUE);
+      acc.addRangeData(chrom, new RangeList.RangeData<>(wideRange, chrom));
+    }
+    return acc.getReferenceRanges();
+  }
 
   // Validation of the supplied ranges against names and lengths in SequenceDictionary
   static <T> void validateRanges(SAMFileHeader header, ReferenceRanges<T> rangeMap) {

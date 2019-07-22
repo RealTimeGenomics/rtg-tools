@@ -142,12 +142,13 @@ public class VcfRecordMerger {
 
     int[] remapGt(int[] splitGt, VcfRecord record, int recordIndex) {
       if (mGtMap != null) {
+        final int[] gtMap = mGtMap[recordIndex];
         for (int gti = 0; gti < splitGt.length; ++gti) {
           if (splitGt[gti] != -1) {
-            if (splitGt[gti] >= mGtMap[recordIndex].length) {
+            if (splitGt[gti] >= gtMap.length) {
               throw new VcfFormatException("Invalid GT allele index " + splitGt[gti] + " in input record: " + record);
             }
-            splitGt[gti] = mGtMap[recordIndex][splitGt[gti]];
+            splitGt[gti] = gtMap[splitGt[gti]];
           }
         }
       }
