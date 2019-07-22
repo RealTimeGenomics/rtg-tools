@@ -30,7 +30,7 @@
 
 package com.rtg.vcf.annotation;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -56,7 +56,7 @@ public class RefAltAnnotation extends AbstractDerivedFormatAnnotation {
 
   @Override
   public Object getValue(VcfRecord record, int sampleNumber) {
-    final ArrayList<String> sampleValues = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> sampleValues = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     final Object value;
     if (sampleValues == null || sampleValues.size() < (sampleNumber + 1)) {
       value = null;

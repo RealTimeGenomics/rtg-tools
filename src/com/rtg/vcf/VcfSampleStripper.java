@@ -29,9 +29,9 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
@@ -115,7 +115,7 @@ public class VcfSampleStripper implements VcfAnnotator {
     int newNumSamples = rec.getNumberOfSamples();
     boolean first = true;
     for (String id : rec.getFormats()) {
-      final ArrayList<String> formatValues = rec.getFormat(id);
+      final List<String> formatValues = rec.getFormat(id);
       //remove each sample from each format
       for (int j = mSampleIdsToRemove.length - 1; j >= 0; --j) { //backwards to avoid changing index values as we remove items
         formatValues.remove(mSampleIdsToRemove[j]);

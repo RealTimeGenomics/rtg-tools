@@ -29,7 +29,7 @@
  */
 package com.rtg.vcf.annotation;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import com.rtg.util.StringUtils;
 import com.rtg.vcf.VcfRecord;
@@ -58,8 +58,8 @@ public class MeanQualityDifferenceAnnotation extends AbstractDerivedFormatAnnota
     if (gts.length < 2 || gts[0] == gts[1] || gts[0] == -1 || gts[1] == -1) {
       return null;
     }
-    final ArrayList<String> adList = record.getFormat(VcfUtils.FORMAT_ALLELIC_DEPTH);
-    final ArrayList<String> aqList = record.getFormat(VcfUtils.FORMAT_ALLELE_QUALITY);
+    final List<String> adList = record.getFormat(VcfUtils.FORMAT_ALLELIC_DEPTH);
+    final List<String> aqList = record.getFormat(VcfUtils.FORMAT_ALLELE_QUALITY);
     if (adList == null || aqList == null) {
       return null;
     }

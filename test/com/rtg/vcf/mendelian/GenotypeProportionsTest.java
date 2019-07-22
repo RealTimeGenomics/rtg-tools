@@ -32,7 +32,7 @@ package com.rtg.vcf.mendelian;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
+import java.util.List;
 
 import com.rtg.launcher.AbstractNanoTest;
 import com.rtg.util.io.MemoryPrintStream;
@@ -59,7 +59,7 @@ public class GenotypeProportionsTest extends AbstractNanoTest {
     try (VcfReader r = new VcfReaderFactory().make(new BufferedReader(new StringReader(mNano.loadReference(vcfResource))))) {
       while (r.hasNext()) {
         final VcfRecord rec = r.next();
-        final ArrayList<String> sampleGts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
+        final List<String> sampleGts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }

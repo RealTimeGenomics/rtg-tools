@@ -116,7 +116,7 @@ public class VcfRecordTest extends TestCase {
       .toString()
       ;
     } catch (final IllegalStateException ex) {
-      assertEquals("not enough data for all samples, FORMAT field = GQ, expected 2 entries, saw 1", ex.getMessage());
+      assertEquals("Not enough data for all samples, FORMAT field = GQ, expected 2 entries, saw 1", ex.getMessage());
     }
   }
 
@@ -153,6 +153,10 @@ public class VcfRecordTest extends TestCase {
     assertEquals(".", rec.getFormat("PAD").get(2));
     rec.setFormatAndSample("PAD", "DAPDAP", 1);
     assertEquals("DAPDAP", rec.getFormat("PAD").get(1));
+    rec.setFormat("PAD", Collections.singletonList("DAPDAP"));
+    assertEquals("DAPDAP", rec.getFormat("PAD").get(0));
+    assertEquals(".", rec.getFormat("PAD").get(1));
+    assertEquals(".", rec.getFormat("PAD").get(2));
     rec.setInfo("INF", "VAL1", "VAL2");
     assertEquals(2, rec.getInfoSplit("INF").length);
     assertEquals("VAL1", rec.getInfoSplit("INF")[0]);

@@ -281,7 +281,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
            VcfWriter writer = new FilterVcfWriter(new VcfWriterFactory().zip(true).make(reader.getHeader(), o), new VcfFilter() {
              @Override
              public boolean accept(VcfRecord record) {
-               final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
+               final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
                if (sampleGts != null) {
                  for (String sampleGt : sampleGts) {
                    for (int i : VcfUtils.splitGt(sampleGt)) {

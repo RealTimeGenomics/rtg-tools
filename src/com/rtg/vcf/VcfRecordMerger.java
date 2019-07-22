@@ -215,11 +215,8 @@ public class VcfRecordMerger {
           }
           sampleDone = true;
           for (final String key : records[i].getFormats()) {
-            ArrayList<String> field = dest.getFormat(key);
-            if (field == null) {
-              field = new ArrayList<>();
-              dest.getFormatAndSample().put(key, field);
-            }
+            dest.addFormat(key); // Ensure the format is present
+            final List<String> field = dest.getFormat(key);
             while (field.size() <= destSampleIndex) {
               field.add(VcfRecord.MISSING);
             }
@@ -244,21 +241,16 @@ public class VcfRecordMerger {
         }
       }
     }
-    padSamples(dest, destHeader);
+    padSamples(dest);
     return true;
   }
 
   // Ensure format fields of samples in record are appropriately padded
-  protected void padSamples(VcfRecord dest, VcfHeader destHeader) {
-    if (destHeader.getNumberOfSamples() > 0 && dest.getFormats().isEmpty()) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
+  protected void padSamples(VcfRecord dest) {
+    if (dest.getNumberOfSamples() > 0 && dest.getFormats().isEmpty()) { // When mixing sample-free and with-sample VCFs, need to ensure at least one format field
       dest.addFormat(mDefaultFormat);
     }
-    for (final String key : dest.getFormats()) {
-      final ArrayList<String> field = dest.getFormat(key);
-      while (field.size() < destHeader.getNumberOfSamples()) {
-        field.add(VcfRecord.MISSING);
-      }
-    }
+    dest.getFormats().forEach(dest::padFormatAndSample);
   }
 
   protected void mergeIds(VcfRecord dest, VcfRecord[] records) {

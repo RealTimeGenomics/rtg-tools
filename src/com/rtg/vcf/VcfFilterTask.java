@@ -367,7 +367,7 @@ class VcfFilterTask {
   boolean allSameAsRef(VcfRecord record) {
     if (mRemoveAllSameAsRef) {
       for (int sampleIndex = 0; sampleIndex < record.getNumberOfSamples(); ++sampleIndex) {
-        final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
+        final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
         if (sampleGts == null) {
           throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record);
         }
@@ -387,7 +387,7 @@ class VcfFilterTask {
     if (!mSnpsOnly && !mNonSnpsOnly && !mRemoveSameAsRef && !mRemoveHom) {
       return true;
     }
-    final ArrayList<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> sampleGts = record.getFormat(VcfUtils.FORMAT_GENOTYPE);
     if (sampleGts == null) {
       throw new VcfFormatException("Specified filters require " + VcfUtils.FORMAT_GENOTYPE + " but no such field contained in record:\n" + record);
     }

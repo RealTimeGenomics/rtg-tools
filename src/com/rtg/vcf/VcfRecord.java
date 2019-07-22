@@ -33,6 +33,7 @@ package com.rtg.vcf;
 import static com.rtg.util.StringUtils.TAB;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -436,7 +437,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @param key format value to be retrieved
    * @return the sample values for this format field
    */
-  public ArrayList<String> getFormat(String key) {
+  public List<String> getFormat(String key) {
     return mFormatAndSample.get(key);
   }
 
@@ -471,6 +472,29 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * Sets format key and value for all samples. If the format key does not already exist in this record,
+   * it will be created. If fewer values are supplied than the expected number of samples, the record is
+   * filled with missing values for all other samples.
+   * @param key format value to be set
+   * @param val per sample values for the key.
+   * @return this, for call chaining
+   */
+  public VcfRecord setFormat(String key, Collection<String> val) {
+    assert val.size() <= mNumSamples : "More values supplied than samples";
+    final ArrayList<String> vals;
+    if (mFormatAndSample.containsKey(key)) {
+      vals = mFormatAndSample.get(key);
+      vals.clear();
+    } else {
+      vals = new ArrayList<>();
+      mFormatAndSample.put(key, vals);
+    }
+    vals.addAll(val);
+    padFormatAndSample(key);
+    return this;
+  }
+
+  /**
    * Sets format key and value for the specified sample. If the format key does not already exist in this record,
    * it will be created with missing values for all other samples.
    * @param key format value to be set
@@ -486,9 +510,7 @@ public class VcfRecord implements SequenceNameLocus {
     } else {
       vals = new ArrayList<>();
       mFormatAndSample.put(key, vals);
-      while (vals.size() < mNumSamples) {
-        vals.add(MISSING);
-      }
+      padFormatAndSample(key);
     }
     vals.set(sampleIndex, val);
     return this;
@@ -547,51 +569,52 @@ public class VcfRecord implements SequenceNameLocus {
     sb.append(TAB);
     sb.append(getRefCall());
     sb.append(TAB);
-    sb.append(getAltCalls(mAltCalls));
+    sb.append(formatAltField(mAltCalls));
     sb.append(TAB);
     sb.append(getQuality());
     sb.append(TAB);
-    sb.append(getFilter(mFilters));
+    sb.append(formatFilterField(mFilters));
     sb.append(TAB);
-    sb.append(getPrintableInfo());
-    if (countNumberOfSamples(mFormatAndSample) != mNumSamples) {
-      throw new IllegalStateException("Number of samples (" + mNumSamples + ") disagrees with contents of VCF record (" + countNumberOfSamples(mFormatAndSample) + ") at: " + getSequenceName() + ":" + getOneBasedStart());
-    }
+    sb.append(formatInfoField());
+    validateNumberOfSamples();
     if (mNumSamples > 0) {
       sb.append(TAB);
-      sb.append(getFormat(getFormatAndSample()));
+      sb.append(formatFormatField(getFormatAndSample()));
       for (int i = 0; i < mNumSamples; ++i) {
         sb.append(TAB);
-        sb.append(getSample(i, getFormatAndSample()));
+        sb.append(formatSampleField(i, getFormatAndSample()));
       }
     }
     return sb.toString();
   }
 
-  private static String getAltCalls(List<String> altCalls) {
+  private static String formatAltField(List<String> altCalls) {
     if (altCalls.isEmpty()) {
       return MISSING;
     }
     return StringUtils.join(ALT_CALL_INFO_SEPARATOR, altCalls);
   }
 
-  private static int countNumberOfSamples(Map<String, ArrayList<String>> formatAndSample) {
+  private void validateNumberOfSamples() {
     int firstCount = 0;
     boolean first = true;
-    for (final Entry<String, ArrayList<String>> formatField : formatAndSample.entrySet()) {
+    for (final Entry<String, ArrayList<String>> formatField : mFormatAndSample.entrySet()) {
       final int currentCount = formatField.getValue().size();
       if (first) {
         firstCount = currentCount;
         first = false;
       }
       if (firstCount != currentCount) {
-        throw new IllegalStateException("not enough data for all samples, FORMAT field = " + formatField.getKey() + ", expected " + firstCount + " entries, saw " + currentCount);
+        throw new IllegalStateException("Not enough data for all samples, FORMAT field = " + formatField.getKey() + ", expected " + firstCount + " entries, saw " + currentCount);
       }
     }
-    return firstCount;
+    final int formatSamples = firstCount;
+    if (formatSamples != mNumSamples) {
+      throw new IllegalStateException("Number of samples (" + mNumSamples + ") disagrees with contents of VCF record (" + formatSamples + ") at: " + getSequenceName() + ":" + getOneBasedStart());
+    }
   }
 
-  private String getPrintableInfo() {
+  private String formatInfoField() {
     final StringBuilder sb = new StringBuilder();
     for (final String key : mInfo.keySet()) {
       sb.append(key);
@@ -608,7 +631,7 @@ public class VcfRecord implements SequenceNameLocus {
     return sb.substring(0, sb.length() - 1);
   }
 
-  private static String getSample(int i, Map<String, ArrayList<String>> formatAndSample) {
+  private static String formatSampleField(int i, Map<String, ArrayList<String>> formatAndSample) {
     final StringBuilder sb = new StringBuilder();
     final StringBuilder msb = new StringBuilder(); // Allow omitting trailing missing sub-fields.
     for (final Entry<String, ArrayList<String>> formatField : formatAndSample.entrySet()) {
@@ -626,14 +649,14 @@ public class VcfRecord implements SequenceNameLocus {
     return sb.substring(0, sb.length() - 1);
   }
 
-  private static String getFormat(Map<String, ArrayList<String>> formatAndSample) {
+  private static String formatFormatField(Map<String, ArrayList<String>> formatAndSample) {
     if (formatAndSample.isEmpty()) {
       return MISSING;
     }
     return StringUtils.join(FORMAT_AND_SAMPLE_SEPARATOR, formatAndSample.keySet());
   }
 
-  private static String getFilter(List<String> filter) {
+  private static String formatFilterField(List<String> filter) {
     if (filter.isEmpty()) {
       return MISSING;
     }

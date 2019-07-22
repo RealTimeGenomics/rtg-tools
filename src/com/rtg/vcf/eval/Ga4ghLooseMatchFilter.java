@@ -31,7 +31,6 @@ package com.rtg.vcf.eval;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
@@ -78,8 +77,8 @@ class Ga4ghLooseMatchFilter implements VcfWriter {
       }
     }
 
-    final ArrayList<String> mk = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_MATCH_KIND);
-    final ArrayList<String> bd = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_DECISION);
+    final List<String> mk = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_MATCH_KIND);
+    final List<String> bd = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_DECISION);
 
     // On entry, possibly set lm status based on proximity to upstream regions
     if (queryWantsLm(mk, bd) && nearbyUpstream(mTruthRegions, record.getStart())) {
@@ -114,8 +113,8 @@ class Ga4ghLooseMatchFilter implements VcfWriter {
       mQueryRegions.remove();
     }
 
-    final ArrayList<String> mk = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_MATCH_KIND);
-    final ArrayList<String> bd = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_DECISION);
+    final List<String> mk = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_MATCH_KIND);
+    final List<String> bd = record.getFormat(Ga4ghEvalSynchronizer.FORMAT_DECISION);
 
     // On exit, possibly set lm status based on proximity to downstream regions
     if (queryWantsLm(mk, bd) && nearbyDownstream(mTruthRegions, record.getEnd())) {

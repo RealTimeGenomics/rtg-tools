@@ -34,7 +34,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -549,7 +548,7 @@ public final class VcfUtils {
    * @return the value converted into a double, or {@code Double.NaN} if missing
    */
   public static double getDoubleFormatFieldFromRecord(VcfRecord rec, int sample, String field) {
-    final ArrayList<String> format = rec.getFormat(field);
+    final List<String> format = rec.getFormat(field);
     if (format != null) {
       final String fieldVal = format.get(sample);
       try {
@@ -746,7 +745,7 @@ public final class VcfUtils {
    * @throws NoTalkbackSlimException if the record does not contain GT values, or the sample is invalid.
    */
   public static String getValidGtStr(VcfRecord rec, int sample) {
-    final ArrayList<String> gtList = rec.getFormat(FORMAT_GENOTYPE);
+    final List<String> gtList = rec.getFormat(FORMAT_GENOTYPE);
     if (gtList == null) {
       throw new VcfFormatException("VCF record does not contain GT field, record: " + rec.toString());
     }
