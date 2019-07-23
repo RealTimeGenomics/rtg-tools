@@ -1,0 +1,38 @@
+Failed Filters               : 0
+Passed Filters               : 7
+Complex Called               : 3
+
+Sample Name: NA12889
+SNPs                         : 5
+MNPs                         : 0
+Insertions                   : 1
+Deletions                    : 1
+Indels                       : 0
+Same as reference            : 0
+SNP Transitions/Transversions: 2.50 (5/2)
+Total Het/Hom ratio          : 2.50 (5/2)
+SNP Het/Hom ratio            : 1.50 (3/2)
+MNP Het/Hom ratio            : - (0/0)
+Insertion Het/Hom ratio      : - (1/0)
+Deletion Het/Hom ratio       : - (1/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : 1.00 (1/1)
+Indel/SNP+MNP ratio          : 0.40 (2/5)
+
+Sample Name: NA12880-1
+SNPs                         : 4
+MNPs                         : 0
+Insertions                   : 1
+Deletions                    : 1
+Indels                       : 0
+Same as reference            : 0
+Missing Genotype             : 1
+SNP Transitions/Transversions: 2.50 (5/2)
+Total Het/Hom ratio          : 2.00 (4/2)
+SNP Het/Hom ratio            : 1.00 (2/2)
+MNP Het/Hom ratio            : - (0/0)
+Insertion Het/Hom ratio      : - (1/0)
+Deletion Het/Hom ratio       : - (1/0)
+Indel Het/Hom ratio          : - (0/0)
+Insertion/Deletion ratio     : 1.00 (1/1)
+Indel/SNP+MNP ratio          : 0.50 (2/4)
