@@ -468,4 +468,15 @@ public class ScriptedVcfFilterTest {
     record.setInfo("IN", "FOO");
     assertTrue(getScriptedVcfFilter(null, "var expected = 'A'", "function record() {return REF == expected;}").accept(record));
   }
+
+  @Test
+  public void testInfoMatch() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.setInfo("IN", "T|synonymous_variant,T|intron_variant&non_coding_transcript_variant|MODIFIER|||||||||");
+    assertTrue(record.hasInfo("IN"));
+    assertTrue(getScriptedVcfFilter("has(INFO.IN)").accept(record));
+    assertTrue(getScriptedVcfFilter("INFO.IN.indexOf(\"intron_variant\") != -1").accept(record));
+    assertTrue(getScriptedVcfFilter("INFO.IN.match(\"intron_variant\") != null").accept(record));
+  }
+
 }

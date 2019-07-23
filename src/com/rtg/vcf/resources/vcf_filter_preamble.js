@@ -75,12 +75,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
             if (value == null) {
                 return ".";
             }
-            var arr = [];
-            var values = value.toString().split(',');
-            values.forEach(function (val) {
-                arr.push(val);
-            });
-            return arr;
+            return value;
         }
     }
     /**
