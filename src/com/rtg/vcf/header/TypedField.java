@@ -48,4 +48,10 @@ public interface TypedField<T extends TypedField<T>> extends IdField<T> {
    * @return field description
    */
   String getDescription();
+
+  /**
+   * @return true if the number of field values are dependent on the set of alleles present in the record
+   */
+  boolean isAlleleDependent();
+
 }

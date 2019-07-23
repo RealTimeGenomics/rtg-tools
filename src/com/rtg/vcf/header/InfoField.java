@@ -140,6 +140,11 @@ public class InfoField implements TypedField<InfoField> {
   }
 
   @Override
+  public boolean isAlleleDependent() {
+    return mNumber.getNumberType().isAlleleDependent();
+  }
+
+  @Override
   public String toString() {
     return VcfHeader.INFO_STRING + "=<ID=" + mId + ",Number=" + mNumber + ",Type=" + mType
       + ",Description=" + StringUtils.dumbQuote(mDescription)

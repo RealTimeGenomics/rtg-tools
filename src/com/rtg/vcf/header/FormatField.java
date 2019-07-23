@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.Utils;
+import com.rtg.vcf.VcfUtils;
 
 /**
  * Class to encapsulate information of a format meta information line in <code>VCF</code>
@@ -103,6 +104,12 @@ public class FormatField implements TypedField<FormatField> {
       return other;
     }
     return null;
+  }
+
+  @Override
+  public boolean isAlleleDependent() {
+    return mNumber.getNumberType().isAlleleDependent()
+      || (mNumber.getNumberType() == VcfNumberType.UNKNOWN && VcfUtils.FORMAT_ALLELIC_DEPTH.equals(getId()));
   }
 
   @Override

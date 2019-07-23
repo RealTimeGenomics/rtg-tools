@@ -37,7 +37,6 @@ import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.launcher.CommonFlags.STRING_OR_FILE;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
-import static com.rtg.vcf.VcfUtils.FORMAT_ALLELIC_DEPTH;
 import static com.rtg.vcf.VcfUtils.FORMAT_GENOTYPE;
 
 import java.io.BufferedReader;
@@ -54,6 +53,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
@@ -72,7 +72,6 @@ import com.rtg.vcf.header.ContigField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfHeaderMerge;
-import com.rtg.vcf.header.VcfNumberType;
 
 /**
  * Merge multiple <code>VCF</code> files. Assumes both files are sorted in the same manner
@@ -232,17 +231,7 @@ public class VcfMerge extends AbstractCli {
   }
 
   static Set<String> alleleBasedFormats(VcfHeader destHeader) {
-    final Set<String> alleleBasedFormats = new HashSet<>(); // This is the set of format fields that we cannot merge if ALTs change
-    for (FormatField field : destHeader.getFormatLines()) {
-      final VcfNumberType numberType = field.getNumber().getNumberType();
-      if (numberType == VcfNumberType.GENOTYPES
-          || numberType == VcfNumberType.ALTS
-          || numberType == VcfNumberType.REF_ALTS
-          || (numberType == VcfNumberType.UNKNOWN && FORMAT_ALLELIC_DEPTH.equals(field.getId()))) { // AD (and potentially other VcfNumberType.UNKNOWN too) cannot be merged as it has one value per ref+alts
-        alleleBasedFormats.add(field.getId());
-      }
-    }
-    return alleleBasedFormats;
+    return destHeader.getFormatLines().stream().filter(FormatField::isAlleleDependent).map(FormatField::getId).collect(Collectors.toSet());
   }
 
   /**

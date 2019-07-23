@@ -35,21 +35,23 @@ package com.rtg.vcf.header;
 public enum VcfNumberType {
 
   /** if specified number of values applies to field */
-  INTEGER(false, ""),
+  INTEGER(false, false, ""),
   /** if one value per alternate allele */
-  ALTS(true, "A"),
+  ALTS(true, true, "A"),
   /** if one value per all possible alleles (ref and alts) */
-  REF_ALTS(true, "R"),
+  REF_ALTS(true, true, "R"),
   /** if one value per genotype */
-  GENOTYPES(true, "G"),
+  GENOTYPES(true, true, "G"),
   /** if number of values varies or is unknown */
-  UNKNOWN(true, ".");
+  UNKNOWN(true, false, ".");
 
   private final boolean mFixed;
+  private final boolean mAlleleDependent;
   private final String mToString;
 
-  VcfNumberType(boolean fixedString, String str) {
+  VcfNumberType(boolean fixedString, boolean alleleDependent, String str) {
     mFixed = fixedString;
+    mAlleleDependent = alleleDependent;
     mToString = str;
   }
 
@@ -58,6 +60,13 @@ public enum VcfNumberType {
    */
   public boolean isFixedString() {
     return mFixed;
+  }
+
+  /**
+   * @return true if the expected number of field values is dependent on the number of alleles present in the record
+   */
+  public boolean isAlleleDependent() {
+    return mAlleleDependent;
   }
 
   @Override
