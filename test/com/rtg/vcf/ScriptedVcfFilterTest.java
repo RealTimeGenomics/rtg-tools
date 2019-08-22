@@ -298,6 +298,26 @@ public class ScriptedVcfFilterTest {
   }
 
   @Test
+  public void testUpdateChrom() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.setSequenceName("foo");
+    assertEquals("foo", record.getSequenceName());
+    assertTrue(getScriptedVcfFilter("CHROM = 'bar'; true").accept(record));
+    assertEquals("bar", record.getSequenceName());
+  }
+
+  @Test
+  public void testUpdatePos() {
+    final VcfRecord record = new VcfRecord("blah", 0, "A");
+    record.setStart(10);
+    assertEquals(10, record.getStart());
+    assertTrue(getScriptedVcfFilter("POS = 2; true").accept(record));
+    assertEquals(1, record.getStart());
+    assertTrue(getScriptedVcfFilter("POS = POS + 3; true").accept(record));
+    assertEquals(4, record.getStart());
+  }
+
+  @Test
   public void testUpdateId() {
     final VcfRecord record = new VcfRecord("blah", 0, "A");
     assertEquals(VcfRecord.MISSING, record.getId());

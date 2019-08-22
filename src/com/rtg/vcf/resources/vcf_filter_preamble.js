@@ -106,6 +106,21 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     infoIds.forEach(function(id) {
         Object.defineProperty(INFO, id, {get: infoGet(id), set: infoSet(id)});
     });
+
+    /**
+     * Fetch the CHROM from the current record
+     */
+    function chrom() {
+        return RTG_VCF_RECORD.getSequenceName();
+    }
+
+    /**
+     * Set the CHROM for the current record
+     */
+    function setChrom(val) {
+        RTG_VCF_RECORD.setSequenceName(val);
+    }
+
     /**
      * Fetch the pos from the current record
      */
@@ -114,10 +129,10 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     }
 
     /**
-     * Fetch the CHROM from the current record
+     * Set the (one-based) POS for the current record
      */
-    function chrom() {
-        return RTG_VCF_RECORD.getSequenceName();
+    function setPos(val) {
+        RTG_VCF_RECORD.setStart(val - 1); // To internal zero-based
     }
 
     /**
@@ -169,7 +184,7 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
      * Set the QUAL for the current record
      */
     function setQual(val) {
-        return RTG_VCF_RECORD.setQuality(val);
+        RTG_VCF_RECORD.setQuality(val);
     }
 
     /**
@@ -220,8 +235,8 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
     }
 
     var props = {
-        CHROM: {get: chrom},
-        POS: {get: pos},
+        CHROM: {get: chrom, set: setChrom},
+        POS: {get: pos, set: setPos},
         ID: {get: getId, set: setId},
         REF: {get: ref},
         ALT: {get: alt},

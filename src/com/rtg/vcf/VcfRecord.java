@@ -61,7 +61,7 @@ public class VcfRecord implements SequenceNameLocus {
 
   private static final String[] EMPTY = {};
 
-  private final String mSequence;
+  private String mSequence;
   private int mStart = -1;
   private String mId; // These are stored in VCF representation (users may need to perform splitting)
   private String mRefCall;
@@ -127,6 +127,10 @@ public class VcfRecord implements SequenceNameLocus {
   @Override
   public String getSequenceName() {
     return mSequence;
+  }
+
+  public void setSequenceName(String sequence) {
+    mSequence = sequence;
   }
 
   public void setStart(final int start) {
