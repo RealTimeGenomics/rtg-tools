@@ -184,7 +184,7 @@ public class Adjuster {
 
   private void validateTypedField(TypedField<?> f) {
     final VcfNumber n = f.getNumber();
-    if (n != VcfNumber.REF_ALTS && n != VcfNumber.DOT) {
+    if (!VcfNumber.REF_ALTS.equals(n) && !VcfNumber.DOT.equals(n)) {
       throw new VcfFormatException("Cannot derive new values for " + f.fieldName() + " " + f.getId() + " declared as Number=" + n);
     }
     final MetaType type = f.getType();
