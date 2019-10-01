@@ -289,7 +289,7 @@ final class DataBundle {
         }
       }
     }
-    return posPoints.toArray(new TextPoint2D[posPoints.size()]);
+    return posPoints.toArray(new TextPoint2D[0]);
   }
 
   TextPoint2D getMaxRangedLabel() {

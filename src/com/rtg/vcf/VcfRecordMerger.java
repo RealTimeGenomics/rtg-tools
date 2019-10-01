@@ -297,8 +297,8 @@ public class VcfRecordMerger {
     for (Integer key : recordSets.keySet()) {
       final Collection<VcfRecord> recs = recordSets.get(key);
       final Collection<VcfHeader> heads = headerSets.get(key);
-      final VcfRecord[] recsArray = recs.toArray(new VcfRecord[recs.size()]);
-      final VcfHeader[] headsArray = heads.toArray(new VcfHeader[heads.size()]);
+      final VcfRecord[] recsArray = recs.toArray(new VcfRecord[0]);
+      final VcfHeader[] headsArray = heads.toArray(new VcfHeader[0]);
       final VcfRecord merged = mergeRecordsWithSameRef(recsArray, headsArray, destHeader, unmergeableFormatFields, !preserveFormats);
       if (merged != null) {
         ret.add(merged);
@@ -316,7 +316,7 @@ public class VcfRecordMerger {
         }
       }
     }
-    return ret.toArray(new VcfRecord[ret.size()]);
+    return ret.toArray(new VcfRecord[0]);
   }
 
   /**

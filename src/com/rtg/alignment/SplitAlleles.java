@@ -72,7 +72,7 @@ public class SplitAlleles {
    * @param alts alternate alleles
    */
   public SplitAlleles(final String ref, final Collection<String> alts) {
-    this(ref, alts.toArray(new String[alts.size()]));
+    this(ref, alts.toArray(new String[0]));
   }
 
   /**
@@ -291,7 +291,7 @@ public class SplitAlleles {
     final String reference = (String) flags.getAnonymousValue(0);
     @SuppressWarnings("unchecked")
     final List<String> a = (List<String>) flags.getAnonymousValues(1);
-    final String[] alts = a.toArray(new String[a.size()]);
+    final String[] alts = a.toArray(new String[0]);
     final SplitAlleles pwa = new SplitAlleles(reference, alts);
     Partition split = Partition.removeAllRef(pwa.partition());
     if (flags.isSet("mnp")) {

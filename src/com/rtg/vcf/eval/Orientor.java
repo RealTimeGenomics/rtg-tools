@@ -239,7 +239,7 @@ public interface Orientor {
         }
         pos.add(new OrientedVariant(variant, true, i, i));
       }
-      return pos.toArray(new OrientedVariant[pos.size()]);
+      return pos.toArray(new OrientedVariant[0]);
     }
   };
 }

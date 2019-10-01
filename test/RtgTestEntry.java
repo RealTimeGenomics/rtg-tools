@@ -214,7 +214,7 @@ public final class RtgTestEntry {
    */
   public static Class<?>[] getClasses() {
     final List<Class<?>> testClasses = new ClassPathSuite().getTestClasses();
-    return testClasses.toArray(new Class<?>[testClasses.size()]);
+    return testClasses.toArray(new Class<?>[0]);
   }
 
 }

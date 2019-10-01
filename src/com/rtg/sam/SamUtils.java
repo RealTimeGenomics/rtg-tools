@@ -680,7 +680,7 @@ public final class SamUtils {
         sampleNames.add(rec.getSample());
       }
     }
-    return sampleNames.toArray(new String[sampleNames.size()]);
+    return sampleNames.toArray(new String[0]);
   }
 
   /**

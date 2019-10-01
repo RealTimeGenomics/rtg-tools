@@ -131,7 +131,7 @@ public final class StringUtils {
       lindex = index + 1;
     }
     output.add(src.substring(lindex));
-    return output.toArray(new String[output.size()]);
+    return output.toArray(new String[0]);
   }
 
   /**

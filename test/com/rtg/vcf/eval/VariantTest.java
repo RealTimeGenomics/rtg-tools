@@ -93,7 +93,7 @@ public class VariantTest extends TestCase {
     allDetections.add(dv4);
     allDetections.add(dv1);
     allDetections.add(dv3);
-    final Variant[] variantArray = allDetections.toArray(new Variant[allDetections.size()]);
+    final Variant[] variantArray = allDetections.toArray(new Variant[0]);
     Arrays.sort(variantArray, new SequenceNameLocusComparator());
     assertEquals("someKindOfName:23-24 (T)", variantArray[0].toString());
     assertEquals("someKindOfName:24-25 (T)", variantArray[1].toString());

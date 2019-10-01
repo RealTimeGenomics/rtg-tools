@@ -166,7 +166,7 @@ public class ParentalVariant extends Variant {
       if (pv.matAlleleB() > 0 && matHet && pv.matAlleleB() != pv.patAlleleA() && pv.matAlleleB() != pv.patAlleleB()) {
         pos.add(new OrientedVariant(variant, pv.matAlleleB()));
       }
-      return pos.toArray(new OrientedVariant[pos.size()]);
+      return pos.toArray(new OrientedVariant[0]);
     }
   };
 

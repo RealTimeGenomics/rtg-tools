@@ -118,7 +118,7 @@ public class Family {
       father = firstParent;
       mother = secondParent;
     }
-    return new Family(pedigree, father, mother, children.toArray(new String[children.size()]));
+    return new Family(pedigree, father, mother, children.toArray(new String[0]));
   }
 
   /**
@@ -196,7 +196,7 @@ public class Family {
         }
       }
       if (accepted) {
-        final Family family = new Family(pedigree, father, mother, entry.getValue().toArray(new String[entry.getValue().size()]));
+        final Family family = new Family(pedigree, father, mother, entry.getValue().toArray(new String[0]));
 //        int fatherId = 0;
 //        if (parentFams.containsKey(father)) {
 //          fatherId = parentFams.get(father) + 1;
@@ -403,7 +403,7 @@ public class Family {
    * @return Returns a list of the children.
    */
   public String[] getChildren() {
-    return mChildren.toArray(new String[mChildren.size()]);
+    return mChildren.toArray(new String[0]);
   }
 
   /**

@@ -149,6 +149,6 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     if (checkFp) {
       files.add("fp.vcf");
     }
-    endToEnd(id, files.toArray(new String[files.size()]), expectWarn, args);
+    endToEnd(id, files.toArray(new String[0]), expectWarn, args);
   }
 }

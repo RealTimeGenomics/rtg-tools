@@ -134,7 +134,7 @@ public final class Resources {
       for (final File f : FileUtils.listFiles(dir)) {
         strings.add("/".equals(StringUtils.FS) ? f.getPath() : f.getPath().replaceAll("\\\\" + StringUtils.FS, "/"));
       }
-      return strings.toArray(new String[strings.size()]);
+      return strings.toArray(new String[0]);
     } else if ("jar".equals(url.getProtocol())) {
       final ArrayList<String> strings = new ArrayList<>();
       assert url.getPath().startsWith("file:");
@@ -152,7 +152,7 @@ public final class Resources {
           }
         }
       }
-      return strings.toArray(new String[strings.size()]);
+      return strings.toArray(new String[0]);
     }
     return null;
   }

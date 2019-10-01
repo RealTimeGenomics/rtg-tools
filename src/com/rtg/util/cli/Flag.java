@@ -443,7 +443,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    */
   public Flag<T> setParameterRange(final Collection<String> range) {
     //System.err.println("setParameterRange range=" + range.toString());
-    final String[] rarray = range.toArray(new String[range.size()]);
+    final String[] rarray = range.toArray(new String[0]);
     return setParameterRange(rarray);
   }
 

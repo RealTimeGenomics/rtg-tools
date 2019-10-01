@@ -126,7 +126,7 @@ public final class TabixIndexMerge {
       }
       ret.add(currIndex);
     }
-    return ret.toArray(new SequenceIndex[ret.size()]);
+    return ret.toArray(new SequenceIndex[0]);
   }
 
   /**
@@ -139,7 +139,7 @@ public final class TabixIndexMerge {
     final LinkedHashSet<String> ret = new LinkedHashSet<>();
     ret.addAll(Arrays.asList(master));
     ret.addAll(Arrays.asList(next));
-    return ret.toArray(new String[ret.size()]);
+    return ret.toArray(new String[0]);
   }
 
   /**
@@ -198,7 +198,7 @@ public final class TabixIndexMerge {
       }
       indexes.add(bi);
     }
-    return indexes.toArray(new SequenceIndex[indexes.size()]);
+    return indexes.toArray(new SequenceIndex[0]);
   }
 
   private static long fixChunkPosition(long filePointer, long accumulatedFileSize) {

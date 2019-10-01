@@ -122,7 +122,7 @@ public class VcfRecordTest extends TestCase {
 
   static void checkRecord(VcfRecord merged, VcfRecord exp, String[] genotype) {
     final List<String> altCalls = exp.getAltCalls();
-    checkRecord(merged, exp.getSequenceName(), exp.getRefCall(), exp.getOneBasedStart(), altCalls.toArray(new String[altCalls.size()]), genotype);
+    checkRecord(merged, exp.getSequenceName(), exp.getRefCall(), exp.getOneBasedStart(), altCalls.toArray(new String[0]), genotype);
   }
   static void checkRecord(VcfRecord merged, VcfRecord exp, String[] altCalls, String[] genotype) {
     checkRecord(merged, exp.getSequenceName(), exp.getRefCall(), exp.getOneBasedStart(), altCalls, genotype);

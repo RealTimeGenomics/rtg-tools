@@ -251,7 +251,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
       final boolean gzip = !flags.isSet(NO_GZIP);
       final File outputVcf = VcfUtils.getZippedVcfFileName(gzip, new File(mOutputDir, moduleName() + VcfUtils.VCF_SUFFIX));
       final VariantStatistics stats = new VariantStatistics(mOutputDir);
-      stats.onlySamples(mCreated.toArray(new String[mCreated.size()]));
+      stats.onlySamples(mCreated.toArray(new String[0]));
       try (VcfReader reader = VcfReader.openVcfReader(results);
            VcfWriter writer = new StatisticsVcfWriter<>(new VcfWriterFactory(mFlags).addRunInfo(true).make(reader.getHeader(), outputVcf), stats)) {
         writer.getHeader().addMetaInformationLine(VcfHeader.META_STRING + "SEED=" + random.getSeed());
@@ -371,7 +371,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
   }
 
   private void simulateChildrenBatch(ArrayList<ChildSampleSimulator.Trio> batch, HashSet<String> batchchildren) {
-    final ChildSampleSimulator.Trio[] trios = batch.toArray(new ChildSampleSimulator.Trio[batch.size()]);
+    final ChildSampleSimulator.Trio[] trios = batch.toArray(new ChildSampleSimulator.Trio[0]);
     addJob("children", (i, o) -> {
       Diagnostic.userLog("Generating a batch of " + trios.length + " children");
       for (ChildSampleSimulator.Trio trio : trios) {

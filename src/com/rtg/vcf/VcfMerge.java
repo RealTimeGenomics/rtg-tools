@@ -194,7 +194,7 @@ public class VcfMerge extends AbstractCli {
     final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
     final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
     final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(mFlags);
-    final VcfPositionZipper posZip = new VcfPositionZipper(regions, forceMerge, inputs.toArray(new File[inputs.size()]));
+    final VcfPositionZipper posZip = new VcfPositionZipper(regions, forceMerge, inputs.toArray(new File[0]));
     final VcfHeader header = posZip.getHeader();
     VcfUtils.addHeaderLines(header, extraHeaderLines);
     final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
@@ -369,7 +369,7 @@ public class VcfMerge extends AbstractCli {
           headers.add(mReaders[i].getHeader());
         } while (mReaders[i].hasNext() && mReaders[i].peek().getStart() == position);
       }
-      callback.vcfAtPosition(recs.toArray(new VcfRecord[recs.size()]), headers.toArray(new VcfHeader[headers.size()]));
+      callback.vcfAtPosition(recs.toArray(new VcfRecord[0]), headers.toArray(new VcfHeader[0]));
       mCurrentRecords.clear();
       populateNext();
     }

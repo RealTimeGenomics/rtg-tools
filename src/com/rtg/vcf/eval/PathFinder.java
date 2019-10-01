@@ -115,10 +115,10 @@ public final class PathFinder {
     mConfig = config;
     mCallOrientor = callOrientor;
     mBaselineOrientor = baselineOrientor;
-    mCalledVariants = calledVariants.toArray(new Variant[calledVariants.size()]);
+    mCalledVariants = calledVariants.toArray(new Variant[0]);
     Arrays.sort(mCalledVariants, Variant.NATURAL_COMPARATOR);
 
-    mBaseLineVariants = baseLineVariants.toArray(new Variant[baseLineVariants.size()]);
+    mBaseLineVariants = baseLineVariants.toArray(new Variant[0]);
     Arrays.sort(mBaseLineVariants, Variant.NATURAL_COMPARATOR);
   }
 

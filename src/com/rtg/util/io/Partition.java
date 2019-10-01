@@ -108,6 +108,6 @@ public final class Partition {
    * @return <code>binCount</code> bins collectively containing all the files
    */
   public static List<List<File>> partition(final int binCount, final Collection<File> files) {
-    return binThem(binCount, files.toArray(new File[files.size()]));
+    return binThem(binCount, files.toArray(new File[0]));
   }
 }

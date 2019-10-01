@@ -113,7 +113,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
       max = Math.max(max, source.currentLength());
     }
     final byte[][] dataArray = data.toArray(new byte[data.size()][]);
-    final String[] labelsArray = labels.toArray(new String[labels.size()]);
+    final String[] labelsArray = labels.toArray(new String[0]);
     return new CompressedMemorySequencesReader(dataArray, labelsArray, ArrayUtils.asLongArray(counts), min, max, source.type());
   }
 

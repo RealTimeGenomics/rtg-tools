@@ -53,6 +53,6 @@ public class BedHeader {
    * @return the BED header lines.
    */
   public String[] getHeaderLines() {
-    return mLines.toArray(new String[mLines.size()]);
+    return mLines.toArray(new String[0]);
   }
 }

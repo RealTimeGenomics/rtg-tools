@@ -53,7 +53,7 @@ public class SamFilterChain implements SamFilter {
    * @param filters the filters to chain
    */
   public SamFilterChain(Collection<SamFilter> filters) {
-    mFilters = filters.toArray(new SamFilter[filters.size()]);
+    mFilters = filters.toArray(new SamFilter[0]);
   }
 
   @Override

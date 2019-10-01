@@ -630,7 +630,7 @@ public final class TestUtils {
     } catch (final IOException ioe) {
       throw new RuntimeException(ioe);
     }
-    return results.toArray(new String[results.size()]);
+    return results.toArray(new String[0]);
   }
 
   /**

@@ -204,7 +204,7 @@ public class FamilyTest extends TestCase {
 
     final Set<Family> families = Family.getFamilies(pedigree, false, null);
     assertEquals(3, families.size());
-    final Family[] afamilies = families.toArray(new Family[families.size()]);
+    final Family[] afamilies = families.toArray(new Family[0]);
     assertEquals("father", afamilies[0].getFather());
     assertEquals("mother", afamilies[0].getMother());
     assertEquals("child", afamilies[0].getChildren()[0]);

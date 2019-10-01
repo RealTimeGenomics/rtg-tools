@@ -152,7 +152,7 @@ public class GenomeRelationships {
    * @return array of genomes declared in file
    */
   public String[] genomes() {
-    return mGenomes.toArray(new String[mGenomes.size()]);
+    return mGenomes.toArray(new String[0]);
   }
 
   /**
@@ -208,7 +208,7 @@ public class GenomeRelationships {
    */
   public Relationship[] relationships(String genome) {
     final Collection<Relationship> col = mRelationships.get(genome);
-    return col == null ? EMPTY_REL : col.toArray(new Relationship[col.size()]);
+    return col == null ? EMPTY_REL : col.toArray(new Relationship[0]);
   }
 
   /**
@@ -238,7 +238,7 @@ public class GenomeRelationships {
         derivatives.add(r);
       }
     }
-    return derivatives.toArray(new Relationship[derivatives.size()]);
+    return derivatives.toArray(new Relationship[0]);
   }
 
   /**
@@ -256,7 +256,7 @@ public class GenomeRelationships {
         }
       }
     }
-    return collected.toArray(new Relationship[collected.size()]);
+    return collected.toArray(new Relationship[0]);
   }
 
   /**
@@ -271,7 +271,7 @@ public class GenomeRelationships {
         collected.add(genome);
       }
     }
-    return collected.toArray(new String[collected.size()]);
+    return collected.toArray(new String[0]);
   }
 
   /**
@@ -802,7 +802,7 @@ public class GenomeRelationships {
    * @return number of groups detected
    */
   public int numberOfDisconnectedGroups(Collection<String> genomes) {
-    final String[] genomes2 = genomes.toArray(new String[genomes.size()]);
+    final String[] genomes2 = genomes.toArray(new String[0]);
     final int[] connectionsMatrix = new int[genomes.size() * genomes.size()];
 
     final HashSet<Integer> groupIds = new HashSet<>();

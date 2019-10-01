@@ -123,9 +123,9 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
     if (annotation != null) {
       if (annotation.size() > 0) {
         if (mInfoId == null) {
-          rec.setId(annotation.toArray(new String[annotation.size()]));
+          rec.setId(annotation.toArray(new String[0]));
         } else {
-          rec.addInfo(mInfoId, annotation.toArray(new String[annotation.size()]));
+          rec.addInfo(mInfoId, annotation.toArray(new String[0]));
         }
       }
     }
