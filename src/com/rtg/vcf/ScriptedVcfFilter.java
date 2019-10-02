@@ -32,12 +32,17 @@ package com.rtg.vcf;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.Invocable;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -70,8 +75,9 @@ public class ScriptedVcfFilter implements VcfFilter {
    * @param expression script to run to determine if record should be accepted
    * @param beginnings initialisation scripts to run at start of processing
    * @param output output stream for the JavaScript print method
+   * @param err output stream for our JavaScript error method
    */
-  public ScriptedVcfFilter(String expression, List<String> beginnings, OutputStream output) {
+  public ScriptedVcfFilter(String expression, List<String> beginnings, OutputStream output, PrintStream err) {
     final ScriptEngineManager manager = new ScriptEngineManager();
     mEngine = manager.getEngineByName("js");
     if (mEngine == null) {
@@ -83,7 +89,22 @@ public class ScriptedVcfFilter implements VcfFilter {
     if (!(mEngine instanceof Invocable)) {
       throw new NoTalkbackSlimException("Javascript engine is not invokable");
     }
-    mEngine.getContext().setWriter(new OutputStreamWriter(output));
+    final ScriptContext sc = mEngine.getContext();
+    sc.setWriter(new OutputStreamWriter(output));
+    sc.setErrorWriter(new PrintWriter(err));
+    sc.setAttribute("stderr", // Make an attribute 'stderr' that we can send Strings to from JS
+      (Consumer<String>) str -> {
+        try {
+          final Writer errDest = sc.getErrorWriter();
+          errDest.write(str);
+          errDest.write(StringUtils.LS);
+          errDest.flush();
+        } catch (Exception e) {
+          throw new Error(e);
+        }
+      },
+      ScriptContext.ENGINE_SCOPE
+    );
     mEngine.put(VERSION_VARIABLE, Environment.getProductVersion());
     final Compilable compileable = (Compilable) mEngine;
     if (expression == null) {

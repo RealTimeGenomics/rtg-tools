@@ -36,13 +36,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.hamcrest.core.StringContains;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
@@ -73,7 +78,7 @@ public class ScriptedVcfFilterTest {
   }
 
   private ScriptedVcfFilter getScriptedVcfFilter(String expression, VcfHeader header, String... begin) {
-    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin), System.err);
+    final ScriptedVcfFilter scriptedVcfFilter = new ScriptedVcfFilter(expression, Arrays.asList(begin), System.out, System.err);
     scriptedVcfFilter.setHeader(header);
     return scriptedVcfFilter;
   }
@@ -83,6 +88,21 @@ public class ScriptedVcfFilterTest {
     final VcfRecord record = new VcfRecord("blah", 1, "A");
     assertTrue(getScriptedVcfFilter("typeof NO_RTG_VERSION == 'undefined'").accept(record));
     assertTrue(getScriptedVcfFilter("typeof RTG_VERSION != 'undefined'").accept(record));
+  }
+
+  @Test
+  public void testCapturePrint() {
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    final ByteArrayOutputStream err = new ByteArrayOutputStream();
+    try (PrintStream printOut = new PrintStream(out); PrintStream printErr = new PrintStream(err)) {
+      List<String> begin = new ArrayList<>();
+      begin.add("print('some standard output');");
+      begin.add("error('some error output');");
+      ScriptedVcfFilter sc = new ScriptedVcfFilter("true;", begin, printOut, printErr);
+      sc.setHeader(getVcfHeader());
+    }
+    assertEquals("some standard output" + StringUtils.LS, out.toString());
+    assertEquals("some error output" + StringUtils.LS, err.toString());
   }
 
   private void expectThrows(String expr) {

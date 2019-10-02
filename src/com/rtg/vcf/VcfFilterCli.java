@@ -424,7 +424,7 @@ public final class VcfFilterCli extends AbstractCli {
       beginnings.add(fileIfExists((String) begin));
     }
     if (expressionString != null || beginnings.size() > 0) {
-      final ScriptedVcfFilter filter = new ScriptedVcfFilter(expressionString, beginnings, output);
+      final ScriptedVcfFilter filter = new ScriptedVcfFilter(expressionString, beginnings, output, System.err);
       return Optional.of(filter);
     }
     return Optional.empty();

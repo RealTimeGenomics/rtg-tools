@@ -308,4 +308,9 @@ var FormatField = Java.type("com.rtg.vcf.header.FormatField");
         }
         throw "This script requires an RTG version of " + minVersion + " or higher!\n";
     }
+
+    global.error = function(message) {
+        stderr.accept(message);
+    };
+
 })(this);
