@@ -53,6 +53,7 @@ public class RegionRestriction implements SequenceNameLocus {
    * Restriction to named sequence, accepts restrictions of
    * the following forms:
    *   <code>name</code>               (corresponds to the whole chromosome)
+   *   <code>name:</code>              (corresponds to the whole chromosome)
    *   <code>name:start</code>         (corresponds to a point on the chromosome)
    *   <code>name:start-end</code>     (a range from start to end)
    *   <code>name:start+length</code>  (a range from start to start+length)
@@ -64,7 +65,7 @@ public class RegionRestriction implements SequenceNameLocus {
       throw malformedRange(restriction);
     }
     final int rangepos = restriction.lastIndexOf(':');
-    if (rangepos != -1) {
+    if (rangepos != -1 && rangepos < restriction.length() - 1) {
       mSequence = restriction.substring(0, rangepos);
       final String range = restriction.substring(rangepos + 1);
       final NumberFormat fmt = NumberFormat.getInstance(Locale.getDefault());
@@ -107,7 +108,7 @@ public class RegionRestriction implements SequenceNameLocus {
         throw malformedRange(restriction);
       }
     } else {
-      mSequence = restriction;
+      mSequence = rangepos == restriction.length() - 1 ? restriction.substring(0, rangepos) : restriction;
       mStart = MISSING;
       mEnd = MISSING;
     }
@@ -166,7 +167,8 @@ public class RegionRestriction implements SequenceNameLocus {
    */
   @Override
   public String toString() {
-    return mSequence + (mStart != MISSING ? ":" + (mStart + 1) + (mEnd != MISSING ? "-" + mEnd : "") : "");
+    final String res = mSequence + (mStart != MISSING ? ":" + (mStart + 1) + (mEnd != MISSING ? "-" + mEnd : "") : "");
+    return mSequence.indexOf(':') != -1 && mStart == MISSING ? res + ':' : res;
   }
 
   /**

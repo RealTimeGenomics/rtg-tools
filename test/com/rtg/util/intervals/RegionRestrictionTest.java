@@ -29,6 +29,8 @@
  */
 package com.rtg.util.intervals;
 
+import static com.rtg.util.intervals.RegionRestriction.MISSING;
+
 import junit.framework.TestCase;
 
 /**
@@ -37,7 +39,7 @@ public class RegionRestrictionTest extends TestCase {
 
   public void test() {
     checkMalformed("");
-    checkMalformed("blah:");
+    //checkMalformed("blah::");
     checkMalformed("blah:-600");
     checkMalformed("blah:600-400");
     checkMalformed("blah:600-+400");
@@ -56,10 +58,18 @@ public class RegionRestrictionTest extends TestCase {
     checkSuccess("blah:600+2", "blah", 599, 601, "blah:600-601");
     checkSuccess("blah:600~2", "blah", 597, 601, "blah:598-601");
     checkSuccess("blah:600-609", "blah", 599, 609, "blah:600-609");
+    // Subsequence from a sequence named like a region
+    checkSuccess("blah:500-509:600-609", "blah:500-509", 599, 609, "blah:500-509:600-609");
+    // All of a sequence that is named like a region
+    checkSuccess("blah:500-509:", "blah:500-509", MISSING, MISSING, "blah:500-509:");
+    // All of a sequence, using colon
+    checkSuccess("blah:", "blah", MISSING, MISSING, "blah");
+    // All of a sequence containing a colon, using colon
+    checkSuccess("blah::", "blah:", MISSING, MISSING, "blah::");
     checkSuccess("blah:600+10", "blah", 599, 609, "blah:600-609");
     checkSuccess("blah:600~10", "blah", 589, 609, "blah:590-609");
     checkSuccess("blah:50~100", "blah", 0, 149, "blah:1-149"); // Check truncation on left
-    checkSuccess("blah", "blah", RegionRestriction.MISSING, RegionRestriction.MISSING, "blah");
+    checkSuccess("blah", "blah", MISSING, MISSING, "blah");
     checkSuccess("blah:1-2", "blah", 0, 2, "blah:1-2");
     checkSuccess("blah:1+2", "blah", 0, 2, "blah:1-2");
     checkSuccess("blah:1+1", "blah", 0, 1, "blah:1-1");
@@ -110,7 +120,8 @@ public class RegionRestrictionTest extends TestCase {
 
   public void testValidateRegion() {
     assertTrue(RegionRestriction.validateRegion("blah"));
-    assertFalse(RegionRestriction.validateRegion("blah:"));
+    assertFalse(RegionRestriction.validateRegion("blah:-1"));
+    assertTrue(RegionRestriction.validateRegion("blah:-1:"));
   }
 
   private void checkSuccess(String region, String template, int start, int end, String formatted) {
