@@ -30,6 +30,8 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.util.intervals.RegionRestriction.MISSING;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
@@ -142,7 +144,7 @@ public class SampleReplayer {
     for (int i = 0; i < count; ++i) {
       final String name = mReference.name(sequenceId);
       output.startSequence(deriveName(name, i, count));
-      try (VcfReader vcfReader = VcfReader.openVcfReader(sampleVcf, new RegionRestriction(name))) {
+      try (VcfReader vcfReader = VcfReader.openVcfReader(sampleVcf, new RegionRestriction(name, MISSING, MISSING))) {
         int currentPos = 0;
         while (vcfReader.hasNext()) {
           final VcfRecord vcf = vcfReader.next();

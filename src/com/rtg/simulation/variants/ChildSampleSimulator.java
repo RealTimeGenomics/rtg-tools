@@ -30,6 +30,8 @@
 
 package com.rtg.simulation.variants;
 
+import static com.rtg.util.intervals.RegionRestriction.MISSING;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -277,7 +279,7 @@ public class ChildSampleSimulator {
       trioStates[i] = new TrioSequenceState(trios[i], refName).invoke();
     }
     int lastPos = 0;
-    try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refName))) {
+    try (VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refName, MISSING, MISSING))) {
       final VcfHeader header = vcfOut.getHeader();
       while (reader.hasNext()) {
         mSeenVariants = true;
