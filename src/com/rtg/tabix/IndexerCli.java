@@ -158,13 +158,13 @@ public class IndexerCli extends AbstractCli {
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     int retCode = 0;
     Collection<File> inputFiles = CommonFlags.getFileList(mFlags, CommonFlags.INPUT_LIST_FLAG, null, false);
+    if (mFlags.isSet(CommonFlags.FORCE)) {
+      inputFiles = IndexUtils.ensureBlockCompressed(inputFiles);
+    }
     final IndexFormat format = getIndexFormat(inputFiles, (IndexFormat) mFlags.getValue(INPUT_FORMAT));
     if (format == null) {
       Diagnostic.warning("Could not automatically determine file format type, please use --" + INPUT_FORMAT);
       return 1;
-    }
-    if (mFlags.isSet(CommonFlags.FORCE)) {
-      inputFiles = IndexUtils.ensureBlockCompressed(inputFiles);
     }
     for (final File f : inputFiles) {
       if (format != IndexFormat.CRAM && !TabixIndexer.isBlockCompressed(f)) {

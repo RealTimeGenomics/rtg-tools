@@ -58,7 +58,7 @@ public final class IndexUtils {
   public static File ensureBlockCompressed(File f) throws IOException {
     File ret = f;
     if (!TabixIndexer.isBlockCompressed(f)) {
-      Diagnostic.info("blockcompressing file: " + f.getPath());
+      Diagnostic.info("Block compressing file: " + f.getPath());
       final File outFile = File.createTempFile(f.getName(), "", f.getAbsoluteFile().getParentFile());
       try (InputStream is = FileUtils.createInputStream(f, false)) {
         try (BlockCompressedOutputStream bcos = new BlockCompressedOutputStream(outFile)) {
@@ -69,14 +69,14 @@ public final class IndexUtils {
       if (!FileUtils.isGzipFilename(f)) {
         mvFile = new File(f.getParentFile(), f.getName() + FileUtils.GZ_SUFFIX);
         if (!f.delete()) {
-          Diagnostic.warning("failed to remove: " + f.getPath());
+          Diagnostic.warning("Failed to remove: " + f.getPath());
         }
         ret = mvFile;
       } else {
         mvFile = f;
       }
       if ((!mvFile.exists() || mvFile.delete()) && !outFile.renameTo(mvFile)) {
-        Diagnostic.warning("failed to rename temporary file: " + outFile.getPath() + " to: " + mvFile.getPath());
+        Diagnostic.warning("Failed to rename temporary file: " + outFile.getPath() + " to: " + mvFile.getPath());
       }
     }
     return ret;
