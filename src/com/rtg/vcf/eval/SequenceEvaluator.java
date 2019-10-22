@@ -41,6 +41,7 @@ import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.launcher.globals.GlobalFlags;
 import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.reader.SequencesReader;
+import com.rtg.util.Constants;
 import com.rtg.util.IORunnable;
 import com.rtg.util.Pair;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -107,6 +108,7 @@ class SequenceEvaluator implements IORunnable {
         if (best == null) {
           // Add some more info to the message so we can try to track this one down.
           final StringBuilder msg = new StringBuilder("After path finding on " + currentName + ", the best path was null!");
+          msg.append("\nThis is an interesting situation -- please send example VCF files to " + Constants.SUPPORT_EMAIL_ADDR);
           if (baseLineCalls.size() < 50) {
             msg.append("\nb: ").append(baseLineCalls.toString());
           }
