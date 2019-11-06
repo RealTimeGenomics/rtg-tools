@@ -48,7 +48,7 @@ public final class ArrayUtils {
   private ArrayUtils() { }
 
   /**
-   * Sum an array of longs.
+   * Sum an array of doubles.
    *
    * @param a array
    * @return sum
