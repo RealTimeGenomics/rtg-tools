@@ -63,6 +63,7 @@ import com.rtg.vcf.VcfAnnotatorCli;
 import com.rtg.vcf.VcfDecomposerCli;
 import com.rtg.vcf.VcfFilterCli;
 import com.rtg.vcf.VcfMerge;
+import com.rtg.vcf.VcfSplitCli;
 import com.rtg.vcf.VcfStatsCli;
 import com.rtg.vcf.VcfSubset;
 import com.rtg.vcf.eval.Vcf2Rocplot;
@@ -107,6 +108,7 @@ public final class ToolsCommand {
   static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCF2ROCPLOT = new Command(new Vcf2Rocplot(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
+  static final Command VCFSPLIT = new Command(new VcfSplitCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command CNVEVAL = new Command(new CnvEvalCli(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
@@ -144,6 +146,7 @@ public final class ToolsCommand {
     SDFSTATS, SDFSUBSET, SDFSUBSEQ,            // SDF related
     MENDELIAN, VCFSTATS, VCFMERGE,                       // VCF related
     VCFFILTER, VCFANNOTATE, VCFSUBSET,
+    VCFSPLIT,
     VCFDECOMPOSE, VCFEVAL, VCF2ROCPLOT,
     SVDECOMPOSE, BNDEVAL, CNVEVAL,
     PEDFILTER, PEDSTATS,
