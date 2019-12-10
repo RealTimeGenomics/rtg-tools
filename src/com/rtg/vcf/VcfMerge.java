@@ -86,6 +86,7 @@ public class VcfMerge extends AbstractCli {
   private static final String NON_PADDING_AWARE = "Xnon-padding-aware";
   private static final String STATS_FLAG = "stats";
   private static final String GT_MAJORITY = "Xgt-majority";
+  private static final String NO_ALT_MERGE = "Xno-merge-alts";
 
   @Override
   public String moduleName() {
@@ -116,6 +117,7 @@ public class VcfMerge extends AbstractCli {
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
     mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
     mFlags.registerOptional(GT_MAJORITY, "alternate mode that combines per sample GTs by majority vote").setCategory(UTILITY);
+    mFlags.registerOptional(NO_ALT_MERGE, "alternate mode that never combines records if the ALTs are different").setCategory(UTILITY);
 
     mFlags.addRequiredSet(inFlag);
     mFlags.addRequiredSet(listFlag);
@@ -206,8 +208,14 @@ public class VcfMerge extends AbstractCli {
 
     final boolean stdout = FileUtils.isStdio(outFile);
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, outFile);
-    final boolean gtMajority = mFlags.isSet(GT_MAJORITY);
-    final VcfRecordMerger merger = gtMajority ? new VcfGtMajorityMerger() : new VcfRecordMerger(defaultFormat, paddingAware);
+    final VcfRecordMerger merger;
+    if (mFlags.isSet(GT_MAJORITY)) {
+      merger = new VcfGtMajorityMerger();
+    } else if (mFlags.isSet(NO_ALT_MERGE)) {
+      merger = new VcfSameAltsMerger();
+    } else {
+      merger = new VcfRecordMerger(defaultFormat, paddingAware);
+    }
     try (final VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
       final ZipperCallback callback = (records, headers) -> {
         assert records.length > 0;
