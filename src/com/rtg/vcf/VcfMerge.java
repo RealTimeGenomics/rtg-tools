@@ -70,7 +70,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.header.ContigField;
-import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 import com.rtg.vcf.header.VcfHeaderMerge;
 
@@ -83,8 +82,8 @@ public class VcfMerge extends AbstractCli {
   private static final String FORCE_MERGE = "force-merge";
   private static final String FORCE_MERGE_ALL = "force-merge-all";
   private static final String PRESERVE_FORMATS = "preserve-formats";
-  private static final String NON_PADDING_AWARE = "Xnon-padding-aware";
   private static final String STATS_FLAG = "stats";
+  private static final String NON_PADDING_AWARE = "Xnon-padding-aware";
   private static final String GT_MAJORITY = "Xgt-majority";
   private static final String NO_ALT_MERGE = "Xno-merge-alts";
 
@@ -104,7 +103,7 @@ public class VcfMerge extends AbstractCli {
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
     CommonFlags.initForce(mFlags);
-    mFlags.setDescription("Merge a set of VCF files.");
+    mFlags.setDescription("Merge a one or more input VCF files to a single output VCF. Use cases include combining single sample calls into a multi-sample VCF, or to combine calls on separate chromosomes into a single VCF.");
     mFlags.registerRequired('o', OUTPUT_FLAG, File.class, FILE, "output VCF file. Use '-' to write to standard output").setCategory(INPUT_OUTPUT);
     CommonFlags.initRegionOrBedRegionsFlags(mFlags);
     mFlags.registerOptional(CommonFlags.NO_HEADER, "prevent VCF header from being written").setCategory(UTILITY);
@@ -113,7 +112,7 @@ public class VcfMerge extends AbstractCli {
     final Flag<File> listFlag = mFlags.registerOptional('I', CommonFlags.INPUT_LIST_FLAG, File.class, FILE, "file containing a list of VCF format files (1 per line) to be merged").setCategory(INPUT_OUTPUT);
     mFlags.registerOptional('F', FORCE_MERGE_ALL, "attempt merging of all non-matching header declarations").setCategory(UTILITY);
     mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
-    mFlags.registerOptional(PRESERVE_FORMATS, "if set, variants with different ALTs and unmergeable FORMAT fields will be kept unmerged (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
+    mFlags.registerOptional(PRESERVE_FORMATS, "do not merge multiple records containing unmergeable FORMAT fields (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
     mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
     mFlags.registerOptional(GT_MAJORITY, "alternate mode that combines per sample GTs by majority vote").setCategory(UTILITY);
@@ -193,13 +192,10 @@ public class VcfMerge extends AbstractCli {
     }
     final boolean gzip = !mFlags.isSet(NO_GZIP);
     final VariantStatistics stats = mFlags.isSet(STATS_FLAG) ? new VariantStatistics(null) : null;
-    final boolean preserveFormats = mFlags.isSet(PRESERVE_FORMATS);
-    final boolean paddingAware = !mFlags.isSet(NON_PADDING_AWARE);
     final ReferenceRanges<String> regions = CommonFlags.parseRegionOrBedRegions(mFlags);
     final VcfPositionZipper posZip = new VcfPositionZipper(regions, forceMerge, inputs.toArray(new File[0]));
     final VcfHeader header = posZip.getHeader();
     VcfUtils.addHeaderLines(header, extraHeaderLines);
-    final Set<String> alleleBasedFormatFields = alleleBasedFormats(header);
 
     String defaultFormat = FORMAT_GENOTYPE;
     if (header.getFormatField(FORMAT_GENOTYPE) == null && header.getFormatLines().size() > 0) {
@@ -210,16 +206,24 @@ public class VcfMerge extends AbstractCli {
     final File vcfFile = VcfUtils.getZippedVcfFileName(gzip, outFile);
     final VcfRecordMerger merger;
     if (mFlags.isSet(GT_MAJORITY)) {
+      if (!FORMAT_GENOTYPE.equals(defaultFormat)) {
+        throw new NoTalkbackSlimException("VCF header does not contain GT declaration");
+      }
       merger = new VcfGtMajorityMerger();
     } else if (mFlags.isSet(NO_ALT_MERGE)) {
       merger = new VcfSameAltsMerger();
     } else {
-      merger = new VcfRecordMerger(defaultFormat, paddingAware);
+      merger = new VcfRecordMerger();
     }
+    merger.setHeader(header);
+    merger.setDefaultFormat(defaultFormat);
+    merger.setPaddingAware(!mFlags.isSet(NON_PADDING_AWARE));
+    merger.setDropUnmergeable(!mFlags.isSet(PRESERVE_FORMATS));
+
     try (final VcfWriter w = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
       final ZipperCallback callback = (records, headers) -> {
         assert records.length > 0;
-        final VcfRecord[] mergedArr = merger.mergeRecords(records, headers, header, alleleBasedFormatFields, preserveFormats);
+        final VcfRecord[] mergedArr = merger.mergeRecords(records, headers);
         for (VcfRecord merged : mergedArr) {
           if (stats != null) {
             stats.tallyVariant(header, merged);
@@ -240,10 +244,6 @@ public class VcfMerge extends AbstractCli {
       }
     }
     return 0;
-  }
-
-  static Set<String> alleleBasedFormats(VcfHeader destHeader) {
-    return destHeader.getFormatLines().stream().filter(FormatField::isAlleleDependent).map(FormatField::getId).collect(Collectors.toSet());
   }
 
   /**

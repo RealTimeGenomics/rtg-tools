@@ -110,6 +110,7 @@ class TrioEvalSynchronizer extends WithInfoEvalSynchronizer {
     mOutHeader.addSampleName(SAMPLE_FATHER);
     mOutHeader.addSampleName(SAMPLE_MOTHER);
     mOutHeader.addSampleName(SAMPLE_CHILD);
+    mMerger.setHeader(mOutHeader);
     mInHeaders[TRUTH_MERGE_INDEX] = variants.baselineHeader().copy();
     mInHeaders[TRUTH_MERGE_INDEX].removeAllSamples();
     mInHeaders[TRUTH_MERGE_INDEX].addSampleName(SAMPLE_FATHER);
@@ -175,7 +176,7 @@ class TrioEvalSynchronizer extends WithInfoEvalSynchronizer {
   private VcfRecord makeCombinedRecord() {
     mInRecs[TRUTH_MERGE_INDEX] = makeSimpleRecord(mBrv, false, 2, 0, mFatherSampleNo, mMotherSampleNo);
     mInRecs[QUERY_MERGE_INDEX] = makeSimpleRecord(mCrv, true, 1, 0, mChildSampleNo);
-    return mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.emptySet(), false); // Takes care of updating ALTs and GTs.
+    return mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders); // Takes care of updating ALTs and GTs.
   }
 
   // Produce a (minimal) record with sample in correct location for easier merging / output

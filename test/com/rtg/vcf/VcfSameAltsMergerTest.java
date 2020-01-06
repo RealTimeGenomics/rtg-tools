@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.util.Collections;
-
 import com.rtg.AbstractTest;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -55,13 +53,16 @@ public class VcfSameAltsMergerTest extends AbstractTest {
       h1.addSampleName("sample" + i);
       inRecs[i++] = getRecord(alts);
     }
-    VcfRecord[] mergedArr = new VcfSameAltsMerger().mergeRecords(inRecs, inHead, h1, Collections.emptySet(), false);
+    VcfRecord[] mergedArr = new VcfSameAltsMerger().setHeader(h1).mergeRecords(inRecs, inHead);
     assertEquals(expLen, mergedArr.length);
   }
 
   public void testSameAltsMerge() {
     checkExpected(1, ".");
     checkExpected(1, "T", "T");
+    checkExpected(1, "T,C", "T,C");
+    checkExpected(2, ".", "T");
+    checkExpected(2, "T", ".");
     checkExpected(2, "T", "C");
     checkExpected(2, "T", "T,C");
     checkExpected(2, "C,T", "T,C"); // Considered a different set of alts, since GT ids have changed

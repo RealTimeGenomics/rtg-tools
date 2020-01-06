@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -88,6 +87,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     mOutHeader.addFormatField(VcfUtils.FORMAT_GENOTYPE, MetaType.STRING, VcfNumber.ONE, "Genotype");
     mOutHeader.addSampleName(SAMPLE_BASELINE);
     mOutHeader.addSampleName(SAMPLE_CALLS);
+    mMerger.setHeader(mOutHeader);
     mInHeaders[0] = variants.baselineHeader().copy();
     mInHeaders[0].removeAllSamples();
     mInHeaders[0].addSampleName(SAMPLE_BASELINE);
@@ -166,7 +166,7 @@ class CombinedEvalSynchronizer extends WithInfoEvalSynchronizer {
     resetRecordFields(mCrv, mCallSampleNo, -1);
     mInRecs[0] = mBrv;
     mInRecs[1] = mCrv;
-    final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders, mOutHeader, Collections.emptySet(), false);
+    final VcfRecord rec = mMerger.mergeRecordsWithSameRef(mInRecs, mInHeaders);
     setNewInfoFields(rec, newInfo);
     mVcfOut.write(rec);
   }

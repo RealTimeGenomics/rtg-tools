@@ -29,8 +29,6 @@
  */
 package com.rtg.vcf;
 
-import java.util.Set;
-
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -38,16 +36,8 @@ import com.rtg.vcf.header.VcfHeader;
  */
 public class VcfSameAltsMerger extends VcfRecordMerger {
 
-  /**
-   * Constructor
-   */
-  public VcfSameAltsMerger() {
-    super(VcfUtils.FORMAT_GENOTYPE, false);
-  }
-
-
   @Override
-  protected boolean mergeSamples(VcfRecord[] records, VcfHeader[] headers, VcfRecord dest, VcfHeader destHeader, AlleleMap map, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    return !map.altsChanged() && super.mergeSamples(records, headers, dest, destHeader, map, unmergeableFormatFields, dropUnmergeable);
+  protected boolean mergeSamples(VcfRecord dest, VcfRecord[] records, VcfHeader[] headers, AlleleMap map) {
+    return !map.altsChanged() && super.mergeSamples(dest, records, headers, map);
   }
 }

@@ -32,7 +32,6 @@ package com.rtg.vcf;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import com.rtg.util.MultiSet;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -50,16 +49,17 @@ public class VcfGtMajorityMerger extends VcfRecordMerger {
    * Constructor
    */
   public VcfGtMajorityMerger() {
-    super(VcfUtils.FORMAT_GENOTYPE, false);
+    super();
+    setPaddingAware(false);
   }
 
 
   @Override
-  protected boolean mergeSamples(VcfRecord[] records, VcfHeader[] headers, VcfRecord dest, VcfHeader destHeader, AlleleMap map, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
+  protected boolean mergeSamples(VcfRecord dest, VcfRecord[] records, VcfHeader[] headers, AlleleMap map) {
     final ArrayList<String> sampleGts = new ArrayList<>();
     dest.getFormatAndSample().put(VcfUtils.FORMAT_GENOTYPE, sampleGts);
-    dest.setNumberOfSamples(destHeader.getNumberOfSamples());
-    final List<String> names = destHeader.getSampleNames();
+    dest.setNumberOfSamples(getHeader().getNumberOfSamples());
+    final List<String> names = getHeader().getSampleNames();
     if (map.mAltsChanged) {
       // This is interesting, dump the situation:
       Diagnostic.developerLog("INTERESTING (alts changed)");

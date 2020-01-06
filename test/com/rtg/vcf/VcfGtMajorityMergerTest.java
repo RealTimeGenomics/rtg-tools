@@ -30,8 +30,6 @@
 
 package com.rtg.vcf;
 
-import java.util.Collections;
-
 import com.rtg.AbstractTest;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -53,7 +51,7 @@ public class VcfGtMajorityMergerTest extends AbstractTest {
       inHead[i] = h1;
       inRecs[i++] = getRecord(gt);
     }
-    VcfRecord[] mergedArr = new VcfGtMajorityMerger().mergeRecords(inRecs, inHead, h1, Collections.emptySet(), false);
+    VcfRecord[] mergedArr = new VcfGtMajorityMerger().setHeader(h1).mergeRecords(inRecs, inHead);
     assertEquals(1, mergedArr.length);
     final String gtStr = mergedArr[0].getFormat(VcfUtils.FORMAT_GENOTYPE).get(0);
     assertEquals(expGt, gtStr);

@@ -35,11 +35,13 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rtg.util.MultiMap;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
+import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -49,25 +51,61 @@ public class VcfRecordMerger {
 
   /** Maximum number of duplicate warnings to explicitly print. */
   public static final long DUPLICATE_WARNINGS_TO_PRINT = 5;
+
   private long mMultipleRecordsForSampleCount = 0;
-  private final String mDefaultFormat;
-  private final boolean mPaddingAware;
+  private String mDefaultFormat = VcfUtils.FORMAT_GENOTYPE;
+  private boolean mPaddingAware = true;
+  private boolean mDropUnmergeable;
+  private VcfHeader mHeader;
+  private Set<String> mUnmergeableFormatFields = Collections.emptySet();
+
 
   /**
-   * Constructor
+   * @param defaultFormat the ID of the FORMAT field to fall back to when merging sample-free VCFs with those containing samples
+   * @return this object, for call chaining
    */
-  public VcfRecordMerger() {
-    this(VcfUtils.FORMAT_GENOTYPE, true);
+  public final VcfRecordMerger setDefaultFormat(String defaultFormat) {
+    mDefaultFormat = defaultFormat;
+    return this;
   }
 
   /**
-   * Constructor
-   * @param defaultFormat the ID of the FORMAT field to fall back to when merging sample-free VCFs with those containing samples
-   * @param paddingAware if true, do not merge records containing padding bases with those without padding bases, to avoid semantic pollution
+   * Sets the behaviour when merging records containing padding bases with those without padding bases,
+   * to avoid semantic pollution of annotations.
+   *
+   * @param paddingAware if true, do not merge records containing padding bases with those without padding bases,
+   * if false, allow merging to proceed.
+   * @return this object, for call chaining
    */
-  public VcfRecordMerger(String defaultFormat, boolean paddingAware) {
-    mDefaultFormat = defaultFormat;
+  public final VcfRecordMerger setPaddingAware(boolean paddingAware) {
     mPaddingAware = paddingAware;
+    return this;
+  }
+
+  /**
+   * Sets the behaviour when encountering any non-mergeable FORMAT fields or duplicate records for the same sample.
+   *
+   * @param dropUnmergeable if false, non-mergeable fields will prevent merging. If true, non-mergeable fields
+   * will be dropped so the merge can continue.
+   * @return this object, for call chaining
+   */
+  public VcfRecordMerger setDropUnmergeable(boolean dropUnmergeable) {
+    mDropUnmergeable = dropUnmergeable;
+    return this;
+  }
+
+  /**
+   * @param header the VcfHeader of the destination VCF
+   * @return this object, for call chaining
+   */
+  public VcfRecordMerger setHeader(VcfHeader header) {
+    mHeader = header;
+    mUnmergeableFormatFields = mHeader.getFormatLines().stream().filter(FormatField::isAlleleDependent).map(FormatField::getId).collect(Collectors.toSet());
+    return this;
+  }
+
+  protected VcfHeader getHeader() {
+    return mHeader;
   }
 
   // Builds the union of alt alleles plus a map converting allele indices from input
@@ -166,12 +204,9 @@ public class VcfRecordMerger {
    *
    * @param records the VCF records to be merged
    * @param headers the headers for each of the VCF records to be merged
-   * @param destHeader the header for the resulting VCF record
-   * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
-   * @param dropUnmergeable if true, alow merge to proceed when encountering any non-mergeable FORMAT fields or duplicate records for the same sample, by dropping appropriate information.
    * @return the merged VCF record, or NULL if there are problems with merging them
    */
-  public VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
+  public VcfRecord mergeRecordsWithSameRef(VcfRecord[] records, VcfHeader[] headers) {
     final String refCall = VcfUtils.normalizeAllele(records[0].getRefCall());
     checkConsistentRefAllele(refCall, records);
 
@@ -185,27 +220,32 @@ public class VcfRecordMerger {
     merged.setQuality(records[0].getQuality());
     merged.getFilters().addAll(records[0].getFilters());
 
-    // Copy INFO from first record into destination (INFO from other records are ignored)
-    for (final String key : records[0].getInfo().keySet()) {
-      merged.setInfo(key, records[0].getInfoSplit(key));
+    if (mergeInfo(merged, records, map)
+      && mergeSamples(merged, records, headers, map)) {
+      return merged;
     }
 
-    if (!mergeSamples(records, headers, merged, destHeader, map, unmergeableFormatFields, dropUnmergeable)) {
-      return null;
-    }
-    return merged;
+    return null;
   }
 
-  protected boolean mergeSamples(VcfRecord[] records, VcfHeader[] headers, VcfRecord dest, VcfHeader destHeader, AlleleMap map, Set<String> unmergeableFormatFields, boolean dropUnmergeable) {
-    dest.setNumberOfSamples(destHeader.getNumberOfSamples());
-    final List<String> names = destHeader.getSampleNames();
+  protected boolean mergeInfo(VcfRecord dest, VcfRecord[] records, AlleleMap map) {
+    // Just copy INFO from first record into destination (INFO from other records are ignored)
+    for (final String key : records[0].getInfo().keySet()) {
+      dest.setInfo(key, records[0].getInfoSplit(key));
+    }
+    return true;
+  }
+
+  protected boolean mergeSamples(VcfRecord dest, VcfRecord[] records, VcfHeader[] headers, AlleleMap map) {
+    dest.setNumberOfSamples(mHeader.getNumberOfSamples());
+    final List<String> names = mHeader.getSampleNames();
     for (int destSampleIndex = 0; destSampleIndex < names.size(); ++destSampleIndex) {
       boolean sampleDone = false;
       for (int i = 0; i < headers.length; ++i) {
         final int sampleIndex = headers[i].getSampleIndex(names.get(destSampleIndex));
         if (sampleIndex > -1) {
           if (sampleDone) {
-            if (dropUnmergeable) {
+            if (mDropUnmergeable) {
               if (++mMultipleRecordsForSampleCount <= DUPLICATE_WARNINGS_TO_PRINT) {
                 Diagnostic.warning("Multiple records found at position: " + dest.getSequenceName() + ":" + dest.getOneBasedStart() + " for sample: " + names.get(destSampleIndex) + ". Keeping first.");
               }
@@ -232,9 +272,9 @@ public class VcfRecordMerger {
     }
     if (map.altsChanged()) {
       final Set<String> formats = dest.getFormats();
-      for (String field : unmergeableFormatFields) {
+      for (String field : mUnmergeableFormatFields) {
         if (formats.contains(field)) {
-          if (dropUnmergeable) {
+          if (mDropUnmergeable) {
             dest.getFormatAndSample().remove(field);
           } else {
             return false;
@@ -276,15 +316,13 @@ public class VcfRecordMerger {
   }
 
   /**
-   * Perform merge operation on a set of records with the same start position, batching up into separate merge operations for each reference span.
+   * Perform merge operation on a set of records with the same start position,
+   * batching up into separate merge operations for each reference span.
    * @param records the records to merge
    * @param headers the VcfHeader corresponding to each record
-   * @param destHeader the VcfHeader of of the destination VCF
-   * @param unmergeableFormatFields the set of alternate allele based format tags that cannot be meaningfully merged
-   * @param preserveFormats if true, any non-mergeable FORMAT fields will be kept (resulting non-merged records), otherwise dropped, allowing merge to proceed.
    * @return the merged records
    */
-  VcfRecord[] mergeRecords(VcfRecord[] records, VcfHeader[] headers, VcfHeader destHeader, Set<String> unmergeableFormatFields, boolean preserveFormats) {
+  VcfRecord[] mergeRecords(VcfRecord[] records, VcfHeader[] headers) {
     assert records.length == headers.length;
     final MultiMap<Integer, VcfRecord> recordSets = new MultiMap<>(true);
     final MultiMap<Integer, VcfHeader> headerSets = new MultiMap<>(true);
@@ -299,7 +337,7 @@ public class VcfRecordMerger {
       final Collection<VcfHeader> heads = headerSets.get(key);
       final VcfRecord[] recsArray = recs.toArray(new VcfRecord[0]);
       final VcfHeader[] headsArray = heads.toArray(new VcfHeader[0]);
-      final VcfRecord merged = mergeRecordsWithSameRef(recsArray, headsArray, destHeader, unmergeableFormatFields, !preserveFormats);
+      final VcfRecord merged = mergeRecordsWithSameRef(recsArray, headsArray);
       if (merged != null) {
         ret.add(merged);
       } else {
@@ -308,7 +346,7 @@ public class VcfRecordMerger {
         for (int i = 0; i < recsArray.length; ++i) {
           recHolder[0] = recsArray[i];
           headHolder[0] = headsArray[i];
-          final VcfRecord r = mergeRecordsWithSameRef(recHolder, headHolder, destHeader, unmergeableFormatFields, !preserveFormats);
+          final VcfRecord r = mergeRecordsWithSameRef(recHolder, headHolder);
           if (r == null) {
             throw new IllegalArgumentException("VCF record could not be converted to destination structure:\n" + recHolder[0]);
           }
