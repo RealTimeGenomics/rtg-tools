@@ -259,6 +259,18 @@ public class VcfMergeTest extends AbstractCliTest {
     checkMerge("numberformats", "snpsA.vcf", "snpsB.vcf", "--preserve-formats");
   }
 
+  public void testNoMerge() throws Exception {
+    checkMerge("no-merge", "vcfmerge-na12889.vcf", "vcfmerge-na12880.vcf",
+      "-a", "##extraline=foo",
+      "-a", "##extraline2=bar", "--no-merge-records");
+  }
+
+  public void testNoMergeAlts() throws Exception {
+    checkMerge("no-merge-alts", "vcfmerge-na12889.vcf", "vcfmerge-na12880.vcf",
+      "-a", "##extraline=foo",
+      "-a", "##extraline2=bar", "--no-merge-alts");
+  }
+
   public void testMergeDrop() throws Exception {
     checkMerge("drop", "vcfmerge-na12889.vcf", "vcfmerge-na12880.vcf",
       "-a", "##extraline=foo",

@@ -87,6 +87,7 @@ public class VcfRecordMergerTest extends AbstractTest {
     mh.addSampleName("sample2");
     VcfRecord r1 = createRecord("chr1", 50, "A", 0, 1, "C");
     VcfRecord r2 = createRecord("chr1", 50, "A", 0, 1, "G");
+    assertEquals(2, new VcfRecordMerger().setHeader(mh).setAllowMerging(false).mergeRecords(new VcfRecord[]{r1, r2}, new VcfHeader[]{h1, h2}).length);
     final VcfRecordMerger merger = new VcfRecordMerger().setHeader(mh);
     VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, new VcfHeader[]{h1, h2});
     assertEquals(1, mergedArr.length);

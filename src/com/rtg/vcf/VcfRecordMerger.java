@@ -54,6 +54,7 @@ public class VcfRecordMerger {
 
   private long mMultipleRecordsForSampleCount = 0;
   private String mDefaultFormat = VcfUtils.FORMAT_GENOTYPE;
+  private boolean mAllowRecordMerging = true;
   private boolean mPaddingAware = true;
   private boolean mDropUnmergeable;
   private VcfHeader mHeader;
@@ -66,6 +67,18 @@ public class VcfRecordMerger {
    */
   public final VcfRecordMerger setDefaultFormat(String defaultFormat) {
     mDefaultFormat = defaultFormat;
+    return this;
+  }
+
+  /**
+   * Sets whether we can attempt to merge multiple records at the same position (e.g. multiple samples).
+   * Note that other options may subsequent veto a multi-record merge in specific conditions.
+   *
+   * @param recordMerging if false, records at the same position will never be combined into a single record.
+   * @return this object, for call chaining
+   */
+  public final VcfRecordMerger setAllowMerging(boolean recordMerging) {
+    mAllowRecordMerging = recordMerging;
     return this;
   }
 
@@ -337,7 +350,7 @@ public class VcfRecordMerger {
       final Collection<VcfHeader> heads = headerSets.get(key);
       final VcfRecord[] recsArray = recs.toArray(new VcfRecord[0]);
       final VcfHeader[] headsArray = heads.toArray(new VcfHeader[0]);
-      final VcfRecord merged = mergeRecordsWithSameRef(recsArray, headsArray);
+      final VcfRecord merged = mAllowRecordMerging ? mergeRecordsWithSameRef(recsArray, headsArray) : null;
       if (merged != null) {
         ret.add(merged);
       } else {

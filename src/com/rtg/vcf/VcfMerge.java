@@ -83,9 +83,10 @@ public class VcfMerge extends AbstractCli {
   private static final String FORCE_MERGE_ALL = "force-merge-all";
   private static final String PRESERVE_FORMATS = "preserve-formats";
   private static final String STATS_FLAG = "stats";
+  private static final String NO_ALT_MERGE = "no-merge-alts";
+  private static final String NO_RECORD_MERGE = "no-merge-records";
   private static final String NON_PADDING_AWARE = "Xnon-padding-aware";
   private static final String GT_MAJORITY = "Xgt-majority";
-  private static final String NO_ALT_MERGE = "Xno-merge-alts";
 
   @Override
   public String moduleName() {
@@ -114,9 +115,10 @@ public class VcfMerge extends AbstractCli {
     mFlags.registerOptional('f', FORCE_MERGE, String.class, STRING, "allow merging of specified header ID even when descriptions do not match").setCategory(UTILITY).setMinCount(0).setMaxCount(Integer.MAX_VALUE).enableCsv();
     mFlags.registerOptional(PRESERVE_FORMATS, "do not merge multiple records containing unmergeable FORMAT fields (Default is to remove those FORMAT fields so the variants can be combined)").setCategory(UTILITY);
     mFlags.registerOptional(STATS_FLAG, "output statistics for the merged VCF file").setCategory(UTILITY);
-    mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
+    mFlags.registerOptional(NO_RECORD_MERGE, "do not merge multiple records at the same position into one").setCategory(UTILITY);
+    mFlags.registerOptional(NO_ALT_MERGE, "do not merge multiple records if the ALTs are different").setCategory(UTILITY);
+    mFlags.registerOptional(NON_PADDING_AWARE, "allow merging of multiple records that mix whether they employ a VCF anchor base").setCategory(UTILITY);
     mFlags.registerOptional(GT_MAJORITY, "alternate mode that combines per sample GTs by majority vote").setCategory(UTILITY);
-    mFlags.registerOptional(NO_ALT_MERGE, "alternate mode that never combines records if the ALTs are different").setCategory(UTILITY);
 
     mFlags.addRequiredSet(inFlag);
     mFlags.addRequiredSet(listFlag);
@@ -129,6 +131,7 @@ public class VcfMerge extends AbstractCli {
     public boolean isValid(final CFlags flags) {
       return CommonFlags.checkFileList(flags, CommonFlags.INPUT_LIST_FLAG, null, Integer.MAX_VALUE)
         && CommonFlags.validateOutputFile(flags, VcfUtils.getZippedVcfFileName(!flags.isSet(NO_GZIP), (File) flags.getValue(OUTPUT_FLAG)))
+        && flags.checkAtMostOne(GT_MAJORITY, NO_ALT_MERGE, NO_RECORD_MERGE)
         && flags.checkNand(FORCE_MERGE_ALL, FORCE_MERGE);
     }
   }
@@ -217,6 +220,7 @@ public class VcfMerge extends AbstractCli {
     }
     merger.setHeader(header);
     merger.setDefaultFormat(defaultFormat);
+    merger.setAllowMerging(!mFlags.isSet(NO_RECORD_MERGE));
     merger.setPaddingAware(!mFlags.isSet(NON_PADDING_AWARE));
     merger.setDropUnmergeable(!mFlags.isSet(PRESERVE_FORMATS));
 
