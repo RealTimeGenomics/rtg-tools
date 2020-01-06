@@ -320,10 +320,21 @@ public class VcfRecordMergerTest extends AbstractTest {
 
     VcfRecord r1 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\tZZ=1,2\tGT\t1/2");
 
-    VcfRecord r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\tZX=3,4,5\tGT\t1/2");  // No ALT change
+    VcfRecord r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\tZX=3,4,5\tGT\t1|2");  // No ALT change
     VcfRecord[] mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads);
     assertEquals(1, mergedArr.length);
-    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\tZZ=1,2\tGT\t1/2\t1/2", mergedArr[0].toString());
+    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\tZZ=1,2\tGT\t1/2\t1|2", mergedArr[0].toString());
+
+    r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tC,A\t.\tPASS\tZX=3,4,5\tGT\t1|2"); // Alt change
+    mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads);
+    assertEquals(2, mergedArr.length);
+    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\tZZ=1,2\tGT\t1/2\t.", mergedArr[0].toString());
+    assertEquals("chr1\t100\t.\tG\tC,A\t.\tPASS\tZX=3,4,5\tGT\t.\t1|2", mergedArr[1].toString());
+
+    merger.setDropUnmergeable(true);
+    mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads);
+    assertEquals(1, mergedArr.length);
+    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT\t1/2\t2|1", mergedArr[0].toString());
   }
 
   public void testIdMerge() {

@@ -42,6 +42,7 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.header.FormatField;
+import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -59,6 +60,7 @@ public class VcfRecordMerger {
   private boolean mDropUnmergeable;
   private VcfHeader mHeader;
   private Set<String> mUnmergeableFormatFields = Collections.emptySet();
+  private Set<String> mUnmergeableInfoFields = Collections.emptySet();
 
 
   /**
@@ -114,6 +116,7 @@ public class VcfRecordMerger {
   public VcfRecordMerger setHeader(VcfHeader header) {
     mHeader = header;
     mUnmergeableFormatFields = mHeader.getFormatLines().stream().filter(FormatField::isAlleleDependent).map(FormatField::getId).collect(Collectors.toSet());
+    mUnmergeableInfoFields = mHeader.getInfoLines().stream().filter(InfoField::isAlleleDependent).map(InfoField::getId).collect(Collectors.toSet());
     return this;
   }
 
@@ -245,6 +248,17 @@ public class VcfRecordMerger {
     // Just copy INFO from first record into destination (INFO from other records are ignored)
     for (final String key : records[0].getInfo().keySet()) {
       dest.setInfo(key, records[0].getInfoSplit(key));
+    }
+    if (map.altsChanged()) {
+      for (String field : mUnmergeableInfoFields) {
+        if (dest.hasInfo(field)) {
+          if (mDropUnmergeable) {
+            dest.removeInfo(field);
+          } else {
+            return false;
+          }
+        }
+      }
     }
     return true;
   }
