@@ -49,7 +49,8 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
 
   private static final int MAX_SEQUENCE_LABEL_MISMATCH_WARNINGS = 10;
 
-  private byte[] mQualityBuffer;
+  private byte[] mQualityBuffer = EMPTY;
+
   private int mQualityBufferPosition;
 
   private boolean mQualityWarned;
@@ -208,7 +209,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
   }
 
   private void ensureQualityBuffer() {
-    if (mQualityBuffer == null) {
+    if (mQualityBuffer == EMPTY) {
       mQualityBuffer = new byte[mInputBufferLength * 10];
       mQualityBufferPosition = 0;
     } else {
@@ -221,7 +222,7 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
     if (mInputBufferLength == -1) {
       return;
     }
-    if (mQualityBuffer == null) {
+    if (mQualityBuffer == EMPTY) {
       ensureQualityBuffer();
     }
     byte inputByte;

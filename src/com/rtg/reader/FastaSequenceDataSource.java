@@ -57,7 +57,9 @@ public class FastaSequenceDataSource implements SequenceDataSource {
    */
   protected static final int NUMBER_OF_TIDE_WARNINGS = 10;
 
-  private byte[] mBuffer;
+  protected static final byte[] EMPTY = new byte[0];
+
+  private byte[] mBuffer = EMPTY;
   int mBufferPosition = -1;
   final byte[] mInputBuffer = new byte[FileUtils.BUFFERED_STREAM_SIZE];
   int mInputBufferPosition = -1;
@@ -185,7 +187,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
   }
 
   private void ensureBuffer() {
-    if (mBufferLength == -1 || mBuffer == null) {
+    if (mBufferLength == -1 || mBuffer == EMPTY) {
       mBuffer = new byte[mInputBufferLength * 10];
       mBufferPosition = 0;
     } else if (mBuffer.length == Integer.MAX_VALUE) {
@@ -223,6 +225,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
     }
 
     mBufferPosition = 0;
+    mBufferLength = 0;
     //we're after the \n, so now is nucleotides
     readData('>');
     return true;
@@ -233,7 +236,7 @@ public class FastaSequenceDataSource implements SequenceDataSource {
     if (mInputBufferLength == -1) {
       return;
     }
-    if (mBuffer == null) {
+    if (mBuffer == EMPTY) {
       ensureBuffer();
     }
     byte inputByte;

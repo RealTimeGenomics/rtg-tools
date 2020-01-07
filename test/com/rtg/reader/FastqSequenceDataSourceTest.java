@@ -37,6 +37,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.rtg.AbstractTest;
 import com.rtg.mode.DNA;
 import com.rtg.mode.SequenceType;
 import com.rtg.util.StringUtils;
@@ -52,20 +53,17 @@ import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class FastqSequenceDataSourceTest extends TestCase {
+public class FastqSequenceDataSourceTest extends AbstractTest {
 
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
-  }
-
-  @Override
-  public void tearDown() {
-    Diagnostic.setLogStream();
+  public void testEmptyDnaFastq() throws IOException {
+    assertEquals(0, ReaderTestUtils.getReaderDnaFastqMemory("@A\n\n+\n").totalLength());
+    assertEquals(0, ReaderTestUtils.getReaderDnaFastqMemory("@A\n\n+\n\n").totalLength());
+    assertEquals(0, ReaderTestUtils.getReaderDnaFastqMemory("@A\n\n+\n\n@B\n\n+\n\n").totalLength());
+    assertEquals(1, ReaderTestUtils.getReaderDnaFastqMemory("@A\nA\n+\n;\n").totalLength());
+    assertEquals(2, ReaderTestUtils.getReaderDnaFastqMemory("@A\nA\n+\n;\n@B\n\n+\n\n").numberSequences());
+    assertEquals(1, ReaderTestUtils.getReaderDnaFastqMemory("@A\nA\n+\n;\n@B\n\n+\n").totalLength());
   }
 
   private InputStream createStream(final String data) {
@@ -77,7 +75,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
@@ -109,7 +106,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
       + "+12345" + StringUtils.LS
       + "IIIIII" + StringUtils.LS));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("12345", ds.name());
     final byte[] b = ds.sequenceData();
@@ -173,7 +169,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nacgt\n+test\n!~!~!\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     try {
       ds.nextSequence();
       fail();
@@ -186,7 +181,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("garbage@test\nacgt\n+test\n!~!~\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     try {
       ds.nextSequence();
       fail();
@@ -214,7 +208,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename3\nacgt\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-      assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
       try {
         assertTrue(ds.nextSequence());
         fail();
@@ -245,7 +238,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename4\nacgt\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-      assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
       try {
         ds.nextSequence();
         fail();
@@ -277,7 +269,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename\nacgt\n+\n!~!\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-      assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
       try {
         assertTrue(ds.nextSequence());
         fail();
@@ -309,7 +300,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
       final ArrayList<InputStream> al = new ArrayList<>();
       al.add(createStream("@testsequencename2\nacgt\n+\n!~!\n"));
       final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-      assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
       try {
         ds.nextSequence();
         fail();
@@ -351,7 +341,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     byte[] b = ds.sequenceData();
@@ -396,7 +385,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n;~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     b = ds.sequenceData();
@@ -412,7 +400,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n@~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA1_3);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     b = ds.sequenceData();
@@ -426,7 +413,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     al = new ArrayList<>();
     al.add(createStream("@test\nac\n  tg\ntnGf\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
     ds = new FastqSequenceDataSource(al, QualityFormat.SOLEXA1_3);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
 
     final DiagnosticListener dl = new DiagnosticListener() {
       @Override
@@ -493,7 +479,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream("@test\n+test\n@test2\n+\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals(0, ds.currentLength()); //
     assertEquals("test", ds.name());
@@ -510,7 +495,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
         + "@test2\n"
         + "+test2\n"));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -531,7 +515,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
         + "+test\n" + bed + "\n"
     ));
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
@@ -671,7 +654,6 @@ public class FastqSequenceDataSourceTest extends TestCase {
 
     //    al.add(getSuperLongStream(2049)); // i.e. test >2GB
     final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(!ds.nextSequence());

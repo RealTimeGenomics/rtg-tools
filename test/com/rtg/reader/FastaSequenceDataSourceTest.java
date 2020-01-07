@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.zip.GZIPOutputStream;
 
+import com.rtg.AbstractTest;
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.mode.Protein;
@@ -56,21 +57,24 @@ import com.rtg.util.diagnostic.WarningEvent;
 import com.rtg.util.diagnostic.WarningType;
 import com.rtg.util.test.FileHelper;
 
-import junit.framework.TestCase;
-
 /**
  * Tests corresponding class
  */
-public class FastaSequenceDataSourceTest extends TestCase {
+public class FastaSequenceDataSourceTest extends AbstractTest {
 
-  @Override
-  public void setUp() {
-    Diagnostic.setLogStream();
+  public void testEmptyDna() throws IOException {
+    assertEquals(0, ReaderTestUtils.getReaderDnaMemory(">A\n").totalLength());
+    assertEquals(0, ReaderTestUtils.getReaderDnaMemory(">A\n\n>B\n").totalLength());
+    assertEquals(1, ReaderTestUtils.getReaderDnaMemory(">A\nA\n").numberSequences());
+    assertEquals(1, ReaderTestUtils.getReaderDnaMemory(">A\nA\n").totalLength());
+    assertEquals(2, ReaderTestUtils.getReaderDnaMemory(">A\nA\n>B\n").numberSequences());
+    assertEquals(1, ReaderTestUtils.getReaderDnaMemory(">A\nA\n>B\n").totalLength());
   }
 
-  @Override
-  public void tearDown() {
-    Diagnostic.setLogStream();
+  public void testEmptyProtein() throws IOException {
+    ReaderTestUtils.getReaderProteinMemory(">A\n");
+    ReaderTestUtils.getReaderProteinMemory(">A\n\n>B\n");
+    ReaderTestUtils.getReaderProteinMemory(">A\nA\n>B\n");
   }
 
   private InputStream createStream(final String data) {
@@ -82,7 +86,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     byte[] b = ds.sequenceData();
@@ -176,7 +179,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
   }
 
   static void checkResult(final SequenceDataSource ds) throws IOException {
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     byte[] b = ds.sequenceData();
@@ -206,7 +208,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\n>test2\n"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -218,7 +219,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\t\n\r\n\r\r\r\n\n\r>>test2\n"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test\t", ds.name());
     assertTrue(ds.nextSequence());
@@ -231,7 +231,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final String bad = "`!@#$%^&*()_+1234567890-={}[]vs\\|?/<,.'\"";
     al.add(createStream(">test\n" + bad));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
@@ -246,7 +245,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\t dog meow\nac\n  tg\ntnGh\n\n\t   \n>test2 pox\r\nATGC"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test\t dog meow", ds.name());
     assertTrue(ds.nextSequence());
@@ -258,7 +256,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\r\nac\n  tg\ntnGh\n\n\t   \n>test2 \nATGC"));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -270,7 +267,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final ArrayList<InputStream> al = new ArrayList<>();
     al.add(createStream(">test\t\t\t\nac\n  tg\ntnGh\n\n\t   \n>test2 "));
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test\t\t\t", ds.name());
     assertTrue(!ds.nextSequence());
@@ -282,7 +278,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
     final Protein[] expected = {Protein.A, Protein.H, Protein.T, Protein.G, Protein.T, Protein.X, Protein.G, Protein.X};
     final Protein[] expected2 = {Protein.A, Protein.T, Protein.G, Protein.C};
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
 
@@ -446,7 +441,6 @@ public class FastaSequenceDataSourceTest extends TestCase {
     al.add(getSuperLongStream(20));
     //    al.add(getSuperLongStream(2049)); // i.e. test >2GB
     final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    assertNull("Haven't called nextSequence, should be null", ds.sequenceData());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(!ds.nextSequence());

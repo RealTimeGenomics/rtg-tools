@@ -215,6 +215,17 @@ public final class ReaderTestUtils {
   }
 
   /**
+   * @param sequence fastq sequence
+   * @return sequences reader for given sequence
+   * @throws IOException if data is invalid
+   */
+  public static SequencesReader getReaderDnaFastqMemory(String sequence) throws IOException {
+    final SequencesWriter sw = new SequencesWriter(new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(sequence.getBytes())), QualityFormat.SANGER), null, PrereadType.UNKNOWN, true);
+    sw.setSdfId(DUMMY_TEST_ID);
+    return sw.processSequencesInMemory(null, true, new SimpleNames(), new SimpleNames(), LongRange.NONE);
+  }
+
+  /**
    * Construct a SDF directory containing the specified fasta sequence.
    * @param inputDnaSequence the sequence.
    * @param dir directory where SDF placed.
