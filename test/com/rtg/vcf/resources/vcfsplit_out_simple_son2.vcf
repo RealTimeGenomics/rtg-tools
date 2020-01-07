@@ -1,0 +1,19 @@
+##fileformat=VCFv4.1
+##CL=[...]
+##contig=<ID=Chr1,length=44903>
+##contig=<ID=Chr2,length=44903>
+##INFO=<ID=AF,Number=A,Type=Float,Description="Allele Frequency">
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##FORMAT=<ID=DN,Number=1,Type=String,Description="De novo allele">
+##PEDIGREE=<Child=son1,Mother=mother,Father=father>
+##PEDIGREE=<Child=son2,Mother=mother,Father=father>
+##PEDIGREE=<Child=daughter1,Mother=mother,Father=father>
+##PEDIGREE=<Child=daughter2,Mother=mother,Father=father>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	son2
+Chr1	649	.	C	A	.	.	AF=0.042	GT	0|1
+Chr1	5152	.	T	C	.	.	AF=0.007	GT	0|1
+Chr1	28547	.	A	G	.	.	AF=0.23	GT	1|0
+Chr1	29304	.	C	T	.	.	AF=0.314	GT	1|0
+Chr2	1193	.	T	C	.	.	AF=0.17	GT	0|1
+Chr2	21692	.	T	C	.	.	AF=0.21	GT	1|0
+Chr2	33300	.	G	A	.	.	AF=0.213	GT	0|1
