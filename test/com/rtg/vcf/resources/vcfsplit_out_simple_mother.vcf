@@ -10,11 +10,11 @@
 ##PEDIGREE=<Child=daughter1,Mother=mother,Father=father>
 ##PEDIGREE=<Child=daughter2,Mother=mother,Father=father>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	mother
-Chr1	649	.	C	A	.	.	AF=0.042	GT	0|1
-Chr1	2937	.	T	TACG	.	.	AF=0.335	GT	1|0
+Chr1	649	.	C	A	.	.	AF=0.042	GT	1|0
+Chr1	2937	.	T	TACG	.	.	AF=0.335	GT	0|1
 Chr1	3812	.	G	C	.	.	AF=0.375	GT	0|1
-Chr1	5152	.	T	C	.	.	AF=0.007	GT	0|1
+Chr1	5152	.	T	C	.	.	AF=0.007	GT	1|0
 Chr1	28547	.	A	G	.	.	AF=0.23	GT	1|0
 Chr2	1193	.	T	C	.	.	AF=0.17	GT	0|1
-Chr2	21913	.	AG	A	.	.	AF=0.266	GT	0|1
+Chr2	21913	.	AG	A	.	.	AF=0.266	GT	1|0
 Chr2	33300	.	G	A	.	.	AF=0.213	GT	0|1

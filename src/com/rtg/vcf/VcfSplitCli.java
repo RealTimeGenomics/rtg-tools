@@ -30,15 +30,18 @@
 
 package com.rtg.vcf;
 
+import static com.rtg.launcher.CommonFlags.BOOL;
 import static com.rtg.launcher.CommonFlags.STRING_OR_FILE;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
+import static com.rtg.util.cli.CommonFlagCategories.UTILITY;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
@@ -57,6 +60,7 @@ public class VcfSplitCli extends LoggedCli {
   private static final String KEEP_REF = "keep-ref";
   private static final String REMOVE_SAMPLE = "remove-sample";
   private static final String KEEP_SAMPLE = "keep-sample";
+  private static final String ASYNC = "Xasync";
 
   @Override
   public String moduleName() {
@@ -80,6 +84,7 @@ public class VcfSplitCli extends LoggedCli {
     CommonFlags.initRegionOrBedRegionsFlags(mFlags);
     CommonFlags.initNoGzip(mFlags);
     CommonFlags.initIndexFlags(mFlags);
+    mFlags.registerOptional(ASYNC, Boolean.class, BOOL, "whether to write output files asynchronously", true).setCategory(UTILITY);
     mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
       && CommonFlags.validateInputFile(flags, INPUT_FLAG)
       && CommonFlags.validateRegions(flags)
@@ -95,6 +100,7 @@ public class VcfSplitCli extends LoggedCli {
   protected int mainExec(OutputStream out, LogStream log) throws IOException {
     final boolean gzip = !mFlags.isSet(CommonFlags.NO_GZIP);
     final boolean keepRef = mFlags.isSet(KEEP_REF);
+    final boolean asyncOutput = (Boolean) mFlags.getValue(ASYNC);
     final VcfSubset.VcfSampleStripperFactory sampleStripperFact = new VcfSubset.VcfSampleStripperFactory(mFlags);
     try (final VcfReader reader = new VcfReaderFactory(mFlags).parser(new VcfSubsetParser(sampleStripperFact)).make(mFlags)) {
       final int numberSamples = reader.getHeader().getNumberOfSamples();
@@ -104,7 +110,7 @@ public class VcfSplitCli extends LoggedCli {
       final VcfWriter[] writers = new VcfWriter[numberSamples];
       final ArrayList<String> samples = new ArrayList<>(reader.getHeader().getSampleNames());
       try {
-        final VcfWriterFactory f = new VcfWriterFactory(mFlags).addRunInfo(true);
+        final VcfWriterFactory f = new VcfWriterFactory(mFlags).addRunInfo(true).async(asyncOutput);
         for (int i = 0; i < numberSamples; ++i) {
           final String sample = samples.get(i);
           final File of = new File(outputDirectory(), sample);
@@ -118,16 +124,20 @@ public class VcfSplitCli extends LoggedCli {
         while (reader.hasNext()) {
           final VcfRecord rec = reader.next();
           if (rec.hasFormat(VcfUtils.FORMAT_GENOTYPE)) {
-            final List<String> gts = new ArrayList<>(rec.getFormat(VcfUtils.FORMAT_GENOTYPE)); // Take copy
-            rec.removeSamples();
-            rec.setNumberOfSamples(1);
+            final List<String> gts = rec.getFormat(VcfUtils.FORMAT_GENOTYPE);
+            final VcfRecord template = new VcfRecord(rec); // Work on a copy
             for (int i = 0; i < numberSamples; ++i) {
               final String gt = gts.get(i);
               final int[] gtArr = VcfUtils.splitGt(gt);
               if (VcfUtils.isValidGt(rec, gtArr) && VcfUtils.isNonMissingGt(gt)
                 && (keepRef || hasAlt(gtArr))) {
-                rec.setFormatAndSample(VcfUtils.FORMAT_GENOTYPE, gt, 0);
-                writers[i].write(rec);
+                template.removeSamples();
+                template.setNumberOfSamples(1);
+                // Copy sample field values from original
+                for (Map.Entry<String, ArrayList<String>> e : rec.getFormatAndSample().entrySet()) {
+                  template.setFormatAndSample(e.getKey(), e.getValue().get(i), 0);
+                }
+                writers[i].write(asyncOutput ? new VcfRecord(template) : template);
               }
             }
           }

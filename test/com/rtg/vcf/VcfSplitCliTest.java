@@ -72,6 +72,7 @@ public class VcfSplitCliTest extends AbstractCliTest {
       assertTrue(output.exists());
       assertTrue(output.isDirectory());
       File[] outfiles = output.listFiles((dir1, name) -> name.endsWith(".vcf"));
+      assertNotNull(outfiles);
       for (File f: outfiles) {
         mNano.check("vcfsplit_out_" + id + "_" + f.getName(), TestUtils.sanitizeVcfHeader(FileHelper.fileToString(f)), false);
       }
