@@ -110,7 +110,7 @@ public class FileStreamIteratorTest extends TestCase {
       if (files.get(2).createNewFile()) {
         FileUtils.appendToFile(files.get(2), "blah");
       }
-      final FileStreamIterator iterator = new FileStreamIterator(files, null);
+      final FileStreamIterator iterator = new FileStreamIterator(files);
       try {
         iterator.hasNext();
       } catch (NoTalkbackSlimException e) {

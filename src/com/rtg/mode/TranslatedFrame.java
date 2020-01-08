@@ -43,6 +43,9 @@ import com.rtg.util.PseudoEnum;
  */
 public abstract class TranslatedFrame implements Frame, PseudoEnum {
 
+  /** The number of nucleotides per codon */
+  public static final int NUCLEOTIDES_PER_CODON = 3;
+
   /**
    * Normal forward direction - phase 1.
    */
