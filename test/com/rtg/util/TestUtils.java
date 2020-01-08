@@ -927,7 +927,7 @@ public final class TestUtils {
    */
   public static String sanitizeTsvHeader(String inString) {
     return inString
-      .replaceAll("#CL .*" + StringUtils.LS, "#CL [...]" + StringUtils.LS)
-      .replaceAll("#Version .*" + StringUtils.LS, "#Version [...]" + StringUtils.LS);
+      .replaceAll("#CL.*" + StringUtils.LS, "#CL [...]" + StringUtils.LS)
+      .replaceAll("#Version.*" + StringUtils.LS, "#Version [...]" + StringUtils.LS);
   }
 }
