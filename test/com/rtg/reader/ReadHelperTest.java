@@ -32,13 +32,12 @@ package com.rtg.reader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.mode.SequenceType;
-import com.rtg.util.intervals.LongRange;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.intervals.LongRange;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.test.FileHelper;
 
@@ -134,12 +133,11 @@ public class ReadHelperTest extends TestCase {
     Diagnostic.setLogStream();
     final File temp = FileUtils.createTempDir("cgblah", "qual");
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(new ByteArrayInputStream(("@testQuality\n"
-          + "actgcatc\n"
-          + "+\n"
-          + "!<><##!<").getBytes()));
-      final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = new ByteArrayInputStream(("@testQuality\n"
+        + "actgcatc\n"
+        + "+\n"
+        + "!<><##!<").getBytes());
+      final FastqSequenceDataSource fq = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       final SequencesWriter sw = new SequencesWriter(fq, temp, 20, PrereadType.CG, false);
       sw.processSequences();
       try (SequencesReader msr = CompressedMemorySequencesReader.createSequencesReader(temp, true, false, LongRange.NONE)) {

@@ -147,10 +147,8 @@ public class SdfSplitterTest extends AbstractCliTest {
     Diagnostic.setLogStream();
     try (TestDirectory inDir = new TestDirectory("prereadsplitter-test.in");
          TestDirectory outDir = new TestDirectory("prereadsplitter-testout")) {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-              new DNAFastaSymbolTable());
+      final InputStream fqis = createStream(TEST_INPUT_STRING);
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       final ArrayList<File> inDirs = new ArrayList<>();
@@ -169,10 +167,8 @@ public class SdfSplitterTest extends AbstractCliTest {
     Diagnostic.setLogStream();
     try (TestDirectory inDir = new TestDirectory("prereadsplitter-test.in");
          TestDirectory outDir = new TestDirectory("prereadsplitter-testout")) {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-              new DNAFastaSymbolTable());
+      final InputStream fqis = createStream(TEST_INPUT_STRING);
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       final ArrayList<File> inDirs = new ArrayList<>();
@@ -196,17 +192,13 @@ public class SdfSplitterTest extends AbstractCliTest {
     try (TestDirectory inDir = new TestDirectory("prereadsplitter-test.in");
          TestDirectory inDir2 = new TestDirectory("prereadsplitter-test.in2");
          TestDirectory outDir = new TestDirectory("prereadsplitter-testout")) {
-      ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING));
-      FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      FastaSequenceDataSource ds = new FastaSequenceDataSource(createStream(TEST_INPUT_STRING), new DNAFastaSymbolTable());
       SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       final ArrayList<File> inDirs = new ArrayList<>();
       inDirs.add(inDir);
 
-      al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING_2));
-      ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      ds = new FastaSequenceDataSource(createStream(TEST_INPUT_STRING_2), new DNAFastaSymbolTable());
       sw = new SequencesWriter(ds, inDir2, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       inDirs.add(inDir2);
@@ -233,14 +225,10 @@ public class SdfSplitterTest extends AbstractCliTest {
          TestDirectory tempDir = new TestDirectory("prereadsplitter-testout")) {
       final File outDir = new File(tempDir, "output");
       final File dupFile = new File(outDir.getAbsolutePath(), "duplicate-names.txt");
-      ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING));
-      FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      FastaSequenceDataSource ds = new FastaSequenceDataSource(createStream(TEST_INPUT_STRING), new DNAFastaSymbolTable());
       SequencesWriter sw = new SequencesWriter(ds, inDir, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
-      al = new ArrayList<>();
-      al.add(createStream(TEST_INPUT_STRING));
-      ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      ds = new FastaSequenceDataSource(createStream(TEST_INPUT_STRING), new DNAFastaSymbolTable());
       sw = new SequencesWriter(ds, inDir2, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       final String err = checkMainInitWarn("-n", "100", "-o", outDir.getAbsolutePath(), inDir.getAbsolutePath(), inDir2.getAbsolutePath());

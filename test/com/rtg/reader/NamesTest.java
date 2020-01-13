@@ -88,10 +88,8 @@ public class NamesTest extends TestCase {
     ;
 
   static void writeProtein(final String inputSequence, final File dir) throws IOException {
-    final ArrayList<InputStream> inputStreams = new ArrayList<>();
-    inputStreams.add(new ByteArrayInputStream(inputSequence.getBytes()));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(inputStreams,
-        new ProteinFastaSymbolTable());
+    final InputStream fqis = new ByteArrayInputStream(inputSequence.getBytes());
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     final SequencesWriter sequenceWriter = new SequencesWriter(ds, dir, 20, PrereadType.UNKNOWN, false);
     sequenceWriter.processSequences();
   }

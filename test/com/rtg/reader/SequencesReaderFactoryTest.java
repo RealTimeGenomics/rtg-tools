@@ -32,7 +32,6 @@ package com.rtg.reader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.TestUtils;
@@ -54,16 +53,14 @@ public class SequencesReaderFactoryTest extends TestCase {
     Diagnostic.setLogStream(err.printStream());
     final File tmpDir = FileUtils.createTempDir("testSeqReaderFact", "blah");
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(new ByteArrayInputStream((">test1\nacgta\n"
-                        + ">test2\nagtcatg\n"
-                        + ">test3\nacgtttggct\n"
-                        + ">test4\natggcttagctacagt\n"
-                        + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
-                        + ">test6\na").getBytes()));
+      final InputStream fqis = new ByteArrayInputStream((">test1\nacgta\n"
+        + ">test2\nagtcatg\n"
+        + ">test3\nacgtttggct\n"
+        + ">test4\natggcttagctacagt\n"
+        + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
+        + ">test6\na").getBytes());
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       //0, 5, 12, 22, 38,
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-              new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, tmpDir, 20000, PrereadType.UNKNOWN, false);
       sw.processSequences();
 

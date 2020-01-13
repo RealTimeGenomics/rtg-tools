@@ -36,9 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -109,9 +107,8 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
   }
 
   public void testRoll() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
     try (SequencesReader dsr = SequencesReaderFactory.createMemorySequencesReader(mDir, true, LongRange.NONE)) {
@@ -137,9 +134,8 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     //set a command line
     CommandLine.setCommandArgs("aksfj", "-d", "djfk siduf");
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob-the-builder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      final InputStream fqis = createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob-the-builder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
       sw.setComment("wejksfd boier sakrjoieje");
       sw.processSequences();
@@ -372,7 +368,7 @@ public class CompressedMemorySequencesReaderTest extends AbstractSequencesReader
     final File fqFile = File.createTempFile("test", ".fq", mDir);
     FileUtils.stringToFile(FASTQ, fqFile);
 
-    final FastqSequenceDataSource fqSource = new FastqSequenceDataSource(Collections.singletonList(new ByteArrayInputStream(FASTQ.getBytes(StandardCharsets.US_ASCII))), QualityFormat.SANGER);
+    final FastqSequenceDataSource fqSource = new FastqSequenceDataSource(new ByteArrayInputStream(FASTQ.getBytes(StandardCharsets.US_ASCII)), QualityFormat.SANGER);
 
     final SequencesWriter sw = new SequencesWriter(fqSource, null, PrereadType.UNKNOWN, true);
     sw.setSdfId(new SdfId(0));

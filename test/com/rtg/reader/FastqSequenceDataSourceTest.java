@@ -72,9 +72,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
 
   public void testOneSeq() throws IOException {
     //testing read() method
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\nac\n  tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXVW@\n\n\t   \n@test2\r\nATGC+\r\n!#$%");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
@@ -99,13 +98,12 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
 
   public void testOneSeq2() throws IOException {
     //testing read() method
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(
+    final InputStream fqis = createStream(
       "@12345" + StringUtils.LS
-      + "acgtgt" + StringUtils.LS
-      + "+12345" + StringUtils.LS
-      + "IIIIII" + StringUtils.LS));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+        + "acgtgt" + StringUtils.LS
+        + "+12345" + StringUtils.LS
+        + "IIIIII" + StringUtils.LS);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     assertEquals("12345", ds.name());
     final byte[] b = ds.sequenceData();
@@ -139,9 +137,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n"));
-      final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = createStream("@x\n" + "actgn\n" + "+x\n" + "ACTGN\n");
+      final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       assertTrue(ds.nextSequence());
       assertEquals("x", ds.name());
       final byte[] b = ds.sequenceData();
@@ -166,9 +163,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testBadSeq() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\nacgt\n+test\n!~!~!\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\nacgt\n+test\n!~!~!\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     try {
       ds.nextSequence();
       fail();
@@ -178,9 +174,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testBadSeq2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("garbage@test\nacgt\n+test\n!~!~\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("garbage@test\nacgt\n+test\n!~!~\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     try {
       ds.nextSequence();
       fail();
@@ -205,9 +200,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream("@testsequencename3\nacgt\n"));
-      final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = createStream("@testsequencename3\nacgt\n");
+      final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       try {
         assertTrue(ds.nextSequence());
         fail();
@@ -235,9 +229,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream("@testsequencename4\nacgt\n"));
-      final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = createStream("@testsequencename4\nacgt\n");
+      final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       try {
         ds.nextSequence();
         fail();
@@ -266,9 +259,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream("@testsequencename\nacgt\n+\n!~!\n"));
-      final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = createStream("@testsequencename\nacgt\n+\n!~!\n");
+      final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       try {
         assertTrue(ds.nextSequence());
         fail();
@@ -297,9 +289,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream("@testsequencename2\nacgt\n+\n!~!\n"));
-      final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      final InputStream fqis = createStream("@testsequencename2\nacgt\n+\n!~!\n");
+      final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
       try {
         ds.nextSequence();
         fail();
@@ -313,9 +304,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testBadSeq5() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\nacgt\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\nacgt\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     try {
       assertTrue(ds.nextSequence());
       fail();
@@ -325,9 +315,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testBadSeq6() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\nacgt\n+\n!!!\u007f"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\nacgt\n+\n!!!\u007f");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     try {
       assertTrue(ds.nextSequence());
       fail();
@@ -454,9 +443,8 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testKindaLong() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(KINDA_LONG_SEQ));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream(KINDA_LONG_SEQ);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     final byte[] b = ds.sequenceData();
     final byte[] q = ds.qualityData();
@@ -468,17 +456,15 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testDustingSequence() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\nac\n  Tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXUVW\n\n\t   \n@test2\r\nATGCn+\r\n!#$%!"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\nac\n  Tg\ntnGh\n\n\t   \n+test\n!~\n  xy\nXUVW\n\n\t   \n@test2\r\nATGCn+\r\n!#$%!");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     ds.setDusting(true);
     FastaSequenceDataSourceTest.checkResult(ds);
   }
 
   public void testConsecutiveLabelsWithoutActualSequenceData() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\n+test\n@test2\n+\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\n+test\n@test2\n+\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     assertEquals(0, ds.currentLength()); //
     assertEquals("test", ds.name());
@@ -489,12 +475,11 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testConsecutiveLabelsWithoutActualSequenceData2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\n\r\n\r\r\r\n\n\r"
-        + "+test\n\r\n\r\r\r\n\n\r"
-        + "@test2\n"
-        + "+test2\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@test\n\r\n\r\r\r\n\n\r"
+      + "+test\n\r\n\r\r\r\n\n\r"
+      + "@test2\n"
+      + "+test2\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -649,11 +634,10 @@ public class FastqSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testSuperLongSeq() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(getSuperLongStream(20));
+    final InputStream fqis = getSuperLongStream(20);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
 
     //    al.add(getSuperLongStream(2049)); // i.e. test >2GB
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(!ds.nextSequence());

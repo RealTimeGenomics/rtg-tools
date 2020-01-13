@@ -33,7 +33,6 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.rtg.mode.DNA;
@@ -82,9 +81,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testRegions() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">seq1\na\n>seq2\nta\n>seq3\ntag\n>seq4\ntagt\n>seq5\nacctt\n>seq6\natatat"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">seq1\na\n>seq2\nta\n>seq3\ntag\n>seq4\ntagt\n>seq5\nacctt\n>seq6\natatat");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 30, PrereadType.UNKNOWN, false);
     sw.processSequences();
     final LongRange region = new LongRange(3, 5);
@@ -123,10 +121,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
 
   public void testLabel() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgt\n>bob\ntagt\n>hobos r us\naccc"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nacgt\n>bob\ntagt\n>hobos r us\naccc");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 30, PrereadType.UNKNOWN, false);
     sw.processSequences();
     try (SequencesReader dsr = createSequencesReader(mDir)) {
@@ -157,13 +153,11 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testLengthBetween() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
+    final InputStream fqis = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     //32
     //17
     //20
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -179,10 +173,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testLengthBetween2() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nactggtcatgca\n>bob the buuilder\ntagttcagcatc\n>hobos r us\naccccaccccac"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nactggtcatgca\n>bob the buuilder\ntagttcagcatc\n>hobos r us\naccccaccccac");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -198,13 +190,11 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testLengths() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
+    final InputStream fqis = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     //32
     //17
     //20
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -219,13 +209,11 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testLengths2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
+    final InputStream fqis = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     //32
     //17
     //20
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 2000000, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -240,10 +228,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testReadRoll() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -321,10 +307,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   public void testRead() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -347,12 +331,11 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testReadQuality() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@testQuality\n"
-                        + "actgcatc\n"
-                        + "+\n"
-                        + "!<><##!<"));
-    final FastqSequenceDataSource fq = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@testQuality\n"
+      + "actgcatc\n"
+      + "+\n"
+      + "!<><##!<");
+    final FastqSequenceDataSource fq = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(fq, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -396,9 +379,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
       dnas.append(DNA.A.toString());
     }
     final String seq = "@TotallyUniqueName\n" + dnas.toString() + "\n+\n" + quals.toString();
-    final ArrayList<InputStream> streams = new ArrayList<>();
-    streams.add(createStream(seq));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(streams, QualityFormat.SANGER);
+    final InputStream fqis = createStream(seq);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -431,10 +413,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testRawRead() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -482,10 +462,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
   }
 
   public void testRead2() throws Exception {
-    final ArrayList<InputStream> al1 = new ArrayList<>();
-    al1.add(createStream(">x1\nACGTACGNNNNN\n"));
-    final FastaSequenceDataSource ds1 = new FastaSequenceDataSource(al1,
-                                                              new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">x1\nACGTACGNNNNN\n");
+    final FastaSequenceDataSource ds1 = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw1 = new SequencesWriter(ds1, mDir, 20, PrereadType.UNKNOWN, false);
     sw1.processSequences();
 
@@ -513,18 +491,14 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
     final File dir1 = FileUtils.createTempDir("dir1", "11");
     final File dir2 = FileUtils.createTempDir("dir2", "22");
     //create data source
-    final ArrayList<InputStream> al1 = new ArrayList<>();
-    al1.add(createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds1 = new FastaSequenceDataSource(al1,
-                                                              new ProteinFastaSymbolTable());
+    final InputStream fqis = createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds1 = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     final SequencesWriter sw1 = new SequencesWriter(ds1, dir1, 20, PrereadType.UNKNOWN, false);
     sw1.processSequences();
 
 
-    final ArrayList<InputStream> al2 = new ArrayList<>();
-    al2.add(createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds2 = new FastaSequenceDataSource(al2,
-                                                              new DNAFastaSymbolTable());
+    final InputStream fqis2 = createStream(">test\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds2 = new FastaSequenceDataSource(fqis2, new DNAFastaSymbolTable());
     final SequencesWriter sw2 = new SequencesWriter(ds2, dir2, 20, PrereadType.UNKNOWN, false);
     sw2.processSequences();
 
@@ -544,10 +518,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   public void testResidueCountsWithoutDusterOnDNA() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -574,10 +546,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   public void testResidueCountsWithDusterOnDNA() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     ds.setDusting(true);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
@@ -603,10 +573,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   public void testResidueCountsWithoutDusterOnProtein() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new ProteinFastaSymbolTable());
+    final InputStream fqis = createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -630,10 +598,8 @@ public abstract class AbstractSequencesReaderTest extends TestCase {
 
   public void testResidueCountsWithDusterOnProtein() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                                                             new ProteinFastaSymbolTable());
+    final InputStream fqis = createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     ds.setDusting(true);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();

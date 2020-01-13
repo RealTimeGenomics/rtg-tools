@@ -33,7 +33,6 @@ package com.rtg.reader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 
@@ -125,11 +124,11 @@ public class CompressedMemorySequencesWriterTest extends TestCase {
   }
 
   private FastaSequenceDataSource getFastaSource(String str) {
-    return new FastaSequenceDataSource(Arrays.asList(new InputStream[] {new ByteArrayInputStream(str.getBytes())}), new DNAFastaSymbolTable());
+    return new FastaSequenceDataSource(new ByteArrayInputStream(str.getBytes()), new DNAFastaSymbolTable());
   }
 
 
   private FastqSequenceDataSource getFastqSource(String str) {
-    return new FastqSequenceDataSource(Arrays.asList(new InputStream[] {new ByteArrayInputStream(str.getBytes())}), QualityFormat.SANGER);
+    return new FastqSequenceDataSource(new ByteArrayInputStream(str.getBytes()), QualityFormat.SANGER);
   }
 }

@@ -78,7 +78,7 @@ public class CompressedMemorySequencesReader2Test extends CompressedMemorySequen
       final IndexFile f = new IndexFile(dir);
 
       final CompressedMemorySequencesReader2 mem = new CompressedMemorySequencesReader2(dir, f, true, true, new LongRange(0, 5));
-      final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), QualityFormat.SANGER);
+      final FastqSequenceDataSource fastq = new FastqSequenceDataSource((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes()), QualityFormat.SANGER);
       int i = 0;
       while (fastq.nextSequence()) {
         final byte[] exp = Arrays.copyOf(fastq.sequenceData(), fastq.currentLength());
@@ -94,7 +94,7 @@ public class CompressedMemorySequencesReader2Test extends CompressedMemorySequen
         ++i;
       }
       final SequencesReader mem2 = mem.copy();
-      final FastqSequenceDataSource fastq2 = new FastqSequenceDataSource(Arrays.asList((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes())), QualityFormat.SANGER);
+      final FastqSequenceDataSource fastq2 = new FastqSequenceDataSource((InputStream) new ByteArrayInputStream(SEQ_DATA.getBytes()), QualityFormat.SANGER);
       int i2 = 0;
       while (fastq2.nextSequence()) {
         final byte[] exp = Arrays.copyOf(fastq2.sequenceData(), fastq2.currentLength());

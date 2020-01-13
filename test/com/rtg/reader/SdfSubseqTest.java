@@ -151,9 +151,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     }
     final File protein = FileUtils.createTempDir("protein", "SDFTest");
     try {
-      al = new ArrayList<>();
-      al.add(createStream(PROT));
-      ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
+      ds = new FastaSequenceDataSource(createStream(PROT), new ProteinFastaSymbolTable());
       sw = new SequencesWriter(ds, protein, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
 
@@ -166,14 +164,11 @@ public class SdfSubseqTest extends AbstractCliTest {
 
   public void testNormalOperation() throws IOException {
     String out;
-    ArrayList<InputStream> al;
     FastaSequenceDataSource ds;
     SequencesWriter sw;
     final File normal = FileUtils.createTempDir("normal", "SDFTest");
     try {
-      al = new ArrayList<>();
-      al.add(createStream(EX2));
-      ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+      ds = new FastqSequenceDataSource(createStream(EX2), QualityFormat.SANGER);
       sw = new SequencesWriter(ds, normal, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
       out = checkMainInitOk("-i", normal.toString(), "TEST:1+5");
@@ -217,9 +212,7 @@ public class SdfSubseqTest extends AbstractCliTest {
     }
     final File fasta = FileUtils.createTempDir("fasta", "SDFTest");
     try {
-      al = new ArrayList<>();
-      al.add(createStream(PROT));
-      ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      ds = new FastaSequenceDataSource(createStream(PROT), new DNAFastaSymbolTable());
       sw = new SequencesWriter(ds, fasta, 20, PrereadType.UNKNOWN, false);
       sw.processSequences();
 

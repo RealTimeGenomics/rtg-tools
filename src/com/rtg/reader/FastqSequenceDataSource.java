@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -76,7 +77,16 @@ public class FastqSequenceDataSource extends FastaSequenceDataSource {
   }
 
   /**
-   * Read FASTQ sequences from given InputStreams. Primarily used for testing
+   * Read FASTQ sequences from given InputStream.
+   * @param iss source of FASTQ data
+   * @param scoreType what type of quality score is represented
+   */
+  public FastqSequenceDataSource(InputStream iss, final QualityFormat scoreType) {
+    this(Collections.singletonList(iss), scoreType);
+  }
+
+  /**
+   * Read FASTQ sequences from given InputStreams.
    * @param iss list of InputStreams
    * @param scoreType what type of quality score is represented
    */

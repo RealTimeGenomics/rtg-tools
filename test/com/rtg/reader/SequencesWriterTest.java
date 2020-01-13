@@ -230,10 +230,8 @@ public class SequencesWriterTest extends TestCase {
   }
 
   public void testPointerRoll() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">1\na\n>2\nc\n>3\ng\n>4\nt\n>5\na\n>6\nc\n>7\ng\n>8\nt\n"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                        new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">1\na\n>2\nc\n>3\ng\n>4\nt\n>5\na\n>6\nc\n>7\ng\n>8\nt\n");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     assertEquals(0, sw.getTotalLength());
     assertEquals(Long.MAX_VALUE, sw.getMinLength());
@@ -330,9 +328,8 @@ public class SequencesWriterTest extends TestCase {
       + "acgtgt" + StringUtils.LS
       + "+12345" + StringUtils.LS
       + "IIIIII" + StringUtils.LS;
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(seq));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream(seq);
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -367,10 +364,8 @@ public class SequencesWriterTest extends TestCase {
   public void testRoll() throws Exception {
     //create data source
     //mDir = new File("/home2/david/cgltest");
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                        new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\naccccaccccacaaacccaa");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
     assertEquals(3, sw.getNumberOfSequences());
@@ -512,30 +507,28 @@ public class SequencesWriterTest extends TestCase {
   }
 
   private void createQualityData(boolean compress) throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n"
-                      + "+123456789012345678901\n!!ASDFFSAFASHSKFSDIUR<<SA><>S<<<\n"
-                      + "@bob the buuilder\ntagttcagcatcgatca\n"
-                      + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
-                      + "@hobos-r us\naccccaccccacaaacccaa\n"
-                      + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n"
+      + "+123456789012345678901\n!!ASDFFSAFASHSKFSDIUR<<SA><>S<<<\n"
+      + "@bob the buuilder\ntagttcagcatcgatca\n"
+      + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
+      + "@hobos-r us\naccccaccccacaaacccaa\n"
+      + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.SOLEXA, compress);
     sw.processSequences();
   }
 
  public void testWrite() throws Exception {
-    //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>xxbaddog\r\nFFF\n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
-    final ArrayList<String> sup = new ArrayList<>();
-    sup.add("baddog");
-    final SequencesWriter sw = new SequencesWriter(ds, mDir, 1024, sup, PrereadType.UNKNOWN, false);
-    assertEquals(0, sw.getNumberOfExcludedSequences());
-    sw.processSequences();
+   //create data source
+   final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>xxbaddog\r\nFFF\n>test2\r\nATGC");
+   final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
+   final ArrayList<String> sup = new ArrayList<>();
+   sup.add("baddog");
+   final SequencesWriter sw = new SequencesWriter(ds, mDir, 1024, sup, PrereadType.UNKNOWN, false);
+   assertEquals(0, sw.getNumberOfExcludedSequences());
+   sw.processSequences();
 
-    //check files
+   //check files
    try (DataInputStream dis = new DataInputStream(new FileInputStream(new File(mDir, SdfFileUtils.INDEX_FILENAME)))) {
      assertEquals(13, dis.readLong());
      assertEquals(1024, dis.readLong());
@@ -578,14 +571,12 @@ public class SequencesWriterTest extends TestCase {
      assertFalse(it.nextSequence());
      assertFalse(dsr.hasQualityData());
    }
-  }
+ }
 
   public void testWriteProtein() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-                        new ProteinFastaSymbolTable());
+    final InputStream fqis = createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 1024, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -648,15 +639,11 @@ public class SequencesWriterTest extends TestCase {
   }
 
   private FastaSequenceDataSource getDataSource(final String sequence) {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(sequence));
-    return new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    return new FastaSequenceDataSource(createStream(sequence), new DNAFastaSymbolTable());
   }
 
   private FastaSequenceDataSource getProteinDataSource(final String sequence) {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(sequence));
-    return new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
+    return new FastaSequenceDataSource(createStream(sequence), new ProteinFastaSymbolTable());
   }
 
   public void testBadSeqNames() {
@@ -796,14 +783,13 @@ public class SequencesWriterTest extends TestCase {
   }
 
   public void testTrim() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n"
-                      + "+123456789012345678901\n!!ASDFFSAFASHSKFSDIUR<<SA><>S<<<\n"
-                      + "@bob the buuilder\ntagttcagcatcgatca\n"
-                      + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
-                      + "@hobos-r us\naccccaccccacaaacccaa\n"
-                      + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n"));
-    final FastqSequenceDataSource ds = new FastqSequenceDataSource(al, QualityFormat.SANGER);
+    final InputStream fqis = createStream("@123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n"
+      + "+123456789012345678901\n!!ASDFFSAFASHSKFSDIUR<<SA><>S<<<\n"
+      + "@bob the buuilder\ntagttcagcatcgatca\n"
+      + "+bob the buuilder\n!ADSFG<<{()))[[[]\n"
+      + "@hobos-r us\naccccaccccacaaacccaa\n"
+      + "+hobos-r us\nADSFAD[[<<<><<[[;;FS\n");
+    final FastqSequenceDataSource ds = new FastqSequenceDataSource(fqis, QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false);
     sw.setReadTrimmer(new BestSumReadTrimmer(50));
     final SequencesReader sr = sw.processSequencesInMemory(null, true, null, null, LongRange.NONE);
@@ -814,14 +800,13 @@ public class SequencesWriterTest extends TestCase {
     assertEquals(20, sr.length(2));
   }
   public void testNoTrimNoQuals() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">123456789012345678901\n"
-        + "acgtgtgtgtcttagggctcactggtcatgca\n"
-        + ">bob the buuilder\n"
-        + "tagttcagcatcgatca\n"
-        + ">hobos-r us"
-        + "\naccccaccccacaaacccaa\n"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">123456789012345678901\n"
+      + "acgtgtgtgtcttagggctcactggtcatgca\n"
+      + ">bob the buuilder\n"
+      + "tagttcagcatcgatca\n"
+      + ">hobos-r us"
+      + "\naccccaccccacaaacccaa\n");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 100000, null, PrereadType.SOLEXA, false);
     sw.setReadTrimmer(new BestSumReadTrimmer(50));
     final File proxy = new File("proxy");

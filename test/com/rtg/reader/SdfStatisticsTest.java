@@ -34,9 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
@@ -208,9 +206,8 @@ public class SdfStatisticsTest extends AbstractCliTest {
     try (final TestDirectory dir = new TestDirectory()) {
       final File preread = ReaderTestUtils.getDNADir(fasta, dir);
 
-      final ArrayList<InputStream> inputStreams = new ArrayList<>();
-      inputStreams.add(new ByteArrayInputStream(fasta.getBytes()));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(inputStreams, new DNAFastaSymbolTable());
+      final InputStream fqis = new ByteArrayInputStream(fasta.getBytes());
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       final SequencesWriter sequenceWriter = new SequencesWriter(ds, preread, Constants.MAX_FILE_SIZE, PrereadType.UNKNOWN, true);
       CommandLine.setCommandArgs("blahrg");
       sequenceWriter.setComment("blooo");
@@ -301,7 +298,7 @@ public class SdfStatisticsTest extends AbstractCliTest {
     } finally {
       archive.close();
     }
-    final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Collections.singletonList(Resources.getResourceAsStream(fastqRes)), QualityFormat.SANGER);
+    final FastqSequenceDataSource fastq = new FastqSequenceDataSource(Resources.getResourceAsStream(fastqRes), QualityFormat.SANGER);
     final SequencesWriter sw = new SequencesWriter(fastq, newDir, 1000000, PrereadType.UNKNOWN, false);
     sw.processSequences();
     final byte[][] newData;

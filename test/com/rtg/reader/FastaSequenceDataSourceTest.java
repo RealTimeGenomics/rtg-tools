@@ -83,9 +83,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
 
   public void testOneSeq() throws IOException {
     //testing read() method
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     byte[] b = ds.sequenceData();
@@ -121,9 +120,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
     };
     Diagnostic.addListener(dl);
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(">x\n" + "actgn\n>"));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      final InputStream fqis = createStream(">x\n" + "actgn\n>");
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       assertTrue(ds.nextSequence());
       assertEquals("x", ds.name());
       final byte[] b = ds.sequenceData();
@@ -144,9 +142,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   public void testWarning() throws IOException {
     final InputStream is = createStream("      ");
     final boolean[] done = new boolean[1];
-    final ArrayList<InputStream> l = new ArrayList<>();
-    l.add(is);
-    final FastaSequenceDataSource fsds = new FastaSequenceDataSource(l, new DNAFastaSymbolTable());
+    final InputStream fqis = is;
+    final FastaSequenceDataSource fsds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final DiagnosticListener dl = new DiagnosticListener() {
       @Override
       public void handleDiagnosticEvent(final DiagnosticEvent<?> event) {
@@ -156,6 +153,7 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
           done[0] = true;
         }
       }
+
       @Override
       public void close() {
       }
@@ -171,9 +169,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
 
 
   public void testDustingSequence() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  Tg\ntnGh\n\n\t   \n>test2\r\nATGCc"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  Tg\ntnGh\n\n\t   \n>test2\r\nATGCc");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     ds.setDusting(true);
     checkResult(ds);
   }
@@ -205,9 +202,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testConsecutiveLabelsWithoutActualSequenceData() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\n>test2\n"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\n>test2\n");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -216,9 +212,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testConsecutiveLabelsWithoutActualSequenceData2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\t\n\r\n\r\r\r\n\n\r>>test2\n"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\t\n\r\n\r\r\r\n\n\r>>test2\n");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test\t", ds.name());
     assertTrue(ds.nextSequence());
@@ -227,10 +222,9 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testBogusChars() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
     final String bad = "`!@#$%^&*()_+1234567890-={}[]vs\\|?/<,.'\"";
-    al.add(createStream(">test\n" + bad));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\n" + bad);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     final byte[] b = ds.sequenceData();
@@ -242,9 +236,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testOneSeqFunnyLabel() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\t dog meow\nac\n  tg\ntnGh\n\n\t   \n>test2 pox\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\t dog meow\nac\n  tg\ntnGh\n\n\t   \n>test2 pox\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test\t dog meow", ds.name());
     assertTrue(ds.nextSequence());
@@ -253,9 +246,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testOneSeqFunnyLabel2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\r\nac\n  tg\ntnGh\n\n\t   \n>test2 \nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\r\nac\n  tg\ntnGh\n\n\t   \n>test2 \nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(ds.nextSequence());
@@ -264,18 +256,16 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testOneSeqFunnyLabel3() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\t\t\t\nac\n  tg\ntnGh\n\n\t   \n>test2 "));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\t\t\t\nac\n  tg\ntnGh\n\n\t   \n>test2 ");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test\t\t\t", ds.name());
     assertTrue(!ds.nextSequence());
   }
 
   public void testProtein() throws Exception {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
+    final InputStream fqis = createStream(">test\naH\n  tg\ntXGj\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     final Protein[] expected = {Protein.A, Protein.H, Protein.T, Protein.G, Protein.T, Protein.X, Protein.G, Protein.X};
     final Protein[] expected2 = {Protein.A, Protein.T, Protein.G, Protein.C};
     assertTrue(ds.nextSequence());
@@ -316,9 +306,8 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
         seq.append(p.name());
       }
       seq.append("BZ");
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(seq.toString()));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
+      final InputStream fqis = createStream(seq.toString());
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
       assertTrue(ds.nextSequence());
       assertEquals("test", ds.name());
 
@@ -342,9 +331,7 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   private FastaSequenceDataSource getDataSource(final String sequence) {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(sequence));
-    return new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    return new FastaSequenceDataSource(createStream(sequence), new DNAFastaSymbolTable());
   }
 
   private FastaSequenceDataSource getDataSource(final String[] sequences) {
@@ -437,10 +424,9 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testSuperLongSeq() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(getSuperLongStream(20));
+    final InputStream fqis = getSuperLongStream(20);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     //    al.add(getSuperLongStream(2049)); // i.e. test >2GB
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
     assertTrue(ds.nextSequence());
     assertEquals("test", ds.name());
     assertTrue(!ds.nextSequence());
@@ -577,12 +563,10 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
   }
 
   public void testTypeErrors() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream("@test\t\t\t\nac\n  tg\ntnGh\n\n\t   \n>test2 "));
     final MyListener dl = new MyListener();
     Diagnostic.addListener(dl);
     try {
-      FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      FastaSequenceDataSource ds = new FastaSequenceDataSource(createStream("@test\t\t\t\nac\n  tg\ntnGh\n\n\t   \n>test2 "), new DNAFastaSymbolTable());
       try {
         ds.nextSequence();
         fail();
@@ -594,9 +578,7 @@ public class FastaSequenceDataSourceTest extends AbstractTest {
       assertEquals("Error: At least one input file looks like FASTQ format rather than FASTA. Try processing with the fastq format option.", dl.mEvent.getMessage());
 
       dl.mEvent = null;
-      al.clear();
-      al.add(createStream("flying spaghetti monster"));
-      ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      ds = new FastaSequenceDataSource(createStream("flying spaghetti monster"), new DNAFastaSymbolTable());
       try {
         ds.nextSequence();
         fail();

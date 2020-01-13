@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -103,16 +102,14 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
 
   public void testLengthsHelper() throws IOException {
     final byte[] buffer = new byte[7];
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test1\nacgta\n"
-                      + ">test2\nagtcatg\n"
-                      + ">test3\nacgtttggct\n"
-                      + ">test4\natggcttagctacagt\n"
-                      + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
-                      + ">test6\na"));
+    final InputStream fqis = createStream(">test1\nacgta\n"
+      + ">test2\nagtcatg\n"
+      + ">test3\nacgtttggct\n"
+      + ">test4\natggcttagctacagt\n"
+      + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
+      + ">test6\na");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     //0, 5, 12, 22, 38,
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-            new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20000, PrereadType.UNKNOWN, false);
     sw.processSequences();
     final File file = SdfFileUtils.sequencePointerFile(mDir, 0);
@@ -135,16 +132,14 @@ public class DefaultSequencesReaderTest extends AbstractSequencesReaderTest {
     //set a command line.
     CommandLine.setCommandArgs("feh", "-f", "super feh");
     try {
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(createStream(">test1\nacgta\n"
+      final InputStream fqis = createStream(">test1\nacgta\n"
         + ">test2\nagtcatg\n"
         + ">test3\nacgtttggct\n"
         + ">test4\natggcttagctacagt\n"
         + ">test5\nactagattagagtagagatgatgtagatgagtagaaagtt\n"
-        + ">test6\na"));
+        + ">test6\na");
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       //0, 5, 12, 22, 38,
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,
-        new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, mDir, 20000, PrereadType.UNKNOWN, false);
       sw.setComment("blah rag");
       sw.processSequences();

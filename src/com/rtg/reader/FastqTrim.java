@@ -46,7 +46,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.FutureTask;
 import java.util.function.Function;
@@ -198,7 +197,7 @@ public final class FastqTrim extends AbstractCli {
     final int threads = CommonFlags.parseThreads((Integer) mFlags.getValue(CommonFlags.THREADS_FLAG));
     final ReadTrimmer trimmer = getTrimmer();
     final File inFile = (File) mFlags.getValue(CommonFlags.INPUT_FLAG);
-    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(Collections.singletonList(FileUtils.createInputStream(inFile, true)), encoding)) {
+    try (final SequenceDataSource fastqReader = new FastqSequenceDataSource(FileUtils.createInputStream(inFile, true), encoding)) {
 
       final Timer t = new Timer("FastqPairTrimmer");
       t.start();

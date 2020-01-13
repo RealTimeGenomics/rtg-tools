@@ -87,9 +87,8 @@ public class Sdf2FastaTest extends AbstractCliTest {
   public void testWorks() throws Exception {
     try (TestDirectory dir = new TestDirectory("sdf2fasta")) {
       final File xd = new File(dir, "sdf");
-      final ArrayList<InputStream> al = new ArrayList<>();
-      al.add(new ByteArrayInputStream(">test\nacgt\n>bob\ntagt\naccc\n>cat\ncat\n>dog\nccc".getBytes()));
-      final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+      final InputStream fqis = new ByteArrayInputStream(">test\nacgt\n>bob\ntagt\naccc\n>cat\ncat\n>dog\nccc".getBytes());
+      final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
       final SequencesWriter sw = new SequencesWriter(ds, xd, 300000, PrereadType.UNKNOWN, false);
       sw.processSequences();
       File x;
@@ -173,16 +172,14 @@ public class Sdf2FastaTest extends AbstractCliTest {
     }
   }
   private void createPreread(final String s, final File dir) throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(new ByteArrayInputStream(s.getBytes()));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = new ByteArrayInputStream(s.getBytes());
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     new SequencesWriter(ds, dir, 100000, PrereadType.UNKNOWN, false).processSequences();
   }
 
   private void createPrereadProtein(final File dir) throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(new ByteArrayInputStream((">x\n" + "X*ARNDCQEGHILKMFPSTWYV\n").getBytes()));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new ProteinFastaSymbolTable());
+    final InputStream fqis = new ByteArrayInputStream((">x\n" + "X*ARNDCQEGHILKMFPSTWYV\n").getBytes());
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new ProteinFastaSymbolTable());
     new SequencesWriter(ds, dir, 100000, PrereadType.UNKNOWN, false).processSequences();
   }
 

@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -88,6 +89,15 @@ public class FastaSequenceDataSource implements SequenceDataSource {
    * FASTA extension
    */
   public static final String FASTA_EXTENSION = ".fasta";
+
+  /**
+   * Read FASTA sequences from given InputStream.
+   * @param iss source of FASTA data
+   * @param table Symbol table for type of input.
+   */
+  public FastaSequenceDataSource(InputStream iss, FastaSymbolTable table) {
+    this(Collections.singletonList(iss), table);
+  }
 
   /**
    * Read FASTA sequences from given InputStreams. Primarily used for testing.

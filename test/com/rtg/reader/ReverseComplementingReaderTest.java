@@ -32,7 +32,6 @@ package com.rtg.reader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 
 import com.rtg.mode.DNA;
 import com.rtg.mode.DNAFastaSymbolTable;
@@ -79,9 +78,8 @@ public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
   @Override
   public void testResidueCountsWithDusterOnDNA() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     ds.setDusting(true);
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
@@ -106,9 +104,8 @@ public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
   @Override
   public void testResidueCountsWithoutDusterOnDNA() throws Exception {
     //create data source
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al,  new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test\nac\n  tg\ntnGh\n\n\t   \n>test2\r\nATGC");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
 
@@ -133,9 +130,8 @@ public class ReverseComplementingReaderTest extends DefaultSequencesReaderTest {
   }
 
   public void testRC() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(">test1\nacngta\n"));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(">test1\nacngta\n");
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, mDir, 20000, PrereadType.UNKNOWN, false);
     sw.processSequences();
     try (SequencesReader dsr = createSequencesReader(mDir)) {

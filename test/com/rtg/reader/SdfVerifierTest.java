@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractCliTest;
@@ -67,9 +66,8 @@ public class SdfVerifierTest extends AbstractCliTest {
       + "tagttcagcatcgatca" + LS + ">hobos r us" + LS + "accccaccccacaaacccaa";
 
   private void createBasePreread(File dir) throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(EX1));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(EX1);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     final SequencesWriter sw = new SequencesWriter(ds, dir, 20, PrereadType.UNKNOWN, false);
     sw.processSequences();
   }
@@ -109,9 +107,8 @@ public class SdfVerifierTest extends AbstractCliTest {
       + LS;
 
   public void testVerifier2() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(EX2));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(EX2);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     try (TestDirectory dir = new TestDirectory()) {
       new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
       try (SequencesReader dsr = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
@@ -255,9 +252,8 @@ public class SdfVerifierTest extends AbstractCliTest {
   }
 
   public void testRunningFromMainInit() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(EX2));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(EX2);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     try (TestDirectory dir = new TestDirectory()) {
       new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
       final MainResult res = MainResult.run(getCli(), dir.getPath());
@@ -292,9 +288,8 @@ public class SdfVerifierTest extends AbstractCliTest {
   }
 
   public void testIfChecksumNotPresent() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(EX2));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(EX2);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     try (TestDirectory dir = new TestDirectory()) {
       new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
       final IndexFile f = new IndexFile(dir);
@@ -311,9 +306,8 @@ public class SdfVerifierTest extends AbstractCliTest {
   }
 
   public void testIfModifyChecksum() throws IOException {
-    final ArrayList<InputStream> al = new ArrayList<>();
-    al.add(createStream(EX2));
-    final FastaSequenceDataSource ds = new FastaSequenceDataSource(al, new DNAFastaSymbolTable());
+    final InputStream fqis = createStream(EX2);
+    final FastaSequenceDataSource ds = new FastaSequenceDataSource(fqis, new DNAFastaSymbolTable());
     try (TestDirectory dir = new TestDirectory()) {
       new SequencesWriter(ds, dir, 1000000000, PrereadType.UNKNOWN, false).processSequences();
       final IndexFile f = new IndexFile(dir);
