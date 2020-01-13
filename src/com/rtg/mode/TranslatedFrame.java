@@ -508,6 +508,30 @@ public abstract class TranslatedFrame implements Frame, PseudoEnum {
     }
   }
 
+  /**
+   * Translate an array of nucleotides into amino acids
+   * @param nt the encoded array of nucleotide values
+   * @param ntLength number of nucleotides to translate
+   * @param aa destination array for translated amino acids
+   * @param frame frame of translation, -3, -2, -1, 1, 2, 3
+   * @return number of amino acids translated
+   */
+  public static int dnaToProtein(byte[] nt, int ntLength, byte[] aa, int frame) {
+    assert aa.length >= ntLength / NUCLEOTIDES_PER_CODON;
+    assert frame > -4 && frame < 4 && frame != 0;
+    int aaLength = 0;
+    if (frame > 0) {
+      for (int i = frame - 1; i + 2 < ntLength; i += 3) {
+        aa[aaLength++] = codonToAmino(nt[i], nt[i + 1], nt[i + 2]);
+      }
+    } else {
+      for (int i = ntLength + frame; i - 2 >= 0; i -= 3) {
+        aa[aaLength++] = codonToAmino(DNA.complement(nt[i]), DNA.complement(nt[i - 1]), DNA.complement(nt[i - 2]));
+      }
+    }
+
+    return aaLength;
+  }
 
 }
 

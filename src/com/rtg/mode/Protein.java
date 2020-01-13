@@ -278,6 +278,21 @@ public class Protein implements Residue, Comparable<Protein>, PseudoEnum {
   }
 
   /**
+   * Convert a binary amino acid sequence to a human readable string using uppercase characters
+   * @param seq protein in internal bytes
+   * @param start offset into array
+   * @param length length of protein
+   * @return readable string
+   */
+  public static String bytesToProtein(final byte[] seq, final int start, final int length) {
+    final StringBuilder sb = new StringBuilder();
+    for (int i = start; i < start + length; ++i) {
+      sb.append((char) pbase(seq, i));
+    }
+    return sb.toString();
+  }
+
+  /**
    * Convert an ascii amino acid character into internal encoding
    * @param c the amino acid character.
    * @return the encoded value
