@@ -70,7 +70,9 @@ public class Flag<T> implements Comparable<Flag<T>> {
 
   private final String mFlagDescription;
 
-  private final Level mLevel;
+  private Level mLevel;
+
+  private boolean mDeprecated = false;
 
   /** The maximum number of times the flag can occur. */
   private int mMaxCount;
@@ -172,6 +174,17 @@ public class Flag<T> implements Comparable<Flag<T>> {
    */
   Level level() {
     return mLevel;
+  }
+
+  /**
+   * Indicate that a flag is deprecated. It will still function, but won't appear
+   * in the default help output.
+   *
+   * Currently implemented by moving the flag to the extended help section.
+   */
+  public void setDeprecated() {
+    mLevel = Level.EXTENDED;
+    mDeprecated = true;
   }
 
   /**
@@ -691,7 +704,11 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @return description string
    */
   public String getUsageDescription() {
-    final StringBuilder description = new StringBuilder(getDescription());
+    final StringBuilder description = new StringBuilder();
+    if (mDeprecated) {
+      description.append("(deprecated) ");
+    }
+    description.append(getDescription());
 
     final List<String> range = getParameterRange();
     if (range != null) {
