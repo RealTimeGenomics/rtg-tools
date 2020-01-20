@@ -43,7 +43,7 @@ import junit.framework.TestCase;
 public class StatisticsVcfWriterTest extends TestCase {
 
   public void test() throws IOException {
-    final VcfRecord rec = VcfReaderTest.vcfLineToRecord("1 1300068 . T T,TA 1959.58 . DP=2 GT 0/1".replaceAll(" ", "\t"));
+    final VcfRecord rec = VcfReaderTest.vcfLineToRecord("1 1300068 . C T,TA 1959.58 . DP=2 GT 0/1".replaceAll(" ", "\t"));
     final VariantStatistics vs = new VariantStatistics(null);
     final VcfHeader header = new VcfHeader();
     try (VcfWriter writer = new StatisticsVcfWriter<>(new NullVcfWriter(header), vs, Collections.emptyList())) {

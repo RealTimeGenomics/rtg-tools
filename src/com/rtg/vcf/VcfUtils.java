@@ -820,6 +820,9 @@ public final class VcfUtils {
     for (int i = 1; i < alleles.length; ++i) {
       final String allele = alts.get(i - 1);
       alleles[i] = prevNt && allele.charAt(0) != VcfUtils.ALT_SPANNING_DELETION ? allele.substring(1) : allele;
+      if (alleles[0].equals(alleles[i])) {
+        throw new VcfFormatException("VCF record ALT allele with ID " + i + " is the same as REF, record: " + rec.toString());
+      }
     }
     return alleles;
   }

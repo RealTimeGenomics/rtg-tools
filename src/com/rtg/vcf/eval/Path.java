@@ -299,6 +299,8 @@ public final class Path implements Comparable<Path> {
 
     // Create a path extension that includes this variant in the possible phases
     for (OrientedVariant o : orientor.orientations(var)) {
+      assert o.isHeterozygous() || o.allele() == null || o.allele().getLength() > 0 || o.allele().nt().length > 0
+        : "Homozygous no-op variants should have been ignored during loading";
       if ((side ? mCalledPath : mBaselinePath).isNew(o)) {
         final Path include = new Path(this, syncPoints);
         include.include(side, o, varIndex);

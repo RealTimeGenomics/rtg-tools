@@ -141,10 +141,11 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
   }
 
   public void testNanoNop() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_nop/nop", new String[] {"summary.txt", "output.vcf"}, false,
-      //"--XXcom.rtg.vcf.eval.trace",
-      "--no-roc", "--output-mode=combine", "--squash-ploidy", "--ref-overlap"
-    );
+    // Input record contains an ALT same as REF, which caused a path finding crash
+    //endToEnd("vcfeval_nop/nop", new String[] {"summary.txt", "output.vcf"}, false, "--no-roc", "--output-mode=combine", "--squash-ploidy", "--ref-overlap");
+
+    // Now detects the invalid record up front
+    endToEnd("vcfeval_nop/nop", "vcfeval_nop/nop", 1, false, null, "--no-roc", "--output-mode=combine", "--squash-ploidy", "--ref-overlap");
   }
 
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {

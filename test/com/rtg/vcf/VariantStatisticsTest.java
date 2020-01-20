@@ -97,7 +97,7 @@ public class VariantStatisticsTest extends AbstractNanoTest {
   }
 
   private static final String[] VARIANTS = {
-    "seq\t0\t.\tA\tA" + "\t.\tPASS\t.\tGT\t0/0"
+    "seq\t0\t.\tA\tC" + "\t.\tPASS\t.\tGT\t0/0"
     , "seq\t0\t.\tA\tC" + "\t.\ta10.0\t.\tGT\t0/0"
     , "seq\t0\t.\tA\tC" + "\t.\tOC\t.\tGT\t0/0"
     , "seq\t0\t.\tA\t." + "\t.\tRC\t.\tGT\t0/0"
