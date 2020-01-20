@@ -140,6 +140,13 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_avoid_overlap/avoid_overlap", new String[] {"summary.txt", "output.vcf"}, false, "--no-roc", "--output-mode=combine", "--sample=BASE,QUERY", "--ref-overlap");
   }
 
+  public void testNanoNop() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_nop/nop", new String[] {"summary.txt", "output.vcf"}, false,
+      //"--XXcom.rtg.vcf.eval.trace",
+      "--no-roc", "--output-mode=combine", "--squash-ploidy", "--ref-overlap"
+    );
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

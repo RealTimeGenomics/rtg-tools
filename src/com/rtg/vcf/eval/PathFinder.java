@@ -311,6 +311,9 @@ public final class PathFinder {
   }
 
   private void addIfBetter(Path add, TreeSet<Path> sortedPaths) {
+    if (TRACE) {
+      System.err.println("Adding  " + add);
+    }
     if (sortedPaths.contains(add)) {
       final Path other = sortedPaths.floor(add);
       final Path best = mConfig.mPathSelector.better(add, other);
@@ -336,9 +339,6 @@ public final class PathFinder {
         }
       }
     } else {
-      if (TRACE) {
-        System.err.println("Keeping " + add);
-      }
       sortedPaths.add(add);
     }
   }

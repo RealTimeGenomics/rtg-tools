@@ -56,6 +56,7 @@ import com.rtg.util.intervals.SequenceNameLocusSimple;
 class SequenceEvaluator implements IORunnable {
 
   private static final boolean DUMP_BEST_PATH = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_DUMP_BEST_PATH);
+  private static final boolean SHORT_CIRCUIT_EMPTY = true; // Boolean.getBoolean("vcfeval.no.short-circuit-empty");
 
   private final EvalSynchronizer mSynchronize;
   private final SequencesReader mTemplate;
@@ -94,7 +95,7 @@ class SequenceEvaluator implements IORunnable {
       Diagnostic.developerLog("Sequence: " + currentName + " has " + baseLineCalls.size() + " baseline variants");
       Diagnostic.developerLog("Sequence: " + currentName + " has " + calledCalls.size() + " called variants");
 
-      if (baseLineCalls.isEmpty() || calledCalls.isEmpty()) {
+      if (SHORT_CIRCUIT_EMPTY && (baseLineCalls.isEmpty() || calledCalls.isEmpty())) {
         setStatus(baseLineCalls, VariantId.STATUS_NO_MATCH);
         setStatus(calledCalls, VariantId.STATUS_NO_MATCH);
         mSynchronize.write(currentName, baseLineCalls, calledCalls, Collections.emptyList(), Collections.emptyList());
