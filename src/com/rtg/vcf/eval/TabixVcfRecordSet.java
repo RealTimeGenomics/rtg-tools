@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,6 +42,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -90,8 +90,8 @@ class TabixVcfRecordSet implements VariantSet {
   private final int mCalledSampleNo; // Index of call sample within header, or -1 if not selecting a sample
   private final VariantFactory mBaselineFactory;
   private final VariantFactory mCallsFactory;
-  private final Map<String, File> mBaselinePreprocessed = new HashMap<>();
-  private final Map<String, File> mCallsPreprocessed = new HashMap<>();
+  private final Map<String, File> mBaselinePreprocessed = new ConcurrentHashMap<>();
+  private final Map<String, File> mCallsPreprocessed = new ConcurrentHashMap<>();
   private final boolean mPassOnly;
   private final int mMaxLength;
   private final File mPreprocessDestDir;
