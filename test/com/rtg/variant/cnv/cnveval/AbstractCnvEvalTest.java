@@ -32,7 +32,6 @@ package com.rtg.variant.cnv.cnveval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractEndToEndTest;
@@ -49,7 +48,7 @@ public abstract class AbstractCnvEvalTest extends AbstractEndToEndTest {
   }
 
   @Override
-  protected void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException {
+  protected void endToEnd(String harnessId, String resultsId, int expectRc, boolean expectWarn, OutputChecker outputChecker, String... args) throws IOException {
     try (TestDirectory dir = new TestDirectory("cnveval-nano")) {
       FileUtils.stringToFile(mNano.loadReference(harnessId + "_in_baseline.vcf"), new File(dir, "baseline.vcf"));
       FileUtils.stringToFile(mNano.loadReference(harnessId + "_in_calls.vcf"), new File(dir, "calls.vcf"));
@@ -59,7 +58,7 @@ public abstract class AbstractCnvEvalTest extends AbstractEndToEndTest {
       final String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", new File(dir, "calls.vcf").getPath(), "-b", new File(dir, "baseline.vcf").getPath(), "-e", new File(dir, "regions.bed").getPath(), "-Z");
       final MainResult res = MainResult.run(getCli(), fullArgs);
 
-      checkResults(resultsId, filesToCheck, expectWarn, extracheck, output, res);
+      checkResults(resultsId, expectRc, expectWarn, outputChecker, output, res);
     }
   }
 

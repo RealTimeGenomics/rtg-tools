@@ -31,7 +31,6 @@ package com.rtg.launcher;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.TestUtils;
@@ -43,46 +42,53 @@ import com.rtg.vcf.VcfUtils;
  */
 public abstract class AbstractEndToEndTest extends AbstractCliTest {
 
+  public interface OutputChecker {
+    void check(File outputDir) throws IOException;
+  }
+
   protected void endToEnd(String id, String[] filesToCheck, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
-    endToEnd(id, id, filesToCheck, expectWarn, null, args);
+    endToEnd(id, id, filesToCheck, expectWarn, args);
   }
 
   protected void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
-    endToEnd(harnessId, resultsId, filesToCheck, expectWarn, null, args);
+    endToEnd(harnessId, resultsId, 0, expectWarn, output -> {
+      for (String fileName : filesToCheck) {
+        checkResultFile(resultsId, output, fileName);
+      }
+    }, args);
   }
 
-  protected void endToEnd(String id, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException, UnindexableDataException {
-    endToEnd(id, id, filesToCheck, expectWarn, extracheck, args);
+  protected void endToEnd(String id, boolean expectWarn, OutputChecker outputChecks, String... args) throws IOException, UnindexableDataException {
+    endToEnd(id, id, 0, expectWarn, outputChecks, args);
   }
 
   /**
    * Run a command line test with the given harness and results id, and check the results.
    * @param harnessId specifier for which input files to use
-   * @param resultsId specifier for which input files to use
-   * @param filesToCheck list of output file names to check
+   * @param resultsId specifier for which result files to compare against
+   * @param expectRc expected return code from the run
    * @param expectWarn if true, check the results of stderr
-   * @param extracheck if not null, run custom checks in the given output directory
+   * @param outputChecks if not null, runs checks in the given output directory
    * @param args additional command line arguments
    * @throws IOException if bad things happen
    * @throws UnindexableDataException if other bad things happen
    */
-  protected abstract void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException, UnindexableDataException;
+  protected abstract void endToEnd(String harnessId, String resultsId, int expectRc, boolean expectWarn, OutputChecker outputChecks, String... args) throws IOException, UnindexableDataException;
 
   // For calling by the endToEnd implementation
-  protected void checkResults(String id, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, File output, MainResult res) throws IOException {
-    assertEquals(res.err(), 0, res.rc());
+  protected void checkResults(String id, int expectRc, boolean expectWarn, OutputChecker outputChecks, File output, MainResult res) throws IOException {
+    assertEquals(res.err(), expectRc, res.rc());
     if (expectWarn) {
       mNano.check(id + "_err.txt", res.err());
     }
-
-    for (String fileName : filesToCheck) {
-      final File file = new File(output, fileName);
-      final String content = FileUtils.fileToString(file);
-      mNano.check(id + "_out_" + fileName, VcfUtils.isVcfExtension(file) ? TestUtils.sanitizeVcfHeader(content) : TestUtils.sanitizeTsvHeader(content));
+    if (outputChecks != null) {
+      outputChecks.check(output);
     }
+  }
 
-    if (extracheck != null) {
-      extracheck.accept(output);
-    }
+  protected void checkResultFile(String id, File output, String fileName) throws IOException {
+    final File file = new File(output, fileName);
+    final String content = FileUtils.fileToString(file);
+    mNano.check(id + "_out_" + fileName, VcfUtils.isVcfExtension(file) ? TestUtils.sanitizeVcfHeader(content) : TestUtils.sanitizeTsvHeader(content));
   }
 }

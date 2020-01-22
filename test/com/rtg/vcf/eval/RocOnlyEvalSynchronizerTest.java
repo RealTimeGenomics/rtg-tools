@@ -41,6 +41,9 @@ public class RocOnlyEvalSynchronizerTest extends AbstractVcfEvalTest {
   }
 
   protected void endToEnd(String id, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
-    endToEnd(id, new String[] {"weighted_roc.tsv"}, expectWarn, dir -> assertEquals(0, dir.listFiles((d2, name) -> name.contains(".vcf")).length), args);
+    endToEnd(id, id, 0, expectWarn, output -> {
+      checkResultFile(id, output, "weighted_roc.tsv");
+      assertEquals(0, output.listFiles((d2, name) -> name.contains(".vcf")).length);
+    }, args);
   }
 }

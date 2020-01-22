@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractEndToEndTest;
@@ -53,7 +52,7 @@ public abstract class AbstractVcfEvalTest extends AbstractEndToEndTest {
   }
 
   @Override
-  protected void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException, UnindexableDataException {
+  protected void endToEnd(String harnessId, String resultsId, int expectRc, boolean expectWarn, OutputChecker outputChecker, String... args) throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcfeval-nano")) {
       final File template = new File(dir, "template");
       ReaderTestUtils.getReaderDNA(mNano.loadReference(harnessId + "_in_template.fa"), template, new SdfId(0));
@@ -71,7 +70,7 @@ public abstract class AbstractVcfEvalTest extends AbstractEndToEndTest {
       final String[] fullArgs = Utils.append(args, "-o", output.getPath(), "-c", calls.getPath(), "-b", baseline.getPath(), "-t", template.getPath(), "-Z");
       final MainResult res = MainResult.run(getCli(), fullArgs);
 
-      checkResults(resultsId, filesToCheck, expectWarn, extracheck, output, res);
+      checkResults(resultsId, expectRc, expectWarn, outputChecker, output, res);
     }
   }
 }

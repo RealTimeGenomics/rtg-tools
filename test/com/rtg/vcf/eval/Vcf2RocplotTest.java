@@ -32,7 +32,6 @@ package com.rtg.vcf.eval;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.AbstractEndToEndTest;
@@ -55,7 +54,7 @@ public class Vcf2RocplotTest extends AbstractEndToEndTest {
   }
 
   @Override
-  protected void endToEnd(String harnessId, String resultsId, String[] filesToCheck, boolean expectWarn, Consumer<File> extracheck, String... args) throws IOException, UnindexableDataException {
+  protected void endToEnd(String harnessId, String resultsId, int expectRc, boolean expectWarn, OutputChecker outputChecker, String... args) throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcf2rocplot-nano")) {
       final File first = new File(dir, "first.vcf.gz");
       FileHelper.stringToGzFile(mNano.loadReference(harnessId + "_in_first.vcf"), first);
@@ -70,7 +69,7 @@ public class Vcf2RocplotTest extends AbstractEndToEndTest {
       final String[] fullArgs = Utils.append(args, "-o", output.getPath(), first.getPath(), second.getPath(), "-Z");
       final MainResult res = MainResult.run(getCli(), fullArgs);
 
-      checkResults(resultsId, filesToCheck, expectWarn, extracheck, output, res);
+      checkResults(resultsId, expectRc, expectWarn, outputChecker, output, res);
     }
   }
 }
