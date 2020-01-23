@@ -85,6 +85,17 @@ public class VcfEvalCliTest extends AbstractVcfEvalTest {
       TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
         "--output-mode", "combine", "--sample", "ALT"), "--output-mode=combine cannot be used");
 
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+        "--at-sensitivity", "-1"), "The value for --at-sensitivity must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+        "--at-sensitivity", "1.1"), "The value for --at-sensitivity must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+        "--at-precision", "-1"), "The value for --at-precision must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+        "--at-precision", "42"), "The value for --at-precision must be in the range [0.0, 1.0]");
+      TestUtils.containsAllUnwrapped(checkHandleFlagsErr("-o", out.getPath(), "-c", calls.getPath(), "-b", mutations.getPath(), "-t", template.getPath(),
+        "--at-precision", "0.5", "--at-sensitivity", "0.5"), "Cannot set both --at-precision and --at-sensitivity");
+
       checkHandleFlags(flagStrings);
 
       assertTrue(out.mkdir());

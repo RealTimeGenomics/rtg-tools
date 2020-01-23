@@ -85,6 +85,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String REF_OVERLAP = "ref-overlap";
   private static final String OUTPUT_MODE = "output-mode";
+  private static final String CRITERIA_SENSITIVITY = "at-sensitivity";
+  private static final String CRITERIA_PRECISION = "at-precision";
 
   private static final String ROC_SUBSET = "Xroc-subset";
   private static final String SLOPE_FILES = "Xslope-files";
@@ -92,8 +94,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
-  private static final String CRITERIA_SENSITIVITY = "Xat-sensitivity";
-  private static final String CRITERIA_PRECISION = "Xat-precision";
   private static final String DECOMPOSE = "decompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
@@ -202,6 +202,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && validatePairedFlag(flags, SAMPLE, "sample name")
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
+      && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
+      && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
     );
   }
 
