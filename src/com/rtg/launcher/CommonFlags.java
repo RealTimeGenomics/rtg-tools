@@ -499,8 +499,17 @@ public final class CommonFlags {
    * @param flags shared flags
    */
   public static void initReadRange(final CFlags flags) {
-    flags.registerOptional(CommonFlags.START_READ_ID, Long.class, CommonFlags.INT, "inclusive lower bound on read id").setCategory(CommonFlagCategories.FILTERING);
-    flags.registerOptional(CommonFlags.END_READ_ID, Long.class, CommonFlags.INT, "exclusive upper bound on read id").setCategory(CommonFlagCategories.FILTERING);
+    initReadRange(flags, "read");
+  }
+
+  /**
+   * Initialise flags for ranges of sequences
+   * @param flags shared flags
+   * @param queryLabel label for the sequences
+   */
+  public static void initReadRange(final CFlags flags, String queryLabel) {
+    flags.registerOptional(CommonFlags.START_READ_ID, Long.class, CommonFlags.INT, "inclusive lower bound on " + queryLabel + " id").setCategory(CommonFlagCategories.FILTERING);
+    flags.registerOptional(CommonFlags.END_READ_ID, Long.class, CommonFlags.INT, "exclusive upper bound on " + queryLabel + " id").setCategory(CommonFlagCategories.FILTERING);
   }
 
   /**
