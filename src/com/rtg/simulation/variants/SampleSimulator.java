@@ -40,6 +40,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.rtg.mode.DnaUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.reference.ReferenceGenome;
 import com.rtg.reference.ReferenceGenome.ReferencePloidy;
@@ -54,7 +55,9 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.StatisticsVcfWriter;
 import com.rtg.vcf.VariantStatistics;
 import com.rtg.vcf.VariantType;
-import com.rtg.vcf.VcfFormatException;
+import com.rtg.vcf.VcfFilter;
+import com.rtg.vcf.VcfFilterIterator;
+import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReader;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -182,7 +185,15 @@ public class SampleSimulator {
   //writes sample to given writer, returns records as list
   private void mutateSequence(File vcfPopFile, VcfWriter vcfOut, String refName, Sex[] sexes) throws IOException {
     Diagnostic.userLog("Selecting genotypes on sequence: " + refName);
-    try (final VcfReader reader = VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refName, MISSING, MISSING))) {
+    final VcfFilter svFilt = new VcfFilter() {
+      @Override
+      public void setHeader(VcfHeader header) { }
+      @Override
+      public boolean accept(VcfRecord record) {
+        return DnaUtils.isValidDna(record.getRefCall()) && record.getAltCalls().stream().allMatch(DnaUtils::isValidDna);
+      }
+    };
+    try (final VcfIterator reader = new VcfFilterIterator(VcfReader.openVcfReader(vcfPopFile, new RegionRestriction(refName, MISSING, MISSING)), svFilt)) {
       final int[] lastVariantEnd = new int[sexes.length];
       Arrays.fill(lastVariantEnd, -1);
       while (reader.hasNext()) {
@@ -242,30 +253,34 @@ public class SampleSimulator {
   double[] getAlleleDistribution(VcfRecord v) {
     final double[] dist;
     final String[] allFreqStr = v.getInfoSplit(VcfUtils.INFO_ALLELE_FREQ);
+    final int numAlts = v.getAltCalls().size();
+    final int numAlleles = numAlts + 1;
     if (allFreqStr == null) {
       ++mMissingAfCount;
       if (mAllowMissingAf) {
         // Uniform probability for each allele
-        final double[] defaultDist = new double[v.getAltCalls().size() + 1];
+        final double[] defaultDist = new double[numAlleles];
         Arrays.fill(defaultDist, 1.0); // All alleles are equally likely
         dist = SimulationUtils.cumulativeDistribution(defaultDist);
       } else {
         // Zero probability for the alt alleles
-        dist = new double[v.getAltCalls().size() + 1];
+        dist = new double[numAlleles];
       }
     } else {
       ++mWithAfCount;
-      if (allFreqStr.length != v.getAltCalls().size()) {
-        throw new VcfFormatException("Incorrect number of AF entries for record " + v);
-      }
-      dist = new double[allFreqStr.length + 1];
-      double ac = 0.0;
-      for (int i = 0; i < allFreqStr.length; ++i) {
-        ac += Double.parseDouble(allFreqStr[i]);
-        dist[i] = ac;
-      }
-      if (ac > 1.0) {
-        throw new NoTalkbackSlimException("Sum of AF probabilities exceeds 1.0 for record " + v);
+      dist = new double[numAlleles];
+      if (allFreqStr.length != numAlts) {
+        Diagnostic.warning("Incorrect number of AF entries for record " + v);
+      } else {
+        double ac = 0.0;
+        for (int i = 0; i < numAlts; ++i) {
+          ac += Double.parseDouble(allFreqStr[i]);
+          dist[i] = ac;
+        }
+        if (ac > 1.0) {
+          Diagnostic.warning("Sum of AF probabilities exceeds 1.0 for record " + v);
+          Arrays.fill(dist, 0.0); // Skip this variant
+        }
       }
     }
     dist[dist.length - 1] = 1.0; //the reference consumes the rest of the distribution
