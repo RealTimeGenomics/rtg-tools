@@ -176,8 +176,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
     mFlags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    mFlags.registerOptional(CRITERIA_PRECISION, Double.class, FLOAT, "output summary statistics where precision >= supplied value").setCategory(REPORTING);
-    mFlags.registerOptional(CRITERIA_SENSITIVITY, Double.class, FLOAT, "output summary statistics where sensitivity >= supplied value").setCategory(REPORTING);
+    mFlags.registerOptional(CRITERIA_PRECISION, Double.class, FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
+    mFlags.registerOptional(CRITERIA_SENSITIVITY, Double.class, FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
 
     mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
