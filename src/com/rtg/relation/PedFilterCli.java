@@ -56,7 +56,7 @@ public class PedFilterCli extends AbstractCli {
   private static final String KEEP_SEX = "Xkeep-sex"; // TODO - behaviour of 'either' is counterintuitive
   private static final String REMOVE_PARENTAGE = "remove-parentage";
   private static final String VCF_OUT = "vcf";
-  private static final String IDS_OUT = "Xids"; // XXX Handy with vcffilter --keep-sample/--remove-sample, but overlaps with pedstats *-ids flags
+  private static final String IDS_OUT = "Xprint-ids"; // Handy to use with vcffilter --keep-sample/--remove-sample, but overlaps with pedstats *-ids flags
 
   @Override
   public String moduleName() {
