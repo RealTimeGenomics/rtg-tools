@@ -91,7 +91,7 @@ public class PedFilterCliTest extends AbstractCliTest {
       final File relationFile = new File(dir, "octet.ped");
       FileUtils.copyResource(RESOURCE_DIR + "octet.ped", relationFile);
 
-      final String output = checkMainInitOk("--Xids", relationFile.toString());
+      final String output = checkMainInitOk("--Xprint-ids", relationFile.toString());
       mNano.check("pedfilter-toIds.ped", output);
     }
   }
