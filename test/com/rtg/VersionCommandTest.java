@@ -105,7 +105,7 @@ public class VersionCommandTest extends TestCase {
         "Contact: " + Constants.SUPPORT_EMAIL_ADDR + StringUtils.LS,
         "Patents / Patents pending:",
         "Citation",
-        "(c) Real Time Genomics, 201");
+        "(c) Real Time Genomics, 2009-20");
 
   }
 

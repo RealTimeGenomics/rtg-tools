@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.time.Year;
 
 import com.rtg.util.Constants;
 import com.rtg.util.Environment;
@@ -59,7 +60,7 @@ public final class VersionCommand {
   static final String CPU_STR = "CPU:";
   static final String JAVA_VERSION_STR = "JVM:";
 
-  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2017";
+  static final String COPYRIGHT_STR = "(c) Real Time Genomics, 2009-" + Year.now().getValue();
 
   static final String CITE_STR_1H = "Citation (variant calling):";
   static final String CITE_STR_1 =
