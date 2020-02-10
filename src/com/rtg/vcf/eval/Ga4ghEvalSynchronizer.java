@@ -237,7 +237,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
       } else if (mCv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         setRocScore(outRec);
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, QUERY_SAMPLE_INDEX);
-        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, QUERY_SAMPLE_INDEX);
         sync = Integer.toString(mCSyncStart + 1);
       } else if (mCv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
         setRocScore(outRec);
@@ -259,7 +259,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
       } else {
         throw new RuntimeException("Unhandle variant status during postprocessing: " + mCv);
       }
-      setSyncId(outRec, sync); // XXX, when there is already a (different) sync ID, we should instead output two separate VCF records
+      setSyncId(outRec, sync); // Maybe when there is already a (different) sync ID, we should instead output two separate VCF records
     }
     return outRec;
   }
@@ -290,7 +290,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
         sync = null;
       } else if (mBv.hasStatus(VariantId.STATUS_GT_MATCH)) {
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_TP, TRUTH_SAMPLE_INDEX);
-        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH_SAMPLE_INDEX); // XXX If running --squash-ploidy, would we rather consider this ALLELE_MATCH (and check zygosity)?
+        outRec.setFormatAndSample(FORMAT_MATCH_KIND, SUBTYPE_GT_MATCH, TRUTH_SAMPLE_INDEX);
         sync = Integer.toString(mBSyncStart + 1);
       } else if (mBv.hasStatus(VariantId.STATUS_ALLELE_MATCH)) {
         outRec.setFormatAndSample(FORMAT_DECISION, DECISION_FN, TRUTH_SAMPLE_INDEX);
@@ -306,7 +306,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
       } else {
         throw new RuntimeException("Unhandled variant status during postprocessing: " + mBv);
       }
-      setSyncId(outRec, sync); // XXX, when there is already a (different) sync ID, we should instead output two separate VCF records
+      setSyncId(outRec, sync); // Maybe when there is already a (different) sync ID, we should instead output two separate VCF records
     }
     return outRec;
   }

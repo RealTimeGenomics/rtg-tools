@@ -265,7 +265,7 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
       variantLength = 1;
     }
     switch (type) {
-      case INSDEL: // XXX Temporarily treat insdel as SNP. Need to implement this
+      case INSDEL: // TODO Temporarily treat insdel as SNP. Need to implement this
         //System.err.println("Insdel wants length " + variantLength);
       case SNP:
         mReader.read(popVar.getSequenceId(), mTemplate, position, 1);
@@ -291,7 +291,7 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
         mReader.read(popVar.getSequenceId(), mTemplate, position, variantLength + 1); // Need anchor base
         popVar.mRef = Arrays.copyOf(mTemplate, 1);
 
-        popVar.mAlleles[0] = mPriors.chooseAltMnp(mRandom, Arrays.copyOf(mTemplate, variantLength + 1)); //XXX Improve this
+        popVar.mAlleles[0] = mPriors.chooseAltMnp(mRandom, Arrays.copyOf(mTemplate, variantLength + 1)); // TODO Improve this, maybe sometimes make it a repeat
         popVar.mAlleles[0][0] = popVar.mRef[0];
         //System.err.println("Insert " + DnaUtils.bytesToSequenceIncCG(popVar.mRef) + " -> " + DnaUtils.bytesToSequenceIncCG(popVar.mAlleles[0]));
         break;
