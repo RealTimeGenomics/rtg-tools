@@ -5,6 +5,158 @@ RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
 
+RTG Core 3.11 (2020-02-25)
+--------------------------
+
+This release includes several new features and commands, along with the
+usual assortment of minor features and bug fixes. Several of these
+result in command line arguments or changes to program outputs, so check
+existing scripts for compatibility before upgrading. Larger features of
+note:
+
+* A new command, mapp, for mapping protein query sequences against a
+  protein database. This command is complementary to the existing
+  translated protein search of the mapx command, and usage is very
+  similar.
+
+* A new command for variant calling tumor samples when no matched normal
+  is available. This command, tumoronly, uses a similar bayesian model
+  as the existing somatic command (and several of the improvements made
+  during development of the tumor-only calling scenario have also been
+  applied to the somatic caller). See the user manual for more
+  information.
+
+* Several improvements to simulation tools, particularly oriented toward
+  the simulation of variants within members of a pedigree. Quite
+  substantial improvements to speed and memory use have been made, as
+  well as adding the ability to utilize genetic map files to choose
+  recombination sites when simulating children.
+
+There have been many other minor improvements and feature
+additions. Detailed changes are listed below by area.  For more
+information on new features, see the RTG Operations Manual.
+
+### Basic Formatting and Mapping
+
+* mapp: This new command is like mapx but for protein query sequences.
+
+* map/mapf: Supports --format fastq-interleaved to allow mapping
+  directly from paired end interleaved FASTQ files.
+
+* mapx: The flag --min-dna-read-length has been renamed to
+  --min-read-length (the old flag name will still work).
+
+### Variant Calling and Evaluation
+
+* tumoronly: New command for detection of somatic variants without a
+  matched normal sample.
+
+* all callers: The --Xformat-annotation flag can be used to enable
+  output of additional FORMAT annotations ADF, ADR, ADF1, ADF2, ADR1,
+  ADR2 containing allelic counts per arm and orientation that can be
+  used for strand and arm-specific filtering.
+
+* vcfeval: Fixed a rare race-condition crash that could occur when using
+  --decompose.
+
+* vcfeval: Added support for the summary metrics to report at
+  user-selectable threshold criteria as an alternative to maximized
+  F-measure, via the new flags --at-precision and --at-sensitivity.
+
+* vcfeval/bndeval/cnveval: New flag --no-roc option to skip the creation
+  of ROC data output files.
+
+### Variant Processing and Analysis
+
+* vcfsplit: This new command allows efficient splitting of a large
+  multi-sample VCF into individual sample VCFs, as the input VCF is only
+  read a single time. See the user manual for more information including
+  supported command line options.
+
+* vcfsubset: The values provided to --keep-sample and --remove-sample
+  argument can now be a file, listing one sample name per line.
+
+* vcfsubset: Significantly faster when subsetting samples from a VCF
+  containing many input samples.
+
+* vcfdecompose/vcfmerge: Smarter handling of Number=R INFO and FORMAT
+  attributes during variant alteration.
+
+* vcfsubset/vcfannotate/vcfmerge: These commands now accept the
+  --bed-regions and --region flags to restrict processing to the regions
+  of interest.
+
+* vcfmerge: Fixed missed cases of allele set changes when warning about
+  Number=R/A/G incompatibility.
+
+* vcfmerge: Now has new flags for controlling the merging of multiple
+  records at the same position. --no-merge-records disables all merging
+  of multiple records at the same position, and --no-merge-alts disables
+  merging of multiple records at the same position when the set of ALTs
+  changes.
+
+* vcfmerge: Now supports --no-header to suppress output of the VCF
+  header.
+
+* vcffilter: When filtering structural variant records, now takes the
+  end position into account (if present) when applying region-based
+  filtering via --include-bed, --include-vcf, --exclude-bed, and
+  --exclude-vcf. (Note that --region and --bed-regions should not be
+  used, as tabix indices are not aware of SV variant spans)
+
+* vcffilter: Fixed JavaScript incorrectly interpreting the setting an
+  ID, FILTER, or INFO field to the value '0' as clearing the field.
+
+* vcffilter: JavaScript extensions can now write to stderr via the new
+  error() function.
+
+* vcffilter: JavaScript extensions can set new values for CHROM and POS.
+
+* vcfdecompose: Improved the handling of AD and related fields when the
+  set of ALT alleles changes.
+
+### Other
+
+* pedsamplesim: Simulation for many samples is now significantly faster
+  and much more memory efficient.
+
+* samplesim/denovosim/childsim: Reduced memory use.
+
+* childsim: Initial support for employing genetic maps for LD-aware
+  crossover point selection. This is enabled by the --genetic-map-dir
+  flag, which specifies a directory containing genetic maps. See the
+  user manual for more information on the genetic maps feature.
+
+* simulators: Fixed a bug where a reference sequence name that looked
+  like a region specification (e.g. "name:start-end") was inadvertently
+  being interpreted as a genomic region, giving unexpected results.
+
+* many: Updated the version of htsjdk that we use for SAM/BAM/CRAM
+  processing, for improved support with newer Java versions.  Note that
+  this new htsjdk is more restrictive in the names that can be used for
+  reference sequences, so there is a chance that this will produce
+  errors when processing old data that does not comply with the new
+  naming constraints.
+
+* sdfsubseq: When outputting a sub-sequence in FASTA/FASTQ format, the
+  output sequence name has been changed from "source[start,end]" to
+  "source:start-end", to comply with the new htsjdk sequence naming
+  restrictions.
+
+* many: Updated the JRE used in bundled builds to Zulu Community OpenJDK
+  8u242.
+
+* many: VCF header parsing is more lenient in the case where fields are
+  declared multiple times.
+
+* many: Fixed off-by-one error during single region based tabix VCF
+  record retrieval where sometimes extra records abutting the requested
+  region would be returned.
+
+* many: VCF output is now VCFv4.2, and along with this several
+  commands now use the new Number=R type.
+
+
 RTG Core 3.10.1 (2019-01-21)
 ----------------------------
 
@@ -104,7 +256,6 @@ information on new features, see the RTG Operations Manual.
 * sdfsubset/sdfsplit: These commands now pass SAM read group information
   from the input SDF to the output SDF.
 
-
 ### Variant Calling
 
 * variant callers: The GT fields for unphased calls are now in a
@@ -142,7 +293,6 @@ information on new features, see the RTG Operations Manual.
   that overlap the specified regions. This is a convenience method that
   can be used to train on a specific subset of the data.
 
-
 ### Variant Processing and Analysis
 
 * svdecompose: Fixed a crash caused by records where SVTYPE=INS but
@@ -170,7 +320,6 @@ information on new features, see the RTG Operations Manual.
 
 * vcfmerge: Fix a crash that could occur when trying to merge a record
   containing duplicated alleles.
-
 
 ### Other
 
