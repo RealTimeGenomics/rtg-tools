@@ -79,12 +79,11 @@ public class CrossoverSelectorTest extends AbstractTest {
       + "female  seq     ref2    none    linear" + StringUtils.LS
       + "either  seq     ref3    polyploid       circular" + StringUtils.LS;
 
-  private static final String REF2MAPTXT =
-    CrossoverSelector.FileGeneticMap.GENETIC_MAP_HEADER + StringUtils.LS
+  private static final String REF2MAPTXT = "chr\tpos\trate\tcM" + StringUtils.LS
       + "ref2\t50\t0\t0" + StringUtils.LS
-      + "ref2\t60\t1.0\t1.0" + StringUtils.LS
-      + "ref2\t61\t0.0\t1.0" + StringUtils.LS
-      + "ref2\t119\t0.0\t1.0" + StringUtils.LS;
+      + "ref2\t60\t1.0\t10.0" + StringUtils.LS
+      + "ref2\t61\t0.0\t0.0" + StringUtils.LS
+      + "ref2\t119\t0.0\t0.0" + StringUtils.LS;
 
 
   public void testSelection() throws IOException {
@@ -104,11 +103,11 @@ public class CrossoverSelectorTest extends AbstractTest {
       CrossoverSelector.GeneticMap m = cs.getGeneticMap(g.sequence("ref1"), Sex.FEMALE);
       assertEquals("Uniform:120", m.toString());
       m = cs.getGeneticMap(g.sequence("ref2"), Sex.FEMALE);
-      assertEquals("Map:female.ref2.CDF.txt", m.toString());
+      assertEquals("ref2.map", CrossoverSelector.mapName(g.sequence("ref2"), null));
+      assertEquals("Map:female.ref2.map", m.toString());
 
-      int[] positions;
       for (int i = 0; i < 50; i++) {
-        positions = cs.getCrossoverPositions(random, g.sequence("ref1"), Sex.FEMALE);
+        final int[] positions = cs.getCrossoverPositions(random, g.sequence("ref1"), Sex.FEMALE);
         assertEquals(2, positions.length);
         for (int pos : positions) {
           //System.err.println("Uniform: " + pos);
@@ -117,9 +116,9 @@ public class CrossoverSelectorTest extends AbstractTest {
       }
       final ArrayList<Integer> sample = new ArrayList<>();
       for (int i = 0; i < 50; i++) {
-        positions = cs.getCrossoverPositions(random, g.sequence("ref2"), Sex.FEMALE);
+        final int[] positions = cs.getCrossoverPositions(random, g.sequence("ref2"), Sex.FEMALE);
         assertEquals(2, positions.length);
-        for (int pos : positions) {
+        for (final int pos : positions) {
           //System.err.println("Map: " + pos);
           sample.add(pos);
           assertTrue(pos >= 50 && pos < 60);

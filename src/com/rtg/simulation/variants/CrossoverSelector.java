@@ -43,6 +43,7 @@ import com.rtg.reference.ReferenceSequence;
 import com.rtg.reference.Sex;
 import com.rtg.util.PortableRandom;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
  * Models crossover position selection, allowing either uniform position selection, or
@@ -78,52 +79,75 @@ public class CrossoverSelector {
    */
   class FileGeneticMap implements GeneticMap {
 
-    static final String EXT = ".CDF.txt";
-    static final String GENETIC_MAP_HEADER = "chr\tpos\tprob\tcdf";
-
+    static final String EXT = ".map";
     private static final int INITIAL_SIZE = 10;
-    private static final int POS_COL = 1;
-    private static final int CDF_COL = 3;
     private final double[] mCdf;
     private final int[] mPos;
     private final File mMapFile;
 
-    FileGeneticMap(File mapFile) throws IOException {
+    FileGeneticMap(final File mapFile) throws IOException {
       if (!mapFile.exists()) {
         throw new IOException("Expected genetic map file " + mapFile + " does not exist");
       }
       mMapFile = mapFile;
       Diagnostic.userLog("Loading genetic map from " + mapFile);
       try (BufferedReader br = new BufferedReader(new FileReader(mapFile))) {
-        double[] cdfList = new double[INITIAL_SIZE];
+        double[] centimorganList = new double[INITIAL_SIZE];
         int[] posList = new int[INITIAL_SIZE];
         int size = 0;
-        String line = br.readLine(); // First line is header
-        if (line == null || !line.startsWith(GENETIC_MAP_HEADER)) {
-          throw new IOException("Expected first line of genetic map to contain: " + GENETIC_MAP_HEADER);
+
+        // First line is header, try and find expected columns
+        String line = br.readLine();
+        int posCol = -1;
+        int centimorganCol = -1;
+        if (line != null) {
+          final String[] header = line.split("\t");
+          for (int k = 0; k < header.length; ++k) {
+            if ("pos".equals(header[k])) {
+              posCol = k;
+            } else if ("cM".equals(header[k])) {
+              centimorganCol = k;
+            }
+          }
         }
+        if (posCol == -1 || centimorganCol == -1) {
+          throw new IOException("Expected first line of genetic map to contain a header line including \"pos\" and \"cM\" columns");
+        }
+
+        // Record the "pos" and "cM" information
         while ((line = br.readLine()) != null) {
           final String[] words = line.split("\t");
-          if (size == cdfList.length) {
-            cdfList = Arrays.copyOf(cdfList, cdfList.length * 2);
+          if (size == centimorganList.length) {
+            centimorganList = Arrays.copyOf(centimorganList, centimorganList.length * 2);
             posList = Arrays.copyOf(posList, posList.length * 2);
           }
-          posList[size] = Integer.parseInt(words[POS_COL]);
-          cdfList[size] = Double.parseDouble(words[CDF_COL]);
+          posList[size] = Integer.parseInt(words[posCol]);
+          centimorganList[size] = Double.parseDouble(words[centimorganCol]);
           size++;
         }
-        mCdf = Arrays.copyOf(cdfList, size);
+        // Convert delta-cM to cumulative probability
+        mCdf = new double[centimorganList.length];
+        double p = 0;
+        for (int k = 0; k < mCdf.length; ++k) {
+          p += centimorgansToProb(centimorganList[k] - (k == 0 ? 0 : centimorganList[k - 1]));
+          mCdf[k] = p;
+        }
+        // Normalize
+        final double max = mCdf[mCdf.length - 1];
+        if (max <= 0) {
+          throw new NoTalkbackSlimException("Genetic map file does not contain non-zero distribution");
+        }
+        for (int k = 0; k < mCdf.length; ++k) {
+          mCdf[k] /= max;
+        }
         mPos = Arrays.copyOf(posList, size);
       }
     }
-    //find the position in the CDF is that random number
+
+    // Find the position in the CDF is that random number
     int findPos(double prob) {
-//      int i = SimulationUtils.chooseFromCumulative(mCdf, prob);
       for (int j = 0; j < mCdf.length - 1 ; j++) {
         if (prob >= mCdf[j] && prob < mCdf[j + 1]) {
-//          if (j != i) {
-//            System.err.println("Different selection position than chooseFromCumulative: " + prob + " " + i + " " + j);
-//          }
           if (mInterpolate) {
             final double frac = prob - mCdf[j] / (mCdf[j + 1] - mCdf[j]);
             final int delta = (int) (frac * (mPos[j + 1] - mPos[j]));
@@ -145,6 +169,10 @@ public class CrossoverSelector {
     public int choosePosition(PortableRandom random) {
       return findPos(random.nextDouble());
     }
+
+    private double centimorgansToProb(final double cM) {
+      return cM <= 0 ? 0 : 0.5 * (1 - Math.exp(-cM / 50));
+    }
   }
 
   GeneticMap getGeneticMap(ReferenceSequence refSeq, Sex sex) throws IOException {
@@ -156,7 +184,13 @@ public class CrossoverSelector {
         if (mapFile.exists()) {
           map = new FileGeneticMap(mapFile);
         } else {
-          Diagnostic.warning("Genetic map file " + mapFile + " does not exist, using uniform distribution");
+          // Sex specific map file did not exist, check for a non-specific version
+          final File nonspecificMapFile = new File(mGeneticMapDir, mapName(refSeq, null));
+          if (nonspecificMapFile.exists()) {
+            map = new FileGeneticMap(nonspecificMapFile);
+          } else {
+            Diagnostic.warning("Genetic map file " + mapFile + " does not exist, using uniform distribution");
+          }
         }
       }
       if (map == null) {
@@ -179,7 +213,9 @@ public class CrossoverSelector {
   }
 
   static String mapName(ReferenceSequence refSeq, Sex sex) {
-    return sex.name().toLowerCase(Locale.getDefault()) + "." + refSeq.name() + FileGeneticMap.EXT;
+    return sex == null
+      ? refSeq.name() + FileGeneticMap.EXT
+      : sex.name().toLowerCase(Locale.getDefault()) + "." + refSeq.name() + FileGeneticMap.EXT;
   }
 
   /**
@@ -192,9 +228,9 @@ public class CrossoverSelector {
    */
   public int[] getCrossoverPositions(PortableRandom random, ReferenceSequence refSeq, Sex sex) throws IOException {
     final int[] crossoverPoints = new int[1 + (random.nextDouble() < mExtraCrossoverFreq ? 1 : 0)];
-    final GeneticMap gmap = getGeneticMap(refSeq, sex);
+    final GeneticMap geneticMap = getGeneticMap(refSeq, sex);
     for (int i = 0; i < crossoverPoints.length; i++) {
-      crossoverPoints[i] = gmap.choosePosition(random);
+      crossoverPoints[i] = geneticMap.choosePosition(random);
     }
     Arrays.sort(crossoverPoints);
     return crossoverPoints;

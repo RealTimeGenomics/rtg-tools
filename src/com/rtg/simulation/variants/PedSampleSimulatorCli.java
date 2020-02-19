@@ -140,7 +140,7 @@ public class PedSampleSimulatorCli extends LoggedCli {
     mFlags.registerOptional(SEED, Integer.class, CommonFlags.INT, "seed for the random number generator").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(REMOVE_UNUSED, "if set, output only variants used by at least one sample").setCategory(CommonFlagCategories.UTILITY);
     mFlags.registerOptional(DeNovoSampleSimulatorCli.EXPECTED_MUTATIONS, Integer.class, CommonFlags.INT, "expected number of mutations per genome", DeNovoSampleSimulatorCli.DEFAULT_MUTATIONS_PER_GENOME).setCategory(CommonFlagCategories.UTILITY);
-    mFlags.registerOptional(GENETIC_MAP_DIR, File.class, FILE, "if set, load genetic maps from this directory for recombination point selection").setCategory(CommonFlagCategories.UTILITY);
+    mFlags.registerOptional(GENETIC_MAP_DIR, File.class, CommonFlags.DIR, "if set, load genetic maps from this directory for recombination point selection").setCategory(CommonFlagCategories.UTILITY);
     CommonFlags.initNoGzip(mFlags);
 
     mFlags.setValidator(flags -> CommonFlags.validateSDF(flags, REFERENCE_SDF)
