@@ -93,6 +93,12 @@ public class TabixIndexReader extends AbstractIndexReader {
       final int endCol = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 20) - 1;
       final int meta = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 24);
       final int skip = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 28);
+      if (seqCol < 0) {
+        throw new IOException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (invalid col_seq)");
+      }
+      if (begCol < 0) {
+        throw new IOException("File: " + tabixFile.getPath() + " is not a valid TABIX index. (invalid col_beg)");
+      }
       mOptions = new TabixIndexer.TabixOptions(format, seqCol, begCol, endCol, meta, skip);
       final int nameLength = ByteArrayIOUtils.bytesToIntLittleEndian(buf, 32);
       if (buf.length < FIXED_HEADER_SIZE + nameLength) {
