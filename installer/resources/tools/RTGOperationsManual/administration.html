@@ -2,29 +2,19 @@
 
 <!doctype html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Administration &amp; Capacity Planning &#8212; RTG Tools Operations Manual v3.10</title>
-    
+    <title>Administration &amp; Capacity Planning &#8212; RTG Tools Operations Manual v3.11</title>
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.10',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,8 +24,7 @@
     <!--[if lt IE 9]>
     <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -48,7 +37,7 @@
         <li class="right" >
           <a href="product_usage.html" title="RTG product usage - baseline progressions"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -56,7 +45,7 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Administration &amp; Capacity Planning</a><ul>
 <li><a class="reference internal" href="#advanced-installation-configuration">Advanced installation configuration</a></li>
@@ -103,14 +92,14 @@
 centrally available file directory or shared drive. Assignment of
 execution privileges can be determined by the administrator, independent
 of the software license file. For commercial users, the software license
-prepared by Real Time Genomics (<code class="docutils literal"><span class="pre">rtg-license.txt</span></code>) need only be included
-in the same directory as the executable (<code class="docutils literal"><span class="pre">RTG.jar</span></code>) and the run-time
-scripts (<code class="docutils literal"><span class="pre">rtg</span></code> or <code class="docutils literal"><span class="pre">rtg.bat</span></code>).</p>
+prepared by Real Time Genomics (<code class="docutils literal notranslate"><span class="pre">rtg-license.txt</span></code>) need only be included
+in the same directory as the executable (<code class="docutils literal notranslate"><span class="pre">RTG.jar</span></code>) and the run-time
+scripts (<code class="docutils literal notranslate"><span class="pre">rtg</span></code> or <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code>).</p>
 <p>During installation on Unix systems, a configuration file named
-<code class="docutils literal"><span class="pre">rtg.cfg</span></code> is created in the installation directory. By editing this
+<code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> is created in the installation directory. By editing this
 configuration file, one may alter further configuration variables
 appropriate to the specific deployment requirements of the organization.
-On Windows systems, these variables are set in the <code class="docutils literal"><span class="pre">rtg.bat</span></code> file in the
+On Windows systems, these variables are set in the <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file in the
 installation directory. These configuration variables include:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -123,43 +112,43 @@ installation directory. These configuration variables include:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_MEM</span></code></td>
-<td>Specify the maximum memory for Java run-time execution. Use a G suffix for gigabytes, e.g.: <code class="docutils literal"><span class="pre">RTG_MEM=48G</span></code>. The default memory allocation is 90% of system memory.</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_MEM</span></code></td>
+<td>Specify the maximum memory for Java run-time execution. Use a G suffix for gigabytes, e.g.: <code class="docutils literal notranslate"><span class="pre">RTG_MEM=48G</span></code>. The default memory allocation is 90% of system memory.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_JAVA</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_JAVA</span></code></td>
 <td>Specify the path to Java (default assumes current path).</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_JAR</span></code></td>
-<td>Indicate the path to the <code class="docutils literal"><span class="pre">RTG.jar</span></code> executable (default assumes current path).</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_JAR</span></code></td>
+<td>Indicate the path to the <code class="docutils literal notranslate"><span class="pre">RTG.jar</span></code> executable (default assumes current path).</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_JAVA_OPTS</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_JAVA_OPTS</span></code></td>
 <td>Provide any additional Java JVM options.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_DEFAULT_THREADS</span></code></td>
-<td>By default any RTG module with a <code class="docutils literal"><span class="pre">--threads</span></code> parameter will automatically use the number of cores as the number of threads. This setting makes the specified number the default for the <code class="docutils literal"><span class="pre">--threads</span></code> parameter instead.</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_DEFAULT_THREADS</span></code></td>
+<td>By default any RTG module with a <code class="docutils literal notranslate"><span class="pre">--threads</span></code> parameter will automatically use the number of cores as the number of threads. This setting makes the specified number the default for the <code class="docutils literal notranslate"><span class="pre">--threads</span></code> parameter instead.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_PROXY</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_PROXY</span></code></td>
 <td>Specify the http proxy server for TalkBack exception management (default is no http proxy).</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_TALKBACK</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_TALKBACK</span></code></td>
 <td>Send log files for crash-severity exception conditions (default is true, set to false to disable).</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_USAGE</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_USAGE</span></code></td>
 <td>If set to true, enable simple usage logging.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_USAGE_DIR</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_USAGE_DIR</span></code></td>
 <td>Destination directory when performing single-user file-based usage logging.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_USAGE_HOST</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_USAGE_HOST</span></code></td>
 <td>Server URL when performing server-based logging.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_USAGE_OPTIONAL</span></code></td>
-<td>May contain a comma-separated list of the names of optional fields to include in usage logging (when enabled). Any of <code class="docutils literal"><span class="pre">username</span></code>, <code class="docutils literal"><span class="pre">hostname</span></code> and <code class="docutils literal"><span class="pre">commandline</span></code> may be set here.</td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_USAGE_OPTIONAL</span></code></td>
+<td>May contain a comma-separated list of the names of optional fields to include in usage logging (when enabled). Any of <code class="docutils literal notranslate"><span class="pre">username</span></code>, <code class="docutils literal notranslate"><span class="pre">hostname</span></code> and <code class="docutils literal notranslate"><span class="pre">commandline</span></code> may be set here.</td>
 </tr>
-<tr class="row-odd"><td><code class="docutils literal"><span class="pre">RTG_REFERENCES_DIR</span></code></td>
+<tr class="row-odd"><td><code class="docutils literal notranslate"><span class="pre">RTG_REFERENCES_DIR</span></code></td>
 <td>Specifies an alternate directory containing metagenomic pipeline reference datasets.</td>
 </tr>
-<tr class="row-even"><td><code class="docutils literal"><span class="pre">RTG_MODELS_DIR</span></code></td>
+<tr class="row-even"><td><code class="docutils literal notranslate"><span class="pre">RTG_MODELS_DIR</span></code></td>
 <td>Specifies an alternate directory containing AVR models.</td>
 </tr>
 </tbody>
@@ -219,7 +208,7 @@ of the log file. This mechanism is called TalkBack and uses an embedded
 URL to which RTG sends the report.</p>
 <p>The following sample log displays the software version information,
 parameter list, and run-time progress.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>2009-09-05 21:38:10 RTG version = v2.0b build 20013 (2009-10-03)
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2009-09-05 21:38:10 RTG version = v2.0b build 20013 (2009-10-03)
 2009-09-05 21:38:10 java.runtime.name = Java(TM) SE Runtime Environment
 2009-09-05 21:38:10 java.runtime.version = 1.6.0_07-b06-153
 2009-09-05 21:38:10 os.arch = x86_64
@@ -232,8 +221,8 @@ parameter list, and run-time progress.</p>
 2009-09-05 21:39:59  Index[0] memory performance
 </pre></div>
 </div>
-<p>TalkBack may be disabled by adding <code class="docutils literal"><span class="pre">RTG_TALK_BACK=false</span></code> to the
-<code class="docutils literal"><span class="pre">rtg.cfg</span></code> configuration file (Unix) or the <code class="docutils literal"><span class="pre">rtg.bat</span></code> file (Window) as
+<p>TalkBack may be disabled by adding <code class="docutils literal notranslate"><span class="pre">RTG_TALK_BACK=false</span></code> to the
+<code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> configuration file (Unix) or the <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file (Window) as
 described in <a class="reference internal" href="#advanced-installation-configuration"><span class="std std-ref">Advanced installation configuration</span></a>.</p>
 </div>
 <div class="section" id="usage-logging">
@@ -256,7 +245,7 @@ commonly used or to locally log RTG command use for their own analysis.</p>
 <li>A command-specific field (e.g. number of reads)</li>
 </ul>
 <p>For example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>2013-02-11 11:38:38007   4f6c2eca-0bfc-4267-be70-b7baa85ebf66    RTG Core v2.7 build d74f45d (2013-02-04)   format  Start   N/A
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>2013-02-11 11:38:38007   4f6c2eca-0bfc-4267-be70-b7baa85ebf66    RTG Core v2.7 build d74f45d (2013-02-04)   format  Start   N/A
 </pre></div>
 </div>
 <p>No confidential information is included in these records. It is possible
@@ -266,8 +255,8 @@ parameters, however as these fields may contain confidential
 information, they must be explicitly enabled as described in <a class="reference internal" href="#advanced-installation-configuration"><span class="std std-ref">Advanced installation configuration</span></a>.</p>
 <p>When RTG is first installed, you will be asked whether to enable user
 logging. Usage logging can also be manually enabled by editing the
-<code class="docutils literal"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal"><span class="pre">rtg.bat</span></code> file on Windows) and setting
-<code class="docutils literal"><span class="pre">RTG_USAGE=true</span></code>. If the <code class="docutils literal"><span class="pre">RTG_USAGE_DIR</span></code> and <code class="docutils literal"><span class="pre">RTG_USAGE_HOST</span></code>
+<code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file on Windows) and setting
+<code class="docutils literal notranslate"><span class="pre">RTG_USAGE=true</span></code>. If the <code class="docutils literal notranslate"><span class="pre">RTG_USAGE_DIR</span></code> and <code class="docutils literal notranslate"><span class="pre">RTG_USAGE_HOST</span></code>
 settings are empty, the default behavior is to directly submit usage
 records to an RTG hosted server via HTTPS. This feature requires the
 machine running RTG to have access to the Internet.</p>
@@ -276,16 +265,16 @@ Internet, there are two alternatives for collecting usage information.</p>
 <div class="section" id="single-user-single-machine">
 <h3>Single-user, single machine<a class="headerlink" href="#single-user-single-machine" title="Permalink to this headline">¶</a></h3>
 <p>Usage information can be recorded directly to a text file. To enable
-this option, edit the <code class="docutils literal"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal"><span class="pre">rtg.bat</span></code> file on Windows),
-and set the <code class="docutils literal"><span class="pre">RTG_USAGE_DIR</span></code> to the name of a directory where the user
+this option, edit the <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file on Windows),
+and set the <code class="docutils literal notranslate"><span class="pre">RTG_USAGE_DIR</span></code> to the name of a directory where the user
 has write permissions. For example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>RTG_USAGE=true
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RTG_USAGE=true
 RTG_USAGE_DIR=/opt/rtg-usage
 </pre></div>
 </div>
 <p>Within this directory, the RTG usage information will be written to a
 text file named after the date of the current month, in the form
-<code class="docutils literal"><span class="pre">YYYY-MM.txt</span></code>. A new file will be created each month. This text file can
+<code class="docutils literal notranslate"><span class="pre">YYYY-MM.txt</span></code>. A new file will be created each month. This text file can
 be manually sent to Real Time Genomics when requested.</p>
 </div>
 <div class="section" id="multi-user-or-multiple-machines">
@@ -293,43 +282,43 @@ be manually sent to Real Time Genomics when requested.</p>
 <p>In this case, a local server can be started to collect usage information
 from compute nodes and recorded to local files for later manual
 submission. To configure this method of collecting usage information,
-edit the <code class="docutils literal"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal"><span class="pre">rtg.bat</span></code> file on Windows), and set the
-<code class="docutils literal"><span class="pre">RTG_USAGE_DIR</span></code> to the name of a directory where the local server will
-store usage logs, and <code class="docutils literal"><span class="pre">RTG_USAGE_HOST</span></code> to a URL consisting of the name
+edit the <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file on Windows), and set the
+<code class="docutils literal notranslate"><span class="pre">RTG_USAGE_DIR</span></code> to the name of a directory where the local server will
+store usage logs, and <code class="docutils literal notranslate"><span class="pre">RTG_USAGE_HOST</span></code> to a URL consisting of the name
 of the local machine that will run the server and the network port on
 which the server will listen. For example if the server will be run on a
-machine named <code class="docutils literal"><span class="pre">gridhost.mylan.net</span></code>, listening on port <code class="docutils literal"><span class="pre">9090</span></code>, writing
-usage information into the directory <code class="docutils literal"><span class="pre">/opt/rtg-usage/</span></code>, set:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>RTG_USAGE=true
+machine named <code class="docutils literal notranslate"><span class="pre">gridhost.mylan.net</span></code>, listening on port <code class="docutils literal notranslate"><span class="pre">9090</span></code>, writing
+usage information into the directory <code class="docutils literal notranslate"><span class="pre">/opt/rtg-usage/</span></code>, set:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RTG_USAGE=true
 RTG_USAGE_DIR=/opt/rtg-usage
 RTG_USAGE_HOST=http://gridhost.mylan.net:9090/
 </pre></div>
 </div>
-<p>On the machine <code class="docutils literal"><span class="pre">gridhost</span></code>, run the command:</p>
+<p>On the machine <code class="docutils literal notranslate"><span class="pre">gridhost</span></code>, run the command:</p>
 <p>$ rtg usageserver</p>
 <p>Which will start the local usage server listening. Now when RTG commands
 are run on other nodes or as other users, they will submit usage records
 to this sever for collation.</p>
 <p>Within the usage directory, the RTG usage information will be written to
 a text file named after the date of the current month, in the form
-<code class="docutils literal"><span class="pre">YYYY-MM.txt</span></code>. A new file will be created each month. This text file can
+<code class="docutils literal notranslate"><span class="pre">YYYY-MM.txt</span></code>. A new file will be created each month. This text file can
 be manually sent to Real Time Genomics when requested.</p>
 </div>
 <div class="section" id="advanced-usage-configuration">
 <h3>Advanced usage configuration<a class="headerlink" href="#advanced-usage-configuration" title="Permalink to this headline">¶</a></h3>
 <p>If you wish to augment usage information with any of the optional
-fields, edit the <code class="docutils literal"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal"><span class="pre">rtg.bat</span></code> file on Windows) and set
-the <code class="docutils literal"><span class="pre">RTG_USAGE_OPTIONAL</span></code> to a comma separated list containing any of
+fields, edit the <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> file (or <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> file on Windows) and set
+the <code class="docutils literal notranslate"><span class="pre">RTG_USAGE_OPTIONAL</span></code> to a comma separated list containing any of
 the following:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">username</span></code> - adds the username of the user running the RTG command.</li>
-<li><code class="docutils literal"><span class="pre">hostname</span></code> - adds the machine name running the RTG command.</li>
-<li><code class="docutils literal"><span class="pre">commandline</span></code> - adds the command line, including parameters, of the
+<li><code class="docutils literal notranslate"><span class="pre">username</span></code> - adds the username of the user running the RTG command.</li>
+<li><code class="docutils literal notranslate"><span class="pre">hostname</span></code> - adds the machine name running the RTG command.</li>
+<li><code class="docutils literal notranslate"><span class="pre">commandline</span></code> - adds the command line, including parameters, of the
 RTG command (this field will be truncated if the length exceeds 1000
 characters).</li>
 </ul>
 <p>For example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>RTG_USAGE_OPTIONAL=username,hostname,commandline
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RTG_USAGE_OPTIONAL=username,hostname,commandline
 </pre></div>
 </div>
 </div>
@@ -340,19 +329,19 @@ characters).</li>
 output, and the decision as to whether to colorize the output is
 automatically determined, although some commands also contain additional
 flags to control colorization.</p>
-<p>The default behaviour of output colorization can be configured by
-defining a Java system property named <code class="docutils literal"><span class="pre">rtg.default-markup</span></code> with an
+<p>The default behavior of output colorization can be configured by
+defining a Java system property named <code class="docutils literal notranslate"><span class="pre">rtg.default-markup</span></code> with an
 appropriate value and supplying it via RTG_JAVA_OPTS. For example, to
 disable output colorization, use:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>RTG_JAVA_OPTS=&quot;-Drtg.default-markup=none&quot;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>RTG_JAVA_OPTS=&quot;-Drtg.default-markup=none&quot;
 </pre></div>
 </div>
-<p>The possible values for <code class="docutils literal"><span class="pre">rtg.default-markup</span></code> are:</p>
+<p>The possible values for <code class="docutils literal notranslate"><span class="pre">rtg.default-markup</span></code> are:</p>
 <ul class="simple">
-<li><code class="docutils literal"><span class="pre">auto</span></code> - automatically enable ANSI markup when running on
+<li><code class="docutils literal notranslate"><span class="pre">auto</span></code> - automatically enable ANSI markup when running on
 non-Windows OS and when I/O is detected to be a console.</li>
-<li><code class="docutils literal"><span class="pre">none</span></code> - disable ANSI markup.</li>
-<li><code class="docutils literal"><span class="pre">ansi</span></code> - enable ANSI markup. This may be useful if you are using
+<li><code class="docutils literal notranslate"><span class="pre">none</span></code> - disable ANSI markup.</li>
+<li><code class="docutils literal notranslate"><span class="pre">ansi</span></code> - enable ANSI markup. This may be useful if you are using
 Windows OS and have installed an ANSI-capable terminal such as
 ANSICON, ConEmu or Console 2.</li>
 </ul>
@@ -377,12 +366,12 @@ ANSICON, ConEmu or Console 2.</li>
         <li class="right" >
           <a href="product_usage.html" title="RTG product usage - baseline progressions"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

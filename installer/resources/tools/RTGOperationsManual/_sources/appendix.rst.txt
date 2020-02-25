@@ -301,6 +301,9 @@ look like.
 RTG includes commands such as ``pedfilter`` and ``pedstats`` for simple
 viewing, filtering and conversion of pedigree files.
 
+.. include:: appendix/genetic_map_dir.inc.rst
+
+
 RTG commands using indexed input files
 --------------------------------------
 
@@ -409,14 +412,24 @@ example:
 
 .. code-block:: text
 
-  ID = "rs23987382"; // Will change the ID value
-  QUAL = "50"; // Will change the QUAL value
-  FILTER = "FAIL"; // Will set the FILTER value
-  INFO.DPR = "0.01"; // Will change the value of the DPR info field
+  CHROM = "chr1";      // Will change the CHROM value
+  POS = 42;            // Will change the POS value               
+  ID = "rs23987382";   // Will change the ID value
+  QUAL = "50";         // Will change the QUAL value
+  FILTER = "FAIL";     // Will set the FILTER value
+  INFO.DPR = "0.01";   // Will change the value of the DPR info field
   'NA12877'.DP = "10"; // Will change the DP field of the NA12877 sample
 
-Other components of the VCF record (such as ``CHROM``, ``POS``, ``REF``,
+Other components of the VCF record (such as ``REF``,
 and ``ALT``) are considered immutable and can not currently be altered.
+
+.. note:: Modification of ``CHROM`` and/or ``POS`` can lead to a VCF file
+          which is incorrectly sorted and this will not necessarily be detected
+          or reported until the resulting VCF file is used with another module
+          or tool.  Depending on the new value assigned to ``CHROM`` it may
+          also be necessary to modify the sequence dictionary in the VCF
+          header to reflect the change (see :ref:`VCF header modification`).
+   
 
 Direct assignment to ``ID`` and ``FILTER`` fields accept either a string
 containing semicolon separated values, or a list of values. For example:
@@ -516,6 +529,15 @@ Writes the provided string to standard output.
 .. code-block:: text
 
   print('The samples are: ' + SAMPLES);
+
+error({STRING})
+```````````````
+
+Writes the provided string to standard error.
+
+.. code-block:: text
+
+  error('The samples are: ' + SAMPLES);
 
 checkMinVersion(RTG_MINIMUM_VERSION)
 ````````````````````````````````````

@@ -2,29 +2,19 @@
 
 <!doctype html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Overview &#8212; RTG Tools Operations Manual v3.10</title>
-    
+    <title>Overview &#8212; RTG Tools Operations Manual v3.11</title>
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.10',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -34,8 +24,7 @@
     <!--[if lt IE 9]>
     <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -48,7 +37,7 @@
         <li class="right" >
           <a href="index.html" title="Table Of Contents"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -56,7 +45,7 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Overview</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
@@ -111,14 +100,14 @@ from the full suite of functions for analyzing and manipulating variant
 call results. These utilities can be used to perform a variety of tasks
 such as:</p>
 <ul class="simple">
-<li><strong>Accuracy Evaluation</strong> &#8211; Compare called variants to a set of known
+<li><strong>Accuracy Evaluation</strong> – Compare called variants to a set of known
 variants to find specificity and sensitivity, check mendelian
 consistency for the variants from a family, finding basic variant
 statistics for a set of calls.</li>
-<li><strong>Result Filtering</strong> &#8211; Find a subset of variants that match a given
+<li><strong>Result Filtering</strong> – Find a subset of variants that match a given
 set of filtering criteria, extracting only the variant information
 required for a specific task.</li>
-<li><strong>Variant Set Manipulation</strong> &#8211; Merging multiple sets of variant
+<li><strong>Variant Set Manipulation</strong> – Merging multiple sets of variant
 results together, adding additional annotation information to existing
 variants.</li>
 </ul>
@@ -130,7 +119,7 @@ executed through a command line interface (CLI). Commands are delivered
 in product packages, and for commercial users each command can be
 independently enabled through a license key.</p>
 <p>Usage:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>rtg COMMAND [OPTIONS] &lt;REQUIRED&gt;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>rtg COMMAND [OPTIONS] &lt;REQUIRED&gt;
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -174,22 +163,22 @@ configuration shown in below.</p>
 wrapper scripts are supplied to provide improved pipeline ergonomics.
 Instructions for a quick start installation are provided here.</p>
 <p>For further information about setting up per-machine configuration
-files, please see the <code class="docutils literal"><span class="pre">README.txt</span></code> contained in the distribution zip
-file (a copy is also included in this manual&#8217;s appendix).</p>
+files, please see the <code class="docutils literal notranslate"><span class="pre">README.txt</span></code> contained in the distribution zip
+file (a copy is also included in this manual’s appendix).</p>
 <div class="section" id="quick-start-instructions">
 <h3>Quick start instructions<a class="headerlink" href="#quick-start-instructions" title="Permalink to this headline">¶</a></h3>
 <p>These instructions are intended for an individual to install and operate
 the RTG software without the need to establish root / administrator
 privileges.</p>
 <p>RTG software is delivered in a compressed zip file, such as:
-<code class="docutils literal"><span class="pre">rtg-core-3.3.zip</span></code>. Unzip this file to begin installation.</p>
+<code class="docutils literal notranslate"><span class="pre">rtg-core-3.3.zip</span></code>. Unzip this file to begin installation.</p>
 <p>Linux and Windows distributions include a Java Virtual Machine (JVM)
 version 1.8 that has undergone quality assurance testing. RTG may be
 used on other operating systems for which a JVM version 1.8 or higher is
-available, such as MacOS X or Solaris, by using the &#8216;no-jre&#8217;
+available, such as MacOS X or Solaris, by using the ‘no-jre’
 distribution.</p>
 <p>RTG for Java is delivered as a Java application accessed via executable
-wrapper script (<code class="docutils literal"><span class="pre">rtg</span></code> on UNIX systems, <code class="docutils literal"><span class="pre">rtg.bat</span></code> on Windows) that allows
+wrapper script (<code class="docutils literal notranslate"><span class="pre">rtg</span></code> on UNIX systems, <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> on Windows) that allows
 a user to customize initial memory allocation and other configuration
 options. It is recommended that these wrapper scripts be used rather
 than directly executing the Java JAR.</p>
@@ -198,66 +187,66 @@ than directly executing the Java JAR.</p>
 <ul>
 <li><p class="first">Unzip the RTG distribution to the desired location.</p>
 </li>
-<li><p class="first">If your installation requires a license file (<code class="docutils literal"><span class="pre">rtg-license.txt</span></code>),
+<li><p class="first">If your installation requires a license file (<code class="docutils literal notranslate"><span class="pre">rtg-license.txt</span></code>),
 copy the license file provided by Real Time Genomics into the RTG
 distribution directory.</p>
 </li>
 <li><dl class="first docutils">
 <dt>In a terminal, cd to the installation directory and test for success</dt>
-<dd><p class="first last">by entering <code class="docutils literal"><span class="pre">./rtg</span> <span class="pre">version</span></code></p>
+<dd><p class="first last">by entering <code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">version</span></code></p>
 </dd>
 </dl>
 </li>
 <li><p class="first">On MacOS X, depending on your operating system version and
 configuration regarding unsigned applications, you may encounter the
 error message:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>-bash: rtg: /usr/bin/env: bad interpreter: Operation not permitted
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>-bash: rtg: /usr/bin/env: bad interpreter: Operation not permitted
 </pre></div>
 </div>
 <p>If this occurs, you must clear the OS X quarantine attribute with the
 command:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ xattr -d com.apple.quarantine rtg
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ xattr -d com.apple.quarantine rtg
 </pre></div>
 </div>
 </li>
 <li><p class="first">The first time rtg is executed you will be prompted with some
 questions to customize your installation. Follow the prompts.</p>
 </li>
-<li><p class="first">Enter <code class="docutils literal"><span class="pre">./rtg</span> <span class="pre">help</span></code> for a list of rtg commands. Help for any
-individual command is available using the <code class="docutils literal"><span class="pre">--help</span></code> flag, e.g.:
-<code class="docutils literal"><span class="pre">./rtg</span> <span class="pre">format</span> <span class="pre">--help</span></code></p>
+<li><p class="first">Enter <code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">help</span></code> for a list of rtg commands. Help for any
+individual command is available using the <code class="docutils literal notranslate"><span class="pre">--help</span></code> flag, e.g.:
+<code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">format</span> <span class="pre">--help</span></code></p>
 </li>
 <li><p class="first">By default, RTG software scripts establish a memory space of 90% of
 the available RAM - this is automatically calculated. One may
-override this limit in the <code class="docutils literal"><span class="pre">rtg.cfg</span></code> settings file or on a per-run
-basis by supplying <code class="docutils literal"><span class="pre">RTG_MEM</span></code> as an environment variable or as the
-first program argument, e.g.: <code class="docutils literal"><span class="pre">./rtg</span> <span class="pre">RTG_MEM=48g</span> <span class="pre">map</span></code></p>
+override this limit in the <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> settings file or on a per-run
+basis by supplying <code class="docutils literal notranslate"><span class="pre">RTG_MEM</span></code> as an environment variable or as the
+first program argument, e.g.: <code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">RTG_MEM=48g</span> <span class="pre">map</span></code></p>
 </li>
 <li><p class="first">[OPTIONAL] If you will be running RTG on multiple machines and would
-like to customize settings on a per-machine basis, copy <code class="docutils literal"><span class="pre">rtg.cfg</span></code> to
-<code class="docutils literal"><span class="pre">/etc/rtg.cfg</span></code>, editing per-machine settings appropriately (requires
+like to customize settings on a per-machine basis, copy <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> to
+<code class="docutils literal notranslate"><span class="pre">/etc/rtg.cfg</span></code>, editing per-machine settings appropriately (requires
 root privileges).  An alternative that does not require root
-privileges is to copy <code class="docutils literal"><span class="pre">rtg.cfg</span></code> to <code class="docutils literal"><span class="pre">rtg.HOSTNAME.cfg</span></code>, editing
-per-machine settings appropriately, where <code class="docutils literal"><span class="pre">HOSTNAME</span></code> is the short host
-name output by the command <code class="docutils literal"><span class="pre">hostname</span> <span class="pre">-s</span></code></p>
+privileges is to copy <code class="docutils literal notranslate"><span class="pre">rtg.cfg</span></code> to <code class="docutils literal notranslate"><span class="pre">rtg.HOSTNAME.cfg</span></code>, editing
+per-machine settings appropriately, where <code class="docutils literal notranslate"><span class="pre">HOSTNAME</span></code> is the short host
+name output by the command <code class="docutils literal notranslate"><span class="pre">hostname</span> <span class="pre">-s</span></code></p>
 </li>
 </ul>
 <p>Windows:</p>
 <ul class="simple">
 <li>Unzip the RTG distribution to the desired location.</li>
 <li>If your installation requires a license, copy the license file
-provided by Real Time Genomics (<code class="docutils literal"><span class="pre">rtg-license.txt</span></code>) into the RTG
+provided by Real Time Genomics (<code class="docutils literal notranslate"><span class="pre">rtg-license.txt</span></code>) into the RTG
 distribution directory.</li>
-<li>Test for success by entering <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">version</span></code> at the command line. The
+<li>Test for success by entering <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">version</span></code> at the command line. The
 first time RTG is executed you will be prompted with some questions
 to customize your installation. Follow the prompts.</li>
-<li>Enter <code class="docutils literal"><span class="pre">rtg</span> <span class="pre">help</span></code> for a list of rtg commands. Help for any
-individual command is available using the <code class="docutils literal"><span class="pre">--help</span></code> flag, e.g.:
-<code class="docutils literal"><span class="pre">./rtg</span> <span class="pre">format</span> <span class="pre">--help</span></code></li>
+<li>Enter <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">help</span></code> for a list of rtg commands. Help for any
+individual command is available using the <code class="docutils literal notranslate"><span class="pre">--help</span></code> flag, e.g.:
+<code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">format</span> <span class="pre">--help</span></code></li>
 <li>By default, RTG software scripts establish a memory space of 90% of
 the available RAM - this is automatically calculated. One may
-override this limit by setting the <code class="docutils literal"><span class="pre">RTG_MEM</span></code> variable in the
-<code class="docutils literal"><span class="pre">rtg.bat</span></code> script or as an environment variable.</li>
+override this limit by setting the <code class="docutils literal notranslate"><span class="pre">RTG_MEM</span></code> variable in the
+<code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> script or as an environment variable.</li>
 </ul>
 </div>
 <div class="section" id="license-management">
@@ -270,7 +259,7 @@ set for the purchased product(s) and features.</p>
 <p>A license key allows flexible use of the RTG package on any node or CPU
 core.</p>
 <p>To view the current license features at the command prompt, enter:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg license
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg license
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -284,7 +273,7 @@ editing scripts, see <a class="reference internal" href="administration.html#adm
 <h2>Technical assistance and support<a class="headerlink" href="#technical-assistance-and-support" title="Permalink to this headline">¶</a></h2>
 <p>For assistance with any technical or conceptual issue that may arise
 during use of the RTG product, contact Real Time Genomics Technical
-Support via email at <code class="docutils literal"><span class="pre">support&#64;realtimegenomics.com</span></code></p>
+Support via email at <code class="docutils literal notranslate"><span class="pre">support&#64;realtimegenomics.com</span></code></p>
 <p>In addition, a discussion group is available at:
 <a class="reference external" href="https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users">https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users</a></p>
 <p>A low-traffic announcements-only group is available at:
@@ -310,12 +299,12 @@ Support via email at <code class="docutils literal"><span class="pre">support&#6
         <li class="right" >
           <a href="index.html" title="Table Of Contents"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>

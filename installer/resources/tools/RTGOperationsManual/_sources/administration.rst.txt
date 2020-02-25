@@ -256,7 +256,7 @@ output, and the decision as to whether to colorize the output is
 automatically determined, although some commands also contain additional
 flags to control colorization.
 
-The default behaviour of output colorization can be configured by
+The default behavior of output colorization can be configured by
 defining a Java system property named ``rtg.default-markup`` with an
 appropriate value and supplying it via RTG_JAVA_OPTS. For example, to
 disable output colorization, use:

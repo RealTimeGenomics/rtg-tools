@@ -2,29 +2,19 @@
 
 <!doctype html>
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Appendix &#8212; RTG Tools Operations Manual v3.10</title>
-    
+    <title>Appendix &#8212; RTG Tools Operations Manual v3.11</title>
     <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '3.10',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
     <script type="text/javascript" src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -33,8 +23,7 @@
     <!--[if lt IE 9]>
     <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
-  </head>
-  <body role="document">
+  </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
@@ -44,7 +33,7 @@
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -52,11 +41,12 @@
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Appendix</a><ul>
 <li><a class="reference internal" href="#rtg-reference-file-format">RTG reference file format</a></li>
 <li><a class="reference internal" href="#pedigree-ped-input-file-format">Pedigree PED input file format</a></li>
+<li><a class="reference internal" href="#genetic-map-directory">Genetic map directory</a></li>
 <li><a class="reference internal" href="#rtg-commands-using-indexed-input-files">RTG commands using indexed input files</a></li>
 <li><a class="reference internal" href="#rtg-javascript-filtering-api">RTG JavaScript filtering API</a><ul>
 <li><a class="reference internal" href="#vcf-record-field-access">VCF record field access</a><ul>
@@ -76,6 +66,7 @@
 <li><a class="reference internal" href="#additional-information-and-functions">Additional information and functions</a><ul>
 <li><a class="reference internal" href="#samples">SAMPLES</a></li>
 <li><a class="reference internal" href="#print-string">print({STRING})</a></li>
+<li><a class="reference internal" href="#error-string">error({STRING})</a></li>
 <li><a class="reference internal" href="#checkminversion-rtg-minimum-version">checkMinVersion(RTG_MINIMUM_VERSION)</a></li>
 </ul>
 </li>
@@ -113,24 +104,24 @@
 <p>Many RTG commands can make use of additional information about the
 structure of a reference genome, such as expected ploidy, sex
 chromosomes, location of PAR regions, etc.  When appropriate, this
-information may be stored inside a reference genome&#8217;s SDF directory in a
-file called <code class="docutils literal"><span class="pre">reference.txt</span></code>.</p>
-<p>The <code class="docutils literal"><span class="pre">format</span></code> command will automatically identify several common
-reference genomes during formatting and will create a <code class="docutils literal"><span class="pre">reference.txt</span></code>
+information may be stored inside a reference genome’s SDF directory in a
+file called <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">format</span></code> command will automatically identify several common
+reference genomes during formatting and will create a <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code>
 in the resulting SDF.  However, for non-human reference genomes, or less
 common human reference genomes, a pre-built reference configuration file
 may not be available, and will need to be manually provided in order to
 make use of RTG sex-aware pipeline features.</p>
-<p>Several example <code class="docutils literal"><span class="pre">reference.txt</span></code> files for different human reference
-versions are included as part of the RTG distribution in the <code class="docutils literal"><span class="pre">scripts</span></code>
+<p>Several example <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code> files for different human reference
+versions are included as part of the RTG distribution in the <code class="docutils literal notranslate"><span class="pre">scripts</span></code>
 subdirectory, so for common reference versions it will suffice to copy
 the appropriate example file into the formatted reference SDF with the
-name <code class="docutils literal"><span class="pre">reference.txt</span></code>, or use one of these example files as the basis
+name <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code>, or use one of these example files as the basis
 for your specific reference genome.</p>
 <p>To see how a reference text file will be interpreted by the chromosomes
-in an SDF for a given sex you can use the <code class="docutils literal"><span class="pre">sdfstats</span></code> command with the
-<code class="docutils literal"><span class="pre">--sex</span></code> flag. For example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>$ rtg sdfstats --sex male /data/human/ref/hg19
+in an SDF for a given sex you can use the <code class="docutils literal notranslate"><span class="pre">sdfstats</span></code> command with the
+<code class="docutils literal notranslate"><span class="pre">--sex</span></code> flag. For example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg sdfstats --sex male /data/human/ref/hg19
 
 Location            : /data/human/ref/hg19
 Parameters          : format -o /data/human/ref/hg19 -I chromosomes.txt
@@ -187,36 +178,36 @@ chrY HAPLOID linear 59373566 ~=chrX
 should be able to handle ZW and X0 sex determination also.</p>
 <p>The following describes the reference file text format in more detail.
 The file contains lines with TAB separated fields describing the
-properties of the chromosomes. Comments within the <code class="docutils literal"><span class="pre">reference.txt</span></code> file
-are preceded by the character <code class="docutils literal"><span class="pre">#</span></code>. The first line of the file that is
+properties of the chromosomes. Comments within the <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code> file
+are preceded by the character <code class="docutils literal notranslate"><span class="pre">#</span></code>. The first line of the file that is
 not a comment or blank must be the version line.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>version1
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>version1
 </pre></div>
 </div>
 <p>The remaining lines have the following common structure:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>&lt;sex&gt; &lt;line-type&gt;     &lt;line-setting&gt;...
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;sex&gt; &lt;line-type&gt;     &lt;line-setting&gt;...
 </pre></div>
 </div>
-<p>The sex field is one of <code class="docutils literal"><span class="pre">male</span></code>, <code class="docutils literal"><span class="pre">female</span></code> or <code class="docutils literal"><span class="pre">either</span></code>. The
-line-type field is one of <code class="docutils literal"><span class="pre">def</span></code> for default sequence settings, <code class="docutils literal"><span class="pre">seq</span></code>
-for specific chromosomal sequence settings and <code class="docutils literal"><span class="pre">dup</span></code> for defining
+<p>The sex field is one of <code class="docutils literal notranslate"><span class="pre">male</span></code>, <code class="docutils literal notranslate"><span class="pre">female</span></code> or <code class="docutils literal notranslate"><span class="pre">either</span></code>. The
+line-type field is one of <code class="docutils literal notranslate"><span class="pre">def</span></code> for default sequence settings, <code class="docutils literal notranslate"><span class="pre">seq</span></code>
+for specific chromosomal sequence settings and <code class="docutils literal notranslate"><span class="pre">dup</span></code> for defining
 pseudo-autosomal regions. The <em>line-setting</em> fields are a variable
 number of fields based on the line type given.</p>
-<p>The default sequence settings line can only be specified with <code class="docutils literal"><span class="pre">either</span></code>
+<p>The default sequence settings line can only be specified with <code class="docutils literal notranslate"><span class="pre">either</span></code>
 for the sex field, can only be specified once and must be specified if
 there are not individual chromosome settings for all chromosomes and
 other contigs. It is specified with the following structure:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>either        def     &lt;ploidy&gt;        &lt;shape&gt;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>either        def     &lt;ploidy&gt;        &lt;shape&gt;
 </pre></div>
 </div>
-<p>The <em>ploidy</em> field is one of <code class="docutils literal"><span class="pre">diploid</span></code>, <code class="docutils literal"><span class="pre">haploid</span></code>, <code class="docutils literal"><span class="pre">polyploid</span></code> or
-<code class="docutils literal"><span class="pre">none</span></code>. The <em>shape</em> field is one of <code class="docutils literal"><span class="pre">circular</span></code> or <code class="docutils literal"><span class="pre">linear</span></code>.</p>
+<p>The <em>ploidy</em> field is one of <code class="docutils literal notranslate"><span class="pre">diploid</span></code>, <code class="docutils literal notranslate"><span class="pre">haploid</span></code>, <code class="docutils literal notranslate"><span class="pre">polyploid</span></code> or
+<code class="docutils literal notranslate"><span class="pre">none</span></code>. The <em>shape</em> field is one of <code class="docutils literal notranslate"><span class="pre">circular</span></code> or <code class="docutils literal notranslate"><span class="pre">linear</span></code>.</p>
 <p>The specific chromosome settings lines are similar to the default
 chromosome settings lines. All the sex field options can be used,
 however for any one chromosome you can only specify a single line for
-<code class="docutils literal"><span class="pre">either</span></code> or two lines for <code class="docutils literal"><span class="pre">male</span></code> and <code class="docutils literal"><span class="pre">female</span></code>. They are specified
+<code class="docutils literal notranslate"><span class="pre">either</span></code> or two lines for <code class="docutils literal notranslate"><span class="pre">male</span></code> and <code class="docutils literal notranslate"><span class="pre">female</span></code>. They are specified
 with the following structure:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>&lt;sex&gt; seq     &lt;chromosome-name&gt;       &lt;ploidy&gt;        &lt;shape&gt; [allosome]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;sex&gt; seq     &lt;chromosome-name&gt;       &lt;ploidy&gt;        &lt;shape&gt; [allosome]
 </pre></div>
 </div>
 <p>The <em>ploidy</em> and <em>shape</em> fields are the same as for the default
@@ -226,16 +217,16 @@ and is used to specify the allosome pair of a haploid chromosome.</p>
 <p>The pseudo-autosomal region settings line can be set with any of the
 <em>sex</em> field options and any number of the lines can be defined as
 necessary. It has the following format:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>&lt;sex&gt; dup     &lt;region&gt;        &lt;region&gt;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;sex&gt; dup     &lt;region&gt;        &lt;region&gt;
 </pre></div>
 </div>
 <p>The regions must be taken from two haploid chromosomes for a given sex,
 have the same length and not go past the end of the chromosome. The
-regions are given in the format <code class="docutils literal"><span class="pre">&lt;chromosome-name&gt;:&lt;start&gt;-&lt;end&gt;</span></code> where
+regions are given in the format <code class="docutils literal notranslate"><span class="pre">&lt;chromosome-name&gt;:&lt;start&gt;-&lt;end&gt;</span></code> where
 start and end are positions counting from one and the end is
 non-inclusive.</p>
 <p>An example for the HG19 human reference:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span># Reference specification for hg19, see
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># Reference specification for hg19, see
 # http://genome.ucsc.edu/cgi-bin/hgTracks?hgsid=184117983&amp;chromInfoPage=
 version 1
 # Unless otherwise specified, assume diploid linear. Well-formed
@@ -280,19 +271,19 @@ either        seq     chrM    polyploid       circular
 </pre></div>
 </div>
 <p>As of the current version of the RTG software the following are the
-effects of various settings in the <code class="docutils literal"><span class="pre">reference.txt</span></code> file when processing
+effects of various settings in the <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code> file when processing
 a sample with the matching sex.</p>
-<p>A ploidy setting of <code class="docutils literal"><span class="pre">none</span></code> will prevent reads from mapping to that
+<p>A ploidy setting of <code class="docutils literal notranslate"><span class="pre">none</span></code> will prevent reads from mapping to that
 chromosome and any variant calling from being done in that chromosome.</p>
-<p>A ploidy setting of <code class="docutils literal"><span class="pre">diploid</span></code>, <code class="docutils literal"><span class="pre">haploid</span></code> or <code class="docutils literal"><span class="pre">polyploid</span></code> does not
+<p>A ploidy setting of <code class="docutils literal notranslate"><span class="pre">diploid</span></code>, <code class="docutils literal notranslate"><span class="pre">haploid</span></code> or <code class="docutils literal notranslate"><span class="pre">polyploid</span></code> does not
 currently affect the output of mapping.</p>
-<p>A ploidy setting of <code class="docutils literal"><span class="pre">diploid</span></code> will treat the chromosome as having two
+<p>A ploidy setting of <code class="docutils literal notranslate"><span class="pre">diploid</span></code> will treat the chromosome as having two
 distinct copies during variant calling, meaning that both homozygous and
 heterozygous diploid genotypes may be called for the chromosome.</p>
-<p>A ploidy setting of <code class="docutils literal"><span class="pre">haploid</span></code> will treat the chromosome as having one
+<p>A ploidy setting of <code class="docutils literal notranslate"><span class="pre">haploid</span></code> will treat the chromosome as having one
 copy during variant calling, meaning that only haploid genotypes will be
 called for the chromosome.</p>
-<p>A ploidy setting of <code class="docutils literal"><span class="pre">polyploid</span></code> will treat the chromosome as having one
+<p>A ploidy setting of <code class="docutils literal notranslate"><span class="pre">polyploid</span></code> will treat the chromosome as having one
 copy during variant calling, meaning that only haploid genotypes will be
 called for the chromosome. For variant calling with a pedigree, maternal
 inheritance is assumed for polyploid sequences.</p>
@@ -303,7 +294,7 @@ variant calling (but are used by simulated data generation commands).</p>
 <p>The pseudo-autosomal regions will cause the second half of the region
 pair to be skipped during mapping. During variant calling the first half
 of the region pair will be called as diploid and the second half will
-not have calls made for it. For the example <code class="docutils literal"><span class="pre">reference.txt</span></code> provided
+not have calls made for it. For the example <code class="docutils literal notranslate"><span class="pre">reference.txt</span></code> provided
 earlier this means that when mapping a male the X chromosome sections of
 the pseudo-autosomal regions will be mapped to exclusively and for
 variant calling the X chromosome sections will be called as diploid
@@ -314,7 +305,7 @@ boundary.</p>
 <div class="section" id="pedigree-ped-input-file-format">
 <h2>Pedigree PED input file format<a class="headerlink" href="#pedigree-ped-input-file-format" title="Permalink to this headline">¶</a></h2>
 <p>The PED file format is a white space (tab or space) delimited ASCII
-file. Lines starting with <code class="docutils literal"><span class="pre">#</span></code> are ignored. It has exactly six required
+file. Lines starting with <code class="docutils literal notranslate"><span class="pre">#</span></code> are ignored. It has exactly six required
 columns in the following order.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -331,13 +322,13 @@ columns in the following order.</p>
 <td>Alphanumeric ID of a family group. This field is ignored by RTG commands.</td>
 </tr>
 <tr class="row-odd"><td><em>Individual ID</em></td>
-<td>Alphanumeric ID of an individual. This corresponds to the Sample ID specified in the read group of the individual (<code class="docutils literal"><span class="pre">SM</span></code> field).</td>
+<td>Alphanumeric ID of an individual. This corresponds to the Sample ID specified in the read group of the individual (<code class="docutils literal notranslate"><span class="pre">SM</span></code> field).</td>
 </tr>
 <tr class="row-even"><td><em>Paternal ID</em></td>
-<td>Alphanumeric ID of the paternal parent for the individual. This corresponds to the Sample ID specified in the read group of the paternal parent (<code class="docutils literal"><span class="pre">SM</span></code> field).</td>
+<td>Alphanumeric ID of the paternal parent for the individual. This corresponds to the Sample ID specified in the read group of the paternal parent (<code class="docutils literal notranslate"><span class="pre">SM</span></code> field).</td>
 </tr>
 <tr class="row-odd"><td><em>Maternal ID</em></td>
-<td>Alphanumeric ID of the maternal parent for the individual. This corresponds to the Sample ID specified in the read group of the maternal parent (<code class="docutils literal"><span class="pre">SM</span></code> field).</td>
+<td>Alphanumeric ID of the maternal parent for the individual. This corresponds to the Sample ID specified in the read group of the maternal parent (<code class="docutils literal notranslate"><span class="pre">SM</span></code> field).</td>
 </tr>
 <tr class="row-even"><td><em>Sex</em></td>
 <td>The sex of the individual specified as using 1 for male, 2 for female and any other number as unknown.</td>
@@ -353,10 +344,10 @@ columns in the following order.</p>
 the PLINK project:
 <a class="reference external" href="http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#ped">http://pngu.mgh.harvard.edu/~purcell/plink/data.shtml#ped</a></p>
 </div>
-<p>The value &#8216;0&#8217; can be used as a missing value for Family ID, Paternal ID
+<p>The value ‘0’ can be used as a missing value for Family ID, Paternal ID
 and Maternal ID.</p>
 <p>The following is an example of what a PED file may look like.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span># PED format pedigree
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># PED format pedigree
 # fam-id ind-id pat-id mat-id sex phen
 FAM01 NA19238 0 0 2 0
 FAM01 NA19239 0 0 1 0
@@ -364,11 +355,11 @@ FAM01 NA19240 NA19239 NA19238 2 0
 0 NA12878 0 0 2 0
 </pre></div>
 </div>
-<p>When specifying a pedigree for the <code class="docutils literal"><span class="pre">lineage</span></code> command, use either the
+<p>When specifying a pedigree for the <code class="docutils literal notranslate"><span class="pre">lineage</span></code> command, use either the
 pat-id or mat-id as appropriate to the gender of the sample cell
 lineage. The following is an example of what a cell lineage PED file may
 look like.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span># PED format pedigree
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span># PED format pedigree
 # fam-id ind-id pat-id mat-id sex phen
 LIN BASE 0 0 2 0
 LIN GENA 0 BASE 2 0
@@ -376,24 +367,78 @@ LIN GENB 0 BASE 2 0
 LIN GENA-A 0 GENA 2 0
 </pre></div>
 </div>
-<p>RTG includes commands such as <code class="docutils literal"><span class="pre">pedfilter</span></code> and <code class="docutils literal"><span class="pre">pedstats</span></code> for simple
+<p>RTG includes commands such as <code class="docutils literal notranslate"><span class="pre">pedfilter</span></code> and <code class="docutils literal notranslate"><span class="pre">pedstats</span></code> for simple
 viewing, filtering and conversion of pedigree files.</p>
+</div>
+<div class="section" id="genetic-map-directory">
+<h2>Genetic map directory<a class="headerlink" href="#genetic-map-directory" title="Permalink to this headline">¶</a></h2>
+<p>Certain commands such as <code class="docutils literal notranslate"><span class="pre">pedsamplesim</span></code> are able to make use of genetic
+linkage information provided in the form of per sequence TSV files in
+a directory.</p>
+<p>Such files must be tab separated with a single header line.  The header
+line must include the columns <code class="docutils literal notranslate"><span class="pre">pos</span></code> and <code class="docutils literal notranslate"><span class="pre">cM</span></code> (for centimorgans).  A
+<code class="docutils literal notranslate"><span class="pre">chr</span></code> column is also recommended, but not essential.  Other columns
+may be present, but are ignored.</p>
+<p>For example, the start of such a file for <code class="docutils literal notranslate"><span class="pre">chr1</span></code> is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>chr     pos     rate            cM
+chr1    6079392 0.0453026       0
+chr1    6085392 0.0696987       0.0002718156
+chr1    6088671 0.719604        0.0005003576373
+chr1    6095199 0.203332        0.0051979325493
+chr1    6098266 0.250261        0.0058215517933
+</pre></div>
+</div>
+<p>The columns in the example are:</p>
+<ol class="arabic simple">
+<li>Chromosome name</li>
+<li>Position in chromosome</li>
+<li>Rate of crossovers in region ending at this position (ignored)</li>
+<li>Total number of centimorgans from start of sequence</li>
+</ol>
+<p>The corresponding map directory should contain a file or files for each sequence
+of interest, using the naming convention
+<code class="docutils literal notranslate"><span class="pre">[</span></code><em>sex</em><code class="docutils literal notranslate"><span class="pre">.]</span></code><em>sequence</em><code class="docutils literal notranslate"><span class="pre">.map</span></code>
+where <em>sex</em> is an optional sex specification (either <code class="docutils literal notranslate"><span class="pre">male</span></code> or <code class="docutils literal notranslate"><span class="pre">female</span></code>)
+and <em>sequence</em> is the name of the sequence, for example <code class="docutils literal notranslate"><span class="pre">chr1</span></code>.</p>
+<p>When loading these files, an attempt is first made to load the file
+corresponding to the sex of the sample being processed.  If that file
+does not exist, then an attempt is made to load a nonspecific version
+of the file.  If that also does not exist, then a uniform distribution
+will be assumed.  For example, if processing a female sample for <code class="docutils literal notranslate"><span class="pre">chr1</span></code>,
+first <code class="docutils literal notranslate"><span class="pre">female.chr1.map</span></code> will be tested.  If that does not exist, then
+<code class="docutils literal notranslate"><span class="pre">chr1.map</span></code> will be tested. If that also does not exist, then the
+uniform distribution will be used. In this way as many or as few sequences
+as desired may be covered within a particular directory.</p>
+<p>For the human genome, several sources of appropriate linkage information
+are available.  Please note that it will generally be necessary to add
+headers and possibly make other adjustments to these files before they
+can be used with RTG.</p>
+<p>Specific sources include:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/cbherer/Bherer_etal_SexualDimorphismRecombination">https://github.com/cbherer/Bherer_etal_SexualDimorphismRecombination</a></li>
+<li><a class="reference external" href="https://genome.sph.umich.edu/wiki/Polymutt2">https://genome.sph.umich.edu/wiki/Polymutt2</a></li>
+<li><a class="reference external" href="http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/">http://bochet.gcc.biostat.washington.edu/beagle/genetic_maps/</a></li>
+</ul>
+<p>A zipfile containing the Bherer genetic map files for human build 37,
+with the required header manipulations already applied is available for
+download from: <a class="reference external" href="https://realtimegenomics.com/news/pre-formatted-reference-datasets">https://realtimegenomics.com/news/pre-formatted-reference-datasets</a></p>
+<p>See <a class="reference internal" href="rtg_command_reference.html#pedsamplesim"><span class="std std-ref">pedsamplesim</span></a>, <a class="reference internal" href="rtg_command_reference.html#childsim"><span class="std std-ref">childsim</span></a>.</p>
 </div>
 <div class="section" id="rtg-commands-using-indexed-input-files">
 <h2>RTG commands using indexed input files<a class="headerlink" href="#rtg-commands-using-indexed-input-files" title="Permalink to this headline">¶</a></h2>
 <p>Several RTG commands require coordinate indexed input files to operate
-and several more require them when the <code class="docutils literal"><span class="pre">--region</span></code> or <code class="docutils literal"><span class="pre">--bed-regions</span></code>
+and several more require them when the <code class="docutils literal notranslate"><span class="pre">--region</span></code> or <code class="docutils literal notranslate"><span class="pre">--bed-regions</span></code>
 parameter is used. The index files used are standard tabix or BAM index
 files.</p>
 <p>The RTG commands which produce the inputs used by these commands will by
 default produce them with appropriate index files. To produce indexes
 for files from third party sources or RTG command output where the
-<code class="docutils literal"><span class="pre">--no-index</span></code> or <code class="docutils literal"><span class="pre">--no-gzip</span></code> parameters were set, use the RTG
-<code class="docutils literal"><span class="pre">bgzip</span></code> and <code class="docutils literal"><span class="pre">index</span></code> commands.</p>
+<code class="docutils literal notranslate"><span class="pre">--no-index</span></code> or <code class="docutils literal notranslate"><span class="pre">--no-gzip</span></code> parameters were set, use the RTG
+<code class="docutils literal notranslate"><span class="pre">bgzip</span></code> and <code class="docutils literal notranslate"><span class="pre">index</span></code> commands.</p>
 </div>
 <div class="section" id="rtg-javascript-filtering-api">
 <h2>RTG JavaScript filtering API<a class="headerlink" href="#rtg-javascript-filtering-api" title="Permalink to this headline">¶</a></h2>
-<p>The <code class="docutils literal"><span class="pre">vcffilter</span></code> command permits filtering VCF records via user-supplied
+<p>The <code class="docutils literal notranslate"><span class="pre">vcffilter</span></code> command permits filtering VCF records via user-supplied
 JavaScript expressions or scripts containing JavaScript functions that
 operate on VCF records. The JavaScript environment has an API provided
 that enables convenient access to components of a VCF record in order to
@@ -403,16 +448,16 @@ satisfy common use cases.</p>
 <p>This section describes the supported methods to access components of an
 individual VCF record. In the following descriptions, assume the input
 VCF contains the following excerpt (the full header has been omitted):</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA12877 NA12878
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>#CHROM POS ID REF ALT QUAL FILTER INFO FORMAT NA12877 NA12878
 1 11259340 . G C,T . PASS DP=795;DPR=0.581;ABC=4.5 GT:DP 1/2:65 1/0:15
 </pre></div>
 </div>
 <div class="section" id="chrom-pos-id-ref-qual">
 <h4>CHROM, POS, ID, REF, QUAL<a class="headerlink" href="#chrom-pos-id-ref-qual" title="Permalink to this headline">¶</a></h4>
-<p>Within the context of a <code class="docutils literal"><span class="pre">--keep-expr</span></code> or <code class="docutils literal"><span class="pre">record</span></code> function these
+<p>Within the context of a <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> or <code class="docutils literal notranslate"><span class="pre">record</span></code> function these
 variables will provide access to the String representation of the VCF
 column of the same name.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>CHROM; // &quot;1&quot;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CHROM; // &quot;1&quot;
 POS; // &quot;11259340&quot;
 ID; // &quot;.&quot;
 REF; // &quot;G&quot;
@@ -423,20 +468,20 @@ QUAL; // &quot;.&quot;
 <div class="section" id="alt-filter">
 <h4>ALT, FILTER<a class="headerlink" href="#alt-filter" title="Permalink to this headline">¶</a></h4>
 <p>Will retrieve an array of the values in the column.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ALT; // [&quot;C&quot;, &quot;T&quot;]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ALT; // [&quot;C&quot;, &quot;T&quot;]
 FILTER; // [&quot;PASS&quot;]
 </pre></div>
 </div>
 </div>
 <div class="section" id="info-info-field">
 <h4>INFO.{INFO_FIELD}<a class="headerlink" href="#info-info-field" title="Permalink to this headline">¶</a></h4>
-<p>The values in the <code class="docutils literal"><span class="pre">INFO</span></code> field are accessible through properties on the
-<code class="docutils literal"><span class="pre">INFO</span></code> object indexed by <code class="docutils literal"><span class="pre">INFO</span> <span class="pre">ID</span></code>. These properties will be the string
-representation of info values with multiple values delimited with &#8220;<code class="docutils literal"><span class="pre">,</span></code>&#8221;.
-Missing fields will be represented by &#8220;<code class="docutils literal"><span class="pre">.</span></code>&#8221;. Assigning to these
+<p>The values in the <code class="docutils literal notranslate"><span class="pre">INFO</span></code> field are accessible through properties on the
+<code class="docutils literal notranslate"><span class="pre">INFO</span></code> object indexed by <code class="docutils literal notranslate"><span class="pre">INFO</span> <span class="pre">ID</span></code>. These properties will be the string
+representation of info values with multiple values delimited with “<code class="docutils literal notranslate"><span class="pre">,</span></code>”.
+Missing fields will be represented by “<code class="docutils literal notranslate"><span class="pre">.</span></code>”. Assigning to these
 properties will update the VCF record. This will be undefined for fields not
 declared in the header.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>INFO.DP; // &quot;795&quot;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>INFO.DP; // &quot;795&quot;
 INFO.ABC; // &quot;4,5&quot;
 </pre></div>
 </div>
@@ -446,14 +491,14 @@ INFO.ABC; // &quot;4,5&quot;
 <p>The JavaScript String prototype has been extended to allow access to the
 format fields for each sample. The string representation of values in
 the sample column are accessible as properties on the string matching
-the sample name named after the <code class="docutils literal"><span class="pre">FORMAT</span></code> field <code class="docutils literal"><span class="pre">ID</span></code>.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>&#39;NA12877&#39;.GT; // &quot;1/2&quot;
+the sample name named after the <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field <code class="docutils literal notranslate"><span class="pre">ID</span></code>.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&#39;NA12877&#39;.GT; // &quot;1/2&quot;
 &#39;NA12878&#39;.GT; // &quot;1/0&quot;
 </pre></div>
 </div>
 <p>Note that these properties are only defined for fields that are declared
 in the VCF header (any that are not declared in the header will be
-undefined). See below for how to add new <code class="docutils literal"><span class="pre">INFO</span></code> or <code class="docutils literal"><span class="pre">FORMAT</span></code> field
+undefined). See below for how to add new <code class="docutils literal notranslate"><span class="pre">INFO</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field
 declarations.</p>
 </div>
 </div>
@@ -462,37 +507,48 @@ declarations.</p>
 <p>Most components of VCF records can be written or updated in a fairly
 natural manner by direct assignment in order to make modifications. For
 example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ID = &quot;rs23987382&quot;; // Will change the ID value
-QUAL = &quot;50&quot;; // Will change the QUAL value
-FILTER = &quot;FAIL&quot;; // Will set the FILTER value
-INFO.DPR = &quot;0.01&quot;; // Will change the value of the DPR info field
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CHROM = &quot;chr1&quot;;      // Will change the CHROM value
+POS = 42;            // Will change the POS value
+ID = &quot;rs23987382&quot;;   // Will change the ID value
+QUAL = &quot;50&quot;;         // Will change the QUAL value
+FILTER = &quot;FAIL&quot;;     // Will set the FILTER value
+INFO.DPR = &quot;0.01&quot;;   // Will change the value of the DPR info field
 &#39;NA12877&#39;.DP = &quot;10&quot;; // Will change the DP field of the NA12877 sample
 </pre></div>
 </div>
-<p>Other components of the VCF record (such as <code class="docutils literal"><span class="pre">CHROM</span></code>, <code class="docutils literal"><span class="pre">POS</span></code>, <code class="docutils literal"><span class="pre">REF</span></code>,
-and <code class="docutils literal"><span class="pre">ALT</span></code>) are considered immutable and can not currently be altered.</p>
-<p>Direct assignment to <code class="docutils literal"><span class="pre">ID</span></code> and <code class="docutils literal"><span class="pre">FILTER</span></code> fields accept either a string
+<p>Other components of the VCF record (such as <code class="docutils literal notranslate"><span class="pre">REF</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ALT</span></code>) are considered immutable and can not currently be altered.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Modification of <code class="docutils literal notranslate"><span class="pre">CHROM</span></code> and/or <code class="docutils literal notranslate"><span class="pre">POS</span></code> can lead to a VCF file
+which is incorrectly sorted and this will not necessarily be detected
+or reported until the resulting VCF file is used with another module
+or tool.  Depending on the new value assigned to <code class="docutils literal notranslate"><span class="pre">CHROM</span></code> it may
+also be necessary to modify the sequence dictionary in the VCF
+header to reflect the change (see <a class="reference internal" href="#vcf-header-modification"><span class="std std-ref">VCF header modification</span></a>).</p>
+</div>
+<p>Direct assignment to <code class="docutils literal notranslate"><span class="pre">ID</span></code> and <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> fields accept either a string
 containing semicolon separated values, or a list of values. For example:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ID = &#39;rs23987382;COSM3805&#39;;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ID = &#39;rs23987382;COSM3805&#39;;
 ID = [&#39;rs23987382&#39;, &#39;COSM3805&#39;];
 FILTER = &#39;BAZ;BANG&#39;;
 FILTER = [&#39;BAZ&#39;, &#39;BANG&#39;];
 </pre></div>
 </div>
-<p>Note that although the <code class="docutils literal"><span class="pre">FILTER</span></code> field returns an array when read, any
+<p>Note that although the <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> field returns an array when read, any
 changes made to this array directly are not reflected back into the VCF
 record.</p>
 <p>Adding a filter to existing filters is a common operation and can be
 accomplished by the above assignment methods, for example by adding a
 value to the existing list and then setting the result:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>var f = FILTER;
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>var f = FILTER;
 f.push(&#39;BOING&#39;);
 FILTER = f;
 </pre></div>
 </div>
 <p>However, since this is a little unwieldy, a convenience function called
 <cite>add()</cite> can be used (and may be chained):</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>FILTER.add(&#39;BOING&#39;);
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>FILTER.add(&#39;BOING&#39;);
 FILTER.add([&#39;BOING&#39;, &#39;DOING&#39;);
 FILTER.add(&#39;BOING&#39;).add(&#39;DOING&#39;);
 </pre></div>
@@ -500,35 +556,35 @@ FILTER.add(&#39;BOING&#39;).add(&#39;DOING&#39;);
 </div>
 <div class="section" id="vcf-header-modification">
 <h3>VCF header modification<a class="headerlink" href="#vcf-header-modification" title="Permalink to this headline">¶</a></h3>
-<p>Functions are provided that allow the addition of new <code class="docutils literal"><span class="pre">FILTER</span></code>,
-<code class="docutils literal"><span class="pre">INFO</span></code> and <code class="docutils literal"><span class="pre">FORMAT</span></code> fields to the header and records. It is
+<p>Functions are provided that allow the addition of new <code class="docutils literal notranslate"><span class="pre">FILTER</span></code>,
+<code class="docutils literal notranslate"><span class="pre">INFO</span></code> and <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> fields to the header and records. It is
 recommended that the following functions only be used within the
-run-once portion of <code class="docutils literal"><span class="pre">--javascript</span></code>.</p>
+run-once portion of <code class="docutils literal notranslate"><span class="pre">--javascript</span></code>.</p>
 <div class="section" id="ensureformatheader-format-header-string">
 <h4>ensureFormatHeader(FORMAT_HEADER_STRING)<a class="headerlink" href="#ensureformatheader-format-header-string" title="Permalink to this headline">¶</a></h4>
-<p>Add a new <code class="docutils literal"><span class="pre">FORMAT</span></code> field to the VCF if it is not already present. This
-will add a <code class="docutils literal"><span class="pre">FORMAT</span></code> declaration line to the header and define the
+<p>Add a new <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field to the VCF if it is not already present. This
+will add a <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> declaration line to the header and define the
 corresponding accessor methods for use in record processing.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ensureFormatHeader(&#39;##FORMAT=&lt;ID=GL,Number=G,Type=Float,&#39; +
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ensureFormatHeader(&#39;##FORMAT=&lt;ID=GL,Number=G,Type=Float,&#39; +
   &#39;Description=&quot;Log_10 scaled genotype likelihoods.&quot;&gt;&#39;);
 </pre></div>
 </div>
 </div>
 <div class="section" id="ensureinfoheader-info-header-string">
 <h4>ensureInfoHeader(INFO_HEADER_STRING)<a class="headerlink" href="#ensureinfoheader-info-header-string" title="Permalink to this headline">¶</a></h4>
-<p>Add a new <code class="docutils literal"><span class="pre">INFO</span></code> field to the VCF if it is not already present. This
-will add an <code class="docutils literal"><span class="pre">INFO</span></code> declaration line to the header and define the
+<p>Add a new <code class="docutils literal notranslate"><span class="pre">INFO</span></code> field to the VCF if it is not already present. This
+will add an <code class="docutils literal notranslate"><span class="pre">INFO</span></code> declaration line to the header and define the
 corresponding accessor methods for use in record processing.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ensureInfoHeader(&#39;##INFO=&lt;ID=CT,Number=1,Type=Integer,&#39; +
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ensureInfoHeader(&#39;##INFO=&lt;ID=CT,Number=1,Type=Integer,&#39; +
   &#39;Description=&quot;Coverage threshold that was applied&quot;&gt;&#39;);
 </pre></div>
 </div>
 </div>
 <div class="section" id="ensurefilterheader-filter-header-string">
 <h4>ensureFilterHeader(FILTER_HEADER_STRING)<a class="headerlink" href="#ensurefilterheader-filter-header-string" title="Permalink to this headline">¶</a></h4>
-<p>Add a new <code class="docutils literal"><span class="pre">FILTER</span></code> field to the VCF header if it is not already
-present. This will add an <code class="docutils literal"><span class="pre">FILTER</span></code> declaration line to the header.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>ensureFilterHeader(&#39;##INFO=&lt;ID=FAIL_VAL,&#39; +
+<p>Add a new <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> field to the VCF header if it is not already
+present. This will add an <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> declaration line to the header.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ensureFilterHeader(&#39;##INFO=&lt;ID=FAIL_VAL,&#39; +
   &#39;Description=&quot;Failed validation&quot;&gt;&#39;);
 </pre></div>
 </div>
@@ -539,14 +595,21 @@ present. This will add an <code class="docutils literal"><span class="pre">FILTE
 <div class="section" id="samples">
 <h4>SAMPLES<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h4>
 <p>This variable contains an array of the sample names in the VCF header.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>SAMPLES; // [&#39;NA12877&#39;, &#39;NA12878&#39;]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SAMPLES; // [&#39;NA12877&#39;, &#39;NA12878&#39;]
 </pre></div>
 </div>
 </div>
 <div class="section" id="print-string">
 <h4>print({STRING})<a class="headerlink" href="#print-string" title="Permalink to this headline">¶</a></h4>
 <p>Writes the provided string to standard output.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>print(&#39;The samples are: &#39; + SAMPLES);
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>print(&#39;The samples are: &#39; + SAMPLES);
+</pre></div>
+</div>
+</div>
+<div class="section" id="error-string">
+<h4>error({STRING})<a class="headerlink" href="#error-string" title="Permalink to this headline">¶</a></h4>
+<p>Writes the provided string to standard error.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>error(&#39;The samples are: &#39; + SAMPLES);
 </pre></div>
 </div>
 </div>
@@ -556,7 +619,7 @@ present. This will add an <code class="docutils literal"><span class="pre">FILTE
 with an error message if the version of RTG does not meet the minimum
 required version. This is useful when distributing scripts that make use
 of features that are not present in earlier versions of RTG.</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>checkMinVersion(&#39;3.9.2&#39;);
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>checkMinVersion(&#39;3.9.2&#39;);
 </pre></div>
 </div>
 <div class="admonition seealso">
@@ -581,9 +644,9 @@ of features that are not present in earlier versions of RTG.</p>
 </div>
 <div class="section" id="readme-txt">
 <h2>README.txt<a class="headerlink" href="#readme-txt" title="Permalink to this headline">¶</a></h2>
-<p>For reference purposes, a copy of the distribution <code class="docutils literal"><span class="pre">README.txt</span></code> file
+<p>For reference purposes, a copy of the distribution <code class="docutils literal notranslate"><span class="pre">README.txt</span></code> file
 follows:</p>
-<div class="highlight-text"><div class="highlight"><pre><span></span>=== RTG.VERSION ===
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=== RTG.VERSION ===
 
 RTG software from Real Time Genomics includes tools for the processing
 and analysis of plant, animal and human sequence data from high
@@ -877,12 +940,12 @@ referenced in this document are the property of their respective owners.</p>
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.10</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.11</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
     </div>
   </body>
 </html>
