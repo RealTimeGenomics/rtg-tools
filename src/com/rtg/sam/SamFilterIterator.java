@@ -89,6 +89,11 @@ public class SamFilterIterator implements RecordIterator<SAMRecord> {
   }
 
   @Override
+  public long getOverCoverageRecordsCount() {
+    return mBaseIterator.getOverCoverageRecordsCount();
+  }
+
+  @Override
   public long getFilteredRecordsCount() {
     return mFilteredRecords + mBaseIterator.getFilteredRecordsCount();
   }
@@ -121,10 +126,8 @@ public class SamFilterIterator implements RecordIterator<SAMRecord> {
             ++mFilteredRecords;
             continue;
           }
-          break;
-        } else {
-          break;
         }
+        break;
       }
     }
     return mNextRecord != null;

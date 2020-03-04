@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -29,40 +29,43 @@
  */
 package com.rtg.sam;
 
-import com.reeltwo.jumble.annotations.TestClass;
-
-import htsjdk.samtools.SAMFileHeader;
-import htsjdk.samtools.SAMRecord;
-
 /**
- * Implements the minimal header tracking and record counting likely to be used by any lowest-level <code>SAMRecord</code> RecordIterator
+ *
  */
-@TestClass("com.rtg.sam.SkipInvalidRecordsIteratorTest")
-public abstract class AbstractSamRecordIterator extends SimpleRecordCounter implements RecordIterator<SAMRecord> {
-
-  protected SAMFileHeader mHeader;
-  protected long mTotalNucleotides = 0;
+public interface RecordCounter {
+  /**
+   * Gets the total number of records that were invalid.
+   * @return the sum of all invalid counts
+   */
+  long getInvalidRecordsCount();
 
   /**
-   * Constructor
-   * @param header give it the damn header
+   * Gets the number of records that were ignored due to filtering criteria
+   * @return the count of records ignored due to user-filtering
    */
-  public AbstractSamRecordIterator(SAMFileHeader header) {
-    mHeader = header;
-  }
+  long getFilteredRecordsCount();
 
-  @Override
-  public long getTotalNucleotides() {
-    return mTotalNucleotides;
-  }
+  /**
+   * Gets the number of records that were detected as duplicates and ignored
+   * @return the number of duplicate records filtered
+   */
+  long getDuplicateRecordsCount();
 
-  @Override
-  public SAMFileHeader header() {
-    return mHeader;
-  }
+  /**
+   * Gets the number of records that were ignored due to over-coverage
+   * @return the number of records ignored
+   */
+  long getOverCoverageRecordsCount();
 
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException("Not supported yet.");
-  }
+  /**
+   * Gets the total number of records that were returned to the caller.
+   * @return the count of records returned to the caller.
+   */
+  long getOutputRecordsCount();
+
+  /**
+   * Gets the total number of input records.
+   * @return the count of all input records (regardless of validity or filtering status).
+   */
+  long getTotalRecordsCount();
 }
