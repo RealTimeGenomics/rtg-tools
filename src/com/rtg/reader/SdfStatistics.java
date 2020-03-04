@@ -87,6 +87,7 @@ public final class SdfStatistics extends AbstractCli {
   private static final String NAMES_AND_LENGTHS_FLAG = "lengths";
   private static final String SAM_FLAG = "Xsam-header";
   private static final String BED_FLAG = "Xbed";
+  private static final String BED_WINDOW = "Xbed-window";
   private static final String SPECIFIED = "Xspecified";
 
   //private static final String SUMMARY_FLAG = "summary";
@@ -130,6 +131,7 @@ public final class SdfStatistics extends AbstractCli {
       flags.registerOptional(NAMES_AND_LENGTHS_FLAG, "print out the name and length of each sequence. (Not recommended for read sets)").setCategory(REPORTING);
       flags.registerOptional(SAM_FLAG, "print out a SAM format header corresponding to this SDF").setCategory(REPORTING);
       flags.registerOptional(BED_FLAG, "print out BED format regions corresponding to sequences in this SDF").setCategory(REPORTING);
+      flags.registerOptional(BED_WINDOW, Integer.class, "INT", "print out BED format regions, with each sequence split into windows of this size").setCategory(REPORTING);
       flags.registerOptional(SPECIFIED, "BED/SAM output should only include sequences specified in the reference configuration").setCategory(REPORTING);
       //flags.setDescription("prints statistics about sequences");
 
@@ -289,13 +291,16 @@ public final class SdfStatistics extends AbstractCli {
     out.append(bo.toString());
   }
 
-  static void printBed(SequencesReader sr, final PrintStream out, boolean specified) throws IOException {
+  static void printBed(SequencesReader sr, final PrintStream out, boolean specified, int binSize) throws IOException {
     final ReferenceGenome rg = new ReferenceGenome(sr, ReferenceGenome.SEX_ALL, ReferenceGenome.ReferencePloidy.AUTO);
     for (long seq = 0; seq < sr.numberSequences(); ++seq) {
       final String name = sr.hasNames() ? sr.name(seq) : ("sequence_" + seq);
       final ReferenceSequence s = specified ? rg.sequence(name) : null;
       if (s == null || s.isSpecified()) {
-        out.println(name + "\t0\t" + sr.length(seq));
+        final long length = sr.length(seq);
+        for (long start = 0; start < length; start += binSize) {
+          out.println(name + "\t" + start + "\t" + Math.min(length, start + binSize));
+        }
       }
     }
   }
@@ -487,7 +492,9 @@ public final class SdfStatistics extends AbstractCli {
       for (File dir : dirs) {
         try (AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(dir)) {
           if (mFlags.isSet(BED_FLAG)) {
-            printBed(reader, ps, mFlags.isSet(SPECIFIED));
+            printBed(reader, ps, mFlags.isSet(SPECIFIED), Integer.MAX_VALUE);
+          } else if (mFlags.isSet(BED_WINDOW)) {
+            printBed(reader, ps, mFlags.isSet(SPECIFIED), (Integer) mFlags.getValue(BED_WINDOW));
           } else if (mFlags.isSet(SAM_FLAG)) {
             printSAMHeader(reader, ps, mFlags.isSet(SPECIFIED));
           } else {
