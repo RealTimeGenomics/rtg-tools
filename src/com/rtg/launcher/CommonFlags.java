@@ -231,10 +231,10 @@ public final class CommonFlags {
    * Basic SDF file check
    * @param flags flags to check
    * @param flagName name of the flag
-   * @return true if indicated path exists and is a directory
+   * @return true if the flag supplied a path that exists and is a directory
    */
   public static boolean validateSDF(CFlags flags, String flagName) {
-    return validateSDF((File) flags.getFlag(flagName).getValue());
+    return !flags.isSet(flagName) || validateSDF((File) flags.getFlag(flagName).getValue());
   }
 
   /**
