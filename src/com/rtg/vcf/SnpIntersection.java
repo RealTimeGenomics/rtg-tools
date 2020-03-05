@@ -171,7 +171,7 @@ CommonFlags.initNoGzip(flags);
     for (Object o : forceMergeRaw) {
       forceMerge.add((String) o);
     }
-    final OutputParams output = new OutputParams(outputFile, false, gzip);
+    final OutputParams output = new OutputParams(outputFile, gzip);
     int totalSecondCount = 0;
     int firstOnlyCount = 0;
     int secondOnlyCount = 0;

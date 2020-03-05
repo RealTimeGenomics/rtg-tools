@@ -61,35 +61,24 @@ public class OutputParamsTest extends TestCase {
     final CFlags flags = new CFlags("testOutputParams", out, null);
     initFlags(flags);
     flags.setFlags(args);
-    return new OutputParams((File) flags.getValue(CommonFlags.OUTPUT_FLAG), flags.isSet(PROGRESS_FLAG), !flags.isSet(CommonFlags.NO_GZIP));
+    return new OutputParams((File) flags.getValue(CommonFlags.OUTPUT_FLAG), !flags.isSet(CommonFlags.NO_GZIP));
   }
 
   public void test() throws Exception {
     final File dirName = FileUtils.createTempDir("output", "");
     assertTrue(dirName.delete());
-    final OutputParams a1 = getParams(new String[] {"-o", dirName.getPath(), "-Z"});
-    final OutputParams a2 = getParams(new String[] {"-o", dirName.getPath(), "-Z"});
     final OutputParams c = getParams(new String[] {"-o", dirName.getPath()});
     final OutputParams d = getParams(new String[] {"-o", dirName.getPath(), "-P", "-Z"});
-    TestUtils.equalsHashTest(new OutputParams[][]{{a1, a2}, {c}, {d}});
+    TestUtils.equalsHashTest(new OutputParams[][]{{c}, {d}});
 
-    assertEquals("OutputParams output directory=" + dirName.getPath() + " progress=" + Boolean.FALSE.toString() + " zip=" + Boolean.FALSE.toString(), a1.toString());
-    assertEquals(dirName.getPath(), a1.directory().toString());
-    assertTrue(a1.file("child").toString().endsWith(dirName.getPath() + FS + "child"));
-    assertEquals(false, a1.progress());
-
-    assertEquals("OutputParams output directory=" + dirName.getPath() + " progress=" + Boolean.FALSE.toString() + " zip=" + Boolean.TRUE.toString(), c.toString());
+    assertEquals("OutputParams output directory=" + dirName.getPath() + " zip=" + Boolean.TRUE.toString(), c.toString());
     assertEquals(dirName.getPath(), c.directory().toString());
     assertTrue(c.file("child").toString().endsWith(dirName.getPath() + FS + "child"));
-    assertEquals(false, c.progress());
 
-    assertEquals("OutputParams output directory=" + dirName.getPath() + " progress=" + Boolean.TRUE.toString() + " zip=" + Boolean.FALSE.toString(), d.toString());
+    assertEquals("OutputParams output directory=" + dirName.getPath() + " zip=" + Boolean.FALSE.toString(), d.toString());
     assertEquals(dirName.getPath(), d.directory().toString());
     assertTrue(d.file("child").toString().endsWith(dirName.getPath() + FS + "child"));
-    assertEquals(true, d.progress());
 
-    a1.close();
-    a2.close();
     c.close();
     d.close();
   }

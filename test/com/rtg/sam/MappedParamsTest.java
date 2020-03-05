@@ -79,11 +79,11 @@ public class MappedParamsTest extends TestCase {
     Diagnostic.setLogStream();
     final File tempDir = FileUtils.createTempDir("mappedparams", "test");
     try {
-      MockMappedParams def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, false, true)).create();
+      MockMappedParams def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, true)).create();
       assertNotNull(def.filterParams());
       assertNull(def.genome());
       def.close();
-      def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, false, true)).genome(new MockReaderParams(1, 1, SequenceMode.BIDIRECTIONAL.codeType())).create();
+      def = MockMappedParams.builder().outputParams(new OutputParams(tempDir, true)).genome(new MockReaderParams(1, 1, SequenceMode.BIDIRECTIONAL.codeType())).create();
       assertNotNull(def.genome());
       def.close();
     } finally {

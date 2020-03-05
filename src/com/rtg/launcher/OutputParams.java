@@ -45,34 +45,20 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
 
   private final File mOutputDir;
 
-  /** True iff progress to be output.  */
-  private final boolean mProgress;
-
   /** True iff output files to be zipped. */
   private final boolean mZip;
 
   /**
    * @param outDir the output directory
-   * @param progress true if progress should be output
    * @param zip true if output should be zipped
    */
-  public OutputParams(File outDir, boolean progress, boolean zip) {
+  public OutputParams(File outDir, boolean zip) {
     if (outDir == null) {
       throw new NullPointerException();
     }
     mOutputDir = outDir;
-    mProgress = progress;
     mZip = zip;
-    append(new Object[] {mOutputDir, mProgress, mZip});
-  }
-
-  /**
-   * Get the progress flag.
-   *
-   * @return the progress flag. (true iff progress is to be output).
-   */
-  public boolean progress() {
-    return mProgress;
+    append(new Object[] {mOutputDir, mZip});
   }
 
   /**
@@ -136,7 +122,6 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
   public String toString() {
     return "OutputParams"
         + " output directory=" + mOutputDir
-        + " progress=" + mProgress
         + " zip=" + mZip;
   }
 

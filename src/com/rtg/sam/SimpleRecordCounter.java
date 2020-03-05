@@ -30,11 +30,13 @@
 package com.rtg.sam;
 
 
+import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.rtg.util.diagnostic.Diagnostic;
 
 /**
  * Hold counts of SAM records by processing category.
  */
+@JumbleIgnore
 public class SimpleRecordCounter implements RecordCounter {
 
   protected long mRecordCount = 0;

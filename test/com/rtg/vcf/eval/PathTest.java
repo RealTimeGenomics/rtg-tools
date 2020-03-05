@@ -632,7 +632,7 @@ public class PathTest extends AbstractNanoTest {
 
       final File output = new File(tmpDir, "eval");
 
-      final OutputParams op = new OutputParams(output, false, false);
+      final OutputParams op = new OutputParams(output, false);
       final VcfEvalParams mep = new VcfEvalParams.VcfEvalParamsBuilder().templateFile(template).baseLineFile(muts).callsFile(calls).outputParams(op).useAllRecords(true).create();
       VcfEvalTask.evaluateCalls(mep);
 

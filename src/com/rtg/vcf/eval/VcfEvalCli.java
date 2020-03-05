@@ -307,7 +307,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   protected VcfEvalParams makeParams() {
     final VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder.name(mFlags.getName());
-    builder.outputParams(new OutputParams(outputDirectory(), false, !mFlags.isSet(CommonFlags.NO_GZIP)));
+    builder.outputParams(new OutputParams(outputDirectory(), !mFlags.isSet(CommonFlags.NO_GZIP)));
     builder.templateFile((File) mFlags.getValue(CommonFlags.TEMPLATE_FLAG));
     final File baseline = (File) mFlags.getValue(BASELINE);
     final File calls = (File) mFlags.getValue(CALLS);

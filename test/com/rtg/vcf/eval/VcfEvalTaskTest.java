@@ -110,7 +110,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       //System.err.println("calls \n" + FileUtils.fileToString(calls));
       ReaderTestUtils.getReaderDNA(ref, template, null).close();
       final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
-        .templateFile(template).outputParams(new OutputParams(out, false, zip)).scoreField(sortField).create();
+        .templateFile(template).outputParams(new OutputParams(out, zip)).scoreField(sortField).create();
       VcfEvalTask.evaluateCalls(params);
       final String zipSuffix = zip ? ".gz" : "";
       final File tpFile = new File(out, "tp.vcf" + zipSuffix);
@@ -238,7 +238,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final File genome = new File(tdir, "template");
       ReaderTestUtils.getReaderDNA(template, genome, null).close();
       final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
-        .templateFile(genome).outputParams(new OutputParams(out, false, false))
+        .templateFile(genome).outputParams(new OutputParams(out, false))
         .rocFilters(rocFilters)
         .create();
       VcfEvalTask.evaluateCalls(params);
@@ -258,7 +258,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       }
 
       final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
-        .templateFile(genome).outputParams(new OutputParams(out, false, false))
+        .templateFile(genome).outputParams(new OutputParams(out, false))
         .sortOrder(RocSortOrder.ASCENDING)
         .rocFilters(rocFilters)
         .create();
@@ -365,7 +365,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       Diagnostic.setLogStream(ps.printStream());
       final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .restriction(new RegionRestriction("seq", 0, 300))
-        .templateFile(template).outputParams(new OutputParams(out, false, false)).create();
+        .templateFile(template).outputParams(new OutputParams(out, false)).create();
       VcfEvalTask.evaluateCalls(params);
       TestUtils.containsAll(ps.toString(),
         "Variant in calls at seq:28 ends outside the length of the reference sequence (27).",

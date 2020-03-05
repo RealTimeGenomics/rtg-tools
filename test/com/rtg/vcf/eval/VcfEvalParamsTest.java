@@ -56,7 +56,7 @@ public class VcfEvalParamsTest extends TestCase {
 
   public void testBuilder() {
     VcfEvalParams.VcfEvalParamsBuilder builder = VcfEvalParams.builder();
-    builder = builder.name("blah").outputParams(new OutputParams(new File("out"), false, false)).baseLineFile(new File("mutations")).callsFile(new File("calls")).templateFile(new File("template")).maxLength(199);
+    builder = builder.name("blah").outputParams(new OutputParams(new File("out"), false)).baseLineFile(new File("mutations")).callsFile(new File("calls")).templateFile(new File("template")).maxLength(199);
     builder = builder.scoreField(VcfUtils.QUAL).sortOrder(RocSortOrder.ASCENDING).baselineSample("name").callsSample("name2");
     final VcfEvalParams params = builder.create();
     assertEquals("blah", params.name());

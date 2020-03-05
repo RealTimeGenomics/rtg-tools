@@ -34,19 +34,17 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.rtg.AbstractTest;
 import com.rtg.launcher.OutputModuleParams.OutputModuleParamsBuilder;
 import com.rtg.launcher.OutputModuleParamsTest.MockOutputModuleParams.MockOutputModuleParamsBuilder;
 import com.rtg.util.StringUtils;
-import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.util.test.params.TestParams;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class OutputModuleParamsTest extends TestCase {
+public class OutputModuleParamsTest extends AbstractTest {
 
   static final class MockOutputModuleParams extends OutputModuleParams {
 
@@ -75,10 +73,8 @@ public class OutputModuleParamsTest extends TestCase {
   }
 
   public void testDefaultOutputModuleParams() throws IOException {
-    Diagnostic.setLogStream();
-    final File tempDir = FileUtils.createTempDir("outputmoduleparams", "test");
-    try {
-      final MockOutputModuleParams def = MockOutputModuleParams.builder().outputParams(new OutputParams(tempDir, false, true)).create();
+    try (final TestDirectory tempDir = new TestDirectory("outputmoduleparams")) {
+      final MockOutputModuleParams def = MockOutputModuleParams.builder().outputParams(new OutputParams(tempDir, true)).create();
       assertNotNull(def.outputParams());
       assertTrue(def.blockCompressed());
       assertEquals(tempDir, def.directory());
@@ -90,9 +86,7 @@ public class OutputModuleParamsTest extends TestCase {
       final File file = new File(tempDir, "df.txt.gz");
       assertTrue(file.exists());
       assertEquals("blah blah", FileHelper.gzFileToString(file));
-      assertEquals("OutputParams output directory=" + tempDir.getPath() + " progress=" + false + " zip=" + true + StringUtils.LS, def.toString());
-    } finally {
-      assertTrue(FileHelper.deleteAll(tempDir));
+      assertEquals("OutputParams output directory=" + tempDir.getPath() + " zip=" + true + StringUtils.LS, def.toString());
     }
   }
 
