@@ -35,6 +35,7 @@ import java.io.OutputStream;
 
 import com.rtg.usage.UsageMetric;
 import com.rtg.util.IORunnable;
+import com.rtg.util.io.FileUtils;
 
 /**
  * Common code for those modules/tasks that can be configured via a ModuleParams.
@@ -82,6 +83,7 @@ public abstract class ParamsTask<P extends ModuleParams, S extends Statistics> i
   @Override
   public void run() throws IOException {
     try {
+      FileUtils.ensureOutputDirectory(mParams.directory());
       exec();
       generateSummary();
       generateReport();

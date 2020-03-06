@@ -68,9 +68,6 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
    * @throws IOException if an I/O error occurs.
    */
   public OutputStream outStream(final String name) throws IOException {
-    if (!directory().exists() && !directory().mkdirs()) {
-      throw new IOException("Unable to create directory \"" + directory().getPath() + "\"");
-    }
     return FileUtils.createOutputStream(outFile(name));
   }
 
@@ -109,10 +106,6 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
     return new File(mOutputDir, child);
   }
 
-  /**
-   * Get the output directory.
-   * @return the output directory.
-   */
   @Override
   public File directory() {
     return mOutputDir;

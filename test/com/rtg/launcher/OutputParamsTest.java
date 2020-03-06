@@ -89,6 +89,7 @@ public class OutputParamsTest extends TestCase {
     final OutputParams a = getParams(new String[] {"-o", dirName.getPath(), "-Z"});
     try {
       final File dir = a.directory();
+      assertTrue(dir.mkdir());
       final File file = new File(dir, "out");
       final PrintStream ps = new PrintStream(a.outStream("out"));
       ps.append("foobar");
@@ -108,6 +109,7 @@ public class OutputParamsTest extends TestCase {
     final OutputParams a = getParams(new String[] {"-o", dirName.getPath()});
     try {
       final File dir = a.directory();
+      assertTrue(dir.mkdir());
       final File file = new File(dir, "out.gz");
       final PrintStream ps = new PrintStream(a.outStream("out"));
       ps.append("foobar");
