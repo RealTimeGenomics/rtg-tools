@@ -87,7 +87,7 @@ public class RangeList<T> {
       mMeta.add(meta);
     }
 
-    RangeData(int start, int end) {
+    private RangeData(int start, int end) {
       this(start, end, (List<T>) null);
     }
 
@@ -115,6 +115,11 @@ public class RangeList<T> {
       return loc >= getStart() && loc < getEnd();
     }
 
+    /** @return true if this range has meta information */
+    public boolean hasMeta() {
+      return mMeta != null;
+    }
+
     /**
      * Returns the meta information for this range
      *
@@ -124,33 +129,18 @@ public class RangeList<T> {
       if (mMeta == null) {
         return null;
       }
-      return new ArrayList<>(mMeta);
-    }
-
-    /**
-     * Add single meta-data to range object.
-     * @param meta the meta-data to add.
-     */
-    public void addMeta(T meta) {
-      if (meta != null) {
-        if (mMeta == null) {
-          mMeta = new ArrayList<>();
-        }
-        mMeta.add(meta);
-      }
+      return Collections.unmodifiableList(mMeta);
     }
 
     /**
      * Add list of meta-data to range object.
      * @param metas the meta-data to add.
      */
-    public void addMeta(List<T> metas) {
-      if (metas != null) {
-        if (mMeta == null) {
-          mMeta = new ArrayList<>();
-        }
-        mMeta.addAll(metas);
+    private void addMeta(List<T> metas) {
+      if (mMeta == null) {
+        mMeta = new ArrayList<>();
       }
+      mMeta.addAll(metas);
     }
 
     private void addOriginalRange(RangeData<T> originalRange) {
@@ -230,7 +220,7 @@ public class RangeList<T> {
     }
     mNonEmptyRanges = new ArrayList<>();
     for (final RangeData<T> range : mRanges) {
-      if (range.getMeta() != null) {
+      if (range.hasMeta()) {
         mNonEmptyRanges.add(range);
       }
     }

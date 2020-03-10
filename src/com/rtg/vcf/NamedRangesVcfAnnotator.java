@@ -83,9 +83,8 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
         if (range.getStart() >= end) {
           break;
         }
-        final List<String> labels = range.getMeta();
-        if (labels != null) {
-          found.addAll(labels);
+        if (range.hasMeta()) {
+          found.addAll(range.getMeta());
         }
       }
       if (!found.isEmpty()) {

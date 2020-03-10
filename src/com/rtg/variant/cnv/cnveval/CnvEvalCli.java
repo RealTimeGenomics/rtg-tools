@@ -370,7 +370,7 @@ public class CnvEvalCli extends LoggedCli {
         final List<RangeList.RangeData<String>> chrEvalRegions = rr.getFullRangeList();
         for (int hit = rr.findFullRangeIndex(rec.getStart()); hit < chrEvalRegions.size() && chrEvalRegions.get(hit).getStart() < end; ++hit) {
           final RangeList.RangeData<String> d = chrEvalRegions.get(hit);
-          if (d.getMeta() != null) {
+          if (d.hasMeta()) {
             //System.err.println("range index=" + hit + "/" + chrEvalRegions.size() + " region=" + d + " meta=" + d.getMeta());
             if (d.getMeta().size() > 1) {
               Diagnostic.warning("SV record encompasses region where multiple evaluation regions overlap at " + rec.getSequenceName() + ":" + d);
