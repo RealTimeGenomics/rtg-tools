@@ -377,6 +377,26 @@ public class SamFilterParams {
     mFindAndRemoveDuplicates = builder.mFindAndRemoveDuplicates;
   }
 
+  /** @return a builder with all the values set to those of this object. */
+  public SamFilterParamsBuilder cloneBuilder() {
+    return new SamFilterParamsBuilder()
+      .minMapQ(minMapQ())
+      .minLength(minReadLength())
+      .subsampleFraction(subsampleFraction()).subsampleSeed(subsampleSeed()).subsampleRampFraction(subsampleRampFraction())
+      .maxAlignmentCount(maxAlignmentCount())
+      .maxMatedAlignmentScore(maxMatedAlignmentScore())
+      .maxUnmatedAlignmentScore(maxUnmatedAlignmentScore())
+      .excludeUnmated(excludeUnmated())
+      .excludeUnplaced(excludeUnplaced())
+      .excludeVariantInvalid(excludeVariantInvalid())
+      .selectReadGroups(selectReadGroups())
+      .requireSetFlags(requireSetFlags()).requireUnsetFlags(requireUnsetFlags())
+      .invertFilters(invertFilters())
+      .bedRegionsFile(bedRegionsFile()).restriction(restriction())
+      .findAndRemoveDuplicates(findAndRemoveDuplicates())
+      ;
+  }
+
   /**
    * @return true if current configuration results in exclusion of records
    */
