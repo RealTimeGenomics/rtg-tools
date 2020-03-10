@@ -235,6 +235,19 @@ public class ReferenceRegions {
   }
 
   /**
+   * @return these ReferenceRegions as a ReferenceRanges data structure
+   */
+  public ReferenceRanges<String> toReferenceRanges() {
+    final ReferenceRanges.Accumulator<String> rangeData = new ReferenceRanges.Accumulator<>();
+    for (Map.Entry<String, MergedIntervals> seq : mSequences.entrySet()) {
+      for (Map.Entry<Integer, Integer> entry : seq.getValue().mIntervals.entrySet()) {
+        rangeData.addRangeData(seq.getKey(), new RangeList.RangeData<>(entry.getKey(), entry.getValue(), ""));
+      }
+    }
+    return rangeData.getReferenceRanges();
+  }
+
+  /**
    * Writes regions out to bed
    * Note: this method closes the Writer that is wrapped around the stream
    * @param stream destination for bed
