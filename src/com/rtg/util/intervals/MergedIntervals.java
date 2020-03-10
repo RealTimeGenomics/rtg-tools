@@ -60,7 +60,7 @@ class MergedIntervals {
    */
   void add(int start, int end) {
     final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(start);
-    final Map.Entry<Integer, Integer> endFloor = mIntervals.lowerEntry(end);
+    final Map.Entry<Integer, Integer> endFloor = mIntervals.floorEntry(end);
     final int actualStart;
     final int actualEnd;
     if (floor != null && start >= floor.getKey() && end <= floor.getValue()) {
@@ -188,5 +188,10 @@ class MergedIntervals {
       total += region.getValue() - region.getKey();
     }
     return total;
+  }
+
+  /** @return the number of regions */
+  public int size() {
+    return mIntervals.size();
   }
 }

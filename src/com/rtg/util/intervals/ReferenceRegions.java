@@ -65,15 +65,7 @@ public class ReferenceRegions {
    * Construct an empty region set
    */
   public ReferenceRegions() {
-    this(new LinkedHashMap<>());
-  }
-
-  /**
-   * Construct an empty region set, backed by the user-supplied map
-   * @param map the user supplied map
-   */
-  public ReferenceRegions(Map<String, MergedIntervals> map) {
-    mSequences = map;
+    mSequences = new LinkedHashMap<>();
   }
 
   /**
@@ -235,6 +227,11 @@ public class ReferenceRegions {
       map.put(entry.getKey(), entry.getValue().totalLength());
     }
     return map;
+  }
+
+  /** @return the number of regions */
+  public int size() {
+    return mSequences.values().stream().mapToInt(MergedIntervals::size).sum();
   }
 
   /**

@@ -180,6 +180,16 @@ public class ReferenceRegionsTest extends TestCase {
     assertEquals(EXPECTED_INTERSECT_2, regions.toString());
   }
 
+  public void testBin() {
+    final ReferenceRegions regions = new ReferenceRegions();
+    regions.add("monkey", 50, 700);
+    regions.add("hobo", 0, 700);
+    assertEquals(2, regions.size());
+    assertTrue(regions.enclosed("monkey", 500, 600));
+    assertFalse(regions.enclosed("monkey", 0, 50));
+    assertFalse(regions.enclosed("monkey", 750, 800));
+  }
+
   public void testEmpty() {
     final ReferenceRegions regions = new ReferenceRegions();
     regions.add("monkey", 60, 80);

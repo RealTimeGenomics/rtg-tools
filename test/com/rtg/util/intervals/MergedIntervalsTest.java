@@ -49,7 +49,9 @@ public class MergedIntervalsTest extends TestCase {
 
   public void testSimple() {
     final MergedIntervals mi = makeBaseIntervals();
+    assertEquals(6, mi.size());
     mi.add(300, 400);
+    assertEquals(4, mi.size());
 
     assertFalse(mi.overlapped(0, 4));
     assertFalse(mi.overlapped(0, 5));
