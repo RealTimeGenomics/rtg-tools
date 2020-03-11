@@ -47,9 +47,9 @@ public class RangeListTest extends TestCase {
     RangeList.RangeData<String> r = new RangeData<>(0, 1, "blah");
     assertTrue(r.hasMeta());
     assertEquals("blah", r.getMeta().get(0));
-    assertTrue(r.isInRange(0));
-    assertFalse(r.isInRange(1));
-    assertFalse(r.isInRange(-1));
+    assertTrue(r.contains(0));
+    assertFalse(r.contains(1));
+    assertFalse(r.contains(-1));
     assertEquals("1-1", r.toString());
     r = new RangeData<>(0, 1, Arrays.asList("blah", "boo"));
     assertTrue(r.hasMeta());
@@ -66,9 +66,9 @@ public class RangeListTest extends TestCase {
   public void testEmptyRange() {
     RangeList.RangeData<String> r = new RangeList.RangeData<>(0, 0, "blah");
     assertEquals("blah", r.getMeta().get(0));
-    assertFalse(r.isInRange(0));
-    assertFalse(r.isInRange(1));
-    assertFalse(r.isInRange(-1));
+    assertFalse(r.contains(0));
+    assertFalse(r.contains(1));
+    assertFalse(r.contains(-1));
     assertEquals("1-0", r.toString());
     r = new RangeList.RangeData<>(0, 0, Arrays.asList("blah", "boo"));
     assertEquals(2, r.getMeta().size());
@@ -87,14 +87,14 @@ public class RangeListTest extends TestCase {
 
   public void testRangeList() {
     RangeList.RangeData<String> r = new RangeData<>(5, 20, "a");
-    assertFalse(r.isInRange(0));
-    assertTrue(r.isInRange(5));
-    assertFalse(r.isInRange(20));
+    assertFalse(r.contains(0));
+    assertTrue(r.contains(5));
+    assertFalse(r.contains(20));
     assertTrue(r.hasMeta());
 
     RangeList.RangeData<String> r2 = new RangeData<>(10, 30, "b");
-    assertTrue(r2.isInRange(10));
-    assertFalse(r2.isInRange(30));
+    assertTrue(r2.contains(10));
+    assertFalse(r2.contains(30));
     assertTrue(r2.hasMeta());
 
     final RangeList<String> search = new RangeList<>(Arrays.asList(r, r2));

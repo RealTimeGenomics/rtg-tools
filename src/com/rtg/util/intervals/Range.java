@@ -71,4 +71,13 @@ public class Range implements Interval {
     return (getStart() + 1) + "-" + getEnd(); // Output as 1-based with end inclusive, like RegionRestriction
   }
 
+  /**
+   * Returns whether given location is within range
+   *
+   * @param loc sequence position
+   * @return true if in range
+   */
+  public boolean contains(int loc) {
+    return loc >= getStart() && loc < getEnd();
+  }
 }

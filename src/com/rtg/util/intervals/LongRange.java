@@ -40,7 +40,7 @@ public class LongRange {
   /** A singleton that treats all locations as in range. */
   public static final LongRange NONE = new LongRange(MISSING, MISSING) {  // Long.MIN_VALUE, Long.MAX_VALUE) {
     @Override
-    public boolean isInRange(final long value) {
+    public boolean contains(final long value) {
       return true;
     }
     @Override
@@ -92,9 +92,9 @@ public class LongRange {
 
   /**
    * @param value the query position
-   * @return true if the query position is within the range region.
+   * @return true if the range region contains the query position.
    */
-  public boolean isInRange(final long value) {
+  public boolean contains(final long value) {
     return value >= mStart && value < mEnd;
   }
 

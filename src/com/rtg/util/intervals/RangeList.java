@@ -105,16 +105,6 @@ public class RangeList<T> {
       mMeta = metas;
     }
 
-    /**
-     * Returns whether given location is within range
-     *
-     * @param loc sequence position
-     * @return true if in range
-     */
-    public boolean isInRange(int loc) {
-      return loc >= getStart() && loc < getEnd();
-    }
-
     /** @return true if this range has meta information */
     public boolean hasMeta() {
       return mMeta != null;
@@ -271,7 +261,7 @@ public class RangeList<T> {
     while (!found) {
       //System.err.println(min + " " + res + " " + max + " : " + loc + " " + ranges[res]);
       final RangeData<T> range = mRanges.get(res);
-      if (range.isInRange(loc)) {
+      if (range.contains(loc)) {
         found = true;
       } else {
         if (loc < range.getStart()) {

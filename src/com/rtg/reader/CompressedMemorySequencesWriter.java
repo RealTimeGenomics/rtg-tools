@@ -160,7 +160,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
   @Override
   public void startSequence(String label) {
     initSequenceStatistics();
-    if (mHasNames && mRestriction.isInRange(mCurrentId)) {
+    if (mHasNames && mRestriction.contains(mCurrentId)) {
       mCurrentLabel = handleSequenceName(label);
     }
     mHasData = false;
@@ -177,7 +177,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
     if (length == 0) {
       noSequenceWarning(mCurrentLabel);
     }
-    if (mRestriction.isInRange(mCurrentId)) {
+    if (mRestriction.contains(mCurrentId)) {
       mSeqData.set(mCurrentPosition, rs, length);
       mDataHashFunction.irvineHash(rs, length);
       mChecksumSeq.update(rs, 0, length);
@@ -197,7 +197,7 @@ public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
   public boolean endSequence() {
     endSequenceStatistics();
     if (mHasData) {
-      if (mRestriction.isInRange(mCurrentId)) {
+      if (mRestriction.contains(mCurrentId)) {
         if (mHasNames) {
           mNames.setName(mCurrentId - mRestriction.getStart(), mCurrentLabel.label());
           if (mWriteFullNames) {
