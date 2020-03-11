@@ -29,9 +29,8 @@
  */
 package com.rtg.bed;
 
-import com.rtg.util.intervals.RangeList;
-import com.rtg.util.intervals.SequenceNameLocus;
-import com.rtg.util.intervals.SequenceNameLocusSimple;
+import com.rtg.util.intervals.SimpleRangeMeta;
+import com.rtg.util.intervals.RangeMeta;
 
 /**
  * Loads BED records into range data that has either name (if present) or
@@ -47,12 +46,8 @@ public class SimpleBedRangeLoader extends BedRangeLoader<String> {
   }
 
   @Override
-  protected RangeList.RangeData<String> getRangeData(BedRecord rec) {
-    SequenceNameLocus region = rec;
-    if (region.getEnd() == region.getStart()) {
-      region = new SequenceNameLocusSimple(rec.getSequenceName(), rec.getStart(), rec.getEnd() + 1);
-    }
-    return new RangeList.RangeData<>(region, getMeta(rec));
+  protected RangeMeta<String> getRangeData(BedRecord rec) {
+    return new SimpleRangeMeta<>(rec.getStart(), rec.getEnd() == rec.getStart() ? rec.getEnd() + 1 : rec.getEnd(), getMeta(rec));
   }
 
   @Override

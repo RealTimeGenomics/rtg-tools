@@ -46,6 +46,8 @@ import com.rtg.util.intervals.Interval;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.SimpleRangeMeta;
+import com.rtg.util.intervals.RangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 import com.rtg.util.intervals.SequenceNameLocus;
@@ -122,7 +124,7 @@ public final class SamRangeUtils {
     for (final SAMSequenceRecord r : header.getSequenceDictionary().getSequences()) {
       final int rlen = r.getSequenceLength();
       if (rlen > 0) {
-        rangeMap.put(r.getSequenceName(), new RangeList<>(new RangeList.RangeData<>(0, rlen, r.getSequenceName())));
+        rangeMap.put(r.getSequenceName(), new RangeList<>(new SimpleRangeMeta<>(0, rlen, r.getSequenceName())));
       }
     }
     rangeMap.setIdMap(SamUtils.getSequenceIdLookup(header.getSequenceDictionary()));
@@ -142,7 +144,7 @@ public final class SamRangeUtils {
       final int rlen = sequencesReader.length(k);
       if (rlen > 0) {
         final String name = sequencesReader.names().name(k);
-        rangeMap.put(name, new RangeList<>(new RangeList.RangeData<>(0, rlen, name)));
+        rangeMap.put(name, new RangeList<>(new SimpleRangeMeta<>(0, rlen, name)));
         idMap.put(name, k);
       }
     }
@@ -159,7 +161,7 @@ public final class SamRangeUtils {
   public static ReferenceRanges<String> createSingleReferenceRange(SAMFileHeader header, SamRegionRestriction regionRestriction) {
     final ReferenceRanges<String> rangeMap = new ReferenceRanges<>(false);
     final SequenceNameLocus resolved = resolveRestriction(header.getSequenceDictionary(), regionRestriction);
-    rangeMap.put(resolved.getSequenceName(), new RangeList<>(new RangeList.RangeData<>(resolved, regionRestriction.toString())));
+    rangeMap.put(resolved.getSequenceName(), new RangeList<>(new SimpleRangeMeta<>(resolved.getStart(), resolved.getEnd(), regionRestriction.toString())));
     rangeMap.setIdMap(SamUtils.getSequenceIdLookup(header.getSequenceDictionary()));
     return rangeMap;
   }
@@ -174,7 +176,7 @@ public final class SamRangeUtils {
     final ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
     for (SamRegionRestriction region : regions) {
       final SequenceNameLocus resolved = resolveRestriction(header.getSequenceDictionary(), region);
-      acc.addRangeData(resolved.getSequenceName(), new RangeList.RangeData<>(resolved, region.toString()));
+      acc.addRangeData(resolved.getSequenceName(), new SimpleRangeMeta<>(resolved.getStart(), resolved.getEnd(), region.toString()));
     }
     final ReferenceRanges<String> ranges = acc.getReferenceRanges();
     ranges.setIdMap(SamUtils.getSequenceIdLookup(header.getSequenceDictionary()));
@@ -197,7 +199,7 @@ public final class SamRangeUtils {
       }
       final Range wideRange = new Range(region.getStart() == RegionRestriction.MISSING ? Integer.MIN_VALUE : region.getStart(),
         region.getEnd() == RegionRestriction.MISSING ? Integer.MAX_VALUE : region.getEnd());
-      acc.addRangeData(region.getSequenceName(), new RangeList.RangeData<>(wideRange, region.toString()));
+      acc.addRangeData(region.getSequenceName(), new SimpleRangeMeta<>(wideRange.getStart(), wideRange.getEnd(), region.toString()));
     }
     return acc.getReferenceRanges();
   }
@@ -212,7 +214,7 @@ public final class SamRangeUtils {
     final ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
     for (String chrom : chroms) {
       final Range wideRange = new Range(Integer.MIN_VALUE, Integer.MAX_VALUE);
-      acc.addRangeData(chrom, new RangeList.RangeData<>(wideRange, chrom));
+      acc.addRangeData(chrom, new SimpleRangeMeta<>(wideRange.getStart(), wideRange.getEnd(), chrom));
     }
     return acc.getReferenceRanges();
   }
@@ -275,14 +277,14 @@ public final class SamRangeUtils {
     }
 
     @Override
-    protected RangeList.RangeData<String> getRangeData(BedRecord rec) {
+    protected RangeMeta<String> getRangeData(BedRecord rec) {
       SequenceNameLocus region = rec;
       if (region.getEnd() == region.getStart()) {
         region = new SequenceNameLocusSimple(rec.getSequenceName(), rec.getStart(), rec.getEnd() + 1);
       }
 
       final SequenceNameLocus r = resolveRestriction(mDictionary, region);
-      return new RangeList.RangeData<>(r, getMeta(rec));
+      return new SimpleRangeMeta<>(r.getStart(), r.getEnd(), getMeta(rec));
     }
 
     @Override

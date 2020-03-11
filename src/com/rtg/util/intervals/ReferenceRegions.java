@@ -241,7 +241,7 @@ public class ReferenceRegions {
     final ReferenceRanges.Accumulator<String> rangeData = new ReferenceRanges.Accumulator<>();
     for (Map.Entry<String, MergedIntervals> seq : mSequences.entrySet()) {
       for (Map.Entry<Integer, Integer> entry : seq.getValue().mIntervals.entrySet()) {
-        rangeData.addRangeData(seq.getKey(), new RangeList.RangeData<>(entry.getKey(), entry.getValue(), ""));
+        rangeData.addRangeData(seq.getKey(), new SimpleRangeMeta<>(entry.getKey(), entry.getValue(), ""));
       }
     }
     return rangeData.getReferenceRanges();

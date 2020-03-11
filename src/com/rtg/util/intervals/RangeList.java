@@ -35,128 +35,66 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-
-import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import java.util.stream.Collectors;
 
 /**
- * A structure that holds multiple ranges that can be searched for a point within the ranges.
+ * A structure that holds multiple, possibly overlapping ranges that can be searched for a point within the ranges.
  *
  * Makes use of a segment tree <code>http://en.wikipedia.org/wiki/Segment_tree</code> to store and efficiently look up meta-data within ranges.
  * The input meta-data are split and merged to form a single set of non-overlapping meta-data ranges.
  * A continuous set of ranges (with and without meta-data) is stored in the ranges array.
  * A simple binary search mechanism is used to look up the meta-data for a given location.
- *
  */
 public class RangeList<T> {
 
   /**
-   * Range with meta-data class.
+   * Range that links to other ranges which enclose it.
    */
-  public static final class RangeData<T> extends Range {
+  public static final class RangeView<T> extends Range {
 
-    private List<T> mMeta = null;
+    private List<RangeMeta<T>> mEnclosingRanges = null;
 
-    private List<RangeData<T>> mOriginalRanges = null;
-
-    /**
-     * Constructor.
-     * @param range an existing range range.
-     * @param meta the meta-data to store.
-     */
-    public RangeData(Interval range, T meta) {
-      this(range.getStart(), range.getEnd(), meta);
-    }
-
-    /**
-     * Constuctor
-     * @param range an existing range range.
-     * @param metas the meta-data to store.
-     */
-    public RangeData(Interval range, List<T> metas) {
-      this(range.getStart(), range.getEnd(), metas);
-    }
-
-    /**
-     * Constructor.
-     * @param start the start of the range (0-based inclusive).
-     * @param end the end of the range (0-based exclusive).
-     * @param meta the meta-data to store.
-     */
-    public RangeData(int start, int end, T meta) {
-      this(start, end, new ArrayList<>());
-      mMeta.add(meta);
-    }
-
-    private RangeData(int start, int end) {
-      this(start, end, (List<T>) null);
-    }
-
-    /**
-     * Constructor.
-     * @param start the start of the range (0-based inclusive).
-     * @param end the end of the range (0-based exclusive).
-     * @param metas the list of meta-data to store.
-     */
-    public RangeData(int start, int end, List<T> metas) {
+    private RangeView(int start, int end) {
       super(start, end);
-      if (end < start) {
-        throw new NoTalkbackSlimException("Invalid range : [" + start + "," + end + ") ");
-      }
-      mMeta = metas;
     }
 
-    /** @return true if this range has meta information */
-    public boolean hasMeta() {
-      return mMeta != null;
+    /** @return true if this range has enclosing ranges */
+    public boolean hasRanges() {
+      return mEnclosingRanges != null;
     }
 
-    /**
-     * Returns the meta information for this range
-     *
-     * @return meta list
-     */
+    /** @return a list of the meta information from all ranges spanning this range */
     public List<T> getMeta() {
-      if (mMeta == null) {
+      if (mEnclosingRanges == null) {
         return null;
       }
-      return Collections.unmodifiableList(mMeta);
+      return mEnclosingRanges.stream().map(RangeMeta::getMeta).collect(Collectors.toList());
     }
 
-    /**
-     * Add list of meta-data to range object.
-     * @param metas the meta-data to add.
-     */
-    private void addMeta(List<T> metas) {
-      if (mMeta == null) {
-        mMeta = new ArrayList<>();
+    private void addEnclosingRange(RangeMeta<T> range) {
+      assert range.getStart() <= getStart() && range.getEnd() >= getEnd();
+      if (mEnclosingRanges == null) {
+        mEnclosingRanges = new ArrayList<>();
       }
-      mMeta.addAll(metas);
-    }
-
-    private void addOriginalRange(RangeData<T> originalRange) {
-      if (mOriginalRanges == null) {
-        mOriginalRanges = new ArrayList<>();
-      }
-      mOriginalRanges.add(originalRange);
+      mEnclosingRanges.add(range);
     }
 
     /**
      * @return the list of ranges as originally specified that are covered by this range
      */
-    public List<RangeData<T>> getOriginalRanges() {
-      return mOriginalRanges;
+    public List<RangeMeta<T>> getEnclosingRanges() {
+      return mEnclosingRanges;
     }
-
   }
 
-  private final List<RangeData<T>> mRanges;
-  private final List<RangeData<T>> mNonEmptyRanges;
+  private final List<RangeView<T>> mRanges;
+  private final List<RangeView<T>> mNonEmptyRanges;
 
   /**
    * Convenience constructor.
    * @param range a meta-data range to store for searching.
    */
-  public RangeList(RangeData<T> range) {
+  public RangeList(RangeMeta<T> range) {
     this(Collections.singletonList(range));
   }
 
@@ -164,56 +102,58 @@ public class RangeList<T> {
    * Constructor.
    * @param ranges the list of meta-data ranges to store for searching.
    */
-  public RangeList(List<RangeData<T>> ranges) {
+  public RangeList(List<RangeMeta<T>> ranges) {
     if (ranges == null || ranges.isEmpty()) {
       mRanges = new ArrayList<>(1);
-      mRanges.add(new RangeData<>(Integer.MIN_VALUE, Integer.MAX_VALUE));
+      mRanges.add(new RangeView<>(Integer.MIN_VALUE, Integer.MAX_VALUE));
     } else {
       // get list of range boundaries
-      final HashSet<Integer> pivots = new HashSet<>();
-      for (final RangeData<T> range : ranges) {
-        if (range.getMeta() == null) {
-          throw new NullPointerException("Input ranges must have metadata to distinguish from empty regions");
-        }
-        pivots.add(range.getStart());
-        pivots.add(range.getEnd());
-      }
-      final int[] pivots2 = new int[pivots.size()];
-      int i2 = 0;
-      for (final Integer x : pivots) {
-        pivots2[i2] = x;
-        ++i2;
-      }
-      Arrays.sort(pivots2);
+      mRanges = getRangeViews(ranges);
 
-      // set up continuous non-overlapping ranges for -inf to +inf
-      mRanges = new ArrayList<>(pivots2.length + 1);
-      if (pivots2[0] != Integer.MIN_VALUE) {
-        mRanges.add(new RangeData<>(Integer.MIN_VALUE, pivots2[0]));
-      }
-      for (int i = 1; i < pivots2.length; ++i) {
-        mRanges.add(new RangeData<>(pivots2[i - 1], pivots2[i]));
-      }
-      if (pivots2[pivots2.length - 1] != Integer.MAX_VALUE) {
-        mRanges.add(new RangeData<>(pivots2[pivots2.length - 1], Integer.MAX_VALUE));
-      }
-
-      // load original meta into non-overlapping range structure
-      for (final RangeData<T> range : ranges) {
+      // load input ranges into the non-overlapping views
+      for (final RangeMeta<T> range : ranges) {
         int index = findFullRangeIndex(range.getStart());
         while (index < mRanges.size() && mRanges.get(index).getEnd() <= range.getEnd()) {
-          mRanges.get(index).addMeta(range.getMeta());
-          mRanges.get(index).addOriginalRange(range);
+          mRanges.get(index).addEnclosingRange(range);
           ++index;
         }
       }
     }
     mNonEmptyRanges = new ArrayList<>();
-    for (final RangeData<T> range : mRanges) {
-      if (range.hasMeta()) {
+    for (final RangeView<T> range : mRanges) {
+      if (range.hasRanges()) {
         mNonEmptyRanges.add(range);
       }
     }
+  }
+
+  // Create a list of non-overlapping RangeView objects
+  private static <U> List<RangeView<U>> getRangeViews(List<RangeMeta<U>> ranges) {
+    final HashSet<Integer> pivots = new HashSet<>();
+    for (final RangeMeta<?> range : ranges) {
+      pivots.add(range.getStart());
+      pivots.add(range.getEnd());
+    }
+    final int[] pivots2 = new int[pivots.size()];
+    int i2 = 0;
+    for (final Integer x : pivots) {
+      pivots2[i2] = x;
+      ++i2;
+    }
+    Arrays.sort(pivots2);
+
+    // set up continuous non-overlapping ranges for -inf to +inf
+    final List<RangeView<U>> views = new ArrayList<>(pivots2.length + 1);
+    if (pivots2[0] != Integer.MIN_VALUE) {
+      views.add(new RangeView<>(Integer.MIN_VALUE, pivots2[0]));
+    }
+    for (int i = 1; i < pivots2.length; ++i) {
+      views.add(new RangeView<>(pivots2[i - 1], pivots2[i]));
+    }
+    if (pivots2[pivots2.length - 1] != Integer.MAX_VALUE) {
+      views.add(new RangeView<>(pivots2[pivots2.length - 1], Integer.MAX_VALUE));
+    }
+    return views;
   }
 
   /**
@@ -225,21 +165,21 @@ public class RangeList<T> {
     return findRange(loc).getMeta();
   }
 
-  private RangeData<T> findRange(int loc) {
+  private RangeView<T> findRange(int loc) {
     return mRanges.get(findFullRangeIndex(loc));
   }
 
   /**
    * @return the list of non-empty ranges
    */
-  public List<RangeData<T>> getRangeList() {
+  public List<RangeView<T>> getRangeList() {
     return mNonEmptyRanges;
   }
 
   /**
    * @return the full list of ranges, includes ranges corresponding to empty intervals
    */
-  public List<RangeData<T>> getFullRangeList() {
+  public List<RangeView<T>> getFullRangeList() {
     return mRanges;
   }
 
@@ -260,7 +200,7 @@ public class RangeList<T> {
     boolean found = false;
     while (!found) {
       //System.err.println(min + " " + res + " " + max + " : " + loc + " " + ranges[res]);
-      final RangeData<T> range = mRanges.get(res);
+      final RangeView<T> range = mRanges.get(res);
       if (range.contains(loc)) {
         found = true;
       } else {

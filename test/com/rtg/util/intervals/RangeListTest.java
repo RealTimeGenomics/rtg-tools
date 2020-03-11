@@ -35,92 +35,61 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import com.rtg.util.intervals.RangeList.RangeData;
+import com.rtg.util.intervals.RangeList.RangeView;
 
 import junit.framework.TestCase;
 
-/**
- */
 public class RangeListTest extends TestCase {
 
-  public void testRange() {
-    RangeList.RangeData<String> r = new RangeData<>(0, 1, "blah");
-    assertTrue(r.hasMeta());
-    assertEquals("blah", r.getMeta().get(0));
-    assertTrue(r.contains(0));
-    assertFalse(r.contains(1));
-    assertFalse(r.contains(-1));
-    assertEquals("1-1", r.toString());
-    r = new RangeData<>(0, 1, Arrays.asList("blah", "boo"));
-    assertTrue(r.hasMeta());
-    assertEquals(2, r.getMeta().size());
-    assertEquals("blah", r.getMeta().get(0));
-    assertEquals("boo", r.getMeta().get(1));
-    r = new RangeList.RangeData<>(1, 2, (String) null);
-    assertFalse(r.hasMeta());
-    assertEquals("2-2", r.toString());
-    assertEquals(1, r.getStart());
-    assertEquals(2, r.getEnd());
-  }
-
   public void testEmptyRange() {
-    RangeList.RangeData<String> r = new RangeList.RangeData<>(0, 0, "blah");
-    assertEquals("blah", r.getMeta().get(0));
-    assertFalse(r.contains(0));
-    assertFalse(r.contains(1));
-    assertFalse(r.contains(-1));
-    assertEquals("1-0", r.toString());
-    r = new RangeList.RangeData<>(0, 0, Arrays.asList("blah", "boo"));
-    assertEquals(2, r.getMeta().size());
-    assertEquals("blah", r.getMeta().get(0));
-    assertEquals("boo", r.getMeta().get(1));
-
-    final RangeList<String> search = new RangeList<>(r);
-
-    final List<RangeList.RangeData<String>> newRanges = search.getRangeList();
+    final RangeList<String> search = new RangeList<>(new SimpleRangeMeta<>(0, 0, "blah"));
+    final List<RangeView<String>> newRanges = search.getRangeList();
     assertEquals(0, newRanges.size());
-
     assertNull(search.find(0));
     assertNull(search.find(1));
     assertNull(search.find(-1));
   }
 
+  public void testSingleRange() {
+    final RangeList<String> search = new RangeList<>(new SimpleRangeMeta<>(10, 20, null));
+    final List<RangeView<String>> newRanges = search.getRangeList();
+    assertEquals(1, newRanges.size());
+    assertNull(search.find(0));
+    assertNull(search.find(1));
+    assertNull(search.find(-1));
+    assertNotNull(search.find(15));
+    assertEquals(1, search.find(15).size());
+    assertNull(search.find(15).get(0));
+  }
+
   public void testRangeList() {
-    RangeList.RangeData<String> r = new RangeData<>(5, 20, "a");
-    assertFalse(r.contains(0));
-    assertTrue(r.contains(5));
-    assertFalse(r.contains(20));
-    assertTrue(r.hasMeta());
-
-    RangeList.RangeData<String> r2 = new RangeData<>(10, 30, "b");
-    assertTrue(r2.contains(10));
-    assertFalse(r2.contains(30));
-    assertTrue(r2.hasMeta());
-
+    SimpleRangeMeta<String> r = new SimpleRangeMeta<>(5, 20, "a");
+    SimpleRangeMeta<String> r2 = new SimpleRangeMeta<>(10, 30, "b");
     final RangeList<String> search = new RangeList<>(Arrays.asList(r, r2));
-    List<RangeList.RangeData<String>> rl = search.getRangeList();
+
+    List<RangeView<String>> rl = search.getRangeList();
     assertEquals(3, rl.size());
-    assertTrue(rl.get(0).hasMeta());
+    assertTrue(rl.get(0).hasRanges());
     assertEquals(Collections.singletonList("a"), rl.get(0).getMeta());
-    assertTrue(rl.get(1).hasMeta());
+    assertTrue(rl.get(1).hasRanges());
     assertEquals(Arrays.asList("a", "b"), rl.get(1).getMeta());
-    assertTrue(rl.get(2).hasMeta());
+    assertTrue(rl.get(2).hasRanges());
     assertEquals(Collections.singletonList("b"), rl.get(2).getMeta());
 
     rl = search.getFullRangeList();
     assertEquals(5, rl.size());
-    assertFalse(rl.get(0).hasMeta());
-    assertTrue(rl.get(1).hasMeta());
-    assertTrue(rl.get(2).hasMeta());
-    assertTrue(rl.get(3).hasMeta());
-    assertFalse(rl.get(4).hasMeta());
+    assertFalse(rl.get(0).hasRanges());
+    assertTrue(rl.get(1).hasRanges());
+    assertTrue(rl.get(2).hasRanges());
+    assertTrue(rl.get(3).hasRanges());
+    assertFalse(rl.get(4).hasRanges());
   }
 
   public void testRangeSearch() {
-    final List<RangeList.RangeData<String>> ranges = new ArrayList<>();
-    ranges.add(new RangeList.RangeData<>(1, 4, "1-4"));
-    ranges.add(new RangeList.RangeData<>(3, 6, "3-6"));
-    ranges.add(new RangeList.RangeData<>(30, 120, "30-120"));
+    final List<RangeMeta<String>> ranges = new ArrayList<>();
+    ranges.add(new SimpleRangeMeta<>(1, 4, "1-4"));
+    ranges.add(new SimpleRangeMeta<>(3, 6, "3-6"));
+    ranges.add(new SimpleRangeMeta<>(30, 120, "30-120"));
     final RangeList<String> search = new RangeList<>(ranges);
     List<String> found = search.find(0);
     assertNull(found);

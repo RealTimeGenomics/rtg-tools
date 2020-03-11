@@ -50,6 +50,7 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.MemoryPrintStream;
@@ -86,7 +87,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       }
       final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
       for (int seq = 1; seq < 32; ++seq) {
-        ranges.put("simulatedSequence" + seq, new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
+        ranges.put("simulatedSequence" + seq, new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "simulatedSequence" + seq)));
       }
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
@@ -134,7 +135,7 @@ public class TabixVcfRecordSetTest extends TestCase {
         final File tabix = new File(dir, "foo.vcf.gz.tbi");
         FileHelper.resourceToFile("com/rtg/sam/resources/vcf.txt.gz.tbi", tabix);
         final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
-        ranges.put("20", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "20")));
+        ranges.put("20", new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "20")));
         try {
           TabixVcfRecordSet.getVariantFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf");
           fail();

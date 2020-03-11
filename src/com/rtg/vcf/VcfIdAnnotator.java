@@ -34,10 +34,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.StringUtils;
-import com.rtg.util.intervals.RangeList.RangeData;
+import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 
 /**
@@ -56,15 +57,15 @@ public class VcfIdAnnotator extends NamedRangesVcfAnnotator {
     super(null, null, loadVcfIdRanges(vcfFiles), fullSpan);
   }
 
-  private static ReferenceRanges<String> loadVcfIdRanges(Collection<File> vcfFiles) throws IOException {
-    final ReferenceRanges.Accumulator<String> rangeData = new ReferenceRanges.Accumulator<>();
+  private static ReferenceRanges<List<String>> loadVcfIdRanges(Collection<File> vcfFiles) throws IOException {
+    final ReferenceRanges.Accumulator<List<String>> rangeData = new ReferenceRanges.Accumulator<>();
     for (final File vcfFile : vcfFiles) {
       try (final VcfReader reader = VcfReader.openVcfReader(vcfFile)) {
         while (reader.hasNext()) {
           final VcfRecord record = reader.next();
           final String id = record.getId();
           if (!VcfRecord.MISSING.equals(id)) {
-            rangeData.addRangeData(record.getSequenceName(), new RangeData<>(record.getStart(), record.getEnd(), Arrays.asList(StringUtils.split(id, ';'))));
+            rangeData.addRangeData(record.getSequenceName(), new SimpleRangeMeta<>(record.getStart(), record.getEnd(), Arrays.asList(StringUtils.split(id, ';'))));
           }
         }
       }

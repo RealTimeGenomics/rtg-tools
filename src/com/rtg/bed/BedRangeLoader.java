@@ -36,7 +36,8 @@ import java.util.Collection;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.diagnostic.Diagnostic;
-import com.rtg.util.intervals.RangeList.RangeData;
+import com.rtg.util.intervals.RangeMeta;
+import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
 
@@ -128,7 +129,7 @@ public abstract class BedRangeLoader<T> {
    * @param rec the bed record.
    * @return the range data item, or null if this record should be skipped
    */
-  protected RangeData<T> getRangeData(BedRecord rec) {
+  protected RangeMeta<T> getRangeData(BedRecord rec) {
     final int start = rec.getStart();
     int end = rec.getEnd();
     if (end == start) {
@@ -140,7 +141,7 @@ public abstract class BedRangeLoader<T> {
       ++mExtendWarningCount;
     }
 
-    return new RangeData<>(start, end, getMeta(rec));
+    return new SimpleRangeMeta<>(start, end, getMeta(rec));
   }
 
   /**

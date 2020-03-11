@@ -102,9 +102,8 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
       final ReferenceRegions evalRegions;
       if (params.evalRegionsFile() != null) {
-        evalRegions = new ReferenceRegions();
         try (IOIterator<? extends SequenceNameLocus> r = BedReader.openBedReader(null, params.evalRegionsFile(), 0)) {
-          evalRegions.add(r);
+          evalRegions = ReferenceRegions.regions(r);
         }
       } else {
         evalRegions = null;

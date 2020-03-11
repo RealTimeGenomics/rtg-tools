@@ -33,6 +33,7 @@ import java.io.File;
 import java.util.List;
 
 import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
 import com.rtg.util.io.TestDirectory;
@@ -52,8 +53,8 @@ public class VcfRecordTabixCallableTest extends TestCase {
       final File tabix = new File(dir, "snp_only.vcf.gz.tbi");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz.tbi", tabix);
       final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
-      ranges.put("simulatedSequence2", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence2")));
-      ranges.put("simulatedSequence13", new RangeList<>(new RangeList.RangeData<>(-1, Integer.MAX_VALUE, "simulatedSequence13")));
+      ranges.put("simulatedSequence2", new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "simulatedSequence2")));
+      ranges.put("simulatedSequence13", new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "simulatedSequence13")));
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
 

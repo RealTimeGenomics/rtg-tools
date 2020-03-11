@@ -38,6 +38,7 @@ import java.util.Set;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.RangeList.RangeView;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
@@ -52,7 +53,7 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
 
 
   /** Per chromosome annotations. */
-  private final ReferenceRanges<String> mAnnotations;
+  private final ReferenceRanges<List<String>> mAnnotations;
 
   private final String mInfoId;
   private final String mInfoDescription;
@@ -65,7 +66,7 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
    * @param namedRanges contains all named ranges.
    * @param fullSpan if true, full reference span each VCF record will be considered, otherwise just the start position.
    */
-  public NamedRangesVcfAnnotator(String infoId, String description, ReferenceRanges<String> namedRanges, boolean fullSpan) {
+  public NamedRangesVcfAnnotator(String infoId, String description, ReferenceRanges<List<String>> namedRanges, boolean fullSpan) {
     mInfoId = infoId;
     mInfoDescription = description;
     mAnnotations = namedRanges;
@@ -73,35 +74,43 @@ public abstract class NamedRangesVcfAnnotator implements VcfAnnotator {
   }
 
   private List<String> getAnnotations(String chr, int start, int end) {
-    List<String> anno = null;
-    final RangeList<String> chrRanges = mAnnotations.get(chr);
+    final RangeList<List<String>> chrRanges = mAnnotations.get(chr);
     if (chrRanges != null) {
       final Set<String> found = new HashSet<>();
-      final List<RangeList.RangeData<String>> ranges = chrRanges.getFullRangeList();
+      final List<RangeView<List<String>>> ranges = chrRanges.getFullRangeList();
       for (int rangeIndex = chrRanges.findFullRangeIndex(start); rangeIndex < ranges.size(); ++rangeIndex) {
-        final RangeList.RangeData<String> range = ranges.get(rangeIndex);
+        final RangeView<List<String>> range = ranges.get(rangeIndex);
         if (range.getStart() >= end) {
           break;
         }
-        if (range.hasMeta()) {
-          found.addAll(range.getMeta());
+        if (range.hasRanges()) {
+          range.getMeta().forEach(found::addAll);
         }
       }
       if (!found.isEmpty()) {
-        anno = new ArrayList<>(found);
+        final List<String> anno = new ArrayList<>(found);
         Collections.sort(anno);
+        return anno;
       }
     }
-    return anno;
+    return null;
   }
 
   private List<String> getAnnotations(String chr, int loc) {
-    List<String> anno = null;
-    final RangeList<String> chrRanges = mAnnotations.get(chr);
+    final RangeList<List<String>> chrRanges = mAnnotations.get(chr);
     if (chrRanges != null) {
-      anno = chrRanges.find(loc);
+      final List<List<String>> m = chrRanges.find(loc);
+      if (m != null) {
+        final Set<String> found = new HashSet<>();
+        m.forEach(found::addAll);
+        if (!found.isEmpty()) {
+          final List<String> anno = new ArrayList<>(found);
+          Collections.sort(anno);
+          return anno;
+        }
+      }
     }
-    return anno;
+    return null;
   }
 
   @Override

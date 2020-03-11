@@ -42,8 +42,8 @@ public class ReferenceRangesTest extends TestCase {
   public void testRanges() {
     final ReferenceRanges.Accumulator<String> acc = new ReferenceRanges.Accumulator<>();
     for (int i = 0; i < 1000; ++i) {
-      acc.addRangeData("sequence1", new RangeList.RangeData<>(i * 100, i * 100 + 50, "region" + i));
-      acc.addRangeData("sequence3", new RangeList.RangeData<>(i * 100, i * 100 + 50, "region" + i));
+      acc.addRangeData("sequence1", new SimpleRangeMeta<>(i * 100, i * 100 + 50, "region" + i));
+      acc.addRangeData("sequence3", new SimpleRangeMeta<>(i * 100, i * 100 + 50, "region" + i));
     }
 
     final ReferenceRanges<String> ranges = acc.getReferenceRanges();

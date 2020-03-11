@@ -33,9 +33,12 @@ package com.rtg.vcf;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
-import com.rtg.bed.NamedBedRangeLoader;
+import com.rtg.bed.BedRangeLoader;
+import com.rtg.bed.BedRecord;
 import com.rtg.util.intervals.ReferenceRanges;
 
 /**
@@ -57,8 +60,13 @@ public class BedVcfAnnotator extends NamedRangesVcfAnnotator {
     super(infoId, description, loadBedIdRanges(bedFiles), fullSpan);
   }
 
-  private static ReferenceRanges<String> loadBedIdRanges(Collection<File> bedFiles) throws IOException {
-    final NamedBedRangeLoader bedLoader = new NamedBedRangeLoader();
+  private static ReferenceRanges<List<String>> loadBedIdRanges(Collection<File> bedFiles) throws IOException {
+    final BedRangeLoader<List<String>> bedLoader = new BedRangeLoader<List<String>>(1) {
+      @Override
+      public List<String> getMeta(BedRecord rec) {
+        return Collections.singletonList(new String(rec.getAnnotations()[0].toCharArray()));
+      }
+    };
     bedLoader.loadRanges(bedFiles);
     return bedLoader.getReferenceRanges();
   }

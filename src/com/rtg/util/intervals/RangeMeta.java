@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,26 +27,17 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-package com.rtg.bed;
-
-import com.rtg.util.intervals.RangeMeta;
-
-import junit.framework.TestCase;
+package com.rtg.util.intervals;
 
 /**
+ * Range with associated meta-data object.
  */
-public class NamedBedRangeLoaderTest extends TestCase {
+public interface RangeMeta<T> extends Interval {
 
-  public void testBedRecord() {
-    final BedRecord rec = new BedRecord("chr1", 2, 80, "anno1", "anno2");
-    final NamedBedRangeLoader l = new NamedBedRangeLoader();
-
-    assertEquals("anno1", l.getMeta(rec));
-
-    final RangeMeta<String> r = l.getRangeData(rec);
-    assertEquals(2, r.getStart());
-    assertEquals(80, r.getEnd());
-    assertEquals("anno1", r.getMeta());
-  }
+  /**
+   * Returns the meta information for this range
+   *
+   * @return meta list
+   */
+  T getMeta();
 }

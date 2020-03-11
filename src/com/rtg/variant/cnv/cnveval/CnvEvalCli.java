@@ -326,7 +326,7 @@ public class CnvEvalCli extends LoggedCli {
     // Sanity check regions for empty set and overlappage
     int numRegions = 0;
     for (final String chr : evalRegions.sequenceNames()) {
-      for (final RangeList.RangeData<String> region : evalRegions.get(chr).getRangeList()) {
+      for (final RangeList.RangeView<String> region : evalRegions.get(chr).getRangeList()) {
         final List<String> meta = region.getMeta();
         if (meta.size() > 1) {
           Diagnostic.warning("Overlapping regions in evaluation BED at " + chr + ":" + region + " with labels: " + meta);
@@ -367,10 +367,10 @@ public class CnvEvalCli extends LoggedCli {
         // Grab all the evaluation regions that it intersects with
         Diagnostic.userLog("Got a variant record: " + rec);
         final RangeList<String> rr = evalRegions.get(rec.getSequenceName());
-        final List<RangeList.RangeData<String>> chrEvalRegions = rr.getFullRangeList();
+        final List<RangeList.RangeView<String>> chrEvalRegions = rr.getFullRangeList();
         for (int hit = rr.findFullRangeIndex(rec.getStart()); hit < chrEvalRegions.size() && chrEvalRegions.get(hit).getStart() < end; ++hit) {
-          final RangeList.RangeData<String> d = chrEvalRegions.get(hit);
-          if (d.hasMeta()) {
+          final RangeList.RangeView<String> d = chrEvalRegions.get(hit);
+          if (d.hasRanges()) {
             //System.err.println("range index=" + hit + "/" + chrEvalRegions.size() + " region=" + d + " meta=" + d.getMeta());
             if (d.getMeta().size() > 1) {
               Diagnostic.warning("SV record encompasses region where multiple evaluation regions overlap at " + rec.getSequenceName() + ":" + d);

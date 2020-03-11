@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017. Real Time Genomics Limited.
+ * Copyright (c) 2014. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -28,25 +28,41 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package com.rtg.bed;
+package com.rtg.util.intervals;
 
-import com.rtg.util.intervals.RangeMeta;
+import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
-/**
- */
-public class NamedBedRangeLoaderTest extends TestCase {
+public class SimpleRangeMetaTest extends TestCase {
 
-  public void testBedRecord() {
-    final BedRecord rec = new BedRecord("chr1", 2, 80, "anno1", "anno2");
-    final NamedBedRangeLoader l = new NamedBedRangeLoader();
+  public void testSingle() {
+    SimpleRangeMeta<String> r = new SimpleRangeMeta<>(0, 1, "blah");
+    assertEquals("blah", r.getMeta());
+    assertTrue(r.contains(0));
+    assertFalse(r.contains(1));
+    assertFalse(r.contains(-1));
+    assertEquals("1-1", r.toString());
 
-    assertEquals("anno1", l.getMeta(rec));
+    r = new SimpleRangeMeta<>(5, 20, "a");
+    assertFalse(r.contains(0));
+    assertTrue(r.contains(5));
+    assertFalse(r.contains(20));
 
-    final RangeMeta<String> r = l.getRangeData(rec);
-    assertEquals(2, r.getStart());
-    assertEquals(80, r.getEnd());
-    assertEquals("anno1", r.getMeta());
+    r = new SimpleRangeMeta<>(1, 2, null);
+    assertEquals("2-2", r.toString());
+    assertEquals(1, r.getStart());
+    assertEquals(2, r.getEnd());
+    assertEquals(null, r.getMeta());
+  }
+
+  public void testList() {
+    RangeMeta<List<String>> r2 = new SimpleRangeMeta<>(0, 1, Arrays.asList("blah", "boo"));
+    assertEquals(2, r2.getMeta().size());
+    assertEquals("blah", r2.getMeta().get(0));
+    assertEquals("boo", r2.getMeta().get(1));
   }
 }
+
+

@@ -111,7 +111,7 @@ public final class SamClosedFileReader extends AbstractSamRecordIterator {
     final List<QueryInterval> intervals = new ArrayList<>();
     for (Integer seqId : ranges.sequenceIds()) {
       assert seqId != null;
-      for (RangeList.RangeData<?> r : ranges.get(seqId).getRangeList()) {
+      for (RangeList.RangeView<?> r : ranges.get(seqId).getRangeList()) {
         intervals.add(new QueryInterval(seqId, r.getStart(), r.getEnd()));
       }
     }

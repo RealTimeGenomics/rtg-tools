@@ -30,7 +30,7 @@
 
 package com.rtg.bed;
 
-import com.rtg.util.intervals.RangeList;
+import com.rtg.util.intervals.RangeMeta;
 
 import junit.framework.TestCase;
 
@@ -49,10 +49,9 @@ public class SimpleBedRangeLoaderTest extends TestCase {
 
     rec = new BedRecord("chr1", 2, 2); // End is exclusive, so this is an odd record, being "before" the start
     assertEquals("chr1:3-2", l.getMeta(rec));
-    final RangeList.RangeData<String> r = l.getRangeData(rec);
+    final RangeMeta<String> r = l.getRangeData(rec);
     assertEquals(2, r.getStart());
     assertEquals(3, r.getEnd());
-    assertEquals(1, r.getMeta().size());
-    assertEquals("chr1:3-2", r.getMeta().get(0));
+    assertEquals("chr1:3-2", r.getMeta());
   }
 }

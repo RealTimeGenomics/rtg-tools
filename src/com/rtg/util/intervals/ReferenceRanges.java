@@ -191,16 +191,16 @@ public class ReferenceRanges<T> {
   /**
    * A helper class that allows incrementally adding RangeData and then conversion to a ReferenceRanges.
    */
-  public static class Accumulator<T> extends TreeMap<String, List<RangeList.RangeData<T>>> {
+  public static class Accumulator<T> extends TreeMap<String, List<RangeMeta<T>>> {
 
     /**
      * Adds a range data element
      * @param sequenceName the sequence that the range element is associated with
      * @param rangeData the range data element
      */
-    public void addRangeData(String sequenceName, RangeList.RangeData<T> rangeData) {
+    public void addRangeData(String sequenceName, RangeMeta<T> rangeData) {
       if (rangeData != null) {
-        final List<RangeList.RangeData<T>> annos;
+        final List<RangeMeta<T>> annos;
         if (containsKey(sequenceName)) {
           annos = get(sequenceName);
         } else {
@@ -218,7 +218,7 @@ public class ReferenceRanges<T> {
      */
     public ReferenceRanges<T> getReferenceRanges() {
       final ReferenceRanges<T> rangeLists = new ReferenceRanges<>(false);
-      for (final Map.Entry<String, List<RangeList.RangeData<T>>> me : entrySet()) {
+      for (final Map.Entry<String, List<RangeMeta<T>>> me : entrySet()) {
         final RangeList<T> search = new RangeList<>(me.getValue());
         rangeLists.put(me.getKey(), search);
       }
