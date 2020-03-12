@@ -35,6 +35,7 @@ import java.io.OutputStream;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ import com.rtg.util.io.IOIterator;
 /**
  * Loads a bunch of chromosomal regions and allows you to ask if a position falls within any of the regions
  */
-public class ReferenceRegions {
+public class ReferenceRegions implements Iterable<SequenceNameLocus> {
 
   /**
    * Create a new instance from the specified region iterator
@@ -66,6 +67,35 @@ public class ReferenceRegions {
    */
   public ReferenceRegions() {
     mSequences = new LinkedHashMap<>();
+  }
+
+  @Override
+  public Iterator<SequenceNameLocus> iterator() {
+    return new Iterator<SequenceNameLocus>() {
+      final Iterator<String> mSeqIt = mSequences.keySet().iterator();
+      String mSequence;
+      Iterator<Map.Entry<Integer, Integer>> mRegionIt = null;
+      @Override
+      public boolean hasNext() {
+        if (mRegionIt == null || !mRegionIt.hasNext()) {
+          mRegionIt = null;
+          while (mSeqIt.hasNext()) {
+            mSequence = mSeqIt.next();
+            mRegionIt = mSequences.get(mSequence).mIntervals.entrySet().iterator();
+            if (mRegionIt.hasNext()) {
+              break;
+            }
+          }
+        }
+        return mRegionIt != null && mRegionIt.hasNext();
+      }
+
+      @Override
+      public SequenceNameLocus next() {
+        final Map.Entry<Integer, Integer> entry = mRegionIt.next();
+        return new SequenceNameLocusSimple(mSequence, entry.getKey(), entry.getValue());
+      }
+    };
   }
 
   /**
@@ -239,10 +269,8 @@ public class ReferenceRegions {
    */
   public ReferenceRanges<String> toReferenceRanges() {
     final ReferenceRanges.Accumulator<String> rangeData = new ReferenceRanges.Accumulator<>();
-    for (Map.Entry<String, MergedIntervals> seq : mSequences.entrySet()) {
-      for (Map.Entry<Integer, Integer> entry : seq.getValue().mIntervals.entrySet()) {
-        rangeData.addRangeData(seq.getKey(), new SimpleRangeMeta<>(entry.getKey(), entry.getValue(), ""));
-      }
+    for (SequenceNameLocus r : this) {
+      rangeData.addRangeData(r.getSequenceName(), new SimpleRangeMeta<>(r.getStart(), r.getEnd(), ""));
     }
     return rangeData.getReferenceRanges();
   }
@@ -255,10 +283,8 @@ public class ReferenceRegions {
    */
   public void toBed(OutputStream stream) throws IOException {
     try (BedWriter bw = new BedWriter(stream)) {
-      for (Map.Entry<String, MergedIntervals> seq : mSequences.entrySet()) {
-        for (Map.Entry<Integer, Integer> entry : seq.getValue().mIntervals.entrySet()) {
-          bw.write(new BedRecord(seq.getKey(), entry.getKey(), entry.getValue()));
-        }
+      for (SequenceNameLocus r : this) {
+        bw.write(new BedRecord(r.getSequenceName(), r.getStart(), r.getEnd()));
       }
     }
   }
@@ -266,10 +292,8 @@ public class ReferenceRegions {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for (String s : sequenceNames()) {
-      for (Map.Entry<Integer, Integer> entry : mSequences.get(s).mIntervals.entrySet()) {
-        sb.append(String.format("%s\t%d\t%d%n", s, entry.getKey(), entry.getValue()));
-      }
+    for (SequenceNameLocus r : this) {
+      sb.append(String.format("%s\t%d\t%d%n", r.getSequenceName(), r.getStart(), r.getEnd()));
     }
     return sb.toString();
   }

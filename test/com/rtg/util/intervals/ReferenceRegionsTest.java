@@ -36,6 +36,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.Map;
 
 import com.rtg.bed.BedReader;
@@ -180,14 +181,27 @@ public class ReferenceRegionsTest extends TestCase {
     assertEquals(EXPECTED_INTERSECT_2, regions.toString());
   }
 
-  public void testBin() {
+  public void testIterator() {
     final ReferenceRegions regions = new ReferenceRegions();
+    assertFalse(regions.iterator().hasNext());
     regions.add("monkey", 50, 700);
     regions.add("hobo", 0, 700);
     assertEquals(2, regions.size());
     assertTrue(regions.enclosed("monkey", 500, 600));
     assertFalse(regions.enclosed("monkey", 0, 50));
     assertFalse(regions.enclosed("monkey", 750, 800));
+    Iterator<SequenceNameLocus> it = regions.iterator();
+    assertTrue(it.hasNext());
+    SequenceNameLocus r = it.next();
+    assertEquals("monkey", r.getSequenceName());
+    assertEquals(50, r.getStart());
+    assertEquals(700, r.getEnd());
+    assertTrue(it.hasNext());
+    r = it.next();
+    assertEquals("hobo", r.getSequenceName());
+    assertEquals(0, r.getStart());
+    assertEquals(700, r.getEnd());
+    assertFalse(it.hasNext());
   }
 
   public void testEmpty() {
