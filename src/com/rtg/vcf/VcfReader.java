@@ -32,12 +32,14 @@ package com.rtg.vcf;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.function.Consumer;
 
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
 import com.rtg.util.cli.CFlags;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.RegionRestriction;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -128,6 +130,11 @@ public class VcfReader implements VcfIterator {
     final VcfRecord result = peek();
     setNext();
     return result;
+  }
+
+  @Override
+  public void forEach(Consumer<? super VcfRecord> action) throws IOException {
+    IOIterator.forEach(this, action);
   }
 
   /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,66 +27,39 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.util.iterators;
 
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 /**
- * A class to help build iterators where it is necessary to do a look ahead to check if the next
- * case is available.
- * @param <X> type the iterator operates over.
+ * Iteration helper methods
  */
-public abstract class IteratorHelper<X> implements Iterator<X>, IteratorForEach<X> {
+public interface IteratorForEach<T> {
 
-  protected abstract void step();
+  /**
+   * Performs the given action for each element of the iterator until all elements
+   * have been processed or the action throws an exception. Unless otherwise specified
+   * by the implementing class, actions are performed in the order of iteration
+   * (if an iteration order is specified). Exceptions thrown by the action are relayed to the caller.
+   * @param action action to be performed on each element
+   * @throws IOException if an exception is thrown while iterating the elements
+   */
+  void forEach(Consumer<? super T> action) throws IOException;
 
-  protected abstract boolean atEnd();
-
-  protected boolean isOK() {
-    return true;
-  }
-
-  protected abstract X current();
-
-  @Override
-  public final boolean hasNext() {
-    check();
-    return !atEnd() && isOK();
-  }
-
-  private void check() {
-    while (!atEnd() && !isOK()) {
-      step();
+  /**
+   * Performs the given action for each element of the iterator until all elements
+   * have been processed or the action throws an exception. Unless otherwise specified
+   * by the implementing class, actions are performed in the order of iteration
+   * (if an iteration order is specified). Exceptions thrown by the action are relayed to the caller.
+   * @param it the iterator
+   * @param action action to be performed on each element
+   * @param <U> the iterator element types
+   */
+  static <U> void forEach(Iterator<U> it, Consumer<? super U> action) {
+    while (it.hasNext()) {
+      action.accept(it.next());
     }
   }
-
-  private void stepAll() {
-    step();
-    check();
-  }
-
-  @Override
-  public final X next() {
-    check();
-    if (!hasNext()) {
-      throw new NoSuchElementException();
-    }
-    final X res = current();
-    stepAll();
-    return res;
-  }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void forEach(Consumer<? super X> action) {
-    IteratorForEach.forEach(this, action);
-  }
-
 }

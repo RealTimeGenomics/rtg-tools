@@ -42,6 +42,7 @@ import java.util.Map;
 import com.rtg.bed.BedRecord;
 import com.rtg.bed.BedWriter;
 import com.rtg.util.io.IOIterator;
+import com.rtg.util.iterators.IteratorForEach;
 
 /**
  * Loads a bunch of chromosomal regions and allows you to ask if a position falls within any of the regions
@@ -52,11 +53,22 @@ public class ReferenceRegions implements Iterable<SequenceNameLocus> {
    * Create a new instance from the specified region iterator
    * @param reader the reader supplying regions
    * @return a new <code>ReferenceRegions</code>
-   * @throws java.io.IOException when reading the file fails
+   * @throws IOException if there is a problem during reading
    */
   public static ReferenceRegions regions(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
     final ReferenceRegions regions = new ReferenceRegions();
-    regions.add(reader);
+    reader.forEach(regions::add);
+    return regions;
+  }
+
+  /**
+   * Create a new instance from the specified region iterator
+   * @param reader the reader supplying regions
+   * @return a new <code>ReferenceRegions</code>
+   */
+  public static ReferenceRegions regions(Iterator<? extends SequenceNameLocus> reader) {
+    final ReferenceRegions regions = new ReferenceRegions();
+    IteratorForEach.forEach(reader, regions::add);
     return regions;
   }
 
@@ -126,28 +138,6 @@ public class ReferenceRegions implements Iterable<SequenceNameLocus> {
         }
         ours.subtract(outStart, Integer.MAX_VALUE);
       }
-    }
-  }
-
-  /**
-   * Add all regions returned by an iterator to the set
-   * @param reader supplies the regions to add
-   * @throws java.io.IOException when reading the region stream fails
-   */
-  public void add(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
-    while (reader.hasNext()) {
-      add(reader.next());
-    }
-  }
-
-  /**
-   * Subtract all regions returned by iterator from the set
-   * @param reader supplies the regions to add
-   * @throws java.io.IOException when reading the region stream fails
-   */
-  public void subtract(IOIterator<? extends SequenceNameLocus> reader) throws IOException {
-    while (reader.hasNext()) {
-      subtract(reader.next());
     }
   }
 

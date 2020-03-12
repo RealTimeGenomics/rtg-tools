@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.ReferenceRanges;
@@ -185,6 +186,11 @@ public class TabixLineReader implements LineReader {
       } else {
         throw new NoSuchElementException();
       }
+    }
+
+    @Override
+    public void forEach(Consumer<? super String> action) throws IOException {
+      IOIterator.forEach(this, action);
     }
 
     @Override

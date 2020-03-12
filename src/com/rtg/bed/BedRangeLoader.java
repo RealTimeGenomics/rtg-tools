@@ -109,10 +109,7 @@ public abstract class BedRangeLoader<T> {
   }
 
   private void loadRanges(BedReader reader) throws IOException {
-    while (reader.hasNext()) {
-      final BedRecord rec = reader.next();
-      mRangeData.addRangeData(rec.getSequenceName(), getRangeData(rec));
-    }
+    reader.forEach(rec -> mRangeData.addRangeData(rec.getSequenceName(), getRangeData(rec)));
   }
 
   /**

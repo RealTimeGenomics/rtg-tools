@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Real Time Genomics Limited.
+ * Copyright (c) 2014. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,66 +27,51 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+package com.rtg.util.io;
 
-package com.rtg.util.iterators;
-
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
+import com.rtg.util.iterators.IteratorForEach;
+
+import htsjdk.samtools.util.RuntimeIOException;
+
 /**
- * A class to help build iterators where it is necessary to do a look ahead to check if the next
- * case is available.
- * @param <X> type the iterator operates over.
+ * Adaptor between IOIterator and regular Iterator.
  */
-public abstract class IteratorHelper<X> implements Iterator<X>, IteratorForEach<X> {
+public class RuntimeIOIterator<T> implements Iterator<T>, IteratorForEach<T> {
 
-  protected abstract void step();
+  IOIterator<T> mIt;
 
-  protected abstract boolean atEnd();
-
-  protected boolean isOK() {
-    return true;
+  /**
+   * Constructor
+   * @param it the iterator being wrapped
+   */
+  public RuntimeIOIterator(IOIterator<T> it) {
+    mIt = it;
   }
-
-  protected abstract X current();
 
   @Override
-  public final boolean hasNext() {
-    check();
-    return !atEnd() && isOK();
-  }
-
-  private void check() {
-    while (!atEnd() && !isOK()) {
-      step();
+  public boolean hasNext() {
+    try {
+      return mIt.hasNext();
+    } catch (IOException e) {
+      throw new RuntimeIOException(e);
     }
   }
 
-  private void stepAll() {
-    step();
-    check();
-  }
-
   @Override
-  public final X next() {
-    check();
-    if (!hasNext()) {
-      throw new NoSuchElementException();
+  public T next() {
+    try {
+      return mIt.next();
+    } catch (IOException e) {
+      throw new RuntimeIOException(e);
     }
-    final X res = current();
-    stepAll();
-    return res;
   }
 
   @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void forEach(Consumer<? super X> action) {
+  public void forEach(Consumer<? super T> action) {
     IteratorForEach.forEach(this, action);
   }
-
 }

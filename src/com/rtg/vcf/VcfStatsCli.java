@@ -147,10 +147,7 @@ public class VcfStatsCli extends AbstractCli {
             }
           }
         }
-        while (vr.hasNext()) {
-          //System.err.println(vr.getCurrent());
-          stats.tallyVariant(header, vr.next());
-        }
+        vr.forEach(rec -> stats.tallyVariant(header, rec));
         out.write(("Location                     : " + vcffile + StringUtils.LS).getBytes());
         stats.printStatistics(out);
       }

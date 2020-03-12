@@ -34,6 +34,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.function.Consumer;
 
 import com.rtg.tabix.BrLineReader;
 import com.rtg.tabix.LineReader;
@@ -163,6 +164,11 @@ public class BedReader implements IOIterator<BedRecord> {
     final BedRecord result = mCurrent;
     setNext();
     return result;
+  }
+
+  @Override
+  public void forEach(Consumer<? super BedRecord> action) throws IOException {
+    IOIterator.forEach(this, action);
   }
 
   /**

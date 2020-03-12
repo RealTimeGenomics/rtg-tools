@@ -33,8 +33,10 @@ package com.rtg.vcf;
 import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 import com.rtg.reader.SequencesReader;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -92,6 +94,11 @@ public class DecomposingVcfIterator extends Decomposer implements VcfIterator {
     final VcfRecord rec = mQueue.poll();
     populateQueue();
     return rec;
+  }
+
+  @Override
+  public void forEach(Consumer<? super VcfRecord> action) throws IOException {
+    IOIterator.forEach(this, action);
   }
 
   private void populateQueue() throws IOException {

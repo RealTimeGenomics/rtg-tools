@@ -32,8 +32,10 @@ package com.rtg.vcf;
 
 import java.io.IOException;
 import java.util.PriorityQueue;
+import java.util.function.Consumer;
 
 import com.rtg.util.intervals.IntervalComparator;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -101,6 +103,11 @@ public class VcfSortRefiner implements VcfIterator {
         mCurrent.add(rec);
       }
     }
+  }
+
+  @Override
+  public void forEach(Consumer<? super VcfRecord> action) throws IOException {
+    IOIterator.forEach(this, action);
   }
 
   @Override

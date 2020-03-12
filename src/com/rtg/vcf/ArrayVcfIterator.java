@@ -29,7 +29,11 @@
  */
 package com.rtg.vcf;
 
+import java.io.IOException;
+import java.util.function.Consumer;
+
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -65,6 +69,11 @@ public class ArrayVcfIterator implements VcfIterator {
   @Override
   public VcfRecord next() {
     return mRecords[mPos++];
+  }
+
+  @Override
+  public void forEach(Consumer<? super VcfRecord> action) throws IOException {
+    IOIterator.forEach(this, action);
   }
 
   @Override

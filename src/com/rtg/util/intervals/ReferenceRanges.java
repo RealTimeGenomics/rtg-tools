@@ -32,18 +32,20 @@ package com.rtg.util.intervals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.RangeList.RangeView;
 
 /**
  * Contains a mapping from reference sequence name to RangeList. Ideally this would be merged with ReferenceRegions.
  * @param <T> type of range
  */
-public class ReferenceRanges<T> {
+public class ReferenceRanges<T> implements Iterable<RangeView<T>> {
 
   private final boolean mAllAvailable;
 
@@ -156,6 +158,37 @@ public class ReferenceRanges<T> {
     return mByName.keySet();
   }
 
+  /** @return an iterator over the non-empty ranges */
+  @Override
+  public Iterator<RangeView<T>> iterator() {
+    if (mAllAvailable) {
+      throw new IllegalStateException("Cannot iterate when allAvailable is true");
+    }
+    return new Iterator<RangeView<T>>() {
+      final Iterator<String> mSeqIt = mByName.keySet().iterator();
+      String mSequence;
+      Iterator<RangeView<T>> mRegionIt = null;
+      @Override
+      public boolean hasNext() {
+        if (mRegionIt == null || !mRegionIt.hasNext()) {
+          mRegionIt = null;
+          while (mSeqIt.hasNext()) {
+            mSequence = mSeqIt.next();
+            mRegionIt = mByName.get(mSequence).getRangeList().iterator();
+            if (mRegionIt.hasNext()) {
+              break;
+            }
+          }
+        }
+        return mRegionIt != null && mRegionIt.hasNext();
+      }
+
+      @Override
+      public RangeView<T> next() {
+        return mRegionIt.next();
+      }
+    };
+  }
 
   // Accessing via sequence ids
 
@@ -189,7 +222,7 @@ public class ReferenceRanges<T> {
   }
 
   /**
-   * A helper class that allows incrementally adding RangeData and then conversion to a ReferenceRanges.
+   * A helper class that allows incrementally adding range data and then conversion to a ReferenceRanges.
    */
   public static class Accumulator<T> extends TreeMap<String, List<RangeMeta<T>>> {
 
