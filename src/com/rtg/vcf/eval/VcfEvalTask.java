@@ -38,7 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.rtg.bed.BedReader;
+import com.rtg.bed.BedUtils;
 import com.rtg.launcher.NoStatistics;
 import com.rtg.launcher.ParamsTask;
 import com.rtg.launcher.globals.GlobalFlags;
@@ -56,8 +56,6 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.LongRange;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
-import com.rtg.util.intervals.SequenceNameLocus;
-import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -100,14 +98,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
       final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
-      final ReferenceRegions evalRegions;
-      if (params.evalRegionsFile() != null) {
-        try (IOIterator<? extends SequenceNameLocus> r = BedReader.openBedReader(null, params.evalRegionsFile(), 0)) {
-          evalRegions = ReferenceRegions.regions(r);
-        }
-      } else {
-        evalRegions = null;
-      }
+      final ReferenceRegions evalRegions = BedUtils.regions(params.evalRegionsFile());
       final VariantSet variants = getVariants(params, templateSequences, ranges, evalRegions);
 
       evaluateCalls(params, templateSequences, variants);
