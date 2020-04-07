@@ -648,7 +648,7 @@ public final class SamUtils {
     record.setReadNegativeStrandFlag(false);
     record.setMappingQuality(0);
     record.setInferredInsertSize(0);
-    record.setCigarString("*");
+    record.setCigarString(NO_CIGAR);
     record.setAttribute(ATTRIBUTE_NUM_MISMATCHES, null);
   }
 
@@ -695,12 +695,11 @@ public final class SamUtils {
       final char c = cigar.charAt(i);
       if (c < '0' || c > '9') {
         switch (c) {
-          case 'M':
-          case 'D':
-          case 'N':
-          case 'P':
-          case '=':
-          case 'X':
+          case CIGAR_SAME_OR_MISMATCH:
+          case CIGAR_DELETION_FROM_REF:
+          case CIGAR_GAP_IN_READ:
+          case CIGAR_SAME:
+          case CIGAR_MISMATCH:
             int mult = 1;
             for (int j = i - 1; j >= numStartPos; --j) {
               refLen += mult * (cigar.charAt(j) - '0');
