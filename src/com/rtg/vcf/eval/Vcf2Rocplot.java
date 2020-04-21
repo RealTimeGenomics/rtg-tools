@@ -38,6 +38,7 @@ import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -92,6 +93,7 @@ public class Vcf2Rocplot extends LoggedCli {
 
     mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
+    mFlags.registerOptional('R', VcfEvalCli.ROC_SUBSET, VcfEvalCli.VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
@@ -109,6 +111,14 @@ public class Vcf2Rocplot extends LoggedCli {
     mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(VcfEvalCli.SCORE_FIELD), (RocSortOrder) mFlags.getValue(VcfEvalCli.SORT_ORDER));
     mRoc = new RocContainer(mRocExtractor);
     final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry in order to produce aggregate stats
+    if (!mFlags.isSet(VcfEvalCli.ROC_SUBSET)) {
+      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
+    } else {
+      final List<?> values = mFlags.getValues(VcfEvalCli.ROC_SUBSET);
+      for (Object o : values) {
+        rocFilters.add(((VcfEvalCli.VcfEvalRocFilter) o).filter());
+      }
+    }
     mRoc.addFilters(rocFilters);
 
     final Collection<?> values = mFlags.getAnonymousValues(0);

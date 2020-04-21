@@ -88,7 +88,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String CRITERIA_SENSITIVITY = "at-sensitivity";
   private static final String CRITERIA_PRECISION = "at-precision";
 
-  private static final String ROC_SUBSET = "Xroc-subset";
+  protected static final String ROC_SUBSET = "Xroc-subset";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
