@@ -64,6 +64,7 @@ public final class RocPlotToFile {
   private boolean mPrecisionRecall = false;
   private Box2D mInitialZoom = null;
   private boolean mInterpolate = false;
+  private String mPaletteName = RocPlotPalettes.SINGLETON.defaultName();
 
   RocPlotToFile() {
   }
@@ -92,6 +93,10 @@ public final class RocPlotToFile {
     mInitialZoom = initialZoom;
     return this;
   }
+  RocPlotToFile setPaletteName(String palette) {
+    mPaletteName = palette;
+    return this;
+  }
   void writeRocPlot(File outFile, List<File> fileList, List<String> nameList, String title) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>(fileList.size());
     for (int i = 0; i < fileList.size(); ++i) {
@@ -102,7 +107,7 @@ public final class RocPlotToFile {
       data.put(db.getTitle(), db);
     }
     final GraphicsRenderer gr = new GraphicsRenderer();
-    gr.setColors(RocPlot.PALETTE);
+    gr.setColors(RocPlotPalettes.SINGLETON.getPalette(mPaletteName));
     gr.setTextAntialiasing(true);
     final ImageWriter iw = new ImageWriter(gr);
 

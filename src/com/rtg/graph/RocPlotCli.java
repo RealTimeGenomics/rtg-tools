@@ -74,6 +74,7 @@ public class RocPlotCli extends AbstractCli {
   static final String CURVE_FLAG = "curve";
   static final String PRECISION_SENSITIVITY_FLAG = "precision-sensitivity";
   static final String ZOOM_FLAG = "zoom";
+  static final String PALETTE = "palette";
 
 
   static final String PNG_EXTENSION = ".png";
@@ -142,6 +143,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the side pane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class, CommonFlags.INT, "sets the plot line width", 2).setCategory(REPORTING);
     flags.registerOptional(ZOOM_FLAG, String.class, CommonFlags.STRING, "show a zoomed view with the given coordinates, supplied in the form <xmax>,<ymax> or <xmin>,<ymin>,<xmax>,<ymax>").setCategory(INPUT_OUTPUT);
+    flags.registerOptional(PALETTE, String.class, CommonFlags.STRING, "name of color palette to use", RocPlotPalettes.SINGLETON.defaultName()).setParameterRange(RocPlotPalettes.SINGLETON.names()).setCategory(REPORTING);
     flags.registerOptional(PNG_FLAG, File.class, CommonFlags.FILE, "if set, output a PNG image to the given file").setCategory(INPUT_OUTPUT);
     flags.registerOptional(SVG_FLAG, File.class, CommonFlags.FILE, "if set, output a SVG image to the given file").setCategory(INPUT_OUTPUT);
     mCurveFlag = flags.registerOptional(CURVE_FLAG, String.class, CommonFlags.STRING, "ROC data file with title optionally specified (path[=title])").setCategory(INPUT_OUTPUT);
@@ -188,7 +190,7 @@ public class RocPlotCli extends AbstractCli {
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG), (String) mFlags.getValue(PALETTE));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime
@@ -239,6 +241,7 @@ public class RocPlotCli extends AbstractCli {
         .setLineWidth((Integer) mFlags.getValue(LINE_WIDTH_FLAG))
         .setPrecisionRecall(mFlags.isSet(PRECISION_SENSITIVITY_FLAG))
         .setInitialZoom(initialZoom(mFlags))
+        .setPaletteName((String) mFlags.getValue(PALETTE))
         .writeRocPlot(file, fileList, nameList, (String) mFlags.getValue(TITLE_FLAG));
     }
   }

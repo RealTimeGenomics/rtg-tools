@@ -114,6 +114,8 @@ public class RocPlot {
   /** Maximum allowed line width */
   public static final int LINE_WIDTH_MAX = 10;
 
+  private static final int LINE_WIDTH_DEFAULT = 2;
+
   // File chooser stored user-preference keys
   private static final String CHOOSER_WIDTH = "chooser-width";
   private static final String CHOOSER_HEIGHT = "chooser-height";
@@ -150,7 +152,7 @@ public class RocPlot {
   // Graph data and state
   final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<>());
   boolean mShowScores = true;
-  int mLineWidth = 2;
+  int mLineWidth = LINE_WIDTH_DEFAULT;
 
   private float mMaxX = Float.NaN;
   private float mMaxY = Float.NaN;
@@ -161,24 +163,10 @@ public class RocPlot {
 
   private final JFileChooser mFileChooser;
   private File mFileChooserParent = null;
-  private int mColorCounter = -1;
 
-  static final Color[] PALETTE = {
-    new Color(0xFF4030),
-    new Color(0x30F030),
-    new Color(0x3030FF),
-    new Color(0xFF30FF),
-    new Color(0x30FFFF),
-    new Color(0xA05050),
-    new Color(0xF0C040),
-    new Color(0x707070),
-    new Color(0xC00000),
-    new Color(0x00C000),
-    new Color(0x0000C0),
-    new Color(0xC000C0),
-    new Color(0x00C0C0),
-    new Color(0xB0B0B0),
-  };
+  private final String mPaletteName;
+  private final Color[] mPalette;
+  private int mColorCounter = -1;
 
   private static class RocFileFilter extends FileFilter {
     @Override
@@ -196,9 +184,12 @@ public class RocPlot {
    * Creates a new swing plot.
    * @param precisionRecall true defaults to precision recall graph
    * @param interpolate if true, enable curve interpolation
+   * @param palette name of palette to use
    */
-  RocPlot(boolean precisionRecall, boolean interpolate) {
+  RocPlot(boolean precisionRecall, boolean interpolate, String palette) {
     mInterpolate = interpolate;
+    mPaletteName = palette;
+    mPalette = RocPlotPalettes.SINGLETON.getPalette(palette);
     mMainPanel = new JPanel();
     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
     mFileChooser = new JFileChooser();
@@ -430,7 +421,9 @@ public class RocPlot {
   private String getCommand() {
     final StringBuilder sb = new StringBuilder("rtg rocplot");
     sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
-    sb.append(" --").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+    if (mLineWidth != LINE_WIDTH_DEFAULT) {
+      sb.append(" --").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+    }
     if (mShowScores) {
       sb.append(" --").append(RocPlotCli.SCORES_FLAG);
     }
@@ -442,6 +435,9 @@ public class RocPlot {
       if (graph != null) {
         sb.append(" --").append(RocPlotCli.ZOOM_FLAG).append(' ').append(graph.getZoomString());
       }
+    }
+    if (!mPaletteName.equals(RocPlotPalettes.SINGLETON.defaultName())) {
+      sb.append(" --").append(RocPlotCli.PALETTE).append(' ').append(mPaletteName);
     }
     for (final Component component : mRocLinesPanel.getComponents()) {
       final RocLinePanel cp = (RocLinePanel) component;
@@ -537,7 +533,7 @@ public class RocPlot {
   }
 
   @JumbleIgnore
-  static class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
+  static final class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
 
     PrecisionRecallGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
@@ -567,7 +563,7 @@ public class RocPlot {
   }
 
   @JumbleIgnore
-  static class RocGraph2D extends ExternalZoomGraph2D {
+  static final class RocGraph2D extends ExternalZoomGraph2D {
     private final int mMaxVariants;
     RocGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
@@ -632,7 +628,7 @@ public class RocPlot {
       }
       final Color[] colors;
       if (ordering.isEmpty()) {
-        colors = PALETTE;
+        colors = RocPlotPalettes.SINGLETON.getPalette(mPaletteName);
       } else {
         colors = new Color[ordering.size()];
         int k = 0;
@@ -693,7 +689,7 @@ public class RocPlot {
    * @param width line width
    */
   public void setLineWidth(int width) {
-    mLineWidth = width < LINE_WIDTH_MIN ? LINE_WIDTH_MIN : width > LINE_WIDTH_MAX ? LINE_WIDTH_MAX : width;
+    mLineWidth = Math.max(Math.min(width, LINE_WIDTH_MAX), LINE_WIDTH_MIN);
     SwingUtilities.invokeLater(() -> mLineWidthSlider.setValue(mLineWidth));
   }
 
@@ -751,7 +747,7 @@ public class RocPlot {
   }
 
   private void addLine(String path, DataBundle dataBundle) {
-    final Color initialColor = PALETTE[++mColorCounter % PALETTE.length];
+    final Color initialColor = mPalette[++mColorCounter % mPalette.length];
     mData.put(path, dataBundle);
     mRocLinesPanel.addLine(new RocLinePanel(this, path, dataBundle.getTitle(), dataBundle, mProgressBar, initialColor));
     showCurrentGraph();
@@ -858,14 +854,14 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate) throws InterruptedException, InvocationTargetException, IOException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate, String palette) throws InterruptedException, InvocationTargetException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot(precisionRecall, interpolate) {
+    final RocPlot rp = new RocPlot(precisionRecall, interpolate, palette) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);
