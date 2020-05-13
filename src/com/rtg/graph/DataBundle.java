@@ -140,8 +140,10 @@ final class DataBundle {
   }
 
   private static <T> Point2D getPrecisionRecall(RocPoint<T> point, int totalVariants, boolean hasRaw) {
+    // Recall is always in baseline variant space (i.e. weighted true positives)
     final double truePositives = point.getTruePositives();
     final double x = ContingencyTable.recall(truePositives, totalVariants - truePositives) * 100.0;
+    // Precision is always in call variant space (i.e. raw true positives, if available)
     final double rawTp = hasRaw ? point.getRawTruePositives() : truePositives;
     final double y = ContingencyTable.precision(rawTp, point.getFalsePositives()) * 100.0;
     return new Point2D((float) x, (float) y);
@@ -174,7 +176,7 @@ final class DataBundle {
         if (autoname.length() > 0) {
           autoname.append(' ');
         }
-        autoname.append(fname.substring(0, rocIdx));
+        autoname.append(fname, 0, rocIdx);
       }
 
       if (getScoreName() != null) {

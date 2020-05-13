@@ -70,7 +70,7 @@ import com.rtg.util.Environment;
  * moving the line up or down in the list.
  */
 @JumbleIgnore
-class RocLinePanel extends JPanel {
+final class RocLinePanel extends JPanel {
 
   private final JCheckBox mCheckBox;
   private final DataBundle mDataBundle;
