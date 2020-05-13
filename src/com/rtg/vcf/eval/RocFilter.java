@@ -35,6 +35,7 @@ import java.util.Locale;
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Interface defining ROC filters
@@ -205,21 +206,16 @@ public abstract class RocFilter {
   }
 
   /**
+   * Set the VCF header to be used with this filter.
+   * @param header VCF header
+   */
+  void setHeader(VcfHeader header) { }
+
+  /**
    * @return true if the filter requires access to a GT value
    */
   public boolean requiresGt() {
     return true;
-  }
-
-  /**
-   * Tests specified record
-   * @param rec record to be tested
-   * @param sample sample number
-   * @return if accepted returns true, false otherwise
-   */
-  public boolean accept(VcfRecord rec, int sample) {
-    final int[] gt = VcfUtils.getValidGt(rec, sample);
-    return accept(rec, gt);
   }
 
   /**

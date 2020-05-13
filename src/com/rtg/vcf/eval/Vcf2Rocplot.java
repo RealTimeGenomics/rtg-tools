@@ -33,17 +33,18 @@ import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
-import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
+import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_PRECISION;
+import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SENSITIVITY;
+import static com.rtg.vcf.eval.VcfEvalCli.SCORE_FIELD;
+import static com.rtg.vcf.eval.VcfEvalCli.SORT_ORDER;
+import static com.rtg.vcf.eval.VcfEvalCli.validateVcfRocExpr;
+import static com.rtg.vcf.eval.VcfEvalCli.validateScoreField;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
@@ -91,15 +92,17 @@ public class Vcf2Rocplot extends LoggedCli {
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
 
-    mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
-    mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
-    mFlags.registerOptional('R', VcfEvalCli.ROC_SUBSET, VcfEvalCli.VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    VcfEvalCli.registerVcfRocFlags(mFlags);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
     mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
       && CommonFlags.validateInputFile(flags)
       && CommonFlags.validateThreads(flags)
+      && validateScoreField(flags)
+      && validateVcfRocExpr(flags)
+      && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
+      && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
     );
   }
 
@@ -108,18 +111,14 @@ public class Vcf2Rocplot extends LoggedCli {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
 
     // Create ROC container / extractor
-    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(VcfEvalCli.SCORE_FIELD), (RocSortOrder) mFlags.getValue(VcfEvalCli.SORT_ORDER));
+    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(SCORE_FIELD), (RocSortOrder) mFlags.getValue(SORT_ORDER));
     mRoc = new RocContainer(mRocExtractor);
-    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry in order to produce aggregate stats
-    if (!mFlags.isSet(VcfEvalCli.ROC_SUBSET)) {
-      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
-    } else {
-      final List<?> values = mFlags.getValues(VcfEvalCli.ROC_SUBSET);
-      for (Object o : values) {
-        rocFilters.add(((VcfEvalCli.VcfEvalRocFilter) o).filter());
-      }
+    if (mFlags.isSet(CRITERIA_PRECISION)) {
+      mRoc.setRocPointCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
+    } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
+      mRoc.setRocPointCriteria(new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY)));
     }
-    mRoc.addFilters(rocFilters);
+    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags));
 
     final Collection<?> values = mFlags.getAnonymousValues(0);
     for (final Object o : values) {
@@ -158,6 +157,7 @@ public class Vcf2Rocplot extends LoggedCli {
         // If this is wrong, the user should vcfsubset to pick out the sample they want.
       }
     }
+    mRoc.filters().forEach(f -> f.setHeader(header));
 
     while (vr.hasNext()) {
       final VcfRecord rec = vr.next();

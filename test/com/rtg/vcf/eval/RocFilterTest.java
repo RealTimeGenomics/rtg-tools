@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import com.rtg.vcf.VcfReaderTest;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 
 import junit.framework.TestCase;
 
@@ -54,122 +55,126 @@ public class RocFilterTest extends TestCase {
 //    TestUtils.testEnum(RocFilter.class, "[ALL, HOM, HET, SNP, NON_SNP, MNP, INDEL, XRX, NON_XRX, HOM_XRX, HOM_NON_XRX, HET_XRX, HET_NON_XRX]");
 //  }
 
+  private boolean accept(RocFilter ff, VcfRecord rec) {
+    return ff.accept(rec, VcfUtils.getValidGt(rec, 0));
+  }
+
   public void testAll() {
     final RocFilter f = RocFilter.ALL;
-    assertTrue(f.accept(PASS_RECORD, 0));
-    assertTrue(f.accept(FAIL_RECORD, 0));
-    assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertTrue(f.accept(IDENTITY_RECORD, 0));
+    assertTrue(accept(f, PASS_RECORD));
+    assertTrue(accept(f, FAIL_RECORD));
+    assertTrue(accept(f, HOMOZYGOUS_RECORD));
+    assertTrue(accept(f, HETEROZYGOUS_RECORD));
+    assertTrue(accept(f, IDENTITY_RECORD));
 
-    assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_IDENTITY_RECORD, 0));
+    assertTrue(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_IDENTITY_RECORD));
   }
 
   public void testHomozygous() {
     final RocFilter f = RocFilter.HOM;
-    assertTrue(f.accept(PASS_RECORD, 0));
-    assertTrue(f.accept(FAIL_RECORD, 0));
-    assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
+    assertTrue(accept(f, PASS_RECORD));
+    assertTrue(accept(f, FAIL_RECORD));
+    assertTrue(accept(f, HOMOZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
 
-    assertFalse(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
+    assertFalse(accept(f, HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
+    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
   }
 
   public void testHeterozygous() {
     final RocFilter f = RocFilter.HET;
-    assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
+    assertTrue(accept(f, HETEROZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
 
-    assertFalse(f.accept(PASS_RECORD, 0));
-    assertFalse(f.accept(FAIL_RECORD, 0));
-    assertFalse(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
+    assertFalse(accept(f, PASS_RECORD));
+    assertFalse(accept(f, FAIL_RECORD));
+    assertFalse(accept(f, HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
   }
 
   public void testComplex() {
     final RocFilter f = RocFilter.XRX;
-    assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertTrue(f.accept(COMPLEX_IDENTITY_RECORD, 0));
+    assertTrue(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertTrue(accept(f, COMPLEX_IDENTITY_RECORD));
 
-    assertFalse(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(PASS_RECORD, 0));
-    assertFalse(f.accept(FAIL_RECORD, 0));
-    assertFalse(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
+    assertFalse(accept(f, HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, PASS_RECORD));
+    assertFalse(accept(f, FAIL_RECORD));
+    assertFalse(accept(f, HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
   }
 
 
   public void testSimple() {
     final RocFilter f = RocFilter.NON_XRX;
-    assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertTrue(f.accept(FAIL_RECORD, 0));
-    assertTrue(f.accept(PASS_RECORD, 0));
-    assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertTrue(f.accept(IDENTITY_RECORD, 0));
+    assertTrue(accept(f, HETEROZYGOUS_RECORD));
+    assertTrue(accept(f, FAIL_RECORD));
+    assertTrue(accept(f, PASS_RECORD));
+    assertTrue(accept(f, HOMOZYGOUS_RECORD));
+    assertTrue(accept(f, IDENTITY_RECORD));
 
-    assertFalse(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
+    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
   }
 
   public void testHomozygousSimple() {
     final RocFilter f = RocFilter.HOM_NON_XRX;
-    assertTrue(f.accept(FAIL_RECORD, 0));
-    assertTrue(f.accept(PASS_RECORD, 0));
-    assertTrue(f.accept(HOMOZYGOUS_RECORD, 0));
+    assertTrue(accept(f, FAIL_RECORD));
+    assertTrue(accept(f, PASS_RECORD));
+    assertTrue(accept(f, HOMOZYGOUS_RECORD));
 
-    assertFalse(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
+    assertFalse(accept(f, HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
   }
 
   public void testHomozygousComplex() {
     final RocFilter f = RocFilter.HOM_XRX;
-    assertTrue(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
+    assertTrue(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
 
-    assertFalse(f.accept(FAIL_RECORD, 0));
-    assertFalse(f.accept(PASS_RECORD, 0));
-    assertFalse(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
+    assertFalse(accept(f, FAIL_RECORD));
+    assertFalse(accept(f, PASS_RECORD));
+    assertFalse(accept(f, HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
   }
 
   public void testHeterozygousSimple() {
     final RocFilter f = RocFilter.HET_NON_XRX;
-    assertTrue(f.accept(HETEROZYGOUS_RECORD, 0));
+    assertTrue(accept(f, HETEROZYGOUS_RECORD));
 
-    assertFalse(f.accept(FAIL_RECORD, 0));
-    assertFalse(f.accept(PASS_RECORD, 0));
-    assertFalse(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
+    assertFalse(accept(f, FAIL_RECORD));
+    assertFalse(accept(f, PASS_RECORD));
+    assertFalse(accept(f, HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
   }
 
   public void testHeterozygousComplex() {
     final RocFilter f = RocFilter.HET_XRX;
-    assertTrue(f.accept(COMPLEX_HETEROZYGOUS_RECORD, 0));
+    assertTrue(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
 
-    assertFalse(f.accept(FAIL_RECORD, 0));
-    assertFalse(f.accept(PASS_RECORD, 0));
-    assertFalse(f.accept(HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(HETEROZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_HOMOZYGOUS_RECORD, 0));
-    assertFalse(f.accept(COMPLEX_IDENTITY_RECORD, 0));
-    assertFalse(f.accept(IDENTITY_RECORD, 0));
+    assertFalse(accept(f, FAIL_RECORD));
+    assertFalse(accept(f, PASS_RECORD));
+    assertFalse(accept(f, HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, HETEROZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
+    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
+    assertFalse(accept(f, IDENTITY_RECORD));
   }
 
 }

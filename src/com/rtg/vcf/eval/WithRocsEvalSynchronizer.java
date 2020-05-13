@@ -94,6 +94,7 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       mDefaultRoc.setRocPointCriteria(rocCriteria);
       mAlleleRoc = null;
     } else {
+      filters.forEach(f -> f.setHeader(variants.calledHeader()));
       mDefaultRoc = new RocContainer(extractor);
       mDefaultRoc.addFilters(filters);
       mDefaultRoc.setRocPointCriteria(rocCriteria);

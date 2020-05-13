@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf.eval;
 
-import static com.rtg.launcher.CommonFlags.FLOAT;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -85,10 +84,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String SQUASH_PLOIDY = "squash-ploidy";
   private static final String REF_OVERLAP = "ref-overlap";
   private static final String OUTPUT_MODE = "output-mode";
-  private static final String CRITERIA_SENSITIVITY = "at-sensitivity";
-  private static final String CRITERIA_PRECISION = "at-precision";
+  protected static final String CRITERIA_SENSITIVITY = "at-sensitivity";
+  protected static final String CRITERIA_PRECISION = "at-precision";
 
   protected static final String ROC_SUBSET = "Xroc-subset";
+  protected static final String ROC_EXPR = "Xroc-expr";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
@@ -170,19 +170,15 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerOptional(SQUASH_PLOIDY, "treat heterozygous genotypes as homozygous ALT in both baseline and calls, to allow matches that ignore zygosity differences").setCategory(FILTERING);
     mFlags.registerOptional(REF_OVERLAP, "allow alleles to overlap where bases of either allele are same-as-ref (Default is to only allow VCF anchor base overlap)").setCategory(FILTERING);
 
-    mFlags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     mFlags.registerOptional(NO_ROC, "do not produce ROCs").setCategory(REPORTING);
-    mFlags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     final Flag<String> modeFlag = mFlags.registerOptional('m', OUTPUT_MODE, String.class, CommonFlags.STRING, "output reporting mode", VcfEvalTask.MODE_SPLIT).setCategory(REPORTING);
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
-    mFlags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    mFlags.registerOptional(CRITERIA_PRECISION, Double.class, FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
-    mFlags.registerOptional(CRITERIA_SENSITIVITY, Double.class, FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
 
     mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
-    mFlags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
-    mFlags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
+
+    registerVcfRocFlags(mFlags);
+
     mFlags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
     mFlags.registerOptional(LOOSE_MATCH_DISTANCE, Integer.class, CommonFlags.INT, "if set, GA4GH mode will also apply distance-based loose-matching with the specified distance", 30).setCategory(FILTERING);
     mFlags.registerOptional(DECOMPOSE, "decompose complex variants into smaller constituents to allow partial credit").setCategory(FILTERING);
@@ -198,13 +194,40 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && flags.checkNand(SCORE_FIELD, NO_ROC)
       && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
       && flags.checkNand(CRITERIA_PRECISION, CRITERIA_SENSITIVITY)
-      && validateScoreField(flags)
       && validatePairedFlag(flags, SAMPLE, "sample name")
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
+      && validateScoreField(flags)
+      && validateVcfRocExpr(flags)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
       && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
     );
+  }
+
+  static void registerVcfRocFlags(CFlags flags) {
+    flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
+    flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
+    flags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "custom ROC filter of the form <NAME>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
+    flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
+    flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
+    flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
+  }
+
+  static boolean validateVcfRocExpr(CFlags flags) {
+    if (flags.isSet(ROC_EXPR)) {
+      final List<?> values = flags.getValues(VcfEvalCli.ROC_EXPR);
+      for (Object o : values) {
+        final String spec = (String) o;
+        final String[] split = StringUtils.split(spec, '=', 2);
+        if (split.length != 2) {
+          flags.setParseMessage("--" + ROC_EXPR + " invalid specification " + spec);
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private static boolean validateModeSample(CFlags flags) {
@@ -336,29 +359,13 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
       builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
     }
-    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
-    if (!mFlags.isSet(ROC_SUBSET)) {
-      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
-    } else {
-      final List<?> values = mFlags.getValues(ROC_SUBSET);
-      for (Object o : values) {
-        rocFilters.add(((VcfEvalRocFilter) o).filter());
-      }
-    }
+    final Set<RocFilter> rocFilters = getRocFilters(mFlags);
+    builder.rocFilters(rocFilters);
     if (mFlags.isSet(CRITERIA_PRECISION)) {
       builder.rocCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
     } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
       builder.rocCriteria(new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY)));
     }
-    if (mFlags.isSet(RTG_STATS)) {
-      rocFilters.add(RocFilter.NON_XRX);
-      rocFilters.add(RocFilter.XRX);
-      rocFilters.add(RocFilter.HET_NON_XRX);
-      rocFilters.add(RocFilter.HET_XRX);
-      rocFilters.add(RocFilter.HOM_NON_XRX);
-      rocFilters.add(RocFilter.HOM_XRX);
-    }
-    builder.rocFilters(rocFilters);
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
     builder.decompose(mFlags.isSet(DECOMPOSE));
     builder.squashPloidy(mFlags.isSet(SQUASH_PLOIDY));
@@ -375,5 +382,37 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.twoPass(true); // Default to two passes except for split mode (backward compability)
     }
     return builder.create();
+  }
+
+  static Set<RocFilter> getRocFilters(CFlags flags) {
+    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
+    if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
+      final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);
+      for (Object o : values) {
+        rocFilters.add(((VcfEvalCli.VcfEvalRocFilter) o).filter());
+      }
+    }
+    if (flags.isSet(ROC_EXPR)) {
+      final List<?> values = flags.getValues(VcfEvalCli.ROC_EXPR);
+      for (Object o : values) {
+        final String[] e = StringUtils.split((String) o, '=', 2);
+        assert e.length == 2;
+        rocFilters.add(new ExpressionRocFilter(e[0], e[1]));
+      }
+    }
+    if (flags.isSet(RTG_STATS)) {
+      rocFilters.add(RocFilter.NON_XRX);
+      rocFilters.add(RocFilter.XRX);
+      rocFilters.add(RocFilter.HET_NON_XRX);
+      rocFilters.add(RocFilter.HET_XRX);
+      rocFilters.add(RocFilter.HOM_NON_XRX);
+      rocFilters.add(RocFilter.HOM_XRX);
+    }
+
+    if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, RTG_STATS)) {
+      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
+    }
+
+    return rocFilters;
   }
 }
