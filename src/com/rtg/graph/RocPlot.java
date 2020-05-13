@@ -146,6 +146,7 @@ public class RocPlot {
   private final JTextField mTitleEntry;
   private final JComboBox<String> mGraphType;
   private final boolean mInterpolate;
+  private final boolean mWeighted;
   private JSplitPane mSplitPane;
   private final JLabel mStatusLabel;
 
@@ -179,10 +180,12 @@ public class RocPlot {
    * Creates a new swing plot.
    * @param precisionRecall true defaults to precision recall graph
    * @param interpolate if true, enable curve interpolation
+   * @param weighted if true, plot TP using weighted (baseline) counts, otherwise unweighted (call) counts
    * @param palette name of palette to use
    */
-  RocPlot(boolean precisionRecall, boolean interpolate, String palette) {
+  RocPlot(boolean precisionRecall, boolean interpolate, boolean weighted, String palette) {
     mInterpolate = interpolate;
+    mWeighted = weighted;
     mPaletteName = palette;
     mPalette = RocPlotPalettes.SINGLETON.getPalette(palette);
     mMainPanel = new JPanel();
@@ -747,6 +750,7 @@ public class RocPlot {
       mProgressBar.setString("This file has already been loaded");
     } else {
       final DataBundle data = ParseRocFile.loadStream(progress, FileUtils.createInputStream(f, false), f.getAbsolutePath(), mInterpolate);
+      data.setWeighted(mWeighted);
       data.setTitle(f, name);
       addLine(path, data);
     }
@@ -860,14 +864,14 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate, String palette) throws InterruptedException, InvocationTargetException {
+  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate, boolean weighted, String palette) throws InterruptedException, InvocationTargetException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot(precisionRecall, interpolate, palette) {
+    final RocPlot rp = new RocPlot(precisionRecall, interpolate, weighted, palette) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);

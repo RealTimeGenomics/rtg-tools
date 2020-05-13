@@ -70,6 +70,7 @@ public class RocPlotCli extends AbstractCli {
   static final String TITLE_FLAG = "title";
   static final String SCORES_FLAG = "scores";
   static final String INTERPOLATE_FLAG = "interpolate";
+  static final String UNWEIGHTED_FLAG = "Xunweighted";
   static final String LINE_WIDTH_FLAG = "line-width";
   static final String CURVE_FLAG = "curve";
   static final String PRECISION_SENSITIVITY_FLAG = "precision-sensitivity";
@@ -139,6 +140,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional('t', TITLE_FLAG, String.class, CommonFlags.STRING, "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
     flags.registerOptional(INTERPOLATE_FLAG, "if set, interpolate curves at regular intervals").setCategory(REPORTING);
+    flags.registerOptional(UNWEIGHTED_FLAG, "if set, use unweighted TP on ROC").setCategory(REPORTING);
     flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the side pane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class, CommonFlags.INT, "sets the plot line width", 2).setCategory(REPORTING);
@@ -190,7 +192,7 @@ public class RocPlotCli extends AbstractCli {
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG), (String) mFlags.getValue(PALETTE));
+        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG), !mFlags.isSet(UNWEIGHTED_FLAG), (String) mFlags.getValue(PALETTE));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime

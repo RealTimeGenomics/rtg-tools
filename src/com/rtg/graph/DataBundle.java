@@ -53,21 +53,24 @@ final class DataBundle {
 
   private static final int TOTAL_LABELS = 10;
 
-  private final Point2D[] mRocPoints;
-  private final String[] mRocScores;
+  private final List<RocPoint<String>> mRawPoints;
+  private final int mTotalVariants;
 
   private final Point2D[] mPrecisionRecallPoints;
   private final String[] mPrecisionRecallScores;
-
-  private final int mTotalVariants;
   private final float mMinPrecision;
+
+  private boolean mWeighted = true;
+  private Point2D[] mRocPoints;
+  private String[] mRocScores;
 
   private String mTitle = "";
   private String mScoreName;
   private boolean mShow;
 
-  private GraphType mGraphType = null;
+  private GraphType mGraphType = GraphType.ROC;
   private float mRangeMax = 1.0f;
+  private boolean mRangedValid = false;
   private Point2D[] mRangedPoints = null;
   private String[] mRangedScores = null;
   private TextPoint2D[] mRangedLabels = null;
@@ -76,15 +79,28 @@ final class DataBundle {
   DataBundle(int totalVariants, List<RocPoint<String>> points) {
     mTotalVariants = totalVariants;
     mShow = true;
-
-    mRocPoints = points.stream()
-      .map(point -> new Point2D((float) point.getFalsePositives(), (float) point.getTruePositives()))
-      .toArray(Point2D[]::new);
-    mRocScores = points.stream().map(RocPoint::getThreshold).toArray(String[]::new);
-    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(points, totalVariants);
+    mRawPoints = points;
+    final boolean hasRawTp = points.stream().anyMatch(x -> x.getRawTruePositives() > 0);
+    final Pair<List<Point2D>, List<String>> pr = rocToPrecisionRecall(mRawPoints, mTotalVariants, hasRawTp);
     mPrecisionRecallPoints = pr.getA().toArray(new Point2D[0]);
     mPrecisionRecallScores = pr.getB().toArray(new String[0]);
     mMinPrecision = findMinPrecision();
+    setWeighted(true);
+  }
+
+  /**
+   * Control whether the plots use weighted (baseline) TP or raw (call) TP
+   * @param weighted true to use weighted TP
+   */
+  public void setWeighted(boolean weighted) {
+    if (weighted != mWeighted || mRocPoints == null) {
+      mWeighted = weighted;
+      mRocPoints = mRawPoints.stream()
+        .map(point -> new Point2D((float) point.getFalsePositives(), (float) (weighted ? point.getTruePositives() : point.getRawTruePositives())))
+        .toArray(Point2D[]::new);
+      mRocScores = mRawPoints.stream().map(RocPoint::getThreshold).toArray(String[]::new);
+      mRangedValid = false;
+    }
   }
 
   private float findMinPrecision() {
@@ -112,11 +128,10 @@ final class DataBundle {
   }
 
 
-  private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants) {
+  private static <T> Pair<List<Point2D>, List<T>> rocToPrecisionRecall(List<RocPoint<T>> points, int totalVariants, boolean hasRaw) {
     final List<Point2D> res = new ArrayList<>();
     final List<T> scores = new ArrayList<>();
     if (totalVariants > 0) {
-      final boolean hasRaw = points.stream().anyMatch(x -> x.getRawTruePositives() > 0);
       for (int i = 0; i < points.size(); ++i) {
         final RocPoint<T> point = points.get(i);
         if (res.size() == 0 && point.getTruePositives() + point.getFalsePositives() <= 0) {
@@ -192,16 +207,19 @@ final class DataBundle {
   void setGraphType(GraphType graphType) {
     if (graphType != mGraphType) {
       mGraphType = graphType;
-      updateRangedData();
+      mRangedValid = false;
     }
   }
 
   void setScoreMax(float max) {
     mRangeMax = max;
-    updateRangedData();
+    mRangedValid = false;
   }
 
   void updateRangedData() {
+    if (mRangedValid) {
+      return;
+    }
     // Since the roc graph and PR graph may contain slightly different numbers of points (due to extrapolation at ends)
     // the current slider position may represent a slightly different threshold on each of the graphs.
     // Ideally we should find the point on the PR graph that has the corresponding threshold
@@ -240,7 +258,7 @@ final class DataBundle {
       mMaxRangedPoint = new TextPoint2D(mRocPoints[i].getX(), mRocPoints[i].getY(), mRocScores[i]);
       break;
     }
-
+    mRangedValid = true;
   }
 
   private void updateLabels() {
@@ -309,12 +327,14 @@ final class DataBundle {
   }
 
   TextPoint2D getMaxRangedLabel() {
+    updateRangedData();
     return mMaxRangedPoint; // This is in ROC coordinate space, even if the current graph type is precision-sensitivity
   }
 
   // Primary line graph
   PointPlot2D getPlot(int lineWidth, int colour) {
     assert mGraphType != null : "graph type has not been set";
+    updateRangedData();
     final PointPlot2D lplot = new PointPlot2D();
     lplot.setData(mRangedPoints);
     lplot.setPoints(false);
@@ -328,6 +348,7 @@ final class DataBundle {
   // Text labels to overlay on the graph
   TextPlot2D getScoreLabels() {
     assert mGraphType != null : "graph type has not been set";
+    updateRangedData();
     final TextPlot2D tplot = new TextPlot2D();
     tplot.setData(mRangedLabels);
     return tplot;
@@ -336,6 +357,7 @@ final class DataBundle {
   // Points corresponding to each text label
   PointPlot2D getScorePoints(int lineWidth, int colour) {
     assert mGraphType != null : "graph type has not been set";
+    updateRangedData();
     final PointPlot2D pplot = new PointPlot2D();
     pplot.setData(mRangedLabels);
     pplot.setPoints(true);
