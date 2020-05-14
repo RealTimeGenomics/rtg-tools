@@ -864,21 +864,21 @@ public class RocPlot {
   }
 
 
-  static void rocStandalone(ArrayList<File> fileList, ArrayList<String> nameList, String title, boolean scores, final boolean hideSidePanel, int lineWidth, boolean precisionRecall, Box2D initialZoom, boolean interpolate, boolean weighted, String palette) throws InterruptedException, InvocationTargetException {
+  static void startGui(ArrayList<File> fileList, ArrayList<String> nameList, RocPlotSettings settings, final boolean hideSidePanel) throws InterruptedException, InvocationTargetException {
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot(precisionRecall, interpolate, weighted, palette) {
+    final RocPlot rp = new RocPlot(settings.mPrecisionRecall, settings.mInterpolate, settings.mWeighted, settings.mPaletteName) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);
         frame.setTitle("rtg rocplot - " + title);
       }
     };
-    rp.setLineWidth(lineWidth);
+    rp.setLineWidth(settings.mLineWidth);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
@@ -892,8 +892,8 @@ public class RocPlot {
         lock.countDown();
       }
     });
-    rp.showScores(scores);
-    rp.setTitle(title != null ? title : precisionRecall ? PRECISION_SENSITIVITY : ROC);
+    rp.showScores(settings.mShowScores);
+    rp.setTitle(settings.mTitle != null ? settings.mTitle : settings.mPrecisionRecall ? PRECISION_SENSITIVITY : ROC);
     SwingUtilities.invokeAndWait(() -> {
       frame.pack();
       frame.setSize(1024, 768);
@@ -904,7 +904,7 @@ public class RocPlot {
         rp.setSplitPaneDividerLocation(1.0);
       }
     });
-    rp.loadData(fileList, nameList, initialZoom);
+    rp.loadData(fileList, nameList, settings.mInitialZoom);
     SwingUtilities.invokeAndWait(rp::showCurrentGraph);
     lock.await();
   }

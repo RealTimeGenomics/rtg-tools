@@ -192,7 +192,7 @@ public class RocPlotCli extends AbstractCli {
           return 1;
         }
         UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.rocStandalone(fileList, nameList, (String) mFlags.getValue(TITLE_FLAG), mFlags.isSet(SCORES_FLAG), mFlags.isSet(HIDE_SIDEPANE_FLAG), (Integer) mFlags.getValue(LINE_WIDTH_FLAG), mFlags.isSet(PRECISION_SENSITIVITY_FLAG), initialZoom(mFlags), mFlags.isSet(INTERPOLATE_FLAG), !mFlags.isSet(UNWEIGHTED_FLAG), (String) mFlags.getValue(PALETTE));
+        RocPlot.startGui(fileList, nameList, settingsFromFlags(new RocPlotSettings()), mFlags.isSet(HIDE_SIDEPANE_FLAG));
       }
     } catch (InvocationTargetException e) {
       //should only be possible to have runtime
@@ -233,18 +233,24 @@ public class RocPlotCli extends AbstractCli {
     }
   }
 
-  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat svg) throws IOException {
+  private <T extends RocPlotSettings> T settingsFromFlags(T s) {
+    s.setTitle((String) mFlags.getValue(TITLE_FLAG))
+      .setShowScores(mFlags.isSet(SCORES_FLAG))
+      .setInterpolate(mFlags.isSet(INTERPOLATE_FLAG))
+      .setWeighted(!mFlags.isSet(UNWEIGHTED_FLAG))
+      .setLineWidth((Integer) mFlags.getValue(LINE_WIDTH_FLAG))
+      .setPrecisionRecall(mFlags.isSet(PRECISION_SENSITIVITY_FLAG))
+      .setInitialZoom(initialZoom(mFlags))
+      .setPaletteName((String) mFlags.getValue(PALETTE));
+    return s;
+  }
+
+  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat format) throws IOException {
     if (mFlags.isSet(flagName)) {
       final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
-      new RocPlotToFile()
-        .setImageFormat(svg)
-        .setShowScores(mFlags.isSet(SCORES_FLAG))
-        .setInterpolate(mFlags.isSet(INTERPOLATE_FLAG))
-        .setLineWidth((Integer) mFlags.getValue(LINE_WIDTH_FLAG))
-        .setPrecisionRecall(mFlags.isSet(PRECISION_SENSITIVITY_FLAG))
-        .setInitialZoom(initialZoom(mFlags))
-        .setPaletteName((String) mFlags.getValue(PALETTE))
-        .writeRocPlot(file, fileList, nameList, (String) mFlags.getValue(TITLE_FLAG));
+      settingsFromFlags(new RocPlotToFile())
+        .setImageFormat(format)
+        .writeRocPlot(file, fileList, nameList);
     }
   }
 

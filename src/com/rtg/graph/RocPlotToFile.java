@@ -39,14 +39,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.reeltwo.plot.Box2D;
 import com.reeltwo.plot.renderer.GraphicsRenderer;
 import com.reeltwo.plot.ui.ImageWriter;
 import com.rtg.util.io.FileUtils;
 
 /**
  */
-public final class RocPlotToFile {
+public final class RocPlotToFile extends RocPlotSettings {
 
   /**
    * Supported image formats.
@@ -59,50 +58,20 @@ public final class RocPlotToFile {
   }
 
   private ImageFormat mImageFormat = ImageFormat.PNG;
-  private boolean mShowScores = true;
-  private int mLineWidth = 2;
-  private boolean mPrecisionRecall = false;
-  private Box2D mInitialZoom = null;
-  private boolean mInterpolate = false;
-  private String mPaletteName = RocPlotPalettes.SINGLETON.defaultName();
 
   RocPlotToFile() {
-  }
-
-  RocPlotToFile setShowScores(boolean show) {
-    mShowScores = show;
-    return this;
-  }
-  RocPlotToFile setLineWidth(int width) {
-    mLineWidth = width;
-    return this;
-  }
-  RocPlotToFile setInterpolate(boolean interpolate) {
-    mInterpolate = interpolate;
-    return this;
-  }
-  RocPlotToFile setPrecisionRecall(boolean precisionRecall) {
-    mPrecisionRecall = precisionRecall;
-    return this;
   }
   RocPlotToFile setImageFormat(ImageFormat format) {
     mImageFormat = format;
     return this;
   }
-  RocPlotToFile setInitialZoom(Box2D initialZoom) {
-    mInitialZoom = initialZoom;
-    return this;
-  }
-  RocPlotToFile setPaletteName(String palette) {
-    mPaletteName = palette;
-    return this;
-  }
-  void writeRocPlot(File outFile, List<File> fileList, List<String> nameList, String title) throws IOException {
+  void writeRocPlot(File outFile, List<File> fileList, List<String> nameList) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>(fileList.size());
     for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
       final DataBundle db = ParseRocFile.loadStream(new ParseRocFile.NullProgressDelegate(), FileUtils.createInputStream(f, false), f.getAbsolutePath(), mInterpolate);
+      db.setWeighted(mWeighted);
       db.setTitle(f, name);
       data.put(db.getTitle(), db);
     }
@@ -115,9 +84,9 @@ public final class RocPlotToFile {
 
     final RocPlot.ExternalZoomGraph2D graph;
     if (mPrecisionRecall) {
-      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, title != null ? title : "Precision/Recall");
+      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, mTitle != null ? mTitle : "Precision/Recall");
     } else {
-      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, title != null ? title : "ROC");
+      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, mTitle != null ? mTitle : "ROC");
     }
     if (mInitialZoom != null) {
       graph.setZoom(mInitialZoom);
