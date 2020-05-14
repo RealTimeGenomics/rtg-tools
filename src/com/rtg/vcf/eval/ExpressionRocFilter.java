@@ -42,7 +42,7 @@ import com.rtg.vcf.header.VcfHeader;
 public class ExpressionRocFilter extends RocFilter {
 
   private final String mExpression;
-  private VcfFilter mFilter;
+  private VcfFilter mFilter = null;
 
   /**
    * Constructor
