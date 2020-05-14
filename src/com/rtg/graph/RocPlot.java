@@ -154,11 +154,6 @@ public class RocPlot {
   boolean mShowScores = true;
   int mLineWidth = LINE_WIDTH_DEFAULT;
 
-  private float mMaxX = Float.NaN;
-  private float mMaxY = Float.NaN;
-  private float mMinX = Float.NaN;
-  private float mMinY = Float.NaN;
-
   private final JScrollPane mScrollPane;
 
   private final JFileChooser mFileChooser;
@@ -607,25 +602,58 @@ public class RocPlot {
     }
   }
 
-  private final InnerZoomPlot.ZoomConfiguration mZoomRoc = new InnerZoomPlot.ZoomConfiguration();
-  private final InnerZoomPlot.ZoomConfiguration mZoomPr = new InnerZoomPlot.ZoomConfiguration();
-  void showCurrentGraph() {
-    SwingUtilities.invokeLater(() -> {
-      final Graph2D graph;
-      final ArrayList<String> ordering = RocPlot.this.mRocLinesPanel.plotOrder();
-      if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-        graph = new PrecisionRecallGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
-        mZoomPP.setZoomConfiguration(mZoomPr);
-      } else {
-        graph = new RocGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
-        mZoomPP.setZoomConfiguration(mZoomRoc);
-      }
+  private static final class ZoomBounds {
+    private float mMaxX = Float.NaN;
+    private float mMaxY = Float.NaN;
+    private float mMinX = Float.NaN;
+    private float mMinY = Float.NaN;
+    private void maintainZoomBounds(Graph2D graph) {
       if (graph.getPlots().length > 0) {
-        maintainZoomBounds(graph);
+        if (Float.isNaN(mMaxX)) {
+          mMaxX = graph.getHi(Graph2D.X, Graph2D.ONE);
+          mMaxY = graph.getHi(Graph2D.Y, Graph2D.ONE);
+          mMinX = graph.getLo(Graph2D.X, Graph2D.ONE);
+          mMinY = graph.getLo(Graph2D.Y, Graph2D.ONE);
+        } else {
+          mMaxX = Math.max(mMaxX, graph.getHi(Graph2D.X, Graph2D.ONE));
+          mMaxY = Math.max(mMaxY, graph.getHi(Graph2D.Y, Graph2D.ONE));
+          mMinX = Math.min(mMinX, graph.getLo(Graph2D.X, Graph2D.ONE));
+          mMinY = Math.min(mMinY, graph.getLo(Graph2D.Y, Graph2D.ONE));
+        }
       }
       if (!Float.isNaN(mMaxX)) {
         graph.addPlot(invisibleGraph());
       }
+    }
+    // Creates an invisible graph, used to maintain graph size when lines are toggled
+    private Plot2D invisibleGraph() {
+      final PointPlot2D plot = new PointPlot2D();
+      plot.setData(Arrays.asList(new Point2D(mMinX, mMinY), new Point2D(mMaxX, mMaxY)));
+      plot.setLines(false);
+      plot.setPoints(false);
+      return plot;
+    }
+  }
+
+  private final InnerZoomPlot.ZoomConfiguration mZoomRoc = new InnerZoomPlot.ZoomConfiguration();
+  private final InnerZoomPlot.ZoomConfiguration mZoomPr = new InnerZoomPlot.ZoomConfiguration();
+  private final ZoomBounds mZoomBoundsRoc = new ZoomBounds();
+  private final ZoomBounds mZoomBoundsPr = new ZoomBounds();
+  void showCurrentGraph() {
+    SwingUtilities.invokeLater(() -> {
+      final Graph2D graph;
+      final ArrayList<String> ordering = RocPlot.this.mRocLinesPanel.plotOrder();
+      final ZoomBounds bounds;
+      if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
+        graph = new PrecisionRecallGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        mZoomPP.setZoomConfiguration(mZoomPr);
+        bounds = mZoomBoundsPr;
+      } else {
+        graph = new RocGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        mZoomPP.setZoomConfiguration(mZoomRoc);
+        bounds = mZoomBoundsRoc;
+      }
+      bounds.maintainZoomBounds(graph);
       final Color[] colors;
       if (ordering.isEmpty()) {
         colors = RocPlotPalettes.SINGLETON.getPalette(mPaletteName);
@@ -641,28 +669,6 @@ public class RocPlot {
     });
   }
 
-  private Plot2D invisibleGraph() {
-    // Invisible graph to maintain graph size when no lines are shown
-    final PointPlot2D plot = new PointPlot2D();
-    plot.setData(Arrays.asList(new Point2D(mMinX, mMinY), new Point2D(mMaxX, mMaxY)));
-    plot.setLines(false);
-    plot.setPoints(false);
-    return plot;
-  }
-
-  private void maintainZoomBounds(Graph2D graph) {
-    if (Float.isNaN(mMaxX)) {
-      mMaxX = graph.getHi(Graph2D.X, Graph2D.ONE);
-      mMaxY = graph.getHi(Graph2D.Y, Graph2D.ONE);
-      mMinX = graph.getLo(Graph2D.X, Graph2D.ONE);
-      mMinY = graph.getLo(Graph2D.Y, Graph2D.ONE);
-    } else {
-      mMaxX = Math.max(mMaxX, graph.getHi(Graph2D.X, Graph2D.ONE));
-      mMaxY = Math.max(mMaxY, graph.getHi(Graph2D.Y, Graph2D.ONE));
-      mMinX = Math.min(mMinX, graph.getLo(Graph2D.X, Graph2D.ONE));
-      mMinY = Math.min(mMinY, graph.getLo(Graph2D.Y, Graph2D.ONE));
-    }
-  }
 
   /**
    * Set the title of the plot
