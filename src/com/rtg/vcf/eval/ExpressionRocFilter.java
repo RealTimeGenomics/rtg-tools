@@ -32,11 +32,17 @@ package com.rtg.vcf.eval;
 import java.util.ArrayList;
 
 import com.rtg.vcf.ScriptedVcfFilter;
+import com.rtg.vcf.VcfFilter;
+import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  * A ROC filter for variants that match a user-supplied expression
  */
-public class ExpressionRocFilter extends VcfFilterRocFilter {
+public class ExpressionRocFilter extends RocFilter {
+
+  private final String mExpression;
+  private VcfFilter mFilter;
 
   /**
    * Constructor
@@ -44,7 +50,24 @@ public class ExpressionRocFilter extends VcfFilterRocFilter {
    * @param expression JavaScript expression applied to each VcfRecord
    */
   public ExpressionRocFilter(String name, String expression) {
-    super(name, createExpressionFilter(expression));
+    super(name);
+    mExpression = expression;
+  }
+
+  @Override
+  public boolean requiresGt() {
+    return false;
+  }
+
+  @Override
+  void setHeader(VcfHeader header) {
+    mFilter = createExpressionFilter(mExpression);
+    mFilter.setHeader(header);
+  }
+
+  @Override
+  public boolean accept(VcfRecord rec, int[] gt) {
+    return mFilter.accept(rec);
   }
 
   private static ScriptedVcfFilter createExpressionFilter(String expression) {
