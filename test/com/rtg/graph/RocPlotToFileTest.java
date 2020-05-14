@@ -53,7 +53,9 @@ public class RocPlotToFileTest extends AbstractTest {
       final File roc = new File(dir, "roc.tsv");
       FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File png = new File(dir, "PNG.png");
-      new RocPlotToFile().writeRocPlot(png, Collections.singletonList(roc), Collections.singletonList("LINE"), "a title");
+      final RocPlotToFile r = new RocPlotToFile();
+      r.setTitle("a title");
+      r.writeRocPlot(png, Collections.singletonList(roc), Collections.singletonList("LINE"));
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
@@ -65,7 +67,10 @@ public class RocPlotToFileTest extends AbstractTest {
       final File roc = new File(dir, "roc.tsv");
       FileUtils.copyResource("com/rtg/graph/resources/roc2.tsv", roc);
       final File png = new File(dir, "PNG.png");
-      new RocPlotToFile().setInitialZoom(new Box2D(10, 10, 100, 100)).writeRocPlot(png, Collections.singletonList(roc), Collections.singletonList("LINE"), "a title");
+      final RocPlotToFile r = new RocPlotToFile();
+      r.setTitle("a title");
+      r.setInitialZoom(new Box2D(10, 10, 100, 100));
+      r.writeRocPlot(png, Collections.singletonList(roc), Collections.singletonList("LINE"));
       final BufferedImage buf = ImageIO.read(png);
       assertEquals(800, buf.getWidth());
       assertEquals(600, buf.getHeight());
@@ -83,7 +88,10 @@ public class RocPlotToFileTest extends AbstractTest {
       final File roc = new File(dir, "roc.tsv");
       FileUtils.copyResource("com/rtg/graph/resources/roc.tsv", roc);
       final File svg = new File(dir, "example.svg");
-      new RocPlotToFile().setImageFormat(SVG).writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"), "a title");
+      final RocPlotToFile r = new RocPlotToFile();
+      r.setTitle("a title");
+      r.setImageFormat(SVG);
+      r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 95,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
@@ -102,7 +110,10 @@ public class RocPlotToFileTest extends AbstractTest {
       final File roc = new File(dir, "roc.tsv");
       FileUtils.copyResource("com/rtg/graph/resources/roc-nototal.tsv", roc);
       final File svg = new File(dir, "example.svg");
-      new RocPlotToFile().setImageFormat(SVG).writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"), "a title");
+      final RocPlotToFile r = new RocPlotToFile();
+      r.setTitle("a title");
+      r.setImageFormat(SVG);
+      r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 88,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
