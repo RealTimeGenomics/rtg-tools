@@ -5,9 +5,11 @@
   <fail message="The required minimum version of ant is ${min.ant.version}, you have ${ant.version}" unless="this.ant.version" />
 
   <dirname property="public.tools.basedir" file="${ant.file.public-tools}"/>
-  <property name="tools.src.dir" location="${public.tools.basedir}/src"/>
+  <property name="tools.src.dir" location="${public.tools.basedir}/src/main/java"/>
+  <property name="tools.src.resource.dir" location="${public.tools.basedir}/src/main/resources"/>
   <property name="tools.src.lib.dir" location="${public.tools.basedir}/lib"/>
-  <property name="tools.test.dir" location="${public.tools.basedir}/test"/>
+  <property name="tools.test.dir" location="${public.tools.basedir}/src/test/java"/>
+  <property name="tools.test.resource.dir" location="${public.tools.basedir}/src/test/resources"/>
   <property name="tools.test.lib.dir" location="${public.tools.basedir}/testLib"/>
   <property name="buildtools.dir" location="${public.tools.basedir}/buildLib"/> <!-- Libraries supporting the build process itself -->
 
@@ -64,7 +66,7 @@
 
   <path id="tools.runtime.classpath">
     <pathelement path="${build.src}" />
-    <pathelement path="${tools.src.dir}" />
+    <pathelement path="${tools.src.resource.dir}" />
     <resources refid="runtime.libs" />
   </path>
 
@@ -72,7 +74,7 @@
     <resources refid="runtime.classpath"/>
     <path>
       <pathelement path="${build.test}" />
-      <pathelement path="${tools.test.dir}" />
+      <pathelement path="${tools.test.resource.dir}" />
       <resources refid="runtime.test.libs" />
     </path>
   </union>
@@ -82,7 +84,7 @@
       <include name="com/rtg/**" />
     </fileset>
     <fileset dir="${build.src}" />
-    <fileset dir="${tools.src.dir}">
+    <fileset dir="${tools.src.resource.dir}">
       <include name="com/**/*.properties"/>
       <include name="com/rtg/simulation/variants/*.txt"/>
       <include name="com/rtg/reference/resources/**/*"/>
@@ -115,7 +117,7 @@
     <fileset dir="${build.test}">
       <include name="**/*.class"/>
     </fileset>
-    <fileset dir="${tools.test.dir}">
+    <fileset dir="${tools.test.resource.dir}">
       <include name="com/**/*.txt"/>
       <include name="com/**/*.properties"/>
       <include name="com/rtg/**/resources/**/*"/>
@@ -149,6 +151,10 @@
 
   <path id="test.path">
     <pathelement path="${tools.test.dir}" />
+  </path>
+
+  <path id="test.regression.path">
+    <pathelement path="${tools.test.resource.dir}" />
   </path>
 
   <union id="runtime.classpath">
@@ -460,7 +466,7 @@
 
   <target name="runtest" depends="compile-src,compile-test" description="Run a unit test class. -Dtest.class=xxx">
     <fail unless="test.class" message="test.class property must be set"/>
-    <property name="regression.root" refid="test.path" />
+    <property name="regression.root" refid="test.regression.path" />
     <java classname="${junit.runner}" fork="true" failonerror="true" dir="${build.junit}">
       <arg line="${test.class}" />
       <jvmarg value="-server" />
