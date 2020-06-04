@@ -39,6 +39,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -270,6 +277,8 @@ public class RocPlot {
     mPopup.add(mZoomPP.getSnapShotAction());
 
     mZoomPP.addMouseListener(new PopupListener());
+    new DropTarget(mZoomPP, new RocDropListener());
+    new DropTarget(mRocLinesPanel, new RocDropListener());
 
     mZoomPP.setBackground(Color.WHITE);
     mZoomPP.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
@@ -383,6 +392,32 @@ public class RocPlot {
 
     mIconLabel.setText(mTitleEntry.getText());
     pane.add(mIconLabel, BorderLayout.NORTH);
+  }
+
+  class RocDropListener extends DropTargetAdapter {
+    @Override
+    @SuppressWarnings("unchecked")
+    public void drop(DropTargetDropEvent event) {
+      event.acceptDrop(DnDConstants.ACTION_COPY);
+      final Transferable transferable = event.getTransferable();
+      for (DataFlavor flavor : transferable.getTransferDataFlavors()) {
+        if (flavor.isFlavorJavaFileListType()) {
+          try {
+            final List<File> files = (List<File>) transferable.getTransferData(flavor);
+            final List<String> names = new ArrayList<>();
+            for (int i = 0; i < files.size(); i++) {
+              names.add("");
+            }
+            loadData(files, names, null);
+          } catch (IOException | UnsupportedFlavorException e) {
+            JOptionPane.showMessageDialog(mMainPanel.getTopLevelAncestor(),
+              "Could not receive dropped files:\n" + e.getMessage() + "\n",
+              "Invalid ROC File", JOptionPane.ERROR_MESSAGE);
+          }
+        }
+      }
+      event.dropComplete(true);
+    }
   }
 
   @JumbleIgnore
@@ -718,7 +753,7 @@ public class RocPlot {
     mStatusLabel.setText(message);
   }
 
-  private void loadData(ArrayList<File> files, ArrayList<String> names, Box2D initialZoom) {
+  private void loadData(List<File> files, List<String> names, Box2D initialZoom) {
     final StringBuilder sb = new StringBuilder();
     final ProgressBarDelegate progress = new ProgressBarDelegate(mProgressBar);
     for (int i = 0; i < files.size(); ++i) {
