@@ -29,8 +29,6 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.ImageFormat.PNG;
-import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
@@ -50,6 +48,7 @@ import java.util.List;
 import javax.swing.UIManager;
 
 import com.reeltwo.plot.Box2D;
+import com.reeltwo.plot.ui.ImageWriter;
 import com.rtg.launcher.AbstractCli;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.Pair;
@@ -59,14 +58,15 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.cli.Flag;
 import com.rtg.util.cli.Validator;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.io.FileUtils;
 
 /**
  */
 public class RocPlotCli extends AbstractCli {
 
   private static final String HIDE_SIDEPANE_FLAG = "hide-sidepane";
-  private static final String PNG_FLAG = "png";
-  private static final String SVG_FLAG = "svg";
+  static final String PNG_FLAG = "png";
+  static final String SVG_FLAG = "svg";
   static final String TITLE_FLAG = "title";
   static final String SCORES_FLAG = "scores";
   static final String INTERPOLATE_FLAG = "interpolate";
@@ -77,6 +77,7 @@ public class RocPlotCli extends AbstractCli {
   static final String ZOOM_FLAG = "zoom";
   static final String PALETTE = "palette";
 
+  static final String SHOW_CMD_FLAG = "Xcmd";
 
   static final String PNG_EXTENSION = ".png";
   static final String SVG_EXTENSION = ".svg";
@@ -108,13 +109,13 @@ public class RocPlotCli extends AbstractCli {
         }
       }
       if (flags.isSet(PNG_FLAG)) {
-        if (!CommonFlags.validateOutputFile(flags, getFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION))) {
+        if (!CommonFlags.validateOutputFile(flags, getImageFile((File) flags.getValue(PNG_FLAG), PNG_EXTENSION))) {
           return false;
         }
       }
 
       if (flags.isSet(SVG_FLAG)) {
-        if (!CommonFlags.validateOutputFile(flags, getFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION))) {
+        if (!CommonFlags.validateOutputFile(flags, getImageFile((File) flags.getValue(SVG_FLAG), SVG_EXTENSION))) {
           return false;
         }
       }
@@ -144,6 +145,7 @@ public class RocPlotCli extends AbstractCli {
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
     flags.registerOptional(INTERPOLATE_FLAG, "if set, interpolate curves at regular intervals").setCategory(REPORTING);
     flags.registerOptional(UNWEIGHTED_FLAG, "if set, use unweighted TP on ROC").setCategory(REPORTING);
+    flags.registerOptional(SHOW_CMD_FLAG, File.class, CommonFlags.FILE, "if set, print rocplot command used in previously saved image").setCategory(REPORTING);
     flags.registerOptional('P', PRECISION_SENSITIVITY_FLAG, "if set, plot precision vs sensitivity rather than ROC").setCategory(REPORTING);
     flags.registerOptional(HIDE_SIDEPANE_FLAG, "if set, hide the side pane from the GUI on startup").setCategory(REPORTING);
     flags.registerOptional(LINE_WIDTH_FLAG, Integer.class, CommonFlags.INT, "sets the plot line width", 2).setCategory(REPORTING);
@@ -185,10 +187,18 @@ public class RocPlotCli extends AbstractCli {
 
     final BufferedWriter outWriter = new BufferedWriter(new OutputStreamWriter(out));
     try {
-      if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
+      if (mFlags.isSet(SHOW_CMD_FLAG)) {
+        final File file = getImageFile((File) mFlags.getValue(SHOW_CMD_FLAG), PNG_EXTENSION);
+        final String cmd = ImageWriter.getPngTextMetaData(file).get(RocPlotToFile.ROCPLOT_META_KEY);
+        if (cmd == null) {
+          Diagnostic.warning("No rocplot command metadata available");
+        } else {
+          Diagnostic.info(cmd);
+        }
+      } else if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
         System.setProperty("java.awt.headless", "true");
-        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, PNG);
-        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, SVG);
+        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, ImageWriter.ImageFormat.PNG);
+        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, ImageWriter.ImageFormat.SVG);
       } else {   //Create and set up as a stand alone app.
         if (isReallyHeadless()) {
           Diagnostic.error("No graphics environment is available to open the rocplot GUI. You can generate a static image using --" + PNG_FLAG + " or --" + SVG_FLAG);
@@ -248,9 +258,9 @@ public class RocPlotCli extends AbstractCli {
     return s;
   }
 
-  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, RocPlotToFile.ImageFormat format) throws IOException {
+  private void createImageIfFlagSet(ArrayList<File> fileList, ArrayList<String> nameList, String flagName, String fileExtension, ImageWriter.ImageFormat format) throws IOException {
     if (mFlags.isSet(flagName)) {
-      final File file = getFile((File) mFlags.getValue(flagName), fileExtension);
+      final File file = getImageFile((File) mFlags.getValue(flagName), fileExtension);
       settingsFromFlags(new RocPlotToFile())
         .setImageFormat(format)
         .writeRocPlot(file, fileList, nameList);
@@ -280,11 +290,8 @@ public class RocPlotCli extends AbstractCli {
   }
 
 
-  static File getFile(File pngFile, String extension) {
-    if (!pngFile.getName().endsWith(extension)) {
-      return new File(pngFile.getParent(), pngFile.getName() + PNG_EXTENSION);
-    }
-    return pngFile;
+  static File getImageFile(File outFile, String extension) {
+    return FileUtils.getOutputFileName(outFile, false, extension);
   }
 
   private static void extractNamedFiles(Flag<String> curveFlag, Flag<File> fileFlag, ArrayList<File> fileList, ArrayList<String> nameList) {

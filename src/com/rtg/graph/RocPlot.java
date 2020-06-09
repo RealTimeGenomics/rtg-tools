@@ -29,6 +29,8 @@
  */
 package com.rtg.graph;
 
+import static com.rtg.graph.RocPlotToFile.ROCPLOT_META_KEY;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -394,6 +396,7 @@ public class RocPlot {
     pane.add(mIconLabel, BorderLayout.NORTH);
   }
 
+  @JumbleIgnore
   class RocDropListener extends DropTargetAdapter {
     @Override
     @SuppressWarnings("unchecked")
@@ -452,26 +455,22 @@ public class RocPlot {
   }
 
   private String getCommand() {
-    final StringBuilder sb = new StringBuilder("rtg rocplot");
-    sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.dumbQuote(mTitleEntry.getText()));
-    if (mLineWidth != LINE_WIDTH_DEFAULT) {
-      sb.append(" --").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
-    }
-    if (mShowScores) {
-      sb.append(" --").append(RocPlotCli.SCORES_FLAG);
-    }
-    if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-      sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
-    }
+    // Create a settings corresponding to the current plot
+    final RocPlotSettings rocPlotSettings = new RocPlotSettings()
+      .setTitle(mTitleEntry.getText())
+      .setLineWidth(mLineWidth)
+      .setShowScores(mShowScores)
+      .setPrecisionRecall(mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY))
+      .setPaletteName(mPaletteName);
     if (mZoomPP.isZoomed()) {
       final ExternalZoomGraph2D graph = (ExternalZoomGraph2D) mZoomPP.getGraph();
       if (graph != null) {
-        sb.append(" --").append(RocPlotCli.ZOOM_FLAG).append(' ').append(graph.getZoomString());
+        rocPlotSettings.setInitialZoom(graph.getZoom());
       }
     }
-    if (!mPaletteName.equals(RocPlotPalettes.SINGLETON.defaultName())) {
-      sb.append(" --").append(RocPlotCli.PALETTE).append(' ').append(mPaletteName);
-    }
+
+    // Convert to equivalent command
+    final StringBuilder sb = new StringBuilder(rocPlotSettings.getSettingsAsFlags());
     for (final Component component : mRocLinesPanel.getComponents()) {
       final RocLinePanel cp = (RocLinePanel) component;
       if (cp.isSelected()) {
@@ -483,12 +482,25 @@ public class RocPlot {
 
   // Adds the notion of painting a current crosshair position
   @JumbleIgnore
-  private static class RocZoomPlotPanel extends InnerZoomPlot {
+  private class RocZoomPlotPanel extends InnerZoomPlot {
     private Point2D mCrosshair; // In underlying metric coordinates (e.g. TP/FP).
     private Point2D mCrosshair2;
     RocZoomPlotPanel() {
       super();
     }
+
+    @Override
+    public Action getSaveImageAction() {
+      final Action aa = super.getSaveImageAction();
+      return new AbstractAction("Save Image") {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          mGraphSaver.getImageWriter().setMetaData(ROCPLOT_META_KEY, getCommand());
+          aa.actionPerformed(e);
+        }
+      };
+    }
+
     @Override
     public void paint(Graphics g) {
       super.paint(g);
@@ -552,16 +564,8 @@ public class RocPlot {
       setRange(Graph2D.X, zoom.getXLo(), zoom.getXHi());
       setRange(Graph2D.Y, zoom.getYLo(), zoom.getYHi());
     }
-    String getZoomString() {
-      final int xlo = Math.round(getLo(Graph2D.X, Graph2D.ONE));
-      final int ylo = Math.round(getLo(Graph2D.Y, Graph2D.ONE));
-      final int xhi = Math.round(getHi(Graph2D.X, Graph2D.ONE));
-      final int yhi = Math.round(getHi(Graph2D.Y, Graph2D.ONE));
-      if (xlo == 0 && ylo == 0) {
-        return String.format("%d,%d", xhi, yhi);
-      } else {
-        return String.format("%d,%d,%d,%d", xlo, ylo, xhi, yhi);
-      }
+    Box2D getZoom() {
+      return new Box2D(getLo(Graph2D.X, Graph2D.ONE), getLo(Graph2D.Y, Graph2D.ONE), getHi(Graph2D.X, Graph2D.ONE), getHi(Graph2D.Y, Graph2D.ONE));
     }
   }
 

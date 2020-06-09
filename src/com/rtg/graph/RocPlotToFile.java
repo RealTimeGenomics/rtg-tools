@@ -29,10 +29,10 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
+import static com.rtg.graph.RocPlotCli.PNG_FLAG;
+import static com.rtg.graph.RocPlotCli.SVG_FLAG;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,32 +41,45 @@ import java.util.Map;
 
 import com.reeltwo.plot.renderer.GraphicsRenderer;
 import com.reeltwo.plot.ui.ImageWriter;
+import com.rtg.util.StringUtils;
 import com.rtg.util.io.FileUtils;
 
 /**
  */
 public final class RocPlotToFile extends RocPlotSettings {
 
-  /**
-   * Supported image formats.
-   */
-  public enum ImageFormat {
-    /** SVG file type Scalable vector graphics */
-    SVG,
-    /** Portable network graphics */
-    PNG
-  }
+  // Metadata key used to store plot command settings
+  static final String ROCPLOT_META_KEY = "rocplot_cmd";
 
-  private ImageFormat mImageFormat = ImageFormat.PNG;
+  private ImageWriter.ImageFormat mImageFormat = ImageWriter.ImageFormat.PNG;
 
   RocPlotToFile() {
   }
-  RocPlotToFile setImageFormat(ImageFormat format) {
+
+  RocPlotToFile setImageFormat(ImageWriter.ImageFormat format) {
     mImageFormat = format;
     return this;
   }
+
+  String getOutputImageAsFlags(File outFile) {
+    final StringBuilder sb = new StringBuilder(" --");
+    switch (mImageFormat) {
+      case PNG:
+        sb.append(PNG_FLAG);
+        break;
+      case SVG:
+        sb.append(SVG_FLAG);
+        break;
+      default:
+        return "";
+    }
+    sb.append(" ").append(StringUtils.smartQuote(outFile.toString()));
+    return sb.toString();
+  }
+
   void writeRocPlot(File outFile, List<File> fileList, List<String> nameList) throws IOException {
     final Map<String, DataBundle> data = new LinkedHashMap<>(fileList.size());
+    final StringBuilder curves = new StringBuilder();
     for (int i = 0; i < fileList.size(); ++i) {
       final File f = fileList.get(i);
       final String name = nameList.get(i);
@@ -74,6 +87,7 @@ public final class RocPlotToFile extends RocPlotSettings {
       db.setWeighted(mWeighted);
       db.setTitle(f, name);
       data.put(db.getTitle(), db);
+      curves.append(" --").append(RocPlotCli.CURVE_FLAG).append(" ").append(StringUtils.dumbQuote(f.getPath() + "=" + db.getTitle()));
     }
     final GraphicsRenderer gr = new GraphicsRenderer();
     gr.setColors(RocPlotPalettes.SINGLETON.getPalette(mPaletteName));
@@ -84,19 +98,18 @@ public final class RocPlotToFile extends RocPlotSettings {
 
     final RocPlot.ExternalZoomGraph2D graph;
     if (mPrecisionRecall) {
-      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, mTitle != null ? mTitle : "Precision/Recall");
+      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, getTitle());
     } else {
-      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, mTitle != null ? mTitle : "ROC");
+      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, getTitle());
     }
     if (mInitialZoom != null) {
       graph.setZoom(mInitialZoom);
     }
-    if (mImageFormat == SVG) {
-      try (final FileOutputStream os = new FileOutputStream(outFile)) {
-        iw.toSVG(os, graph, 800, 600, null);
-      }
-    } else {
-      iw.toPNG(outFile, graph, 800, 600, null);
-    }
+
+    final StringBuilder sb = new StringBuilder(getSettingsAsFlags())
+      .append(getOutputImageAsFlags(outFile))
+      .append(curves);
+    iw.setMetaData(ROCPLOT_META_KEY, sb.toString());
+    iw.toImage(mImageFormat, outFile, graph, 800, 600, null);
   }
 }

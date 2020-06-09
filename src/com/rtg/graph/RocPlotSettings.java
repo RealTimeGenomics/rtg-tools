@@ -31,6 +31,7 @@ package com.rtg.graph;
 
 import com.reeltwo.jumble.annotations.JumbleIgnore;
 import com.reeltwo.plot.Box2D;
+import com.rtg.util.StringUtils;
 
 /**
  * Stores common settings for ROC plot drawing style
@@ -38,9 +39,11 @@ import com.reeltwo.plot.Box2D;
 @JumbleIgnore
 class RocPlotSettings {
 
+  private static final int LINE_WIDTH_DEFAULT = 2;
+
   protected String mTitle = null;
   protected boolean mShowScores = true;
-  protected int mLineWidth = 2;
+  protected int mLineWidth = LINE_WIDTH_DEFAULT;
   protected boolean mPrecisionRecall = false;
   protected Box2D mInitialZoom = null;
   protected boolean mInterpolate = false;
@@ -78,5 +81,44 @@ class RocPlotSettings {
   RocPlotSettings setPaletteName(String palette) {
     mPaletteName = palette;
     return this;
+  }
+
+  String getTitle() {
+    return mTitle != null ? mTitle : mPrecisionRecall ? "Precision/Recall" : "ROC";
+  }
+
+  private String getZoomString(Box2D zoom) {
+    final int xlo = Math.round(zoom.getXLo());
+    final int ylo = Math.round(zoom.getYLo());
+    final int xhi = Math.round(zoom.getXHi());
+    final int yhi = Math.round(zoom.getYHi());
+    if (xlo == 0 && ylo == 0) {
+      return String.format("%d,%d", xhi, yhi);
+    } else {
+      return String.format("%d,%d,%d,%d", xlo, ylo, xhi, yhi);
+    }
+  }
+
+  String getSettingsAsFlags() {
+    final StringBuilder sb = new StringBuilder("rtg rocplot");
+    if (mTitle != null) {
+      sb.append(" --").append(RocPlotCli.TITLE_FLAG).append(' ').append(StringUtils.smartQuote(mTitle));
+    }
+    if (mLineWidth != LINE_WIDTH_DEFAULT) {
+      sb.append(" --").append(RocPlotCli.LINE_WIDTH_FLAG).append(' ').append(mLineWidth);
+    }
+    if (mShowScores) {
+      sb.append(" --").append(RocPlotCli.SCORES_FLAG);
+    }
+    if (mPrecisionRecall) {
+      sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);
+    }
+    if (mInitialZoom != null) {
+      sb.append(" --").append(RocPlotCli.ZOOM_FLAG).append(' ').append(getZoomString(mInitialZoom));
+    }
+    if (!mPaletteName.equals(RocPlotPalettes.SINGLETON.defaultName())) {
+      sb.append(" --").append(RocPlotCli.PALETTE).append(' ').append(StringUtils.smartQuote(mPaletteName));
+    }
+    return sb.toString();
   }
 }

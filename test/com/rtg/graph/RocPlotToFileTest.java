@@ -29,7 +29,6 @@
  */
 package com.rtg.graph;
 
-import static com.rtg.graph.RocPlotToFile.ImageFormat.SVG;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -39,6 +38,7 @@ import java.util.Collections;
 import javax.imageio.ImageIO;
 
 import com.reeltwo.plot.Box2D;
+import com.reeltwo.plot.ui.ImageWriter;
 import com.rtg.AbstractTest;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
@@ -90,7 +90,7 @@ public class RocPlotToFileTest extends AbstractTest {
       final File svg = new File(dir, "example.svg");
       final RocPlotToFile r = new RocPlotToFile();
       r.setTitle("a title");
-      r.setImageFormat(SVG);
+      r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 95,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
@@ -112,7 +112,7 @@ public class RocPlotToFileTest extends AbstractTest {
       final File svg = new File(dir, "example.svg");
       final RocPlotToFile r = new RocPlotToFile();
       r.setTitle("a title");
-      r.setImageFormat(SVG);
+      r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 88,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
