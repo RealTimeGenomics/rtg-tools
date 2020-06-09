@@ -46,13 +46,14 @@ public class RocPlotCliTest extends AbstractCliTest {
 
   public void test() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
-      checkHandleFlagsErr();
+      checkHandleFlagsOut();
+      final File png = new File(dir, "png.png");
+      checkHandleFlagsErr("--png", png.getPath());
       final File f = new File(dir, "moo");
       checkHandleFlagsErr(f.getPath());
       assertTrue(f.createNewFile());
       checkHandleFlagsOut(f.getPath());
       checkHandleFlagsOut("--curve", f.getPath() + "=Monkey");
-      final File png = new File(dir, "png.png");
       checkHandleFlagsOut(f.getPath(), "--png", png.getPath());
       assertTrue(png.createNewFile());
       checkHandleFlagsErr(f.getPath(), "--png", png.getPath());
