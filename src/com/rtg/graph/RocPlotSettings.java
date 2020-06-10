@@ -43,6 +43,7 @@ class RocPlotSettings {
 
   protected String mTitle = null;
   protected boolean mShowScores = true;
+  protected boolean mPlain = false;
   protected int mLineWidth = LINE_WIDTH_DEFAULT;
   protected boolean mPrecisionRecall = false;
   protected Box2D mInitialZoom = null;
@@ -56,6 +57,10 @@ class RocPlotSettings {
   }
   RocPlotSettings setShowScores(boolean show) {
     mShowScores = show;
+    return this;
+  }
+  RocPlotSettings setPlain(boolean plain) {
+    mPlain = plain;
     return this;
   }
   RocPlotSettings setLineWidth(int width) {
@@ -84,7 +89,7 @@ class RocPlotSettings {
   }
 
   String getTitle() {
-    return mTitle != null ? mTitle : mPrecisionRecall ? "Precision/Recall" : "ROC";
+    return mTitle != null ? mTitle : mPrecisionRecall ? "Precision/Sensitivity" : "ROC";
   }
 
   private String getZoomString(Box2D zoom) {
@@ -109,6 +114,9 @@ class RocPlotSettings {
     }
     if (mShowScores) {
       sb.append(" --").append(RocPlotCli.SCORES_FLAG);
+    }
+    if (mPlain) {
+      sb.append(" --").append(RocPlotCli.PLAIN_FLAG);
     }
     if (mPrecisionRecall) {
       sb.append(" --").append(RocPlotCli.PRECISION_SENSITIVITY_FLAG);

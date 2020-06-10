@@ -69,6 +69,7 @@ public class RocPlotCli extends AbstractCli {
   static final String SVG_FLAG = "svg";
   static final String TITLE_FLAG = "title";
   static final String SCORES_FLAG = "scores";
+  static final String PLAIN_FLAG = "plain";
   static final String INTERPOLATE_FLAG = "interpolate";
   static final String UNWEIGHTED_FLAG = "Xunweighted";
   static final String LINE_WIDTH_FLAG = "line-width";
@@ -143,6 +144,7 @@ public class RocPlotCli extends AbstractCli {
     CommonFlags.initForce(flags);
     flags.registerOptional('t', TITLE_FLAG, String.class, CommonFlags.STRING, "title for the plot").setCategory(REPORTING);
     flags.registerOptional(SCORES_FLAG, "if set, show scores on the plot").setCategory(REPORTING);
+    flags.registerOptional(PLAIN_FLAG, "if set, use a plain plot style").setCategory(REPORTING);
     flags.registerOptional(INTERPOLATE_FLAG, "if set, interpolate curves at regular intervals").setCategory(REPORTING);
     flags.registerOptional(UNWEIGHTED_FLAG, "if set, use unweighted TP on ROC").setCategory(REPORTING);
     flags.registerOptional(SHOW_CMD_FLAG, File.class, CommonFlags.FILE, "if set, print rocplot command used in previously saved image").setCategory(REPORTING);
@@ -249,6 +251,7 @@ public class RocPlotCli extends AbstractCli {
   private <T extends RocPlotSettings> T settingsFromFlags(T s) {
     s.setTitle((String) mFlags.getValue(TITLE_FLAG))
       .setShowScores(mFlags.isSet(SCORES_FLAG))
+      .setPlain(mFlags.isSet(PLAIN_FLAG))
       .setInterpolate(mFlags.isSet(INTERPOLATE_FLAG))
       .setWeighted(!mFlags.isSet(UNWEIGHTED_FLAG))
       .setLineWidth((Integer) mFlags.getValue(LINE_WIDTH_FLAG))

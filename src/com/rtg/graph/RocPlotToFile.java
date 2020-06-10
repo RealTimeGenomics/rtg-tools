@@ -32,6 +32,7 @@ package com.rtg.graph;
 import static com.rtg.graph.RocPlotCli.PNG_FLAG;
 import static com.rtg.graph.RocPlotCli.SVG_FLAG;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -92,6 +93,10 @@ public final class RocPlotToFile extends RocPlotSettings {
     final GraphicsRenderer gr = new GraphicsRenderer();
     gr.setColors(RocPlotPalettes.SINGLETON.getPalette(mPaletteName));
     gr.setTextAntialiasing(true);
+    if (!mPlain) {
+      gr.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
+      gr.setGraphShadowWidth(4);
+    }
     final ImageWriter iw = new ImageWriter(gr);
 
     final ArrayList<String> paths = new ArrayList<>(data.keySet());

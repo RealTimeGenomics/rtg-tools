@@ -123,8 +123,6 @@ public class RocPlot {
   /** Maximum allowed line width */
   public static final int LINE_WIDTH_MAX = 10;
 
-  private static final int LINE_WIDTH_DEFAULT = 2;
-
   // File chooser stored user-preference keys
   private static final String CHOOSER_WIDTH = "chooser-width";
   private static final String CHOOSER_HEIGHT = "chooser-height";
@@ -161,8 +159,9 @@ public class RocPlot {
 
   // Graph data and state
   final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<>());
-  boolean mShowScores = true;
-  int mLineWidth = LINE_WIDTH_DEFAULT;
+  boolean mShowScores;
+  boolean mPlain;
+  int mLineWidth;
 
   private final JScrollPane mScrollPane;
 
@@ -187,16 +186,17 @@ public class RocPlot {
 
   /**
    * Creates a new swing plot.
-   * @param precisionRecall true defaults to precision recall graph
-   * @param interpolate if true, enable curve interpolation
-   * @param weighted if true, plot TP using weighted (baseline) counts, otherwise unweighted (call) counts
-   * @param palette name of palette to use
+
+   * @param settings initial graph configuration
    */
-  RocPlot(boolean precisionRecall, boolean interpolate, boolean weighted, String palette) {
-    mInterpolate = interpolate;
-    mWeighted = weighted;
-    mPaletteName = palette;
-    mPalette = RocPlotPalettes.SINGLETON.getPalette(palette);
+  RocPlot(RocPlotSettings settings) {
+    mInterpolate = settings.mInterpolate;
+    mWeighted = settings.mWeighted;
+    mLineWidth = settings.mLineWidth;
+    mShowScores = settings.mShowScores;
+    mPlain = settings.mPlain;
+    mPaletteName = settings.mPaletteName;
+    mPalette = RocPlotPalettes.SINGLETON.getPalette(mPaletteName);
     mMainPanel = new JPanel();
     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
     mFileChooser = new JFileChooser();
@@ -222,7 +222,7 @@ public class RocPlot {
     mScoreCB = new JCheckBox("Show Scores");
     mScoreCB.setSelected(true);
     mSelectAllCB = new JCheckBox("Select / Deselect all");
-    mTitleEntry = new JTextField("ROC");
+    mTitleEntry = new JTextField();
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
     mOpenButton = new JButton("Open...");
     mOpenButton.setToolTipText("Add a new curve from a file");
@@ -240,8 +240,9 @@ public class RocPlot {
       mIconLabel.setMinimumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
     }
     mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_SENSITIVITY});
-    mGraphType.setSelectedItem(precisionRecall ? PRECISION_SENSITIVITY : ROC_PLOT);
+    mGraphType.setSelectedItem(settings.mPrecisionRecall ? PRECISION_SENSITIVITY : ROC_PLOT);
     configureUI();
+    setTitle(settings.getTitle());
   }
 
   protected static ImageIcon createImageIcon(String path, String description) {
@@ -283,8 +284,10 @@ public class RocPlot {
     new DropTarget(mRocLinesPanel, new RocDropListener());
 
     mZoomPP.setBackground(Color.WHITE);
-    mZoomPP.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
-    mZoomPP.setGraphShadowWidth(4);
+    if (!mPlain) {
+      mZoomPP.setGraphBGColor(new Color(0.8f, 0.9f, 1.0f), Color.WHITE);
+      mZoomPP.setGraphShadowWidth(4);
+    }
 
     final GridBagConstraints c = new GridBagConstraints();
     c.insets = new Insets(2, 2, 2, 2);
@@ -487,6 +490,7 @@ public class RocPlot {
     private Point2D mCrosshair2;
     RocZoomPlotPanel() {
       super();
+      mPlainSave = false; // Use whatever config we have
     }
 
     @Override
@@ -724,24 +728,6 @@ public class RocPlot {
   }
 
   /**
-   * Set whether to show scores on the plot lines
-   * @param flag show scores
-   */
-  public void showScores(boolean flag) {
-    mShowScores = flag;
-    SwingUtilities.invokeLater(() -> mScoreCB.setSelected(mShowScores));
-  }
-
-  /**
-   * Set the line width slider to the given value
-   * @param width line width
-   */
-  public void setLineWidth(int width) {
-    mLineWidth = Math.max(Math.min(width, LINE_WIDTH_MAX), LINE_WIDTH_MIN);
-    SwingUtilities.invokeLater(() -> mLineWidthSlider.setValue(mLineWidth));
-  }
-
-  /**
    * Sets the split pane divider location
    * @param loc proportional location
    */
@@ -910,14 +896,13 @@ public class RocPlot {
       frame.setIconImage(icon.getImage());
     }
 
-    final RocPlot rp = new RocPlot(settings.mPrecisionRecall, settings.mInterpolate, settings.mWeighted, settings.mPaletteName) {
+    final RocPlot rp = new RocPlot(settings) {
       @Override
       public void setTitle(final String title) {
         super.setTitle(title);
         frame.setTitle("rtg rocplot - " + title);
       }
     };
-    rp.setLineWidth(settings.mLineWidth);
     frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     frame.setLayout(new BorderLayout());
     frame.add(rp.mMainPanel, BorderLayout.CENTER);
@@ -931,8 +916,6 @@ public class RocPlot {
         lock.countDown();
       }
     });
-    rp.showScores(settings.mShowScores);
-    rp.setTitle(settings.mTitle != null ? settings.mTitle : settings.mPrecisionRecall ? PRECISION_SENSITIVITY : ROC);
     SwingUtilities.invokeAndWait(() -> {
       frame.pack();
       frame.setSize(1024, 768);

@@ -90,6 +90,7 @@ public class RocPlotToFileTest extends AbstractTest {
       final File svg = new File(dir, "example.svg");
       final RocPlotToFile r = new RocPlotToFile();
       r.setTitle("a title");
+      r.setPlain(true);
       r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 95,
@@ -112,6 +113,7 @@ public class RocPlotToFileTest extends AbstractTest {
       final File svg = new File(dir, "example.svg");
       final RocPlotToFile r = new RocPlotToFile();
       r.setTitle("a title");
+      r.setPlain(true);
       r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
       checkSvg(svg, 88,
