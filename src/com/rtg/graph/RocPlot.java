@@ -227,7 +227,7 @@ public class RocPlot {
     mOpenButton = new JButton("Open...");
     mOpenButton.setToolTipText("Add a new curve from a file");
     mCommandButton = new JButton("Cmd...");
-    mCommandButton.setToolTipText("Send the equivalent rocplot command-line to the terminal");
+    mCommandButton.setToolTipText("Show the equivalent rocplot command-line for the current configuration");
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
     mIconLabel = new JLabel(icon);
     mIconLabel.setBackground(new Color(16, 159, 205));
