@@ -220,7 +220,7 @@ public class RocPlot {
     mScrollPane.setWheelScrollingEnabled(true);
     mLineWidthSlider = new JSlider(JSlider.HORIZONTAL, LINE_WIDTH_MIN, LINE_WIDTH_MAX, 1);
     mScoreCB = new JCheckBox("Show Scores");
-    mScoreCB.setSelected(true);
+    mScoreCB.setSelected(mShowScores);
     mSelectAllCB = new JCheckBox("Select / Deselect all");
     mTitleEntry = new JTextField();
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
