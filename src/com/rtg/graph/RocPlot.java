@@ -923,11 +923,19 @@ public class RocPlot {
       frame.setVisible(true);
       rp.showCurrentGraph();
       if (hideSidePanel) {
+        try {  // Put a pause, because fricken swing is a load of bollocks
+          Thread.sleep(200);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
         rp.setSplitPaneDividerLocation(1.0);
       }
     });
     rp.loadData(fileList, nameList, settings.mInitialZoom);
     SwingUtilities.invokeAndWait(rp::showCurrentGraph);
+    if (hideSidePanel) { // Redo, as fricken swing is a load of bollocks
+      SwingUtilities.invokeAndWait(() -> rp.setSplitPaneDividerLocation(1.0));
+    }
     lock.await();
   }
 }
