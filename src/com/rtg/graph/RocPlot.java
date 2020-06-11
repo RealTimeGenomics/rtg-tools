@@ -134,28 +134,29 @@ public class RocPlot {
 
   private static final String ROC = "ROC";
 
-  private final JPanel mMainPanel;
+  private final JPanel mMainPanel = new JPanel();
   /** panel showing plot */
-  private final RocZoomPlotPanel mZoomPP;
+  private final RocZoomPlotPanel mZoomPP = new RocZoomPlotPanel();
   /** a progress bar */
-  private final JProgressBar mProgressBar;
+  private final JProgressBar mProgressBar = new JProgressBar(-1, -1);
   /** pop up menu */
-  private final JPopupMenu mPopup;
+  private final JPopupMenu mPopup = new JPopupMenu();
 
-  private final JLabel mIconLabel;
+  private final JLabel mIconLabel = new JLabel(createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo"));
 
-  private final RocLinesPanel mRocLinesPanel;
-  private final JSlider mLineWidthSlider;
-  private final JCheckBox mScoreCB;
-  private final JCheckBox mSelectAllCB;
-  private final JButton mOpenButton;
-  private final JButton mCommandButton;
-  private final JTextField mTitleEntry;
-  private final JComboBox<String> mGraphType;
+  private final RocLinesPanel mRocLinesPanel = new RocLinesPanel(this);
+  private final JScrollPane mScrollPane = new JScrollPane(mRocLinesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+  private final JSlider mLineWidthSlider = new JSlider(JSlider.HORIZONTAL, LINE_WIDTH_MIN, LINE_WIDTH_MAX, 1);
+  private final JCheckBox mScoreCB = new JCheckBox("Show Scores");
+  private final JCheckBox mSelectAllCB = new JCheckBox("Select / Deselect all");
+  private final JButton mOpenButton = new JButton("Open...");
+  private final JButton mCommandButton = new JButton("Cmd...");
+  private final JTextField mTitleEntry = new JTextField();
+  private final JComboBox<String> mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_SENSITIVITY});
   private final boolean mInterpolate;
   private final boolean mWeighted;
-  private JSplitPane mSplitPane;
-  private final JLabel mStatusLabel;
+  private final JSplitPane mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+  private final JLabel mStatusLabel = new JLabel();
 
   // Graph data and state
   final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<>());
@@ -163,7 +164,6 @@ public class RocPlot {
   boolean mPlain;
   int mLineWidth;
 
-  private final JScrollPane mScrollPane;
 
   private final JFileChooser mFileChooser;
   private File mFileChooserParent = null;
@@ -197,7 +197,6 @@ public class RocPlot {
     mPlain = settings.mPlain;
     mPaletteName = settings.mPaletteName;
     mPalette = RocPlotPalettes.SINGLETON.getPalette(mPaletteName);
-    mMainPanel = new JPanel();
     UIManager.put("FileChooser.readOnly", Boolean.TRUE);
     mFileChooser = new JFileChooser();
     final Action details = mFileChooser.getActionMap().get("viewTypeDetails");
@@ -206,40 +205,25 @@ public class RocPlot {
     }
     mFileChooser.setMultiSelectionEnabled(true);
     mFileChooser.setFileFilter(new RocFileFilter());
-    mZoomPP = new RocZoomPlotPanel();
     mZoomPP.setOriginIsMin(true);
     mZoomPP.setTextAntialiasing(true);
-    mProgressBar = new JProgressBar(-1, -1);
     mProgressBar.setVisible(true);
     mProgressBar.setStringPainted(true);
     mProgressBar.setIndeterminate(true);
-    mStatusLabel = new JLabel();
-    mPopup = new JPopupMenu();
-    mRocLinesPanel = new RocLinesPanel(this);
-    mScrollPane = new JScrollPane(mRocLinesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     mScrollPane.setWheelScrollingEnabled(true);
-    mLineWidthSlider = new JSlider(JSlider.HORIZONTAL, LINE_WIDTH_MIN, LINE_WIDTH_MAX, 1);
-    mScoreCB = new JCheckBox("Show Scores");
     mScoreCB.setSelected(mShowScores);
-    mSelectAllCB = new JCheckBox("Select / Deselect all");
-    mTitleEntry = new JTextField();
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
-    mOpenButton = new JButton("Open...");
     mOpenButton.setToolTipText("Add a new curve from a file");
-    mCommandButton = new JButton("Cmd...");
     mCommandButton.setToolTipText("Show the equivalent rocplot command-line for the current configuration");
-    final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo.png", "RTG Logo");
-    mIconLabel = new JLabel(icon);
     mIconLabel.setBackground(new Color(16, 159, 205));
     mIconLabel.setForeground(Color.WHITE);
     mIconLabel.setOpaque(true);
     mIconLabel.setFont(new Font("Arial", Font.BOLD, 24));
     mIconLabel.setHorizontalAlignment(JLabel.LEFT);
     mIconLabel.setIconTextGap(50);
-    if (icon != null) {
-      mIconLabel.setMinimumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
+    if (mIconLabel.getIcon() != null) {
+      mIconLabel.setMinimumSize(new Dimension(mIconLabel.getIcon().getIconWidth(), mIconLabel.getIcon().getIconHeight()));
     }
-    mGraphType = new JComboBox<>(new String[] {ROC_PLOT, PRECISION_SENSITIVITY});
     mGraphType.setSelectedItem(settings.mPrecisionRecall ? PRECISION_SENSITIVITY : ROC_PLOT);
     configureUI();
     setTitle(settings.getTitle());
@@ -260,10 +244,16 @@ public class RocPlot {
    */
   private void configureUI() {
     mMainPanel.setLayout(new BorderLayout());
+
     final JPanel pane = new JPanel(new BorderLayout());
+    pane.add(mIconLabel, BorderLayout.NORTH);
     pane.add(mZoomPP, BorderLayout.CENTER);
+    pane.add(mProgressBar, BorderLayout.SOUTH);
+
     final JPanel rightPanel = new JPanel(new GridBagLayout());
-    mSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane, rightPanel);
+
+    mSplitPane.setLeftComponent(pane);
+    mSplitPane.setRightComponent(rightPanel);
     mSplitPane.setContinuousLayout(true);
     mSplitPane.setOneTouchExpandable(true);
     mSplitPane.setResizeWeight(1);
@@ -393,10 +383,6 @@ public class RocPlot {
     b.add(mCommandButton);
     rightPanel.add(b, c);
 
-    pane.add(mProgressBar, BorderLayout.SOUTH);
-
-    mIconLabel.setText(mTitleEntry.getText());
-    pane.add(mIconLabel, BorderLayout.NORTH);
   }
 
   @JumbleIgnore
