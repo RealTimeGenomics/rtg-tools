@@ -176,31 +176,41 @@ final class DataBundle {
     mTitle = title;
   }
 
+  // Guess an appropriate string from parent directory name
+  static String mangleDir(String dirname) {
+    return dirname.replaceFirst("^(vcf)?eval[-_.]", "").replaceFirst("[-_.](vcf)?eval$", "");
+  }
+
+  // Make an appropriate automatic name from weighted ROC data file
+  static String autoName(File f, String scoreName) {
+    final StringBuilder autoname = new StringBuilder();
+    final String parentDir = mangleDir(f.getAbsoluteFile().getParentFile().getName());
+    autoname.append(parentDir);
+
+    final String fname = f.getName();
+    final int rocIdx = fname.indexOf(RocFilter.ROC_EXT);
+    if (rocIdx != -1 && !fname.startsWith(RocFilter.ALL.fileName())) {
+      if (autoname.length() > 0) {
+        autoname.append(' ');
+      }
+      autoname.append(fname, 0, rocIdx);
+    }
+
+    if (scoreName != null) {
+      if (autoname.length() > 0) {
+        autoname.append(' ');
+      }
+      autoname.append(scoreName);
+    }
+    return autoname.toString();
+  }
+
   // Set an automatic name based on directory name of file and score field if no explicit name was provided
   void setTitle(File f, String name) {
     if (name.length() > 0) {
       setTitle(name);
     } else {
-      final StringBuilder autoname = new StringBuilder();
-      final String parentDir = f.getAbsoluteFile().getParentFile().getName().replaceFirst("^(vcf)?eval[-_.]", "").replaceFirst("[-_.](vcf)?eval$", "");
-      autoname.append(parentDir);
-
-      final String fname = f.getName();
-      final int rocIdx = fname.indexOf(RocFilter.ROC_EXT);
-      if (rocIdx != -1 && !fname.startsWith(RocFilter.ALL.fileName())) {
-        if (autoname.length() > 0) {
-          autoname.append(' ');
-        }
-        autoname.append(fname, 0, rocIdx);
-      }
-
-      if (getScoreName() != null) {
-        if (autoname.length() > 0) {
-          autoname.append(' ');
-        }
-        autoname.append(getScoreName());
-      }
-      setTitle(autoname.toString());
+      setTitle(autoName(f, getScoreName()));
     }
   }
 
