@@ -208,7 +208,7 @@ public class ChildSampleSimulator {
       }
     }
     if (!foundGt) {
-      throw new NoTalkbackSlimException("input VCF does not contain GT information");
+      throw new NoTalkbackSlimException("Input VCF does not contain GT information");
     }
     final GenomeRelationships ped = VcfPedigreeParser.load(header);
 
@@ -346,19 +346,25 @@ public class ChildSampleSimulator {
     }
     private void prepareTrio(VcfHeader header, Map<Sex, ReferenceGenome> sexRef, GenomeRelationships ped) {
       if (header.getSampleIndex(mChildSampleName) != -1) {
-        throw new NoTalkbackSlimException("sample '" + mChildSampleName + "' already exists");
+        throw new NoTalkbackSlimException("Sample '" + mChildSampleName + "' already exists");
       }
       final int fatherSampleNum = header.getSampleIndex(mFatherSampleName);
       if (fatherSampleNum == -1) {
-        throw new NoTalkbackSlimException("father sample '" + mFatherSampleName + "' does not exist");
+        throw new NoTalkbackSlimException("Father sample '" + mFatherSampleName + "' does not exist");
       }
       final int motherSampleNum = header.getSampleIndex(mMotherSampleName);
       if (motherSampleNum == -1) {
-        throw new NoTalkbackSlimException("mother sample '" + mMotherSampleName + "' does not exist");
+        throw new NoTalkbackSlimException("Mother sample '" + mMotherSampleName + "' does not exist");
       }
 
       mFatherSex = ped.getSex(mFatherSampleName);
+      if (mFatherSex == Sex.FEMALE) {
+        throw new NoTalkbackSlimException("Father sample is already declared as FEMALE in VCF SAMPLE/PEDIGREE definitions");
+      }
       mMotherSex = ped.getSex(mMotherSampleName);
+      if (mMotherSex == Sex.MALE) {
+        throw new NoTalkbackSlimException("Mother sample is already declared as MALE in VCF SAMPLE/PEDIGREE definitions");
+      }
       header.addSampleName(mChildSampleName);
       if (mChildSex == Sex.FEMALE || mChildSex == Sex.MALE) {
         header.addMetaInformationLine(VcfHeader.SAMPLE_STRING + "=<ID=" + mChildSampleName + ",Sex=" + mChildSex + ">");
