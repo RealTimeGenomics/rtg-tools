@@ -369,12 +369,12 @@ public final class VcfFilterCli extends AbstractCli {
     if (mFlags.isSet(INCLUDE_BED)) {
       mVcfFilterTask.mIncludeBed = BedUtils.regions((File) mFlags.getValue(INCLUDE_BED));
     } else if (mFlags.isSet(INCLUDE_VCF)) {
-      mVcfFilterTask.mIncludeBed = VcfUtils.regionsVcf((File) mFlags.getValue(INCLUDE_VCF));
+      mVcfFilterTask.mIncludeBed = VcfUtils.regions((File) mFlags.getValue(INCLUDE_VCF));
     }
     if (mFlags.isSet(EXCLUDE_BED)) {
       mVcfFilterTask.mExcludeBed = BedUtils.regions((File) mFlags.getValue(EXCLUDE_BED));
     } else if (mFlags.isSet(EXCLUDE_VCF)) {
-      mVcfFilterTask.mExcludeBed = VcfUtils.regionsVcf((File) mFlags.getValue(EXCLUDE_VCF));
+      mVcfFilterTask.mExcludeBed = VcfUtils.regions((File) mFlags.getValue(EXCLUDE_VCF));
     }
     mVcfFilterTask.mAllSamples = mFlags.isSet(ALL_SAMPLES);
     for (final Object expr : mFlags.getValues(EXPR_FLAG)) {

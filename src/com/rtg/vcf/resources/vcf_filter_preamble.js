@@ -1,6 +1,8 @@
 // Global variable to hold the current record
 var rec;
 
+var Regions = Java.type("com.rtg.util.intervals.JSReferenceRegions");
+var BedUtils = Java.type("com.rtg.bed.BedUtils");
 var VcfUtils = Java.type("com.rtg.vcf.VcfUtils");
 var FilterField = Java.type("com.rtg.vcf.header.FilterField");
 var InfoField = Java.type("com.rtg.vcf.header.InfoField");

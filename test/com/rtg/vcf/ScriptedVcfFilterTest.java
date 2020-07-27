@@ -37,6 +37,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,6 +51,8 @@ import org.junit.rules.ExpectedException;
 
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.io.FileUtils;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.vcf.header.FilterField;
 import com.rtg.vcf.header.FormatField;
 import com.rtg.vcf.header.InfoField;
@@ -517,6 +521,44 @@ public class ScriptedVcfFilterTest {
     assertTrue(getScriptedVcfFilter("has(INFO.IN)").accept(record));
     assertTrue(getScriptedVcfFilter("INFO.IN.indexOf(\"intron_variant\") != -1").accept(record));
     assertTrue(getScriptedVcfFilter("INFO.IN.match(\"intron_variant\") != null").accept(record));
+  }
+
+  @Test
+  public void testRegions() throws IOException {
+    try (TestDirectory tdir = new TestDirectory("scripted-filters")) {
+      File bedfile = new File(tdir, "regions.bed");
+      FileUtils.stringToFile("blah\t100\t106", bedfile);
+
+      File vcffile = new File(tdir, "regions.vcf");
+      VcfRecord record = new VcfRecord("blah", 100, "ATATAT");
+      final VcfHeader header = new VcfHeader();
+      header.addCommonHeader();
+      FileUtils.stringToFile(header.toString() + record.toString(), vcffile);
+
+      ScriptedVcfFilter bedFilter = getScriptedVcfFilter("regions.overlaps(CHROM, POS, POS+REF.length)",
+        "var regions = Regions.fromBed('" + bedfile.toString() + "')");
+      ScriptedVcfFilter vcfFilter = getScriptedVcfFilter("regions.overlaps(CHROM, POS, POS+REF.length)",
+        "var regions = Regions.fromVcf('" + vcffile.toString() + "')");
+
+      // Note: direct VcfRecord construction is zero-based, but the JS overlap api is one-based
+      VcfRecord[] positives = {
+        new VcfRecord("blah", 100, "A"),
+        new VcfRecord("blah", 105, "A"),
+      };
+      for (VcfRecord p : positives) {
+        assertTrue(bedFilter.accept(p));
+        assertTrue(vcfFilter.accept(p));
+      }
+      VcfRecord[] negatives = {
+        new VcfRecord("blah", 1, "A"),
+        new VcfRecord("blah", 99, "A"),
+        new VcfRecord("blah", 106, "A"),
+      };
+      for (VcfRecord p : negatives) {
+        assertFalse(bedFilter.accept(p));
+        assertFalse(vcfFilter.accept(p));
+      }
+    }
   }
 
 }

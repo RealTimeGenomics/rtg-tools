@@ -102,7 +102,18 @@ public class ReferenceRegionsTest extends TestCase {
   }
 
   public void testFromFile() throws IOException {
-    assertNull(BedUtils.regions(null));
+    try {
+      assertNull(BedUtils.regions((String) null));
+      fail();
+    } catch (NullPointerException e) {
+      // expected
+    }
+    try {
+      assertNull(BedUtils.regions((File) null));
+      fail();
+    } catch (NullPointerException e) {
+      // expected
+    }
     try (TestDirectory tmp = new TestDirectory()) {
       final File f = new File(tmp, "bed");
       FileUtils.stringToFile(BED, f);

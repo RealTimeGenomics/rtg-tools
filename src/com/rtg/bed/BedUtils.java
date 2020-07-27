@@ -73,17 +73,29 @@ public final class BedUtils {
 
   /**
    * Create a ReferenceRegions from the specified BED file
-   * @param f a pointer to the bed file
-   * @return a new <code>ReferenceRegions</code> or null if the argument is null
+   * @param filename a pointer to the BED file
+   * @return a new <code>ReferenceRegions</code>
+   * @throws java.io.IOException when reading the file fails
+   */
+  public static ReferenceRegions regions(String filename) throws IOException {
+    if (filename == null) {
+      throw new NullPointerException();
+    }
+    return regions(new File(filename));
+  }
+
+  /**
+   * Create a ReferenceRegions from the specified BED file
+   * @param f a pointer to the BED file
+   * @return a new <code>ReferenceRegions</code>
    * @throws java.io.IOException when reading the file fails
    */
   public static ReferenceRegions regions(File f) throws IOException {
-    if (f != null) {
-      try (BedReader reader = BedReader.openBedReader(null, f, 0)) {
-        return ReferenceRegions.regions(reader);
-      }
-    } else {
-      return null;
+    if (f == null) {
+      throw new NullPointerException();
+    }
+    try (BedReader reader = BedReader.openBedReader(null, f, 0)) {
+      return ReferenceRegions.regions(reader);
     }
   }
 }

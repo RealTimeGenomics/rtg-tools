@@ -98,7 +98,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       checkHeader(VcfUtils.getHeader(baseline), VcfUtils.getHeader(calls), templateSequences.getSdfId());
 
       final ReferenceRanges<String> ranges = getReferenceRanges(params, templateSequences);
-      final ReferenceRegions evalRegions = BedUtils.regions(params.evalRegionsFile());
+      final ReferenceRegions evalRegions = params.evalRegionsFile() == null ? null : BedUtils.regions(params.evalRegionsFile());
       final VariantSet variants = getVariants(params, templateSequences, ranges, evalRegions);
 
       evaluateCalls(params, templateSequences, variants);

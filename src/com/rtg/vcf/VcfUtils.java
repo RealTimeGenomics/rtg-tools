@@ -868,18 +868,30 @@ public final class VcfUtils {
   }
 
   /**
-   * Create a new instance from the specified VCF file.
-   * @param f a pointer to the VCF file
-   * @return a new <code>ReferenceRegions</code> or null if the argument is null
+   * Create a ReferenceRegions from the specified VCF file
+   * @param filename a pointer to the VCF file
+   * @return a new <code>ReferenceRegions</code>
    * @throws java.io.IOException when reading the file fails
    */
-  public static ReferenceRegions regionsVcf(File f) throws IOException {
-    if (f != null) {
-      try (VcfReader reader = VcfReader.openVcfReader(f)) {
-        return ReferenceRegions.regions(reader);
-      }
-    } else {
-      return null;
+  public static ReferenceRegions regions(String filename) throws IOException {
+    if (filename == null) {
+      throw new NullPointerException();
+    }
+    return regions(new File(filename));
+  }
+
+  /**
+   * Create a new instance from the specified VCF file.
+   * @param f a pointer to the VCF file
+   * @return a new <code>ReferenceRegions</code>
+   * @throws java.io.IOException when reading the file fails
+   */
+  public static ReferenceRegions regions(File f) throws IOException {
+    if (f == null) {
+      throw new NullPointerException();
+    }
+    try (VcfReader reader = VcfReader.openVcfReader(f)) {
+      return ReferenceRegions.regions(reader);
     }
   }
 
