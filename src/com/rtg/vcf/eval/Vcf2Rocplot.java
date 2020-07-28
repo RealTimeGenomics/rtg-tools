@@ -35,10 +35,12 @@ import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_PRECISION;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SENSITIVITY;
+import static com.rtg.vcf.eval.VcfEvalCli.ROC_EXPR;
+import static com.rtg.vcf.eval.VcfEvalCli.ROC_REGIONS;
 import static com.rtg.vcf.eval.VcfEvalCli.SCORE_FIELD;
 import static com.rtg.vcf.eval.VcfEvalCli.SORT_ORDER;
-import static com.rtg.vcf.eval.VcfEvalCli.validateVcfRocExpr;
 import static com.rtg.vcf.eval.VcfEvalCli.validateScoreField;
+import static com.rtg.vcf.eval.VcfEvalCli.validateVcfRocFlag;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,7 +102,8 @@ public class Vcf2Rocplot extends LoggedCli {
       && CommonFlags.validateInputFile(flags)
       && CommonFlags.validateThreads(flags)
       && validateScoreField(flags)
-      && validateVcfRocExpr(flags)
+      && validateVcfRocFlag(flags, ROC_EXPR)
+      && validateVcfRocFlag(flags, ROC_REGIONS)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
       && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
     );

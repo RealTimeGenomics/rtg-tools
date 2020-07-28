@@ -34,6 +34,7 @@ import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -89,6 +90,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
   protected static final String ROC_SUBSET = "Xroc-subset";
   protected static final String ROC_EXPR = "Xroc-expr";
+  protected static final String ROC_REGIONS = "Xroc-regions";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String RTG_STATS = "Xrtg-stats";
@@ -200,7 +202,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
       && validateScoreField(flags)
-      && validateVcfRocExpr(flags)
+      && validateVcfRocFlag(flags, ROC_EXPR)
+      && validateVcfRocFlag(flags, ROC_REGIONS)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
       && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
     );
@@ -210,21 +213,22 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     flags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "custom ROC filter of the form <NAME>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "custom JavaScript ROC filter of the form <NAME>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "custom region ROC filter of the form <NAME>=<BEDFILE>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
   }
 
-  static boolean validateVcfRocExpr(CFlags flags) {
-    if (flags.isSet(ROC_EXPR)) {
-      final List<?> values = flags.getValues(VcfEvalCli.ROC_EXPR);
+  static boolean validateVcfRocFlag(CFlags flags, String rocFlag) {
+    if (flags.isSet(rocFlag)) {
+      final List<?> values = flags.getValues(rocFlag);
       for (Object o : values) {
         final String spec = (String) o;
         final String[] split = StringUtils.split(spec, '=', 2);
         if (split.length != 2) {
-          flags.setParseMessage("--" + ROC_EXPR + " invalid specification " + spec);
+          flags.setParseMessage("--" + rocFlag + " invalid specification " + spec);
           return false;
         }
       }
@@ -329,7 +333,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   }
 
   @Override
-  protected VcfEvalParams makeParams() {
+  protected VcfEvalParams makeParams() throws IOException {
     final VcfEvalParamsBuilder builder = VcfEvalParams.builder();
     builder.name(mFlags.getName());
     builder.outputParams(new OutputParams(outputDirectory(), !mFlags.isSet(CommonFlags.NO_GZIP)));
@@ -385,7 +389,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     return builder.create();
   }
 
-  static Set<RocFilter> getRocFilters(CFlags flags) {
+  static Set<RocFilter> getRocFilters(CFlags flags) throws IOException {
     final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
       final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);
@@ -401,6 +405,14 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
         rocFilters.add(new ExpressionRocFilter(e[0], e[1]));
       }
     }
+    if (flags.isSet(ROC_REGIONS)) {
+      final List<?> values = flags.getValues(VcfEvalCli.ROC_REGIONS);
+      for (Object o : values) {
+        final String[] e = StringUtils.split((String) o, '=', 2);
+        assert e.length == 2;
+        rocFilters.add(new RegionsRocFilter(e[0], new File(e[1])));
+      }
+    }
     if (flags.isSet(RTG_STATS)) {
       rocFilters.add(RocFilter.NON_XRX);
       rocFilters.add(RocFilter.XRX);
@@ -410,7 +422,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       rocFilters.add(RocFilter.HOM_XRX);
     }
 
-    if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, RTG_STATS)) {
+    if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, ROC_REGIONS, RTG_STATS)) {
       rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
     }
 
