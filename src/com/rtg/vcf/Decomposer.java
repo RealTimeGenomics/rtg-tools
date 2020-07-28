@@ -46,6 +46,7 @@ import com.rtg.mode.DnaUtils;
 import com.rtg.reader.ReaderUtils;
 import com.rtg.reader.SequencesReader;
 import com.rtg.util.diagnostic.Diagnostic;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
@@ -101,7 +102,10 @@ class Decomposer {
 
   private void updateTemplate(final String sequenceName) throws IOException {
     if (mTemplate != null) {
-      final long sequenceId = mNameMap.get(sequenceName);
+      final Long sequenceId = mNameMap.get(sequenceName);
+      if (sequenceId == null) {
+        throw new NoTalkbackSlimException("Sequence " + sequenceName + " was not contained in the supplied reference");
+      }
       if (mCurrentSequenceId != sequenceId) {
         mCurrentSequenceId = sequenceId;
         mCurrentSequence = mTemplate.read(sequenceId);
