@@ -204,6 +204,9 @@ public class Adjuster {
           break;
         case SUM:
           final InfoField f = mHeader.getInfoField(field);
+          if (f == null) {
+            throw new VcfFormatException("INFO field " + field + " was not declared in the VCF header");
+          }
           validateTypedField(f);
           final String[] parts = original.getInfoSplit(field);
           if (parts.length != alleleMap.length) {
@@ -232,6 +235,9 @@ public class Adjuster {
           break;
         case SUM:
           final FormatField f = mHeader.getFormatField(field);
+          if (f == null) {
+            throw new VcfFormatException("FORMAT field " + field + " was not declared in the VCF header");
+          }
           validateTypedField(f);
           final List<String> replacementFieldValues = sumAdjustFormatSamples(original.getFormat(field), alleleMap, numAlleles, f.getType());
           replacement.setFormat(field, replacementFieldValues);
