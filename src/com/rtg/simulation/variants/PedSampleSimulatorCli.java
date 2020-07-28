@@ -312,8 +312,11 @@ public class PedSampleSimulatorCli extends LoggedCli {
       // Warn about cases where one parent was missing (these aren't selected as families above, so the child(ren) aren't using inheritance
       final Relationship[] rel = pedigree.relationships(sample, new Relationship.RelationshipTypeFilter(Relationship.RelationshipType.PARENT_CHILD), new Relationship.SecondInRelationshipFilter(sample));
       if (rel.length != 0) {
-        assert rel.length != 2; // Should have already been generated above
-        Diagnostic.warning("Sample " + sample + " is a child of non-complete family, generating as independent individual.");
+        if (rel.length == 2) {
+          Diagnostic.warning("Sample " + sample + " is a child of unknown sex, generating as independent individual.");
+        } else {
+          Diagnostic.warning("Sample " + sample + " is a child of non-complete family, generating as independent individual.");
+        }
       }
       mSamples.add(sample);
       mCreated.add(sample);

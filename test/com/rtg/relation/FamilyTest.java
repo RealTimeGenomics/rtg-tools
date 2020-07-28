@@ -218,4 +218,18 @@ public class FamilyTest extends TestCase {
     assertEquals("fathermother", afamilies[2].getMother());
     assertEquals("father", afamilies[2].getChildren()[0]);
   }
+
+
+  public void testIncompleteFamily() throws PedigreeException {
+    final GenomeRelationships pedigree = new GenomeRelationships();
+    pedigree.addGenome("father", GenomeRelationships.SEX_MALE);
+    pedigree.addGenome("mother", GenomeRelationships.SEX_FEMALE);
+    pedigree.addGenome("child");
+    pedigree.addParentChild("father", "child");
+    pedigree.addParentChild("mother", "child");
+
+    final Set<Family> families = Family.getFamilies(pedigree, false, null);
+    assertEquals(0, families.size()); // Child does not have sex specified
+  }
+
 }
