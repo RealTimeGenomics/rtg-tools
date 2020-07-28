@@ -536,9 +536,9 @@ public class ScriptedVcfFilterTest {
       FileUtils.stringToFile(header.toString() + record.toString(), vcffile);
 
       ScriptedVcfFilter bedFilter = getScriptedVcfFilter("regions.overlaps(CHROM, POS, POS+REF.length)",
-        "var regions = Regions.fromBed('" + bedfile.toString() + "')");
+        "var regions = Regions.fromBed('" + bedfile.toString().replace("\\", "\\\\") + "')");
       ScriptedVcfFilter vcfFilter = getScriptedVcfFilter("regions.overlaps(CHROM, POS, POS+REF.length)",
-        "var regions = Regions.fromVcf('" + vcffile.toString() + "')");
+        "var regions = Regions.fromVcf('" + vcffile.toString().replace("\\", "\\\\") + "')");
 
       // Note: direct VcfRecord construction is zero-based, but the JS overlap api is one-based
       VcfRecord[] positives = {
