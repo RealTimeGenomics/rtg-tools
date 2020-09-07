@@ -116,7 +116,7 @@ public final class HalfPath implements Comparable<HalfPath> {
     final StringBuilder sb = new StringBuilder();
     final HaplotypePlayback haplotype = new HaplotypePlayback(mHaplotypeA.mTemplate);
     for (OrientedVariant v : included) {
-      haplotype.addVariant(v);
+      haplotype.add(v.allele());
     }
     if (region.getStart() > 0) {
       haplotype.moveForward(region.getStart() - 1);
@@ -161,8 +161,8 @@ public final class HalfPath implements Comparable<HalfPath> {
     mVariantIndex = varIndex;
     mIncludedVariantEndPosition = Math.max(mIncludedVariantEndPosition, var.variant().getEnd());
 
-    mHaplotypeA.addVariant(var);
-    mHaplotypeB.addVariant(var.other());
+    mHaplotypeA.add(var.allele());
+    mHaplotypeB.add(var.other().allele());
   }
 
   /**
@@ -260,11 +260,7 @@ public final class HalfPath implements Comparable<HalfPath> {
    * @return the leading reference
    */
   public int getPosition() {
-    if (mHaplotypeA.templatePosition() > mHaplotypeB.templatePosition()) {
-      return mHaplotypeA.templatePosition();
-    } else {
-      return mHaplotypeB.templatePosition();
-    }
+    return Math.max(mHaplotypeA.templatePosition(), mHaplotypeB.templatePosition());
   }
 
   /**
@@ -338,12 +334,12 @@ public final class HalfPath implements Comparable<HalfPath> {
     final StringBuilder sb = new StringBuilder();
     sb.append(mHaplotypeA.templatePosition() + 1);
     if (!mHaplotypeA.isOnTemplate()) {
-      sb.append('.').append(mHaplotypeA.positionInVariant());
+      sb.append('.').append(mHaplotypeA.positionInAllele());
     }
     sb.append("^:");
     sb.append(mHaplotypeB.templatePosition() + 1);
     if (!mHaplotypeB.isOnTemplate()) {
-      sb.append('.').append(mHaplotypeB.positionInVariant());
+      sb.append('.').append(mHaplotypeB.positionInAllele());
     }
     sb.append("v ");
     sb.append(' ');

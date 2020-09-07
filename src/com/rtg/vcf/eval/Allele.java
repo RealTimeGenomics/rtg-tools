@@ -32,6 +32,7 @@ package com.rtg.vcf.eval;
 
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.DnaUtils;
+import com.rtg.util.Utils;
 import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
@@ -44,7 +45,7 @@ import com.rtg.visualization.DisplayHelper;
  * Hold a variant allele, one allele of a genotype.
  */
 @TestClass("com.rtg.vcf.eval.VariantTest")
-public class Allele extends SequenceNameLocusSimple {
+public class Allele extends SequenceNameLocusSimple implements Comparable<Allele> {
 
   private static final byte[] UNKNOWN = {
     5 // Unspecified, but different to "N" (0)
@@ -88,6 +89,42 @@ public class Allele extends SequenceNameLocusSimple {
    */
   public boolean unknown() {
     return mNt == UNKNOWN;
+  }
+
+  @Override
+  public int compareTo(Allele that) {
+    if (this == that) {
+      return 0;
+    }
+    int id = Integer.compare(this.getStart(), that.getStart());
+    if (id != 0) {
+      return id;
+    }
+    id = Integer.compare(this.getEnd(), that.getEnd());
+    if (id != 0) {
+      return id;
+    }
+    id = Integer.compare(this.nt().length, that.nt().length);
+    if (id != 0) {
+      return id;
+    }
+    for (int i = 0; i < this.nt().length; i++) {
+      id = Integer.compare(that.nt()[i], this.nt()[i]);
+      if (id != 0) {
+        return id;
+      }
+    }
+    return 0;
+  }
+
+  @Override
+  public int hashCode() {
+    return Utils.pairHash(getStart(), getEnd(), nt().length);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Allele && compareTo((Allele) obj) == 0;
   }
 
   @Override

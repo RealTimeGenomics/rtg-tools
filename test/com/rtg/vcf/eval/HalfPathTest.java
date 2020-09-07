@@ -199,8 +199,8 @@ public class HalfPathTest extends TestCase {
     final HalfPath copy = new HalfPath(template);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 0);
     copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 1);
-    assertEquals(1, copy.compareTo(path));
-    assertEquals(-1, path.compareTo(copy));
+    assertEquals(-1, copy.compareTo(path));
+    assertEquals(1, path.compareTo(copy));
   }
 
   public void testMoreCompares3() {
