@@ -150,8 +150,8 @@ public class VariantTest extends TestCase {
 
     final OrientedVariant[] pos = Orientor.UNPHASED.orientations(variant);
     assertEquals(2, pos.length);
-    assertTrue(pos[0].isAlleleA());
-    assertFalse(pos[1].isAlleleA());
+    assertTrue(pos[0].isOriginal());
+    assertFalse(pos[1].isOriginal());
     assertTrue(pos[0].isHeterozygous());
     assertTrue(pos[1].isHeterozygous());
     assertEquals(1, pos[0].alleleId());

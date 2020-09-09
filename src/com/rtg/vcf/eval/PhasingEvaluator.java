@@ -184,7 +184,7 @@ public final class PhasingEvaluator {
         result = new VariantSummary(mCurrentExcluded, false, false);
         mCurrentExcluded = mExcluded.hasNext() ? mExcluded.next() : null;
       } else {
-        result = new VariantSummary(mCurrentIncluded.variant(), true, mCurrentIncluded.isAlleleA());
+        result = new VariantSummary(mCurrentIncluded.variant(), true, mCurrentIncluded.isOriginal());
         mCurrentIncluded = mIncluded.hasNext() ? mIncluded.next() : null;
       }
 

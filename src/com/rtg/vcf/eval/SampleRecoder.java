@@ -126,7 +126,7 @@ public class SampleRecoder extends InterleavingEvalSynchronizer {
       // Add the appropriate GT and output the record
       mBrv.setInfo("STATUS", "B-TP=" + mBv);
       final OrientedVariant ov = (OrientedVariant) mBv;
-      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleId(), ov.other().alleleId()));
+      mBrv.addFormatAndSample(VcfUtils.FORMAT_GENOTYPE, VcfUtils.joinGt(false, ov.alleleIds()));
       normalize(mBrv, 0);
       mSampleVcf.write(mBrv);
     } else if (mBv.hasStatus(VariantId.STATUS_SKIPPED)) {

@@ -104,7 +104,7 @@ public class PathTest extends AbstractNanoTest {
     int includeCount = 0;
     int excludeCount = 0;
     for (final OrientedVariant v : side) {
-      if (v.isAlleleA()) {
+      if (v.isOriginal()) { // An abuse of this field??
         ++includeCount;
         //System.err.println("include: " + v);
         boolean found = false;
@@ -138,7 +138,7 @@ public class PathTest extends AbstractNanoTest {
         assert variant.numAlleles() == 1;
         // Homozygous / haploid
         return new OrientedVariant[] {
-          new OrientedVariant(variant, 0)
+          new OrientedVariant(variant, false, 0, 0)
         };
       }
     }

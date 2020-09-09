@@ -127,8 +127,7 @@ public interface VariantFactory {
       final int alleleA = gtArray[0];
       final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
 
-      return new GtIdVariant(id, rec.getSequenceName(), alleles, alleleA, alleleB,
-        VcfUtils.isPhasedGt(VcfUtils.getValidGtStr(rec, mSampleNo))
+      return new GtIdVariant(id, rec.getSequenceName(), alleles, VcfUtils.isPhasedGt(VcfUtils.getValidGtStr(rec, mSampleNo)), alleleA, alleleB
       );
     }
   }

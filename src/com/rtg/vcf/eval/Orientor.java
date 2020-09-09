@@ -65,7 +65,7 @@ public interface Orientor {
       } else {
         // Homozygous / haploid
         return new OrientedVariant[]{
-          new OrientedVariant(variant, gv.alleleA())
+          new OrientedVariant(variant, true, gv.alleleA(), gv.alleleA())
         };
       }
     }
@@ -103,7 +103,7 @@ public interface Orientor {
       } else {
         // Homozygous / haploid
         return new OrientedVariant[]{
-          new OrientedVariant(variant, gv.alleleA())
+          new OrientedVariant(variant, true, gv.alleleA(), gv.alleleA())
         };
       }
     }
@@ -176,18 +176,18 @@ public interface Orientor {
       final int lb = bVar ? gv.alleleB() : gv.alleleA();
       if (la == lb) { // { 0/1, 1/0, 1/1 }   ->   0/1 + 1/0 + 1/1
         return new OrientedVariant[]{
-          new OrientedVariant(variant, true, 0, la),
-          new OrientedVariant(variant, true, la, 0),
-          new OrientedVariant(variant, la),
+          new OrientedVariant(variant, false, 0, la),
+          new OrientedVariant(variant, false, la, 0),
+          new OrientedVariant(variant, false, la, la),
         };
       } else { // { 1/2, 2/1 }  ->   0/1 + 0/2 + 1/0 + 2/0 + 1/2 + 2/1
         return new OrientedVariant[]{
-          new OrientedVariant(variant, true, 0, la),
-          new OrientedVariant(variant, true, 0, lb),
-          new OrientedVariant(variant, true, la, 0),
-          new OrientedVariant(variant, true, lb, 0),
-          new OrientedVariant(variant, true, la, lb),
-          new OrientedVariant(variant, true, lb, la),
+          new OrientedVariant(variant, false, 0, la),
+          new OrientedVariant(variant, false, 0, lb),
+          new OrientedVariant(variant, false, la, 0),
+          new OrientedVariant(variant, false, lb, 0),
+          new OrientedVariant(variant, false, la, lb),
+          new OrientedVariant(variant, false, lb, la),
           // For completeness we should add: (but they may actually be superfluous in the context of other variants)
           // new OrientedVariant(variant, la),
           // new OrientedVariant(variant, lb),

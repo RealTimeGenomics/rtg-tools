@@ -33,6 +33,7 @@ package com.rtg.vcf.eval;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.BasicLinkedListNode;
@@ -102,21 +103,19 @@ public final class HalfPath implements Comparable<HalfPath> {
 
     final StringBuilder sb = new StringBuilder(region.toString());
     sb.append(' ');
-    sb.append(replayAll(included, region));
+    sb.append(replayAll(included.stream().map(v -> v.allele(0)).collect(Collectors.toList()), region));
 
-    for (int i = 0; i < included.size(); ++i) {
-      included.set(i, included.get(i).other());
-    }
-    sb.append("|").append(replayAll(included, region));
+    sb.append("|");
+    sb.append(replayAll(included.stream().map(v -> v.allele(1)).collect(Collectors.toList()), region));
     return sb.toString();
   }
 
   // Return the full haplotype sequence with respect to the given variants
-  private String replayAll(List<OrientedVariant> included, Range region) {
+  private String replayAll(List<Allele> included, Range region) {
     final StringBuilder sb = new StringBuilder();
     final HaplotypePlayback haplotype = new HaplotypePlayback(mHaplotypeA.mTemplate);
-    for (OrientedVariant v : included) {
-      haplotype.add(v.allele());
+    for (Allele a : included) {
+      haplotype.add(a);
     }
     if (region.getStart() > 0) {
       haplotype.moveForward(region.getStart() - 1);
@@ -143,7 +142,7 @@ public final class HalfPath implements Comparable<HalfPath> {
       return true; // Can be added without considering overlapping
     }
     // Check if we can include this variant by overlapping
-    return mHaplotypeA.isNew(var) && mHaplotypeB.isNew(var.other());
+    return mHaplotypeA.isNew(var.allele(0)) && mHaplotypeB.isNew(var.allele(1));
   }
 
   void exclude(Variant var, int varIndex) {
@@ -161,8 +160,8 @@ public final class HalfPath implements Comparable<HalfPath> {
     mVariantIndex = varIndex;
     mIncludedVariantEndPosition = Math.max(mIncludedVariantEndPosition, var.variant().getEnd());
 
-    mHaplotypeA.add(var.allele());
-    mHaplotypeB.add(var.other().allele());
+    mHaplotypeA.add(var.allele(0));
+    mHaplotypeB.add(var.allele(1));
   }
 
   /**

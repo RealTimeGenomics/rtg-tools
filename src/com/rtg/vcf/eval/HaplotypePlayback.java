@@ -104,13 +104,6 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
   }
 
   /**
-   * @param var the variant to check
-   * @return true if the variant can be added to this HaplotypePlayback
-   */
-  public boolean isNew(OrientedVariant var) {
-    return isNew(var.allele());
-  }
-  /**
    * @param allele the allele to check
    * @return true if the allele can be added to this HaplotypePlayback
    */
