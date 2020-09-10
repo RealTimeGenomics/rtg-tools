@@ -63,6 +63,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
 
   /** Allele currently in or the next one. */
   private Allele mNextAllele;
+  private boolean mFinished;
 
   HaplotypePlayback(final byte[] template) {
     mAlleles = new LinkedList<>();
@@ -79,6 +80,7 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
     mTemplatePosition = old.mTemplatePosition;
     mPositionInAllele = old.mPositionInAllele;
     mLastAlleleEnd = old.mLastAlleleEnd;
+    mFinished = old.mFinished;
     assert globalIntegrity();
   }
 
@@ -128,6 +130,18 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
    */
   boolean hasNext() {
     return mTemplatePosition < mTemplate.length - 1;
+  }
+
+  void step() {
+    if (hasNext()) {
+      next();
+    } else {
+      mFinished = true;
+    }
+  }
+
+  boolean finished() {
+    return mFinished;
   }
 
   /**
@@ -297,6 +311,10 @@ public final class HaplotypePlayback implements Integrity, Comparable<HaplotypeP
   /** @return a copy of this object for use in another path */
   public HaplotypePlayback copy() {
     return new HaplotypePlayback(this);
+  }
+
+  boolean matches(HaplotypePlayback other) {
+    return finished() || other.finished() || nt() == other.nt();
   }
 
   /**

@@ -60,7 +60,7 @@ public class HalfPathTest extends TestCase {
     //                            1  2  3  4  5  6  7  8  9
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1};
                            //     2, 1  1 31  1     2  1  1
-    final HalfPath path = new HalfPath(template);
+    final HalfPath path = new HalfPath(1, template);
     assertEquals(0, path.getVariantEndPosition());
     final OrientedVariant included = OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, null), true);
     path.include(included, 0);
@@ -82,7 +82,7 @@ public class HalfPathTest extends TestCase {
     int i = 0;
     path.step();
     while (!path.finished()) {
-      assertEquals(expected[i], path.nextHaplotypeABase());
+      assertEquals(expected[i], path.nextHaplotypeBase(0));
       path.step();
       ++i;
     }
@@ -90,39 +90,39 @@ public class HalfPathTest extends TestCase {
   }
 
   public void testHetero() {
-    //                            1  2  3  4  5  6  7  8  9
+    //                       1  2  3  4  5  6  7  8  9
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1};
-                           //     2, 1  1 31  1     2  1  1
-                           //     2, 1  1431  1     2  1  1
-    final HalfPath path = new HalfPath(template);
+    //                       2, 1  1 31  1     2  1  1
+    //                       2, 1  1431  1     2  1  1
+    final HalfPath path = new HalfPath(2, template);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, new byte[]{1}), false), 0);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(4, 4, new byte[]{3}, new byte[]{4, 3}), true), 1);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(6, 7, new byte[]{}, null), true), 2);
 
-    final byte[] expected = {1, 1, 1, 3, 1, 1, 2, 1, 1};
-    final byte[] expectedMinus = {2, 1, 1, 4, 3, 1, 1, 2, 1, 1};
+    final byte[][] expected = {
+      {1, 1, 1, 3, 1, 1, 2, 1, 1},
+      {2, 1, 1, 4, 3, 1, 1, 2, 1, 1}
+    };
     int i = 0;
     path.step();
     while (!path.finished()) {
-      if (!path.finishedHaplotypeA()) {
-        assertEquals(expected[i], path.nextHaplotypeABase());
-      }
-      if (!path.finishedHaplotypeB()) {
-        assertEquals(expectedMinus[i], path.nextHaplotypeBBase());
-        //System.out.println(expectedMinus[i] + " " + path.nextMinusBase());
+      for (int h = 0; h < expected.length; h++) {
+        if (!path.finishedHaplotype(h)) {
+          assertEquals(expected[h][i], path.nextHaplotypeBase(h));
+        }
       }
       path.step();
       ++i;
     }
-    assertEquals(Math.max(expected.length, expectedMinus.length), i);
+    assertEquals(Math.max(expected[0].length, expected[1].length), i);
   }
 
   public void testCompare() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
     assertFalse(path.equals(null));
-    assertFalse(path.finishedHaplotypeA());
-    assertFalse(path.finishedHaplotypeB());
+    assertFalse(path.finishedHaplotype(0));
+    assertFalse(path.finishedHaplotype(1));
     assertEquals(0, path.getVariantEndPosition());
 
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(1, 2, new byte[]{2}, new byte[]{1}), false), 0);
@@ -182,8 +182,8 @@ public class HalfPathTest extends TestCase {
 
   public void testMoreCompares() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
-    final HalfPath copy = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
+    final HalfPath copy = new HalfPath(2, template);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 0);
     copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 1);
     path.step();
@@ -195,8 +195,8 @@ public class HalfPathTest extends TestCase {
 
   public void testMoreCompares2() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
-    final HalfPath copy = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
+    final HalfPath copy = new HalfPath(2, template);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 0);
     copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, new byte[]{4, 3}), true), 1);
     assertEquals(-1, copy.compareTo(path));
@@ -205,8 +205,8 @@ public class HalfPathTest extends TestCase {
 
   public void testMoreCompares3() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
-    final HalfPath copy = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
+    final HalfPath copy = new HalfPath(2, template);
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 0);
     copy.include(OrientedVariantTest.createOrientedVariant(new MockVariant(2, 3, new byte[]{3, 4}, null), true), 1);
     assertEquals(0, copy.compareTo(path));
@@ -214,7 +214,7 @@ public class HalfPathTest extends TestCase {
 
   public void testPosition() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
     path.step();
     path.step();
     assertEquals(1, path.getPosition());
@@ -224,7 +224,7 @@ public class HalfPathTest extends TestCase {
     path.step();
     assertEquals(4, path.getPosition());
 
-    final HalfPath path2 = new HalfPath(template);
+    final HalfPath path2 = new HalfPath(2, template);
     path2.step();
     path2.step();
     assertEquals(1, path2.getPosition());
@@ -237,7 +237,7 @@ public class HalfPathTest extends TestCase {
 
   public void testToString() {
     final byte[] template = {1, 1, 1, 1, 1, 3, 2, 1, 1, 1, 2, 3, 4, 1, 2, 3, 4};
-    final HalfPath path = new HalfPath(template);
+    final HalfPath path = new HalfPath(2, template);
     assertFalse(path.toString().contains("minus:"));
     path.include(OrientedVariantTest.createOrientedVariant(new MockVariant(3, 4, new byte[]{3}, new byte[]{4}), true), 0);
     path.exclude(new MockVariant(5, 6, new byte[]{2}, new byte[]{4}), 1);
@@ -276,7 +276,7 @@ public class HalfPathTest extends TestCase {
 
   public void testCaseFromMutationEvalTricky() {
     final byte[] template = DnaUtils.encodeString("ACTTTCCCACGTACGTCCTCT");
-    HalfPath path = new HalfPath(template);
+    HalfPath path = new HalfPath(1, template);
 
     int varIndex = 0;
     for (final String var : CALLS_TRICKY) {
@@ -286,12 +286,12 @@ public class HalfPathTest extends TestCase {
     StringBuilder sb = new StringBuilder();
     path.step();
     while (!path.finished()) {
-      sb.append(DNA.valueChars()[path.nextHaplotypeABase()]);
+      sb.append(DNA.valueChars()[path.nextHaplotypeBase(0)]);
       path.step();
     }
     assertEquals("TCTTTCCCAAGAAAGACCTAT", sb.toString());
 
-    path = new HalfPath(template);
+    path = new HalfPath(1, template);
     varIndex = 0;
     for (final String var : MUTATIONS_TRICKY) {
       final String vartab = var.replaceAll(" ", "\t");
@@ -300,7 +300,7 @@ public class HalfPathTest extends TestCase {
     sb = new StringBuilder();
     path.step();
     while (!path.finished()) {
-      sb.append(DNA.valueChars()[path.nextHaplotypeABase()]);
+      sb.append(DNA.valueChars()[path.nextHaplotypeBase(0)]);
       path.step();
     }
     assertEquals("ACTTTCCCAAGAAAGACATAT", sb.toString());

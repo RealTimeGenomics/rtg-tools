@@ -159,8 +159,18 @@ public final class Path implements Comparable<Path> {
    * @param template the template sequence to build a path for.
    */
   Path(byte[] template) {
-    mCalledPath = new HalfPath(template);
-    mBaselinePath = new HalfPath(template);
+    this(2, template);
+  }
+
+  /**
+   * Construct a path object for the specified template
+   *
+   * @param haplotypes number of haplotypes
+   * @param template the template sequence to build a path for.
+   */
+  Path(int haplotypes, byte[] template) {
+    mCalledPath = new HalfPath(haplotypes, template);
+    mBaselinePath = new HalfPath(haplotypes, template);
     mSyncPointList = null;
   }
 
@@ -185,10 +195,10 @@ public final class Path implements Comparable<Path> {
    * @return true if all positions are the same and there are no unplayed variants.
    */
   boolean inSync() {
-    if (mCalledPath.compareHaplotypePositions() != 0) {
+    if (mCalledPath.trailingHaplotype() != -1) {
       return false;
     }
-    if (mBaselinePath.compareHaplotypePositions() != 0) {
+    if (mBaselinePath.trailingHaplotype() != -1) {
       return false;
     }
     if (mCalledPath.getPosition() != mBaselinePath.getPosition()) {
@@ -315,18 +325,15 @@ public final class Path implements Comparable<Path> {
   }
 
   void step() {
-    if (mCalledPath.compareHaplotypePositions() > 0) {
-      // make B haplotype catch up to A
-      mCalledPath.haplotypeBStep();
-      mBaselinePath.haplotypeBStep();
-    } else if (mCalledPath.compareHaplotypePositions() < 0) {
-      // make A haplotype catch up to B
-      mCalledPath.haplotypeAStep();
-      mBaselinePath.haplotypeAStep();
-    } else {
-      // step both
+    final int trailing = mCalledPath.trailingHaplotype();
+    if (trailing == -1) {
+      // step all
       mCalledPath.step();
       mBaselinePath.step();
+    } else {
+      // Make the trailing haplotype catch up
+      mCalledPath.step(trailing);
+      mBaselinePath.step(trailing);
     }
   }
 
