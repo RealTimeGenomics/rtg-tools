@@ -110,6 +110,10 @@ public final class PathFinder {
   private int mCurrentMaxPos;
 
   <T extends Variant> PathFinder(byte[] template, String templateName, Collection<T> baseLineVariants, Collection<T> calledVariants, Orientor baselineOrientor, Orientor callOrientor, Config config) {
+    if (baselineOrientor.haplotypes() != callOrientor.haplotypes()) {
+      throw new IllegalArgumentException("Number of haplotypes produced by baseline and calls must match!"
+        + " (" + baselineOrientor.haplotypes() + " != " + callOrientor.haplotypes() + ")");
+    }
     mTemplate = template;
     mTemplateName = templateName;
     mConfig = config;
@@ -126,7 +130,7 @@ public final class PathFinder {
     Diagnostic.developerLog("Starting path-finding for " + mTemplateName + " using " + mBaselineOrientor + "," + mCallOrientor);
     // make it easy to find variants
     final TreeSet<Path> sortedPaths = new TreeSet<>();
-    sortedPaths.add(new Path(mTemplate));
+    sortedPaths.add(new Path(mBaselineOrientor.haplotypes(), mTemplate));
     Path best = null;
     int maxPaths = 0;
     String maxPathsRegion = "";

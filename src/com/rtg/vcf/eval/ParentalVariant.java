@@ -103,6 +103,10 @@ public class ParentalVariant extends Variant {
       return "transmitted-dip";
     }
     @Override
+    public int haplotypes() {
+      return 2;
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final ParentalVariant pv = (ParentalVariant) variant;
       if (pv.patAlleleA() == pv.patAlleleB()) {
@@ -147,6 +151,10 @@ public class ParentalVariant extends Variant {
     @Override
     public String toString() {
       return "transmitted-hap";
+    }
+    @Override
+    public int haplotypes() {
+      return 1;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {

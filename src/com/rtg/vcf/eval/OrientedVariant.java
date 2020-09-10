@@ -54,7 +54,7 @@ public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNam
    * @param alleleId the allele selected
    */
   public OrientedVariant(Variant variant, int alleleId) {
-    this(variant, false, alleleId, alleleId);
+    this(variant, false, alleleId);
   }
 
   /**

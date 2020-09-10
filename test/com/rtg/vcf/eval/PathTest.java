@@ -127,6 +127,10 @@ public class PathTest extends AbstractNanoTest {
 
   static class MockOrientor implements Orientor {
     @Override
+    public int haplotypes() {
+      return 2;
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       if (variant.numAlleles() == 2) {
         // If the variant is heterozygous we need both phases

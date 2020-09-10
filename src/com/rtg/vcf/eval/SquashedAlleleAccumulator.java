@@ -115,7 +115,7 @@ public class SquashedAlleleAccumulator extends AlleleAccumulator {
 
   private void writeResidual(OrientedVariant ov) throws IOException {
     // If the original variant contained multiple ALTs, null out the one used and then write to alternate, otherwise write to alternate as-is
-    assert ov.alleleIds().length == 2 : "Diploid only supported";
+    assert ov.alleleIds().length == 1 : "Haploid only supported";
     final GtIdVariant v = (GtIdVariant) ov.variant();
     int remaining = -1;
     int numAlts = 0;

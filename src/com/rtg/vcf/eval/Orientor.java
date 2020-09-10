@@ -44,6 +44,11 @@ public interface Orientor {
   OrientedVariant[] orientations(Variant variant);
 
   /**
+   * @return the number of haplotypes that oriented variants will contain
+   */
+  int haplotypes();
+
+  /**
    * Produces orientations corresponding to the possible diploid phasings from the
    * GT-derived variant.
    * Path finding will require matching both alleles.
@@ -52,6 +57,10 @@ public interface Orientor {
     @Override
     public String toString() {
       return "unphased";
+    }
+    @Override
+    public int haplotypes() {
+      return 2;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
@@ -82,6 +91,10 @@ public interface Orientor {
     @Override
     public String toString() {
       return "phase-" + (mInvert ? "inverting" : "obeying");
+    }
+    @Override
+    public int haplotypes() {
+      return 2;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
@@ -135,6 +148,10 @@ public interface Orientor {
       return "squash";
     }
     @Override
+    public int haplotypes() {
+      return 1;
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
       final boolean aVar = gv.alleleA() > 0 && variant.allele(gv.alleleA()) != null;
@@ -165,6 +182,10 @@ public interface Orientor {
     @Override
     public String toString() {
       return "allele-gt";
+    }
+    @Override
+    public int haplotypes() {
+      return 2;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
@@ -206,6 +227,10 @@ public interface Orientor {
       return "squash-all";
     }
     @Override
+    public int haplotypes() {
+      return 1;
+    }
+    @Override
     public OrientedVariant[] orientations(Variant variant) {
       final OrientedVariant[] pos = new OrientedVariant[variant.numAlleles() - 1];
       for (int i = 0; i < pos.length; ++i) {
@@ -224,6 +249,10 @@ public interface Orientor {
     @Override
     public String toString() {
       return "diploid-all";
+    }
+    @Override
+    public int haplotypes() {
+      return 2;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
