@@ -58,7 +58,7 @@ public class VcfRecordTabixCallableTest extends TestCase {
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
 
-      final VariantFactory fact = TabixVcfRecordSet.getVariantFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null);
+      final VariantFactory fact = TabixVcfRecordSet.getVariantFactory(VariantSetType.BASELINE, VcfUtils.getHeader(input), null, 2);
       final VcfRecordTabixCallable runner = new VcfRecordTabixCallable(input, ranges.forSequence("simulatedSequence13"), highConf, "simulatedSequence13", -1, VariantSetType.BASELINE, fact, true, 100, null, false);
       List<Variant> set = runner.call().mVariants;
       for (Variant v : set) {

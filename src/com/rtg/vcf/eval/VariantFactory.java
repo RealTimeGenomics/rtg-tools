@@ -95,24 +95,36 @@ public interface VariantFactory {
    */
   class SampleVariants implements VariantFactory {
 
+    private final int mPloidy;
     private final int mSampleNo;
     private final boolean mExplicitUnknown;
 
     /**
-     * Constructor
+     * Constructor for diploid variants.
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      * @param explicitUnknown if true, treat half call allele as a separate token
      */
     public SampleVariants(int sampleNo, boolean explicitUnknown) {
+      this(sampleNo, explicitUnknown, 2);
+    }
+
+    /**
+     * General constructor.
+     * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
+     * @param explicitUnknown if true, treat half call allele as a separate token
+     * @param ploidy the expected ploidy
+     */
+    public SampleVariants(int sampleNo, boolean explicitUnknown, int ploidy) {
       mSampleNo = sampleNo;
       mExplicitUnknown = explicitUnknown;
+      mPloidy = ploidy;
     }
 
     @Override
     public GtIdVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
       // Currently we skip both non-variant and SV
       // Check we have a GT that refers to a non-SV variant in at least one allele
-      final int[] gtArray = getDefinedVariantGt(rec, mSampleNo);
+      final int[] gtArray = getDefinedVariantGt(rec, mSampleNo, mPloidy);
       if (gtArray == null) {
         return null;
       }
@@ -124,11 +136,7 @@ public interface VariantFactory {
         throw new SkippedVariantException("Invalid VCF allele. " + e.getMessage());
       }
 
-      final int alleleA = gtArray[0];
-      final int alleleB = gtArray.length == 1 ? alleleA : gtArray[1];
-
-      return new GtIdVariant(id, rec.getSequenceName(), alleles, VcfUtils.isPhasedGt(VcfUtils.getValidGtStr(rec, mSampleNo)), alleleA, alleleB
-      );
+      return new GtIdVariant(id, rec.getSequenceName(), alleles, VcfUtils.isPhasedGt(VcfUtils.getValidGtStr(rec, mSampleNo)), gtArray);
     }
   }
 
@@ -137,10 +145,11 @@ public interface VariantFactory {
    * evaluation.
    * @param rec the VCF record to extract from
    * @param sampleId the sample index
+   * @param ploidy the expected ploidy
    * @return the genotype array, or null if the variant should be ignored due to not being variant
    * @throws SkippedVariantException if the genotype is in some way unexpected.
    */
-  static int[] getDefinedVariantGt(VcfRecord rec, int sampleId) throws SkippedVariantException {
+  static int[] getDefinedVariantGt(VcfRecord rec, int sampleId, int ploidy) throws SkippedVariantException {
     if (sampleId >= rec.getNumberOfSamples()) {
       throw new VcfFormatException("Record did not contain enough samples: " + rec.toString());
     }
@@ -148,12 +157,17 @@ public interface VariantFactory {
       return null;
     }
     final String gt = VcfUtils.getValidGtStr(rec, sampleId);
-    final int[] gtArr = VcfUtils.splitGt(gt);
-    if (gtArr.length == 0 || gtArr.length > 2) {
-      throw new SkippedVariantException("GT value '" + gt + "' is not haploid or diploid.");
-    }
+    int[] gtArr = VcfUtils.splitGt(gt);
     if (!VcfUtils.isValidGt(rec, gtArr)) {
       throw new VcfFormatException("VCF record GT contains allele ID out of range, record: " + rec.toString());
+    }
+    if (ploidy == 2 && gtArr.length == 1) { // In diploid mode, treat haploid as homozygous for sex chromosome convenience
+      final int[] newArr = new int[ploidy];
+      Arrays.fill(newArr, gtArr[0]);
+      gtArr = newArr;
+    }
+    if (gtArr.length != ploidy) {
+      throw new SkippedVariantException("Ploidy of GT value '" + gt + "' is unexpected.");
     }
     final String[] alleles = VcfUtils.getAlleleStrings(rec);
     for (final int a : gtArr) {

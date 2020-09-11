@@ -95,10 +95,10 @@ public class VariantTest extends TestCase {
     allDetections.add(dv3);
     final Variant[] variantArray = allDetections.toArray(new Variant[0]);
     Arrays.sort(variantArray, new SequenceNameLocusComparator());
-    assertEquals("someKindOfName:23-24 (T)", variantArray[0].toString());
-    assertEquals("someKindOfName:24-25 (T)", variantArray[1].toString());
-    assertEquals("someOtherKindOfName:19-20 (T)", variantArray[2].toString());
-    assertEquals("someOtherKindOfName:55-56 (T)", variantArray[3].toString());
+    assertEquals("someKindOfName:23-24 (T:T)", variantArray[0].toString());
+    assertEquals("someKindOfName:24-25 (T:T)", variantArray[1].toString());
+    assertEquals("someOtherKindOfName:19-20 (T:T)", variantArray[2].toString());
+    assertEquals("someOtherKindOfName:55-56 (T:T)", variantArray[3].toString());
     final SequenceNameLocusComparator comparator = new SequenceNameLocusComparator();
     assertEquals(0, comparator.compare(dv1, dv1));
     assertEquals(-1, comparator.compare(dv1, dv2));
@@ -110,13 +110,16 @@ public class VariantTest extends TestCase {
     assertEquals(0, insert.compareTo(insert));
   }
 
-  public void testTriploid() {
+  public void testTriploid() throws SkippedVariantException {
     final VcfRecord rec = createRecord("someKindOfName 23 . A T,G 12.8 PASS . GT:DP:RE:GQ 1/1/2:4:0.02:12.8");
     try {
-      new VariantFactory.SampleVariants(0, true).variant(rec, 0);
+      new VariantFactory.SampleVariants(0, true, 2).variant(rec, 0);
       fail("Expected failure to process triploid call");
     } catch (SkippedVariantException ignored) {
     }
+    GtIdVariant v = new VariantFactory.SampleVariants(0, true, 3).variant(rec, 0);
+    assertEquals(3, v.ploidy());
+    assertEquals("someKindOfName:23-24 (T:T:G)", v.toString());
   }
 
   static final String SNP_LINE = "someKindOfName 23 . A T 12.8 PASS . GT:DP:RE:GQ 1/1:4:0.02:12.8";
@@ -148,7 +151,7 @@ public class VariantTest extends TestCase {
     assertEquals(1, variant.nt(2).length);
     assertEquals(2, variant.nt(2)[0]);
 
-    final OrientedVariant[] pos = Orientor.UNPHASED.orientations(variant);
+    final OrientedVariant[] pos = new Orientor.UnphasedOrientor(2).orientations(variant);
     assertEquals(2, pos.length);
     assertTrue(pos[0].isOriginal());
     assertFalse(pos[1].isOriginal());

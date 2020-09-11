@@ -62,7 +62,7 @@ public class PathTest extends AbstractNanoTest {
    * @return the best path (non-null).
    */
   public static <T extends Variant> Path bestPath(byte[] template, String templateName, Collection<T> calledVariants, Collection<T> baseLineVariants) {
-    return new PathFinder(template, templateName, baseLineVariants, calledVariants, Orientor.UNPHASED, Orientor.UNPHASED, new PathFinder.Config()).bestPath();
+    return new PathFinder(template, templateName, baseLineVariants, calledVariants, new Orientor.UnphasedOrientor(2), new Orientor.UnphasedOrientor(2), new PathFinder.Config()).bestPath();
   }
 
   public void testBestPath() {
@@ -151,7 +151,7 @@ public class PathTest extends AbstractNanoTest {
   // Any variant with isAlleleA true is expected to be included, and isAlleleA false is expected to be excluded
   private void check(byte[] template, List<OrientedVariant> aSide, List<OrientedVariant> bSide) {
     final Variant v = aSide.size() > 0 ? aSide.get(0).variant() : bSide.get(0).variant();
-    final Orientor o = v instanceof MockVariant ? new MockOrientor() : Orientor.UNPHASED;
+    final Orientor o = v instanceof MockVariant ? new MockOrientor() : new Orientor.UnphasedOrientor(2);
     check(template, aSide, bSide, o);
   }
 
@@ -576,7 +576,8 @@ public class PathTest extends AbstractNanoTest {
 
     final double[] expectedWeights = {1, 0, 0, 1.0};
 
-    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(b), Arrays.asList(a), Orientor.UNPHASED, Orientor.UNPHASED,
+    final PathFinder finder = new PathFinder(template, "currentName", Arrays.asList(b), Arrays.asList(a),
+      new Orientor.UnphasedOrientor(2), new Orientor.UnphasedOrientor(2),
       new PathFinder.Config(new MaxCallsMinBaseline(), 1000, 1000, false, false));
     final Path original = finder.bestPath();
     assertEquals(4, original.getCalledIncluded().size()); // The NOP variants are initially TP

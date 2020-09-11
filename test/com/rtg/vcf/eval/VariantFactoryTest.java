@@ -59,10 +59,11 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE2 = "chr 23 . A T,C,G . PASS . GT 1/2";
   static final String SNP_LINE3 = "chr 23 . A T     . PASS . GT 0/1";
   static final String SNP_LINE4 = "chr 23 . A T     . PASS . GT ./1";
+  static final String SNP_LINE2_3 = "chr 23 . A T,C,G . PASS . GT 1/2/3";
 
   public void testUntrimmedGt() throws Exception {
     // Test 1/2 -> 1, 2
-    final VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
+    VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
     assertNull(variant.allele(-1));
@@ -72,6 +73,7 @@ public class VariantFactoryTest extends TestCase {
     assertEquals(1, variant.nt(2).length);
     assertEquals("T", variant.alleleStr(1));
     assertEquals("C", variant.alleleStr(2));
+    assertEquals("*", variant.alleleStr(3));
 
     // Test 0/1 -> 1
     variant = fact.variant(VariantTest.createRecord(SNP_LINE3), 0);
@@ -91,6 +93,17 @@ public class VariantFactoryTest extends TestCase {
     assertNotNull(variant.allele(0)); // Ref allele just kept for potential trimming
     assertEquals(1, variant.nt(1).length);
     assertEquals(T.ordinal(), variant.nt(1)[0]);
+
+    // Test 1/2/3 -> 1, 2, 3
+    fact = new VariantFactory.SampleVariants(0, true, 3);
+    variant = fact.variant(VariantTest.createRecord(SNP_LINE2_3), 0);
+    assertEquals(4, variant.numAlleles());
+    assertNull(variant.allele(-1));
+    assertNotNull(variant.allele(0)); // Ref allele just kept for potential trimming
+    assertNotNull(variant.allele(3));
+    assertEquals("T", variant.alleleStr(1));
+    assertEquals("C", variant.alleleStr(2));
+    assertEquals("G", variant.alleleStr(3));
   }
 
   static final String SNP_LINE5 = "chr 23 . AA T,ATTA . PASS . GT 0/2";
@@ -167,9 +180,9 @@ public class VariantFactoryTest extends TestCase {
 
     assertNull(f.variant(VariantTest.createRecord(SNP_LINE10), 0)); // No alleles remaining
 
-    assertNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE11), 0));
+    assertNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE11), 0, 2));
     assertNull(f.variant(VariantTest.createRecord(SNP_LINE11), 0)); // No alleles remaining
-    assertNotNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE12), 0));
+    assertNotNull(VariantFactory.getDefinedVariantGt(VariantTest.createRecord(SNP_LINE12), 0, 2));
     variant = f.variant(VariantTest.createRecord(SNP_LINE12), 0);
     assertEquals(2, variant.numAlleles()); // partial spanning deletion allele is not included in allele set
   }

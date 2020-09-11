@@ -94,6 +94,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
+  private static final String DEFAULT_PLOIDY = "Xdefault-ploidy";
   private static final String DECOMPOSE = "decompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
@@ -175,6 +176,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
 
     mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
+    mFlags.registerOptional(DEFAULT_PLOIDY, Integer.class, CommonFlags.INT, "default ploidy to use when matching", 2).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
 
     registerVcfRocFlags(mFlags);
@@ -313,14 +315,14 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   }
 
   // Map from name to the subset of Orientors that are relevant to phased GT comparisons
-  private static Orientor phaseTypeToOrientor(String name) {
+  private static Orientor phaseTypeToOrientor(String name, int haplotypes) {
     switch (name) {
       case "true":
-        return Orientor.PHASED;
+        return new Orientor.PhasedOrientor(false, haplotypes);
       case "invert":
-        return Orientor.PHASE_INVERTED;
+        return new Orientor.PhasedOrientor(true, haplotypes);
       case "false":
-        return Orientor.UNPHASED;
+        return new Orientor.UnphasedOrientor(haplotypes);
       default:
         throw new NoTalkbackSlimException("Unrecognized phase type:" + name);
     }
@@ -354,11 +356,10 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselineSample(samples[0]);
       builder.callsSample(samples[1]);
     }
-    if (mFlags.isSet(OBEY_PHASE)) {
-      final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
-      builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0]));
-      builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1]));
-    }
+    final int haplotypes = (Integer) mFlags.getValue(DEFAULT_PLOIDY);
+    final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
+    builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0], haplotypes));
+    builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1], haplotypes));
     final Set<RocFilter> rocFilters = getRocFilters(mFlags);
     builder.rocFilters(rocFilters);
     if (mFlags.isSet(CRITERIA_PRECISION)) {

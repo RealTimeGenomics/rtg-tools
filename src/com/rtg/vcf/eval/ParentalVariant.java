@@ -70,8 +70,8 @@ public class ParentalVariant extends Variant {
     @Override
     public ParentalVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
       // Check we have a GT that refers to a non-SV variant in at least one allele in at least one parent
-      final int[] patGtArr = VariantFactory.getDefinedVariantGt(rec, mPSampleNo);
-      final int[] matGtArr = VariantFactory.getDefinedVariantGt(rec, mMSampleNo);
+      final int[] patGtArr = VariantFactory.getDefinedVariantGt(rec, mPSampleNo, 2);
+      final int[] matGtArr = VariantFactory.getDefinedVariantGt(rec, mMSampleNo, 2);
       if (patGtArr == null && matGtArr == null) {
         return null;
       }

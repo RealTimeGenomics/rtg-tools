@@ -146,11 +146,20 @@ public class Allele extends SequenceNameLocusSimple implements Comparable<Allele
     final boolean removePaddingBase = VcfUtils.hasRedundantFirstNucleotide(rec);
     final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
     for (int i = -1; i < alleles.length - 1; ++i) {
-      if (gtArray == null || i == 0 || gtArray[0] == i || (gtArray.length == 2 && gtArray[1] == i)) {
+      if (gtArray == null || i == 0 || isCalled(i, gtArray)) {
         alleles[i + 1] = getAllele(rec, i, removePaddingBase, explicitUnknown);
       }
     }
     return alleles;
+  }
+
+  private static boolean isCalled(int allele, int... gt) {
+    for (int call : gt) {
+      if (call == allele) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

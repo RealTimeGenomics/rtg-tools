@@ -112,16 +112,17 @@ public class OrientorTest extends TestCase {
     // Test trimming ploidy  AA:ATTA -> :TT
     final VariantFactory fact = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.SampleVariants(0, false));
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
-    OrientedVariant[] pos = Orientor.UNPHASED.orientations(variant);
+    final Orientor unphased = new Orientor.UnphasedOrientor(2);
+    OrientedVariant[] pos = unphased.orientations(variant);
     assertEquals(2, pos.length);
 
     variant = fact.variant(VariantTest.createRecord(SNP_LINE6), 0);
-    pos = Orientor.UNPHASED.orientations(variant);
+    pos = unphased.orientations(variant);
     assertEquals(2, pos.length);
     assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
 
     variant = fact.variant(VariantTest.createRecord(SNP_LINE7), 0);
-    pos = Orientor.UNPHASED.orientations(variant);
+    pos = unphased.orientations(variant);
     assertEquals(2, pos.length);
     assertEquals("chr:24-24 (.^:*:*:AAAv)", pos[0].toString());
   }
@@ -130,18 +131,20 @@ public class OrientorTest extends TestCase {
     // Test trimming ploidy  AA:ATTA -> :TT
     final VariantFactory fact = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.SampleVariants(0, false));
     Variant variant = fact.variant(VariantTest.createRecord(SNP_LINE5), 0);
-    OrientedVariant[] pos = Orientor.PHASED.orientations(variant);
+    final Orientor phased = new Orientor.PhasedOrientor(false, 2);
+    final Orientor inverted = new Orientor.PhasedOrientor(true, 2);
+    OrientedVariant[] pos = phased.orientations(variant);
     assertEquals(2, pos.length);
 
     variant = fact.variant(VariantTest.createRecord(SNP_LINE6), 0);
-    pos = Orientor.PHASED.orientations(variant);
+    pos = phased.orientations(variant);
     assertEquals(1, pos.length);
     assertTrue(pos[0].isOriginal());
     assertTrue(pos[0].isHeterozygous());
     assertEquals(2, pos[0].alleleId());
     assertEquals("chr:23-24 (*:Av:<24-24>AAA^)", pos[0].toString());
 
-    pos = Orientor.PHASE_INVERTED.orientations(variant);
+    pos = inverted.orientations(variant);
     assertEquals(1, pos.length);
     assertFalse(pos[0].isOriginal());
     assertTrue(pos[0].isHeterozygous());
@@ -149,7 +152,7 @@ public class OrientorTest extends TestCase {
     assertEquals("chr:23-24 (*:A^:<24-24>AAAv)", pos[0].toString());
 
     variant = fact.variant(VariantTest.createRecord(SNP_LINE7), 0);
-    pos = Orientor.PHASED.orientations(variant);
+    pos = phased.orientations(variant);
     assertEquals(1, pos.length);
     assertTrue(pos[0].isOriginal());
     assertTrue(pos[0].isHeterozygous());
@@ -157,7 +160,7 @@ public class OrientorTest extends TestCase {
     assertEquals(2, pos[0].alleleIds()[1]);
     assertEquals("chr:24-24 (.^:*:*:AAAv)", pos[0].toString());
 
-    pos = Orientor.PHASE_INVERTED.orientations(variant);
+    pos = inverted.orientations(variant);
     assertEquals(1, pos.length);
     assertFalse(pos[0].isOriginal());
     assertTrue(pos[0].isHeterozygous());

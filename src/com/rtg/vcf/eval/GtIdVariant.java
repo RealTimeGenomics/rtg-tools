@@ -30,9 +30,11 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.util.Utils;
 
 /**
  * A Variant that offers orientations where the allele IDs correspond to original GT allele indexing.
@@ -40,24 +42,40 @@ import com.reeltwo.jumble.annotations.TestClass;
 @TestClass("com.rtg.vcf.eval.VariantFactoryTest")
 public class GtIdVariant extends Variant {
 
-  private final int mAlleleA; // First allele in GT
-  private final int mAlleleB; // Second allele in GT
+  private final int[] mAlleleIds;
 
   GtIdVariant(int id, String seq, Allele[] alleles,
-              boolean phased, int alleleA, int alleleB) {
+              boolean phased, int[] gtArr) {
     super(id, seq, alleles, phased);
-    mAlleleA = alleleA;
-    mAlleleB = alleleB;
+    mAlleleIds = gtArr;
+  }
+
+  /** @return the ploidy of the GT */
+  public int ploidy() {
+    return mAlleleIds.length;
+  }
+
+  /** @return the allele IDs assigned to each haplotype */
+  public int[] alleleIds() {
+    return mAlleleIds;
+  }
+
+  /**
+   * @param hap index of the haplotype
+   * @return the allele ID of the specified haplotype in the GT
+   */
+  public int alleleId(int hap) {
+    return mAlleleIds[hap];
   }
 
   /** @return the allele ID of the first allele in the GT */
   public int alleleA() {
-    return mAlleleA;
+    return alleleId(0);
   }
 
   /** @return the allele ID of the second allele in the GT */
   public int alleleB() {
-    return mAlleleB;
+    return alleleId(1);
   }
 
   @Override
@@ -72,22 +90,23 @@ public class GtIdVariant extends Variant {
       return false;
     }
     final GtIdVariant that = (GtIdVariant) o;
-    return Objects.equals(mAlleleA, that.mAlleleA) && Objects.equals(mAlleleB, that.mAlleleB);
+    return Arrays.equals(mAlleleIds, that.mAlleleIds);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(super.hashCode(), mAlleleA, mAlleleB);
+    return Objects.hash(super.hashCode(), Utils.pairHashContinuous(mAlleleIds));
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append(getSequenceName()).append(":").append(getStart() + 1).append("-").append(getEnd() + 1).append(" (");
-    sb.append(alleleStr(mAlleleA));
-    if (mAlleleB != mAlleleA) {
-      sb.append(":");
-      sb.append(alleleStr(mAlleleB));
+    for (int i = 0; i < mAlleleIds.length; i++) {
+      if (i > 0) {
+        sb.append(":");
+      }
+      sb.append(alleleStr(mAlleleIds[i]));
     }
     sb.append(")");
     return sb.toString();

@@ -148,6 +148,10 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_nop/nop", "vcfeval_nop/nop", 1, false, null, "--no-roc", "--output-mode=combine", "--squash-ploidy", "--ref-overlap");
   }
 
+  public void testNanoTetraploid() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_tetraploid/small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--output-mode=annotate", "--no-roc", "--Xdefault-ploidy=4", "--Xobey-phase=true,false");
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

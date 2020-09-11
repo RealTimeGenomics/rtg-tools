@@ -76,8 +76,8 @@ public final class VcfEvalParams extends OutputModuleParams {
     private File mEvalRegionsFile = null;
     private Set<RocFilter> mRocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
     private RocPointCriteria mRocCriteria = new FMeasureThreshold();
-    private Orientor mBaselinePhaseOrientor = Orientor.UNPHASED;
-    private Orientor mCallsPhaseOrientor = Orientor.UNPHASED;
+    private Orientor mBaselinePhaseOrientor = new Orientor.UnphasedOrientor(2);
+    private Orientor mCallsPhaseOrientor = new Orientor.UnphasedOrientor(2);
     private boolean mDecompose = false;
 
     @Override

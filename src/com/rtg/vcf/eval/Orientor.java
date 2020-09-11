@@ -31,6 +31,8 @@ package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
 
+import com.rtg.util.Permutation;
+
 /**
  * Produces various orientations onto haplotypes of a variant
  */
@@ -49,44 +51,71 @@ public interface Orientor {
   int haplotypes();
 
   /**
-   * Produces orientations corresponding to the possible diploid phasings from the
+   * Produces orientations corresponding to the possible phasings from the
    * GT-derived variant.
-   * Path finding will require matching both alleles.
+   * Path finding will require matching all called alleles.
    */
-  Orientor UNPHASED = new Orientor() {
+  final class UnphasedOrientor implements Orientor {
+    final int mHaplotypes;
+    UnphasedOrientor(int haplotypes) {
+      mHaplotypes = haplotypes;
+    }
     @Override
     public String toString() {
       return "unphased";
     }
     @Override
     public int haplotypes() {
-      return 2;
+      return mHaplotypes;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
-      if (gv.alleleA() != gv.alleleB()) {
-        // If the variant is heterozygous we need both phases
-        return new OrientedVariant[]{
-          new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
-          new OrientedVariant(variant, false, gv.alleleB(), gv.alleleA())
-        };
+      assert gv.ploidy() == mHaplotypes;
+      if (mHaplotypes == 2) { // Use old method for diploid, for now
+        if (gv.alleleA() != gv.alleleB()) {
+          // If the variant is heterozygous we need both phases
+          return new OrientedVariant[]{
+            new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
+            new OrientedVariant(variant, false, gv.alleleB(), gv.alleleA())
+          };
+        } else {
+          // Homozygous / haploid
+          return new OrientedVariant[]{
+            new OrientedVariant(variant, true, gv.alleleA(), gv.alleleA())
+          };
+        }
       } else {
-        // Homozygous / haploid
-        return new OrientedVariant[]{
-          new OrientedVariant(variant, true, gv.alleleA(), gv.alleleA())
-        };
+        final Permutation p = new Permutation(gv.alleleIds());
+        final ArrayList<OrientedVariant> o = new ArrayList<>();
+        int[] r;
+        while ((r = p.next()) != null) {
+          o.add(new OrientedVariant(variant, false, r.clone()));
+        }
+        return o.toArray(new OrientedVariant[0]);
       }
     }
-  };
+  }
 
   /**
-   * Orientor that obeys global phasing if present in the GT-derived variant.
+   * Produces orientations corresponding to the possible phasings from the
+   * GT-derived variant, obeying global phasing if present. Global phasing can be
+   * taken as-is, or inverted. Path finding will require matching all the called alleles.
    */
   final class PhasedOrientor implements Orientor {
     final boolean mInvert;
-    PhasedOrientor(boolean invert) {
+    final int mHaplotypes;
+    final UnphasedOrientor mUnphased;
+
+    /**
+     * Constructor
+     * @param invert if true, invert the provided phasing
+     * @param haplotypes number of haplotypes
+     */
+    PhasedOrientor(boolean invert, int haplotypes) {
       mInvert = invert;
+      mHaplotypes = haplotypes;
+      mUnphased = new UnphasedOrientor(mHaplotypes);
     }
     @Override
     public String toString() {
@@ -94,47 +123,27 @@ public interface Orientor {
     }
     @Override
     public int haplotypes() {
-      return 2;
+      return mHaplotypes;
     }
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
-      if (gv.alleleA() != gv.alleleB()) {
-        if (variant.isPhased()) {
-          return new OrientedVariant[]{
-            mInvert
-              ? new OrientedVariant(variant, false, gv.alleleB(), gv.alleleA())
-              : new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
-          };
+      if (variant.isPhased()) {
+        if (mInvert) {
+          int i = gv.alleleIds().length;
+          final int[] reversed = new int[i];
+          for (int a : gv.alleleIds()) {
+            reversed[--i] = a;
+          }
+          return new OrientedVariant[]{new OrientedVariant(variant, false, reversed)};
         } else {
-          // If the variant is heterozygous we need both phases
-          return new OrientedVariant[]{
-            new OrientedVariant(variant, true, gv.alleleA(), gv.alleleB()),
-            new OrientedVariant(variant, false, gv.alleleB(), gv.alleleA())
-          };
+          return new OrientedVariant[]{new OrientedVariant(variant, true, gv.alleleIds())};
         }
       } else {
-        // Homozygous / haploid
-        return new OrientedVariant[]{
-          new OrientedVariant(variant, true, gv.alleleA(), gv.alleleA())
-        };
+        return mUnphased.orientations(variant);
       }
     }
   }
-
-  /**
-   * Produces orientations corresponding to the possible diploid phasings from the
-   * GT-derived variant, obeying global phasing if present.
-   * Path finding will require matching both alleles.
-   */
-  Orientor PHASED = new PhasedOrientor(false);
-
-  /**
-   * Produces orientations corresponding to the possible diploid phasings from the
-   * GT-derived variant, obeying but inverting global phasing if present.
-   * Path finding will require matching both alleles.
-   */
-  Orientor PHASE_INVERTED = new PhasedOrientor(true);
 
   /**
    * Produces orientations corresponding to the possible haploid genotypes that employ any

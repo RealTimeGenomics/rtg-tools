@@ -105,7 +105,7 @@ class TabixVcfRecordSet implements VariantSet {
                     ReferenceRanges<String> ranges, ReferenceRegions evalRegions,
                     Collection<Pair<String, Integer>> referenceNameOrdering,
                     String baselineSample, String callsSample,
-                    boolean passOnly, boolean relaxedRef, int maxLength, File preprocessDestDir) throws IOException {
+                    boolean passOnly, boolean relaxedRef, int maxLength, File preprocessDestDir, int ploidy) throws IOException {
     if (referenceNameOrdering == null) {
       throw new NullPointerException();
     }
@@ -189,8 +189,8 @@ class TabixVcfRecordSet implements VariantSet {
 
     mBaseLineHeader = mPreprocess ? addDecompositionHeader(baselineHeader) : baselineHeader;
     mCalledHeader = mPreprocess ? addDecompositionHeader(calledHeader) : calledHeader;
-    mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample);
-    mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample);
+    mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, ploidy);
+    mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, ploidy);
     mBaselineSampleNo = baselineSample != null ? mBaseLineHeader.getSampleIndex(baselineSample) : 0;
     mCalledSampleNo = callsSample != null ? mCalledHeader.getSampleIndex(callsSample) : 0;
   }
@@ -200,12 +200,12 @@ class TabixVcfRecordSet implements VariantSet {
     return new DecomposingVcfIterator(new ArrayVcfIterator(baselineHeader), null, false, false).getHeader();
   }
 
-  static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName) {
+  static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, int ploidy) {
     final boolean explicitUnknown = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_EXPLICIT_UNKNOWN_ALLELES);
     final String f = VariantFactory.getFactoryName(type, sampleName);
     switch (f) {
       case VariantFactory.SAMPLE_FACTORY:
-        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), explicitUnknown);
+        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), explicitUnknown, ploidy);
       case VariantFactory.ALL_FACTORY:
         return new VariantFactory.AllAlts(explicitUnknown);
       case ParentalVariant.Factory.NAME:

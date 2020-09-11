@@ -50,9 +50,9 @@ import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.intervals.RangeList;
-import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.ReferenceRegions;
+import com.rtg.util.intervals.SimpleRangeMeta;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
@@ -91,7 +91,7 @@ public class TabixVcfRecordSetTest extends TestCase {
       }
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100, null);
+      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100, null, 2);
 
       final Set<String> expected = new HashSet<>();
       for (int seq = 1; seq < 32; ++seq) {
@@ -137,7 +137,7 @@ public class TabixVcfRecordSetTest extends TestCase {
         final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
         ranges.put("20", new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "20")));
         try {
-          TabixVcfRecordSet.getVariantFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf");
+          TabixVcfRecordSet.getVariantFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", 2);
           fail();
         } catch (NoTalkbackSlimException e) {
           TestUtils.containsAll(e.toString(), "Sample \"asdf\" not found in calls VCF");

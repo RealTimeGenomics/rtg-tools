@@ -64,10 +64,6 @@ class SequenceEvaluator implements IORunnable {
   private final List<Pair<Orientor, Orientor>> mOrientors;
   private final PathFinder.Config mPathFinderConfig = new PathFinder.Config();
 
-  SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template) {
-    this(variantSets, nameMap, template, Collections.singletonList(new Pair<>(Orientor.UNPHASED, Orientor.UNPHASED)));
-  }
-
   SequenceEvaluator(EvalSynchronizer variantSets, Map<String, Long> nameMap, SequencesReader template, List<Pair<Orientor, Orientor>> orientors) {
     assert orientors.size() == 1 || orientors.size() == 2;
     mSynchronize = variantSets;

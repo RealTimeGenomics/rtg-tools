@@ -236,7 +236,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     } else {
       preprocessDir = null;
     }
-    return new TabixVcfRecordSet(baseline, calls, ranges, evalRegions, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength(), preprocessDir);
+    return new TabixVcfRecordSet(baseline, calls, ranges, evalRegions, nameOrdering, baselineSample, callsSample, !params.useAllRecords(), params.refOverlap(), params.maxLength(), preprocessDir, params.baselinePhaseOrientor().haplotypes());
   }
 
   static ReferenceRanges<String> getReferenceRanges(VcfEvalParams params, SequencesReader templateSequences) throws IOException {
