@@ -30,6 +30,7 @@
 package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.rtg.util.Permutation;
 
@@ -163,19 +164,23 @@ public interface Orientor {
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
-      final boolean aVar = gv.alleleA() > 0 && variant.allele(gv.alleleA()) != null;
-      final boolean bVar = gv.alleleB() > 0 && variant.allele(gv.alleleB()) != null;
-      assert aVar || bVar; // Must be at least one replayable variant allele
-      final int la = aVar ? gv.alleleA() : gv.alleleB();
-      final int lb = bVar ? gv.alleleB() : gv.alleleA();
-      final OrientedVariant[] pos;
-      if (la == lb) {
-        pos = new OrientedVariant[1];
-        pos[0] = new OrientedVariant(variant, la);
-      } else {
-        pos = new OrientedVariant[2];
-        pos[0] = new OrientedVariant(variant, la);
-        pos[1] = new OrientedVariant(variant, lb);
+
+      // Get the unique replayable ALTs
+      final int[] altIds = gv.alleleIds().clone();
+      Arrays.sort(altIds);
+      int numAlts = 0;
+      int prevId = 0;
+      for (final int id : altIds) {
+        if ((id > prevId) && variant.allele(id) != null) {
+          altIds[numAlts++] = id;
+          prevId = id;
+        }
+      }
+      assert numAlts > 0;
+
+      final OrientedVariant[] pos = new OrientedVariant[numAlts];
+      for (int i = 0; i < numAlts; i++) {
+        pos[i] = new OrientedVariant(variant, altIds[i]);
       }
       return pos;
     }
@@ -199,6 +204,7 @@ public interface Orientor {
     @Override
     public OrientedVariant[] orientations(Variant variant) {
       final GtIdVariant gv = (GtIdVariant) variant;
+      assert gv.alleleIds().length == 2;
       final boolean aVar = gv.alleleA() > 0 && variant.allele(gv.alleleA()) != null;
       final boolean bVar = gv.alleleB() > 0 && variant.allele(gv.alleleB()) != null;
       assert aVar || bVar; // Must be at least one replayable variant allele

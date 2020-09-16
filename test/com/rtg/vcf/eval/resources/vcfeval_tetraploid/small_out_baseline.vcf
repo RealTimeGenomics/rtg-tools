@@ -7,4 +7,5 @@
 ##INFO=<ID=BASE_ALTERNATE,Number=1,Type=Flag,Description="Baseline variant could be matched in an alternate path">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878_NA24385
+chr22	10	.	G	C	.	.	SYNC=10;BASE=FN	GT	0|0|0|1
 chr22	82	.	CAAAA	CAAA,C,CAA	.	.	SYNC=83;BASE=TP	GT	1|2|3|1

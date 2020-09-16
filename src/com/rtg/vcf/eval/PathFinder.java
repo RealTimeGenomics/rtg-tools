@@ -127,7 +127,7 @@ public final class PathFinder {
   }
 
   Path bestPath() {
-    Diagnostic.developerLog("Starting path-finding for " + mTemplateName + " using " + mBaselineOrientor + "," + mCallOrientor);
+    Diagnostic.developerLog("Starting path-finding with " + mBaselineOrientor.haplotypes() + " haplotypes on sequence " + mTemplateName + " using " + mBaselineOrientor + "," + mCallOrientor);
     // make it easy to find variants
     final TreeSet<Path> sortedPaths = new TreeSet<>();
     sortedPaths.add(new Path(mBaselineOrientor.haplotypes(), mTemplate));

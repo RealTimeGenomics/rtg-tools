@@ -308,7 +308,10 @@ public final class Path implements Comparable<Path> {
     paths.add(exclude);
 
     // Create a path extension that includes this variant in the possible phases
-    for (OrientedVariant o : orientor.orientations(var)) {
+
+    final OrientedVariant[] orientations = orientor.orientations(var);
+    assert orientations.length > 0 : "Variant produced no orientations: " + var;
+    for (OrientedVariant o : orientations) {
       if ((side ? mCalledPath : mBaselinePath).isNew(o)) {
         final Path include = new Path(this, syncPoints);
         include.include(side, o, varIndex);
