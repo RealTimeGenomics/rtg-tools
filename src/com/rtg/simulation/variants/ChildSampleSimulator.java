@@ -424,7 +424,7 @@ public class ChildSampleSimulator {
         throw new NoTalkbackSlimException("Sequence " + mRefName + ": Illegal ploidy combination " + desc);
       }
       if (childCount > 2 || mFatherCount > 2 || mMotherCount > 2) {
-        throw new NoTalkbackSlimException("Sequence " + mRefName + ": Unsupported ploidy combination" + desc);
+        throw new NoTalkbackSlimException("Sequence " + mRefName + ": Unsupported ploidy combination " + desc);
       }
     }
 

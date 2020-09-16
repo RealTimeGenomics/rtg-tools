@@ -204,16 +204,14 @@ public class SampleSimulator {
         for (int sample = 0; sample < sexes.length; sample++) {
           final ReferenceSequence refSeq = mSexRef.get(sexes[sample]).sequence(refName);
           final int ploidyCount = refSeq.ploidy().count() >= 0 ? refSeq.ploidy().count() : 1; //effectively treats polyploid as haploid
-          final StringBuilder gt = new StringBuilder();
+          final String gt;
           if (refSeq.ploidy().count() != 0) {
             if (dist == null) {
               dist = getAlleleDistribution(v);
             }
             int variantEnd = lastVariantEnd[sample]; // Need to use separate variable while going through the ploidy loop, otherwise we won't make hom variants.
+            final int[] gtArr = new int[ploidyCount];
             for (int i = 0; i < ploidyCount; ++i) {
-              if (gt.length() != 0) {
-                gt.append(VcfUtils.PHASED_SEPARATOR);
-              }
               final int alleleId;
               if (v.getStart() < lastVariantEnd[sample]) { // Do not generate overlapping variants
                 alleleId = 0;
@@ -225,22 +223,21 @@ public class SampleSimulator {
               if (svType != null) {
                 Diagnostic.warning("Symbolic variant ignored: " + v);
                 variantEnd = Math.max(variantEnd, v.getEnd());
-                gt.append(0); // For now, skip symbolic alleles.
+                gtArr[i] = 0; // For now, skip symbolic alleles.
               } else {
                 // Updating variantEnd even for alleleId == 0 prevents VCF representational issues with overlapping variants.
-                //if (alleleId > 0) {
                 variantEnd = Math.max(variantEnd, v.getEnd());
-                //}
-                gt.append(alleleId);
+                gtArr[i] = alleleId;
               }
             }
             lastVariantEnd[sample] = variantEnd;
+            gt = VcfUtils.joinGt(true, gtArr);
           } else { //ploidy count == 0
-            gt.append('.');
+            gt = VcfUtils.joinGt(true);
           }
           v.setNumberOfSamples(v.getNumberOfSamples() + 1);
           for (String format : v.getFormats()) {
-            final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt.toString() : VcfRecord.MISSING;
+            final String value = VcfUtils.FORMAT_GENOTYPE.equals(format) ? gt : VcfRecord.MISSING;
             v.addFormatAndSample(format, value);
           }
         }

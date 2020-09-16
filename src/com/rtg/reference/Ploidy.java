@@ -38,6 +38,14 @@ public enum Ploidy {
   HAPLOID(1),
   /** Two copies. */
   DIPLOID(2),
+  /** Three copies. */
+  TRIPLOID(3),
+  /** Four copies. */
+  TETRAPLOID(4),
+  /** Five copies. */
+  PENTAPLOID(5),
+  /** Six copies. */
+  HEXAPLOID(6),
   /** Many, non-fixed number of copies. */
   POLYPLOID(-1),
   ;

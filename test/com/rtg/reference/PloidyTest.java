@@ -39,6 +39,6 @@ import junit.framework.TestCase;
 public class PloidyTest extends TestCase {
 
   public void test() {
-    TestUtils.testEnum(Ploidy.class, "[NONE, HAPLOID, DIPLOID, POLYPLOID]");
+    TestUtils.testEnum(Ploidy.class, "[NONE, HAPLOID, DIPLOID, TRIPLOID, TETRAPLOID, PENTAPLOID, HEXAPLOID, POLYPLOID]");
   }
 }
