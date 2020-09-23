@@ -172,9 +172,16 @@ public class Vcf2Rocplot extends LoggedCli {
             mRoc.incrementBaselineCount(rec, bSample, true);
             break;
           case WithInfoEvalSynchronizer.STATUS_FN:
+          case WithInfoEvalSynchronizer.STATUS_FN_CA:
             mRoc.incrementBaselineCount(rec, bSample, false);
             break;
+          case WithInfoEvalSynchronizer.STATUS_OUTSIDE:
+          case WithInfoEvalSynchronizer.STATUS_HARD:
+          case WithInfoEvalSynchronizer.STATUS_IGNORED:
+            // ignore these known values silently
+            break;
           default:
+            Diagnostic.warning("Unrecognized annotation for " + WithInfoEvalSynchronizer.INFO_BASE + " " + base);
             // ignore
         }
       }
@@ -186,9 +193,16 @@ public class Vcf2Rocplot extends LoggedCli {
             mRoc.addRocLine(rec, cSample, Double.isNaN(weight) ? 1 : weight, 0, 1);
             break;
           case WithInfoEvalSynchronizer.STATUS_FP:
+          case WithInfoEvalSynchronizer.STATUS_FP_CA:
             mRoc.addRocLine(rec, cSample, 0, 1, 0);
             break;
+          case WithInfoEvalSynchronizer.STATUS_OUTSIDE:
+          case WithInfoEvalSynchronizer.STATUS_HARD:
+          case WithInfoEvalSynchronizer.STATUS_IGNORED:
+            // ignore these known values silently
+            break;
           default:
+            Diagnostic.warning("Unrecognized annotation for " + WithInfoEvalSynchronizer.INFO_CALL + " " + call);
             // ignore
         }
       }
