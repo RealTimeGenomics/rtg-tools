@@ -126,6 +126,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     } else {
       o = Collections.singletonList(new Pair<>(getOrientor(bvf, params.squashPloidy(), params.baselinePhaseOrientor()), getOrientor(cvf, params.squashPloidy(), params.callsPhaseOrientor())));
     }
+    Diagnostic.userLog("Variant orientors per pass: " + o);
     try (final EvalSynchronizer sync = getPathProcessor(params, variants)) {
       final SimpleThreadPool threadPool = new SimpleThreadPool(params.numberThreads(), "VcfEval", true);
       threadPool.enableBasicProgress(templateSequences.numberSequences());

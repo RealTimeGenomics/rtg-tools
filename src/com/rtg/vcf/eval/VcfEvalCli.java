@@ -202,6 +202,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
       && validateScoreField(flags)
+      && flags.checkInRange(DEFAULT_PLOIDY, 1, Integer.MAX_VALUE)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)

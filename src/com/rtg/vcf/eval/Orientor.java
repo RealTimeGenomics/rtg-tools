@@ -63,7 +63,7 @@ public interface Orientor {
     }
     @Override
     public String toString() {
-      return "unphased";
+      return "unphased (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
@@ -120,7 +120,7 @@ public interface Orientor {
     }
     @Override
     public String toString() {
-      return "phase-" + (mInvert ? "inverting" : "obeying");
+      return "phase-" + (mInvert ? "inverting" : "obeying") + " (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
@@ -155,7 +155,7 @@ public interface Orientor {
   Orientor SQUASH_GT = new Orientor() {
     @Override
     public String toString() {
-      return "squash";
+      return "squash (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
@@ -195,7 +195,7 @@ public interface Orientor {
   Orientor ALLELE_GT = new Orientor() {
     @Override
     public String toString() {
-      return "allele-gt";
+      return "allele-gt (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
@@ -239,7 +239,7 @@ public interface Orientor {
   Orientor HAPLOID_POP = new Orientor() {
     @Override
     public String toString() {
-      return "squash-all";
+      return "squash-all (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
@@ -263,7 +263,7 @@ public interface Orientor {
   Orientor DIPLOID_POP = new Orientor() {
     @Override
     public String toString() {
-      return "diploid-all";
+      return "diploid-all (" + haplotypes() + " haplotypes)";
     }
     @Override
     public int haplotypes() {
