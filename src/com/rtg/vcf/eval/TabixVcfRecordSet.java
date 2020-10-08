@@ -137,8 +137,8 @@ class TabixVcfRecordSet implements VariantSet {
     for (ContigField c : calledHeader.getContigLines()) {
       calldeclarednames.add(c.getId());
     }
-    if (Collections.disjoint(basedeclarednames, calldeclarednames)) {
-      throw new NoTalkbackSlimException("There were no sequence names in common between the supplied baseline and called variant sets. Check they use the same reference and are non-empty.");
+    if (Collections.disjoint(basedeclarednames, calldeclarednames) && !basedeclarednames.isEmpty() && !calldeclarednames.isEmpty()) {
+      throw new NoTalkbackSlimException("There were no sequence names in common between the supplied baseline and called variant sets. Check they use the same reference.");
     }
 
     final Set<String> union = new HashSet<>(basenames);
