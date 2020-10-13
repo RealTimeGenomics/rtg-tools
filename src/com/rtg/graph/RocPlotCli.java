@@ -78,7 +78,7 @@ public class RocPlotCli extends AbstractCli {
   static final String ZOOM_FLAG = "zoom";
   static final String PALETTE = "palette";
 
-  static final String SHOW_CMD_FLAG = "Xcmd";
+  static final String SHOW_CMD_FLAG = "cmd";
 
   static final String PNG_EXTENSION = ".png";
   static final String SVG_EXTENSION = ".svg";
