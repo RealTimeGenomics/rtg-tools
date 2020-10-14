@@ -89,6 +89,9 @@ public class ScriptedVcfFilter implements VcfFilter {
     if (!(mEngine instanceof Invocable)) {
       throw new NoTalkbackSlimException("Javascript engine is not invokable");
     }
+//    Diagnostic.userLog("Script Engine: " + mEngine.getFactory().getEngineName()
+//      + " " + mEngine.getFactory().getLanguageName()
+//      + " (" + mEngine.getFactory().getLanguageVersion() + ")");
     final ScriptContext sc = mEngine.getContext();
     sc.setWriter(new OutputStreamWriter(output));
     sc.setErrorWriter(new PrintWriter(err));

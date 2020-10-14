@@ -54,6 +54,12 @@
     <include name="commons-compress-1.4.1.jar" />
     <include name="snappy-java-1.1.4.jar" />
     <include name="json-simple-1.1.1.jar" />
+    <include name="js-20.2.0.jar" />
+    <include name="js-scriptengine-20.2.0.jar" />
+    <include name="graal-sdk-20.2.0.jar" />
+    <include name="regex-20.2.0.jar" />
+    <include name="truffle-api-20.2.0.jar" />
+    <include name="icu4j-67.1.jar" />
   </fileset>
 
   <path id="tools.runtime.classpath">

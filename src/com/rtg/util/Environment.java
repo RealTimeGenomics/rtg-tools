@@ -65,6 +65,8 @@ public final class Environment {
     // Ughhh, on JDK-11 any time you use the default js engine it spits out a warning to stderr.
     // This disables it.
     System.setProperty("nashorn.option.no.deprecation.warning", "true");
+    // But if you're using graal, this gives some compatibility
+    System.setProperty("polyglot.js.nashorn-compat", "true");
   }
 
   // To disable checking for release update during testing

@@ -49,6 +49,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.rtg.util.Environment;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
@@ -68,6 +69,11 @@ public class ScriptedVcfFilterTest {
   /** Expected exception handler */
   @Rule
   public ExpectedException mExpectedException = ExpectedException.none();
+
+  static {
+    // This is actually just to get the other Environment static init to run
+    Environment.setCheckRelease(false);
+  }
 
   private VcfHeader getVcfHeader() {
     final VcfHeader vcfHeader = new VcfHeader();
