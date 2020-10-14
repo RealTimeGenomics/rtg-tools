@@ -325,14 +325,14 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
     // "Line: badread2", "RNAME 'gi' not found in any SQ record");
     checkWarning(SAM_HEAD10 + SAM_REC_BAD2, 0, "SAM record is invalid in file ",
       "badread2" + TAB + "16" + TAB + "gi" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /*+ "AS:i:0" + TAB + "IH:0\n" SAM bug*/,
-      "[ERROR: Read name badread2, Reference sequence not found in sequence dictionary.]",
+      "[ERROR::INVALID_REFERENCE_INDEX:Read name badread2, Reference sequence not found in sequence dictionary.]",
       "At data line 1");
   }
 
   public void testBad2First3() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD3, 0, "SAM record is invalid in file ",
       "badread3" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /* + "AS:i:0" + TAB + "IH:0\n" SAM bug*/,
-      "[ERROR: Read name badread3, CIGAR should have > zero elements for mapped read.]",
+      "[ERROR::INVALID_CIGAR:Read name badread3, CIGAR should have > zero elements for mapped read.]",
       "At data line 1"); // "Line: badread3", "Empty field at position 5 (zero-based);");
   }
 
@@ -343,9 +343,9 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   public void testBad2First5() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD4, 0, "SAM record is invalid in file ",
       "badread4" + TAB + "2308" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=I3IIII" + TAB /*+ "AS:i:0" + TAB + "IH:i:0"*/,
-      "ERROR: Read name badread4, Secondary alignment flag should not be set for unmapped read.",
-      "ERROR: Read name badread4, Supplementary alignment flag should not be set for unmapped read.",
-      "ERROR: Read name badread4, MAPQ should be 0 for unmapped read.]",
+      "ERROR::INVALID_FLAG_NOT_PRIM_ALIGNMENT:Read name badread4, Secondary alignment flag should not be set for unmapped read.",
+      "ERROR::INVALID_FLAG_SUPPLEMENTARY_ALIGNMENT:Read name badread4, Supplementary alignment flag should not be set for unmapped read.",
+      "ERROR::INVALID_MAPPING_QUALITY:Read name badread4, MAPQ should be 0 for unmapped read.]",
       "At data line 1"); //"Line: badread4", "MRNM not specified but flags indicate mate mapped;");
   }
 
@@ -362,8 +362,8 @@ public class SkipInvalidRecordsIteratorTest extends TestCase {
   public void testBad2First8() throws IOException {
     checkWarning(SAM_HEAD10 + SAM_REC_BAD8, 0, "SAM record is invalid in file ",
       "badread8" + TAB + "16" + TAB + "gi0" + TAB + "3" + TAB + "255" + TAB + "10M" + TAB + "*" + TAB + "0" + TAB + "0" + TAB + "AAAAAAAAAA" + TAB + "GC@=" + TAB /*+ "AS:i:0" + TAB + "IH:i:0"*/,
-      "ERROR: Read name badread8, Read length does not match quals length",
-      "ERROR: Read name badread8, Read length is  10 bases but have 4 qualities",
+      "ERROR::MISMATCH_READ_LENGTH_AND_QUALS_LENGTH:Read name badread8, Read length does not match quals length",
+      "ERROR::MISMATCH_SEQ_QUAL_LENGTH:Read name badread8, Read length is  10 bases but have 4 qualities",
       "At data line 1"); //"Line: badread8", "length(QUAL) != length(SEQ)");
   }
 
