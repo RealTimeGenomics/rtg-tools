@@ -99,11 +99,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String DECOMPOSE = "decompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
-  /** Defines the RocFilters that make sense to use with vcfeval */
+  /** Defines the preset RocFilters that make sense to use with vcfeval */
   public enum VcfEvalRocFilter {
     // Generic filters that should apply to any call set
-    /** All variants (required) */
-    ALL(RocFilter.ALL),
     /** Homozygous only */
     HOM(RocFilter.HOM),
     /** Heterozygous only */
@@ -198,9 +196,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   static void registerVcfRocFlags(CFlags flags) {
     flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
-    flags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
-    flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "custom JavaScript ROC filter of the form <NAME>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
-    flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "custom region ROC filter of the form <NAME>=<BEDFILE>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional('R', ROC_SUBSET, VcfEvalRocFilter.class, "FILTER", "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "output ROC file for variants matching custom JavaScript expression. Use the form <NAME>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "output ROC file for variants overlapping custom regions. Use the form <NAME>=<BEDFILE>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
