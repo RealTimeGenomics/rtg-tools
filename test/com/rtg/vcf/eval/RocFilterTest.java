@@ -51,10 +51,6 @@ public class RocFilterTest extends TestCase {
   private static final VcfRecord COMPLEX_HETEROZYGOUS_RECORD = VcfReaderTest.vcfLineToRecord("chr1 250 . A C 20.0 PASS XRX GT 0/1".replaceAll(" ", "\t"));
   private static final VcfRecord COMPLEX_IDENTITY_RECORD = VcfReaderTest.vcfLineToRecord("chr1 250 . A . 20.0 PASS XRX GT 0/0".replaceAll(" ", "\t"));
 
-//  public void testEnum() {
-//    TestUtils.testEnum(RocFilter.class, "[ALL, HOM, HET, SNP, NON_SNP, MNP, INDEL, XRX, NON_XRX, HOM_XRX, HOM_NON_XRX, HET_XRX, HET_NON_XRX]");
-//  }
-
   private boolean accept(RocFilter ff, VcfRecord rec) {
     return ff.accept(rec, VcfUtils.getValidGt(rec, 0));
   }
@@ -124,57 +120,5 @@ public class RocFilterTest extends TestCase {
     assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
     assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
   }
-
-  public void testHomozygousSimple() {
-    final RocFilter f = RocFilter.HOM_NON_XRX;
-    assertTrue(accept(f, FAIL_RECORD));
-    assertTrue(accept(f, PASS_RECORD));
-    assertTrue(accept(f, HOMOZYGOUS_RECORD));
-
-    assertFalse(accept(f, HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
-    assertFalse(accept(f, IDENTITY_RECORD));
-  }
-
-  public void testHomozygousComplex() {
-    final RocFilter f = RocFilter.HOM_XRX;
-    assertTrue(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
-
-    assertFalse(accept(f, FAIL_RECORD));
-    assertFalse(accept(f, PASS_RECORD));
-    assertFalse(accept(f, HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
-    assertFalse(accept(f, IDENTITY_RECORD));
-  }
-
-  public void testHeterozygousSimple() {
-    final RocFilter f = RocFilter.HET_NON_XRX;
-    assertTrue(accept(f, HETEROZYGOUS_RECORD));
-
-    assertFalse(accept(f, FAIL_RECORD));
-    assertFalse(accept(f, PASS_RECORD));
-    assertFalse(accept(f, HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
-    assertFalse(accept(f, IDENTITY_RECORD));
-  }
-
-  public void testHeterozygousComplex() {
-    final RocFilter f = RocFilter.HET_XRX;
-    assertTrue(accept(f, COMPLEX_HETEROZYGOUS_RECORD));
-
-    assertFalse(accept(f, FAIL_RECORD));
-    assertFalse(accept(f, PASS_RECORD));
-    assertFalse(accept(f, HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, HETEROZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_HOMOZYGOUS_RECORD));
-    assertFalse(accept(f, COMPLEX_IDENTITY_RECORD));
-    assertFalse(accept(f, IDENTITY_RECORD));
-  }
-
+  
 }

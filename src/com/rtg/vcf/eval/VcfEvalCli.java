@@ -93,7 +93,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   protected static final String ROC_REGIONS = "Xroc-regions";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
-  private static final String RTG_STATS = "Xrtg-stats";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
   private static final String DEFAULT_PLOIDY = "Xdefault-ploidy";
@@ -116,21 +115,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     /** MNPs only */
     MNP(RocFilter.MNP),
     /** Length-changing only */
-    INDEL(RocFilter.INDEL),
-
-    // RTG specific annotations
-    /** complex called */
-    XRX(RocFilter.XRX),
-    /** non-complex called */
-    NON_XRX(RocFilter.NON_XRX),
-    /** Homozygous complex called */
-    HOM_XRX(RocFilter.HOM_XRX),
-    /** Homozygous non-complex called */
-    HOM_NON_XRX(RocFilter.HOM_NON_XRX),
-    /** Heterozygous complex called */
-    HET_XRX(RocFilter.HET_XRX),
-    /** Heterozygous non-complex called */
-    HET_NON_XRX(RocFilter.HET_NON_XRX);
+    INDEL(RocFilter.INDEL);
 
     RocFilter mFilter;
     VcfEvalRocFilter(RocFilter f) {
@@ -218,7 +203,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "custom region ROC filter of the form <NAME>=<BEDFILE>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
-    flags.registerOptional(RTG_STATS, "output RTG specific files and statistics").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
   }
 
@@ -414,16 +398,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
         rocFilters.add(new RegionsRocFilter(e[0], new File(e[1])));
       }
     }
-    if (flags.isSet(RTG_STATS)) {
-      rocFilters.add(RocFilter.NON_XRX);
-      rocFilters.add(RocFilter.XRX);
-      rocFilters.add(RocFilter.HET_NON_XRX);
-      rocFilters.add(RocFilter.HET_XRX);
-      rocFilters.add(RocFilter.HOM_NON_XRX);
-      rocFilters.add(RocFilter.HOM_XRX);
-    }
 
-    if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, ROC_REGIONS, RTG_STATS)) {
+    if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, ROC_REGIONS)) {
       rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
     }
 

@@ -136,38 +136,6 @@ public abstract class RocFilter {
     }
   };
 
-  /** homozygous complex calls **/
-  public static final RocFilter HOM_XRX = new RocFilter("HOM_XRX", "homozygous_xrx") {
-    @Override
-    public boolean accept(VcfRecord rec, int[] gt) {
-      return VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
-    }
-  };
-
-  /** homozygous simple (non complex) calls **/
-  public static final RocFilter HOM_NON_XRX = new RocFilter("HOM_NON_XRX", "homozygous_non_xrx") {
-    @Override
-    public boolean accept(VcfRecord rec, int[] gt) {
-      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHomozygousAlt(gt);
-    }
-  };
-
-  /** heterozygous complex calls **/
-  public static final RocFilter HET_XRX = new RocFilter("HET_XRX", "heterozygous_xrx") {
-    @Override
-    public boolean accept(VcfRecord rec, int[] gt) {
-      return VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
-    }
-  };
-
-  /** heterozygous simple (non complex) calls **/
-  public static final RocFilter HET_NON_XRX = new RocFilter("HET_NON_XRX", "heterozygous_non_xrx") {
-    @Override
-    public boolean accept(VcfRecord rec, int[] gt) {
-      return !VcfUtils.isComplexScored(rec) && VcfUtils.isHeterozygous(gt);
-    }
-  };
-
 
   /** The filename extension used for all ROC files */
   public static final String ROC_EXT = "_roc.tsv";
