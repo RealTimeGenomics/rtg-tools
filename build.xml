@@ -37,7 +37,7 @@
   <property name="regression.update" value=""/> <!-- Empty means don't update nano-regression results -->
 
   <!-- This must currently be built from the RTG fork of htsjdk -->
-  <property name="htsjdk.jar" value="sam-rtg-2.23.0.jar"/>
+  <property name="htsjdk.jar" value="sam-rtg-2.23.0.1.jar"/>
 
 
   <!-- Define resource collections for compilation, running, etc -->
