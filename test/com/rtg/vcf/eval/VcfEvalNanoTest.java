@@ -38,11 +38,11 @@ import com.rtg.tabix.UnindexableDataException;
 public class VcfEvalNanoTest extends AbstractVcfEvalTest {
 
   public void testNanoSmall() throws IOException, UnindexableDataException {
-    check("vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "all,snp");
+    check("vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "snp");
   }
 
   public void testNanoSmallSquash() throws IOException, UnindexableDataException {
-    check("vcfeval_small_squash/vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "all,snp", "--squash-ploidy");
+    check("vcfeval_small_squash/vcfeval_small", true, false, false, "--sample", "sample1", "--vcf-score-field", "QUAL", "--Xroc-subset", "snp", "--squash-ploidy");
   }
 
   public void testNanoSmallAlt() throws IOException, UnindexableDataException {
