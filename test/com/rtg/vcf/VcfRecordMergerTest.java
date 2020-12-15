@@ -277,6 +277,12 @@ public class VcfRecordMergerTest extends AbstractTest {
     assertEquals(1, mergedArr.length);
     assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZZ:ZX\t1/2:1,2\t1/2:.:3,4,5", mergedArr[0].toString());
 
+    // Check that GT is moved to front
+    r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tZX\t3,4,5");
+    mergedArr = merger.mergeRecords(new VcfRecord[]{r2, r1}, heads);
+    assertEquals(1, mergedArr.length);
+    assertEquals("chr1\t100\t.\tG\tA,C\t.\tPASS\t.\tGT:ZX:ZZ\t.:3,4,5\t1/2:.:1,2", mergedArr[0].toString());
+
     r2 = VcfReaderTest.vcfLineToRecord("chr1\t100\t.\tG\tC,A\t.\tPASS\t.\tGT:ZX\t1/2:3,4,5");
     mergedArr = merger.mergeRecords(new VcfRecord[]{r1, r2}, heads);
     assertEquals(2, mergedArr.length);
@@ -348,6 +354,7 @@ public class VcfRecordMergerTest extends AbstractTest {
       .addFilter("TEST2")
       .setInfo("DP", "23")
       .setInfo("TEST", "45", "46", "47", "48")
+      .setNumberOfSamples(1)
       .addFormatAndSample("GT", "0/0")
       .addFormatAndSample("GQ", "100")
     ;
@@ -360,6 +367,7 @@ public class VcfRecordMergerTest extends AbstractTest {
       .addFilter("TEST2")
       .setInfo("DP", "23")
       .setInfo("TEST", "45", "46", "47", "48")
+      .setNumberOfSamples(1)
       .addFormatAndSample("GT", "0/1")
       .addFormatAndSample("GQ", "95")
     ;

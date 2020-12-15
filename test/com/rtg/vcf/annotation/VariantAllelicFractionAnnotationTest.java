@@ -49,14 +49,16 @@ public class VariantAllelicFractionAnnotationTest extends TestCase {
 
   public void test() {
     final VariantAllelicFractionAnnotation annotation = new VariantAllelicFractionAnnotation();
-    VcfRecord rec = new VcfRecord("seq", 0, "AAA");
-    rec.addAltCall("A");
-    rec.addFormatAndSample("ADE", "6.0,2.0");
+    VcfRecord rec = new VcfRecord("seq", 0, "AAA")
+      .addAltCall("A")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("ADE", "6.0,2.0");
     assertEquals(0.25, ((double[]) annotation.getValue(rec, 0))[0], 0.0001);
 
-    rec = new VcfRecord("seq", 0, "AAA");
-    rec.addAltCall("A");
-    rec.addFormatAndSample("AD", "6,2");
+    rec = new VcfRecord("seq", 0, "AAA")
+      .setNumberOfSamples(1)
+      .addAltCall("A")
+      .addFormatAndSample("AD", "6,2");
     assertEquals(0.25, ((double[]) annotation.getValue(rec, 0))[0], 0.0001);
   }
 

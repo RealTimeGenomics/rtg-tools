@@ -281,8 +281,9 @@ public class ScriptedVcfFilterTest {
 
   @Test
   public void testStringFilter() {
-    final VcfRecord record = new VcfRecord("blah", 0, "A");
-    record.addFormatAndSample("GT", "0/1");
+    final VcfRecord record = new VcfRecord("blah", 0, "A")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("GT", "0/1");
     assertTrue(getScriptedVcfFilter("'BOB'.GT == '0/1'").accept(record));
   }
 

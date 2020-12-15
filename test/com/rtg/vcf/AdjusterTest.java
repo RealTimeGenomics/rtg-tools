@@ -90,8 +90,9 @@ public class AdjusterTest extends TestCase {
 
   public void testMalformedFormat() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader());
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.addFormatAndSample(ID, "42,3,4,5");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,3,4,5");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac");
     try {
       adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
@@ -103,8 +104,9 @@ public class AdjusterTest extends TestCase {
 
   public void testMalformedFormatType() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader(MetaType.STRING, VcfNumber.REF_ALTS));
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.addFormatAndSample(ID, "42,3,4");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,3,4");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac");
     try {
       adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
@@ -116,9 +118,10 @@ public class AdjusterTest extends TestCase {
 
   public void testSum() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader());
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.setInfo(ID, "43", "4", "15");
-    inrec.addFormatAndSample(ID, "42,3,14");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setInfo(ID, "43", "4", "15")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,3,14");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").setNumberOfSamples(1);
     adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
     assertEquals("42,17", rec.getFormat(ID).get(0));
@@ -128,9 +131,10 @@ public class AdjusterTest extends TestCase {
 
   public void testSumFloat() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader(MetaType.FLOAT, VcfNumber.REF_ALTS));
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.setInfo(ID, "43.1", "4.2", "15.3");
-    inrec.addFormatAndSample(ID, "42.1,3.2,14.3");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setInfo(ID, "43.1", "4.2", "15.3")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42.1,3.2,14.3");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").setNumberOfSamples(1);
     adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
     assertEquals("42.100,17.500", rec.getFormat(ID).get(0));
@@ -147,11 +151,13 @@ public class AdjusterTest extends TestCase {
     adjuster.setPolicy("INFO." + ID, null);
     assertFalse(adjuster.hasPolicy(header.getFormatField(ID)));
     assertFalse(adjuster.hasPolicy(header.getInfoField(ID)));
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.addFormatAndSample(ID, "42,3,14");
-    final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac");
-    rec.setInfo(ID, "a,b");
-    rec.addFormatAndSample(ID, "142,13,114");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,3,14");
+    final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac")
+      .setInfo(ID, "a,b")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "142,13,114");
     adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
     assertEquals("142,13,114", rec.getFormat(ID).get(0));
     assertEquals("a,b", rec.getInfo(ID));
@@ -160,8 +166,9 @@ public class AdjusterTest extends TestCase {
   public void testDropPolicy() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader());
     adjuster.setPolicy("FORMAT." + ID, Adjuster.Policy.DROP);
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.addFormatAndSample(ID, "42,3,14");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,3,14");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac");
     adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
     assertNull(rec.getFormat(ID));
@@ -171,9 +178,10 @@ public class AdjusterTest extends TestCase {
     final Adjuster adjuster = new Adjuster(makeHeader(MetaType.STRING, VcfNumber.REF_ALTS));
     adjuster.setPolicy("INFO." + ID, Adjuster.Policy.RETAIN);
     adjuster.setPolicy("FORMAT." + ID, Adjuster.Policy.RETAIN);
-    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat");
-    inrec.setInfo(ID, "a,b");
-    inrec.addFormatAndSample(ID, "a,b,c");
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setInfo(ID, "a,b")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "a,b,c");
     final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").setNumberOfSamples(1);
     adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
     assertEquals("a,b,c", rec.getFormat(ID).get(0));

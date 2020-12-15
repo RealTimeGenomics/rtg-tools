@@ -46,9 +46,10 @@ public class AltAlleleQualityAnnotationTest extends TestCase {
   }
 
   public void check(String va, String aq, Double expQa) {
-    final VcfRecord rec = new VcfRecord("seq", 0, "A");
-    rec.addFormatAndSample("VA", va);
-    rec.addFormatAndSample("AQ", aq);
+    final VcfRecord rec = new VcfRecord("seq", 0, "A")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("VA", va)
+      .addFormatAndSample("AQ", aq);
     assertEquals(expQa, new AltAlleleQualityAnnotation().getValue(rec, 0));
   }
 

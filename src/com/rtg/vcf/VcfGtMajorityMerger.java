@@ -29,7 +29,6 @@
  */
 package com.rtg.vcf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -56,8 +55,9 @@ public class VcfGtMajorityMerger extends VcfRecordMerger {
 
   @Override
   protected boolean mergeSamples(VcfRecord dest, VcfRecord[] records, VcfHeader[] headers, AlleleMap map) {
-    final ArrayList<String> sampleGts = new ArrayList<>();
-    dest.getFormatAndSample().put(VcfUtils.FORMAT_GENOTYPE, sampleGts);
+    dest.addFormat(VcfUtils.FORMAT_GENOTYPE);
+    final List<String> sampleGts = dest.getFormat(VcfUtils.FORMAT_GENOTYPE);
+    sampleGts.clear();
     dest.setNumberOfSamples(getHeader().getNumberOfSamples());
     final List<String> names = getHeader().getSampleNames();
     if (map.mAltsChanged) {

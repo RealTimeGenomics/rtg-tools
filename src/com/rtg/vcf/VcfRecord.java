@@ -451,10 +451,25 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addFormat(String key) {
-    if (!mFormatAndSample.containsKey(key)) {
-      mFormatAndSample.put(key, new ArrayList<>());
-    }
+    addOrGetFormat(key);
     return this;
+  }
+
+  // Ensures that GT is first
+  private List<String> addOrGetFormat(String key) {
+    ArrayList<String> ret = mFormatAndSample.get(key);
+    if (ret == null) {
+      ret = new ArrayList<>();
+      if (!mFormatAndSample.isEmpty() && VcfUtils.FORMAT_GENOTYPE.equals(key)) {
+        final LinkedHashMap<String, ArrayList<String>> prev = new LinkedHashMap<>(mFormatAndSample);
+        mFormatAndSample.clear();
+        mFormatAndSample.put(key, ret);
+        mFormatAndSample.putAll(prev);
+      } else {
+        mFormatAndSample.put(key, ret);
+      }
+    }
+    return ret;
   }
 
   /**
@@ -464,14 +479,9 @@ public class VcfRecord implements SequenceNameLocus {
    * @return this, for call chaining
    */
   public VcfRecord addFormatAndSample(String key, String val) {
-    if (mFormatAndSample.containsKey(key)) {
-      assert mFormatAndSample.get(key).size() < mNumSamples : "Tried to insert more " + key + " format values than number of samples";
-      mFormatAndSample.get(key).add(val);
-    } else {
-      final ArrayList<String> list = new ArrayList<>();
-      list.add(val);
-      mFormatAndSample.put(key, list);
-    }
+    final List<String> list = addOrGetFormat(key);
+    assert list.size() < mNumSamples : "Tried to insert more " + key + " format values than number of samples";
+    list.add(val);
     return this;
   }
 
@@ -485,14 +495,8 @@ public class VcfRecord implements SequenceNameLocus {
    */
   public VcfRecord setFormat(String key, Collection<String> val) {
     assert val.size() <= mNumSamples : "More values supplied than samples";
-    final ArrayList<String> vals;
-    if (mFormatAndSample.containsKey(key)) {
-      vals = mFormatAndSample.get(key);
-      vals.clear();
-    } else {
-      vals = new ArrayList<>();
-      mFormatAndSample.put(key, vals);
-    }
+    final List<String> vals = addOrGetFormat(key);
+    vals.clear();
     vals.addAll(val);
     padFormatAndSample(key);
     return this;
@@ -508,12 +512,11 @@ public class VcfRecord implements SequenceNameLocus {
    */
   public VcfRecord setFormatAndSample(String key, String val, int sampleIndex) {
     assert sampleIndex < mNumSamples : "Invalid sample index: " + sampleIndex;
-    final ArrayList<String> vals;
+    final List<String> vals;
     if (mFormatAndSample.containsKey(key)) {
       vals = mFormatAndSample.get(key);
     } else {
-      vals = new ArrayList<>();
-      mFormatAndSample.put(key, vals);
+      vals = addOrGetFormat(key);
       padFormatAndSample(key);
     }
     vals.set(sampleIndex, val);

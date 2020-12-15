@@ -56,16 +56,18 @@ public class MeanQualityDifferenceAnnotationTest extends TestCase {
   }
 
   public void check(String gt, String ad, String aq, Double expQad) {
-    final VcfRecord rec = new VcfRecord("seq", 0, "A");
-    rec.addFormatAndSample("GT", gt);
-    rec.addFormatAndSample("AD", ad);
-    rec.addFormatAndSample("AQ", aq);
+    final VcfRecord rec = new VcfRecord("seq", 0, "A")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("GT", gt)
+      .addFormatAndSample("AD", ad)
+      .addFormatAndSample("AQ", aq);
     assertEquals(expQad, new MeanQualityDifferenceAnnotation().getValue(rec, 0));
   }
 
   public void testNoAd() {
-    final VcfRecord rec = new VcfRecord("seq", 0, "A");
-    rec.addFormatAndSample("GT", "1/0");
+    final VcfRecord rec = new VcfRecord("seq", 0, "A")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("GT", "1/0");
     assertNull(new MeanQualityDifferenceAnnotation().getValue(rec, 0));
   }
 }

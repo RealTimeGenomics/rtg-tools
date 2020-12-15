@@ -67,14 +67,16 @@ public class QualOverDepthAnnotationTest extends TestCase {
     rec.setQuality("987.6");
     assertNull(ann.getValue(rec, 0));
 
-    rec = new VcfRecord("seq", 0, "A");
-    rec.setQuality("987.6");
-    rec.addFormatAndSample("DP", "123");
+    rec = new VcfRecord("seq", 0, "A")
+      .setQuality("987.6")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("DP", "123");
     assertEquals(8.029, ann.getValue(rec, 0), 0.001);
 
-    rec = new VcfRecord("seq", 0, "A");
-    rec.setQuality("987.6");
-    rec.addFormatAndSample("DP", "0");
+    rec = new VcfRecord("seq", 0, "A")
+      .setQuality("987.6")
+      .setNumberOfSamples(1)
+      .addFormatAndSample("DP", "0");
     assertEquals(Double.POSITIVE_INFINITY, ann.getValue(rec, -1), 0.001);
 
     rec = new VcfRecord("seq", 0, "A");
