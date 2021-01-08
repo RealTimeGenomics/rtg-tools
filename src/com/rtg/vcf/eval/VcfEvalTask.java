@@ -199,7 +199,7 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
       case VariantFactory.SAMPLE_FACTORY:
         return dipAlleleMatching ? Orientor.ALLELE_GT : hapAlleleMatching ? Orientor.SQUASH_GT : phaseOrientor;
       case VariantFactory.ALL_FACTORY:
-        return hapAlleleMatching ? Orientor.HAPLOID_POP : Orientor.DIPLOID_POP;
+        return dipAlleleMatching ? Orientor.DIPLOID_POP : hapAlleleMatching ? Orientor.HAPLOID_POP : new Orientor.AltOrientor(phaseOrientor.haplotypes());
       case ParentalVariant.Factory.NAME:
         return hapAlleleMatching ? ParentalVariant.PARENTAL_TRANSMISSION_HAP : ParentalVariant.PARENTAL_TRANSMISSION_DIP;
       default:

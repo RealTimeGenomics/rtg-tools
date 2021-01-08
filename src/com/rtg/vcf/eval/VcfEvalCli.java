@@ -186,7 +186,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && validateModeSample(flags)
       && validateScoreField(flags)
       && flags.checkInRange(SAMPLE_PLOIDY, 1, Integer.MAX_VALUE)
-      && validatePloidySample(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
@@ -224,17 +223,6 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final String mode = (String) flags.getValue(OUTPUT_MODE);
     if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (VcfEvalTask.MODE_COMBINE.equals(mode) || VcfEvalTask.MODE_GA4GH.equals(mode))) {
       flags.setParseMessage("--" + OUTPUT_MODE + "=" + mode + " cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
-      return false;
-    }
-    return true;
-  }
-
-  private static boolean validatePloidySample(CFlags flags) {
-    final int ploidy = (Integer) flags.getValue(SAMPLE_PLOIDY);
-    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE)
-      && !flags.isSet(SQUASH_PLOIDY)
-      && ploidy > 2) {
-      flags.setParseMessage("--" + SAMPLE_PLOIDY + "=" + ploidy + " cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
       return false;
     }
     return true;

@@ -31,6 +31,7 @@ package com.rtg.vcf.eval;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import com.rtg.util.Permutation;
 
@@ -233,7 +234,7 @@ public interface Orientor {
   };
 
   /**
-   * Produces orientations corresponding to the possible haploid ALTs from the
+   * Produces orientations corresponding to the possible variant haploid genotypes from the
    * population-alleles-derived variant.
    */
   Orientor HAPLOID_POP = new Orientor() {
@@ -256,7 +257,7 @@ public interface Orientor {
   };
 
   /**
-   * Produces orientations corresponding to all the possible diploid genotypes allowed by the
+   * Produces orientations corresponding to all the possible variant diploid genotypes allowed by the
    * population-alleles-derived variant.
    * With twists to help with sample recoding.
    */
@@ -275,15 +276,64 @@ public interface Orientor {
       final ArrayList<OrientedVariant> pos = new ArrayList<>(variant.numAlleles() * variant.numAlleles() - 1);
       for (int i = 1; i < variant.numAlleles(); ++i) {
         for (int j = -1; j < i; ++j) {
+          if (j == 0 && !explicitHalfCall) {
+            // Jump from . to first allele, so skips will match as missing
+            continue;
+          }
           pos.add(new OrientedVariant(variant, false, i, j));
           pos.add(new OrientedVariant(variant, false, j, i));
-          if (j == -1 && !explicitHalfCall) {
-            ++j; // Jump from . to first allele, so skips will match as missing
-          }
         }
         pos.add(new OrientedVariant(variant, false, i, i));
       }
       return pos.toArray(new OrientedVariant[0]);
     }
   };
+
+  /**
+   * Produces orientations corresponding to all the possible variant genotypes allowed by the
+   * population-alleles-derived variant. This general implementation allows specifying the target
+   * ploidy.
+   */
+  final class AltOrientor implements Orientor {
+    final int mHaplotypes;
+    AltOrientor(int haplotypes) {
+      mHaplotypes = haplotypes;
+    }
+    @Override
+    public String toString() {
+      return "generic-all (" + haplotypes() + " haplotypes)";
+    }
+    @Override
+    public int haplotypes() {
+      return mHaplotypes;
+    }
+    @Override
+    public OrientedVariant[] orientations(Variant variant) {
+      final ArrayList<OrientedVariant> o = new ArrayList<>();
+      final int[] r = new int[haplotypes()];
+      for (int i = 1; i < variant.numAlleles(); ++i) { // Must be at least one variant allele
+        r[0] = i;
+        fillAlleles(variant, o, r, 1);
+      }
+      return o.toArray(new OrientedVariant[0]);
+    }
+    private void fillAlleles(Variant variant, List<OrientedVariant> o, int[] alleles, int i) {
+      if (i == alleles.length) {
+        final Permutation p = new Permutation(alleles);
+        int[] r;
+        while ((r = p.next()) != null) {
+          o.add(new OrientedVariant(variant, false, r.clone()));
+        }
+      } else {
+        final boolean explicitHalfCall = variant.allele(-1) != null;
+        for (int j = -1; j <= alleles[i - 1]; ++j) {
+          if (j == 0 && !explicitHalfCall) {
+            continue; // Jump from . to first allele, so skips will match as missing
+          }
+          alleles[i] = j;
+          fillAlleles(variant, o, alleles, i + 1);
+        }
+      }
+    }
+  }
 }

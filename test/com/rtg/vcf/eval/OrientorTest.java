@@ -30,6 +30,12 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
 import junit.framework.TestCase;
 
 /**
@@ -182,9 +188,16 @@ public class OrientorTest extends TestCase {
     assertEquals(1, pos[0].alleleId()); // REF allele doesn't get included in orientations, so first is T.
     assertEquals(2, pos[1].alleleId());
     assertEquals(3, pos[2].alleleId());
+
+    // Check generic version is equivalent
+    final OrientedVariant[] pos2 = new Orientor.AltOrientor(1).orientations(variant);
+    assertEquals(
+      Arrays.stream(pos).map(OrientedVariant::toString).sorted().collect(Collectors.toList()),
+      Arrays.stream(pos2).map(OrientedVariant::toString).sorted().collect(Collectors.toList())
+    );
   }
 
-  public void testRecodeAlts() throws Exception {
+  public void testDiploidAlts() throws Exception {
     final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     // Test diploid combos  A T,C,G -> .:T, T:., T:T, .:C, C:., C:C, .:G, G:., G:G, T:C, C:T, T:G, G:T, C:G, G:C
@@ -196,6 +209,24 @@ public class OrientorTest extends TestCase {
     assertEquals("chr:23-24 (.v:*:T:C^:G)", pos[3].toString());
     assertEquals("chr:23-24 (*:T:C^:Gv)", pos[13].toString());
     assertEquals("chr:23-24 (*:T:C:Gx)", pos[14].toString());
+
+    // Check generic version is equivalent (order may vary)
+    final OrientedVariant[] pos2 = new Orientor.AltOrientor(2).orientations(variant);
+    assertEquals(
+      Arrays.stream(pos).map(OrientedVariant::toString).sorted().collect(Collectors.toList()),
+      Arrays.stream(pos2).map(OrientedVariant::toString).sorted().collect(Collectors.toList())
+    );
+  }
+  
+  public void testTriploidAlts() throws Exception {
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
+
+    final OrientedVariant[] pos = new Orientor.AltOrientor(3).orientations(variant);
+    assertEquals(63, pos.length);
+    List<String> names = Arrays.stream(pos).map(OrientedVariant::toString).sorted().collect(Collectors.toList());
+    // System.err.println(names);
+    SortedSet<String> unames = new TreeSet<>(names);
+    assertEquals(names.size(), unames.size());
   }
 
 }
