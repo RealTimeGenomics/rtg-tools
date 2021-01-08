@@ -95,7 +95,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String TWO_PASS = "Xtwo-pass";
   private static final String OBEY_PHASE = "Xobey-phase";
-  private static final String DEFAULT_PLOIDY = "Xdefault-ploidy";
+  private static final String SAMPLE_PLOIDY = "sample-ploidy";
   private static final String DECOMPOSE = "decompose";
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
@@ -161,7 +161,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     modeFlag.setParameterRange(new String[]{VcfEvalTask.MODE_SPLIT, VcfEvalTask.MODE_ANNOTATE, VcfEvalTask.MODE_COMBINE, VcfEvalTask.MODE_GA4GH, VcfEvalTask.MODE_ROC_ONLY});
 
     mFlags.registerOptional(MAX_LENGTH, Integer.class, CommonFlags.INT, "don't attempt to evaluate variant alternatives longer than this", 1000).setCategory(FILTERING);
-    mFlags.registerOptional(DEFAULT_PLOIDY, Integer.class, CommonFlags.INT, "default ploidy to use when matching", 2).setCategory(FILTERING);
+    mFlags.registerOptional(SAMPLE_PLOIDY, Integer.class, CommonFlags.INT, "expected ploidy of samples", 2).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
 
     registerVcfRocFlags(mFlags);
@@ -185,7 +185,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
       && validateScoreField(flags)
-      && flags.checkInRange(DEFAULT_PLOIDY, 1, Integer.MAX_VALUE)
+      && flags.checkInRange(SAMPLE_PLOIDY, 1, Integer.MAX_VALUE)
+      && validatePloidySample(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
@@ -223,6 +224,17 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final String mode = (String) flags.getValue(OUTPUT_MODE);
     if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE) && (VcfEvalTask.MODE_COMBINE.equals(mode) || VcfEvalTask.MODE_GA4GH.equals(mode))) {
       flags.setParseMessage("--" + OUTPUT_MODE + "=" + mode + " cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean validatePloidySample(CFlags flags) {
+    final int ploidy = (Integer) flags.getValue(SAMPLE_PLOIDY);
+    if (flags.isSet(SAMPLE) && ((String) flags.getValue(SAMPLE)).contains(VariantFactory.ALT_SAMPLE)
+      && !flags.isSet(SQUASH_PLOIDY)
+      && ploidy > 2) {
+      flags.setParseMessage("--" + SAMPLE_PLOIDY + "=" + ploidy + " cannot be used when either sample is " + VariantFactory.ALT_SAMPLE);
       return false;
     }
     return true;
@@ -343,7 +355,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.baselineSample(samples[0]);
       builder.callsSample(samples[1]);
     }
-    final int haplotypes = (Integer) mFlags.getValue(DEFAULT_PLOIDY);
+    final int haplotypes = (Integer) mFlags.getValue(SAMPLE_PLOIDY);
     final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
     builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0], haplotypes));
     builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1], haplotypes));

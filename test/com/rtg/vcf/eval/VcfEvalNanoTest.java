@@ -153,11 +153,11 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     // One haplotype is reference-only
     // However, without --ref-overlap, some variants cannot match, as the long deletion asserts reference bases,
     // and other variants inside the span of the long deletion also assert reference bases
-    endToEnd("vcfeval_triploid/small", new String[] {"output.vcf"}, false, "--output-mode=combine", "--no-roc", "--Xdefault-ploidy=3", "--Xobey-phase=true,false", "--ref-overlap");
+    endToEnd("vcfeval_triploid/small", new String[] {"output.vcf"}, false, "--output-mode=combine", "--no-roc", "--sample-ploidy=3", "--Xobey-phase=true,false", "--ref-overlap");
   }
 
   public void testNanoTetraploid() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_tetraploid/small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--output-mode=annotate", "--no-roc", "--Xdefault-ploidy=4", "--Xobey-phase=true,false");
+    endToEnd("vcfeval_tetraploid/small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--output-mode=annotate", "--no-roc", "--sample-ploidy=4", "--Xobey-phase=true,false");
   }
 
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
