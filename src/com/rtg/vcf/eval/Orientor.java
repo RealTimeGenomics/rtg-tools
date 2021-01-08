@@ -275,13 +275,13 @@ public interface Orientor {
       final ArrayList<OrientedVariant> pos = new ArrayList<>(variant.numAlleles() * variant.numAlleles() - 1);
       for (int i = 1; i < variant.numAlleles(); ++i) {
         for (int j = -1; j < i; ++j) {
-          pos.add(new OrientedVariant(variant, true, i, j));
+          pos.add(new OrientedVariant(variant, false, i, j));
           pos.add(new OrientedVariant(variant, false, j, i));
           if (j == -1 && !explicitHalfCall) {
             ++j; // Jump from . to first allele, so skips will match as missing
           }
         }
-        pos.add(new OrientedVariant(variant, true, i, i));
+        pos.add(new OrientedVariant(variant, false, i, i));
       }
       return pos.toArray(new OrientedVariant[0]);
     }
