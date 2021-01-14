@@ -90,7 +90,7 @@ public final class ToolsCommand {
   static final Command SAMPLESIM = new Command(new SampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command CHILDSIM = new Command(new ChildSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command DENOVOSIM = new Command(new DeNovoSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
-  static final Command PEDSAMPLESIM = new Command(new PedSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.BETA);
+  static final Command PEDSAMPLESIM = new Command(new PedSampleSimulatorCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
   static final Command SAMPLEREPLAY = new Command(new SampleReplayerCli(), CommandCategory.SIMULATE, ReleaseLevel.GA);
 
   static final Command BGZIP = new Command(new BgZip(), CommandCategory.UTILITY, ReleaseLevel.GA);
@@ -105,11 +105,11 @@ public final class ToolsCommand {
   static final Command VCFSUBSET = new Command(new VcfSubset(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFFILTER = new Command(new VcfFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFANNOTATE = new Command(new VcfAnnotatorCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-  static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCF2ROCPLOT = new Command(new Vcf2Rocplot(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
-  static final Command VCFSPLIT = new Command(new VcfSplitCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
-  static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.BETA);
+  static final Command VCFSPLIT = new Command(new VcfSplitCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
+  static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command CNVEVAL = new Command(new CnvEvalCli(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
