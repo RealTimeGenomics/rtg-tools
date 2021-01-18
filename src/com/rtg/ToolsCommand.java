@@ -107,7 +107,7 @@ public final class ToolsCommand {
   static final Command VCFANNOTATE = new Command(new VcfAnnotatorCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFDECOMPOSE = new Command(new VcfDecomposerCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command VCFEVAL = new Command(new VcfEvalCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
-  static final Command VCF2ROCPLOT = new Command(new Vcf2Rocplot(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
+  static final Command VCF2ROCPLOT = new Command(new Vcf2Rocplot(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command VCFSPLIT = new Command(new VcfSplitCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
