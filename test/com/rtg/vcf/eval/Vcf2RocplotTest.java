@@ -53,6 +53,10 @@ public class Vcf2RocplotTest extends AbstractEndToEndTest {
     endToEnd("vcf2rocplot/simple", new String[] {"summary.txt", "weighted_roc.tsv"}, false, "--vcf-score-field", "QUAL", "-T", "1");
   }
 
+  public void testSimpleRegion() throws IOException, UnindexableDataException {
+    endToEnd("vcf2rocplot/simple", "vcf2rocplot/simple-region", new String[] {"summary.txt", "weighted_roc.tsv"}, false, "--vcf-score-field", "QUAL", "-T", "1", "--region=18");
+  }
+
   @Override
   protected void endToEnd(String harnessId, String resultsId, int expectRc, boolean expectWarn, OutputChecker outputChecker, String... args) throws IOException, UnindexableDataException {
     try (TestDirectory dir = new TestDirectory("vcf2rocplot-nano")) {

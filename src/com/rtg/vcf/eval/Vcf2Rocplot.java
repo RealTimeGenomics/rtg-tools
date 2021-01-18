@@ -55,7 +55,7 @@ import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.LogStream;
 import com.rtg.vcf.VcfIterator;
-import com.rtg.vcf.VcfReader;
+import com.rtg.vcf.VcfReaderFactory;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
@@ -76,7 +76,7 @@ public class Vcf2Rocplot extends LoggedCli {
 
   @Override
   public String description() {
-    return "produce rocplot compatible data files from multiple vcfeval annotated VCFs";
+    return "produce rocplot compatible ROC data files from vcfeval annotated VCFs";
   }
 
   @Override
@@ -89,6 +89,7 @@ public class Vcf2Rocplot extends LoggedCli {
     CommonFlagCategories.setCategories(mFlags);
     mFlags.setDescription(StringUtils.sentencify(description()));
     CommonFlags.initOutputDirFlag(mFlags);
+    CommonFlags.initRegionOrBedRegionsFlags(mFlags);
     mFlags.registerRequired(File.class, FILE, "input VCF files containing vcfeval annotations")
       .setMinCount(1)
       .setMaxCount(Integer.MAX_VALUE)
@@ -101,6 +102,7 @@ public class Vcf2Rocplot extends LoggedCli {
     mFlags.setValidator(flags -> CommonFlags.validateOutputDirectory(flags)
       && CommonFlags.validateInputFile(flags)
       && CommonFlags.validateThreads(flags)
+      && CommonFlags.validateRegions(flags)
       && validateScoreField(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
@@ -126,7 +128,8 @@ public class Vcf2Rocplot extends LoggedCli {
     final Collection<?> values = mFlags.getAnonymousValues(0);
     for (final Object o : values) {
       final File vcf = (File) o;
-      try (final VcfIterator vr = VcfReader.openVcfReader(vcf)) {
+      final VcfReaderFactory fact = new VcfReaderFactory(mFlags);
+      try (final VcfIterator vr = fact.make(vcf)) {
         if (vr.getHeader().getInfoField(WithInfoEvalSynchronizer.INFO_CALL) != null
           || vr.getHeader().getInfoField(WithInfoEvalSynchronizer.INFO_BASE) != null) {
           Diagnostic.userLog("VCF file " + vcf + " looks to contain regular vcfeval annotation");
