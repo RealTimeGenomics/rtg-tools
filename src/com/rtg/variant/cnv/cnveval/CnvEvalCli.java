@@ -93,14 +93,12 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public class CnvEvalCli extends LoggedCli {
 
-  private static final String ROC_SUBSET = "Xroc-subset";
+  private static final String ROC_SUBSET = "roc-subset";
   private static final String RETAIN_OVERLAPS = "Xretain-overlapping-calls";
   private static final String FORMAT_SQS = "SQS";
 
   /** Defines the RocFilters we want to use with cnveval */
   public enum CnvRocFilter {
-    /** Everything */
-    ALL(RocFilter.ALL),
     /** Only duplications **/
     DUP(new RocFilter("DUP") {
       @Override
@@ -163,7 +161,7 @@ public class CnvEvalCli extends LoggedCli {
     mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
     mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
 
-    mFlags.registerOptional('R', ROC_SUBSET, CnvRocFilter.class, "FILTER", "output ROC files corresponding to call subsets").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    mFlags.registerOptional(ROC_SUBSET, CnvRocFilter.class, "STRING", "output ROC files for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     mFlags.registerOptional(RETAIN_OVERLAPS, "retain overlapping calls").setCategory(UTILITY);
 
     CommonFlags.initThreadsFlag(mFlags);
