@@ -221,20 +221,12 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   }
 
   private void checkRoc(String label, String template, String[] both, String[] calledOnly, String[] baselineOnly, boolean checktotal) throws IOException, UnindexableDataException {
-    checkRoc(label, template, both, calledOnly, baselineOnly, checktotal, true);
-    checkRoc(label, template, both, calledOnly, baselineOnly, checktotal, false);
-  }
-  private void checkRoc(String label, String template, String[] both, String[] calledOnly, String[] baselineOnly, boolean checktotal, boolean rtgStats) throws IOException, UnindexableDataException {
     try (TestDirectory tdir = new TestDirectory()) {
       createInput(tdir, both, calledOnly, baselineOnly);
       final Set<RocFilter> rocFilters = new HashSet<>(Arrays.asList(RocFilter.ALL, RocFilter.HET, RocFilter.HOM));
-      if (rtgStats) {
-        rocFilters.add(RocFilter.NON_XRX);
-        rocFilters.add(RocFilter.XRX);
-      }
       final File calls = new File(tdir, "calls.vcf.gz");
       final File baseline = new File(tdir, "baseline.vcf.gz");
-      final File out = FileUtils.createTempDir("out-rtgstats-" + rtgStats, "", tdir);
+      final File out = FileUtils.createTempDir("out", "", tdir);
       final File genome = new File(tdir, "template");
       ReaderTestUtils.getReaderDNA(template, genome, null).close();
       final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
@@ -249,13 +241,6 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       checkRocResults(label + "-weighted.tsv", new File(out, RocFilter.ALL.fileName()), checktotal, tpCount, fnCount);
       checkRocResults(label + "-homo.tsv", new File(out, RocFilter.HOM.fileName()), false, tpCount, fnCount);
       checkRocResults(label + "-hetero.tsv", new File(out, RocFilter.HET.fileName()), false, tpCount, fnCount);
-      if (rtgStats) {
-        checkRocResults(label + "-simple.tsv", new File(out, RocFilter.NON_XRX.fileName()), false, tpCount, fnCount);
-        checkRocResults(label + "-complex.tsv", new File(out, RocFilter.XRX.fileName()), false, tpCount, fnCount);
-      } else {
-        assertFalse(new File(out, RocFilter.NON_XRX.fileName()).exists());
-        assertFalse(new File(out, RocFilter.XRX.fileName()).exists());
-      }
 
       final VcfEvalParams paramsrev = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .templateFile(genome).outputParams(new OutputParams(out, false))

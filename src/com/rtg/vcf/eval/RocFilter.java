@@ -32,6 +32,8 @@ package com.rtg.vcf.eval;
 
 import java.util.Locale;
 
+import com.rtg.launcher.globals.GlobalFlags;
+import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.vcf.VariantType;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
@@ -43,7 +45,7 @@ import com.rtg.vcf.header.VcfHeader;
 public abstract class RocFilter {
 
   /** accepts everything **/
-  public static final RocFilter ALL = new RocFilter("ALL") {
+  public static final RocFilter ALL = new RocFilter("ALL", false) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       return true;
@@ -60,7 +62,7 @@ public abstract class RocFilter {
   };
 
   /** all homozygous **/
-  public static final RocFilter HOM = new RocFilter("HOM", "homozygous") {
+  public static final RocFilter HOM = new RocFilter("HOM", "homozygous", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHomozygousAlt(gt);
@@ -68,7 +70,7 @@ public abstract class RocFilter {
   };
 
   /** all heterozygous **/
-  public static final RocFilter HET = new RocFilter("HET", "heterozygous") {
+  public static final RocFilter HET = new RocFilter("HET", "heterozygous", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       return VcfUtils.isHeterozygous(gt);
@@ -76,7 +78,7 @@ public abstract class RocFilter {
   };
 
   /** all SNPs **/
-  public static final RocFilter SNP = new RocFilter("SNP") {
+  public static final RocFilter SNP = new RocFilter("SNP", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
@@ -85,7 +87,7 @@ public abstract class RocFilter {
   };
 
   /** non-SNPs **/
-  public static final RocFilter NON_SNP = new RocFilter("NON_SNP") {
+  public static final RocFilter NON_SNP = new RocFilter("NON_SNP", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
@@ -94,7 +96,7 @@ public abstract class RocFilter {
   };
 
   /** all MNPs (non-length changing) **/
-  public static final RocFilter MNP = new RocFilter("MNP") {
+  public static final RocFilter MNP = new RocFilter("MNP", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
@@ -103,7 +105,7 @@ public abstract class RocFilter {
   };
 
   /** all indels (length changing) **/
-  public static final RocFilter INDEL = new RocFilter("INDEL") {
+  public static final RocFilter INDEL = new RocFilter("INDEL", true) {
     @Override
     public boolean accept(VcfRecord rec, int[] gt) {
       final VariantType type = VariantType.getType(rec, gt);
@@ -142,23 +144,36 @@ public abstract class RocFilter {
 
   private final String mName;
   private final String mBaseFilename;
+  private final Boolean mRescale;
+
+  /**
+   * Create a RocFilter with default output file name, and using global default for whether to rescale counts to
+   * baseline.
+   * @param name the name of the filter
+   */
+  public RocFilter(String name) {
+    this(name, null, null);
+  }
 
   /**
    * Create a RocFilter with default output file name
    * @param name the name of the filter
+   * @param rescale true if the call counts should be rescaled to baseline, false if the counts should not be rescaled, null to use global default
    */
-  public RocFilter(String name) {
-    this(name, null);
+  public RocFilter(String name, Boolean rescale) {
+    this(name, null, rescale);
   }
 
   /**
    * Create a RocFilter with specified output file name
    * @param name the name of the filter
    * @param baseFilename the base filename used for ROC output files
+   * @param rescale true if the call counts should be rescaled to baseline, false if the counts should not be rescaled, null to use global default
    */
-  public RocFilter(String name, String baseFilename) {
-    mName = name;
+  public RocFilter(String name, String baseFilename, Boolean rescale) {
+    mName = name.trim();
     mBaseFilename = baseFilename;
+    mRescale = rescale;
   }
 
   /**
@@ -168,6 +183,15 @@ public abstract class RocFilter {
     return mName;
   }
 
+  /** @return true if the call counts should be rescaled with respect to baseline total */
+  boolean rescale() {
+    if (mRescale != null) {
+      return mRescale;
+    } else {
+      return GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_ROC_SUBSET_RESCALE);
+    }
+  }
+  
   @Override
   public String toString() {
     return name();

@@ -56,8 +56,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import com.rtg.launcher.CommonFlags;
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Environment;
 import com.rtg.util.MathUtils;
@@ -106,7 +104,6 @@ public class RocContainer {
 
   private static final String SLOPE_EXT = "_slope.tsv";
 
-  private final boolean mRescaleCategories;
   private final String mFieldLabel;
   private final Map<RocFilter, SortedMap<Double, RocPoint<Double>>> mRocs = new LinkedHashMap<>();
   private final Comparator<Double> mComparator;
@@ -131,7 +128,7 @@ public class RocContainer {
    * @param filePrefix prefix attached to ROC output file names
    */
   public RocContainer(RocSortValueExtractor extractor, String filePrefix) {
-    this(extractor, filePrefix, RocFilter.ALL, GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_ROC_SUBSET_RESCALE));
+    this(extractor, filePrefix, RocFilter.ALL);
   }
 
   /**
@@ -139,9 +136,8 @@ public class RocContainer {
    * @param extractor responsible for extracting ROC scores from VCF records.
    * @param filePrefix prefix attached to ROC output file names
    * @param filter the RocFilter to regard as the default for summary reporting
-   * @param rescale true if rescaling is permitted
    */
-  public RocContainer(RocSortValueExtractor extractor, String filePrefix, RocFilter filter, boolean rescale) {
+  public RocContainer(RocSortValueExtractor extractor, String filePrefix, RocFilter filter) {
     switch (extractor.getSortOrder()) {
       case ASCENDING:
         mComparator = new AscendingDoubleComparator();
@@ -155,7 +151,6 @@ public class RocContainer {
     mFilePrefix = filePrefix;
     mRocExtractor = extractor;
     mDefaultRocFilter = filter;
-    mRescaleCategories = rescale;
   }
 
   /**
@@ -279,7 +274,7 @@ public class RocContainer {
       // For example, if the baseline atomizes all variants to SNPs but the called variants keep MNPs and complex variants as a
       // unit, many of the TP baseline SNPs end up getting their correctness associated with the non_snp ROC. To
       // adjust for this, we scale each categorized baseline TP metric so that the endpoints are the same.
-      final boolean rescale = mRescaleCategories && filter != mDefaultRocFilter;
+      final boolean rescale = filter.rescale();
       final int totalBaselineVariants = mBaselineTotals.get(rescale ? filter : mDefaultRocFilter);
       final RocPoint<Double> total = getTotal(rescale ? filter : mDefaultRocFilter); // Get totals according to call-representation categorization
       final int totalCallVariants = (int) Math.round(total.getRawTruePositives() + total.getFalsePositives());

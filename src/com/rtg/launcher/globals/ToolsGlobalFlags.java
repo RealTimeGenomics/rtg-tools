@@ -144,7 +144,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
     registerFlag(VCFEVAL_PRUNE_NO_OPS, Boolean.class, Boolean.TRUE);
     registerFlag(VCFEVAL_DECOMPOSE_MNPS, Boolean.class, Boolean.FALSE);
     registerFlag(VCFEVAL_DECOMPOSE_INDELS, Boolean.class, Boolean.FALSE);
-    registerFlag(VCFEVAL_ROC_SUBSET_RESCALE, Boolean.class, Boolean.TRUE);
+    registerFlag(VCFEVAL_ROC_SUBSET_RESCALE, Boolean.class, Boolean.FALSE);
 
     registerFlag(ROCPLOT_INTERPOLATE_LABEL, Boolean.class, Boolean.FALSE);
     registerFlag(ROCPLOT_INTERPOLATION_GAP, Integer.class, 1);

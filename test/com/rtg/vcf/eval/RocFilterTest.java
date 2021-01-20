@@ -57,6 +57,7 @@ public class RocFilterTest extends TestCase {
 
   public void testAll() {
     final RocFilter f = RocFilter.ALL;
+    assertFalse(f.rescale());
     assertTrue(accept(f, PASS_RECORD));
     assertTrue(accept(f, FAIL_RECORD));
     assertTrue(accept(f, HOMOZYGOUS_RECORD));
