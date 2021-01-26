@@ -120,7 +120,8 @@ other contigs. It is specified with the following structure:
 
   either	def	<ploidy>	<shape>
 
-The *ploidy* field is one of ``diploid``, ``haploid``, ``polyploid`` or
+The *ploidy* field is one of ``haploid``, ``diploid``, ``triploid``,
+``tetraploid``, ``pentaploid``, ``hexaploid``, ``polyploid`` or
 ``none``. The *shape* field is one of ``circular`` or ``linear``.
 
 The specific chromosome settings lines are similar to the default
@@ -350,7 +351,7 @@ Within the context of a ``--keep-expr`` or ``record`` function these
 variables will provide access to the String representation of the VCF
 column of the same name.
 
-.. code-block:: text
+.. code-block:: javascript
 
   CHROM; // "1"
   POS; // "11259340"
@@ -363,7 +364,7 @@ ALT, FILTER
 
 Will retrieve an array of the values in the column.
 
-.. code-block:: text
+.. code-block:: javascript
 
   ALT; // ["C", "T"]
   FILTER; // ["PASS"]
@@ -378,7 +379,7 @@ Missing fields will be represented by "``.``". Assigning to these
 properties will update the VCF record. This will be undefined for fields not
 declared in the header.
 
-.. code-block:: text
+.. code-block:: javascript
 
   INFO.DP; // "795"
   INFO.ABC; // "4,5"
@@ -392,7 +393,7 @@ format fields for each sample. The string representation of values in
 the sample column are accessible as properties on the string matching
 the sample name named after the ``FORMAT`` field ``ID``.
 
-.. code-block:: text
+.. code-block:: javascript
 
   'NA12877'.GT; // "1/2"
   'NA12878'.GT; // "1/0"
@@ -410,10 +411,10 @@ Most components of VCF records can be written or updated in a fairly
 natural manner by direct assignment in order to make modifications. For
 example:
 
-.. code-block:: text
+.. code-block:: javascript
 
   CHROM = "chr1";      // Will change the CHROM value
-  POS = 42;            // Will change the POS value               
+  POS = 42;            // Will change the POS value
   ID = "rs23987382";   // Will change the ID value
   QUAL = "50";         // Will change the QUAL value
   FILTER = "FAIL";     // Will set the FILTER value
@@ -429,12 +430,12 @@ and ``ALT``) are considered immutable and can not currently be altered.
           or tool.  Depending on the new value assigned to ``CHROM`` it may
           also be necessary to modify the sequence dictionary in the VCF
           header to reflect the change (see :ref:`VCF header modification`).
-   
+
 
 Direct assignment to ``ID`` and ``FILTER`` fields accept either a string
 containing semicolon separated values, or a list of values. For example:
 
-.. code-block:: text
+.. code-block:: javascript
 
     ID = 'rs23987382;COSM3805';
     ID = ['rs23987382', 'COSM3805'];
@@ -450,7 +451,7 @@ Adding a filter to existing filters is a common operation and can be
 accomplished by the above assignment methods, for example by adding a
 value to the existing list and then setting the result:
 
-.. code-block:: text
+.. code-block:: javascript
 
     var f = FILTER;
     f.push('BOING');
@@ -459,7 +460,7 @@ value to the existing list and then setting the result:
 However, since this is a little unwieldy, a convenience function called
 `add()` can be used (and may be chained):
 
-.. code-block:: text
+.. code-block:: javascript
 
     FILTER.add('BOING');
     FILTER.add(['BOING', 'DOING');
@@ -474,40 +475,102 @@ Functions are provided that allow the addition of new ``FILTER``,
 recommended that the following functions only be used within the
 run-once portion of ``--javascript``.
 
-ensureFormatHeader(FORMAT\_HEADER\_STRING)
-``````````````````````````````````````````
+ensureFormatHeader({FORMAT\_HEADER\_STRING})
+````````````````````````````````````````````
 
 Add a new ``FORMAT`` field to the VCF if it is not already present. This
 will add a ``FORMAT`` declaration line to the header and define the
 corresponding accessor methods for use in record processing.
 
-.. code-block:: text
+.. code-block:: javascript
 
   ensureFormatHeader('##FORMAT=<ID=GL,Number=G,Type=Float,' +
     'Description="Log_10 scaled genotype likelihoods.">');
 
-ensureInfoHeader(INFO\_HEADER\_STRING)
-``````````````````````````````````````
+ensureInfoHeader({INFO\_HEADER\_STRING})
+````````````````````````````````````````
 
 Add a new ``INFO`` field to the VCF if it is not already present. This
 will add an ``INFO`` declaration line to the header and define the
 corresponding accessor methods for use in record processing.
 
-.. code-block:: text
+.. code-block:: javascript
 
   ensureInfoHeader('##INFO=<ID=CT,Number=1,Type=Integer,' +
     'Description="Coverage threshold that was applied">');
 
-ensureFilterHeader(FILTER\_HEADER\_STRING)
-``````````````````````````````````````````
+ensureFilterHeader({FILTER\_HEADER\_STRING})
+````````````````````````````````````````````
 
 Add a new ``FILTER`` field to the VCF header if it is not already
 present. This will add an ``FILTER`` declaration line to the header.
 
-.. code-block:: text
+.. code-block:: javascript
 
   ensureFilterHeader('##INFO=<ID=FAIL_VAL,' +
     'Description="Failed validation">');
+
+
+Testing for overlap with genomic regions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+One common use case is to test whether any given VCF record overlaps or
+is contained within a set of genomic regions. Regions may be loaded from
+either an external BED file or VCF file in the run-once portion of the
+JavaScript by either of the following:
+
+Regions.fromBed({FILENAME})
+```````````````````````````
+
+Load the specified BED file into a `regions` object. For example:
+
+.. code-block:: javascript
+
+  var myregions = Regions.fromBed('/path/to/regions.bed');
+
+Regions.fromVcf({FILENAME})
+```````````````````````````
+
+Load the specified VCF file into a `regions` object. For example:
+
+.. code-block:: javascript
+
+  var myregions = Regions.fromVcf('/path/to/regions.vcf');
+
+
+Having loaded a set of genomic regions, this can be used to test for
+region overlaps using the following methods:
+
+{REGIONS\_OBJECT}.overlaps({CHROM}, {START}, {END})
+```````````````````````````````````````````````````
+
+Return true if the loaded regions overlap the specified interval.  This
+function is typically used within the ``record`` function to test the
+coordinates of the current VCF record, e.g.:
+
+.. code-block:: javascript
+
+    function record() {
+        if (myregions.overlaps(CHROM, POS, POS + REF.length)) {
+            // do something if the record overlaps any region
+        }
+    }
+
+{REGIONS\_OBJECT}.encloses({CHROM}, {START}, {END})
+```````````````````````````````````````````````````
+
+Return true if the loaded regions entirely encloses the supplied
+interval.  This function is typically used within the ``record``
+function to test the coordinates of the current VCF record, e.g.:
+
+.. code-block:: javascript
+
+    function record() {
+        if (myregions.encloses(CHROM, POS, POS + REF.length)) {
+            // do something if the record is fully enclosed by any region
+        }
+    }
+
 
 Additional information and functions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -517,37 +580,37 @@ SAMPLES
 
 This variable contains an array of the sample names in the VCF header.
 
-.. code-block:: text
+.. code-block:: javascript
 
   SAMPLES; // ['NA12877', 'NA12878']
 
 print({STRING})
 ```````````````
 
-Writes the provided string to standard output.
+Write the provided string to standard output.
 
-.. code-block:: text
+.. code-block:: javascript
 
   print('The samples are: ' + SAMPLES);
 
 error({STRING})
 ```````````````
 
-Writes the provided string to standard error.
+Write the provided string to standard error.
 
-.. code-block:: text
+.. code-block:: javascript
 
   error('The samples are: ' + SAMPLES);
 
 checkMinVersion(RTG_MINIMUM_VERSION)
 ````````````````````````````````````
 
-Checks the version of RTG that the script is running under, and exits
+Check the version of RTG that the script is running under, and exits
 with an error message if the version of RTG does not meet the minimum
 required version. This is useful when distributing scripts that make use
 of features that are not present in earlier versions of RTG.
 
-.. code-block:: text
+.. code-block:: javascript
 
   checkMinVersion('3.9.2');
 
