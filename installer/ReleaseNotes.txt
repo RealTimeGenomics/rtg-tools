@@ -5,6 +5,117 @@ RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
 
+RTG Core 3.12 (2021-01-27)
+--------------------------
+
+This release includes new features and commands, along with the
+usual assortment of minor features and bug fixes. Several of these
+result in command line arguments or changes to program outputs, so check
+existing scripts for compatibility before upgrading. Larger features of
+note:
+
+* Several improvements to vcfeval, which now includes the ability to
+  match variant calls of non-diploid genomes and to output additional ROC
+  stratifications, including user-defined custom JavaScript
+  stratifications.
+
+* A new command vcf2rocplot for aggregating and regenerating ROC
+  information from one or more vcfeval annotated evaluation outputs. This
+  is particularly useful for aggregating results from multiple samples or
+  re-evaluating with respect to different score criteria or
+  stratifications.
+
+There have been many other minor improvements and feature
+additions. Detailed changes are listed below by area.  For more
+information on new features, see the RTG Operations Manual.
+
+### Variant Calling and Evaluation
+
+* calling: Fixed a rare exception during variant calling arising from
+  attempted output of an empty region when calling a single base region
+  with --all mode.
+
+* vcfeval: Support for the comparison of sample calls with ploidy greater
+  than 2. This is enabled via the new flag --sample-ploidy N (the GT of
+  any calls without the specified ploidy will be ignored). Note that as
+  the ploidy increases the search space of possible phasings can expand
+  significantly, which may cause long run times and/or regions where
+  vcfeval cannot fully evaluate the alternatives.
+
+* vcfeval: New flag --roc-subset to allow stratifications by common
+  variant types. While the default is to produce SNP and non-SNP
+  breakdowns, this flag allows a couple more presets.
+
+* vcfeval: New flag --roc-regions to allow stratification by overlap with
+  regions loaded from BED file, for example the stratification regions
+  provided by the Genome in a Bottle project.
+
+* vcfeval: New flag --roc-expr to allow custom stratifications defined by
+  a user-supplied JavaScript expression, for example to stratify by depth
+  of coverage during calling, variant allelic fraction or other
+  annotations present in the input VCFs. For more information see the
+  user manual.
+
+* vcf2rocplot: New beta command to produce a rocplot-compatible data file
+  from one or more vcfeval output directories. See the user manual
+  for more information on usage.
+
+* rocplot: User-selectable preset palettes are available via
+  --palette. In particular, several of the palettes are more color-blind
+  friendly than the default palette.
+
+* rocplot: Fix graph bounds maintenance when switching between ROC/PR.
+
+* rocplot: Unified the GUI vs non-GUI plot styles. Both default to the
+  "pretty" version with background gradient etc (previously the GUI
+  default), and a new flag --plain switches to the plain style (which was
+  previously the non-GUI default).
+
+* rocplot: (GUI) Supports loading ROC data files by drag and drop into
+  the graph or curve configuration widget areas.
+
+* rocplot: PNG images now include rocplot command line as image metadata
+  for future reference. A new flag --cmd when run on a previously saved
+  rocplot PNG image containing this metadata will display the rocplot
+  command line.
+
+### Variant Processing and Analysis
+
+* vcffilter: Javascript filters can now easily test for genomic range
+  overlaps with ranges loaded from BED or VCF. See the user manual for
+  more information.
+
+* vcfdecompose: Graceful error handling of the case where the supplied
+  SDF does not contain a reference sequence named in the VCF.
+
+* vcfmerge: Ensure that when merging files with and without GT that the
+  GT is maintained as the first FORMAT field, as per VCF specification.
+
+### Other
+
+* docker: Include fontconfig in docker images so that image writing
+  during rocplot and other command reports doesn't crash.
+
+* childsim: Better detection of inconsistent sex declarations in VCF
+  header / pedigree.
+
+* samplesim: With appropriate reference.txt configuration specifying
+  expected ploidy, now allows the simulation of higher ploidies.
+
+* many: Improved the handling of SAM records containing invalid CIGAR
+  fields.
+
+* misc: Updated htsjdk to 2.23.0.
+
+* misc: Updated the JRE used in bundled builds to Zulu Community OpenJDK
+  8u282.
+
+* misc: Compatibility testing with JDK 15. Note that JDK15 removes the
+  nashorn JavaScript engine, which disables the JavaScript functionality
+  of vcffilter, vcfeval, vcf2rocplot unless your JVM has been augmented
+  with the GraalVM JavaScript engine.
+
+
 RTG Core 3.11 (2020-02-25)
 --------------------------
 
@@ -172,7 +283,7 @@ This release primarily includes bugfixes and minor improvements:
 * map: Fix an exception that could be triggered during report generation
   when using --all-hits.
 
-* rocplot: (gui) Fix the status bar metrics not showing when the curve
+* rocplot: (GUI) Fix the status bar metrics not showing when the curve
   hugs an axis.
 
 * rocplot: Fix a rare exception that would occur during
@@ -2686,7 +2797,7 @@ pipeline scripts may be required.
   --max-insert-size renamed to --max-fragment-size
   --min-insert-size renamed to --min-fragment-size
   --max-alignment-score renamed to --max-mismatches
-  --max-mated-score renamed to --max-mated-mismatches 
+  --max-mated-score renamed to --max-mated-mismatches
   --max-unmated-score renamed to --max-unmated-mismatches
 
 * map/mapf/cgmap: The various --max-*-mismatches flags have a slightly
@@ -2943,7 +3054,7 @@ so updates to your pipeline scripts may be required.
   appropriate "click-to-open" behavior for viewing tabular results in
   a spreadsheet application. Full listing below:
 
-  mapx: Renamed primary output files (alignments.txt -> alignments.tsv 
+  mapx: Renamed primary output files (alignments.txt -> alignments.tsv
   and unmapped.txt -> unmapped.tsv)
 
   map/cgmap: Read group statistics output file (rgstats.txt -> rgstats.tsv)
@@ -3481,7 +3592,7 @@ Changes by command:
   accompanying calibration files, a merged calibration file will
   automatically be created.
 
-* sammerge: Flag --exclude-duplicates was not working correctly. Fixed. 
+* sammerge: Flag --exclude-duplicates was not working correctly. Fixed.
 
 * sammerge: Added the flag --legacy-cigars to allow convert new-style
   (X/=) CIGARS to legacy cigars in the output.
