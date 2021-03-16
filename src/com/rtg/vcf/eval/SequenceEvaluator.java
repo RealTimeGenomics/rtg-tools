@@ -116,13 +116,7 @@ class SequenceEvaluator implements IORunnable {
         }
 
         if (DUMP_BEST_PATH) {
-          System.out.println("#### " + best);
-          final List<Integer> syncPoints = best.getSyncPoints();
-          final Range interesting = new SequenceNameLocusSimple(currentName, syncPoints.isEmpty() ? 0 : syncPoints.get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()) + 1);
-          final HalfPath empty = new Path(op.getA().haplotypes(), template).mBaselinePath;
-          System.out.println("#### Template " + empty.dumpHaplotypes(interesting));
-          System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
-          System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
+          dumpPath(best, currentName, template, op.getA().haplotypes());
         }
 
         final PhasingEvaluator.PhasingResult misPhasings = PhasingEvaluator.countMisphasings(best);
@@ -143,6 +137,10 @@ class SequenceEvaluator implements IORunnable {
           final PathFinder f2 = new PathFinder(template, currentName, falseNegatives, falsePositives, op.getA(), op.getB(), mPathFinderConfig);
           bestHap = f2.bestPath();
 
+          // if (DUMP_BEST_PATH) {
+          //   dumpPath(bestHap, currentName, template, op.getA().haplotypes());
+          // }
+
           halfPositives = bestHap.getCalledIncluded();
           baselineHalfPositives = bestHap.getBaselineIncluded();
           Path.calculateWeights(bestHap, halfPositives, baselineHalfPositives);
@@ -157,6 +155,16 @@ class SequenceEvaluator implements IORunnable {
         mSynchronize.write(currentName, baseline, calls, best.getSyncPoints(), bestHap != null ? bestHap.getSyncPoints() : Collections.emptyList());
       }
     }
+  }
+
+  private void dumpPath(Path best, String currentName, byte[] template, int haplotypes) {
+    System.out.println("#### " + best);
+    final List<Integer> syncPoints = best.getSyncPoints();
+    final Range interesting = new SequenceNameLocusSimple(currentName, syncPoints.isEmpty() ? 0 : syncPoints.get(0), Math.max(best.mBaselinePath.getVariantEndPosition(), best.mCalledPath.getVariantEndPosition()) + 1);
+    final HalfPath empty = new Path(haplotypes, template).mBaselinePath;
+    System.out.println("#### Template " + empty.dumpHaplotypes(interesting));
+    System.out.println("#### Baseline " + best.mBaselinePath.dumpHaplotypes(interesting));
+    System.out.println("#### Call     " + best.mCalledPath.dumpHaplotypes(interesting));
   }
 
   private static List<VariantId> mergeVariants(Collection<Variant> allVariants, List<OrientedVariant> included, List<OrientedVariant> partial, List<Variant> excluded) {
