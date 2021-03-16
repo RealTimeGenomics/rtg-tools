@@ -88,7 +88,7 @@ public enum VariantType {
   public static VariantType getPrecedence(VariantType... vt) {
     VariantType a = vt[0];
     for (int i = 1; i < vt.length; i++) {
-      VariantType b = vt[i];
+      final VariantType b = vt[i];
       if (a != b && a.isIndelType() && b.isIndelType()) {
         // If both variants are not the same and both within the three Indel categories default to INDEL
         a = INDEL;

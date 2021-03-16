@@ -39,7 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractStatistics;
 import com.rtg.reference.Ploidy;
@@ -351,13 +350,12 @@ public class VariantStatistics extends AbstractStatistics {
           sampleStats.mTotalUnchanged++;
         } else {
           final SimpleNormalizedVariant[] nv = Arrays.stream(splitGt).mapToObj(v -> new SimpleNormalizedVariant(ref, alleles[v])).toArray(SimpleNormalizedVariant[]::new);
-          if (splitGt.length > 2) {
-            //Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
-            sampleStats.mPolyploidCalls++;
-          } else if (splitGt.length == 1) {
+          if (splitGt.length == 1) {
             tallyNonIdentity(nv, Ploidy.HAPLOID, sampleStats);
           } else if (splitGt.length == 2) {
             tallyNonIdentity(nv, Ploidy.DIPLOID, sampleStats);
+          } else if (splitGt.length > 2) {
+            tallyNonIdentity(nv, Ploidy.POLYPLOID, sampleStats);
           }
         }
         for (int alleleId : splitGt) {
@@ -406,16 +404,18 @@ public class VariantStatistics extends AbstractStatistics {
     final PerSampleVariantStatistics.VariantTypeCounts pstats;
     if (ploidy == Ploidy.HAPLOID) {
       pstats = sampleStats.mHaploid;
-    } else {
-      assert ploidy == Ploidy.DIPLOID;
+    } else if (ploidy == Ploidy.DIPLOID) {
       if (!nv[0].mAlt.equals(nv[1].mAlt)) {
         pstats = sampleStats.mHeterozygous;
       } else {
         pstats = sampleStats.mHomozygous;
       }
+    } else {
+      assert ploidy == Ploidy.POLYPLOID;
+      pstats = sampleStats.mPolyploid;
     }
     pstats.incrementTotal();
-    VariantType precedence = VariantType.getPrecedence(Arrays.stream(nv).map(v -> v.mType).toArray(VariantType[]::new));
+    final VariantType precedence = VariantType.getPrecedence(Arrays.stream(nv).map(v -> v.mType).toArray(VariantType[]::new));
     if (precedence == VariantType.SV_MISSING) {
       sampleStats.mPartialCalls++;
     } else {

@@ -243,13 +243,13 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     + "Deletions                    : 0" + StringUtils.LS
     + "Indels                       : 1" + StringUtils.LS
     + "Same as reference            : 0" + StringUtils.LS
-    + "SNP Transitions/Transversions: - (0/0)" + StringUtils.LS
     + "Total Haploid                : 1" + StringUtils.LS
     + "Haploid SNPs                 : 0" + StringUtils.LS
     + "Haploid MNPs                 : 0" + StringUtils.LS
     + "Haploid Insertions           : 0" + StringUtils.LS
     + "Haploid Deletions            : 0" + StringUtils.LS
     + "Haploid Indels               : 1" + StringUtils.LS
+    + "SNP Transitions/Transversions: - (0/0)" + StringUtils.LS
     + "Insertion/Deletion ratio     : - (0/0)" + StringUtils.LS
     + "Indel/SNP+MNP ratio          : - (1/0)" + StringUtils.LS
     + StringUtils.LS
@@ -287,13 +287,13 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     + "Deletions                    : 0" + StringUtils.LS
     + "Indels                       : 0" + StringUtils.LS
     + "Same as reference            : 0" + StringUtils.LS
-    + "SNP Transitions/Transversions: - (1/0)" + StringUtils.LS
     + "Total Haploid                : 1" + StringUtils.LS
     + "Haploid SNPs                 : 1" + StringUtils.LS
     + "Haploid MNPs                 : 0" + StringUtils.LS
     + "Haploid Insertions           : 0" + StringUtils.LS
     + "Haploid Deletions            : 0" + StringUtils.LS
     + "Haploid Indels               : 0" + StringUtils.LS
+    + "SNP Transitions/Transversions: - (1/0)" + StringUtils.LS
     + "Insertion/Deletion ratio     : - (0/0)" + StringUtils.LS
     + "Indel/SNP+MNP ratio          : 0.00 (0/1)" + StringUtils.LS
     + StringUtils.LS

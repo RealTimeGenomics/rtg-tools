@@ -27,13 +27,13 @@ Insertions                   : 0
 Deletions                    : 0
 Indels                       : 0
 Same as reference            : 2
-SNP Transitions/Transversions: 1.00 (1/1)
 Total Haploid                : 1
 Haploid SNPs                 : 1
 Haploid MNPs                 : 0
 Haploid Insertions           : 0
 Haploid Deletions            : 0
 Haploid Indels               : 0
+SNP Transitions/Transversions: 1.00 (1/1)
 Total Het/Hom ratio          : - (1/0)
 SNP Het/Hom ratio            : - (1/0)
 MNP Het/Hom ratio            : - (0/0)

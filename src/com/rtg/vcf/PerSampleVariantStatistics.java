@@ -79,10 +79,10 @@ public class PerSampleVariantStatistics {
   protected final VariantTypeCounts mHeterozygous = new VariantTypeCounts();
   protected final VariantTypeCounts mHomozygous = new VariantTypeCounts();
   protected final VariantTypeCounts mHaploid = new VariantTypeCounts();
+  protected final VariantTypeCounts mPolyploid = new VariantTypeCounts();
 
   protected long mMissingGenotype = 0;
   protected long mPartialCalls = 0;
-  protected long mPolyploidCalls = 0;
 
   protected final Histogram[] mAlleleLengths;
 
@@ -122,8 +122,6 @@ public class PerSampleVariantStatistics {
     values.add(mMissingGenotype > 0 ? Long.toString(mMissingGenotype) : null);
     names.add("Partial Genotype");
     values.add(mPartialCalls > 0 ? Long.toString(mPartialCalls) : null);
-    names.add("Polyploid Genotypes");
-    values.add(mPolyploidCalls > 0 ? Long.toString(mPolyploidCalls) : null);
     names.add("Somatic Genotypes");
     values.add(mSomatic > 0 ? Long.toString(mSomatic) : null);
     names.add("De Novo Genotypes");
@@ -131,11 +129,12 @@ public class PerSampleVariantStatistics {
     names.add("Phased Genotypes");
     final long totalNonMissingGenotypes = mAll.count(VariantType.SNP) + mAll.count(VariantType.MNP) + mAll.count(VariantType.INSERTION) + mAll.count(VariantType.DELETION) + mAll.count(VariantType.INDEL) + mTotalUnchanged + mPartialCalls;
     values.add(mPhased > 0 ? VariantStatistics.percent(mPhased, totalNonMissingGenotypes) : null);
+
+    addBreakdown(names, values, mHaploid, "Haploid");
+    addBreakdown(names, values, mPolyploid, "Polyploid");
+
     names.add("SNP Transitions/Transversions");
     values.add(VariantStatistics.divide(mTransitions, mTransversions));
-
-    //haploid stats
-    addBreakdown(names, values, mHaploid, "Haploid");
 
     //if diploid het/hom breakdowns are available
     final Maybe notHaploid = maybe(mHeterozygous.total() > 0 || mHomozygous.total() > 0);
