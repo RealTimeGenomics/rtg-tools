@@ -39,6 +39,7 @@ import com.rtg.util.StringUtils;
 import com.rtg.util.TestUtils;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -50,33 +51,6 @@ public class VariantStatisticsTest extends AbstractNanoTest {
     assertEquals("- (1/0)", VariantStatistics.divide(1L, 0L));
     assertEquals("0.00 (0/1)", VariantStatistics.divide(0L, 1L));
     assertEquals("0.33 (1/3)", VariantStatistics.divide(1L, 3L));
-  }
-
-  public void testGetVariantType() {
-    final VcfRecord r = VcfReaderTest.vcfLineToRecord("1 1300068 . TCTGCGGGGGCAGCACAGGTGAGGCCCAAGCACACCCGGTCCAGCCCCCAACATGCAGCCTGTGCTCAGGGGCAGCCCCCACGCACTCAC T,TTCAC 1959.58 . AC=27,1;AF=0.900,0.033;AN=30 GT 0/0/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/1/2".replaceAll(" ", "\t"));
-    final String gt = r.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0);
-    final int[] gtSplit = VcfUtils.splitGt(gt);
-    final VariantType t = VariantType.getType(r, gtSplit);
-    assertEquals(VariantType.DELETION, t);
-
-    final VcfRecord r2 = VcfReaderTest.vcfLineToRecord("1 1300068 . T TTCAC 1959.58 . . GT .".replaceAll(" ", "\t"));
-    assertEquals(VariantType.NO_CALL, VariantType.getType(r2, VcfUtils.splitGt(r2.getFormat(VcfUtils.FORMAT_GENOTYPE).get(0))));
-
-    assertEquals(VariantType.UNCHANGED, VariantType.getType("C", "C"));
-    assertEquals(VariantType.SNP, VariantType.getType("C", "T"));
-    assertEquals(VariantType.MNP, VariantType.getType("CG", "TT"));
-    assertEquals(VariantType.DELETION, VariantType.getType("CG", ""));
-    assertEquals(VariantType.DELETION, VariantType.getType("CG", "C"));
-    assertEquals(VariantType.DELETION, VariantType.getType("CG", "G"));
-    assertEquals(VariantType.INSERTION, VariantType.getType("", "TT"));
-    assertEquals(VariantType.INSERTION, VariantType.getType("C", "CTT"));
-    assertEquals(VariantType.INSERTION, VariantType.getType("T", "CTT"));
-    assertEquals(VariantType.INDEL, VariantType.getType("CG", "TTA"));
-    assertEquals(VariantType.SV_SYMBOLIC, VariantType.getType("C", "C<ctg1>"));
-    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "C[2:123["));
-    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "CTAT[<ctg1>["));
-    assertEquals(VariantType.SV_BREAKEND, VariantType.getType("C", "]<ctg1:123>]CTAT"));
-    assertEquals(VariantType.SV_MISSING, VariantType.getType("C", "*"));
   }
 
   private static final String[] BASE_OUTPUT = {
@@ -392,12 +366,15 @@ public class VariantStatisticsTest extends AbstractNanoTest {
       + "chr1\t181263907\t.\tTTCCT\tTTC,TTCCC\t5.3\tPASS\tLOH=-1.0;RSS=0.1;DP=66;XRX\tGT:DP:RE:GQ:SS\t1/1:26:3.559:15.8\t1/2:40:4.499:3.6:2\n"
       + "chr1\t240295482\t.\tTC\tT,TT\t31.8\tPASS\tLOH=-1.0;RSS=2.9;DP=67;XRX\tGT:DP:RE:GQ\t1/1:30:2.627:29.4\t1/2:37:5.703:30.5\n"
       + "chr1\t240295492\t.\tTC\tT,TT\t31.8\tPASS\tLOH=-1.0;RSS=2.9;DP=67;XRX\tGT:DP:RE:GQ\t1/1/2:30:2.627:29.4\t./2:37:5.703:30.5\n"
-      + "chr1\t240430567\t.\tAT\tA,AA\t10.6\tPASS\tLOH=-1.0;RSS=1.0;DP=88;XRX\tGT:DP:RE:GQ:DN\t1/1:38:2.961:14.8\t1/2:50:4.304:11.3:Y\n";
+      + "chr1\t240430567\t.\tAT\tA,AA\t10.6\tPASS\tLOH=-1.0;RSS=1.0;DP=88;XRX\tGT:DP:RE:GQ:DN\t1/1:38:2.961:14.8\t1/2:50:4.304:11.3:Y\n"
+      + "chr1\t240430569\t.\tAT\tA,AA\t10.6\tPASS\tLOH=-1.0;RSS=1.0;DP=88;XRX\tGT:DP:RE:GQ\t2/1/0:38:2.961:14.8\t2/2:50:4.304:11.3\n"
+      + "chr1\t240430571\t.\tAT\tA,AA\t10.6\tPASS\tLOH=-1.0;RSS=1.0;DP=88;XRX\tGT:DP:RE:GQ\t0:38:2.961:14.8\t1:50:4.304:11.3\n"
+    ;
 
 
   public void testBasic() throws IOException {
-    final File vcfFile = FileHelper.createTempFile();
-    try {
+    try (final TestDirectory tdir = new TestDirectory("vcfstats")) {
+      final File vcfFile = File.createTempFile("example", ".vcf", tdir);
       FileUtils.stringToFile(VCF, vcfFile);
       MainResult res = MainResult.run(new VcfStatsCli(), vcfFile.getPath(), "--Xvariant");
       assertEquals(res.err(), 0, res.rc());
@@ -419,8 +396,6 @@ public class VariantStatisticsTest extends AbstractNanoTest {
       assertEquals(res.err(), 0, res.rc());
       outStats = res.out();
       mNano.check("variantstatistics-novel.txt", outStats.substring(outStats.indexOf(StringUtils.LS) + StringUtils.LS.length()), true);
-    } finally {
-      assertTrue(vcfFile.delete());
     }
   }
 

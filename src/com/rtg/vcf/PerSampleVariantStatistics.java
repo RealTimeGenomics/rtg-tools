@@ -114,20 +114,8 @@ public class PerSampleVariantStatistics {
   protected Pair<List<String>, List<String>> getStatistics() {
     final List<String> names = new ArrayList<>();
     final List<String> values = new ArrayList<>();
-    names.add("SNPs");
-    values.add(Long.toString(mAll.count(VariantType.SNP)));
-    names.add("MNPs");
-    values.add(Long.toString(mAll.count(VariantType.MNP)));
-    names.add("Insertions");
-    values.add(Long.toString(mAll.count(VariantType.INSERTION)));
-    names.add("Deletions");
-    values.add(Long.toString(mAll.count(VariantType.DELETION)));
-    names.add("Indels");
-    values.add(Long.toString(mAll.count(VariantType.INDEL)));
-    names.add("Structural variant breakends");
-    values.add(mAll.count(VariantType.SV_BREAKEND) > 0 ? Long.toString(mAll.count(VariantType.SV_BREAKEND)) : null);
-    names.add("Symbolic structural variants");
-    values.add(mAll.count(VariantType.SV_SYMBOLIC) > 0 ? Long.toString(mAll.count(VariantType.SV_SYMBOLIC)) : null);
+
+    addBreakdown(names, values, mAll, null);
     names.add("Same as reference");
     values.add(Long.toString(mTotalUnchanged));
     names.add("Missing Genotype");
@@ -147,25 +135,9 @@ public class PerSampleVariantStatistics {
     values.add(VariantStatistics.divide(mTransitions, mTransversions));
 
     //haploid stats
-    final Maybe haploid = maybe(mHaploid.total() > 0);
-    names.add("Total Haploid");
-    values.add(haploid.val(Long.toString(mHaploid.total())));
-    names.add("Haploid SNPs");
-    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.SNP))));
-    names.add("Haploid MNPs");
-    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.MNP))));
-    names.add("Haploid Insertions");
-    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.INSERTION))));
-    names.add("Haploid Deletions");
-    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.DELETION))));
-    names.add("Haploid Indels");
-    values.add(haploid.val(Long.toString(mHaploid.count(VariantType.INDEL))));
-    names.add("Haploid Breakends");
-    values.add(haploid.val(mHaploid.count(VariantType.SV_BREAKEND) > 0 ? Long.toString(mHaploid.count(VariantType.SV_BREAKEND)) : null));
-    names.add("Haploid Symbolic SVs");
-    values.add(haploid.val(mHaploid.count(VariantType.SV_SYMBOLIC) > 0 ? Long.toString(mHaploid.count(VariantType.SV_SYMBOLIC)) : null));
+    addBreakdown(names, values, mHaploid, "Haploid");
 
-    //not if haploid
+    //if diploid het/hom breakdowns are available
     final Maybe notHaploid = maybe(mHeterozygous.total() > 0 || mHomozygous.total() > 0);
     names.add("Total Het/Hom ratio");
     values.add(notHaploid.val(VariantStatistics.divide(mHeterozygous.total(), mHomozygous.total())));
@@ -190,6 +162,32 @@ public class PerSampleVariantStatistics {
     values.add(VariantStatistics.divide(mAll.count(VariantType.INDEL) + mAll.count(VariantType.INSERTION) + mAll.count(VariantType.DELETION), mAll.count(VariantType.SNP) + mAll.count(VariantType.MNP)));
     return Pair.create(names, values);
 
+  }
+
+  private void addBreakdown(List<String> names, List<String> values, VariantTypeCounts counts, String label) {
+    final Maybe maybe = maybe(label == null || counts.total() > 0);
+    final String prefix;
+    if (label == null) {
+      prefix = "";
+    } else {
+      names.add("Total " + label);
+      prefix = label + " ";
+      values.add(maybe.val(Long.toString(counts.total())));
+    }
+    names.add(prefix + "SNPs");
+    values.add(maybe.val(Long.toString(counts.count(VariantType.SNP))));
+    names.add(prefix + "MNPs");
+    values.add(maybe.val(Long.toString(counts.count(VariantType.MNP))));
+    names.add(prefix + "Insertions");
+    values.add(maybe.val(Long.toString(counts.count(VariantType.INSERTION))));
+    names.add(prefix + "Deletions");
+    values.add(maybe.val(Long.toString(counts.count(VariantType.DELETION))));
+    names.add(prefix + "Indels");
+    values.add(maybe.val(Long.toString(counts.count(VariantType.INDEL))));
+    names.add(prefix + "Breakends");
+    values.add(maybe.val(counts.count(VariantType.SV_BREAKEND) > 0 ? Long.toString(counts.count(VariantType.SV_BREAKEND)) : null));
+    names.add(prefix + "Symbolic SVs");
+    values.add(maybe.val(counts.count(VariantType.SV_SYMBOLIC) > 0 ? Long.toString(counts.count(VariantType.SV_SYMBOLIC)) : null));
   }
 
   /**

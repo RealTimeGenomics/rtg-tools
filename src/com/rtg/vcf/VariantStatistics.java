@@ -39,6 +39,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.rtg.launcher.AbstractStatistics;
 import com.rtg.reference.Ploidy;
@@ -348,13 +349,16 @@ public class VariantStatistics extends AbstractStatistics {
           sampleStats.mPartialCalls++;
         } else if (!VcfUtils.isVariantGt(splitGt)) {
           sampleStats.mTotalUnchanged++;
-        } else if (splitGt.length > 2) {
-          //Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
-          sampleStats.mPolyploidCalls++;
-        } else if (splitGt.length == 1) {
-          tallyNonIdentity(ref, alleles[splitGt[0]], alleles[splitGt[0]], Ploidy.HAPLOID, sampleStats);
-        } else if (splitGt.length == 2) {
-          tallyNonIdentity(ref, alleles[splitGt[0]], alleles[splitGt[1]], Ploidy.DIPLOID, sampleStats);
+        } else {
+          final SimpleNormalizedVariant[] nv = Arrays.stream(splitGt).mapToObj(v -> new SimpleNormalizedVariant(ref, alleles[v])).toArray(SimpleNormalizedVariant[]::new);
+          if (splitGt.length > 2) {
+            //Diagnostic.warning("Unexpected " + splitGt.length + " subfields in fields GT \"" + gtStr + "\" for sample " + sampleName + " in record " + rec);
+            sampleStats.mPolyploidCalls++;
+          } else if (splitGt.length == 1) {
+            tallyNonIdentity(nv, Ploidy.HAPLOID, sampleStats);
+          } else if (splitGt.length == 2) {
+            tallyNonIdentity(nv, Ploidy.DIPLOID, sampleStats);
+          }
         }
         for (int alleleId : splitGt) {
           if (alleleId != MISSING_ALLELE) {
@@ -369,32 +373,31 @@ public class VariantStatistics extends AbstractStatistics {
     }
   }
 
-  protected void tallyNonIdentity(String ref, String predA, String predB, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
-    //System.err.println("Ref:" + ref + " Call:" + predA + "/" + predB);
-    String refAtrimmed = ref;
-    String predAtrimmed = predA;
-    String refBtrimmed = ref;
-    String predBtrimmed = predB;
-    if (ref.length() > 1) {
-      if (ref.length() == predA.length() && !ref.equals(predA)) {
-        final Range range = mnpUniquenessRange(ref, predA);
-        if (range.getLength() < ref.length()) {
-          refAtrimmed = ref.substring(range.getStart(), range.getStart() + range.getLength());
-          predAtrimmed = predA.substring(range.getStart(), range.getStart() + range.getLength());
+  static class SimpleNormalizedVariant {
+    final String mRef;
+    final String mAlt;
+    final VariantType mType;
+    
+    SimpleNormalizedVariant(String ref, String alt) {
+      String refTrimmed = ref;
+      String altTrimmed = alt;
+      if (ref.length() > 1) {
+        if (ref.length() == alt.length() && !ref.equals(alt)) {
+          final Range range = mnpUniquenessRange(ref, alt);
+          if (range.getLength() < ref.length()) {
+            refTrimmed = ref.substring(range.getStart(), range.getStart() + range.getLength());
+            altTrimmed = alt.substring(range.getStart(), range.getStart() + range.getLength());
+          }
         }
       }
-      if (ref.length() == predB.length() && !ref.equals(predB)) {
-        final Range range = mnpUniquenessRange(ref, predB);
-        if (range.getLength() < ref.length()) {
-          refBtrimmed = ref.substring(range.getStart(), range.getStart() + range.getLength());
-          predBtrimmed = predB.substring(range.getStart(), range.getStart() + range.getLength());
-        }
-      }
+      mRef = refTrimmed;
+      mAlt = altTrimmed;
+      mType = VariantType.getType(mRef, mAlt); 
     }
-    tallyNonIdentity(refAtrimmed, refBtrimmed, predAtrimmed, predBtrimmed, VariantType.getType(refAtrimmed, predAtrimmed), VariantType.getType(refBtrimmed, predBtrimmed), ploidy, sampleStats);
   }
+  
 
-  protected void tallyNonIdentity(String refA, String refB, String predA, String predB, VariantType typeA, VariantType typeB, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
+  protected void tallyNonIdentity(SimpleNormalizedVariant[] nv, Ploidy ploidy, PerSampleVariantStatistics sampleStats) {
     // Based on ref and preds determine:
     //   haploid vs heterozygous vs homozygous
     //   Kind of variant: SNP, MNP, INS, DEL, INDEL, COMPLEX
@@ -404,21 +407,21 @@ public class VariantStatistics extends AbstractStatistics {
     if (ploidy == Ploidy.HAPLOID) {
       pstats = sampleStats.mHaploid;
     } else {
-      if (!predA.equals(predB)) {
+      assert ploidy == Ploidy.DIPLOID;
+      if (!nv[0].mAlt.equals(nv[1].mAlt)) {
         pstats = sampleStats.mHeterozygous;
       } else {
         pstats = sampleStats.mHomozygous;
       }
     }
     pstats.incrementTotal();
-    final VariantType precedence = VariantType.getPrecedence(typeA, typeB);
+    VariantType precedence = VariantType.getPrecedence(Arrays.stream(nv).map(v -> v.mType).toArray(VariantType[]::new));
     if (precedence == VariantType.SV_MISSING) {
       sampleStats.mPartialCalls++;
     } else {
       if (precedence == VariantType.SNP) {
-        tallyTransitionTransversionRatio(refA, predA, typeA, sampleStats);
-        if (ploidy != Ploidy.HAPLOID) {
-          tallyTransitionTransversionRatio(refB, predB, typeB, sampleStats);
+        for (SimpleNormalizedVariant v : nv) {
+          tallyTransitionTransversionRatio(v, sampleStats);
         }
       }
       pstats.increment(precedence);
@@ -426,16 +429,15 @@ public class VariantStatistics extends AbstractStatistics {
     }
 
     if (mShowLengthHistograms) {
-      tallyLength(typeA, refA, predA, sampleStats);
-      if (ploidy != Ploidy.HAPLOID) {
-        tallyLength(typeB, refB, predB, sampleStats);
+      for (SimpleNormalizedVariant v : nv) {
+        tallyLength(v, sampleStats);
       }
     }
   }
 
-  private void tallyTransitionTransversionRatio(String ref, String pred, VariantType type, PerSampleVariantStatistics sampleStats) {
-    if (type == VariantType.SNP) {
-      final boolean transition = "AG".contains(ref) && "AG".contains(pred) || "CT".contains(ref) && "CT".contains(pred);
+  private void tallyTransitionTransversionRatio(SimpleNormalizedVariant v, PerSampleVariantStatistics sampleStats) {
+    if (v.mType == VariantType.SNP) {
+      final boolean transition = "AG".contains(v.mRef) && "AG".contains(v.mAlt) || "CT".contains(v.mRef) && "CT".contains(v.mAlt);
       if (transition) {
         sampleStats.mTransitions++;
       } else {
@@ -444,25 +446,25 @@ public class VariantStatistics extends AbstractStatistics {
     }
   }
 
-  private void tallyLength(VariantType alleleType, String ref, String pred, PerSampleVariantStatistics sampleStats) {
-    if (alleleType.isVariant() && !alleleType.isSvType()) {
+  private void tallyLength(SimpleNormalizedVariant v, PerSampleVariantStatistics sampleStats) {
+    if (v.mType.isVariant() && !v.mType.isSvType()) {
       final int alleleLength;
-      switch (alleleType) {
+      switch (v.mType) {
         case UNCHANGED:
         case SNP:
         case MNP:
-          alleleLength = pred.length();
+          alleleLength = v.mAlt.length();
           break;
         case INDEL:
         case INSERTION:
         case DELETION:
-          alleleLength = Math.abs(pred.length() - ref.length());
+          alleleLength = Math.abs(v.mAlt.length() - v.mRef.length());
           break;
         default:
           alleleLength = 0;
           break;
       }
-      sampleStats.mAlleleLengths[alleleType.ordinal()].increment(alleleLength);
+      sampleStats.mAlleleLengths[v.mType.ordinal()].increment(alleleLength);
     }
   }
 

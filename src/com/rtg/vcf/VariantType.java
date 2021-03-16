@@ -29,12 +29,9 @@
  */
 package com.rtg.vcf;
 
-import com.reeltwo.jumble.annotations.TestClass;
-
 /**
  * Enumeration of Variant types
  */
-@TestClass("com.rtg.vcf.VariantStatisticsTest")
 public enum VariantType {
   //Ordered least to most precedence
 
@@ -85,19 +82,21 @@ public enum VariantType {
    * Return a single VariantType most indicative of a pair of VariantTypes, to be used to assign a variant
    * type to a polyploid genotype or a variant record as a whole. This generally takes the more "complex"
    * of the input types.
-   * @param a a variant type
-   * @param b another variant type
+   * @param vt variant types
    * @return the resolved variant type.
    */
-  public static VariantType getPrecedence(VariantType a, VariantType b) {
-    if (a != b && a.isIndelType() && b.isIndelType()) {
-      // If both variants are not the same and both within the three Indel categories default to INDEL
-      return INDEL;
+  public static VariantType getPrecedence(VariantType... vt) {
+    VariantType a = vt[0];
+    for (int i = 1; i < vt.length; i++) {
+      VariantType b = vt[i];
+      if (a != b && a.isIndelType() && b.isIndelType()) {
+        // If both variants are not the same and both within the three Indel categories default to INDEL
+        a = INDEL;
+      } else {
+        a = a.ordinal() > b.ordinal() ? a : b;
+      }
     }
-    if (a.ordinal() > b.ordinal()) {
-      return a;
-    }
-    return b;
+    return a;
   }
 
   /**
