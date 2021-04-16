@@ -128,6 +128,20 @@ public class AdjusterTest extends TestCase {
     assertEquals("43", rec.getInfoSplit(ID)[0]);
     assertEquals("19", rec.getInfoSplit(ID)[1]);
   }
+  
+  public void testSumMissingElement() throws IOException {
+    // We skip over sub-elements with missing value during summation
+    final Adjuster adjuster = new Adjuster(makeHeader());
+    final VcfRecord inrec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").addAltCall("cat")
+      .setInfo(ID, "43", ".", "15")
+      .setNumberOfSamples(1)
+      .addFormatAndSample(ID, "42,.,14");
+    final VcfRecord rec = new VcfRecord("bar", 4, "aaa").addAltCall("gac").setNumberOfSamples(1);
+    adjuster.adjust(inrec, rec, new int[] {0, 1, 1});
+    assertEquals("42,14", rec.getFormat(ID).get(0));
+    assertEquals("43", rec.getInfoSplit(ID)[0]);
+    assertEquals("15", rec.getInfoSplit(ID)[1]);
+  }
 
   public void testSumFloat() throws IOException {
     final Adjuster adjuster = new Adjuster(makeHeader(MetaType.FLOAT, VcfNumber.REF_ALTS));

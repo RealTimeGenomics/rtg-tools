@@ -215,7 +215,7 @@ public class Adjuster {
           try {
             replacement.setInfo(field, sumAdjustField(alleleMap, numAlleles, f.getType(), parts));
           } catch (NumberFormatException e) {
-            throw new VcfFormatException(e.getMessage());
+            throw new VcfFormatException("INFO field " + field + " contained non-numeric values. " + e.getMessage());
           }
           break;
         default:
@@ -275,7 +275,7 @@ public class Adjuster {
       try {
         newFieldForsample = StringUtil.join(",", sumAdjustField(alleleMap, numAlleles, type, parts));
       } catch (NumberFormatException e) {
-        throw new VcfFormatException(e.getMessage());
+        throw new VcfFormatException("FORMAT field value " + fieldValue + " contained non-numeric values. " + e.getMessage());
       }
     }
     return newFieldForsample;
@@ -287,7 +287,7 @@ public class Adjuster {
       final long[] sums = new long[numAlleles];
       for (int k = 0; k < parts.length; ++k) {
         final int newAllele = alleleMap[k];
-        if (newAllele != VcfUtils.MISSING_GT) {
+        if (newAllele != VcfUtils.MISSING_GT && !VcfRecord.MISSING.equals(parts[k])) {
           sums[newAllele] += Long.parseLong(parts[k]);
         }
       }
@@ -296,14 +296,14 @@ public class Adjuster {
       final double[] sums = new double[numAlleles];
       for (int k = 0; k < parts.length; ++k) {
         final int newAllele = alleleMap[k];
-        if (newAllele != VcfUtils.MISSING_GT) {
+        if (newAllele != VcfUtils.MISSING_GT && !VcfRecord.MISSING.equals(parts[k])) {
           sums[newAllele] += Double.parseDouble(parts[k]);
         }
       }
       // We don't currently have a way to specify number of DP.
       adjusted = VcfUtils.formatFloatArray(sums);
     } else {
-      throw new RuntimeException();
+      throw new RuntimeException("Unsupported MetaType for field adjustment");
     }
     return adjusted;
   }
