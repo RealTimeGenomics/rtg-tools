@@ -280,6 +280,23 @@ public class VcfRecord implements SequenceNameLocus {
   }
 
   /**
+   * @param sampleIndex index of sample, (from <code>VcfHeader</code>)
+   * @return true if the sample has failed sample-specific filters
+   */
+  public boolean isSampleFiltered(int sampleIndex) {
+    List<String> ft = getFormat(VcfUtils.FORMAT_FILTER);
+    if (ft == null) {
+      return false;
+    }
+    for (final String f : StringUtils.split(ft.get(sampleIndex), VcfUtils.VALUE_SEPARATOR)) {
+      if (!(VcfUtils.FILTER_PASS.equals(f) || VcfRecord.MISSING.equals(f))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * @return list of filters (should be treated as read-only).
    */
   public List<String> getFilters() {

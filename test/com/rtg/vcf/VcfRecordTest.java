@@ -173,23 +173,32 @@ public class VcfRecordTest extends TestCase {
     final VcfRecord rec = new VcfRecord("seq", 0, "A");
     rec.addFilter("PASS");
     assertEquals(Collections.singletonList("PASS"), rec.getFilters());
+    assertFalse(rec.isFiltered());
     rec.addFilter("a1.0");
     assertEquals(Collections.singletonList("a1.0"), rec.getFilters());
+    assertTrue(rec.isFiltered());
 
     // Test per-sample filtering
     rec.setNumberOfSamples(2);
+    assertFalse(rec.isSampleFiltered(1));
     rec.addSampleFilter("PASS", 1);
     assertEquals("[., PASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    assertFalse(rec.isSampleFiltered(1));
     rec.addSampleFilter("NOPASS", 1);
     assertEquals("[., NOPASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    assertFalse(rec.isSampleFiltered(0));
+    assertTrue(rec.isSampleFiltered(1));
     rec.addSampleFilter("AVR", 1);
     assertEquals("[., NOPASS;AVR]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    assertTrue(rec.isSampleFiltered(1));
     rec.addSampleFilter("NOPASS", 0);
     assertEquals("[NOPASS, NOPASS;AVR]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    assertTrue(rec.isSampleFiltered(0));
     rec.addSampleFilter("PASS", 1);
     assertEquals("[NOPASS, PASS]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
+    assertFalse(rec.isSampleFiltered(1));
     rec.addSampleFilter(".", 1);
     assertEquals("[NOPASS, .]", rec.getFormat(VcfUtils.FORMAT_FILTER).toString());
-
+    assertFalse(rec.isSampleFiltered(1));
   }
 }
