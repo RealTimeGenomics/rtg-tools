@@ -92,7 +92,6 @@ class TabixVcfRecordSet implements VariantSet {
   private final VariantFactory mCallsFactory;
   private final Map<String, File> mBaselinePreprocessed = new ConcurrentHashMap<>();
   private final Map<String, File> mCallsPreprocessed = new ConcurrentHashMap<>();
-  private final boolean mPassOnly;
   private final int mMaxLength;
   private final File mPreprocessDestDir;
   private final boolean mPreprocess;
@@ -118,7 +117,6 @@ class TabixVcfRecordSet implements VariantSet {
     final VcfHeader calledHeader = VcfUtils.getHeader(calledFile);
     mRanges = ranges;
     mEvalRegions = evalRegions;
-    mPassOnly = passOnly;
     mMaxLength = maxLength;
     mPreprocessDestDir = preprocessDestDir;
     mPreprocess = mPreprocessDestDir != null;
@@ -189,8 +187,8 @@ class TabixVcfRecordSet implements VariantSet {
 
     mBaseLineHeader = mPreprocess ? addDecompositionHeader(baselineHeader) : baselineHeader;
     mCalledHeader = mPreprocess ? addDecompositionHeader(calledHeader) : calledHeader;
-    mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, ploidy);
-    mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, ploidy);
+    mBaselineFactory = getVariantFactory(VariantSetType.BASELINE, mBaseLineHeader, baselineSample, ploidy, passOnly);
+    mCallsFactory = getVariantFactory(VariantSetType.CALLS, mCalledHeader, callsSample, ploidy, passOnly);
     mBaselineSampleNo = baselineSample != null ? mBaseLineHeader.getSampleIndex(baselineSample) : 0;
     mCalledSampleNo = callsSample != null ? mCalledHeader.getSampleIndex(callsSample) : 0;
   }
@@ -200,14 +198,14 @@ class TabixVcfRecordSet implements VariantSet {
     return new DecomposingVcfIterator(new ArrayVcfIterator(baselineHeader), null, false, false).getHeader();
   }
 
-  static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, int ploidy) {
+  static VariantFactory getVariantFactory(VariantSetType type, VcfHeader header, String sampleName, int ploidy, boolean passOnly) {
     final boolean explicitUnknown = GlobalFlags.getBooleanValue(ToolsGlobalFlags.VCFEVAL_EXPLICIT_UNKNOWN_ALLELES);
     final String f = VariantFactory.getFactoryName(type, sampleName);
     switch (f) {
       case VariantFactory.SAMPLE_FACTORY:
-        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), explicitUnknown, ploidy);
+        return new VariantFactory.SampleVariants(VcfUtils.getSampleIndexOrDie(header, sampleName, type.label()), explicitUnknown, ploidy, passOnly);
       case VariantFactory.ALL_FACTORY:
-        return new VariantFactory.AllAlts(explicitUnknown);
+        return new VariantFactory.AllAlts(explicitUnknown, passOnly);
       case ParentalVariant.Factory.NAME:
         final Family family;
         try {
@@ -218,7 +216,7 @@ class TabixVcfRecordSet implements VariantSet {
         if (type != VariantSetType.BASELINE) {
           throw new RuntimeException("Parents must be specified as the baseline side only");
         }
-        return new ParentalVariant.Factory(VcfUtils.getSampleIndexOrDie(header, family.getFather(), type.label()), VcfUtils.getSampleIndexOrDie(header, family.getMother(), type.label()), explicitUnknown);
+        return new ParentalVariant.Factory(VcfUtils.getSampleIndexOrDie(header, family.getFather(), type.label()), VcfUtils.getSampleIndexOrDie(header, family.getMother(), type.label()), explicitUnknown, passOnly);
       default:
         throw new RuntimeException("Could not determine variant factory for " + f);
     }
@@ -245,8 +243,8 @@ class TabixVcfRecordSet implements VariantSet {
     final ExecutorService executor = Executors.newFixedThreadPool(2);
     try {
       final ReferenceRanges<String> subRanges = mRanges.forSequence(currentName);
-      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.BASELINE, mBaselineFactory, mPassOnly, mMaxLength, mPreprocessDestDir, mRelaxedRef));
-      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.CALLS, mCallsFactory, mPassOnly, mMaxLength, mPreprocessDestDir, mRelaxedRef));
+      final FutureTask<LoadedVariants> baseFuture = new FutureTask<>(new VcfRecordTabixCallable(mBaselineFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.BASELINE, mBaselineFactory, mMaxLength, mPreprocessDestDir, mRelaxedRef));
+      final FutureTask<LoadedVariants> callFuture = new FutureTask<>(new VcfRecordTabixCallable(mCallsFile, subRanges, mEvalRegions, currentName, currentLength, VariantSetType.CALLS, mCallsFactory, mMaxLength, mPreprocessDestDir, mRelaxedRef));
       executor.execute(baseFuture);
       executor.execute(callFuture);
       final LoadedVariants baseVars = baseFuture.get();

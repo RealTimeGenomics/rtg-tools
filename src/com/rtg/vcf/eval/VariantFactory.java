@@ -98,6 +98,7 @@ public interface VariantFactory {
     private final int mPloidy;
     private final int mSampleNo;
     private final boolean mExplicitUnknown;
+    private final boolean mPassOnly;
 
     /**
      * Constructor for diploid variants.
@@ -105,7 +106,7 @@ public interface VariantFactory {
      * @param explicitUnknown if true, treat half call allele as a separate token
      */
     public SampleVariants(int sampleNo, boolean explicitUnknown) {
-      this(sampleNo, explicitUnknown, 2);
+      this(sampleNo, explicitUnknown, 2, true);
     }
 
     /**
@@ -113,15 +114,20 @@ public interface VariantFactory {
      * @param sampleNo the sample column number (starting from 0) for multiple sample variant calls
      * @param explicitUnknown if true, treat half call allele as a separate token
      * @param ploidy the expected ploidy
+     * @param passOnly if true, only return variant objects for samples which passed filters
      */
-    public SampleVariants(int sampleNo, boolean explicitUnknown, int ploidy) {
+    public SampleVariants(int sampleNo, boolean explicitUnknown, int ploidy, boolean passOnly) {
       mSampleNo = sampleNo;
       mExplicitUnknown = explicitUnknown;
       mPloidy = ploidy;
+      mPassOnly = passOnly;
     }
 
     @Override
     public GtIdVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
+      if (mPassOnly && (rec.isFiltered() || rec.isSampleFiltered(mSampleNo))) {
+        return null;
+      }
       // Currently we skip both non-variant and SV
       // Check we have a GT that refers to a non-SV variant in at least one allele
       final int[] gtArray = getDefinedVariantGt(rec, mSampleNo, mPloidy);
@@ -189,13 +195,16 @@ public interface VariantFactory {
   class AllAlts implements VariantFactory {
 
     private final boolean mExplicitUnknown;
+    private final boolean mPassOnly;
 
     /**
      * Constructor
      * @param explicitUnknown if true, treat half-call allele as a separate token
+     * @param passOnly if true, only return variant objects for records which passed filters
      */
-    public AllAlts(boolean explicitUnknown) {
+    public AllAlts(boolean explicitUnknown, boolean passOnly) {
       mExplicitUnknown = explicitUnknown;
+      mPassOnly = passOnly;
     }
 
     // Remove any of the ALT entries that have not been assigned an Allele
@@ -213,7 +222,7 @@ public interface VariantFactory {
 
     @Override
     public Variant variant(final VcfRecord rec, final int id) throws SkippedVariantException {
-      if (rec.getAltCalls().isEmpty()) {
+      if ((mPassOnly && rec.isFiltered()) || rec.getAltCalls().isEmpty()) {
         return null;
       }
 

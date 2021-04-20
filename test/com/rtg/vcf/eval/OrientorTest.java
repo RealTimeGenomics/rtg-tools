@@ -177,7 +177,7 @@ public class OrientorTest extends TestCase {
   }
 
   public void testSquashAlts() throws Exception {
-    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false, false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
     // Test squashing ploidy  A T,C,G -> T, C, G
     final OrientedVariant[] pos = Orientor.HAPLOID_POP.orientations(variant);
     assertEquals(3, pos.length);
@@ -198,7 +198,7 @@ public class OrientorTest extends TestCase {
   }
 
   public void testDiploidAlts() throws Exception {
-    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false, false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     // Test diploid combos  A T,C,G -> .:T, T:., T:T, .:C, C:., C:C, .:G, G:., G:G, T:C, C:T, T:G, G:T, C:G, G:C
     final OrientedVariant[] pos = Orientor.DIPLOID_POP.orientations(variant);
@@ -219,7 +219,7 @@ public class OrientorTest extends TestCase {
   }
   
   public void testTriploidAlts() throws Exception {
-    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
+    final Variant variant = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false, false)).variant(VariantTest.createRecord(SNP_LINE2), 0);
 
     final OrientedVariant[] pos = new Orientor.AltOrientor(3).orientations(variant);
     assertEquals(63, pos.length);

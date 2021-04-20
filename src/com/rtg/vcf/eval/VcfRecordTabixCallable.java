@@ -64,12 +64,11 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
   private final int mTemplateLength;
   private final VariantSetType mType;
   private final VariantFactory mFactory;
-  private final boolean mPassOnly;
   private final int mMaxLength;
   private final File mDecomposedFile;
   private final boolean mRelaxedRef;
 
-  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, boolean passOnly, int maxLength, File preprocessDestDir, boolean relaxedRef) {
+  VcfRecordTabixCallable(File file, ReferenceRanges<String> ranges, ReferenceRegions evalRegions, String templateName, Integer templateLength, VariantSetType type, VariantFactory factory, int maxLength, File preprocessDestDir, boolean relaxedRef) {
     if (!ranges.containsSequence(templateName)) {
       throw new IllegalArgumentException("Ranges supplied do not contain reference sequence " + templateName);
     }
@@ -79,7 +78,6 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
     mFactory = factory;
     mTemplateLength = templateLength;
     mType = type;
-    mPassOnly = passOnly;
     mMaxLength = maxLength;
     mRelaxedRef = relaxedRef;
     if (preprocessDestDir != null) {
@@ -100,10 +98,6 @@ public class VcfRecordTabixCallable implements Callable<LoadedVariants> {
           final VcfRecord rec = reader.next();
           preprocessed.write(rec);
           ++id;
-
-          if (mPassOnly && rec.isFiltered()) {
-            continue;
-          }
 
           // Skip variants that are too long (these cause problems during evaluation)
           int length = rec.getRefCall().length();

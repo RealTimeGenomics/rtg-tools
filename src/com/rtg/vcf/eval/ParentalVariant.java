@@ -54,6 +54,7 @@ public class ParentalVariant extends Variant {
     private final int mPSampleNo;
     private final int mMSampleNo;
     private final boolean mExplicitUnknown;
+    private final boolean mPassOnly;
 
     /**
      * Constructor
@@ -61,17 +62,21 @@ public class ParentalVariant extends Variant {
      * @param matSample the maternal sample column number (starting from 0)
      * @param explicitUnknown if true, treat half call allele as a separate token
      */
-    Factory(int patSample, int matSample, boolean explicitUnknown) {
+    Factory(int patSample, int matSample, boolean explicitUnknown, boolean passOnly) {
       mPSampleNo = patSample;
       mMSampleNo = matSample;
       mExplicitUnknown = explicitUnknown;
+      mPassOnly = passOnly;
     }
 
     @Override
     public ParentalVariant variant(VcfRecord rec, int id) throws SkippedVariantException {
+      if (mPassOnly && rec.isFiltered()) {
+        return null;
+      }
       // Check we have a GT that refers to a non-SV variant in at least one allele in at least one parent
-      final int[] patGtArr = VariantFactory.getDefinedVariantGt(rec, mPSampleNo, 2);
-      final int[] matGtArr = VariantFactory.getDefinedVariantGt(rec, mMSampleNo, 2);
+      final int[] patGtArr = mPassOnly && rec.isSampleFiltered(mPSampleNo) ? null : VariantFactory.getDefinedVariantGt(rec, mPSampleNo, 2);
+      final int[] matGtArr = mPassOnly && rec.isSampleFiltered(mMSampleNo) ? null : VariantFactory.getDefinedVariantGt(rec, mMSampleNo, 2);
       if (patGtArr == null && matGtArr == null) {
         return null;
       }

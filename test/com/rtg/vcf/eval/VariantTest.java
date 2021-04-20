@@ -113,11 +113,11 @@ public class VariantTest extends TestCase {
   public void testTriploid() throws SkippedVariantException {
     final VcfRecord rec = createRecord("someKindOfName 23 . A T,G 12.8 PASS . GT:DP:RE:GQ 1/1/2:4:0.02:12.8");
     try {
-      new VariantFactory.SampleVariants(0, true, 2).variant(rec, 0);
+      new VariantFactory.SampleVariants(0, true, 2, true).variant(rec, 0);
       fail("Expected failure to process triploid call");
     } catch (SkippedVariantException ignored) {
     }
-    GtIdVariant v = new VariantFactory.SampleVariants(0, true, 3).variant(rec, 0);
+    GtIdVariant v = new VariantFactory.SampleVariants(0, true, 3, true).variant(rec, 0);
     assertEquals(3, v.ploidy());
     assertEquals("someKindOfName:23-24 (T:T:G)", v.toString());
   }

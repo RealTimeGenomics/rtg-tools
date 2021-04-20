@@ -57,10 +57,26 @@ public class VariantFactoryTest extends TestCase {
   }
 
   static final String SNP_LINE2 = "chr 23 . A T,C,G . PASS . GT 1/2";
+  static final String SNP_LINE2_F = "chr 23 . A T,C,G . FAIL . GT 1/2";
+  static final String SNP_LINE2_FT = "chr 23 . A T,C,G . PASS . GT:FT 1/2:FAIL";
   static final String SNP_LINE3 = "chr 23 . A T     . PASS . GT 0/1";
   static final String SNP_LINE4 = "chr 23 . A T     . PASS . GT ./1";
   static final String SNP_LINE2_3 = "chr 23 . A T,C,G . PASS . GT 1/2/3";
 
+  public void testFiltered() throws Exception {
+    VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
+    assertNotNull(fact.variant(VariantTest.createRecord(SNP_LINE2), 0));
+    assertNull(fact.variant(VariantTest.createRecord(SNP_LINE2_F), 0));
+    assertNull(fact.variant(VariantTest.createRecord(SNP_LINE2_FT), 0));
+    fact = new VariantFactory.SampleVariants(0, true, 2, false);
+    assertNotNull(fact.variant(VariantTest.createRecord(SNP_LINE2_FT), 0));
+
+    VariantFactory.AllAlts afact = new VariantFactory.AllAlts(true, true);
+    assertNotNull(afact.variant(VariantTest.createRecord(SNP_LINE2), 0));
+    assertNull(afact.variant(VariantTest.createRecord(SNP_LINE2_F), 0));
+    assertNotNull(afact.variant(VariantTest.createRecord(SNP_LINE2_FT), 0));
+  }
+  
   public void testUntrimmedGt() throws Exception {
     // Test 1/2 -> 1, 2
     VariantFactory.SampleVariants fact = new VariantFactory.SampleVariants(0, true);
@@ -95,7 +111,7 @@ public class VariantFactoryTest extends TestCase {
     assertEquals(T.ordinal(), variant.nt(1)[0]);
 
     // Test 1/2/3 -> 1, 2, 3
-    fact = new VariantFactory.SampleVariants(0, true, 3);
+    fact = new VariantFactory.SampleVariants(0, true, 3, true);
     variant = fact.variant(VariantTest.createRecord(SNP_LINE2_3), 0);
     assertEquals(4, variant.numAlleles());
     assertNull(variant.allele(-1));
@@ -159,7 +175,7 @@ public class VariantFactoryTest extends TestCase {
   static final String SNP_LINE12 = "chr 23 . TAAAA TA,*AAAA . PASS . GT 2|1";
 
   public void testAlts() throws Exception {
-    final VariantFactory f = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false));
+    final VariantFactory f = new VariantFactoryTest.SimpleRefTrimmer(new VariantFactory.AllAlts(false, false));
     Variant variant = f.variant(VariantTest.createRecord(SNP_LINE2), 0);
     assertEquals(4, variant.numAlleles());
     assertEquals(null, variant.allele(-1)); // missing allele is ignored
@@ -197,7 +213,7 @@ public class VariantFactoryTest extends TestCase {
       // Expected
     }
     try {
-      new VariantFactory.AllAlts(false).variant(VariantTest.createRecord(BADALT_LINE1), 0);
+      new VariantFactory.AllAlts(false, false).variant(VariantTest.createRecord(BADALT_LINE1), 0);
       fail();
     } catch (SkippedVariantException e) {
       // Expected

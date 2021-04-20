@@ -137,7 +137,7 @@ public class TabixVcfRecordSetTest extends TestCase {
         final ReferenceRanges<String> ranges = new ReferenceRanges<>(false);
         ranges.put("20", new RangeList<>(new SimpleRangeMeta<>(-1, Integer.MAX_VALUE, "20")));
         try {
-          TabixVcfRecordSet.getVariantFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", 2);
+          TabixVcfRecordSet.getVariantFactory(VariantSetType.CALLS, VcfUtils.getHeader(input), "asdf", 2, true);
           fail();
         } catch (NoTalkbackSlimException e) {
           TestUtils.containsAll(e.toString(), "Sample \"asdf\" not found in calls VCF");
