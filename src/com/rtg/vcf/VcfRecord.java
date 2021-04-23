@@ -284,7 +284,7 @@ public class VcfRecord implements SequenceNameLocus {
    * @return true if the sample has failed sample-specific filters
    */
   public boolean isSampleFiltered(int sampleIndex) {
-    List<String> ft = getFormat(VcfUtils.FORMAT_FILTER);
+    final List<String> ft = getFormat(VcfUtils.FORMAT_FILTER);
     if (ft == null) {
       return false;
     }
