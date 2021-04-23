@@ -61,6 +61,7 @@ public class ParentalVariant extends Variant {
      * @param patSample the paternal sample column number (starting from 0)
      * @param matSample the maternal sample column number (starting from 0)
      * @param explicitUnknown if true, treat half call allele as a separate token
+     * @param passOnly if true, only return variant objects for samples which passed filters
      */
     Factory(int patSample, int matSample, boolean explicitUnknown, boolean passOnly) {
       mPSampleNo = patSample;
