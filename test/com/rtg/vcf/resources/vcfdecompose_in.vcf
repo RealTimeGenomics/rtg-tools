@@ -1,19 +1,21 @@
 ##fileformat=VCFv4.1
 ##fileDate=20160526
 ##contig=<ID=1,length=1000,species="Homo Sapiens">
+##FILTER=<ID=NOPASS,Description="not so good">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Read Depth">
+##FORMAT=<ID=FT,Number=1,Type=String,Description="Call-specific filters">
 ##SAMPLE=<ID=normal,Genomes=normal,Mixture=1.0,Description="Original genome">
 ##SAMPLE=<ID=tumor,Genomes=normal;tumor,Mixture=0.20;0.80,Description="Original genome;Derived genome">
 ##SAMPLE=<ID=other,Genomes=other>
 #CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	normal	tumor	other
-1	5	a	GAA	GAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	5	b	GAAGCAA	GAAGCAAA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	5	c	GAA	CAT,AAT	.	PASS	.	GT:DP	./1:0	1/2:26	0/0:.
+1	5	a	GAA	GAAA	.	NOPASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	5	b	GAAGCAA	GAAGCAAA	.	NOPASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	5	c	GAA	CAT,AAT	.	NOPASS	.	GT:DP:FT	./1:0:NOPASS	1/2:26	0/0:.
 1	8	d	G	GA	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
 1	8	e	G	<DUP>	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
 1	8	f	G	G]2:23]	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	9	g	CAA	CATT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
+1	9	g	CAA	CATT	.	NOPASS	.	GT:DP	./1:0	1/0:26	0/0:.
 1	10	h	A	AA	.	PASS	.	GT:DP	./0:0	0/1:26	0/0:.
 1	10	i	AA	ATT	.	PASS	.	GT:DP	./1:0	1/0:27	0/0:.
 1	10	j	AA	TA	.	PASS	.	GT:DP	./0:0	0/1:28	1/0:.
@@ -24,6 +26,6 @@
 1	15	o	AA	GNN	.	PASS	.	GT:DP	./0:0	1/0:26	0/0:.
 1	20	p	GCGCGCGCGCG	TTTGCGCGCTTGCGCGTTT	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
 1	40	q	TTTGCGCGCTTGCGCGTTT	GCGCGCGCGCG	.	PASS	.	GT:DP	./1:0	1/0:26	0/0:.
-1	70	r	GTGC	GAAAC,TCCGC,TCCGG	.	PASS	.	GT:DP	0|1:0	1/2:26	2/3:4
+1	70	r	GTGC	GAAAC,TCCGC,TCCGG	.	PASS	.	GT:DP:FT	0|1:0:NOPASS	1/2:26	2/3:4
 1	100	r2	GTGC	GAAAC,TCCGC,TCCGG	.	PASS	.	DP	0	26	4
 1	860	s	GTGTCTCCCTCT	CTGTCTCC	.	PASS	.	GT:DP	1|1:0	.:26	1:4
