@@ -5,6 +5,21 @@ RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
 
+RTG Core 3.12.1 (2021-05-19)
+----------------------------
+
+This release primarily includes bugfixes and minor improvements:
+
+* vcfeval: When ignoring filtered variants, also take per-sample filter
+  status (FORMAT FT) into account.
+
+* vcfdecompose: Treat a missing value in a field sub-value (e.g.:
+  components of an AD annotation) as zero when computing updated field
+  values for the decomposed variant.
+
+* vcfstats: Include summary statistics for polyploid variants.
+
+
 RTG Core 3.12 (2021-01-27)
 --------------------------
 
