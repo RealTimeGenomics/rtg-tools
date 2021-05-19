@@ -69,8 +69,8 @@ public final class Environment {
     System.setProperty("polyglot.js.nashorn-compat", "true");
   }
 
-  // To disable checking for release update during testing
-  private static boolean sCheckRelease = true;
+  // To disable checking for latest release version during testing
+  private static boolean sCheckRelease = Boolean.parseBoolean(System.getProperty("rtg.version.check-latest", "true"));
   public static void setCheckRelease(final boolean enable) {
     sCheckRelease = enable;
   }
