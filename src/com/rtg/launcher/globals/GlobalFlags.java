@@ -170,14 +170,18 @@ public final class GlobalFlags {
   }
 
   /**
+   * In general, if an XX flag is supplied, check that it was actually accessed. In strict mode (default)
    * @return true iff all set flags were also accessed since registration
    */
   public static boolean finalAccessCheck() {
+    final boolean strictXX = getBooleanValue(ToolsGlobalFlags.STRICT_XX_CHECK);
     for (final Flag<?> f : FLAGS) {
       if (f.isSet() && !ACCESSED_FLAGS.contains(f.getName())) {
         Diagnostic.warning("Flag: --" + f.getName() + " is set but never accessed.");
-        resetAccessedStatus();
-        return false;
+        if (strictXX) {
+          resetAccessedStatus();
+          return false;
+        }
       }
     }
     resetAccessedStatus();

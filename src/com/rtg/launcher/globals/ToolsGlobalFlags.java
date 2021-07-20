@@ -47,6 +47,9 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** Allow definite SDF-ID mismatches to be warning rather than exit */
   public static final String LENIENT_SDF_ID_MISMATCH_FLAG = "com.rtg.sam.lenient-sdf-id";
 
+  /** With strict checking it is fatal to use an XX flag that doesn't end up getting accessed by the time the run completes. */
+  public static final String STRICT_XX_CHECK = "com.rtg.cli.strict-xx-check";
+
   /** Level of gzip compression to use. */
   public static final String GZIP_LEVEL = "com.rtg.utils.gzip-level";
 
@@ -114,6 +117,7 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   @Override
   public void registerFlags() {
     registerFlag(SAM_IGNORE_SORT_ORDER_FLAG);
+    registerFlag(STRICT_XX_CHECK, Boolean.class, Boolean.TRUE);
     registerFlag(LENIENT_SDF_ID_MISMATCH_FLAG, Boolean.class, Boolean.TRUE);
     registerFlag(FORMAT_SAMPE_KEEP_SINGLETONS, Boolean.class, Boolean.FALSE);
     registerFlag(GZIP_LEVEL, Integer.class, 2);
