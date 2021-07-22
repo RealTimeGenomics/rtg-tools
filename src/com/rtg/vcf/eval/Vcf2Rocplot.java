@@ -36,12 +36,8 @@ import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_PRECISION;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SCORE;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SENSITIVITY;
-import static com.rtg.vcf.eval.VcfEvalCli.ROC_EXPR;
-import static com.rtg.vcf.eval.VcfEvalCli.ROC_REGIONS;
 import static com.rtg.vcf.eval.VcfEvalCli.SCORE_FIELD;
 import static com.rtg.vcf.eval.VcfEvalCli.SORT_ORDER;
-import static com.rtg.vcf.eval.VcfEvalCli.validateScoreField;
-import static com.rtg.vcf.eval.VcfEvalCli.validateVcfRocFlag;
 
 import java.io.File;
 import java.io.IOException;
