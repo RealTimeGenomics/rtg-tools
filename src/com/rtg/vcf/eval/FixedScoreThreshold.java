@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014. Real Time Genomics Limited.
+ * Copyright (c) 2018. Real Time Genomics Limited.
  *
  * All rights reserved.
  *
@@ -27,65 +27,37 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package com.rtg.vcf.eval;
 
-import java.io.Serializable;
 import java.util.Comparator;
 
 /**
- * Enumeration of possible ROC sort orders
+ * Select the last point that meets score threshold.
  */
-public enum RocSortOrder {
-
-  /**
-   * ROC is ordered assuming lowest sort value (best) to highest value (worst)
-   */
-  ASCENDING(new AscendingDoubleComparator()),
-
-  /**
-   * ROC is ordered assuming highest sort value (best) to lowest value (worst)
-   */
-  DESCENDING(new DescendingDoubleComparator());
+class FixedScoreThreshold extends RocPointCriteria {
 
   private final Comparator<Double> mComparator;
+  private final double mTargetScore;
 
-  RocSortOrder(Comparator<Double> comparator) {
+  FixedScoreThreshold(double targetScore, Comparator<Double> comparator) {
+    mTargetScore = targetScore;
     mComparator = comparator;
   }
 
-  /**
-   * @return a comparator appropriate for testing values for this sort order
-   */
-  public Comparator<Double> comparator() {
-    return mComparator;
+  @Override
+  public void init() {
+    super.init();
   }
 
-  // Need to manually ensure that Double.NaN looks smaller than every other number, so that it comes last on the ROC
-  private static class DescendingDoubleComparator implements Comparator<Double>, Serializable {
-    @Override
-    public int compare(Double o1, Double o2) {
-      if (Double.isNaN(o1)) {
-        return Double.isNaN(o2) ? 0 : 1;
-      } else if (Double.isNaN(o2)) {
-        return -1;
-      }
-      return o2.compareTo(o1);
-    }
-
-    public String toString() {
-      return ">";
+  @Override
+  public void considerRocPoint(RocPoint<Double> point, double precision, double recall, double fMeasure) {
+    if (mComparator.compare(mTargetScore, point.getThreshold()) >= 0) {
+      mCutpoint = new RocPoint<>(point);
     }
   }
 
-  private static class AscendingDoubleComparator implements Comparator<Double>, Serializable {
-    @Override
-    public int compare(Double o1, Double o2) {
-      return o1.compareTo(o2);
-    }
-
-    public String toString() {
-      return "<";
-    }
+  @Override
+  public String name() {
+    return "score " + mComparator.toString() + "= " + mTargetScore;
   }
 }

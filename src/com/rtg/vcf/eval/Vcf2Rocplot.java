@@ -34,6 +34,7 @@ import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_PRECISION;
+import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SCORE;
 import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SENSITIVITY;
 import static com.rtg.vcf.eval.VcfEvalCli.ROC_EXPR;
 import static com.rtg.vcf.eval.VcfEvalCli.ROC_REGIONS;
@@ -103,11 +104,7 @@ public class Vcf2Rocplot extends LoggedCli {
       && CommonFlags.validateInputFile(flags)
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateRegions(flags)
-      && validateScoreField(flags)
-      && validateVcfRocFlag(flags, ROC_EXPR)
-      && validateVcfRocFlag(flags, ROC_REGIONS)
-      && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
-      && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
+      && VcfEvalCli.validateVcfRocFlags(flags)
     );
   }
 
@@ -116,12 +113,15 @@ public class Vcf2Rocplot extends LoggedCli {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
 
     // Create ROC container / extractor
-    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(SCORE_FIELD), (RocSortOrder) mFlags.getValue(SORT_ORDER));
+    final RocSortOrder sortOrder = (RocSortOrder) mFlags.getValue(SORT_ORDER);
+    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(SCORE_FIELD), sortOrder);
     mRoc = new RocContainer(mRocExtractor);
     if (mFlags.isSet(CRITERIA_PRECISION)) {
       mRoc.setRocPointCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
     } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
       mRoc.setRocPointCriteria(new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY)));
+    } else if (mFlags.isSet(CRITERIA_SCORE)) {
+      mRoc.setRocPointCriteria(new FixedScoreThreshold((Double) mFlags.getValue(CRITERIA_SCORE), sortOrder.comparator()));
     }
     mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags));
 

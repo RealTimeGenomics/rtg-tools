@@ -87,6 +87,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String OUTPUT_MODE = "output-mode";
   protected static final String CRITERIA_SENSITIVITY = "at-sensitivity";
   protected static final String CRITERIA_PRECISION = "at-precision";
+  protected static final String CRITERIA_SCORE = "at-score";
 
   protected static final String ROC_SUBSET = "roc-subset";
   protected static final String ROC_EXPR = "roc-expr";
@@ -180,17 +181,21 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && CommonFlags.validateRegions(flags)
       && flags.checkNand(SCORE_FIELD, NO_ROC)
       && flags.checkNand(SQUASH_PLOIDY, TWO_PASS)
-      && flags.checkNand(CRITERIA_PRECISION, CRITERIA_SENSITIVITY)
       && validatePairedFlag(flags, SAMPLE, "sample name")
       && validatePairedFlag(flags, OBEY_PHASE, "phase type")
       && validateModeSample(flags)
-      && validateScoreField(flags)
+      && validateVcfRocFlags(flags)
       && flags.checkInRange(SAMPLE_PLOIDY, 1, Integer.MAX_VALUE)
+    );
+  }
+
+  static boolean validateVcfRocFlags(CFlags flags) {
+      return validateScoreField(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
+      && flags.checkAtMostOne(CRITERIA_PRECISION, CRITERIA_SENSITIVITY, CRITERIA_SCORE)
       && flags.checkInRange(CRITERIA_PRECISION, 0.0, 1.0)
-      && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0)
-    );
+      && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0);
   }
 
   static void registerVcfRocFlags(CFlags flags) {
@@ -201,6 +206,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "output ROC file for variants overlapping custom regions supplied in BED file. Use the form <LABEL>=<FILENAME>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
+    flags.registerOptional(CRITERIA_SCORE, Double.class, CommonFlags.FLOAT, "output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(SLOPE_FILES, "output files for ROC slope analysis").setCategory(REPORTING);
   }
 
@@ -324,7 +330,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final File baseline = (File) mFlags.getValue(BASELINE);
     final File calls = (File) mFlags.getValue(CALLS);
     builder.baseLineFile(baseline).callsFile(calls);
-    builder.sortOrder((RocSortOrder) mFlags.getValue(SORT_ORDER));
+    final RocSortOrder sortOrder = (RocSortOrder) mFlags.getValue(SORT_ORDER);
+    builder.sortOrder(sortOrder);
     final String scoreField = mFlags.isSet(VcfEvalCli.NO_ROC) ? null : (String) mFlags.getValue(VcfEvalCli.SCORE_FIELD);
     builder.scoreField(scoreField);
     builder.maxLength((Integer) mFlags.getValue(MAX_LENGTH));
@@ -353,6 +360,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       builder.rocCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
     } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
       builder.rocCriteria(new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY)));
+    } else if (mFlags.isSet(CRITERIA_SCORE)) {
+      builder.rocCriteria(new FixedScoreThreshold((Double) mFlags.getValue(CRITERIA_SCORE), sortOrder.comparator()));
     }
     builder.useAllRecords(mFlags.isSet(ALL_RECORDS));
     builder.decompose(mFlags.isSet(DECOMPOSE));

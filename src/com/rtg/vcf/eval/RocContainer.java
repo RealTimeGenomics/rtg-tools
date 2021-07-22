@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -138,15 +137,7 @@ public class RocContainer {
    * @param filter the RocFilter to regard as the default for summary reporting
    */
   public RocContainer(RocSortValueExtractor extractor, String filePrefix, RocFilter filter) {
-    switch (extractor.getSortOrder()) {
-      case ASCENDING:
-        mComparator = new AscendingDoubleComparator();
-        break;
-      case DESCENDING:
-      default:
-        mComparator = new DescendingDoubleComparator();
-        break;
-    }
+    mComparator = extractor.getSortOrder().comparator();
     mFieldLabel = extractor.toString();
     mFilePrefix = filePrefix;
     mRocExtractor = extractor;
@@ -441,25 +432,5 @@ public class RocContainer {
       total.add(point);
     }
     return total;
-  }
-
-  // Need to manually ensure that Double.NaN looks smaller than every other number, so that it comes last on the ROC
-  private static class DescendingDoubleComparator implements Comparator<Double>, Serializable {
-    @Override
-    public int compare(Double o1, Double o2) {
-      if (Double.isNaN(o1)) {
-        return Double.isNaN(o2) ? 0 : 1;
-      } else if (Double.isNaN(o2)) {
-        return -1;
-      }
-      return o2.compareTo(o1);
-    }
-  }
-
-  private static class AscendingDoubleComparator implements Comparator<Double>, Serializable {
-    @Override
-    public int compare(Double o1, Double o2) {
-      return o1.compareTo(o2);
-    }
   }
 }
