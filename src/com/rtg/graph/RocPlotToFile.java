@@ -43,6 +43,7 @@ import java.util.Map;
 import com.reeltwo.plot.renderer.GraphicsRenderer;
 import com.reeltwo.plot.ui.ImageWriter;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 
 /**
@@ -98,7 +99,10 @@ public final class RocPlotToFile extends RocPlotSettings {
       gr.setGraphShadowWidth(4);
     }
     final ImageWriter iw = new ImageWriter(gr);
-
+    final String m = ImageWriter.isImageWritingEnabled();
+    if (m != null) {
+      throw new NoTalkbackSlimException("Host OS is not correctly configured for image output: " + m);
+    }
     final ArrayList<String> paths = new ArrayList<>(data.keySet());
 
     final RocPlot.ExternalZoomGraph2D graph;
