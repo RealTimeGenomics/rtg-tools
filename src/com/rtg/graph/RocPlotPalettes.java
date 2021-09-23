@@ -42,7 +42,10 @@ import com.rtg.util.Resources;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 
 /**
- * Provide a built-in set of named palettes
+ * Provide a built-in set of named palettes.
+ *
+ * NOTE: The actual Colors are instantiated lazily, to prevent java.awt from
+ * baking in the Toolkit headless status when the singleton is constructed.
  */
 public final class RocPlotPalettes {
 
@@ -54,8 +57,7 @@ public final class RocPlotPalettes {
   /** The public palette instance */
   public static final RocPlotPalettes SINGLETON = new RocPlotPalettes();
 
-
-  private final Map<String, Color[]> mPalettes = new TreeMap<>();
+  private final Map<String, String> mPalettes = new TreeMap<>();
   private final String mDefault;
 
   private RocPlotPalettes() {
@@ -67,10 +69,7 @@ public final class RocPlotPalettes {
         if (DEFAULT.equals(pname)) {
           defaultPalette = props.getProperty(pname);
         } else {
-          final String palette = props.getProperty(pname);
-          mPalettes.put(pname, Arrays.stream(palette.split(","))
-            .map(String::trim).map(Color::decode)
-            .toArray(Color[]::new));
+          mPalettes.put(pname, props.getProperty(pname));
         }
       }
       if (mPalettes.size() == 0) {
@@ -105,6 +104,8 @@ public final class RocPlotPalettes {
    * @return the named palette
    */
   public Color[] getPalette(String name) {
-    return mPalettes.get(name);
+    return Arrays.stream(mPalettes.get(name).split(","))
+      .map(String::trim).map(Color::decode)
+      .toArray(Color[]::new);
   }
 }
