@@ -29,6 +29,8 @@
  */
 package com.rtg.graph;
 
+import static com.rtg.graph.RocPlotCli.PNG_FLAG;
+import static com.rtg.graph.RocPlotCli.SVG_FLAG;
 import static com.rtg.graph.RocPlotToFile.ROCPLOT_META_KEY;
 
 import java.awt.BorderLayout;
@@ -37,8 +39,11 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.HeadlessException;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
@@ -105,6 +110,7 @@ import com.reeltwo.plot.ui.InnerZoomPlot;
 import com.rtg.util.ContingencyTable;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
+import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
 import com.rtg.vcf.eval.RocFilter;
@@ -874,8 +880,48 @@ public class RocPlot {
     return message;
   }
 
+  private static boolean isReallyHeadless() {
+    if (GraphicsEnvironment.isHeadless()) {
+      return true;
+    }
+    try {
+      final GraphicsDevice[] screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+      return screenDevices == null || screenDevices.length == 0;
+    } catch (Error e) {
+      Diagnostic.error(e.getMessage());
+      return true;
+    } catch (HeadlessException e) {
+      return true;
+    }
+  }
 
-  static void startGui(ArrayList<File> fileList, ArrayList<String> nameList, RocPlotSettings settings, final boolean hideSidePanel) throws InterruptedException, InvocationTargetException {
+
+  static int mainExec(ArrayList<File> fileList, ArrayList<String> nameList, RocPlotSettings settings, final boolean hideSidePanel) {
+    if (isReallyHeadless()) {
+      Diagnostic.error("No graphics environment is available to open the rocplot GUI. You can generate a static image using --" + PNG_FLAG + " or --" + SVG_FLAG);
+      return 1;
+    }
+    try {
+      createGui(fileList, nameList, settings, hideSidePanel);
+    } catch (InvocationTargetException e) {
+      //should only be possible to have runtime
+      Diagnostic.developerLog(e);
+      final Throwable target = e.getTargetException();
+      if (target instanceof RuntimeException) {
+        throw (RuntimeException) target;
+      } else {
+        //shouldn't be possible, investigate
+        throw new RuntimeException(target);
+      }
+    } catch (InterruptedException e) {
+      Diagnostic.warning("Interrupted, aborting...");
+      return 1;
+    }
+    return 0;
+  }
+
+  private static void createGui(ArrayList<File> fileList, ArrayList<String> nameList, RocPlotSettings settings, final boolean hideSidePanel) throws InterruptedException, InvocationTargetException {
+    UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
     final JFrame frame = new JFrame();
     final ImageIcon icon = createImageIcon("com/rtg/graph/resources/realtimegenomics_logo_sm.png", "rtg rocplot");
     if (icon != null) {

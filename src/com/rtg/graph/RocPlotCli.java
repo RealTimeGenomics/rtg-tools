@@ -32,20 +32,12 @@ package com.rtg.graph;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.HeadlessException;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.UIManager;
 
 import com.reeltwo.plot.Box2D;
 import com.reeltwo.plot.ui.ImageWriter;
@@ -165,65 +157,28 @@ public class RocPlotCli extends AbstractCli {
     flags.addRequiredSet(mCurveFlag);
     flags.setValidator(new FlagValidator());
   }
-
-  private static boolean isReallyHeadless() {
-    if (GraphicsEnvironment.isHeadless()) {
-      return true;
-    }
-    try {
-      final GraphicsDevice[] screenDevices = GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-      return screenDevices == null || screenDevices.length == 0;
-    } catch (Error e) {
-      Diagnostic.error(e.getMessage());
-      return true;
-    } catch (HeadlessException e) {
-      return true;
-    }
-  }
-
+  
   @Override
   protected int mainExec(OutputStream out, PrintStream err) throws IOException {
     final ArrayList<File> fileList = new ArrayList<>();
     final ArrayList<String> nameList = new ArrayList<>();
     extractNamedFiles(mCurveFlag, mFileFlag, fileList, nameList);
 
-    final BufferedWriter outWriter = new BufferedWriter(new OutputStreamWriter(out));
-    try {
-      if (mFlags.isSet(SHOW_CMD_FLAG)) {
-        final File file = getImageFile((File) mFlags.getValue(SHOW_CMD_FLAG), PNG_EXTENSION);
-        final String cmd = ImageWriter.getPngTextMetaData(file).get(RocPlotToFile.ROCPLOT_META_KEY);
-        if (cmd == null) {
-          Diagnostic.warning("No rocplot command metadata available");
-        } else {
-          Diagnostic.info(cmd);
-        }
-      } else if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
-        System.setProperty("java.awt.headless", "true");
-        createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, ImageWriter.ImageFormat.PNG);
-        createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, ImageWriter.ImageFormat.SVG);
-      } else {   //Create and set up as a stand alone app.
-        if (isReallyHeadless()) {
-          Diagnostic.error("No graphics environment is available to open the rocplot GUI. You can generate a static image using --" + PNG_FLAG + " or --" + SVG_FLAG);
-          return 1;
-        }
-        UIManager.put("Slider.paintValue", Boolean.FALSE); // Make GTK theme more bearable, if used
-        RocPlot.startGui(fileList, nameList, settingsFromFlags(new RocPlotSettings()), mFlags.isSet(HIDE_SIDEPANE_FLAG));
-      }
-    } catch (InvocationTargetException e) {
-      //should only be possible to have runtime
-      Diagnostic.developerLog(e);
-      final Throwable target = e.getTargetException();
-      if (target instanceof RuntimeException) {
-        throw (RuntimeException) target;
+    if (mFlags.isSet(SHOW_CMD_FLAG)) {
+      final File file = getImageFile((File) mFlags.getValue(SHOW_CMD_FLAG), PNG_EXTENSION);
+      final String cmd = ImageWriter.getPngTextMetaData(file).get(RocPlotToFile.ROCPLOT_META_KEY);
+      if (cmd == null) {
+        Diagnostic.warning("No rocplot command metadata available");
       } else {
-        //shouldn't be possible, investigate
-        throw new RuntimeException(target);
+        Diagnostic.info(cmd);
       }
-    } catch (InterruptedException e) {
-      Diagnostic.warning("Interrupted, aborting...");
-      return 1;
-    } finally {
-      outWriter.flush();
+    } else if (mFlags.isSet(PNG_FLAG) || mFlags.isSet(SVG_FLAG)) {
+      System.setProperty("java.awt.headless", "true");
+      assert java.awt.GraphicsEnvironment.isHeadless() : "Something is messing with headless status before us!!";
+      createImageIfFlagSet(fileList, nameList, PNG_FLAG, PNG_EXTENSION, ImageWriter.ImageFormat.PNG);
+      createImageIfFlagSet(fileList, nameList, SVG_FLAG, SVG_EXTENSION, ImageWriter.ImageFormat.SVG);
+    } else {   //Create and set up as a stand alone app.
+      return RocPlot.mainExec(fileList, nameList, settingsFromFlags(new RocPlotSettings()), mFlags.isSet(HIDE_SIDEPANE_FLAG));
     }
     return 0;
   }
