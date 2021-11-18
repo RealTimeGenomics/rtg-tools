@@ -40,6 +40,7 @@ import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.variant.cnv.CnaType;
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.eval.VariantSetType;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -104,10 +105,12 @@ class CnaVariantSet extends LinkedHashMap<String, CnaVariantList> {
           overlap++;
         } else {
           if (overlap > 0) {
+            final SequenceNameLocusSimple l = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
+            final String msg = "Multiple " + mType.label() + " variants apply to region: " + l + " " + types.toString();
             if (mType == VariantSetType.BASELINE) {
-              Diagnostic.warning("Multiple " + mType.label() + " variants apply to region: " + new SequenceNameLocusSimple(v.record()) + " " + types.toString());
+              Diagnostic.warning(msg);
             } else {
-              Diagnostic.userLog("Multiple " + mType.label() + " variants apply to region: " + new SequenceNameLocusSimple(v.record()) + " " + types.toString());
+              Diagnostic.userLog(msg);
             }
           }
           overlap = 0;
@@ -125,7 +128,7 @@ class CnaVariantSet extends LinkedHashMap<String, CnaVariantList> {
   }
 
   private void incrementRecordCount(CnaVariant v) {
-    mPerRecord.get(v.record()).increment(v.isCorrect());
+    mPerRecord.get(v.record()).increment(v);
   }
 
   @Override

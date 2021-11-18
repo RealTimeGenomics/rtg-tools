@@ -42,19 +42,21 @@ class CnaVariant extends Range {
 
   enum SpanType { PARTIAL, FULL}
 
+  private final String mNames;
   private final VcfRecord mRec;
   private final CnaType mCnaType;
   private final SpanType mSpan;
   private boolean mCorrect;
 
-  CnaVariant(Interval range, VcfRecord rec) {
-    this(range.getStart(), range.getEnd(), rec);
+  CnaVariant(Interval range, VcfRecord rec, String names) {
+    this(range.getStart(), range.getEnd(), rec, names);
   }
 
-  private CnaVariant(int start, int end, VcfRecord rec) {
+  private CnaVariant(int start, int end, VcfRecord rec, String names) {
     super(start, end);
     mRec = rec;
     mCnaType = CnaType.valueOf(rec);
+    mNames = names == null ? "" : names;
     assert mCnaType != null;
     assert Interval.overlaps(new Range(start, end), new Range(rec.getStart(), VcfUtils.getEnd(rec) - 1));
     mSpan = rec.getStart() > start || VcfUtils.getEnd(rec) < end ? SpanType.PARTIAL : SpanType.FULL;
@@ -70,6 +72,10 @@ class CnaVariant extends Range {
 
   VcfRecord record() {
     return mRec;
+  }
+
+  String names() {
+    return mNames;
   }
 
   void setCorrect(boolean correct) {

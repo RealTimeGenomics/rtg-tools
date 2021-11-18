@@ -43,6 +43,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -93,6 +94,7 @@ import com.rtg.vcf.header.VcfNumber;
  */
 public class CnvEvalCli extends LoggedCli {
 
+  private static final String REGION_NAMES = "names";
   private static final String ROC_SUBSET = "roc-subset";
   private static final String RETAIN_OVERLAPS = "Xretain-overlapping-calls";
   private static final String FORMAT_SQS = "SQS";
@@ -156,6 +158,7 @@ public class CnvEvalCli extends LoggedCli {
     mFlags.registerRequired('c', VcfEvalCli.CALLS, File.class, FILE, "VCF file containing called variants").setCategory(INPUT_OUTPUT);
     mFlags.registerRequired('e', VcfEvalCli.EVAL_REGIONS_FLAG, File.class, FILE, "evaluate with respect to the supplied regions of interest BED file").setCategory(INPUT_OUTPUT);
 
+    mFlags.registerOptional(REGION_NAMES, "include evaluation region names in annotated outputs").setCategory(REPORTING);
     mFlags.registerOptional(VcfEvalCli.ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
     mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", FORMAT_SQS).setCategory(REPORTING);
     mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
@@ -231,16 +234,22 @@ public class CnvEvalCli extends LoggedCli {
 
   private void writeVariants(CnaVariantSet variants, RocSortValueExtractor extractor, int sampleCol, boolean gzip, boolean index) throws IOException {
     final VariantSetType setType = variants.variantSetType();
+    final boolean writeNames = mFlags.isSet(REGION_NAMES);
 
     // Write out a BED file of each evaluation region indicating status
     final File bedFile = FileUtils.getZippedFileName(gzip, new File(outputDirectory(), setType == VariantSetType.BASELINE ? "baseline.bed" : "calls.bed"));
     Diagnostic.userLog("Writing " + setType.label() + " region results to " + bedFile);
     try (final BedWriter w = new BedWriter(FileUtils.createOutputStream(bedFile))) {
-      if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
-        w.writeComment("chrom\tstart\tend\tstatus\tsvtype\tspan\toriginal_pos\t" + extractor.toString());
-      } else {
-        w.writeComment("chrom\tstart\tend\tstatus\tsvtype\tspan\toriginal_pos");
+      final ArrayList<String> cols = new ArrayList<>(Arrays.asList("chrom", "start", "end", "status", "svtype", "span"));
+      if (writeNames) {
+        cols.add("name");
       }
+      cols.add("original_pos");
+      if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
+        cols.add(extractor.toString());
+      }
+      w.writeComment(StringUtils.join("\t", cols));
+
       for (final CnaVariantList chrVars : variants.values()) {
         for (final CnaVariant v : chrVars) {
           final String status;
@@ -255,11 +264,15 @@ public class CnvEvalCli extends LoggedCli {
               throw new RuntimeException("Unknown variant set type: " + setType);
           }
           final SequenceNameLocusSimple originalSpan = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
-          if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
-            w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), status, v.cnaType().name(), v.spanType().name(), originalSpan.toString(), Utils.realFormat(extractor.getSortValue(v.record(), sampleCol), 4)));
-          } else {
-            w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), status, v.cnaType().name(), v.spanType().name(), originalSpan.toString()));
+          final ArrayList<String> annots = new ArrayList<>(Arrays.asList(status, v.cnaType().name(), v.spanType().name()));
+          if (writeNames) {
+            annots.add(v.names());
           }
+          annots.add(originalSpan.toString());
+          if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
+            annots.add(Utils.realFormat(extractor.getSortValue(v.record(), sampleCol), 4));
+          }
+          w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), annots.toArray(new String[0])));
         }
       }
     }
@@ -270,20 +283,40 @@ public class CnvEvalCli extends LoggedCli {
     // Write out VCF records with appropriate overall status annotations.
     final File vcfFile = FileUtils.getZippedFileName(gzip, new File(outputDirectory(), setType == VariantSetType.BASELINE ? "baseline.vcf" : "calls.vcf"));
     Diagnostic.userLog("Writing " + setType.label() + " VCF results to " + vcfFile);
-    final String annot = setType == VariantSetType.BASELINE ? "BASE" : "CALL";
-    final String infoFrac = annot + "_FRAC";
-    final String infoHit = annot + "_HIT";
-    final String infoMiss = annot + "_MISS";
     final VcfHeader header = variants.getHeader();
-    header.ensureContains(new InfoField(infoFrac, MetaType.FLOAT, VcfNumber.ONE, "Evaluation region hit fraction"));
-    header.ensureContains(new InfoField(infoHit, MetaType.INTEGER, VcfNumber.ONE, "Evaluation region hit count"));
-    header.ensureContains(new InfoField(infoMiss, MetaType.INTEGER, VcfNumber.ONE, "Evaluation region miss count"));
+    final String infoHit;
+    final String infoMiss;
+    final String infoFrac;
+    if (setType == VariantSetType.BASELINE) {
+      infoHit = "BASE_TP";
+      infoMiss = "BASE_FN";
+      infoFrac = "BASE_FRAC";
+      header.ensureContains(new InfoField(infoMiss, MetaType.INTEGER, VcfNumber.ONE, "Evaluation region FN count"));
+    } else {
+      infoHit  = "CALL_TP";
+      infoMiss = "CALL_FP";
+      infoFrac = "CALL_FRAC";
+      header.ensureContains(new InfoField(infoMiss, MetaType.INTEGER, VcfNumber.ONE, "Evaluation region FP count"));
+    }
+    header.ensureContains(new InfoField(infoHit, MetaType.INTEGER, VcfNumber.ONE, "Evaluation region TP count"));
+    header.ensureContains(new InfoField(infoFrac, MetaType.FLOAT, VcfNumber.ONE, "Evaluation region TP fraction"));
+    final String infoName = "NAME";
+    if (writeNames) {
+      header.ensureContains(new InfoField(infoName, MetaType.STRING, VcfNumber.ONE, "Evaluation region names information"));
+    }
     try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
       for (final CnaRecordStats stats : variants.records()) {
         final VcfRecord rec = stats.record();
         rec.setInfo(infoFrac, String.format("%.3g", stats.hitFraction()));
-        rec.setInfo(infoHit, Integer.toString(stats.hit()));
-        rec.setInfo(infoMiss, Integer.toString(stats.miss()));
+        if (stats.hit() > 0) {
+          rec.setInfo(infoHit, Integer.toString(stats.hit()));
+        }
+        if (stats.miss() > 0) {
+          rec.setInfo(infoMiss, Integer.toString(stats.miss()));
+        }
+        if (writeNames && !stats.names().isEmpty()) {
+          rec.setInfo(infoName, StringUtils.join(",", stats.names()));
+        }
         writer.write(rec);
       }
     }
@@ -325,9 +358,9 @@ public class CnvEvalCli extends LoggedCli {
     int numRegions = 0;
     for (final String chr : evalRegions.sequenceNames()) {
       for (final RangeList.RangeView<String> region : evalRegions.get(chr).getRangeList()) {
-        final List<String> meta = region.getMeta();
-        if (meta.size() > 1) {
-          Diagnostic.warning("Overlapping regions in evaluation BED at " + chr + ":" + region + " with labels: " + meta);
+        final List<String> names = region.getMeta();
+        if (names.size() > 1) {
+          Diagnostic.warning("Overlapping regions in evaluation BED at " + chr + ":" + region + " with labels: " + names);
           // Currently this means that we'll end up with an extra "pseudo-ROI" corresponding to the overlap, so that region effectively gets more weight in the evaluation.
           // e.g.:
           //   |---A---|-AB-|---B---|
@@ -373,12 +406,12 @@ public class CnvEvalCli extends LoggedCli {
             if (d.getMeta().size() > 1) {
               Diagnostic.warning("SV record encompasses region where multiple evaluation regions overlap at " + rec.getSequenceName() + ":" + d);
             }
-
+            final String names = StringUtils.join(",", d.getMeta());
             // TODO, if the variant /partially/ overlaps the region, perhaps we could cut down the inserted region
-            final CnaVariant v = new CnaVariant(d, rec);
+            final CnaVariant v = new CnaVariant(d, rec, names);
             if (setType == VariantSetType.BASELINE && v.spanType() == CnaVariant.SpanType.PARTIAL) {
               // We currently expect baseline variants to fully span any given evaluation region, see sanityCheck below
-              Diagnostic.warning(StringUtils.titleCase(setType.label()) + " variant at " + new SequenceNameLocusSimple(v.record()) + " only partially spans evaluation region " + d);
+              Diagnostic.warning(StringUtils.titleCase(setType.label()) + " variant at " + new SequenceNameLocusSimple(rec.getSequenceName(), rec.getStart(), end) + " only partially spans evaluation region " + d);
             }
             variants.add(v);
           }

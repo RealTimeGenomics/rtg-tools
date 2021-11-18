@@ -48,11 +48,11 @@ public class CnaVariantSetTest extends TestCase {
     final VcfRecord rec1 = CnaVariantTest.makeRecord("chr1", 123, 100123, CnaType.DEL.toString());
     final VcfRecord rec2 = CnaVariantTest.makeRecord("chr2", 123, 100123, CnaType.DUP.toString());
     final VcfRecord rec3 = CnaVariantTest.makeRecord("chr2", 2000000, 3000000, CnaType.DUP.toString());
-    s.add(new CnaVariant(new Range(0, 124), rec1));
-    s.add(new CnaVariant(new Range(0, 124), rec2));
-    s.add(new CnaVariant(new Range(2001000, 2002000), rec3));
-    s.add(new CnaVariant(new Range(2003000, 2004000), rec3));
-    s.add(new CnaVariant(new Range(2005000, 2006000), rec3));
+    s.add(new CnaVariant(new Range(0, 124), rec1, null));
+    s.add(new CnaVariant(new Range(0, 124), rec2, null));
+    s.add(new CnaVariant(new Range(2001000, 2002000), rec3, null));
+    s.add(new CnaVariant(new Range(2003000, 2004000), rec3, null));
+    s.add(new CnaVariant(new Range(2005000, 2006000), rec3, null));
 
     s.loaded();
 

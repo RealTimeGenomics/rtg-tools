@@ -39,7 +39,7 @@ public class CnaVariantListTest extends TestCase {
 
   public void test() {
     VcfRecord rec = CnaVariantTest.makeRecord("foo", 123, 100123, "DEL");
-    CnaVariant var = new CnaVariant(new Range(0, 124), rec);
+    CnaVariant var = new CnaVariant(new Range(0, 124), rec, null);
     CnaVariantList l = new CnaVariantList();
     assertEquals(0, l.size());
     l.add(var);

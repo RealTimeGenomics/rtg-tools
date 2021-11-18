@@ -32,6 +32,9 @@ package com.rtg.variant.cnv.cnveval;
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.vcf.VcfRecord;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Store simple per VcfRecord evaluation region statistics
  */
@@ -39,11 +42,19 @@ import com.rtg.vcf.VcfRecord;
 class CnaRecordStats {
 
   private final VcfRecord mRecord;
+  private Set<String> mNames = new HashSet<String>();
   private int mHit = 0;
   private int mMiss = 0;
 
   CnaRecordStats(VcfRecord rec) {
     mRecord = rec;
+  }
+
+  void increment(CnaVariant v) {
+    increment(v.isCorrect());
+    if (v.names() != null) {
+      mNames.add(v.names());
+    }
   }
 
   void increment(boolean correct) {
@@ -56,6 +67,10 @@ class CnaRecordStats {
 
   VcfRecord record() {
     return mRecord;
+  }
+
+  Set<String> names() {
+    return mNames;
   }
 
   int hit() {

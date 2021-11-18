@@ -51,7 +51,7 @@ public class CnaVariantTest extends TestCase {
   public void test() {
     VcfRecord rec = makeRecord("foo", 123, 100123, "DEL");
 
-    CnaVariant var = new CnaVariant(new Range(0, 124), rec);
+    CnaVariant var = new CnaVariant(new Range(0, 124), rec, null);
     assertFalse(var.isCorrect());
     assertEquals(CnaType.DEL, var.cnaType());
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());
@@ -59,21 +59,21 @@ public class CnaVariantTest extends TestCase {
     var.setCorrect(true);
     assertTrue(var.isCorrect());
 
-    var = new CnaVariant(new Range(0, 200124), rec);
+    var = new CnaVariant(new Range(0, 200124), rec, null);
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());
 
-    var = new CnaVariant(new Range(50123, 100000), rec);
+    var = new CnaVariant(new Range(50123, 100000), rec, null);
     assertEquals(CnaVariant.SpanType.FULL, var.spanType());
 
-    var = new CnaVariant(new Range(100122, 200124), rec);
+    var = new CnaVariant(new Range(100122, 200124), rec, null);
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());
 
     rec = makeRecord("foo", 123, 100123, "DUP");
-    var = new CnaVariant(new Range(0, 124), rec);
+    var = new CnaVariant(new Range(0, 124), rec, null);
     assertEquals(CnaType.DUP, var.cnaType());
 
     rec = makeRecord("foo", 123, 100123, "foo");
-    var = new CnaVariant(new Range(0, 124), rec);
+    var = new CnaVariant(new Range(0, 124), rec, null);
     assertEquals(CnaType.NONE, var.cnaType());
   }
 }
