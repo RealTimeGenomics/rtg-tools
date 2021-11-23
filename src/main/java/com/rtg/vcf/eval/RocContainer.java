@@ -193,12 +193,23 @@ public class RocContainer {
    * @param correct if the baseline variant was correct
    */
   public void incrementBaselineCount(VcfRecord rec, int sampleId, boolean correct) {
+    incrementBaselineCount(rec, sampleId, correct, 1);
+  }
+
+  /**
+   * Add an assessed baseline variant to the total baseline count
+   * @param rec the VCF record containing the baseline variant
+   * @param sampleId index of the sample column for identifying the variant classification
+   * @param correct if the baseline variant was correct
+   * @param weight weight of variant
+   */
+  public void incrementBaselineCount(VcfRecord rec, int sampleId, boolean correct, int weight) {
     final int[] gt = mRequiresGt ? VcfUtils.getValidGt(rec, sampleId) : null;
     for (final RocFilter filter : filters()) {
       if (filter.accept(rec, gt)) {
-        mBaselineTotals.add(filter);
+        mBaselineTotals.add(filter, weight);
         if (correct) {
-          mBaselineTpTotal.add(filter);
+          mBaselineTpTotal.add(filter, weight);
         }
       }
     }

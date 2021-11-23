@@ -42,14 +42,18 @@ import static com.rtg.vcf.eval.VcfEvalCli.SORT_ORDER;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
+import com.rtg.util.EnumHelper;
+import com.rtg.util.PseudoEnum;
 import com.rtg.util.StringUtils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.LogStream;
+import com.rtg.variant.cnv.cnveval.CnvEvalCli;
 import com.rtg.vcf.VcfIterator;
 import com.rtg.vcf.VcfReaderFactory;
 import com.rtg.vcf.VcfRecord;
@@ -61,6 +65,63 @@ import com.rtg.vcf.header.VcfHeader;
  * You need to ensure that both baseline and calls annotated VCFs are provided.
  */
 public class Vcf2Rocplot extends LoggedCli {
+
+  /** Lets us select from vcfeval and cnveval roc filter subsets. */
+  public static final class UnionRocFilter implements PseudoEnum, RocFilterProxy {
+
+    private final int mOrdinal;
+    private final String mName;
+    private final RocFilter mFilter;
+    private UnionRocFilter(final int ordinal, final String name, final RocFilter filter) {
+      mOrdinal = ordinal;
+      mName = name;
+      mFilter = filter;
+    }
+    @Override
+    public int ordinal() {
+      return mOrdinal;
+    }
+    @Override
+    public String name() {
+      return mName;
+    }
+    @Override
+    public String toString() {
+      return mName;
+    }
+    @Override
+    public RocFilter filter() {
+      return mFilter;
+    }
+
+    private static final EnumHelper<UnionRocFilter> ENUM_HELPER;
+    static {
+      final ArrayList<UnionRocFilter> fp = new ArrayList<>();
+      for (RocFilterProxy p : VcfEvalCli.VcfEvalRocFilter.values()) {
+        fp.add(new UnionRocFilter(fp.size(), p.name(), p.filter()));
+      }
+      for (RocFilterProxy p : CnvEvalCli.CnvRocFilter.values()) {
+        fp.add(new UnionRocFilter(fp.size(), p.name(), p.filter()));
+      }
+      ENUM_HELPER = new EnumHelper<>(UnionRocFilter.class, fp.toArray(new UnionRocFilter[0]));
+    }
+
+    /**
+     * Like an enum's values() method.
+     * @return list of enum values
+     */
+    public static UnionRocFilter[] values() {
+      return ENUM_HELPER.values();
+    }
+    /**
+     * see {@link java.lang.Enum#valueOf(Class, String)}
+     * @param str name of enum
+     * @return the enum value
+     */
+    public static UnionRocFilter valueOf(final String str) {
+      return ENUM_HELPER.valueOf(str);
+    }
+  }
 
   private RocContainer mRoc = null;
   private RocSortValueExtractor mRocExtractor = null;
@@ -91,7 +152,7 @@ public class Vcf2Rocplot extends LoggedCli {
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
 
-    VcfEvalCli.registerVcfRocFlags(mFlags);
+    VcfEvalCli.registerVcfRocFlags(mFlags, VcfUtils.QUAL, UnionRocFilter.class);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
@@ -122,11 +183,12 @@ public class Vcf2Rocplot extends LoggedCli {
     }
     mRoc = new RocContainer(mRocExtractor);
     mRoc.setRocPointCriteria(criteria);
-    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags));
+    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>()));
 
     final EvaluatedVariantsLoader[] loaders = {
       new WithInfoVcfLoader(),
-      new Ga4ghVcfLoader()
+      new Ga4ghVcfLoader(),
+      new CnvEvalVcfLoader()
     };
     for (final Object o : mFlags.getAnonymousValues(0)) {
       boolean loaded = false;
@@ -284,6 +346,59 @@ public class Vcf2Rocplot extends LoggedCli {
             break;
           default:
             // ignore
+        }
+      }
+    }
+  }
+
+  // Parses cnveval style annotations
+  private class CnvEvalVcfLoader implements EvaluatedVariantsLoader {
+
+    private static final String INFO_CALL_TP = "CALL_TP";
+    private static final String INFO_CALL_FP = "CALL_FP";
+    private static final String INFO_BASE_TP = "BASE_TP";
+    private static final String INFO_BASE_FN = "BASE_FN";
+
+    public String toString() {
+      return "cnveval standard annotations";
+    }
+
+    @Override
+    public boolean isCompatible(VcfHeader vh) {
+      return vh.getInfoField(INFO_CALL_TP) != null
+        || vh.getInfoField(INFO_CALL_FP) != null
+        || vh.getInfoField(INFO_BASE_TP) != null
+        || vh.getInfoField(INFO_BASE_FN) != null;
+    }
+
+    @Override
+    public void loadVariants(VcfIterator vr, File vcf) throws IOException {
+      final VcfHeader header = vr.getHeader();
+      if (mRocExtractor.requiresSample()) {
+        if (header.getNumberOfSamples() > 1) {
+          Diagnostic.warning("VCF file " + vcf + " contains multiple samples, assuming first");
+          // If this is wrong, the user should vcfsubset to pick out the sample they want.
+        }
+      }
+      mRoc.filters().forEach(f -> f.setHeader(header));
+
+      while (vr.hasNext()) {
+        final VcfRecord rec = vr.next();
+
+        if (rec.hasInfo(INFO_BASE_TP)) {
+          mRoc.incrementBaselineCount(rec, 0, true, VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_BASE_TP));
+        }
+        if (rec.hasInfo(INFO_BASE_FN)) {
+          mRoc.incrementBaselineCount(rec, 0, false, VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_BASE_FN));
+        }
+
+        if (rec.hasInfo(INFO_CALL_TP)) {
+          final int weight = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_CALL_TP);
+          mRoc.addRocLine(rec, 0, weight, 0, weight);
+        }
+        if (rec.hasInfo(INFO_CALL_FP)) {
+          final int weight = VcfUtils.getIntegerInfoFieldFromRecord(rec, INFO_CALL_FP);
+          mRoc.addRocLine(rec, 0, 0, weight, 0);
         }
       }
     }

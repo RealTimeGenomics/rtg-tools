@@ -101,7 +101,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   private static final String LOOSE_MATCH_DISTANCE = "Xloose-match-distance";
 
   /** Defines the preset RocFilters that make sense to use with vcfeval */
-  public enum VcfEvalRocFilter {
+  public enum VcfEvalRocFilter implements RocFilterProxy {
     // Generic filters that should apply to any call set
     /** Homozygous only */
     HOM(RocFilter.HOM),
@@ -120,7 +120,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     VcfEvalRocFilter(RocFilter f) {
       mFilter = f;
     }
-    RocFilter filter() {
+    @Override
+    public RocFilter filter() {
       return mFilter;
     }
   }
@@ -165,7 +166,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     mFlags.registerOptional(SAMPLE_PLOIDY, Integer.class, CommonFlags.INT, "expected ploidy of samples", 2).setCategory(FILTERING);
     mFlags.registerOptional(TWO_PASS, Boolean.class, "BOOL", "run diploid matching followed by squash-ploidy matching on FP/FN to find common alleles (Default is automatically set by output mode)").setCategory(FILTERING);
 
-    registerVcfRocFlags(mFlags);
+    registerVcfRocFlags(mFlags, VcfUtils.FORMAT_GENOTYPE_QUALITY, VcfEvalRocFilter.class);
 
     mFlags.registerOptional(OBEY_PHASE, String.class, CommonFlags.STRING, "if set, obey global phasing if present in the input VCFs. Use <baseline_phase>,<calls_phase> to select independently for baseline and calls. (Values must be one of [true, false, and invert])", "false").setCategory(FILTERING);
     mFlags.registerOptional(LOOSE_MATCH_DISTANCE, Integer.class, CommonFlags.INT, "if set, GA4GH mode will also apply distance-based loose-matching with the specified distance", 30).setCategory(FILTERING);
@@ -189,7 +190,8 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     );
   }
 
-  static boolean validateVcfRocFlags(CFlags flags) {
+  /** @return true if the standard ROC flags validate sucessfully */
+  public static boolean validateVcfRocFlags(CFlags flags) {
       return validateScoreField(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
       && validateVcfRocFlag(flags, ROC_REGIONS)
@@ -198,10 +200,16 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
       && flags.checkInRange(CRITERIA_SENSITIVITY, 0.0, 1.0);
   }
 
-  static void registerVcfRocFlags(CFlags flags) {
-    flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", VcfUtils.FORMAT_GENOTYPE_QUALITY).setCategory(REPORTING);
+  /**
+   * @param flags object to register flags into
+   * @param defaultScoreField default value for the score field flag
+   * @param rocfilterclass supplier of preset roc subsets
+   * @param <T> type of class providing roc filter subsets 
+   */
+  public static <T extends RocFilterProxy> void registerVcfRocFlags(CFlags flags, String defaultScoreField, Class<T> rocfilterclass) {
+    flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", defaultScoreField).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
-    flags.registerOptional(ROC_SUBSET, VcfEvalRocFilter.class, CommonFlags.STRING, "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    flags.registerOptional(ROC_SUBSET, rocfilterclass, CommonFlags.STRING, "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "output ROC file for variants matching custom JavaScript expression. Use the form <LABEL>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "output ROC file for variants overlapping custom regions supplied in BED file. Use the form <LABEL>=<FILENAME>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
@@ -354,7 +362,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
     builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0], haplotypes));
     builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1], haplotypes));
-    final Set<RocFilter> rocFilters = getRocFilters(mFlags);
+    final Set<RocFilter> rocFilters = getRocFilters(mFlags, Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
     builder.rocFilters(rocFilters);
     if (mFlags.isSet(CRITERIA_PRECISION)) {
       builder.rocCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
@@ -381,12 +389,12 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     return builder.create();
   }
 
-  static Set<RocFilter> getRocFilters(CFlags flags) throws IOException {
+  static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters) throws IOException {
     final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
       final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);
       for (Object o : values) {
-        rocFilters.add(((VcfEvalCli.VcfEvalRocFilter) o).filter());
+        rocFilters.add(((RocFilterProxy) o).filter());
       }
     }
     if (flags.isSet(ROC_EXPR)) {
@@ -407,7 +415,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     }
 
     if (!flags.isAnySet(ROC_SUBSET, ROC_EXPR, ROC_REGIONS)) {
-      rocFilters.addAll(Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
+      rocFilters.addAll(fallbackRocFilters);
     }
 
     return rocFilters;

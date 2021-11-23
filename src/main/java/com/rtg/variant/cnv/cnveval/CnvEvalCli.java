@@ -33,7 +33,6 @@ import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.NO_INDEX;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
-import static com.rtg.launcher.CommonFlags.STRING;
 import static com.rtg.util.cli.CommonFlagCategories.FILTERING;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
 import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
@@ -84,6 +83,7 @@ import com.rtg.vcf.eval.RocSortOrder;
 import com.rtg.vcf.eval.RocSortValueExtractor;
 import com.rtg.vcf.eval.VariantSetType;
 import com.rtg.vcf.eval.VcfEvalCli;
+import com.rtg.vcf.eval.RocFilterProxy;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -97,10 +97,9 @@ public class CnvEvalCli extends LoggedCli {
   private static final String REGION_NAMES = "names";
   private static final String ROC_SUBSET = "roc-subset";
   private static final String RETAIN_OVERLAPS = "Xretain-overlapping-calls";
-  private static final String FORMAT_SQS = "SQS";
 
   /** Defines the RocFilters we want to use with cnveval */
-  public enum CnvRocFilter {
+  public enum CnvRocFilter implements RocFilterProxy {
     /** Only duplications **/
     DUP(new RocFilter("DUP") {
       @Override
@@ -128,7 +127,8 @@ public class CnvEvalCli extends LoggedCli {
     CnvRocFilter(RocFilter f) {
       mFilter = f;
     }
-    RocFilter filter() {
+    @Override
+    public RocFilter filter() {
       return mFilter;
     }
   }
@@ -160,11 +160,10 @@ public class CnvEvalCli extends LoggedCli {
 
     mFlags.registerOptional(REGION_NAMES, "include evaluation region names in annotated outputs").setCategory(REPORTING);
     mFlags.registerOptional(VcfEvalCli.ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
-    mFlags.registerOptional('f', VcfEvalCli.SCORE_FIELD, String.class, STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\" or \"INFO.<name>\" to select the named VCF INFO field", FORMAT_SQS).setCategory(REPORTING);
-    mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
-    mFlags.registerOptional('O', VcfEvalCli.SORT_ORDER, RocSortOrder.class, STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
 
-    mFlags.registerOptional(ROC_SUBSET, CnvRocFilter.class, "STRING", "output ROC files for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
+    VcfEvalCli.registerVcfRocFlags(mFlags, VcfUtils.QUAL, CnvRocFilter.class);
+
+    mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
     mFlags.registerOptional(RETAIN_OVERLAPS, "retain overlapping calls").setCategory(UTILITY);
 
     CommonFlags.initThreadsFlag(mFlags);
@@ -174,7 +173,7 @@ public class CnvEvalCli extends LoggedCli {
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateRegions(flags)
       && flags.checkNand(VcfEvalCli.SCORE_FIELD, VcfEvalCli.NO_ROC)
-      && VcfEvalCli.validateScoreField(flags));
+      && VcfEvalCli.validateVcfRocFlags(flags));
   }
 
   @Override
