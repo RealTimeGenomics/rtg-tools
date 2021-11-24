@@ -43,11 +43,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.rtg.bed.BedRecord;
 import com.rtg.bed.BedUtils;
@@ -79,11 +76,11 @@ import com.rtg.vcf.VcfWriter;
 import com.rtg.vcf.VcfWriterFactory;
 import com.rtg.vcf.eval.RocContainer;
 import com.rtg.vcf.eval.RocFilter;
+import com.rtg.vcf.eval.RocFilterProxy;
 import com.rtg.vcf.eval.RocSortOrder;
 import com.rtg.vcf.eval.RocSortValueExtractor;
 import com.rtg.vcf.eval.VariantSetType;
 import com.rtg.vcf.eval.VcfEvalCli;
-import com.rtg.vcf.eval.RocFilterProxy;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -198,19 +195,16 @@ public class CnvEvalCli extends LoggedCli {
     }
 
     final RocContainer roc = new RocContainer(rocExtractor);
-    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry in order to produce aggregate stats
-    if (mFlags.isSet(ROC_SUBSET)) {
-      for (Object o : mFlags.getValues(ROC_SUBSET)) {
-        rocFilters.add(((CnvRocFilter) o).filter());
-      }
-    }
-    roc.addFilters(rocFilters);
+    roc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>()));
 
+    roc.filters().forEach(f -> f.setHeader(baseline.getHeader()));
     for (final CnaVariantList chrVars : baseline.values()) {
       for (final CnaVariant v : chrVars) {
         roc.incrementBaselineCount(v.record(), sampleCol, v.isCorrect());
       }
     }
+
+    roc.filters().forEach(f -> f.setHeader(calls.getHeader()));
     for (final CnaVariantList chrVars : calls.values()) {
       for (final CnaVariant v : chrVars) {
         if (v.isCorrect()) {

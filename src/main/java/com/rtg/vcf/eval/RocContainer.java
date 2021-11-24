@@ -179,7 +179,7 @@ public class RocContainer {
     }
   }
 
-  Collection<RocFilter> filters() {
+  public Collection<RocFilter> filters() {
     return mRocs.keySet();
   }
 

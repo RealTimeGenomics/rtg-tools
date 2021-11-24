@@ -201,7 +201,7 @@ public abstract class RocFilter {
    * Set the VCF header to be used with this filter.
    * @param header VCF header
    */
-  void setHeader(VcfHeader header) { }
+  public void setHeader(VcfHeader header) { }
 
   /**
    * @return true if the filter requires access to a GT value

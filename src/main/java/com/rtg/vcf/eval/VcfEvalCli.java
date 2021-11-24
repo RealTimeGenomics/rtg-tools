@@ -190,7 +190,10 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     );
   }
 
-  /** @return true if the standard ROC flags validate sucessfully */
+  /**
+   * @param flags object to register flags into
+   * @return true if the standard ROC flags validate successfully 
+   */
   public static boolean validateVcfRocFlags(CFlags flags) {
       return validateScoreField(flags)
       && validateVcfRocFlag(flags, ROC_EXPR)
@@ -389,7 +392,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     return builder.create();
   }
 
-  static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters) throws IOException {
+  public static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters) throws IOException {
     final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
       final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);

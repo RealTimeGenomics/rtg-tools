@@ -60,7 +60,7 @@ public class ExpressionRocFilter extends RocFilter {
   }
 
   @Override
-  void setHeader(VcfHeader header) {
+  public void setHeader(VcfHeader header) {
     mFilter = createExpressionFilter(mExpression);
     mFilter.setHeader(header);
   }
