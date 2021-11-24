@@ -179,6 +179,9 @@ public class RocContainer {
     }
   }
 
+  /**
+   * @return the current set of filters.
+   */
   public Collection<RocFilter> filters() {
     return mRocs.keySet();
   }

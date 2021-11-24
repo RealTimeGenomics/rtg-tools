@@ -392,6 +392,13 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     return builder.create();
   }
 
+  /**
+   * Helper method to construct roc filters from flags
+   * @param flags the flags with options set
+   * @param fallbackRocFilters the default filters to configure if no flags were provided
+   * @return the set of roc filters to use
+   * @throws IOException if a region based filter is specified but cannot be loaded
+   */
   public static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters) throws IOException {
     final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
     if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
