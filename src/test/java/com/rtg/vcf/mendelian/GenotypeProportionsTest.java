@@ -63,20 +63,21 @@ public class GenotypeProportionsTest extends AbstractNanoTest {
         prop.addRecord(new Genotype(sampleGts.get(0)), new Genotype(sampleGts.get(1)), new Genotype(sampleGts.get(2)));
       }
     }
-    MemoryPrintStream mps = new MemoryPrintStream();
-    prop.writeResults(mps.printStream());
-    mNano.check(id + "_results.txt", mps.toString());
-
-    mps = new MemoryPrintStream();
-    prop.canonicalParents().writeResults(mps.printStream());
-    mNano.check(id + "_can_results.txt", mps.toString());
-
-    mps = new MemoryPrintStream();
-    prop.filterMultiallelic().writeResults(mps.printStream());
-    mNano.check(id + "_biallelic_results.txt", mps.toString());
-
-    mps = new MemoryPrintStream();
-    prop.filterNonDiploid().writeResults(mps.printStream());
-    mNano.check(id + "_diploid_results.txt", mps.toString());
+    try (MemoryPrintStream mps = new MemoryPrintStream()) {
+      prop.writeResults(mps.printStream());
+      mNano.check(id + "_results.txt", mps.toString());
+    }
+    try (MemoryPrintStream mps = new MemoryPrintStream()) {
+      prop.canonicalParents().writeResults(mps.printStream());
+      mNano.check(id + "_can_results.txt", mps.toString());
+    }
+    try (MemoryPrintStream mps = new MemoryPrintStream()) {
+      prop.filterMultiallelic().writeResults(mps.printStream());
+      mNano.check(id + "_biallelic_results.txt", mps.toString());
+    }
+    try (MemoryPrintStream mps = new MemoryPrintStream()) {
+      prop.filterNonDiploid().writeResults(mps.printStream());
+      mNano.check(id + "_diploid_results.txt", mps.toString());
+    }
   }
 }

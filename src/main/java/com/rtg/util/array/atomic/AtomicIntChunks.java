@@ -40,9 +40,6 @@ public class AtomicIntChunks implements AtomicIndex {
 
   protected static final int CHUNK_BITS = 30;
 
-  /** Number of a bits in an int. */
-  private static final int INT_BITS = 32;
-
   private final int mChunkBits;
 
   private final int mChunkMask;
@@ -80,13 +77,11 @@ public class AtomicIntChunks implements AtomicIndex {
     final int chunks = (int) ch;
     mArray = new AtomicIntegerArray[chunks];
     long left = mLength;
-    long total = 0;
     for (int i = 0; i < chunks; ++i) {
       final int assignedLength = left <= chunkSize ? (int) left : chunkSize;
       assert assignedLength > 0;
       mArray[i] =  new AtomicIntegerArray(assignedLength);
       left -= assignedLength;
-      total += assignedLength;
     }
     assert left == 0;
   }

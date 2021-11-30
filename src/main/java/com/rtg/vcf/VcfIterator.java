@@ -29,15 +29,13 @@
  */
 package com.rtg.vcf;
 
-import java.io.Closeable;
-
 import com.rtg.util.io.IOIterator;
 import com.rtg.vcf.header.VcfHeader;
 
 /**
  * Provides access to the VCF header when iterating a VCF source
  */
-public interface VcfIterator extends IOIterator<VcfRecord>, Closeable {
+public interface VcfIterator extends IOIterator<VcfRecord> {
 
   /**
    * @return the VCF header.

@@ -30,7 +30,7 @@
 package com.rtg.sam;
 
 import java.util.HashSet;
-
+import com.rtg.AbstractTest;
 import com.rtg.launcher.CommonFlags;
 import com.rtg.util.IntegerOrPercentage;
 import com.rtg.util.TestUtils;
@@ -39,12 +39,10 @@ import com.rtg.util.cli.Flag;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.MemoryPrintStream;
 
-import junit.framework.TestCase;
-
 /**
  * Test the corresponding class.
  */
-public class SamFilterOptionsTest extends TestCase {
+public class SamFilterOptionsTest extends AbstractTest {
 
   public void testConstants() {
     final HashSet<String> names = new HashSet<>();
@@ -151,40 +149,39 @@ public class SamFilterOptionsTest extends TestCase {
   }
 
   public void testValidator() {
-    final MemoryPrintStream err = new MemoryPrintStream();
-    Diagnostic.setLogStream(err.printStream());
-    final CFlags flags = new CFlags();
-    SamFilterOptions.registerMaxHitsFlag(flags, 'c');
-    SamFilterOptions.registerMaxASMatedFlag(flags, 's');
-    SamFilterOptions.registerMaxASUnmatedFlag(flags, 'u');
-    SamFilterOptions.registerExcludeMatedFlag(flags);
-    SamFilterOptions.registerExcludeUnmatedFlag(flags);
-    SamFilterOptions.registerRestrictionFlag(flags);
-    flags.setFlags("-c", "0");
-    assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
-    TestUtils.containsAll(flags.getParseMessage(), "--max-hits must be at least 1");
-    err.reset();
-    flags.setFlags("-s", "-1");
-    assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
-    TestUtils.containsAll(flags.getParseMessage(), "--max-as-mated must be at least 0");
-    err.reset();
-    flags.setFlags("-u", "-1");
-    assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
-    TestUtils.containsAll(flags.getParseMessage(), "--max-as-unmated must be at least 0");
-    err.reset();
-    flags.setFlags("--exclude-mated", "--exclude-unmated");
-    assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
-    TestUtils.containsAll(flags.getParseMessage(), "Cannot set both --exclude-mated and --exclude-unmated");
-    flags.setFlags("--region", "blarhg:-1");
-    assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
-    TestUtils.containsAll(flags.getParseMessage(), "The value \"blarhg:-1\" for --region is malformed.");
-    flags.setFlags();
-    assertTrue(SamFilterOptions.validateFilterFlags(flags, false));
-    Diagnostic.setLogStream();
+    try (final MemoryPrintStream err = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(err.printStream());
+      final CFlags flags = new CFlags();
+      SamFilterOptions.registerMaxHitsFlag(flags, 'c');
+      SamFilterOptions.registerMaxASMatedFlag(flags, 's');
+      SamFilterOptions.registerMaxASUnmatedFlag(flags, 'u');
+      SamFilterOptions.registerExcludeMatedFlag(flags);
+      SamFilterOptions.registerExcludeUnmatedFlag(flags);
+      SamFilterOptions.registerRestrictionFlag(flags);
+      flags.setFlags("-c", "0");
+      assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
+      TestUtils.containsAll(flags.getParseMessage(), "--max-hits must be at least 1");
+      err.reset();
+      flags.setFlags("-s", "-1");
+      assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
+      TestUtils.containsAll(flags.getParseMessage(), "--max-as-mated must be at least 0");
+      err.reset();
+      flags.setFlags("-u", "-1");
+      assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
+      TestUtils.containsAll(flags.getParseMessage(), "--max-as-unmated must be at least 0");
+      err.reset();
+      flags.setFlags("--exclude-mated", "--exclude-unmated");
+      assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
+      TestUtils.containsAll(flags.getParseMessage(), "Cannot set both --exclude-mated and --exclude-unmated");
+      flags.setFlags("--region", "blarhg:-1");
+      assertFalse(SamFilterOptions.validateFilterFlags(flags, false));
+      TestUtils.containsAll(flags.getParseMessage(), "The value \"blarhg:-1\" for --region is malformed.");
+      flags.setFlags();
+      assertTrue(SamFilterOptions.validateFilterFlags(flags, false));
+    }
   }
 
   public void testMakeParams() {
-    Diagnostic.setLogStream();
     final CFlags flags = new CFlags();
     SamFilterOptions.registerMaxHitsFlag(flags, 'c');
     SamFilterOptions.registerMaxASMatedFlag(flags, 's');
@@ -196,18 +193,18 @@ public class SamFilterOptionsTest extends TestCase {
   }
 
   public void testMakeParams2() {
-    final MemoryPrintStream err = new MemoryPrintStream();
-    Diagnostic.setLogStream(err.printStream());
-    final CFlags flags = new CFlags();
-    SamFilterOptions.registerMaxHitsFlag(flags, 'c');
-    SamFilterOptions.registerMaxASMatedFlag(flags, 's');
-    SamFilterOptions.registerMaxASUnmatedFlag(flags, 'u');
-    SamFilterOptions.registerExcludeMatedFlag(flags);
-    SamFilterOptions.registerExcludeUnmatedFlag(flags);
-    SamFilterOptions.registerRestrictionFlag(flags);
-    flags.setFlags("-c", "5", "-s", "6", "--exclude-unmated", "-u", "7", "--region", "chrx");
-    assertEquals("SamFilterParams minMapQ=-1 maxAlignmentCount=5 maxMatedAlignmentScore=6 maxUnmatedAlignmentScore=7 excludeUnmated=true excludeUnplaced=false excludeVariantInvalid=false requireSetFlags=0 requireUnsetFlags=0 regionTemplate=chrx", SamFilterOptions.makeFilterParamsBuilder(flags).create().toString());
-    assertTrue(err.toString(), err.toString().contains("--max-as-unmated should not be greater than --max-as-mated"));
-    Diagnostic.setLogStream();
+    try (final MemoryPrintStream err = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(err.printStream());
+      final CFlags flags = new CFlags();
+      SamFilterOptions.registerMaxHitsFlag(flags, 'c');
+      SamFilterOptions.registerMaxASMatedFlag(flags, 's');
+      SamFilterOptions.registerMaxASUnmatedFlag(flags, 'u');
+      SamFilterOptions.registerExcludeMatedFlag(flags);
+      SamFilterOptions.registerExcludeUnmatedFlag(flags);
+      SamFilterOptions.registerRestrictionFlag(flags);
+      flags.setFlags("-c", "5", "-s", "6", "--exclude-unmated", "-u", "7", "--region", "chrx");
+      assertEquals("SamFilterParams minMapQ=-1 maxAlignmentCount=5 maxMatedAlignmentScore=6 maxUnmatedAlignmentScore=7 excludeUnmated=true excludeUnplaced=false excludeVariantInvalid=false requireSetFlags=0 requireUnsetFlags=0 regionTemplate=chrx", SamFilterOptions.makeFilterParamsBuilder(flags).create().toString());
+      assertTrue(err.toString(), err.toString().contains("--max-as-unmated should not be greater than --max-as-mated"));
+    }
   }
 }

@@ -337,7 +337,8 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   }
 
   public void testOutsideRef() throws IOException, UnindexableDataException {
-    try (TestDirectory tdir = new TestDirectory()) {
+    try (TestDirectory tdir = new TestDirectory();
+         MemoryPrintStream ps = new MemoryPrintStream()) {
 
       createInput(tdir, new String[]{"seq 28 . A G 0.0 PASS . GT 1/1"}, new String[]{"seq 30 . C T 0.0 PASS . GT 0/1"}, new String[]{});
       final File calls = new File(tdir, "calls.vcf.gz");
@@ -346,7 +347,7 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
       final File template = new File(tdir, "template");
 
       ReaderTestUtils.getReaderDNA(TEMPLATE, template, null).close();
-      final MemoryPrintStream ps = new MemoryPrintStream();
+
       Diagnostic.setLogStream(ps.printStream());
       final VcfEvalParams params = VcfEvalParams.builder().baseLineFile(baseline).callsFile(calls)
         .restriction(new RegionRestriction("seq", 0, 300))
@@ -363,32 +364,32 @@ public class VcfEvalTaskTest extends AbstractNanoTest {
   }
 
   public void testCheckHeader() {
-    final MemoryPrintStream ps = new MemoryPrintStream();
-    Diagnostic.setLogStream(ps.printStream());
-    final SdfId idA = new SdfId();
-    SdfId idB;
-    do {
-      idB = new SdfId();
-    } while (idA.check(idB));
-    final VcfHeader hA = new VcfHeader();
-    hA.addMetaInformationLine(HEADER_SDF_PREFIX + idA.toString());
-    VcfEvalTask.checkHeader(hA, hA, idA);
-    assertEquals("", ps.toString());
+    try (final MemoryPrintStream ps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(ps.printStream());
+      final SdfId idA = new SdfId();
+      SdfId idB;
+      do {
+        idB = new SdfId();
+      } while (idA.check(idB));
+      final VcfHeader hA = new VcfHeader();
+      hA.addMetaInformationLine(HEADER_SDF_PREFIX + idA.toString());
+      VcfEvalTask.checkHeader(hA, hA, idA);
+      assertEquals("", ps.toString());
 
-    final VcfHeader hB = new VcfHeader();
-    hB.addMetaInformationLine(HEADER_SDF_PREFIX + idB.toString());
-    VcfEvalTask.checkHeader(hB, hA, idA);
-    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline variants were not created from the given reference"));
-    ps.reset();
+      final VcfHeader hB = new VcfHeader();
+      hB.addMetaInformationLine(HEADER_SDF_PREFIX + idB.toString());
+      VcfEvalTask.checkHeader(hB, hA, idA);
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline variants were not created from the given reference"));
+      ps.reset();
 
-    VcfEvalTask.checkHeader(hA, hB, idA);
-    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, called variants were not created from the given reference"));
-    ps.reset();
+      VcfEvalTask.checkHeader(hA, hB, idA);
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, called variants were not created from the given reference"));
+      ps.reset();
 
-    VcfEvalTask.checkHeader(hB, hA, new SdfId(0));
-    assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline and called variants were created with different references"));
-
-    ps.reset();
+      VcfEvalTask.checkHeader(hB, hA, new SdfId(0));
+      assertTrue(ps.toString(), ps.toString().contains("Reference template ID mismatch, baseline and called variants were created with different references"));
+      ps.reset();
+    }
   }
 
   public void testGetVariants() throws IOException {

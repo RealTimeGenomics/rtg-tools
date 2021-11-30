@@ -155,9 +155,8 @@ public class SplitEvalSynchronizerTest extends AbstractVcfEvalTest {
   }
 
   public void testEvalSynchronizer() throws IOException, UnindexableDataException {
-    final MemoryPrintStream mp = new MemoryPrintStream();
-    Diagnostic.setLogStream(mp.printStream());
-    try {
+    try (final MemoryPrintStream mp = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mp.printStream());
       try (final TestDirectory dir = new TestDirectory()) {
         final File fake = FileHelper.stringToGzFile(FAKE_VCF, new File(dir, "fake.vcf.gz"));
         new TabixIndexer(fake).saveVcfIndex();

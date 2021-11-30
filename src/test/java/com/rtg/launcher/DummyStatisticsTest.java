@@ -70,22 +70,24 @@ public class DummyStatisticsTest extends TestCase {
   }
 
   public void test() throws IOException {
-    final MemoryPrintStream ps = new MemoryPrintStream();
-    final MemoryPrintStream ps2 = new MemoryPrintStream();
+    try (final MemoryPrintStream ps = new MemoryPrintStream();
+         final MemoryPrintStream ps2 = new MemoryPrintStream()) {
 
-    Diagnostic.setLogStream(ps2.printStream());
-    final DummyStatistics stat = new DummyStatistics(null);
-    stat.printStatistics(null);
-    assertEquals("", ps.toString());
-    stat.printStatistics(null);
-    assertEquals("", ps.toString());
-    stat.mStats = "Line1" + StringUtils.LS + "Line2";
+      Diagnostic.setLogStream(ps2.printStream());
+      final DummyStatistics stat = new DummyStatistics(null);
+      stat.printStatistics(null);
+      assertEquals("", ps.toString());
+      stat.printStatistics(null);
+      assertEquals("", ps.toString());
+      stat.mStats = "Line1" + StringUtils.LS + "Line2";
 
-    stat.printStatistics(ps.outputStream());
-    assertEquals("Line1" + StringUtils.LS + "Line2", ps.toString());
-    assertEquals(2, ps.toString().split(StringUtils.LS).length);
+      stat.printStatistics(ps.outputStream());
+      assertEquals("Line1" + StringUtils.LS + "Line2", ps.toString());
+      assertEquals(2, ps.toString().split(StringUtils.LS).length);
 
-    TestUtils.containsAll(ps2.toString(), "Line1", "Line2"); //logged statistics
-    assertEquals(2, ps2.toString().split(StringUtils.LS).length);
+      TestUtils.containsAll(ps2.toString(), "Line1", "Line2");
+      // logged statistics
+      assertEquals(2, ps2.toString().split(StringUtils.LS).length);
+    }
   }
 }

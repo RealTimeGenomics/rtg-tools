@@ -104,12 +104,13 @@ public class AdjustableGZIPOutputStreamTest extends TestCase {
     final long size = bos.size();
 
     // now check that decompressing gives the original contents
-    final InputStream in = new WorkingGzipInputStream(new ByteArrayInputStream(bytes));
-    for (int i = 0; i < contents.length(); ++i) {
-      assertEquals(contents.charAt(i), in.read());
+    try (final InputStream in = new WorkingGzipInputStream(new ByteArrayInputStream(bytes))) {
+      for (int i = 0; i < contents.length(); ++i) {
+        assertEquals(contents.charAt(i), in.read());
+      }
+      assertEquals(-1, in.read());
+      return size;
     }
-    assertEquals(-1, in.read());
-    return size;
   }
 
   private String makeJunk() {

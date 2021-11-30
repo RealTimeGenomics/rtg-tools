@@ -40,11 +40,12 @@ import junit.framework.TestCase;
 public class FastqWriterTest extends TestCase {
 
   public void test() throws Exception {
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastqWriter f = new FastqWriter(out.lineWriter(), 0, (byte) 0);
-    f.write("0 foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    f.write("1 foo 1", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    f.write("1 foo 2", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    assertEquals("@0 foo\nNACGT\n+\n55555\n@1 foo 1\nNACGT\n+\n55555\n@1 foo 2\nNACGT\n+\n55555\n", out.toString());
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastqWriter f = new FastqWriter(out.lineWriter(), 0, (byte) 0);
+      f.write("0 foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      f.write("1 foo 1", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      f.write("1 foo 2", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      assertEquals("@0 foo\nNACGT\n+\n55555\n@1 foo 1\nNACGT\n+\n55555\n@1 foo 2\nNACGT\n+\n55555\n", out.toString());
+    }
   }
 }

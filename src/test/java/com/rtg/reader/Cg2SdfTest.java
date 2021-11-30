@@ -166,28 +166,6 @@ public class Cg2SdfTest extends AbstractCliTest {
     }
   }
 
-  private static final String[] EXPECTED_MSGS = {
-                            StringUtils.LS
-                          + "Input Data" + StringUtils.LS
-                          + "Files              : in.tsv" + StringUtils.LS
-                          + "Format             : CG" + StringUtils.LS
-                          + "Type               : DNA" + StringUtils.LS
-                          + "Number of pairs    : 2" + StringUtils.LS
-                          + "Number of sequences: 4" + StringUtils.LS
-                          + "Total residues     : 40" + StringUtils.LS
-                          + "Minimum length     : 10" + StringUtils.LS
-                          + "Maximum length     : 10" + StringUtils.LS
-                          + StringUtils.LS
-                          + "Output Data" + StringUtils.LS,
-                            "SDF-ID             : ",
-                            "Number of pairs    : 1" + StringUtils.LS
-                          + "Number of sequences: 2" + StringUtils.LS
-                          + "Total residues     : 20" + StringUtils.LS
-                          + "Minimum length     : 10" + StringUtils.LS
-                          + "Maximum length     : 10" + StringUtils.LS,
-                            "There were 1 pairs skipped due to filters"
-  };
-
   public void testNs() throws Exception {
     try (final TestDirectory tempDir = new TestDirectory("cg2sdf")) {
       final File out = new File(tempDir, "out");

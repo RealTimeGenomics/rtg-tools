@@ -60,9 +60,10 @@ public class SimpleNamesTest extends TestCase {
     final StringBuilder sb = new StringBuilder();
     sprn.writeName(sb, 2);
     assertEquals("third", sb.toString());
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    sprn.writeName(mps.outputStream(), 1);
-    assertEquals("second", mps.toString());
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      sprn.writeName(mps.outputStream(), 1);
+      assertEquals("second", mps.toString());
+    }
   }
 
   public void testViaFile() throws Exception {

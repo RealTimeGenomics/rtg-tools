@@ -97,11 +97,11 @@ public class VcfPedigreeParserTest extends AbstractNanoTest {
   public void testNoInformationWarning() {
     final GenomeRelationships ped = new GenomeRelationships();
     final PedigreeField f = new PedigreeField("##PEDIGREE=<Sibling=>");
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    VcfPedigreeParser.parsePedLine(ped, f);
-    assertTrue(mps.toString().contains("Pedigree line contains no pedigree information: ##PEDIGREE=<Sibling=>"));
-    Diagnostic.setLogStream();
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
+      VcfPedigreeParser.parsePedLine(ped, f);
+      assertTrue(mps.toString() .contains("Pedigree line contains no pedigree information: ##PEDIGREE=<Sibling=>"));
+    }
   }
 
 }

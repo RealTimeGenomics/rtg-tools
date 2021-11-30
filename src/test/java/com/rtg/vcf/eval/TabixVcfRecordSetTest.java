@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.rtg.AbstractTest;
 import com.rtg.tabix.TabixIndexer;
 import com.rtg.tabix.UnindexableDataException;
 import com.rtg.util.MathUtils;
@@ -59,11 +60,9 @@ import com.rtg.util.test.FileHelper;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.header.VcfHeader;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class TabixVcfRecordSetTest extends TestCase {
+public class TabixVcfRecordSetTest extends AbstractTest {
 
   private static final String CALLS = ""
     + VcfHeader.MINIMAL_HEADER + "\tSAMPLE" + LS
@@ -72,7 +71,6 @@ public class TabixVcfRecordSetTest extends TestCase {
     + "simulatedSequence45\t737\t.\tG\tC\t50\tPASS\t.\tGT:GQ\t1/1:" + PosteriorUtils.phredIfy(7.4 * MathUtils.LOG_10) + LS;
 
   public void testSomeMethod() throws IOException, UnindexableDataException {
-    Diagnostic.setLogStream();
     try (final TestDirectory dir = new TestDirectory("eval")) {
       final File input = new File(dir, "snp_only.vcf.gz");
       FileHelper.resourceToFile("com/rtg/sam/resources/snp_only.vcf.gz", input);
@@ -91,44 +89,45 @@ public class TabixVcfRecordSetTest extends TestCase {
       }
       final ReferenceRegions highConf = new ReferenceRegions();
       highConf.add("simulatedSequence2", 0, Integer.MAX_VALUE);
-      final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100, null, 2);
 
-      final Set<String> expected = new HashSet<>();
-      for (int seq = 1; seq < 32; ++seq) {
-        expected.add("simulatedSequence" + seq);
-      }
-      expected.remove("simulatedSequence12");
-      // All other sequences either not contained in reference (N<32), or not in both baseline and calls (45)
+      try (final VariantSet set = new TabixVcfRecordSet(input, out, ranges, highConf, names, null, null, true, false, 100, null, 2)) {
+        final Set<String> expected = new HashSet<>();
+        for (int seq = 1; seq < 32; ++seq) {
+          expected.add("simulatedSequence" + seq);
+        }
+        expected.remove("simulatedSequence12");
+        // All other sequences either not contained in reference (N<32), or not in both
+        // baseline and calls (45)
 
-      Pair<String, Map<VariantSetType, List<Variant>>> current;
-      while ((current = set.nextSet()) != null) {
-        final String currentName = current.getA();
-        assertTrue("unexpected sequence <" + currentName + ">", expected.contains(currentName));
-        expected.remove(currentName);
-        for (Variant v : current.getB().get(VariantSetType.BASELINE)) {
-          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
+        Pair<String, Map<VariantSetType, List<Variant>>> current;
+        while ((current = set.nextSet()) != null) {
+          final String currentName = current.getA();
+          assertTrue("unexpected sequence <" + currentName + ">", expected.contains(currentName));
+          expected.remove(currentName);
+          for (Variant v : current.getB().get(VariantSetType.BASELINE)) {
+            assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
+          }
+          for (Variant v : current.getB().get(VariantSetType.CALLS)) {
+            assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
+          }
+          if (currentName.equals("simulatedSequence19")) {
+            assertEquals(1, current.getB().get(VariantSetType.CALLS).size());
+            assertEquals(6, current.getB().get(VariantSetType.BASELINE).size());
+          }
+          if (currentName.equals("simulatedSequence45")) {
+            assertEquals(0, current.getB().get(VariantSetType.BASELINE).size());
+            assertEquals(1, current.getB().get(VariantSetType.CALLS).size());
+          }
         }
-        for (Variant v : current.getB().get(VariantSetType.CALLS)) {
-          assertEquals(currentName.equals("simulatedSequence2"), !v.hasStatus(VariantId.STATUS_OUTSIDE_EVAL));
-        }
-        if (currentName.equals("simulatedSequence19")) {
-          assertEquals(1, current.getB().get(VariantSetType.CALLS).size());
-          assertEquals(6, current.getB().get(VariantSetType.BASELINE).size());
-        }
-        if (currentName.equals("simulatedSequence45")) {
-          assertEquals(0, current.getB().get(VariantSetType.BASELINE).size());
-          assertEquals(1, current.getB().get(VariantSetType.CALLS).size());
-        }
+        assertTrue("these sequences weren't used: " + expected, expected.isEmpty());
       }
-      assertTrue("these sequences weren't used: " + expected, expected.isEmpty());
     }
   }
 
 
   public void testMissingSample() throws Exception {
-    final MemoryPrintStream mp = new MemoryPrintStream();
-    Diagnostic.setLogStream(mp.printStream());
-    try {
+    try (final MemoryPrintStream mp = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mp.printStream());
       try (final TestDirectory dir = new TestDirectory("indexercli")) {
         final File input = new File(dir, "foo.vcf.gz");
         FileHelper.resourceToFile("com/rtg/sam/resources/vcf.txt.gz", input);
@@ -143,9 +142,6 @@ public class TabixVcfRecordSetTest extends TestCase {
           TestUtils.containsAll(e.toString(), "Sample \"asdf\" not found in calls VCF");
         }
       }
-    } finally {
-      Diagnostic.setLogStream();
     }
   }
-
 }

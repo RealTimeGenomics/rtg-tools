@@ -42,8 +42,9 @@ public class NullVcfWriterTest {
   @Test
   public void testHeader() {
     final VcfHeader header = new VcfHeader();
-    final NullVcfWriter nullVcfWriter = new NullVcfWriter(header);
-    assertEquals(header, nullVcfWriter.getHeader());
+    try (final NullVcfWriter nullVcfWriter = new NullVcfWriter(header)) {
+      assertEquals(header, nullVcfWriter.getHeader());
+    }
   }
 
 }

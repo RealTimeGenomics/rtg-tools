@@ -73,17 +73,18 @@ public class BgZipTest extends AbstractCliTest {
     try (TestDirectory dir = new TestDirectory()) {
       final File file1 = FileHelper.resourceToFile("com/rtg/sam/resources/test.sam", new File(dir, "test1.sam"));
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      getCli().mainInit(new String[]{"--stdout", file1.getPath()}, mps.outputStream(), mps.printStream());
-      assertTrue(mps.toString().length() > 1);
-      assertTrue(file1.exists());
-      final File bgzippedOutFile = new File(dir, "out.gz");
-      FileUtils.byteArrayToFile(mps.outputStream().toByteArray(), bgzippedOutFile);
+      try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+        getCli().mainInit(new String[] {"--stdout", file1.getPath()}, mps.outputStream(), mps.printStream());
+        assertTrue(mps.toString().length() > 1);
+        assertTrue(file1.exists());
+        final File bgzippedOutFile = new File(dir, "out.gz");
+        FileUtils.byteArrayToFile(mps.outputStream().toByteArray(), bgzippedOutFile);
 
-      final String out = checkMainInitOk("-d", "-c", bgzippedOutFile.getPath());
+        final String out = checkMainInitOk("-d", "-c", bgzippedOutFile.getPath());
 
-      assertTrue(out.length() > 1);
-      assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), out);
+        assertTrue(out.length() > 1);
+        assertEquals(FileHelper.resourceToString("com/rtg/sam/resources/test.sam"), out);
+      }
     }
   }
 

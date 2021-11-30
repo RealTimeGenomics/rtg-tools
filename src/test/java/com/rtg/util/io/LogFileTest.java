@@ -51,19 +51,20 @@ public class LogFileTest extends TestCase {
    */
   public final void test() throws IOException {
     final File file = File.createTempFile("logFileTest", "log");
-    final LogStream ls = new LogFile(file);
-    assertTrue(file.exists());
-    final String ts = ls.toString();
-    assertTrue(ts.startsWith("LogFile "));
-    assertTrue(ts.contains(FS + "logFileTest"));
-    assertTrue(ts.endsWith("log"));
-    ls.stream().println("l1");
-    ls.stream().println("l2");
-    ls.stream().flush();
-    assertEquals("l1" + StringUtils.LS + "l2" + StringUtils.LS, FileUtils.fileToString(file));
-    assertEquals(file, ls.file());
-    assertEquals(new File(file.getPath()), file);
-    ls.removeLog();
+    try (final LogStream ls = new LogFile(file)) {
+      assertTrue(file.exists());
+      final String ts = ls.toString();
+      assertTrue(ts.startsWith("LogFile "));
+      assertTrue(ts.contains(FS + "logFileTest"));
+      assertTrue(ts.endsWith("log"));
+      ls.stream().println("l1");
+      ls.stream().println("l2");
+      ls.stream().flush();
+      assertEquals("l1" + StringUtils.LS + "l2" + StringUtils.LS, FileUtils.fileToString(file));
+      assertEquals(file, ls.file());
+      assertEquals(new File(file.getPath()), file);
+      ls.removeLog();
+    }
     assertTrue(!file.exists());
   }
 
@@ -73,8 +74,7 @@ public class LogFileTest extends TestCase {
    */
   public final void testNull() throws IOException {
     final File impossibleLog = FileHelper.createTempDirectory();
-    try {
-      final LogStream ls = new LogFile(impossibleLog);
+    try (final LogStream ls = new LogFile(impossibleLog)) {
       assertNull(ls.stream());
       ls.removeLog();
     } finally {

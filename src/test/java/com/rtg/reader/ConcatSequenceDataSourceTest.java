@@ -90,8 +90,7 @@ public class ConcatSequenceDataSourceTest extends TestCase {
       }
     };
     Diagnostic.addListener(dl);
-    try {
-      final ConcatSequenceDataSource<SequenceDataSource> ds = new ConcatSequenceDataSource<>(list, Arrays.asList(names));
+    try (final ConcatSequenceDataSource<SequenceDataSource> ds = new ConcatSequenceDataSource<>(list, Arrays.asList(names))) {
       assertEquals(1, infoEvents[0]);
       assertEquals(0, ds.getWarningCount());
       assertTrue(ds.nextSequence());
@@ -102,7 +101,7 @@ public class ConcatSequenceDataSourceTest extends TestCase {
 
       assertFalse(ds.nextSequence());
 
-      new ConcatSequenceDataSource<>(list, null);
+      new ConcatSequenceDataSource<>(list, null).close();
       assertEquals(1, infoEvents[0]);
     } finally {
       Diagnostic.removeListener(dl);

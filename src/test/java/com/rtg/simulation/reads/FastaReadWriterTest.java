@@ -40,13 +40,14 @@ import junit.framework.TestCase;
 public class FastaReadWriterTest extends TestCase {
 
   public void test() throws Exception {
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastaReadWriter f = new FastaReadWriter(out.lineWriter());
-    f.writeRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    f.writeLeftRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    f.writeRightRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
-    assertEquals(">0 foo\nNACGT\n>1 foo/Left\nNACGT\n>1 foo/Right\nNACGT\n", out.toString());
-    assertEquals(2, f.readsWritten());
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastaReadWriter f = new FastaReadWriter(out.lineWriter());
+      f.writeRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      f.writeLeftRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      f.writeRightRead("foo", new byte[] {0, 1, 2, 3, 4}, new byte[] {20, 20, 20, 20, 20}, 5);
+      assertEquals(">0 foo\nNACGT\n>1 foo/Left\nNACGT\n>1 foo/Right\nNACGT\n", out.toString());
+      assertEquals(2, f.readsWritten());
+    }
   }
 
 }

@@ -32,6 +32,7 @@ package com.rtg.launcher;
 import static com.rtg.util.StringUtils.LS;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 
 import com.rtg.launcher.ModuleParams.ModuleParamsBuilder;
@@ -97,8 +98,10 @@ public class ModuleParamsTest extends TestCase {
     b.close();
   }
 
-  public void testBuilderDefaults() {
-    assertEquals("ModuleParams", new MockModuleParams(new MockModuleParamsBuilder()).name());
+  public void testBuilderDefaults() throws IOException {
+    try (MockModuleParams mp = new MockModuleParams(new MockModuleParamsBuilder())) {
+      assertEquals("ModuleParams", mp.name());
+    }
   }
 
   public void testBuilder() {

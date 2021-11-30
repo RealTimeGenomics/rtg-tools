@@ -45,15 +45,15 @@ import com.rtg.vcf.VcfWriter;
 public class Ga4ghLooseMatchFilterTest extends AbstractNanoTest {
 
   protected void checkFiltering(int looseMatchDistance) throws IOException {
-    final MemoryPrintStream p = new MemoryPrintStream();
-    try (VcfReader r = new VcfReaderFactory().make(new BufferedReader(new StringReader(mNano.loadReference("ga4gh-loose-match_in.vcf"))))) {
-      try (VcfWriter w = new Ga4ghLooseMatchFilter(new DefaultVcfWriter(r.getHeader(), p.outputStream()), looseMatchDistance)) {
+    try (final MemoryPrintStream p = new MemoryPrintStream()) {
+      try (VcfReader r = new VcfReaderFactory().make(new BufferedReader(new StringReader(mNano.loadReference("ga4gh-loose-match_in.vcf"))));
+           VcfWriter w = new Ga4ghLooseMatchFilter(new DefaultVcfWriter(r.getHeader(), p.outputStream()), looseMatchDistance)) {
         while (r.hasNext()) {
           w.write(r.next());
         }
       }
+      mNano.check("ga4gh-loose-match-" + looseMatchDistance + "_out.vcf", TestUtils.sanitizeVcfHeader(p.toString()));
     }
-    mNano.check("ga4gh-loose-match-" + looseMatchDistance + "_out.vcf", TestUtils.sanitizeVcfHeader(p.toString()));
   }
 
   public void testLoose0() throws IOException {

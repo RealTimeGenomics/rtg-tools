@@ -38,6 +38,7 @@ import com.rtg.util.cli.CFlags;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
+import com.rtg.util.io.TestDirectory;
 import com.rtg.util.test.FileHelper;
 
 import junit.framework.TestCase;
@@ -78,15 +79,13 @@ public class SamCommandHelperTest extends TestCase {
   }
 
   public void testSamRGErrors() throws IOException, InvalidParamsException {
-    final File outer = FileUtils.createTempDir("rammap", "end2end");
-    try {
 
+    try (final TestDirectory outer = new TestDirectory("rammap")) {
       final File header = new File(outer, "header");
       FileUtils.stringToFile("", header);
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      Diagnostic.setLogStream(mps.printStream());
-      try {
+      try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+        Diagnostic.setLogStream(mps.printStream());
         try {
           SamCommandHelper.validateAndCreateSamRG(header.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
           fail();
@@ -99,9 +98,8 @@ public class SamCommandHelperTest extends TestCase {
         final File header2 = new File(outer, "header2");
         FileUtils.stringToFile("@RG\tID:L23\tSM:NA123" + "\n" + "@RG\tID:L43\tSM:NA123", header2);
 
-        final MemoryPrintStream mps2 = new MemoryPrintStream();
-        Diagnostic.setLogStream(mps2.printStream());
-        try {
+        try (final MemoryPrintStream mps2 = new MemoryPrintStream()) {
+          Diagnostic.setLogStream(mps2.printStream());
           SamCommandHelper.validateAndCreateSamRG(header2.toString(), SamCommandHelper.ReadGroupStrictness.REQUIRED);
           fail();
         } catch (final InvalidParamsException ipe) {
@@ -119,8 +117,6 @@ public class SamCommandHelperTest extends TestCase {
       } finally {
         Diagnostic.setLogStream();
       }
-    } finally {
-      assertTrue(FileHelper.deleteAll(outer));
     }
   }
 

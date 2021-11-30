@@ -48,15 +48,15 @@ public class DefaultVcfWriterTest extends AbstractVcfWriterTest {
     return new DefaultVcfWriter(head, out);
   }
 
-  public void testErrors() {
+  public void testErrors() throws IOException {
     try {
-      new DefaultVcfWriter(null, new ByteArrayOutputStream());
+      new DefaultVcfWriter(null, new ByteArrayOutputStream()).close();
     } catch (NullPointerException ex) {
       assertEquals("header cannot be null", ex.getMessage());
     }
 
     try {
-      new DefaultVcfWriter(new VcfHeader(), null);
+      new DefaultVcfWriter(new VcfHeader(), null).close();
     } catch (NullPointerException ex) {
       assertEquals("output stream cannot be null", ex.getMessage());
     }

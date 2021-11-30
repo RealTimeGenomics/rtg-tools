@@ -67,12 +67,12 @@ public class TaxonomyDistributionTest extends TestCase {
     taxonLookup.put("0", 0);
     taxonLookup.put("1", 1);
     taxonLookup.put("2", 2);
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.DNA_FRACTION);
-    assertTrue(Arrays.equals(new double[]{0.5, 0, 0.5}, dist.getDistribution()));
-    assertFalse(mps.toString().contains("Input distribution sums to"));
-
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
+      final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.DNA_FRACTION);
+      assertTrue(Arrays.equals(new double[]{0.5, 0, 0.5}, dist.getDistribution()));
+      assertFalse(mps.toString().contains("Input distribution sums to"));
+    }
   }
   public void testHarder() throws IOException {
     final SequencesReader reader = ReaderTestUtils.getReaderDnaMemory(ReaderTestUtils.fasta("AAAAA", "AA", "AAA", "AA"));
@@ -157,11 +157,12 @@ public class TaxonomyDistributionTest extends TestCase {
     taxonLookup.put("0", 0);
     taxonLookup.put("1", 1);
     taxonLookup.put("2", 2);
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.DNA_FRACTION);
-    assertTrue(Arrays.equals(new double[]{0.5, 0, 0.5}, dist.getDistribution()));
-    TestUtils.containsAll(mps.toString(), "Input distribution sums to: 0.98");
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
+      final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.DNA_FRACTION);
+      assertTrue(Arrays.equals(new double[]{0.5, 0, 0.5}, dist.getDistribution()));
+      TestUtils.containsAll(mps.toString(), "Input distribution sums to: 0.98");
+    }
   }
 
   public void testAbundance() throws IOException {
@@ -172,10 +173,11 @@ public class TaxonomyDistributionTest extends TestCase {
     taxonLookup.put("1", 0);
     taxonLookup.put("2", 1);
     taxonLookup.put("3", 2);
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.ABUNDANCE);
-    assertTrue(Arrays.toString(dist.getDistribution()), Arrays.equals(new double[]{0.5, 0.25, 0, 0.25}, dist.getDistribution()));
-    assertFalse(mps.toString().contains("Input distribution sums to"));
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
+      final TaxonomyDistribution dist = new TaxonomyDistribution(in, taxonLookup, reader, TaxonomyDistribution.DistributionType.ABUNDANCE);
+      assertTrue(Arrays.toString(dist.getDistribution()), Arrays.equals(new double[] {0.5, 0.25, 0, 0.25}, dist.getDistribution()));
+      assertFalse(mps.toString().contains("Input distribution sums to"));
+    }
   }
 }

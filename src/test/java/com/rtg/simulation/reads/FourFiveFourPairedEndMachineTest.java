@@ -57,19 +57,19 @@ public class FourFiveFourPairedEndMachineTest extends AbstractMachineTest {
 
   public void test() throws Exception {
     final FourFiveFourPairedEndMachine m = (FourFiveFourPairedEndMachine) getMachine(47);
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
-    m.setReadWriter(w);
-    m.setMinPairSize(3);
-    m.setMaxPairSize(7);
-    final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    m.processFragment("name/", 30, frag, frag.length);
-    m.processFragment("name/", 30, frag, frag.length);
-    m.processFragment("name/", 30, frag, frag.length);
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
+      m.setReadWriter(w);
+      m.setMinPairSize(3);
+      m.setMaxPairSize(7);
+      final byte[] frag =
+          {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+      m.processFragment("name/", 30, frag, frag.length);
+      m.processFragment("name/", 30, frag, frag.length);
+      m.processFragment("name/", 30, frag, frag.length);
 
-    //System.out.println(out.toString());
-    mNano.check("454pe-results.fa", out.toString(), false);
+      // System.out.println(out.toString());
+      mNano.check("454pe-results.fa", out.toString(), false);
+    }
   }
-
-
 }

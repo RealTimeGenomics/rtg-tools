@@ -113,7 +113,6 @@ public class MendeliannessCheckerTest extends AbstractCliTest {
   public void testDiploidChild() {
     final String ref = "0";
     final String var = "1";
-    final String missing = ".";
     final String missing2 = "./.";
     final String missingref = "./0";
     final String missingvar = "./1";

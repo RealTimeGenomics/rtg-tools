@@ -71,9 +71,9 @@ public class TalkbackTest extends TestCase {
 
   public void testPostTalkback1() throws IOException {
     if (License.checkLicense()) {
-      try (final TestDirectory tmpDir = new TestDirectory("talkback")) {
+      try (final TestDirectory tmpDir = new TestDirectory("talkback");
+           final MemoryPrintStream mps = new MemoryPrintStream()) {
         final PrintStream olderr = System.err;
-        final MemoryPrintStream mps = new MemoryPrintStream();
         System.setErr(mps.printStream());
         try {
           final File logFile = new File(tmpDir, "log");
@@ -111,9 +111,8 @@ public class TalkbackTest extends TestCase {
     final Map<String, String> posted = new HashMap<>();
 
     final PrintStream olderr = System.err;
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    System.setErr(mps.printStream());
-    try {
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      System.setErr(mps.printStream());
 
       HttpServer h = createHttpServer(got, posted);
       h.start();

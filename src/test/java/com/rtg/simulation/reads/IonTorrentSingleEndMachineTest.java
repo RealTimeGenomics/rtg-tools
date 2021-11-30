@@ -105,13 +105,14 @@ public class IonTorrentSingleEndMachineTest extends TestCase {
     m.setMaxSize(50);
     m.updateWorkingSpace(10);
 
-    final MockReadWriter mrw = new MockReadWriter();
-    m.mReadWriter = mrw;
+    try (final MockReadWriter mrw = new MockReadWriter()) {
+      m.mReadWriter = mrw;
 
-    final byte[] t = DnaUtils.encodeString("TCAGCTATTGTTCACCTTTCTTCTATACTGTATGTATGTCTCAGCAAGCTTGTGTTTGTTTGGTGGTTGGCTCCTCTATCTGTGGATGCATCAACTCCATNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
-    m.processFragment("id/", 0, t, 100);
-    assertEquals("TGTGTTTGTTTGGTGGTTGGCTCCTCTATCTGTGGATGCATCAACTCCAT", DnaUtils.bytesToSequenceIncCG(mrw.mLastData));
-    assertEquals("id/51/F/50.", mrw.mName);
+      final byte[] t = DnaUtils.encodeString("TCAGCTATTGTTCACCTTTCTTCTATACTGTATGTATGTCTCAGCAAGCTTGTGTTTGTTTGGTGGTTGGCTCCTCTATCTGTGGATGCATCAACTCCATNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN");
+      m.processFragment("id/", 0, t, 100);
+      assertEquals("TGTGTTTGTTTGGTGGTTGGCTCCTCTATCTGTGGATGCATCAACTCCAT", DnaUtils.bytesToSequenceIncCG(mrw.mLastData));
+      assertEquals("id/51/F/50.", mrw.mName);
+    }
   }
 
   private static class MockReadWriter implements ReadWriter {

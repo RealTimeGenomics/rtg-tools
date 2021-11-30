@@ -38,7 +38,7 @@ import com.rtg.util.intervals.SequenceNameLocus;
 /**
  * Represents a variant that has a defined phasing with respect to the haplotypes.
  */
-public class OrientedVariant implements Comparable<OrientedVariant>, SequenceNameLocus, VariantId {
+public class OrientedVariant implements Comparable<OrientedVariant>, VariantId {
 
   private final Variant mVariant;
 

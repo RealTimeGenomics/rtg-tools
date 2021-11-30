@@ -43,11 +43,12 @@ public class RtgToolsTest extends TestCase {
   }
 
   public void test2() {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    assertEquals(1, new RtgTools().help(null, mps.outputStream(), mps.printStream()));
-    final String out = mps.toString();
-    TestUtils.containsAll(out, "format", "index", "bgzip");
-    assertFalse(out.contains("map"));
-    assertFalse(out.contains("family"));
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      assertEquals(1, new RtgTools().help(null, mps.outputStream(), mps.printStream()));
+      final String out = mps.toString();
+      TestUtils.containsAll(out, "format", "index", "bgzip");
+      assertFalse(out.contains("map"));
+      assertFalse(out.contains("family"));
+    }
   }
 }

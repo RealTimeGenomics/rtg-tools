@@ -57,18 +57,19 @@ public class DummyIlluminaMachineTest extends AbstractMachineTest {
 
   public void test() throws Exception {
     final AbstractIlluminaMachine m = (IlluminaSingleEndMachine) getMachine(42);
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
-    m.setReadWriter(w);
-    final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
+      m.setReadWriter(w);
+      final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-    m.mWorkspace = new int[10];
-    m.mReadBytes = new byte[10];
-    m.reseedErrorRandom(m.mFrameRandom.nextLong());
-    final String resF = m.generateRead("name/", 30, frag, frag.length, true, 5);
-    assertEquals("name/31/F/5.", resF);
-    final String resR = m.generateRead("name/", 30, frag, frag.length, false, 6);
-    assertEquals("name/51/R/6.", resR);
-    assertEquals(PrereadType.UNKNOWN, m.prereadType());
+      m.mWorkspace = new int[10];
+      m.mReadBytes = new byte[10];
+      m.reseedErrorRandom(m.mFrameRandom.nextLong());
+      final String resF = m.generateRead("name/", 30, frag, frag.length, true, 5);
+      assertEquals("name/31/F/5.", resF);
+      final String resR = m.generateRead("name/", 30, frag, frag.length, false, 6);
+      assertEquals("name/51/R/6.", resR);
+      assertEquals(PrereadType.UNKNOWN, m.prereadType());
+    }
   }
 }

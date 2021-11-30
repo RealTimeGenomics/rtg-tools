@@ -131,10 +131,10 @@ public class ReadSimCliTest extends AbstractCliTest {
           "seed=17"
       );
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      SdfStatistics.performStatistics(SequencesReaderFactory.createDefaultSequencesReader(outDir), outDir, mps.printStream(), true, false, false);
+      try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+        SdfStatistics.performStatistics(SequencesReaderFactory.createDefaultSequencesReader(outDir), outDir, mps.printStream(), true, false, false);
 
-      TestUtils.containsAll(mps.toString(),
+        TestUtils.containsAll(mps.toString(),
           "Maximum length     : 2",
           "Minimum length     : 2",
           "N                  : 0",
@@ -143,7 +143,8 @@ public class ReadSimCliTest extends AbstractCliTest {
           "G                  : 249",
           "T                  : 252",
           "Total residues     : 980"
-      );
+                              );
+      }
     }
   }
   public void testExecCoverageNs() throws Exception {
@@ -173,15 +174,14 @@ public class ReadSimCliTest extends AbstractCliTest {
           "seed=17"
       );
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
-      SdfStatistics.performStatistics(SequencesReaderFactory.createDefaultSequencesReader(outDir), outDir, mps.printStream(), true, false, false);
-
-      TestUtils.containsAll(mps.toString(),
-          "Total residues     : 980"
-      );
-      final String res = StringUtils.grep(mps.toString(), "^N *:");
-      final String count = res.replaceAll("^N *: ", "").replaceAll(StringUtils.LS, "");
-      assertTrue(Integer.parseInt(count) > 100);
+      try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+        SdfStatistics.performStatistics(SequencesReaderFactory.createDefaultSequencesReader(outDir),
+            outDir, mps.printStream(), true, false, false);
+        TestUtils.containsAll(mps.toString(), "Total residues     : 980");
+        final String res = StringUtils.grep(mps.toString(), "^N *:");
+        final String count = res.replaceAll("^N *: ", "").replaceAll(StringUtils.LS, "");
+        assertTrue(Integer.parseInt(count) > 100);
+      }
     }
   }
 

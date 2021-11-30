@@ -41,19 +41,18 @@ import junit.framework.TestCase;
 public class RtgVelocityLogChuteTest extends TestCase {
 
   public void test() {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    try {
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
       final RtgVelocityLogChute chute = new RtgVelocityLogChute();
       chute.log(LogChute.TRACE_ID, "not gonna log");
       chute.log(LogChute.DEBUG_ID, "totally logged");
       assertFalse(chute.isLevelEnabled(LogChute.TRACE_ID));
       assertTrue(chute.isLevelEnabled(LogChute.DEBUG_ID));
       assertTrue(chute.isLevelEnabled(LogChute.INFO_ID));
+      assertFalse(mps.toString().contains("not gonna log"));
+      assertTrue(mps.toString().contains("totally logged"));
     } finally {
       Diagnostic.setLogStream();
     }
-    assertFalse(mps.toString().contains("not gonna log"));
-    assertTrue(mps.toString().contains("totally logged"));
   }
 }

@@ -60,8 +60,8 @@ public class SamOutputTest extends AbstractNanoTest {
     rec.setReadString("acgt");
     rec.setBaseQualityString("####");
     rec.setCigarString("4=");
-    try (TestDirectory dir = new TestDirectory()) {
-      final MemoryPrintStream mps = new MemoryPrintStream();
+    try (TestDirectory dir = new TestDirectory();
+         final MemoryPrintStream mps = new MemoryPrintStream()) {
       try (SamOutput out = SamOutput.getSamOutput(new File(dir, "foo"), mps.outputStream(), header, true, true, null)) {
         out.getWriter().addAlignment(rec);
       }

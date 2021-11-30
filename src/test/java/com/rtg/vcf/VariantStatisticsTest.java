@@ -64,10 +64,11 @@ public class VariantStatisticsTest extends AbstractNanoTest {
   }
 
   public void testPrintStatistics() throws IOException {
-    final MemoryPrintStream ps = new MemoryPrintStream();
-    final VariantStatistics stats = new VariantStatistics(null);
-    stats.printStatistics(ps.outputStream());
-    TestUtils.containsAll(ps.toString(), BASE_OUTPUT);
+    try (final MemoryPrintStream ps = new MemoryPrintStream()) {
+      final VariantStatistics stats = new VariantStatistics(null);
+      stats.printStatistics(ps.outputStream());
+      TestUtils.containsAll(ps.toString(), BASE_OUTPUT);
+    }
   }
 
   private static final String[] VARIANTS = {

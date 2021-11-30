@@ -47,8 +47,7 @@ public class LogSimpleTest extends TestCase {
    */
   public final void test() {
     final ByteArrayOutputStream ba = new ByteArrayOutputStream();
-    final PrintStream ps = new PrintStream(ba);
-    final LogStream ls = new LogSimple(ps);
+    final LogStream ls = new LogSimple(new PrintStream(ba));
     assertEquals("LogSimple", ls.toString());
     ls.stream().println("l1");
     ls.stream().println("l2");

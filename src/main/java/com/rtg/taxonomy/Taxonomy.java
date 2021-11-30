@@ -256,15 +256,16 @@ public class Taxonomy {
    * @throws IOException if an error occurs while writing.
    */
   public void write(Writer writer) throws IOException {
-    final LineWriter lw = new LineWriter(writer);
+    try (final LineWriter lw = new LineWriter(writer)) {
+      lw.writeln(VERSION_HEADER);
+      lw.writeln("#taxID" + TAB + "parentID" + TAB + "rank" + TAB + "name");
 
-    lw.writeln(VERSION_HEADER);
-    lw.writeln("#taxID" + TAB + "parentID" + TAB + "rank" + TAB + "name");
-
-    final TaxonNode root = getRoot();
-    if (root != null) {
-      for (final TaxonNode node : root.depthFirstTraversal()) {
-        lw.writeln(node.getId() + TAB + node.getParentId() + TAB + node.getRank() + TAB + node.getName());
+      final TaxonNode root = getRoot();
+      if (root != null) {
+        for (final TaxonNode node : root.depthFirstTraversal()) {
+          lw.writeln(node.getId() + TAB + node.getParentId() + TAB + node.getRank() + TAB
+              + node.getName());
+        }
       }
     }
   }

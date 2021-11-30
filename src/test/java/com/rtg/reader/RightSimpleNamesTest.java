@@ -32,13 +32,10 @@ package com.rtg.reader;
 
 import java.io.IOException;
 
+import com.rtg.AbstractTest;
 import com.rtg.util.io.MemoryPrintStream;
 
-import junit.framework.TestCase;
-
-/**
- */
-public class RightSimpleNamesTest extends TestCase {
+public class RightSimpleNamesTest extends AbstractTest {
   public void testSomeMethod() throws IOException {
     final SimpleNames sprn = new SimpleNames();
     final RightSimpleNames rprn = new RightSimpleNames(sprn);

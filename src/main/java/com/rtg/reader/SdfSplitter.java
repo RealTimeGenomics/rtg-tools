@@ -125,45 +125,45 @@ public final class SdfSplitter extends LoggedCli {
     long guid = 0;
     final SequenceType type;
     int maxLength;
-    SdfReaderWrapper reader;
+
     long totalSequences;
-    try {
-      reader = new SdfReaderWrapper(inDirs.get(0), false, true);
+    try (SdfReaderWrapper reader = new SdfReaderWrapper(inDirs.get(0), false, true)) {
+      isPaired = reader.isPaired();
+      hasQuality = reader.hasQualityData();
+      hasNames = reader.hasNames();
+      while (guid == 0) {
+        guid = random.nextLong();
+      }
+      maxLength = reader.maxLength();
+      type = reader.type();
+      totalSequences = reader.numberSequences();
     } catch (final FileNotFoundException e) {
       throw new NoTalkbackSlimException(ErrorType.FILE_NOT_FOUND, inDirs.get(0).toString());
     }
-    isPaired = reader.isPaired();
-    hasQuality = reader.hasQualityData();
-    hasNames = reader.hasNames();
-    while (guid == 0) {
-      guid = random.nextLong();
-    }
-    maxLength = reader.maxLength();
-    type = reader.type();
-    totalSequences = reader.numberSequences();
-    reader.close();
     for (int i = 1; i < inDirs.size(); ++i) {
       final File dir = inDirs.get(i);
-      try {
-        reader = new SdfReaderWrapper(dir, false, isPaired);
+      try (SdfReaderWrapper r = new SdfReaderWrapper(dir, false, isPaired)) {
+        if (r.isPaired() != isPaired) {
+          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR,
+              "Mixed paired and non-paired SDF files provided.");
+        }
+        if (r.hasQualityData() != hasQuality) {
+          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR,
+              "Mixed quality and non-quality SDF files provided.");
+        }
+        if (r.hasNames() != hasNames) {
+          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR,
+              "Mixed names and non-names SDF files provided.");
+        }
+        if (!r.type().equals(type)) {
+          throw new NoTalkbackSlimException(ErrorType.INFO_ERROR,
+              "Mixed DNA and Protein SDF files provided.");
+        }
+        maxLength = Math.max(maxLength, r.maxLength());
+        totalSequences += r.numberSequences();
       } catch (final FileNotFoundException e) {
         throw new NoTalkbackSlimException(ErrorType.FILE_NOT_FOUND, dir.toString());
       }
-      if (reader.isPaired() != isPaired) {
-        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Mixed paired and non-paired SDF files provided.");
-      }
-      if (reader.hasQualityData() != hasQuality) {
-        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Mixed quality and non-quality SDF files provided.");
-      }
-      if (reader.hasNames() != hasNames) {
-        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Mixed names and non-names SDF files provided.");
-      }
-      if (!reader.type().equals(type)) {
-        throw new NoTalkbackSlimException(ErrorType.INFO_ERROR, "Mixed DNA and Protein SDF files provided.");
-      }
-      maxLength = Math.max(maxLength, reader.maxLength());
-      totalSequences += reader.numberSequences();
-      reader.close();
     }
 
     long numSequences = 0;
@@ -172,38 +172,34 @@ public final class SdfSplitter extends LoggedCli {
     final byte[] quality = new byte[maxLength];
     SdfWriterWrapper writer = null;
     final NameDuplicateDetector dupDetector = disableDupeDetect || !hasNames ? NameDuplicateDetector.getNullDetector() : new NameDuplicateDetector(totalSequences);
-    reader = null;
     int readerNumber = -1;
     final int numberOutputs = (int) Math.ceil(totalSequences / (double) sequencesPerOutput);
     Diagnostic.info(InformationType.INFO_USER, "sdfsplit is creating " + numberOutputs + " SDF" + (numberOutputs != 1 ? "s" : ""));
     try {
       for (final File dir : inDirs) {
-        try {
-          reader = new SdfReaderWrapper(dir, useMem, false);
+        try (SdfReaderWrapper reader = new SdfReaderWrapper(dir, useMem, false)) {
           if (writer != null) {
             writer.setReader(reader);
           }
           ++readerNumber;
+          for (long seq = 0; seq < reader.numberSequences(); ++seq) {
+            if (writer == null) {
+              final String fname;
+              fname = String.format("%06d", numOutputs);
+              writer = new SdfWriterWrapper(new File(outDir, fname), reader, forceCompression);
+              ++numOutputs;
+            }
+            dupDetector.addPair(reader.name(seq), (int) seq, readerNumber);
+            writer.writeSequence(seq, data, quality);
+            if (++numSequences == sequencesPerOutput) {
+              writer.close();
+              writer = null;
+              numSequences = 0;
+            }
+          }
         } catch (final FileNotFoundException e) {
           throw new NoTalkbackSlimException(ErrorType.FILE_NOT_FOUND, dir.toString());
         }
-        for (long seq = 0; seq < reader.numberSequences(); ++seq) {
-          if (writer == null) {
-            final String fname;
-            fname = String.format("%06d", numOutputs);
-            writer = new SdfWriterWrapper(new File(outDir, fname), reader, forceCompression);
-            ++numOutputs;
-          }
-          dupDetector.addPair(reader.name(seq), (int) seq, readerNumber);
-          writer.writeSequence(seq, data, quality);
-          if (++numSequences == sequencesPerOutput) {
-            writer.close();
-            writer = null;
-            numSequences = 0;
-          }
-        }
-        reader.close();
-        reader = null;
       }
       if (!disableDupeDetect) {
         readerNumber = 0;
@@ -232,14 +228,8 @@ public final class SdfSplitter extends LoggedCli {
         }
       }
     } finally {
-      try {
-        if (reader != null) {
-          reader.close();
-        }
-      } finally {
-        if (writer != null) {
-          writer.close();
-        }
+      if (writer != null) {
+        writer.close();
       }
     }
   }

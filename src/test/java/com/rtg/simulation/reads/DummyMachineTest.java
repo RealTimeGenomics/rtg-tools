@@ -110,37 +110,39 @@ public class DummyMachineTest extends TestCase {
 
   public void test() throws Exception {
     final AbstractMachine m = getMachine();
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
-    m.setReadWriter(w);
-    m.mWorkspace = new int[10];
-    m.mReadBytes = new byte[10];
-    m.mQualityBytes = new byte[10];
-    final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastaReadWriter w = new FastaReadWriter(out.lineWriter());
+      m.setReadWriter(w);
+      m.mWorkspace = new int[10];
+      m.mReadBytes = new byte[10];
+      m.mQualityBytes = new byte[10];
+      final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
-    m.reseedErrorRandom(21);
-    assertEquals(0, m.process(0, frag, frag.length, 1, 10));
-    assertTrue(Arrays.equals(new byte[] {1, 1, 1, 1, 1, 1, 3, 1, 1, 1}, m.mReadBytes));
+      m.reseedErrorRandom(21);
+      assertEquals(0, m.process(0, frag, frag.length, 1, 10));
+      assertTrue(Arrays.equals(new byte[] {1, 1, 1, 1, 1, 1, 3, 1, 1, 1}, m.mReadBytes));
 
-    assertEquals("6.1X3.", m.getCigar(false));
-    assertEquals("6.1X6.", m.getCigar(true));
+      assertEquals("6.1X3.", m.getCigar(false));
+      assertEquals("6.1X6.", m.getCigar(true));
 
-    assertEquals(0, m.mResidueCount);   //this is never incremented by process...
-    assertEquals(0, m.residues());
+      assertEquals(0, m.mResidueCount); // this is never incremented by process...
+      assertEquals(0, m.residues());
 
-    assertEquals(0, m.process(0, frag, frag.length, 1, 10));
-    assertEquals("10.", m.getCigar(false));
-    assertEquals(0, m.process(0, frag, frag.length, 1, 10));
-    assertEquals("1X9.", m.getCigar(false));
-    for (int c = 0; c < 1551; ++c) {
-      m.process(0, frag, frag.length, 1, 10);
+      assertEquals(0, m.process(0, frag, frag.length, 1, 10));
+      assertEquals("10.", m.getCigar(false));
+      assertEquals(0, m.process(0, frag, frag.length, 1, 10));
+      assertEquals("1X9.", m.getCigar(false));
+      for (int c = 0; c < 1551; ++c) {
+        m.process(0, frag, frag.length, 1, 10);
+      }
+      // System.out.println(m.getCigar(false, 0, 10, 10));
+      assertEquals("9.1D1.", m.getCigar(false));
+      for (int c = 0; c < 1134; ++c) {
+        m.process(0, frag, frag.length, 1, 10);
+      }
+      assertEquals("3.1I6.", m.getCigar(false));
+
     }
-    //    System.out.println(m.getCigar(false, 0, 10, 10));
-    assertEquals("9.1D1.", m.getCigar(false));
-    for (int c = 0; c < 1134; ++c) {
-      m.process(0, frag, frag.length, 1, 10);
-    }
-    assertEquals("3.1I6.", m.getCigar(false));
   }
 
   public void testNameFormat() {

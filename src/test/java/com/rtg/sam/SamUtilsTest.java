@@ -212,12 +212,12 @@ public class SamUtilsTest extends TestCase {
   }
 
   public void testGuid() {
-    try {
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
       final SAMFileHeader sf = new SAMFileHeader();
       sf.addComment("READ-SDF-ID:" + Long.toHexString(123456));
       SamUtils.checkReadsGuid(sf, new SdfId(123456)); //this should work
 
-      final MemoryPrintStream mps = new MemoryPrintStream();
+
       Diagnostic.setLogStream(mps.printStream());
       SamUtils.checkReadsGuid(sf, new SdfId(12));
       TestUtils.containsAll(mps.toString(), "Current reads SDF-ID does not match SDF-ID of reads used during mapping.");
@@ -297,16 +297,17 @@ public class SamUtilsTest extends TestCase {
 
 
   public void testSamRunId() {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    final SAMFileHeader header = new SAMFileHeader();
-    header.addComment(SamUtils.RUN_ID_ATTRIBUTE + "booyahhhhh");
-    SamUtils.logRunId(header);
-    assertTrue(mps.toString().contains("Referenced SAM file with RUN-ID: booyahhhhh"));
-    mps.reset();
-    assertEquals("", mps.toString().trim());
-    SamUtils.logRunId(header);
-    assertEquals("", mps.toString().trim());
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
+      final SAMFileHeader header = new SAMFileHeader();
+      header.addComment(SamUtils.RUN_ID_ATTRIBUTE + "booyahhhhh");
+      SamUtils.logRunId(header);
+      assertTrue(mps.toString().contains("Referenced SAM file with RUN-ID: booyahhhhh"));
+      mps.reset();
+      assertEquals("", mps.toString().trim());
+      SamUtils.logRunId(header);
+      assertEquals("", mps.toString().trim());
+    }
   }
 
   public void testCigarCodes() {

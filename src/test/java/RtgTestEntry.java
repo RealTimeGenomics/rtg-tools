@@ -148,7 +148,6 @@ public final class RtgTestEntry {
    * @param args list of test classes to run
    * @throws ClassNotFoundException can't load the specified classes
    */
-  @SuppressWarnings("unchecked")
   public static void main(final String[] args) throws ClassNotFoundException {
     final JUnitCore jUnitCore = new JUnitCore();
     if (CAPTURE_OUTPUT) {

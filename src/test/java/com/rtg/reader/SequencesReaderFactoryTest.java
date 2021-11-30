@@ -30,29 +30,24 @@
 package com.rtg.reader;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.InputStream;
-
+import com.rtg.AbstractTest;
 import com.rtg.mode.DNAFastaSymbolTable;
 import com.rtg.util.TestUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.LongRange;
-import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.MemoryPrintStream;
-import com.rtg.util.test.FileHelper;
-
-import junit.framework.TestCase;
+import com.rtg.util.io.TestDirectory;
 
 /**
  * Tests corresponding class
  */
-public class SequencesReaderFactoryTest extends TestCase {
+public class SequencesReaderFactoryTest extends AbstractTest {
 
   public void testFactory() throws Exception {
-    final MemoryPrintStream err = new MemoryPrintStream();
-    Diagnostic.setLogStream(err.printStream());
-    final File tmpDir = FileUtils.createTempDir("testSeqReaderFact", "blah");
-    try {
+    try (final TestDirectory tmpDir = new TestDirectory("testSeqReaderFact");
+         final MemoryPrintStream err = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(err.printStream());
       final InputStream fqis = new ByteArrayInputStream((">test1\nacgta\n"
         + ">test2\nagtcatg\n"
         + ">test3\nacgtttggct\n"
@@ -104,10 +99,6 @@ public class SequencesReaderFactoryTest extends TestCase {
 
       sr = SequencesReaderFactory.createMemorySequencesReader(null, true, LongRange.NONE);
       assertNull(sr);
-
-    } finally {
-      Diagnostic.setLogStream();
-      FileHelper.deleteAll(tmpDir);
     }
   }
 

@@ -39,7 +39,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
-
+import com.rtg.AbstractTest;
 import com.rtg.util.Environment;
 import com.rtg.util.License;
 import com.rtg.util.MD5Utils;
@@ -51,11 +51,9 @@ import com.rtg.util.io.IOUtils;
 import com.rtg.util.io.MemoryPrintStream;
 import com.rtg.util.io.TestDirectory;
 
-import junit.framework.TestCase;
-
 /**
  */
-public class UsageServerTest extends TestCase {
+public class UsageServerTest extends AbstractTest {
 
   public void test1() throws IOException {
     try (TestDirectory dir = new TestDirectory()) {
@@ -134,9 +132,8 @@ public class UsageServerTest extends TestCase {
   }
 
   public void testErrors() throws Exception {
-    final MemoryPrintStream mps = new MemoryPrintStream();
-    Diagnostic.setLogStream(mps.printStream());
-    try {
+    try (final MemoryPrintStream mps = new MemoryPrintStream()) {
+      Diagnostic.setLogStream(mps.printStream());
       try (TestDirectory dir = new TestDirectory()) {
         final UsageServer us = new UsageServer(0, dir, 4);
         us.start();
@@ -172,8 +169,6 @@ public class UsageServerTest extends TestCase {
         assertTrue(mps.toString().contains("Failed to decode parameter: 'f%ag=ra%3d'"));
         //final HttpUsageTrackingClient http = new HttpUsageTrackingClient("http://localhost:" + us.getPort() + "/usage", new UsageConfiguration(new Properties()), false);
       }
-    } finally {
-      Diagnostic.setLogStream();
     }
   }
 

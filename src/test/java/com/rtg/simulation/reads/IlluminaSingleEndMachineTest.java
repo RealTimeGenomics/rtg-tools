@@ -48,22 +48,23 @@ public class IlluminaSingleEndMachineTest extends DummyIlluminaMachineTest {
   @Override
   public void test() throws Exception {
     final IlluminaSingleEndMachine m = (IlluminaSingleEndMachine) getMachine(42);
-    final MemoryPrintStream out = new MemoryPrintStream();
-    final FastaReadWriter w = new FastaReadWriter(out.lineWriter()) {
+    try (final MemoryPrintStream out = new MemoryPrintStream()) {
+      final FastaReadWriter w = new FastaReadWriter(out.lineWriter()) {
         @Override
         public void writeRead(String name, byte[] data, byte[] qual, int length) throws IOException {
           super.writeRead(name, data, qual, length);
           assertEquals("[20, 20, 20, 20]", Arrays.toString(qual));
         }
       };
-    m.setReadWriter(w);
-    final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-    m.setReadLength(4);
+      m.setReadWriter(w);
+      final byte[] frag = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+      m.setReadLength(4);
 
-    m.processFragment("name/", 30, frag, frag.length);
-    assertEquals(">0 name/31/F/4.\nAAAA\n", out.toString());
+      m.processFragment("name/", 30, frag, frag.length);
+      assertEquals(">0 name/31/F/4.\nAAAA\n", out.toString());
 
-    assertEquals(4, m.mResidueCount);
-    assertEquals(4, m.mWorkspace.length);
+      assertEquals(4, m.mResidueCount);
+      assertEquals(4, m.mWorkspace.length);
+    }
   }
 }

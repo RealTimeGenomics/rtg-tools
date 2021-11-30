@@ -146,10 +146,6 @@ public final class ReferenceDetector {
       return mSeqName;
     }
 
-    public int count() {
-      return mValues.size();
-    }
-
     public String getValue(int index) {
       return mValues.get(index);
     }

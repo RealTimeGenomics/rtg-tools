@@ -56,7 +56,8 @@ public class UsageServerCliTest extends TestCase {
 
   public void test() throws Exception {
     GlobalFlags.resetAccessedStatus();
-    try (TestDirectory dir = new TestDirectory(); TestDirectory configDir = new TestDirectory()) {
+    try (TestDirectory dir = new TestDirectory(); TestDirectory configDir = new TestDirectory();
+         final MemoryPrintStream ps = new MemoryPrintStream()) {
       final File configFile = UsageConfiguration.createSimpleConfigurationFile(new File(configDir, "config"), dir.getPath(), null);
       final UsageServerCli cli = new UsageServerCli() {
         @Override
@@ -65,7 +66,7 @@ public class UsageServerCliTest extends TestCase {
           return super.mainExec(out, err);
         }
       };
-      final MemoryPrintStream ps = new MemoryPrintStream();
+
       final int[] code = new int[1];
       code[0] = 1001;
       final Runnable run = new Runnable() {

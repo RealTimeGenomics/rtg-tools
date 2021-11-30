@@ -155,9 +155,8 @@ public class SdfStatisticsTest extends AbstractCliTest {
 
 
   public void testLengths() throws IOException {
-    final MemoryPrintStream ps = new MemoryPrintStream();
     final String fasta = ">123456789012345678901\nacgtgtgtgtcttagggctcactggtcatgca\n>bob the buuilder\ntagttcagcatcgatca\n>hobos r us\nnaccccaccccacaaacccaann";
-    try (final TestDirectory dir = new TestDirectory()) {
+    try (final TestDirectory dir = new TestDirectory(); final MemoryPrintStream ps = new MemoryPrintStream()) {
       final File preread = ReaderTestUtils.getDNADir(fasta, dir);
       try (final AnnotatedSequencesReader reader = SequencesReaderFactory.createDefaultSequencesReader(preread)) {
         SdfStatistics.printSequenceNameAndLength(reader, ps.printStream(), false);

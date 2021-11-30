@@ -67,25 +67,28 @@ public class RuntimeIOIteratorTest extends TestCase {
   }
 
   public void testIterator() throws IOException {
-    final MockIOIterator mi = new MockIOIterator("a", "b", "c");
-    StringBuilder sb = new StringBuilder();
-    mi.forEach(sb::append);
-    assertEquals("abc", sb.toString());
+    try (final MockIOIterator mi = new MockIOIterator("a", "b", "c")) {
+      StringBuilder sb = new StringBuilder();
+      mi.forEach(sb::append);
+      assertEquals("abc", sb.toString());
 
-    final RuntimeIOIterator<String> ri = new RuntimeIOIterator<>(new MockIOIterator("a", "b", "c"));
-    sb = new StringBuilder();
-    ri.forEach(sb::append);
-    assertEquals("abc", sb.toString());
+      final RuntimeIOIterator<String> ri =
+          new RuntimeIOIterator<>(new MockIOIterator("a", "b", "c"));
+      sb = new StringBuilder();
+      ri.forEach(sb::append);
+      assertEquals("abc", sb.toString());
+    }
   }
 
   public void testException() {
-    final MockIOIterator mi = new MockIOIterator("a", null, "c");
     final StringBuilder sb = new StringBuilder();
-    try {
-      mi.forEach(sb::append);
-      fail();
-    } catch (IOException e) {
-      assertEquals(1, mi.mPos);
+    try (final MockIOIterator mi = new MockIOIterator("a", null, "c")) {
+      try {
+        mi.forEach(sb::append);
+        fail();
+      } catch (IOException e) {
+        assertEquals(1, mi.mPos);
+      }
     }
     assertEquals("a", sb.toString());
   }

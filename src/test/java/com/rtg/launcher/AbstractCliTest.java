@@ -135,10 +135,11 @@ public abstract class AbstractCliTest extends AbstractNanoTest {
    */
   protected String checkHandleFlagsOut(String... args) {
     final StringWriter writer = new StringWriter();
-    final MemoryPrintStream err = new MemoryPrintStream();
-    GlobalFlags.resetAccessedStatus();
-    final boolean val = mCli.handleFlags(args, writer, err.printStream());
-    assertTrue(err.toString(), val);
+    try (final MemoryPrintStream err = new MemoryPrintStream()) {
+      GlobalFlags.resetAccessedStatus();
+      final boolean val = mCli.handleFlags(args, writer, err.printStream());
+      assertTrue(err.toString(), val);
+    }
     return writer.toString();
   }
 

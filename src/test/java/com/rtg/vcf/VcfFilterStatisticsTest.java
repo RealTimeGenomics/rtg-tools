@@ -44,59 +44,41 @@ import junit.framework.TestCase;
 public class VcfFilterStatisticsTest extends TestCase {
 
   public void test() {
-    final VcfFilterStatistics stats = new VcfFilterStatistics();
-    final MemoryPrintStream stream = new MemoryPrintStream();
-    stats.printStatistics(stream.outputStream());
-    final String expected = "" + LS
-        + "Total records : 0" + LS
-        + "Remaining records : 0" + LS
-        ;
-    assertEquals(expected, stream.toString());
-    stream.reset();
-    stats.increment(Stat.TOTAL_COUNT);
-    stats.incrementInfoTag("Bar");
-    stats.incrementFilterTag("Foo");
-    stats.printStatistics(stream.outputStream());
-    final String expected2  = "" + LS
-                            + "Total records : 1" + LS
-                            + "Filtered due to Foo : 1" + LS
-                            + "Filtered due to Bar : 1" + LS
-                            + "Remaining records : 0" + LS
-        ;
-    assertEquals(expected2, stream.toString());
-    stream.reset();
+    try (final MemoryPrintStream stream = new MemoryPrintStream()) {
+      final VcfFilterStatistics stats = new VcfFilterStatistics();
+      stats.printStatistics(stream.outputStream());
+      final String expected = "" + LS + "Total records : 0" + LS + "Remaining records : 0" + LS;
+      assertEquals(expected, stream.toString());
+      stream.reset();
+      stats.increment(Stat.TOTAL_COUNT);
+      stats.incrementInfoTag("Bar");
+      stats.incrementFilterTag("Foo");
+      stats.printStatistics(stream.outputStream());
+      final String expected2 = "" + LS + "Total records : 1" + LS + "Filtered due to Foo : 1" + LS
+          + "Filtered due to Bar : 1" + LS + "Remaining records : 0" + LS;
+      assertEquals(expected2, stream.toString());
+      stream.reset();
 
-    for (int i = 0; i < 15; ++i) {
-      for (VcfFilterStatistics.Stat s : Stat.values()) {
-        if (s.ordinal() > i - 2) {
-          stats.increment(s);
+      for (int i = 0; i < 15; ++i) {
+        for (VcfFilterStatistics.Stat s : Stat.values()) {
+          if (s.ordinal() > i - 2) {
+            stats.increment(s);
+          }
         }
       }
-    }
 
-    stats.incrementInfoTag("Bar");
-    stats.incrementFilterTag("Foo");
-    stats.printStatistics(stream.outputStream());
-    TestUtils.containsAll(stream.toString(),
-        "Total records",
-        "Filtered due to Foo",
-        "Filtered due to Bar",
-        "Filtered due to quality",
-        "Filtered due to genotype quality",
-        "Filtered due to AVR score",
-        "Filtered due to sample read depth",
-        "Filtered due to combined read depth",
-        "Filtered due to ambiguity ratio",
-        "Filtered due to allele balance",
-        "Filtered due to same as reference",
-        "Filtered due to all samples same as reference",
-        "Filtered due to not a SNP",
-        "Filtered due to simple SNP",
-        "Filtered due to not in keep set",
-        "Filtered due to overlap with previous",
-        "Filtered due to density window",
-        "Filtered due to include file",
-        "Filtered due to exclude file",
-        "Remaining records");
+      stats.incrementInfoTag("Bar");
+      stats.incrementFilterTag("Foo");
+      stats.printStatistics(stream.outputStream());
+      TestUtils.containsAll(stream.toString(), "Total records", "Filtered due to Foo",
+          "Filtered due to Bar", "Filtered due to quality", "Filtered due to genotype quality",
+          "Filtered due to AVR score", "Filtered due to sample read depth",
+          "Filtered due to combined read depth", "Filtered due to ambiguity ratio",
+          "Filtered due to allele balance", "Filtered due to same as reference",
+          "Filtered due to all samples same as reference", "Filtered due to not a SNP",
+          "Filtered due to simple SNP", "Filtered due to not in keep set",
+          "Filtered due to overlap with previous", "Filtered due to density window",
+          "Filtered due to include file", "Filtered due to exclude file", "Remaining records");
+    }
   }
 }
