@@ -37,7 +37,7 @@ import java.util.TreeMap;
  * Store information about multiple intervals on a single sequence.
  * Overlapping regions are joined together into a single interval.
  */
-class MergedIntervals {
+public class MergedIntervals {
 
   /**
    * Map of region start to region end
@@ -49,7 +49,7 @@ class MergedIntervals {
    * Add a new interval to the set
    * @param interval the region to add
    */
-  void add(Interval interval) {
+  public void add(Interval interval) {
     add(interval.getStart(), interval.getEnd());
   }
 
@@ -58,7 +58,7 @@ class MergedIntervals {
    * @param start 0-based inclusive start position of the region
    * @param end 0-based exclusive end position of the region
    */
-  void add(int start, int end) {
+  public void add(int start, int end) {
     final Map.Entry<Integer, Integer> floor = mIntervals.floorEntry(start);
     final Map.Entry<Integer, Integer> endFloor = mIntervals.floorEntry(end);
     final int actualStart;
@@ -169,7 +169,7 @@ class MergedIntervals {
    * @param end zero based end position within the sequence
    * @return true if the range specified is overlapped by the intervals
    */
-  boolean overlapped(int start, int end) {
+  public boolean overlapped(int start, int end) {
     final Map.Entry<Integer, Integer> floor = mIntervals.lowerEntry(end);
     if (floor == null) {
       return false;

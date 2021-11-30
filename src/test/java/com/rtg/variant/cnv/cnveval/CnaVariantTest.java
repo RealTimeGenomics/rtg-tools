@@ -55,15 +55,21 @@ public class CnaVariantTest extends TestCase {
     assertFalse(var.isCorrect());
     assertEquals(CnaType.DEL, var.cnaType());
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());
+    assertEquals(123, var.span().getStart());
+    assertEquals(124, var.span().getEnd());
 
     var.setCorrect(true);
     assertTrue(var.isCorrect());
 
     var = new CnaVariant(new Range(0, 200124), rec, null);
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());
+    assertEquals(123, var.span().getStart());
+    assertEquals(100123, var.span().getEnd());
 
     var = new CnaVariant(new Range(50123, 100000), rec, null);
     assertEquals(CnaVariant.SpanType.FULL, var.spanType());
+    assertEquals(50123, var.span().getStart());
+    assertEquals(100000, var.span().getEnd());
 
     var = new CnaVariant(new Range(100122, 200124), rec, null);
     assertEquals(CnaVariant.SpanType.PARTIAL, var.spanType());

@@ -39,8 +39,9 @@ import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.intervals.IntervalComparator;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.variant.cnv.CnaType;
+import com.rtg.variant.cnv.cnveval.CnaVariant.RegionContext;
+import com.rtg.variant.cnv.cnveval.CnaVariant.SpanType;
 import com.rtg.vcf.VcfRecord;
-import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.eval.VariantSetType;
 import com.rtg.vcf.header.VcfHeader;
 
@@ -88,7 +89,7 @@ class CnaVariantSet extends LinkedHashMap<String, CnaVariantList> {
 
   private void sanityCheck() {
     // Check for cases where the intersection between variant set and evaluation region yields multiple variants for an
-    // evaluation region region.
+    // evaluation region.
 
     // For calls, this is a reasonably common occurrence (e.g. when gene-level evaluation and calls are small pieces of the gene).
     // In this case, each resulting CnaVariant will get an appropriate match status as long as there is at most a single
@@ -98,26 +99,59 @@ class CnaVariantSet extends LinkedHashMap<String, CnaVariantList> {
     // or if we have multiple baseline variants for any given evaluation region (handled here).
     for (final CnaVariantList chrVars : values()) {
       CnaVariant last = null;
-      int overlap = 0;
+      int overlaps = 0;
       final MultiSet<CnaType> types = new MultiSet<>();
-      for (CnaVariant v : chrVars) {
+      for (int i = 0; i < chrVars.size(); i++) {
+        final CnaVariant v =  chrVars.get(i);
         if (last != null && last.getStart() == v.getStart() && last.getEnd() == v.getEnd()) {
-          overlap++;
+          overlaps++;
         } else {
-          if (overlap > 0) {
-            final SequenceNameLocusSimple l = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
-            final String msg = "Multiple " + mType.label() + " variants apply to region: " + l + " " + types.toString();
-            if (mType == VariantSetType.BASELINE) {
-              Diagnostic.warning(msg);
-            } else {
-              Diagnostic.userLog(msg);
-            }
-          }
-          overlap = 0;
+          checkOverlaps(chrVars, last, overlaps, i, types);
+          overlaps = 0;
           types.clear();
         }
         last = v;
         types.add(v.cnaType());
+      }
+      checkOverlaps(chrVars, last, overlaps, chrVars.size(), types);
+    }
+  }
+
+  private void checkOverlaps(final CnaVariantList chrVars, final CnaVariant last, final int overlaps, final int end, final MultiSet<CnaType> types) {
+    if (overlaps > 0) {
+      final int start = end - 1 - overlaps;
+      final SequenceNameLocusSimple l = new SequenceNameLocusSimple(chrVars.get(start).record().getSequenceName(), chrVars.get(start).getStart(), chrVars.get(start).getEnd());
+
+      // We trust that if they are all PARTIAL, they don't actually overlap with each other, so only warn if one of them is FULL.
+      // We could check this more thoroughly if we really wanted to.
+      for (int j = start; j < end; j++) {
+        if (chrVars.get(j).spanType() == SpanType.FULL) {
+          Diagnostic.warning("Multiple " + mType.label() + " variants apply to region: " + l + " " + types.toString());
+          break;
+        }
+      }
+
+      final String post;
+      if (types.keySet().size() > 1) {
+        // Mix of DEL/DUP, mark all in the region as inconsistent
+        // Perhaps we should arbitrarily retain one.
+        post = " (mixed types, marking all as inconsistent)";
+        for (int j = start; j < end; j++) {
+          chrVars.get(j).setRegionContext(RegionContext.INCONSISTENT);
+        }
+      } else {
+        // Consistent types, mark all but the first in the region as redundant
+        post = " (keeping first, types are consistent)";
+        for (int j = start + 1; j < end; j++) {
+          chrVars.get(j).setRegionContext(RegionContext.REDUNDANT);
+        }
+      }
+
+      final String msg = "Multiple " + mType.label() + " variants apply to region: " + l + " " + types.toString() + post;
+      if (mType == VariantSetType.BASELINE) {
+        Diagnostic.warning(msg);
+      } else {
+        Diagnostic.userLog(msg);
       }
     }
   }

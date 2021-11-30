@@ -42,10 +42,21 @@ class CnaVariant extends Range {
 
   enum SpanType { PARTIAL, FULL}
 
+  enum RegionContext {
+    /** This variant can be evaluated */
+    NORMAL,
+    /** This variant should be ignored (conflicts with other variants) */
+    INCONSISTENT,
+    /** This variant should be ignored (duplicates another variant) */
+    REDUNDANT
+  }
+
   private final String mNames;
   private final VcfRecord mRec;
   private final CnaType mCnaType;
-  private final SpanType mSpan;
+  private final SpanType mSpanType;
+  private final Range mSpan;
+  private RegionContext mRegionContext = RegionContext.NORMAL;
   private boolean mCorrect;
 
   CnaVariant(Interval range, VcfRecord rec, String names) {
@@ -58,8 +69,10 @@ class CnaVariant extends Range {
     mCnaType = CnaType.valueOf(rec);
     mNames = names == null ? "" : names;
     assert mCnaType != null;
-    assert Interval.overlaps(new Range(start, end), new Range(rec.getStart(), VcfUtils.getEnd(rec) - 1));
-    mSpan = rec.getStart() > start || VcfUtils.getEnd(rec) < end ? SpanType.PARTIAL : SpanType.FULL;
+    final int recEnd = VcfUtils.getEnd(rec) - 1;
+    assert Interval.overlaps(new Range(start, end), new Range(rec.getStart(), recEnd));
+    mSpanType = rec.getStart() > start || VcfUtils.getEnd(rec) < end ? SpanType.PARTIAL : SpanType.FULL;
+    mSpan = new Range(Math.max(start, rec.getStart()), Math.min(end, recEnd));
   }
 
   CnaType cnaType() {
@@ -67,6 +80,18 @@ class CnaVariant extends Range {
   }
 
   SpanType spanType() {
+    return mSpanType;
+  }
+
+  void setRegionContext(RegionContext context) {
+    mRegionContext = context;
+  }
+
+  RegionContext context() {
+    return mRegionContext;
+  }
+
+  Interval span() {
     return mSpan;
   }
 
@@ -87,6 +112,7 @@ class CnaVariant extends Range {
   }
 
   public String toString() {
-    return super.toString() + " " + mCnaType + " " + mSpan;
+    return super.toString() + " " + mCnaType + " " + mSpanType + " " + mRegionContext;
   }
+
 }

@@ -53,10 +53,10 @@ import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
 import com.rtg.sam.SamRangeUtils;
 import com.rtg.util.StringUtils;
-import com.rtg.util.Utils;
 import com.rtg.util.cli.CommonFlagCategories;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.util.intervals.Interval;
 import com.rtg.util.intervals.RangeList;
 import com.rtg.util.intervals.ReferenceRanges;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
@@ -64,6 +64,7 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LogStream;
 import com.rtg.variant.cnv.CnaType;
 import com.rtg.variant.cnv.CnvRecordFilter;
+import com.rtg.variant.cnv.cnveval.CnaVariant.RegionContext;
 import com.rtg.vcf.AssertVcfSorted;
 import com.rtg.vcf.PassOnlyFilter;
 import com.rtg.vcf.VcfFilter;
@@ -92,7 +93,6 @@ import com.rtg.vcf.header.VcfNumber;
 public class CnvEvalCli extends LoggedCli {
 
   private static final String REGION_NAMES = "names";
-  private static final String ROC_SUBSET = "roc-subset";
   private static final String RETAIN_OVERLAPS = "Xretain-overlapping-calls";
 
   /** Defines the RocFilters we want to use with cnveval */
@@ -200,22 +200,26 @@ public class CnvEvalCli extends LoggedCli {
     roc.filters().forEach(f -> f.setHeader(baseline.getHeader()));
     for (final CnaVariantList chrVars : baseline.values()) {
       for (final CnaVariant v : chrVars) {
-        roc.incrementBaselineCount(v.record(), sampleCol, v.isCorrect());
+        if (v.context() == RegionContext.NORMAL) {
+          roc.incrementBaselineCount(v.record(), sampleCol, v.isCorrect());
+        }
       }
     }
 
     roc.filters().forEach(f -> f.setHeader(calls.getHeader()));
     for (final CnaVariantList chrVars : calls.values()) {
       for (final CnaVariant v : chrVars) {
-        if (v.isCorrect()) {
-          roc.addRocLine(v.record(), sampleCol, 1, 0, 1);
-        } else {
-          roc.addRocLine(v.record(), sampleCol, 0, 1, 0);
+        if (v.context() == RegionContext.NORMAL) {
+          if (v.isCorrect()) {
+            roc.addRocLine(v.record(), sampleCol, 1, 0, 1);
+          } else {
+            roc.addRocLine(v.record(), sampleCol, 0, 1, 0);
+          }
         }
       }
     }
 
-    writeVariants(baseline, null, sampleCol, gzip, index);
+    writeVariants(baseline, rocExtractor, sampleCol, gzip, index);
     writeVariants(calls, rocExtractor, sampleCol, gzip, index);
 
     roc.missingScoreWarning();
@@ -225,47 +229,25 @@ public class CnvEvalCli extends LoggedCli {
     return 0;
   }
 
-  private void writeVariants(CnaVariantSet variants, RocSortValueExtractor extractor, int sampleCol, boolean gzip, boolean index) throws IOException {
+  private void writeVariants(CnaVariantSet variants, final RocSortValueExtractor extractor, final int sampleCol, boolean gzip, boolean index) throws IOException {
     final VariantSetType setType = variants.variantSetType();
     final boolean writeNames = mFlags.isSet(REGION_NAMES);
 
     // Write out a BED file of each evaluation region indicating status
+    final List<BedAnnotation> annots = BedAnnotation.makeBedAnnotations(setType, extractor, sampleCol, writeNames);
     final File bedFile = FileUtils.getZippedFileName(gzip, new File(outputDirectory(), setType == VariantSetType.BASELINE ? "baseline.bed" : "calls.bed"));
     Diagnostic.userLog("Writing " + setType.label() + " region results to " + bedFile);
     try (final BedWriter w = new BedWriter(FileUtils.createOutputStream(bedFile))) {
-      final ArrayList<String> cols = new ArrayList<>(Arrays.asList("chrom", "start", "end", "status", "svtype", "span"));
-      if (writeNames) {
-        cols.add("name");
-      }
-      cols.add("original_pos");
-      if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
-        cols.add(extractor.toString());
+      final ArrayList<String> cols = new ArrayList<>(Arrays.asList("chrom", "start", "end"));
+      for (BedAnnotation b : annots) {
+        cols.add(b.name());
       }
       w.writeComment(StringUtils.join("\t", cols));
 
       for (final CnaVariantList chrVars : variants.values()) {
         for (final CnaVariant v : chrVars) {
-          final String status;
-          switch (setType) {
-            case BASELINE:
-              status = v.isCorrect() ? "TP" : "FN";
-              break;
-            case CALLS:
-              status = v.isCorrect() ? "TP" : "FP";
-              break;
-            default:
-              throw new RuntimeException("Unknown variant set type: " + setType);
-          }
-          final SequenceNameLocusSimple originalSpan = new SequenceNameLocusSimple(v.record().getSequenceName(), v.record().getStart(), VcfUtils.getEnd(v.record()));
-          final ArrayList<String> annots = new ArrayList<>(Arrays.asList(status, v.cnaType().name(), v.spanType().name()));
-          if (writeNames) {
-            annots.add(v.names());
-          }
-          annots.add(originalSpan.toString());
-          if (extractor != null && extractor != RocSortValueExtractor.NULL_EXTRACTOR) {
-            annots.add(Utils.realFormat(extractor.getSortValue(v.record(), sampleCol), 4));
-          }
-          w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(), annots.toArray(new String[0])));
+          w.write(new BedRecord(v.record().getSequenceName(), v.getStart(), v.getEnd(),
+                                annots.stream().map(a -> a.value(v)).toArray(String[]::new)));
         }
       }
     }
@@ -300,7 +282,9 @@ public class CnvEvalCli extends LoggedCli {
     try (final VcfWriter writer = new VcfWriterFactory(mFlags).addRunInfo(true).make(header, vcfFile)) {
       for (final CnaRecordStats stats : variants.records()) {
         final VcfRecord rec = stats.record();
-        rec.setInfo(infoFrac, String.format("%.3g", stats.hitFraction()));
+        if (stats.hit() > 0 || stats.miss() > 0) {
+          rec.setInfo(infoFrac, String.format("%.3g", stats.hitFraction()));
+        }
         if (stats.hit() > 0) {
           rec.setInfo(infoHit, Integer.toString(stats.hit()));
         }
@@ -319,20 +303,21 @@ public class CnvEvalCli extends LoggedCli {
     // Sets each CnaVariant correctness status
     for (Map.Entry<String, CnaVariantList> chrCalls : calls.entrySet()) {
       CnaVariantList chrBaseline = baseline.get(chrCalls.getKey());
-      for (final CnaVariant c : chrCalls.getValue()) {
-        if (chrBaseline != null) {
-          chrBaseline = (CnaVariantList) chrBaseline.clone();
-          for (int bPos = 0; bPos < chrBaseline.size(); ++bPos) {
-            final CnaVariant b = chrBaseline.get(bPos);
-            // If the baseline variant is encapsulated by the call, has the same amplification type, and hasn't already been matched, consider them matched
-            if (c.getStart() < b.getEnd() && c.getEnd() > b.getStart() // TODO: Do we want to handle CIPOS/CIEND?
-              && c.cnaType() == b.cnaType() && !b.isCorrect()) {
-              c.setCorrect(true);
-              b.setCorrect(true);
-              chrBaseline.remove(bPos); // Less stuff to go through next time
-              break;
-//            } else if (b.getEnd() < c.getStart()) { // Assuming calls is sorted.
-//              chrBaseline.remove(bPos--);
+      if (chrBaseline != null) {
+        chrBaseline = (CnaVariantList) chrBaseline.clone();
+        for (final CnaVariant c : chrCalls.getValue()) {
+          if (c.context() == RegionContext.NORMAL) {
+            for (int bPos = 0; bPos < chrBaseline.size(); ++bPos) {
+              final CnaVariant b = chrBaseline.get(bPos);
+              // If the baseline variant is encapsulated by the call, has the same amplification type, and hasn't already been matched, consider them matched
+              if (b.context() == RegionContext.NORMAL && Interval.overlaps(b, c) && c.cnaType() == b.cnaType() && !b.isCorrect()) {
+                c.setCorrect(true);
+                b.setCorrect(true);
+                chrBaseline.remove(bPos); // Less stuff to go through next time
+                break;
+                //            } else if (b.getEnd() < c.getStart()) { // Assuming calls is sorted.
+                //              chrBaseline.remove(bPos--);
+              }
             }
           }
         }
@@ -400,7 +385,6 @@ public class CnvEvalCli extends LoggedCli {
               Diagnostic.warning("SV record encompasses region where multiple evaluation regions overlap at " + rec.getSequenceName() + ":" + d);
             }
             final String names = StringUtils.join(",", d.getMeta());
-            // TODO, if the variant /partially/ overlaps the region, perhaps we could cut down the inserted region
             final CnaVariant v = new CnaVariant(d, rec, names);
             if (setType == VariantSetType.BASELINE && v.spanType() == CnaVariant.SpanType.PARTIAL) {
               // We currently expect baseline variants to fully span any given evaluation region, see sanityCheck below

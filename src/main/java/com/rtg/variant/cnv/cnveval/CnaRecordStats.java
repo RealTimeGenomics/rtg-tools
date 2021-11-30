@@ -30,6 +30,7 @@
 package com.rtg.variant.cnv.cnveval;
 
 import com.reeltwo.jumble.annotations.TestClass;
+import com.rtg.variant.cnv.cnveval.CnaVariant.RegionContext;
 import com.rtg.vcf.VcfRecord;
 
 import java.util.HashSet;
@@ -51,7 +52,9 @@ class CnaRecordStats {
   }
 
   void increment(CnaVariant v) {
-    increment(v.isCorrect());
+    if (v.context() == RegionContext.NORMAL) {
+      increment(v.isCorrect());
+    }
     if (v.names() != null) {
       mNames.add(v.names());
     }
