@@ -69,11 +69,11 @@ public class ParseRocFileTest extends TestCase {
         assertEquals("Monkey", bundle.getTitle());
         assertEquals(3092754, bundle.getTotalVariants());
         bundle.setGraphType(DataBundle.GraphType.ROC);
-        assertEquals(1864591.0, bundle.getPlot(1, 7342).getHi(Graph2D.X), 1e-9);
-        assertEquals(0.0, bundle.getPlot(1, 7342).getLo(Graph2D.X), 1e-9);
-        assertEquals(2995295.0, bundle.getPlot(1, 7342).getHi(Graph2D.Y), 1e-9);
-        assertEquals(0.0, bundle.getPlot(1, 7342).getLo(Graph2D.Y), 1e-9);
-        assertEquals(8, bundle.getPlot(1, 1).getData().length);
+        assertEquals(1864591.0, bundle.getPlot(1, 7342, false).getHi(Graph2D.X), 1e-9);
+        assertEquals(0.0, bundle.getPlot(1, 7342, false).getLo(Graph2D.X), 1e-9);
+        assertEquals(2995295.0, bundle.getPlot(1, 7342, false).getHi(Graph2D.Y), 1e-9);
+        assertEquals(0.0, bundle.getPlot(1, 7342, false).getLo(Graph2D.Y), 1e-9);
+        assertEquals(8, bundle.getPlot(1, 1, false).getData().length);
       }
     }
   }
@@ -123,7 +123,7 @@ public class ParseRocFileTest extends TestCase {
         assertEquals(Arrays.asList(100, 200, 300, 400, 500, 600, 700, 800, 900, 1000), progressBarDelegate.mProgressLog);
         assertEquals(-1, bundle.getTotalVariants());
         bundle.setGraphType(DataBundle.GraphType.ROC);
-        assertEquals(2, bundle.getPlot(1, 1).getData().length);
+        assertEquals(2, bundle.getPlot(1, 1, false).getData().length);
       }
     }
   }

@@ -53,12 +53,12 @@ public class DataBundleTest extends TestCase {
     db.setTitle("Monkey");
     db.setScoreName("age");
     assertEquals(300, db.getTotalVariants());
-    assertEquals(100.0, db.getPlot(1, 1).getHi(Graph2D.X), 1e-9);
-    assertEquals(200.0, db.getPlot(1, 1).getHi(Graph2D.Y), 1e-9);
-    assertEquals(4.0, db.getPlot(1, 1).getLo(Graph2D.X), 1e-9);
-    assertEquals(5.0, db.getPlot(1, 1).getLo(Graph2D.Y), 1e-9);
+    assertEquals(100.0, db.getPlot(1, 1, false).getHi(Graph2D.X), 1e-9);
+    assertEquals(200.0, db.getPlot(1, 1, false).getHi(Graph2D.Y), 1e-9);
+    assertEquals(4.0, db.getPlot(1, 1, false).getLo(Graph2D.X), 1e-9);
+    assertEquals(5.0, db.getPlot(1, 1, false).getLo(Graph2D.Y), 1e-9);
     assertEquals("Monkey", db.getTitle());
-    assertEquals(2, db.getPlot(1, 1).getData().length);
+    assertEquals(2, db.getPlot(1, 1, false).getData().length);
   }
 
   public void testAutoName() {

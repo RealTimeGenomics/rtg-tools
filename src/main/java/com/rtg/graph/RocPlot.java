@@ -108,6 +108,7 @@ import com.reeltwo.plot.PointPlot2D;
 import com.reeltwo.plot.renderer.Mapping;
 import com.reeltwo.plot.ui.InnerZoomPlot;
 import com.rtg.util.ContingencyTable;
+import com.rtg.util.Pair;
 import com.rtg.util.Resources;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
@@ -154,6 +155,7 @@ public class RocPlot {
   private final JScrollPane mScrollPane = new JScrollPane(mRocLinesPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
   private final JSlider mLineWidthSlider = new JSlider(JSlider.HORIZONTAL, LINE_WIDTH_MIN, LINE_WIDTH_MAX, 1);
   private final JCheckBox mScoreCB = new JCheckBox("Show Scores");
+  private final JCheckBox mPointsCB = new JCheckBox("Show Points");
   private final JCheckBox mSelectAllCB = new JCheckBox("Select / Deselect all");
   private final JButton mOpenButton = new JButton("Open...");
   private final JButton mCommandButton = new JButton("Cmd...");
@@ -167,6 +169,7 @@ public class RocPlot {
   // Graph data and state
   final Map<String, DataBundle> mData = Collections.synchronizedMap(new HashMap<>());
   boolean mShowScores;
+  boolean mShowPoints;
   boolean mPlain;
   int mLineWidth;
 
@@ -200,6 +203,7 @@ public class RocPlot {
     mWeighted = settings.mWeighted;
     mLineWidth = settings.mLineWidth;
     mShowScores = settings.mShowScores;
+    mShowPoints = settings.mShowPoints;
     mPlain = settings.mPlain;
     mPaletteName = settings.mPaletteName;
     mPalette = RocPlotPalettes.SINGLETON.getPalette(mPaletteName);
@@ -218,6 +222,7 @@ public class RocPlot {
     mProgressBar.setIndeterminate(true);
     mScrollPane.setWheelScrollingEnabled(true);
     mScoreCB.setSelected(mShowScores);
+    mPointsCB.setSelected(mShowPoints);
     mTitleEntry.setMaximumSize(new Dimension(Integer.MAX_VALUE, mTitleEntry.getPreferredSize().height));
     mOpenButton.setToolTipText("Add a new curve from a file");
     mCommandButton.setToolTipText("Show the equivalent rocplot command-line for the current configuration");
@@ -338,6 +343,13 @@ public class RocPlot {
       showCurrentGraph();
     });
     rightPanel.add(mLineWidthSlider, c);
+
+    mPointsCB.addItemListener(e -> {
+      mShowPoints = mPointsCB.isSelected();
+      showCurrentGraph();
+    });
+    mPointsCB.setAlignmentX(0);
+    rightPanel.add(mPointsCB, c);
 
     mScoreCB.addItemListener(e -> {
       mShowScores = mScoreCB.isSelected();
@@ -568,26 +580,29 @@ public class RocPlot {
   @JumbleIgnore
   static final class PrecisionRecallGraph2D extends ExternalZoomGraph2D {
 
-    PrecisionRecallGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
+    PrecisionRecallGraph2D(ArrayList<Pair<DataBundle, Integer>> toShow, int lineWidth, boolean showScores, String title, boolean showPoints) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.LEFT);
       setGrid(true);
       setLabel(Graph2D.X, SENSITIVITY);
       setLabel(Graph2D.Y, PRECISION);
       setTitle(title);
-      float yLow = 100;
-      for (int i = 0; i < lineOrdering.size(); ++i) {
-        final DataBundle db = data.get(lineOrdering.get(i));
-        if (db.show()) {
-          db.setGraphType(DataBundle.GraphType.PRECISION_RECALL);
-          addPlot(db.getPlot(lineWidth, i));
-          if (showScores) {
-            addPlot(db.getScorePoints(lineWidth, i));
-            addPlot(db.getScoreLabels());
-          }
-          yLow = Math.min(yLow, db.getMinPrecision());
-        }
+
+      toShow.stream().map(Pair::getA).forEach(db -> db.setGraphType(DataBundle.GraphType.PRECISION_RECALL));
+      if (showScores && !showPoints) {
+        toShow.stream().forEach(p -> addPlot(p.getA().getScorePoints(lineWidth, p.getB())));
       }
+      float yLow = 100;
+      for (Pair<DataBundle, Integer> p : toShow) {
+        final DataBundle db = p.getA();
+        final int color = p.getB();
+        addPlot(db.getPlot(lineWidth, color, showPoints));
+        yLow = Math.min(yLow, db.getMinPrecision());
+      }
+      if (showScores) {
+        toShow.stream().map(Pair::getA).forEach(db -> addPlot(db.getScoreLabels()));
+      }
+
       setRange(Graph2D.X, 0, 100);
       setRange(Graph2D.Y, Math.max(0, yLow), 100);
       setTitle(title);
@@ -598,7 +613,7 @@ public class RocPlot {
   @JumbleIgnore
   static final class RocGraph2D extends ExternalZoomGraph2D {
     private final int mMaxVariants;
-    RocGraph2D(List<String> lineOrdering, int lineWidth, boolean showScores, Map<String, DataBundle> data, String title) {
+    RocGraph2D(ArrayList<Pair<DataBundle, Integer>> toShow, int lineWidth, boolean showScores, String title, boolean showPoints) {
       setKeyVerticalPosition(KeyPosition.BOTTOM);
       setKeyHorizontalPosition(KeyPosition.RIGHT);
       setGrid(true);
@@ -606,18 +621,19 @@ public class RocPlot {
       setLabel(Graph2D.X, "False Positives");
       setTitle(title);
 
+      toShow.stream().map(Pair::getA).forEach(db -> db.setGraphType(DataBundle.GraphType.ROC));
+      if (showScores && !showPoints) {
+        toShow.stream().forEach(p -> addPlot(p.getA().getScorePoints(lineWidth, p.getB())));
+      }
       int maxVariants = -1;
-      for (int i = 0; i < lineOrdering.size(); ++i) {
-        final DataBundle db = data.get(lineOrdering.get(i));
-        if (db.show()) {
-          db.setGraphType(DataBundle.GraphType.ROC);
-          addPlot(db.getPlot(lineWidth, i));
-          if (showScores) {
-            addPlot(db.getScorePoints(lineWidth, i));
-            addPlot(db.getScoreLabels());
-          }
-          maxVariants = Math.max(maxVariants, db.getTotalVariants());
-        }
+      for (Pair<DataBundle, Integer> p : toShow) {
+        final DataBundle db = p.getA();
+        final int color = p.getB();
+        addPlot(db.getPlot(lineWidth, color, showPoints));
+        maxVariants = Math.max(maxVariants, db.getTotalVariants());
+      }
+      if (showScores) {
+        toShow.stream().map(Pair::getA).forEach(db -> addPlot(db.getScoreLabels()));
       }
 
       if (maxVariants > 0) {
@@ -682,12 +698,19 @@ public class RocPlot {
       final Graph2D graph;
       final ArrayList<String> ordering = RocPlot.this.mRocLinesPanel.plotOrder();
       final ZoomBounds bounds;
+      final ArrayList<Pair<DataBundle, Integer>> toShow = new ArrayList<>();
+      for (int i = 0; i < ordering.size(); ++i) {
+        final DataBundle db = RocPlot.this.mData.get(ordering.get(i));
+        if (db.show()) {
+          toShow.add(new Pair<>(db, i));
+        }
+      }
       if (mGraphType.getSelectedItem().equals(PRECISION_SENSITIVITY)) {
-        graph = new PrecisionRecallGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        graph = new PrecisionRecallGraph2D(toShow, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mTitleEntry.getText(), RocPlot.this.mShowPoints);
         mZoomPP.setZoomConfiguration(mZoomPr);
         bounds = mZoomBoundsPr;
       } else {
-        graph = new RocGraph2D(ordering, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mData, RocPlot.this.mTitleEntry.getText());
+        graph = new RocGraph2D(toShow, RocPlot.this.mLineWidth, RocPlot.this.mShowScores, RocPlot.this.mTitleEntry.getText(), RocPlot.this.mShowPoints);
         mZoomPP.setZoomConfiguration(mZoomRoc);
         bounds = mZoomBoundsRoc;
       }

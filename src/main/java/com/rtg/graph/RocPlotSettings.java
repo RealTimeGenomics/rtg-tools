@@ -43,6 +43,7 @@ class RocPlotSettings {
 
   protected String mTitle = null;
   protected boolean mShowScores = true;
+  protected boolean mShowPoints = false;
   protected boolean mPlain = false;
   protected int mLineWidth = LINE_WIDTH_DEFAULT;
   protected boolean mPrecisionRecall = false;
@@ -57,6 +58,10 @@ class RocPlotSettings {
   }
   RocPlotSettings setShowScores(boolean show) {
     mShowScores = show;
+    return this;
+  }
+  RocPlotSettings setShowPoints(boolean show) {
+    mShowPoints = show;
     return this;
   }
   RocPlotSettings setPlain(boolean plain) {
@@ -114,6 +119,9 @@ class RocPlotSettings {
     }
     if (mShowScores) {
       sb.append(" --").append(RocPlotCli.SCORES_FLAG);
+    }
+    if (mShowPoints) {
+      sb.append(" --").append(RocPlotCli.POINTS_FLAG);
     }
     if (mPlain) {
       sb.append(" --").append(RocPlotCli.PLAIN_FLAG);

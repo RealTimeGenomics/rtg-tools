@@ -93,7 +93,7 @@ public class RocPlotToFileTest extends AbstractTest {
       r.setPlain(true);
       r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
-      checkSvg(svg, 95,
+      checkSvg(svg, 105,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",
@@ -116,7 +116,7 @@ public class RocPlotToFileTest extends AbstractTest {
       r.setPlain(true);
       r.setImageFormat(ImageWriter.ImageFormat.SVG);
       r.writeRocPlot(svg, Collections.singletonList(roc), Collections.singletonList("LINE"));
-      checkSvg(svg, 88,
+      checkSvg(svg, 92,
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>",
         "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">",
         "<rect height=\"600\" style=\"fill:rgb(255,255,255);stroke:none;\" width=\"800\" x=\"0\" y=\"0\"/>",

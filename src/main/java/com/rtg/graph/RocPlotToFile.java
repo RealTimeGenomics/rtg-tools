@@ -42,6 +42,7 @@ import java.util.Map;
 
 import com.reeltwo.plot.renderer.GraphicsRenderer;
 import com.reeltwo.plot.ui.ImageWriter;
+import com.rtg.util.Pair;
 import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.util.io.FileUtils;
@@ -103,13 +104,19 @@ public final class RocPlotToFile extends RocPlotSettings {
     if (m != null) {
       throw new NoTalkbackSlimException("Host OS is not correctly configured for image output: " + m);
     }
-    final ArrayList<String> paths = new ArrayList<>(data.keySet());
-
+    final ArrayList<String> ordering = new ArrayList<>(data.keySet());
+    final ArrayList<Pair<DataBundle, Integer>> toShow = new ArrayList<>();
+    for (int i = 0; i < ordering.size(); ++i) {
+      final DataBundle db = data.get(ordering.get(i));
+      if (db.show()) {
+        toShow.add(new Pair<>(db, i));
+      }
+    }
     final RocPlot.ExternalZoomGraph2D graph;
     if (mPrecisionRecall) {
-      graph = new RocPlot.PrecisionRecallGraph2D(paths, mLineWidth, mShowScores, data, getTitle());
+      graph = new RocPlot.PrecisionRecallGraph2D(toShow, mLineWidth, mShowScores, getTitle(), mShowPoints);
     } else {
-      graph = new RocPlot.RocGraph2D(paths, mLineWidth, mShowScores, data, getTitle());
+      graph = new RocPlot.RocGraph2D(toShow, mLineWidth, mShowScores, getTitle(), mShowPoints);
     }
     if (mInitialZoom != null) {
       graph.setZoom(mInitialZoom);

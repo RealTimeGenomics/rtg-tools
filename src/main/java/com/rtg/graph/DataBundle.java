@@ -342,12 +342,12 @@ final class DataBundle {
   }
 
   // Primary line graph
-  PointPlot2D getPlot(int lineWidth, int colour) {
+  PointPlot2D getPlot(int lineWidth, int colour, boolean points) {
     assert mGraphType != null : "graph type has not been set";
     updateRangedData();
     final PointPlot2D lplot = new PointPlot2D();
     lplot.setData(mRangedPoints);
-    lplot.setPoints(false);
+    lplot.setPoints(points);
     lplot.setLines(true);
     lplot.setLineWidth(lineWidth);
     lplot.setColor(colour);
