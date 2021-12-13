@@ -58,7 +58,7 @@ public abstract class RocSortValueExtractor {
     if (scoreField == null) {
       return RocSortValueExtractor.NULL_EXTRACTOR;
     } else {
-      final String[] splitScore = StringUtils.split(scoreField, scoreField.indexOf('.') != -1 ? '.' : '=', 2);
+      final String[] splitScore = StringUtils.split(scoreField, '.', 2);
       if (splitScore.length > 1) {
         final String fieldTypeName = splitScore[0].toUpperCase(Locale.getDefault());
         try {
@@ -100,7 +100,7 @@ public abstract class RocSortValueExtractor {
    * Lets the extractor see the header in order to get any required information.
    * @param header a VCF header
    */
-  void setHeader(VcfHeader header) { }
+  public void setHeader(VcfHeader header) { }
 
   /** Dummy null extractor for testing purposes */
   public static final RocSortValueExtractor NULL_EXTRACTOR = new RocSortValueExtractor() {

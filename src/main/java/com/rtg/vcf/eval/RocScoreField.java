@@ -39,6 +39,7 @@ import com.rtg.util.diagnostic.NoTalkbackSlimException;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
+import com.rtg.vcf.annotation.AbstractDerivedFormatAnnotation;
 import com.rtg.vcf.annotation.DerivedAnnotations;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -106,7 +107,7 @@ public enum RocScoreField {
           return fieldName + " (INFO)";
         }
         @Override
-        void setHeader(VcfHeader header) {
+        public void setHeader(VcfHeader header) {
           if (header.getInfoLines().stream().noneMatch(f -> f.getId().equals(fieldName))) {
             if (header.getFormatLines().stream().anyMatch(f -> f.getId().equals(fieldName))) {
               Diagnostic.warning("VCF header does not contain an INFO field named " + fieldName + " (did you mean FORMAT." + fieldName + "?)");
@@ -144,7 +145,7 @@ public enum RocScoreField {
           return fieldName + " (FORMAT)";
         }
         @Override
-        void setHeader(VcfHeader header) {
+        public void setHeader(VcfHeader header) {
           if (header.getFormatLines().stream().noneMatch(f -> f.getId().equals(fieldName))) {
             if (header.getInfoLines().stream().anyMatch(f -> f.getId().equals(fieldName))) {
               Diagnostic.warning("VCF header does not contain a FORMAT field named " + fieldName + " (did you mean INFO." + fieldName + "?)");
@@ -205,16 +206,18 @@ public enum RocScoreField {
     private final RocSortOrder mOrder;
     protected final AbstractDerivedAnnotation<?> mAnno;
     private final String mFieldName;
+    private final boolean mRequiresSample;
 
     DerivedRocSortValueExtractor(RocSortOrder order, AbstractDerivedAnnotation<?> anno) {
       mOrder = order;
       mAnno = anno;
       mFieldName = anno.getField().getId();
+      mRequiresSample = anno instanceof AbstractDerivedFormatAnnotation;
     }
 
     @Override
     public boolean requiresSample() {
-      return true;
+      return mRequiresSample;
     }
 
     @Override
@@ -223,7 +226,7 @@ public enum RocScoreField {
     }
 
     @Override
-    void setHeader(VcfHeader header) {
+    public void setHeader(VcfHeader header) {
       final String msg = mAnno.checkHeader(header);
       if (msg != null) {
         Diagnostic.warning(msg);

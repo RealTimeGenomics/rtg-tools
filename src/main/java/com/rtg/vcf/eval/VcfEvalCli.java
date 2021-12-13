@@ -253,7 +253,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   public static boolean validateScoreField(CFlags flags) {
     if (flags.isSet(SCORE_FIELD)) {
       final String field = (String) flags.getValue(SCORE_FIELD);
-      final int pIndex = field.indexOf('=');
+      final int pIndex = field.indexOf('.');
       if (pIndex != -1) {
         final String fieldTypeName = field.substring(0, pIndex).toUpperCase(Locale.getDefault());
         try {
