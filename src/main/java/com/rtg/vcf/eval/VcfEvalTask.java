@@ -145,7 +145,6 @@ public final class VcfEvalTask extends ParamsTask<VcfEvalParams, NoStatistics> {
     final EvalSynchronizer processor;
     final String outputMode = GlobalFlags.isSet(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) ? GlobalFlags.getStringValue(ToolsGlobalFlags.VCFEVAL_PATH_PROCESSOR) : params.outputMode();
     final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor(params.scoreField(), params.sortOrder());
-    rocExtractor.setHeader(variants.calledHeader());
     switch (outputMode) {
       case MODE_ALLELES:
         if (params.squashPloidy()) {

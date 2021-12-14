@@ -112,6 +112,7 @@ class Ga4ghEvalSynchronizer extends InterleavingEvalSynchronizer {
                         File outdir, boolean zip, int looseMatchDistance) throws IOException {
     super(variants);
     mRocExtractor = extractor;
+    mRocExtractor.setHeader(variants.calledHeader());
     mBaselineSampleNo = variants.baselineSample();
     mCallSampleNo = variants.calledSample();
 

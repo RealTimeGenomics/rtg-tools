@@ -39,6 +39,9 @@ import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.eval.RocSortValueExtractor;
 import com.rtg.vcf.eval.VariantSetType;
 
+/**
+ * Simple interface for objects generating a column in the evaluation output BED file.
+ */
 interface BedAnnotation {
 
   /** @return the annotation name. */

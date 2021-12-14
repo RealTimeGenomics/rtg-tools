@@ -68,6 +68,7 @@ import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.LineWriter;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
+import com.rtg.vcf.header.VcfHeader;
 
 /**
  */
@@ -218,6 +219,15 @@ public class RocContainer {
     }
   }
 
+
+  /**
+   * Prepare the container for accepting roc points from VCF records.
+   * @param header the header corresponding to subsequent records.
+   */
+  public void setHeader(VcfHeader header) {
+    filters().forEach(f -> f.setHeader(header));
+    mRocExtractor.setHeader(header);
+  }
 
   /**
    * Add single called variant result to the ROC

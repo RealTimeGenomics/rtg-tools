@@ -1,2 +1,1 @@
-VCF header does not contain a FORMAT field named GQ
 During ALT comparison no ROC data will be produced, as a sample is required by the selected ROC score field: GQ (FORMAT)

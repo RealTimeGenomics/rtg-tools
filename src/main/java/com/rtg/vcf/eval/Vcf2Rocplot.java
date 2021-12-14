@@ -255,7 +255,7 @@ public class Vcf2Rocplot extends LoggedCli {
           // If this is wrong, the user should vcfsubset to pick out the sample they want.
         }
       }
-      mRoc.filters().forEach(f -> f.setHeader(header));
+      mRoc.setHeader(header);
 
       while (vr.hasNext()) {
         final VcfRecord rec = vr.next();
@@ -319,6 +319,7 @@ public class Vcf2Rocplot extends LoggedCli {
 
     @Override
     public void loadVariants(VcfIterator vr, File vcf) throws IOException {
+      mRoc.setHeader(vr.getHeader());
       while (vr.hasNext()) {
         final VcfRecord rec = vr.next();
 
@@ -380,7 +381,7 @@ public class Vcf2Rocplot extends LoggedCli {
           // If this is wrong, the user should vcfsubset to pick out the sample they want.
         }
       }
-      mRoc.filters().forEach(f -> f.setHeader(header));
+      mRoc.setHeader(header);
 
       while (vr.hasNext()) {
         final VcfRecord rec = vr.next();

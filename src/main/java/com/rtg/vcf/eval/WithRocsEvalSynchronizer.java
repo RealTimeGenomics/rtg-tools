@@ -94,7 +94,6 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       mDefaultRoc.setRocPointCriteria(rocCriteria);
       mAlleleRoc = null;
     } else {
-      filters.forEach(f -> f.setHeader(variants.calledHeader()));
       mDefaultRoc = new RocContainer(extractor);
       mDefaultRoc.addFilters(filters);
       mDefaultRoc.setRocPointCriteria(rocCriteria);
@@ -106,6 +105,9 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
         mAlleleRoc = null;
       }
     }
+    // Inform the roc container of the header. (mAlleleRoc, if present, uses same filters and extractor)
+    // Use the calls header, may affect some more complex JS expression based filters/scores.
+    mDefaultRoc.setHeader(variants.calledHeader());
     mZip = zip;
     mSlope = slope;
     mOutDir = outdir;

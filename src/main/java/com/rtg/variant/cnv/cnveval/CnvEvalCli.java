@@ -197,8 +197,7 @@ public class CnvEvalCli extends LoggedCli {
     final RocContainer roc = new RocContainer(rocExtractor);
     roc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>()));
 
-    roc.filters().forEach(f -> f.setHeader(baseline.getHeader()));
-    rocExtractor.setHeader(baseline.getHeader());
+    roc.setHeader(baseline.getHeader());
     for (final CnaVariantList chrVars : baseline.values()) {
       for (final CnaVariant v : chrVars) {
         if (v.context() == RegionContext.NORMAL) {
@@ -207,8 +206,7 @@ public class CnvEvalCli extends LoggedCli {
       }
     }
 
-    roc.filters().forEach(f -> f.setHeader(calls.getHeader()));
-    rocExtractor.setHeader(calls.getHeader());
+    roc.setHeader(calls.getHeader());
     for (final CnaVariantList chrVars : calls.values()) {
       for (final CnaVariant v : chrVars) {
         if (v.context() == RegionContext.NORMAL) {
