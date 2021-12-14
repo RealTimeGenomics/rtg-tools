@@ -31,11 +31,14 @@
 package com.rtg.vcf.eval;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Locale;
 
 import com.rtg.util.MathUtils;
+import com.rtg.util.StringUtils;
 import com.rtg.util.diagnostic.Diagnostic;
 import com.rtg.util.diagnostic.NoTalkbackSlimException;
+import com.rtg.vcf.ScriptedVcfProcessor;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.vcf.annotation.AbstractDerivedAnnotation;
@@ -198,6 +201,18 @@ public enum RocScoreField {
         throw new NoTalkbackSlimException("Cannot use derived annotation \"" + field + "\", must be numeric");
       }
     }
+  },
+  /** Use javascript expression to compute sort value on the fly */
+  EXPR {
+    @Override
+    RocSortValueExtractor getExtractor(final String fieldName, final RocSortOrder order) {
+      final String[] e = StringUtils.split(fieldName, '=', 2);
+      if (e.length != 2) {
+        throw new NoTalkbackSlimException(
+            "Expected sort value expression of form EXPR.<label>=<expression>");
+      }
+      return new ExpressionRocSortValueExtractor(order, e[0], e[1]);
+    }
   };
 
   abstract RocSortValueExtractor getExtractor(String fieldName, RocSortOrder order);
@@ -238,4 +253,65 @@ public enum RocScoreField {
       return mFieldName + " (derived)";
     }
   }
+
+  private static class ExpressionRocSortValueExtractor extends RocSortValueExtractor {
+    private final RocSortOrder mOrder;
+    private final String mExpression;
+    private final String mFieldName;
+    private ScriptedVcfProcessor mJsProcessor = null;
+
+    ExpressionRocSortValueExtractor(RocSortOrder order, String name, String expression) {
+      mOrder = order;
+      mFieldName = name;
+      mExpression = expression;
+    }
+
+    @Override
+    public boolean requiresSample() {
+      return false;
+    }
+
+    @Override
+    public RocSortOrder getSortOrder() {
+      return mOrder;
+    }
+
+    @Override
+    public void setHeader(VcfHeader header) {
+      mJsProcessor = createExpressionDelegate(mExpression);
+      mJsProcessor.setHeader(header);
+    }
+
+    @Override
+    public String toString() {
+      return mFieldName + " (expr)";
+    }
+
+    @Override
+    public double getSortValue(VcfRecord rec, int sampleNo) {
+      mJsProcessor.setRecord(rec);
+      final Object o = mJsProcessor.invokeExpression();
+      if (o == null) {
+        return Double.NaN;
+      }
+      if (o instanceof Integer) {
+        return (Integer) o;
+      } else if (o instanceof Double) {
+        final Double d = (Double) o;
+        if (MathUtils.approxEquals(d, 0, 0.00000001)) {
+          return 0;
+        }
+        return d;
+      }
+      throw new NoTalkbackSlimException(
+          "Could not evaluate script on record: " + rec + StringUtils.LS + "The " + toString()
+              + " sort value expression did not evaluate to a numeric value. '" + o + "' has type "
+              + o.getClass().getCanonicalName());
+    }
+
+    private static ScriptedVcfProcessor createExpressionDelegate(String expression) {
+      return new ScriptedVcfProcessor(expression, Collections.emptyList(), System.out, System.err);
+    }
+  }
+
 }

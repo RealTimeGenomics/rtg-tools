@@ -29,7 +29,7 @@
  */
 package com.rtg.vcf.eval;
 
-import java.util.ArrayList;
+import java.util.Collections;
 
 import com.rtg.vcf.ScriptedVcfFilter;
 import com.rtg.vcf.VcfFilter;
@@ -71,6 +71,6 @@ public class ExpressionRocFilter extends RocFilter {
   }
 
   private static ScriptedVcfFilter createExpressionFilter(String expression) {
-    return new ScriptedVcfFilter(expression, new ArrayList<>(), System.out, System.err);
+    return new ScriptedVcfFilter(expression, Collections.emptyList(), System.out, System.err);
   }
 }

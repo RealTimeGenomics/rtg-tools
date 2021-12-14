@@ -39,7 +39,7 @@ import junit.framework.TestCase;
 public class RocScoreFieldTest extends TestCase {
 
   public void test() {
-    TestUtils.testEnum(RocScoreField.class, "[QUAL, INFO, FORMAT, DERIVED]");
+    TestUtils.testEnum(RocScoreField.class, "[QUAL, INFO, FORMAT, DERIVED, EXPR]");
     final VcfRecord rec = new VcfRecord("chr1", 1209, "a");
     rec.setId(".")
     .setQuality("12.8")
