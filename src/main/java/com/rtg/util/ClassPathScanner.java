@@ -104,9 +104,9 @@ public class ClassPathScanner {
           scanDirectory(classes, acceptor, root, dir);
         }
       } else if (uri.getScheme().equals("jar")) {
-        final int jarpos = uri.getSchemeSpecificPart().indexOf(JAR_EXT + "!");
+        final int jarpos = uri.getRawSchemeSpecificPart().indexOf(JAR_EXT + "!");
         if (jarpos > 0) {
-          final URI jar = new URI(uri.getSchemeSpecificPart().substring(0, jarpos + JAR_EXT.length()));
+          final URI jar = new URI(uri.getRawSchemeSpecificPart().substring(0, jarpos + JAR_EXT.length()));
           scanZipFile(classes, acceptor, new File(jar));
         }
       }
