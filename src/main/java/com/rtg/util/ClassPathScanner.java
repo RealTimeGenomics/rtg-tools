@@ -33,8 +33,12 @@ package com.rtg.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -76,20 +80,48 @@ public class ClassPathScanner {
     final List<Class<?>> testClasses = new ArrayList<>();
 
     try {
-      for (String each : CLASSPATH.split(File.pathSeparator)) {
-        final File root = new File(each);
-        if (root.isDirectory()) {
-          scanDirectory(testClasses, acceptor, root, root);
-        } else if (root.getName().endsWith(JAR_EXT)) {
-          scanZipFile(testClasses, acceptor, root);
-        }
+      scanClassLoader(testClasses, acceptor);
+      if (testClasses.isEmpty()) {
+        scanClassPath(testClasses, acceptor);
       }
       testClasses.sort(Comparator.comparing(Class::getName));
     } catch (Throwable t) {
       t.printStackTrace();
-      throw t;
+      throw new RuntimeException(t);
     }
     return testClasses;
+  }
+
+  private void scanClassLoader(List<Class<?>> classes, ClassAcceptor acceptor) throws IOException, URISyntaxException {
+    final String packagePath = mPackage.replace('.', '/');
+    final Enumeration<URL> e = getClass().getClassLoader().getResources(packagePath);
+    while (e.hasMoreElements()) {
+      final URI uri = e.nextElement().toURI();
+      if (uri.getScheme().equals("file")) {
+        final File dir = new File(uri);
+        if (dir.isDirectory()) {
+          final File root = new File(uri.getPath().replace(packagePath, ""));
+          scanDirectory(classes, acceptor, root, dir);
+        }
+      } else if (uri.getScheme().equals("jar")) {
+        final int jarpos = uri.getSchemeSpecificPart().indexOf(JAR_EXT + "!");
+        if (jarpos > 0) {
+          final URI jar = new URI(uri.getSchemeSpecificPart().substring(0, jarpos + JAR_EXT.length()));
+          scanZipFile(classes, acceptor, new File(jar));
+        }
+      }
+    }
+  }
+
+  private void scanClassPath(List<Class<?>> classes, ClassAcceptor acceptor) {
+    for (String each : CLASSPATH.split(File.pathSeparator)) {
+      final File root = new File(each);
+      if (root.isDirectory()) {
+        scanDirectory(classes, acceptor, root, root);
+      } else if (root.getName().endsWith(JAR_EXT)) {
+        scanZipFile(classes, acceptor, root);
+      }
+    }
   }
 
   private static String getClassName(String fileName, String classPathRoot, char separatorChar) {
