@@ -1,5 +1,0 @@
-#ref-manifest v2.0
-@desc	Just Chr Names UCSC style
-@source	NotAFile
-@checks	name
-chrW
