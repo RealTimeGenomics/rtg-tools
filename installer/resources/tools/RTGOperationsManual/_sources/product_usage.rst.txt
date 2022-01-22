@@ -1,3 +1,0 @@
-.. only:: core or extra
-
-  .. include:: product_usage.inc.rst
