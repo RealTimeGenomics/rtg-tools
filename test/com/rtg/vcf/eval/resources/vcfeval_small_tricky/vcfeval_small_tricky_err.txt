@@ -1,1 +1,0 @@
-There were 3 baseline variants skipped due to being too long, overlapping or starting outside the expected reference sequence length.

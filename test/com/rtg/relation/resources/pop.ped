@@ -1,7 +1,0 @@
-# PED format pedigree
-# fam-id	ind-id	pat-id	mat-id	sex	phen
-0	child	father	mother	1	2
-0	mother	0	0	2	0
-0	father	0	0	1	2
-0	child2	father	0	2	2
-0	child3	0	mother	1	0

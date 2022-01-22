@@ -1,4 +1,0 @@
-
-Total records : 20
-Filtered due to all samples same as reference : 3
-Remaining records : 17

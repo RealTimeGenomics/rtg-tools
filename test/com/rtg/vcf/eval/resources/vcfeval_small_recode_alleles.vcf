@@ -1,8 +1,0 @@
-##fileformat=VCFv4.1
-##contig=<ID=22,length=51304566,assembly=hg19>
-##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each alternative allele, in the same order as listed">
-##INFO=<ID=STATUS,Number=.,Type=String,Description="Allele accumulation status">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-22	21	.	C	CCCT	.	.	STATUS=B-TP=22:22-22 (*:CCTx)
-22	25	.	T	C	.	.	STATUS=B-TP=22:25-26 (*:Cx)
-22	27	.	AATGGTG	A	.	.	STATUS=B-TP=22:28-34 (*:x)

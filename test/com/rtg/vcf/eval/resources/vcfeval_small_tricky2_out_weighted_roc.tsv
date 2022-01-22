@@ -1,8 +1,0 @@
-#Version [...]
-#CL [...]
-#selection: ALL
-#total baseline variants: 7
-#total call variants: 4
-#score field: QUAL
-#score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
-None	5.00	0.00	4.00	2.00	1.0000	0.7143	0.8333

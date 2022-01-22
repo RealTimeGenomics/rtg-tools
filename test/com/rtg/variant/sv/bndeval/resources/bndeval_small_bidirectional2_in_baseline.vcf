@@ -1,5 +1,0 @@
-##fileformat=VCFv4.1
-##fileDate=20170720
-##reference=file:///rtgshare/data/human/ref/1000g_v37_phase2/hs37d5.fasta
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-10	61638615	.	N	[10:43609947[N	999	.	.

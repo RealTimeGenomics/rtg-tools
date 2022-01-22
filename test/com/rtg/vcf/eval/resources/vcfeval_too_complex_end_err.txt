@@ -1,4 +1,0 @@
-VCF header does not contain a FORMAT field named GQ
-Evaluation too complex (50002 unresolved paths, 189621 iterations) at reference region 11:3795-3836. Variants in this region will not be included in results.
-There were 2 variants not thresholded in ROC data files due to missing or invalid GQ (FORMAT) values.
-Could not select maximized F-measure threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --vcf-score-field

@@ -1,7 +1,0 @@
-##fileformat=VCFv4.1
-##reference=hg19
-##contig=<ID=chr6,length=171115067>
-##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-##FORMAT=<ID=GQ,Number=1,Type=Float,Description="Genotype Quality">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	HG002
-chr6	7	.	A	A,T	8247.77	.	.	GT:GQ	2/1:99

@@ -1,6 +1,0 @@
-
-Total records : 42
-Filtered due to quality : 3
-Filtered due to genotype quality : 2
-Filtered due to ambiguity ratio : 5
-Remaining records : 32

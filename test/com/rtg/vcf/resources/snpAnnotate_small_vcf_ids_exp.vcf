@@ -1,6 +1,0 @@
-chr2	100	label1	A	C,G	.	PASS	NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d
-chr2	200	label1	A	C	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
-chr2	900	label2	A	G	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
-chr3	200	label4	A	G	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	.	1/1:o:d
-chr3	300	label3;label4	A	C	.	PASS	NAA=1;AC=2;AN=2	GT:ZY:PD	1/1:o:d	.
-chr3	500	.	A	C,G	.	PASS	NAA=2;AC=2,2;AN=4	GT:ZY:PD	1/1:o:d	2/2:o:d

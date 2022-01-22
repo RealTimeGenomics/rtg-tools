@@ -1,3 +1,0 @@
-#Version [...]
-#posterior	slope	log-slope
-10.00	1.00	0.000

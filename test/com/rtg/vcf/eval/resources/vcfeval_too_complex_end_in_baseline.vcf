@@ -1,9 +1,0 @@
-##fileformat=VCFv4.1
-##fileDate=20140319
-##contig=<ID=11,length=10000>
-##FILTER=<ID=PASS,Description="All filters passed">
-##FORMAT=<ID=GT,Number=1,Type=String,Description="Net Genotype across all datasets">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878
-11	1881	.	A	ATT	.	PASS	.	GT	0|1
-11	3532	.	G	GC	.	PASS	.	GT	1/1
-11	3795	.	AACACACACAC	A,AACACACAC	.	PASS	.	GT	1|2

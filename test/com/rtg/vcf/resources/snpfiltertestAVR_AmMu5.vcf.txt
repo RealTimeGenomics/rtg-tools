@@ -1,4 +1,0 @@
-
-Total records : 20
-Filtered due to not in keep set : 4
-Remaining records : 20

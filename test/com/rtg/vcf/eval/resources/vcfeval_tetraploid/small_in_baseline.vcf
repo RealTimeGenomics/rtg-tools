@@ -1,7 +1,0 @@
-##fileformat=VCFv4.2
-##fileDate=20200911
-##CL=vcffilter -i /home/len/dan-tetraploid.baseline.vcf.gz -o - --region chr22:21110600+100 -j start='21110600' -j chr='chr22-1' -j "\nfunction record() {\n  if (has(INFO.END)) {\n    INFO.END = INFO.END - start + 1;\n  }\n  CHR = chr;\n  POS = POS - start + 1;\n  return true;\n}"
-##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NA12878_NA24385
-chr22	10	.	G	C	.	.	.	GT	0|0|0|1
-chr22	82	.	CAAAA	CAAA,C,CAA	.	.	.	GT	1|2|3|1

@@ -1,4 +1,0 @@
-
-Total records : 20
-Filtered due to density window : 15
-Remaining records : 5

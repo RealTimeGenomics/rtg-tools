@@ -1,7 +1,0 @@
-##fileformat=VCFv4.2
-##fileDate=[...]
-##CL=[...]
-##FILTER=<ID=LOW_QUAL,Description="Low quality call as specified by 'variantcalling.lowQuality'">
-##FILTER=<ID=REF,Description="Breakpoint corresponds to reference allele">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-10	43609952	.	G	[10:61638611[G	2686.75	.	.

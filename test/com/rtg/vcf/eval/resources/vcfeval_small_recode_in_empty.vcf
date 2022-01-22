@@ -1,4 +1,0 @@
-##fileformat=VCFv4.1
-##contig=<ID=22,length=51304566,assembly=hg19>
-##INFO=<ID=AC,Number=A,Type=Integer,Description="Allele count in genotypes, for each alternative allele, in the same order as listed">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	SAMPLE1	SAMPLE2	SAMPLE3	SAMPLE4

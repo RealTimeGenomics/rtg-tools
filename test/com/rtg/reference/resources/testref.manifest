@@ -1,7 +1,0 @@
-#ref-manifest v2.0
-@desc	test manifest for testref.fasta
-@source	com/rtg/reference/resources/testref-reference.txt
-@checks	name	length
-abcd	57
-moo	60
-lalala	53

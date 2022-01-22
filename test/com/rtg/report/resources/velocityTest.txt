@@ -1,6 +1,0 @@
-$aVariable
-textNextTo${bVariable}foo
-
-#if ($valExists)
-$valExists
-#end

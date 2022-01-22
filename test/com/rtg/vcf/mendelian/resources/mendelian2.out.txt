@@ -1,7 +1,0 @@
-Checking: 
-Family: [NA19239 + NA19238] -> [NA19240]
-36 non-pass records were skipped
-Concordance NA19240: F:2/2 (100.00%)  M:2/2 (100.00%)  F+M:2/2 (100.00%)
-0/5 (0.00%) records did not conform to expected call ploidy
-2/5 (40.00%) records were variant in at least 1 family member and checked for Mendelian constraints
-0/2 (0.00%) records contained a violation of Mendelian constraints

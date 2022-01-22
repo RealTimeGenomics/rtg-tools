@@ -1,5 +1,0 @@
-
-Total records : 42
-Filtered due to . : 4
-Filtered due to PASS : 35
-Remaining records : 3

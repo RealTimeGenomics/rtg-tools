@@ -1,7 +1,0 @@
-   Parental  Child      Count    Local  Global
-  0/0   1/1    1/2          1  100.00%  33.33% INCONSISTENT
-
-  0/1   0/1    0/1          1  100.00%  33.33%
-
-  0/1   0/2    0/2          1  100.00%  33.33%
-

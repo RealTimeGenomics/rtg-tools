@@ -1,4 +1,0 @@
-
-Total records : 27
-Filtered due to de novo score : 24
-Remaining records : 3

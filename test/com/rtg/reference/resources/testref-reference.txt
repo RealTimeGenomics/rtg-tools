@@ -1,5 +1,0 @@
-version 1
-either	def	diploid	linear
-either	seq	abcd	diploid	linear
-either	seq	moo	diploid	linear
-either	seq	lalala	diploid	linear

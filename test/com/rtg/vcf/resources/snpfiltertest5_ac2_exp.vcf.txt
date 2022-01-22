@@ -1,4 +1,0 @@
-
-Total records : 42
-Filtered due to allele count : 30
-Remaining records : 12

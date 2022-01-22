@@ -1,8 +1,0 @@
-#Version [...]
-#selection: HOM (baseline rescaled)
-#total baseline variants: 2
-#total call variants: 2
-#score field: GQ (FORMAT)
-#score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
-25.600	1.00	0.00	1.00	1.00	1.0000	0.5000	0.6667
-22.600	2.00	0.00	2.00	0.00	1.0000	1.0000	1.0000

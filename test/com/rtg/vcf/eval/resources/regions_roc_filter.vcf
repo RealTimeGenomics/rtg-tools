@@ -1,6 +1,0 @@
-##fileformat=VCFv4.1
-##fileDate=[...]
-##FILTER=<ID=PASS,Description="All filters passed">
-#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
-chr1	101	.	AAAAAAAAAA	C	.	PASS	.
-chr1	121	.	A	C	.	PASS	.
