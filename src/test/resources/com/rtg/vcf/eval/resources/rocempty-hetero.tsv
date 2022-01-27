@@ -4,3 +4,4 @@
 #total call variants: 0
 #score field: GQ (FORMAT)
 #score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
+None	0.00	0.00	0.00	1.00	NaN	0.0000	NaN

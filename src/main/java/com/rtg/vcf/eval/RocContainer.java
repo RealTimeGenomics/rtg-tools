@@ -311,10 +311,11 @@ public class RocContainer {
       try (LineWriter os = new LineWriter(new OutputStreamWriter(FileUtils.createOutputStream(rocFile)))) {
         rocHeader(os, filter, totalBaselineVariants, totalCallVariants, extraMetrics, rescale);
         String prevScore = null;
+        String score = "None";
         final RocPoint<Double> cumulative = new RocPoint<>();
         for (final Map.Entry<Double, RocPoint<Double>> me : points.entrySet()) {
           final RocPoint<Double> point = me.getValue();
-          final String score = Double.isNaN(point.getThreshold()) ? "None" : Utils.realFormat(point.getThreshold(), SCORE_DP);
+          score = Double.isNaN(point.getThreshold()) ? "None" : Utils.realFormat(point.getThreshold(), SCORE_DP);
           if (prevScore != null && score.compareTo(prevScore) != 0) {
             writeRocLine(os, filter, prevScore, totalBaselineVariants, cumulative, extraMetrics, scale);
           }
@@ -322,8 +323,8 @@ public class RocContainer {
           cumulative.add(point);
           cumulative.setThreshold(point.getThreshold());
         }
-        if (prevScore != null) {
-          writeRocLine(os, filter, prevScore, totalBaselineVariants, cumulative, extraMetrics, scale);
+        if (prevScore != null || (totalBaselineVariants > 0)) {
+          writeRocLine(os, filter, score, totalBaselineVariants, cumulative, extraMetrics, scale);
         }
       }
       if (slope) {
@@ -368,7 +369,7 @@ public class RocContainer {
         + "\t" + Utils.realFormat(precision, METRICS_DP)
         + "\t" + Utils.realFormat(recall, METRICS_DP)
         + "\t" + Utils.realFormat(fMeasure, METRICS_DP));
-      if ((filter == mDefaultRocFilter) && !Double.isNaN(point.getThreshold())) {
+      if ((filter == mDefaultRocFilter) && point.getThreshold() != null && !Double.isNaN(point.getThreshold())) {
         mBestCutpoint.considerRocPoint(point, precision, recall, fMeasure);
       }
     }
