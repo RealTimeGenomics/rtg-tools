@@ -493,7 +493,7 @@ present. This will add an ``FILTER`` declaration line to the header.
 
 .. code-block:: text
 
-  ensureFilterHeader('##INFO=<ID=FAIL_VAL,' +
+  ensureFilterHeader('##FILTER=<ID=FAIL_VAL,' +
     'Description="Failed validation">');
 
 Additional information and functions
