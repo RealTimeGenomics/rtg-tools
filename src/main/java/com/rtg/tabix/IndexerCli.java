@@ -81,6 +81,8 @@ public class IndexerCli extends AbstractCli {
     BED(".bed.gz"),
     /** <code>VCF</code> format */
     VCF(".vcf.gz"),
+    /** <code>GVCF</code> format */
+    GVCF(".gvcf.gz"),
     /** Automatically determine format */
     AUTO(null);
 
@@ -201,9 +203,10 @@ public class IndexerCli extends AbstractCli {
             Diagnostic.info("Creating index for: " + f.getPath() + " (" + indexFile.getName() + ")");
             new TabixIndexer(f, indexFile).saveTsvIndex();
             break;
-          case VCF:
+          case VCF: // deliberate FALL THROUGH
+          case GVCF:
             if (!VcfUtils.isVcfFormat(f)) {
-              Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not in VCF format.");
+              Diagnostic.warning("Cannot create index for " + f.getPath() + " as it is not in " + format.toString() + " format.");
               retCode = 1;
               continue;
             }
