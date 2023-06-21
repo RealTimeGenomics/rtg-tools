@@ -417,11 +417,11 @@ public final class VcfFilterCli extends AbstractCli {
   }
 
   private Optional<ScriptedVcfFilter> buildScriptFilter(CFlags flags, OutputStream output) throws IOException {
-    final String expressionString = fileOrString(flags, KEEP_EXPRESSION_FLAG);
+    final String expressionString = jsStringOrFileContents(flags, KEEP_EXPRESSION_FLAG);
     final List<?> values = flags.getValues(JAVASCRIPT_FLAG);
     final List<String> beginnings = new ArrayList<>(values.size());
     for (Object begin : values) {
-      beginnings.add(fileIfExists((String) begin));
+      beginnings.add(jsStringOrFileContents((String) begin));
     }
     if (expressionString != null || beginnings.size() > 0) {
       final ScriptedVcfFilter filter = new ScriptedVcfFilter(expressionString, beginnings, output, System.err);
@@ -430,17 +430,27 @@ public final class VcfFilterCli extends AbstractCli {
     return Optional.empty();
   }
 
-  private String fileOrString(CFlags flags, String flag) throws IOException {
+  private String jsStringOrFileContents(CFlags flags, String flag) throws IOException {
     if (!flags.isSet(flag)) {
       return null;
     }
     final String flagValue = (String) flags.getValue(flag);
-    return fileIfExists(flagValue);
+    return jsStringOrFileContents(flagValue);
   }
 
-  private String fileIfExists(String flagValue) throws IOException {
-    final File file = new File(flagValue);
-    return file.exists() ? FileUtils.fileToString(file) : flagValue;
+  /**
+   * Given a string intended to be either a javascript file name or a literal
+   * javascript string, return the javascript. Assumes if the provided
+   * parameter is either an existing file name or ends in ".js" then it is
+   * intended to be a file.
+   *
+   * @param fileOrString either a file name or string
+   * @return the javascript
+   * @exception IOException if the file does not exist or cannot be read
+   */
+  private String jsStringOrFileContents(String fileOrString) throws IOException {
+    final File file = new File(fileOrString);
+    return (fileOrString.endsWith(".js") || file.exists()) ? FileUtils.fileToString(file) : fileOrString;
   }
 
 }
