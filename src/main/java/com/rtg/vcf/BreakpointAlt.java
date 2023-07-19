@@ -70,7 +70,7 @@ public class BreakpointAlt {
       throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }
     final String remoteString = alt.substring(bracketPos + 1, nextBracketPos);
-    final int colonPos = remoteString.indexOf(':');
+    final int colonPos = remoteString.lastIndexOf(':');
     if (colonPos == -1 || colonPos == 0) {
       throw new IllegalArgumentException("Invalid breakend specification: " + alt);
     }

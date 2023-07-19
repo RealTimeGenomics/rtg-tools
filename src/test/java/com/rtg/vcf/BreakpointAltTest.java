@@ -52,5 +52,6 @@ public class BreakpointAltTest extends TestCase {
     check("]foo:221]A", "foo", 220, false, true);
     check("]foo:261]A", "foo", 260, false, true);
     check("]bar:261]A", "bar", 260, false, true);
+    check("A]foo:bar:221]", "foo:bar", 220, true, true);
   }
 }
