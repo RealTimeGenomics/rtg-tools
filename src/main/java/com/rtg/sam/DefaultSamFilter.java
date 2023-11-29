@@ -142,7 +142,7 @@ public class DefaultSamFilter implements SamFilter {
     return true;
   }
 
-  private static long internalHash(final String data, final long seed) {
+  static long internalHash(final String data, final long seed) {
     long hash = 13L;
     final char[] charArray = data.toCharArray();
     for (final char c : charArray) {
