@@ -29,8 +29,9 @@
  */
 package com.rtg.sam;
 
-import com.rtg.launcher.globals.GlobalFlags;
-import com.rtg.launcher.globals.ToolsGlobalFlags;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import com.rtg.util.IntegerOrPercentage;
 
 import htsjdk.samtools.SAMReadGroupRecord;
@@ -45,7 +46,6 @@ public class DefaultSamFilter implements SamFilter {
   private static final int SUBSAMPLE_RESOLUTION = 16;
   private static final int SUBSAMPLE_MAX = 1 << SUBSAMPLE_RESOLUTION;
   private static final int SUBSAMPLE_MASK = SUBSAMPLE_MAX - 1;
-  private static final int HASH_MULT = GlobalFlags.getIntegerValue(ToolsGlobalFlags.SAMMERGE_HASH_MULT);
 
   private final SamFilterParams mFilterParams;
   private final boolean mInvert;
@@ -145,13 +145,21 @@ public class DefaultSamFilter implements SamFilter {
     return true;
   }
 
-  static long internalHash(final String data, final long seed) {
-    long hash = 13;
-    final char[] charArray = data.toCharArray();
-    for (final char c : charArray) {
-      hash = hash * HASH_MULT + c;
+  static long internalHash(final String data, final byte[] seed) {
+    try {
+      final MessageDigest md = MessageDigest.getInstance("MD5");
+      md.update(seed);
+      md.update(data.getBytes());
+      final byte[] digest = md.digest();
+      long h = 0;
+      for (int k = 0; k < Long.BYTES; ++k) {
+        h <<= Byte.SIZE;
+        h += digest[k] & 0xFF;
+      }
+      return h;
+    } catch (final NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
     }
-    return hash + seed;
   }
 
   @Override

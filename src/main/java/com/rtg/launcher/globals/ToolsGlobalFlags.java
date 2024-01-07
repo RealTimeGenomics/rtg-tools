@@ -108,10 +108,6 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
   /** Minimum sensitivity gap between points after interpolation */
   public static final String ROCPLOT_INTERPOLATION_GAP = "com.rtg.vcf.eval.rocplot-interpolate-gap";
 
-  /** Set a different multiplier for the hashing function. */
-  public static final String SAMMERGE_HASH_MULT = "com.rtg.sam.hash-multiplier";
-
-
   ToolsGlobalFlags(List<Flag<?>> flags) {
     super(flags);
   }
@@ -155,7 +151,5 @@ public class ToolsGlobalFlags extends GlobalFlagsInitializer {
 
     registerFlag(ROCPLOT_INTERPOLATE_LABEL, Boolean.class, Boolean.FALSE);
     registerFlag(ROCPLOT_INTERPOLATION_GAP, Integer.class, 1);
-
-    registerFlag(SAMMERGE_HASH_MULT, Integer.class, 31);
   }
 }

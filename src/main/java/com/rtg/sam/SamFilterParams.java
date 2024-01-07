@@ -30,6 +30,7 @@
 package com.rtg.sam;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Set;
 
 import com.rtg.util.IntegerOrPercentage;
@@ -68,7 +69,7 @@ public class SamFilterParams {
     protected boolean mFindAndRemoveDuplicates = false; //this is for the detect and remove, rather than looking at the sam flag
     protected Double mSubsampleFraction = null;
     protected Double mSubsampleRampFraction = null;
-    protected long mSubsampleSeed = 42;
+    protected byte[] mSubsampleSeed = longToBytes(42);
     protected boolean mInvertFilters = false;
 
     protected SamRegionRestriction mRestriction = null;
@@ -131,7 +132,17 @@ public class SamFilterParams {
      * @return this builder, so calls can be chained
      */
     public SamFilterParamsBuilder subsampleSeed(final long seed) {
-      mSubsampleSeed = new PortableRandom(seed).nextLong(); // Add some PRNG variability to the user-supplied seed.
+      mSubsampleSeed = longToBytes(new PortableRandom(seed).nextLong()); // Add some PRNG variability to the user-supplied seed.
+      return this;
+    }
+
+    /**
+     * Set the seed/salt used during subsampling.
+     * @param seed the seed
+     * @return this builder, so calls can be chained
+     */
+    public SamFilterParamsBuilder subsampleSeed(final byte[] seed) {
+      mSubsampleSeed = seed;
       return this;
     }
 
@@ -329,7 +340,7 @@ public class SamFilterParams {
   private final Set<String> mSelectReadGroups;
   private final Double mSubsampleFraction;
   private final Double mSubsampleRampFraction;
-  private final long mSubsampleSeed;
+  private final byte[] mSubsampleSeed;
   private final boolean mInvertFilters;
 
   private final SamRegionRestriction mRestriction;
@@ -375,6 +386,12 @@ public class SamFilterParams {
     mRestriction = builder.mRestriction;
     mBedRegionsFile = builder.mBedRegionsFile;
     mFindAndRemoveDuplicates = builder.mFindAndRemoveDuplicates;
+  }
+
+  private static byte[] longToBytes(final long s) {
+    final ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
+    buffer.putLong(0, s);
+    return buffer.array();
   }
 
   /** @return a builder with all the values set to those of this object. */
@@ -449,7 +466,7 @@ public class SamFilterParams {
   /**
    * @return the seed used during subsampling (actually a salt)
    */
-  public long subsampleSeed() {
+  public byte[] subsampleSeed() {
     return mSubsampleSeed;
   }
 
