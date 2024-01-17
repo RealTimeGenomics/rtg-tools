@@ -30,6 +30,9 @@
 
 package com.rtg.vcf.eval;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.reeltwo.jumble.annotations.TestClass;
 import com.rtg.mode.DnaUtils;
 import com.rtg.util.Utils;
@@ -37,6 +40,7 @@ import com.rtg.util.intervals.Range;
 import com.rtg.util.intervals.SequenceNameLocus;
 import com.rtg.util.intervals.SequenceNameLocusSimple;
 import com.rtg.vcf.VariantType;
+import com.rtg.vcf.VcfFormatException;
 import com.rtg.vcf.VcfRecord;
 import com.rtg.vcf.VcfUtils;
 import com.rtg.visualization.DisplayHelper;
@@ -144,10 +148,14 @@ public class Allele extends SequenceNameLocusSimple implements Comparable<Allele
    */
   static Allele[] getAlleles(VcfRecord rec, int[] gtArray, boolean explicitUnknown) {
     final boolean removePaddingBase = VcfUtils.hasRedundantFirstNucleotide(rec);
-    final Allele[] alleles = new Allele[rec.getAltCalls().size() + 2];
+    final List<String> alts = rec.getAltCalls();
+    final Allele[] alleles = new Allele[alts.size() + 2];
     for (int i = -1; i < alleles.length - 1; ++i) {
       if (gtArray == null || i == 0 || isCalled(i, gtArray)) {
         alleles[i + 1] = getAllele(rec, i, removePaddingBase, explicitUnknown);
+        if ((i > 0) && rec.getRefCall().equals(alts.get(i - 1))) {
+          throw new VcfFormatException("VCF record ALT allele with ID " + i + " is the same as REF, record: " + rec.toString());
+        }
       }
     }
     return alleles;
