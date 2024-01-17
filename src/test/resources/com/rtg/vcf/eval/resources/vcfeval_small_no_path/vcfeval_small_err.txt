@@ -1,0 +1,2 @@
+During ALT comparison some ROC data files will not be produced: [SNP, NON_SNP], producing ROC data for: [ALL]
+Error: VCF record ALT allele with ID 1 is the same as REF, record: chr2	200	.	A	A	2	PASS	.	GT	1/1	.

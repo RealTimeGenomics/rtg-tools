@@ -49,6 +49,12 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_small_alt/vcfeval_small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--sample", "ALT", "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
   }
 
+  public void testNanoAltNoPath() throws IOException, UnindexableDataException {
+    // Case where an invalid VCF record containing an ALT the same as REF caused NPE with no path found.
+    // Now handled by explicit allele check and reported appropriately
+    endToEnd("vcfeval_small_no_path/vcfeval_small", "vcfeval_small_no_path/vcfeval_small", 1, true, null, "--sample", "ALT", "--vcf-score-field", "QUAL", "--output-mode", "annotate", "--squash-ploidy");
+  }
+
   public void testNanoTricky() throws IOException, UnindexableDataException {
     // Tricky cases where the notion of equivalence depends on the treatment of reference bases in the calls
     // Variant on 14 requires less conservative padding removal (use default-trim variant factory)
