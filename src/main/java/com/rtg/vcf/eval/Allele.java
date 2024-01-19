@@ -30,7 +30,6 @@
 
 package com.rtg.vcf.eval;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.reeltwo.jumble.annotations.TestClass;
