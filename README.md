@@ -64,7 +64,7 @@ please consider our full analysis suite
 
 A user manual is included within the installation in both PDF and HTML
 versions. These may also be viewed
-online ([HTML](https://cdn.rawgit.com/RealTimeGenomics/rtg-tools/master/installer/resources/tools/RTGOperationsManual/index.html),
+online ([HTML](https://realtimegenomics.github.io/rtg-tools/index.html),
 [PDF](https://cdn.rawgit.com/RealTimeGenomics/rtg-tools/master/installer/resources/tools/RTGOperationsManual.pdf)).
 
 You can use the commands in RTG Tools to format your own reference
