@@ -86,7 +86,7 @@ public abstract class AbstractVcfFilter implements VcfFilter {
       // QUAL filtering
       final String qualityStr = record.getQuality();
       if (!VcfRecord.MISSING.equals(qualityStr)) {
-        final double quality = Double.parseDouble(qualityStr);
+        final double quality = VcfUtils.getDoubleQualFromRecord(record);
         if (quality < mMinQuality || quality > mMaxQuality) {
           return false;
         }

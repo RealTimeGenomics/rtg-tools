@@ -177,6 +177,23 @@ public class VcfUtilsTest extends TestCase {
     assertFalse(VcfUtils.hasDefinedVariantGt(makeRecord("0/1", "A", "T]bar:198982]"), 0));
   }
 
+  public void testGetQualValues() {
+    VcfRecord r = makeRecord("0/1", "A", "T").setQuality(".");
+
+    assertTrue(Double.isNaN(VcfUtils.getDoubleQualFromRecord(r)));
+
+    r.setQuality("14.0");
+    assertEquals(14.0, VcfUtils.getDoubleQualFromRecord(r));
+
+    r.setQuality("-inf");
+    try {
+      VcfUtils.getDoubleQualFromRecord(r);
+      fail();
+    } catch (VcfFormatException e) {
+      // Expected
+    }
+  }
+
   public void testGetInfoValues() {
     VcfRecord r = makeRecord("0/1", "A", "T").setInfo("DP", "14").setInfo("DPR", "1.2")
       .setInfo("IMP").setInfo("DPD", "2", "3");

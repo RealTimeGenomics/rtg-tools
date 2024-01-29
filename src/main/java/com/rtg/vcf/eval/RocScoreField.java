@@ -67,15 +67,7 @@ public enum RocScoreField {
         }
         @Override
         public double getSortValue(VcfRecord rec, int sampleNo) {
-          final String qualStr = rec.getQuality();
-          if (VcfRecord.MISSING.equals(qualStr)) {
-            return Double.NaN;
-          }
-          try {
-            return Double.parseDouble(qualStr);
-          } catch (NumberFormatException e) {
-            throw new NoTalkbackSlimException("Invalid QUAL value = " + rec.getQuality());
-          }
+          return VcfUtils.getDoubleQualFromRecord(rec);
         }
         @Override
         public String toString() {

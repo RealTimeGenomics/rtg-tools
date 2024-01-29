@@ -592,7 +592,30 @@ public final class VcfUtils {
   }
 
   /**
-   * Get and INFO field as a double.
+   * Get the QUAL field as a double.
+   * @param rec VCF record
+   * @return the value converted into a double, or {@code Double.NaN} if missing
+   * @throws VcfFormatException if the field value is not missing and is not a single floating point number
+   */
+  public static double getDoubleQualFromRecord(VcfRecord rec) {
+    final String fieldVal = rec.getQuality();
+    if (fieldVal != null) {
+      try {
+        if (VcfRecord.MISSING.equals(fieldVal)) {
+          return Double.NaN;
+        }
+        return Double.parseDouble(fieldVal);
+      } catch (NumberFormatException ex) {
+        throw new VcfFormatException(
+            "Invalid float value \"" + fieldVal + "\" in QUAL for VCF record :" + rec);
+      }
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  /**
+   * Get an INFO field as a double.
    * @param rec VCF record
    * @param field string ID of field to extract
    * @return the value converted into a double, or {@code Double.NaN} if missing
