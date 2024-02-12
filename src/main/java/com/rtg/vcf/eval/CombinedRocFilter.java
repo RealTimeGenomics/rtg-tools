@@ -10,7 +10,7 @@ public class CombinedRocFilter extends RocFilter {
     private final ArrayList<RocFilter> mRocFilters = new ArrayList<>();
 
     /**
-     * Create a CombinedRocFilter which incorporates multiple RocFilters into one filter
+     * Create a CombinedRocFilter which accepts only records that are accepted by all delegate RocFilters.
      * @param inputRocFilters List of RocFilters matched against to accept variant
      */
     public CombinedRocFilter(List<RocFilter> inputRocFilters, Boolean rescale) {
@@ -30,6 +30,11 @@ public class CombinedRocFilter extends RocFilter {
     @Override
     public void setHeader(VcfHeader header) {
         mRocFilters.forEach(f -> f.setHeader(header));
+    }
+
+    @Override
+    public boolean requiresGt() {
+        return mRocFilters.stream().anyMatch(RocFilter::requiresGt);
     }
 
     @Override

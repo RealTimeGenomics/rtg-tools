@@ -93,7 +93,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   protected static final String ROC_SUBSET = "roc-subset";
   protected static final String ROC_EXPR = "roc-expr";
   protected static final String ROC_REGIONS = "roc-regions";
-  protected static final String ROC_INTERSECT_MODE = "roc-intersect-mode";
+  protected static final String ROC_CROSS_JOIN = "roc-cross-join";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String TWO_PASS = "Xtwo-pass";
@@ -217,7 +217,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(ROC_SUBSET, rocfilterclass, CommonFlags.STRING, "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "output ROC file for variants matching custom JavaScript expression. Use the form <LABEL>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "output ROC file for variants overlapping custom regions supplied in BED file. Use the form <LABEL>=<FILENAME>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
-    flags.registerOptional(ROC_INTERSECT_MODE, "toggle producing ROC files for each intersection of ROC_SUBSET, ROC_EXPR, and ROC_REGIONS values provided").setCategory(REPORTING);
+    flags.registerOptional(ROC_CROSS_JOIN, "output ROC files for each intersection of --" + ROC_SUBSET + ", --" + ROC_EXPR + ", and --" + ROC_REGIONS + " values provided").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SCORE, Double.class, CommonFlags.FLOAT, "output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
@@ -414,7 +414,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
         rocExprFilters.add(new ExpressionRocFilter(e[0], e[1]));
       }
     }
-    rocFiltersTypeMap.put("rocExprFilters", rocExprFilters);
+    rocFiltersTypeMap.put(ROC_EXPR, rocExprFilters);
 
     final Set<RocFilter> rocRegionsFilters = new LinkedHashSet<>();
     if (flags.isSet(ROC_REGIONS)) {
@@ -425,9 +425,9 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
         rocRegionsFilters.add(new RegionsRocFilter(e[0], new File(e[1])));
       }
     }
-    rocFiltersTypeMap.put("rocRegionsFilters", rocRegionsFilters);
+    rocFiltersTypeMap.put(ROC_REGIONS, rocRegionsFilters);
 
-    // Split subset filters into genotype or variant flavors for intersecting in ROC_INTERSECT_MODE
+    // Split subset filters into genotype or variant flavors for intersecting in ROC_CROSS_JOIN
     final Set<RocFilter> rocGenotypeFilters = new LinkedHashSet<>();
     final Set<RocFilter> rocVariantFilters = new LinkedHashSet<>();
     if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
@@ -451,15 +451,15 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     rocFiltersTypeMap.put("rocVariantFilters", rocVariantFilters);
 
     final Set<RocFilter> rocFilters = new LinkedHashSet<>();
-    if (flags.isSet(ROC_INTERSECT_MODE)) {
+    if (flags.isSet(ROC_CROSS_JOIN)) {
       // Add decoy "ALL" filters to ensure following cartesian product isn't empty and hit every combination
-      rocFiltersTypeMap.get("rocExprFilters").add(RocFilter.ALL);
-      rocFiltersTypeMap.get("rocRegionsFilters").add(RocFilter.ALL);
+      rocFiltersTypeMap.get(ROC_EXPR).add(RocFilter.ALL);
+      rocFiltersTypeMap.get(ROC_REGIONS).add(RocFilter.ALL);
       rocFiltersTypeMap.get("rocGenotypeFilters").add(RocFilter.ALL);
       rocFiltersTypeMap.get("rocVariantFilters").add(RocFilter.ALL);
 
-      for (RocFilter exprFilter : rocFiltersTypeMap.get("rocExprFilters")) {  // Take cartesian product of 4 types of RocFilters for RocCombinationFilter
-        for (RocFilter regionFilter : rocFiltersTypeMap.get("rocRegionsFilters")) {
+      for (RocFilter exprFilter : rocFiltersTypeMap.get(ROC_EXPR)) {  // Take cartesian product of 4 types of RocFilters for RocCombinationFilter
+        for (RocFilter regionFilter : rocFiltersTypeMap.get(ROC_REGIONS)) {
           for (RocFilter genotypeFilter : rocFiltersTypeMap.get("rocGenotypeFilters")) {
             for (RocFilter variantFilter : rocFiltersTypeMap.get("rocVariantFilters")) {
               if ((exprFilter == RocFilter.ALL) & (regionFilter == RocFilter.ALL) & (genotypeFilter == RocFilter.ALL) & (variantFilter == RocFilter.ALL)) {
