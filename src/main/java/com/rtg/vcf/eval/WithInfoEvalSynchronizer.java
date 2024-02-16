@@ -109,12 +109,12 @@ public abstract class WithInfoEvalSynchronizer extends WithRocsEvalSynchronizer 
     header.ensureContains(new InfoField(INFO_SYNCPOS, MetaType.INTEGER, VcfNumber.DOT, "Chromosome-unique sync region ID. When IDs differ for baseline/call, both will be listed."));
     if (type == null || type == VariantSetType.BASELINE) {
       header.ensureContains(new InfoField(INFO_BASE, MetaType.STRING, VcfNumber.ONE, "Baseline genotype status"));
-      header.ensureContains(new InfoField(INFO_BASE_ALTERNATE, MetaType.FLAG, VcfNumber.ONE, "Baseline variant could be matched in an alternate path"));
+      header.ensureContains(new InfoField(INFO_BASE_ALTERNATE, MetaType.FLAG, VcfNumber.ZERO, "Baseline variant could be matched in an alternate path"));
     }
     if (type == null || type == VariantSetType.CALLS) {
       header.ensureContains(new InfoField(INFO_CALL, MetaType.STRING, VcfNumber.ONE, "Call genotype status"));
       header.ensureContains(new InfoField(INFO_CALL_WEIGHT, MetaType.FLOAT, VcfNumber.ONE, "Call weight (equivalent number of baseline variants). When unspecified, assume 1.0"));
-      header.ensureContains(new InfoField(INFO_CALL_ALTERNATE, MetaType.FLAG, VcfNumber.ONE, "Call variant could be matched in an alternate path"));
+      header.ensureContains(new InfoField(INFO_CALL_ALTERNATE, MetaType.FLAG, VcfNumber.ZERO, "Call variant could be matched in an alternate path"));
     }
   }
 
