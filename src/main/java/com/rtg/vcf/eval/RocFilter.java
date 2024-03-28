@@ -142,7 +142,7 @@ public abstract class RocFilter {
   /** The filename extension used for all ROC files */
   public static final String ROC_EXT = "_roc.tsv";
 
-  private final String mName;
+  protected String mName;
   private final String mBaseFilename;
   private final Boolean mRescale;
 

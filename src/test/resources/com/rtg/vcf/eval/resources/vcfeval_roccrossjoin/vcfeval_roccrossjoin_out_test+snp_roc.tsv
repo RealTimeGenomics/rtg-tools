@@ -1,0 +1,8 @@
+#Version RTG Tools 3.12.1-dev / Core 0132811a (2023-10-13), ROC output 1.2
+#CL vcfeval -b baseline.vcf.gz -c calls.vcf.gz --sample syndip,syndip -t rtg_ref -o test --roc-subset snp,indel --roc-expr test=INFO.TEST>5 --roc-intersect-mode
+#selection: test+SNP
+#total baseline variants: 4
+#total call variants: 4
+#score field: GQ (FORMAT)
+#score	true_positives_baseline	false_positives	true_positives_call
+None	1.00	0.00	1.00
