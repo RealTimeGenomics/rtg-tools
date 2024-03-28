@@ -161,7 +161,7 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
   }
 
   public void testNanoRocCrossJoin() throws IOException, UnindexableDataException {
-    endToEnd("vcfeval_roccrossjoin/roccrossjoin", new String[] {"snp_roc.tsv.gz", "indel_roc.tsv.gz", "test_roc.tsv.gz", "test+snp_roc.tsv.gz", "test+indel_roc.tsv.gz", "weighted_roc.tsv.gz"}, false, "--roc-cross-join", "--roc-expr test=INFO.TEST>5", "--roc-subset snp,indel");
+    endToEnd("vcfeval_roccrossjoin/vcfeval_roccrossjoin", new String[] {"snp_roc.tsv.gz", "indel_roc.tsv.gz", "test_roc.tsv.gz", "test+snp_roc.tsv.gz", "test+indel_roc.tsv.gz", "weighted_roc.tsv.gz"}, false, "--roc-cross-join", "--roc-expr",  "test=INFO.TEST>5", "--roc-subset", "snp,indel");
   }
 
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
