@@ -1,0 +1,8 @@
+#Version [...]
+#CL [...]
+#selection: test+SNP
+#total baseline variants: 4
+#total call variants: 4
+#score field: GQ (FORMAT)
+#score	true_positives_baseline	false_positives	true_positives_call
+None	1.00	0.00	1.00

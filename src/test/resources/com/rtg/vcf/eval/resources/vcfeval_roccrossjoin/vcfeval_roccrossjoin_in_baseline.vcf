@@ -1,0 +1,12 @@
+##fileformat=VCFv4.2
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+##INFO=<ID=TEST,Number=1,Type=Integer,Description="Test value">
+##contig=<ID=chr1,length=12>
+##contig=<ID=chr2,length=13>
+##contig=<ID=chr3,length=15>
+##contig=<ID=chr4,length=17>
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	syndip
+chr1	11	.	T	A	.	.	TEST=4	GT	0|1
+chr2	12	.	G	GA	.	.	.	GT	1|1
+chr3	13	.	T	C	.	.	TEST=7	GT	1|0
+chr4	14	.	A	G	.	.	TEST=8	GT	0|1

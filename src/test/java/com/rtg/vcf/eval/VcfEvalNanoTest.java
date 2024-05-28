@@ -166,6 +166,10 @@ public class VcfEvalNanoTest extends AbstractVcfEvalTest {
     endToEnd("vcfeval_tetraploid/small", new String[] {"baseline.vcf", "calls.vcf"}, false, "--output-mode=annotate", "--no-roc", "--sample-ploidy=4", "--Xobey-phase=true,false");
   }
 
+  public void testNanoRocCrossJoin() throws IOException, UnindexableDataException {
+    endToEnd("vcfeval_roccrossjoin/vcfeval_roccrossjoin", new String[] {"test+snp_roc.tsv", "test+indel_roc.tsv", "weighted_roc.tsv"}, false, "--roc-cross-join", "--roc-expr",  "test=INFO.TEST>5", "--roc-subset", "snp,indel");
+  }
+
   private void check(String id, boolean checkTp, boolean checkFp, boolean expectWarn, String... args) throws IOException, UnindexableDataException {
     final ArrayList<String> files = new ArrayList<>();
     files.add("weighted_roc.tsv");

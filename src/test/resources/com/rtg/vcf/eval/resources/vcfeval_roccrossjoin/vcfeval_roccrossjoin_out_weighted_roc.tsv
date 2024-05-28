@@ -1,0 +1,8 @@
+#Version [...]
+#CL [...]
+#selection: ALL
+#total baseline variants: 4
+#total call variants: 4
+#score field: GQ (FORMAT)
+#score	true_positives_baseline	false_positives	true_positives_call	false_negatives	precision	sensitivity	f_measure
+None	3.00	1.00	3.00	1.00	0.7500	0.7500	0.7500

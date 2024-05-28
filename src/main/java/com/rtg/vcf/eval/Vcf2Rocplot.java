@@ -43,7 +43,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.rtg.launcher.CommonFlags;
 import com.rtg.launcher.LoggedCli;
@@ -183,7 +186,11 @@ public class Vcf2Rocplot extends LoggedCli {
     }
     mRoc = new RocContainer(mRocExtractor);
     mRoc.setRocPointCriteria(criteria);
-    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>()));
+    final Set<String> genotypeSubsets = new HashSet<>(Arrays.asList(RocFilter.HET.name(), RocFilter.HOM.name()));
+    final Set<String> variantSubsets = new HashSet<>(
+              Arrays.asList(RocFilter.SNP.name(), RocFilter.NON_SNP.name(), RocFilter.INDEL.name(), RocFilter.MNP.name(), CnvEvalCli.CnvRocFilter.DEL.name(), CnvEvalCli.CnvRocFilter.DUP.name())
+    );
+    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>(), genotypeSubsets, variantSubsets));
 
     final EvaluatedVariantsLoader[] loaders = {
       new WithInfoVcfLoader(),

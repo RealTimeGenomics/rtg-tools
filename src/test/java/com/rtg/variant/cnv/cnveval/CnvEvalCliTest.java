@@ -84,7 +84,12 @@ public class CnvEvalCliTest extends AbstractCnvEvalTest {
   }
 
   public void testNanoSmallAnnotate() throws IOException, UnindexableDataException {
-    endToEnd("cnveval_small", "cnveval_small", new String[] {"summary.txt", "baseline.vcf", "calls.vcf"}, false, "--vcf-score-field", "INFO.SQS");
+    endToEnd("cnveval_small", "cnveval_small", new String[] {"summary.txt", "baseline.vcf", "calls.vcf", "weighted_roc.tsv", "del_roc.tsv", "dup_roc.tsv"}, false, "--vcf-score-field", "INFO.SQS", "--roc-subset", "del,dup");
+  }
+
+  public void testNanoSmallAnnotateTrivialCrossJoin() throws IOException, UnindexableDataException {
+    // Using the same resultsID here - adding --roc-cross-join should not cause baseline rescaling to change
+    endToEnd("cnveval_small", "cnveval_small", new String[] {"summary.txt", "baseline.vcf", "calls.vcf", "weighted_roc.tsv", "del_roc.tsv", "dup_roc.tsv"}, false, "--vcf-score-field", "INFO.SQS", "--roc-subset", "del,dup", "--roc-cross-join");
   }
 
   public void testNanoSmallAnnotateNoRoc() throws IOException, UnindexableDataException {

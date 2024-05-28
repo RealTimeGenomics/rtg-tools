@@ -1,0 +1,15 @@
+#Version [...]
+#CL [...]
+#selection: DUP
+#total baseline variants: 1249
+#total call variants: 981
+#score field: SQS (INFO)
+#score	true_positives_baseline	false_positives	true_positives_call
+0.653	19.00	0.00	19.00
+0.572	37.00	1.00	37.00
+0.567	56.00	1.00	56.00
+0.507	80.00	1.00	80.00
+0.502	108.00	1.00	108.00
+0.465	138.00	1.00	138.00
+0.443	174.00	1.00	174.00
+0.403	215.00	1.00	215.00

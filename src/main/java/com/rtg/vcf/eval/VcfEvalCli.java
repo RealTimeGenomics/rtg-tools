@@ -36,11 +36,14 @@ import static com.rtg.util.cli.CommonFlagCategories.REPORTING;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import com.reeltwo.jumble.annotations.TestClass;
@@ -92,6 +95,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
   protected static final String ROC_SUBSET = "roc-subset";
   protected static final String ROC_EXPR = "roc-expr";
   protected static final String ROC_REGIONS = "roc-regions";
+  protected static final String ROC_CROSS_JOIN = "roc-cross-join";
   private static final String SLOPE_FILES = "Xslope-files";
   private static final String MAX_LENGTH = "Xmax-length";
   private static final String TWO_PASS = "Xtwo-pass";
@@ -215,6 +219,7 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     flags.registerOptional(ROC_SUBSET, rocfilterclass, CommonFlags.STRING, "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
     flags.registerOptional(ROC_EXPR, String.class, CommonFlags.STRING, "output ROC file for variants matching custom JavaScript expression. Use the form <LABEL>=<EXPRESSION>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
     flags.registerOptional(ROC_REGIONS, String.class, CommonFlags.STRING, "output ROC file for variants overlapping custom regions supplied in BED file. Use the form <LABEL>=<FILENAME>").setMaxCount(Integer.MAX_VALUE).setCategory(REPORTING);
+    flags.registerOptional(ROC_CROSS_JOIN, "output ROC files for each intersection of --" + ROC_SUBSET + ", --" + ROC_EXPR + ", and --" + ROC_REGIONS + " values provided").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_PRECISION, Double.class, CommonFlags.FLOAT, "output summary statistics where precision >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SENSITIVITY, Double.class, CommonFlags.FLOAT, "output summary statistics where sensitivity >= supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
     flags.registerOptional(CRITERIA_SCORE, Double.class, CommonFlags.FLOAT, "output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)").setCategory(REPORTING);
@@ -365,7 +370,11 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
     final String[] phaseTypes = splitPairedSpec((String) mFlags.getValue(OBEY_PHASE));
     builder.baselinePhaseOrientor(phaseTypeToOrientor(phaseTypes[0], haplotypes));
     builder.callsPhaseOrientor(phaseTypeToOrientor(phaseTypes[1], haplotypes));
-    final Set<RocFilter> rocFilters = getRocFilters(mFlags, Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP));
+    final Set<String> genotypeSubsets = new HashSet<>(Arrays.asList(RocFilter.HET.name(), RocFilter.HOM.name()));
+    final Set<String> variantSubsets = new HashSet<>(
+              Arrays.asList(RocFilter.SNP.name(), RocFilter.NON_SNP.name(), RocFilter.INDEL.name(), RocFilter.MNP.name())
+    );
+    final Set<RocFilter> rocFilters = getRocFilters(mFlags, Arrays.asList(RocFilter.SNP, RocFilter.NON_SNP), genotypeSubsets, variantSubsets);
     builder.rocFilters(rocFilters);
     if (mFlags.isSet(CRITERIA_PRECISION)) {
       builder.rocCriteria(new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION)));
@@ -396,31 +405,75 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
    * Helper method to construct roc filters from flags
    * @param flags the flags with options set
    * @param fallbackRocFilters the default filters to configure if no flags were provided
+   * @param rocSubsetGroups defines how to group together the various pre-defined roc subsets when determining
+   * cross-join combinations
    * @return the set of roc filters to use
    * @throws IOException if a region based filter is specified but cannot be loaded
    */
-  public static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters) throws IOException {
-    final Set<RocFilter> rocFilters = new LinkedHashSet<>(Collections.singletonList(RocFilter.ALL));  // We require the ALL entry for aggregate stats
-    if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
-      final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);
-      for (Object o : values) {
-        rocFilters.add(((RocFilterProxy) o).filter());
-      }
-    }
+  @SafeVarargs
+  public static Set<RocFilter> getRocFilters(CFlags flags, List<RocFilter> fallbackRocFilters, Set<String>... rocSubsetGroups) throws IOException {
+    final LinkedHashMap<Object, Set<RocFilter>> rocFiltersTypeMap = new LinkedHashMap<>();
+
+    final Set<RocFilter> rocExprFilters = new LinkedHashSet<>();
     if (flags.isSet(ROC_EXPR)) {
       final List<?> values = flags.getValues(VcfEvalCli.ROC_EXPR);
       for (Object o : values) {
         final String[] e = StringUtils.split((String) o, '=', 2);
         assert e.length == 2;
-        rocFilters.add(new ExpressionRocFilter(e[0], e[1]));
+        rocExprFilters.add(new ExpressionRocFilter(e[0], e[1]));
       }
     }
+    rocFiltersTypeMap.put(ROC_EXPR, rocExprFilters);
+
+    final Set<RocFilter> rocRegionsFilters = new LinkedHashSet<>();
     if (flags.isSet(ROC_REGIONS)) {
       final List<?> values = flags.getValues(VcfEvalCli.ROC_REGIONS);
       for (Object o : values) {
         final String[] e = StringUtils.split((String) o, '=', 2);
         assert e.length == 2;
-        rocFilters.add(new RegionsRocFilter(e[0], new File(e[1])));
+        rocRegionsFilters.add(new RegionsRocFilter(e[0], new File(e[1])));
+      }
+    }
+    rocFiltersTypeMap.put(ROC_REGIONS, rocRegionsFilters);
+
+    // Split subset filters into flavors for intersecting in ROC_CROSS_JOIN
+    for (Set<String> group : rocSubsetGroups) {
+      rocFiltersTypeMap.put(group, new LinkedHashSet<>());
+    }
+    if (flags.isSet(VcfEvalCli.ROC_SUBSET)) {
+      final List<?> values = flags.getValues(VcfEvalCli.ROC_SUBSET);
+      for (Object o : values) {
+        boolean invalid = true;
+        final RocFilter rocFilter = ((RocFilterProxy) o).filter();
+        for (Set<String> group : rocSubsetGroups) {
+          if (group.contains(rocFilter.name())) {
+            rocFiltersTypeMap.get(group).add(rocFilter);
+            invalid = false;
+          }
+        }
+        if (invalid) {
+          throw new NoTalkbackSlimException("Cannot use roc-subset filter: " + rocFilter.name() + " with this tool.");
+        }
+      }
+    }
+
+    final Set<RocFilter> rocFilters = new LinkedHashSet<>();
+    if (flags.isSet(ROC_CROSS_JOIN)) {
+      final List<Object> keys = new ArrayList<>();
+      for (Map.Entry<Object, Set<RocFilter>> e : rocFiltersTypeMap.entrySet()) {
+        if (!e.getValue().isEmpty()) {
+          keys.add(e.getKey());
+        }
+      }
+      if (keys.size() > 0) {
+        buildCombinedRocFilters(rocFilters, rocFiltersTypeMap, keys, 0, new RocFilter[keys.size()]);
+      }
+      rocFilters.add(RocFilter.ALL);  // Make sure this is added at end for downstream
+
+    } else {
+      rocFilters.add(RocFilter.ALL); // We require the ALL entry for aggregate stats
+      for (Set<RocFilter> filters : rocFiltersTypeMap.values()) {
+        rocFilters.addAll(filters);
       }
     }
 
@@ -430,4 +483,19 @@ public class VcfEvalCli extends ParamsCli<VcfEvalParams> {
 
     return rocFilters;
   }
+
+  private static void buildCombinedRocFilters(Set<RocFilter> filters, LinkedHashMap<Object, Set<RocFilter>> rocFiltersTypeMap, List<Object> keys, int pos, RocFilter[] path) {
+    if (pos < keys.size()) {
+      final Set<RocFilter> group = rocFiltersTypeMap.get(keys.get(pos));
+      for (RocFilter f : group) {
+        path[pos] = f;
+        buildCombinedRocFilters(filters, rocFiltersTypeMap, keys, pos + 1, path);
+      }
+    } else {
+      final List<RocFilter> delegates = Arrays.asList(path);
+      final boolean rescale = delegates.stream().allMatch(RocFilter::rescale);
+      filters.add(new CombinedRocFilter(delegates, rescale));
+    }
+  }
+
 }

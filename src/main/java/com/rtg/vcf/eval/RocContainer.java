@@ -443,7 +443,7 @@ public class RocContainer {
   }
 
   /**
-   * Issue a warning if there were were variants that did not contain the score field.
+   * Issue a warning if there were variants that did not contain the score field.
    */
   public void missingScoreWarning() {
     if (isRocEnabled() && getNumberOfIgnoredVariants() > 0) {

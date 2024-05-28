@@ -43,8 +43,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.rtg.bed.BedRecord;
 import com.rtg.bed.BedUtils;
@@ -195,7 +197,10 @@ public class CnvEvalCli extends LoggedCli {
     }
 
     final RocContainer roc = new RocContainer(rocExtractor);
-    roc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>()));
+    final Set<String> variantSubsets = new HashSet<>(Arrays.asList(
+        CnvEvalCli.CnvRocFilter.DEL.name(), CnvEvalCli.CnvRocFilter.DUP.name()
+    ));
+    roc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>(), variantSubsets));
 
     roc.setHeader(baseline.getHeader());
     for (final CnaVariantList chrVars : baseline.values()) {
