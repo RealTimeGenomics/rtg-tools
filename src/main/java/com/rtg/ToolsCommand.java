@@ -111,7 +111,7 @@ public final class ToolsCommand {
   static final Command VCFSPLIT = new Command(new VcfSplitCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command SVDECOMPOSE = new Command(new VcfSvDecomposer(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command BNDEVAL = new Command(new BndEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
-  static final Command CNVEVAL = new Command(new CnvEvalCli(), CommandCategory.UTILITY, ReleaseLevel.ALPHA);
+  static final Command CNVEVAL = new Command(new CnvEvalCli(), CommandCategory.UTILITY, ReleaseLevel.BETA);
   static final Command PEDFILTER = new Command(new PedFilterCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command PEDSTATS = new Command(new PedStatsCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
   static final Command ROCPLOT = new Command(new RocPlotCli(), CommandCategory.UTILITY, ReleaseLevel.GA);
