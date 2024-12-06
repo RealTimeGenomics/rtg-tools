@@ -57,5 +57,8 @@ public class CnaTypeTest extends TestCase {
     final VcfRecord rec3 = new VcfRecord("seq1", 42, "A");
     rec3.setInfo("SVTYPE", "FOO");
     assertEquals(CnaType.NONE, CnaType.valueOf(rec3));
+    final VcfRecord rec4 = new VcfRecord("seq1", 42, "A").addAltCall(VcfUtils.ALT_DEL);
+    rec4.setInfo("SVTYPE", "CNV");
+    assertEquals(CnaType.DEL, CnaType.valueOf(rec4));
   }
 }

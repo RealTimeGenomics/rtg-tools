@@ -31,7 +31,10 @@ package com.rtg.variant.cnv;
 
 import static com.rtg.vcf.VcfUtils.INFO_SVTYPE;
 
+import java.util.List;
+
 import com.rtg.vcf.VcfRecord;
+import com.rtg.vcf.VcfUtils;
 
 /** Simple classification of copy number alteration types */
 public enum CnaType {
@@ -58,6 +61,17 @@ public enum CnaType {
         return CnaType.DUP;
       case "DEL":
         return CnaType.DEL;
+      case "CNV":
+        final List<String> alts = rec.getAltCalls();
+        if (alts.size() == 1) {
+          final String alt = alts.get(0);
+          if (VcfUtils.ALT_DEL.equals(alt)) {
+            return CnaType.DEL;
+          } else if (VcfUtils.ALT_DUP.equals(alt)) {
+            return CnaType.DUP;
+          }
+        }
+        return CnaType.NONE;
       default:
         return CnaType.NONE;
     }
