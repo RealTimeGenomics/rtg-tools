@@ -44,7 +44,6 @@ import javax.script.CompiledScript;
 import javax.script.Invocable;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import com.reeltwo.jumble.annotations.TestClass;
@@ -80,8 +79,7 @@ public class ScriptedVcfProcessor {
    * @param err output stream for our JavaScript error method
    */
   public ScriptedVcfProcessor(String expression, List<String> beginnings, OutputStream output, PrintStream err) {
-    final ScriptEngineManager manager = new ScriptEngineManager();
-    mEngine = manager.getEngineByName("js");
+    mEngine = new org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory().getScriptEngine();
     if (mEngine == null) {
       throw new NoTalkbackSlimException("JVM does not contain a javascript engine");
     }

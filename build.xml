@@ -58,12 +58,12 @@
     <include name="commons-compress-1.4.1.jar" />
     <include name="snappy-java-1.1.4.jar" />
     <include name="json-simple-1.1.1.jar" />
-    <include name="js-20.2.0.jar" />
-    <include name="js-scriptengine-20.2.0.jar" />
-    <include name="graal-sdk-20.2.0.jar" />
-    <include name="regex-20.2.0.jar" />
-    <include name="truffle-api-20.2.0.jar" />
-    <include name="icu4j-67.1.jar" />
+    <include name="asm-7.3.1.jar" />
+    <include name="asm-analysis-7.3.1.jar" />
+    <include name="asm-commons-7.3.1.jar" />
+    <include name="asm-tree-7.3.1.jar" />
+    <include name="asm-util-7.3.1.jar" />
+    <include name="nashorn-core-15.4.jar" />
   </fileset>
 
   <path id="tools.runtime.classpath">
@@ -107,6 +107,13 @@
     <zipfileset src="${tools.src.lib.dir}/commons-compress-1.4.1.jar" excludes="META-INF/**" />
     <zipfileset src="${tools.src.lib.dir}/snappy-java-1.1.4.jar" excludes="META-INF/**" includes="**/*.class" />
     <zipfileset src="${tools.src.lib.dir}/json-simple-1.1.1.jar" excludes="META-INF/**" />
+
+    <zipfileset src="${tools.src.lib.dir}/asm-7.3.1.jar" excludes="META-INF/**,module-info.class" />
+    <zipfileset src="${tools.src.lib.dir}/asm-analysis-7.3.1.jar" excludes="META-INF/**,module-info.class" />
+    <zipfileset src="${tools.src.lib.dir}/asm-commons-7.3.1.jar" excludes="META-INF/**,module-info.class" />
+    <zipfileset src="${tools.src.lib.dir}/asm-tree-7.3.1.jar" excludes="META-INF/**,module-info.class" />
+    <zipfileset src="${tools.src.lib.dir}/asm-util-7.3.1.jar" excludes="META-INF/**,module-info.class" />
+    <zipfileset src="${tools.src.lib.dir}/nashorn-core-15.4.jar" excludes="META-INF/**,module-info.class" />
 
     <zipfileset src="${tools.src.lib.dir}/RPlot.jar" excludes="META-INF/**"/>
     <zipfileset src="${tools.src.lib.dir}/gzipfix.jar">
