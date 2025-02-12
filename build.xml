@@ -23,6 +23,8 @@
   <property name="build.executable" location="${build.dir}/executable"/>
   <property name="build.misc" location="${build.dir}/misc"/>
 
+  <property name="javac.extra.compiler.args" value="-proc:none"/>
+
   <property name="build.sysclasspath" value="ignore"/>
   <taskdef resource="net/sf/antcontrib/antlib.xml">
     <classpath>
@@ -215,14 +217,11 @@
     <echo message="Current build revision is ${rtg.vcs.commit.revision}"/>
   </target>
 
-
   <target name="compile-src" depends="init" description="Compiles all code in src.">
     <property name="src.path" refid="src.path" />
     <javac destdir="${build.src}"  debug="true"
            sourcepath="" srcdir="${src.path}">
-      <compilerarg value="-Xlint" />
-      <compilerarg value="-Xlint:-serial" />
-      <compilerarg value="-proc:none" />
+      <compilerarg line="${javac.extra.compiler.args}" />
       <classpath>
         <resources refid="runtime.libs"/>
         <resources refid="compiletime.libs"/>
@@ -234,9 +233,7 @@
     <property name="test.path" refid="test.path" />
     <javac destdir="${build.test}" debug="true"
            sourcepath="" srcdir="${test.path}">
-      <compilerarg value="-Xlint" />
-      <compilerarg value="-Xlint:-serial" />
-      <compilerarg value="-proc:none" />
+      <compilerarg line="${javac.extra.compiler.args}" />
       <classpath>
         <pathelement path="${build.src}"/>
         <resources refid="runtime.libs"/>
