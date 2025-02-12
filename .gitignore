@@ -30,5 +30,6 @@ tmp
 *.project
 /test/.checkstyle
 /.metadata
+/target
 /.idea
 *.iml
