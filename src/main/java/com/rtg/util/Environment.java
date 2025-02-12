@@ -37,7 +37,8 @@ import java.lang.management.OperatingSystemMXBean;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.UnknownHostException;
 import java.util.HashMap;
@@ -302,13 +303,13 @@ public final class Environment {
       return null;
     }
     try {
-      final URLConnection conn = new URL("https://api.github.com/repos/" + repo + "/releases/latest").openConnection();
+      final URLConnection conn = new URI("https://api.github.com/repos/" + repo + "/releases/latest").toURL().openConnection();
       // Use short timeout so this doesn't take ages if there are network problems
       conn.setConnectTimeout(2000);
       conn.setReadTimeout(3000);
       final JSONObject dict = (JSONObject) new JSONParser().parse(IOUtils.readAll(conn.getInputStream()));
       return (String) dict.get("tag_name");
-    } catch (IOException | ParseException e) {
+    } catch (IOException | ParseException | URISyntaxException e) {
       Diagnostic.developerLog(e);
       return null;
     }

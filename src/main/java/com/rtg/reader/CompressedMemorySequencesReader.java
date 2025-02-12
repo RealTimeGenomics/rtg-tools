@@ -261,7 +261,7 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
         final DataFileIndex seqIndex = DataFileIndex.loadSequenceDataFileIndex(index.dataIndexVersion(), dir);
         mPositions = new LongChunks(mEnd - mStart + 1);
         mChecksums = ByteArray.allocate(mPositions.length() - 1);
-        final DataFileOpenerFactory openerFactory = new DataFileOpenerFactory(mIndex.getSequenceEncoding(), mIndex.getQualityEncoding(), type());
+        final DataFileOpenerFactory openerFactory = new DataFileOpenerFactory(mIndex.getSequenceEncoding(), mIndex.getQualityEncoding(), SequenceType.values()[mIndex.getSequenceType()]);
         if (mIndex.hasQuality() && mIndex.hasPerSequenceChecksums()) {
           mQualityChecksums = initQualityChecksumArray();
         }
@@ -472,11 +472,11 @@ public class CompressedMemorySequencesReader extends AbstractSequencesReader imp
     }
   }
 
-  ByteArray initQualityChecksumArray() {
+  final ByteArray initQualityChecksumArray() {
     return ByteArray.allocate(mPositions.length() - 1);
   }
 
-  void infoString(final StringBuilder sb) {
+  final void infoString(final StringBuilder sb) {
     sb.append("Memory Usage\tbytes\tlength").append(LS);
     long totalBytes = 0;
     sb.append("\t\t").append(StringUtils.commas(mSeqData.bytes())).append("\t").append(StringUtils.commas(mSeqData.length())).append("\tSeqData").append(LS);

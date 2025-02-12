@@ -45,7 +45,7 @@ import com.rtg.vcf.header.VcfNumber;
 /**
  * Decomposes variants during reading.
  */
-public class DecomposingVcfIterator extends Decomposer implements VcfIterator {
+public final class DecomposingVcfIterator extends Decomposer implements VcfIterator {
 
   private static final String ORP = "ORP";
   private static final String ORL = "ORL";

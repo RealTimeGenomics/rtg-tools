@@ -55,7 +55,7 @@ import htsjdk.samtools.util.RuntimeIOException;
 /**
  * Reads BAM data
  */
-public class BamReader extends SamBamReader {
+public final class BamReader extends SamBamReader {
 
   private final SamBamRecordImpl mCurrentRecord;
 

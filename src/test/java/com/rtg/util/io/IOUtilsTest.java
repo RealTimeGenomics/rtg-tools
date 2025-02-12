@@ -90,8 +90,8 @@ public class IOUtilsTest extends TestCase {
       fw.close();
 
       assertEquals(STRING, IOUtils.readAll(a));
-      assertEquals(STRING, IOUtils.readAll(new URL(a.toURI().toString())));
-      checkBytes(BYTES, IOUtils.readData(new URL(a.toURI().toString())));
+      assertEquals(STRING, IOUtils.readAll(a.toURI().toURL()));
+      checkBytes(BYTES, IOUtils.readData(a.toURI().toURL()));
     } finally {
       assertTrue(!a.exists() || FileHelper.deleteAll(a));
     }

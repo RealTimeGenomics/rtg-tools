@@ -129,7 +129,7 @@ public class PriorPopulationVariantGenerator extends PopulationVariantGenerator 
 
             double count = Double.parseDouble(parts[1]);
             count = biasFactor * count * freq + (1.0 - biasFactor) * count * (1 - freq);
-            cumcount += count;
+            cumcount += (long) count;
             assert count >= 0 : "Illegal negative allele frequency count in priors " + count;
             assert cumcount >= 0 : "Overflow in allele frequency prior counts";
 

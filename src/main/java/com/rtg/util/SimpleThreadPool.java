@@ -109,6 +109,7 @@ public final class SimpleThreadPool {
             }
             while (!mJobs.isEmpty() && mThreads.size() < mMaxThreads) {
               final WorkerThread t = new WorkerThread(mSubName + "-" + mThreads.size(), mJobs);
+              t.setDaemon(true);
               mThreads.add(t);
               if (mLogLifecycleEvents) {
                 Diagnostic.developerLog(mSubName + ": Worker Thread Created - " + t.getName() + " - " + mThreads.size() + "/" + mMaxThreads + " Threads");

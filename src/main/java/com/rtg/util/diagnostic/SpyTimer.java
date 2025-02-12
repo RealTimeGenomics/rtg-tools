@@ -32,7 +32,7 @@ package com.rtg.util.diagnostic;
 
 /**
  */
-public class SpyTimer extends Timer {
+public final class SpyTimer extends Timer {
 
   /**
    * Do timing and output to developer log at end of run.

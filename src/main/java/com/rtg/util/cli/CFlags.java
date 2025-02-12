@@ -102,17 +102,17 @@ public final class CFlags {
 
   static {
     // Try a couple of approaches to working out a larger default value, 80 is fairly cramped
-    int defaultWidth = getTermWidth("printenv TERMCAP", ":CO#([0-9]+):", 1);
+    int defaultWidth = getTermWidth(new String[] {"printenv", "TERMCAP"}, ":CO#([0-9]+):", 1);
     if (defaultWidth == -1) {
-      defaultWidth = getTermWidth("stty -F /dev/tty size", "([0-9]+) ([0-9]+)", 2);
+      defaultWidth = getTermWidth(new String[] {"stty", "-F", "/dev/tty size"}, "([0-9]+) ([0-9]+)", 2);
     }
     if (defaultWidth == -1) {
-      defaultWidth = getTermWidth("stty -f /dev/tty size", "([0-9]+) ([0-9]+)", 2);
+      defaultWidth = getTermWidth(new String[] {"stty", "-f", "/dev/tty size"}, "([0-9]+) ([0-9]+)", 2);
     }
     DEFAULT_WIDTH = Math.max(MIN_WIDTH, Math.min(defaultWidth, MAX_WIDTH));
   }
 
-  private static int getTermWidth(String command, String regex, int group) {
+  private static int getTermWidth(String[] command, String regex, int group) {
     try {
       final Process p = Runtime.getRuntime().exec(command);
       try {

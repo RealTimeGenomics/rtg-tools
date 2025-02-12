@@ -56,7 +56,6 @@ public class WorkerThread extends Thread {
    */
   public WorkerThread(final String name, final Object complete) {
     super(name);
-    setDaemon(true);
     mCompleteNotify = complete;
   }
 

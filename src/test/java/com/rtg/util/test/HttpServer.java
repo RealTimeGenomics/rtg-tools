@@ -37,6 +37,8 @@ import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,7 +119,7 @@ public class HttpServer {
             if (requestURL.startsWith("/")) {
               requestURL = "http://localhost" + requestURL;
             }
-            final URL u = new URL(requestURL);
+            final URL u = new URI(requestURL).toURL();
 
             final Map<String, String> get = decodeQuery(u.getQuery());
             final Map<String, String> headers = readHeaders(br);
@@ -136,7 +138,7 @@ public class HttpServer {
             }
           }
         }
-      } catch (final IOException e) {
+      } catch (final IOException | URISyntaxException e) {
         throw new RuntimeException(e);
       }
     }

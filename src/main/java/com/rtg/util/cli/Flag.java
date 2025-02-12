@@ -34,6 +34,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -182,7 +184,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    *
    * Currently implemented by moving the flag to the extended help section.
    */
-  public void setDeprecated() {
+  public final void setDeprecated() {
     mLevel = Level.EXTENDED;
     mDeprecated = true;
   }
@@ -308,7 +310,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param count the maximum number of times the flag can be specified.
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> setMaxCount(final int count) {
+  public final Flag<T> setMaxCount(final int count) {
     if ((count < 1) || (count < mMinCount)) {
       throw new IllegalArgumentException("MaxCount (" + count
           + ") must not be 0 or less than MinCount (" + mMinCount + ")");
@@ -322,7 +324,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    *
    * @return the maximum number of times the flag can be specified.
    */
-  public int getMaxCount() {
+  public final int getMaxCount() {
     return mMaxCount;
   }
 
@@ -332,7 +334,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param count the minimum number of times the flag can be specified.
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> setMinCount(final int count) {
+  public final Flag<T> setMinCount(final int count) {
     if (count > mMaxCount) {
       throw new IllegalArgumentException("MinCount (" + count
           + ") must not be greater than MaxCount (" + mMaxCount + ")");
@@ -350,7 +352,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    *
    * @return the minimum number of times the flag can be specified.
    */
-  public int getMinCount() {
+  public final int getMinCount() {
     return mMinCount;
   }
 
@@ -359,7 +361,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    *
    * @return the number of times the flag has been set.
    */
-  public int getCount() {
+  public final int getCount() {
     return mParameter.size();
   }
 
@@ -368,7 +370,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    *
    * @return true if the flag has been set.
    */
-  public boolean isSet() {
+  public final boolean isSet() {
     return mParameter.size() > 0;
   }
 
@@ -378,7 +380,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @return the character name of this flag, or null if no character name has
    * been set.
    */
-  public Character getChar() {
+  public final Character getChar() {
     return mFlagChar;
   }
 
@@ -410,7 +412,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
     return mParameterDescription;
   }
 
-  protected void setParameterDescription(String desc) {
+  protected final void setParameterDescription(String desc) {
     mParameterDescription = desc;
   }
 
@@ -440,7 +442,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param paramDefault a default value that can be used for optional flags.
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> setParameterDefault(final T paramDefault) {
+  public final Flag<T> setParameterDefault(final T paramDefault) {
     if (mParameterType == null) {
       throw new IllegalArgumentException("Cannot set default parameter for untyped flags");
     }
@@ -454,7 +456,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param range a collection of Strings.
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> setParameterRange(final Collection<String> range) {
+  public final Flag<T> setParameterRange(final Collection<String> range) {
     //System.err.println("setParameterRange range=" + range.toString());
     final String[] rarray = range.toArray(new String[0]);
     return setParameterRange(rarray);
@@ -495,7 +497,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param min the minimum
    * @param max the maximum
    */
-  public void setPsuedoMinMaxRangeString(final int min, final int max) {
+  public final void setPsuedoMinMaxRangeString(final int min, final int max) {
     final String str = minMaxUsage(min, max, mRangeList);
     if (str.length() == 0) {
       mPsuedoMinMaxString = null;
@@ -510,7 +512,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @return a <code>List</code> containing the permitted values, or null if
    * this has not been set.
    */
-  public List<String> getParameterRange() {
+  public final List<String> getParameterRange() {
     return mParameterRange;
   }
 
@@ -703,7 +705,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * The description including default values and bounds/limits
    * @return description string
    */
-  public String getUsageDescription() {
+  public final String getUsageDescription() {
     final StringBuilder description = new StringBuilder();
     if (mDeprecated) {
       description.append("(deprecated) ");
@@ -789,7 +791,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
       } else if (type == File.class) {
         return (T) new File(stringRep);
       } else if (type == URL.class) {
-        return (T) new URL(stringRep);
+        return (T) new URI(stringRep).toURL();
       } else if (type == String.class) {
         return (T) stringRep;
       } else if (isValidEnum(type)) {
@@ -799,7 +801,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
       } else if (type == IntegerOrPercentage.class) {
         return (T) IntegerOrPercentage.valueOf(stringRep);
       }
-    } catch (final MalformedURLException | ClassNotFoundException e) {
+    } catch (final MalformedURLException | URISyntaxException | ClassNotFoundException e) {
       throw new IllegalArgumentException(e);
     } catch (final NumberFormatException e) {
       throw new IllegalArgumentException(""); // We rely on this message being empty
@@ -812,7 +814,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * and produce an list of those values
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> enableCsv() {
+  public final Flag<T> enableCsv() {
     mRangeList = true;
     return this;
   }
@@ -821,7 +823,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
    * @param category the category to set
    * @return this flag, so calls can be chained.
    */
-  public Flag<T> setCategory(final String category) {
+  public final Flag<T> setCategory(final String category) {
     mCategory = category;
     return this;
   }
@@ -829,7 +831,7 @@ public class Flag<T> implements Comparable<Flag<T>> {
   /**
    * @return the category
    */
-  public String getCategory() {
+  public final String getCategory() {
     return mCategory;
   }
 }

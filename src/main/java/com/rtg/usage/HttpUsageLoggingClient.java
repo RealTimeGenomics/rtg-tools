@@ -33,7 +33,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -111,8 +112,8 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
     map.put(UsageServer.VERSION, Environment.getVersion());
   }
 
-  HttpURLConnection openConnection() throws IOException {
-    return (HttpURLConnection) new URL(mHost).openConnection();
+  HttpURLConnection openConnection() throws IOException, URISyntaxException {
+    return (HttpURLConnection) new URI(mHost).toURL().openConnection();
   }
 
   int getRetryTimeInMillis() {
@@ -174,7 +175,7 @@ public class HttpUsageLoggingClient implements UsageLoggingClient {
         } else {
           success = true; //all good!
         }
-      } catch (IOException ioe) {
+      } catch (IOException | URISyntaxException ioe) {
         failureMessage = "Failed to send usage information to " + mHost + " (" + ioe.getMessage() + ")";
         if (License.isDeveloper() || "Regression User".equals(License.getPerson())) {
           // For debugging failures during development / regression testing

@@ -81,7 +81,7 @@ public class MockSequencesReader extends DummySequencesReader {
       if (mNumberSequences > 0) {
         final int fillVal = (int) (mTotalLength / mNumberSequences);
         Arrays.fill(mLengths, fillVal);
-        mLengths[0] += mTotalLength % mNumberSequences;
+        mLengths[0] += (int) (mTotalLength % mNumberSequences);
       }
     }
   }

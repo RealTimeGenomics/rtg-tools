@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import com.rtg.util.Utils;
 import com.rtg.util.ObjectParams;
 import com.rtg.util.io.FileUtils;
 import com.rtg.util.io.GzipAsynchOutputStream;
@@ -58,7 +59,7 @@ public class OutputParams extends ObjectParams implements OutputDirParams {
     }
     mOutputDir = outDir;
     mZip = zip;
-    append(new Object[] {mOutputDir, mZip});
+    mObjects = Utils.append(mObjects, new Object[] {mOutputDir, mZip});
   }
 
   /**

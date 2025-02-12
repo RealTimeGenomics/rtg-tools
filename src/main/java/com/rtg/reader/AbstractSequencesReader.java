@@ -44,13 +44,10 @@ public abstract class AbstractSequencesReader implements AnnotatedSequencesReade
 
   private static final String README_FILENAME = "readme.txt";
 
-  private final SequencesReaderReferenceSource mReferenceSource;
-
   /**
    * Constructor
    */
   public AbstractSequencesReader() {
-    mReferenceSource = new SequencesReaderReferenceSource(this);
   }
 
   @Override
@@ -63,7 +60,7 @@ public abstract class AbstractSequencesReader implements AnnotatedSequencesReade
 
   @Override
   public SequencesReaderReferenceSource referenceSource() {
-    return mReferenceSource;
+    return new SequencesReaderReferenceSource(this);
   }
 
   // For Direct sequence access

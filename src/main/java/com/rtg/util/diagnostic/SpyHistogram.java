@@ -33,7 +33,7 @@ package com.rtg.util.diagnostic;
 /**
  * Collect counts and have them reported when <code>Spy.report()</code> is called.
  */
-public class SpyHistogram {
+public final class SpyHistogram {
   private final String mName;
   private long mCount = 0;
   private final long[] mHisto;

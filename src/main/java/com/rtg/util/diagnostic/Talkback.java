@@ -35,8 +35,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.SortedMap;
@@ -81,7 +81,7 @@ public final class Talkback {
 
   private static boolean doPost(final String url, final String contentType, final String body, final int timeout) {
     try {
-      final HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+      final HttpURLConnection conn = (HttpURLConnection) new URI(url).toURL().openConnection();
       conn.setConnectTimeout(timeout);
       conn.setReadTimeout(timeout);
       conn.setRequestMethod("POST");
@@ -93,7 +93,7 @@ public final class Talkback {
         postStream.write(data);
       }
       return conn.getResponseCode() == HttpURLConnection.HTTP_OK;
-    } catch (final MalformedURLException e) {
+    } catch (final URISyntaxException e) {
       throw new IllegalArgumentException("Bad Url", e);
     } catch (final IOException e) {
       return false;

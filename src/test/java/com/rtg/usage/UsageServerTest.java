@@ -33,12 +33,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
 import java.util.UUID;
+
 import com.rtg.AbstractTest;
 import com.rtg.util.Environment;
 import com.rtg.util.License;
@@ -137,7 +139,7 @@ public class UsageServerTest extends AbstractTest {
       try (TestDirectory dir = new TestDirectory()) {
         final UsageServer us = new UsageServer(0, dir, 4);
         us.start();
-        final HttpURLConnection http = (HttpURLConnection) new URL("http://localhost:" + us.getPort() + "/usage").openConnection();
+        final HttpURLConnection http = (HttpURLConnection) new URI("http://localhost:" + us.getPort() + "/usage").toURL().openConnection();
         http.setRequestMethod("POST");
         http.setDoOutput(true);
         http.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -280,7 +282,7 @@ public class UsageServerTest extends AbstractTest {
           }
           http.getResponseCode();
           http.disconnect();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
           // Don't care
         }
       }

@@ -122,7 +122,7 @@ public class Adjuster {
    * @param fieldName name of format field
    * @param policy policy (null removes handling)
    */
-  void setPolicy(final String fieldName, final Policy policy) {
+  final void setPolicy(final String fieldName, final Policy policy) {
     final Map<String, Policy> m;
     final String f;
     if (fieldName.startsWith("INFO.")) {

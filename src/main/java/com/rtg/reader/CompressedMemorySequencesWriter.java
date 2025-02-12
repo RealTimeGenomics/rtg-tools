@@ -45,7 +45,7 @@ import com.rtg.util.intervals.LongRange;
 /**
  *
  */
-public class CompressedMemorySequencesWriter extends AbstractSdfWriter {
+public final class CompressedMemorySequencesWriter extends AbstractSdfWriter {
 
   private Label mCurrentLabel;
   private final BitwiseByteArray mSeqData;

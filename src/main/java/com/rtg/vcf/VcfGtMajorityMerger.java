@@ -40,7 +40,7 @@ import com.rtg.vcf.header.VcfHeader;
 /**
  * Provides GT merging that takes a majority vote at sample variants are genotyped multiple times.
  */
-public class VcfGtMajorityMerger extends VcfRecordMerger {
+public final class VcfGtMajorityMerger extends VcfRecordMerger {
 
   private static final String DIP_MISSING = "./.";
 

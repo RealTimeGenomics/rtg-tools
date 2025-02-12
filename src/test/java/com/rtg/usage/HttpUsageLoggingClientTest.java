@@ -35,7 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 import com.rtg.util.diagnostic.Diagnostic;
@@ -156,8 +157,8 @@ public class HttpUsageLoggingClientTest extends TestCase {
     }
 
     @Override
-    HttpURLConnection openConnection() throws IOException {
-      return new HttpURLConnection(new URL(mHost)) {
+    HttpURLConnection openConnection() throws IOException, URISyntaxException {
+      return new HttpURLConnection(new URI(mHost).toURL()) {
         @Override
         public OutputStream getOutputStream() throws IOException {
           connect();

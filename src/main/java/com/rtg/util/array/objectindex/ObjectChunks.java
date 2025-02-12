@@ -37,7 +37,7 @@ import com.rtg.util.integrity.Exam;
  *
  * @param <A> type of objects stored in array.
  */
-public class ObjectChunks<A> extends ObjectIndex<A> {
+public final class ObjectChunks<A> extends ObjectIndex<A> {
 
   private final int mChunkBits;
 
@@ -134,7 +134,7 @@ public class ObjectChunks<A> extends ObjectIndex<A> {
   }
 
   @Override
-  public final boolean integrity() {
+  public boolean integrity() {
     super.integrity();
     Exam.assertTrue(mChunkBits > 0 && mChunkBits <= 31);
     Exam.assertTrue((mChunkSize & mChunkMask) == 0);

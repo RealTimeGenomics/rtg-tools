@@ -44,15 +44,6 @@ public abstract class ObjectParams implements Params {
   /** This is really final but needs to be set late in the constructors for the sub-classes so can't be declared final. */
   protected Object[] mObjects = new Object[0];
 
-  /**
-   * Append objects.
-   * Useful in subclasses with their own state.
-   * @param objs to be added.
-   */
-  protected void append(final Object[] objs) {
-    mObjects = Utils.append(mObjects, objs);
-  }
-
   protected final Object[] objects() {
     return mObjects;
   }

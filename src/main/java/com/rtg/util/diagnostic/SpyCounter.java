@@ -33,7 +33,7 @@ package com.rtg.util.diagnostic;
 /**
  * Collect counts and have them reported when <code>Spy.report()</code> is called.
  */
-public class SpyCounter {
+public final class SpyCounter {
   private final String mName;
   private long mCount = 0;
 

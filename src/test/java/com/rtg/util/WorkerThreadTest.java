@@ -48,7 +48,7 @@ public class WorkerThreadTest extends TestCase {
     };
     final Object signal = new Object();
     final WorkerThread wt = new WorkerThread("testWorkerThread", signal);
-    assertTrue(wt.isDaemon()); // sigh jumble
+    wt.setDaemon(true);
     wt.start();
     for (int i = 0; i < 10000; ++i) {
       synchronized (signal) {

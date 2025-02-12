@@ -36,8 +36,6 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -72,38 +70,35 @@ public final class TestUtils {
    */
   public static <T extends Enum<T>> void testEnum(final Class<T> clazz, final String expectedToString) {
     // Check toString of values
-    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-      try {
-        final Method values = clazz.getMethod("values");
-        values.setAccessible(true);
-        final Object[] r = (Object[]) values.invoke(null);
-        Assert.assertEquals(expectedToString, Arrays.toString(r));
+    try {
+      final Method values = clazz.getMethod("values");
+      values.setAccessible(true);
+      final Object[] r = (Object[]) values.invoke(null);
+      Assert.assertEquals(expectedToString, Arrays.toString(r));
 
-        final Method valueOf = clazz.getMethod("valueOf", String.class);
-        valueOf.setAccessible(true);
+      final Method valueOf = clazz.getMethod("valueOf", String.class);
+      valueOf.setAccessible(true);
 
 
-        final Method ordinal = clazz.getMethod("ordinal");
-        ordinal.setAccessible(true);
+      final Method ordinal = clazz.getMethod("ordinal");
+      ordinal.setAccessible(true);
 
-        final Method nameMethod = clazz.getMethod("name");
-        nameMethod.setAccessible(true);
+      final Method nameMethod = clazz.getMethod("name");
+      nameMethod.setAccessible(true);
 
-        // Check ordinal and valueOf
-        for (int i = 0; i < r.length; ++i) {
-          final int oi = (Integer) ordinal.invoke(r[i]);
-          Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
-          final String name = (String) nameMethod.invoke(r[i]);
-          Assert.assertEquals(r[i], valueOf.invoke(null, name));
-          Assert.assertEquals(Enum.valueOf(clazz, name), r[i]);
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e);
+      // Check ordinal and valueOf
+      for (int i = 0; i < r.length; ++i) {
+        final int oi = (Integer) ordinal.invoke(r[i]);
+        Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
+        final String name = (String) nameMethod.invoke(r[i]);
+        Assert.assertEquals(r[i], valueOf.invoke(null, name));
+        Assert.assertEquals(Enum.valueOf(clazz, name), r[i]);
       }
-      return null;
-    });
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -119,37 +114,34 @@ public final class TestUtils {
    */
   public static <T extends PseudoEnum> void testPseudoEnum(final Class<T> clazz, final String expectedToString) {
     // Check toString of values
-    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-      try {
-        final Method values = clazz.getMethod("values");
-        values.setAccessible(true);
-        final Object[] r = (Object[]) values.invoke(null);
-        Assert.assertEquals(expectedToString, Arrays.toString(r));
+    try {
+      final Method values = clazz.getMethod("values");
+      values.setAccessible(true);
+      final Object[] r = (Object[]) values.invoke(null);
+      Assert.assertEquals(expectedToString, Arrays.toString(r));
 
-        final Method valueOf = clazz.getMethod("valueOf", String.class);
-        valueOf.setAccessible(true);
+      final Method valueOf = clazz.getMethod("valueOf", String.class);
+      valueOf.setAccessible(true);
 
 
-        final Method ordinal = clazz.getMethod("ordinal");
-        ordinal.setAccessible(true);
+      final Method ordinal = clazz.getMethod("ordinal");
+      ordinal.setAccessible(true);
 
-        final Method nameMethod = clazz.getMethod("name");
-        nameMethod.setAccessible(true);
+      final Method nameMethod = clazz.getMethod("name");
+      nameMethod.setAccessible(true);
 
-        // Check ordinal and valueOf
-        for (int i = 0; i < r.length; ++i) {
-          final int oi = (Integer) ordinal.invoke(r[i]);
-          Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
-          final String name = (String) nameMethod.invoke(r[i]);
-          Assert.assertEquals(r[i], valueOf.invoke(null, name));
-        }
-      } catch (final RuntimeException e) {
-        throw e;
-      } catch (final Exception e) {
-        throw new RuntimeException(e);
+      // Check ordinal and valueOf
+      for (int i = 0; i < r.length; ++i) {
+        final int oi = (Integer) ordinal.invoke(r[i]);
+        Assert.assertEquals("Enum member " + r[i] + " at position " + i + " had ordinal " + oi, i, oi);
+        final String name = (String) nameMethod.invoke(r[i]);
+        Assert.assertEquals(r[i], valueOf.invoke(null, name));
       }
-      return null;
-    });
+    } catch (final RuntimeException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -445,18 +437,13 @@ public final class TestUtils {
    * testing method, there is no need to throw a checked exception.
    */
   public static Object getField(final String fieldName, final Object instance) {
-    return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        try {
-          final Field f = instance.getClass().getDeclaredField(fieldName);
-          f.setAccessible(true);
-          return f.get(instance);
-        } catch (final NoSuchFieldException | IllegalAccessException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    });
+    try {
+      final Field f = instance.getClass().getDeclaredField(fieldName);
+      f.setAccessible(true);
+      return f.get(instance);
+    } catch (final NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -470,18 +457,13 @@ public final class TestUtils {
    * testing method, there is no need to throw a checked exception.
    */
   public static Object getField(final String fieldName, final Class<?> theClass) {
-    return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        try {
-          final Field f = theClass.getDeclaredField(fieldName);
-          f.setAccessible(true);
-          return f.get(null);
-        } catch (final NoSuchFieldException | IllegalAccessException e) {
-          throw new RuntimeException(e);
-        }
-      }
-    });
+    try {
+      final Field f = theClass.getDeclaredField(fieldName);
+      f.setAccessible(true);
+      return f.get(null);
+    } catch (final NoSuchFieldException | IllegalAccessException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

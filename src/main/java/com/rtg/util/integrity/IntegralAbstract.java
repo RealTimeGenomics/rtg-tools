@@ -32,8 +32,6 @@ package com.rtg.util.integrity;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -175,10 +173,7 @@ public abstract class IntegralAbstract implements Integrity {
   }
 
   private static void setAccessible(final Field field) {
-    AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
       field.setAccessible(true);
-      return null;
-    });
   }
 
   /**
