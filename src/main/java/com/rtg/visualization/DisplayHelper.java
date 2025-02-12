@@ -31,6 +31,9 @@
 package com.rtg.visualization;
 
 
+import java.io.Console;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Locale;
 
 import com.rtg.util.Environment;
@@ -43,6 +46,23 @@ import com.rtg.util.StringUtils;
 public class DisplayHelper {
 
   private static final String DEFAULT_MARKUP = System.getProperty("rtg.default-markup", "auto");
+
+  private static final boolean HAS_TERMINAL_CONSOLE;
+  static {
+    final Console c = System.console();
+    boolean isTerminal = false;
+    if (c != null && !Environment.OS_WINDOWS) {
+      isTerminal = true;
+      // Under Java 22, we additionally need to check the result of "isTerminal".
+      try {
+        final Method isTerminalMethod = Console.class.getMethod("isTerminal");
+        isTerminal = (boolean) isTerminalMethod.invoke(c);
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        // The method doesn't exist under earlier versions
+      }
+    }
+    HAS_TERMINAL_CONSOLE = isTerminal;
+  }
 
   /** Possible user-specifiable markup implementations */
   public enum MarkupType {
@@ -71,7 +91,7 @@ public class DisplayHelper {
     AUTO {
       @Override
       DisplayHelper create() {
-        return System.console() != null && !Environment.OS_WINDOWS ? new AnsiDisplayHelper() : new DisplayHelper();
+        return HAS_TERMINAL_CONSOLE ? new AnsiDisplayHelper() : new DisplayHelper();
       }
     };
 
