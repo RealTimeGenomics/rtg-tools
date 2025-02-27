@@ -33,11 +33,6 @@ import static com.rtg.launcher.CommonFlags.FILE;
 import static com.rtg.launcher.CommonFlags.NO_GZIP;
 import static com.rtg.launcher.CommonFlags.OUTPUT_FLAG;
 import static com.rtg.util.cli.CommonFlagCategories.INPUT_OUTPUT;
-import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_PRECISION;
-import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SCORE;
-import static com.rtg.vcf.eval.VcfEvalCli.CRITERIA_SENSITIVITY;
-import static com.rtg.vcf.eval.VcfEvalCli.SCORE_FIELD;
-import static com.rtg.vcf.eval.VcfEvalCli.SORT_ORDER;
 
 import java.io.File;
 import java.io.IOException;
@@ -155,7 +150,7 @@ public class Vcf2Rocplot extends LoggedCli {
       .setMaxCount(Integer.MAX_VALUE)
       .setCategory(INPUT_OUTPUT);
 
-    VcfEvalCli.registerVcfRocFlags(mFlags, VcfUtils.QUAL, UnionRocFilter.class);
+    RocFlags.registerVcfRocFlags(mFlags, VcfUtils.QUAL, UnionRocFilter.class);
 
     CommonFlags.initThreadsFlag(mFlags);
     CommonFlags.initNoGzip(mFlags);
@@ -163,7 +158,7 @@ public class Vcf2Rocplot extends LoggedCli {
       && CommonFlags.validateInputFile(flags)
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateRegions(flags)
-      && VcfEvalCli.validateVcfRocFlags(flags)
+      && RocFlags.validateVcfRocFlags(flags)
     );
   }
 
@@ -172,25 +167,16 @@ public class Vcf2Rocplot extends LoggedCli {
     final boolean gzip = !mFlags.isSet(NO_GZIP);
 
     // Create ROC container / extractor
-    final RocSortOrder sortOrder = (RocSortOrder) mFlags.getValue(SORT_ORDER);
-    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor((String) mFlags.getValue(SCORE_FIELD), sortOrder);
-    final RocPointCriteria criteria;
-    if (mFlags.isSet(CRITERIA_PRECISION)) {
-      criteria = new PrecisionThreshold((Double) mFlags.getValue(CRITERIA_PRECISION));
-    } else if (mFlags.isSet(CRITERIA_SENSITIVITY)) {
-      criteria = new SensitivityThreshold((Double) mFlags.getValue(CRITERIA_SENSITIVITY));
-    } else if (mFlags.isSet(CRITERIA_SCORE)) {
-      criteria = new FixedScoreThreshold((Double) mFlags.getValue(CRITERIA_SCORE), sortOrder.comparator());
-    } else {
-      criteria = new FMeasureThreshold();
-    }
+    final RocSortOrder sortOrder = (RocSortOrder) mFlags.getValue(RocFlags.SORT_ORDER);
+    final String scoreField = (String) mFlags.getValue(RocFlags.SCORE_FIELD);
+    mRocExtractor = RocSortValueExtractor.getRocSortValueExtractor(scoreField, sortOrder);
     mRoc = new RocContainer(mRocExtractor);
-    mRoc.setRocPointCriteria(criteria);
+    mRoc.setRocPointCriteria(RocFlags.getRocPointCriteria(mFlags, sortOrder));
     final Set<String> genotypeSubsets = new HashSet<>(Arrays.asList(RocFilter.HET.name(), RocFilter.HOM.name()));
     final Set<String> variantSubsets = new HashSet<>(
               Arrays.asList(RocFilter.SNP.name(), RocFilter.NON_SNP.name(), RocFilter.INDEL.name(), RocFilter.MNP.name(), CnvEvalCli.CnvRocFilter.DEL.name(), CnvEvalCli.CnvRocFilter.DUP.name())
     );
-    mRoc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>(), genotypeSubsets, variantSubsets));
+    mRoc.addFilters(RocFlags.getRocFilters(mFlags, new ArrayList<>(), genotypeSubsets, variantSubsets));
 
     final EvaluatedVariantsLoader[] loaders = {
       new WithInfoVcfLoader(),

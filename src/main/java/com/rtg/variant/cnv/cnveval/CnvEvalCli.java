@@ -84,6 +84,7 @@ import com.rtg.vcf.eval.RocSortOrder;
 import com.rtg.vcf.eval.RocSortValueExtractor;
 import com.rtg.vcf.eval.VariantSetType;
 import com.rtg.vcf.eval.VcfEvalCli;
+import com.rtg.vcf.eval.RocFlags;
 import com.rtg.vcf.header.InfoField;
 import com.rtg.vcf.header.MetaType;
 import com.rtg.vcf.header.VcfHeader;
@@ -160,9 +161,9 @@ public class CnvEvalCli extends LoggedCli {
     mFlags.registerOptional(REGION_NAMES, "include evaluation region names in annotated outputs").setCategory(REPORTING);
     mFlags.registerOptional(VcfEvalCli.ALL_RECORDS, "use all records regardless of FILTER status (Default is to only process records where FILTER is \".\" or \"PASS\")").setCategory(FILTERING);
 
-    VcfEvalCli.registerVcfRocFlags(mFlags, VcfUtils.QUAL, CnvRocFilter.class);
+    RocFlags.registerVcfRocFlags(mFlags, VcfUtils.QUAL, CnvRocFilter.class);
 
-    mFlags.registerOptional(VcfEvalCli.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
+    mFlags.registerOptional(RocFlags.NO_ROC, "do not produce ROCs").setCategory(REPORTING);
     mFlags.registerOptional(RETAIN_OVERLAPS, "retain overlapping calls").setCategory(UTILITY);
 
     CommonFlags.initThreadsFlag(mFlags);
@@ -171,8 +172,7 @@ public class CnvEvalCli extends LoggedCli {
       && CommonFlags.validateInputFile(flags, VcfEvalCli.BASELINE, VcfEvalCli.CALLS, VcfEvalCli.EVAL_REGIONS_FLAG)
       && CommonFlags.validateThreads(flags)
       && CommonFlags.validateRegions(flags)
-      && flags.checkNand(VcfEvalCli.SCORE_FIELD, VcfEvalCli.NO_ROC)
-      && VcfEvalCli.validateVcfRocFlags(flags));
+      && RocFlags.validateVcfRocFlags(flags));
   }
 
   @Override
@@ -190,17 +190,18 @@ public class CnvEvalCli extends LoggedCli {
 
     // Create ROC container / extractor
     final int sampleCol = 0; // Only used if extracting FORMAT sort fields, we may want to flagify it.
-    final String scoreField = mFlags.isSet(VcfEvalCli.NO_ROC) ? null : (String) mFlags.getValue(VcfEvalCli.SCORE_FIELD);
-    final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor(scoreField, (RocSortOrder) mFlags.getValue(VcfEvalCli.SORT_ORDER));
+    final RocSortOrder sortOrder = (RocSortOrder) mFlags.getValue(RocFlags.SORT_ORDER);
+    final String scoreField = mFlags.isSet(RocFlags.NO_ROC) ? null : (String) mFlags.getValue(RocFlags.SCORE_FIELD);
+    final RocSortValueExtractor rocExtractor = RocSortValueExtractor.getRocSortValueExtractor(scoreField, sortOrder);
     if (rocExtractor.requiresSample()) {
       Diagnostic.warning("Specified score field " + rocExtractor + " requires a sample column, using first");
     }
-
     final RocContainer roc = new RocContainer(rocExtractor);
+    roc.setRocPointCriteria(RocFlags.getRocPointCriteria(mFlags, sortOrder));
     final Set<String> variantSubsets = new HashSet<>(Arrays.asList(
         CnvEvalCli.CnvRocFilter.DEL.name(), CnvEvalCli.CnvRocFilter.DUP.name()
     ));
-    roc.addFilters(VcfEvalCli.getRocFilters(mFlags, new ArrayList<>(), variantSubsets));
+    roc.addFilters(RocFlags.getRocFilters(mFlags, new ArrayList<>(), variantSubsets));
 
     roc.setHeader(baseline.getHeader());
     for (final CnaVariantList chrVars : baseline.values()) {

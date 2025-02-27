@@ -407,7 +407,7 @@ public class RocContainer {
       if (isRocEnabled()) {
         final RocPoint<Double> best = mBestCutpoint.cutpoint();
         if (best == null) {
-          Diagnostic.warning("Could not select " + mBestCutpoint.name() + " threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --" + VcfEvalCli.SCORE_FIELD);
+          Diagnostic.warning("Could not select " + mBestCutpoint.name() + " threshold from ROC data, only un-thresholded statistics will be shown. Consider selecting a different scoring attribute with --" + RocFlags.SCORE_FIELD);
         } else {
           Diagnostic.info("Selected score threshold using: " + mBestCutpoint.name());
           addSummaryRow(table, Utils.realFormat(best.getThreshold(), SCORE_DP), best.getTruePositives(), totalPositives - best.getTruePositives(), best.getRawTruePositives(), best.getFalsePositives());
