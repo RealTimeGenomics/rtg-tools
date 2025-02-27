@@ -4,6 +4,90 @@ Below are the release notes for the full RTG suite, upon which
 RTG.VERSION is based.  Not all features described below may be included
 in this product.
 
+RTG Core 3.13 (2025-05-27)
+--------------------------
+
+This release includes new features and commands, along with the
+usual assortment of minor features and bug fixes. Several of these
+result in command line arguments or changes to program outputs, so check
+existing scripts for compatibility before upgrading. Larger changes of
+note:
+
+* RTG Core is now released under the BSD license, there are no longer separate
+  non-commercial and commercial releases.
+
+* A new command cnveval assists when evaluating CNV calling algorithms. This
+  tool uses many of the same conventions as vcfeval and is supported by
+  vcf2rocplot/rocplot.
+
+* Improved ROC curve slicing and dicing.
+
+* The minimum Java version required is now Java 11. We explicitly include the
+  Nashorn JavaScript interpreter which was removed from Java 17 onwards, in
+  order to retain vcffilter JavaScript capability in these newer Java
+  releases.
+
+There have been many other minor improvements and feature
+additions. Detailed changes are listed below by area.  For more
+information on new features, see the RTG Operations Manual.
+
+### Variant Calling Evaluation and Analysis
+
+* cnveval: A new tool to evaluate CNV calls with respect to a truth set. See
+  the user manual for more information on how to use and options.
+
+* vcf2rocplot: Add support for cnveval annotated VCF files as input.
+
+* vcfeval/cnveval/vcf2rocplot: New flag --roc-cross-join to allow easily
+  outputting ROC curves corresponding to the intersection of selected criteria
+  (e.g: snps within BED file x).  See the user manual for more
+  information. Contributed by Ricky Magner.
+
+* vcfeval/cnveval/vcf2rocplot: New flag --at-score for selecting summary
+  metrics with respect to a user specified VCF score field value.
+
+* vcfeval/cnveval/vcf2rocplot: --vcf-score-field can now take a JavaScript
+  expression for custom dynamic score criteria.
+
+* vcfeval: Gracefully handle malformed VCF that have an ALT allele the same as
+  REF.
+
+* vcfeval: Correct VCF field definition for CALL_ALTERNATE and BASE_ALTERNATE.
+
+* bndeval: Fix behaviour when sequence names contain ":".
+
+* bndeval: Add the various --at-* and --roc flags for consistency with other
+  evaluation tools.
+
+* rocplot: Add the ability to show points (via UI and --points flag).
+
+* rocplot Improve error messages when running in a headless environment or
+  without fonts installed.
+
+* vcffilter: Gracefully handle malformed QUAL values.
+
+* vcffilter: Improve --javascript differentiation between inline and
+  file-based JavaScript.
+
+### Formatting, Mapping and Aligning
+
+* map / coverage: When running in an environment without fonts, skip report
+  generation.
+
+* coverage: Support coverage regions larger than 2^31.
+
+* sammerge: Fix a problem where taking a subsample of a previously subsampled
+  file had very poor statistical behavior (typically 0% or 100% of reads would
+  be retained irrespective of the subsample fraction or seed). Note: this
+  change means that a different subsample will be produced compared to
+  previous releases (even when the same seed is specified).
+
+### Other
+
+* rtg: The launcher script supports newer macbooks with Apple silicon.
+
+* index: Support indexing .gvcf.gz files.
+
 
 RTG Core 3.12.1 (2021-05-19)
 ----------------------------
