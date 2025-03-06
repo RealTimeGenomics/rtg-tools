@@ -88,7 +88,7 @@ public final class RocFlags {
    * @param <T> type of class providing roc filter subsets
    */
   public static <T extends RocFilterProxy> void registerVcfRocFlags(CFlags flags, String defaultScoreField, Class<T> rocfilterclass) {
-    flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field", defaultScoreField).setCategory(REPORTING);
+    flags.registerOptional('f', SCORE_FIELD, String.class, CommonFlags.STRING, "the name of the VCF FORMAT field to use as the ROC score. Also valid are \"QUAL\", \"INFO.<name>\" or \"FORMAT.<name>\" to select the named VCF FORMAT or INFO field, or use \"EXPR.<LABEL>=<EXPRESSION>\" to define a JavaScript expression that dynamically computes a score", defaultScoreField).setCategory(REPORTING);
     flags.registerOptional('O', SORT_ORDER, RocSortOrder.class, CommonFlags.STRING, "the order in which to sort the ROC scores so that \"good\" scores come before \"bad\" scores", RocSortOrder.DESCENDING).setCategory(REPORTING);
     if (rocfilterclass != null) {
       flags.registerOptional(ROC_SUBSET, rocfilterclass, CommonFlags.STRING, "output ROC file for preset variant subset").setMaxCount(Integer.MAX_VALUE).enableCsv().setCategory(REPORTING);
