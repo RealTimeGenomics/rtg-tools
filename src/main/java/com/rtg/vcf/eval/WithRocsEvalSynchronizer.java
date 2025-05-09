@@ -165,12 +165,12 @@ abstract class WithRocsEvalSynchronizer extends InterleavingEvalSynchronizer {
       Diagnostic.userLog("Fraction of calls outside evaluation regions: " + Utils.realFormat((double) mCallOutside / callTotal, 4) + " (" + mCallOutside + "/" + callTotal + ")");
     }
     writePhasingInfo();
-    if (mAlleleRoc != null) {
-      mAlleleRoc.writeRocs(mOutDir, mZip, mSlope);
-      // Do we want the allele-level summary too?
-      //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
-    }
     if (mDefaultRoc.isRocEnabled()) {
+      if (mAlleleRoc != null) {
+        mAlleleRoc.writeRocs(mOutDir, mZip, mSlope);
+        // Do we want the allele-level summary too?
+        //mAlleleRoc.writeSummary(mOutDir, alleleTp, mFalsePositives, mFalseNegatives);
+      }
       mDefaultRoc.writeRocs(mOutDir, mZip, mSlope);
     }
     mDefaultRoc.writeSummary(mOutDir);
