@@ -210,8 +210,8 @@ fi
 
 RTG_MIN_MEM=-Xmx64m                  # Minimal memory just used for java version checking, log sending etc.
 version=$("$RTG_JAVA" $RTG_MIN_MEM -version 2>&1 | awk '/version "/ {gsub(/"/, "", $3); print $3}')
-if [[ "$version" =~ ^1.[0-7] ]]; then
-  echo "$RTG_JAVA is not Java 8 or later"
+if [[ "${version/.*}" -lt 11 ]]; then
+  echo "$RTG_JAVA is not Java 11 or later"
   exit 1
 fi
 
