@@ -22,7 +22,7 @@ No-JRE:
   The no-JRE distribution does not include a Java Runtime Environment
   and instead uses the system-installed Java.  Ensure that at the
   command line you can enter 'java -version' and that this command
-  reports a java version of 1.8 or higher before proceeding with the
+  reports a Java version of 11 or higher before proceeding with the
   steps below. This may require setting your PATH environment variable
   to include the location of an appropriate version of java.
 
