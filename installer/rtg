@@ -21,24 +21,6 @@ else
     THIS_DIR="$(cd "$(dirname "$THIS_SCRIPT")" 2>/dev/null && pwd -P)"
 fi
 
-# Allow RTG_MEM/RTG_JAVA_OPTS to be set before subcommand name
-while [[ "${1:0:4}" == "RTG_" ]]; do
-    if [[ "${1:0:8}" == "RTG_MEM=" ]]; then
-        RTG_MEM=${1:8}
-    elif [[ "${1:0:14}" == "RTG_JAVA_OPTS=" ]]; then
-        RTG_JAVA_OPTS=${1:14}
-    else
-        echo "Error: expected RTG_MEM=NNg or RTG_JAVA_OPTS=\"<jvm arguments>\", e.g.:"
-        echo "    $0 RTG_MEM=16g help"
-        exit 1
-    fi
-    shift
-done
-
-# First stash settings from environment that the user may wish to change on a per-run basis (they need to override other configuration sources below)
-USER_RTG_MEM=$RTG_MEM
-USER_JAVA_OPTS=$RTG_JAVA_OPTS
-
 if [[ ! -r "$THIS_DIR/rtg.cfg" ]]; then
     shopt -s nocasematch
     # Perform initial setup
@@ -191,9 +173,22 @@ if [[ "${hostname}" ]] && [[ -r "$THIS_DIR/rtg.${hostname}.cfg" ]]; then
   source "$THIS_DIR/rtg.${hostname}.cfg" || exit 1
 fi
 
-# Apply settings from user environment
-RTG_MEM=${USER_RTG_MEM:-$RTG_MEM}
-RTG_JAVA_OPTS=${USER_JAVA_OPTS:-$RTG_JAVA_OPTS}
+# Allow RTG_MEM/RTG_JAVA/RTG_JAVA_OPTS override by setting before subcommand name
+while [[ "${1:0:4}" == "RTG_" ]]; do
+    if [[ "${1:0:8}" == "RTG_MEM=" ]]; then
+        RTG_MEM=${1:8}
+    elif [[ "${1:0:9}" == "RTG_JAVA=" ]]; then
+        RTG_JAVA=${1:9}
+    elif [[ "${1:0:14}" == "RTG_JAVA_OPTS=" ]]; then
+        RTG_JAVA_OPTS=${1:14}
+    else
+        echo "Error: expected RTG_MEM=NNg, RTG_JAVA=/path/to/java, or RTG_JAVA_OPTS=\"<jvm arguments>\", e.g.:"
+        echo "    $0 RTG_MEM=16g help"
+        exit 1
+    fi
+    shift
+done
+
 RTG_JAVA_OPTS_ARRAY=($RTG_JAVA_OPTS)  # explicit word split into array
 
 # Check that the mandatory config is present
