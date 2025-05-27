@@ -2,24 +2,23 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Table Of Contents &#8212; RTG Tools Operations Manual v3.12</title>
-    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Table Of Contents &#8212; RTG Tools Operations Manual v3.13</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=e0de18cf" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/documentation_options.js?v=aca65d0a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Overview" href="overview.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
@@ -33,7 +32,7 @@
         <li class="right" >
           <a href="overview.html" title="Overview"
              accesskey="N">next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Table Of Contents</a></li> 
       </ul>
     </div>  
@@ -43,8 +42,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="table-of-contents">
-<h1>Table Of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h1>
+  <section id="table-of-contents">
+<h1>Table Of Contents<a class="headerlink" href="#table-of-contents" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
@@ -52,7 +51,6 @@
 <li class="toctree-l2"><a class="reference internal" href="overview.html#rtg-software-description">RTG software description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#installation-and-deployment">Installation and deployment</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="overview.html#quick-start-instructions">Quick start instructions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="overview.html#license-management">License Management</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#technical-assistance-and-support">Technical assistance and support</a></li>
@@ -102,6 +100,7 @@
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#vcf2rocplot">vcf2rocplot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#svdecompose">svdecompose</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#bndeval">bndeval</a></li>
+<li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#cnveval">cnveval</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#pedfilter">pedfilter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#pedstats">pedstats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="rtg_command_reference.html#rocplot">rocplot</a></li>
@@ -130,7 +129,9 @@
 <li class="toctree-l2"><a class="reference internal" href="appendix.html#rtg-reference-file-format">RTG reference file format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appendix.html#pedigree-ped-input-file-format">Pedigree PED input file format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="appendix.html#genetic-map-directory">Genetic map directory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="appendix.html#rtg-commands-using-indexed-input-files">RTG commands using indexed input files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="appendix.html#rtg-commands-using-indexed-input-files">RTG commands using indexed input files</a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="appendix.html#rtg-javascript-filtering-api">RTG JavaScript filtering API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="appendix.html#vcf-record-field-access">VCF record field access</a></li>
 <li class="toctree-l3"><a class="reference internal" href="appendix.html#vcf-record-modification">VCF record modification</a></li>
@@ -146,7 +147,7 @@
 </li>
 </ul>
 </div>
-</div>
+</section>
 
 
             <div class="clearer"></div>
@@ -158,9 +159,11 @@
             <p class="logo"><a href="#">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="overview.html"
-                        title="next chapter">Overview</a></p>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="overview.html"
+                          title="next chapter">Overview</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -181,13 +184,13 @@
         <li class="right" >
           <a href="overview.html" title="Overview"
              >next</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="#">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Table Of Contents</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    &#169; Copyright 2025, Real Time Genomics.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

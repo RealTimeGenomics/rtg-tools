@@ -15,10 +15,7 @@ RTG is installed as a single executable in any system subdirectory where
 permissions authorize a particular community of users to run the
 application. RTG commands are executed through the RTG command-line
 interface (CLI). Each command has its own set of parameters and options
-described in this section. The availability of each command may be
-determined by the RTG license that has been installed. Contact
-``support@realtimegenomics.com`` to discuss changing the set of commands
-that are enabled by your license.
+described in this section.
 
 Results are organized in results directories defined by command
 parameters and settings. The command line shell environment should
@@ -134,7 +131,7 @@ launch of RTG product commands, options, and utilities:
   $ rtg version
 
 It will display the version of the RTG software installed, RAM
-requirements, and license expiration, for example:
+requirements, for example:
 
 .. code-block:: text
 
@@ -142,8 +139,7 @@ requirements, and license expiration, for example:
   Product: RTG Core 3.5
   Core Version: 6236f4e (2014-10-31)
   RAM: 40.0GB of 47.0GB RAM can be used by rtg (84%)
-  License: Expires on 2015-09-30
-  License location: /home/rtgcustomer/rtg/rtg-license.txt
+  License: No license file required
   Contact: support@realtimegenomics.com
 
   Patents / Patents pending:
@@ -163,14 +159,12 @@ requirements, and license expiration, for example:
   doi:10.1089/cmb.2014.0029.
   (c) Real Time Genomics Inc, 2014
 
-To see what commands you are licensed to use, type ``rtg license``:
+To see release status of commands you are licensed to use, type ``rtg license``:
 
 .. code-block:: text
 
   $rtg license
-  License: Expires on 2015-03-30
-  Licensed to: John Doe
-  License location: /home/rtgcustomer/rtg/rtg-license.txt
+  License: No license file required
 
       Command name    Licensed?  Release Level
 
@@ -285,8 +279,7 @@ license, type ``rtg help``:
         license                print license information for all commands
         help                   print this screen or help for specified command
 
-The help command will only list the commands for which you have a
-license to use.
+The help command will only list the commands at GA or beta release level.
 
 To display help and syntax information for a specific command from the
 command line, type the command and then the --help option, as in:
@@ -306,6 +299,21 @@ command line, type the command and then the --help option, as in:
 .. only:: core or extra
 
   .. include:: rtg_command_reference_mapish.inc.rst
+
+.. only:: core or extra
+
+  .. include:: rtg_command_reference_variant_calling.inc.rst
+
+  .. only:: extra
+
+    .. include:: rtg_command_reference/segment.inc.rst
+    .. include:: rtg_command_reference/cnvsummary.inc.rst
+    .. include:: rtg_command_reference/cnvponbuild.inc.rst
+    .. include:: rtg_command_reference/fusionfilter.inc.rst
+
+.. only:: core or extra
+
+  .. include:: rtg_command_reference_metagenomics.inc.rst
 
 .. include:: rtg_command_reference_simulation.inc.rst
 

@@ -29,8 +29,8 @@ RTG software description
 
 RTG software is delivered as a single executable with multiple commands
 executed through a command line interface (CLI). Commands are delivered
-in product packages, and for commercial users each command can be
-independently enabled through a license key.
+in product packages, and the available commands vary per product
+package.
 
 Usage:
 
@@ -115,10 +115,7 @@ Here are platform-specific instructions for RTG deployment.
 Linux/MacOS X:
 
 -  Unzip the RTG distribution to the desired location.
--  If your installation requires a license file (``rtg-license.txt``),
-   copy the license file provided by Real Time Genomics into the RTG
-   distribution directory.
-- In a terminal, cd to the installation directory and test for success
+-  In a terminal, cd to the installation directory and test for success
    by entering ``./rtg version``
 -  On MacOS X, depending on your operating system version and
    configuration regarding unsigned applications, you may encounter the
@@ -156,9 +153,6 @@ Linux/MacOS X:
 Windows:
 
 -  Unzip the RTG distribution to the desired location.
--  If your installation requires a license, copy the license file
-   provided by Real Time Genomics (``rtg-license.txt``) into the RTG
-   distribution directory.
 -  Test for success by entering ``rtg version`` at the command line. The
    first time RTG is executed you will be prompted with some questions
    to customize your installation. Follow the prompts.
@@ -169,25 +163,6 @@ Windows:
    the available RAM - this is automatically calculated. One may
    override this limit by setting the ``RTG_MEM`` variable in the
    ``rtg.bat`` script or as an environment variable.
-
-License Management
-~~~~~~~~~~~~~~~~~~
-
-Commercial distributions of RTG products require the presence of a valid
-license key file for operation.
-
-The license key file must be located in the same directory as the RTG
-executable. The license enables the execution of a particular command
-set for the purchased product(s) and features.
-
-A license key allows flexible use of the RTG package on any node or CPU
-core.
-
-To view the current license features at the command prompt, enter:
-
-.. code-block:: text
-
-  $ rtg license
 
 .. seealso:: For more data center deployment and instructions for
   editing scripts, see :ref:`Administration & capacity planning`.

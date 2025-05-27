@@ -2,25 +2,24 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.12</title>
-    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>RTG Command Reference &#8212; RTG Tools Operations Manual v3.13</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=e0de18cf" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/documentation_options.js?v=aca65d0a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RTG product usage - baseline progressions" href="product_usage.html" />
     <link rel="prev" title="Overview" href="overview.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
@@ -37,7 +36,7 @@
         <li class="right" >
           <a href="overview.html" title="Overview"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">RTG Command Reference</a></li> 
       </ul>
     </div>  
@@ -47,29 +46,26 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="rtg-command-reference">
-<h1>RTG Command Reference<a class="headerlink" href="#rtg-command-reference" title="Permalink to this headline">¶</a></h1>
+  <section id="rtg-command-reference">
+<h1>RTG Command Reference<a class="headerlink" href="#rtg-command-reference" title="Link to this heading">¶</a></h1>
 <p>This chapter describes RTG commands with a generic description of
 parameter options and usage. This section also includes expected
 operation and output results.</p>
-<div class="section" id="command-line-interface-cli">
-<h2>Command line interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Permalink to this headline">¶</a></h2>
+<section id="command-line-interface-cli">
+<h2>Command line interface (CLI)<a class="headerlink" href="#command-line-interface-cli" title="Link to this heading">¶</a></h2>
 <p>RTG is installed as a single executable in any system subdirectory where
 permissions authorize a particular community of users to run the
 application. RTG commands are executed through the RTG command-line
 interface (CLI). Each command has its own set of parameters and options
-described in this section. The availability of each command may be
-determined by the RTG license that has been installed. Contact
-<code class="docutils literal notranslate"><span class="pre">support&#64;realtimegenomics.com</span></code> to discuss changing the set of commands
-that are enabled by your license.</p>
+described in this section.</p>
 <p>Results are organized in results directories defined by command
 parameters and settings. The command line shell environment should
 include a set of familiar text post-processing tools, such as <code class="docutils literal notranslate"><span class="pre">grep</span></code>,
 <code class="docutils literal notranslate"><span class="pre">awk</span></code>, or <code class="docutils literal notranslate"><span class="pre">perl</span></code>. Otherwise, no additional applications such as
 databases or directory services are required.</p>
-</div>
-<div class="section" id="rtg-command-syntax">
-<h2>RTG command syntax<a class="headerlink" href="#rtg-command-syntax" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="rtg-command-syntax">
+<h2>RTG command syntax<a class="headerlink" href="#rtg-command-syntax" title="Link to this heading">¶</a></h2>
 <p><strong>Usage:</strong></p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>rtg COMMAND [OPTIONS] &lt;REQUIRED&gt;
 </pre></div>
@@ -90,10 +86,6 @@ is issued with the command.</p>
 <p>Many command parameters require user-supplied information of various
 types, as shown in the following:</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 83%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Type</p></th>
 <th class="head"><p>Description</p></th>
@@ -212,13 +204,12 @@ launch of RTG product commands, options, and utilities:</p>
 </pre></div>
 </div>
 <p>It will display the version of the RTG software installed, RAM
-requirements, and license expiration, for example:</p>
+requirements, for example:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$rtg version
 Product: RTG Core 3.5
 Core Version: 6236f4e (2014-10-31)
 RAM: 40.0GB of 47.0GB RAM can be used by rtg (84%)
-License: Expires on 2015-09-30
-License location: /home/rtgcustomer/rtg/rtg-license.txt
+License: No license file required
 Contact: support@realtimegenomics.com
 
 Patents / Patents pending:
@@ -239,11 +230,9 @@ doi:10.1089/cmb.2014.0029.
 (c) Real Time Genomics Inc, 2014
 </pre></div>
 </div>
-<p>To see what commands you are licensed to use, type <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">license</span></code>:</p>
+<p>To see release status of commands you are licensed to use, type <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">license</span></code>:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$rtg license
-License: Expires on 2015-03-30
-Licensed to: John Doe
-License location: /home/rtgcustomer/rtg/rtg-license.txt
+License: No license file required
 
     Command name    Licensed?  Release Level
 
@@ -356,8 +345,7 @@ Utility:
       help                   print this screen or help for specified command
 </pre></div>
 </div>
-<p>The help command will only list the commands for which you have a
-license to use.</p>
+<p>The help command will only list the commands at GA or beta release level.</p>
 <p>To display help and syntax information for a specific command from the
 command line, type the command and then the –help option, as in:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg format --help
@@ -373,11 +361,11 @@ command line, type the command and then the –help option, as in:</p>
 <p>Refer to <a class="reference internal" href="overview.html#installation-and-deployment"><span class="std std-ref">Installation and deployment</span></a> for information
 about installing the RTG product executable.</p>
 </div>
-</div>
-<div class="section" id="data-formatting-commands">
-<h2>Data Formatting Commands<a class="headerlink" href="#data-formatting-commands" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="format">
-<h3>format<a class="headerlink" href="#format" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="data-formatting-commands">
+<h2>Data Formatting Commands<a class="headerlink" href="#data-formatting-commands" title="Link to this heading">¶</a></h2>
+<section id="format">
+<h3>format<a class="headerlink" href="#format" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">format</span></code> command converts the contents of sequence data files
 (FASTA/FASTQ/SAM/BAM) into the RTG Sequence Data File (SDF) format. This
@@ -409,11 +397,6 @@ reference, sequencing reads, protein sequences, etc.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 18%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -454,11 +437,6 @@ reference, sequencing reads, protein sequences, etc.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 2%" />
-<col style="width: 18%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -484,11 +462,6 @@ SDF. May be specified 0 or more times.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 16%" />
-<col style="width: 79%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -610,9 +583,9 @@ since the output many commands identifies sequences by their names.</p>
 <a class="reference internal" href="#sdf2fastq"><span class="std std-ref">sdf2fastq</span></a>,
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="sdf2fasta">
-<h3>sdf2fasta<a class="headerlink" href="#sdf2fasta" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdf2fasta">
+<h3>sdf2fasta<a class="headerlink" href="#sdf2fasta" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Convert SDF data into a FASTA file.</p>
 <p><strong>Syntax:</strong></p>
@@ -625,11 +598,6 @@ since the output many commands identifies sequences by their names.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 19%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -641,16 +609,11 @@ since the output many commands identifies sequences by their names.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output filename (extension added if not present). Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output filename (extension added if not present). Use ‘-’ to write to standard output.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 12%" />
-<col style="width: 82%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -683,11 +646,6 @@ since the output many commands identifies sequences by their names.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 13%" />
-<col style="width: 82%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -748,9 +706,9 @@ following command:</p>
 <a class="reference internal" href="#sdf2fastq"><span class="std std-ref">sdf2fastq</span></a>,
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="sdf2fastq">
-<h3>sdf2fastq<a class="headerlink" href="#sdf2fastq" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdf2fastq">
+<h3>sdf2fastq<a class="headerlink" href="#sdf2fastq" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Convert SDF data into a FASTQ file.</p>
 <p><strong>Syntax:</strong></p>
@@ -763,11 +721,6 @@ following command:</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 21%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -784,11 +737,6 @@ following command:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 15%" />
-<col style="width: 78%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -817,11 +765,6 @@ following command:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 14%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -872,9 +815,9 @@ and may also be more convenient when dealing with paired-end data.</p>
 <a class="reference internal" href="#sdf2sam"><span class="std std-ref">sdf2sam</span></a>,
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="sdf2sam">
-<h3>sdf2sam<a class="headerlink" href="#sdf2sam" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdf2sam">
+<h3>sdf2sam<a class="headerlink" href="#sdf2sam" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Convert SDF read data into unaligned SAM or BAM format file.</p>
 <p><strong>Syntax:</strong></p>
@@ -887,11 +830,6 @@ and may also be more convenient when dealing with paired-end data.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 13%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -904,16 +842,11 @@ and may also be more convenient when dealing with paired-end data.</p>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
 <td><p>Specifies the file name used to write the resulting SAM/BAM to. The output format is automatically determined based on the
-filename specified. If ‘-‘ is given, the data is written as uncompressed SAM to standard output.</p></td>
+filename specified. If ‘-’ is given, the data is written as uncompressed SAM to standard output.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 15%" />
-<col style="width: 78%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -942,11 +875,6 @@ filename specified. If ‘-‘ is given, the data is written as uncompressed SAM
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 10%" />
-<col style="width: 85%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -987,9 +915,9 @@ format.</p>
 <a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
 <a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
 </div>
-</div>
-<div class="section" id="fastqtrim">
-<h3>fastqtrim<a class="headerlink" href="#fastqtrim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="fastqtrim">
+<h3>fastqtrim<a class="headerlink" href="#fastqtrim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Trim reads in FASTQ files.</p>
 <p><strong>Syntax:</strong></p>
@@ -1003,11 +931,6 @@ format.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 18%" />
-<col style="width: 78%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -1015,11 +938,11 @@ format.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>Input FASTQ file, Use ‘-‘ to read from standard input.</p></td>
+<td><p>Input FASTQ file, Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output filename. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output filename. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-q</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--quality-format=FORMAT</span></code></p></td>
@@ -1028,11 +951,6 @@ format.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 24%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -1065,11 +983,6 @@ format.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 24%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -1133,8 +1046,8 @@ pairs in the two files will no longer be matched.</p>
 file for paired-end data, you should specify an explicit randomization
 seed via <code class="docutils literal notranslate"><span class="pre">--seed</span></code> and use the same seed value for the left and right
 files.</p>
-<div class="section" id="formatting-with-filtering-on-the-fly">
-<h4>Formatting with filtering on the fly<a class="headerlink" href="#formatting-with-filtering-on-the-fly" title="Permalink to this headline">¶</a></h4>
+<section id="formatting-with-filtering-on-the-fly">
+<h4>Formatting with filtering on the fly<a class="headerlink" href="#formatting-with-filtering-on-the-fly" title="Link to this heading">¶</a></h4>
 <p>Running custom filtering with <code class="docutils literal notranslate"><span class="pre">fastqtrim</span></code> need not mean that
 additional disk space is required or that formatting be slowed down due
 to additional disk I/O.  It is possible when using standard unix shells
@@ -1150,10 +1063,10 @@ formatting to SDF:</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#format"><span class="std std-ref">format</span></a></p>
 </div>
-</div>
-</div>
-<div class="section" id="petrim">
-<h3>petrim<a class="headerlink" href="#petrim" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="petrim">
+<h3>petrim<a class="headerlink" href="#petrim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Trim paired-end read FASTQ files based on read arm alignment overlap.</p>
 <p><strong>Syntax:</strong></p>
@@ -1162,11 +1075,6 @@ formatting to SDF:</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 17%" />
-<col style="width: 79%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -1178,7 +1086,7 @@ formatting to SDF:</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output filename prefix. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output filename prefix. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-q</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--quality-format=FORMAT</span></code></p></td>
@@ -1191,11 +1099,6 @@ formatting to SDF:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 22%" />
-<col style="width: 72%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Sensitivity Tuning</p></th>
 </tr>
@@ -1236,11 +1139,6 @@ formatting to SDF:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 18%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -1281,11 +1179,6 @@ formatting to SDF:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 23%" />
-<col style="width: 71%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -1376,8 +1269,8 @@ zero-length.</p>
 <p><code class="docutils literal notranslate"><span class="pre">petrim</span></code> also provides the ability to down-sample a read set by using
 the <code class="docutils literal notranslate"><span class="pre">--subsample</span></code> option. This will produce a different sampling each time,
 unless an explicit randomization seed is specified via <code class="docutils literal notranslate"><span class="pre">--seed</span></code>.</p>
-<div class="section" id="formatting-with-paired-end-trimming-on-the-fly">
-<h4>Formatting with paired-end trimming on the fly<a class="headerlink" href="#formatting-with-paired-end-trimming-on-the-fly" title="Permalink to this headline">¶</a></h4>
+<section id="formatting-with-paired-end-trimming-on-the-fly">
+<h4>Formatting with paired-end trimming on the fly<a class="headerlink" href="#formatting-with-paired-end-trimming-on-the-fly" title="Link to this heading">¶</a></h4>
 <p>Running custom filtering with <code class="docutils literal notranslate"><span class="pre">petrim</span></code> can be done in standard Unix
 shells without incurring the use of additional disk space or unduly
 slowing down the formatting of reads. The following example demonstrates
@@ -1410,11 +1303,11 @@ orientation.</p>
 <p><a class="reference internal" href="#fastqtrim"><span class="std std-ref">fastqtrim</span></a>,
 <a class="reference internal" href="#format"><span class="std std-ref">format</span></a></p>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="simulation-commands">
-<h2>Simulation Commands<a class="headerlink" href="#simulation-commands" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+</section>
+<section id="simulation-commands">
+<h2>Simulation Commands<a class="headerlink" href="#simulation-commands" title="Link to this heading">¶</a></h2>
 <p>RTG includes some simulation commands that may be useful for
 experimenting with effects of various RTG command parameters or when
 getting familiar with RTG work flows. A simple simulation series might
@@ -1431,8 +1324,8 @@ $ rtg map --template sim-ref-sdf --input reads-sdf --output sim-mapping \
 $ rtg snp --template sim-ref-sdf --output sim-name-snp sim-mapping/alignments.bam
 </pre></div>
 </div>
-<div class="section" id="genomesim">
-<h3>genomesim<a class="headerlink" href="#genomesim" title="Permalink to this headline">¶</a></h3>
+<section id="genomesim">
+<h3>genomesim<a class="headerlink" href="#genomesim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">genomesim</span></code> command to simulate a reference genome, or to create
 a baseline reference genome for a research project when an actual genome
@@ -1452,11 +1345,6 @@ reference sequence is unavailable.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 33%" />
-<col style="width: 51%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -1469,11 +1357,6 @@ reference sequence is unavailable.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 17%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -1536,9 +1419,9 @@ would yield contigs named <code class="docutils literal notranslate"><span class
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
 </div>
-</div>
-<div class="section" id="cgsim">
-<h3>cgsim<a class="headerlink" href="#cgsim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="cgsim">
+<h3>cgsim<a class="headerlink" href="#cgsim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Simulate Complete Genomics Inc sequencing reads. Supports the original 35 bp read structure (5-10-10-10), and the newer 29 bp read structure (10-9-10).</p>
 <p><strong>Syntax:</strong></p>
@@ -1556,11 +1439,6 @@ would yield contigs named <code class="docutils literal notranslate"><span class
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 24%" />
-<col style="width: 71%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -1577,11 +1455,6 @@ would yield contigs named <code class="docutils literal notranslate"><span class
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 24%" />
-<col style="width: 71%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Fragment Generation</p></th>
 </tr>
@@ -1630,11 +1503,6 @@ would yield contigs named <code class="docutils literal notranslate"><span class
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 9%" />
-<col style="width: 25%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Complete Genomics</p></th>
 </tr>
@@ -1647,11 +1515,6 @@ would yield contigs named <code class="docutils literal notranslate"><span class
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 19%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -1707,9 +1570,9 @@ and must sum to one in the file.</p>
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
 </div>
-</div>
-<div class="section" id="readsim">
-<h3>readsim<a class="headerlink" href="#readsim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="readsim">
+<h3>readsim<a class="headerlink" href="#readsim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">readsim</span></code> command to generate single or paired end reads of
 fixed or variable length from a reference genome, introducing machine
@@ -1729,11 +1592,6 @@ errors.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 17%" />
-<col style="width: 79%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -1754,11 +1612,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 26%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Fragment Generation</p></th>
 </tr>
@@ -1807,11 +1660,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 27%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Illumina PE</p></th>
 </tr>
@@ -1828,11 +1676,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 27%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Illumina SE</p></th>
 </tr>
@@ -1845,11 +1688,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 25%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>454 SE/PE</p></th>
 </tr>
@@ -1866,11 +1704,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 27%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>IonTorrent SE</p></th>
 </tr>
@@ -1887,11 +1720,6 @@ errors.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 19%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -1973,9 +1801,9 @@ sequence will have a lower depth of coverage than a short sequence.</p>
 <a class="reference internal" href="#popsim"><span class="std std-ref">popsim</span></a>,
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a></p>
 </div>
-</div>
-<div class="section" id="popsim">
-<h3>popsim<a class="headerlink" href="#popsim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="popsim">
+<h3>popsim<a class="headerlink" href="#popsim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">popsim</span></code> command to generate a VCF containing simulated
 population variants. Each variant allele generated has an associated
@@ -1991,11 +1819,6 @@ allele is.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 19%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2012,11 +1835,6 @@ allele is.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 19%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2051,9 +1869,9 @@ observed variants and allele frequency distribution in human studies.</p>
 <a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
-</div>
-<div class="section" id="samplesim">
-<h3>samplesim<a class="headerlink" href="#samplesim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="samplesim">
+<h3>samplesim<a class="headerlink" href="#samplesim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">samplesim</span></code> command to generate a VCF containing a genotype
 simulated from population variants according to allele frequency.</p>
@@ -2073,11 +1891,6 @@ simulated from population variants according to allele frequency.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 20%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2106,11 +1919,6 @@ simulated from population variants according to allele frequency.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 21%" />
-<col style="width: 72%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2173,9 +1981,9 @@ simulate a read set for the individual.</p>
 <a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
-</div>
-<div class="section" id="denovosim">
-<h3>denovosim<a class="headerlink" href="#denovosim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="denovosim">
+<h3>denovosim<a class="headerlink" href="#denovosim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">denovosim</span></code> command to generate a VCF containing a derived
 genotype containing <em>de novo</em> variants.</p>
@@ -2190,11 +1998,6 @@ genotype containing <em>de novo</em> variants.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 24%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2227,11 +2030,6 @@ genotype containing <em>de novo</em> variants.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 15%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2293,9 +2091,9 @@ simulate a read set for the new genome.</p>
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
-</div>
-<div class="section" id="childsim">
-<h3>childsim<a class="headerlink" href="#childsim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="childsim">
+<h3>childsim<a class="headerlink" href="#childsim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">childsim</span></code> command to generate a VCF containing a genotype
 simulated as a child of two parents.</p>
@@ -2311,11 +2109,6 @@ simulated as a child of two parents.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 24%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2352,11 +2145,6 @@ simulated as a child of two parents.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 25%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2425,9 +2213,9 @@ files can be specified by using the <code class="docutils literal notranslate"><
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a></p>
 </div>
-</div>
-<div class="section" id="pedsamplesim">
-<h3>pedsamplesim<a class="headerlink" href="#pedsamplesim" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="pedsamplesim">
+<h3>pedsamplesim<a class="headerlink" href="#pedsamplesim" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Generates simulated genotypes for all members of a
 pedigree. <code class="docutils literal notranslate"><span class="pre">pedsamplesim</span></code> automatically simulates founder individuals,
@@ -2443,11 +2231,6 @@ inheritance by children, and de novo mutations.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 25%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2476,11 +2259,6 @@ inheritance by children, and de novo mutations.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 25%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2567,9 +2345,9 @@ files can be specified by using the <code class="docutils literal notranslate"><
 <a class="reference internal" href="#samplereplay"><span class="std std-ref">samplereplay</span></a>,
 <a class="reference internal" href="#readsim"><span class="std std-ref">readsim</span></a></p>
 </div>
-</div>
-<div class="section" id="samplereplay">
-<h3>samplereplay<a class="headerlink" href="#samplereplay" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="samplereplay">
+<h3>samplereplay<a class="headerlink" href="#samplereplay" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">samplereplay</span></code> command to generate the genome SDF corresponding
 to a sample genotype in a VCF file.</p>
@@ -2583,11 +2361,6 @@ to a sample genotype in a VCF file.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 19%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2612,11 +2385,6 @@ to a sample genotype in a VCF file.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 19%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2644,12 +2412,12 @@ sequences in the resulting SDF.</p>
 <a class="reference internal" href="#samplesim"><span class="std std-ref">samplesim</span></a>,
 <a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a></p>
 </div>
-</div>
-</div>
-<div class="section" id="utility-commands">
-<h2>Utility Commands<a class="headerlink" href="#utility-commands" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="bgzip">
-<h3>bgzip<a class="headerlink" href="#bgzip" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="utility-commands">
+<h2>Utility Commands<a class="headerlink" href="#utility-commands" title="Link to this heading">¶</a></h2>
+<section id="bgzip">
+<h3>bgzip<a class="headerlink" href="#bgzip" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Block compress a file or decompress a block compressed file. Block
 compressed outputs from the mapping and variant detection commands can
@@ -2665,11 +2433,6 @@ standard gzip tools such as <code class="docutils literal notranslate"><span cla
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 21%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2697,16 +2460,11 @@ standard gzip tools such as <code class="docutils literal notranslate"><span cla
 </tr>
 <tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">FILE+</span></code></p></td>
-<td><p>File to (de)compress, use ‘-‘ for standard input. Must be specified 1 or more times.</p></td>
+<td><p>File to (de)compress, use ‘-’ for standard input. Must be specified 1 or more times.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 21%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2726,9 +2484,9 @@ retrieval of records corresponding to specific genomic regions.</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#index"><span class="std std-ref">index</span></a></p>
 </div>
-</div>
-<div class="section" id="index">
-<h3>index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="index">
+<h3>index<a class="headerlink" href="#index" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Create tabix index files for block compressed TAB-delimited genome
 position data files or BAM index files for BAM files.</p>
@@ -2747,11 +2505,6 @@ position data files or BAM index files for BAM files.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2772,11 +2525,6 @@ position data files or BAM index files for BAM files.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 20%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2801,9 +2549,9 @@ can also be used to produce BAM indexes for BAM files with no index.</p>
 <a class="reference internal" href="#extract"><span class="std std-ref">extract</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a></p>
 </div>
-</div>
-<div class="section" id="extract">
-<h3>extract<a class="headerlink" href="#extract" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="extract">
+<h3>extract<a class="headerlink" href="#extract" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Extract specified parts of an indexed block compressed genome position
 data file.</p>
@@ -2822,11 +2570,6 @@ data file.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 14%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2839,11 +2582,6 @@ data file.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 10%" />
-<col style="width: 86%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -2857,11 +2595,6 @@ May be specified 0 or more times.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 32%" />
-<col style="width: 62%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -2878,11 +2611,6 @@ May be specified 0 or more times.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 21%" />
-<col style="width: 64%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -2906,9 +2634,9 @@ format.</p>
 <a class="reference internal" href="#index"><span class="std std-ref">index</span></a>,
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a></p>
 </div>
-</div>
-<div class="section" id="aview">
-<h3>aview<a class="headerlink" href="#aview" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="aview">
+<h3>aview<a class="headerlink" href="#aview" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>View read mapping and variants corresponding to a region of the genome,
 with output as ASCII to the terminal, or HTML.</p>
@@ -2923,11 +2651,6 @@ with output as ASCII to the terminal, or HTML.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 21%" />
-<col style="width: 73%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -2964,11 +2687,6 @@ with output as ASCII to the terminal, or HTML.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 16%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -2990,11 +2708,6 @@ with output as ASCII to the terminal, or HTML.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 21%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -3071,11 +2784,6 @@ with output as ASCII to the terminal, or HTML.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 23%" />
-<col style="width: 72%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3100,9 +2808,9 @@ HTML).</p>
 <p><a class="reference internal" href="#map"><span class="std std-ref">map</span></a>,
 <a class="reference internal" href="#snp"><span class="std std-ref">snp</span></a></p>
 </div>
-</div>
-<div class="section" id="sdfstats">
-<h3>sdfstats<a class="headerlink" href="#sdfstats" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdfstats">
+<h3>sdfstats<a class="headerlink" href="#sdfstats" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Print statistics that describe a directory of SDF formatted data.</p>
 <p><strong>Syntax:</strong></p>
@@ -3133,11 +2841,6 @@ Quality scores available on this SDF
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 11%" />
-<col style="width: 85%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3150,11 +2853,6 @@ Quality scores available on this SDF
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 9%" />
-<col style="width: 86%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -3187,11 +2885,6 @@ Quality scores available on this SDF
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 21%" />
-<col style="width: 64%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3209,13 +2902,15 @@ SDFs.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#format"><span class="std std-ref">format</span></a>,
+<a class="reference internal" href="#cg2sdf"><span class="std std-ref">cg2sdf</span></a>,
 <a class="reference internal" href="#sdf2fasta"><span class="std std-ref">sdf2fasta</span></a>,
 <a class="reference internal" href="#sdf2fastq"><span class="std std-ref">sdf2fastq</span></a>,
-<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
+<a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a>,
+<a class="reference internal" href="#sdfsplit"><span class="std std-ref">sdfsplit</span></a></p>
 </div>
-</div>
-<div class="section" id="sdfsubset">
-<h3>sdfsubset<a class="headerlink" href="#sdfsubset" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdfsubset">
+<h3>sdfsubset<a class="headerlink" href="#sdfsubset" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Extracts a specified subset of sequences from one SDF and outputs them
 to another SDF.</p>
@@ -3234,11 +2929,6 @@ to another SDF.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 16%" />
-<col style="width: 33%" />
-<col style="width: 51%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3255,11 +2945,6 @@ to another SDF.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 13%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -3288,11 +2973,6 @@ to another SDF.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 21%" />
-<col style="width: 64%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3322,9 +3002,9 @@ zero and are the same as the ids that <code class="docutils literal notranslate"
 <p><a class="reference internal" href="#sdfsubseq"><span class="std std-ref">sdfsubseq</span></a>,
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="sdfsubseq">
-<h3>sdfsubseq<a class="headerlink" href="#sdfsubseq" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="sdfsubseq">
+<h3>sdfsubseq<a class="headerlink" href="#sdfsubseq" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Prints a subsequence of a given sequence in an SDF.</p>
 <p><strong>Syntax:</strong></p>
@@ -3342,11 +3022,6 @@ zero and are the same as the ids that <code class="docutils literal notranslate"
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 17%" />
-<col style="width: 34%" />
-<col style="width: 48%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3359,11 +3034,6 @@ zero and are the same as the ids that <code class="docutils literal notranslate"
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 13%" />
-<col style="width: 83%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -3381,11 +3051,6 @@ Must be specified 1 or more times.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 12%" />
-<col style="width: 35%" />
-<col style="width: 53%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3422,9 +3087,9 @@ AGGCGTCTGCAGCCGACGCG
 <p><a class="reference internal" href="#sdfsubset"><span class="std std-ref">sdfsubset</span></a>,
 <a class="reference internal" href="#sdfstats"><span class="std std-ref">sdfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="mendelian">
-<h3>mendelian<a class="headerlink" href="#mendelian" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="mendelian">
+<h3>mendelian<a class="headerlink" href="#mendelian" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>The <code class="docutils literal notranslate"><span class="pre">mendelian</span></code> command checks a multi-sample VCF file for variant calls
 which do not follow Mendelian inheritance, and compute aggregate sample
@@ -3439,11 +3104,6 @@ concordance.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 25%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3451,11 +3111,11 @@ concordance.</p>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing multi-sample variant calls. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing multi-sample variant calls. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>If set, output annotated calls to this VCF file. Use ‘-‘ to write to standard output.</p></td>
+<td><p>If set, output annotated calls to this VCF file. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output-consistent=FILE</span></code></p></td>
@@ -3472,11 +3132,6 @@ concordance.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 21%" />
-<col style="width: 74%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Sensitivity Tuning</p></th>
 </tr>
@@ -3501,11 +3156,6 @@ concordance.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 23%" />
-<col style="width: 72%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3588,9 +3238,9 @@ the <code class="docutils literal notranslate"><span class="pre">--all-records</
 <a class="reference internal" href="#population"><span class="std std-ref">population</span></a>,
 <a class="reference internal" href="#vcfstats"><span class="std std-ref">vcfstats</span></a></p>
 </div>
-</div>
-<div class="section" id="vcfannotate">
-<h3>vcfannotate<a class="headerlink" href="#vcfannotate" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcfannotate">
+<h3>vcfannotate<a class="headerlink" href="#vcfannotate" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Used to add annotations to a VCF file, either to the VCF <code class="docutils literal notranslate"><span class="pre">ID</span></code> field,
 as a VCF <code class="docutils literal notranslate"><span class="pre">INFO</span></code> sub-field, or as a VCF <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> sub-field.</p>
@@ -3604,11 +3254,6 @@ as a VCF <code class="docutils literal notranslate"><span class="pre">INFO</span
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3620,11 +3265,11 @@ as a VCF <code class="docutils literal notranslate"><span class="pre">INFO</span
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing variants to annotate. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing variants to annotate. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file name. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output VCF file name. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--region=REGION</span></code></p></td>
@@ -3634,11 +3279,6 @@ as a VCF <code class="docutils literal notranslate"><span class="pre">INFO</span
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -3680,11 +3320,6 @@ more times, or as a comma separated list.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 22%" />
-<col style="width: 72%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3757,9 +3392,9 @@ evidence annotations: <code class="docutils literal notranslate"><span class="pr
 <a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
-</div>
-<div class="section" id="vcfdecompose">
-<h3>vcfdecompose<a class="headerlink" href="#vcfdecompose" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcfdecompose">
+<h3>vcfdecompose<a class="headerlink" href="#vcfdecompose" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Decomposes complex variants within a VCF file into smaller components.</p>
 <p><strong>Syntax:</strong></p>
@@ -3768,11 +3403,6 @@ evidence annotations: <code class="docutils literal notranslate"><span class="pr
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 18%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3780,11 +3410,11 @@ evidence annotations: <code class="docutils literal notranslate"><span class="pr
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing variants to decompose. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing variants to decompose. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file name. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output VCF file name. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--template=SDF</span></code></p></td>
@@ -3793,11 +3423,6 @@ evidence annotations: <code class="docutils literal notranslate"><span class="pr
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 18%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Sensitivity Tuning</p></th>
 </tr>
@@ -3814,11 +3439,6 @@ evidence annotations: <code class="docutils literal notranslate"><span class="pr
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 18%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -3887,9 +3507,9 @@ as such by haplotype-aware comparison tools such as <code class="docutils litera
 <p><a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
 <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a></p>
 </div>
-</div>
-<div class="section" id="vcfeval">
-<h3>vcfeval<a class="headerlink" href="#vcfeval" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcfeval">
+<h3>vcfeval<a class="headerlink" href="#vcfeval" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Evaluates called variants for agreement with a baseline variant set
 irrespective of representational differences. Outputs a weighted ROC
@@ -3912,11 +3532,6 @@ or simply an alternative call-set being used as a basis for comparison.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -3955,11 +3570,6 @@ regions of interest where region boundary effects should be minimized.</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -3967,7 +3577,7 @@ regions of interest where region boundary effects should be minimized.</p></td>
 <tbody>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--all-records</span></code></p></td>
-<td><p>Use all records regardless of FILTER status (Default is to only process records where FILTER is <code class="docutils literal notranslate"><span class="pre">.</span></code> or <code class="docutils literal notranslate"><span class="pre">PASS</span></code>)</p></td>
+<td><p>Use all records regardless of filter status (Default is to only process variants passing filters)</p></td>
 </tr>
 <tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--decompose</span></code></p></td>
@@ -3993,11 +3603,6 @@ multi-sample VCF files)</p></td>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -4008,16 +3613,24 @@ multi-sample VCF files)</p></td>
 <td><p>Output summary statistics where precision &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
 </tr>
 <tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--at-score=FLOAT</span></code></p></td>
+<td><p>Output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--at-sensitivity=FLOAT</span></code></p></td>
 <td><p>Output summary statistics where sensitivity &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
 </tr>
-<tr class="row-even"><td></td>
+<tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--no-roc</span></code></p></td>
 <td><p>Do not produce ROCs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-m</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-m</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output-mode=STRING</span></code></p></td>
 <td><p>Output reporting mode. Allowed values are [split, annotate, combine, ga4gh, roc-only] (Default is split)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-cross-join</span></code></p></td>
+<td><p>Output ROC files for each intersection of –roc-subset, –roc-expr, and –roc-regions values provided.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--roc-expr=STRING</span></code></p></td>
@@ -4039,16 +3652,11 @@ list.</p></td>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-f</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--vcf-score-field=STRING</span></code></p></td>
 <td><p>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal notranslate"><span class="pre">QUAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO.&lt;name&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT.&lt;name&gt;</span></code> to select the named VCF FORMAT or INFO
-field (Default is GQ)</p></td>
+field, or use <code class="docutils literal notranslate"><span class="pre">EXPR.&lt;LABEL&gt;=&lt;EXPRESSION&gt;</span></code> to define a JavaScript expression that dynamically computes a score (Default is GQ)</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 26%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -4099,7 +3707,23 @@ identify variants which may not have a diploid match but which share a
 common allele (for example, zygosity errors made during calling). If
 desired, this more lenient haploid comparison can be used at the outset
 by setting the <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code> flag (see below).</p>
-<p>Note that variants selected for inclusion in a haplotype cannot be
+<p>A few categories of variants are excluded from the matching process:</p>
+<ul class="simple">
+<li><p>Those variants that have failed filters, according to the record
+<code class="docutils literal notranslate"><span class="pre">FILTER</span></code> field, or the per-sample <code class="docutils literal notranslate"><span class="pre">FT</span></code> <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field (when
+applicable), unless <code class="docutils literal notranslate"><span class="pre">--all-records</span></code> is specified.</p></li>
+<li><p>Variants that are not resolved at the nucleotide level, such as CNVs
+and structural variants.</p></li>
+<li><p>Variants that do not represent variation from the reference (for
+example reference calls).</p></li>
+<li><p>Variants where <code class="docutils literal notranslate"><span class="pre">REF</span></code> or <code class="docutils literal notranslate"><span class="pre">ALT</span></code> exceeds a maximum length of 1000
+nucleotides, for performance reasons.</p></li>
+<li><p>Variants which are not fully enclosed by the relevant reference
+sequence.</p></li>
+<li><p>Variants which do not overlap the regions specified via
+<code class="docutils literal notranslate"><span class="pre">--bed-regions</span></code>, when applicable.</p></li>
+</ul>
+<p>Variants selected for inclusion in a haplotype cannot be
 permitted to overlap each other (otherwise the question arises of which
 variant should have priority when determining the resulting haplotype),
 and any well-formed call-set should not contain these situations in
@@ -4116,13 +3740,13 @@ a more lenient comparison is desired. The <code class="docutils literal notransl
 permit such overlapping variants to both match, as long as any overlap
 only occurs where one variant or other has asserted haplotype bases as
 being the same as reference.</p>
-<div class="section" id="common-allele-matching-with-squash-ploidy">
-<h4>Common allele matching with <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code><a class="headerlink" href="#common-allele-matching-with-squash-ploidy" title="Permalink to this headline">¶</a></h4>
+<section id="common-allele-matching-with-squash-ploidy">
+<h4>Common allele matching with <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code><a class="headerlink" href="#common-allele-matching-with-squash-ploidy" title="Link to this heading">¶</a></h4>
 <p>When <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code> is specified, a haploid match is attempted
 using <em>each</em> of the non-reference alleles used in the sample
 genotype. For example if the baseline and call VCFs each had a record
-with the same REF and ALT alleles declared, the following GT fields
-would be considered a match:</p>
+with the same <code class="docutils literal notranslate"><span class="pre">REF</span></code> and <code class="docutils literal notranslate"><span class="pre">ALT</span></code> alleles declared, the following <code class="docutils literal notranslate"><span class="pre">GT</span></code>
+fields would be considered a match:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>0/1, 1/1, 1/2   (genotypes match due to the 1 allele)
 0/2, 1/2, 2/2   (genotypes match due to the 2 allele)
 </pre></div>
@@ -4134,21 +3758,21 @@ to use this option when matching somatic variant calls, as since somatic
 variation is usually associated with variable allelic fractions and
 heterogeneity that mean strict diploid genotype comparisons are not
 appropriate.</p>
-</div>
-<div class="section" id="comparing-non-diploid-genomes">
-<h4>Comparing non-diploid genomes<a class="headerlink" href="#comparing-non-diploid-genomes" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="comparing-non-diploid-genomes">
+<h4>Comparing non-diploid genomes<a class="headerlink" href="#comparing-non-diploid-genomes" title="Link to this heading">¶</a></h4>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> assumes diploid organisms (that is, the expected
-ploidy of any GT call is 2). As a special case to ease the comparison of
-male calls on sex chromosomes (where callers often continue to use
-diploid representation), haploid calls are treated as homozygous
-diploid. Any calls made with unexpected ploidy are ignored and reported
-in the <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> log file.</p>
+ploidy of any <code class="docutils literal notranslate"><span class="pre">GT</span></code> call is 2). As a special case to ease the
+comparison of male calls on sex chromosomes (where callers often
+continue to use diploid representation), haploid calls are treated as
+homozygous diploid. Any calls made with unexpected ploidy are ignored
+and reported in the <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> log file.</p>
 <p>To compare genomes with non-diploid ploidy, the expected sample ploidy
 can be overridden via <code class="docutils literal notranslate"><span class="pre">--sample-ploidy</span></code> – for example
 <code class="docutils literal notranslate"><span class="pre">--sample-ploidy=4</span></code> would be used to compare tetraploid organisms.</p>
-</div>
-<div class="section" id="comparing-with-a-vcf-that-has-no-sample-column">
-<h4>Comparing with a VCF that has no sample column<a class="headerlink" href="#comparing-with-a-vcf-that-has-no-sample-column" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="comparing-with-a-vcf-that-has-no-sample-column">
+<h4>Comparing with a VCF that has no sample column<a class="headerlink" href="#comparing-with-a-vcf-that-has-no-sample-column" title="Link to this heading">¶</a></h4>
 <p>A common scenario is to match a call set against a baseline which
 contains no sample column, where the objective is to identify which
 baseline alleles which have been called. One example of this is to
@@ -4156,30 +3780,30 @@ identify whether calls match a database of known high-priority somatic
 variants such as COSMIC, or to find calls which have been previously
 seen in a population allele database such as ExAC. Ordinarily
 <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> requires the input VCFs to contain a sample column
-containing a genotype in the GT field, however, it is possible to
-specify a special sample name of ‘ALT’ in order to indicate that the
-the genotypes for comparison should be derived from the ALT alleles of
+containing a genotype in the <code class="docutils literal notranslate"><span class="pre">GT</span></code> field, however, it is possible to
+specify a special sample name of ‘ALT’ in order to indicate that the the
+genotypes for comparison should be derived from the <code class="docutils literal notranslate"><span class="pre">ALT</span></code> alleles of
 the record. This can be specified independently for baseline and calls,
 for example:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg vcfeval -t build37.sdf -b cosmic.vcf.gz -c tumor-calls.vcf.gz \
 --squash-ploidy --sample ALT,tumor -o tumor-vs-cosmic
 </pre></div>
 </div>
-<p>Which would perform a haploid matching of the GT of the called sample
-‘tumor’ against all possible haploid genotypes in the COSMIC VCF. The
-resulting true positives file contains all the calls containing an
-allele present in the COSMIC VCF.</p>
+<p>Which would perform a haploid matching of the <code class="docutils literal notranslate"><span class="pre">GT</span></code> of the called
+sample ‘tumor’ against all possible haploid genotypes in the COSMIC
+VCF. The resulting true positives file contains all the calls containing
+an allele present in the COSMIC VCF.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>It is also possible to run a diploid comparison by omitting
 <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code>, but this is not usually required, and is
 computationally more intensive since there may be many more possible
 diploid genotypes to explore, particularly if the ALT VCF contains
-many multiallelic records.)</p>
+many multi-allelic records.)</p>
 </div>
-</div>
-<div class="section" id="evaluation-with-respect-to-regions">
-<h4>Evaluation with respect to regions<a class="headerlink" href="#evaluation-with-respect-to-regions" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="evaluation-with-respect-to-regions">
+<h4>Evaluation with respect to regions<a class="headerlink" href="#evaluation-with-respect-to-regions" title="Link to this heading">¶</a></h4>
 <p>When evaluating exome variant calls, it may be useful to restrict
 analysis only to exome target regions.  In this case, supply a BED file
 containing the list of regions to restrict analysis to via the
@@ -4199,9 +3823,9 @@ which match a baseline variant are only considered a true positive if
 the baseline variant is inside the high confidence regions, and call
 variants are only considered false positive if they fall inside the high
 confidence regions.</p>
-</div>
-<div class="section" id="vcfeval-outputs">
-<h4>vcfeval outputs<a class="headerlink" href="#vcfeval-outputs" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="vcfeval-outputs">
+<h4>vcfeval outputs<a class="headerlink" href="#vcfeval-outputs" title="Link to this heading">¶</a></h4>
 <p>The primary outputs of <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> are VCF files indicating which variants
 matched between the baseline and the calls VCF, and data files
 containing information used to generate ROC curves with the <code class="docutils literal notranslate"><span class="pre">rocplot</span></code>
@@ -4209,8 +3833,8 @@ command (or via spreadsheet). <code class="docutils literal notranslate"><span c
 output modes which can be selected with the <code class="docutils literal notranslate"><span class="pre">--output-mode</span></code> flag
 according to the type of analysis workflow desired. The following modes
 are available:</p>
-<div class="section" id="split-output-mode-split">
-<h5>Split (<code class="docutils literal notranslate"><span class="pre">--output-mode=split</span></code>)<a class="headerlink" href="#split-output-mode-split" title="Permalink to this headline">¶</a></h5>
+<section id="split-output-mode-split">
+<h5>Split (<code class="docutils literal notranslate"><span class="pre">--output-mode=split</span></code>)<a class="headerlink" href="#split-output-mode-split" title="Link to this heading">¶</a></h5>
 <p>This output mode is the default, and produces separate VCF files for
 each of the match categories. The individual VCF records in these files
 are not altered in any way, preserving all annotations present in the
@@ -4232,9 +3856,9 @@ correctly called.</p></li>
 default), or haploid mode (if <code class="docutils literal notranslate"><span class="pre">--squash-ploidy</span></code> has been set). The
 separate output files produced by this mode allow the use of <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>
 as an advanced haplotype-aware VCF intersection tool.</p>
-</div>
-<div class="section" id="annotate-output-mode-annotate">
-<h5>Annotate (<code class="docutils literal notranslate"><span class="pre">--output-mode=annotate</span></code>)<a class="headerlink" href="#annotate-output-mode-annotate" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="annotate-output-mode-annotate">
+<h5>Annotate (<code class="docutils literal notranslate"><span class="pre">--output-mode=annotate</span></code>)<a class="headerlink" href="#annotate-output-mode-annotate" title="Link to this heading">¶</a></h5>
 <p>This output mode does not split the input VCFs by match status, but
 instead adds <code class="docutils literal notranslate"><span class="pre">INFO</span></code> annotations containing the match status of each
 record:</p>
@@ -4259,9 +3883,9 @@ falling outside the evaluation regions when <code class="docutils literal notran
 being used. The annotated VCF files produced in this mode may also be
 used with <code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> to produce additional post-evaluation ROC data
 files.</p>
-</div>
-<div class="section" id="combine-output-mode-combine">
-<h5>Combine (<code class="docutils literal notranslate"><span class="pre">--output-mode=combine</span></code>)<a class="headerlink" href="#combine-output-mode-combine" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="combine-output-mode-combine">
+<h5>Combine (<code class="docutils literal notranslate"><span class="pre">--output-mode=combine</span></code>)<a class="headerlink" href="#combine-output-mode-combine" title="Link to this heading">¶</a></h5>
 <p>This output mode provides an easy way to view the baseline and call
 variants in a single two-sample VCF.</p>
 <ul class="simple">
@@ -4276,9 +3900,9 @@ preserve any of the original variant annotations.</p></li>
 <p>As with the annotation output mode, this output mode automatically
 performs two comparison passes to find both diploid matches and haploid
 (lenient) matches.</p>
-</div>
-<div class="section" id="roc-only-output-mode-roc-only">
-<h5>ROC-only (<code class="docutils literal notranslate"><span class="pre">--output-mode=roc-only</span></code>)<a class="headerlink" href="#roc-only-output-mode-roc-only" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="roc-only-output-mode-roc-only">
+<h5>ROC-only (<code class="docutils literal notranslate"><span class="pre">--output-mode=roc-only</span></code>)<a class="headerlink" href="#roc-only-output-mode-roc-only" title="Link to this heading">¶</a></h5>
 <p>This output mode provides a lightweight way to run performance
 benchmarking, as VCF file output is omitted, and only ROC data files are
 produced.</p>
@@ -4293,10 +3917,10 @@ inside the <code class="docutils literal notranslate"><span class="pre">hap.py</
 <a class="reference external" href="https://github.com/ga4gh/benchmarking-tools">https://github.com/ga4gh/benchmarking-tools</a> and
 <a class="reference external" href="https://github.com/Illumina/hap.py">https://github.com/Illumina/hap.py</a></p>
 </div>
-</div>
-</div>
-<div class="section" id="additional-roc-stratifications">
-<h4>Additional ROC stratifications<a class="headerlink" href="#additional-roc-stratifications" title="Permalink to this headline">¶</a></h4>
+</section>
+</section>
+<section id="additional-roc-stratifications">
+<h4>Additional ROC stratifications<a class="headerlink" href="#additional-roc-stratifications" title="Link to this heading">¶</a></h4>
 <p>All of the output modes produce the following ROC data files (unless
 disabled by <code class="docutils literal notranslate"><span class="pre">--no-roc</span></code>):</p>
 <ul class="simple">
@@ -4317,23 +3941,28 @@ metrics are computed for this file.</p></li>
 <p><code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> also provides the ability to produce additional ROC data
 files corresponding to preset and customized variant stratifications
 with the following flags:</p>
-<div class="section" id="preset-stratifications">
-<h5>Preset stratifications<a class="headerlink" href="#preset-stratifications" title="Permalink to this headline">¶</a></h5>
-<p>The <code class="docutils literal notranslate"><span class="pre">--roc-subset</span></code> flag allows selection from preset stratifications
-based on variant type (according to their representation in the
-relevant input VCF):</p>
+<section id="preset-stratifications">
+<h5>Preset stratifications<a class="headerlink" href="#preset-stratifications" title="Link to this heading">¶</a></h5>
+<p>The <code class="docutils literal notranslate"><span class="pre">--roc-subset</span></code> flag allows selection from preset stratifications.</p>
+<p>The following presets are based on <em>variant type</em> (according to their
+representation in the relevant input VCF):</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">hom</span></code> – homozygous variants only</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">het</span></code> – heterozygous variants only</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">snp</span></code> – SNP variants (enabled by default)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">non-snp</span></code> – non-SNP variants (enabled by default)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">mnp</span></code> – multi-nucleotide polymorphisms only</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">indel</span></code> – length-changing variants only</p></li>
 </ul>
-<p>Multiple presets can be enabled in a single run, e.g. <code class="docutils literal notranslate"><span class="pre">--roc-subset</span> <span class="pre">hom,het,indel</span></code></p>
-</div>
-<div class="section" id="region-based-stratifications">
-<h5>Region-based stratifications<a class="headerlink" href="#region-based-stratifications" title="Permalink to this headline">¶</a></h5>
+<p>The following preset stratifications are based on the <em>variant genotype</em>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">hom</span></code> – homozygous variants only</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">het</span></code> – heterozygous variants only</p></li>
+</ul>
+<p>Multiple presets can be enabled in a single run, e.g. <code class="docutils literal notranslate"><span class="pre">--roc-subset</span>
+<span class="pre">hom,het,indel</span></code>. See below for more information regarding multiple
+stratifications.</p>
+</section>
+<section id="region-based-stratifications">
+<h5>Region-based stratifications<a class="headerlink" href="#region-based-stratifications" title="Link to this heading">¶</a></h5>
 <p>The <code class="docutils literal notranslate"><span class="pre">--roc-regions</span></code> flag produces a stratified ROC data file using only
 variants that overlap regions specified in a user-supplied BED file. The
 special syntax for this flag is: <code class="docutils literal notranslate"><span class="pre">--roc-regions</span> <span class="pre">LABEL=FILE</span></code>, where
@@ -4346,9 +3975,9 @@ based on GC content:</p>
   --roc-regions GC60TO65=/path/to/GCcontent/GRCh37_gc60to65_slop50.bed.gz
 </pre></div>
 </div>
-</div>
-<div class="section" id="custom-javascript-based-stratifications">
-<h5>Custom JavaScript based stratifications<a class="headerlink" href="#custom-javascript-based-stratifications" title="Permalink to this headline">¶</a></h5>
+</section>
+<section id="custom-javascript-based-stratifications">
+<h5>Custom JavaScript based stratifications<a class="headerlink" href="#custom-javascript-based-stratifications" title="Link to this heading">¶</a></h5>
 <p>The above stratification flags will satisfy most common usages, but
 <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> also includes the ability to write custom stratifications
 using JavaScript expressions (similar to <code class="docutils literal notranslate"><span class="pre">vcffilter</span> <span class="pre">--keep-expr</span></code>). The
@@ -4374,10 +4003,29 @@ names are different between baseline and calls files).</p></li>
 via <code class="docutils literal notranslate"><span class="pre">vcffilter</span> <span class="pre">--keep-expr</span></code>.</p></li>
 </ul>
 <p>For more information on JavaScript expressions, see <a class="reference internal" href="appendix.html#rtg-javascript-filtering-api"><span class="std std-ref">RTG JavaScript filtering API</span></a></p>
+</section>
+<section id="intersecting-multiple-stratifications">
+<h5>Intersecting multiple stratifications<a class="headerlink" href="#intersecting-multiple-stratifications" title="Link to this heading">¶</a></h5>
+<p>The default behaviour of vcfeval is to treat each stratification independently
+and output one ROC file for each selected stratification. In some cases it is
+useful to produce an output file for each possible intersection of the
+selected ROC categories. For example, to generate separate ROC curves for SNPs
+and non-SNPs within each of multiple specified BED region files. This can be
+accomplished with the <code class="docutils literal notranslate"><span class="pre">--roc-cross-join</span></code> flag, for example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg vcfeval -t build37.sdf -b baseline.vcf.gz -c calls.vcf.gz \
+  --roc-cross-join \
+  --roc-subset snp,non-snp \
+  --roc-regions GC55TO60=/path/to/GCcontent/GRCh37_gc55to60_slop50.bed.gz \
+  --roc-regions GC60TO65=/path/to/GCcontent/GRCh37_gc60to65_slop50.bed.gz
+</pre></div>
 </div>
-</div>
-<div class="section" id="benchmarking-comparisons-using-roc-and-precision-sensitivity-curves">
-<h4>Benchmarking comparisons using ROC and precision/sensitivity curves<a class="headerlink" href="#benchmarking-comparisons-using-roc-and-precision-sensitivity-curves" title="Permalink to this headline">¶</a></h4>
+<p>This will produce the four ROC output files: <code class="docutils literal notranslate"><span class="pre">GC55TO60+snp_roc.tsv.gz</span></code>,
+<code class="docutils literal notranslate"><span class="pre">GC55TO60+non_snp_roc.tsv.gz</span></code>, <code class="docutils literal notranslate"><span class="pre">GC60TO65+snp_roc.tsv.gz</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">GC60TO65+non_snp_roc.tsv.gz</span></code>.</p>
+</section>
+</section>
+<section id="benchmarking-comparisons-using-roc-and-precision-sensitivity-curves">
+<h4>Benchmarking comparisons using ROC and precision/sensitivity curves<a class="headerlink" href="#benchmarking-comparisons-using-roc-and-precision-sensitivity-curves" title="Link to this heading">¶</a></h4>
 <p>Multiple ROC data files (from a single or several <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> runs) can
 be plotted with the <code class="docutils literal notranslate"><span class="pre">rocplot</span></code> command, which allows output to a PNG or
 SVG image or analysis in an interactive GUI that provides zooming and
@@ -4395,12 +4043,16 @@ curve. While this latter point is somewhat arbitrary, it represents a
 balanced tradeoff between precision and sensitivity which is likely to
 provide a fairer comparison when comparing call sets from different
 callers.</p>
-<p>Sometimes it is useful to perform the summary statistic evaluation at
-some point other than maximized F-measure (for example when comparing
-a large number of results at a particular precision level).  This can
-be accomplished by specifying a different point using either the
+<p>Sometimes it is useful to report the summary statistic evaluation at
+some point other than maximized F-measure (for example when comparing a
+large number of results at a particular precision level).  This can be
+accomplished by specifying a different point using either the
 <code class="docutils literal notranslate"><span class="pre">--at-precision</span></code> or <code class="docutils literal notranslate"><span class="pre">--at-sensitivity</span></code> flag with a value in the
-range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>.</p>
+range <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code>. Alternatively, you can instruct the summary table to
+select the point corresponding to a fixed score threshold of interest.
+For example, when using <code class="docutils literal notranslate"><span class="pre">QUAL</span></code> as a score field, <code class="docutils literal notranslate"><span class="pre">--at-score</span> <span class="pre">20</span></code>
+would list the accuracy statistics equivalent to selecting VCF records
+with a <code class="docutils literal notranslate"><span class="pre">QUAL</span></code> score greater or equal to 20.</p>
 <p>Note that <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> reports true positives both counted using the
 baseline variant representation as well as counted using the call
 variant representation. When these numbers differ greatly, it indicates
@@ -4420,9 +4072,9 @@ accuracy, see:
 <a class="reference external" href="https://en.wikipedia.org/wiki/Receiver_operating_characteristic">https://en.wikipedia.org/wiki/Receiver_operating_characteristic</a>
 and <a class="reference external" href="https://en.wikipedia.org/wiki/Sensitivity_and_specificity">https://en.wikipedia.org/wiki/Sensitivity_and_specificity</a></p>
 </div>
-</div>
-<div class="section" id="benchmarking-performance-for-snps-versus-indels">
-<h4>Benchmarking performance for SNPs versus indels<a class="headerlink" href="#benchmarking-performance-for-snps-versus-indels" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="benchmarking-performance-for-snps-versus-indels">
+<h4>Benchmarking performance for SNPs versus indels<a class="headerlink" href="#benchmarking-performance-for-snps-versus-indels" title="Link to this heading">¶</a></h4>
 <p>A common desire is to perform analysis separately for SNPs versus
 indels. However, it is important to note that due the representation
 ambiguity problem, it is not always trivial to decide in a global sense
@@ -4484,9 +4136,9 @@ when computing metrics without any threshold.</p>
 stratifications available via <code class="docutils literal notranslate"><span class="pre">--roc-subset</span></code>, but is not applied to
 any custom stratifications produced via <code class="docutils literal notranslate"><span class="pre">--roc-regions</span></code> or
 <code class="docutils literal notranslate"><span class="pre">--roc-expr</span></code>.</p>
-</div>
-<div class="section" id="variant-decomposition-and-benchmarking">
-<h4>Variant decomposition and benchmarking<a class="headerlink" href="#variant-decomposition-and-benchmarking" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="variant-decomposition-and-benchmarking">
+<h4>Variant decomposition and benchmarking<a class="headerlink" href="#variant-decomposition-and-benchmarking" title="Link to this heading">¶</a></h4>
 <p>In general, it is not necessary to run any variant decomposition and/or
 normalization on variant call sets prior to evaluation with <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>,
 as the haplotype aware matching process can account for representation
@@ -4507,12 +4159,14 @@ decomposition options) is also available via <code class="docutils literal notra
 <a class="reference internal" href="#childsim"><span class="std std-ref">childsim</span></a>,
 <a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a>,
 <a class="reference internal" href="#vcf2rocplot"><span class="std std-ref">vcf2rocplot</span></a>,
-<a class="reference internal" href="#vcfdecompose"><span class="std std-ref">vcfdecompose</span></a></p>
+<a class="reference internal" href="#vcfdecompose"><span class="std std-ref">vcfdecompose</span></a>,
+<a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a>,
+<a class="reference internal" href="#cnveval"><span class="std std-ref">cnveval</span></a></p>
 </div>
-</div>
-</div>
-<div class="section" id="vcffilter">
-<h3>vcffilter<a class="headerlink" href="#vcffilter" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="vcffilter">
+<h3>vcffilter<a class="headerlink" href="#vcffilter" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Filters VCF records based on various criteria. When filtering on multiple samples, if any of the specified samples fail the criteria, the record will be
 filtered. By default filtered records are removed, but see the –fail, –clear-failed-samples, and –fail-samples options for alternatives.</p>
@@ -4531,11 +4185,6 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 17%" />
-<col style="width: 79%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -4551,11 +4200,11 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing variants to be filtered. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing variants to be filtered. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file. Use ‘-‘ to write to standard output. This option is required, unless <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> is being used.</p></td>
+<td><p>Output VCF file. Use ‘-’ to write to standard output. This option is required, unless <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> is being used.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--region=REGION</span></code></p></td>
@@ -4569,11 +4218,6 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 18%" />
-<col style="width: 78%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering (Record based)</p></th>
 </tr>
@@ -4656,11 +4300,6 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering (Sample based)</p></th>
 </tr>
@@ -4725,11 +4364,6 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 28%" />
-<col style="width: 66%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -4750,11 +4384,6 @@ filtered. By default filtered records are removed, but see the –fail, –clear
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 24%" />
-<col style="width: 70%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -4818,8 +4447,8 @@ function will not be called for records filtered out by <code class="docutils li
 <p class="admonition-title">See also</p>
 <p>For full details of functions available in <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> and <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> see <a class="reference internal" href="appendix.html#rtg-javascript-filtering-api"><span class="std std-ref">RTG JavaScript filtering API</span></a></p>
 </div>
-<div class="section" id="simple-filtering-by-javascript-expression-with-keep-expr">
-<h4>Simple filtering by JavaScript expression with <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code><a class="headerlink" href="#simple-filtering-by-javascript-expression-with-keep-expr" title="Permalink to this headline">¶</a></h4>
+<section id="simple-filtering-by-javascript-expression-with-keep-expr">
+<h4>Simple filtering by JavaScript expression with <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code><a class="headerlink" href="#simple-filtering-by-javascript-expression-with-keep-expr" title="Link to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> flag aims to provide a convenient way to apply some
 simple (typically one line) filtering expressions which are evaluated in
 the context of each record. The final expression of the fragment must
@@ -4827,8 +4456,8 @@ evaluate to a boolean value. Records which evaluate to <code class="docutils lit
 retained, while <code class="docutils literal notranslate"><span class="pre">false</span></code> will be removed. The value must be of type
 boolean, simply being truthy/falsy (in the JavaScript sense) will raise
 an error.</p>
-<div class="section" id="keep-expr-examples">
-<span id="expression-examples"></span><h5><code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> examples:<a class="headerlink" href="#keep-expr-examples" title="Permalink to this headline">¶</a></h5>
+<section id="keep-expr-examples">
+<span id="expression-examples"></span><h5><code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> examples:<a class="headerlink" href="#keep-expr-examples" title="Link to this heading">¶</a></h5>
 <p>The following expression keeps records where the <code class="docutils literal notranslate"><span class="pre">NA12878</span></code> sample has
 <code class="docutils literal notranslate"><span class="pre">GQ</span></code> &gt; 30 and the total depth is &gt; 20. JavaScript will auto convert
 numerical strings when comparing a string with a number, so calls to <code class="docutils literal notranslate"><span class="pre">parseInt</span></code> can be omitted.</p>
@@ -4878,10 +4507,10 @@ following is required:</p>
   --keep-expr &quot;INFO.AF.split(&#39;,&#39;).some(function(af) {return af &gt;= 0.1})&quot;
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="advanced-javascript-filtering-with-javascript">
-<h4>Advanced JavaScript filtering with <code class="docutils literal notranslate"><span class="pre">--javascript</span></code><a class="headerlink" href="#advanced-javascript-filtering-with-javascript" title="Permalink to this headline">¶</a></h4>
+</section>
+</section>
+<section id="advanced-javascript-filtering-with-javascript">
+<h4>Advanced JavaScript filtering with <code class="docutils literal notranslate"><span class="pre">--javascript</span></code><a class="headerlink" href="#advanced-javascript-filtering-with-javascript" title="Link to this heading">¶</a></h4>
 <p>The <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> option aims to support more complicated processing
 than <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code>, permitting modification of the output VCF, or
 supporting use cases where the script is tasked to compute and output
@@ -4905,16 +4534,16 @@ evaluated in order, in a shared JavaScript namespace, before VCF
 processing commences. This permits a use case where an initial
 JavaScript expression supplies parameter values which will be required
 by a subsequent JavaScript file.</p>
-<div class="section" id="example-javascript-scripts">
-<span id="javascript-examples"></span><h5>Example <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> scripts:<a class="headerlink" href="#example-javascript-scripts" title="Permalink to this headline">¶</a></h5>
+<section id="example-javascript-scripts">
+<span id="javascript-examples"></span><h5>Example <code class="docutils literal notranslate"><span class="pre">--javascript</span></code> scripts:<a class="headerlink" href="#example-javascript-scripts" title="Link to this heading">¶</a></h5>
 <p>To find indels with length greater than 5, save the following to a file
 named <code class="docutils literal notranslate"><span class="pre">find-indels.js</span></code>:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Finds indels with length &gt; 5</span>
-<span class="kd">function</span> <span class="nx">record</span><span class="p">()</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">deltas</span> <span class="o">=</span> <span class="nx">ALT</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">alt</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">alt</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
-  <span class="p">});</span>
-  <span class="k">return</span> <span class="nx">deltas</span><span class="p">.</span><span class="nx">some</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">delta</span><span class="p">)</span> <span class="p">{</span><span class="k">return</span> <span class="nx">delta</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">});</span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">record</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">deltas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ALT</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">(</span><span class="nx">alt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">alt</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">);</span>
+<span class="w">  </span><span class="p">});</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">deltas</span><span class="p">.</span><span class="nx">some</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">(</span><span class="nx">delta</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="k">return</span><span class="w"> </span><span class="nx">delta</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">5</span><span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -4927,19 +4556,19 @@ allelic fraction to two decimal places based on the values in the <code class="d
 and <code class="docutils literal notranslate"><span class="pre">DP</span></code> <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> annotations, for every sample contained in the
 VCF. Save the following to a file named <code class="docutils literal notranslate"><span class="pre">add-vaf.js</span></code>:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Derive new VAF FORMAT field for each sample</span>
-<span class="nx">ensureFormatHeader</span><span class="p">(</span><span class="s1">&#39;##FORMAT=&lt;ID=VAF,Number=1,Type=Float,&#39;</span> <span class="o">+</span>
-  <span class="s1">&#39;Description=&quot;Variant Allelic Fraction&quot;&gt;&#39;</span><span class="p">);</span>
+<span class="nx">ensureFormatHeader</span><span class="p">(</span><span class="s1">&#39;##FORMAT=&lt;ID=VAF,Number=1,Type=Float,&#39;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="s1">&#39;Description=&quot;Variant Allelic Fraction&quot;&gt;&#39;</span><span class="p">);</span>
 
-<span class="kd">function</span> <span class="nx">record</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">SAMPLES</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">sample</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// Take all but the first AD value as numerics</span>
-    <span class="kd">var</span> <span class="nx">altDepths</span> <span class="o">=</span> <span class="nx">sample</span><span class="p">.</span><span class="nx">AD</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
-    <span class="c1">// Find the max</span>
-    <span class="kd">var</span> <span class="nx">maxAltDepth</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">altDepths</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">maxAltDepth</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">sample</span><span class="p">.</span><span class="nx">VAF</span> <span class="o">=</span> <span class="p">(</span><span class="nx">maxAltDepth</span> <span class="o">/</span> <span class="nx">sample</span><span class="p">.</span><span class="nx">DP</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
-    <span class="p">}</span>
-  <span class="p">});</span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">record</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">SAMPLES</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">sample</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// Take all but the first AD value as numerics</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">altDepths</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">sample</span><span class="p">.</span><span class="nx">AD</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">).</span><span class="nx">slice</span><span class="p">(</span><span class="mf">1</span><span class="p">);</span>
+<span class="w">    </span><span class="c1">// Find the max</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="nx">maxAltDepth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">altDepths</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">maxAltDepth</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">sample</span><span class="p">.</span><span class="nx">VAF</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nx">maxAltDepth</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nx">sample</span><span class="p">.</span><span class="nx">DP</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mf">2</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">});</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -4951,42 +4580,42 @@ VCF. Save the following to a file named <code class="docutils literal notranslat
 following to a file named <code class="docutils literal notranslate"><span class="pre">indel-lengths.js</span></code>:</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// bin breakpoints can be customised by defining your own bins[] in a</span>
 <span class="c1">// previous -j flag</span>
-<span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">bins</span> <span class="o">==</span> <span class="s2">&quot;undefined&quot;</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">bins</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">11</span><span class="p">];</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">bins</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">&quot;undefined&quot;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">bins</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">10</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">5</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">3</span><span class="p">,</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">,</span><span class="w"> </span><span class="mf">6</span><span class="p">,</span><span class="w"> </span><span class="mf">11</span><span class="p">];</span>
 <span class="p">}</span>
 
-<span class="kd">var</span> <span class="nx">counts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="nx">bins</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="nx">counts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mi">0</span><span class="p">)});</span>
-<span class="kd">function</span> <span class="nx">record</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">ALT</span><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="kd">var</span> <span class="nx">deltas</span> <span class="o">=</span> <span class="nx">ALT</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">alt</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">alt</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="p">});</span>
-  <span class="kd">var</span> <span class="nx">maxDel</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">deltas</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">maxIns</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span> <span class="nx">deltas</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">delta</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">maxDel</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nx">maxIns</span> <span class="o">?</span> <span class="nx">maxDel</span> <span class="o">:</span> <span class="nx">maxIns</span><span class="p">;</span>
+<span class="kd">var</span><span class="w"> </span><span class="nx">counts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0</span><span class="p">];</span>
+<span class="nx">bins</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="nx">counts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="mf">0</span><span class="p">)});</span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">record</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">ALT</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">deltas</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">ALT</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span><span class="w"> </span><span class="p">(</span><span class="nx">alt</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nx">alt</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">maxDel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">deltas</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">maxIns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="kc">null</span><span class="p">,</span><span class="w"> </span><span class="nx">deltas</span><span class="p">);</span>
+<span class="w">  </span><span class="kd">var</span><span class="w"> </span><span class="nx">delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">maxDel</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">maxIns</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">maxDel</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">maxIns</span><span class="p">;</span>
 
-  <span class="k">if</span> <span class="p">(</span><span class="nx">delta</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">delta</span> <span class="o">&lt;</span> <span class="nx">bins</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="p">{</span>
-      <span class="nx">counts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
-      <span class="k">break</span><span class="p">;</span>
-    <span class="p">}</span>
-  <span class="p">}</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">delta</span> <span class="o">&gt;</span> <span class="nx">bins</span><span class="p">[</span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span> <span class="p">{</span>
-    <span class="nx">counts</span><span class="p">[</span><span class="nx">counts</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
-  <span class="p">}</span>
-  <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">delta</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mf">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">delta</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">bins</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="nx">counts</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<span class="w">      </span><span class="k">break</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">delta</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="nx">bins</span><span class="p">[</span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">counts</span><span class="p">[</span><span class="nx">counts</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">]</span><span class="o">++</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="kc">false</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kd">function</span> <span class="nx">end</span><span class="p">()</span> <span class="p">{</span>
-  <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;Delta\\tCount&quot;</span><span class="p">);</span>
-  <span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span> <span class="o">+</span> <span class="nx">bins</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\\t&quot;</span> <span class="o">+</span> <span class="nx">counts</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
-  <span class="p">}</span>
-  <span class="nx">print</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span> <span class="o">+</span> <span class="nx">bins</span><span class="p">[</span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;\\t&quot;</span> <span class="o">+</span> <span class="nx">counts</span><span class="p">[</span><span class="nx">counts</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]);</span>
+<span class="kd">function</span><span class="w"> </span><span class="nx">end</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="nx">print</span><span class="p">(</span><span class="s2">&quot;Delta\\tCount&quot;</span><span class="p">);</span>
+<span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nx">print</span><span class="p">(</span><span class="s2">&quot;&lt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">bins</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;\\t&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">counts</span><span class="p">[</span><span class="nx">i</span><span class="p">]);</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="nx">print</span><span class="p">(</span><span class="s2">&quot;&gt;&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">bins</span><span class="p">[</span><span class="nx">bins</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;\\t&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">counts</span><span class="p">[</span><span class="nx">counts</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">]);</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -5014,11 +4643,11 @@ of the VCF via:</p>
 <a class="reference internal" href="#vcfmerge"><span class="std std-ref">vcfmerge</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="vcfmerge">
-<h3>vcfmerge<a class="headerlink" href="#vcfmerge" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+</section>
+<section id="vcfmerge">
+<h3>vcfmerge<a class="headerlink" href="#vcfmerge" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Combines the contents of two or more VCF files. The <code class="docutils literal notranslate"><span class="pre">vcfmerge</span></code> command
 can concatenate the outputs of per-chromosome variant detection runs to
@@ -5034,11 +4663,6 @@ multiple samples to form a multi-sample VCF file.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5054,7 +4678,7 @@ multiple samples to form a multi-sample VCF file.</p>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output VCF file. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--region=REGION</span></code></p></td>
@@ -5068,11 +4692,6 @@ multiple samples to form a multi-sample VCF file.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 17%" />
-<col style="width: 79%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5139,8 +4758,8 @@ parameter, or inconsistent header checking can be entirely disabled with
 <code class="docutils literal notranslate"><span class="pre">--force-merge-all</span></code>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">--add-header</span></code> option allows inserting arbitrary VCF header lines
 into the output VCF. For more information, see <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a>.</p>
-<div class="section" id="merging-records-at-the-same-position">
-<h4>Merging records at the same position<a class="headerlink" href="#merging-records-at-the-same-position" title="Permalink to this headline">¶</a></h4>
+<section id="merging-records-at-the-same-position">
+<h4>Merging records at the same position<a class="headerlink" href="#merging-records-at-the-same-position" title="Link to this heading">¶</a></h4>
 <p>When multiple records occur with the same position and length on the
 reference, <code class="docutils literal notranslate"><span class="pre">vcfmerge</span></code> will attempt to combine the records into a
 single record. Combining multiple fully annotated records is
@@ -5178,10 +4797,10 @@ or <code class="docutils literal notranslate"><span class="pre">R</span></code> 
 <a class="reference internal" href="#bgzip"><span class="std std-ref">bgzip</span></a>,
 <a class="reference internal" href="#index"><span class="std std-ref">index</span></a></p>
 </div>
-</div>
-</div>
-<div class="section" id="vcfsplit">
-<h3>vcfsplit<a class="headerlink" href="#vcfsplit" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="vcfsplit">
+<h3>vcfsplit<a class="headerlink" href="#vcfsplit" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Splits samples contained within a VCF into separate files, one per
 sample.</p>
@@ -5195,11 +4814,6 @@ sample.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 16%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5211,7 +4825,7 @@ sample.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>The input VCF, or ‘-‘ to read from standard input.</p></td>
+<td><p>The input VCF, or ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=DIR</span></code></p></td>
@@ -5225,11 +4839,6 @@ sample.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -5250,11 +4859,6 @@ sample.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 27%" />
-<col style="width: 67%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5284,9 +4888,9 @@ where the sample has a non-reference genotype will be output, unless
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
-</div>
-<div class="section" id="vcfstats">
-<h3>vcfstats<a class="headerlink" href="#vcfstats" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcfstats">
+<h3>vcfstats<a class="headerlink" href="#vcfstats" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Display simple statistics about the contents of a set of VCF files.</p>
 <p><strong>Syntax:</strong></p>
@@ -5318,11 +4922,6 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 3%" />
-<col style="width: 13%" />
-<col style="width: 84%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5342,16 +4941,11 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 </tr>
 <tr class="row-odd"><td></td>
 <td><p>FILE+</p></td>
-<td><p>VCF file from which to derive statistics. Use ‘-‘ to read from standard input. Must be specified 1 or more times.</p></td>
+<td><p>VCF file from which to derive statistics. Use ‘-’ to read from standard input. Must be specified 1 or more times.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 34%" />
-<col style="width: 61%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -5364,11 +4958,6 @@ Indel/SNP+MNP ratio           : 0.13 (31568/247249)
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 21%" />
-<col style="width: 64%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5430,9 +5019,9 @@ overall length.</p>
 <a class="reference internal" href="#vcfmerge"><span class="std std-ref">vcfmerge</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
-</div>
-<div class="section" id="vcfsubset">
-<h3>vcfsubset<a class="headerlink" href="#vcfsubset" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcfsubset">
+<h3>vcfsubset<a class="headerlink" href="#vcfsubset" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Create a VCF file containing a subset of the original columns.</p>
 <p><strong>Syntax:</strong></p>
@@ -5445,11 +5034,6 @@ overall length.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 16%" />
-<col style="width: 80%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5461,11 +5045,11 @@ overall length.</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing variants to manipulate. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing variants to manipulate. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output VCF file. Use ‘-’ to write to standard output.</p></td>
 </tr>
 <tr class="row-odd"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--region=REGION</span></code></p></td>
@@ -5475,11 +5059,6 @@ overall length.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -5540,11 +5119,6 @@ overall length.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 24%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5581,9 +5155,9 @@ specified multiple times or with comma separated lists, for example,
 <a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
 <a class="reference internal" href="#vcfannotate"><span class="std std-ref">vcfannotate</span></a></p>
 </div>
-</div>
-<div class="section" id="vcf2rocplot">
-<h3>vcf2rocplot<a class="headerlink" href="#vcf2rocplot" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcf2rocplot">
+<h3>vcf2rocplot<a class="headerlink" href="#vcf2rocplot" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Produce rocplot compatible ROC data files from vcfeval annotated
 VCFs. The primary use cases for this command are to produce aggregate
@@ -5609,11 +5183,6 @@ $ rtg rocplot eval_family/weighted_roc.tsv.gz \
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5639,11 +5208,6 @@ $ rtg rocplot eval_family/weighted_roc.tsv.gz \
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -5654,8 +5218,16 @@ $ rtg rocplot eval_family/weighted_roc.tsv.gz \
 <td><p>Output summary statistics where precision &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
 </tr>
 <tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--at-score=FLOAT</span></code></p></td>
+<td><p>Output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--at-sensitivity=FLOAT</span></code></p></td>
 <td><p>Output summary statistics where sensitivity &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-cross-join</span></code></p></td>
+<td><p>Output ROC files for each intersection of –roc-subset, –roc-expr, and –roc-regions values provided.</p></td>
 </tr>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--roc-expr=STRING</span></code></p></td>
@@ -5667,8 +5239,8 @@ $ rtg rocplot eval_family/weighted_roc.tsv.gz \
 </tr>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--roc-subset=STRING</span></code></p></td>
-<td><p>Output ROC file for preset variant subset. Allowed values are [hom, het, snp, non-snp, mnp, indel]. May be specified 0 or more times, or as a comma separated
-list.</p></td>
+<td><p>Output ROC file for preset variant subset. Allowed values are [hom, het, snp, non-snp, mnp, indel, dup, del]. May be specified 0 or more times, or as a comma
+separated list.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-O</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--sort-order=STRING</span></code></p></td>
@@ -5677,16 +5249,11 @@ list.</p></td>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-f</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--vcf-score-field=STRING</span></code></p></td>
 <td><p>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal notranslate"><span class="pre">QUAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO.&lt;name&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT.&lt;name&gt;</span></code> to select the named VCF FORMAT or INFO
-field (Default is GQ)</p></td>
+field, or use <code class="docutils literal notranslate"><span class="pre">EXPR.&lt;LABEL&gt;=&lt;EXPRESSION&gt;</span></code> to define a JavaScript expression that dynamically computes a score (Default is QUAL)</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 25%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5707,35 +5274,40 @@ field (Default is GQ)</p></td>
 </tbody>
 </table>
 <p><strong>Usage:</strong></p>
-<p>While the ROC outputs generated by <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> are sufficient for many
-scenarios, there are some situations where it is useful to regenerate
-ROC files from one or more existing vcfeval outputs.</p>
+<p>While the ROC outputs generated by <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>/<code class="docutils literal notranslate"><span class="pre">cnveval</span></code>/<code class="docutils literal notranslate"><span class="pre">bndeval</span></code> are
+sufficient for many scenarios, there are some situations where it is useful
+to regenerate ROC files from one or more existing vcfeval outputs.</p>
 <p>One such situation is when evaluating caller accuracy across a cohort of
-samples where the number of variants per individual sample is
-low. Individual sample ROC curves are fairly uninformative with regard
-to overall accuracy or where to place suitable filter thresholds. An ROC
+samples where the number of variants per individual sample is low. This is
+a particular problem with CNV calling and restricted gene
+panels. Individual sample ROC curves are fairly uninformative with regard
+to overall accuracy or where to place suitable filter thresholds. A ROC
 curve from the combined evaluations provides a much better indication of
 overall caller accuracy.</p>
-<p>Another use case for generating ROC files from an existing <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>
+<p>Another use case for generating ROC files from an existing evaluation
 run is to look at alternative scoring methods or stratifications without
 having to execute the time-consuming variant matching stage implied by a
 new <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> run.</p>
-<p>The prerequisite for using <code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> is that <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> must
-have been run in “annotation” mode (i.e. via <code class="docutils literal notranslate"><span class="pre">--output-mode=annotate</span></code>)
-so that the output VCF files contain sufficient annotations regarding
-variant classification status. It is important that <code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> be
-provided with both annotated baseline and call VCFs in order to produce
-correct outputs.</p>
+<p>The prerequisite for using <code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> with <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> outputs is that
+<code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> must have been run in “annotation” mode (i.e. via
+<code class="docutils literal notranslate"><span class="pre">--output-mode=annotate</span></code>) so that the output VCF files contain sufficient
+annotations regarding variant classification status. It is important that
+<code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> be provided with both annotated baseline and call VCFs in
+order to produce correct outputs.</p>
 <p>The operation of the various score field selection and ROC
 stratification flags works the same as when running <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">vcf2rocplot</span></code> is compatible with the outputs of <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code>, <code class="docutils literal notranslate"><span class="pre">cnveval</span></code>
+and <code class="docutils literal notranslate"><span class="pre">bndeval</span></code>, although these should not be mixed in a single run.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a>,
+<a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a>,
+<a class="reference internal" href="#cnveval"><span class="std std-ref">cnveval</span></a>,
 <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a></p>
 </div>
-</div>
-<div class="section" id="svdecompose">
-<h3>svdecompose<a class="headerlink" href="#svdecompose" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="svdecompose">
+<h3>svdecompose<a class="headerlink" href="#svdecompose" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Split composite structural variants into a breakend representation.</p>
 <p><strong>Syntax:</strong></p>
@@ -5744,11 +5316,6 @@ stratification flags works the same as when running <code class="docutils litera
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 17%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5756,20 +5323,15 @@ stratification flags works the same as when running <code class="docutils litera
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-i</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--input=FILE</span></code></p></td>
-<td><p>VCF file containing variants to filter. Use ‘-‘ to read from standard input.</p></td>
+<td><p>VCF file containing variants to filter. Use ‘-’ to read from standard input.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--output=FILE</span></code></p></td>
-<td><p>Output VCF file name. Use ‘-‘ to write to standard output.</p></td>
+<td><p>Output VCF file name. Use ‘-’ to write to standard output.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 17%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5825,9 +5387,9 @@ nearby on the virtual contig. For the following insertions:</p>
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a></p>
 </div>
-</div>
-<div class="section" id="bndeval">
-<h3>bndeval<a class="headerlink" href="#bndeval" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="bndeval">
+<h3>bndeval<a class="headerlink" href="#bndeval" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Evaluate called breakends for agreement with a baseline breakend set.
 Outputs a weighted ROC file which can be viewed with <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">rocplot</span></code>
@@ -5841,11 +5403,6 @@ baseline and calls).</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -5875,11 +5432,6 @@ baseline and calls).</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -5900,11 +5452,6 @@ baseline and calls).</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -5925,16 +5472,11 @@ baseline and calls).</p>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-f</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--vcf-score-field=STRING</span></code></p></td>
 <td><p>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal notranslate"><span class="pre">QUAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO.&lt;name&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT.&lt;name&gt;</span></code> to select the named VCF FORMAT or INFO
-field (Default is INFO.DP)</p></td>
+field, or use <code class="docutils literal notranslate"><span class="pre">EXPR.&lt;LABEL&gt;=&lt;EXPRESSION&gt;</span></code> to define a JavaScript expression that dynamically computes a score (Default is INFO.DP)</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 25%" />
-<col style="width: 68%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -5969,18 +5511,21 @@ with the breakend records contained in the truth VCF in order to obtain a
 list of <em>truth breakend regions</em>. An evaluation region is included if there
 is any overlapping truth VCF record (no attempt is made to look at the
 degree of overlap).  Thus by supplying either evaluation regions
-corresponding to targeted regions or larger gene-level regions
-<code class="docutils literal notranslate"><span class="pre">bndeval</span></code> can be used to evaluate at different levels of granularity.</p>
+corresponding to targeted regions or larger gene-level regions <code class="docutils literal notranslate"><span class="pre">bndeval</span></code>
+can be used to evaluate at different levels of granularity.</p>
 <p>Similarly, the evaluation regions are intersected with the breakend records
 records contained in the calls VCF to obtain <em>called breakend regions</em>.</p>
 <p>The <em>truth breakend regions</em> are then intersected with the <em>called breakend
 regions</em> to obtain TP/FP/FN metrics.  The intersection supports a
-user-selectable tolerance in position.  Further, be default, a breakend
+user-selectable tolerance in position.  Further, by default, a breakend
 must occur in the same orientation to be considered a match, but this
 constraint can be relaxed by supplying the <code class="docutils literal notranslate"><span class="pre">--bidirectional</span></code> command
 line option.</p>
-<div class="section" id="bndeval-outputs">
-<h4>bndeval outputs<a class="headerlink" href="#bndeval-outputs" title="Permalink to this headline">¶</a></h4>
+<p>As with <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a>, a selection of ROC files can be generated according
+to various score field selection and ROC stratification flags. See
+<a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a> for more information.</p>
+<section id="bndeval-outputs">
+<h4>bndeval outputs<a class="headerlink" href="#bndeval-outputs" title="Link to this heading">¶</a></h4>
 <p>Once complete, <code class="docutils literal notranslate"><span class="pre">bndeval</span></code> command produces summary statistics and the
 following primary result files in the output directory:</p>
 <ul class="simple">
@@ -6001,12 +5546,204 @@ standard output.</p></li>
 <p><a class="reference internal" href="#discord"><span class="std std-ref">discord</span></a>,
 <a class="reference internal" href="#svdecompose"><span class="std std-ref">svdecompose</span></a>,
 <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a>,
+<a class="reference internal" href="#cnveval"><span class="std std-ref">cnveval</span></a>,
+<a class="reference internal" href="#vcf2rocplot"><span class="std std-ref">vcf2rocplot</span></a>,
 <a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a></p>
 </div>
+</section>
+</section>
+<section id="cnveval">
+<h3>cnveval<a class="headerlink" href="#cnveval" title="Link to this heading">¶</a></h3>
+<p><strong>Synopsis:</strong></p>
+<p>Evaluate called CNV regions for agreement with a baseline CNV set and
+output ROC information in a form compatible with <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">rocplot</span></code>.</p>
+<p><strong>Syntax:</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg cnveval [OPTION]... -b FILE -c FILE -e FILE -o DIR
+</pre></div>
 </div>
+<p><strong>Parameters:</strong></p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-b</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--baseline=FILE</span></code></p></td>
+<td><p>VCF file containing baseline variants.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-c</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--calls=FILE</span></code></p></td>
+<td><p>VCF file containing called variants.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-e</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--evaluation-regions=FILE</span></code></p></td>
+<td><p>Evaluate with respect to the supplied regions of interest BED file.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-o</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--output=DIR</span></code></p></td>
+<td><p>Directory for output.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--all-records</span></code></p></td>
+<td><p>Use all records regardless of FILTER status (Default is to only process records where FILTER is “.” or “PASS”)</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--at-precision=FLOAT</span></code></p></td>
+<td><p>Output summary statistics where precision &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--at-score=FLOAT</span></code></p></td>
+<td><p>Output summary statistics where score meets supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--at-sensitivity=FLOAT</span></code></p></td>
+<td><p>Output summary statistics where sensitivity &gt;= supplied value (Default is to summarize at maximum F-measure)</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--names</span></code></p></td>
+<td><p>Include evaluation region names in annotated outputs.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--no-roc</span></code></p></td>
+<td><p>Do not produce ROCs.</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-cross-join</span></code></p></td>
+<td><p>Output ROC files for each intersection of –roc-subset, –roc-expr, and –roc-regions values provided.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-expr=STRING</span></code></p></td>
+<td><p>Output ROC file for variants matching custom JavaScript expression. Use the form &lt;LABEL&gt;=&lt;EXPRESSION&gt;. May be specified 0 or more times.</p></td>
+</tr>
+<tr class="row-odd"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-regions=STRING</span></code></p></td>
+<td><p>Output ROC file for variants overlapping custom regions supplied in BED file. Use the form &lt;LABEL&gt;=&lt;FILENAME&gt;. May be specified 0 or more times.</p></td>
+</tr>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--roc-subset=STRING</span></code></p></td>
+<td><p>Output ROC file for preset variant subset. Allowed values are [dup, del]. May be specified 0 or more times, or as a comma separated list.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-O</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--sort-order=STRING</span></code></p></td>
+<td><p>The order in which to sort the ROC scores so that <code class="docutils literal notranslate"><span class="pre">good</span></code> scores come before <code class="docutils literal notranslate"><span class="pre">bad</span></code> scores. Allowed values are [ascending, descending] (Default is descending)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-f</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--vcf-score-field=STRING</span></code></p></td>
+<td><p>The name of the VCF FORMAT field to use as the ROC score. Also valid are <code class="docutils literal notranslate"><span class="pre">QUAL</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO.&lt;name&gt;</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT.&lt;name&gt;</span></code> to select the named VCF FORMAT or INFO
+field, or use <code class="docutils literal notranslate"><span class="pre">EXPR.&lt;LABEL&gt;=&lt;EXPRESSION&gt;</span></code> to define a JavaScript expression that dynamically computes a score (Default is QUAL)</p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-h</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--help</span></code></p></td>
+<td><p>Print help on command-line flag usage.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-Z</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--no-gzip</span></code></p></td>
+<td><p>Do not gzip the output.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-T</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--threads=INT</span></code></p></td>
+<td><p>Number of threads (Default is the number of available cores)</p></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Usage:</strong></p>
+<p>The <code class="docutils literal notranslate"><span class="pre">cnveval</span></code> command operates on the CNV VCF files that are produced
+by <code class="docutils literal notranslate"><span class="pre">segment</span></code>, but in principal could be used with any VCF file that
+follows the VCF specification for structural variants. The VCF records
+must contain an <code class="docutils literal notranslate"><span class="pre">INFO</span></code> <code class="docutils literal notranslate"><span class="pre">END</span></code> annotation, and <code class="docutils literal notranslate"><span class="pre">INFO</span></code> <code class="docutils literal notranslate"><span class="pre">SVTYPE</span></code>
+annotation containing a value of either <code class="docutils literal notranslate"><span class="pre">DUP</span></code> or <code class="docutils literal notranslate"><span class="pre">DEL</span></code>.</p>
+<p>The primary inputs to <code class="docutils literal notranslate"><span class="pre">cnveval</span></code> are an evaluation regions BED file, a
+truth/baseline VCF containing expected CNV calls, and a query/calls VCF
+containing the called CNV regions.</p>
+<p>The regions contained in the evaluation regions BED file are intersected
+with the CNV records contained in the truth VCF in order to obtain a list
+of <em>truth CNV regions</em>, which each have a status of <code class="docutils literal notranslate"><span class="pre">DUP</span></code> or <code class="docutils literal notranslate"><span class="pre">DEL</span></code>. An
+evaluation region is included if there is any overlapping truth VCF record
+(no attempt is made to look at the degree of overlap).  Thus by supplying
+either evaluation regions corresponding to targeted regions or larger
+gene-level regions <code class="docutils literal notranslate"><span class="pre">cnveval</span></code> can be used to evaluate at different levels
+of granularity.</p>
+<p>Similarly, the evaluation regions are intersected with the CNV records
+records contained in the calls VCF to obtain <em>called CNV regions</em>.</p>
+<p>The <em>truth CNV regions</em> are then intersected with the <em>called CNV
+regions</em> to obtain TP/FP/FN metrics.</p>
+<p>As with <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a>, a selection of ROC files can be generated according
+to various score field selection and ROC stratification flags. See
+<a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a> for more information.</p>
+<section id="cnveval-outputs">
+<h4>cnveval outputs<a class="headerlink" href="#cnveval-outputs" title="Link to this heading">¶</a></h4>
+<p>Once complete, <code class="docutils literal notranslate"><span class="pre">cnveval</span></code> command produces summary statistics and the
+following primary result files in the output directory:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">weighted_roc.tsv.gz</span></code> - contains ROC data that can be plotted
+with <code class="docutils literal notranslate"><span class="pre">rocplot</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">baseline.bed.gz</span></code> contains the <em>truth CNV regions</em>, where each BED
+record contains the region status as <code class="docutils literal notranslate"><span class="pre">TP</span></code> or <code class="docutils literal notranslate"><span class="pre">FN</span></code>, the <code class="docutils literal notranslate"><span class="pre">SVTYPE</span></code>,
+and the span of the original truth VCF record.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">calls.bed.gz</span></code> contains the <em>called CNV regions</em>, where each BED
+record contains the region status as <code class="docutils literal notranslate"><span class="pre">TP</span></code> or <code class="docutils literal notranslate"><span class="pre">FP</span></code>, the <code class="docutils literal notranslate"><span class="pre">SVTYPE</span></code>,
+the span of the original calls VCF record, and the score value used
+for ranking in the ROC plot.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">summary.txt</span></code> contains the same summary statistics printed to
+standard output.</p></li>
+</ul>
+</section>
+<section id="evaluation-per-target-region">
+<h4>Evaluation per target region<a class="headerlink" href="#evaluation-per-target-region" title="Link to this heading">¶</a></h4>
+<p>The default method of evaluation is with respect to target regions,
+where each individual region of interest will be evaluated as correct or
+incorrect. For this mode, supply the standard target regions BED file,
+and both VCF files.</p>
+<p>For RTG calls, directly supply either the raw VCF produced by
+<code class="docutils literal notranslate"><span class="pre">segment</span></code> or after filtering with <code class="docutils literal notranslate"><span class="pre">vcffilter</span></code></p>
+</section>
+<section id="evaluation-per-gene-region">
+<h4>Evaluation per gene region<a class="headerlink" href="#evaluation-per-gene-region" title="Link to this heading">¶</a></h4>
+<p>A second form of evaluation is when the desired level of granularity is
+at the gene level. For this mode, the evaluation regions should be one
+region per gene (this is the same BED file that is used with
+<code class="docutils literal notranslate"><span class="pre">--summary-regions</span></code> when running <code class="docutils literal notranslate"><span class="pre">segment</span></code> or <code class="docutils literal notranslate"><span class="pre">cnvsummary</span></code>), and
+the input VCFs should be pre-processed to contain at most one record per
+gene.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#segment"><span class="std std-ref">segment</span></a>,
+<a class="reference internal" href="#cnvsummary"><span class="std std-ref">cnvsummary</span></a>,
+<a class="reference internal" href="#vcffilter"><span class="std std-ref">vcffilter</span></a>,
+<a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a>,
+<a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a>,
+<a class="reference internal" href="#vcf2rocplot"><span class="std std-ref">vcf2rocplot</span></a>,
+<a class="reference internal" href="#rocplot"><span class="std std-ref">rocplot</span></a></p>
 </div>
-<div class="section" id="pedfilter">
-<h3>pedfilter<a class="headerlink" href="#pedfilter" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="pedfilter">
+<h3>pedfilter<a class="headerlink" href="#pedfilter" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Filter and convert a pedigree file.</p>
 <p><strong>Syntax:</strong></p>
@@ -6019,11 +5756,6 @@ standard output.</p></li>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 18%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -6031,16 +5763,11 @@ standard output.</p></li>
 <tbody>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">FILE</span></code></p></td>
-<td><p>The pedigree file to process, may be PED or VCF, use ‘-‘ to read from stdin.</p></td>
+<td><p>The pedigree file to process, may be PED or VCF, use ‘-’ to read from stdin.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 17%" />
-<col style="width: 77%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Filtering</p></th>
 </tr>
@@ -6065,11 +5792,6 @@ standard output.</p></li>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 18%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -6082,11 +5804,6 @@ standard output.</p></li>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 6%" />
-<col style="width: 18%" />
-<col style="width: 76%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -6115,9 +5832,9 @@ be redirected to a file or another pipeline command as required.</p>
 <a class="reference internal" href="#mendelian"><span class="std std-ref">mendelian</span></a>,
 <a class="reference internal" href="#pedstats"><span class="std std-ref">pedstats</span></a></p>
 </div>
-</div>
-<div class="section" id="pedstats">
-<h3>pedstats<a class="headerlink" href="#pedstats" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="pedstats">
+<h3>pedstats<a class="headerlink" href="#pedstats" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Output information from pedigree files of various formats.</p>
 <p><strong>Syntax:</strong></p>
@@ -6156,11 +5873,6 @@ command-line such as:</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 18%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -6168,16 +5880,11 @@ command-line such as:</p>
 <tbody>
 <tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">FILE</span></code></p></td>
-<td><p>The pedigree file to process, may be PED or VCF, use ‘-‘ to read from stdin.</p></td>
+<td><p>The pedigree file to process, may be PED or VCF, use ‘-’ to read from stdin.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 13%" />
-<col style="width: 82%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -6226,11 +5933,6 @@ command-line such as:</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 18%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -6301,9 +6003,9 @@ package managers, and can also be downloaded from their web site:
 <a class="reference internal" href="#pedfilter"><span class="std std-ref">pedfilter</span></a>,
 <a class="reference internal" href="#vcfsubset"><span class="std std-ref">vcfsubset</span></a></p>
 </div>
-</div>
-<div class="section" id="rocplot">
-<h3>rocplot<a class="headerlink" href="#rocplot" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="rocplot">
+<h3>rocplot<a class="headerlink" href="#rocplot" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>Plot ROC curves from <code class="docutils literal notranslate"><span class="pre">readsimeval</span></code> and <code class="docutils literal notranslate"><span class="pre">vcfeval</span></code> ROC data files, either
 to an image, or using an interactive GUI.</p>
@@ -6320,11 +6022,6 @@ to an image, or using an interactive GUI.</p>
 </div>
 <p><strong>Parameters:</strong></p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 5%" />
-<col style="width: 19%" />
-<col style="width: 75%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>File Input/Output</p></th>
 </tr>
@@ -6353,11 +6050,6 @@ to an image, or using an interactive GUI.</p>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 4%" />
-<col style="width: 15%" />
-<col style="width: 81%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Reporting</p></th>
 </tr>
@@ -6388,26 +6080,25 @@ brewer_set1, brewer_set2, brewer_set3, classic] (Default is classic)</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--plain</span></code></p></td>
 <td><p>If set, use a plain plot style.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-P</span></code></p></td>
+<tr class="row-even"><td></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--points</span></code></p></td>
+<td><p>If set, show points on each curve.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-P</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--precision-sensitivity</span></code></p></td>
 <td><p>If set, plot precision vs sensitivity rather than ROC.</p></td>
 </tr>
-<tr class="row-odd"><td></td>
+<tr class="row-even"><td></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--scores</span></code></p></td>
 <td><p>If set, show scores on the plot.</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">-t</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">-t</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">--title=STRING</span></code></p></td>
 <td><p>Title for the plot.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 7%" />
-<col style="width: 24%" />
-<col style="width: 69%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head" colspan="3"><p>Utility</p></th>
 </tr>
@@ -6473,8 +6164,8 @@ palette. In addition, PNG images saved by <code class="docutils literal notransl
 indicating the graph configuration that may be useful when recreating
 graphs. This metadata can be displayed (when present) via the <code class="docutils literal notranslate"><span class="pre">--cmd</span></code>
 parameter.</p>
-<div class="section" id="interactive-gui">
-<h4>Interactive GUI<a class="headerlink" href="#interactive-gui" title="Permalink to this headline">¶</a></h4>
+<section id="interactive-gui">
+<h4>Interactive GUI<a class="headerlink" href="#interactive-gui" title="Link to this heading">¶</a></h4>
 <p>The following image shows the <code class="docutils literal notranslate"><span class="pre">rocplot</span></code> GUI with an example ROC plot :</p>
 <img alt="_images/rocplot_roc.png" src="_images/rocplot_roc.png" />
 <p>Similarly, here is an example precision/sensitivity plot:</p>
@@ -6542,12 +6233,14 @@ curves”, Davis, J., (2006),
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#readsimeval"><span class="std std-ref">readsimeval</span></a>,
 <a class="reference internal" href="#bndeval"><span class="std std-ref">bndeval</span></a>,
+<a class="reference internal" href="#cnveval"><span class="std std-ref">cnveval</span></a>,
+<a class="reference internal" href="#vcf2rocplot"><span class="std std-ref">vcf2rocplot</span></a>,
 <a class="reference internal" href="#vcfeval"><span class="std std-ref">vcfeval</span></a></p>
 </div>
-</div>
-</div>
-<div class="section" id="version">
-<h3>version<a class="headerlink" href="#version" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="version">
+<h3>version<a class="headerlink" href="#version" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>The RTG version display utility.</p>
 <p><strong>Syntax:</strong></p>
@@ -6577,7 +6270,7 @@ John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis,
 Citation (vcfeval):
 John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis, Sean A. Irvine, Alan Jackson, Richard Littin, Mehul Rathod, David Ware, Justin M. Zook, Len Trigg, and Francisco M. De La Vega. &quot;Comparing Variant Call Files for Performance Benchmarking of Next-Generation Sequencing Variant Calling Pipelines.&quot; bioRxiv, 2015. doi:10.1101/023754.
 
-(c) Real Time Genomics, 2017
+(c) Real Time Genomics, 2025
 </pre></div>
 </div>
 <p><strong>Parameters:</strong></p>
@@ -6589,11 +6282,11 @@ John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis,
 <p><a class="reference internal" href="#help"><span class="std std-ref">help</span></a>,
 <a class="reference internal" href="#license"><span class="std std-ref">license</span></a></p>
 </div>
-</div>
-<div class="section" id="license">
-<h3>license<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="license">
+<h3>license<a class="headerlink" href="#license" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
-<p>The RTG license display utility.</p>
+<p>The RTG licensed commands display utility.</p>
 <p><strong>Syntax:</strong></p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg license
 </pre></div>
@@ -6605,17 +6298,17 @@ John G. Cleary, Ross Braithwaite, Kurt Gaastra, Brian S. Hilbush, Stuart Inglis,
 <p><strong>Parameters:</strong></p>
 <p>There are no options associated with the license command.</p>
 <p><strong>Usage:</strong></p>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">license</span></code> command to display license information and expiration
-date. Output at the command line (standard output) shows command name,
+<p>Use the <code class="docutils literal notranslate"><span class="pre">license</span></code> command to display the release status of each licensed
+command.  Output at the command line (standard output) shows command name,
 licensed status, and command release level.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#help"><span class="std std-ref">help</span></a>,
 <a class="reference internal" href="#version"><span class="std std-ref">version</span></a></p>
 </div>
-</div>
-<div class="section" id="help">
-<h3>help<a class="headerlink" href="#help" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="help">
+<h3>help<a class="headerlink" href="#help" title="Link to this heading">¶</a></h3>
 <p><strong>Synopsis:</strong></p>
 <p>The RTG help command provides online help for all RTG commands.</p>
 <p><strong>Syntax:</strong></p>
@@ -6641,9 +6334,9 @@ licensed status, and command release level.</p>
 <p><a class="reference internal" href="#license"><span class="std std-ref">license</span></a>,
 <a class="reference internal" href="#version"><span class="std std-ref">version</span></a></p>
 </div>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -6655,8 +6348,9 @@ licensed status, and command release level.</p>
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">RTG Command Reference</a><ul>
 <li><a class="reference internal" href="#command-line-interface-cli">Command line interface (CLI)</a></li>
 <li><a class="reference internal" href="#rtg-command-syntax">RTG command syntax</a></li>
@@ -6701,6 +6395,7 @@ licensed status, and command release level.</p>
 <li><a class="reference internal" href="#vcf2rocplot">vcf2rocplot</a></li>
 <li><a class="reference internal" href="#svdecompose">svdecompose</a></li>
 <li><a class="reference internal" href="#bndeval">bndeval</a></li>
+<li><a class="reference internal" href="#cnveval">cnveval</a></li>
 <li><a class="reference internal" href="#pedfilter">pedfilter</a></li>
 <li><a class="reference internal" href="#pedstats">pedstats</a></li>
 <li><a class="reference internal" href="#rocplot">rocplot</a></li>
@@ -6713,12 +6408,17 @@ licensed status, and command release level.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="overview.html"
-                        title="previous chapter">Overview</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="product_usage.html"
-                        title="next chapter">RTG product usage - baseline progressions</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="overview.html"
+                          title="previous chapter">Overview</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="product_usage.html"
+                          title="next chapter">RTG product usage - baseline progressions</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -6742,13 +6442,13 @@ licensed status, and command release level.</p>
         <li class="right" >
           <a href="overview.html" title="Overview"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">RTG Command Reference</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    &#169; Copyright 2025, Real Time Genomics.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

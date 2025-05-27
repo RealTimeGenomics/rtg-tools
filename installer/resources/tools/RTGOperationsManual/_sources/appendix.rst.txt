@@ -323,6 +323,10 @@ for files from third party sources or RTG command output where the
 
   .. include:: appendix_output_formats.inc.rst
 
+.. only:: extra
+
+  .. include:: appendix/segment_output_formats.inc.rst
+
 RTG JavaScript filtering API
 ----------------------------
 
@@ -507,7 +511,7 @@ present. This will add an ``FILTER`` declaration line to the header.
 
 .. code-block:: javascript
 
-  ensureFilterHeader('##INFO=<ID=FAIL_VAL,' +
+  ensureFilterHeader('##FILTER=<ID=FAIL_VAL,' +
     'Description="Failed validation">');
 
 
@@ -661,7 +665,7 @@ notice. While every effort has been made to make this guide as complete
 and accurate as possible as of the publication date, no warranty of
 fitness is implied.
 
-© 2017 Real Time Genomics All rights reserved.
+© 2025 Real Time Genomics All rights reserved.
 
 Illumina, Solexa, Complete Genomics, Ion Torrent, Roche, ABI, Life
 Technologies, and PacBio are registered trademarks and all other brands

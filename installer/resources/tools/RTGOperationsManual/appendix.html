@@ -2,24 +2,23 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appendix &#8212; RTG Tools Operations Manual v3.12</title>
-    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Appendix &#8212; RTG Tools Operations Manual v3.13</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=e0de18cf" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/documentation_options.js?v=aca65d0a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Administration &amp; Capacity Planning" href="administration.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
@@ -33,7 +32,7 @@
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Appendix</a></li> 
       </ul>
     </div>  
@@ -43,10 +42,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="appendix">
-<h1>Appendix<a class="headerlink" href="#appendix" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="rtg-reference-file-format">
-<h2>RTG reference file format<a class="headerlink" href="#rtg-reference-file-format" title="Permalink to this headline">¶</a></h2>
+  <section id="appendix">
+<h1>Appendix<a class="headerlink" href="#appendix" title="Link to this heading">¶</a></h1>
+<section id="rtg-reference-file-format">
+<h2>RTG reference file format<a class="headerlink" href="#rtg-reference-file-format" title="Link to this heading">¶</a></h2>
 <p>Many RTG commands can make use of additional information about the
 structure of a reference genome, such as expected ploidy, sex
 chromosomes, location of PAR regions, etc.  When appropriate, this
@@ -248,17 +247,13 @@ variant calling the X chromosome sections will be called as diploid
 while the Y chromosome sections will be skipped. There may be some edge
 effects up to a read length either side of a pseudo-autosomal region
 boundary.</p>
-</div>
-<div class="section" id="pedigree-ped-input-file-format">
-<h2>Pedigree PED input file format<a class="headerlink" href="#pedigree-ped-input-file-format" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="pedigree-ped-input-file-format">
+<h2>Pedigree PED input file format<a class="headerlink" href="#pedigree-ped-input-file-format" title="Link to this heading">¶</a></h2>
 <p>The PED file format is a white space (tab or space) delimited ASCII
 file. Lines starting with <code class="docutils literal notranslate"><span class="pre">#</span></code> are ignored. It has exactly six required
 columns in the following order.</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Column</p></th>
 <th class="head"><p>Definition</p></th>
@@ -316,9 +311,9 @@ LIN GENA-A 0 GENA 2 0
 </div>
 <p>RTG includes commands such as <code class="docutils literal notranslate"><span class="pre">pedfilter</span></code> and <code class="docutils literal notranslate"><span class="pre">pedstats</span></code> for simple
 viewing, filtering and conversion of pedigree files.</p>
-</div>
-<div class="section" id="genetic-map-directory">
-<h2>Genetic map directory<a class="headerlink" href="#genetic-map-directory" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="genetic-map-directory">
+<h2>Genetic map directory<a class="headerlink" href="#genetic-map-directory" title="Link to this heading">¶</a></h2>
 <p>Certain commands such as <code class="docutils literal notranslate"><span class="pre">pedsamplesim</span></code> are able to make use of genetic
 linkage information provided in the form of per sequence TSV files in
 a directory.</p>
@@ -370,9 +365,9 @@ can be used with RTG.</p>
 with the required header manipulations already applied is available for
 download from: <a class="reference external" href="https://realtimegenomics.com/news/pre-formatted-reference-datasets">https://realtimegenomics.com/news/pre-formatted-reference-datasets</a></p>
 <p>See <a class="reference internal" href="rtg_command_reference.html#pedsamplesim"><span class="std std-ref">pedsamplesim</span></a>, <a class="reference internal" href="rtg_command_reference.html#childsim"><span class="std std-ref">childsim</span></a>.</p>
-</div>
-<div class="section" id="rtg-commands-using-indexed-input-files">
-<h2>RTG commands using indexed input files<a class="headerlink" href="#rtg-commands-using-indexed-input-files" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="rtg-commands-using-indexed-input-files">
+<h2>RTG commands using indexed input files<a class="headerlink" href="#rtg-commands-using-indexed-input-files" title="Link to this heading">¶</a></h2>
 <p>Several RTG commands require coordinate indexed input files to operate
 and several more require them when the <code class="docutils literal notranslate"><span class="pre">--region</span></code> or <code class="docutils literal notranslate"><span class="pre">--bed-regions</span></code>
 parameter is used. The index files used are standard tabix or BAM index
@@ -382,16 +377,16 @@ default produce them with appropriate index files. To produce indexes
 for files from third party sources or RTG command output where the
 <code class="docutils literal notranslate"><span class="pre">--no-index</span></code> or <code class="docutils literal notranslate"><span class="pre">--no-gzip</span></code> parameters were set, use the RTG
 <code class="docutils literal notranslate"><span class="pre">bgzip</span></code> and <code class="docutils literal notranslate"><span class="pre">index</span></code> commands.</p>
-</div>
-<div class="section" id="rtg-javascript-filtering-api">
-<h2>RTG JavaScript filtering API<a class="headerlink" href="#rtg-javascript-filtering-api" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="rtg-javascript-filtering-api">
+<h2>RTG JavaScript filtering API<a class="headerlink" href="#rtg-javascript-filtering-api" title="Link to this heading">¶</a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">vcffilter</span></code> command permits filtering VCF records via user-supplied
 JavaScript expressions or scripts containing JavaScript functions that
 operate on VCF records. The JavaScript environment has an API provided
 that enables convenient access to components of a VCF record in order to
 satisfy common use cases.</p>
-<div class="section" id="vcf-record-field-access">
-<h3>VCF record field access<a class="headerlink" href="#vcf-record-field-access" title="Permalink to this headline">¶</a></h3>
+<section id="vcf-record-field-access">
+<h3>VCF record field access<a class="headerlink" href="#vcf-record-field-access" title="Link to this heading">¶</a></h3>
 <p>This section describes the supported methods to access components of an
 individual VCF record. In the following descriptions, assume the input
 VCF contains the following excerpt (the full header has been omitted):</p>
@@ -399,68 +394,68 @@ VCF contains the following excerpt (the full header has been omitted):</p>
 1 11259340 . G C,T . PASS DP=795;DPR=0.581;ABC=4.5 GT:DP 1/2:65 1/0:15
 </pre></div>
 </div>
-<div class="section" id="chrom-pos-id-ref-qual">
-<h4>CHROM, POS, ID, REF, QUAL<a class="headerlink" href="#chrom-pos-id-ref-qual" title="Permalink to this headline">¶</a></h4>
+<section id="chrom-pos-id-ref-qual">
+<h4>CHROM, POS, ID, REF, QUAL<a class="headerlink" href="#chrom-pos-id-ref-qual" title="Link to this heading">¶</a></h4>
 <p>Within the context of a <code class="docutils literal notranslate"><span class="pre">--keep-expr</span></code> or <code class="docutils literal notranslate"><span class="pre">record</span></code> function these
 variables will provide access to the String representation of the VCF
 column of the same name.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">CHROM</span><span class="p">;</span> <span class="c1">// &quot;1&quot;</span>
-<span class="nx">POS</span><span class="p">;</span> <span class="c1">// &quot;11259340&quot;</span>
-<span class="nx">ID</span><span class="p">;</span> <span class="c1">// &quot;.&quot;</span>
-<span class="nx">REF</span><span class="p">;</span> <span class="c1">// &quot;G&quot;</span>
-<span class="nx">QUAL</span><span class="p">;</span> <span class="c1">// &quot;.&quot;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">CHROM</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;1&quot;</span>
+<span class="nx">POS</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;11259340&quot;</span>
+<span class="nx">ID</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;.&quot;</span>
+<span class="nx">REF</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;G&quot;</span>
+<span class="nx">QUAL</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;.&quot;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="alt-filter">
-<h4>ALT, FILTER<a class="headerlink" href="#alt-filter" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="alt-filter">
+<h4>ALT, FILTER<a class="headerlink" href="#alt-filter" title="Link to this heading">¶</a></h4>
 <p>Will retrieve an array of the values in the column.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ALT</span><span class="p">;</span> <span class="c1">// [&quot;C&quot;, &quot;T&quot;]</span>
-<span class="nx">FILTER</span><span class="p">;</span> <span class="c1">// [&quot;PASS&quot;]</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ALT</span><span class="p">;</span><span class="w"> </span><span class="c1">// [&quot;C&quot;, &quot;T&quot;]</span>
+<span class="nx">FILTER</span><span class="p">;</span><span class="w"> </span><span class="c1">// [&quot;PASS&quot;]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="info-info-field">
-<h4>INFO.{INFO_FIELD}<a class="headerlink" href="#info-info-field" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="info-info-field">
+<h4>INFO.{INFO_FIELD}<a class="headerlink" href="#info-info-field" title="Link to this heading">¶</a></h4>
 <p>The values in the <code class="docutils literal notranslate"><span class="pre">INFO</span></code> field are accessible through properties on the
 <code class="docutils literal notranslate"><span class="pre">INFO</span></code> object indexed by <code class="docutils literal notranslate"><span class="pre">INFO</span> <span class="pre">ID</span></code>. These properties will be the string
 representation of info values with multiple values delimited with “<code class="docutils literal notranslate"><span class="pre">,</span></code>”.
 Missing fields will be represented by “<code class="docutils literal notranslate"><span class="pre">.</span></code>”. Assigning to these
 properties will update the VCF record. This will be undefined for fields not
 declared in the header.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">INFO</span><span class="p">.</span><span class="nx">DP</span><span class="p">;</span> <span class="c1">// &quot;795&quot;</span>
-<span class="nx">INFO</span><span class="p">.</span><span class="nx">ABC</span><span class="p">;</span> <span class="c1">// &quot;4,5&quot;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">INFO</span><span class="p">.</span><span class="nx">DP</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;795&quot;</span>
+<span class="nx">INFO</span><span class="p">.</span><span class="nx">ABC</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;4,5&quot;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="sample-name-format-field">
-<h4>{SAMPLE_NAME}.{FORMAT_FIELD}<a class="headerlink" href="#sample-name-format-field" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="sample-name-format-field">
+<h4>{SAMPLE_NAME}.{FORMAT_FIELD}<a class="headerlink" href="#sample-name-format-field" title="Link to this heading">¶</a></h4>
 <p>The JavaScript String prototype has been extended to allow access to the
 format fields for each sample. The string representation of values in
 the sample column are accessible as properties on the string matching
 the sample name named after the <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field <code class="docutils literal notranslate"><span class="pre">ID</span></code>.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;NA12877&#39;</span><span class="p">.</span><span class="nx">GT</span><span class="p">;</span> <span class="c1">// &quot;1/2&quot;</span>
-<span class="s1">&#39;NA12878&#39;</span><span class="p">.</span><span class="nx">GT</span><span class="p">;</span> <span class="c1">// &quot;1/0&quot;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="s1">&#39;NA12877&#39;</span><span class="p">.</span><span class="nx">GT</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;1/2&quot;</span>
+<span class="s1">&#39;NA12878&#39;</span><span class="p">.</span><span class="nx">GT</span><span class="p">;</span><span class="w"> </span><span class="c1">// &quot;1/0&quot;</span>
 </pre></div>
 </div>
 <p>Note that these properties are only defined for fields that are declared
 in the VCF header (any that are not declared in the header will be
 undefined). See below for how to add new <code class="docutils literal notranslate"><span class="pre">INFO</span></code> or <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field
 declarations.</p>
-</div>
-</div>
-<div class="section" id="vcf-record-modification">
-<h3>VCF record modification<a class="headerlink" href="#vcf-record-modification" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="vcf-record-modification">
+<h3>VCF record modification<a class="headerlink" href="#vcf-record-modification" title="Link to this heading">¶</a></h3>
 <p>Most components of VCF records can be written or updated in a fairly
 natural manner by direct assignment in order to make modifications. For
 example:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">CHROM</span> <span class="o">=</span> <span class="s2">&quot;chr1&quot;</span><span class="p">;</span>      <span class="c1">// Will change the CHROM value</span>
-<span class="nx">POS</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span>            <span class="c1">// Will change the POS value</span>
-<span class="nx">ID</span> <span class="o">=</span> <span class="s2">&quot;rs23987382&quot;</span><span class="p">;</span>   <span class="c1">// Will change the ID value</span>
-<span class="nx">QUAL</span> <span class="o">=</span> <span class="s2">&quot;50&quot;</span><span class="p">;</span>         <span class="c1">// Will change the QUAL value</span>
-<span class="nx">FILTER</span> <span class="o">=</span> <span class="s2">&quot;FAIL&quot;</span><span class="p">;</span>     <span class="c1">// Will set the FILTER value</span>
-<span class="nx">INFO</span><span class="p">.</span><span class="nx">DPR</span> <span class="o">=</span> <span class="s2">&quot;0.01&quot;</span><span class="p">;</span>   <span class="c1">// Will change the value of the DPR info field</span>
-<span class="s1">&#39;NA12877&#39;</span><span class="p">.</span><span class="nx">DP</span> <span class="o">=</span> <span class="s2">&quot;10&quot;</span><span class="p">;</span> <span class="c1">// Will change the DP field of the NA12877 sample</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">CHROM</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;chr1&quot;</span><span class="p">;</span><span class="w">      </span><span class="c1">// Will change the CHROM value</span>
+<span class="nx">POS</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">42</span><span class="p">;</span><span class="w">            </span><span class="c1">// Will change the POS value</span>
+<span class="nx">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;rs23987382&quot;</span><span class="p">;</span><span class="w">   </span><span class="c1">// Will change the ID value</span>
+<span class="nx">QUAL</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;50&quot;</span><span class="p">;</span><span class="w">         </span><span class="c1">// Will change the QUAL value</span>
+<span class="nx">FILTER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;FAIL&quot;</span><span class="p">;</span><span class="w">     </span><span class="c1">// Will set the FILTER value</span>
+<span class="nx">INFO</span><span class="p">.</span><span class="nx">DPR</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.01&quot;</span><span class="p">;</span><span class="w">   </span><span class="c1">// Will change the value of the DPR info field</span>
+<span class="s1">&#39;NA12877&#39;</span><span class="p">.</span><span class="nx">DP</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;10&quot;</span><span class="p">;</span><span class="w"> </span><span class="c1">// Will change the DP field of the NA12877 sample</span>
 </pre></div>
 </div>
 <p>Other components of the VCF record (such as <code class="docutils literal notranslate"><span class="pre">REF</span></code>,
@@ -476,10 +471,10 @@ header to reflect the change (see <a class="reference internal" href="#vcf-heade
 </div>
 <p>Direct assignment to <code class="docutils literal notranslate"><span class="pre">ID</span></code> and <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> fields accept either a string
 containing semicolon separated values, or a list of values. For example:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ID</span> <span class="o">=</span> <span class="s1">&#39;rs23987382;COSM3805&#39;</span><span class="p">;</span>
-<span class="nx">ID</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;rs23987382&#39;</span><span class="p">,</span> <span class="s1">&#39;COSM3805&#39;</span><span class="p">];</span>
-<span class="nx">FILTER</span> <span class="o">=</span> <span class="s1">&#39;BAZ;BANG&#39;</span><span class="p">;</span>
-<span class="nx">FILTER</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;BAZ&#39;</span><span class="p">,</span> <span class="s1">&#39;BANG&#39;</span><span class="p">];</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;rs23987382;COSM3805&#39;</span><span class="p">;</span>
+<span class="nx">ID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;rs23987382&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;COSM3805&#39;</span><span class="p">];</span>
+<span class="nx">FILTER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;BAZ;BANG&#39;</span><span class="p">;</span>
+<span class="nx">FILTER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;BAZ&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;BANG&#39;</span><span class="p">];</span>
 </pre></div>
 </div>
 <p>Note that although the <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> field returns an array when read, any
@@ -488,129 +483,129 @@ record.</p>
 <p>Adding a filter to existing filters is a common operation and can be
 accomplished by the above assignment methods, for example by adding a
 value to the existing list and then setting the result:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">f</span> <span class="o">=</span> <span class="nx">FILTER</span><span class="p">;</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">f</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">FILTER</span><span class="p">;</span>
 <span class="nx">f</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;BOING&#39;</span><span class="p">);</span>
-<span class="nx">FILTER</span> <span class="o">=</span> <span class="nx">f</span><span class="p">;</span>
+<span class="nx">FILTER</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">f</span><span class="p">;</span>
 </pre></div>
 </div>
 <p>However, since this is a little unwieldy, a convenience function called
 <cite>add()</cite> can be used (and may be chained):</p>
 <div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">FILTER</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;BOING&#39;</span><span class="p">);</span>
-<span class="nx">FILTER</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="s1">&#39;BOING&#39;</span><span class="p">,</span> <span class="s1">&#39;DOING&#39;</span><span class="p">);</span>
+<span class="nx">FILTER</span><span class="p">.</span><span class="nx">add</span><span class="p">([</span><span class="s1">&#39;BOING&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;DOING&#39;</span><span class="p">);</span>
 <span class="nx">FILTER</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;BOING&#39;</span><span class="p">).</span><span class="nx">add</span><span class="p">(</span><span class="s1">&#39;DOING&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="vcf-header-modification">
-<h3>VCF header modification<a class="headerlink" href="#vcf-header-modification" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="vcf-header-modification">
+<h3>VCF header modification<a class="headerlink" href="#vcf-header-modification" title="Link to this heading">¶</a></h3>
 <p>Functions are provided that allow the addition of new <code class="docutils literal notranslate"><span class="pre">FILTER</span></code>,
 <code class="docutils literal notranslate"><span class="pre">INFO</span></code> and <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> fields to the header and records. It is
 recommended that the following functions only be used within the
 run-once portion of <code class="docutils literal notranslate"><span class="pre">--javascript</span></code>.</p>
-<div class="section" id="ensureformatheader-format-header-string">
-<h4>ensureFormatHeader({FORMAT_HEADER_STRING})<a class="headerlink" href="#ensureformatheader-format-header-string" title="Permalink to this headline">¶</a></h4>
+<section id="ensureformatheader-format-header-string">
+<h4>ensureFormatHeader({FORMAT_HEADER_STRING})<a class="headerlink" href="#ensureformatheader-format-header-string" title="Link to this heading">¶</a></h4>
 <p>Add a new <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> field to the VCF if it is not already present. This
 will add a <code class="docutils literal notranslate"><span class="pre">FORMAT</span></code> declaration line to the header and define the
 corresponding accessor methods for use in record processing.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureFormatHeader</span><span class="p">(</span><span class="s1">&#39;##FORMAT=&lt;ID=GL,Number=G,Type=Float,&#39;</span> <span class="o">+</span>
-  <span class="s1">&#39;Description=&quot;Log_10 scaled genotype likelihoods.&quot;&gt;&#39;</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureFormatHeader</span><span class="p">(</span><span class="s1">&#39;##FORMAT=&lt;ID=GL,Number=G,Type=Float,&#39;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="s1">&#39;Description=&quot;Log_10 scaled genotype likelihoods.&quot;&gt;&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="ensureinfoheader-info-header-string">
-<h4>ensureInfoHeader({INFO_HEADER_STRING})<a class="headerlink" href="#ensureinfoheader-info-header-string" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="ensureinfoheader-info-header-string">
+<h4>ensureInfoHeader({INFO_HEADER_STRING})<a class="headerlink" href="#ensureinfoheader-info-header-string" title="Link to this heading">¶</a></h4>
 <p>Add a new <code class="docutils literal notranslate"><span class="pre">INFO</span></code> field to the VCF if it is not already present. This
 will add an <code class="docutils literal notranslate"><span class="pre">INFO</span></code> declaration line to the header and define the
 corresponding accessor methods for use in record processing.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureInfoHeader</span><span class="p">(</span><span class="s1">&#39;##INFO=&lt;ID=CT,Number=1,Type=Integer,&#39;</span> <span class="o">+</span>
-  <span class="s1">&#39;Description=&quot;Coverage threshold that was applied&quot;&gt;&#39;</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureInfoHeader</span><span class="p">(</span><span class="s1">&#39;##INFO=&lt;ID=CT,Number=1,Type=Integer,&#39;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="s1">&#39;Description=&quot;Coverage threshold that was applied&quot;&gt;&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="ensurefilterheader-filter-header-string">
-<h4>ensureFilterHeader({FILTER_HEADER_STRING})<a class="headerlink" href="#ensurefilterheader-filter-header-string" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="ensurefilterheader-filter-header-string">
+<h4>ensureFilterHeader({FILTER_HEADER_STRING})<a class="headerlink" href="#ensurefilterheader-filter-header-string" title="Link to this heading">¶</a></h4>
 <p>Add a new <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> field to the VCF header if it is not already
 present. This will add an <code class="docutils literal notranslate"><span class="pre">FILTER</span></code> declaration line to the header.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureFilterHeader</span><span class="p">(</span><span class="s1">&#39;##INFO=&lt;ID=FAIL_VAL,&#39;</span> <span class="o">+</span>
-  <span class="s1">&#39;Description=&quot;Failed validation&quot;&gt;&#39;</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">ensureFilterHeader</span><span class="p">(</span><span class="s1">&#39;##FILTER=&lt;ID=FAIL_VAL,&#39;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">  </span><span class="s1">&#39;Description=&quot;Failed validation&quot;&gt;&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="testing-for-overlap-with-genomic-regions">
-<h3>Testing for overlap with genomic regions<a class="headerlink" href="#testing-for-overlap-with-genomic-regions" title="Permalink to this headline">¶</a></h3>
+</section>
+</section>
+<section id="testing-for-overlap-with-genomic-regions">
+<h3>Testing for overlap with genomic regions<a class="headerlink" href="#testing-for-overlap-with-genomic-regions" title="Link to this heading">¶</a></h3>
 <p>One common use case is to test whether any given VCF record overlaps or
 is contained within a set of genomic regions. Regions may be loaded from
 either an external BED file or VCF file in the run-once portion of the
 JavaScript by either of the following:</p>
-<div class="section" id="regions-frombed-filename">
-<h4>Regions.fromBed({FILENAME})<a class="headerlink" href="#regions-frombed-filename" title="Permalink to this headline">¶</a></h4>
+<section id="regions-frombed-filename">
+<h4>Regions.fromBed({FILENAME})<a class="headerlink" href="#regions-frombed-filename" title="Link to this heading">¶</a></h4>
 <p>Load the specified BED file into a <cite>regions</cite> object. For example:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">myregions</span> <span class="o">=</span> <span class="nx">Regions</span><span class="p">.</span><span class="nx">fromBed</span><span class="p">(</span><span class="s1">&#39;/path/to/regions.bed&#39;</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">myregions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Regions</span><span class="p">.</span><span class="nx">fromBed</span><span class="p">(</span><span class="s1">&#39;/path/to/regions.bed&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="regions-fromvcf-filename">
-<h4>Regions.fromVcf({FILENAME})<a class="headerlink" href="#regions-fromvcf-filename" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="regions-fromvcf-filename">
+<h4>Regions.fromVcf({FILENAME})<a class="headerlink" href="#regions-fromvcf-filename" title="Link to this heading">¶</a></h4>
 <p>Load the specified VCF file into a <cite>regions</cite> object. For example:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span> <span class="nx">myregions</span> <span class="o">=</span> <span class="nx">Regions</span><span class="p">.</span><span class="nx">fromVcf</span><span class="p">(</span><span class="s1">&#39;/path/to/regions.vcf&#39;</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">var</span><span class="w"> </span><span class="nx">myregions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">Regions</span><span class="p">.</span><span class="nx">fromVcf</span><span class="p">(</span><span class="s1">&#39;/path/to/regions.vcf&#39;</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>Having loaded a set of genomic regions, this can be used to test for
 region overlaps using the following methods:</p>
-</div>
-<div class="section" id="regions-object-overlaps-chrom-start-end">
-<h4>{REGIONS_OBJECT}.overlaps({CHROM}, {START}, {END})<a class="headerlink" href="#regions-object-overlaps-chrom-start-end" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="regions-object-overlaps-chrom-start-end">
+<h4>{REGIONS_OBJECT}.overlaps({CHROM}, {START}, {END})<a class="headerlink" href="#regions-object-overlaps-chrom-start-end" title="Link to this heading">¶</a></h4>
 <p>Return true if the loaded regions overlap the specified interval.  This
 function is typically used within the <code class="docutils literal notranslate"><span class="pre">record</span></code> function to test the
 coordinates of the current VCF record, e.g.:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">record</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">myregions</span><span class="p">.</span><span class="nx">overlaps</span><span class="p">(</span><span class="nx">CHROM</span><span class="p">,</span> <span class="nx">POS</span><span class="p">,</span> <span class="nx">POS</span> <span class="o">+</span> <span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">))</span> <span class="p">{</span>
-        <span class="c1">// do something if the record overlaps any region</span>
-    <span class="p">}</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span><span class="w"> </span><span class="nx">record</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">myregions</span><span class="p">.</span><span class="nx">overlaps</span><span class="p">(</span><span class="nx">CHROM</span><span class="p">,</span><span class="w"> </span><span class="nx">POS</span><span class="p">,</span><span class="w"> </span><span class="nx">POS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// do something if the record overlaps any region</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="regions-object-encloses-chrom-start-end">
-<h4>{REGIONS_OBJECT}.encloses({CHROM}, {START}, {END})<a class="headerlink" href="#regions-object-encloses-chrom-start-end" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="regions-object-encloses-chrom-start-end">
+<h4>{REGIONS_OBJECT}.encloses({CHROM}, {START}, {END})<a class="headerlink" href="#regions-object-encloses-chrom-start-end" title="Link to this heading">¶</a></h4>
 <p>Return true if the loaded regions entirely encloses the supplied
 interval.  This function is typically used within the <code class="docutils literal notranslate"><span class="pre">record</span></code>
 function to test the coordinates of the current VCF record, e.g.:</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span> <span class="nx">record</span><span class="p">()</span> <span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">myregions</span><span class="p">.</span><span class="nx">encloses</span><span class="p">(</span><span class="nx">CHROM</span><span class="p">,</span> <span class="nx">POS</span><span class="p">,</span> <span class="nx">POS</span> <span class="o">+</span> <span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">))</span> <span class="p">{</span>
-        <span class="c1">// do something if the record is fully enclosed by any region</span>
-    <span class="p">}</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">function</span><span class="w"> </span><span class="nx">record</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">myregions</span><span class="p">.</span><span class="nx">encloses</span><span class="p">(</span><span class="nx">CHROM</span><span class="p">,</span><span class="w"> </span><span class="nx">POS</span><span class="p">,</span><span class="w"> </span><span class="nx">POS</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">REF</span><span class="p">.</span><span class="nx">length</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// do something if the record is fully enclosed by any region</span>
+<span class="w">    </span><span class="p">}</span>
 <span class="p">}</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="additional-information-and-functions">
-<h3>Additional information and functions<a class="headerlink" href="#additional-information-and-functions" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="samples">
-<h4>SAMPLES<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h4>
+</section>
+</section>
+<section id="additional-information-and-functions">
+<h3>Additional information and functions<a class="headerlink" href="#additional-information-and-functions" title="Link to this heading">¶</a></h3>
+<section id="samples">
+<h4>SAMPLES<a class="headerlink" href="#samples" title="Link to this heading">¶</a></h4>
 <p>This variable contains an array of the sample names in the VCF header.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">SAMPLES</span><span class="p">;</span> <span class="c1">// [&#39;NA12877&#39;, &#39;NA12878&#39;]</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">SAMPLES</span><span class="p">;</span><span class="w"> </span><span class="c1">// [&#39;NA12877&#39;, &#39;NA12878&#39;]</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="print-string">
-<h4>print({STRING})<a class="headerlink" href="#print-string" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="print-string">
+<h4>print({STRING})<a class="headerlink" href="#print-string" title="Link to this heading">¶</a></h4>
 <p>Write the provided string to standard output.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">print</span><span class="p">(</span><span class="s1">&#39;The samples are: &#39;</span> <span class="o">+</span> <span class="nx">SAMPLES</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">print</span><span class="p">(</span><span class="s1">&#39;The samples are: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">SAMPLES</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="error-string">
-<h4>error({STRING})<a class="headerlink" href="#error-string" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="error-string">
+<h4>error({STRING})<a class="headerlink" href="#error-string" title="Link to this heading">¶</a></h4>
 <p>Write the provided string to standard error.</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;The samples are: &#39;</span> <span class="o">+</span> <span class="nx">SAMPLES</span><span class="p">);</span>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;The samples are: &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">SAMPLES</span><span class="p">);</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="checkminversion-rtg-minimum-version">
-<h4>checkMinVersion(RTG_MINIMUM_VERSION)<a class="headerlink" href="#checkminversion-rtg-minimum-version" title="Permalink to this headline">¶</a></h4>
+</section>
+<section id="checkminversion-rtg-minimum-version">
+<h4>checkMinVersion(RTG_MINIMUM_VERSION)<a class="headerlink" href="#checkminversion-rtg-minimum-version" title="Link to this heading">¶</a></h4>
 <p>Check the version of RTG that the script is running under, and exits
 with an error message if the version of RTG does not meet the minimum
 required version. This is useful when distributing scripts that make use
@@ -622,11 +617,11 @@ of features that are not present in earlier versions of RTG.</p>
 <p class="admonition-title">See also</p>
 <p>For javascript filtering usage and examples see <a class="reference internal" href="rtg_command_reference.html#vcffilter"><span class="std std-ref">vcffilter</span></a></p>
 </div>
-</div>
-</div>
-</div>
-<div class="section" id="distribution-contents">
-<h2>Distribution Contents<a class="headerlink" href="#distribution-contents" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+</section>
+<section id="distribution-contents">
+<h2>Distribution Contents<a class="headerlink" href="#distribution-contents" title="Link to this heading">¶</a></h2>
 <p>The contents of the RTG distribution zip file should include:</p>
 <ul class="simple">
 <li><p>The RTG executable JAR file.</p></li>
@@ -637,9 +632,9 @@ of features that are not present in earlier versions of RTG.</p>
 </ul>
 <p>Some distributions also include an appropriate java runtime environment
 (JRE) for your operating system.</p>
-</div>
-<div class="section" id="readme-txt">
-<h2>README.txt<a class="headerlink" href="#readme-txt" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="readme-txt">
+<h2>README.txt<a class="headerlink" href="#readme-txt" title="Link to this heading">¶</a></h2>
 <p>For reference purposes, a copy of the distribution <code class="docutils literal notranslate"><span class="pre">README.txt</span></code> file
 follows:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>=== RTG.VERSION ===
@@ -673,10 +668,6 @@ No-JRE:
 Linux/MacOS X:
 
   Unzip the RTG distribution to the desired location.
-
-  If your RTG distribution requires a license file (rtg-license.txt),
-  copy the license file from Real Time Genomics into the RTG
-  distribution directory.
 
   In a terminal, cd to the installation directory and test for success
   by entering &quot;./rtg version&quot;
@@ -715,10 +706,6 @@ Linux/MacOS X:
 Windows:
 
   Unzip the RTG distribution to the desired location.
-
-  If your RTG distribution requires a license file (rtg-license.txt),
-  copy the license file from Real Time Genomics into the RTG
-  distribution directory.
 
   Test for success by entering &quot;rtg version&quot; at the command line.  The
   first time rtg is executed you will be prompted with some
@@ -902,9 +889,9 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </pre></div>
 </div>
-</div>
-<div class="section" id="notice">
-<h2>Notice<a class="headerlink" href="#notice" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="notice">
+<h2>Notice<a class="headerlink" href="#notice" title="Link to this heading">¶</a></h2>
 <p>Real Time Genomics does not assume any liability arising out of the
 application or use of any software described herein. Further, Real Time
 Genomics does not convey any license under its patent, trademark,
@@ -914,12 +901,12 @@ processes, products, or parts thereof, described herein, without
 notice. While every effort has been made to make this guide as complete
 and accurate as possible as of the publication date, no warranty of
 fitness is implied.</p>
-<p>© 2017 Real Time Genomics All rights reserved.</p>
+<p>© 2025 Real Time Genomics All rights reserved.</p>
 <p>Illumina, Solexa, Complete Genomics, Ion Torrent, Roche, ABI, Life
 Technologies, and PacBio are registered trademarks and all other brands
 referenced in this document are the property of their respective owners.</p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -931,13 +918,16 @@ referenced in this document are the property of their respective owners.</p>
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Appendix</a><ul>
 <li><a class="reference internal" href="#rtg-reference-file-format">RTG reference file format</a></li>
 <li><a class="reference internal" href="#pedigree-ped-input-file-format">Pedigree PED input file format</a></li>
 <li><a class="reference internal" href="#genetic-map-directory">Genetic map directory</a></li>
-<li><a class="reference internal" href="#rtg-commands-using-indexed-input-files">RTG commands using indexed input files</a></li>
+<li><a class="reference internal" href="#rtg-commands-using-indexed-input-files">RTG commands using indexed input files</a><ul class="simple">
+</ul>
+</li>
 <li><a class="reference internal" href="#rtg-javascript-filtering-api">RTG JavaScript filtering API</a><ul>
 <li><a class="reference internal" href="#vcf-record-field-access">VCF record field access</a><ul>
 <li><a class="reference internal" href="#chrom-pos-id-ref-qual">CHROM, POS, ID, REF, QUAL</a></li>
@@ -976,9 +966,12 @@ referenced in this document are the property of their respective owners.</p>
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="administration.html"
-                        title="previous chapter">Administration &amp; Capacity Planning</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="administration.html"
+                          title="previous chapter">Administration &amp; Capacity Planning</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -999,13 +992,13 @@ referenced in this document are the property of their respective owners.</p>
         <li class="right" >
           <a href="administration.html" title="Administration &amp; Capacity Planning"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Appendix</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    &#169; Copyright 2025, Real Time Genomics.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

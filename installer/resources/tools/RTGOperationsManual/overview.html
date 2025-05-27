@@ -2,25 +2,24 @@
 
 <!doctype html>
 
-<html>
+<html lang="en" data-content_root="./">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Overview &#8212; RTG Tools Operations Manual v3.12</title>
-    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Overview &#8212; RTG Tools Operations Manual v3.13</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css?v=e0de18cf" />
     
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
+    <script src="_static/documentation_options.js?v=aca65d0a"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/bizstyle.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="RTG Command Reference" href="rtg_command_reference.html" />
     <link rel="prev" title="Table Of Contents" href="index.html" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
     <![endif]-->
@@ -37,7 +36,7 @@
         <li class="right" >
           <a href="index.html" title="Table Of Contents"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
       </ul>
     </div>  
@@ -47,13 +46,13 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h1>
 <p>This chapter introduces the features, operational options, and
 installation requirements of the data analysis software from <a class="reference external" href="http://realtimegenomics.com">Real Time
 Genomics</a>.</p>
-<div class="section" id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
 <p>RTG software enables the development of fast, efficient software
 pipelines for deep genomic analysis. RTG is built on innovative search
 technologies and new algorithms designed for processing high volumes of
@@ -77,13 +76,13 @@ required for a specific task.</p></li>
 results together, adding additional annotation information to existing
 variants.</p></li>
 </ul>
-</div>
-<div class="section" id="rtg-software-description">
-<h2>RTG software description<a class="headerlink" href="#rtg-software-description" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="rtg-software-description">
+<h2>RTG software description<a class="headerlink" href="#rtg-software-description" title="Link to this heading">¶</a></h2>
 <p>RTG software is delivered as a single executable with multiple commands
 executed through a command line interface (CLI). Commands are delivered
-in product packages, and for commercial users each command can be
-independently enabled through a license key.</p>
+in product packages, and the available commands vary per product
+package.</p>
 <p>Usage:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>rtg COMMAND [OPTIONS] &lt;REQUIRED&gt;
 </pre></div>
@@ -93,9 +92,9 @@ independently enabled through a license key.</p>
 <p>For detailed information about RTG command syntax and
 usage of individual commands, refer to <a class="reference internal" href="rtg_command_reference.html#rtg-command-reference"><span class="std std-ref">RTG Command Reference</span></a>.</p>
 </div>
-</div>
-<div class="section" id="installation-and-deployment">
-<h2>Installation and deployment<a class="headerlink" href="#installation-and-deployment" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="installation-and-deployment">
+<h2>Installation and deployment<a class="headerlink" href="#installation-and-deployment" title="Link to this heading">¶</a></h2>
 <p>RTG is a self-contained tool that sets minimal expectations on the
 environment in which it is placed. It comes with the application
 components it needs to execute completely, yet performance can be
@@ -109,10 +108,6 @@ analysis benchmarks suggest the use of six server nodes of the
 configuration shown in below.</p>
 <p>Table : Recommended system requirements</p>
 <table class="docutils align-default">
-<colgroup>
-<col style="width: 23%" />
-<col style="width: 77%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p>Processor</p></td>
 <td><p>Intel Core i7-2600</p></td>
@@ -131,8 +126,8 @@ Instructions for a quick start installation are provided here.</p>
 <p>For further information about setting up per-machine configuration
 files, please see the <code class="docutils literal notranslate"><span class="pre">README.txt</span></code> contained in the distribution zip
 file (a copy is also included in this manual’s appendix).</p>
-<div class="section" id="quick-start-instructions">
-<h3>Quick start instructions<a class="headerlink" href="#quick-start-instructions" title="Permalink to this headline">¶</a></h3>
+<section id="quick-start-instructions">
+<h3>Quick start instructions<a class="headerlink" href="#quick-start-instructions" title="Link to this heading">¶</a></h3>
 <p>These instructions are intended for an individual to install and operate
 the RTG software without the need to establish root / administrator
 privileges.</p>
@@ -152,14 +147,8 @@ than directly executing the Java JAR.</p>
 <p>Linux/MacOS X:</p>
 <ul>
 <li><p>Unzip the RTG distribution to the desired location.</p></li>
-<li><p>If your installation requires a license file (<code class="docutils literal notranslate"><span class="pre">rtg-license.txt</span></code>),
-copy the license file provided by Real Time Genomics into the RTG
-distribution directory.</p></li>
-<li><dl class="simple">
-<dt>In a terminal, cd to the installation directory and test for success</dt><dd><p>by entering <code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">version</span></code></p>
-</dd>
-</dl>
-</li>
+<li><p>In a terminal, cd to the installation directory and test for success
+by entering <code class="docutils literal notranslate"><span class="pre">./rtg</span> <span class="pre">version</span></code></p></li>
 <li><p>On MacOS X, depending on your operating system version and
 configuration regarding unsigned applications, you may encounter the
 error message:</p>
@@ -193,9 +182,6 @@ name output by the command <code class="docutils literal notranslate"><span clas
 <p>Windows:</p>
 <ul class="simple">
 <li><p>Unzip the RTG distribution to the desired location.</p></li>
-<li><p>If your installation requires a license, copy the license file
-provided by Real Time Genomics (<code class="docutils literal notranslate"><span class="pre">rtg-license.txt</span></code>) into the RTG
-distribution directory.</p></li>
 <li><p>Test for success by entering <code class="docutils literal notranslate"><span class="pre">rtg</span> <span class="pre">version</span></code> at the command line. The
 first time RTG is executed you will be prompted with some questions
 to customize your installation. Follow the prompts.</p></li>
@@ -207,29 +193,15 @@ the available RAM - this is automatically calculated. One may
 override this limit by setting the <code class="docutils literal notranslate"><span class="pre">RTG_MEM</span></code> variable in the
 <code class="docutils literal notranslate"><span class="pre">rtg.bat</span></code> script or as an environment variable.</p></li>
 </ul>
-</div>
-<div class="section" id="license-management">
-<h3>License Management<a class="headerlink" href="#license-management" title="Permalink to this headline">¶</a></h3>
-<p>Commercial distributions of RTG products require the presence of a valid
-license key file for operation.</p>
-<p>The license key file must be located in the same directory as the RTG
-executable. The license enables the execution of a particular command
-set for the purchased product(s) and features.</p>
-<p>A license key allows flexible use of the RTG package on any node or CPU
-core.</p>
-<p>To view the current license features at the command prompt, enter:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>$ rtg license
-</pre></div>
-</div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p>For more data center deployment and instructions for
 editing scripts, see <a class="reference internal" href="administration.html#administration-capacity-planning"><span class="std std-ref">Administration &amp; Capacity Planning</span></a>.</p>
 </div>
-</div>
-</div>
-<div class="section" id="technical-assistance-and-support">
-<h2>Technical assistance and support<a class="headerlink" href="#technical-assistance-and-support" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="technical-assistance-and-support">
+<h2>Technical assistance and support<a class="headerlink" href="#technical-assistance-and-support" title="Link to this heading">¶</a></h2>
 <p>For assistance with any technical or conceptual issue that may arise
 during use of the RTG product, contact Real Time Genomics Technical
 Support via email at <code class="docutils literal notranslate"><span class="pre">support&#64;realtimegenomics.com</span></code></p>
@@ -237,8 +209,8 @@ Support via email at <code class="docutils literal notranslate"><span class="pre
 <a class="reference external" href="https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users">https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-users</a></p>
 <p>A low-traffic announcements-only group is available at:
 <a class="reference external" href="https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-announce">https://groups.google.com/a/realtimegenomics.com/forum/#!forum/rtg-announce</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -250,14 +222,14 @@ Support via email at <code class="docutils literal notranslate"><span class="pre
             <p class="logo"><a href="index.html">
               <img class="logo" src="_static/html_logo.png" alt="Logo"/>
             </a></p>
-  <h3><a href="index.html">Table of Contents</a></h3>
-  <ul>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
 <li><a class="reference internal" href="#">Overview</a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#rtg-software-description">RTG software description</a></li>
 <li><a class="reference internal" href="#installation-and-deployment">Installation and deployment</a><ul>
 <li><a class="reference internal" href="#quick-start-instructions">Quick start instructions</a></li>
-<li><a class="reference internal" href="#license-management">License Management</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#technical-assistance-and-support">Technical assistance and support</a></li>
@@ -265,12 +237,17 @@ Support via email at <code class="docutils literal notranslate"><span class="pre
 </li>
 </ul>
 
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="index.html"
-                        title="previous chapter">Table Of Contents</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="rtg_command_reference.html"
-                        title="next chapter">RTG Command Reference</a></p>
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Table Of Contents</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="rtg_command_reference.html"
+                          title="next chapter">RTG Command Reference</a></p>
+  </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -294,13 +271,13 @@ Support via email at <code class="docutils literal notranslate"><span class="pre
         <li class="right" >
           <a href="index.html" title="Table Of Contents"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.12</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">RTG Tools Operations Manual v3.13</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Overview</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2017, Real Time Genomics.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    &#169; Copyright 2025, Real Time Genomics.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.2.6.
     </div>
   </body>
 </html>

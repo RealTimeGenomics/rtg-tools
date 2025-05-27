@@ -6,11 +6,7 @@ Advanced installation configuration
 
 RTG software can be shared by a group of users by installing on a
 centrally available file directory or shared drive. Assignment of
-execution privileges can be determined by the administrator, independent
-of the software license file. For commercial users, the software license
-prepared by Real Time Genomics (``rtg-license.txt``) need only be included
-in the same directory as the executable (``RTG.jar``) and the run-time
-scripts (``rtg`` or ``rtg.bat``).
+execution privileges can be determined by the administrator.
 
 During installation on Unix systems, a configuration file named
 ``rtg.cfg`` is created in the installation directory. By editing this
@@ -138,15 +134,13 @@ Usage logging
 RTG has the ability to record simple command usage information for
 submission to Real Time Genomics. The first time RTG is run (typically
 during installation), the user will be asked whether to enable usage
-logging. This information may be required for customers with a
-pay-per-use license. Other customers may choose to send this information
+logging. Customers may choose to send this information
 to give Real Time Genomics feedback on which commands and features are
 commonly used or to locally log RTG command use for their own analysis.
 
 A usage record contains the following fields:
 
 -  Time and date
--  License serial number
 -  Unique ID for the run
 -  Version of RTG software
 -  RTG command name, without parameters (e.g. map)
